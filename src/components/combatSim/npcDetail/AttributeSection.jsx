@@ -11,25 +11,25 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
     {
       label: "DEX",
       value: calcAttr("Slow", "Enraged", "dexterity", selectedNPC),
-      color: "#42a5f5",
+      color: theme.palette.info.main,
       originalValue: selectedNPC.attributes?.dexterity,
     },
     {
       label: "INS",
       value: calcAttr("Dazed", "Enraged", "insight", selectedNPC),
-      color: "#ab47bc",
+      color: theme.palette.secondary.main,
       originalValue: selectedNPC.attributes?.insight,
     },
     {
       label: "MIG",
       value: calcAttr("Weak", "Poisoned", "might", selectedNPC),
-      color: "#ff7043",
+      color: theme.palette.error.light,
       originalValue: selectedNPC.attributes?.might,
     },
     {
       label: "WLP",
       value: calcAttr("Shaken", "Poisoned", "will", selectedNPC),
-      color: "#e8b923",
+      color: theme.palette.warning.main,
       originalValue: selectedNPC.attributes?.will,
     },
   ];
@@ -40,9 +40,9 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
         display: "flex",
         justifyContent: "space-around",
         alignItems: "center",
-        borderTop: `1px solid ${isDarkMode ? "#444" : "#ccc"}`,
+        borderTop: `1px solid ${theme.palette.divider}`,
         paddingY: 1,
-        bgcolor: isDarkMode ? "#333333" : "#f5f5f5",
+        bgcolor: isDarkMode ? theme.palette.grey[800] : theme.palette.grey[200],
       }}
     >
       {attributes.map((attr) => (
@@ -53,7 +53,9 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
             alignItems: "center",
             borderRadius: "16px",
             overflow: "hidden",
-            bgcolor: isDarkMode ? "#444" : "#e0e0e0",
+            bgcolor: isDarkMode
+              ? theme.palette.grey[700]
+              : theme.palette.grey[300],
           }}
         >
           {/* Label Part */}
@@ -80,8 +82,8 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
                 attr.value === attr.originalValue
                   ? "inherit"
                   : attr.value > attr.originalValue
-                    ? "green !important"
-                    : "red !important",
+                    ? theme.palette.success.main + " !important"
+                    : theme.palette.error.main + " !important",
             }}
           >
             {attr.value}

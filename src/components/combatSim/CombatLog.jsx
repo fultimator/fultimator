@@ -525,7 +525,7 @@ export default function CombatLog({
                 minWidth: "auto",
                 padding: 0,
                 marginLeft: 1,
-                color: isDarkMode ? "#ddd" : "#555",
+                color: theme.palette.text.secondary,
               }}
             >
               <DeleteSweepIcon />
@@ -544,17 +544,17 @@ export default function CombatLog({
               justifyContent: "center",
               alignItems: "center",
               cursor: "ns-resize",
-              backgroundColor: isDarkMode ? "#555" : "#ccc",
+              backgroundColor: theme.palette.action.hover,
               borderRadius: "8px 8px 0 0",
               py: 0.5,
               mt: 1,
-              "&:hover": { backgroundColor: isDarkMode ? "#777" : "#aaa" },
+              "&:hover": { backgroundColor: theme.palette.action.selected },
             }}
             onMouseDown={handleMouseDown}
           >
             <DragHandleIcon
               fontSize="small"
-              sx={{ color: isDarkMode ? "#ddd" : "#555", m: -1 }}
+              sx={{ color: theme.palette.text.secondary, m: -1 }}
             />
           </Box>
         )}
@@ -566,11 +566,11 @@ export default function CombatLog({
             p: 2,
             height: isSmallScreen ? 150 : height, // Fixed height on mobile
             overflowY: "auto",
-            backgroundColor: isDarkMode ? "#333" : "#f9f9f9",
+            backgroundColor: theme.palette.background.default,
             borderRadius: "0 0 8px 8px",
             "&::-webkit-scrollbar": { width: 6 },
             "&::-webkit-scrollbar-thumb": {
-              background: "#888",
+              background: theme.palette.divider,
               borderRadius: 3,
             },
           }}

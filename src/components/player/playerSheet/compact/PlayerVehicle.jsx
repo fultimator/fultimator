@@ -11,7 +11,10 @@ import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import SpellVehicle from "./spells/SpellVehicle";
 
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
+const StyledTableCellHeader = styled(TableCell)({
+  padding: "4px 8px",
+  color: "#fff",
+});
 
 function collectStringValues(value, bag = []) {
   if (typeof value === "string") {
@@ -57,7 +60,7 @@ export default function PlayerVehicle({ player, searchQuery = "" }) {
 
   return (
     <>
-      <Table sx={{ mb: 0 }}>
+      <Table sx={{ mb: 1, tableLayout: "fixed", width: "100%" }} size="small">
         <TableHead>
           <TableRow
             sx={{

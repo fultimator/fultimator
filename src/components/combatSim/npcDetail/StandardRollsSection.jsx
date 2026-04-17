@@ -49,7 +49,7 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
             minWidth: 100,
             mx: 1,
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: isDarkMode ? "#fff" : "primary",
+              borderColor: theme.palette.primary.main,
             },
           }}
         >
@@ -68,7 +68,7 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
             minWidth: 100,
             mx: 1,
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: isDarkMode ? "#fff" : "primary",
+              borderColor: theme.palette.primary.main,
             },
           }}
         >

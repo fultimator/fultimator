@@ -13,8 +13,8 @@ import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
 
 const StyledTableCell = styled(TableCell)({
-  padding: "2px 4px",
-  fontSize: "0.8rem",
+  padding: "4px 8px",
+  fontSize: "0.85rem",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 

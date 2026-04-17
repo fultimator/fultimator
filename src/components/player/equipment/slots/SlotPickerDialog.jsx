@@ -512,7 +512,7 @@ export default function SlotPickerDialog({
               <Box>
                 <Button
                   size="small"
-                  color="primary"
+                  variant="outlined"
                   sx={{ mr: 1 }}
                   onClick={() => {
                     onDisableModule?.();
@@ -521,7 +521,12 @@ export default function SlotPickerDialog({
                 >
                   {t("Use Regular Equipment")}
                 </Button>
-                <Button size="small" sx={{ mr: 1 }} onClick={onClose}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  sx={{ mr: 1 }}
+                  onClick={onClose}
+                >
                   {t("Cancel")}
                 </Button>
                 <Button
@@ -796,7 +801,12 @@ export default function SlotPickerDialog({
                 )}
               </Box>
               <Box>
-                <Button onClick={onClose} size="small" sx={{ mr: 1 }}>
+                <Button
+                  onClick={onClose}
+                  size="small"
+                  variant="outlined"
+                  sx={{ mr: 1 }}
+                >
                   {t("Cancel")}
                 </Button>
                 <Button

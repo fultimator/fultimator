@@ -70,8 +70,14 @@ import classList, {
 import SpellTinkererMagitechRankModal from "../../spells/SpellTinkererMagitechRankModal";
 
 // Styled Components
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: 0 });
+const StyledTableCellHeader = styled(TableCell)({
+  padding: "4px 8px",
+  color: "#fff",
+});
+const StyledTableCell = styled(TableCell)({
+  padding: "4px 8px",
+  fontSize: "0.85rem",
+});
 const SINGLE_INSTANCE_SPELL_TYPES = new Set([
   "tinkerer-alchemy",
   "tinkerer-infusion",

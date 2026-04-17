@@ -28,8 +28,14 @@ import Clock from "../Clock";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: "2px 4px" });
+const StyledTableCellHeader = styled(TableCell)({
+  padding: "4px 8px",
+  color: "#fff",
+});
+const StyledTableCell = styled(TableCell)({
+  padding: "4px 8px",
+  fontSize: "0.85rem",
+});
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -145,8 +151,8 @@ export default function PlayerZeroPower({
   const isOpen = !!openRows.zeroPower[zeroPowerKey] || forceOpen;
 
   return (
-    <TableContainer component={Paper}>
-      <Table size="small">
+    <TableContainer component={Paper} sx={{ mb: 1 }}>
+      <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
         <TableHead>
           <TableRow
             sx={{
@@ -231,7 +237,7 @@ export default function PlayerZeroPower({
               <Typography
                 variant="body2"
                 sx={{
-                  fontSize: "0.8rem",
+                  fontSize: "0.85rem",
                   fontWeight: "bold",
                 }}
               >
@@ -277,7 +283,13 @@ export default function PlayerZeroPower({
             <TableRow>
               <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
                 <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                  <Box sx={{ px: 2, py: 1 }}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      ml: { xs: 1, sm: 4 },
+                      bgcolor: "rgba(0,0,0,0.03)",
+                    }}
+                  >
                     {triggerName && (
                       <Typography variant="body2" sx={{ mb: 0.5 }}>
                         <strong>{t("Trigger")}: </strong>

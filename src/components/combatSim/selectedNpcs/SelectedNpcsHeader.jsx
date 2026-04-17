@@ -34,7 +34,7 @@ export default function SelectedNpcsHeader({
         justifyContent: "space-between",
         alignItems: "center",
         flexShrink: 0,
-        borderBottom: "1px solid #ccc",
+        borderBottom: `1px solid ${theme.palette.divider}`,
         paddingBottom: 1,
         gap: 1,
       }}
@@ -63,10 +63,7 @@ export default function SelectedNpcsHeader({
         }}
       >
         {selectedNPCs.length > 0 && (
-          <Typography
-            variant={isMobile ? "h6" : "h5"}
-            color={isDarkMode ? "#fff" : primary}
-          >
+          <Typography variant={isMobile ? "h6" : "h5"} color={primary}>
             {t("combat_sim_npc_initiative")}: <strong>{highestInit}</strong>
           </Typography>
         )}
@@ -85,10 +82,10 @@ export default function SelectedNpcsHeader({
             size="small"
             sx={{
               padding: 0.5,
-              border: `1px solid ${isDarkMode ? "#fff" : primary}`,
+              border: `1px solid ${primary}`,
               boxShadow: 3,
             }}
-            color={isDarkMode ? "inherit" : "primary"}
+            color="primary"
             onClick={onNotesClick}
           >
             <Notes />
@@ -97,7 +94,7 @@ export default function SelectedNpcsHeader({
           <Button
             size="small"
             sx={{ padding: "0 0.5rem" }}
-            color={isDarkMode ? "white" : "primary"}
+            color="primary"
             variant="outlined"
             onClick={onNotesClick}
             endIcon={<Notes />}
@@ -110,10 +107,10 @@ export default function SelectedNpcsHeader({
             size="small"
             sx={{
               padding: 0.5,
-              border: `1px solid ${isDarkMode ? "#fff" : primary}`,
+              border: `1px solid ${primary}`,
               boxShadow: 3,
             }}
-            color={isDarkMode ? "inherit" : "primary"}
+            color="primary"
             onClick={onClockClick}
           >
             <AccessTime />
@@ -122,7 +119,7 @@ export default function SelectedNpcsHeader({
           <Button
             size="small"
             sx={{ padding: "0 0.5rem" }}
-            color={isDarkMode ? "white" : "primary"}
+            color="primary"
             variant="outlined"
             onClick={onClockClick}
             endIcon={<AccessTime />}
@@ -135,19 +132,11 @@ export default function SelectedNpcsHeader({
             size="small"
             sx={{
               padding: 0.5,
-              border: `1px solid ${isDarkMode ? "#fff" : primary}`,
+              border: `1px solid ${primary}`,
               backgroundColor: isAllTurnsChecked ? "primary.main" : "inherit",
               boxShadow: 3,
             }}
-            color={
-              isAllTurnsChecked
-                ? isDarkMode
-                  ? "inherit"
-                  : "white"
-                : isDarkMode
-                  ? "inherit"
-                  : "primary"
-            }
+            color="primary"
             onClick={handleResetTurns}
             disabled={selectedNPCs.length === 0}
           >
@@ -157,7 +146,7 @@ export default function SelectedNpcsHeader({
           <Button
             size="small"
             sx={{ padding: "0 0.5rem" }}
-            color={isDarkMode && !isAllTurnsChecked ? "white" : "primary"}
+            color="primary"
             variant={isAllTurnsChecked ? "contained" : "outlined"}
             onClick={handleResetTurns}
             endIcon={<Replay />}

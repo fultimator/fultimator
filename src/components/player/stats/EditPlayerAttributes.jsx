@@ -2,7 +2,7 @@ import React from "react";
 import {
   FormControl,
   Grid,
-  InputLabel,
+  Typography,
   useTheme,
   Paper,
   Slider,
@@ -100,12 +100,9 @@ export default function EditPlayerAttributes({
                 size={12}
               >
                 <Grid size={2}>
-                  <InputLabel
-                    id={attribute.key}
-                    sx={{ fontSize: "20px", fontWeight: 400 }}
-                  >
+                  <Typography variant="h2" sx={{ minWidth: "50px" }}>
                     {attribute.label}
-                  </InputLabel>
+                  </Typography>
                 </Grid>
                 <Grid size={10}>
                   <FormControl variant="standard" fullWidth>

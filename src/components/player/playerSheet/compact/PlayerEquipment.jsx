@@ -44,13 +44,14 @@ import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import {
   Casino,
-  RadioButtonChecked,
+  RadioButtonUnchecked,
   SwapHoriz,
   Edit,
   Add,
   Search as SearchIcon,
+  Error as ErrorIcon,
+  WarningAmber as WarningAmberIcon,
 } from "@mui/icons-material";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import {
   calculateAttribute,
@@ -60,10 +61,13 @@ import { deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({
-  padding: "4px 8px",
+  padding: "2px 6px",
   color: "#fff",
 });
-const StyledTableCell = styled(TableCell)({ padding: "4px 8px" });
+const StyledTableCell = styled(TableCell)({
+  padding: "2px 6px",
+  fontSize: "0.8rem",
+});
 
 const StyledMarkdown = ({ children, ...props }) => (
   <div sx={{ whiteSpace: "pre-line", display: "inline" }}>
@@ -633,7 +637,10 @@ export default function PlayerEquipment({
             ? "armor"
             : "accessories";
     const arr = eq0?.[source] ?? [];
-    const idx = arr.findIndex((it) => it.name === item.name);
+    const idx =
+      item.originalIndex !== undefined
+        ? item.originalIndex
+        : arr.findIndex((it) => it.name === item.name);
     if (idx === -1) return;
     const invItem = arr[idx];
 
@@ -849,29 +856,33 @@ export default function PlayerEquipment({
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       {groupedItems.map((group) => (
-        <TableContainer
-          key={group.key}
-          component={Paper}
-          sx={{ overflowX: "auto" }}
-        >
-          <Table size="small" sx={{ tableLayout: "fixed", minWidth: 400 }}>
+        <TableContainer key={group.key} component={Paper} sx={{ mb: 1 }}>
+          <Table size="small" sx={{ width: "100%" }}>
             <TableHead>
-              <TableRow sx={{ background: theme.primary }}>
-                <StyledTableCellHeader sx={{ width: 36 }} />
+              <TableRow
+                sx={{
+                  background: theme.primary,
+                  "& .MuiTypography-root": {
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    textTransform: "uppercase",
+                  },
+                }}
+              >
+                <StyledTableCellHeader sx={{ width: 30 }} />
                 <StyledTableCellHeader>
                   <Typography
                     variant="h4"
                     sx={{
                       textTransform: "uppercase",
                       color: "#fff",
-                      textAlign: "center",
+                      textAlign: "left",
                     }}
                   >
                     {group.label}
                   </Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader
-                  sx={{ width: { xs: 70, sm: 120 }, textAlign: "center" }}
+                  sx={{ width: { xs: 62, sm: 92 }, textAlign: "center" }}
                 >
                   <Typography
                     variant="caption"
@@ -887,7 +898,7 @@ export default function PlayerEquipment({
                   </Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader
-                  sx={{ width: { xs: 70, sm: 120 }, textAlign: "center" }}
+                  sx={{ width: { xs: 62, sm: 92 }, textAlign: "center" }}
                 >
                   <Typography
                     variant="caption"
@@ -903,7 +914,7 @@ export default function PlayerEquipment({
                   </Typography>
                 </StyledTableCellHeader>
                 <StyledTableCellHeader
-                  sx={{ width: { xs: 90, sm: 100 }, textAlign: "right" }}
+                  sx={{ width: { xs: 80, sm: 92 }, textAlign: "right" }}
                 >
                   <Box
                     sx={{
@@ -919,7 +930,7 @@ export default function PlayerEquipment({
                           <IconButton
                             size="small"
                             onClick={() => handleAddAction(group)}
-                            sx={{ color: "#fff", p: 0 }}
+                            sx={{ color: "#fff", p: 0.25 }}
                           >
                             <Add fontSize="small" />
                           </IconButton>
@@ -928,7 +939,7 @@ export default function PlayerEquipment({
                           <IconButton
                             size="small"
                             onClick={() => setCompendiumType(group.compendium)}
-                            sx={{ color: "#fff", p: 0 }}
+                            sx={{ color: "#fff", p: 0.25 }}
                           >
                             <SearchIcon fontSize="small" />
                           </IconButton>
@@ -1181,7 +1192,7 @@ function EquipmentRow({
     if (item.equipType === "weapon" || item.equipType === "custom-weapon") {
       return (
         <>
-          <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
+          <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               <OpenBracket />
               {`${attributes[item.att1].shortcaps} + ${attributes[item.att2].shortcaps}`}
@@ -1189,7 +1200,7 @@ function EquipmentRow({
               {item.prec !== 0 ? (item.prec > 0 ? "+" : "") + item.prec : ""}
             </Typography>
           </StyledTableCell>
-          <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
+          <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               <OpenBracket />
               {t("HR")} {item.damage >= 0 ? "+" : ""} {item.damage}
@@ -1203,7 +1214,7 @@ function EquipmentRow({
     if (item.equipType === "armor" || item.equipType === "shield") {
       return (
         <>
-          <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
+          <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               {/* <Box component="span" sx={{ display: { xs: 'none', md: 'inline' }, mr: 0.5 }}>{t("DEF")}:</Box> */}
               {item.equipType === "shield"
@@ -1215,7 +1226,7 @@ function EquipmentRow({
                     : `${t("DEX die")} + ${item.def + (item.defModifier || 0)}`}
             </Typography>
           </StyledTableCell>
-          <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
+          <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               {/* <Box component="span" sx={{ display: { xs: 'none', md: 'inline' }, mr: 0.5 }}>{t("M.DEF")}:</Box> */}
               {item.equipType === "shield"
@@ -1230,12 +1241,12 @@ function EquipmentRow({
     }
     return (
       <>
-        <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }}>
+        <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
           <Typography
             sx={{ textAlign: "center" }}
           >{`${item.cost}z`}</Typography>
         </StyledTableCell>
-        <StyledTableCell sx={{ width: { xs: 70, sm: 120 } }} />
+        <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }} />
       </>
     );
   };
@@ -1256,14 +1267,14 @@ function EquipmentRow({
       <TableRow
         sx={{ backgroundColor: isOpen ? "rgba(0,0,0,0.02)" : "inherit" }}
       >
-        <StyledTableCell sx={{ width: 36 }}>
+        <StyledTableCell sx={{ width: 30 }}>
           <IconButton
             onClick={(e) => {
               e.stopPropagation();
               toggleRow(rowKey);
             }}
             size="small"
-            sx={{ p: 0.5 }}
+            sx={{ p: 0.25 }}
           >
             {isOpen ? (
               <KeyboardArrowUpIcon fontSize="small" />
@@ -1298,9 +1309,7 @@ function EquipmentRow({
           </Box>
         </StyledTableCell>
         {renderStats()}
-        <StyledTableCell
-          sx={{ width: { xs: 90, sm: 100 }, textAlign: "right" }}
-        >
+        <StyledTableCell sx={{ width: { xs: 80, sm: 92 }, textAlign: "right" }}>
           <Box
             sx={{
               display: "flex",
@@ -1338,21 +1347,14 @@ function EquipmentRow({
                   size="small"
                   sx={{ p: 0.25 }}
                 >
-                  {item.isEquipped &&
-                  item.equipType !== "weapon" &&
-                  item.equipType !== "custom-weapon" ? (
-                    <RadioButtonChecked sx={{ fontSize: "1.1rem" }} />
-                  ) : (
+                  {item.isEquipped ? (
                     <Icon />
-                  )}
-                  {!item.isEquipped && !checkIfEquippable(item) && (
-                    <WarningAmberIcon
-                      sx={{
-                        color: "warning.main",
-                        fontSize: "1.1rem",
-                        position: "absolute",
-                      }}
+                  ) : !checkIfEquippable(item) ? (
+                    <ErrorIcon
+                      sx={{ fontSize: "1.1rem", color: "error.main" }}
                     />
+                  ) : (
+                    <RadioButtonUnchecked sx={{ fontSize: "1.1rem" }} />
                   )}
                 </IconButton>
               </Badge>

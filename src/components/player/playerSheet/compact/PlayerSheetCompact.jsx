@@ -90,6 +90,8 @@ import PlayerCompanion from "./PlayerCompanion";
 import CompactLoadout from "./CompactLoadout";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { calculateAttribute } from "../../common/playerCalculations";
+import ExpIcon from "../../../svgs/exp.svg?react";
+import ExpDisabledIcon from "../../../svgs/exp_disabled.svg?react";
 
 // Styled Components
 // const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
@@ -117,8 +119,11 @@ export default function PlayerCardSheet({
   },
   characterImage,
   id,
+  isExpanded = false,
   updateMaxStats,
   onToggleEditMode,
+  onLevelUpRequest,
+  canLevelUpFromExp,
   _onAddClass,
   _onAddFeature,
 }) {
@@ -760,7 +765,9 @@ export default function PlayerCardSheet({
 
   const homeTabStyle = {
     ...tabStyle,
-    flex: 0.5,
+    flex: 0,
+    minWidth: "30px !important",
+    padding: "0 !important",
   };
 
   // Tab content panel
@@ -962,6 +969,8 @@ export default function PlayerCardSheet({
           isEditMode={isEditMode}
           setPlayer={setPlayer}
           updateMaxStats={updateMaxStats}
+          canLevelUpFromExp={canLevelUpFromExp}
+          onLevelUpRequest={onLevelUpRequest}
         />
       </Box>
       <Stats
@@ -1286,6 +1295,78 @@ export default function PlayerCardSheet({
           />
         </CustomTabPanel>
       </Box>
+
+      {isExpanded && (
+        <Box
+          sx={{
+            borderTop: `1px solid ${muiTheme.palette.divider}`,
+            p: { xs: 0.5, sm: 1, md: 1.25 },
+            display: "flex",
+            flexDirection: "column",
+            gap: { xs: 0.75, sm: 1 },
+          }}
+        >
+          <Box
+            sx={{
+              border: `0.5px solid ${muiTheme.palette.divider}`,
+              borderRadius: "6px",
+              overflow: "hidden",
+            }}
+          >
+            <Box sx={{ background: theme.primary, px: 1, py: "2px" }}>
+              <Typography
+                sx={{
+                  color: theme.white,
+                  fontFamily: "Antonio",
+                  fontSize: { xs: "0.85rem", sm: "1rem", md: "1.08rem" },
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                {t("Description")}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                px: 1,
+                py: { xs: "6px", sm: "8px" },
+                maxHeight: "200px",
+                overflow: "hidden",
+                position: "relative",
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: "40px",
+                  background: `linear-gradient(transparent, ${muiTheme.palette.background.paper})`,
+                  pointerEvents: "none",
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+                  fontSize: { xs: "0.82rem", sm: "0.92rem", md: "0.98rem" },
+                  lineHeight: 1.45,
+                  whiteSpace: "pre-line",
+                  color: player?.info?.description?.trim()
+                    ? muiTheme.palette.text.primary
+                    : muiTheme.palette.text.secondary,
+                  fontStyle: player?.info?.description?.trim()
+                    ? "normal"
+                    : "italic",
+                }}
+              >
+                {player?.info?.description?.trim()
+                  ? player.info.description
+                  : t("No description")}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      )}
 
       {/* Class edit card dialog */}
       {openClassCard &&
@@ -1621,9 +1702,12 @@ function Header({
   isEditMode,
   setPlayer,
   updateMaxStats,
+  canLevelUpFromExp,
+  onLevelUpRequest,
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const muiTheme = useTheme();
 
   const background =
     theme.mode === "dark"
@@ -1660,6 +1744,19 @@ function Header({
   const handleClose = () => {
     setOpen(false);
   };
+
+  const setInfoNumber = (key, value) => {
+    setPlayer((prevState) => ({
+      ...prevState,
+      info: { ...prevState.info, [key]: Math.max(0, value) },
+    }));
+  };
+
+  const bumpInfoNumber = (key, delta) => {
+    const current = parseInt(player.info?.[key], 10) || 0;
+    setInfoNumber(key, current + delta);
+  };
+  const hasDescription = Boolean(player.info?.description?.trim());
 
   return (
     <Grid container sx={{ alignItems: "stretch" }}>
@@ -1770,21 +1867,137 @@ function Header({
               >
                 <Add fontSize="small" />
               </IconButton>
+              <Diamond />
+              <Tooltip
+                title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onLevelUpRequest}
+                    disabled={!canLevelUpFromExp}
+                    sx={{
+                      animation: canLevelUpFromExp
+                        ? "flash 1s infinite"
+                        : "none",
+                      p: 0.25,
+                    }}
+                  >
+                    {canLevelUpFromExp ? (
+                      <ExpIcon style={{ width: "18px", height: "18px" }} />
+                    ) : (
+                      <ExpDisabledIcon
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: "0.95rem",
+                  textTransform: "uppercase",
+                }}
+              >
+                {t("Exp")}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => bumpInfoNumber("exp", -1)}
+              >
+                <Remove fontSize="small" />
+              </IconButton>
+              <TextField
+                value={player.info.exp || 0}
+                onChange={(e) => {
+                  const nextValue = parseInt(e.target.value, 10);
+                  setInfoNumber("exp", Number.isNaN(nextValue) ? 0 : nextValue);
+                }}
+                size="small"
+                variant="standard"
+                sx={{ width: "44px" }}
+                slotProps={{
+                  htmlInput: {
+                    style: {
+                      textAlign: "center",
+                      fontFamily: "Antonio",
+                      fontWeight: "bold",
+                    },
+                  },
+                }}
+              />
+              <IconButton size="small" onClick={() => bumpInfoNumber("exp", 1)}>
+                <Add fontSize="small" />
+              </IconButton>
             </Box>
           ) : (
-            <Typography
+            <Box
               sx={{
-                fontFamily: "Antonio",
-                fontSize: "1.25rem",
-                fontWeight: "medium",
-                textTransform: "uppercase",
+                display: "flex",
+                alignItems: "center",
+                gap: 0.35,
               }}
             >
-              {player.info.pronouns} <Diamond /> {t("Lvl")} {player.lvl}
-            </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: "1.25rem",
+                  fontWeight: "medium",
+                  textTransform: "uppercase",
+                }}
+              >
+                {player.info.pronouns} <Diamond /> {t("Lvl")} {player.lvl}{" "}
+                <Diamond />
+              </Typography>
+              <Tooltip
+                title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onLevelUpRequest}
+                    disabled={!canLevelUpFromExp}
+                    sx={{
+                      animation: canLevelUpFromExp
+                        ? "flash 1s infinite"
+                        : "none",
+                      p: 0.25,
+                    }}
+                  >
+                    {canLevelUpFromExp ? (
+                      <ExpIcon style={{ width: "16px", height: "16px" }} />
+                    ) : (
+                      <ExpDisabledIcon
+                        style={{ width: "16px", height: "16px" }}
+                      />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: "1.25rem",
+                  fontWeight: "medium",
+                  textTransform: "uppercase",
+                }}
+              >
+                {t("Exp")} {player.info.exp || 0}
+              </Typography>
+            </Box>
           )}
         </Grid>
       </Grid>
+      <style>
+        {`
+          @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
       <Box sx={{ display: "flex", width: 1 }}>
         {/* EditableImage */}
         {characterImage ? (
@@ -1793,11 +2006,13 @@ function Header({
               minWidth: "128px",
               width: "128px",
               height: "auto",
-              background: "white",
+              background:
+                theme.mode === "dark" ? theme.background.paper : "white",
               border: "1px solid #684268",
               borderTop: "none",
               overflow: "hidden",
               cursor: "pointer",
+              position: "relative",
             }}
             onClick={handleClickOpen}
           >
@@ -1808,12 +2023,142 @@ function Header({
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
-                objectPosition: "center center",
+                objectPosition: "top center",
                 display: "block",
               }}
             />
+            <Box
+              sx={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                px: 0.5,
+                pb: 0.5,
+                pt: 2,
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+                background:
+                  "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0.9) 100%)",
+              }}
+            >
+              {[
+                {
+                  key: "hp",
+                  label: t("HP"),
+                  color: muiTheme.palette.error.main,
+                },
+                {
+                  key: "mp",
+                  label: t("MP"),
+                  color: muiTheme.palette.info.main,
+                },
+                {
+                  key: "ip",
+                  label: t("IP"),
+                  color: muiTheme.palette.success.main,
+                },
+              ].map(({ key, label, color }) => {
+                const current = player.stats?.[key]?.current || 0;
+                const max = player.stats?.[key]?.max || 0;
+                const pct =
+                  max > 0
+                    ? Math.max(0, Math.min(100, (current / max) * 100))
+                    : 0;
+
+                return (
+                  <Box
+                    key={key}
+                    sx={{
+                      width: "100%",
+                      height: "13px",
+                      display: "flex",
+                      alignItems: "stretch",
+                      overflow: "hidden",
+                      bgcolor: "rgba(0,0,0,0.25)",
+                      border: "1px solid rgba(0,0,0,0.35)",
+                      borderRadius: "2px",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: "24px",
+                        height: "100%",
+                        bgcolor: "rgba(0,0,0,0.35)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontFamily: "Antonio",
+                        fontWeight: "bold",
+                        fontSize: "0.48rem",
+                        color: "#fff",
+                        letterSpacing: "0.04em",
+                        textTransform: "uppercase",
+                        borderRight: "1px solid rgba(255,255,255,0.2)",
+                      }}
+                    >
+                      {label}
+                    </Box>
+                    <Box
+                      sx={{
+                        flex: 1,
+                        position: "relative",
+                        bgcolor: "rgba(255,255,255,0.16)",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: `${pct}%`,
+                          height: "100%",
+                          bgcolor: color,
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          position: "absolute",
+                          inset: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontFamily: "Antonio",
+                          fontWeight: "bold",
+                          fontSize: "0.5rem",
+                          color: "#fff",
+                          textShadow: "0 1px 2px rgba(0,0,0,0.8)",
+                        }}
+                      >
+                        {current}/{max}
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
           </Box>
-        ) : null}
+        ) : (
+          <Box
+            sx={{
+              minWidth: "128px",
+              width: "128px",
+              height: "128px",
+              background:
+                theme.mode === "dark" ? theme.background.paper : "white",
+              border: "1px solid #684268",
+              borderTop: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "text.secondary",
+              fontStyle: "italic",
+              fontSize: "0.75rem",
+              padding: 1,
+              textAlign: "center",
+            }}
+          >
+            No Image
+          </Box>
+        )}
         {/* Dialog for expanded image */}
         <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
           <img
@@ -1826,7 +2171,6 @@ function Header({
             onClick={handleClose}
           />
         </Dialog>
-
         {/* Rows */}
         <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
           {/* Row 1 */}
@@ -1837,67 +2181,68 @@ function Header({
               borderBottom: borderBottom,
               borderImage: borderImageBody,
               flex: 1,
+              minHeight: hasDescription ? undefined : 68,
               display: "flex",
               justifyContent: "left",
               alignItems: "center",
             }}
           >
-            <div
-              style={{
-                whiteSpace: "pre-line",
-                display: "inline",
-                margin: 0,
-                padding: 1,
-              }}
-            >
-              <ReactMarkdown
-                components={{
-                  p: (props) => (
-                    <p style={{ margin: 0, padding: 0 }} {...props} />
-                  ),
-                  ul: (props) => (
-                    <ul style={{ margin: 0, padding: 0 }} {...props} />
-                  ),
-                  li: (props) => (
-                    <li style={{ margin: 0, padding: 0 }} {...props} />
-                  ),
-                  strong: (props) => (
-                    <strong style={{ fontWeight: "bold" }} {...props} />
-                  ),
-                  em: (props) => (
-                    <em style={{ fontStyle: "italic" }} {...props} />
-                  ),
+            {hasDescription ? (
+              <div
+                style={{
+                  whiteSpace: "pre-line",
+                  display: "inline",
+                  margin: 0,
+                  padding: 1,
                 }}
-                allowedElements={["strong"]}
-                unwrapDisallowed={true}
               >
-                {player.info.description}
-              </ReactMarkdown>
-            </div>
+                <ReactMarkdown
+                  components={{
+                    p: (props) => (
+                      <p style={{ margin: 0, padding: 0 }} {...props} />
+                    ),
+                    ul: (props) => (
+                      <ul style={{ margin: 0, padding: 0 }} {...props} />
+                    ),
+                    li: (props) => (
+                      <li style={{ margin: 0, padding: 0 }} {...props} />
+                    ),
+                    strong: (props) => (
+                      <strong style={{ fontWeight: "bold" }} {...props} />
+                    ),
+                    em: (props) => (
+                      <em style={{ fontStyle: "italic" }} {...props} />
+                    ),
+                  }}
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {player.info.description}
+                </ReactMarkdown>
+              </div>
+            ) : (
+              <Box sx={{ width: "100%", height: "100%" }} />
+            )}
           </Box>
           {/* Row 2 */}
-          {(player.info.identity ||
-            player.info.theme ||
-            player.info.origin) && (
-            <Box
+          <Box
+            sx={{
+              px: 2,
+              py: 0.5,
+              borderBottom: borderBottom,
+              borderImage: borderImageBody,
+              flex: 1,
+            }}
+          >
+            <Typography
               sx={{
-                px: 2,
-                py: 0.5,
-                borderBottom: borderBottom,
-                borderImage: borderImageBody,
-                flex: 1,
+                fontFamily: "body1",
+                fontSize: "0.80rem",
               }}
             >
-              <Typography
-                sx={{
-                  fontFamily: "body1",
-                  fontSize: "0.80rem",
-                }}
-              >
-                <RenderTraits player={player} />
-              </Typography>
-            </Box>
-          )}
+              <RenderTraits player={player} />
+            </Typography>
+          </Box>
         </Box>
       </Box>
     </Grid>
@@ -1916,28 +2261,33 @@ function RenderTraits({ player }) {
   return (
     <Grid container>
       {/* Iterate over traits */}
-      {traits.map(
-        ({ label, value }) =>
-          value && (
-            <Grid key={label} sx={{ marginTop: 0.5 }} size={12}>
-              <Grid container sx={{ alignItems: "center" }} spacing={1}>
-                {/* Label */}
-                <Grid size={3}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                  >
-                    {label}:
-                  </Typography>
-                </Grid>
-                {/* Value */}
-                <Grid size={9}>
-                  <Typography align="left">{value}</Typography>
-                </Grid>
-              </Grid>
+      {traits.map(({ label, value }) => (
+        <Grid key={label} sx={{ marginTop: 0.5 }} size={12}>
+          <Grid container sx={{ alignItems: "center" }} spacing={1}>
+            {/* Label */}
+            <Grid size={3}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+              >
+                {label}:
+              </Typography>
             </Grid>
-          ),
-      )}
+            {/* Value */}
+            <Grid size={9}>
+              <Typography
+                align="left"
+                sx={{
+                  fontStyle: value ? "normal" : "italic",
+                  color: value ? "inherit" : "text.secondary",
+                }}
+              >
+                {value || `No ${label.toLowerCase()}`}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+      ))}
     </Grid>
   );
 }
@@ -2145,6 +2495,17 @@ function Stats({
               }}
             >
               {player.stats?.mp.max}
+            </Grid>
+            <Grid sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>{t("IP")}</Grid>
+            <Grid
+              sx={{
+                px: isMobile ? 0.75 : 1.5,
+                py: 0.4,
+                color: "white.main",
+                bgcolor: "success.main",
+              }}
+            >
+              {player.stats?.ip.max}
             </Grid>
             <Grid sx={{ py: 0.4 }} size="grow">
               {t("Init.")} {currInit}

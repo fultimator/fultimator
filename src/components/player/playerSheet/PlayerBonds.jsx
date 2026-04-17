@@ -5,6 +5,7 @@ import {
   Typography,
   Divider,
   Box,
+  Card,
   IconButton,
   Dialog,
   DialogTitle,
@@ -206,7 +207,11 @@ export default function PlayerBonds({
               </Typography>
             )}
 
-            <Grid container spacing={0.75} sx={{ p: 0.75 }}>
+            <Grid
+              container
+              spacing={0.75}
+              sx={{ p: 0.75, flex: 1, minWidth: 0, width: "100%" }}
+            >
               {bonds && bonds.length > 0
                 ? bonds.map((bond, index) => (
                     <Grid
@@ -217,26 +222,16 @@ export default function PlayerBonds({
                         md: 4,
                       }}
                     >
-                      <Box
+                      <Card
                         sx={{
                           height: "100%",
-                          border: "1px solid",
-                          borderColor:
-                            theme.palette.mode === "dark"
-                              ? "rgba(255,255,255,0.2)"
-                              : "rgba(0,0,0,0.2)",
-                          borderRadius: 1,
-                          px: 1.1,
-                          py: 0.8,
-                          minHeight: 64,
-                          bgcolor:
-                            theme.palette.mode === "dark"
-                              ? "rgba(255,255,255,0.06)"
-                              : "rgba(0,0,0,0.03)",
-                          boxShadow:
-                            theme.palette.mode === "dark"
-                              ? "inset 0 0 0 1px rgba(255,255,255,0.05)"
-                              : "inset 0 0 0 1px rgba(255,255,255,0.55)",
+                          minWidth: { xs: "none", sm: "150px" },
+                          px: 1,
+                          py: 0.5,
+                          minHeight: 48,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
                         }}
                       >
                         <Box
@@ -337,7 +332,7 @@ export default function PlayerBonds({
                             </Typography>
                           )}
                         </Box>
-                      </Box>
+                      </Card>
                     </Grid>
                   ))
                 : null}

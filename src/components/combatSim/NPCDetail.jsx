@@ -484,14 +484,6 @@ const NPCDetail = ({
       variant="fullWidth"
       sx={{
         minHeight: 40,
-        "& .Mui-selected": {
-          // Selected tab
-          color: (isDarkMode ? secondary : primary) + " !important",
-        },
-        "& .MuiTab-root": {
-          // Unselected tab
-          color: isDarkMode ? "white" : "black",
-        },
       }}
     >
       <Tab
@@ -549,7 +541,7 @@ const NPCDetail = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            borderBottom: "1px solid #ccc",
+            borderBottom: `1px solid ${theme.palette.divider}`,
             paddingBottom: 1,
           }}
         >
@@ -654,7 +646,7 @@ const NPCDetail = ({
               size="small"
               sx={{
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                  borderColor: isDarkMode ? "#fff" : "primary",
+                  borderColor: theme.palette.primary.main,
                 },
               }}
             >
@@ -672,7 +664,7 @@ const NPCDetail = ({
 
             <Tooltip title="Download Sheet" placement="bottom">
               <Button
-                color={isDarkMode ? "white" : "primary"}
+                color="primary"
                 aria-label="download"
                 onClick={downloadImage}
               >
@@ -721,7 +713,7 @@ const NPCDetail = ({
           sx={{
             fontWeight: "bold",
             textAlign: "center",
-            borderBottom: "1px solid #ddd",
+            borderBottom: `1px solid ${theme.palette.divider}`,
             pb: 1,
           }}
         >
@@ -742,7 +734,7 @@ const NPCDetail = ({
             error={!!error}
             sx={{
               "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: isDarkMode ? "#fff" : "primary",
+                borderColor: theme.palette.primary.main,
               },
             }}
           >
@@ -769,7 +761,7 @@ const NPCDetail = ({
               setError("");
             }}
             variant="outlined"
-            color={isDarkMode ? "white" : "primary"}
+            color="primary"
             sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
           >
             {t("Cancel")}
@@ -894,7 +886,7 @@ const NPCDetail = ({
     <Box
       sx={{
         width: npcDetailWidth,
-        bgcolor: isDarkMode ? "#333333" : "#ffffff",
+        bgcolor: theme.palette.background.paper,
         padding: 2,
         display: "flex",
         flexDirection: "column",

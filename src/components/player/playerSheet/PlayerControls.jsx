@@ -21,10 +21,12 @@ import {
   FormControlLabel,
   Checkbox,
   Box,
+  ListItemText,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { typesList } from "../../../libs/types";
+import { TypeIcon } from "../../types";
 
 const STAT_INCREMENTS = {
   hp: [-20, -10, -5, -2, -1, 1, 2, 5, 10, 20],
@@ -124,7 +126,23 @@ function StatChangeDialog({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      PaperProps={{
+        sx: {
+          backgroundColor: "background.paper",
+          backdropFilter: "blur(4px)",
+        },
+      }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
+          },
+        },
+      }}
+    >
       <form onSubmit={handleSubmit}>
         <DialogTitle
           variant="h4"
@@ -181,11 +199,40 @@ function StatChangeDialog({
                   labelId="player-damage-type-label"
                   value={damageType}
                   onChange={(e) => setDamageType(e.target.value)}
+                  renderValue={(selected) =>
+                    selected ? (
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <TypeIcon type={selected} />
+                        <span>{t(selected)}</span>
+                      </Box>
+                    ) : (
+                      t("combat_sim_none")
+                    )
+                  }
                 >
                   <MenuItem value="">{t("combat_sim_none")}</MenuItem>
                   {typesList.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {t(type)}
+                    <MenuItem
+                      key={type}
+                      value={type}
+                      sx={{ display: "flex", alignItems: "center", py: "6px" }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          minWidth: 70,
+                        }}
+                      >
+                        <TypeIcon type={type} />
+                        <ListItemText
+                          sx={{ ml: 1, mb: 0, textTransform: "capitalize" }}
+                        >
+                          {t(type)}
+                        </ListItemText>
+                      </Box>
                     </MenuItem>
                   ))}
                 </Select>

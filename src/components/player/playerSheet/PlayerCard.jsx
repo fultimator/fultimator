@@ -28,6 +28,9 @@ import Diamond from "../../Diamond";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { DefIcon, MdefIcon, InitIcon } from "../../icons";
+import FabulaIcon from "../../svgs/fabula.svg?react";
+import ExpIcon from "../../svgs/exp.svg?react";
+import ExpDisabledIcon from "../../svgs/exp_disabled.svg?react";
 
 import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
@@ -110,7 +113,7 @@ const AffinityCell = styled(Box)(({ theme }) => ({
 }));
 
 const CombatStatCard = styled(Box)(({ theme }) => ({
-  background: theme.palette.background.default,
+  background: theme.palette.primary.main,
   border: `0.5px solid ${theme.palette.divider}`,
   borderRadius: theme.shape.borderRadius,
   padding: "4px 6px",
@@ -276,7 +279,7 @@ function StatBar({
   );
 }
 
-function CombatStat({ icon, label, value, theme }) {
+function CombatStat({ icon, label, value }) {
   return (
     <CombatStatCard sx={{ px: { xs: "2px", sm: "6px" }, py: "4px" }}>
       <Typography
@@ -291,7 +294,7 @@ function CombatStat({ icon, label, value, theme }) {
           },
           letterSpacing: "0.06em",
           textTransform: "uppercase",
-          color: theme.palette.text.secondary,
+          color: "#fff",
           lineHeight: 1.2,
         }}
       >
@@ -305,7 +308,7 @@ function CombatStat({ icon, label, value, theme }) {
           gap: "2px",
         }}
       >
-        {React.cloneElement(icon, { size: "14px" })}
+        {React.cloneElement(icon, { size: "14px", color: "#fff" })}
         <Typography
           sx={{
             fontFamily: "'Antonio', fantasy, sans-serif",
@@ -317,6 +320,7 @@ function CombatStat({ icon, label, value, theme }) {
             },
             fontWeight: "bold",
             lineHeight: 1.3,
+            color: "#fff",
           }}
         >
           {value}
@@ -336,6 +340,8 @@ export default function PlayerCard({
   isCharacterSheet,
   characterImage,
   updateMaxStats,
+  canLevelUpFromExp,
+  onLevelUpRequest,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -375,6 +381,18 @@ export default function PlayerCard({
       ...prevState,
       info: { ...prevState.info, theme: updatedValue },
     }));
+  };
+
+  const setInfoNumber = (key, value) => {
+    setPlayer((prevState) => ({
+      ...prevState,
+      info: { ...prevState.info, [key]: Math.max(0, value) },
+    }));
+  };
+
+  const bumpInfoNumber = (key, delta) => {
+    const current = parseInt(player.info?.[key], 10) || 0;
+    setInfoNumber(key, current + delta);
   };
 
   const handleThemeInputChange = (event, newInputValue) => {
@@ -720,28 +738,144 @@ export default function PlayerCard({
               >
                 <Add fontSize="small" />
               </IconButton>
+              <Diamond color={primary} />
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: {
+                    xs: "0.84rem",
+                    sm: "1rem",
+                    md: "1.08rem",
+                    lg: "1.15rem",
+                  },
+                  textTransform: "uppercase",
+                }}
+              >
+                {t("Exp")}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => bumpInfoNumber("exp", -1)}
+              >
+                <Remove fontSize="small" />
+              </IconButton>
+              <TextField
+                value={player.info.exp || 0}
+                onChange={(e) => {
+                  const nextValue = parseInt(e.target.value, 10);
+                  setInfoNumber("exp", Number.isNaN(nextValue) ? 0 : nextValue);
+                }}
+                size="small"
+                variant="standard"
+                sx={{ width: { xs: "40px", sm: "50px" } }}
+                slotProps={{
+                  htmlInput: {
+                    style: {
+                      textAlign: "center",
+                      fontFamily: "Antonio",
+                      fontWeight: "bold",
+                    },
+                  },
+                }}
+              />
+              <IconButton size="small" onClick={() => bumpInfoNumber("exp", 1)}>
+                <Add fontSize="small" />
+              </IconButton>
+              <Tooltip
+                title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onLevelUpRequest}
+                    disabled={!isOwner || !canLevelUpFromExp}
+                    sx={{
+                      animation: canLevelUpFromExp
+                        ? "flash 1s infinite"
+                        : "none",
+                      p: 0.25,
+                    }}
+                  >
+                    {canLevelUpFromExp ? (
+                      <ExpIcon style={{ width: "18px", height: "18px" }} />
+                    ) : (
+                      <ExpDisabledIcon
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
             </Box>
           ) : (
-            <Typography
+            <Box
               sx={{
-                fontFamily: "Antonio",
-                fontSize: {
-                  xs: "0.96rem",
-                  sm: "1.25rem",
-                  md: "1.35rem",
-                  lg: "1.45rem",
-                },
-                fontWeight: "medium",
-                textTransform: "uppercase",
+                display: "flex",
+                alignItems: "center",
+                gap: 0.35,
               }}
             >
-              {player.info.pronouns && (
-                <>
-                  {player.info.pronouns} <Diamond color={primary} />{" "}
-                </>
-              )}
-              {t("Lvl")} {player.lvl}
-            </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: {
+                    xs: "0.96rem",
+                    sm: "1.25rem",
+                    md: "1.35rem",
+                    lg: "1.45rem",
+                  },
+                  fontWeight: "medium",
+                  textTransform: "uppercase",
+                }}
+              >
+                {player.info.pronouns && (
+                  <>
+                    {player.info.pronouns} <Diamond color={primary} />{" "}
+                  </>
+                )}
+                {t("Lvl")} {player.lvl} <Diamond color={primary} />
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: {
+                    xs: "0.96rem",
+                    sm: "1.25rem",
+                    md: "1.35rem",
+                    lg: "1.45rem",
+                  },
+                  fontWeight: "medium",
+                  textTransform: "uppercase",
+                }}
+              >
+                {t("Exp")} {player.info.exp || 0}
+              </Typography>
+              <Tooltip
+                title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onLevelUpRequest}
+                    disabled={!isOwner || !canLevelUpFromExp}
+                    sx={{
+                      animation: canLevelUpFromExp
+                        ? "flash 1s infinite"
+                        : "none",
+                      p: 0.25,
+                    }}
+                  >
+                    {canLevelUpFromExp ? (
+                      <ExpIcon style={{ width: "16px", height: "16px" }} />
+                    ) : (
+                      <ExpDisabledIcon
+                        style={{ width: "16px", height: "16px" }}
+                      />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
           )}
         </Box>
       </Box>
@@ -771,14 +905,21 @@ export default function PlayerCard({
         >
           {" "}
           {/* Avatar */}
-          <Box sx={{ position: "relative" }}>
+          <Box
+            sx={{
+              position: "relative",
+              backgroundColor: theme.palette.background.paper,
+            }}
+          >
             <img
               src={avatarSrc}
               alt="Player Avatar"
               style={{
                 width: "100%",
-                aspectRatio: "1",
+                height: "auto",
+                maxHeight: "300px",
                 objectFit: "cover",
+                objectPosition: "center",
                 display: "block",
               }}
             />
@@ -883,7 +1024,7 @@ export default function PlayerCard({
             },
           }}
           >
-            <CardLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} />
+            <CardLoadout player={player} setPlayer={setPlayer} isEditMode={isEditMode} showHeader={false} showSideDivider={false} showSupportColumn />
           </Box> */}
         </Box>
 
@@ -1145,13 +1286,67 @@ export default function PlayerCard({
                 gridColumn: 5,
                 gridRow: "1 / -1",
                 display: isCharacterSheet ? "none" : { xs: "none", md: "flex" },
+                flexDirection: "column",
+                minHeight: 0,
+                width: "100%",
+                minWidth: 0,
+                overflow: "hidden",
               }}
             >
-              <CardLoadout
-                player={player}
-                setPlayer={setPlayer}
-                isEditMode={isEditMode}
-              />
+              <Box
+                sx={{
+                  border: `0.5px solid ${theme.palette.divider}`,
+                  borderRadius: "6px",
+                  overflow: "hidden",
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  flex: 1,
+                }}
+              >
+                <Box sx={{ background: primary, px: 1, py: "2px" }}>
+                  <Typography
+                    sx={{
+                      color: custom.white,
+                      fontFamily: "Antonio",
+                      fontSize: {
+                        xs: "0.85rem",
+                        sm: "1rem",
+                        md: "1.08rem",
+                        lg: "1.16rem",
+                      },
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    {t("Loadout")}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    px: 1,
+                    py: "6px",
+                    minHeight: 0,
+                    flex: 1,
+                    "& *": {
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
+                      whiteSpace: "normal !important",
+                      minWidth: "0 !important",
+                    },
+                  }}
+                >
+                  <CardLoadout
+                    player={player}
+                    setPlayer={setPlayer}
+                    isEditMode={isEditMode}
+                    isOwner={isOwner}
+                    showHeader={false}
+                    showSideDivider={false}
+                    showSupportColumn
+                  />
+                </Box>
+              </Box>
             </Box>
 
             {ATTRIBUTES.map(({ key, label, curr }, i) => {
@@ -1311,6 +1506,82 @@ export default function PlayerCard({
                 value={(currInit > 0 ? "+" : "") + currInit}
               />
             </Tooltip>
+            {isEditMode ? (
+              <CombatStatCard sx={{ px: { xs: "2px", sm: "6px" }, py: "4px" }}>
+                <Typography
+                  sx={{
+                    fontFamily: "'Antonio', fantasy, sans-serif",
+                    fontWeight: "bold",
+                    fontSize: {
+                      xs: "0.55rem",
+                      sm: "0.62rem",
+                      md: "0.68rem",
+                      lg: "0.74rem",
+                    },
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    color: theme.palette.text.secondary,
+                    lineHeight: 1.2,
+                    textAlign: "center",
+                  }}
+                >
+                  FP
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "2px",
+                  }}
+                >
+                  <FabulaIcon style={{ width: "14px", height: "14px" }} />
+                  <IconButton
+                    size="small"
+                    sx={{ p: 0.25 }}
+                    onClick={() => bumpInfoNumber("fabulapoints", -1)}
+                  >
+                    <Remove sx={{ fontSize: "0.95rem" }} />
+                  </IconButton>
+                  <TextField
+                    value={player.info.fabulapoints || 0}
+                    onChange={(e) => {
+                      const nextValue = parseInt(e.target.value, 10);
+                      setInfoNumber(
+                        "fabulapoints",
+                        Number.isNaN(nextValue) ? 0 : nextValue,
+                      );
+                    }}
+                    size="small"
+                    variant="standard"
+                    sx={{ width: { xs: "30px", sm: "36px" } }}
+                    slotProps={{
+                      htmlInput: {
+                        style: {
+                          textAlign: "center",
+                          fontFamily: "Antonio",
+                          fontWeight: "bold",
+                        },
+                      },
+                    }}
+                  />
+                  <IconButton
+                    size="small"
+                    sx={{ p: 0.25 }}
+                    onClick={() => bumpInfoNumber("fabulapoints", 1)}
+                  >
+                    <Add sx={{ fontSize: "0.95rem" }} />
+                  </IconButton>
+                </Box>
+              </CombatStatCard>
+            ) : (
+              <CombatStat
+                theme={theme}
+                label="FP"
+                icon={<FabulaIcon style={{ width: "14px", height: "14px" }} />}
+                value={player.info.fabulapoints || 0}
+              />
+            )}
           </Box>
         </Box>
       </Box>
@@ -1344,6 +1615,15 @@ export default function PlayerCard({
         onApply={handleStatApply}
         t={t}
       />
+      <style>
+        {`
+          @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+          }
+        `}
+      </style>
     </Card>
   );
 }

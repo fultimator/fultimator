@@ -19,8 +19,8 @@ import attributes from "../../../../../libs/attributes";
 import types from "../../../../../libs/types";
 
 const StyledTableCell = styled(TableCell)({
-  padding: "2px 4px",
-  fontSize: "0.8rem",
+  padding: "4px 8px",
+  fontSize: "0.85rem",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
@@ -176,7 +176,7 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
                       searchQuery,
                     )}
                     {m.martial && (
-                      <Martial sx={{ fontSize: "0.8rem", ml: 0.5 }} />
+                      <Martial sx={{ fontSize: "0.85rem", ml: 0.5 }} />
                     )}
                   </Box>
                 </StyledTableCell>
@@ -227,7 +227,7 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
                         searchQuery,
                       )}
                       {m.martial && (
-                        <Martial sx={{ fontSize: "0.8rem", ml: 0.5 }} />
+                        <Martial sx={{ fontSize: "0.85rem", ml: 0.5 }} />
                       )}
                     </Box>
                   </StyledTableCell>

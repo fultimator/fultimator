@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useTranslate } from "../../../translation/translate";
+import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import CustomHeader from "../../common/CustomHeader";
 import classList from "../../../libs/classes";
 import PlayerClassCard from "./PlayerClassCard";
@@ -36,6 +37,7 @@ export default function EditPlayerClasses({
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const fileInputRef = useRef(null);
+  const customTheme = useCustomTheme();
 
   useEffect(() => {
     checkWarnings();
@@ -462,7 +464,16 @@ export default function EditPlayerClasses({
               </Grid>
               {warnings.map((warning, index) => (
                 <Grid key={index} size={12}>
-                  <Alert variant="filled" severity="warning">
+                  <Alert
+                    variant="filled"
+                    severity="warning"
+                    sx={{
+                      color: customTheme.text.primary,
+                      "& .MuiAlert-icon": {
+                        color: customTheme.text.primary,
+                      },
+                    }}
+                  >
                     {t(warning)}
                   </Alert>
                 </Grid>

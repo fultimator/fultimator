@@ -32,12 +32,13 @@ import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../../components/common/DeleteConfirmationDialog";
 
 const StyledTableCellHeader = styled(TableCell)({
-  padding: 0,
+  padding: "4px 8px",
   color: "#fff",
 });
 
 const StyledTableCell = styled(TableCell)({
-  padding: 0,
+  padding: "4px 8px",
+  fontSize: "0.85rem",
 });
 
 const POSITIVE = ["admiration", "loyality", "affection"];
@@ -169,7 +170,7 @@ export default function PlayerBonds({
 
   return (
     <>
-      <TableContainer component={Paper} sx={{ width: "100%" }}>
+      <TableContainer component={Paper} sx={{ width: "100%", mb: 1 }}>
         <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
             <TableRow
@@ -211,7 +212,7 @@ export default function PlayerBonds({
                         size="small"
                         onClick={addNewBond}
                         disabled={bonds.length >= 6}
-                        sx={{ color: "#fff", p: 0.5 }}
+                        sx={{ color: "#fff", p: 0.25 }}
                       >
                         <AddIcon fontSize="small" />
                       </IconButton>
@@ -273,6 +274,7 @@ export default function PlayerBonds({
                             color: POSITIVE.includes(s)
                               ? "success.main"
                               : "error.main",
+                            fontWeight: "bold",
                             textTransform: "uppercase",
                             fontSize: "0.75rem",
                             whiteSpace: "nowrap",

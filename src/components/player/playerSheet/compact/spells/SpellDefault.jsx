@@ -54,16 +54,16 @@ export default function SpellDefault({
             </Box>
           </StyledTableCell>
           <StyledTableCell align="center" sx={{ width: "15%" }}>
-            <Typography sx={{ fontSize: "0.8rem" }}>
+            <Typography sx={{ fontSize: "0.85rem" }}>
               {mp}
               {maxTargets !== 1 ? " × " + t("T") : ""}
             </Typography>
           </StyledTableCell>
           <StyledTableCell align="center" sx={{ width: "20%" }}>
-            <Typography sx={{ fontSize: "0.8rem" }}>{targetDesc}</Typography>
+            <Typography sx={{ fontSize: "0.85rem" }}>{targetDesc}</Typography>
           </StyledTableCell>
           <StyledTableCell align="center" sx={{ width: "25%" }}>
-            <Typography sx={{ fontSize: "0.8rem" }}>{duration}</Typography>
+            <Typography sx={{ fontSize: "0.85rem" }}>{duration}</Typography>
           </StyledTableCell>
         </TableRow>
         <TableRow>
@@ -71,7 +71,7 @@ export default function SpellDefault({
             <Box sx={{ padding: "4px 0" }}>
               <Typography
                 component="div"
-                sx={{ fontSize: "0.8rem", marginBottom: 0.5 }}
+                sx={{ fontSize: "0.85rem", marginBottom: 0.5 }}
               >
                 <StyledMarkdown
                   allowedElements={["p", "ul", "li", "strong", "em", "mark"]}

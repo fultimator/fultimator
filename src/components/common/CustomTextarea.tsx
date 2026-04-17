@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { TextareaAutosize, Button } from "@mui/material";
+import { TextField, Button, Box } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
@@ -13,6 +13,7 @@ interface CustomTextareaProps {
   onMouseOver?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
   onMouseOut?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
   readOnly?: boolean;
+  minRows?: number;
   maxRows?: number;
   maxLength?: number;
   placeholder?: string;
@@ -28,14 +29,13 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   onMouseOver,
   onMouseOut,
   readOnly = false,
+  minRows,
   maxRows,
   maxLength,
   placeholder,
 }) => {
   const theme = useCustomTheme();
-  const isDarkMode = theme.mode === "dark";
   const [isFocused, setIsFocused] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const [pendingFocus, setPendingFocus] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -64,7 +64,6 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
 
   const handleMouseOver = useCallback(
     (e: React.MouseEvent<HTMLTextAreaElement>) => {
-      setIsHovered(true);
       if (onMouseOver) onMouseOver(e);
     },
     [onMouseOver],
@@ -72,7 +71,6 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
 
   const handleMouseOut = useCallback(
     (e: React.MouseEvent<HTMLTextAreaElement>) => {
-      setIsHovered(false);
       if (onMouseOut) onMouseOut(e);
     },
     [onMouseOut],
@@ -115,158 +113,190 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     [value, onChange],
   );
 
-  const { fontFamily, fontSize } = theme.typography.body1;
+  const showMarkdown = !isFocused && !pendingFocus && !!value;
 
-  const textareaStyle: React.CSSProperties = {
+  const textFieldSx = {
+    width: "100%",
+    "& .MuiOutlinedInput-root": {
+      fontFamily: theme.typography.body1.fontFamily,
+      fontSize: theme.typography.body1.fontSize,
+      "& fieldset": {
+        borderColor:
+          theme.mode === "dark"
+            ? "rgba(255, 255, 255, 0.23)"
+            : "rgba(0, 0, 0, 0.23)",
+      },
+      "&:hover fieldset": {
+        borderColor: theme.primary,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: theme.primary,
+      },
+      "&:hover .MuiOutlinedInput-input": {
+        color: theme.text.primary,
+      },
+      "&.Mui-focused .MuiOutlinedInput-input": {
+        color: theme.text.primary,
+      },
+    },
+    "& .MuiOutlinedInput-input": {
+      padding: "14px",
+      resize: "vertical",
+      color: theme.text.primary,
+      fontFamily: theme.typography.body1.fontFamily,
+    },
+    "& .MuiOutlinedInput-input::placeholder": {
+      color: theme.text.secondary,
+      opacity: 0.7,
+    },
+    "& .MuiFormLabel-root": {
+      color: theme.text.secondary,
+      "&.Mui-focused": {
+        color: theme.text.primary,
+      },
+    },
+    "& .MuiFormHelperText-root": {
+      color: theme.text.secondary,
+      marginLeft: 0,
+      marginRight: 0,
+      marginTop: "4px",
+      marginBottom: 0,
+    },
+  };
+
+  const previewSx = {
     width: "100%",
     padding: "14px",
     fontSize: "1rem",
-    lineHeight: fontSize,
-    fontFamily: fontFamily,
+    fontFamily: theme.typography.body1.fontFamily,
     borderRadius: "4px",
-    border: isFocused
-      ? "none"
-      : `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)"}`,
-    outline: isHovered && !isFocused ? `1px solid white` : "none",
-    resize: "vertical",
-    boxShadow: isFocused
-      ? `0 0 0 1px ${isDarkMode ? "#ffffff" : theme.primary}`
-      : "none",
-    backgroundColor: readOnly ? "#f5f5f5" : `${theme.transparent}`,
-    cursor: readOnly ? "not-allowed" : "text",
-    color: isDarkMode ? "white" : "black",
-    transition: "border 0.3s ease, box-shadow 0.3s ease",
-    display: "flex",
-    alignItems: "center",
-  };
-
-  const labelStyle: React.CSSProperties = {
-    position: "absolute",
-    padding: "0 2px",
-    top: isFocused || value ? "-8px" : "16px",
-    backgroundColor: isDarkMode ? "#252525" : "white",
-    left: "14px",
-    transition: "top 0.2s ease, font-size 0.2s ease",
-    fontSize: isFocused || value ? "0.8rem" : "1rem",
-    lineHeight: fontSize,
-    fontFamily: fontFamily,
-    color: isFocused
-      ? isDarkMode
-        ? "rgba(255, 255, 255, 0.87)"
-        : "black"
-      : isDarkMode
-        ? "#b0b0b0"
-        : "black",
-    pointerEvents: "none",
-    borderRadius: "4px",
-  };
-
-  const helperStyle: React.CSSProperties = {
-    fontSize: "0.8rem",
-    color: isDarkMode ? "white" : "#252525",
-    marginTop: "4px",
-    marginRight: "14px",
-    marginBottom: "0",
-    marginLeft: "14px",
-  };
-
-  const toolbarStyle: React.CSSProperties = {
-    position: "absolute",
-    top: "-10px",
-    right: "10px",
-    display: "flex",
-    border: isFocused
-      ? `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.87)" : "rgba(0, 0, 0, 0.87)"}`
-      : `1px solid ${isDarkMode ? "#b0b0b0" : theme.ternary}`,
-    outline: isHovered && !isFocused ? `1px solid white` : "none",
-    borderRadius: "50px",
-    overflow: "hidden",
-    backgroundColor: isDarkMode ? "#252525" : `${theme.ternary}`,
-  };
-
-  const buttonStyle: React.CSSProperties = {
-    fontSize: "12px",
-    padding: "0",
-    marginRight: "8px",
-    transition: "font-weight 0.3s ease",
-    fontWeight: "normal",
-    color: isDarkMode ? "white" : "black",
-  };
-  const showMarkdown = !isFocused && !pendingFocus && !!value;
-
-  const previewStyle: React.CSSProperties = {
-    ...textareaStyle,
-    resize: undefined,
+    border: `1px solid ${theme.ternary || theme.primary}`,
     overflow: "auto",
     minHeight: "56px",
     cursor: readOnly ? "not-allowed" : "text",
+    backgroundColor: theme.background.paper,
+    color: theme.text.primary,
+    transition: "border-color 0.3s ease",
+    "&:hover": !readOnly && {
+      borderColor: theme.primary,
+    },
+  };
+
+  const toolbarSx = {
+    display: isFocused ? "flex" : "none",
+    gap: "4px",
+    mt: "8px",
+    mb: isFocused ? "8px" : "0",
+    p: "6px 8px",
+    border: `1px solid ${theme.ternary || theme.primary}`,
+    borderRadius: "50px",
+    backgroundColor: theme.background.paper,
+    boxShadow: `0 1px 3px rgba(0, 0, 0, ${theme.mode === "dark" ? "0.5" : "0.2"})`,
+    width: "fit-content",
+    animation: isFocused ? "slideUp 0.2s ease-out" : undefined,
+    "@keyframes slideUp": {
+      from: {
+        opacity: 0,
+        transform: "translateY(8px)",
+      },
+      to: {
+        opacity: 1,
+        transform: "translateY(0)",
+      },
+    },
+  };
+
+  const buttonSx = {
+    fontSize: "12px",
+    padding: "6px 8px",
+    minWidth: "auto",
+    textTransform: "none",
+    color: theme.text.primary,
+    transition: "background-color 0.2s ease, color 0.2s ease",
+    "&:hover": {
+      backgroundColor:
+        theme.mode === "dark"
+          ? "rgba(255, 255, 255, 0.1)"
+          : "rgba(0, 0, 0, 0.05)",
+      color: theme.primary,
+    },
+    "&:disabled": {
+      opacity: 0.5,
+      color: theme.text.secondary,
+    },
   };
 
   return (
-    <div style={{ position: "relative", margin: "5px 0" }}>
-      {!showMarkdown && (
-        <div style={toolbarStyle}>
-          <Button
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleFormat("bold");
-            }}
-            style={buttonStyle}
-            disabled={readOnly}
-          >
-            Bold
-          </Button>
-          <Button
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleFormat("italic");
-            }}
-            style={buttonStyle}
-            disabled={readOnly}
-          >
-            Italic
-          </Button>
-          <Button
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleFormat("brackets");
-            }}
-            style={buttonStyle}
-            disabled={readOnly}
-          >
-            【】
-          </Button>
-        </div>
-      )}
+    <Box sx={{ my: "5px" }}>
       {showMarkdown ? (
-        <div
-          style={previewStyle}
+        <Box
+          sx={previewSx}
           onClick={() => {
             if (!readOnly) setPendingFocus(true);
           }}
         >
           <ReactMarkdown>{value}</ReactMarkdown>
-        </div>
+        </Box>
       ) : (
-        <TextareaAutosize
-          ref={textareaRef}
-          aria-label={label}
-          value={value}
-          onChange={onChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
-          readOnly={readOnly}
-          style={textareaStyle}
-          maxRows={maxRows}
-          maxLength={maxLength}
-          placeholder={placeholder}
-        />
+        <>
+          <TextField
+            inputRef={textareaRef}
+            label={label}
+            value={value}
+            onChange={onChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onMouseOver={handleMouseOver}
+            onMouseOut={handleMouseOut}
+            disabled={readOnly}
+            multiline
+            minRows={minRows || 4}
+            maxRows={maxRows}
+            maxLength={maxLength}
+            placeholder={placeholder}
+            helperText={helperText}
+            variant="outlined"
+            fullWidth
+            sx={textFieldSx}
+          />
+          <Box sx={toolbarSx}>
+            <Button
+              size="small"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleFormat("bold");
+              }}
+              sx={buttonSx}
+              disabled={readOnly}
+            >
+              Bold
+            </Button>
+            <Button
+              size="small"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleFormat("italic");
+              }}
+              sx={buttonSx}
+              disabled={readOnly}
+            >
+              Italic
+            </Button>
+            <Button
+              size="small"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleFormat("brackets");
+              }}
+              sx={buttonSx}
+              disabled={readOnly}
+            >
+              【】
+            </Button>
+          </Box>
+        </>
       )}
-      <label style={labelStyle}>{label}</label>
-      <div style={helperStyle}>{helperText}</div>
-    </div>
+    </Box>
   );
 };
 

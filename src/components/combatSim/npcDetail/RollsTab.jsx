@@ -7,6 +7,7 @@ import {
   ListItem,
   Divider,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import CasinoIcon from "@mui/icons-material/Casino";
 import ReactMarkdown from "react-markdown";
 import {
@@ -27,6 +28,7 @@ const RollsTab = ({
   handleAttack,
   handleSpell,
 }) => {
+  const theme = useTheme();
   const hideLogs = useCombatSimSettingsStore.getState().settings.hideLogs;
   const autoUseMP = useCombatSimSettingsStore.getState().settings.autoUseMP;
   const autoRollSpellOneTarget =
@@ -178,7 +180,7 @@ const RollsTab = ({
           sx={{
             display: "flex",
             alignItems: "stretch",
-            borderBottom: "1px solid #ddd",
+            borderBottom: `1px solid ${theme.palette.divider}`,
             py: 1,
             minHeight: 80,
           }}

@@ -5,7 +5,6 @@ import {
   useTheme,
   Paper,
   FormControl,
-  InputLabel,
   Slider,
   Typography,
 } from "@mui/material";
@@ -153,15 +152,17 @@ export default function EditPlayerAffinities({ player, setPlayer }) {
               return (
                 <Fragment key={i}>
                   <Grid size={3}>
-                    <InputLabel
-                      id={typeKey}
+                    <Typography
+                      variant="h2"
                       sx={{
-                        fontSize: { xs: "16px", sm: "20px" },
-                        fontWeight: 400,
+                        minWidth: "50px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
                       }}
                     >
                       <TypeIcon type={typeKey} /> <TypeName type={typeKey} />
-                    </InputLabel>
+                    </Typography>
                   </Grid>
                   <Grid size={9}>
                     <FormControl variant="standard" fullWidth>

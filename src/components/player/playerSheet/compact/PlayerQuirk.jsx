@@ -19,8 +19,14 @@ import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import NotesMarkdown from "../../../common/NotesMarkdown";
 
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: "2px 4px" });
+const StyledTableCellHeader = styled(TableCell)({
+  padding: "4px 8px",
+  color: "#fff",
+});
+const StyledTableCell = styled(TableCell)({
+  padding: "4px 8px",
+  fontSize: "0.85rem",
+});
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -77,8 +83,8 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
   const isOpen = !!openRows.quirk[quirkKey] || forceOpen;
 
   return (
-    <TableContainer component={Paper}>
-      <Table size="small">
+    <TableContainer component={Paper} sx={{ mb: 1 }}>
+      <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
         <TableHead>
           <TableRow
             sx={{
@@ -144,7 +150,13 @@ export default function PlayerQuirk({ player, searchQuery = "" }) {
             <TableRow>
               <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
                 <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                  <Box sx={{ px: 2, py: 1 }}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      ml: { xs: 1, sm: 4 },
+                      bgcolor: "rgba(0,0,0,0.03)",
+                    }}
+                  >
                     {quirk.description && (
                       <NotesMarkdown
                         sx={{ fontSize: "0.85rem", fontStyle: "italic" }}

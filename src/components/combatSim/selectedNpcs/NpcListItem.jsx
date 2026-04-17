@@ -55,6 +55,8 @@ export default function NpcListItem({
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const isDarkMode = theme.palette.mode === "dark";
+  const error = theme.palette.error;
+  const text = theme.palette.text;
 
   const {
     attributes,
@@ -87,33 +89,30 @@ export default function NpcListItem({
       button
       onClick={(e) => npc.id && handleListItemClick(e, npc.combatId)}
       sx={{
-        border: isDarkMode
-          ? selectedNpcID && selectedNpcID === npc.combatId
-            ? "1px solid #fff"
-            : "1px solid #555"
-          : selectedNpcID && selectedNpcID === npc.combatId
-            ? "1px solid " + primary
-            : "1px solid #ddd",
+        border:
+          selectedNpcID && selectedNpcID === npc.combatId
+            ? `1px solid ${primary}`
+            : `1px solid ${theme.palette.divider}`,
         marginY: 1,
         borderRadius: 1,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: isDarkMode
-          ? npc.combatStats?.currentHp === 0
-            ? "#5c1010"
-            : "#333"
-          : npc.combatStats?.currentHp === 0
-            ? "#ffe6e6"
+        backgroundColor:
+          npc.combatStats?.currentHp === 0
+            ? isDarkMode
+              ? error.dark
+              : error.light
             : "inherit",
         "&:hover": {
-          backgroundColor: isDarkMode
-            ? npc.combatStats?.currentHp === 0
-              ? "#6f0000"
-              : "#444"
-            : npc.combatStats?.currentHp === 0
-              ? "#ffcccc"
-              : "#f1f1f1",
+          backgroundColor:
+            npc.combatStats?.currentHp === 0
+              ? isDarkMode
+                ? error.main
+                : error.lighter
+              : isDarkMode
+                ? theme.palette.grey[700]
+                : theme.palette.grey[200],
         },
         paddingY: 1,
         flexDirection: "row",
@@ -134,9 +133,9 @@ export default function NpcListItem({
             width: "40px",
             cursor: "grab",
             marginRight: 1,
-            color: isDarkMode ? "#888" : "#666",
+            color: text.secondary,
             "&:hover": {
-              color: isDarkMode ? "#ccc" : "#333",
+              color: text.primary,
             },
             touchAction: "none",
           }}
@@ -161,7 +160,7 @@ export default function NpcListItem({
           variant="h6"
           sx={{
             fontWeight: "bold",
-            color: isDarkMode ? "#fff" : "#333",
+            color: text.primary,
           }}
         >
           {index + 1}
@@ -227,16 +226,16 @@ export default function NpcListItem({
                   sx={{
                     color:
                       npc.combatStats?.currentHp <= Math.floor(calcHP(npc) / 2)
-                        ? "#D32F2F"
-                        : "#4CAF50",
+                        ? error.main
+                        : theme.palette.success.main,
                     fontWeight: "bold",
                     transition: "color 0.2s ease-in-out",
                     "&:hover": {
                       color:
                         npc.combatStats?.currentHp <=
                         Math.floor(calcHP(npc) / 2)
-                          ? "#B71C1C"
-                          : "#388E3C",
+                          ? error.dark
+                          : theme.palette.success.dark,
                       textDecoration: "underline",
                     },
                   }}
@@ -268,11 +267,11 @@ export default function NpcListItem({
                   component="span"
                   variant="h5"
                   sx={{
-                    color: "#2196F3",
+                    color: theme.palette.info.main,
                     fontWeight: "bold",
                     transition: "color 0.2s ease-in-out",
                     "&:hover": {
-                      color: "#1976D2",
+                      color: theme.palette.info.dark,
                       textDecoration: "underline",
                     },
                   }}

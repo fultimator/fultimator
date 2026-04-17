@@ -34,7 +34,7 @@ const StyledMarkdown = ({ children, ...props }) => {
         components={{
           p: (props) => (
             <p
-              style={{ margin: 0, padding: 0, fontSize: "0.8rem" }}
+              style={{ margin: 0, padding: 0, fontSize: "0.85rem" }}
               {...props}
             />
           ),
@@ -68,12 +68,12 @@ export default function SpellEntropistGamble({ gamble }) {
             sx={{
               color: "#fff",
               fontWeight: "bold",
-              fontSize: "0.8rem",
+              fontSize: "0.85rem",
               textAlign: "center",
             }}
           >
             <Typography
-              sx={{ color: "#fff", fontWeight: "bold", fontSize: "0.8rem" }}
+              sx={{ color: "#fff", fontWeight: "bold", fontSize: "0.85rem" }}
             >
               {gamble.spellName} - {gamble.mp}MP × {gamble.maxTargets}{" "}
               {t("Max Dices")} - {t(attributes[gamble.attr].shortcaps)}

@@ -51,8 +51,14 @@ import SpellVehicle from "./spells/SpellVehicle";
 import SpellDeck from "./spells/SpellDeck";
 
 // Styled Components
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: 0 });
+const StyledTableCellHeader = styled(TableCell)({
+  padding: "4px 8px",
+  color: "#fff",
+});
+const StyledTableCell = styled(TableCell)({
+  padding: "4px 8px",
+  fontSize: "0.85rem",
+});
 
 const StyledMarkdown = ({ children, ...props }) => (
   <div style={{ whiteSpace: "pre-line", display: "inline" }}>
@@ -431,10 +437,18 @@ export default function PlayerClasses({
           ))}
         </Box>
       )}
-      <TableContainer component={Paper}>
-        <Table size="small" sx={{ tableLayout: "fixed", minWidth: 400 }}>
+      <TableContainer component={Paper} sx={{ mb: 1 }}>
+        <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
-            <TableRow sx={{ background: theme.primary }}>
+            <TableRow
+              sx={{
+                background: theme.primary,
+                "& .MuiTypography-root": {
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  textTransform: "uppercase",
+                },
+              }}
+            >
               <StyledTableCellHeader sx={{ width: 36 }} />
               <StyledTableCellHeader>
                 <Typography
@@ -592,7 +606,7 @@ export default function PlayerClasses({
                                   Math.max(1, cls.lvl - 1),
                                 )
                               }
-                              sx={{ p: 0 }}
+                              sx={{ p: 0.25, color: "#fff" }}
                               disabled={cls.lvl <= 1}
                             >
                               <Remove fontSize="small" />
@@ -616,7 +630,7 @@ export default function PlayerClasses({
                                   Math.min(10, cls.lvl + 1),
                                 )
                               }
-                              sx={{ p: 0 }}
+                              sx={{ p: 0.25, color: "#fff" }}
                               disabled={cls.lvl >= 10}
                             >
                               <Add fontSize="small" />
@@ -660,10 +674,9 @@ export default function PlayerClasses({
                         >
                           <Box
                             sx={{
-                              ml: 2.5,
-                              borderLeft: `2px solid ${theme.primary}55`, // Semi-transparent theme color
-                              pl: 1,
-                              pb: 1,
+                              p: 1,
+                              ml: { xs: 1, sm: 4 },
+                              bgcolor: "rgba(0,0,0,0.03)",
                               mt: 0.5,
                             }}
                           >
@@ -891,11 +904,10 @@ export default function PlayerClasses({
                                                 >
                                                   <Box
                                                     sx={{
-                                                      p: 1.5,
-                                                      ml: 4,
+                                                      p: 1,
+                                                      ml: { xs: 1, sm: 4 },
                                                       bgcolor:
                                                         "rgba(0,0,0,0.03)",
-                                                      borderRadius: 1,
                                                     }}
                                                   >
                                                     <StyledMarkdown
@@ -965,7 +977,7 @@ export default function PlayerClasses({
                                                 sx={{
                                                   fontWeight: "bold",
                                                   mr: 0.5,
-                                                  color: theme.secondary,
+                                                  color: theme.text.primary,
                                                 }}
                                               >
                                                 {cls.heroic?.name ? (
@@ -1024,10 +1036,9 @@ export default function PlayerClasses({
                                             >
                                               <Box
                                                 sx={{
-                                                  p: 1.5,
-                                                  ml: 4,
+                                                  p: 1,
+                                                  ml: { xs: 1, sm: 4 },
                                                   bgcolor: "rgba(0,0,0,0.03)",
-                                                  borderRadius: 1,
                                                 }}
                                               >
                                                 <StyledMarkdown
@@ -1144,7 +1155,13 @@ export default function PlayerClasses({
                                                 timeout="auto"
                                                 unmountOnExit
                                               >
-                                                <Box sx={{ p: 1.5, ml: 4 }}>
+                                                <Box
+                                                  sx={{
+                                                    p: 1,
+                                                    ml: { xs: 1, sm: 4 },
+                                                    bgcolor: "rgba(0,0,0,0.03)",
+                                                  }}
+                                                >
                                                   {renderSpellContent(
                                                     spell,
                                                     setPlayer,

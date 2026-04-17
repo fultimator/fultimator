@@ -12,8 +12,8 @@ import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 
 const StyledTableCell = styled(TableCell)({
-  padding: "2px 4px",
-  fontSize: "0.8rem",
+  padding: "4px 8px",
+  fontSize: "0.85rem",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
@@ -85,7 +85,7 @@ export default function SpellArcanist({ arcana, rework }) {
             <Typography
               sx={{
                 fontStyle: "italic",
-                fontSize: "0.8rem",
+                fontSize: "0.85rem",
               }}
             >
               {!arcana.description ? (
@@ -97,7 +97,7 @@ export default function SpellArcanist({ arcana, rework }) {
                   unwrapDisallowed={true}
                   components={{
                     p: (props) => (
-                      <span style={{ fontSize: "0.8rem" }} {...props} />
+                      <span style={{ fontSize: "0.85rem" }} {...props} />
                     ),
                     mark: (props) => (
                       <mark
@@ -118,14 +118,14 @@ export default function SpellArcanist({ arcana, rework }) {
         {arcana.domain && (
           <TableRow>
             <StyledTableCell>
-              <Typography sx={{ fontSize: "0.8rem" }}>
+              <Typography sx={{ fontSize: "0.85rem" }}>
                 <strong>{t("Domains: ")}</strong>
                 <ReactMarkdown
                   allowedElements={["strong", "em"]}
                   unwrapDisallowed={true}
                   components={{
                     p: (props) => (
-                      <span style={{ fontSize: "0.8rem" }} {...props} />
+                      <span style={{ fontSize: "0.85rem" }} {...props} />
                     ),
                   }}
                 >
@@ -139,7 +139,7 @@ export default function SpellArcanist({ arcana, rework }) {
         {/* Merge Row */}
         <TableRow sx={{ backgroundColor: theme.secondary }}>
           <StyledTableCell
-            sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}
+            sx={{ color: "white", fontWeight: "bold", fontSize: "0.85rem" }}
           >
             {t("MERGE")}: {arcana.merge}
           </StyledTableCell>
@@ -166,7 +166,7 @@ export default function SpellArcanist({ arcana, rework }) {
           <>
             <TableRow sx={{ backgroundColor: theme.secondary }}>
               <StyledTableCell
-                sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}
+                sx={{ color: "white", fontWeight: "bold", fontSize: "0.85rem" }}
               >
                 {t("PULSE")}: {arcana.pulse}
               </StyledTableCell>
@@ -193,7 +193,7 @@ export default function SpellArcanist({ arcana, rework }) {
         {/* Dismiss Row */}
         <TableRow sx={{ backgroundColor: theme.secondary }}>
           <StyledTableCell
-            sx={{ color: "white", fontWeight: "bold", fontSize: "0.8rem" }}
+            sx={{ color: "white", fontWeight: "bold", fontSize: "0.85rem" }}
           >
             {t("DISMISS")}: {arcana.dismiss}
           </StyledTableCell>

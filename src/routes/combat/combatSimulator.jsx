@@ -1387,7 +1387,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         <Box
           sx={{
             flex: 1,
-            bgcolor: isDarkMode ? "#333333" : "#ffffff",
+            bgcolor: theme.palette.background.paper,
             padding: 2,
             display: "flex",
             flexDirection: "column",
@@ -1440,8 +1440,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             sx={{
               width: "5px",
               cursor: "ew-resize",
-              backgroundColor: isDarkMode ? "#555" : "#ccc",
-              "&:hover": { backgroundColor: isDarkMode ? "#777" : "#aaa" },
+              backgroundColor: theme.palette.action.hover,
+              "&:hover": { backgroundColor: theme.palette.action.selected },
               marginLeft: -1,
               marginRight: -2,
               p: "0 5px",
@@ -1455,7 +1455,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             <DragHandle
               fontSize="small"
               sx={{
-                color: isDarkMode ? "#ddd" : "#555",
+                color: theme.palette.text.secondary,
                 transform: "rotate(90deg)", // Rotate the icon by 90 degrees
                 display: "flex",
                 justifyContent: "center",

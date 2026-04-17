@@ -81,7 +81,7 @@ export default function SelectorPanel({
     <Box
       sx={{
         width: isExpanded ? "20%" : "60px",
-        bgcolor: isDarkMode ? "#333333" : "#ffffff",
+        bgcolor: theme.palette.background.paper,
         padding: 2,
         height: "100%",
         borderRadius: "8px",
@@ -95,7 +95,7 @@ export default function SelectorPanel({
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              borderBottom: "1px solid #ccc",
+              borderBottom: `1px solid ${theme.palette.divider}`,
               marginBottom: 1,
               paddingBottom: 1,
             }}

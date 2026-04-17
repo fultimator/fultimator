@@ -10,7 +10,6 @@ export default function PCDetail({
   npcDetailWidth,
 }) {
   const theme = useTheme();
-  const isDarkMode = theme.palette.mode === "dark";
 
   if (!selectedPC) return null;
 
@@ -18,7 +17,7 @@ export default function PCDetail({
     <Box
       sx={{
         width: npcDetailWidth,
-        bgcolor: isDarkMode ? "#333333" : "#ffffff",
+        bgcolor: theme.palette.background.paper,
         height: "100%",
         overflowY: "auto",
         borderRadius: "8px",
@@ -35,7 +34,7 @@ export default function PCDetail({
           alignItems: "center",
           p: 1,
           borderBottom: "1px solid",
-          borderColor: isDarkMode ? "#555" : "#ddd",
+          borderColor: theme.palette.divider,
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>

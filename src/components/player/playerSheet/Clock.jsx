@@ -116,7 +116,11 @@ const Clock = ({
         key={i}
         d={pathData}
         fill={fill}
-        stroke="black"
+        stroke={
+          theme.palette.mode === "dark"
+            ? "rgba(255, 255, 255, 0.4)"
+            : "rgba(0, 0, 0, 0.4)"
+        }
         strokeWidth="1"
         onClick={() => handleClick(i)}
         onMouseEnter={() => handleMouseEnter(i)}
@@ -133,6 +137,16 @@ const Clock = ({
       onContextMenu={handleRightClick}
       style={{ cursor: isCharacterSheet ? "default" : "pointer" }}
     >
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={size / 2}
+        fill={
+          theme.palette.mode === "dark"
+            ? "rgba(255, 255, 255, 0.1)"
+            : "rgba(0, 0, 0, 0.03)"
+        }
+      />
       {sections}
     </svg>
   );

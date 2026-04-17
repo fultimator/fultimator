@@ -34,8 +34,8 @@ import { useTranslate } from "../../../../../translation/translate";
 import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
 
 const StyledTableCell = styled(TableCell)({
-  padding: "2px 4px",
-  fontSize: "0.8rem",
+  padding: "4px 8px",
+  fontSize: "0.85rem",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
@@ -557,7 +557,7 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                   {t("ace_discard_pile")}: {discardPile.length}
                 </Typography>
                 {totalTracked !== 30 && (
-                  <Warning sx={{ fontSize: "0.8rem", color: "error.main" }} />
+                  <Warning sx={{ fontSize: "0.85rem", color: "error.main" }} />
                 )}
               </Box>
             </StyledTableCell>

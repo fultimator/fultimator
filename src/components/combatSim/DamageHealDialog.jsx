@@ -113,7 +113,7 @@ const DamageHealDialog = ({
         sx={{
           fontWeight: "bold",
           textAlign: "center",
-          borderBottom: "1px solid #ddd",
+          borderBottom: `1px solid ${theme.palette.divider}`,
           pb: 1,
         }}
       >
@@ -189,7 +189,7 @@ const DamageHealDialog = ({
                   }}
                   sx={{
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: isDarkMode ? "#fff" : "primary",
+                      borderColor: theme.palette.primary.main,
                     },
                   }}
                 >
@@ -276,7 +276,11 @@ const DamageHealDialog = ({
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <GiPiercedHeart
                         size={20}
-                        color={isIgnoreResistance ? "#cc0000" : "gray"}
+                        color={
+                          isIgnoreResistance
+                            ? theme.palette.error.main
+                            : theme.palette.text.secondary
+                        }
                       />
                       {t("combat_sim_ignore_resistance")}
                     </Box>
@@ -306,7 +310,11 @@ const DamageHealDialog = ({
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <GiBrokenShield
                         size={20}
-                        color={isIgnoreImmunity ? "#ffcc00" : "gray"}
+                        color={
+                          isIgnoreImmunity
+                            ? theme.palette.warning.main
+                            : theme.palette.text.secondary
+                        }
                       />
                       {t("combat_sim_ignore_immunity")}
                     </Box>
@@ -329,7 +337,9 @@ const DamageHealDialog = ({
                             isIgnoreResistance,
                             isIgnoreImmunity,
                           );
-                          return calculated < 0 ? "green" : "#cc0000";
+                          return calculated < 0
+                            ? theme.palette.success.main
+                            : theme.palette.error.main;
                         })(),
                       }}
                     >
@@ -365,7 +375,7 @@ const DamageHealDialog = ({
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
           <Button
             onClick={handleClose}
-            color={isDarkMode ? "white" : "primary"}
+            color="primary"
             sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
           >
             {t("Cancel")}

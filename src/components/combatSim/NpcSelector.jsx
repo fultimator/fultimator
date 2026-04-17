@@ -269,7 +269,7 @@ export default function NpcSelector({
                       <GiWolfHead
                         style={{
                           marginRight: 10,
-                          color: isDarkMode ? "white" : "black",
+                          color: theme.palette.text.primary,
                         }}
                       />
                     )}
@@ -277,7 +277,7 @@ export default function NpcSelector({
                       <GiRobotGolem
                         style={{
                           marginRight: 10,
-                          color: isDarkMode ? "white" : "black",
+                          color: theme.palette.text.primary,
                         }}
                       />
                     )}
@@ -285,7 +285,7 @@ export default function NpcSelector({
                       <GiEvilBat
                         style={{
                           marginRight: 10,
-                          color: isDarkMode ? "white" : "black",
+                          color: theme.palette.text.primary,
                         }}
                       />
                     )}
@@ -293,7 +293,7 @@ export default function NpcSelector({
                       <GiFire
                         style={{
                           marginRight: 10,
-                          color: isDarkMode ? "white" : "black",
+                          color: theme.palette.text.primary,
                         }}
                       />
                     )}
@@ -301,7 +301,7 @@ export default function NpcSelector({
                       <GiSwordwoman
                         style={{
                           marginRight: 10,
-                          color: isDarkMode ? "white" : "black",
+                          color: theme.palette.text.primary,
                         }}
                       />
                     )}
@@ -309,7 +309,7 @@ export default function NpcSelector({
                       <GiRaiseZombie
                         style={{
                           marginRight: 10,
-                          color: isDarkMode ? "white" : "black",
+                          color: theme.palette.text.primary,
                         }}
                       />
                     )}
@@ -317,7 +317,7 @@ export default function NpcSelector({
                       <GiRose
                         style={{
                           marginRight: 10,
-                          color: isDarkMode ? "white" : "black",
+                          color: theme.palette.text.primary,
                         }}
                       />
                     )}
@@ -325,7 +325,7 @@ export default function NpcSelector({
                       <GiGooeyDaemon
                         style={{
                           marginRight: 10,
-                          color: isDarkMode ? "white" : "black",
+                          color: theme.palette.text.primary,
                         }}
                       />
                     )}
@@ -366,7 +366,7 @@ export default function NpcSelector({
     <Box
       sx={{
         width: isExpanded ? "20%" : "60px", // Collapsed view
-        bgcolor: isDarkMode ? "#333333" : "#ffffff",
+        bgcolor: theme.palette.background.paper,
         padding: 2,
         height: "100%",
         borderRadius: "8px",
@@ -379,7 +379,7 @@ export default function NpcSelector({
             display: "flex",
             justifyContent: "space-between", // Ensure title and button are on opposite ends
             alignItems: "center",
-            borderBottom: "1px solid #ccc",
+            borderBottom: `1px solid ${theme.palette.divider}`,
             marginBottom: 2,
             paddingBottom: 1,
           }}

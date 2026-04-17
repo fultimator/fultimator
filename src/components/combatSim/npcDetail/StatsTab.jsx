@@ -30,6 +30,16 @@ const StatsTab = ({
   const isDarkMode = theme.palette.mode === "dark";
   const [defenseDialogType, setDefenseDialogType] = useState(null);
 
+  // Status effect colors
+  const statusEffectColors = {
+    Slow: theme.palette.info.main,
+    Dazed: theme.palette.warning.main,
+    Weak: theme.palette.error.light,
+    Shaken: theme.palette.warning.light,
+    Enraged: theme.palette.error.main,
+    Poisoned: theme.palette.success.main,
+  };
+
   const isCrisis =
     selectedNPC?.combatStats?.currentHp <= Math.floor(calcHP(selectedNPC) / 2);
 
@@ -82,11 +92,15 @@ const StatsTab = ({
           label={t("HP")}
           currentValue={selectedNPC?.combatStats?.currentHp || 0}
           maxValue={calcHP(selectedNPC)}
-          startColor={isCrisis ? "#D32F2F" : "#66bb6a"}
-          endColor={isCrisis ? "#B71C1C" : "#39823d"} //#39823d #388e3c
-          bgColor="#333333"
+          startColor={
+            isCrisis ? theme.palette.error.main : theme.palette.success.main
+          }
+          endColor={
+            isCrisis ? theme.palette.error.dark : theme.palette.success.dark
+          }
+          bgColor={theme.palette.grey[isDarkMode ? 700 : 300]}
           rightText={isCrisis && t("CRISIS")}
-          rightTextColor={isCrisis && "#ffff00"}
+          rightTextColor={isCrisis && theme.palette.warning.main}
         />
       </Box>
 
@@ -96,9 +110,9 @@ const StatsTab = ({
           label={t("MP")}
           currentValue={selectedNPC?.combatStats?.currentMp || 0}
           maxValue={calcMP(selectedNPC)}
-          startColor="#42a5f5"
-          endColor="#02679e"
-          bgColor="#333333"
+          startColor={theme.palette.info.main}
+          endColor={theme.palette.info.dark}
+          bgColor={theme.palette.grey[isDarkMode ? 700 : 300]}
         />
       </Box>
 
@@ -109,11 +123,17 @@ const StatsTab = ({
           onClick={() => handleOpen("HP", selectedNPC)}
           size="small"
           sx={{
-            bgcolor: isCrisis ? "#B71C1C" : "#388e3c",
-            "&:hover": { bgcolor: isCrisis ? "#8b1515" : "#224d24" },
+            bgcolor: isCrisis
+              ? theme.palette.error.main
+              : theme.palette.success.main,
+            "&:hover": {
+              bgcolor: isCrisis
+                ? theme.palette.error.dark
+                : theme.palette.success.dark,
+            },
             borderRadius: 0,
             fontWeight: "bold",
-            fontFamily: "'Press Start 2P', cursive",
+            fontFamily: "'PT Sans Narrow', sans-serif",
             fontSize: {
               xs: "0.5rem",
               sm: "0.6rem",
@@ -132,11 +152,11 @@ const StatsTab = ({
           size="small"
           sx={{
             ml: 1,
-            bgcolor: "#0288d1",
-            "&:hover": { bgcolor: "#013652" },
+            bgcolor: theme.palette.info.main,
+            "&:hover": { bgcolor: theme.palette.info.dark },
             borderRadius: 0,
             fontWeight: "bold",
-            fontFamily: "'Press Start 2P', cursive",
+            fontFamily: "'PT Sans Narrow', sans-serif",
             fontSize: {
               xs: "0.5rem",
               sm: "0.6rem",
@@ -160,7 +180,7 @@ const StatsTab = ({
           sx={{
             borderRadius: 0,
             fontWeight: "bold",
-            fontFamily: "'Press Start 2P', cursive",
+            fontFamily: "'PT Sans Narrow', sans-serif",
             fontSize: {
               xs: "0.5rem",
               sm: "0.6rem",
@@ -180,7 +200,7 @@ const StatsTab = ({
             ml: 1,
             borderRadius: 0,
             fontWeight: "bold",
-            fontFamily: "'Press Start 2P', cursive",
+            fontFamily: "'PT Sans Narrow', sans-serif",
             fontSize: {
               xs: "0.5rem",
               sm: "0.6rem",
@@ -198,15 +218,12 @@ const StatsTab = ({
       <Box sx={{ marginTop: 3 }}>
         {[
           [
-            { label: "Slow", color: "#1565c0" },
-            { label: "Dazed", color: "#ab47bc" },
-            { label: "Weak", color: "#ff7043" },
-            { label: "Shaken", color: "#e8b923" },
+            { label: "Slow" },
+            { label: "Dazed" },
+            { label: "Weak" },
+            { label: "Shaken" },
           ],
-          [
-            { label: "Enraged", color: "#d32f2f" },
-            { label: "Poisoned", color: "#4caf50" },
-          ],
+          [{ label: "Enraged" }, { label: "Poisoned" }],
         ].map((row, rowIndex) => (
           <ToggleButtonGroup
             key={rowIndex}
@@ -222,17 +239,19 @@ const StatsTab = ({
               mt: rowIndex === 0 ? 0 : 1,
             }}
           >
-            {row.map(({ label, color }) => (
+            {row.map(({ label }) => (
               <ToggleButton
                 key={label}
                 value={label}
                 sx={{
                   flex: "1 1 16%",
-                  minWidth: "80px", // Minimum width for small screens
+                  minWidth: "80px",
                   justifyContent: "center",
                   padding: "5px 0",
-                  backgroundColor: isDarkMode ? "#424242" : "#ECECEC", // Background color changes for dark mode
-                  color: isDarkMode ? "#fff !important" : "black !important", // Text color adjusts for dark mode
+                  backgroundColor: isDarkMode
+                    ? theme.palette.grey[700]
+                    : theme.palette.grey[300],
+                  color: isDarkMode ? "#fff !important" : "#000 !important",
                   fontWeight: "bold",
                   letterSpacing: "1.5px",
                   fontSize: {
@@ -240,19 +259,20 @@ const StatsTab = ({
                     sm: "0.75rem",
                     md: "0.9rem",
                     lg: "1.2rem",
-                  }, // Adjust font size for smaller screens
+                  },
                   transition: "all 0.3s ease-in-out",
                   "&:hover": {
                     backgroundColor: isDarkMode
-                      ? "#616161 !important"
-                      : "#D3D3D3 !important", // Hover effect adjusts for dark mode
-                    color: isDarkMode ? "#fff !important" : "black !important", // Text color on hover
+                      ? theme.palette.grey[600]
+                      : theme.palette.grey[400],
+                    color: isDarkMode ? "#fff !important" : "#000 !important",
                   },
                   "&.Mui-selected": {
-                    backgroundColor: color,
+                    backgroundColor: statusEffectColors[label],
                     color: "white !important",
                     "&:hover": {
-                      backgroundColor: color + " !important",
+                      backgroundColor:
+                        statusEffectColors[label] + " !important",
                       color: "white !important",
                     },
                   },
@@ -303,7 +323,7 @@ const StatsTab = ({
               sx={{
                 marginBottom: 0,
                 fontWeight: "bold",
-                color: isDarkMode ? "#fff" : "#000", // Text color adjusts for dark mode
+                color: isDarkMode ? "#fff" : theme.palette.text.primary,
               }}
             >
               Ultima Points: {selectedNPC?.combatStats?.ultima}

@@ -28,8 +28,14 @@ import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompact
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import Clock from "../Clock";
 
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: 0 });
+const StyledTableCellHeader = styled(TableCell)({
+  padding: "4px 8px",
+  color: "#fff",
+});
+const StyledTableCell = styled(TableCell)({
+  padding: "4px 8px",
+  fontSize: "0.85rem",
+});
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -131,7 +137,7 @@ export default function PlayerNotes({
   };
 
   return (
-    <TableContainer component={Paper} sx={{ width: "100%" }}>
+    <TableContainer component={Paper} sx={{ width: "100%", mb: 1 }}>
       <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
         <TableHead>
           <TableRow
@@ -165,7 +171,7 @@ export default function PlayerNotes({
               }}
             />
             <StyledTableCellHeader
-              sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+              sx={{ width: { xs: 156, sm: 176 }, textAlign: "right" }}
             >
               {isEditMode && onAddNote && (
                 <Tooltip title={t("Add Note")}>
@@ -200,7 +206,7 @@ export default function PlayerNotes({
                           e.stopPropagation();
                           toggleRow("notes", noteKey);
                         }}
-                        sx={{ p: 0.5 }}
+                        sx={{ p: 0.25 }}
                       >
                         {isOpen ? (
                           <KeyboardArrowUp fontSize="small" />
@@ -262,7 +268,7 @@ export default function PlayerNotes({
                     }}
                   />
                   <StyledTableCell
-                    sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                    sx={{ width: { xs: 156, sm: 176 }, textAlign: "right" }}
                   >
                     {isEditMode && (
                       <Tooltip title={t("Edit Note")}>
@@ -284,7 +290,13 @@ export default function PlayerNotes({
                   <TableRow key={`desc-${noteIndex}`}>
                     <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
                       <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                        <Box sx={{ px: 2, py: 1 }}>
+                        <Box
+                          sx={{
+                            p: 1,
+                            ml: { xs: 1, sm: 4 },
+                            bgcolor: "rgba(0,0,0,0.03)",
+                          }}
+                        >
                           <NotesMarkdown sx={{ fontSize: "0.85rem" }}>
                             {highlightMarkdownText(
                               note.description,
@@ -308,22 +320,7 @@ export default function PlayerNotes({
                       key={`clock-${noteIndex}-${clockIndex}`}
                       sx={{ bgcolor: "action.hover" }}
                     >
-                      <StyledTableCell
-                        sx={{
-                          width: 36,
-                          pl: 1,
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Clock
-                          numSections={total}
-                          size={28}
-                          state={clock.state}
-                          setState={() => {}}
-                          isCharacterSheet={true}
-                        />
-                      </StyledTableCell>
+                      <StyledTableCell sx={{ width: 36, pl: 1 }} />
                       <StyledTableCell
                         sx={{
                           minWidth: { xs: 60, sm: 100 },
@@ -362,23 +359,35 @@ export default function PlayerNotes({
                         }}
                       />
                       <StyledTableCell
-                        sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                        sx={{
+                          width: { xs: 156, sm: 176 },
+                          textAlign: "right",
+                          overflow: "visible",
+                        }}
                       >
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "flex-end",
-                            gap: 0.25,
+                            gap: 0,
+                            flexWrap: "nowrap",
                           }}
                         >
+                          <Clock
+                            numSections={total}
+                            size={28}
+                            state={clock.state}
+                            setState={() => {}}
+                            isCharacterSheet={true}
+                          />
                           <IconButton
                             size="small"
                             disabled={!canDecrement}
                             onClick={() =>
                               decrement(note.originalIndex, clockIndex, clock)
                             }
-                            sx={{ p: "4px" }}
+                            sx={{ p: "2px" }}
                           >
                             <Remove fontSize="small" />
                           </IconButton>
@@ -388,7 +397,7 @@ export default function PlayerNotes({
                             onClick={() =>
                               increment(note.originalIndex, clockIndex, clock)
                             }
-                            sx={{ p: "4px" }}
+                            sx={{ p: "2px" }}
                           >
                             <Add fontSize="small" />
                           </IconButton>
@@ -398,7 +407,7 @@ export default function PlayerNotes({
                               onClick={() =>
                                 reset(note.originalIndex, clockIndex, clock)
                               }
-                              sx={{ p: "4px" }}
+                              sx={{ p: "2px" }}
                             >
                               <RestartAlt fontSize="small" />
                             </IconButton>

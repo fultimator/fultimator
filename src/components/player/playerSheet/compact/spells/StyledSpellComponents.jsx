@@ -11,7 +11,7 @@ export const StyledTableCell = styled(TableCell)({
 });
 
 export const StyledMarkdown = ({ children, ...props }) => {
-  const markdownConfig = useMarkdown({ fontSize: "0.8rem" });
+  const markdownConfig = useMarkdown({ fontSize: "0.85rem" });
   return (
     <div style={markdownConfig.containerStyle}>
       <ReactMarkdown {...markdownConfig} {...props}>

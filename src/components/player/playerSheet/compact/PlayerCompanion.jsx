@@ -14,8 +14,14 @@ import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import Pretty from "../../../npc/Pretty";
 
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: 0, color: "#fff" });
+const StyledTableCellHeader = styled(TableCell)({
+  padding: "4px 8px",
+  color: "#fff",
+});
+const StyledTableCell = styled(TableCell)({
+  padding: "4px 8px",
+  fontSize: "0.85rem",
+});
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -71,15 +77,20 @@ export default function PlayerCompanion({ player, searchQuery = "" }) {
 
   return (
     <TableContainer component={Paper} sx={{ mb: 1 }}>
-      <Table size="small">
+      <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
         <TableHead>
-          <TableRow sx={{ background: theme.primary }}>
+          <TableRow
+            sx={{
+              background: theme.primary,
+              "& .MuiTypography-root": {
+                fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                textTransform: "uppercase",
+              },
+            }}
+          >
             <StyledTableCellHeader sx={{ width: 36 }} />
-            <StyledTableCellHeader sx={{ px: 1, py: 0.5 }}>
-              <Typography
-                variant="h4"
-                sx={{ fontSize: "0.85rem", textTransform: "uppercase" }}
-              >
+            <StyledTableCellHeader>
+              <Typography variant="h4">
                 {highlightMatch(t("Faithful Companion"), searchQuery)} (SL:{" "}
                 {faithfulCompanionSkills[0].currentLvl})
               </Typography>
@@ -89,7 +100,7 @@ export default function PlayerCompanion({ player, searchQuery = "" }) {
         <TableBody>
           <TableRow>
             <StyledTableCell sx={{ width: 36 }} />
-            <TableCell sx={{ p: 0.5 }}>
+            <TableCell sx={{ p: 1 }}>
               <Pretty npc={companion} collapse={true} />
             </TableCell>
           </TableRow>

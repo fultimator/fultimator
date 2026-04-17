@@ -805,12 +805,14 @@ export default function PlayerCardGallery({
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
+                    fontStyle: player.info.identity ? "normal" : "italic",
+                    color: player.info.identity ? "inherit" : "text.secondary",
                   }}
                 >
                   <strong>{t("Identity")}: </strong>
-                  {player.info.identity && player.info.identity.length > 40
+                  {player.info.identity?.length > 40
                     ? player.info.identity.slice(0, 40) + "…"
-                    : player.info.identity}
+                    : player.info.identity || "No identity"}
                 </Typography>
               </Box>
               <Typography
@@ -826,12 +828,14 @@ export default function PlayerCardGallery({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
+                  fontStyle: player.info.theme ? "normal" : "italic",
+                  color: player.info.theme ? "inherit" : "text.secondary",
                 }}
               >
                 <strong>{t("Theme")}: </strong>
                 {t(player.info.theme)?.length > 18
                   ? t(player.info.theme).slice(0, 18) + "…"
-                  : t(player.info.theme)}
+                  : t(player.info.theme) || "No theme"}
               </Typography>
               <Typography
                 sx={{
@@ -846,12 +850,14 @@ export default function PlayerCardGallery({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
+                  fontStyle: player.info.origin ? "normal" : "italic",
+                  color: player.info.origin ? "inherit" : "text.secondary",
                 }}
               >
                 <strong>{t("Origin")}: </strong>
                 {player.info.origin?.length > 18
                   ? player.info.origin.slice(0, 18) + "…"
-                  : player.info.origin}
+                  : player.info.origin || "No origin"}
               </Typography>
             </Box>
           </Box>

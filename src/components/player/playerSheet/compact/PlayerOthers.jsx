@@ -28,8 +28,14 @@ import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompact
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import Clock from "../Clock";
 
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
-const StyledTableCell = styled(TableCell)({ padding: "2px 4px" });
+const StyledTableCellHeader = styled(TableCell)({
+  padding: "4px 8px",
+  color: "#fff",
+});
+const StyledTableCell = styled(TableCell)({
+  padding: "4px 8px",
+  fontSize: "0.85rem",
+});
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -113,8 +119,8 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
     updateClock(index, new Array(sections).fill(false));
 
   return (
-    <TableContainer component={Paper}>
-      <Table size="small">
+    <TableContainer component={Paper} sx={{ mb: 1 }}>
+      <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
         <TableHead>
           <TableRow
             sx={{
@@ -239,7 +245,7 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
                       <Typography
                         variant="body2"
                         sx={{
-                          fontSize: "0.8rem",
+                          fontSize: "0.85rem",
                           fontWeight: "bold",
                         }}
                       >
@@ -296,7 +302,13 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
                   <TableRow>
                     <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
                       <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                        <Box sx={{ px: 2, py: 1 }}>
+                        <Box
+                          sx={{
+                            p: 1,
+                            ml: { xs: 1, sm: 4 },
+                            bgcolor: "rgba(0,0,0,0.03)",
+                          }}
+                        >
                           {other.description && (
                             <NotesMarkdown
                               sx={{ fontSize: "0.85rem", fontStyle: "italic" }}

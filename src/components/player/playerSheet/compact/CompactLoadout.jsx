@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
+  Paper,
   Typography,
   ButtonBase,
   Collapse,
@@ -20,6 +21,7 @@ import {
   Checkbox,
   Chip,
   Divider,
+  TableContainer,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -147,6 +149,7 @@ export default function CompactLoadout({
   const [equipOpen, setEquipOpen] = useState(false);
   const [rollDialog, setRollDialog] = useState(null);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
+  const canClickSlot = isEditMode || !!setPlayer;
 
   const store = useLoadoutStore();
   useEffect(() => {
@@ -301,580 +304,585 @@ export default function CompactLoadout({
   ];
 
   return (
-    <Box sx={{ mb: 0.5 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          background: theme.primary,
-          px: 1,
-          py: 0.25,
-          display: "flex",
-          alignItems: "center",
-          gap: 0.5,
-        }}
-      >
-        <Typography
-          variant="h4"
+    <TableContainer component={Paper} sx={{ mb: 1 }}>
+      <Box>
+        {/* Header */}
+        <Box
           sx={{
-            fontSize: { xs: "0.75rem", sm: "0.875rem" },
-            textTransform: "uppercase",
-            color: "#fff",
-            flex: 1,
+            background: theme.primary,
+            px: 0.75,
+            py: 0.35,
+            display: "flex",
+            alignItems: "center",
+            gap: 0.75,
           }}
         >
-          {t("Loadout")}
-        </Typography>
-
-        {pilotSpellInfo && isEditMode && (
-          <>
-            <Tooltip
-              title={activeVehicle ? t("Exit Vehicle") : t("Enter Vehicle")}
-            >
-              <IconButton
-                size="small"
-                onClick={handleToggleVehicle}
-                sx={{ color: activeVehicle ? "#ff7070" : "#aaffaa", p: 0.25 }}
-              >
-                <DirectionsWalkIcon sx={{ fontSize: "1rem" }} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Swap Vehicle")}>
-              <IconButton
-                size="small"
-                onClick={() => setVehicleModalOpen(true)}
-                sx={{ color: "#fff", p: 0.25 }}
-              >
-                <SyncAltIcon sx={{ fontSize: "1rem" }} />
-              </IconButton>
-            </Tooltip>
-          </>
-        )}
-
-        {withEquipment && (
-          <IconButton
-            size="small"
-            onClick={() => setEquipOpen((v) => !v)}
-            sx={{ color: "#fff", p: 0.25 }}
+          <Typography
+            variant="h4"
+            sx={{
+              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+              textTransform: "uppercase",
+              color: "#fff",
+              flex: 1,
+            }}
           >
-            {equipOpen ? (
-              <ExpandLessIcon fontSize="small" />
-            ) : (
-              <ExpandMoreIcon fontSize="small" />
-            )}
-          </IconButton>
-        )}
-      </Box>
-      {/* Main 4 slots + aux */}
-      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-        {allSlots.map(({ slot, resolved, locked, isAux }) => {
-          const isEmpty = !resolved;
-          const isVehicle = resolved?.kind === "vehicleModule";
-          const hasModule = !isAux && !!getEquippedModuleForSlot(player, slot);
-          const clickable = !isAux && !locked && isEditMode && !!setPlayer;
-          const showRoll =
-            (slot === "mainHand" || slot === "offHand" || slot === "aux") &&
-            !locked &&
-            isWeaponResolved(resolved);
-          const showSwap =
-            (slot === "mainHand" || slot === "offHand") &&
-            hasTransforming(resolved);
+            {t("Loadout")}
+          </Typography>
 
-          const name = locked
-            ? slot === "offHand"
-              ? t("2-Handed")
-              : t("Locked")
-            : isEmpty
-              ? t("- Empty -")
-              : isVehicle
-                ? resolved.module.customName || t(resolved.module.name)
-                : (() => {
-                    const item = resolved.item;
-                    if (
-                      "accuracyCheck" in item &&
-                      item.activeForm === "secondary"
-                    )
-                      return item.secondWeaponName || `${item.name} (Alt)`;
-                    return item.name ?? t("- Empty -");
-                  })();
+          {pilotSpellInfo && isEditMode && (
+            <>
+              <Tooltip
+                title={activeVehicle ? t("Exit Vehicle") : t("Enter Vehicle")}
+              >
+                <IconButton
+                  size="small"
+                  onClick={handleToggleVehicle}
+                  sx={{ color: activeVehicle ? "#ff7070" : "#aaffaa", p: 0.15 }}
+                >
+                  <DirectionsWalkIcon sx={{ fontSize: "1rem" }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Swap Vehicle")}>
+                <IconButton
+                  size="small"
+                  onClick={() => setVehicleModalOpen(true)}
+                  sx={{ color: "#fff", p: 0.15 }}
+                >
+                  <SyncAltIcon sx={{ fontSize: "1rem" }} />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
 
-          const inner = (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                px: 1,
-                py: 0.25,
-                borderBottom: "1px solid",
-                borderColor: "divider",
-                minWidth: 0,
-              }}
+          {withEquipment && (
+            <IconButton
+              size="small"
+              onClick={() => setEquipOpen((v) => !v)}
+              sx={{ color: "#fff", p: 0.15 }}
             >
-              <Typography
-                component="span"
+              {equipOpen ? (
+                <ExpandLessIcon fontSize="small" />
+              ) : (
+                <ExpandMoreIcon fontSize="small" />
+              )}
+            </IconButton>
+          )}
+        </Box>
+        {/* Main 4 slots + aux */}
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+          {allSlots.map(({ slot, resolved, locked, isAux }) => {
+            const isEmpty = !resolved;
+            const isVehicle = resolved?.kind === "vehicleModule";
+            const hasModule =
+              !isAux && !!getEquippedModuleForSlot(player, slot);
+            const clickable = !isAux && !locked && canClickSlot;
+            const showRoll =
+              (slot === "mainHand" || slot === "offHand" || slot === "aux") &&
+              !locked &&
+              isWeaponResolved(resolved);
+            const showSwap =
+              (slot === "mainHand" || slot === "offHand") &&
+              hasTransforming(resolved);
+
+            const name = locked
+              ? slot === "offHand"
+                ? t("2-Handed")
+                : t("Locked")
+              : isEmpty
+                ? t("- Empty -")
+                : isVehicle
+                  ? resolved.module.customName || t(resolved.module.name)
+                  : (() => {
+                      const item = resolved.item;
+                      if (
+                        "accuracyCheck" in item &&
+                        item.activeForm === "secondary"
+                      )
+                        return item.secondWeaponName || `${item.name} (Alt)`;
+                      return item.name ?? t("- Empty -");
+                    })();
+
+            const inner = (
+              <Box
                 sx={{
-                  fontSize: { xs: "0.65rem", sm: "0.7rem" },
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  color: locked ? "text.disabled" : "text.secondary",
-                  whiteSpace: "nowrap",
-                  flexShrink: 0,
-                  mr: 0.5,
-                  width: { xs: "65px", sm: "75px" },
+                  display: "flex",
+                  alignItems: "center",
+                  px: 0.75,
+                  py: 0.35,
+                  borderBottom: "1px solid",
+                  borderColor: "divider",
+                  minWidth: 0,
                 }}
               >
-                {slotLabel(t, slot)}
-              </Typography>
-              {locked && (
-                <LockIcon
+                <Typography
+                  component="span"
                   sx={{
-                    fontSize: "0.65rem",
-                    color: "text.disabled",
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    color: locked ? "text.disabled" : "text.secondary",
+                    whiteSpace: "nowrap",
                     flexShrink: 0,
                     mr: 0.5,
-                  }}
-                />
-              )}
-              {isVehicle && !locked && (
-                <PrecisionManufacturingIcon
-                  sx={{
-                    fontSize: "0.65rem",
-                    color: "success.main",
-                    flexShrink: 0,
-                    mr: 0.25,
-                  }}
-                />
-              )}
-              {hasModule && !isVehicle && !isEmpty && !locked && (
-                <PrecisionManufacturingIcon
-                  sx={{
-                    fontSize: "0.65rem",
-                    color: "success.light",
-                    opacity: 0.6,
-                    flexShrink: 0,
-                    mr: 0.25,
-                  }}
-                />
-              )}
-              <Typography
-                component="span"
-                noWrap
-                sx={{
-                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                  fontWeight: isEmpty || locked ? 400 : 600,
-                  color: locked
-                    ? "text.disabled"
-                    : isEmpty
-                      ? "text.disabled"
-                      : isVehicle
-                        ? "success.main"
-                        : isAux
-                          ? "warning.main"
-                          : "text.primary",
-                  fontStyle: isEmpty || locked ? "italic" : "normal",
-                  flex: 1,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {highlightMatch(name, searchQuery)}
-              </Typography>
-              {(showSwap || showRoll) && (
-                <Box sx={{ display: "flex", flexShrink: 0, ml: 0.25 }}>
-                  {showSwap && (
-                    <Tooltip title={t("weapon_customization_swap_form")}>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSwapSlot(slot);
-                        }}
-                        sx={{ p: 0.25 }}
-                      >
-                        <SwapHoriz sx={{ fontSize: "0.9rem" }} />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  {showRoll && (
-                    <Tooltip title={t("Roll")}>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRollSlot(slot);
-                        }}
-                        sx={{ p: 0.25 }}
-                      >
-                        <CasinoIcon sx={{ fontSize: "0.9rem" }} />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Box>
-              )}
-            </Box>
-          );
-
-          return clickable ? (
-            <ButtonBase
-              key={slot}
-              onClick={() => handleSlotClick(slot)}
-              sx={{
-                display: "block",
-                textAlign: "left",
-                width: "100%",
-                "&:hover": { bgcolor: "action.hover" },
-              }}
-            >
-              {inner}
-            </ButtonBase>
-          ) : (
-            <Box key={slot}>{inner}</Box>
-          );
-        })}
-      </Box>
-      {/* Vehicle support slots */}
-      {activeVehicle && supportSlots.length > 0 && (
-        <>
-          <Divider sx={{ my: 0.25 }}>
-            <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-              <Chip
-                icon={<PrecisionManufacturingIcon />}
-                label={activeVehicle.customName || t("Vehicle")}
-                size="small"
-                color="success"
-                variant="outlined"
-                sx={{ fontSize: "0.65rem", height: 18 }}
-              />
-              {vehicleModuleUsage &&
-                [
-                  { key: "weapon", label: t("Weapon") },
-                  { key: "armor", label: t("Armor") },
-                  { key: "support", label: t("Support") },
-                ].map(({ key, label }) => {
-                  const used = vehicleModuleUsage.counts[key];
-                  const max = vehicleModuleUsage.limits[key];
-                  const over = max !== -1 && used > max;
-                  return (
-                    <Chip
-                      key={key}
-                      label={`${label}: ${used}/${max === -1 ? "∞" : max}`}
-                      size="small"
-                      color={over ? "error" : "success"}
-                      variant={over ? "filled" : "outlined"}
-                      sx={{ fontSize: "0.6rem", height: 18 }}
-                    />
-                  );
-                })}
-            </Box>
-          </Divider>
-          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-            {supportSlots.map((entry, i) => {
-              const isEmpty = !entry.module;
-              const inner = (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    px: 1,
-                    py: 0.25,
-                    borderBottom: "1px solid",
-                    borderColor: "divider",
-                    minWidth: 0,
+                    width: { xs: "58px", sm: "68px" },
                   }}
                 >
+                  {slotLabel(t, slot)}
+                </Typography>
+                {locked && (
+                  <LockIcon
+                    sx={{
+                      fontSize: "0.65rem",
+                      color: "text.disabled",
+                      flexShrink: 0,
+                      mr: 0.5,
+                    }}
+                  />
+                )}
+                {isVehicle && !locked && (
                   <PrecisionManufacturingIcon
                     sx={{
                       fontSize: "0.65rem",
                       color: "success.main",
                       flexShrink: 0,
-                      mr: 0.5,
+                      mr: 0.25,
                     }}
                   />
-                  <Typography
-                    component="span"
+                )}
+                {hasModule && !isVehicle && !isEmpty && !locked && (
+                  <PrecisionManufacturingIcon
                     sx={{
-                      fontSize: { xs: "0.65rem", sm: "0.7rem" },
-                      fontWeight: 700,
-                      textTransform: "uppercase",
-                      color: "text.secondary",
-                      whiteSpace: "nowrap",
+                      fontSize: "0.65rem",
+                      color: "success.light",
+                      opacity: 0.6,
                       flexShrink: 0,
-                      mr: 0.5,
-                      width: { xs: "65px", sm: "75px" },
+                      mr: 0.25,
                     }}
-                  >
-                    {`${t("Support")} ${i + 1}`}
-                  </Typography>
-                  <Typography
-                    component="span"
-                    noWrap
-                    sx={{
-                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                      fontWeight: isEmpty ? 400 : 600,
-                      color: isEmpty ? "text.disabled" : "success.main",
-                      fontStyle: isEmpty ? "italic" : "normal",
-                      flex: 1,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {isEmpty
-                      ? t("- Empty -")
-                      : highlightMatch(
-                          entry.module.customName || t(entry.module.name),
-                          searchQuery,
-                        )}
-                  </Typography>
-                </Box>
-              );
-              return isEditMode ? (
-                <ButtonBase
-                  key={i}
-                  onClick={() => setSupportPickerOpen(true)}
+                  />
+                )}
+                <Typography
+                  component="span"
+                  noWrap
                   sx={{
-                    display: "block",
-                    textAlign: "left",
-                    width: "100%",
-                    "&:hover": { bgcolor: "action.hover" },
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    fontWeight: isEmpty || locked ? 400 : 600,
+                    color: locked
+                      ? "text.disabled"
+                      : isEmpty
+                        ? "text.disabled"
+                        : isVehicle
+                          ? "success.main"
+                          : isAux
+                            ? "warning.main"
+                            : "text.primary",
+                    fontStyle: isEmpty || locked ? "italic" : "normal",
+                    flex: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                 >
-                  {inner}
-                </ButtonBase>
-              ) : (
-                <Box key={i}>{inner}</Box>
-              );
-            })}
-          </Box>
-        </>
-      )}
-      {/* Collapsible equipment list */}
-      {withEquipment && (
-        <Collapse in={equipOpen}>
-          <PlayerEquipment
-            player={player}
-            setPlayer={setPlayer}
-            isEditMode={isEditMode}
-            isCharacterSheet
-            isMainTab={isMainTab}
-            searchQuery={searchQuery}
-          />
-        </Collapse>
-      )}
-      {/* Slot picker dialog (includes module override view) */}
-      {pickerSlot && (
-        <SlotPickerDialog
-          open
-          onClose={() => {
-            setPickerSlot(null);
-            setPickerOpenModuleOverride(false);
-          }}
-          slot={pickerSlot}
-          player={player}
-          setPlayer={setPlayer}
-          vehicleModules={
-            activeVehicle &&
-            ["mainHand", "offHand", "armor"].includes(pickerSlot)
-              ? getEquippedModulesForSlot(player, pickerSlot)
-              : []
-          }
-          onSelectModule={(idx) => store.selectModule(pickerSlot, idx)}
-          onDisableModule={() => store.disableModule(pickerSlot)}
-          openModuleOverride={pickerOpenModuleOverride}
-          onClearOtherHandModule={
-            activeVehicle && ["mainHand", "offHand"].includes(pickerSlot)
-              ? () =>
-                  store.disableModule(
-                    pickerSlot === "mainHand" ? "offHand" : "mainHand",
-                  )
-              : undefined
-          }
-        />
-      )}
-      {/* Support module picker */}
-      <Dialog
-        open={supportPickerOpen}
-        onClose={() => setSupportPickerOpen(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <PrecisionManufacturingIcon color="success" fontSize="small" />
-          {t("Support Modules")}
-        </DialogTitle>
-        <DialogContent sx={{ pb: 1 }}>
-          {equippedSupportModules.length === 0 ? (
-            <Typography
-              variant="body2"
-              sx={{
-                color: "text.secondary",
-              }}
-            >
-              {t("No support modules installed on this vehicle.")}
-            </Typography>
-          ) : (
-            <>
-              <Typography
-                variant="caption"
-                gutterBottom
+                  {highlightMatch(name, searchQuery)}
+                </Typography>
+                {(showSwap || showRoll) && (
+                  <Box sx={{ display: "flex", flexShrink: 0, ml: 0.25 }}>
+                    {showSwap && (
+                      <Tooltip title={t("weapon_customization_swap_form")}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSwapSlot(slot);
+                          }}
+                          sx={{ p: 0.25 }}
+                        >
+                          <SwapHoriz sx={{ fontSize: "0.85rem" }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {showRoll && (
+                      <Tooltip title={t("Roll")}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRollSlot(slot);
+                          }}
+                          sx={{ p: 0.25 }}
+                        >
+                          <CasinoIcon sx={{ fontSize: "0.85rem" }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Box>
+                )}
+              </Box>
+            );
+
+            return clickable ? (
+              <ButtonBase
+                key={slot}
+                onClick={() => handleSlotClick(slot)}
                 sx={{
-                  color: "text.secondary",
                   display: "block",
+                  textAlign: "left",
+                  width: "100%",
+                  "&:hover": { bgcolor: "action.hover" },
                 }}
               >
-                {t("Enable or disable support modules:")}
-              </Typography>
-              <List dense>
-                {equippedSupportModules.map((m) => (
-                  <ListItem key={m.originalIndex} disablePadding>
-                    <ListItemButton
-                      onClick={() => store.toggleSupportModule(m.originalIndex)}
-                    >
-                      <ListItemIcon sx={{ minWidth: 36 }}>
-                        <Checkbox
-                          edge="start"
-                          checked={m.enabled ?? false}
-                          disableRipple
-                          size="small"
-                          color="success"
-                        />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={m.customName || t(m.name)}
-                        secondary={
-                          m.isComplex
-                            ? `${t("Complex")} - ${(m.name === "pilot_custom_support" ? m.description : t(m.description || "")).slice(0, 40)}`
-                            : (m.name === "pilot_custom_support"
-                                ? m.description
-                                : t(m.description || "")
-                              ).slice(0, 50)
-                        }
-                        primaryTypographyProps={{
-                          variant: "body2",
-                          fontWeight: m.enabled ? 700 : 400,
-                        }}
-                        secondaryTypographyProps={{ variant: "caption" }}
+                {inner}
+              </ButtonBase>
+            ) : (
+              <Box key={slot}>{inner}</Box>
+            );
+          })}
+        </Box>
+        {/* Vehicle support slots */}
+        {activeVehicle && supportSlots.length > 0 && (
+          <>
+            <Divider sx={{ my: 0.25 }}>
+              <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+                <Chip
+                  icon={<PrecisionManufacturingIcon />}
+                  label={activeVehicle.customName || t("Vehicle")}
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                  sx={{ fontSize: "0.65rem", height: 18 }}
+                />
+                {vehicleModuleUsage &&
+                  [
+                    { key: "weapon", label: t("Weapon") },
+                    { key: "armor", label: t("Armor") },
+                    { key: "support", label: t("Support") },
+                  ].map(({ key, label }) => {
+                    const used = vehicleModuleUsage.counts[key];
+                    const max = vehicleModuleUsage.limits[key];
+                    const over = max !== -1 && used > max;
+                    return (
+                      <Chip
+                        key={key}
+                        label={`${label}: ${used}/${max === -1 ? "∞" : max}`}
+                        size="small"
+                        color={over ? "error" : "success"}
+                        variant={over ? "filled" : "outlined"}
+                        sx={{ fontSize: "0.6rem", height: 18 }}
                       />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button size="small" onClick={() => setSupportPickerOpen(false)}>
-            {t("Done")}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* Roll result dialog */}
-      {rollDialog && (
+                    );
+                  })}
+              </Box>
+            </Divider>
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+              {supportSlots.map((entry, i) => {
+                const isEmpty = !entry.module;
+                const inner = (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      px: 0.75,
+                      py: 0.35,
+                      borderBottom: "1px solid",
+                      borderColor: "divider",
+                      minWidth: 0,
+                    }}
+                  >
+                    <PrecisionManufacturingIcon
+                      sx={{
+                        fontSize: "0.65rem",
+                        color: "success.main",
+                        flexShrink: 0,
+                        mr: 0.5,
+                      }}
+                    />
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontSize: "0.7rem",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        color: "text.secondary",
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                        mr: 0.5,
+                        width: { xs: "58px", sm: "68px" },
+                      }}
+                    >
+                      {`${t("Support")} ${i + 1}`}
+                    </Typography>
+                    <Typography
+                      component="span"
+                      noWrap
+                      sx={{
+                        fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                        fontWeight: isEmpty ? 400 : 600,
+                        color: isEmpty ? "text.disabled" : "success.main",
+                        fontStyle: isEmpty ? "italic" : "normal",
+                        flex: 1,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {isEmpty
+                        ? t("- Empty -")
+                        : highlightMatch(
+                            entry.module.customName || t(entry.module.name),
+                            searchQuery,
+                          )}
+                    </Typography>
+                  </Box>
+                );
+                return canClickSlot ? (
+                  <ButtonBase
+                    key={i}
+                    onClick={() => setSupportPickerOpen(true)}
+                    sx={{
+                      display: "block",
+                      textAlign: "left",
+                      width: "100%",
+                      "&:hover": { bgcolor: "action.hover" },
+                    }}
+                  >
+                    {inner}
+                  </ButtonBase>
+                ) : (
+                  <Box key={i}>{inner}</Box>
+                );
+              })}
+            </Box>
+          </>
+        )}
+        {/* Collapsible equipment list */}
+        {withEquipment && (
+          <Collapse in={equipOpen}>
+            <PlayerEquipment
+              player={player}
+              setPlayer={setPlayer}
+              isEditMode={isEditMode}
+              isCharacterSheet
+              isMainTab={isMainTab}
+              searchQuery={searchQuery}
+            />
+          </Collapse>
+        )}
+        {/* Slot picker dialog (includes module override view) */}
+        {pickerSlot && (
+          <SlotPickerDialog
+            open
+            onClose={() => {
+              setPickerSlot(null);
+              setPickerOpenModuleOverride(false);
+            }}
+            slot={pickerSlot}
+            player={player}
+            setPlayer={setPlayer}
+            vehicleModules={
+              activeVehicle &&
+              ["mainHand", "offHand", "armor"].includes(pickerSlot)
+                ? getEquippedModulesForSlot(player, pickerSlot)
+                : []
+            }
+            onSelectModule={(idx) => store.selectModule(pickerSlot, idx)}
+            onDisableModule={() => store.disableModule(pickerSlot)}
+            openModuleOverride={pickerOpenModuleOverride}
+            onClearOtherHandModule={
+              activeVehicle && ["mainHand", "offHand"].includes(pickerSlot)
+                ? () =>
+                    store.disableModule(
+                      pickerSlot === "mainHand" ? "offHand" : "mainHand",
+                    )
+                : undefined
+            }
+          />
+        )}
+        {/* Support module picker */}
         <Dialog
-          open
-          onClose={() => setRollDialog(null)}
+          open={supportPickerOpen}
+          onClose={() => setSupportPickerOpen(false)}
           maxWidth="xs"
           fullWidth
-          slotProps={{
-            paper: { sx: { width: { xs: "90%", md: "30%" } } },
-          }}
         >
-          <DialogTitle
-            variant="h3"
-            sx={{
-              backgroundColor: rollDialog.isCritFail
-                ? "#bb2124"
-                : rollDialog.isCritSuccess
-                  ? "#22bb33"
-                  : "#aaaaaa",
-            }}
-          >
-            {rollDialog.isCritFail
-              ? t("Critical Failure!")
-              : rollDialog.isCritSuccess
-                ? t("Critical Success!")
-                : t("Result")}
+          <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <PrecisionManufacturingIcon color="success" fontSize="small" />
+            {t("Support Modules")}
           </DialogTitle>
-          <DialogContent sx={{ mt: 1 }}>
-            <Grid container spacing={2} sx={{ textAlign: "center", pt: 1 }}>
-              <Grid size={6}>
+          <DialogContent sx={{ pb: 1 }}>
+            {equippedSupportModules.length === 0 ? (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
+                {t("No support modules installed on this vehicle.")}
+              </Typography>
+            ) : (
+              <>
                 <Typography
-                  variant="h3"
-                  sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                >
-                  {t("Accuracy")}
-                </Typography>
-                <Typography variant="h1">{rollDialog.accuracy}</Typography>
-              </Grid>
-              <Grid size={6}>
-                <Typography
-                  variant="h3"
-                  sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                >
-                  {t("Damage")}
-                </Typography>
-                <Typography variant="h1">{rollDialog.damageRoll}</Typography>
-                {rollDialog.type && (
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                  >
-                    {t(rollDialog.type)}
-                  </Typography>
-                )}
-              </Grid>
-              <Grid sx={{ mt: 1 }} size={12}>
-                <Typography
-                  variant="body2"
+                  variant="caption"
+                  gutterBottom
                   sx={{
                     color: "text.secondary",
+                    display: "block",
                   }}
                 >
-                  {rollDialog.r1} [
-                  {attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
-                  {" + "}
-                  {rollDialog.r2} [
-                  {attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
-                  {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ""}
+                  {t("Enable or disable support modules:")}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                  }}
-                >
-                  {t("Damage")}: {Math.max(rollDialog.r1, rollDialog.r2)} +{" "}
-                  {rollDialog.damage}
-                </Typography>
-              </Grid>
-            </Grid>
+                <List dense>
+                  {equippedSupportModules.map((m) => (
+                    <ListItem key={m.originalIndex} disablePadding>
+                      <ListItemButton
+                        onClick={() =>
+                          store.toggleSupportModule(m.originalIndex)
+                        }
+                      >
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <Checkbox
+                            edge="start"
+                            checked={m.enabled ?? false}
+                            disableRipple
+                            size="small"
+                            color="success"
+                          />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={m.customName || t(m.name)}
+                          secondary={
+                            m.isComplex
+                              ? `${t("Complex")} - ${(m.name === "pilot_custom_support" ? m.description : t(m.description || "")).slice(0, 40)}`
+                              : (m.name === "pilot_custom_support"
+                                  ? m.description
+                                  : t(m.description || "")
+                                ).slice(0, 50)
+                          }
+                          primaryTypographyProps={{
+                            variant: "body2",
+                            fontWeight: m.enabled ? 700 : 400,
+                          }}
+                          secondaryTypographyProps={{ variant: "caption" }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </>
+            )}
           </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => setRollDialog(null)}
-              color="secondary"
-              variant="contained"
-            >
-              {t("Close")}
-            </Button>
-            <Button
-              onClick={() => handleRollSlot(rollDialog.slot)}
-              color="primary"
-              variant="contained"
-              autoFocus
-            >
-              {t("Re-roll")}
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button size="small" onClick={() => setSupportPickerOpen(false)}>
+              {t("Done")}
             </Button>
           </DialogActions>
         </Dialog>
-      )}
-      {/* Vehicle swap modal */}
-      {vehicleModalOpen && pilotSpellInfo && (
-        <SpellPilotVehiclesModal
-          open
-          onClose={() => setVehicleModalOpen(false)}
-          pilot={pilotSpellInfo.spell}
-          onSave={handleSaveVehicles}
-        />
-      )}
-    </Box>
+        {/* Roll result dialog */}
+        {rollDialog && (
+          <Dialog
+            open
+            onClose={() => setRollDialog(null)}
+            maxWidth="xs"
+            fullWidth
+            slotProps={{
+              paper: { sx: { width: { xs: "90%", md: "30%" } } },
+            }}
+          >
+            <DialogTitle
+              variant="h3"
+              sx={{
+                backgroundColor: rollDialog.isCritFail
+                  ? "#bb2124"
+                  : rollDialog.isCritSuccess
+                    ? "#22bb33"
+                    : "#aaaaaa",
+              }}
+            >
+              {rollDialog.isCritFail
+                ? t("Critical Failure!")
+                : rollDialog.isCritSuccess
+                  ? t("Critical Success!")
+                  : t("Result")}
+            </DialogTitle>
+            <DialogContent sx={{ mt: 1 }}>
+              <Grid container spacing={2} sx={{ textAlign: "center", pt: 1 }}>
+                <Grid size={6}>
+                  <Typography
+                    variant="h3"
+                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                  >
+                    {t("Accuracy")}
+                  </Typography>
+                  <Typography variant="h1">{rollDialog.accuracy}</Typography>
+                </Grid>
+                <Grid size={6}>
+                  <Typography
+                    variant="h3"
+                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                  >
+                    {t("Damage")}
+                  </Typography>
+                  <Typography variant="h1">{rollDialog.damageRoll}</Typography>
+                  {rollDialog.type && (
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                    >
+                      {t(rollDialog.type)}
+                    </Typography>
+                  )}
+                </Grid>
+                <Grid sx={{ mt: 1 }} size={12}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
+                    {rollDialog.r1} [
+                    {attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
+                    {" + "}
+                    {rollDialog.r2} [
+                    {attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
+                    {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ""}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
+                    {t("Damage")}: {Math.max(rollDialog.r1, rollDialog.r2)} +{" "}
+                    {rollDialog.damage}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => setRollDialog(null)}
+                color="secondary"
+                variant="contained"
+              >
+                {t("Close")}
+              </Button>
+              <Button
+                onClick={() => handleRollSlot(rollDialog.slot)}
+                color="primary"
+                variant="contained"
+                autoFocus
+              >
+                {t("Re-roll")}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+        {/* Vehicle swap modal */}
+        {vehicleModalOpen && pilotSpellInfo && (
+          <SpellPilotVehiclesModal
+            open
+            onClose={() => setVehicleModalOpen(false)}
+            pilot={pilotSpellInfo.spell}
+            onSave={handleSaveVehicles}
+          />
+        )}
+      </Box>
+    </TableContainer>
   );
 }

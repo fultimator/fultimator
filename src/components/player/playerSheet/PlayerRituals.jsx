@@ -149,6 +149,20 @@ export default function PlayerRituals({
     !hasEntropism &&
     !hasChimerism
   ) {
+    if (compact) {
+      return (
+        <Typography
+          sx={{
+            fontStyle: "italic",
+            color: "text.secondary",
+            fontSize: "0.9rem",
+            py: 1,
+          }}
+        >
+          No rituals
+        </Typography>
+      );
+    }
     return null;
   }
 
