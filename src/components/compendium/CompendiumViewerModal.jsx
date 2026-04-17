@@ -204,6 +204,7 @@ const CompendiumViewerModal = ({
   const [pendingNavPackId, setPendingNavPackId] = useState(null);
   const mainRef = useRef(null);
   const selectedCardRef = useRef(null);
+  const resetDone = useRef(false);
 
   useEffect(() => {
     ensurePersonalPack();
@@ -211,7 +212,8 @@ const CompendiumViewerModal = ({
 
   // Reset state when modal opens
   useEffect(() => {
-    if (open) {
+    if (open && !resetDone.current) {
+      resetDone.current = true;
       const resolvedType = restrictToTypes?.length
         ? restrictToTypes.includes(initialType)
           ? initialType
@@ -228,12 +230,14 @@ const CompendiumViewerModal = ({
       setSelectedQualityCategories([]);
       setSelectedHeroicClasses([]);
       setSelectedOptionalSubtypes(initialOptionalSubtypes);
+    } else if (!open) {
+      resetDone.current = false;
     }
   }, [
     open,
     initialType,
-    initialSpellClass,
     initialSearchQuery,
+    initialSpellClass,
     initialModuleTypeFilter,
     initialOptionalSubtypes,
     restrictToTypes,

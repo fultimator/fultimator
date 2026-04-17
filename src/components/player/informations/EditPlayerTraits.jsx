@@ -6,7 +6,7 @@ import {
   Paper,
   Autocomplete,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeader from "../../common/CustomHeader";
 
@@ -15,18 +15,21 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
 
-  const themes = [
-    t("Ambition"),
-    t("Anger"),
-    t("Belonging"),
-    t("Doubt"),
-    t("Duty"),
-    t("Guilt"),
-    t("Hope"),
-    t("Justice"),
-    t("Mercy"),
-    t("Vengeance"),
-  ];
+  const themes = useMemo(
+    () => [
+      t("Ambition"),
+      t("Anger"),
+      t("Belonging"),
+      t("Doubt"),
+      t("Duty"),
+      t("Guilt"),
+      t("Hope"),
+      t("Justice"),
+      t("Mercy"),
+      t("Vengeance"),
+    ],
+    [t],
+  );
 
   const [inputTheme, setInputTheme] = useState(player.info.theme || "");
 
@@ -108,25 +111,20 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
             sm: 6,
           }}
         >
-          <Autocomplete
-            id="theme-autocomplete"
-            options={themes}
-            value={inputTheme}
-            onChange={handleThemeChange}
-            onInputChange={handleThemeInputChange}
-            freeSolo
-            readOnly={!isEditMode} // Disable Autocomplete when not in edit mode
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("Theme") + ":"}
-                fullWidth
-                slotProps={{
-                  htmlInput: { ...params.inputProps, maxLength: 50 },
-                }}
-              />
-            )}
-          />
+          <FormControl variant="standard" fullWidth>
+            <Autocomplete
+              id="theme-autocomplete"
+              options={themes}
+              value={inputTheme}
+              onChange={handleThemeChange}
+              onInputChange={handleThemeInputChange}
+              freeSolo
+              disabled={!isEditMode}
+              renderInput={(params) => (
+                <TextField {...params} label={t("Theme") + ":"} fullWidth />
+              )}
+            />
+          </FormControl>
         </Grid>
         <Grid
           size={{

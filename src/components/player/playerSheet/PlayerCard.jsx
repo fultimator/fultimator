@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useState, useRef, useLayoutEffect, useMemo } from "react";
 import {
   Typography,
   LinearProgress,
@@ -362,18 +362,21 @@ export default function PlayerCard({
     }
   }, [player.info.description]);
 
-  const themes = [
-    t("Ambition"),
-    t("Anger"),
-    t("Belonging"),
-    t("Doubt"),
-    t("Duty"),
-    t("Guilt"),
-    t("Hope"),
-    t("Justice"),
-    t("Mercy"),
-    t("Vengeance"),
-  ];
+  const themes = useMemo(
+    () => [
+      t("Ambition"),
+      t("Anger"),
+      t("Belonging"),
+      t("Doubt"),
+      t("Duty"),
+      t("Guilt"),
+      t("Hope"),
+      t("Justice"),
+      t("Mercy"),
+      t("Vengeance"),
+    ],
+    [t],
+  );
 
   const handleThemeChange = (event, newValue) => {
     const updatedValue = newValue === null ? "" : newValue;
@@ -917,7 +920,7 @@ export default function PlayerCard({
               style={{
                 width: "100%",
                 height: "auto",
-                maxHeight: "300px",
+                // maxHeight: "300px",
                 objectFit: "cover",
                 objectPosition: "center",
                 display: "block",
@@ -1172,23 +1175,19 @@ export default function PlayerCard({
                   onChange={handleThemeChange}
                   onInputChange={handleThemeInputChange}
                   freeSolo
-                  sx={{ width: "100%" }}
+                  sx={{
+                    width: "100%",
+                    "& input": {
+                      fontFamily: "Antonio",
+                      fontSize: "0.9rem",
+                      textTransform: "uppercase",
+                    },
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label={t("Theme")}
                       variant="standard"
-                      slotProps={{
-                        htmlInput: {
-                          ...params.inputProps,
-                          maxLength: 50,
-                          style: {
-                            fontFamily: "Antonio",
-                            fontSize: "0.9rem",
-                            textTransform: "uppercase",
-                          },
-                        },
-                      }}
                     />
                   )}
                 />

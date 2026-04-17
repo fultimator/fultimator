@@ -155,9 +155,10 @@ const SidebarRow = React.memo(function SidebarRow({
 }) {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
+  const stableItem = useMemo(() => item, [item]);
   const handleClick = useCallback(
-    () => onItemClick(item, idx),
-    [onItemClick, item, idx],
+    () => onItemClick(stableItem, idx),
+    [onItemClick, stableItem, idx],
   );
 
   return (
@@ -755,7 +756,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           <TableBody>
             {filteredItems.map((item, idx) => (
               <SidebarRow
-                key={idx}
+                key={`${selectedType}-${item.name}`}
                 item={item}
                 idx={idx}
                 isSelected={idx === selectedIdx}

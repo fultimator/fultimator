@@ -265,13 +265,15 @@ export default function PlayerEdit() {
     const element = document.getElementById(
       compactView ? "character-sheet-short" : "character-sheet",
     );
-    const cleanup = fixVerticalLabels(element);
     const canvas = await html2canvas(element, {
       useCORS: true,
+      ignoreCORS: true,
       scale: 2,
       backgroundColor: theme.palette.background.default,
+      onclone: (clonedDoc) => {
+        fixVerticalLabels(element, clonedDoc);
+      },
     });
-    cleanup();
     const data = canvas.toDataURL("image/png");
     download(data, `${playerTemp.name}.png`);
   };
@@ -800,13 +802,14 @@ export default function PlayerEdit() {
                 onLevelUpRequest={() => setLevelUpDialogOpen(true)}
               />
               <Divider sx={{ my: 1 }} />
-              <PlayerNumbers
+              {/* TODO: Add Zenit somewhere else */}
+              {/* <PlayerNumbers
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
                 isOwner={isOwner}
               />
-              <Divider sx={{ my: 1 }} />
+              <Divider sx={{ my: 1 }} /> */}
               <GenericRolls player={playerTemp} isEditMode={isEditMode} />
               <Divider sx={{ my: 1 }} />
               <PlayerBonds
