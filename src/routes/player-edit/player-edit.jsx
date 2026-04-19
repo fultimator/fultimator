@@ -26,6 +26,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
@@ -409,6 +412,7 @@ export default function PlayerEdit() {
 
   const settings = playerTemp?.settings ?? {};
   const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
+  const advancement = settings.advancement ?? false;
   const canLevelUpFromExp =
     isOwner &&
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
@@ -440,6 +444,8 @@ export default function PlayerEdit() {
     campActivities: settings.optionalRules?.campActivities ?? false,
     zeroPower: settings.optionalRules?.zeroPower ?? false,
     technospheres: settings.optionalRules?.technospheres ?? false,
+    technospheresVariant:
+      settings.optionalRules?.technospheresVariant ?? "none",
   };
   const specialSkillOverrides = settings.specialSkillOverrides ?? {};
 
@@ -509,6 +515,23 @@ export default function PlayerEdit() {
       optionalRules: {
         ...(prevSettings.optionalRules ?? {}),
         [rule]: checked,
+      },
+    }));
+  };
+
+  const handleAdvancementChange = (checked) => {
+    updatePlayerSettings((prevSettings) => ({
+      ...prevSettings,
+      advancement: checked,
+    }));
+  };
+
+  const handleOptionalRuleValueChange = (rule, value) => {
+    updatePlayerSettings((prevSettings) => ({
+      ...prevSettings,
+      optionalRules: {
+        ...(prevSettings.optionalRules ?? {}),
+        [rule]: value,
       },
     }));
   };
@@ -1105,6 +1128,21 @@ export default function PlayerEdit() {
                   </SettingRow>
 
                   <SettingRow
+                    label={t("Advancement")}
+                    hint={t(
+                      "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, automated class level tracking, and per-level skill management.",
+                    )}
+                    compactControl
+                  >
+                    <Checkbox
+                      checked={advancement}
+                      onChange={(e) =>
+                        handleAdvancementChange(e.target.checked)
+                      }
+                    />
+                  </SettingRow>
+
+                  <SettingRow
                     label={t("Special Skills Overrides")}
                     hint={t(
                       "Open a modal with active special skills and override toggles.",
@@ -1318,6 +1356,7 @@ export default function PlayerEdit() {
                             "Not currently active. Enable to force this special skill behavior.",
                           )
                     }
+                    compactControl
                   >
                     <Checkbox
                       checked={
@@ -1364,8 +1403,11 @@ export default function PlayerEdit() {
             <SettingRow
               label={t("Quirks")}
               hint={t(
-                "Enable or disable Quirk sections in Player Sheet and edit tabs.",
+                "Play with the Quirk advanced optional rule from High Fantasy Atlas, page 114.",
               )}
+              showDivider={false}
+              dense
+              compactControl
             >
               <Checkbox
                 checked={optionalRules.quirks}
@@ -1376,24 +1418,13 @@ export default function PlayerEdit() {
             </SettingRow>
 
             <SettingRow
-              label={t("Camp Activities")}
-              hint={t(
-                "Enable or disable Camp Activities sections in Player Sheet and edit tabs.",
-              )}
-            >
-              <Checkbox
-                checked={optionalRules.campActivities}
-                onChange={(e) =>
-                  handleOptionalRuleChange("campActivities", e.target.checked)
-                }
-              />
-            </SettingRow>
-
-            <SettingRow
               label={t("Zero Power")}
               hint={t(
-                "Enable or disable Zero Power sections in Player Sheet and edit tabs.",
+                "Play with the Zero Power optional rule from High Fantasy Atlas, page 124.",
               )}
+              showDivider={false}
+              dense
+              compactControl
             >
               <Checkbox
                 checked={optionalRules.zeroPower}
@@ -1404,10 +1435,30 @@ export default function PlayerEdit() {
             </SettingRow>
 
             <SettingRow
+              label={t("Camp Activities")}
+              hint={t(
+                "Enable the Camp Activity optional rule from Natural Fantasy Atlas, page 130.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={optionalRules.campActivities}
+                onChange={(e) =>
+                  handleOptionalRuleChange("campActivities", e.target.checked)
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
               label={t("Technospheres")}
               hint={t(
-                "Placeholder toggle stored in settings for future Technospheres behavior.",
+                "(Placeholder) Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
               )}
+              showDivider={false}
+              dense
+              compactControl
             >
               <Checkbox
                 checked={optionalRules.technospheres}
@@ -1416,6 +1467,59 @@ export default function PlayerEdit() {
                 }
               />
             </SettingRow>
+
+            {optionalRules.technospheres && (
+              <SettingRow
+                label={t("Technospheres Alternative Rule")}
+                hint={t("Select which Technospheres variant to use.")}
+                showDivider={false}
+                dense
+                compactControl
+              >
+                <RadioGroup
+                  value={optionalRules.technospheresVariant}
+                  onChange={(e) =>
+                    handleOptionalRuleValueChange(
+                      "technospheresVariant",
+                      e.target.value,
+                    )
+                  }
+                  sx={{
+                    alignItems: "flex-end",
+                    minWidth: 240,
+                    "& .MuiFormControlLabel-root": {
+                      mr: 0,
+                      ml: 0,
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    value="none"
+                    control={<Radio size="small" />}
+                    label={t("None")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="integrated"
+                    control={<Radio size="small" />}
+                    label={t("Integrated technospheres")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="mnemospheres"
+                    control={<Radio size="small" />}
+                    label={t("Mnemospheres only")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="hoplospheres"
+                    control={<Radio size="small" />}
+                    label={t("Hoplospheres only")}
+                    labelPlacement="start"
+                  />
+                </RadioGroup>
+              </SettingRow>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>

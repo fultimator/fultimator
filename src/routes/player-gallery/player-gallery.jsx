@@ -36,6 +36,14 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Fab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Checkbox,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -69,6 +77,7 @@ import { useDatabase } from "../../hooks/useDatabase";
 import JSZip from "jszip";
 import useDownload from "../../hooks/useDownload";
 import useDownloadImage from "../../hooks/useDownloadImage";
+import SettingRow from "../../components/common/SettingRow";
 
 export default function PlayerGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -83,10 +92,26 @@ export default function PlayerGallery() {
 
 function Personal() {
   const { t } = useTranslate();
+  const defaultCreatePlayerOptions = {
+    name: "",
+    advancement: false,
+    defaultView: "normal",
+    optionalRules: {
+      quirks: false,
+      campActivities: false,
+      zeroPower: false,
+      technospheres: false,
+      technospheresVariant: "none",
+    },
+  };
   const [name, setName] = useState("");
   const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
+  const [isCreatePlayerModalOpen, setIsCreatePlayerModalOpen] = useState(false);
+  const [createPlayerOptions, setCreatePlayerOptions] = useState(
+    defaultCreatePlayerOptions,
+  );
 
   // Deletion confirmation states
   const playerToDeleteRef = useRef(null);
@@ -183,9 +208,9 @@ function Personal() {
         })
     : [];
 
-  const addPlayer = async function () {
+  const addPlayer = async function (options = defaultCreatePlayerOptions) {
     const data = {
-      name: "-",
+      name: options.name,
       lvl: 5,
       info: {
         pronouns: "",
@@ -290,6 +315,13 @@ function Personal() {
         rangedPrec: 0,
         magicPrec: 0,
       },
+      settings: {
+        defaultView: options.defaultView,
+        advancement: options.advancement,
+        optionalRules: {
+          ...options.optionalRules,
+        },
+      },
     };
 
     try {
@@ -302,8 +334,10 @@ function Personal() {
         normalizedData,
       );
       console.debug(res);
+      return res.id;
     } catch (e) {
       console.debug(e);
+      return null;
     }
   };
 
@@ -745,6 +779,52 @@ function Personal() {
     setIsBugDialogOpen(false);
   };
 
+  const handleOpenCreatePlayerModal = () => {
+    setCreatePlayerOptions(defaultCreatePlayerOptions);
+    setIsCreatePlayerModalOpen(true);
+  };
+
+  const handleCloseCreatePlayerModal = () => {
+    setIsCreatePlayerModalOpen(false);
+  };
+
+  const handleCreatePlayerOptionChange = (field, value) => {
+    setCreatePlayerOptions((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleCreateOptionalRuleChange = (rule, checked) => {
+    setCreatePlayerOptions((prev) => ({
+      ...prev,
+      optionalRules: {
+        ...prev.optionalRules,
+        [rule]: checked,
+      },
+    }));
+  };
+
+  const handleCreateOptionalRuleValueChange = (rule, value) => {
+    setCreatePlayerOptions((prev) => ({
+      ...prev,
+      optionalRules: {
+        ...prev.optionalRules,
+        [rule]: value,
+      },
+    }));
+  };
+
+  const handleCreatePlayerConfirm = async () => {
+    const newPlayerId = await addPlayer(createPlayerOptions);
+    handleCloseCreatePlayerModal();
+    if (newPlayerId) {
+      navigate(`/player-edit/${newPlayerId}`, {
+        state: { from: "/pc-gallery" },
+      });
+    }
+  };
+
   const sharePlayer = async (id) => {
     let baseUrl = window.location.href.replace(/\/[^/]+$/, "");
     if (IS_ELECTRON) {
@@ -832,7 +912,7 @@ function Personal() {
             <Button
               variant="contained"
               startIcon={<HistoryEdu />}
-              onClick={addPlayer}
+              onClick={handleOpenCreatePlayerModal}
               disabled={dbMode === "cloud" && !cloudUser}
             >
               {t("Create Player")}
@@ -1239,6 +1319,218 @@ function Personal() {
           )
         }
       />
+      <Dialog
+        open={isCreatePlayerModalOpen}
+        onClose={handleCloseCreatePlayerModal}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{t("Create Player")}</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ mt: 1 }}>
+            <SettingRow
+              label={t("Player Name")}
+              hint={t("Optional. Leave empty to create with an empty name.")}
+            >
+              <TextField
+                value={createPlayerOptions.name}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange("name", evt.target.value)
+                }
+                size="small"
+                sx={{ minWidth: 220 }}
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Default View")}
+              hint={t("Choose which view opens first in Player Edit.")}
+            >
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ minWidth: 180 }}
+              >
+                <Select
+                  value={createPlayerOptions.defaultView}
+                  onChange={(evt) =>
+                    handleCreatePlayerOptionChange(
+                      "defaultView",
+                      evt.target.value,
+                    )
+                  }
+                >
+                  <MenuItem value="normal">{t("Normal View")}</MenuItem>
+                  <MenuItem value="compact">{t("Compact View")}</MenuItem>
+                </Select>
+              </FormControl>
+            </SettingRow>
+
+            <SettingRow
+              label={t("Advancement")}
+              hint={t(
+                "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, automated class level tracking, and per-level skill management.",
+              )}
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.advancement}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "advancement",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <Typography
+              variant="body1"
+              sx={{ px: 1, mt: 1, mb: 0.25, fontWeight: 600 }}
+            >
+              {t("Optional Rules")}
+            </Typography>
+
+            <SettingRow
+              label={t("Quirks")}
+              hint={t(
+                "Play with the Quirk advanced optional rule from High Fantasy Atlas, page 114.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.optionalRules.quirks}
+                onChange={(evt) =>
+                  handleCreateOptionalRuleChange("quirks", evt.target.checked)
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Zero Power")}
+              hint={t(
+                "Play with the Zero Power optional rule from High Fantasy Atlas, page 124.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.optionalRules.zeroPower}
+                onChange={(evt) =>
+                  handleCreateOptionalRuleChange(
+                    "zeroPower",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Camp Activities")}
+              hint={t(
+                "Enable the Camp Activity optional rule from Natural Fantasy Atlas, page 130.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.optionalRules.campActivities}
+                onChange={(evt) =>
+                  handleCreateOptionalRuleChange(
+                    "campActivities",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Technospheres")}
+              hint={t(
+                "(Placeholder) Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.optionalRules.technospheres}
+                onChange={(evt) =>
+                  handleCreateOptionalRuleChange(
+                    "technospheres",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+            {createPlayerOptions.optionalRules.technospheres && (
+              <SettingRow
+                label={t("Technospheres Alternative Rule")}
+                hint={t("Select which Technospheres variant to use.")}
+                showDivider={false}
+                dense
+                compactControl
+              >
+                <RadioGroup
+                  value={
+                    createPlayerOptions.optionalRules.technospheresVariant ??
+                    "none"
+                  }
+                  onChange={(evt) =>
+                    handleCreateOptionalRuleValueChange(
+                      "technospheresVariant",
+                      evt.target.value,
+                    )
+                  }
+                  sx={{
+                    alignItems: "flex-end",
+                    minWidth: 240,
+                    "& .MuiFormControlLabel-root": {
+                      mr: 0,
+                      ml: 0,
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    value="none"
+                    control={<Radio size="small" />}
+                    label={t("None")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="integrated"
+                    control={<Radio size="small" />}
+                    label={t("Integrated technospheres")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="mnemospheres"
+                    control={<Radio size="small" />}
+                    label={t("Mnemospheres only")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="hoplospheres"
+                    control={<Radio size="small" />}
+                    label={t("Hoplospheres only")}
+                    labelPlacement="start"
+                  />
+                </RadioGroup>
+              </SettingRow>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCreatePlayerModal}>{t("Cancel")}</Button>
+          <Button variant="contained" onClick={handleCreatePlayerConfirm}>
+            {t("Create Player")}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}

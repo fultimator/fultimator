@@ -8,6 +8,7 @@
  * @param {Document} clonedDoc - The cloned document from html2canvas onclone callback.
  */
 export const fixVerticalLabels = (originalRoot, clonedDoc) => {
+  if (!clonedDoc) return;
   const clonedRoot = clonedDoc.getElementById(originalRoot.id);
   if (!clonedRoot) return;
 

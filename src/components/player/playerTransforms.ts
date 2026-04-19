@@ -59,6 +59,7 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
     campActivities: rawOptionalRules.campActivities ?? false,
     zeroPower: rawOptionalRules.zeroPower ?? false,
     technospheres: rawOptionalRules.technospheres ?? false,
+    technospheresVariant: rawOptionalRules.technospheresVariant ?? "none",
   };
 
   const rawOverrides = settings.specialSkillOverrides ?? {};
@@ -70,6 +71,7 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
   const nextSettings: Record<string, any> = {
     ...settings,
     defaultView: settings.defaultView === "compact" ? "compact" : "normal",
+    advancement: settings.advancement ?? rawOptionalRules.advancement ?? false,
     optionalRules,
   };
 
