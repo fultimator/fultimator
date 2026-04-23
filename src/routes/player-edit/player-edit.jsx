@@ -413,6 +413,22 @@ export default function PlayerEdit() {
   const settings = playerTemp?.settings ?? {};
   const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
   const advancement = settings.advancement ?? false;
+  const autoEquipUnarmed = settings.autoEquipUnarmed ?? true;
+  const defaultUnarmedStrikeRef = settings.defaultUnarmedStrikeRef ?? null;
+
+  const inv = playerTemp?.equipment?.[0];
+  const unarmedStrikeOptions = [
+    ...(inv?.weapons ?? []).map((w, i) => ({
+      source: "weapons",
+      name: w.name,
+      index: i,
+    })),
+    ...(inv?.customWeapons ?? []).map((w, i) => ({
+      source: "customWeapons",
+      name: w.name,
+      index: i,
+    })),
+  ];
   const canLevelUpFromExp =
     isOwner &&
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
@@ -523,6 +539,20 @@ export default function PlayerEdit() {
     updatePlayerSettings((prevSettings) => ({
       ...prevSettings,
       advancement: checked,
+    }));
+  };
+
+  const handleAutoEquipUnarmedChange = (checked) => {
+    updatePlayerSettings((prevSettings) => ({
+      ...prevSettings,
+      autoEquipUnarmed: checked,
+    }));
+  };
+
+  const handleDefaultUnarmedStrikeChange = (ref) => {
+    updatePlayerSettings((prev) => ({
+      ...prev,
+      defaultUnarmedStrikeRef: ref,
     }));
   };
 
@@ -1141,6 +1171,62 @@ export default function PlayerEdit() {
                       }
                     />
                   </SettingRow>
+
+                  <SettingRow
+                    label={t("Auto-Equip Unarmed Strike")}
+                    hint={t(
+                      "When a weapon is unequipped from a hand slot, automatically equip Unarmed Strike if that hand is now empty.",
+                    )}
+                    compactControl
+                  >
+                    <Checkbox
+                      checked={autoEquipUnarmed}
+                      onChange={(e) =>
+                        handleAutoEquipUnarmedChange(e.target.checked)
+                      }
+                    />
+                  </SettingRow>
+
+                  {autoEquipUnarmed && (
+                    <SettingRow
+                      label={t("Default Unarmed Strike")}
+                      hint={t(
+                        "Select the weapon used as the default unarmed strike when a hand slot is empty.",
+                      )}
+                    >
+                      <FormControl
+                        variant="outlined"
+                        size="small"
+                        sx={{ minWidth: 180 }}
+                      >
+                        <Select
+                          value={
+                            defaultUnarmedStrikeRef
+                              ? `${defaultUnarmedStrikeRef.source}:${defaultUnarmedStrikeRef.index}`
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const opt = unarmedStrikeOptions.find(
+                              (o) =>
+                                `${o.source}:${o.index}` === e.target.value,
+                            );
+                            if (opt) handleDefaultUnarmedStrikeChange(opt);
+                          }}
+                        >
+                          {unarmedStrikeOptions.map((opt) => (
+                            <MenuItem
+                              key={`${opt.source}:${opt.index}`}
+                              value={`${opt.source}:${opt.index}`}
+                            >
+                              {opt.name === "Unarmed Strike"
+                                ? `★ ${opt.name}`
+                                : opt.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </SettingRow>
+                  )}
 
                   <SettingRow
                     label={t("Special Skills Overrides")}

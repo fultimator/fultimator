@@ -58,6 +58,7 @@ import {
   calculateCustomWeaponStats,
 } from "../../common/playerCalculations";
 import { deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
+import { clearSlotAction } from "../../equipment/slots/loadoutActions";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({
@@ -553,29 +554,14 @@ export default function PlayerEquipment({
     const slotKey = Object.keys(slots).find(
       (k) => slots[k]?.source === source && slots[k]?.name === itemName,
     );
-    const slotRef = slotKey ? slots[slotKey] : null;
-    let updated = patchInv(player, source, (arr) =>
-      arr.map((it, idx) => {
-        const match =
-          slotRef?.index !== undefined
-            ? idx === slotRef.index
-            : it.name === itemName;
-        return match ? { ...it, isEquipped: false } : it;
-      }),
-    );
     if (slotKey) {
-      const prevSlots = updated.equippedSlots ?? {
-        mainHand: null,
-        offHand: null,
-        armor: null,
-        accessory: null,
-      };
-      setPlayer({
-        ...updated,
-        equippedSlots: { ...prevSlots, [slotKey]: null },
-        vehicleSlots: deriveVehicleSlots(updated),
-      });
+      setPlayer((prev) => clearSlotAction(prev, slotKey));
     } else {
+      const updated = patchInv(player, source, (arr) =>
+        arr.map((it) =>
+          it.name === itemName ? { ...it, isEquipped: false } : it,
+        ),
+      );
       setPlayer({ ...updated, vehicleSlots: deriveVehicleSlots(updated) });
     }
   };
@@ -1154,9 +1140,27 @@ function EquipmentRow({
     translatedQuality.toLowerCase().includes(searchQuery.trim().toLowerCase());
   const isOpen = !!openRows[rowKey] || isDescriptionMatch;
 
+  const getDefaultUnarmedStrikeInfo = () => {
+    const settings = player.settings ?? {};
+    const defaultRef = settings.defaultUnarmedStrikeRef;
+    const autoEquipEnabled = settings.autoEquipUnarmed ?? !!defaultRef;
+    if (!defaultRef || !autoEquipEnabled) return null;
+
+    const source =
+      item.equipType === "custom-weapon" ? "customWeapons" : "weapons";
+    const name =
+      item.equipType === "custom-weapon" ? item.originalData?.name : item.name;
+
+    const isDefaultUnarmed =
+      defaultRef.source === source && defaultRef.name === name;
+    return isDefaultUnarmed ? { isDefault: true, settings } : null;
+  };
+
   const getBadge = () => {
-    if (!item.isEquipped) return null;
     const slots = player.equippedSlots ?? {};
+    const settings = player.settings ?? {};
+    const defaultRef = settings.defaultUnarmedStrikeRef;
+
     if (item.equipType === "weapon" || item.equipType === "custom-weapon") {
       const source =
         item.equipType === "custom-weapon" ? "customWeapons" : "weapons";
@@ -1164,6 +1168,24 @@ function EquipmentRow({
         item.equipType === "custom-weapon"
           ? item.originalData?.name
           : item.name;
+
+      // Check if this is the default unarmed strike
+      const isDefaultUnarmed =
+        defaultRef && defaultRef.source === source && defaultRef.name === name;
+
+      // For unarmed strikes, show which slots it would fill based on what's empty
+      const autoEquipEnabled = settings.autoEquipUnarmed ?? !!defaultRef;
+      if (isDefaultUnarmed && autoEquipEnabled) {
+        const mainHandEmpty = !slots.mainHand;
+        const offHandEmpty = !slots.offHand;
+        if (mainHandEmpty && offHandEmpty) return "M+O";
+        if (mainHandEmpty && !offHandEmpty) return "M";
+        if (!mainHandEmpty && offHandEmpty) return "O";
+        // Both slots occupied, no badge
+        return null;
+      }
+
+      // For non-unarmed weapons, show which slot(s) they occupy
       if (slots.mainHand?.source === source && slots.mainHand?.name === name)
         return item.hands === 2 ||
           item.isTwoHand ||
@@ -1346,6 +1368,7 @@ function EquipmentRow({
                   onClick={(e) => handleEquipment(item, e)}
                   size="small"
                   sx={{ p: 0.25 }}
+                  disabled={!!getDefaultUnarmedStrikeInfo()}
                 >
                   {item.isEquipped ? (
                     <Icon />

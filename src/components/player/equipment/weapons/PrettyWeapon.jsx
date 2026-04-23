@@ -80,18 +80,22 @@ export default function PrettyWeapon({
             }}
           >
             <Grid size={3}>
-              <Typography sx={{ textAlign: "left" }}>{t("Weapon")}</Typography>
+              <Typography sx={{ textAlign: "left", color: "inherit" }}>
+                {t("Weapon")}
+              </Typography>
             </Grid>
             <Grid size={1}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+              <Typography sx={{ textAlign: "center", color: "inherit" }}>
+                {t("Cost")}
+              </Typography>
             </Grid>
             <Grid size={4}>
-              <Typography sx={{ textAlign: "center" }}>
+              <Typography sx={{ textAlign: "center", color: "inherit" }}>
                 {t("Accuracy")}
               </Typography>
             </Grid>
             <Grid size={4}>
-              <Typography sx={{ textAlign: "center" }}>
+              <Typography sx={{ textAlign: "center", color: "inherit" }}>
                 {t("Damage")}
               </Typography>
             </Grid>

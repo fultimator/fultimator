@@ -299,7 +299,6 @@ function Personal() {
           magicModifier: 0,
           damageMeleeModifier: 0,
           damageRangedModifier: 0,
-          isEquipped: true,
         },
       ],
       armor: [],
@@ -314,6 +313,18 @@ function Personal() {
         meleePrec: 0,
         rangedPrec: 0,
         magicPrec: 0,
+      },
+      equippedSlots: {
+        mainHand: {
+          source: "weapons",
+          name: "Unarmed Strike",
+          index: 0,
+        },
+        offHand: {
+          source: "weapons",
+          name: "Unarmed Strike",
+          index: 0,
+        },
       },
       settings: {
         defaultView: options.defaultView,

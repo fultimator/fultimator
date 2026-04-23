@@ -1,11 +1,14 @@
 import {
   TypePlayer,
   EquippedSlots,
+  SlotRef,
   AnyEquipmentItem,
   PlayerClass,
   Spells,
   VehicleModule,
   Vehicle,
+  CustomWeaponCustomization,
+  PlayerEquipment,
 } from "../../../../types/Players";
 import { resolveEffectiveSlot, syncSlots } from "./equipmentSlots";
 import type { PilotSpellInfo } from "./loadoutSelectors";
@@ -32,15 +35,16 @@ function patchInv(
     ...(player.equipment?.[0] ?? {}),
     [source]: updater(
       ((
-        player.equipment?.[0] as Record<string, AnyEquipmentItem[]> | undefined
+        player.equipment?.[0] as unknown as
+          | Record<string, AnyEquipmentItem[]>
+          | undefined
       )?.[source] ?? []) as AnyEquipmentItem[],
     ),
-  };
-  // Cast through any: the spread always preserves the required fields when
-  // equipment[0] exists; the fallback `{}` case only arises for players with
-  // no inventory, which is treated as an empty-but-valid entry.
+  } as unknown;
   const equipment = (
-    player.equipment ? [eq0, ...player.equipment.slice(1)] : [eq0]
+    player.equipment
+      ? [eq0 as unknown as PlayerEquipment, ...player.equipment.slice(1)]
+      : [eq0 as unknown as PlayerEquipment]
   ) as TypePlayer["equipment"];
   return { ...player, equipment };
 }
@@ -98,8 +102,8 @@ export function equipItemToSlot(
   const isCustom = candidate.source === "customWeapons";
   const isTwoHand =
     isCustom ||
-    candidate.item?.hands === 2 ||
-    (candidate.item?.isTwoHand ?? false);
+    ("hands" in candidate.item && candidate.item.hands === 2) ||
+    ("isTwoHand" in candidate.item && candidate.item.isTwoHand);
 
   let updated = player;
 
@@ -143,18 +147,64 @@ export function equipItemToSlot(
     }),
   );
 
-  return syncSlots(updated);
+  updated = syncSlots(updated);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const autoEquipUnarmed = (updated as any).settings?.autoEquipUnarmed ?? false;
+  if (autoEquipUnarmed && (slot === "mainHand" || slot === "offHand")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const defaultRef = (updated as any).settings?.defaultUnarmedStrikeRef;
+    let unarmedIdx: number;
+    let unarmedSource: "weapons" | "customWeapons" = "weapons";
+    let unarmed: AnyEquipmentItem | null = null;
+
+    if (defaultRef) {
+      unarmedSource = defaultRef.source;
+      const sourceArr = (updated.equipment?.[0]?.[unarmedSource] ??
+        []) as AnyEquipmentItem[];
+      unarmedIdx =
+        defaultRef.index !== undefined
+          ? defaultRef.index
+          : sourceArr.findIndex((w) => w.name === defaultRef.name);
+      if (unarmedIdx !== -1) {
+        unarmed = sourceArr[unarmedIdx];
+      }
+    } else {
+      const weapons: AnyEquipmentItem[] = updated.equipment?.[0]?.weapons ?? [];
+      unarmedIdx = weapons.findIndex((w) => w.name === "Unarmed Strike");
+      if (unarmedIdx !== -1) {
+        unarmed = weapons[unarmedIdx];
+      }
+    }
+
+    if (unarmed) {
+      const emptyHands = (["mainHand", "offHand"] as const).filter(
+        (h) => !updated.equippedSlots?.[h],
+      );
+
+      if (emptyHands.length > 0) {
+        updated = patchInv(updated, unarmedSource, (arr) =>
+          arr.map((it: AnyEquipmentItem, idx: number) => {
+            const match = idx === unarmedIdx || it.name === unarmed.name;
+            return match ? { ...it, isEquipped: true } : it;
+          }),
+        );
+        updated = syncSlots(updated);
+      }
+    }
+  }
+
+  return updated;
 }
 
 /**
- * Remove whatever is in `slot`, marking the item as unequipped.
- * Ends with `syncSlots`.
+ * Clear a slot and auto-equip Unarmed Strike if enabled.
  */
 export function clearSlotAction(player: TypePlayer, slot: string): TypePlayer {
   const currentRef = player.equippedSlots?.[slot as keyof EquippedSlots];
   if (!currentRef) return player;
 
-  const updated = patchInv(player, currentRef.source, (arr) =>
+  let updated = patchInv(player, currentRef.source, (arr) =>
     arr.map((it: AnyEquipmentItem, idx: number) => {
       const match =
         currentRef.index !== undefined
@@ -164,7 +214,68 @@ export function clearSlotAction(player: TypePlayer, slot: string): TypePlayer {
     }),
   );
 
-  return syncSlots(updated);
+  updated = syncSlots(updated);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const autoEquipUnarmed = (updated as any).settings?.autoEquipUnarmed ?? false;
+  if (autoEquipUnarmed && (slot === "mainHand" || slot === "offHand")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const defaultRef = (updated as any).settings?.defaultUnarmedStrikeRef;
+    let unarmedIdx: number;
+    let unarmedSource: "weapons" | "customWeapons" = "weapons";
+    let unarmed: AnyEquipmentItem | null = null;
+
+    if (defaultRef) {
+      unarmedSource = defaultRef.source;
+      const sourceArr = (updated.equipment?.[0]?.[unarmedSource] ??
+        []) as AnyEquipmentItem[];
+      unarmedIdx =
+        defaultRef.index !== undefined
+          ? defaultRef.index
+          : sourceArr.findIndex((w) => w.name === defaultRef.name);
+      if (unarmedIdx !== -1) {
+        unarmed = sourceArr[unarmedIdx];
+      }
+    } else {
+      const weapons: AnyEquipmentItem[] = updated.equipment?.[0]?.weapons ?? [];
+      unarmedIdx = weapons.findIndex((w) => w.name === "Unarmed Strike");
+      if (unarmedIdx !== -1) {
+        unarmed = weapons[unarmedIdx];
+      }
+    }
+
+    if (unarmed) {
+      const candidate: PickerCandidate = {
+        source: unarmedSource,
+        label: unarmed.name,
+        index: unarmedIdx,
+        item: unarmed,
+      };
+      const emptyHands = (["mainHand", "offHand"] as const).filter(
+        (h) => !updated.equippedSlots?.[h],
+      );
+      if (emptyHands.length > 0) {
+        updated = equipItemToSlot(updated, emptyHands[0], candidate);
+      }
+      // Unarmed Strike can occupy both hand slots
+      if (emptyHands.length === 2) {
+        const unarmedRef: SlotRef = {
+          source: unarmedSource,
+          name: unarmed.name,
+          index: unarmedIdx,
+        };
+        updated = {
+          ...updated,
+          equippedSlots: {
+            ...updated.equippedSlots,
+            [emptyHands[1]]: unarmedRef,
+          },
+        };
+      }
+    }
+  }
+
+  return updated;
 }
 
 // Vehicle module actions
@@ -423,7 +534,7 @@ export function swapTransformingWeaponForm(
   if (
     !("customizations" in item) ||
     !item?.customizations?.some(
-      (c: Record<string, unknown>) =>
+      (c: CustomWeaponCustomization) =>
         c.name === "weapon_customization_transforming",
     )
   ) {
@@ -446,9 +557,9 @@ export function swapTransformingWeaponForm(
         }
       : cw,
   );
-  const eq0 = { ...inv, customWeapons };
-  const equipment = player.equipment
-    ? [eq0, ...player.equipment.slice(1)]
-    : [eq0];
+  const eq0 = { ...inv, customWeapons } as unknown as PlayerEquipment;
+  const equipment = (
+    player.equipment ? [eq0, ...player.equipment.slice(1)] : [eq0]
+  ) as TypePlayer["equipment"];
   return syncSlots({ ...player, equipment });
 }

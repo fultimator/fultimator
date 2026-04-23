@@ -108,6 +108,21 @@ export interface HeroicSkills {
   description: string;
 }
 
+export interface PlayerSettings {
+  defaultView?: "compact" | "normal";
+  advancement?: boolean;
+  autoEquipUnarmed?: boolean;
+  defaultUnarmedStrikeRef?: SlotRef;
+  optionalRules?: {
+    quirks?: boolean;
+    campActivities?: boolean;
+    zeroPower?: boolean;
+    technospheres?: boolean;
+    technospheresVariant?: boolean;
+  };
+  specialSkillOverrides?: Record<string, true>;
+}
+
 export interface VehicleModule {
   name: string;
   type: string;
@@ -339,6 +354,7 @@ export interface TypePlayer {
   modifiers: PlayerModifiers;
   equippedSlots?: EquippedSlots;
   vehicleSlots?: VehicleSlots;
+  settings?: PlayerSettings;
 }
 
 export type EquipmentSource =
