@@ -6,7 +6,7 @@ import {
   Tooltip,
   Container,
 } from "@mui/material";
-import { ArrowBack, Search } from "@mui/icons-material";
+import { ArrowBack, Search, Tune as TuneIcon } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 import { useNpc } from "../npc/useNpcContext";
 import ExplainSkillsSimplified from "../npc/ExplainSkillsSimplified";
@@ -17,11 +17,14 @@ const NpcEditAppBar = ({
   //isNpcEdit,
   isPcEdit,
   selectedTheme,
+  selectedStyleProfile,
   handleSelectTheme,
+  handleSelectStyleProfile,
   isDarkMode,
   handleToggleDarkMode,
   showGoBackButton,
   handleNavigation,
+  onOpenDrawer,
 }) => {
   const { npcTemp } = useNpc(); // Use the context to get npcTemp data
 
@@ -62,9 +65,18 @@ const NpcEditAppBar = ({
                   </IconButton>
                 </Tooltip>
               )}
+              {onOpenDrawer && (
+                <Tooltip title="Open Drawer">
+                  <IconButton color="inherit" onClick={onOpenDrawer}>
+                    <TuneIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
               <MenuOption
                 selectedTheme={selectedTheme}
+                selectedStyleProfile={selectedStyleProfile}
                 onSelectTheme={handleSelectTheme}
+                onSelectStyleProfile={handleSelectStyleProfile}
                 isDarkMode={isDarkMode}
                 onToggleDarkMode={handleToggleDarkMode}
               />
@@ -85,11 +97,14 @@ const PcEditAppBar = ({
   //isNpcEdit,
   //isPcEdit,
   selectedTheme,
+  selectedStyleProfile,
   handleSelectTheme,
+  handleSelectStyleProfile,
   isDarkMode,
   handleToggleDarkMode,
   showGoBackButton,
   handleNavigation,
+  onOpenDrawer,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -127,9 +142,18 @@ const PcEditAppBar = ({
                   </IconButton>
                 </Tooltip>
               )}
+              {onOpenDrawer && (
+                <Tooltip title="Open Drawer">
+                  <IconButton color="inherit" onClick={onOpenDrawer}>
+                    <TuneIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
               <MenuOption
                 selectedTheme={selectedTheme}
+                selectedStyleProfile={selectedStyleProfile}
                 onSelectTheme={handleSelectTheme}
+                onSelectStyleProfile={handleSelectStyleProfile}
                 isDarkMode={isDarkMode}
                 onToggleDarkMode={handleToggleDarkMode}
               />

@@ -10,29 +10,25 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router";
-import { ArrowBack, Search } from "@mui/icons-material";
+import { ArrowBack, Search, Tune as TuneIcon } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
+import type { ThemeValue, StyleProfileValue } from "../../store/themeStore";
 
 import logo929 from "./../logo_929.webp";
 import logo1400 from "./../logo_1400.webp";
 
-type ThemeValue =
-  | "Fabula"
-  | "High"
-  | "Techno"
-  | "Natural"
-  | "Bravely"
-  | "Obscura";
-
 interface AppBarProps {
   isNpcEdit: boolean;
   selectedTheme: ThemeValue;
+  selectedStyleProfile: StyleProfileValue;
   handleSelectTheme: (theme: ThemeValue) => void;
+  handleSelectStyleProfile: (profile: StyleProfileValue) => void;
   isDarkMode: boolean;
   handleToggleDarkMode: () => void;
   showGoBackButton: boolean;
   handleNavigation: () => void;
+  onOpenDrawer?: () => void;
 }
 
 const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
@@ -49,11 +45,14 @@ const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
 const AppBar: React.FC<AppBarProps> = ({
   isNpcEdit,
   selectedTheme,
+  selectedStyleProfile,
   handleSelectTheme,
+  handleSelectStyleProfile,
   isDarkMode,
   handleToggleDarkMode,
   showGoBackButton,
   handleNavigation,
+  onOpenDrawer,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const viewportWidth = window.innerWidth;
@@ -115,7 +114,13 @@ const AppBar: React.FC<AppBarProps> = ({
                   >
                     <Typography sx={{ textAlign: "center" }}>
                       <img
-                        style={{ height: "100%", maxHeight: "60px" }}
+                        style={{
+                          height: "100%",
+                          maxHeight: "60px",
+                          filter: isDarkMode
+                            ? "brightness(0.9) drop-shadow(0 0 2px rgba(255, 255, 255, 0.3))"
+                            : "brightness(1.05) drop-shadow(0 0 1px rgba(0, 0, 0, 0.2))",
+                        }}
                         src={isSmallViewport ? logo929 : undefined}
                         srcSet={
                           isSmallViewport
@@ -144,9 +149,18 @@ const AppBar: React.FC<AppBarProps> = ({
                       <Search />
                     </IconButton>
                   </Tooltip>
+                  {onOpenDrawer && (
+                    <Tooltip title="Open Drawer">
+                      <IconButton color="inherit" onClick={onOpenDrawer}>
+                        <TuneIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   <MenuOption
                     selectedTheme={selectedTheme}
+                    selectedStyleProfile={selectedStyleProfile}
                     onSelectTheme={handleSelectTheme}
+                    onSelectStyleProfile={handleSelectStyleProfile}
                     isDarkMode={isDarkMode}
                     onToggleDarkMode={handleToggleDarkMode}
                   />

@@ -52,7 +52,9 @@ interface MenuOptionProps extends ThemeSwitcherProps, DarkModeToggleProps {}
 
 const MenuOption: React.FC<MenuOptionProps> = ({
   selectedTheme,
+  selectedStyleProfile,
   onSelectTheme,
+  onSelectStyleProfile,
   isDarkMode,
   onToggleDarkMode,
 }) => {
@@ -296,7 +298,9 @@ const MenuOption: React.FC<MenuOptionProps> = ({
 
         <ThemeSwitcher
           selectedTheme={selectedTheme}
+          selectedStyleProfile={selectedStyleProfile}
           onSelectTheme={onSelectTheme}
+          onSelectStyleProfile={onSelectStyleProfile}
         />
         <Divider />
 

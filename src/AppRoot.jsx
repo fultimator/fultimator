@@ -2,18 +2,19 @@ import React, { Suspense } from "react";
 import { BrowserRouter, MemoryRouter, Routes, Route } from "react-router";
 import { IS_ELECTRON } from "./platform";
 import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import Home from "./routes/Home";
-import { lightFabula, darkFabula } from "./themes/Fabula";
-import { lightHigh, darkHigh } from "./themes/High";
-import { lightTechno, darkTechno } from "./themes/Techno";
-import { lightNatural, darkNatural } from "./themes/Natural";
-import { lightBravely, darkBravely } from "./themes/Bravely";
-import { lightObscura, darkObscura } from "./themes/Obscura";
+import { createThemeComponents } from "./themes/themeComponentFactory";
+import { resolveThemePalette } from "./themes/resolveThemePalette";
+import {
+  THEMES_REGISTRY,
+  THEME_DEFAULT_PROFILE_MAP,
+  STYLE_PROFILE_MAP,
+} from "./themes/themeRegistry";
 
-import { ThemeProvider as AppThemeProvider } from "./ThemeContext";
-import { useThemeContext } from "./hooks/useThemeContext";
+import { useThemeStore } from "./store/themeStore";
+import { useShallow } from "zustand/react/shallow";
 import { DatabaseProvider } from "./context/DatabaseContext";
 import ErrorBoundary from "./ErrorBoundary";
 import LoadingPage from "./components/common/LoadingPage";
@@ -44,24 +45,55 @@ const CompendiumViewer = React.lazy(
   () => import("./routes/compendium/compendium"),
 );
 
-const themes = {
-  Fabula: { light: lightFabula, dark: darkFabula },
-  High: { light: lightHigh, dark: darkHigh },
-  Techno: { light: lightTechno, dark: darkTechno },
-  Natural: { light: lightNatural, dark: darkNatural },
-  Bravely: { light: lightBravely, dark: darkBravely },
-  Obscura: { light: lightObscura, dark: darkObscura },
-};
-
 const Router = IS_ELECTRON ? MemoryRouter : BrowserRouter;
 
 export const App = () => {
-  const { selectedTheme, isDarkMode } = useThemeContext();
-  const currentTheme = themes[selectedTheme]
-    ? isDarkMode
-      ? themes[selectedTheme].dark
-      : themes[selectedTheme].light
-    : themes.Fabula.light;
+  const { selectedTheme, selectedStyleProfile, isDarkMode, customization } =
+    useThemeStore(
+      useShallow((s) => ({
+        selectedTheme: s.selectedTheme,
+        selectedStyleProfile: s.selectedStyleProfile,
+        isDarkMode: s.isDarkMode,
+        customization: s.customization,
+      })),
+    );
+
+  const currentTheme = React.useMemo(() => {
+    const baseTheme = THEMES_REGISTRY[selectedTheme]
+      ? isDarkMode
+        ? THEMES_REGISTRY[selectedTheme].dark
+        : THEMES_REGISTRY[selectedTheme].light
+      : THEMES_REGISTRY.Fabula.light;
+
+    const resolvedPalette = resolveThemePalette(baseTheme, customization);
+
+    // Determine which style profile to use
+    const profileKey =
+      selectedStyleProfile === "ThemeDefault"
+        ? THEME_DEFAULT_PROFILE_MAP[selectedTheme] || "flat"
+        : STYLE_PROFILE_MAP[selectedStyleProfile] || "flat";
+
+    return createTheme(baseTheme, {
+      palette: {
+        primary: { main: resolvedPalette.primary },
+        secondary: { main: resolvedPalette.secondary },
+        ternary: { main: resolvedPalette.ternary },
+        quaternary: { main: resolvedPalette.quaternary },
+      },
+      components: createThemeComponents({
+        mode: isDarkMode ? "dark" : "light",
+        primary: resolvedPalette.primary,
+        secondary: resolvedPalette.secondary,
+        ternary: resolvedPalette.ternary,
+        quaternary: resolvedPalette.quaternary,
+        paper: resolvedPalette.paper,
+        profile: profileKey,
+        panelRadiusOverride: customization.panelRadius,
+        controlRadiusOverride: customization.controlRadius,
+        styleCustomization: customization,
+      }),
+    });
+  }, [selectedTheme, selectedStyleProfile, isDarkMode, customization]);
 
   return (
     <React.StrictMode>
@@ -208,9 +240,7 @@ export const App = () => {
 };
 
 export const Root = () => (
-  <AppThemeProvider>
-    <DatabaseProvider>
-      <App />
-    </DatabaseProvider>
-  </AppThemeProvider>
+  <DatabaseProvider>
+    <App />
+  </DatabaseProvider>
 );
