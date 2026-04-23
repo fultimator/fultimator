@@ -1,19 +1,22 @@
-// Hook for managing Compendium Packs stored in IndexedDB ("compendium-packs" store).
-// Always local — never synced to Firestore, but included in Drive backup via STORES.
-// Pack CRUD
 import { useState, useEffect, useCallback } from "react";
 import { getDb, notifyListeners, subscribeToStore } from "../platform/idb";
 import type {
   CompendiumPack,
   CompendiumItem,
   CompendiumItemType,
+  PackTheme,
   PackType,
 } from "../types/CompendiumPack";
 import { validateManifest } from "../utils/validateCompendiumPack";
-// Item operations
+import { decodeThemeFile, themeSlug } from "../utils/themePackCodec";
+import {
+  sanitizeImportedCustomization,
+  DEFAULT_CUSTOMIZATION,
+} from "../themes/themeCustomization";
+import { useThemeStore } from "../store/themeStore";
+
 const STORE = "compendium-packs";
 const PERSONAL_ID = "personal";
-// Module I/O
 async function getAllPacks(): Promise<CompendiumPack[]> {
   const db = await getDb();
   return db.getAll(STORE) as Promise<CompendiumPack[]>;
@@ -56,6 +59,7 @@ export function useCompendiumPacks() {
       createdAt: now,
       updatedAt: now,
       items: [],
+      themes: [],
     };
     try {
       const db = await getDb();
@@ -63,7 +67,7 @@ export function useCompendiumPacks() {
       notifyListeners(STORE);
       return pack;
     } catch {
-      // Another concurrent call already created it — return the existing one
+      // Another concurrent call already created it - return the existing one
       const refreshed = await getAllPacks();
       return refreshed.find((p) => p.id === PERSONAL_ID)!;
     }
@@ -81,6 +85,7 @@ export function useCompendiumPacks() {
         createdAt: now,
         updatedAt: now,
         items: [],
+        themes: [],
       };
       await savePack(pack);
       return id;
@@ -236,6 +241,89 @@ export function useCompendiumPacks() {
     [],
   );
 
+  // Theme operations
+  const addTheme = useCallback(
+    async (
+      packId: string,
+      input: {
+        name: string;
+        description?: string | null;
+        baseTheme: string;
+        styleProfile: string;
+        isDarkMode: boolean;
+        customization: unknown;
+      },
+    ): Promise<void> => {
+      const all = await getAllPacks();
+      let pack = all.find((p) => p.id === packId);
+
+      if (!pack && packId === PERSONAL_ID) {
+        pack = await ensurePersonalPack();
+      }
+      if (!pack) return;
+
+      const sanitized = sanitizeImportedCustomization(input.customization);
+      const customization = { ...DEFAULT_CUSTOMIZATION, ...sanitized };
+
+      const theme: PackTheme = {
+        id: crypto.randomUUID(),
+        name: input.name.trim(),
+        description:
+          typeof input.description === "string"
+            ? input.description.trim() || null
+            : null,
+        baseTheme: input.baseTheme,
+        styleProfile: input.styleProfile,
+        isDarkMode: input.isDarkMode,
+        customization,
+        addedAt: Date.now(),
+      };
+      await savePack({
+        ...pack,
+        themes: [...(pack.themes ?? []), theme],
+        updatedAt: Date.now(),
+      });
+    },
+    [ensurePersonalPack],
+  );
+
+  const removeTheme = useCallback(
+    async (packId: string, themeId: string): Promise<void> => {
+      const all = await getAllPacks();
+      const pack = all.find((p) => p.id === packId);
+      if (!pack) return;
+      await savePack({
+        ...pack,
+        themes: (pack.themes ?? []).filter((t) => t.id !== themeId),
+        updatedAt: Date.now(),
+      });
+    },
+    [],
+  );
+
+  const applyTheme = useCallback(
+    async (packId: string, themeId: string): Promise<void> => {
+      const all = await getAllPacks();
+      const pack = all.find((p) => p.id === packId);
+      const theme = (pack?.themes ?? []).find((t) => t.id === themeId);
+      if (!theme) throw new Error(`Theme "${themeId}" not found`);
+
+      const store = useThemeStore.getState();
+      store.setTheme(theme.baseTheme as Parameters<typeof store.setTheme>[0]);
+      store.setStyleProfile(
+        theme.styleProfile as Parameters<typeof store.setStyleProfile>[0],
+      );
+      if (store.isDarkMode !== theme.isDarkMode) {
+        store.toggleDarkMode();
+      }
+      store.resetCustomization();
+      store.setCustomization(
+        theme.customization as Parameters<typeof store.setCustomization>[0],
+      );
+    },
+    [],
+  );
+
   // Module I/O
   const exportAsModule = useCallback(
     async (
@@ -272,6 +360,27 @@ export function useCompendiumPacks() {
             : "item";
           const filename = `${baseSlug}-${item.id.slice(0, 8)}.json`;
           typeFolder.file(filename, JSON.stringify(item.data, null, 2));
+        }
+      }
+
+      // Bundle pack's themes into themes/ folder
+      const packThemes = pack.themes ?? [];
+      if (packThemes.length > 0) {
+        const themesFolder = zip.folder("themes")!;
+        for (const theme of packThemes) {
+          const slug = themeSlug(theme.name);
+          const filename = `${slug}-${theme.id.slice(0, 8)}.json`;
+          const payload = {
+            schema: "fultimator.theme@1",
+            id: theme.id,
+            name: theme.name,
+            description: theme.description,
+            baseTheme: theme.baseTheme,
+            styleProfile: theme.styleProfile,
+            isDarkMode: theme.isDarkMode,
+            customization: theme.customization,
+          };
+          themesFolder.file(filename, JSON.stringify(payload, null, 2));
         }
       }
 
@@ -375,9 +484,45 @@ export function useCompendiumPacks() {
     const packType: PackType =
       rawType === "supplement" ? "supplement" : "compendium";
 
+    const packName =
+      typeof manifest.name === "string"
+        ? manifest.name.trim()
+        : "Imported Pack";
+
+    // Import themes from themes/ folder
+    const importedThemes: PackTheme[] = [];
+    for (const [path, zipEntry] of Object.entries(zip.files)) {
+      if (zipEntry.dir || !path.startsWith("themes/")) continue;
+      const parts = path.split("/");
+      if (parts.length < 2 || !parts[1].endsWith(".json")) continue;
+
+      let raw: unknown;
+      try {
+        const text = await zipEntry.async("text");
+        raw = JSON.parse(text);
+      } catch {
+        continue;
+      }
+
+      const result = decodeThemeFile(raw);
+      if (!result.ok) continue;
+
+      const { payload } = result;
+      importedThemes.push({
+        id: crypto.randomUUID(), // fresh ID on import
+        name: payload.name,
+        description: payload.description,
+        baseTheme: payload.baseTheme,
+        styleProfile: payload.styleProfile,
+        isDarkMode: payload.isDarkMode,
+        customization: { ...DEFAULT_CUSTOMIZATION, ...payload.customization },
+        addedAt: now,
+      });
+    }
+
     const pack: CompendiumPack = {
       id: packId,
-      name: (manifest.name as string).trim(),
+      name: packName,
       description:
         typeof manifest.description === "string"
           ? manifest.description.trim() || undefined
@@ -396,8 +541,10 @@ export function useCompendiumPacks() {
         typeof manifest.createdAt === "number" ? manifest.createdAt : now,
       updatedAt: now,
       items,
+      themes: importedThemes,
     };
     await savePack(pack);
+
     return packId;
   }, []);
 
@@ -463,6 +610,9 @@ export function useCompendiumPacks() {
     updateItem,
     removeItem,
     moveItem,
+    addTheme,
+    removeTheme,
+    applyTheme,
     exportAsModule,
     importFromFile,
     importFromManifestUrl,
