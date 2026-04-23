@@ -30,6 +30,7 @@ import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
 import { deriveVehicleSlots, validateSlots } from "./slots/equipmentSlots";
+import { clearSlotAction } from "./slots/loadoutActions";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -66,7 +67,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     React.useState(false);
   const [openAccessoryCompendium, setOpenAccessoryCompendium] =
     React.useState(false);
-  const [martialWarning, setMartialWarning] = React.useState(null); // { itemName, onConfirm }
 
   const inv = player.equipment?.[0] || {};
 
@@ -123,14 +123,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     }
 
     return false;
-  };
-
-  const guardMartialEquip = (itemType, item, onConfirm) => {
-    if (hasMartialProficiency(itemType, item)) {
-      onConfirm();
-      return;
-    }
-    setMartialWarning({ itemName: item?.name ?? "", onConfirm });
   };
 
   // For add/edit/delete operations: preserve existing equippedSlots (only clear slots
@@ -538,47 +530,23 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         return ref.index === itemIndex;
       return ref.name === itemName;
     });
-    const slotRef = slotKey ? slots[slotKey] : null;
-
-    let updated = patchInv(player, source, (arr) =>
-      arr.map((it, idx) => {
-        const match =
-          slotRef?.index !== undefined
-            ? idx === slotRef.index
-            : it.name === itemName;
-        return match ? { ...it, isEquipped: false } : it;
-      }),
-    );
-
     if (slotKey) {
-      const prevSlots = updated.equippedSlots ?? {
-        mainHand: null,
-        offHand: null,
-        armor: null,
-        accessory: null,
-      };
-      setPlayer({
-        ...updated,
-        equippedSlots: { ...prevSlots, [slotKey]: null },
-        vehicleSlots: deriveVehicleSlots(updated),
-      });
+      setPlayer((prev) => clearSlotAction(prev, slotKey));
     } else {
-      setPlayer(preserveSlots(updated));
+      setPlayer(preserveSlots(player));
     }
   };
 
   const handleEquipWeapon = (index, slot) => {
     const weapon = (inv.weapons ?? [])[index];
     if (!weapon) return;
-    guardMartialEquip("weapons", weapon, () => {
-      equipToSlot(
-        "weapons",
-        weapon.name,
-        index,
-        slot,
-        weapon.hands === 2 || weapon.isTwoHand,
-      );
-    });
+    equipToSlot(
+      "weapons",
+      weapon.name,
+      index,
+      slot,
+      weapon.hands === 2 || weapon.isTwoHand,
+    );
   };
 
   const handleUnequipWeapon = (index) => {
@@ -590,9 +558,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const handleEquipCustomWeapon = (index) => {
     const cw = (inv.customWeapons ?? [])[index];
     if (!cw) return;
-    guardMartialEquip("customWeapons", cw, () => {
-      equipToSlot("customWeapons", cw.name, index, "mainHand", true);
-    });
+    equipToSlot("customWeapons", cw.name, index, "mainHand", true);
   };
 
   const handleUnequipCustomWeapon = (index) => {
@@ -616,18 +582,14 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     if (armor.isEquipped) {
       unequipItem("armor", armor.name, armorIndex);
     } else {
-      guardMartialEquip("armor", armor, () => {
-        equipToSlot("armor", armor.name, armorIndex, "armor", false);
-      });
+      equipToSlot("armor", armor.name, armorIndex, "armor", false);
     }
   };
 
   const handleEquipShield = (index, slot) => {
     const shield = (inv.shields ?? [])[index];
     if (!shield) return;
-    guardMartialEquip("shields", shield, () => {
-      equipToSlot("shields", shield.name, index, slot, false);
-    });
+    equipToSlot("shields", shield.name, index, slot, false);
   };
 
   const handleUnequipShield = (index) => {
@@ -642,15 +604,13 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     if (accessory.isEquipped) {
       unequipItem("accessories", accessory.name, accessoryIndex);
     } else {
-      guardMartialEquip("accessories", accessory, () => {
-        equipToSlot(
-          "accessories",
-          accessory.name,
-          accessoryIndex,
-          "accessory",
-          false,
-        );
-      });
+      equipToSlot(
+        "accessories",
+        accessory.name,
+        accessoryIndex,
+        "accessory",
+        false,
+      );
     }
   };
 
@@ -993,55 +953,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         restrictToTypes={["accessories"]}
         context="player"
       />
-      {martialWarning && (
-        <Dialog
-          open
-          onClose={() => setMartialWarning(null)}
-          maxWidth="xs"
-          fullWidth
-        >
-          <DialogTitle
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              color: "warning.main",
-            }}
-          >
-            <WarningAmber fontSize="small" />
-            {t("Not Proficient")}
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="body2">
-              <strong>{martialWarning.itemName}</strong>{" "}
-              {t(
-                "is a martial item and your character is not proficient with it.",
-              )}
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
-              {t(
-                "Equipping it without proficiency may be against the rules. Equip anyway?",
-              )}
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setMartialWarning(null)} size="small">
-              {t("Cancel")}
-            </Button>
-            <Button
-              color="warning"
-              variant="contained"
-              size="small"
-              onClick={() => {
-                martialWarning.onConfirm?.();
-                setMartialWarning(null);
-              }}
-            >
-              {t("Equip Anyway")}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
     </>
   );
 }

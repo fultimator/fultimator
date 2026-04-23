@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import PrettyWeapon from "./PrettyWeapon";
-import { Edit, WarningAmber } from "@mui/icons-material";
+import { Edit, WarningAmber, Error as ErrorIcon } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
@@ -172,17 +172,127 @@ export default function PlayerWeapons({
                         <Tooltip title={tooltipTitle}>
                           <span>
                             <Badge
-                              badgeContent={
-                                equippedSlot === "mainHand"
-                                  ? isTwoHand
-                                    ? "M+O"
-                                    : "M"
-                                  : equippedSlot === "offHand"
-                                    ? "O"
-                                    : null
-                              }
+                              badgeContent={(() => {
+                                const settings = player.settings ?? {};
+                                const defaultRef =
+                                  settings.defaultUnarmedStrikeRef;
+                                const autoEquipEnabled =
+                                  settings.autoEquipUnarmed ?? !!defaultRef;
+                                const isDefaultUnarmed =
+                                  defaultRef &&
+                                  defaultRef.source === "weapons" &&
+                                  (defaultRef.index !== undefined
+                                    ? defaultRef.index === index
+                                    : defaultRef.name === weapon.name);
+
+                                if (
+                                  isDefaultUnarmed &&
+                                  autoEquipEnabled &&
+                                  !equippedSlot
+                                ) {
+                                  const slots = player.equippedSlots ?? {};
+                                  const playerInv = player.equipment?.[0];
+                                  const mainHandWeapon = slots.mainHand
+                                    ? (playerInv?.weapons ?? []).find(
+                                        (w, i) =>
+                                          i === slots.mainHand.index ||
+                                          w.name === slots.mainHand.name,
+                                      )
+                                    : null;
+                                  const mainHandIs2H =
+                                    mainHandWeapon &&
+                                    (mainHandWeapon.isTwoHand ||
+                                      mainHandWeapon.hands === 2);
+
+                                  const mainHandEmpty = !slots.mainHand;
+                                  const offHandEmpty =
+                                    !slots.offHand && !mainHandIs2H;
+
+                                  if (mainHandEmpty && offHandEmpty)
+                                    return "M+O";
+                                  if (mainHandEmpty && !offHandEmpty)
+                                    return "M";
+                                  if (!mainHandEmpty && offHandEmpty)
+                                    return "O";
+                                  return null;
+                                }
+
+                                if (equippedSlot === "mainHand") {
+                                  const offRef = player.equippedSlots?.offHand;
+                                  const sameInBoth =
+                                    offRef?.source === "weapons" &&
+                                    (offRef?.index === index ||
+                                      offRef?.name === weapon.name);
+                                  return isTwoHand || sameInBoth ? "M+O" : "M";
+                                }
+                                return equippedSlot === "offHand" ? "O" : null;
+                              })()}
                               color="primary"
-                              invisible={!weapon.isEquipped || !equippedSlot}
+                              invisible={(() => {
+                                const badge = (() => {
+                                  const settings = player.settings ?? {};
+                                  const defaultRef =
+                                    settings.defaultUnarmedStrikeRef;
+                                  const autoEquipEnabled =
+                                    settings.autoEquipUnarmed ?? !!defaultRef;
+                                  const isDefaultUnarmed =
+                                    defaultRef &&
+                                    defaultRef.source === "weapons" &&
+                                    (defaultRef.index !== undefined
+                                      ? defaultRef.index === index
+                                      : defaultRef.name === weapon.name);
+
+                                  if (
+                                    isDefaultUnarmed &&
+                                    autoEquipEnabled &&
+                                    !equippedSlot
+                                  ) {
+                                    const slots = player.equippedSlots ?? {};
+                                    const playerInv = player.equipment?.[0];
+                                    const mainHandWeapon = slots.mainHand
+                                      ? (playerInv?.weapons ?? []).find(
+                                          (w, i) =>
+                                            i === slots.mainHand.index ||
+                                            w.name === slots.mainHand.name,
+                                        )
+                                      : null;
+                                    const mainHandIs2H =
+                                      mainHandWeapon &&
+                                      (mainHandWeapon.isTwoHand ||
+                                        mainHandWeapon.hands === 2);
+
+                                    const mainHandEmpty = !slots.mainHand;
+                                    const offHandEmpty =
+                                      !slots.offHand && !mainHandIs2H;
+
+                                    if (mainHandEmpty && offHandEmpty)
+                                      return "M+O";
+                                    if (mainHandEmpty && !offHandEmpty)
+                                      return "M";
+                                    if (!mainHandEmpty && offHandEmpty)
+                                      return "O";
+                                    return null;
+                                  }
+
+                                  if (equippedSlot === "mainHand") {
+                                    // Check if offHand has the same weapon (both hands)
+                                    const offRef =
+                                      player.equippedSlots?.offHand;
+                                    const sameInBoth =
+                                      offRef?.source === "weapons" &&
+                                      (offRef?.index === index ||
+                                        offRef?.name === weapon.name);
+                                    return isTwoHand || sameInBoth
+                                      ? "M+O"
+                                      : "M";
+                                  }
+                                  return equippedSlot === "offHand"
+                                    ? "O"
+                                    : null;
+                                })();
+
+                                return !badge;
+                              })()}
                               sx={{
                                 "& .MuiBadge-badge": {
                                   fontSize: "0.6rem",
@@ -193,7 +303,23 @@ export default function PlayerWeapons({
                             >
                               <IconButton
                                 onClick={(e) => handleEquipClick(e, index)}
-                                disabled={!isEditMode}
+                                disabled={
+                                  !isEditMode ||
+                                  (() => {
+                                    const settings = player.settings ?? {};
+                                    const defaultRef =
+                                      settings.defaultUnarmedStrikeRef;
+                                    const autoEquipEnabled =
+                                      settings.autoEquipUnarmed ?? !!defaultRef;
+                                    const isDefaultUnarmed =
+                                      defaultRef &&
+                                      defaultRef.source === "weapons" &&
+                                      (defaultRef.index !== undefined
+                                        ? defaultRef.index === index
+                                        : defaultRef.name === weapon.name);
+                                    return isDefaultUnarmed && autoEquipEnabled;
+                                  })()
+                                }
                                 size="small"
                                 sx={{
                                   backgroundColor: weapon.isEquipped
@@ -231,13 +357,169 @@ export default function PlayerWeapons({
                       ) : (
                         <Tooltip title={t("Not proficient  -  martial item")}>
                           <span>
-                            <IconButton
-                              onClick={(e) => handleEquipClick(e, index)}
-                              disabled={!isEditMode}
-                              size="small"
+                            <Badge
+                              badgeContent={(() => {
+                                const settings = player.settings ?? {};
+                                const defaultRef =
+                                  settings.defaultUnarmedStrikeRef;
+                                const autoEquipEnabled =
+                                  settings.autoEquipUnarmed ?? !!defaultRef;
+                                const isDefaultUnarmed =
+                                  defaultRef &&
+                                  defaultRef.source === "weapons" &&
+                                  (defaultRef.index !== undefined
+                                    ? defaultRef.index === index
+                                    : defaultRef.name === weapon.name);
+
+                                // For default unarmed strike, show which slots it would fill (based on empty slots)
+                                if (isDefaultUnarmed && autoEquipEnabled) {
+                                  const slots = player.equippedSlots ?? {};
+                                  // Check if mainHand has a 2-handed weapon (occupies both slots)
+                                  const playerInv = player.equipment?.[0];
+                                  const mainHandWeapon = slots.mainHand
+                                    ? (playerInv?.weapons ?? []).find(
+                                        (w, i) =>
+                                          i === slots.mainHand.index ||
+                                          w.name === slots.mainHand.name,
+                                      )
+                                    : null;
+                                  const mainHandIs2H =
+                                    mainHandWeapon &&
+                                    (mainHandWeapon.isTwoHand ||
+                                      mainHandWeapon.hands === 2);
+
+                                  const mainHandEmpty = !slots.mainHand;
+                                  const offHandEmpty =
+                                    !slots.offHand && !mainHandIs2H;
+
+                                  if (mainHandEmpty && offHandEmpty)
+                                    return "M+O";
+                                  if (mainHandEmpty && !offHandEmpty)
+                                    return "M";
+                                  if (!mainHandEmpty && offHandEmpty)
+                                    return "O";
+                                  return null;
+                                }
+
+                                return equippedSlot === "mainHand"
+                                  ? isTwoHand
+                                    ? "M+O"
+                                    : "M"
+                                  : equippedSlot === "offHand"
+                                    ? "O"
+                                    : null;
+                              })()}
+                              color="primary"
+                              invisible={(() => {
+                                const badge = (() => {
+                                  const settings = player.settings ?? {};
+                                  const defaultRef =
+                                    settings.defaultUnarmedStrikeRef;
+                                  const autoEquipEnabled =
+                                    settings.autoEquipUnarmed ?? !!defaultRef;
+                                  const isDefaultUnarmed =
+                                    defaultRef &&
+                                    defaultRef.source === "weapons" &&
+                                    (defaultRef.index !== undefined
+                                      ? defaultRef.index === index
+                                      : defaultRef.name === weapon.name);
+
+                                  if (isDefaultUnarmed && autoEquipEnabled) {
+                                    const slots = player.equippedSlots ?? {};
+                                    const playerInv = player.equipment?.[0];
+                                    const mainHandWeapon = slots.mainHand
+                                      ? (playerInv?.weapons ?? []).find(
+                                          (w, i) =>
+                                            i === slots.mainHand.index ||
+                                            w.name === slots.mainHand.name,
+                                        )
+                                      : null;
+                                    const mainHandIs2H =
+                                      mainHandWeapon &&
+                                      (mainHandWeapon.isTwoHand ||
+                                        mainHandWeapon.hands === 2);
+
+                                    const mainHandEmpty = !slots.mainHand;
+                                    const offHandEmpty =
+                                      !slots.offHand && !mainHandIs2H;
+
+                                    if (mainHandEmpty && offHandEmpty)
+                                      return "M+O";
+                                    if (mainHandEmpty && !offHandEmpty)
+                                      return "M";
+                                    if (!mainHandEmpty && offHandEmpty)
+                                      return "O";
+                                    return null;
+                                  }
+
+                                  if (equippedSlot === "mainHand") {
+                                    // Check if offHand has the same weapon (both hands)
+                                    const offRef =
+                                      player.equippedSlots?.offHand;
+                                    const sameInBoth =
+                                      offRef?.source === "weapons" &&
+                                      (offRef?.index === index ||
+                                        offRef?.name === weapon.name);
+                                    return isTwoHand || sameInBoth
+                                      ? "M+O"
+                                      : "M";
+                                  }
+                                  return equippedSlot === "offHand"
+                                    ? "O"
+                                    : null;
+                                })();
+
+                                return !badge;
+                              })()}
+                              sx={{
+                                "& .MuiBadge-badge": {
+                                  fontSize: "0.6rem",
+                                  height: 14,
+                                  minWidth: 14,
+                                },
+                              }}
                             >
-                              <WarningAmber color="warning" fontSize="small" />
-                            </IconButton>
+                              <IconButton
+                                onClick={(e) => handleEquipClick(e, index)}
+                                disabled={!isEditMode}
+                                size="small"
+                                sx={{
+                                  backgroundColor: weapon.isEquipped
+                                    ? theme.palette.ternary.main
+                                    : theme.palette.background.paper,
+                                  "&:hover": {
+                                    backgroundColor: weapon.isEquipped
+                                      ? theme.palette.quaternary.main
+                                      : theme.palette.secondary.main,
+                                  },
+                                  transition: "background-color 0.3s",
+                                  p: 0.5,
+                                  border: `1px solid ${theme.palette.divider}`,
+                                }}
+                              >
+                                {weapon.isEquipped ? (
+                                  <Equip
+                                    color={
+                                      theme.palette.mode === "dark"
+                                        ? theme.palette.white.main
+                                        : theme.palette.primary.main
+                                    }
+                                    strokeColor={
+                                      theme.palette.mode === "dark"
+                                        ? theme.palette.white.main
+                                        : theme.palette.secondary.main
+                                    }
+                                  />
+                                ) : (
+                                  <ErrorIcon
+                                    sx={{
+                                      fontSize: "1.1rem",
+                                      color: "error.main",
+                                    }}
+                                  />
+                                )}
+                              </IconButton>
+                            </Badge>
                           </span>
                         </Tooltip>
                       )}

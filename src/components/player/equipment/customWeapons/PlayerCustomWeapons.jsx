@@ -252,9 +252,82 @@ export default function PlayerCustomWeapons({
                         >
                           <span>
                             <Badge
-                              badgeContent="M+O"
+                              badgeContent={(() => {
+                                const settings = player.settings ?? {};
+                                const defaultRef =
+                                  settings.defaultUnarmedStrikeRef;
+                                const autoEquipEnabled =
+                                  settings.autoEquipUnarmed ?? !!defaultRef;
+                                const isDefaultUnarmed =
+                                  defaultRef &&
+                                  defaultRef.source === "customWeapons" &&
+                                  (defaultRef.index !== undefined
+                                    ? defaultRef.index === index
+                                    : defaultRef.name === customWeapon.name);
+
+                                // For default unarmed strike, show which slots it would fill (based on empty slots)
+                                if (isDefaultUnarmed && autoEquipEnabled) {
+                                  const slots = player.equippedSlots ?? {};
+                                  // Custom weapons are always 2-handed, check if mainHand has a custom weapon
+                                  const mainHandIsCustomWeapon =
+                                    slots.mainHand?.source === "customWeapons";
+
+                                  const mainHandEmpty = !slots.mainHand;
+                                  const offHandEmpty =
+                                    !slots.offHand && !mainHandIsCustomWeapon;
+
+                                  if (mainHandEmpty && offHandEmpty)
+                                    return "M+O";
+                                  if (mainHandEmpty && !offHandEmpty)
+                                    return "M";
+                                  if (!mainHandEmpty && offHandEmpty)
+                                    return "O";
+                                  return null;
+                                }
+
+                                // For regular custom weapons, always show M+O
+                                return "M+O";
+                              })()}
                               color="primary"
-                              invisible={!customWeapon.isEquipped}
+                              invisible={(() => {
+                                const badge = (() => {
+                                  const settings = player.settings ?? {};
+                                  const defaultRef =
+                                    settings.defaultUnarmedStrikeRef;
+                                  const autoEquipEnabled =
+                                    settings.autoEquipUnarmed ?? !!defaultRef;
+                                  const isDefaultUnarmed =
+                                    defaultRef &&
+                                    defaultRef.source === "customWeapons" &&
+                                    (defaultRef.index !== undefined
+                                      ? defaultRef.index === index
+                                      : defaultRef.name === customWeapon.name);
+
+                                  if (isDefaultUnarmed && autoEquipEnabled) {
+                                    const slots = player.equippedSlots ?? {};
+                                    // Custom weapons are always 2-handed, check if mainHand has a custom weapon
+                                    const mainHandIsCustomWeapon =
+                                      slots.mainHand?.source ===
+                                      "customWeapons";
+
+                                    const mainHandEmpty = !slots.mainHand;
+                                    const offHandEmpty =
+                                      !slots.offHand && !mainHandIsCustomWeapon;
+
+                                    if (mainHandEmpty && offHandEmpty)
+                                      return "M+O";
+                                    if (mainHandEmpty && !offHandEmpty)
+                                      return "M";
+                                    if (!mainHandEmpty && offHandEmpty)
+                                      return "O";
+                                    return null;
+                                  }
+
+                                  return "M+O";
+                                })();
+
+                                return !badge;
+                              })()}
                               sx={{
                                 "& .MuiBadge-badge": {
                                   fontSize: "0.6rem",
@@ -265,7 +338,24 @@ export default function PlayerCustomWeapons({
                             >
                               <IconButton
                                 onClick={() => handleEquipClick(index)}
-                                disabled={!isEditMode}
+                                disabled={
+                                  !isEditMode ||
+                                  (() => {
+                                    const settings = player.settings ?? {};
+                                    const defaultRef =
+                                      settings.defaultUnarmedStrikeRef;
+                                    const autoEquipEnabled =
+                                      settings.autoEquipUnarmed ?? !!defaultRef;
+                                    const isDefaultUnarmed =
+                                      defaultRef &&
+                                      defaultRef.source === "customWeapons" &&
+                                      (defaultRef.index !== undefined
+                                        ? defaultRef.index === index
+                                        : defaultRef.name ===
+                                          customWeapon.name);
+                                    return isDefaultUnarmed && autoEquipEnabled;
+                                  })()
+                                }
                                 size="small"
                                 sx={{
                                   backgroundColor: customWeapon.isEquipped
