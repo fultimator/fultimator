@@ -9,6 +9,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import {
+  Bookmark as BookmarkIcon,
   ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
   ChevronRight as ChevronRightIcon,
   Palette as PaletteIcon,
@@ -16,10 +17,35 @@ import {
 import { APP_DRAWER_WIDTH } from "./constants";
 import { NotesPanel } from "./panels/NotesPanel";
 import { CustomizerPanel } from "./panels/CustomizerPanel";
+import { SavedThemesPanel } from "./panels/SavedThemesPanel";
 
 const TAB_RAIL_WIDTH = 44;
 
-type DrawerTab = "notes" | "customizer";
+type DrawerTab = "notes" | "customizer" | "themes";
+
+const TAB_TITLE: Record<DrawerTab, string> = {
+  notes: "Chat",
+  customizer: "Customizer",
+  themes: "Saved Themes",
+};
+
+const TABS: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
+  {
+    id: "notes",
+    label: "Chat",
+    icon: <ChatBubbleOutlineIcon fontSize="small" />,
+  },
+  {
+    id: "customizer",
+    label: "Customizer",
+    icon: <PaletteIcon fontSize="small" />,
+  },
+  {
+    id: "themes",
+    label: "Saved Themes",
+    icon: <BookmarkIcon fontSize="small" />,
+  },
+];
 
 interface AppDrawerProps {
   open: boolean;
@@ -93,49 +119,26 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
             gap: 1,
           }}
         >
-          <Tooltip title="Chat" placement="right">
-            <IconButton
-              aria-label="Chat"
-              onClick={() => setActiveTab("notes")}
-              size="small"
-              sx={{
-                width: 30,
-                height: 30,
-                borderRadius: 1,
-                color:
-                  activeTab === "notes" ? "primary.main" : "text.secondary",
-                backgroundColor:
-                  activeTab === "notes" ? "action.selected" : "transparent",
-                "&:hover": { backgroundColor: "action.hover" },
-              }}
-            >
-              <ChatBubbleOutlineIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="Customizer" placement="right">
-            <IconButton
-              aria-label="Customizer"
-              onClick={() => setActiveTab("customizer")}
-              size="small"
-              sx={{
-                width: 30,
-                height: 30,
-                borderRadius: 1,
-                color:
-                  activeTab === "customizer"
-                    ? "primary.main"
-                    : "text.secondary",
-                backgroundColor:
-                  activeTab === "customizer"
-                    ? "action.selected"
-                    : "transparent",
-                "&:hover": { backgroundColor: "action.hover" },
-              }}
-            >
-              <PaletteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {TABS.map(({ id, label, icon }) => (
+            <Tooltip key={id} title={label} placement="right">
+              <IconButton
+                aria-label={label}
+                onClick={() => setActiveTab(id)}
+                size="small"
+                sx={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 1,
+                  color: activeTab === id ? "primary.main" : "text.secondary",
+                  backgroundColor:
+                    activeTab === id ? "action.selected" : "transparent",
+                  "&:hover": { backgroundColor: "action.hover" },
+                }}
+              >
+                {icon}
+              </IconButton>
+            </Tooltip>
+          ))}
         </Box>
 
         {/* Content area */}
@@ -157,7 +160,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
             }}
           >
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {activeTab === "notes" ? "Chat" : "Customizer"}
+              {TAB_TITLE[activeTab]}
             </Typography>
             <IconButton onClick={onClose} size="small" sx={{ ml: 1 }}>
               <ChevronRightIcon />
@@ -169,6 +172,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
           <Box sx={{ flex: 1, overflowY: "auto" }}>
             {activeTab === "notes" && <NotesPanel />}
             {activeTab === "customizer" && <CustomizerPanel />}
+            {activeTab === "themes" && <SavedThemesPanel />}
           </Box>
         </Box>
       </Box>

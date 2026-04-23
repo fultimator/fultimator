@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import type { SyntheticEvent, ChangeEvent } from "react";
 import type { Theme } from "@mui/material";
 import { useThemeStore } from "../../../store/themeStore";
@@ -8,6 +8,7 @@ import {
   THEMES_REGISTRY,
   STYLE_PROFILE_MAP,
 } from "../../../themes/themeRegistry";
+import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
 
 export function useCustomizerState() {
   const {
@@ -22,8 +23,11 @@ export function useCustomizerState() {
     toggleDarkMode,
   } = useThemeStore();
 
+  const { packs, addTheme } = useCompendiumPacks();
+
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [snackbar, setSnackbar] = useState<string | null>(null);
+  const [saveThemeOpen, setSaveThemeOpen] = useState(false);
   const [tempSliderValues, setTempSliderValues] = useState<
     Record<string, number>
   >({});
@@ -102,6 +106,28 @@ export function useCustomizerState() {
     setResetConfirmOpen(false);
   };
   const cancelReset = () => setResetConfirmOpen(false);
+
+  const handleSaveTheme = () => setSaveThemeOpen(true);
+  const cancelSaveTheme = () => setSaveThemeOpen(false);
+  const confirmSaveTheme = useCallback(
+    async (name: string, description: string | null, packId: string) => {
+      try {
+        await addTheme(packId, {
+          name,
+          description,
+          baseTheme: selectedTheme,
+          styleProfile: selectedStyleProfile,
+          isDarkMode,
+          customization,
+        });
+        setSaveThemeOpen(false);
+        setSnackbar(`Theme "${name}" saved`);
+      } catch (e) {
+        setSnackbar(e instanceof Error ? e.message : "Failed to save theme");
+      }
+    },
+    [addTheme, selectedTheme, selectedStyleProfile, isDarkMode, customization],
+  );
 
   const handleExportJSON = () => {
     const dataStr = JSON.stringify(customization, null, 2);
@@ -210,5 +236,10 @@ export function useCustomizerState() {
     resetConfirmOpen,
     snackbar,
     setSnackbar,
+    packs,
+    saveThemeOpen,
+    handleSaveTheme,
+    cancelSaveTheme,
+    confirmSaveTheme,
   };
 }

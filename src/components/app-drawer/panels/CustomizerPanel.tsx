@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  Bookmark as BookmarkIcon,
   FileDownload as FileDownloadIcon,
   FileUpload as FileUploadIcon,
   Palette as PaletteIcon,
@@ -30,6 +31,7 @@ import { FrameEffectsAccordion } from "../accordions/FrameEffectsAccordion";
 import { TextEffectsAccordion } from "../accordions/TextEffectsAccordion";
 import { SurfaceEffectsAccordion } from "../accordions/SurfaceEffectsAccordion";
 import { ResetConfirmDialog } from "../dialogs/ResetConfirmDialog";
+import { SaveThemeDialog } from "../dialogs/SaveThemeDialog";
 import { useCustomizerState } from "../hooks/useCustomizerState";
 
 export const CustomizerPanel: React.FC = () => {
@@ -58,6 +60,11 @@ export const CustomizerPanel: React.FC = () => {
     resetConfirmOpen,
     snackbar,
     setSnackbar,
+    packs,
+    saveThemeOpen,
+    handleSaveTheme,
+    cancelSaveTheme,
+    confirmSaveTheme,
   } = useCustomizerState();
 
   return (
@@ -241,6 +248,16 @@ export const CustomizerPanel: React.FC = () => {
         <Stack spacing={1}>
           <Button
             fullWidth
+            variant="contained"
+            startIcon={<BookmarkIcon />}
+            onClick={handleSaveTheme}
+            size="small"
+          >
+            Save Theme
+          </Button>
+
+          <Button
+            fullWidth
             variant="outlined"
             startIcon={<RestoreIcon />}
             onClick={handleResetAll}
@@ -292,6 +309,13 @@ export const CustomizerPanel: React.FC = () => {
         open={resetConfirmOpen}
         onConfirm={confirmReset}
         onCancel={cancelReset}
+      />
+
+      <SaveThemeDialog
+        open={saveThemeOpen}
+        packs={packs}
+        onConfirm={confirmSaveTheme}
+        onCancel={cancelSaveTheme}
       />
     </>
   );
