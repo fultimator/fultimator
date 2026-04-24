@@ -73,12 +73,14 @@ function PrettyAccessory({
             }}
           >
             <Grid size={6}>
-              <Typography sx={{ textAlign: "left" }}>
+              <Typography sx={{ textAlign: "left", color: "inherit" }}>
                 {t("Accessory")}
               </Typography>
             </Grid>
             <Grid size={2}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+              <Typography sx={{ textAlign: "center", color: "inherit" }}>
+                {t("Cost")}
+              </Typography>
             </Grid>
           </Grid>
         )}

@@ -82,24 +82,28 @@ export default function PrettyArmor({
             }}
           >
             <Grid size={3}>
-              <Typography sx={{ textAlign: "left" }}>{t(category)}</Typography>
+              <Typography sx={{ textAlign: "left", color: "inherit" }}>
+                {t(category)}
+              </Typography>
             </Grid>
             <Grid size={1}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+              <Typography sx={{ textAlign: "center", color: "inherit" }}>
+                {t("Cost")}
+              </Typography>
             </Grid>
             <Grid size={2}>
-              <Typography sx={{ textAlign: "center" }}>
+              <Typography sx={{ textAlign: "center", color: "inherit" }}>
                 {t("Defense")}
               </Typography>
             </Grid>
             <Grid size={2}>
-              <Typography sx={{ textAlign: "center" }}>
+              <Typography sx={{ textAlign: "center", color: "inherit" }}>
                 {t("M. Defense")}
               </Typography>
             </Grid>
             {!armor.rework && (
               <Grid size={2}>
-                <Typography sx={{ textAlign: "center" }}>
+                <Typography sx={{ textAlign: "center", color: "inherit" }}>
                   {t("Initiative")}
                 </Typography>
               </Grid>
