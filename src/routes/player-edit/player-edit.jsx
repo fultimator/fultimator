@@ -413,8 +413,7 @@ export default function PlayerEdit() {
   const settings = playerTemp?.settings ?? {};
   const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
   const advancement = settings.advancement ?? false;
-  const autoEquipUnarmed = settings.autoEquipUnarmed ?? true;
-  const defaultUnarmedStrikeRef = settings.defaultUnarmedStrikeRef ?? null;
+  const autoEquipUnarmed = settings.autoEquipUnarmed ?? false;
 
   const inv = playerTemp?.equipment?.[0];
   const unarmedStrikeOptions = [
@@ -429,6 +428,10 @@ export default function PlayerEdit() {
       index: i,
     })),
   ];
+  const defaultUnarmedStrikeRef =
+    settings.defaultUnarmedStrikeRef ??
+    unarmedStrikeOptions.find((o) => o.name === "Unarmed Strike") ??
+    null;
   const canLevelUpFromExp =
     isOwner &&
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
