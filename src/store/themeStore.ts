@@ -49,6 +49,7 @@ interface ThemeStore {
   isDarkMode: boolean;
   customization: ThemeCustomization;
   drawerOpen: boolean;
+  unsavedChanges: boolean;
 
   setTheme: (theme: ThemeValue) => void;
   setStyleProfile: (profile: StyleProfileValue) => void;
@@ -57,6 +58,7 @@ interface ThemeStore {
   resetCustomization: () => void;
   toggleDrawer: () => void;
   setDrawerOpen: (open: boolean) => void;
+  setUnsavedChanges: (unsaved: boolean) => void;
 }
 
 export const useThemeStore = create<ThemeStore>()(
@@ -67,6 +69,7 @@ export const useThemeStore = create<ThemeStore>()(
       isDarkMode: false,
       customization: DEFAULT_CUSTOMIZATION,
       drawerOpen: false,
+      unsavedChanges: false,
 
       setTheme: (theme) => set({ selectedTheme: theme }),
       setStyleProfile: (profile) => set({ selectedStyleProfile: profile }),
@@ -78,6 +81,7 @@ export const useThemeStore = create<ThemeStore>()(
 
       toggleDrawer: () => set((s) => ({ drawerOpen: !s.drawerOpen })),
       setDrawerOpen: (open) => set({ drawerOpen: open }),
+      setUnsavedChanges: (unsaved) => set({ unsavedChanges: unsaved }),
     }),
     {
       name: "theme-store",

@@ -44,6 +44,7 @@ const Resources = React.lazy(() => import("./routes/resources/resources"));
 const CompendiumViewer = React.lazy(
   () => import("./routes/compendium/compendium"),
 );
+const DebugMenu = React.lazy(() => import("./routes/debug-menu/debug-menu"));
 
 const Router = IS_ELECTRON ? MemoryRouter : BrowserRouter;
 
@@ -228,6 +229,14 @@ export const App = () => {
                 element={
                   <Suspense fallback={<LoadingPage />}>
                     <CompendiumViewer />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/debug-menu"
+                element={
+                  <Suspense fallback={<LoadingPage />}>
+                    <DebugMenu />
                   </Suspense>
                 }
               />

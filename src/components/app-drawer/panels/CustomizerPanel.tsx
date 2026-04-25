@@ -15,11 +15,15 @@ import {
 } from "@mui/material";
 import {
   Bookmark as BookmarkIcon,
+  BugReport as BugReportIcon,
   FileDownload as FileDownloadIcon,
   FileUpload as FileUploadIcon,
   Palette as PaletteIcon,
   Restore as RestoreIcon,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router";
+import { useThemeStore } from "../../../store/themeStore";
+import { globalConfirm } from "../../../utility/globalConfirm";
 import {
   THEMES_REGISTRY,
   STYLE_PROFILE_MAP,
@@ -35,6 +39,19 @@ import { SaveThemeDialog } from "../dialogs/SaveThemeDialog";
 import { useCustomizerState } from "../hooks/useCustomizerState";
 
 export const CustomizerPanel: React.FC = () => {
+  const navigate = useNavigate();
+  const { unsavedChanges } = useThemeStore();
+
+  const handleGoToDebugMenu = async () => {
+    if (unsavedChanges) {
+      const ok = await globalConfirm(
+        "You have unsaved changes. Are you sure you want to leave?",
+      );
+      if (!ok) return;
+    }
+    navigate("/debug-menu");
+  };
+
   const {
     customization,
     selectedTheme,
@@ -294,6 +311,20 @@ export const CustomizerPanel: React.FC = () => {
               />
             </Button>
           </Box>
+
+          <Divider />
+
+          <Button
+            fullWidth
+            variant="text"
+            startIcon={<BugReportIcon />}
+            onClick={handleGoToDebugMenu}
+            size="small"
+            color="inherit"
+            sx={{ opacity: 0.5 }}
+          >
+            Debug Menu
+          </Button>
         </Stack>
       </Box>
 

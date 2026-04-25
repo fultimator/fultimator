@@ -42,7 +42,12 @@ const Layout: React.FC<LayoutProps> = ({
     drawerOpen,
     toggleDrawer,
     setDrawerOpen,
+    setUnsavedChanges,
   } = useThemeStore();
+
+  useEffect(() => {
+    setUnsavedChanges(unsavedChanges ?? false);
+  }, [unsavedChanges, setUnsavedChanges]);
 
   const handleSelectTheme = (theme: ThemeValue) => {
     setTheme(theme);

@@ -44,8 +44,8 @@ function EditableImage({ size }: EditableAvatarProps) {
     <>
       <Box
         sx={{
-          width: "100%",
-          height: "100%",
+          width: `${size}px`,
+          height: `${size}px`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -59,7 +59,7 @@ function EditableImage({ size }: EditableAvatarProps) {
             src={image}
             width={`${size}px`}
             height={`${size}px`}
-            style={{ objectFit: "cover" }}
+            style={{ objectFit: "contain" }}
           />
         ) : (
           <AddPhotoAlternate
