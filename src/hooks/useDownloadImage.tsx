@@ -10,8 +10,9 @@ const useDownloadImage = (name, ref) => {
     if (ref.current) {
       try {
         const canvas = await html2canvas(ref.current, {
-          logging: true,
+          logging: false,
           useCORS: true,
+          allowTaint: true,
           scale: 2,
           backgroundColor: `${background}`,
         });

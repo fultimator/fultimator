@@ -603,6 +603,225 @@ export const SharedShieldCard = React.memo(function SharedShieldCard(props) {
   return <SharedArmorLikeCard {...props} forceCategory="Shield" />;
 });
 
+function CustomWeaponRows({
+  item,
+  customTheme,
+  scale,
+  background,
+  imageMode,
+  imageSize,
+  imageVisible,
+  imageSlot,
+  cols,
+  t,
+}) {
+  const { precision, damage } = calculateCustomWeaponStats(item, false);
+  const { attr1, attr2 } = resolveAccuracyAttributes(item);
+  const damageType = types[getCustomWeaponDamageType(item)];
+  const martial = isCustomWeaponMartial(item);
+
+  return (
+    <RowsWithOptionalImage
+      imageMode={imageMode}
+      imageSize={imageSize}
+      imageVisible={imageVisible}
+      imageSlot={imageSlot}
+      customTheme={customTheme}
+    >
+      <Grid
+        container
+        sx={dataRowSx(customTheme, imageMode, background, {
+          borderBottom: `1px solid ${customTheme.secondary}`,
+        })}
+      >
+        <Grid sx={{ display: "flex", alignItems: "center" }} size={cols.name}>
+          <Typography
+            sx={{
+              fontWeight: 600,
+              fontSize: scale.headingRow,
+              lineHeight: 1,
+              margin: 0,
+            }}
+          >
+            {item.name || t("Custom Weapon")}
+          </Typography>
+          {martial && <Martial />}
+        </Grid>
+        <Grid size={cols.cost}>
+          <Typography
+            sx={{
+              textAlign: "center",
+              fontSize: scale.body,
+              lineHeight: 1,
+              margin: 0,
+            }}
+          >
+            {item.cost || 300}z
+          </Typography>
+        </Grid>
+        <Grid size={cols.accuracy}>
+          <Typography
+            sx={{
+              textAlign: "center",
+              fontWeight: 600,
+              fontSize: scale.body,
+              lineHeight: 1,
+              margin: 0,
+            }}
+          >
+            <OpenBracket />
+            {attr1?.shortcaps} + {attr2?.shortcaps}
+            <CloseBracket />
+            {precision > 0
+              ? `+${precision}`
+              : precision < 0
+                ? `${precision}`
+                : ""}
+          </Typography>
+        </Grid>
+        <Grid size={cols.damage}>
+          <Typography
+            sx={{
+              textAlign: "center",
+              fontWeight: 600,
+              fontSize: scale.body,
+              lineHeight: 1,
+              margin: 0,
+            }}
+          >
+            <OpenBracket />
+            {t("HR +")} {damage}
+            <CloseBracket />
+            {damageType?.long}
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Grid
+        container
+        sx={dataRowSx(customTheme, imageMode, null, {
+          borderBottom: `1px solid ${customTheme.secondary}`,
+        })}
+      >
+        <Grid size={cols.name}>
+          <Typography
+            sx={{
+              fontWeight: 600,
+              fontSize: scale.headingRow,
+              lineHeight: 1,
+              margin: 0,
+            }}
+          >
+            {t(item.category)}
+          </Typography>
+        </Grid>
+        <Grid
+          size={1}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Diamond color={customTheme.primary} />
+        </Grid>
+        <Grid size={cols.hands}>
+          <Typography
+            sx={{
+              textAlign: "center",
+              fontSize: scale.body,
+              lineHeight: 1,
+              margin: 0,
+            }}
+          >
+            {item.hands === 1 ? t("One-handed") : t("Two-handed")}
+          </Typography>
+        </Grid>
+        <Grid
+          size={1}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Diamond color={customTheme.primary} />
+        </Grid>
+        <Grid size={cols.range}>
+          <Typography
+            sx={{
+              textAlign: "center",
+              fontSize: scale.body,
+              lineHeight: 1,
+              margin: 0,
+            }}
+          >
+            {getCustomWeaponRangeLabel(item, t)}
+          </Typography>
+        </Grid>
+      </Grid>
+    </RowsWithOptionalImage>
+  );
+}
+
+function CustomizationsAndQualityRow({ item, customTheme, imageMode, t }) {
+  const customizations = item.customizations || [];
+  if (customizations.length === 0 && !item.quality) return null;
+  return (
+    <Box sx={qualityRowSx(customTheme, imageMode)}>
+      <Typography
+        variant="body2"
+        sx={{
+          lineHeight: 1.35,
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: "4px",
+        }}
+        component="div"
+      >
+        {customizations.map((c, i) => (
+          <React.Fragment key={i}>
+            <span>{t(c.name)}</span>
+            {(i < customizations.length - 1 || item.quality) && (
+              <Diamond color={customTheme.primary} />
+            )}
+          </React.Fragment>
+        ))}
+        {item.quality && (
+          <StyledMarkdown
+            allowedElements={["strong", "em"]}
+            unwrapDisallowed
+            components={QUALITY_MARKDOWN_COMPONENTS}
+          >
+            {item.quality}
+          </StyledMarkdown>
+        )}
+      </Typography>
+    </Box>
+  );
+}
+
+function buildSecondWeaponItem(item) {
+  return {
+    name: item.secondWeaponName || item.name,
+    category: item.secondSelectedCategory || item.category,
+    range: item.secondSelectedRange || item.range,
+    accuracyCheck: item.secondSelectedAccuracyCheck || item.accuracyCheck,
+    type: item.secondSelectedType || item.type,
+    customizations: item.secondCurrentCustomizations || [],
+    quality: item.quality,
+    qualityCost: item.qualityCost,
+    cost: item.cost,
+    damageModifier: item.secondDamageModifier || 0,
+    precModifier: item.secondPrecModifier || 0,
+    defModifier: item.secondDefModifier || 0,
+    mDefModifier: item.secondMDefModifier || 0,
+    overrideDamageType: item.secondOverrideDamageType || false,
+    customDamageType: item.secondCustomDamageType || item.customDamageType,
+  };
+}
+
 export const SharedCustomWeaponCard = React.memo(
   function SharedCustomWeaponCard({
     item,
@@ -621,6 +840,8 @@ export const SharedCustomWeaponCard = React.memo(
     imageTempInfoTextKey = CARD_DEFAULTS.imageTempInfoTextKey,
     actionContent = CARD_DEFAULTS.actionContent,
     defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
+    activeForm = null,
+    cardRef = null,
   }) {
     const {
       t,
@@ -638,19 +859,32 @@ export const SharedCustomWeaponCard = React.memo(
       imageTempInfoTextKey,
     });
 
-    const { precision, damage } = calculateCustomWeaponStats(item, false);
-    const { attr1, attr2 } = resolveAccuracyAttributes(item);
-    const damageType = types[getCustomWeaponDamageType(item)];
-    const martial = isCustomWeaponMartial(item);
     const withImage = isImageMode(imageMode);
     const cols = withImage
       ? { name: 3, cost: 1, accuracy: 4, damage: 4, hands: 3, range: 4 }
       : { name: 4, cost: 2, accuracy: 3, damage: 3, hands: 3, range: 3 };
 
+    const hasStoredSecondForm =
+      item.secondWeaponName != null || item.secondCurrentCustomizations != null;
+    const secondItem = hasStoredSecondForm ? buildSecondWeaponItem(item) : null;
+
+    const rowProps = {
+      customTheme,
+      scale,
+      background,
+      imageMode,
+      imageSize,
+      imageVisible,
+      imageSlot,
+      cols,
+      t,
+    };
+
     return (
       <CardContentWrapper
         showCard={showCard}
         id={id}
+        cardRef={cardRef}
         showImageToggle={showImageToggle}
         imageMode={imageMode}
         imageVisible={imageVisible}
@@ -693,155 +927,72 @@ export const SharedCustomWeaponCard = React.memo(
           </Grid>
         )}
 
-        <RowsWithOptionalImage
-          imageMode={imageMode}
-          imageSize={imageSize}
-          imageVisible={imageVisible}
-          imageSlot={imageSlot}
-          customTheme={customTheme}
-        >
-          <Grid
-            container
-            sx={dataRowSx(customTheme, imageMode, background, {
-              borderBottom: `1px solid ${customTheme.secondary}`,
-            })}
+        {secondItem && (
+          <Box
+            sx={{
+              px: 1,
+              pt: 0.5,
+              pb: 0.25,
+              background: customTheme.secondary + "33",
+            }}
           >
-            <Grid
-              sx={{ display: "flex", alignItems: "center" }}
-              size={cols.name}
-            >
-              <Typography
-                sx={{
-                  fontWeight: 600,
-                  fontSize: scale.headingRow,
-                  lineHeight: 1,
-                  margin: 0,
-                }}
-              >
-                {item.name || t("Custom Weapon")}
-              </Typography>
-              {martial && <Martial />}
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography
-                sx={{
-                  textAlign: "center",
-                  fontSize: scale.body,
-                  lineHeight: 1,
-                  margin: 0,
-                }}
-              >
-                {item.cost || 300}z
-              </Typography>
-            </Grid>
-            <Grid size={cols.accuracy}>
-              <Typography
-                sx={{
-                  textAlign: "center",
-                  fontWeight: 600,
-                  fontSize: scale.body,
-                  lineHeight: 1,
-                  margin: 0,
-                }}
-              >
-                <OpenBracket />
-                {attr1?.shortcaps} + {attr2?.shortcaps}
-                <CloseBracket />
-                {precision > 0
-                  ? `+${precision}`
-                  : precision < 0
-                    ? `${precision}`
-                    : ""}
-              </Typography>
-            </Grid>
-            <Grid size={cols.damage}>
-              <Typography
-                sx={{
-                  textAlign: "center",
-                  fontWeight: 600,
-                  fontSize: scale.body,
-                  lineHeight: 1,
-                  margin: 0,
-                }}
-              >
-                <OpenBracket />
-                {t("HR +")} {damage}
-                <CloseBracket />
-                {damageType?.long}
-              </Typography>
-            </Grid>
-          </Grid>
-
-          <Grid
-            container
-            sx={dataRowSx(customTheme, imageMode, null, {
-              borderBottom: `1px solid ${customTheme.secondary}`,
-            })}
-          >
-            <Grid size={cols.name}>
-              <Typography
-                sx={{
-                  fontWeight: 600,
-                  fontSize: scale.headingRow,
-                  lineHeight: 1,
-                  margin: 0,
-                }}
-              >
-                {t(item.category)}
-              </Typography>
-            </Grid>
-            <Grid
-              size={1}
+            <Typography
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                opacity: 0.7,
               }}
             >
-              <Diamond color={customTheme.primary} />
-            </Grid>
-            <Grid size={cols.hands}>
-              <Typography
-                sx={{
-                  textAlign: "center",
-                  fontSize: scale.body,
-                  lineHeight: 1,
-                  margin: 0,
-                }}
-              >
-                {item.hands === 1 ? t("One-handed") : t("Two-handed")}
-              </Typography>
-            </Grid>
-            <Grid
-              size={1}
+              {t("Primary Form")}
+            </Typography>
+          </Box>
+        )}
+        <Box sx={{ opacity: activeForm === "secondary" ? 0.5 : 1 }}>
+          <CustomWeaponRows item={item} {...rowProps} />
+          <CustomizationsAndQualityRow
+            item={item}
+            customTheme={customTheme}
+            imageMode={imageMode}
+            t={t}
+          />
+        </Box>
+
+        {secondItem && (
+          <>
+            <Box
               sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                px: 1,
+                pt: 0.5,
+                pb: 0.25,
+                background: customTheme.secondary + "33",
+                borderTop: `1px solid ${customTheme.secondary}`,
               }}
             >
-              <Diamond color={customTheme.primary} />
-            </Grid>
-            <Grid size={cols.range}>
               <Typography
                 sx={{
-                  textAlign: "center",
-                  fontSize: scale.body,
-                  lineHeight: 1,
-                  margin: 0,
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  opacity: 0.7,
                 }}
               >
-                {getCustomWeaponRangeLabel(item, t)}
+                {t("Transforming Form")}
               </Typography>
-            </Grid>
-          </Grid>
-        </RowsWithOptionalImage>
-
-        <QualityRow
-          item={item}
-          customTheme={customTheme}
-          imageMode={imageMode}
-        />
+            </Box>
+            <Box sx={{ opacity: activeForm === "primary" ? 0.5 : 1 }}>
+              <CustomWeaponRows item={secondItem} {...rowProps} />
+              <CustomizationsAndQualityRow
+                item={secondItem}
+                customTheme={customTheme}
+                imageMode={imageMode}
+                t={t}
+              />
+            </Box>
+          </>
+        )}
       </CardContentWrapper>
     );
   },

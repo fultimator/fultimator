@@ -88,9 +88,6 @@ export function ImageToggleRow({
         borderRadius: "0 0 4px 4px",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", minHeight: 32 }}>
-        {actionContent}
-      </Box>
       {shouldShowToggle && (
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <FormControlLabel
@@ -106,14 +103,17 @@ export function ImageToggleRow({
           {showImageTempInfo && <ImageInfoIcon text={imageTempInfoText} />}
         </Box>
       )}
+      <Box sx={{ display: "flex", alignItems: "center", minHeight: 32 }}>
+        {actionContent}
+      </Box>
     </Paper>
   );
 }
 
-export function CardWrapper({ showCard, id, children }) {
+export function CardWrapper({ showCard, id, cardRef, children }) {
   if (!showCard) return children;
   return (
-    <Card id={id} elevation={1}>
+    <Card id={id} elevation={1} ref={cardRef}>
       {children}
     </Card>
   );
@@ -180,6 +180,7 @@ export function RowsWithOptionalImage({
 export function CardContentWrapper({
   showCard,
   id,
+  cardRef,
   showImageToggle,
   imageMode,
   imageVisible,
@@ -191,7 +192,7 @@ export function CardContentWrapper({
 }) {
   return (
     <Stack>
-      <CardWrapper showCard={showCard} id={id}>
+      <CardWrapper showCard={showCard} id={id} cardRef={cardRef}>
         <Stack>{children}</Stack>
       </CardWrapper>
       <ImageToggleRow
