@@ -9,7 +9,7 @@ import {
   Badge,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import PrettyArmor from "./PrettyArmor";
+import { SharedArmorCard } from "../../../../components/shared/itemCards";
 import { Edit, WarningAmber } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
@@ -98,7 +98,7 @@ export default function PlayerArmor({
             <React.Fragment key={index}>
               <Grid sx={{ mb: 2 }} size={12}>
                 <Box>
-                  <PrettyArmor armor={armorItem} />
+                  <SharedArmorCard item={armorItem} />
                 </Box>
 
                 <Box

@@ -9,7 +9,7 @@ import {
   Box,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import PrettyCustomWeapon from "../../../../routes/equip/customWeapons/PrettyCustomWeapon";
+import { SharedCustomWeaponCard } from "../../../../components/shared/itemCards";
 import { Edit, WarningAmber, SwapHoriz } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
@@ -142,82 +142,23 @@ export default function PlayerCustomWeapons({
             return (
               <React.Fragment key={index}>
                 <Grid sx={{ mb: 2 }} size={12}>
-                  {/* Primary Weapon */}
-                  <Box
-                    sx={{
-                      opacity:
-                        customWeapon.activeForm === "secondary" ? 0.6 : 1,
+                  <SharedCustomWeaponCard
+                    variant="sheet"
+                    item={{
+                      ...customWeapon,
+                      hands: 2,
+                      cost: customWeapon.cost || 300,
+                      damageModifier: customWeapon.damageModifier || 0,
+                      precModifier: customWeapon.precModifier || 0,
+                      defModifier: customWeapon.defModifier || 0,
+                      mDefModifier: customWeapon.mDefModifier || 0,
+                      overrideDamageType:
+                        customWeapon.overrideDamageType || false,
+                      customDamageType:
+                        customWeapon.customDamageType || "physical",
                     }}
-                  >
-                    <PrettyCustomWeapon
-                      weaponData={{
-                        ...customWeapon,
-                        hands: 2, // Custom weapons are always two-handed
-                        cost: customWeapon.cost || 300, // Custom weapons have base cost of 300
-                        damageModifier: customWeapon.damageModifier || 0,
-                        precModifier: customWeapon.precModifier || 0,
-                        defModifier: customWeapon.defModifier || 0,
-                        mDefModifier: customWeapon.mDefModifier || 0,
-                        overrideDamageType:
-                          customWeapon.overrideDamageType || false,
-                        customDamageType:
-                          customWeapon.customDamageType || "physical",
-                      }}
-                      showActions={false}
-                    />
-                  </Box>
-
-                  {/* Secondary Weapon (Transforming Form) */}
-                  {hasTransforming && (
-                    <Box
-                      sx={{
-                        mt: 0.5,
-                        opacity:
-                          customWeapon.activeForm === "secondary" ? 1 : 0.6,
-                      }}
-                    >
-                      {(() => {
-                        const secondWeaponData = {
-                          ...customWeapon,
-                          name:
-                            customWeapon.secondWeaponName ||
-                            `${customWeapon.name} (Transforming)`,
-                          category:
-                            customWeapon.secondSelectedCategory ||
-                            "weapon_category_brawling",
-                          range:
-                            customWeapon.secondSelectedRange ||
-                            "weapon_range_melee",
-                          accuracyCheck:
-                            customWeapon.secondSelectedAccuracyCheck || {
-                              att1: "dexterity",
-                              att2: "might",
-                            },
-                          type: customWeapon.secondSelectedType || "physical",
-                          customizations:
-                            customWeapon.secondCurrentCustomizations || [],
-                          hands: 2, // Custom weapons are always two-handed
-                          cost: customWeapon.cost || 300, // Same cost as primary
-                          damageModifier:
-                            customWeapon.secondDamageModifier || 0,
-                          precModifier: customWeapon.secondPrecModifier || 0,
-                          defModifier: customWeapon.secondDefModifier || 0,
-                          mDefModifier: customWeapon.secondMDefModifier || 0,
-                          overrideDamageType:
-                            customWeapon.secondOverrideDamageType || false,
-                          customDamageType:
-                            customWeapon.secondCustomDamageType || "physical",
-                        };
-
-                        return (
-                          <PrettyCustomWeapon
-                            weaponData={secondWeaponData}
-                            showActions={false}
-                          />
-                        );
-                      })()}
-                    </Box>
-                  )}
+                    activeForm={customWeapon.activeForm}
+                  />
 
                   {/* Compact Actions Row Below Card */}
                   <Box

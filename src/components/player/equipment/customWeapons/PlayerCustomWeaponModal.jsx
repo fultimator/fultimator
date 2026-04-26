@@ -24,7 +24,7 @@ import { useTranslate } from "../../../../translation/translate";
 import { Close, ExpandMore } from "@mui/icons-material";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
-import PrettyCustomWeapon from "../../../../routes/equip/customWeapons/PrettyCustomWeapon";
+import { SharedCustomWeaponCard } from "../../../../components/shared/itemCards";
 import ChangeCategory from "../../../../routes/equip/customWeapons/ChangeCategory";
 import ChangeRange from "../../../../routes/equip/customWeapons/ChangeRange";
 import ChangeAccuracyCheck from "../../../../routes/equip/customWeapons/ChangeAccuracyCheck";
@@ -1014,8 +1014,8 @@ export default function PlayerCustomWeaponModal({
             <Typography variant="h6" gutterBottom>
               {t("weapon_customization_transforming_form_preview")}
             </Typography>
-            <PrettyCustomWeapon
-              weaponData={{
+            <SharedCustomWeaponCard
+              item={{
                 ...customWeapon,
                 name: weaponName,
                 category: selectedCategory,
@@ -1034,7 +1034,6 @@ export default function PlayerCustomWeaponModal({
                 overrideDamageType,
                 customDamageType,
               }}
-              showActions={!hasTransforming}
             />
 
             {hasTransforming && (
@@ -1042,8 +1041,8 @@ export default function PlayerCustomWeaponModal({
                 <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
                   {t("weapon_customization_transforming_form_preview")}
                 </Typography>
-                <PrettyCustomWeapon
-                  weaponData={{
+                <SharedCustomWeaponCard
+                  item={{
                     ...customWeapon,
                     name: secondWeaponName || `${weaponName} (Transforming)`,
                     category: secondSelectedCategory,
@@ -1061,7 +1060,6 @@ export default function PlayerCustomWeaponModal({
                     overrideDamageType: secondOverrideDamageType,
                     customDamageType: secondCustomDamageType,
                   }}
-                  showActions={false}
                 />
               </>
             )}

@@ -17,11 +17,12 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, SwapHoriz, Edit, Info } from "@mui/icons-material";
 import {
-  WeaponCard,
-  ArmorCard,
-  CustomWeaponCard,
-  AccessoryCard,
-} from "../../compendium/ItemCards";
+  SharedWeaponCard,
+  SharedArmorCard,
+  SharedShieldCard,
+  SharedCustomWeaponCard,
+  SharedAccessoryCard,
+} from "../../shared/itemCards";
 // import { OpenBracket, CloseBracket } from "../../Bracket";
 import attributes from "../../../libs/attributes";
 // import types from "../../../libs/types";
@@ -1006,15 +1007,15 @@ export default function PlayerEquipment({
           {selectedItem && (
             <>
               {selectedItem.isCustomWeapon ? (
-                <CustomWeaponCard weapon={selectedItem} />
+                <SharedCustomWeaponCard item={selectedItem} />
               ) : allEquippedWeapons.includes(selectedItem) ? (
-                <WeaponCard weapon={selectedItem} />
+                <SharedWeaponCard item={selectedItem} />
               ) : equippedArmor.includes(selectedItem) ? (
-                <ArmorCard armor={selectedItem} />
+                <SharedArmorCard item={selectedItem} />
               ) : equippedShields.includes(selectedItem) ? (
-                <ArmorCard armor={selectedItem} />
+                <SharedShieldCard item={selectedItem} />
               ) : equippedAccessories.includes(selectedItem) ? (
-                <AccessoryCard accessory={selectedItem} />
+                <SharedAccessoryCard item={selectedItem} />
               ) : null}
             </>
           )}

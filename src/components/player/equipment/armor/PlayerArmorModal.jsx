@@ -24,7 +24,7 @@ import ChangeName from "../../../../routes/equip/common/ChangeName";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
 import ApplyRework from "../../../../routes/equip/common/ApplyRework";
 import ChangeModifiers from "../ChangeModifiers";
-import PrettyArmor from "./PrettyArmor";
+import { SharedArmorCard } from "../../../../components/shared/itemCards";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
@@ -459,8 +459,8 @@ export default function PlayerArmorModal({
               sm: 6,
             }}
           >
-            <PrettyArmor
-              armor={{
+            <SharedArmorCard
+              item={{
                 base,
                 ...base,
                 name: name,
