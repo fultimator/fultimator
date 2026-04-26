@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
@@ -163,9 +163,11 @@ function Personal() {
   const cloudDb = useDatabase("cloud");
   const [download] = useDownload();
 
-  const [personalList, loading, err] = db.useCollectionData(
-    db.query(db.collection("player-personal")),
+  const playerQuery = useMemo(
+    () => db.query(db.collection("player-personal")),
+    [db],
   );
+  const [personalList, loading, err] = db.useCollectionData(playerQuery);
 
   const [snackMsg, setSnackMsg] = useState(null);
 
