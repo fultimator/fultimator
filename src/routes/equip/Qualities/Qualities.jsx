@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import { useState, useRef } from "react";
-import Pretty from "./Pretty";
+import { SharedQualityCard } from "../../../components/shared/itemCards";
 import ChangeName from "../common/ChangeName";
 import ChangeQuality from "../common/ChangeQuality";
 import { useTranslate } from "../../../translation/translate";
@@ -260,8 +260,8 @@ function Qualities() {
           sm: 6,
         }}
       >
-        <Pretty
-          custom={{
+        <SharedQualityCard
+          item={{
             name,
             category,
             quality,

@@ -50,13 +50,6 @@ import shields from "../../libs/shields";
 import weaponQualities from "../../routes/equip/weapons/qualities";
 import armorShieldQualities from "../../routes/equip/ArmorShield/qualities";
 import {
-  WeaponCard,
-  ArmorCard,
-  QualityCard,
-  CustomWeaponCard,
-  AccessoryCard,
-} from "./ItemCards";
-import {
   SharedSpellCard,
   SharedPlayerSpellCard,
   SharedGambleSpellCard,
@@ -79,6 +72,12 @@ import {
   SharedClassCard,
   SharedHeroicCard,
   SharedOptionalCard,
+  SharedWeaponCard,
+  SharedArmorCard,
+  SharedShieldCard,
+  SharedCustomWeaponCard,
+  SharedAccessoryCard,
+  SharedQualityCard,
 } from "../shared/itemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
@@ -2424,7 +2423,7 @@ function QualityPanel() {
       }
       previewContent={
         data.name ? (
-          <QualityCard quality={data} />
+          <SharedQualityCard item={data} />
         ) : (
           <Box sx={{ p: 2 }}>
             <Typography
@@ -3306,7 +3305,7 @@ function WeaponPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<WeaponCard weapon={weaponObj} />}
+      previewContent={<SharedWeaponCard item={weaponObj} />}
       addButton={<AddToCompendiumButton itemType="weapon" data={weaponObj} />}
       data={weaponObj}
       itemName={weaponObj.name || ""}
@@ -3508,7 +3507,7 @@ function ArmorPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<ArmorCard armor={armorObj} />}
+      previewContent={<SharedArmorCard item={armorObj} />}
       addButton={<AddToCompendiumButton itemType="armor" data={armorObj} />}
       data={armorObj}
       itemName={armorObj.name || ""}
@@ -3710,7 +3709,7 @@ function ShieldPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<ArmorCard armor={shieldObj} />}
+      previewContent={<SharedShieldCard item={shieldObj} />}
       addButton={<AddToCompendiumButton itemType="shield" data={shieldObj} />}
       data={shieldObj}
       itemName={shieldObj.name || ""}
@@ -4242,7 +4241,7 @@ function CustomWeaponPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<CustomWeaponCard weapon={weaponObj} />}
+      previewContent={<SharedCustomWeaponCard item={weaponObj} />}
       addButton={
         <AddToCompendiumButton itemType="custom-weapon" data={weaponObj} />
       }
@@ -4423,7 +4422,7 @@ function AccessoryPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<AccessoryCard accessory={accessoryObj} />}
+      previewContent={<SharedAccessoryCard item={accessoryObj} />}
       addButton={
         <AddToCompendiumButton itemType="accessory" data={accessoryObj} />
       }

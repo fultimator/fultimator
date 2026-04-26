@@ -71,13 +71,6 @@ import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
 import {
-  WeaponCard,
-  ArmorCard,
-  QualityCard,
-  CustomWeaponCard,
-  AccessoryCard,
-} from "../../components/compendium/ItemCards";
-import {
   SharedSpellCard,
   SharedPlayerSpellCard,
   SharedGambleSpellCard,
@@ -101,6 +94,12 @@ import {
   SharedSkillCard,
   SharedHeroicCard,
   SharedOptionalCard,
+  SharedWeaponCard,
+  SharedArmorCard,
+  SharedShieldCard,
+  SharedCustomWeaponCard,
+  SharedAccessoryCard,
+  SharedQualityCard,
 } from "../../components/shared/itemCards";
 
 import classList, { spellList, spellsByClass } from "../../libs/classes";
@@ -800,10 +799,17 @@ export const ItemCard = React.memo(function ItemCard({
 }) {
   switch (type) {
     case "weapons":
-      return <WeaponCard weapon={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedWeaponCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "armor":
+      return (
+        <SharedArmorCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "shields":
-      return <ArmorCard armor={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedShieldCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "spells":
       return (
         <SharedSpellCard item={item} id={id} onHeaderClick={onHeaderClick} />
@@ -934,7 +940,7 @@ export const ItemCard = React.memo(function ItemCard({
       );
     case "qualities":
       return (
-        <QualityCard quality={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedQualityCard item={item} id={id} onHeaderClick={onHeaderClick} />
       );
     case "classes":
       return (
@@ -946,11 +952,19 @@ export const ItemCard = React.memo(function ItemCard({
       );
     case "custom-weapons":
       return (
-        <CustomWeaponCard weapon={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedCustomWeaponCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
       );
     case "accessories":
       return (
-        <AccessoryCard accessory={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedAccessoryCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
       );
     case "special":
       return (
