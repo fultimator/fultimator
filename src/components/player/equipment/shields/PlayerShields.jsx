@@ -12,7 +12,7 @@ import {
   Box,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import PrettyArmor from "../armor/PrettyArmor";
+import { SharedShieldCard } from "../../../../components/shared/itemCards";
 import { Edit, WarningAmber } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
@@ -152,7 +152,7 @@ export default function PlayerShields({
               <React.Fragment key={index}>
                 <Grid sx={{ mb: 1 }} size={12}>
                   <Box>
-                    <PrettyArmor armor={shield} />
+                    <SharedShieldCard item={shield} />
                   </Box>
 
                   <Box

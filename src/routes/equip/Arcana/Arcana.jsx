@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import { useState, useRef } from "react";
-import Pretty from "./Pretty";
+import { SharedArcanumCard } from "../../../components/shared/itemCards";
 import ChangeName from "../common/ChangeName";
 import ApplyRework from "../common/ApplyRework";
 import { useTranslate } from "../../../translation/translate";
@@ -263,8 +263,8 @@ function Arcana() {
           sm: 6,
         }}
       >
-        <Pretty
-          custom={{
+        <SharedArcanumCard
+          item={{
             name: name,
             description: description,
             domain: domain,
@@ -276,7 +276,6 @@ function Arcana() {
             dismissBenefit: dismissBenefit,
             rework: rework,
           }}
-          rework={rework}
         />
       </Grid>
     </Grid>

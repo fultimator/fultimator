@@ -23,7 +23,7 @@ import SelectQuality from "../../../../routes/equip/ArmorShield/SelectQuality";
 import ChangeName from "../../../../routes/equip/common/ChangeName";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
 import ApplyRework from "../../../../routes/equip/common/ApplyRework";
-import PrettyArmor from "../armor/PrettyArmor";
+import { SharedShieldCard } from "../../../../components/shared/itemCards";
 import ChangeModifiers from "../ChangeModifiers";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
@@ -456,8 +456,8 @@ export default function PlayerShieldModal({
               sm: 6,
             }}
           >
-            <PrettyArmor
-              armor={{
+            <SharedShieldCard
+              item={{
                 base,
                 ...base,
                 name: name,

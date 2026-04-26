@@ -32,7 +32,7 @@ import ChangeModifiers from "../ChangeModifiers";
 import ChangeCategory from "./ChangeCategory";
 import { Close } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import PrettyWeapon from "./PrettyWeapon";
+import { SharedWeaponCard } from "../../../../components/shared/itemCards";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
@@ -614,8 +614,8 @@ export default function PlayerWeaponModal({
               sm: 6,
             }}
           >
-            <PrettyWeapon
-              weapon={{
+            <SharedWeaponCard
+              item={{
                 base: base,
                 name: name,
                 att1: att1,

@@ -71,21 +71,36 @@ import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
 import {
-  WeaponCard,
-  ArmorCard,
-  SpellCard,
-  PlayerSpellCard,
-  NonStaticSpellCard,
-  AttackCard,
-  QualityCard,
-  HeroicCard,
-  ClassCard,
-  SpecialRuleCard,
-  ActionCard,
-  CustomWeaponCard,
-  AccessoryCard,
-  OptionalCard,
-} from "../../components/compendium/ItemCards";
+  SharedSpellCard,
+  SharedPlayerSpellCard,
+  SharedGambleSpellCard,
+  SharedGiftCard,
+  SharedDanceCard,
+  SharedTherioformCard,
+  SharedArcanumCard,
+  SharedAlchemyCard,
+  SharedInfusionCard,
+  SharedMagitechCard,
+  SharedInvocationCard,
+  SharedCookingCard,
+  SharedMagiseedCard,
+  SharedPilotVehicleCard,
+  SharedSymbolCard,
+  SharedMagichantCard,
+  SharedAttackCard,
+  SharedSpecialRuleCard,
+  SharedActionCard,
+  SharedClassCard,
+  SharedSkillCard,
+  SharedHeroicCard,
+  SharedOptionalCard,
+  SharedWeaponCard,
+  SharedArmorCard,
+  SharedShieldCard,
+  SharedCustomWeaponCard,
+  SharedAccessoryCard,
+  SharedQualityCard,
+} from "../../components/shared/itemCards";
 
 import classList, { spellList, spellsByClass } from "../../libs/classes";
 import _attributes from "../../libs/attributes";
@@ -784,47 +799,188 @@ export const ItemCard = React.memo(function ItemCard({
 }) {
   switch (type) {
     case "weapons":
-      return <WeaponCard weapon={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedWeaponCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "armor":
+      return (
+        <SharedArmorCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "shields":
-      return <ArmorCard armor={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedShieldCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "spells":
-      return <SpellCard spell={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedSpellCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "player-spells":
-      return item.spellType &&
-        item.spellType !== "default" &&
-        item.spellType !== "gamble" ? (
-        <NonStaticSpellCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      ) : (
-        <PlayerSpellCard spell={item} id={id} onHeaderClick={onHeaderClick} />
+      if (!item.spellType || item.spellType === "default") {
+        return (
+          <SharedPlayerSpellCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "gamble") {
+        return (
+          <SharedGambleSpellCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "gift") {
+        return (
+          <SharedGiftCard item={item} id={id} onHeaderClick={onHeaderClick} />
+        );
+      } else if (item.spellType === "dance") {
+        return (
+          <SharedDanceCard item={item} id={id} onHeaderClick={onHeaderClick} />
+        );
+      } else if (item.spellType === "therioform") {
+        return (
+          <SharedTherioformCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "magichant") {
+        return (
+          <SharedMagichantCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "symbol") {
+        return (
+          <SharedSymbolCard item={item} id={id} onHeaderClick={onHeaderClick} />
+        );
+      } else if (item.spellType === "invocation") {
+        return (
+          <SharedInvocationCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "magiseed") {
+        return (
+          <SharedMagiseedCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "tinkerer-alchemy") {
+        return (
+          <SharedAlchemyCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "tinkerer-infusion") {
+        return (
+          <SharedInfusionCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "tinkerer-magitech") {
+        return (
+          <SharedMagitechCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "cooking") {
+        return (
+          <SharedCookingCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (item.spellType === "pilot-vehicle") {
+        return (
+          <SharedPilotVehicleCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      } else if (
+        item.spellType === "arcanist" ||
+        item.spellType === "arcanist-rework"
+      ) {
+        return (
+          <SharedArcanumCard
+            item={item}
+            id={id}
+            onHeaderClick={onHeaderClick}
+          />
+        );
+      }
+      return (
+        <SharedPlayerSpellCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
       );
     case "attacks":
-      return <AttackCard attack={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedAttackCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "qualities":
       return (
-        <QualityCard quality={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedQualityCard item={item} id={id} onHeaderClick={onHeaderClick} />
       );
     case "classes":
-      return <ClassCard cls={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedClassCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "heroics":
-      return <HeroicCard heroic={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedHeroicCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "custom-weapons":
       return (
-        <CustomWeaponCard weapon={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedCustomWeaponCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
       );
     case "accessories":
       return (
-        <AccessoryCard accessory={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedAccessoryCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
       );
     case "special":
       return (
-        <SpecialRuleCard item={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedSpecialRuleCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
       );
     case "actions":
-      return <ActionCard item={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedActionCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "optionals":
       return (
-        <OptionalCard optional={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedOptionalCard item={item} id={id} onHeaderClick={onHeaderClick} />
       );
     default:
       return null;

@@ -11,7 +11,7 @@ import {
 import { useTranslate } from "../../../../translation/translate";
 import { Edit, WarningAmber } from "@mui/icons-material";
 import { Equip } from "../../../icons";
-import PrettyAccessory from "./PrettyAccessory";
+import { SharedAccessoryCard } from "../../../../components/shared/itemCards";
 import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
 import { useTheme } from "@mui/material/styles";
@@ -98,7 +98,7 @@ export default function PlayerAccessories({
             <React.Fragment key={index}>
               <Grid sx={{ mb: 1 }} size={12}>
                 <Box>
-                  <PrettyAccessory accessory={accessory} />
+                  <SharedAccessoryCard item={accessory} />
                 </Box>
 
                 <Box

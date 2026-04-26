@@ -49,6 +49,7 @@ export const SharedRitualCard = React.memo(function SharedRitualCard({
   imageTempInfoTextKey = CARD_DEFAULTS.imageTempInfoTextKey,
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
+  cardRef = null,
 }) {
   const {
     t,
@@ -83,6 +84,7 @@ export const SharedRitualCard = React.memo(function SharedRitualCard({
     <CardContentWrapper
       showCard={showCard}
       id={id}
+      cardRef={cardRef}
       showImageToggle={showImageToggle}
       imageMode={imageMode}
       imageVisible={imageVisible}
@@ -199,13 +201,15 @@ export const SharedRitualCard = React.memo(function SharedRitualCard({
           <Grid size={3}>
             <Typography
               sx={{
-                fontWeight: "bold",
                 fontSize: scale.body,
                 lineHeight: 1,
                 margin: 0,
               }}
             >
-              {t("Potency")}: {potency}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                {t("Potency")}
+              </Box>
+              : {potency}
             </Typography>
           </Grid>
           <Grid
@@ -227,7 +231,10 @@ export const SharedRitualCard = React.memo(function SharedRitualCard({
                 margin: 0,
               }}
             >
-              {t("Area")}: {area}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                {t("Area")}
+              </Box>
+              : {area}
             </Typography>
           </Grid>
           {reductionLabel && (
@@ -251,7 +258,10 @@ export const SharedRitualCard = React.memo(function SharedRitualCard({
                     margin: 0,
                   }}
                 >
-                  {t("DL")}: {reductionLabel}
+                  <Box component="span" sx={{ fontWeight: "bold" }}>
+                    {t("DL")}
+                  </Box>
+                  : {reductionLabel}
                 </Typography>
               </Grid>
             </>
@@ -318,6 +328,7 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
   imageTempInfoTextKey = CARD_DEFAULTS.imageTempInfoTextKey,
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
+  cardRef = null,
 }) {
   const {
     t,
@@ -351,6 +362,7 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
     <CardContentWrapper
       showCard={showCard}
       id={id}
+      cardRef={cardRef}
       showImageToggle={showImageToggle}
       imageMode={imageMode}
       imageVisible={imageVisible}
@@ -461,7 +473,10 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
                 margin: 0,
               }}
             >
-              {t("Cost")}: {item.cost}z
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                {t("Cost")}
+              </Box>
+              : {item.cost}z
             </Typography>
           </Grid>
           <Grid
@@ -483,7 +498,10 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
                 margin: 0,
               }}
             >
-              {t("Progress")}: {item.progress}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                {t("Progress")}
+              </Box>
+              : {item.progress}
             </Typography>
           </Grid>
           <Grid
@@ -505,7 +523,10 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
                 margin: 0,
               }}
             >
-              {t("Flaw")}: {item.defect ? t("Yes") : t("No")}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                {t("Flaw")}
+              </Box>
+              : {item.defect ? t("Yes") : t("No")}
             </Typography>
           </Grid>
         </Grid>
@@ -525,7 +546,10 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
                 margin: 0,
               }}
             >
-              {t("Uses")}: {uses}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                {t("Uses")}
+              </Box>
+              : {uses}
             </Typography>
           </Grid>
           <Grid
@@ -547,7 +571,10 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
                 margin: 0,
               }}
             >
-              {t("Tinkerers")}: {item.tinkerers}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                {t("Tinkerers")}
+              </Box>
+              : {item.tinkerers}
             </Typography>
           </Grid>
           <Grid
@@ -569,7 +596,10 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
                 margin: 0,
               }}
             >
-              {t("Progress/day")}: {item.progressPerDay}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                {t("Progress/day")}
+              </Box>
+              : {item.progressPerDay}
             </Typography>
           </Grid>
         </Grid>
@@ -577,16 +607,29 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
         {(item.visionary > 0 || item.description) && (
           <Box sx={{ px: 1.5, py: 0.75 }}>
             {item.visionary > 0 && (
-              <Typography
-                variant="body2"
+              <Box
                 sx={{
-                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.75,
                   mb: item.description ? 0.5 : 0,
                   fontSize: scale.body,
                 }}
               >
-                {t("Savings")}: {savings}
-              </Typography>
+                <Typography variant="body2" sx={{ fontSize: "inherit" }}>
+                  <Box component="span" sx={{ fontWeight: "bold" }}>
+                    {t("Savings")}
+                  </Box>
+                  : {savings} ({t("Visionary")} SL{item.visionary})
+                </Typography>
+                <Diamond color={customTheme.primary} />
+                <Typography variant="body2" sx={{ fontSize: "inherit" }}>
+                  <Box component="span" sx={{ fontWeight: "bold" }}>
+                    {t("Hired Helper")}
+                  </Box>
+                  : {item.helpers ?? 0}
+                </Typography>
+              </Box>
             )}
             {item.description && (
               <Typography

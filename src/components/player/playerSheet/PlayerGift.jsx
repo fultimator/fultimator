@@ -17,7 +17,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { NonStaticSpellCard } from "../../compendium/ItemCards";
+import { SharedGiftCard } from "../../shared/itemCards";
 import Clock from "./Clock";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -331,7 +331,7 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedGift && (
-                  <NonStaticSpellCard
+                  <SharedGiftCard
                     item={{
                       ...selectedGift,
                       spellType: "gift",

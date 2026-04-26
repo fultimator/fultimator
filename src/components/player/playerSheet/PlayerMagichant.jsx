@@ -14,7 +14,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import { NonStaticSpellCard } from "../../compendium/ItemCards";
+import { SharedMagichantCard } from "../../shared/itemCards";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
@@ -607,7 +607,7 @@ export default function PlayerMagichant({ player }) {
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedTone && (
-                  <NonStaticSpellCard
+                  <SharedMagichantCard
                     item={{
                       ...selectedTone,
                       spellType: "magichant",
