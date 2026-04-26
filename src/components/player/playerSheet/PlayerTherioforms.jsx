@@ -15,7 +15,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { NonStaticSpellCard } from "../../compendium/ItemCards";
+import { SharedTherioformCard } from "../../shared/itemCards";
 
 export default function PlayerTherioforms({ player }) {
   const { t } = useTranslate();
@@ -178,7 +178,7 @@ export default function PlayerTherioforms({ player }) {
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedTherioform && (
-                  <NonStaticSpellCard
+                  <SharedTherioformCard
                     item={{
                       ...selectedTherioform,
                       spellType: "therioform",

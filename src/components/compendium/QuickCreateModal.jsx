@@ -52,19 +52,34 @@ import armorShieldQualities from "../../routes/equip/ArmorShield/qualities";
 import {
   WeaponCard,
   ArmorCard,
-  SpellCard,
-  PlayerSpellCard,
   AttackCard,
   QualityCard,
   HeroicCard,
   ClassCard,
-  NonStaticSpellCard,
   CustomWeaponCard,
   AccessoryCard,
   OptionalCard,
   SpecialRuleCard,
   ActionCard,
 } from "./ItemCards";
+import {
+  SharedSpellCard,
+  SharedPlayerSpellCard,
+  SharedGambleSpellCard,
+  SharedGiftCard,
+  SharedDanceCard,
+  SharedTherioformCard,
+  SharedArcanumCard,
+  SharedAlchemyCard,
+  SharedInfusionCard,
+  SharedMagitechCard,
+  SharedInvocationCard,
+  SharedCookingCard,
+  SharedMagiseedCard,
+  SharedPilotVehicleCard,
+  SharedSymbolCard,
+  SharedMagichantCard,
+} from "../shared/itemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
 import qualities from "../../libs/qualities";
@@ -708,8 +723,8 @@ function NpcSpellPanel() {
         </Grid>
       }
       previewContent={
-        <SpellCard
-          spell={{ ...data, effect: data.special?.join("; ") ?? "" }}
+        <SharedSpellCard
+          item={{ ...data, effect: data.special?.join("; ") ?? "" }}
         />
       }
       addButton={<AddToCompendiumButton itemType="npc-spell" data={data} />}
@@ -2185,9 +2200,37 @@ function PlayerSpellPanel() {
       }
       previewContent={
         spellType === "default" ? (
-          <PlayerSpellCard spell={data} />
+          <SharedPlayerSpellCard item={data} />
+        ) : spellType === "gamble" ? (
+          <SharedGambleSpellCard item={nonStaticData} />
+        ) : spellType === "gift" ? (
+          <SharedGiftCard item={nonStaticData} />
+        ) : spellType === "dance" ? (
+          <SharedDanceCard item={nonStaticData} />
+        ) : spellType === "therioform" ? (
+          <SharedTherioformCard item={nonStaticData} />
+        ) : spellType === "magichant" || spellType === "magichant-key" ? (
+          <SharedMagichantCard item={nonStaticData} />
+        ) : spellType === "symbol" ? (
+          <SharedSymbolCard item={nonStaticData} />
+        ) : spellType === "invocation" ? (
+          <SharedInvocationCard item={nonStaticData} />
+        ) : spellType === "magiseed" ? (
+          <SharedMagiseedCard item={nonStaticData} />
+        ) : spellType === "tinkerer-alchemy" ? (
+          <SharedAlchemyCard item={nonStaticData} />
+        ) : spellType === "tinkerer-infusion" ? (
+          <SharedInfusionCard item={nonStaticData} />
+        ) : spellType === "tinkerer-magitech" ? (
+          <SharedMagitechCard item={nonStaticData} />
+        ) : spellType === "cooking" ? (
+          <SharedCookingCard item={nonStaticData} />
+        ) : spellType === "pilot-vehicle" ? (
+          <SharedPilotVehicleCard item={nonStaticData} />
+        ) : spellType === "arcanist" || spellType === "arcanist-rework" ? (
+          <SharedArcanumCard item={nonStaticData} />
         ) : (
-          <NonStaticSpellCard item={nonStaticData} />
+          <SharedPlayerSpellCard item={data} />
         )
       }
       addButton={

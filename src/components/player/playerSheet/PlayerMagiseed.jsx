@@ -18,7 +18,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { NonStaticSpellCard } from "../../compendium/ItemCards";
+import { SharedMagiseedCard } from "../../shared/itemCards";
 import Clock from "./Clock";
 import { magiseeds } from "../../../libs/floralistMagiseedData";
 import AddIcon from "@mui/icons-material/Add";
@@ -415,7 +415,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                     const template =
                       magiseeds.find((m) => m.name === selectedSeed.name) || {};
                     return (
-                      <NonStaticSpellCard
+                      <SharedMagiseedCard
                         item={{
                           ...template,
                           ...selectedSeed,
