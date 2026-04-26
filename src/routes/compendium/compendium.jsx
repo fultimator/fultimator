@@ -73,12 +73,9 @@ import { IS_ELECTRON } from "../../platform";
 import {
   WeaponCard,
   ArmorCard,
-  AttackCard,
   QualityCard,
   HeroicCard,
   ClassCard,
-  SpecialRuleCard,
-  ActionCard,
   CustomWeaponCard,
   AccessoryCard,
   OptionalCard,
@@ -100,6 +97,9 @@ import {
   SharedPilotVehicleCard,
   SharedSymbolCard,
   SharedMagichantCard,
+  SharedAttackCard,
+  SharedSpecialRuleCard,
+  SharedActionCard,
 } from "../../components/shared/itemCards";
 
 import classList, { spellList, spellsByClass } from "../../libs/classes";
@@ -928,7 +928,9 @@ export const ItemCard = React.memo(function ItemCard({
         />
       );
     case "attacks":
-      return <AttackCard attack={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedAttackCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "qualities":
       return (
         <QualityCard quality={item} id={id} onHeaderClick={onHeaderClick} />
@@ -947,10 +949,16 @@ export const ItemCard = React.memo(function ItemCard({
       );
     case "special":
       return (
-        <SpecialRuleCard item={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedSpecialRuleCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
       );
     case "actions":
-      return <ActionCard item={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedActionCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "optionals":
       return (
         <OptionalCard optional={item} id={id} onHeaderClick={onHeaderClick} />

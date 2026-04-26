@@ -52,15 +52,12 @@ import armorShieldQualities from "../../routes/equip/ArmorShield/qualities";
 import {
   WeaponCard,
   ArmorCard,
-  AttackCard,
   QualityCard,
   HeroicCard,
   ClassCard,
   CustomWeaponCard,
   AccessoryCard,
   OptionalCard,
-  SpecialRuleCard,
-  ActionCard,
 } from "./ItemCards";
 import {
   SharedSpellCard,
@@ -79,6 +76,9 @@ import {
   SharedPilotVehicleCard,
   SharedSymbolCard,
   SharedMagichantCard,
+  SharedAttackCard,
+  SharedSpecialRuleCard,
+  SharedActionCard,
 } from "../shared/itemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
@@ -441,7 +441,7 @@ function NpcAttackPanel() {
             </Grid>
           </Grid>
         }
-        previewContent={<AttackCard attack={data} />}
+        previewContent={<SharedAttackCard item={data} />}
         addButton={<AddToCompendiumButton itemType="npc-attack" data={data} />}
         exportDataType="attacks"
       />
@@ -802,7 +802,7 @@ function NpcSpecialPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<SpecialRuleCard item={data} />}
+      previewContent={<SharedSpecialRuleCard item={data} />}
       addButton={<AddToCompendiumButton itemType="npc-special" data={data} />}
       data={data}
       itemName={data.name || ""}
@@ -878,7 +878,7 @@ function NpcActionPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<ActionCard item={data} />}
+      previewContent={<SharedActionCard item={data} />}
       addButton={<AddToCompendiumButton itemType="npc-action" data={data} />}
       data={data}
       itemName={data.name || ""}
