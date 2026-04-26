@@ -74,11 +74,8 @@ import {
   WeaponCard,
   ArmorCard,
   QualityCard,
-  HeroicCard,
-  ClassCard,
   CustomWeaponCard,
   AccessoryCard,
-  OptionalCard,
 } from "../../components/compendium/ItemCards";
 import {
   SharedSpellCard,
@@ -100,6 +97,10 @@ import {
   SharedAttackCard,
   SharedSpecialRuleCard,
   SharedActionCard,
+  SharedClassCard,
+  SharedSkillCard,
+  SharedHeroicCard,
+  SharedOptionalCard,
 } from "../../components/shared/itemCards";
 
 import classList, { spellList, spellsByClass } from "../../libs/classes";
@@ -936,9 +937,13 @@ export const ItemCard = React.memo(function ItemCard({
         <QualityCard quality={item} id={id} onHeaderClick={onHeaderClick} />
       );
     case "classes":
-      return <ClassCard cls={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedClassCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "heroics":
-      return <HeroicCard heroic={item} id={id} onHeaderClick={onHeaderClick} />;
+      return (
+        <SharedHeroicCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
     case "custom-weapons":
       return (
         <CustomWeaponCard weapon={item} id={id} onHeaderClick={onHeaderClick} />
@@ -961,7 +966,7 @@ export const ItemCard = React.memo(function ItemCard({
       );
     case "optionals":
       return (
-        <OptionalCard optional={item} id={id} onHeaderClick={onHeaderClick} />
+        <SharedOptionalCard item={item} id={id} onHeaderClick={onHeaderClick} />
       );
     default:
       return null;

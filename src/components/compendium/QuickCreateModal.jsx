@@ -53,11 +53,8 @@ import {
   WeaponCard,
   ArmorCard,
   QualityCard,
-  HeroicCard,
-  ClassCard,
   CustomWeaponCard,
   AccessoryCard,
-  OptionalCard,
 } from "./ItemCards";
 import {
   SharedSpellCard,
@@ -79,6 +76,9 @@ import {
   SharedAttackCard,
   SharedSpecialRuleCard,
   SharedActionCard,
+  SharedClassCard,
+  SharedHeroicCard,
+  SharedOptionalCard,
 } from "../shared/itemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
@@ -2567,7 +2567,7 @@ function HeroicPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<HeroicCard heroic={data} />}
+      previewContent={<SharedHeroicCard item={data} />}
       addButton={<AddToCompendiumButton itemType="heroic" data={data} />}
       data={data}
       itemName={data.name || ""}
@@ -2974,8 +2974,8 @@ function ClassPanel() {
           </Grid>
         }
         previewContent={
-          <ClassCard
-            cls={{
+          <SharedClassCard
+            item={{
               ...classData,
               skills: classData.skills.filter((s) => s.skillName.trim()),
             }}
@@ -4777,7 +4777,7 @@ function OptionalPanel() {
       }
       previewContent={
         data.name ? (
-          <OptionalCard optional={data} />
+          <SharedOptionalCard item={data} />
         ) : (
           <Box sx={{ p: 2 }}>
             <Typography
