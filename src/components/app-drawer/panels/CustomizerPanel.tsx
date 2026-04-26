@@ -40,7 +40,7 @@ import { useCustomizerState } from "../hooks/useCustomizerState";
 
 export const CustomizerPanel: React.FC = () => {
   const navigate = useNavigate();
-  const { unsavedChanges } = useThemeStore();
+  const { unsavedChanges, setCustomization } = useThemeStore();
 
   const handleGoToDebugMenu = async () => {
     if (unsavedChanges) {
@@ -256,6 +256,30 @@ export const CustomizerPanel: React.FC = () => {
             createSliderHandler={createSliderHandler}
           />
         </Stack>
+
+        <Box
+          sx={{
+            mt: 1.5,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Tooltip title="Strip box-shadow, text-shadow, and bevel borders from NPC and player sheet cards">
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
+              Effects on actor sheets
+            </Typography>
+          </Tooltip>
+          <Switch
+            size="small"
+            checked={customization.actorSheetEffectsEnabled !== false}
+            onChange={(e) =>
+              setCustomization({
+                actorSheetEffectsEnabled: e.target.checked ? null : false,
+              })
+            }
+          />
+        </Box>
       </Box>
 
       <Divider />

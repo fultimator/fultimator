@@ -33,6 +33,7 @@ export interface ThemeCustomization {
   buttonUppercase: boolean | null;
   buttonLetterSpacing: number | null;
   appBarGradient: boolean | null;
+  actorSheetEffectsEnabled: boolean | null;
 }
 
 const HEX_COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
@@ -91,6 +92,7 @@ export function sanitizeImportedCustomization(
     "textEffectsEnabled",
     "buttonUppercase",
     "appBarGradient",
+    "actorSheetEffectsEnabled",
   ];
 
   for (const key of hexFields) {
@@ -149,4 +151,5 @@ export const DEFAULT_CUSTOMIZATION: ThemeCustomization = {
   buttonUppercase: null,
   buttonLetterSpacing: null,
   appBarGradient: null,
+  actorSheetEffectsEnabled: null,
 };

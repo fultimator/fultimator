@@ -34,6 +34,7 @@ import ExpDisabledIcon from "../../svgs/exp_disabled.svg?react";
 
 import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { useThemeStore } from "../../../store/themeStore";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import CardLoadout from "./CardLoadout";
@@ -346,6 +347,9 @@ export default function PlayerCard({
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
+  const actorSheetEffectsEnabled = useThemeStore(
+    (s) => s.customization.actorSheetEffectsEnabled,
+  );
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const isDark = theme.palette.mode === "dark";
@@ -616,6 +620,16 @@ export default function PlayerCard({
         border: "2px solid",
         borderColor: secondary,
         overflow: "hidden",
+        ...(actorSheetEffectsEnabled === false
+          ? {
+              background: theme.palette.background.paper,
+              boxShadow: "none",
+              borderTop: "",
+              borderLeft: "",
+              borderBottom: "",
+              borderRight: "",
+            }
+          : {}),
       }}
     >
       {/* Header */}

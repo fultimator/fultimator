@@ -606,27 +606,29 @@ function getEffectIntensity(
 function buildBevelBorders(
   baseTokens: Record<string, string> | null,
   customization: ThemeCustomization | null | undefined,
+  fallbackColor: string,
 ): Record<string, string> | null {
   const hasCustomBorder =
     customization?.bevelBorderStyle ||
     customization?.bevelBorderColor ||
     customization?.bevelBorderWidth;
+
   if (!hasCustomBorder) return baseTokens;
 
   const borderWidth = (customization?.bevelBorderWidth ?? 2) + "px";
   const borderStyle = customization?.bevelBorderStyle ?? "solid";
-  const borderColor = customization?.bevelBorderColor;
   const finalColor =
-    borderColor ||
+    customization?.bevelBorderColor ||
     (baseTokens
-      ? extractColorFromBorder(baseTokens.borderTop || "#999999")
-      : "#999999");
+      ? extractColorFromBorder(baseTokens.borderTop || fallbackColor)
+      : fallbackColor);
 
+  const value = `${borderWidth} ${borderStyle} ${finalColor}`;
   return {
-    borderTop: `${borderWidth} ${borderStyle} ${finalColor}`,
-    borderLeft: `${borderWidth} ${borderStyle} ${finalColor}`,
-    borderBottom: `${borderWidth} ${borderStyle} ${finalColor}`,
-    borderRight: `${borderWidth} ${borderStyle} ${finalColor}`,
+    borderTop: value,
+    borderLeft: value,
+    borderBottom: value,
+    borderRight: value,
   };
 }
 
@@ -643,16 +645,17 @@ function buildFrameEffect(
   customization: ThemeCustomization | null | undefined,
   intensity: number,
 ): Record<string, string> | null {
-  if (!baseTokens?.boxShadow) return null;
-
   const effectColor = customization?.frameEffectColor;
   const effectIntensity = Math.max(0, Math.min(1, intensity));
 
-  if (!effectColor) return { boxShadow: baseTokens.boxShadow };
+  if (effectColor) {
+    return {
+      boxShadow: `0 0 0 1px ${alpha(effectColor, 0.7 * effectIntensity)}, 0 0 6px ${alpha(effectColor, 0.35 * effectIntensity)}, 0 4px 12px rgba(0,0,0,${(0.65 * effectIntensity).toFixed(2)})`,
+    };
+  }
 
-  return {
-    boxShadow: `0 0 0 1px ${alpha(effectColor, 0.7 * effectIntensity)}, 0 0 6px ${alpha(effectColor, 0.35 * effectIntensity)}, 0 4px 12px rgba(0,0,0,${(0.65 * effectIntensity).toFixed(2)})`,
-  };
+  if (!baseTokens?.boxShadow) return null;
+  return { boxShadow: baseTokens.boxShadow };
 }
 
 function buildTextEffect(
@@ -857,7 +860,7 @@ export function createThemeComponents({
   const gradientOpacity = getGradientOpacity(styleCustomization);
 
   const customBevelBorders = enableBevelBorders
-    ? buildBevelBorders(tokens.bevelBorders, styleCustomization)
+    ? buildBevelBorders(tokens.bevelBorders, styleCustomization, quaternary)
     : null;
   const hasProfileFrameFx =
     tokens.frameFx !== null && tokens.frameFx !== undefined;
@@ -896,27 +899,21 @@ export function createThemeComponents({
     MuiCard: {
       styleOverrides: {
         root: {
-          background: !enableGradients
-            ? isDark
-              ? alpha(paper, 0.9)
-              : alpha(paper, 0.95)
-            : profile === "dystopian"
-              ? tokens.panelSurface
-              : tokens.cardBg,
-          ...(enableGradients && gradientOpacity < 1
+          background:
+            profile === "dystopian"
+              ? !enableGradients
+                ? isDark
+                  ? alpha(paper, 0.9)
+                  : alpha(paper, 0.95)
+                : tokens.panelSurface
+              : tokens.paperBg,
+          ...(profile === "dystopian" && enableGradients && gradientOpacity < 1
             ? {
-                backgroundImage:
-                  profile === "dystopian"
-                    ? applyGradientOpacity(
-                        tokens.panelSurface,
-                        gradientOpacity,
-                        isDark,
-                      )
-                    : applyGradientOpacity(
-                        tokens.cardBg,
-                        gradientOpacity,
-                        isDark,
-                      ),
+                backgroundImage: applyGradientOpacity(
+                  tokens.panelSurface,
+                  gradientOpacity,
+                  isDark,
+                ),
                 backgroundBlendMode: "overlay",
               }
             : {}),
@@ -967,6 +964,10 @@ export function createThemeComponents({
           borderRadius: tokens.buttonRadius ?? controlRadius,
           textTransform: buttonUppercase ? "uppercase" : "none",
           letterSpacing: buttonLetterSpacing,
+          textShadow:
+            enableTextEffects && customTextEffect !== "none"
+              ? customTextEffect
+              : "none",
           "&:hover": {
             borderColor: isDark ? alpha(secondary, 0.95) : quaternary,
             backgroundColor: isDark
@@ -1028,6 +1029,10 @@ export function createThemeComponents({
           borderRadius: tokens.buttonRadius ?? controlRadius,
           textTransform: buttonUppercase ? "uppercase" : "none",
           letterSpacing: buttonLetterSpacing,
+          textShadow:
+            enableTextEffects && customTextEffect !== "none"
+              ? customTextEffect
+              : "none",
           ...(customBevelBorders ?? {}),
           ...(customFrameEffect ?? {}),
           "&:hover": {
@@ -1161,6 +1166,10 @@ export function createThemeComponents({
           color: shouldApplyTextEffectColor
             ? (tokens.textColor ?? undefined)
             : undefined,
+          textShadow:
+            enableTextEffects && customTextEffect !== "none"
+              ? customTextEffect
+              : "none",
           "&.Mui-selected": {
             backgroundColor: selectionBg(primary, isDark),
             "&:hover": {
@@ -1173,12 +1182,26 @@ export function createThemeComponents({
     MuiListItemButton: {
       styleOverrides: {
         root: {
+          textShadow:
+            enableTextEffects && customTextEffect !== "none"
+              ? customTextEffect
+              : "none",
           "&.Mui-selected": {
             backgroundColor: selectionBg(primary, isDark),
             "&:hover": {
               backgroundColor: selectionHoverBg(quaternary, primary, isDark),
             },
           },
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        label: {
+          textShadow:
+            enableTextEffects && customTextEffect !== "none"
+              ? customTextEffect
+              : "none",
         },
       },
     },
@@ -1244,9 +1267,10 @@ export function createThemeComponents({
               ? (tokens.arcGradient ?? tokens.tabsBg)
               : tokens.tabsBg,
           borderRadius: profile === "flat" ? 0 : panelRadius,
-          ...(enableTextEffects && customTextEffect !== "none"
-            ? { textShadow: customTextEffect }
-            : {}),
+          textShadow:
+            enableTextEffects && customTextEffect !== "none"
+              ? customTextEffect
+              : "none",
           ...(customBevelBorders ?? {}),
           ...(customFrameEffect ?? {}),
         },
@@ -1281,7 +1305,10 @@ export function createThemeComponents({
     MuiTypography: {
       styleOverrides: {
         root: {
-          textShadow: "none",
+          textShadow:
+            enableTextEffects && customTextEffect !== "none"
+              ? customTextEffect
+              : "none",
         },
       },
     },
