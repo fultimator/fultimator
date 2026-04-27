@@ -20,6 +20,7 @@ const CustomHeaderAccordion = ({
   icon = null,
   addItem = null,
   openCompendium = null,
+  actions = null,
 }: {
   isExpanded?: boolean;
   headerText?: string;
@@ -27,6 +28,7 @@ const CustomHeaderAccordion = ({
   icon?: React.ReactNode;
   addItem?: (() => void) | null;
   openCompendium?: (() => void) | null;
+  actions?: React.ReactNode | null;
 }) => {
   const theme = useCustomTheme();
   return (
@@ -100,6 +102,14 @@ const CustomHeaderAccordion = ({
               </IconButton>
             </Tooltip>
           )}
+        </Box>
+      )}
+      {actions && (
+        <Box
+          onClick={(e) => e.stopPropagation()}
+          sx={{ display: "flex", alignItems: "center" }}
+        >
+          {actions}
         </Box>
       )}
     </AccordionSummary>
