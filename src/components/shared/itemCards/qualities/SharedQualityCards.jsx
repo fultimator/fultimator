@@ -8,19 +8,15 @@ import {
   isImageMode,
 } from "../core-utils";
 import { StyledMarkdown } from "../markdown";
-import {
-  CardContentWrapper,
-  RowsWithOptionalImage,
-  HeaderSpacer,
-} from "../core";
+import { CardContentWrapper, RowsWithOptionalImage } from "../core";
 
 function dataRowSx(customTheme, background, extraSx = {}) {
   return {
     alignItems: "center",
-    minHeight: "38px",
+    minHeight: "36px",
     flexGrow: 1,
     py: 0.25,
-    pl: 1,
+    px: 2,
     width: "100%",
     ...extraSx,
     ...(background ? { background } : {}),
@@ -76,37 +72,30 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={{
-            ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-            px: 0,
-          }}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid
-            container
-            sx={{ flex: 1, px: withImage ? 0.75 : 2, alignItems: "center" }}
-          >
-            <Grid size={cols.name}>
-              <Typography>{t("Quality")}</Typography>
-            </Grid>
-            <Grid size={cols.category}>
-              <Typography>{t("Category")}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={{
+                ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+              }}
+            >
+              <Grid size={cols.name}>
+                <Typography>{t("Quality")}</Typography>
+              </Grid>
+              <Grid size={cols.category}>
+                <Typography>{t("Category")}</Typography>
+              </Grid>
+              <Grid size={cols.cost}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Cost")}
+                </Typography>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -159,7 +148,7 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
         </Grid>
 
         {item.quality && (
-          <Box sx={{ px: 1.5, py: 0.75, fontSize: "0.875rem" }}>
+          <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
             <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
               {item.quality}
             </StyledMarkdown>
@@ -169,7 +158,7 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
         {item.filter?.length > 0 && (
           <Box
             sx={{
-              px: 1.5,
+              px: 2,
               pb: 0.75,
               display: "flex",
               gap: 0.5,

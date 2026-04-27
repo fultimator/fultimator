@@ -3781,6 +3781,9 @@ function CustomWeaponPanel() {
       if (transformingCustomization) {
         setSecondCurrentCustomizations([transformingCustomization]);
       }
+    } else if (!hasTransforming) {
+      setSecondCurrentCustomizations([]);
+      setSecondWeaponName("");
     }
   }, [hasTransforming, secondCurrentCustomizations.length]);
 

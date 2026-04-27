@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Children, cloneElement, isValidElement, useState } from "react";
 import {
   Box,
   Card,
@@ -21,7 +21,6 @@ import {
   getImageBackground,
   isImageMode,
   HEADER_MIN_HEIGHT,
-  IMAGE_COL_MIN_HEIGHT,
 } from "./core-utils";
 
 function ImageInfoIcon({ text }) {
@@ -132,48 +131,77 @@ export function HeaderSpacer({ imageMode, imageSize, imageVisible }) {
   );
 }
 
+function withRowMinHeight(row) {
+  if (!isValidElement(row)) return row;
+
+  return cloneElement(row, {
+    sx: [
+      ...(Array.isArray(row.props.sx) ? row.props.sx : [row.props.sx]),
+      { minHeight: HEADER_MIN_HEIGHT },
+    ],
+  });
+}
+
 export function RowsWithOptionalImage({
+  header = null,
   imageMode,
   imageSize,
   imageVisible,
   imageSlot,
   customTheme,
+  imageRowCount = 1,
   children,
 }) {
-  if (!isImageMode(imageMode) || !imageVisible) return children;
-  return (
-    <Grid
-      container
-      sx={{ alignItems: "stretch", minHeight: IMAGE_COL_MIN_HEIGHT }}
-    >
-      <Grid
-        sx={{
-          flex: `0 0 ${imageSize}px`,
-          width: `${imageSize}px`,
-          background: getImageBackground(customTheme),
-          borderRight: `1px solid ${customTheme.secondary}`,
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          overflow: "hidden",
-          alignSelf: "stretch",
-        }}
-      >
-        {imageSlot ?? <EditableImage size={imageSize} />}
-      </Grid>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
-          flexShrink: 1,
-          flexBasis: 0,
-          minWidth: 0,
-        }}
-      >
+  if (!isImageMode(imageMode) || !imageVisible) {
+    return (
+      <>
+        {header}
         {children}
+      </>
+    );
+  }
+
+  const rows = Children.toArray(children);
+  const imageRows = rows.slice(0, imageRowCount).map(withRowMinHeight);
+  const remainingRows = rows.slice(imageRowCount);
+  const imageContentSize = Math.min(imageSize, 72);
+
+  return (
+    <Box>
+      <Box sx={{ display: "flex", alignItems: "stretch" }}>
+        <Grid
+          sx={{
+            flex: `0 0 ${imageSize}px`,
+            width: `${imageSize}px`,
+            height: `${imageSize}px`,
+            background: getImageBackground(customTheme),
+            border: `1px solid ${customTheme.secondary}`,
+            boxSizing: "border-box",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            overflow: "hidden",
+          }}
+        >
+          {imageSlot ?? <EditableImage size={imageContentSize} />}
+        </Grid>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+            flexShrink: 1,
+            flexBasis: 0,
+            minWidth: 0,
+            minHeight: imageSize,
+          }}
+        >
+          {header}
+          {imageRows}
+        </Box>
       </Box>
-    </Grid>
+      {remainingRows}
+    </Box>
   );
 }
 
