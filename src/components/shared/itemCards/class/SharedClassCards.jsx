@@ -134,34 +134,31 @@ export const SharedClassCard = React.memo(function SharedClassCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Box
-          onClick={onHeaderClick}
-          sx={headerBoxSx(
-            customTheme,
-            scale,
-            onHeaderClick,
-            imageVisible ? imageSize : 0,
-          )}
-        >
-          <Typography>{t(item.name)}</Typography>
-          {item.book && (
-            <Chip
-              label={item.book}
-              size="small"
-              sx={{
-                textTransform: "capitalize",
-                backgroundColor: "rgba(255,255,255,0.2)",
-                color: "#ffffff",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-                flexShrink: 0,
-              }}
-            />
-          )}
-        </Box>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Box
+              onClick={onHeaderClick}
+              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+            >
+              <Typography>{t(item.name)}</Typography>
+              {item.book && (
+                <Chip
+                  label={item.book}
+                  size="small"
+                  sx={{
+                    textTransform: "capitalize",
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    color: "#ffffff",
+                    fontWeight: "bold",
+                    fontSize: "0.7rem",
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+            </Box>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -522,46 +519,43 @@ export const SharedSkillCard = React.memo(function SharedSkillCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Box
-          onClick={onHeaderClick}
-          sx={headerBoxSx(
-            customTheme,
-            scale,
-            onHeaderClick,
-            imageVisible ? imageSize : 0,
-          )}
-        >
-          <Typography sx={{ fontSize: "1rem !important" }}>
-            {t(item.className)}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Chip
-              label={`SL ${item.currentLvl}`}
-              size="small"
-              sx={{
-                backgroundColor: "rgba(255,255,255,0.2)",
-                color: "#ffffff",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-              }}
-            />
-            {item.isHomebrew && (
-              <Chip
-                label="Homebrew"
-                size="small"
-                sx={{
-                  backgroundColor: "rgba(255,165,0,0.3)",
-                  color: "#ffffff",
-                  fontWeight: "bold",
-                  fontSize: "0.65rem",
-                }}
-              />
-            )}
-          </Box>
-        </Box>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Box
+              onClick={onHeaderClick}
+              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+            >
+              <Typography sx={{ fontSize: "1rem !important" }}>
+                {t(item.className)}
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Chip
+                  label={`SL ${item.currentLvl}`}
+                  size="small"
+                  sx={{
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    color: "#ffffff",
+                    fontWeight: "bold",
+                    fontSize: "0.7rem",
+                  }}
+                />
+                {item.isHomebrew && (
+                  <Chip
+                    label="Homebrew"
+                    size="small"
+                    sx={{
+                      backgroundColor: "rgba(255,165,0,0.3)",
+                      color: "#ffffff",
+                      fontWeight: "bold",
+                      fontSize: "0.65rem",
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -633,55 +627,52 @@ export const SharedHeroicCard = React.memo(function SharedHeroicCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Box
-          onClick={onHeaderClick}
-          sx={headerBoxSx(
-            customTheme,
-            scale,
-            onHeaderClick,
-            imageVisible ? imageSize : 0,
-          )}
-        >
-          <Typography>{t("Heroic Skill")}</Typography>
-          <Box
-            sx={{
-              display: "flex",
-              gap: 0.5,
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-          >
-            {item.book && (
-              <Chip
-                label={item.book}
-                size="small"
-                sx={{
-                  textTransform: "capitalize",
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                  color: "#ffffff",
-                  fontWeight: "bold",
-                  fontSize: "0.7rem",
-                }}
-              />
-            )}
-            {item.applicableTo?.map((cls) => (
-              <Chip
-                key={cls}
-                label={t(cls)}
-                size="small"
-                sx={{
-                  textTransform: "capitalize",
-                  backgroundColor: "rgba(255,255,255,0.15)",
-                  color: "#ffffff",
-                  fontSize: "0.7rem",
-                }}
-              />
-            ))}
-          </Box>
-        </Box>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Box
+              onClick={onHeaderClick}
+              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+            >
+              <Typography>{t("Heroic Skill")}</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 0.5,
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                }}
+              >
+                {item.book && (
+                  <Chip
+                    label={item.book}
+                    size="small"
+                    sx={{
+                      textTransform: "capitalize",
+                      backgroundColor: "rgba(255,255,255,0.2)",
+                      color: "#ffffff",
+                      fontWeight: "bold",
+                      fontSize: "0.7rem",
+                    }}
+                  />
+                )}
+                {item.applicableTo?.map((cls) => (
+                  <Chip
+                    key={cls}
+                    label={t(cls)}
+                    size="small"
+                    sx={{
+                      textTransform: "capitalize",
+                      backgroundColor: "rgba(255,255,255,0.15)",
+                      color: "#ffffff",
+                      fontSize: "0.7rem",
+                    }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}

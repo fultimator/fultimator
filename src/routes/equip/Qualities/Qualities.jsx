@@ -12,8 +12,10 @@ import {
   Chip,
   Tabs,
   Tab,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material";
+import { AutoAwesome, Download } from "@mui/icons-material";
 import { useState, useRef } from "react";
 import { SharedQualityCard } from "../../../components/shared/itemCards";
 import ChangeName from "../common/ChangeName";
@@ -24,6 +26,9 @@ import useUploadJSON from "../../../hooks/useUploadJSON";
 import QualitiesGenerator from "./QualitiesGenerator";
 import SelectBase from "./SelectBase";
 import qualities from "../../../libs/qualities";
+import Export from "../../../components/Export";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
+import useDownloadImage from "../../../hooks/useDownloadImage";
 
 const CATEGORIES = ["Offensive", "Defensive", "Enhancement"];
 const FILTER_OPTIONS = [
@@ -48,6 +53,16 @@ function Qualities() {
   const [selectedBase, setSelectedBase] = useState("");
 
   const fileInputRef = useRef(null);
+  const cardRef = useRef(null);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(name, cardRef);
+
+  const qualityData = {
+    name,
+    category,
+    quality,
+    cost,
+    filter,
+  };
 
   const { handleFileUpload } = useUploadJSON((data) => {
     if (data) {
@@ -260,16 +275,29 @@ function Qualities() {
           sm: 6,
         }}
       >
-        <SharedQualityCard
-          item={{
-            name,
-            category,
-            quality,
-            cost,
-            filter,
-          }}
-        />
+        <div ref={cardRef}>
+          <SharedQualityCard
+            item={qualityData}
+            variant="equip"
+            imageMode="slot"
+            showImageToggle
+            actionContent={
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <Tooltip title={t("Download as Image")}>
+                  <IconButton onClick={downloadImage}>
+                    <Download />
+                  </IconButton>
+                </Tooltip>
+                <Export name={name} dataType="qualities" data={qualityData} />
+                <AddToCompendiumButton itemType="quality" data={qualityData} />
+              </div>
+            }
+          />
+        </div>
       </Grid>
+      {downloadSnackbar}
     </Grid>
   );
 }

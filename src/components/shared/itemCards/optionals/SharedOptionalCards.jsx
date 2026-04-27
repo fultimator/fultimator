@@ -13,16 +13,12 @@ import {
   isImageMode,
 } from "../core-utils";
 import { StyledMarkdown, md } from "../markdown";
-import {
-  CardContentWrapper,
-  RowsWithOptionalImage,
-  HeaderSpacer,
-} from "../core";
+import { CardContentWrapper, RowsWithOptionalImage } from "../core";
 
 function dataRowSx(customTheme, background, extraSx = {}) {
   return {
     alignItems: "center",
-    minHeight: "38px",
+    minHeight: "36px",
     flexGrow: 1,
     py: 0.25,
     pl: 1,
@@ -93,40 +89,47 @@ export const SharedRitualCard = React.memo(function SharedRitualCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={{
-            ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-            px: 0,
-          }}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid
-            container
-            sx={{ flex: 1, px: withImage ? 0.75 : 2, alignItems: "center" }}
-          >
-            <Grid size={3}>
-              <Typography>{t("Ritual")}</Typography>
-            </Grid>
-            <Grid size={1}>
-              <Typography sx={{ textAlign: "center" }}>{t("MP")}</Typography>
-            </Grid>
-            <Grid size={4}>
-              <Typography sx={{ textAlign: "center" }}>{t("DL")}</Typography>
-            </Grid>
-            <Grid size={4}>
-              <Typography sx={{ textAlign: "center" }}>{t("Clock")}</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={{
+                ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+                px: 0,
+              }}
+            >
+              <Grid
+                container
+                sx={{
+                  flex: 1,
+                  px: withImage ? 0.75 : 2,
+                  alignItems: "center",
+                }}
+              >
+                <Grid size={3}>
+                  <Typography>{t("Ritual")}</Typography>
+                </Grid>
+                <Grid size={1}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("MP")}
+                  </Typography>
+                </Grid>
+                <Grid size={4}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("DL")}
+                  </Typography>
+                </Grid>
+                <Grid size={4}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Clock")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -371,40 +374,43 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={{
-            ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-            px: 0,
-          }}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid
-            container
-            sx={{ flex: 1, px: withImage ? 0.75 : 2, alignItems: "center" }}
-          >
-            <Grid size={3}>
-              <Typography>{t("Project")}</Typography>
-            </Grid>
-            <Grid size={1}></Grid>
-            <Grid size={4}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Potency")}
-              </Typography>
-            </Grid>
-            <Grid size={4}>
-              <Typography sx={{ textAlign: "center" }}>{t("Area")}</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={{
+                ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+                px: 0,
+              }}
+            >
+              <Grid
+                container
+                sx={{
+                  flex: 1,
+                  px: withImage ? 0.75 : 2,
+                  alignItems: "center",
+                }}
+              >
+                <Grid size={3}>
+                  <Typography>{t("Project")}</Typography>
+                </Grid>
+                <Grid size={1}></Grid>
+                <Grid size={4}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Potency")}
+                  </Typography>
+                </Grid>
+                <Grid size={4}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Area")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -719,20 +725,17 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Box
-          onClick={onHeaderClick}
-          sx={headerBoxSx(
-            customTheme,
-            scale,
-            onHeaderClick,
-            imageVisible ? imageSize : 0,
-          )}
-        >
-          <Typography>{subtypeLabel}</Typography>
-        </Box>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Box
+              onClick={onHeaderClick}
+              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+            >
+              <Typography>{subtypeLabel}</Typography>
+            </Box>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}

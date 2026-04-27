@@ -8,16 +8,12 @@ import {
   isImageMode,
 } from "../core-utils";
 import { StyledMarkdown } from "../markdown";
-import {
-  CardContentWrapper,
-  RowsWithOptionalImage,
-  HeaderSpacer,
-} from "../core";
+import { CardContentWrapper, RowsWithOptionalImage } from "../core";
 
 function dataRowSx(customTheme, background, extraSx = {}) {
   return {
     alignItems: "center",
-    minHeight: "38px",
+    minHeight: "36px",
     flexGrow: 1,
     py: 0.25,
     pl: 1,
@@ -76,37 +72,40 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={{
-            ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-            px: 0,
-          }}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid
-            container
-            sx={{ flex: 1, px: withImage ? 0.75 : 2, alignItems: "center" }}
-          >
-            <Grid size={cols.name}>
-              <Typography>{t("Quality")}</Typography>
-            </Grid>
-            <Grid size={cols.category}>
-              <Typography>{t("Category")}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={{
+                ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+                px: 0,
+              }}
+            >
+              <Grid
+                container
+                sx={{
+                  flex: 1,
+                  px: withImage ? 0.75 : 2,
+                  alignItems: "center",
+                }}
+              >
+                <Grid size={cols.name}>
+                  <Typography>{t("Quality")}</Typography>
+                </Grid>
+                <Grid size={cols.category}>
+                  <Typography>{t("Category")}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}

@@ -12,11 +12,7 @@ import {
   CARD_DEFAULTS,
 } from "../core-utils";
 import { StyledMarkdown } from "../markdown";
-import {
-  CardContentWrapper,
-  RowsWithOptionalImage,
-  HeaderSpacer,
-} from "../core";
+import { CardContentWrapper, RowsWithOptionalImage } from "../core";
 
 export const SharedAttackCard = React.memo(function SharedAttackCard({
   item,
@@ -68,38 +64,37 @@ export const SharedAttackCard = React.memo(function SharedAttackCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid container sx={{ flex: 1 }}>
-            <Grid size={3}>
-              <Typography>{t(item.category)}</Typography>
-            </Grid>
-            <Grid size={3}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Accuracy")}
-              </Typography>
-            </Grid>
-            <Grid size={3}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Damage")}
-              </Typography>
-            </Grid>
-            <Grid size={3}>
-              <Typography sx={{ textAlign: "center" }}>{t("Range")}</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid container sx={{ flex: 1 }}>
+                <Grid size={3}>
+                  <Typography>{t(item.category)}</Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Accuracy")}
+                  </Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Damage")}
+                  </Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Range")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -229,32 +224,29 @@ export const SharedSpecialRuleCard = React.memo(function SharedSpecialRuleCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Box
-          onClick={onHeaderClick}
-          sx={headerBoxSx(
-            customTheme,
-            scale,
-            onHeaderClick,
-            imageVisible ? imageSize : 0,
-          )}
-        >
-          <Typography>{t("Special Rule")}</Typography>
-          {item.spCost != null && (
-            <Chip
-              label={`${item.spCost} SP`}
-              size="small"
-              sx={{
-                backgroundColor: "rgba(255,255,255,0.2)",
-                color: "#ffffff",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-              }}
-            />
-          )}
-        </Box>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Box
+              onClick={onHeaderClick}
+              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+            >
+              <Typography>{t("Special Rule")}</Typography>
+              {item.spCost != null && (
+                <Chip
+                  label={`${item.spCost} SP`}
+                  size="small"
+                  sx={{
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    color: "#ffffff",
+                    fontWeight: "bold",
+                    fontSize: "0.7rem",
+                  }}
+                />
+              )}
+            </Box>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -334,32 +326,29 @@ export const SharedActionCard = React.memo(function SharedActionCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Box
-          onClick={onHeaderClick}
-          sx={headerBoxSx(
-            customTheme,
-            scale,
-            onHeaderClick,
-            imageVisible ? imageSize : 0,
-          )}
-        >
-          <Typography>{t("Other Action")}</Typography>
-          {item.spCost != null && (
-            <Chip
-              label={`${item.spCost} SP`}
-              size="small"
-              sx={{
-                backgroundColor: "rgba(255,255,255,0.2)",
-                color: "#ffffff",
-                fontWeight: "bold",
-                fontSize: "0.7rem",
-              }}
-            />
-          )}
-        </Box>
-      )}
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Box
+              onClick={onHeaderClick}
+              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+            >
+              <Typography>{t("Other Action")}</Typography>
+              {item.spCost != null && (
+                <Chip
+                  label={`${item.spCost} SP`}
+                  size="small"
+                  sx={{
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    color: "#ffffff",
+                    fontWeight: "bold",
+                    fontSize: "0.7rem",
+                  }}
+                />
+              )}
+            </Box>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}

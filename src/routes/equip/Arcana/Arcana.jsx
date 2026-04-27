@@ -6,8 +6,10 @@ import {
   FormControl,
   TextField,
   Divider,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material";
+import { AutoAwesome, Download } from "@mui/icons-material";
 import { useState, useRef } from "react";
 import { SharedArcanumCard } from "../../../components/shared/itemCards";
 import ChangeName from "../common/ChangeName";
@@ -15,6 +17,9 @@ import ApplyRework from "../common/ApplyRework";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../../components/common/CustomTextarea";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
+import Export from "../../../components/Export";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
+import useDownloadImage from "../../../hooks/useDownloadImage";
 
 function Arcana() {
   const { t } = useTranslate();
@@ -33,6 +38,22 @@ function Arcana() {
   const [rework, setRework] = useState(false);
 
   const fileInputRef = useRef(null);
+  const cardRef = useRef(null);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(name, cardRef);
+
+  const arcanumData = {
+    name,
+    description,
+    domain,
+    mergeName,
+    mergeBenefit,
+    pulseName,
+    pulseBenefit,
+    dismissName,
+    dismissBenefit,
+    rework,
+    spellType: rework ? "arcanist-rework" : "arcanist",
+  };
 
   const handleFileUpload = (data) => {
     if (data) {
@@ -263,21 +284,36 @@ function Arcana() {
           sm: 6,
         }}
       >
-        <SharedArcanumCard
-          item={{
-            name: name,
-            description: description,
-            domain: domain,
-            mergeName: mergeName,
-            mergeBenefit: mergeBenefit,
-            pulseName: pulseName,
-            pulseBenefit: pulseBenefit,
-            dismissName: dismissName,
-            dismissBenefit: dismissBenefit,
-            rework: rework,
-          }}
-        />
+        <div ref={cardRef}>
+          <SharedArcanumCard
+            item={arcanumData}
+            variant="equip"
+            imageMode="slot"
+            showImageToggle
+            actionContent={
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <Tooltip title={t("Download as Image")}>
+                  <IconButton onClick={downloadImage}>
+                    <Download />
+                  </IconButton>
+                </Tooltip>
+                <Export
+                  name={name}
+                  dataType="player-spells"
+                  data={arcanumData}
+                />
+                <AddToCompendiumButton
+                  itemType="player-spell"
+                  data={arcanumData}
+                />
+              </div>
+            }
+          />
+        </div>
       </Grid>
+      {downloadSnackbar}
     </Grid>
   );
 }
