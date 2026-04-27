@@ -1,19 +1,14 @@
 import React, { useEffect } from "react";
-import { Container } from "@mui/material";
+import { Container, Box, useMediaQuery } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
 import AppBar from "./appbar/AppBar";
 import CompactAppBar from "./appbar/CompactAppBar";
-import { useThemeContext } from "../hooks/useThemeContext";
+import { AppDrawer } from "./app-drawer/AppDrawer";
+import { APP_DRAWER_WIDTH } from "./app-drawer/constants";
+import { useThemeStore } from "../store/themeStore";
+import type { ThemeValue, StyleProfileValue } from "../store/themeStore";
 import { globalConfirm } from "../utility/globalConfirm";
 import { useTranslate } from "../translation/translate";
-
-type ThemeValue =
-  | "Fabula"
-  | "High"
-  | "Techno"
-  | "Natural"
-  | "Bravely"
-  | "Obscura";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -28,6 +23,8 @@ interface NavigationState {
   search?: string;
 }
 
+const DRAWER_WIDTH = APP_DRAWER_WIDTH;
+
 const Layout: React.FC<LayoutProps> = ({
   children,
   fullWidth,
@@ -35,19 +32,31 @@ const Layout: React.FC<LayoutProps> = ({
   loading,
 }) => {
   const { t } = useTranslate();
-  const { selectedTheme, isDarkMode, setTheme, toggleDarkMode } =
-    useThemeContext();
+  const {
+    selectedTheme,
+    selectedStyleProfile,
+    isDarkMode,
+    setTheme,
+    setStyleProfile,
+    toggleDarkMode,
+    drawerOpen,
+    toggleDrawer,
+    setDrawerOpen,
+    setUnsavedChanges,
+  } = useThemeStore();
+
+  useEffect(() => {
+    setUnsavedChanges(unsavedChanges ?? false);
+  }, [unsavedChanges, setUnsavedChanges]);
 
   const handleSelectTheme = (theme: ThemeValue) => {
     setTheme(theme);
   };
+  const handleSelectStyleProfile = (profile: StyleProfileValue) => {
+    setStyleProfile(profile);
+  };
 
-  useEffect(() => {
-    // Ensure theme and mode are in sync with localStorage
-    localStorage.setItem("selectedTheme", selectedTheme);
-    localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode));
-  }, [selectedTheme, isDarkMode]);
-
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -156,30 +165,54 @@ const Layout: React.FC<LayoutProps> = ({
           isNpcEdit={isNpcEdit}
           isPcEdit={isPcEdit}
           selectedTheme={selectedTheme}
+          selectedStyleProfile={selectedStyleProfile}
           handleSelectTheme={handleSelectTheme}
+          handleSelectStyleProfile={handleSelectStyleProfile}
           isDarkMode={isDarkMode}
           handleToggleDarkMode={toggleDarkMode}
           showGoBackButton={!isHomepage}
           handleNavigation={handleNavigation}
+          onOpenDrawer={toggleDrawer}
         />
       ) : (
         <AppBar
           isNpcEdit={isNpcEdit}
           selectedTheme={selectedTheme}
+          selectedStyleProfile={selectedStyleProfile}
           handleSelectTheme={handleSelectTheme}
+          handleSelectStyleProfile={handleSelectStyleProfile}
           isDarkMode={isDarkMode}
           handleToggleDarkMode={toggleDarkMode}
           showGoBackButton={!isHomepage}
           handleNavigation={handleNavigation}
+          onOpenDrawer={toggleDrawer}
         />
       )}
-      {fullWidth ? (
-        <div style={{ marginTop: "5em" }}>{children}</div>
-      ) : (
-        <Container style={{ marginTop: "6em", alignItems: "center" }}>
-          {children}
-        </Container>
-      )}
+
+      <AppDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+
+      <Box
+        sx={{
+          marginRight: !isMobile && drawerOpen ? `${DRAWER_WIDTH}px` : 0,
+          transition: (theme) =>
+            theme.transitions.create("marginRight", {
+              easing: drawerOpen
+                ? theme.transitions.easing.easeOut
+                : theme.transitions.easing.sharp,
+              duration: drawerOpen
+                ? theme.transitions.duration.enteringScreen
+                : theme.transitions.duration.leavingScreen,
+            }),
+        }}
+      >
+        {fullWidth ? (
+          <div style={{ marginTop: "5em" }}>{children}</div>
+        ) : (
+          <Container style={{ marginTop: "6em", alignItems: "center" }}>
+            {children}
+          </Container>
+        )}
+      </Box>
     </>
   );
 };

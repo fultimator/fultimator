@@ -14,7 +14,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
-import { SkillCard } from "../../compendium/ItemCards";
+import { SharedSkillCard } from "../../shared/itemCards";
 
 export default function PlayerSkills({ player }) {
   const { t } = useTranslate();
@@ -179,7 +179,7 @@ export default function PlayerSkills({ player }) {
               maxWidth="sm"
             >
               <DialogContent sx={{ p: 0 }}>
-                {selectedSkill && <SkillCard skill={selectedSkill} />}
+                {selectedSkill && <SharedSkillCard item={selectedSkill} />}
               </DialogContent>
               <DialogActions>
                 <Button

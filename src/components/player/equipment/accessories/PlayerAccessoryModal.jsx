@@ -21,7 +21,7 @@ import SelectQuality from "../../../../routes/equip/Accessories/SelectQuality";
 import ChangeName from "../../../../routes/equip/common/ChangeName";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
 import ChangeModifiers from "../ChangeModifiers";
-import PrettyAccessory from "./PrettyAccessory";
+import { SharedAccessoryCard } from "../../../../components/shared/itemCards";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
@@ -375,8 +375,8 @@ export default function PlayerAccessoryModal({
               sm: 6,
             }}
           >
-            <PrettyAccessory
-              accessory={{
+            <SharedAccessoryCard
+              item={{
                 name: name,
                 cost: cost,
                 quality: quality,

@@ -6,7 +6,6 @@ import {
   Button,
   TextField,
   Divider,
-  Box,
   useTheme,
   IconButton,
   Tooltip,
@@ -28,7 +27,7 @@ import ChangeRange from "./ChangeRange";
 import ChangeAccuracyCheck from "./ChangeAccuracyCheck";
 import ChangeType from "./ChangeType";
 import ChangeCustomizations from "./ChangeCustomizations";
-import PrettyCustomWeapon from "./PrettyCustomWeapon";
+import { SharedCustomWeaponCard } from "../../../components/shared/itemCards";
 import Export from "../../../components/Export";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
@@ -119,7 +118,7 @@ function CustomWeapons() {
   );
 
   // Combined download for transforming weapons
-  const [downloadCombinedImage, downloadSnackbar] = useDownloadImage(
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
     `${weaponName || "Custom Weapon"}`,
     weaponCardsRef,
   );
@@ -181,19 +180,19 @@ function CustomWeapons() {
   };
 
   // Handle customization removal
-  const handleCustomizationRemove = (customizationToRemove) => {
+  const handleCustomizationRemove = (customizationName) => {
     setCurrentCustomizations((prev) =>
-      prev.filter((c) => c.name !== customizationToRemove.name),
+      prev.filter((c) => c.name !== customizationName),
     );
   };
 
-  const handleSecondCustomizationRemove = (customizationToRemove) => {
+  const handleSecondCustomizationRemove = (customizationName) => {
     // Prevent removing transforming from second form
-    if (customizationToRemove.name === "weapon_customization_transforming") {
+    if (customizationName === "weapon_customization_transforming") {
       return;
     }
     setSecondCurrentCustomizations((prev) =>
-      prev.filter((c) => c.name !== customizationToRemove.name),
+      prev.filter((c) => c.name !== customizationName),
     );
   };
 
@@ -1002,174 +1001,77 @@ function CustomWeapons() {
           md: 6,
         }}
       >
-        <Box>
-          <Box ref={weaponCardsRef}>
-            <Typography variant="h6" gutterBottom>
-              Primary Weapon Preview
-            </Typography>
-            <PrettyCustomWeapon
-              weaponData={{
-                name: weaponName,
-                category: selectedCategory,
-                range: selectedRange,
-                martial: martial,
-                accuracyCheck: selectedAccuracyCheck,
-                type: selectedType,
-                customizations: currentCustomizations,
-                quality: quality,
-                qualityCost: qualityCost,
-                // Map to standard format
-                damageModifier: customDamageMod,
-                precModifier: customAccuracyMod,
-                defModifier: defModifier,
-                mDefModifier: mDefModifier,
-                overrideDamageType: overrideType,
-                customDamageType: customDamageType,
-              }}
-              showActions={!hasTransforming}
-              showImageOverride={hasTransforming ? showImageOnBoth : undefined}
-            />
-
-            {hasTransforming && (
-              <>
-                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                  Transforming Form Preview
-                </Typography>
-                <PrettyCustomWeapon
-                  weaponData={{
-                    name: secondWeaponName,
-                    category: secondSelectedCategory,
-                    range: secondSelectedRange,
-                    martial: secondMartial,
-                    accuracyCheck: secondSelectedAccuracyCheck,
-                    type: secondSelectedType,
-                    customizations: secondCurrentCustomizations,
-                    quality: quality,
-                    qualityCost: qualityCost,
-                    // Map to standard format for transforming form
-                    damageModifier: secondCustomDamageMod,
-                    precModifier: secondCustomAccuracyMod,
-                    defModifier: secondDefModifier,
-                    mDefModifier: secondMDefModifier,
-                    overrideDamageType: secondOverrideType,
-                    customDamageType: secondCustomDamageType,
-                  }}
-                  showActions={false}
-                  showImageOverride={showImageOnBoth}
-                />
-              </>
-            )}
-          </Box>
-
-          {hasTransforming && (
-            /* Combined Download Actions for Transforming Weapons */
-            <Box
-              sx={{
-                display: "flex",
-                mt: 2,
-                alignItems: "center",
-                gap: 1,
-                flexWrap: "wrap",
-              }}
-            >
-              <Tooltip title={t("Download Combined as Image")}>
-                <IconButton onClick={downloadCombinedImage}>
-                  <Download />
-                </IconButton>
-              </Tooltip>
-              <Export
-                name={`${weaponName || "Custom Weapon"}`}
-                dataType="weapon"
-                data={{
-                  name: weaponName,
-                  category: selectedCategory,
-                  range: selectedRange,
-                  martial: martial,
-                  accuracyCheck: selectedAccuracyCheck,
-                  type: selectedType,
-                  customizations: currentCustomizations,
-                  selectedQuality: selectedQuality,
-                  quality: quality,
-                  qualityCost: qualityCost,
-                  cost: calculateWeaponCost(),
-                  hands: 2,
-                  isEquipped: false,
-                  damageModifier: customDamageMod,
-                  precModifier: customAccuracyMod,
-                  defModifier: defModifier,
-                  mDefModifier: mDefModifier,
-                  initModifier: 0,
-                  magicModifier: 0,
-                  damageMeleeModifier: 0,
-                  damageRangedModifier: 0,
-                  overrideDamageType: overrideType,
-                  customDamageType: customDamageType,
-                  secondWeaponName: secondWeaponName,
-                  secondSelectedCategory: secondSelectedCategory,
-                  secondSelectedRange: secondSelectedRange,
-                  secondMartial: secondMartial,
-                  secondSelectedAccuracyCheck: secondSelectedAccuracyCheck,
-                  secondSelectedType: secondSelectedType,
-                  secondCurrentCustomizations: secondCurrentCustomizations,
-                  secondDamageModifier: secondCustomDamageMod,
-                  secondPrecModifier: secondCustomAccuracyMod,
-                  secondDefModifier: secondDefModifier,
-                  secondMDefModifier: secondMDefModifier,
-                  secondOverrideDamageType: secondOverrideType,
-                  secondCustomDamageType: secondCustomDamageType,
-
-                  dataType: "weapon",
-                }}
-              />
-              <AddToCompendiumButton
-                itemType="custom-weapon"
-                data={{
-                  name: weaponName,
-                  category: selectedCategory,
-                  range: selectedRange,
-                  martial: martial,
-                  accuracyCheck: selectedAccuracyCheck,
-                  type: selectedType,
-                  customizations: currentCustomizations,
-                  selectedQuality: selectedQuality,
-                  quality: quality,
-                  qualityCost: qualityCost,
-                  cost: calculateWeaponCost(),
-                  hands: 2,
-                  isEquipped: false,
-                  damageModifier: customDamageMod,
-                  precModifier: customAccuracyMod,
-                  defModifier: defModifier,
-                  mDefModifier: mDefModifier,
-                  overrideDamageType: overrideType,
-                  customDamageType: customDamageType,
-                  secondWeaponName: secondWeaponName,
-                  secondSelectedCategory: secondSelectedCategory,
-                  secondSelectedRange: secondSelectedRange,
-                  secondMartial: secondMartial,
-                  secondSelectedAccuracyCheck: secondSelectedAccuracyCheck,
-                  secondSelectedType: secondSelectedType,
-                  secondCurrentCustomizations: secondCurrentCustomizations,
-                  secondDamageModifier: secondCustomDamageMod,
-                  secondPrecModifier: secondCustomAccuracyMod,
-                  secondDefModifier: secondDefModifier,
-                  secondMDefModifier: secondMDefModifier,
-                  secondOverrideDamageType: secondOverrideType,
-                  secondCustomDamageType: secondCustomDamageType,
-                }}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={showImageOnBoth}
-                    onChange={(e) => setShowImageOnBoth(e.target.checked)}
+        {(() => {
+          const exportData = {
+            name: weaponName,
+            category: selectedCategory,
+            range: selectedRange,
+            martial: martial,
+            accuracyCheck: selectedAccuracyCheck,
+            type: selectedType,
+            customizations: currentCustomizations,
+            selectedQuality: selectedQuality,
+            quality: quality,
+            qualityCost: qualityCost,
+            cost: calculateWeaponCost(),
+            hands: 2,
+            isEquipped: false,
+            damageModifier: customDamageMod,
+            precModifier: customAccuracyMod,
+            defModifier: defModifier,
+            mDefModifier: mDefModifier,
+            overrideDamageType: overrideType,
+            customDamageType: customDamageType,
+            ...(hasTransforming && {
+              secondWeaponName,
+              secondSelectedCategory,
+              secondSelectedRange,
+              secondMartial,
+              secondSelectedAccuracyCheck,
+              secondSelectedType,
+              secondCurrentCustomizations,
+              secondDamageModifier: secondCustomDamageMod,
+              secondPrecModifier: secondCustomAccuracyMod,
+              secondDefModifier,
+              secondMDefModifier,
+              secondOverrideDamageType: secondOverrideType,
+              secondCustomDamageType,
+            }),
+          };
+          return (
+            <SharedCustomWeaponCard
+              variant="equip"
+              item={exportData}
+              cardRef={weaponCardsRef}
+              imageMode="slot"
+              showImageToggle
+              showImage={hasTransforming ? showImageOnBoth : undefined}
+              onShowImageChange={
+                hasTransforming ? setShowImageOnBoth : undefined
+              }
+              actionContent={
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <Tooltip title={t("Download as Image")}>
+                    <IconButton onClick={downloadImage}>
+                      <Download />
+                    </IconButton>
+                  </Tooltip>
+                  <Export
+                    name={weaponName || "Custom Weapon"}
+                    dataType="weapon"
+                    data={{ ...exportData, dataType: "weapon" }}
                   />
-                }
-                label={t("Add Image")}
-              />
-            </Box>
-          )}
-        </Box>
+                  <AddToCompendiumButton
+                    itemType="custom-weapon"
+                    data={exportData}
+                  />
+                </div>
+              }
+            />
+          );
+        })()}
       </Grid>
       {downloadSnackbar}
     </Grid>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  Alert,
   Grid,
   Accordion,
   AccordionDetails,
@@ -10,9 +11,10 @@ import {
   ListItemText,
   Badge,
   Box,
+  Snackbar,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import PrettyArmor from "../armor/PrettyArmor";
+import { SharedShieldCard } from "../../../../components/shared/itemCards";
 import { Edit, WarningAmber } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
@@ -37,6 +39,7 @@ export default function PlayerShields({
   const [expanded, setExpanded] = useState(false);
   const [slotMenuAnchor, setSlotMenuAnchor] = useState(null);
   const [slotMenuIndex, setSlotMenuIndex] = useState(null);
+  const [equipWarningOpen, setEquipWarningOpen] = useState(false);
 
   const hasDualShieldBearer = player.classes.some((playerClass) =>
     playerClass.skills.some(
@@ -84,7 +87,10 @@ export default function PlayerShields({
       return;
     }
     // 2H or custom weapon in main hand locks both hands
-    if (isTwoHandedEquipped(player)) return;
+    if (isTwoHandedEquipped(player)) {
+      if (!checkIfEquippable(shield)) setEquipWarningOpen(true);
+      return;
+    }
     if (hasDualShieldBearer) {
       setSlotMenuAnchor(event.currentTarget);
       setSlotMenuIndex(index);
@@ -152,7 +158,7 @@ export default function PlayerShields({
               <React.Fragment key={index}>
                 <Grid sx={{ mb: 1 }} size={12}>
                   <Box>
-                    <PrettyArmor armor={shield} />
+                    <SharedShieldCard item={shield} />
                   </Box>
 
                   <Box
@@ -280,6 +286,22 @@ export default function PlayerShields({
           />
         </MenuItem>
       </Menu>
+      <Snackbar
+        open={equipWarningOpen}
+        autoHideDuration={3000}
+        onClose={() => setEquipWarningOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="warning"
+          onClose={() => setEquipWarningOpen(false)}
+          sx={{ width: "100%" }}
+        >
+          {t(
+            "Cannot equip a martial shield you are not proficient with while a two-handed weapon is equipped.",
+          )}
+        </Alert>
+      </Snackbar>
     </Accordion>
   );
 }

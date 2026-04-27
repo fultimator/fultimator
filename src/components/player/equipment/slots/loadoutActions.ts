@@ -93,52 +93,72 @@ function applyModuleUpdater(
  * If a two-handed weapon is assigned to mainHand, offHand is also cleared.
  * Ends with `syncSlots` so both equippedSlots and vehicleSlots are consistent.
  */
+function unequipRef(
+  player: TypePlayer,
+  ref: SlotRef | null | undefined,
+): TypePlayer {
+  if (!ref) return player;
+  return patchInv(player, ref.source, (arr) =>
+    arr.map((it, idx) => {
+      const match =
+        ref.index !== undefined ? idx === ref.index : it.name === ref.name;
+      return match ? { ...it, isEquipped: false } : it;
+    }),
+  );
+}
+
+function resolveUnarmedRef(
+  player: TypePlayer,
+  defaultRef: SlotRef | null | undefined,
+): { source: "weapons" | "customWeapons"; index: number; ref: SlotRef } | null {
+  const inv = player.equipment?.[0];
+  if (defaultRef) {
+    const source = defaultRef.source as "weapons" | "customWeapons";
+    const arr = (inv?.[source] ?? []) as AnyEquipmentItem[];
+    const index =
+      defaultRef.index !== undefined
+        ? defaultRef.index
+        : arr.findIndex((w) => w.name === defaultRef.name);
+    if (index === -1 || !arr[index]) return null;
+    return { source, index, ref: { source, name: arr[index].name, index } };
+  }
+  const weapons = inv?.weapons ?? [];
+  const index = weapons.findIndex((w) => w.name === "Unarmed Strike");
+  if (index === -1) return null;
+  return {
+    source: "weapons",
+    index,
+    ref: { source: "weapons", name: "Unarmed Strike", index },
+  };
+}
+
 export function equipItemToSlot(
   player: TypePlayer,
   slot: string,
   candidate: PickerCandidate,
 ): TypePlayer {
-  const currentRef = player.equippedSlots?.[slot as keyof EquippedSlots];
   const isCustom = candidate.source === "customWeapons";
   const isTwoHand =
     isCustom ||
     ("hands" in candidate.item && candidate.item.hands === 2) ||
     ("isTwoHand" in candidate.item && candidate.item.isTwoHand);
+  const isHandSlot = slot === "mainHand" || slot === "offHand";
+  const otherHand =
+    slot === "mainHand" ? "offHand" : slot === "offHand" ? "mainHand" : null;
 
   let updated = player;
 
-  // Un-equip the item currently in this slot
-  if (currentRef) {
-    updated = patchInv(updated, currentRef.source, (arr) =>
-      arr.map((it: AnyEquipmentItem, idx: number) => {
-        const match =
-          currentRef.index !== undefined
-            ? idx === currentRef.index
-            : it.name === currentRef.name;
-        return match ? { ...it, isEquipped: false } : it;
-      }),
-    );
-  }
+  updated = unequipRef(
+    updated,
+    updated.equippedSlots?.[slot as keyof EquippedSlots],
+  );
 
-  // Two-handed to mainHand: also clear offHand
   if (slot === "mainHand" && isTwoHand) {
-    const offRef = updated.equippedSlots?.offHand;
-    if (offRef) {
-      updated = patchInv(updated, offRef.source, (arr) =>
-        arr.map((it: AnyEquipmentItem, idx: number) => {
-          const match =
-            offRef.index !== undefined
-              ? idx === offRef.index
-              : it.name === offRef.name;
-          return match ? { ...it, isEquipped: false } : it;
-        }),
-      );
-    }
+    updated = unequipRef(updated, updated.equippedSlots?.offHand);
   }
 
-  // Equip the new item
   updated = patchInv(updated, candidate.source, (arr) =>
-    arr.map((it: AnyEquipmentItem, idx: number) => {
+    arr.map((it, idx) => {
       const match =
         candidate.index !== undefined
           ? idx === candidate.index
@@ -149,47 +169,48 @@ export function equipItemToSlot(
 
   updated = syncSlots(updated);
 
+  const candidateRef: SlotRef = {
+    source: candidate.source,
+    name: candidate.label,
+    index: candidate.index,
+  };
+  const otherHandRef = otherHand
+    ? updated.equippedSlots?.[otherHand as keyof EquippedSlots]
+    : null;
+  const otherHandDisplaced =
+    otherHandRef?.source === candidateRef.source &&
+    otherHandRef?.index === candidateRef.index;
+
+  updated = {
+    ...updated,
+    equippedSlots: {
+      ...updated.equippedSlots,
+      [slot]: candidateRef,
+      ...(otherHandDisplaced && otherHand ? { [otherHand]: null } : {}),
+      ...(slot === "mainHand" && isTwoHand ? { offHand: null } : {}),
+    },
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const autoEquipUnarmed = (updated as any).settings?.autoEquipUnarmed ?? false;
-  if (autoEquipUnarmed && (slot === "mainHand" || slot === "offHand")) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const defaultRef = (updated as any).settings?.defaultUnarmedStrikeRef;
-    let unarmedIdx: number;
-    let unarmedSource: "weapons" | "customWeapons" = "weapons";
-    let unarmed: AnyEquipmentItem | null = null;
-
-    if (defaultRef) {
-      unarmedSource = defaultRef.source;
-      const sourceArr = (updated.equipment?.[0]?.[unarmedSource] ??
-        []) as AnyEquipmentItem[];
-      unarmedIdx =
-        defaultRef.index !== undefined
-          ? defaultRef.index
-          : sourceArr.findIndex((w) => w.name === defaultRef.name);
-      if (unarmedIdx !== -1) {
-        unarmed = sourceArr[unarmedIdx];
-      }
-    } else {
-      const weapons: AnyEquipmentItem[] = updated.equipment?.[0]?.weapons ?? [];
-      unarmedIdx = weapons.findIndex((w) => w.name === "Unarmed Strike");
-      if (unarmedIdx !== -1) {
-        unarmed = weapons[unarmedIdx];
-      }
-    }
-
+  const settings = (updated as any).settings ?? {};
+  if (settings.autoEquipUnarmed && isHandSlot && !isTwoHand) {
+    const unarmed = resolveUnarmedRef(
+      updated,
+      settings.defaultUnarmedStrikeRef,
+    );
     if (unarmed) {
       const emptyHands = (["mainHand", "offHand"] as const).filter(
         (h) => !updated.equippedSlots?.[h],
       );
-
       if (emptyHands.length > 0) {
-        updated = patchInv(updated, unarmedSource, (arr) =>
-          arr.map((it: AnyEquipmentItem, idx: number) => {
-            const match = idx === unarmedIdx || it.name === unarmed.name;
-            return match ? { ...it, isEquipped: true } : it;
-          }),
+        updated = patchInv(updated, unarmed.source, (arr) =>
+          arr.map((it, idx) =>
+            idx === unarmed.index ? { ...it, isEquipped: true } : it,
+          ),
         );
-        updated = syncSlots(updated);
+        const newSlots = { ...updated.equippedSlots };
+        for (const hand of emptyHands) newSlots[hand] = unarmed.ref;
+        updated = { ...updated, equippedSlots: newSlots };
       }
     }
   }
@@ -204,73 +225,33 @@ export function clearSlotAction(player: TypePlayer, slot: string): TypePlayer {
   const currentRef = player.equippedSlots?.[slot as keyof EquippedSlots];
   if (!currentRef) return player;
 
-  let updated = patchInv(player, currentRef.source, (arr) =>
-    arr.map((it: AnyEquipmentItem, idx: number) => {
-      const match =
-        currentRef.index !== undefined
-          ? idx === currentRef.index
-          : it.name === currentRef.name;
-      return match ? { ...it, isEquipped: false } : it;
-    }),
-  );
+  let updated = unequipRef(player, currentRef);
 
   updated = syncSlots(updated);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const autoEquipUnarmed = (updated as any).settings?.autoEquipUnarmed ?? false;
-  if (autoEquipUnarmed && (slot === "mainHand" || slot === "offHand")) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const defaultRef = (updated as any).settings?.defaultUnarmedStrikeRef;
-    let unarmedIdx: number;
-    let unarmedSource: "weapons" | "customWeapons" = "weapons";
-    let unarmed: AnyEquipmentItem | null = null;
-
-    if (defaultRef) {
-      unarmedSource = defaultRef.source;
-      const sourceArr = (updated.equipment?.[0]?.[unarmedSource] ??
-        []) as AnyEquipmentItem[];
-      unarmedIdx =
-        defaultRef.index !== undefined
-          ? defaultRef.index
-          : sourceArr.findIndex((w) => w.name === defaultRef.name);
-      if (unarmedIdx !== -1) {
-        unarmed = sourceArr[unarmedIdx];
-      }
-    } else {
-      const weapons: AnyEquipmentItem[] = updated.equipment?.[0]?.weapons ?? [];
-      unarmedIdx = weapons.findIndex((w) => w.name === "Unarmed Strike");
-      if (unarmedIdx !== -1) {
-        unarmed = weapons[unarmedIdx];
-      }
-    }
-
+  const settings = (updated as any).settings ?? {};
+  if (
+    settings.autoEquipUnarmed &&
+    (slot === "mainHand" || slot === "offHand")
+  ) {
+    const unarmed = resolveUnarmedRef(
+      updated,
+      settings.defaultUnarmedStrikeRef,
+    );
     if (unarmed) {
-      const candidate: PickerCandidate = {
-        source: unarmedSource,
-        label: unarmed.name,
-        index: unarmedIdx,
-        item: unarmed,
-      };
       const emptyHands = (["mainHand", "offHand"] as const).filter(
         (h) => !updated.equippedSlots?.[h],
       );
       if (emptyHands.length > 0) {
-        updated = equipItemToSlot(updated, emptyHands[0], candidate);
-      }
-      // Unarmed Strike can occupy both hand slots
-      if (emptyHands.length === 2) {
-        const unarmedRef: SlotRef = {
-          source: unarmedSource,
-          name: unarmed.name,
-          index: unarmedIdx,
-        };
-        updated = {
-          ...updated,
-          equippedSlots: {
-            ...updated.equippedSlots,
-            [emptyHands[1]]: unarmedRef,
-          },
-        };
+        updated = patchInv(updated, unarmed.source, (arr) =>
+          arr.map((it, idx) =>
+            idx === unarmed.index ? { ...it, isEquipped: true } : it,
+          ),
+        );
+        const newSlots = { ...updated.equippedSlots };
+        for (const hand of emptyHands) newSlots[hand] = unarmed.ref;
+        updated = { ...updated, equippedSlots: newSlots };
       }
     }
   }

@@ -9,13 +9,18 @@ import {
   AccordionDetails,
   Typography,
 } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material";
+import { AutoAwesome, ArrowDownward, Download } from "@mui/icons-material";
+import { IconButton, Tooltip } from "@mui/material";
+import useDownloadImage from "../../../hooks/useDownloadImage";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChangeModifiers from "../../../components/player/equipment/ChangeModifiers";
 import { useState, useRef } from "react";
 import armor from "./base";
 import ChangeBase from "./ChangeBase";
-import Pretty from "./Pretty";
+import {
+  SharedArmorCard,
+  SharedShieldCard,
+} from "../../../components/shared/itemCards";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import ChangeName from "../common/ChangeName";
@@ -24,6 +29,8 @@ import { useTranslate } from "../../../translation/translate";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import useUploadJSON from "../../../hooks/useUploadJSON";
 import ApplyRework from "../common/ApplyRework";
+import Export from "../../../components/Export";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 
 function ArmorShield() {
   const { t } = useTranslate();
@@ -57,6 +64,8 @@ function ArmorShield() {
   const cost = calcCost();
 
   const fileInputRef = useRef(null);
+  const cardRef = useRef(null);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(name, cardRef);
 
   const { handleFileUpload } = useUploadJSON((data) => {
     if (data) {
@@ -121,241 +130,292 @@ function ArmorShield() {
   };
 
   return (
-    <Grid container spacing={2}>
-      {/* Form */}
-      <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            p: "14px",
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
+    <>
+      <Grid container spacing={2}>
+        {/* Form */}
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
           }}
         >
-          {/* Header */}
-          <CustomHeaderAlt
-            headerText={t("Armor and Shield")}
-            icon={<AutoAwesome fontSize="large" />}
-          />
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
-            {/* Change Base */}
-            <Grid size={4}>
-              <ChangeBase
-                value={base.name}
-                onChange={(e) => {
-                  const base = armor.find((el) => el.name === e.target.value);
+          <Paper
+            elevation={3}
+            sx={{
+              p: "14px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+            }}
+          >
+            {/* Header */}
+            <CustomHeaderAlt
+              headerText={t("Armor and Shield")}
+              icon={<AutoAwesome fontSize="large" />}
+            />
+            <Grid container spacing={2} sx={{ alignItems: "center" }}>
+              {/* Change Base */}
+              <Grid size={4}>
+                <ChangeBase
+                  value={base.name}
+                  onChange={(e) => {
+                    const base = armor.find((el) => el.name === e.target.value);
 
-                  setBase(base);
-                  setName(base.name);
-                  setMartial(base.martial);
-                  setInit(base.init);
-                }}
-              />
-            </Grid>
-            {/* <Grid size={2}>
+                    setBase(base);
+                    setName(base.name);
+                    setMartial(base.martial);
+                    setInit(base.init);
+                  }}
+                />
+              </Grid>
+              {/* <Grid size={2}>
               <ChangeMartial martial={martial} setMartial={setMartial} />
             </Grid> */}
-            <Grid size={4}>
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value,
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
-                }}
-              />
-            </Grid>
-
-            <Grid size={4}>
-              <ChangeName
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Grid>
-            <Grid size={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-              <Divider />
-            </Grid>
-            <Grid size={12}>
-              <Accordion
-                sx={{ width: "100%" }}
-                expanded={modifiersExpanded}
-                onChange={() => setModifiersExpanded(!modifiersExpanded)}
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>{t("Modifiers")}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={2}>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"DEF Modifier"}
-                        value={defModifier}
-                        onChange={(e) => setDefModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"MDEF Modifier"}
-                        value={mDefModifier}
-                        onChange={(e) => setMDefModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"INIT Modifier"}
-                        value={initModifier}
-                        onChange={(e) => setInitModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"Magic Modifier"}
-                        value={magicModifier}
-                        onChange={(e) => setMagicModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"Precision Modifier"}
-                        value={precModifier}
-                        onChange={(e) => setPrecModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"Damage (Melee) Modifier"}
-                        value={damageMeleeModifier}
-                        onChange={(e) => setDamageMeleeModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"Damage (Ranged) Modifier"}
-                        value={damageRangedModifier}
-                        onChange={(e) =>
-                          setDamageRangedModifier(e.target.value)
-                        }
-                      />
-                    </Grid>
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-              <Divider />
-            </Grid>
-            <Grid sx={{ py: 0 }} size={12}>
-              <Grid container spacing={2} sx={{ alignItems: "center" }}>
-                <Grid>
-                  <Button
-                    variant="outlined"
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    {t("Upload JSON")}
-                  </Button>
-                </Grid>
-                <Grid>
-                  <Button variant="outlined" onClick={handleClearFields}>
-                    {t("Clear All Fields")}
-                  </Button>
-                </Grid>
-                {/* Rework */}
-                <Grid size="grow">
-                  <ApplyRework rework={rework} setRework={setRework} />
-                </Grid>
+              <Grid size={4}>
+                <SelectQuality
+                  quality={selectedQuality}
+                  setQuality={(e) => {
+                    const quality = qualities.find(
+                      (el) => el.name === e.target.value,
+                    );
+                    setSelectedQuality(quality.name);
+                    setQuality(quality.quality);
+                    setQualityCost(quality.cost);
+                  }}
+                />
               </Grid>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={handleFileUpload}
-                style={{ display: "none" }}
-              />
+
+              <Grid size={4}>
+                <ChangeName
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </Grid>
+              <Grid size={12}>
+                <ChangeQuality
+                  quality={quality}
+                  setQuality={(e) => setQuality(e.target.value)}
+                  qualityCost={qualityCost}
+                  setQualityCost={(e) => setQualityCost(e.target.value)}
+                />
+                <Divider />
+              </Grid>
+              <Grid size={12}>
+                <Accordion
+                  sx={{ width: "100%" }}
+                  expanded={modifiersExpanded}
+                  onChange={() => setModifiersExpanded(!modifiersExpanded)}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>{t("Modifiers")}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Grid container spacing={2}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"DEF Modifier"}
+                          value={defModifier}
+                          onChange={(e) => setDefModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"MDEF Modifier"}
+                          value={mDefModifier}
+                          onChange={(e) => setMDefModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"INIT Modifier"}
+                          value={initModifier}
+                          onChange={(e) => setInitModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Magic Modifier"}
+                          value={magicModifier}
+                          onChange={(e) => setMagicModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Precision Modifier"}
+                          value={precModifier}
+                          onChange={(e) => setPrecModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Damage (Melee) Modifier"}
+                          value={damageMeleeModifier}
+                          onChange={(e) =>
+                            setDamageMeleeModifier(e.target.value)
+                          }
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Damage (Ranged) Modifier"}
+                          value={damageRangedModifier}
+                          onChange={(e) =>
+                            setDamageRangedModifier(e.target.value)
+                          }
+                        />
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
+                <Divider />
+              </Grid>
+              <Grid sx={{ py: 0 }} size={12}>
+                <Grid container spacing={2} sx={{ alignItems: "center" }}>
+                  <Grid>
+                    <Button
+                      variant="outlined"
+                      onClick={() => fileInputRef.current.click()}
+                    >
+                      {t("Upload JSON")}
+                    </Button>
+                  </Grid>
+                  <Grid>
+                    <Button variant="outlined" onClick={handleClearFields}>
+                      {t("Clear All Fields")}
+                    </Button>
+                  </Grid>
+                  {/* Rework */}
+                  <Grid size="grow">
+                    <ApplyRework rework={rework} setRework={setRework} />
+                  </Grid>
+                </Grid>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileUpload}
+                  style={{ display: "none" }}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
-      </Grid>
-      {/* Pretty */}
-      <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
-      >
-        <Pretty
-          base={base}
-          custom={{
-            base,
-            ...base,
-            name: name,
-            cost: cost,
-            martial: martial,
-            quality: quality,
-            qualityCost: qualityCost,
-            selectedQuality: selectedQuality,
-            init: init,
-            rework: rework,
-            defModifier: defModifier,
-            mDefModifier: mDefModifier,
-            initModifier: initModifier,
-            magicModifier: magicModifier,
-            precModifier: precModifier,
-            damageMeleeModifier: damageMeleeModifier,
-            damageRangedModifier: damageRangedModifier,
-            damageModifier: 0,
-            isEquipped: false,
+          </Paper>
+        </Grid>
+        {/* Pretty */}
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
           }}
-        />
+        >
+          {(() => {
+            const SharedCard =
+              base.category === "Shield" ? SharedShieldCard : SharedArmorCard;
+            const customItem = {
+              base,
+              ...base,
+              name: name,
+              cost: cost,
+              martial: martial,
+              quality: quality,
+              qualityCost: qualityCost,
+              selectedQuality: selectedQuality,
+              init: init,
+              rework: rework,
+              defModifier: defModifier,
+              mDefModifier: mDefModifier,
+              initModifier: initModifier,
+            };
+            return (
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 10 }}
+              >
+                <SharedCard
+                  item={base}
+                  variant="equip"
+                  imageMode="slot"
+                  showImageToggle
+                />
+                <Typography sx={{ textAlign: "center" }}>
+                  <ArrowDownward />
+                </Typography>
+                <div ref={cardRef}>
+                  <SharedCard
+                    item={customItem}
+                    variant="equip"
+                    imageMode="slot"
+                    showImageToggle
+                    actionContent={
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <Tooltip title={t("Download as Image")}>
+                          <IconButton onClick={downloadImage}>
+                            <Download />
+                          </IconButton>
+                        </Tooltip>
+                        <Export
+                          name={name}
+                          dataType={
+                            base.category === "Shield" ? "shield" : "armor"
+                          }
+                          data={customItem}
+                        />
+                        <AddToCompendiumButton
+                          itemType={
+                            base.category === "Shield" ? "shield" : "armor"
+                          }
+                          data={customItem}
+                        />
+                      </div>
+                    }
+                  />
+                </div>
+              </div>
+            );
+          })()}
+        </Grid>
       </Grid>
-    </Grid>
+      {downloadSnackbar}
+    </>
   );
 }
 export default ArmorShield;

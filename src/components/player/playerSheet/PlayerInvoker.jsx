@@ -24,7 +24,7 @@ import {
   Water,
 } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { NonStaticSpellCard } from "../../compendium/ItemCards";
+import { SharedInvocationCard } from "../../shared/itemCards";
 import { buildInvokerAvailableInvocations } from "../spells/invokerUtils";
 
 export default function PlayerInvoker({ player, setPlayer }) {
@@ -375,7 +375,7 @@ export default function PlayerInvoker({ player, setPlayer }) {
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedInvocation && (
-                  <NonStaticSpellCard
+                  <SharedInvocationCard
                     item={{
                       ...selectedInvocation,
                       spellType: "invocation",

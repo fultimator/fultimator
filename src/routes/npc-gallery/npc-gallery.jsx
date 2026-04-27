@@ -126,13 +126,16 @@ function Personal() {
   // Migration states
   const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
 
-  const [personalList, loading, err] = db.useCollectionData(
-    db.query(
-      db.collection("npc-personal"),
-      db.orderBy("lvl", "asc"),
-      db.orderBy("name", "asc"),
-    ),
+  const npcQuery = useMemo(
+    () =>
+      db.query(
+        db.collection("npc-personal"),
+        db.orderBy("lvl", "asc"),
+        db.orderBy("name", "asc"),
+      ),
+    [db],
   );
+  const [personalList, loading, err] = db.useCollectionData(npcQuery);
 
   const staleNpcs = useMemo(() => {
     if (!personalList) return [];

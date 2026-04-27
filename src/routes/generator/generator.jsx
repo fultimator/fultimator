@@ -19,7 +19,7 @@ import {
   useScrollTrigger,
 } from "@mui/material";
 import { Spa } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Layout from "../../components/Layout";
 import Weapons from "../equip/weapons/Weapons";
 import ArmorShield from "../equip/ArmorShield/ArmorShield";
@@ -27,10 +27,17 @@ import Accessories from "../equip/Accessories/Accessories";
 import Arcana from "../equip/Arcana/Arcana";
 import Qualities from "../equip/Qualities/Qualities";
 import CustomWeapons from "../equip/customWeapons/CustomWeapons.jsx";
-import { RitualPretty, ProjectPretty } from "../equip/ritualsProjects/Pretty";
+import {
+  SharedRitualCard,
+  SharedProjectCard,
+} from "../../components/shared/itemCards";
 import { useTranslate } from "../../translation/translate";
 import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import CustomTextarea from "../../components/common/CustomTextarea";
+import useDownloadImage from "../../hooks/useDownloadImage";
+import Export from "../../components/Export";
+import { Tooltip, IconButton } from "@mui/material";
+import { Download } from "@mui/icons-material";
 
 const powerPMs = {
   minor: 20,
@@ -270,6 +277,7 @@ function Rituals() {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const cardRef = useRef(null);
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
   const [ingredient, setIngredient] = useState(false);
@@ -278,6 +286,10 @@ function Rituals() {
   const [fastRitual, setFastRitual] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
+    name || t("Custom Ritual"),
+    cardRef,
+  );
   const ingredientMod = ingredient ? 0.5 : 1;
   const itemHeldMod = itemHeld ? dlReduction : 0;
 
@@ -498,7 +510,27 @@ function Rituals() {
             md: 6,
           }}
         >
-          <RitualPretty ritual={ritualPreview} />
+          <SharedRitualCard
+            item={ritualPreview}
+            showImageToggle
+            imageMode="slot"
+            cardRef={cardRef}
+            actionContent={
+              <>
+                <Export
+                  name={name || t("Custom Ritual")}
+                  dataType="ritual"
+                  data={ritualPreview}
+                />
+                <Tooltip title={t("Download as Image")}>
+                  <IconButton onClick={downloadImage}>
+                    <Download />
+                  </IconButton>
+                </Tooltip>
+              </>
+            }
+          />
+          {downloadSnackbar}
         </Grid>
       </Grid>
     </>
@@ -508,6 +540,7 @@ function Projects() {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const cardRef = useRef(null);
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
   const [uses, setUses] = useState("consumable");
@@ -517,6 +550,10 @@ function Projects() {
   const [visionary, setVisionary] = useState(0);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
+    name || t("Custom Project"),
+    cardRef,
+  );
 
   const defectMod = defect ? 0.75 : 1;
   const cost =
@@ -787,7 +824,27 @@ function Projects() {
             md: 6,
           }}
         >
-          <ProjectPretty project={projectPreview} />
+          <SharedProjectCard
+            item={projectPreview}
+            showImageToggle
+            imageMode="slot"
+            cardRef={cardRef}
+            actionContent={
+              <>
+                <Export
+                  name={name || t("Custom Project")}
+                  dataType="project"
+                  data={projectPreview}
+                />
+                <Tooltip title={t("Download as Image")}>
+                  <IconButton onClick={downloadImage}>
+                    <Download />
+                  </IconButton>
+                </Tooltip>
+              </>
+            }
+          />
+          {downloadSnackbar}
         </Grid>
       </Grid>
     </>

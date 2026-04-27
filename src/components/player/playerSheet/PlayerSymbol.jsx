@@ -15,7 +15,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { NonStaticSpellCard } from "../../compendium/ItemCards";
+import { SharedSymbolCard } from "../../shared/itemCards";
 
 export default function PlayerSymbol({ player }) {
   const { t } = useTranslate();
@@ -179,7 +179,7 @@ export default function PlayerSymbol({ player }) {
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedSymbol && (
-                  <NonStaticSpellCard
+                  <SharedSymbolCard
                     item={{
                       ...selectedSymbol,
                       spellType: "symbol",

@@ -9,7 +9,7 @@ import {
   AccordionDetails,
   Typography,
 } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material";
+import { AutoAwesome, ArrowDownward } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChangeModifiers from "../../../components/player/equipment/ChangeModifiers";
 import { useState, useRef, useEffect } from "react";
@@ -21,13 +21,18 @@ import ChangeBonus from "./ChangeBonus";
 import ChangeHands from "./ChangeHands";
 import ChangeName from "../common/ChangeName";
 import ChangeType from "./ChangeType";
-import Pretty from "./Pretty";
+import { SharedWeaponCard } from "../../../components/shared/itemCards";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import qualities from "./qualities";
 import ApplyRework from "../common/ApplyRework";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
+import Export from "../../../components/Export";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
+import useDownloadImage from "../../../hooks/useDownloadImage";
+import { Download } from "@mui/icons-material";
+import { IconButton, Tooltip } from "@mui/material";
 
 function Weapons() {
   const { t } = useTranslate();
@@ -56,6 +61,8 @@ function Weapons() {
   const [modifiersExpanded, setModifiersExpanded] = useState(false);
 
   const fileInputRef = useRef(null);
+  const cardRef = useRef(null);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(name, cardRef);
 
   const handleFileUpload = (data) => {
     if (data) {
@@ -242,256 +249,300 @@ function Weapons() {
   }, [damageReworkBonus, cost]);
 
   return (
-    <Grid container spacing={2}>
-      {/* Form */}
-      <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            p: "14px",
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
+    <>
+      <Grid container spacing={2}>
+        {/* Form */}
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
           }}
         >
-          {/* Header */}
-          <CustomHeaderAlt
-            headerText={t("Rare Weapons")}
-            icon={<AutoAwesome fontSize="large" />}
-          />
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            {/* Change Base */}
-            <Grid size={4}>
-              <ChangeBase
-                value={base.name}
-                onChange={(e) => {
-                  const selectedBase = weapons.find(
-                    (el) => el.name === e.target.value,
-                  );
+          <Paper
+            elevation={3}
+            sx={{
+              p: "14px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+            }}
+          >
+            {/* Header */}
+            <CustomHeaderAlt
+              headerText={t("Rare Weapons")}
+              icon={<AutoAwesome fontSize="large" />}
+            />
+            <Grid container spacing={1} sx={{ alignItems: "center" }}>
+              {/* Change Base */}
+              <Grid size={4}>
+                <ChangeBase
+                  value={base.name}
+                  onChange={(e) => {
+                    const selectedBase = weapons.find(
+                      (el) => el.name === e.target.value,
+                    );
 
-                  setBase(selectedBase);
-                  // Set the name to the translated version when base changes
-                  setName(t(selectedBase.name));
-                  setType(selectedBase.type);
-                  setHands(selectedBase.hands);
-                  setDamageBonus(false);
-                  setDamageReworkBonus(false);
-                  setPrecBonus(false);
-                  setAtt1(selectedBase.att1);
-                  setAtt2(selectedBase.att2);
-                  setMartial(selectedBase.martial);
-                }}
-              />
-            </Grid>
-            {/* Change Martial */}
-            <Grid size={2}>
-              <ChangeMartial martial={martial} setMartial={setMartial} />
-            </Grid>
-            {/* Change Name */}
-            <Grid size={6}>
-              <ChangeName
-                value={isLoaded ? name : t(name)}
-                onChange={(e) =>
-                  isLoaded
-                    ? setName(e.target.value)
-                    : (setName(e.target.value), setIsLoaded(true))
-                }
-              />
-            </Grid>
-            {/* Change Type */}
-            <Grid size={3}>
-              <ChangeType
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-              />
-            </Grid>
-            {/* Change Hands */}
-            <Grid size={3}>
-              <ChangeHands
-                value={hands}
-                onChange={(e) => setHands(e.target.value)}
-              />
-            </Grid>
-            {/* Change Attributes */}
-            <Grid size={6}>
-              <ChangeAttr
-                att1={att1}
-                att2={att2}
-                setAtt1={(e) => setAtt1(e.target.value)}
-                setAtt2={(e) => setAtt2(e.target.value)}
-              />
-            </Grid>
-            {/* Change Quality */}
-            <Grid size={6}>
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value,
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
-                }}
-              />
-            </Grid>
-            {/* Change Bonus */}
-            <Grid size={6}>
-              <ChangeBonus
-                basePrec={base.prec}
-                precBonus={precBonus}
-                damageBonus={damageBonus}
-                damageReworkBonus={damageReworkBonus}
-                setPrecBonus={setPrecBonus}
-                setDamageBonus={setDamageBonus}
-                setDamageReworkBonus={setDamageReworkBonus}
-                rework={rework}
-                totalBonus={totalBonus}
-              />
-            </Grid>
-            <Grid size={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-              <Divider />
-            </Grid>
-            <Grid size={12}>
-              <Accordion
-                sx={{ width: "100%" }}
-                expanded={modifiersExpanded}
-                onChange={() => setModifiersExpanded(!modifiersExpanded)}
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>{t("Modifiers")}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={2}>
-                    <Grid size={6}>
-                      <ChangeModifiers
-                        label={"Damage Modifier"}
-                        value={damageModifier}
-                        onChange={(e) => setDamageModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid size={6}>
-                      <ChangeModifiers
-                        label={"Precision Modifier"}
-                        value={precModifier}
-                        onChange={(e) => setPrecModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid size={6}>
-                      <ChangeModifiers
-                        label={"DEF Modifier"}
-                        value={defModifier}
-                        onChange={(e) => setDefModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid size={6}>
-                      <ChangeModifiers
-                        label={"MDEF Modifier"}
-                        value={mDefModifier}
-                        onChange={(e) => setMDefModifier(e.target.value)}
-                      />
-                    </Grid>
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-              <Divider />
-            </Grid>
-            <Grid size={12}>
-              <Grid container spacing={1} sx={{ alignItems: "center" }}>
-                <Grid>
-                  <Button
-                    variant="outlined"
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    {t("Upload JSON")}
-                  </Button>
-                </Grid>
-                <Grid>
-                  <Button variant="outlined" onClick={handleClearFields}>
-                    {t("Clear All Fields")}
-                  </Button>
-                </Grid>
-                {/* Rework */}
-                <Grid size="grow">
-                  <ApplyRework rework={rework} setRework={setRework} />
-                </Grid>
+                    setBase(selectedBase);
+                    // Set the name to the translated version when base changes
+                    setName(t(selectedBase.name));
+                    setType(selectedBase.type);
+                    setHands(selectedBase.hands);
+                    setDamageBonus(false);
+                    setDamageReworkBonus(false);
+                    setPrecBonus(false);
+                    setAtt1(selectedBase.att1);
+                    setAtt2(selectedBase.att2);
+                    setMartial(selectedBase.martial);
+                  }}
+                />
               </Grid>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      const result = JSON.parse(reader.result);
-                      handleFileUpload(result);
-                    };
-                    reader.readAsText(file);
+              {/* Change Martial */}
+              <Grid size={2}>
+                <ChangeMartial martial={martial} setMartial={setMartial} />
+              </Grid>
+              {/* Change Name */}
+              <Grid size={6}>
+                <ChangeName
+                  value={isLoaded ? name : t(name)}
+                  onChange={(e) =>
+                    isLoaded
+                      ? setName(e.target.value)
+                      : (setName(e.target.value), setIsLoaded(true))
                   }
-                }}
-                style={{ display: "none" }}
-              />
+                />
+              </Grid>
+              {/* Change Type */}
+              <Grid size={3}>
+                <ChangeType
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                />
+              </Grid>
+              {/* Change Hands */}
+              <Grid size={3}>
+                <ChangeHands
+                  value={hands}
+                  onChange={(e) => setHands(e.target.value)}
+                />
+              </Grid>
+              {/* Change Attributes */}
+              <Grid size={6}>
+                <ChangeAttr
+                  att1={att1}
+                  att2={att2}
+                  setAtt1={(e) => setAtt1(e.target.value)}
+                  setAtt2={(e) => setAtt2(e.target.value)}
+                />
+              </Grid>
+              {/* Change Quality */}
+              <Grid size={6}>
+                <SelectQuality
+                  quality={selectedQuality}
+                  setQuality={(e) => {
+                    const quality = qualities.find(
+                      (el) => el.name === e.target.value,
+                    );
+                    setSelectedQuality(quality.name);
+                    setQuality(quality.quality);
+                    setQualityCost(quality.cost);
+                  }}
+                />
+              </Grid>
+              {/* Change Bonus */}
+              <Grid size={6}>
+                <ChangeBonus
+                  basePrec={base.prec}
+                  precBonus={precBonus}
+                  damageBonus={damageBonus}
+                  damageReworkBonus={damageReworkBonus}
+                  setPrecBonus={setPrecBonus}
+                  setDamageBonus={setDamageBonus}
+                  setDamageReworkBonus={setDamageReworkBonus}
+                  rework={rework}
+                  totalBonus={totalBonus}
+                />
+              </Grid>
+              <Grid size={12}>
+                <ChangeQuality
+                  quality={quality}
+                  setQuality={(e) => setQuality(e.target.value)}
+                  qualityCost={qualityCost}
+                  setQualityCost={(e) => setQualityCost(e.target.value)}
+                />
+                <Divider />
+              </Grid>
+              <Grid size={12}>
+                <Accordion
+                  sx={{ width: "100%" }}
+                  expanded={modifiersExpanded}
+                  onChange={() => setModifiersExpanded(!modifiersExpanded)}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>{t("Modifiers")}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Grid container spacing={2}>
+                      <Grid size={6}>
+                        <ChangeModifiers
+                          label={"Damage Modifier"}
+                          value={damageModifier}
+                          onChange={(e) => setDamageModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid size={6}>
+                        <ChangeModifiers
+                          label={"Precision Modifier"}
+                          value={precModifier}
+                          onChange={(e) => setPrecModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid size={6}>
+                        <ChangeModifiers
+                          label={"DEF Modifier"}
+                          value={defModifier}
+                          onChange={(e) => setDefModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid size={6}>
+                        <ChangeModifiers
+                          label={"MDEF Modifier"}
+                          value={mDefModifier}
+                          onChange={(e) => setMDefModifier(e.target.value)}
+                        />
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
+                <Divider />
+              </Grid>
+              <Grid size={12}>
+                <Grid container spacing={1} sx={{ alignItems: "center" }}>
+                  <Grid>
+                    <Button
+                      variant="outlined"
+                      onClick={() => fileInputRef.current.click()}
+                    >
+                      {t("Upload JSON")}
+                    </Button>
+                  </Grid>
+                  <Grid>
+                    <Button variant="outlined" onClick={handleClearFields}>
+                      {t("Clear All Fields")}
+                    </Button>
+                  </Grid>
+                  {/* Rework */}
+                  <Grid size="grow">
+                    <ApplyRework rework={rework} setRework={setRework} />
+                  </Grid>
+                </Grid>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const result = JSON.parse(reader.result);
+                        handleFileUpload(result);
+                      };
+                      reader.readAsText(file);
+                    }
+                  }}
+                  style={{ display: "none" }}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
-      </Grid>
-      {/* Pretty */}
-      <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
-      >
-        <Pretty
-          base={base}
-          custom={{
-            base: base,
-            name: name,
-            att1: att1,
-            att2: att2,
-            martial: martial,
-            type: type,
-            hands: hands,
-            category: base.category,
-            melee: base.melee,
-            ranged: base.ranged,
-            cost: cost,
-            damage: damage,
-            prec: prec,
-            quality: quality,
-            qualityCost: qualityCost,
-            selectedQuality: selectedQuality,
-            totalBonus: totalBonus,
-            damageBonus: damageBonus,
-            damageReworkBonus: damageReworkBonus,
-            precBonus: precBonus,
-            rework: rework,
-            damageModifier: damageModifier,
-            precModifier: precModifier,
-            defModifier: defModifier,
-            mDefModifier: mDefModifier,
-            initModifier: 0,
-            magicModifier: 0,
-            damageMeleeModifier: 0,
-            damageRangedModifier: 0,
-            isEquipped: false,
+          </Paper>
+        </Grid>
+        {/* Pretty */}
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
           }}
-        />
+        >
+          {(() => {
+            const customItem = {
+              base: base,
+              name: name,
+              att1: att1,
+              att2: att2,
+              martial: martial,
+              type: type,
+              hands: hands,
+              category: base.category,
+              melee: base.melee,
+              ranged: base.ranged,
+              cost: cost,
+              damage: damage,
+              prec: prec,
+              quality: quality,
+              qualityCost: qualityCost,
+              selectedQuality: selectedQuality,
+              totalBonus: totalBonus,
+              damageBonus: damageBonus,
+              damageReworkBonus: damageReworkBonus,
+              precBonus: precBonus,
+              rework: rework,
+              damageModifier: damageModifier,
+              precModifier: precModifier,
+              defModifier: defModifier,
+              mDefModifier: mDefModifier,
+            };
+            return (
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 10 }}
+              >
+                <SharedWeaponCard
+                  item={base}
+                  variant="equip"
+                  imageMode="slot"
+                  showImageToggle
+                />
+                <Typography sx={{ textAlign: "center" }}>
+                  <ArrowDownward />
+                </Typography>
+                <div ref={cardRef}>
+                  <SharedWeaponCard
+                    item={customItem}
+                    variant="equip"
+                    imageMode="slot"
+                    showImageToggle
+                    actionContent={
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <Tooltip title={t("Download as Image")}>
+                          <IconButton onClick={downloadImage}>
+                            <Download />
+                          </IconButton>
+                        </Tooltip>
+                        <Export
+                          name={name}
+                          dataType="weapon"
+                          data={customItem}
+                        />
+                        <AddToCompendiumButton
+                          itemType="weapon"
+                          data={customItem}
+                        />
+                      </div>
+                    }
+                  />
+                </div>
+              </div>
+            );
+          })()}
+        </Grid>
       </Grid>
-    </Grid>
+      {downloadSnackbar}
+    </>
   );
 }
 export default Weapons;

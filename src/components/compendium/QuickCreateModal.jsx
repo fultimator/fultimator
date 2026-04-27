@@ -50,21 +50,35 @@ import shields from "../../libs/shields";
 import weaponQualities from "../../routes/equip/weapons/qualities";
 import armorShieldQualities from "../../routes/equip/ArmorShield/qualities";
 import {
-  WeaponCard,
-  ArmorCard,
-  SpellCard,
-  PlayerSpellCard,
-  AttackCard,
-  QualityCard,
-  HeroicCard,
-  ClassCard,
-  NonStaticSpellCard,
-  CustomWeaponCard,
-  AccessoryCard,
-  OptionalCard,
-  SpecialRuleCard,
-  ActionCard,
-} from "./ItemCards";
+  SharedSpellCard,
+  SharedPlayerSpellCard,
+  SharedGambleSpellCard,
+  SharedGiftCard,
+  SharedDanceCard,
+  SharedTherioformCard,
+  SharedArcanumCard,
+  SharedAlchemyCard,
+  SharedInfusionCard,
+  SharedMagitechCard,
+  SharedInvocationCard,
+  SharedCookingCard,
+  SharedMagiseedCard,
+  SharedPilotVehicleCard,
+  SharedSymbolCard,
+  SharedMagichantCard,
+  SharedAttackCard,
+  SharedSpecialRuleCard,
+  SharedActionCard,
+  SharedClassCard,
+  SharedHeroicCard,
+  SharedOptionalCard,
+  SharedWeaponCard,
+  SharedArmorCard,
+  SharedShieldCard,
+  SharedCustomWeaponCard,
+  SharedAccessoryCard,
+  SharedQualityCard,
+} from "../shared/itemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
 import qualities from "../../libs/qualities";
@@ -426,7 +440,7 @@ function NpcAttackPanel() {
             </Grid>
           </Grid>
         }
-        previewContent={<AttackCard attack={data} />}
+        previewContent={<SharedAttackCard item={data} />}
         addButton={<AddToCompendiumButton itemType="npc-attack" data={data} />}
         exportDataType="attacks"
       />
@@ -708,8 +722,8 @@ function NpcSpellPanel() {
         </Grid>
       }
       previewContent={
-        <SpellCard
-          spell={{ ...data, effect: data.special?.join("; ") ?? "" }}
+        <SharedSpellCard
+          item={{ ...data, effect: data.special?.join("; ") ?? "" }}
         />
       }
       addButton={<AddToCompendiumButton itemType="npc-spell" data={data} />}
@@ -787,7 +801,7 @@ function NpcSpecialPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<SpecialRuleCard item={data} />}
+      previewContent={<SharedSpecialRuleCard item={data} />}
       addButton={<AddToCompendiumButton itemType="npc-special" data={data} />}
       data={data}
       itemName={data.name || ""}
@@ -863,7 +877,7 @@ function NpcActionPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<ActionCard item={data} />}
+      previewContent={<SharedActionCard item={data} />}
       addButton={<AddToCompendiumButton itemType="npc-action" data={data} />}
       data={data}
       itemName={data.name || ""}
@@ -2185,9 +2199,37 @@ function PlayerSpellPanel() {
       }
       previewContent={
         spellType === "default" ? (
-          <PlayerSpellCard spell={data} />
+          <SharedPlayerSpellCard item={data} />
+        ) : spellType === "gamble" ? (
+          <SharedGambleSpellCard item={nonStaticData} />
+        ) : spellType === "gift" ? (
+          <SharedGiftCard item={nonStaticData} />
+        ) : spellType === "dance" ? (
+          <SharedDanceCard item={nonStaticData} />
+        ) : spellType === "therioform" ? (
+          <SharedTherioformCard item={nonStaticData} />
+        ) : spellType === "magichant" || spellType === "magichant-key" ? (
+          <SharedMagichantCard item={nonStaticData} />
+        ) : spellType === "symbol" ? (
+          <SharedSymbolCard item={nonStaticData} />
+        ) : spellType === "invocation" ? (
+          <SharedInvocationCard item={nonStaticData} />
+        ) : spellType === "magiseed" ? (
+          <SharedMagiseedCard item={nonStaticData} />
+        ) : spellType === "tinkerer-alchemy" ? (
+          <SharedAlchemyCard item={nonStaticData} />
+        ) : spellType === "tinkerer-infusion" ? (
+          <SharedInfusionCard item={nonStaticData} />
+        ) : spellType === "tinkerer-magitech" ? (
+          <SharedMagitechCard item={nonStaticData} />
+        ) : spellType === "cooking" ? (
+          <SharedCookingCard item={nonStaticData} />
+        ) : spellType === "pilot-vehicle" ? (
+          <SharedPilotVehicleCard item={nonStaticData} />
+        ) : spellType === "arcanist" || spellType === "arcanist-rework" ? (
+          <SharedArcanumCard item={nonStaticData} />
         ) : (
-          <NonStaticSpellCard item={nonStaticData} />
+          <SharedPlayerSpellCard item={data} />
         )
       }
       addButton={
@@ -2381,7 +2423,7 @@ function QualityPanel() {
       }
       previewContent={
         data.name ? (
-          <QualityCard quality={data} />
+          <SharedQualityCard item={data} />
         ) : (
           <Box sx={{ p: 2 }}>
             <Typography
@@ -2524,7 +2566,7 @@ function HeroicPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<HeroicCard heroic={data} />}
+      previewContent={<SharedHeroicCard item={data} />}
       addButton={<AddToCompendiumButton itemType="heroic" data={data} />}
       data={data}
       itemName={data.name || ""}
@@ -2931,8 +2973,8 @@ function ClassPanel() {
           </Grid>
         }
         previewContent={
-          <ClassCard
-            cls={{
+          <SharedClassCard
+            item={{
               ...classData,
               skills: classData.skills.filter((s) => s.skillName.trim()),
             }}
@@ -3263,7 +3305,7 @@ function WeaponPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<WeaponCard weapon={weaponObj} />}
+      previewContent={<SharedWeaponCard item={weaponObj} />}
       addButton={<AddToCompendiumButton itemType="weapon" data={weaponObj} />}
       data={weaponObj}
       itemName={weaponObj.name || ""}
@@ -3465,7 +3507,7 @@ function ArmorPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<ArmorCard armor={armorObj} />}
+      previewContent={<SharedArmorCard item={armorObj} />}
       addButton={<AddToCompendiumButton itemType="armor" data={armorObj} />}
       data={armorObj}
       itemName={armorObj.name || ""}
@@ -3667,7 +3709,7 @@ function ShieldPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<ArmorCard armor={shieldObj} />}
+      previewContent={<SharedShieldCard item={shieldObj} />}
       addButton={<AddToCompendiumButton itemType="shield" data={shieldObj} />}
       data={shieldObj}
       itemName={shieldObj.name || ""}
@@ -4199,7 +4241,7 @@ function CustomWeaponPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<CustomWeaponCard weapon={weaponObj} />}
+      previewContent={<SharedCustomWeaponCard item={weaponObj} />}
       addButton={
         <AddToCompendiumButton itemType="custom-weapon" data={weaponObj} />
       }
@@ -4380,7 +4422,7 @@ function AccessoryPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={<AccessoryCard accessory={accessoryObj} />}
+      previewContent={<SharedAccessoryCard item={accessoryObj} />}
       addButton={
         <AddToCompendiumButton itemType="accessory" data={accessoryObj} />
       }
@@ -4734,7 +4776,7 @@ function OptionalPanel() {
       }
       previewContent={
         data.name ? (
-          <OptionalCard optional={data} />
+          <SharedOptionalCard item={data} />
         ) : (
           <Box sx={{ p: 2 }}>
             <Typography

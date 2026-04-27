@@ -17,6 +17,7 @@ interface CustomHeaderClassesProps {
   readOnlyNumber: number;
   onLevelChange: (newValue: number) => void;
   isEditMode: boolean;
+  isNumberReadOnly?: boolean;
 }
 
 const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
@@ -28,6 +29,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
   readOnlyNumber,
   onLevelChange,
   isEditMode,
+  isNumberReadOnly = false,
 }) => {
   const theme = useCustomTheme();
 
@@ -121,7 +123,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
                 inputProps: {
                   min: 1,
                   max: 10,
-                  readOnly: !isEditMode,
+                  readOnly: !isEditMode || isNumberReadOnly,
                   style: { textAlign: "center" },
                 },
                 style: {

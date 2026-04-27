@@ -21,14 +21,26 @@ import { useTranslate } from "../../../translation/translate";
 import { Casino, Info, SettingsSuggest } from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../../icons";
 import attributes from "../../../libs/attributes";
-import SpellEntropistGamble from "../spells/SpellEntropistGamble";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import {
-  PlayerSpellCard,
-  NonStaticSpellCard,
-} from "../../compendium/ItemCards";
+  SharedPlayerSpellCard,
+  SharedGambleSpellCard,
+  SharedGiftCard,
+  SharedDanceCard,
+  SharedTherioformCard,
+  SharedArcanumCard,
+  SharedAlchemyCard,
+  SharedInfusionCard,
+  SharedMagitechCard,
+  SharedInvocationCard,
+  SharedCookingCard,
+  SharedMagiseedCard,
+  SharedPilotVehicleCard,
+  SharedSymbolCard,
+  SharedMagichantCard,
+} from "../../shared/itemCards";
 import { spellList } from "../../../libs/classes";
 
 export default function PlayerSpells({ player, setPlayer, isEditMode }) {
@@ -650,12 +662,37 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               <DialogContent sx={{ p: 0 }}>
                 {selectedSpell &&
                   (selectedSpell.spellType === "default" ? (
-                    <PlayerSpellCard spell={selectedSpell} />
+                    <SharedPlayerSpellCard item={selectedSpell} />
                   ) : selectedSpell.spellType === "gamble" ? (
-                    <SpellEntropistGamble gamble={selectedSpell} />
-                  ) : (
-                    <NonStaticSpellCard item={selectedSpell} />
-                  ))}
+                    <SharedGambleSpellCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "gift" ? (
+                    <SharedGiftCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "dance" ? (
+                    <SharedDanceCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "therioform" ? (
+                    <SharedTherioformCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "magichant" ? (
+                    <SharedMagichantCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "symbol" ? (
+                    <SharedSymbolCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "invocation" ? (
+                    <SharedInvocationCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "magiseed" ? (
+                    <SharedMagiseedCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "tinkerer-alchemy" ? (
+                    <SharedAlchemyCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "tinkerer-infusion" ? (
+                    <SharedInfusionCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "tinkerer-magitech" ? (
+                    <SharedMagitechCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "cooking" ? (
+                    <SharedCookingCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "pilot-vehicle" ? (
+                    <SharedPilotVehicleCard item={selectedSpell} />
+                  ) : selectedSpell.spellType === "arcanist" ||
+                    selectedSpell.spellType === "arcanist-rework" ? (
+                    <SharedArcanumCard item={selectedSpell} />
+                  ) : null)}
               </DialogContent>
               <DialogActions>
                 <Button

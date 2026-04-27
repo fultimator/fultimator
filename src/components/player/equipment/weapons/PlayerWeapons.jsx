@@ -12,7 +12,7 @@ import {
   Box,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import PrettyWeapon from "./PrettyWeapon";
+import { SharedWeaponCard } from "../../../../components/shared/itemCards";
 import { Edit, WarningAmber, Error as ErrorIcon } from "@mui/icons-material";
 import { Equip } from "../../../icons";
 import Export from "../../../Export";
@@ -145,7 +145,7 @@ export default function PlayerWeapons({
               <React.Fragment key={index}>
                 <Grid sx={{ mb: 2 }} size={12}>
                   <Box>
-                    <PrettyWeapon weapon={weapon} />
+                    <SharedWeaponCard item={weapon} />
                   </Box>
 
                   <Box

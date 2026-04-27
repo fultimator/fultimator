@@ -1,5 +1,16 @@
 export type PackType = "compendium" | "supplement";
 
+export interface PackTheme {
+  id: string;
+  name: string;
+  description: string | null;
+  baseTheme: string;
+  styleProfile: string;
+  isDarkMode: boolean;
+  customization: Record<string, unknown>;
+  addedAt: number;
+}
+
 export type CompendiumItemType =
   | "npc-attack"
   | "npc-spell"
@@ -38,4 +49,5 @@ export interface CompendiumPack {
   createdAt: number;
   updatedAt: number;
   items: CompendiumItem[];
+  themes?: PackTheme[];
 }

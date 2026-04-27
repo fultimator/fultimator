@@ -14,6 +14,7 @@ interface CustomHeader3Props {
   onOpenCompendium?: () => void;
   isEditMode: boolean;
   isHeroicSkill: boolean;
+  hideEditButton?: boolean;
 }
 
 const CustomHeader3: React.FC<CustomHeader3Props> = ({
@@ -26,6 +27,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   onOpenCompendium,
   isEditMode,
   isHeroicSkill,
+  hideEditButton = false,
 }) => {
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
 
@@ -156,15 +158,17 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
                 </span>
               </Tooltip>
             </span>
-            <span>
-              <Tooltip title={t("Edit Skill")}>
-                <span>
-                  <IconButton size="small" onClick={onEdit}>
-                    <Edit style={{ color: "white" }} />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </span>
+            {!hideEditButton && (
+              <span>
+                <Tooltip title={t("Edit Skill")}>
+                  <span>
+                    <IconButton size="small" onClick={onEdit}>
+                      <Edit style={{ color: "white" }} />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </span>
+            )}
           </>
         )}
         {isEditMode && isHeroicSkill && (

@@ -52,6 +52,7 @@ export default function PlayerClassCard({
   editHeroic,
   userId,
   isHomebrew,
+  isClassLevelReadOnly = false,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -115,6 +116,7 @@ export default function PlayerClassCard({
       0,
     );
     if (sumOfSkillLevels !== classItem.lvl) {
+      if (isClassLevelReadOnly) return;
       warnings.push(
         t("The sum of the skill levels is different from the class level"),
       );
@@ -384,6 +386,7 @@ export default function PlayerClassCard({
             readOnlyNumber={10}
             onLevelChange={onLevelChange}
             isEditMode={isEditMode}
+            isNumberReadOnly={isClassLevelReadOnly}
             editClassName={() => handleOpenEditClassNameModal()}
           />
         </Grid>

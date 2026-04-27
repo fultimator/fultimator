@@ -17,7 +17,7 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import ErrorIcon from "@mui/icons-material/Error";
 import CloseIcon from "@mui/icons-material/Close";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import { useTranslate } from "../../../../translation/translate";
@@ -75,7 +75,7 @@ export default function SlotPickerDialog({
   const { t } = useTranslate();
   const [hoveredCandidate, setHoveredCandidate] = useState(null);
   const [pendingCandidate, setPendingCandidate] = useState(null);
-  const [martialWarning, setMartialWarning] = useState(null); // candidate that triggered the warning
+
   const [moduleOverrideOpen, setModuleOverrideOpen] = useState(false);
   const [hoveredModule, setHoveredModule] = useState(null);
   const [pendingModule, setPendingModule] = useState(null);
@@ -299,10 +299,6 @@ export default function SlotPickerDialog({
   const handleAccept = () => {
     if (!pendingCandidate) {
       onClose();
-      return;
-    }
-    if (!checkMartialProficiency(pendingCandidate)) {
-      setMartialWarning(pendingCandidate);
       return;
     }
     handleSelect(pendingCandidate);
@@ -597,8 +593,8 @@ export default function SlotPickerDialog({
                         <Tooltip
                           title={t("Not proficient with this martial item")}
                         >
-                          <WarningAmberIcon
-                            sx={{ fontSize: 14, color: "warning.main" }}
+                          <ErrorIcon
+                            sx={{ fontSize: 14, color: "error.main" }}
                           />
                         </Tooltip>
                       )}
@@ -701,14 +697,7 @@ export default function SlotPickerDialog({
                       >
                         <ListItemButton
                           onClick={() => setPendingCandidate(c)}
-                          onDoubleClick={() => {
-                            if (!checkMartialProficiency(c)) {
-                              setPendingCandidate(c);
-                              setMartialWarning(c);
-                            } else {
-                              handleSelect(c);
-                            }
-                          }}
+                          onDoubleClick={() => handleSelect(c)}
                         >
                           <ListItemIcon sx={{ minWidth: 36 }}>
                             <Radio
@@ -743,12 +732,14 @@ export default function SlotPickerDialog({
                                 )}
                                 {!isProficient && (
                                   <Tooltip
-                                    title={t("Not proficient  -  martial item")}
+                                    title={t(
+                                      "Not proficient with this martial item",
+                                    )}
                                   >
-                                    <WarningAmberIcon
+                                    <ErrorIcon
                                       sx={{
                                         fontSize: 13,
-                                        color: "warning.main",
+                                        color: "error.main",
                                         verticalAlign: "middle",
                                       }}
                                     />
@@ -823,56 +814,6 @@ export default function SlotPickerDialog({
           </>
         )}
       </Dialog>
-      {/* Martial proficiency warning */}
-      {martialWarning && (
-        <Dialog
-          open
-          onClose={() => setMartialWarning(null)}
-          maxWidth="xs"
-          fullWidth
-        >
-          <DialogTitle
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              color: "warning.main",
-            }}
-          >
-            <WarningAmberIcon fontSize="small" />
-            {t("Not Proficient")}
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="body2">
-              <strong>{martialWarning.label}</strong>{" "}
-              {t(
-                "is a martial item and your character is not proficient with it.",
-              )}
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
-              {t(
-                "Equipping it without proficiency may be against the rules. Equip anyway?",
-              )}
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setMartialWarning(null)} size="small">
-              {t("Cancel")}
-            </Button>
-            <Button
-              color="warning"
-              variant="contained"
-              size="small"
-              onClick={() => {
-                handleSelect(martialWarning);
-                setMartialWarning(null);
-              }}
-            >
-              {t("Equip Anyway")}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
     </>
   );
 }

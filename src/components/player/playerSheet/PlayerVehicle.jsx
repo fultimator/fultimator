@@ -16,7 +16,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Casino, Info } from "@mui/icons-material";
-import { VehicleModuleCard } from "../../compendium/ItemCards";
+import { SharedPilotVehicleCard } from "../../shared/itemCards";
 import attributes from "../../../libs/attributes";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { availableFrames } from "../../../libs/pilotVehicleData";
@@ -676,7 +676,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
           maxWidth="sm"
         >
           <DialogContent sx={{ p: 0 }}>
-            {selectedModule && <VehicleModuleCard module={selectedModule} />}
+            {selectedModule && <SharedPilotVehicleCard item={selectedModule} />}
           </DialogContent>
           <DialogActions>
             <Button

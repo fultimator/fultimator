@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
@@ -96,6 +96,7 @@ function Personal() {
     name: "",
     advancement: false,
     defaultView: "normal",
+    autoEquipUnarmed: false,
     optionalRules: {
       quirks: false,
       campActivities: false,
@@ -162,9 +163,11 @@ function Personal() {
   const cloudDb = useDatabase("cloud");
   const [download] = useDownload();
 
-  const [personalList, loading, err] = db.useCollectionData(
-    db.query(db.collection("player-personal")),
+  const playerQuery = useMemo(
+    () => db.query(db.collection("player-personal")),
+    [db],
   );
+  const [personalList, loading, err] = db.useCollectionData(playerQuery);
 
   const [snackMsg, setSnackMsg] = useState(null);
 
@@ -329,6 +332,7 @@ function Personal() {
       settings: {
         defaultView: options.defaultView,
         advancement: options.advancement,
+        autoEquipUnarmed: options.autoEquipUnarmed ?? false,
         optionalRules: {
           ...options.optionalRules,
         },
@@ -1389,6 +1393,24 @@ function Personal() {
                 onChange={(evt) =>
                   handleCreatePlayerOptionChange(
                     "advancement",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Auto-Equip Unarmed Strike")}
+              hint={t(
+                "When a weapon is unequipped from a hand slot, automatically equip Unarmed Strike if that hand is now empty.",
+              )}
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.autoEquipUnarmed ?? false}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "autoEquipUnarmed",
                     evt.target.checked,
                   )
                 }

@@ -31,6 +31,7 @@ import { ArrowDropDown } from "@mui/icons-material";
 import { useTranslate, t } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { useTheme } from "@mui/material/styles";
+import { useThemeStore } from "../../store/themeStore";
 
 function NpcPretty({
   npc,
@@ -42,9 +43,25 @@ function NpcPretty({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const actorSheetEffectsEnabled = useThemeStore(
+    (s) => s.customization.actorSheetEffectsEnabled,
+  );
 
   return (
-    <Card>
+    <Card
+      sx={
+        actorSheetEffectsEnabled === false
+          ? {
+              background: theme.palette.background.paper,
+              boxShadow: "none",
+              borderTop: "",
+              borderLeft: "",
+              borderBottom: "",
+              borderRight: "",
+            }
+          : undefined
+      }
+    >
       <div ref={ref} onClick={() => onClick()} style={{ cursor: "pointer" }}>
         {(study === 0 || study === null || study === undefined) && (
           <>

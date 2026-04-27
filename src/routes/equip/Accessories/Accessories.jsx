@@ -9,10 +9,12 @@ import {
   AccordionDetails,
   Typography,
 } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material";
+import { AutoAwesome, Download } from "@mui/icons-material";
+import { IconButton, Tooltip } from "@mui/material";
+import useDownloadImage from "../../../hooks/useDownloadImage";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState, useRef } from "react";
-import Pretty from "./Pretty";
+import { SharedAccessoryCard } from "../../../components/shared/itemCards";
 import ChangeQuality from "../common/ChangeQuality";
 import SelectQuality from "./SelectQuality";
 import ChangeName from "../common/ChangeName";
@@ -20,6 +22,8 @@ import ChangeModifiers from "../../../components/player/equipment/ChangeModifier
 import qualities from "./qualities";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
+import Export from "../../../components/Export";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 
 function Accessories() {
   const { t } = useTranslate();
@@ -46,6 +50,8 @@ function Accessories() {
   const cost = calcCost();
 
   const fileInputRef = useRef(null);
+  const cardRef = useRef(null);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(name, cardRef);
 
   const handleFileUpload = (data) => {
     if (data) {
@@ -103,223 +109,252 @@ function Accessories() {
   };
 
   return (
-    <Grid container spacing={2}>
-      {/* Form */}
-      <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            p: "14px",
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
+    <>
+      <Grid container spacing={2}>
+        {/* Form */}
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
           }}
         >
-          {/* Header */}
-          <CustomHeaderAlt
-            headerText={t("Accessories")}
-            icon={<AutoAwesome fontSize="large" />}
-          />
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
-            <Grid size={6}>
-              <ChangeName
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Grid>
-            <Grid size={6}>
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value,
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
-                }}
-              />
-            </Grid>
-            <Grid size={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-              <Divider />
-            </Grid>
-            <Grid size={12}>
-              <Accordion
-                sx={{ width: "100%" }}
-                expanded={modifiersExpanded}
-                onChange={() => setModifiersExpanded(!modifiersExpanded)}
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>{t("Modifiers")}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={2}>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"DEF Modifier"}
-                        value={defModifier}
-                        onChange={(e) => setDefModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"MDEF Modifier"}
-                        value={mDefModifier}
-                        onChange={(e) => setMDefModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"INIT Modifier"}
-                        value={initModifier}
-                        onChange={(e) => setInitModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"Magic Modifier"}
-                        value={magicModifier}
-                        onChange={(e) => setMagicModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"Precision Modifier"}
-                        value={precModifier}
-                        onChange={(e) => setPrecModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"Damage (Melee) Modifier"}
-                        value={damageMeleeModifier}
-                        onChange={(e) => setDamageMeleeModifier(e.target.value)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 6,
-                        md: 4,
-                      }}
-                    >
-                      <ChangeModifiers
-                        label={"Damage (Ranged) Modifier"}
-                        value={damageRangedModifier}
-                        onChange={(e) =>
-                          setDamageRangedModifier(e.target.value)
-                        }
-                      />
-                    </Grid>
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-              <Divider />
-            </Grid>
-            <Grid size={12}>
-              <Grid container spacing={2} sx={{ alignItems: "center" }}>
-                <Grid>
-                  <Button
-                    variant="outlined"
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    {t("Upload JSON")}
-                  </Button>
-                </Grid>
-                <Grid>
-                  <Button variant="outlined" onClick={handleClearFields}>
-                    {t("Clear All Fields")}
-                  </Button>
-                </Grid>
+          <Paper
+            elevation={3}
+            sx={{
+              p: "14px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+            }}
+          >
+            {/* Header */}
+            <CustomHeaderAlt
+              headerText={t("Accessories")}
+              icon={<AutoAwesome fontSize="large" />}
+            />
+            <Grid container spacing={2} sx={{ alignItems: "center" }}>
+              <Grid size={6}>
+                <ChangeName
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </Grid>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      const result = JSON.parse(reader.result);
-                      handleFileUpload(result);
-                    };
-                    reader.readAsText(file);
-                  }
-                }}
-                style={{ display: "none" }}
-              />
+              <Grid size={6}>
+                <SelectQuality
+                  quality={selectedQuality}
+                  setQuality={(e) => {
+                    const quality = qualities.find(
+                      (el) => el.name === e.target.value,
+                    );
+                    setSelectedQuality(quality.name);
+                    setQuality(quality.quality);
+                    setQualityCost(quality.cost);
+                  }}
+                />
+              </Grid>
+              <Grid size={12}>
+                <ChangeQuality
+                  quality={quality}
+                  setQuality={(e) => setQuality(e.target.value)}
+                  qualityCost={qualityCost}
+                  setQualityCost={(e) => setQualityCost(e.target.value)}
+                />
+                <Divider />
+              </Grid>
+              <Grid size={12}>
+                <Accordion
+                  sx={{ width: "100%" }}
+                  expanded={modifiersExpanded}
+                  onChange={() => setModifiersExpanded(!modifiersExpanded)}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>{t("Modifiers")}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Grid container spacing={2}>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"DEF Modifier"}
+                          value={defModifier}
+                          onChange={(e) => setDefModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"MDEF Modifier"}
+                          value={mDefModifier}
+                          onChange={(e) => setMDefModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"INIT Modifier"}
+                          value={initModifier}
+                          onChange={(e) => setInitModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Magic Modifier"}
+                          value={magicModifier}
+                          onChange={(e) => setMagicModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Precision Modifier"}
+                          value={precModifier}
+                          onChange={(e) => setPrecModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Damage (Melee) Modifier"}
+                          value={damageMeleeModifier}
+                          onChange={(e) =>
+                            setDamageMeleeModifier(e.target.value)
+                          }
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 6,
+                          md: 4,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Damage (Ranged) Modifier"}
+                          value={damageRangedModifier}
+                          onChange={(e) =>
+                            setDamageRangedModifier(e.target.value)
+                          }
+                        />
+                      </Grid>
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
+                <Divider />
+              </Grid>
+              <Grid size={12}>
+                <Grid container spacing={2} sx={{ alignItems: "center" }}>
+                  <Grid>
+                    <Button
+                      variant="outlined"
+                      onClick={() => fileInputRef.current.click()}
+                    >
+                      {t("Upload JSON")}
+                    </Button>
+                  </Grid>
+                  <Grid>
+                    <Button variant="outlined" onClick={handleClearFields}>
+                      {t("Clear All Fields")}
+                    </Button>
+                  </Grid>
+                </Grid>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const result = JSON.parse(reader.result);
+                        handleFileUpload(result);
+                      };
+                      reader.readAsText(file);
+                    }
+                  }}
+                  style={{ display: "none" }}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
-      </Grid>
-      {/* Pretty */}
-      <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
-      >
-        <Pretty
-          custom={{
-            name: name,
-            cost: cost,
-            quality: quality,
-            qualityCost: qualityCost,
-            selectedQuality: selectedQuality,
-            defModifier: defModifier,
-            mDefModifier: mDefModifier,
-            initModifier: initModifier,
-            magicModifier: magicModifier,
-            precModifier: precModifier,
-            damageMeleeModifier: damageMeleeModifier,
-            damageRangedModifier: damageRangedModifier,
-            damageModifier: 0,
-            isEquipped: false,
+          </Paper>
+        </Grid>
+        {/* Pretty */}
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
           }}
-        />
+        >
+          <div ref={cardRef}>
+            <SharedAccessoryCard
+              variant="equip"
+              item={{
+                name: name,
+                cost: cost,
+                quality: quality,
+                qualityCost: qualityCost,
+                selectedQuality: selectedQuality,
+                defModifier: defModifier,
+                mDefModifier: mDefModifier,
+                initModifier: initModifier,
+                magicModifier: magicModifier,
+                precModifier: precModifier,
+                damageMeleeModifier: damageMeleeModifier,
+                damageRangedModifier: damageRangedModifier,
+                isEquipped: false,
+              }}
+              imageMode="slot"
+              showImageToggle
+              actionContent={
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <Tooltip title={t("Download as Image")}>
+                    <IconButton onClick={downloadImage}>
+                      <Download />
+                    </IconButton>
+                  </Tooltip>
+                  <Export
+                    name={name}
+                    dataType="accessory"
+                    data={{ name, cost, quality, qualityCost }}
+                  />
+                  <AddToCompendiumButton
+                    itemType="accessory"
+                    data={{ name, cost, quality, qualityCost }}
+                  />
+                </div>
+              }
+            />
+          </div>
+        </Grid>
       </Grid>
-    </Grid>
+      {downloadSnackbar}
+    </>
   );
 }
 export default Accessories;

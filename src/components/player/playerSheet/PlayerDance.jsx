@@ -15,7 +15,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { NonStaticSpellCard } from "../../compendium/ItemCards";
+import { SharedDanceCard } from "../../shared/itemCards";
 
 export default function PlayerDance({ player }) {
   const { t } = useTranslate();
@@ -178,7 +178,7 @@ export default function PlayerDance({ player }) {
             >
               <DialogContent sx={{ p: 0 }}>
                 {selectedDance && (
-                  <NonStaticSpellCard
+                  <SharedDanceCard
                     item={{
                       ...selectedDance,
                       spellType: "dance",
