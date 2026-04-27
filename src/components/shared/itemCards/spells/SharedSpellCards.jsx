@@ -82,28 +82,23 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
               onClick={onHeaderClick}
               sx={{
                 ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-                px: 0,
               }}
             >
-              <Grid container sx={{ flex: 1, pl: 1, alignItems: "center" }}>
-                <Grid size={4}>
-                  <Typography>{t("Spell")}</Typography>
-                </Grid>
-                <Grid size={2}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("MP")}
-                  </Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Duration")}
-                  </Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Target")}
-                  </Typography>
-                </Grid>
+              <Grid size={4}>
+                <Typography>{t("Spell")}</Typography>
+              </Grid>
+              <Grid size={2}>
+                <Typography sx={{ textAlign: "center" }}>{t("MP")}</Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Duration")}
+                </Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Target")}
+                </Typography>
               </Grid>
             </Grid>
           )
@@ -166,7 +161,7 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
         </Grid>
 
         {effectText && (
-          <Box sx={{ px: 1, py: 0.75 }}>
+          <Box sx={{ px: 2, py: 0.75 }}>
             <Typography
               variant="body2"
               component="div"
@@ -264,28 +259,23 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
               onClick={onHeaderClick}
               sx={{
                 ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-                px: 0,
               }}
             >
-              <Grid container sx={{ flex: 1, pl: 1, alignItems: "center" }}>
-                <Grid size={4}>
-                  <Typography>{t("Spell")}</Typography>
-                </Grid>
-                <Grid size={2}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("MP")}
-                  </Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Duration")}
-                  </Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Target")}
-                  </Typography>
-                </Grid>
+              <Grid size={4}>
+                <Typography>{t("Spell")}</Typography>
+              </Grid>
+              <Grid size={2}>
+                <Typography sx={{ textAlign: "center" }}>{t("MP")}</Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Duration")}
+                </Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Target")}
+                </Typography>
               </Grid>
             </Grid>
           )
@@ -345,7 +335,7 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
           </Grid>
         </Grid>
 
-        <Box sx={{ px: 1, py: 0.75 }}>
+        <Box sx={{ px: 2, py: 0.75 }}>
           <Typography
             variant="body2"
             component="div"
@@ -456,28 +446,23 @@ export const SharedGambleSpellCard = React.memo(function SharedGambleSpellCard({
               onClick={onHeaderClick}
               sx={{
                 ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-                px: 0,
               }}
             >
-              <Grid container sx={{ flex: 1, pl: 1, alignItems: "center" }}>
-                <Grid size={4}>
-                  <Typography>{t("Gamble")}</Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("MP")}
-                  </Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Max Dices")}
-                  </Typography>
-                </Grid>
-                <Grid size={2}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Attribute")}
-                  </Typography>
-                </Grid>
+              <Grid size={4}>
+                <Typography>{t("Gamble")}</Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>{t("MP")}</Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Max Dices")}
+                </Typography>
+              </Grid>
+              <Grid size={2}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Attribute")}
+                </Typography>
               </Grid>
             </Grid>
           )
@@ -1094,6 +1079,7 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
               sx={{
                 fontSize: scale.header,
                 fontWeight: 700,
+                fontFamily: "Antonio",
                 textTransform: "uppercase",
                 color: "inherit",
                 letterSpacing: "0.5px",
@@ -1842,12 +1828,12 @@ export const SharedPilotVehicleCard = React.memo(
       const attr1 = attributes[item.att1];
       const attr2 = attributes[item.att2];
       const ROW_MIN_HEIGHT = "36px";
-      const pl = 1;
+      const pl = 2;
       const rowSx = (bg, extra = {}) => ({
         alignItems: "center",
         minHeight: ROW_MIN_HEIGHT,
         py: 0.5,
-        pl,
+        px: pl,
         width: "100%",
         borderBottom: `1px solid ${customTheme.secondary}`,
         ...(bg ? { background: bg } : {}),
@@ -1881,28 +1867,25 @@ export const SharedPilotVehicleCard = React.memo(
                       onHeaderClick,
                       imageMode,
                     ),
-                    px: 0,
                   }}
                 >
-                  <Grid container sx={{ flex: 1, pl, alignItems: "center" }}>
-                    <Grid size={cols.name}>
-                      <Typography>{typeLabel}</Typography>
-                    </Grid>
-                    <Grid size={cols.cost}>
-                      <Typography sx={{ textAlign: "center" }}>
-                        {t("Cost")}
-                      </Typography>
-                    </Grid>
-                    <Grid size={cols.accuracy}>
-                      <Typography sx={{ textAlign: "center" }}>
-                        {t("Accuracy")}
-                      </Typography>
-                    </Grid>
-                    <Grid size={cols.damage}>
-                      <Typography sx={{ textAlign: "center" }}>
-                        {t("Damage")}
-                      </Typography>
-                    </Grid>
+                  <Grid size={cols.name}>
+                    <Typography>{typeLabel}</Typography>
+                  </Grid>
+                  <Grid size={cols.cost}>
+                    <Typography sx={{ textAlign: "center" }}>
+                      {t("Cost")}
+                    </Typography>
+                  </Grid>
+                  <Grid size={cols.accuracy}>
+                    <Typography sx={{ textAlign: "center" }}>
+                      {t("Accuracy")}
+                    </Typography>
+                  </Grid>
+                  <Grid size={cols.damage}>
+                    <Typography sx={{ textAlign: "center" }}>
+                      {t("Damage")}
+                    </Typography>
                   </Grid>
                 </Grid>
               )

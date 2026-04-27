@@ -16,7 +16,7 @@ function dataRowSx(customTheme, background, extraSx = {}) {
     minHeight: "36px",
     flexGrow: 1,
     py: 0.25,
-    pl: 1,
+    px: 2,
     width: "100%",
     ...extraSx,
     ...(background ? { background } : {}),
@@ -80,28 +80,18 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
               onClick={onHeaderClick}
               sx={{
                 ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-                px: 0,
               }}
             >
-              <Grid
-                container
-                sx={{
-                  flex: 1,
-                  px: withImage ? 0.75 : 2,
-                  alignItems: "center",
-                }}
-              >
-                <Grid size={cols.name}>
-                  <Typography>{t("Quality")}</Typography>
-                </Grid>
-                <Grid size={cols.category}>
-                  <Typography>{t("Category")}</Typography>
-                </Grid>
-                <Grid size={cols.cost}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Cost")}
-                  </Typography>
-                </Grid>
+              <Grid size={cols.name}>
+                <Typography>{t("Quality")}</Typography>
+              </Grid>
+              <Grid size={cols.category}>
+                <Typography>{t("Category")}</Typography>
+              </Grid>
+              <Grid size={cols.cost}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Cost")}
+                </Typography>
               </Grid>
             </Grid>
           )
@@ -158,7 +148,7 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
         </Grid>
 
         {item.quality && (
-          <Box sx={{ px: 1.5, py: 0.75, fontSize: "0.875rem" }}>
+          <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
             <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
               {item.quality}
             </StyledMarkdown>
@@ -168,7 +158,7 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
         {item.filter?.length > 0 && (
           <Box
             sx={{
-              px: 1.5,
+              px: 2,
               pb: 0.75,
               display: "flex",
               gap: 0.5,

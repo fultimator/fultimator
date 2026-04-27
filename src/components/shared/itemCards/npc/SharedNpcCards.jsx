@@ -72,25 +72,23 @@ export const SharedAttackCard = React.memo(function SharedAttackCard({
               onClick={onHeaderClick}
               sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
             >
-              <Grid container sx={{ flex: 1 }}>
-                <Grid size={3}>
-                  <Typography>{t(item.category)}</Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Accuracy")}
-                  </Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Damage")}
-                  </Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Range")}
-                  </Typography>
-                </Grid>
+              <Grid size={3}>
+                <Typography>{t(item.category)}</Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Accuracy")}
+                </Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Damage")}
+                </Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Range")}
+                </Typography>
               </Grid>
             </Grid>
           )

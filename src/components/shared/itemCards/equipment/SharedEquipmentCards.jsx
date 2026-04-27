@@ -52,13 +52,14 @@ function rowMinHeight(imageMode) {
 }
 
 function rowPl(imageMode) {
-  return isImageMode(imageMode) ? 0.75 : 1;
+  return isImageMode(imageMode) ? 0.75 : 2;
 }
 
 function headerSx(customTheme, scale, onHeaderClick, imageMode) {
   return {
     alignItems: "center",
     minHeight: "36px",
+    px: 2,
     py: isImageMode(imageMode) ? 0 : 1,
     background: customTheme.primary,
     color: "#ffffff",
@@ -66,6 +67,7 @@ function headerSx(customTheme, scale, onHeaderClick, imageMode) {
     "& .MuiTypography-root": {
       fontSize: scale.header,
       fontWeight: 600,
+      fontFamily: "Antonio",
       textTransform: "uppercase",
       letterSpacing: "0.5px",
       lineHeight: 1.4,
@@ -80,7 +82,7 @@ function dataRowSx(customTheme, imageMode, background, extraSx = {}) {
     minHeight: rowMinHeight(imageMode),
     flexGrow: 1,
     py: isImageMode(imageMode) ? 0.25 : 0.5,
-    pl: rowPl(imageMode),
+    px: rowPl(imageMode),
     width: "100%",
     ...extraSx,
     ...(background ? { background } : {}),
@@ -89,8 +91,7 @@ function dataRowSx(customTheme, imageMode, background, extraSx = {}) {
 
 function qualityRowSx(customTheme, imageMode) {
   return {
-    pl: rowPl(imageMode),
-    pr: rowPl(imageMode),
+    px: rowPl(imageMode),
     py: 0.75,
     borderBottom: `1px solid ${customTheme.secondary}`,
     display: "flex",
@@ -242,25 +243,23 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
               onClick={onHeaderClick}
               sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
             >
-              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-                <Grid size={cols.name}>
-                  <Typography>{t("Weapon")}</Typography>
-                </Grid>
-                <Grid size={cols.cost}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Cost")}
-                  </Typography>
-                </Grid>
-                <Grid size={cols.accuracy}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Accuracy")}
-                  </Typography>
-                </Grid>
-                <Grid size={cols.damage}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Damage")}
-                  </Typography>
-                </Grid>
+              <Grid size={cols.name}>
+                <Typography>{t("Weapon")}</Typography>
+              </Grid>
+              <Grid size={cols.cost}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Cost")}
+                </Typography>
+              </Grid>
+              <Grid size={cols.accuracy}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Accuracy")}
+                </Typography>
+              </Grid>
+              <Grid size={cols.damage}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Damage")}
+                </Typography>
               </Grid>
             </Grid>
           )
@@ -471,33 +470,29 @@ function SharedArmorLikeCard({
               onClick={onHeaderClick}
               sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
             >
-              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-                <Grid size={cols.name}>
-                  <Typography>{t(category)}</Typography>
-                </Grid>
-                <Grid size={cols.cost}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Cost")}
-                  </Typography>
-                </Grid>
-                <Grid size={cols.def}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("DEF")}
-                  </Typography>
-                </Grid>
-                <Grid size={cols.mdef}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("MDEF")}
-                  </Typography>
-                </Grid>
-                {!item.rework && (
-                  <Grid size={cols.init}>
-                    <Typography sx={{ textAlign: "center" }}>
-                      {t("INIT")}
-                    </Typography>
-                  </Grid>
-                )}
+              <Grid size={cols.name}>
+                <Typography>{t(category)}</Typography>
               </Grid>
+              <Grid size={cols.cost}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Cost")}
+                </Typography>
+              </Grid>
+              <Grid size={cols.def}>
+                <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
+              </Grid>
+              <Grid size={cols.mdef}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("MDEF")}
+                </Typography>
+              </Grid>
+              {!item.rework && (
+                <Grid size={cols.init}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("INIT")}
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
           )
         }
@@ -898,7 +893,9 @@ export const SharedCustomWeaponCard = React.memo(
       : { name: 4, cost: 2, accuracy: 3, damage: 3, hands: 3, range: 3 };
 
     const hasStoredSecondForm =
-      item.secondWeaponName != null || item.secondCurrentCustomizations != null;
+      (item.secondWeaponName != null && item.secondWeaponName !== "") ||
+      (Array.isArray(item.secondCurrentCustomizations) &&
+        item.secondCurrentCustomizations.length > 0);
     const secondItem = hasStoredSecondForm ? buildSecondWeaponItem(item) : null;
 
     const rowProps = { customTheme, scale, background, imageMode, cols, t };
@@ -922,32 +919,28 @@ export const SharedCustomWeaponCard = React.memo(
             onClick={onHeaderClick}
             sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
           >
-            <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-              <Grid size={cols.name}>
-                <Typography>{t("Custom Weapon")}</Typography>
-              </Grid>
-              <Grid size={cols.cost}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Cost")}
-                </Typography>
-              </Grid>
-              <Grid size={cols.accuracy}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Accuracy")}
-                </Typography>
-              </Grid>
-              <Grid size={cols.damage}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Damage")}
-                </Typography>
-              </Grid>
+            <Grid size={cols.name}>
+              <Typography>{t("Custom Weapon")}</Typography>
+            </Grid>
+            <Grid size={cols.cost}>
+              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+            </Grid>
+            <Grid size={cols.accuracy}>
+              <Typography sx={{ textAlign: "center" }}>
+                {t("Accuracy")}
+              </Typography>
+            </Grid>
+            <Grid size={cols.damage}>
+              <Typography sx={{ textAlign: "center" }}>
+                {t("Damage")}
+              </Typography>
             </Grid>
           </Grid>
         )}
         {secondItem && (
           <Box
             sx={{
-              px: 1,
+              px: 2,
               pt: 0.5,
               pb: 0.25,
               background: customTheme.secondary + "33",
@@ -983,7 +976,7 @@ export const SharedCustomWeaponCard = React.memo(
           <>
             <Box
               sx={{
-                px: 1,
+                px: 2,
                 pt: 0.5,
                 pb: 0.25,
                 background: customTheme.secondary + "33",
@@ -1078,15 +1071,13 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
               onClick={onHeaderClick}
               sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
             >
-              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-                <Grid size={cols.name}>
-                  <Typography>{t("Accessory")}</Typography>
-                </Grid>
-                <Grid size={cols.cost}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Cost")}
-                  </Typography>
-                </Grid>
+              <Grid size={cols.name}>
+                <Typography>{t("Accessory")}</Typography>
+              </Grid>
+              <Grid size={cols.cost}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Cost")}
+                </Typography>
               </Grid>
             </Grid>
           )
