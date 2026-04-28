@@ -16,10 +16,10 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { CheckCircle, Cancel, OpenInNew } from "@mui/icons-material";
-import { createClient } from "@supabase/supabase-js";
 import { useAuthState, auth } from "@platform/db";
 import { moderators } from "../../libs/userGroups";
 import { useTranslate } from "../../translation/translate";
+import { getResourcesSupabaseClient } from "./supabaseClient";
 
 interface PendingSubmission {
   id: number;
@@ -64,9 +64,7 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<number | null>(null);
 
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabase = getResourcesSupabaseClient();
   const webhookUrl = import.meta.env.VITE_DISCORD_APPLICATIONS_WEBHOOK_URL;
 
   // Check if user is moderator

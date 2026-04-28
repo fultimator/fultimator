@@ -19,16 +19,14 @@ import CommunityResources from "../../components/resources/CommunityResources";
 import StatisticsFooter from "../../components/resources/StatisticsFooter";
 import AddResourceRequestDialog from "../../components/resources/AddResourceRequestDialog";
 import ResourceModerationPanel from "../../components/resources/ResourceModerationPanel";
-import { createClient } from "@supabase/supabase-js";
 import { languages } from "../../components/resources/resourceUtils";
 import { useAuthState, auth } from "@platform/db";
 import { moderators } from "../../libs/userGroups";
+import { getResourcesSupabaseClient } from "../../components/resources/supabaseClient";
 
 function Resources() {
   const [user, _loadingUser] = useAuthState(auth);
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabase = getResourcesSupabaseClient();
 
   // State for resources
   const [resources, setResources] = useState([]);
