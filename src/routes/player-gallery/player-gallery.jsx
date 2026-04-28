@@ -96,7 +96,7 @@ function Personal() {
     name: "",
     advancement: false,
     defaultView: "normal",
-    autoEquipUnarmed: false,
+    autoEquipUnarmed: true,
     optionalRules: {
       quirks: false,
       campActivities: false,
@@ -332,7 +332,7 @@ function Personal() {
       settings: {
         defaultView: options.defaultView,
         advancement: options.advancement,
-        autoEquipUnarmed: options.autoEquipUnarmed ?? false,
+        autoEquipUnarmed: options.autoEquipUnarmed ?? true,
         optionalRules: {
           ...options.optionalRules,
         },
@@ -1407,7 +1407,7 @@ function Personal() {
               compactControl
             >
               <Checkbox
-                checked={createPlayerOptions.autoEquipUnarmed ?? false}
+                checked={createPlayerOptions.autoEquipUnarmed ?? true}
                 onChange={(evt) =>
                   handleCreatePlayerOptionChange(
                     "autoEquipUnarmed",
