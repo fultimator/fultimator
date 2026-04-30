@@ -15,6 +15,8 @@ interface CustomHeader3Props {
   isEditMode: boolean;
   isHeroicSkill: boolean;
   hideEditButton?: boolean;
+  increaseDisabled?: boolean;
+  increaseTooltip?: string;
 }
 
 const CustomHeader3: React.FC<CustomHeader3Props> = ({
@@ -28,6 +30,8 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   isEditMode,
   isHeroicSkill,
   hideEditButton = false,
+  increaseDisabled = false,
+  increaseTooltip,
 }) => {
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
 
@@ -144,15 +148,26 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
               </Tooltip>
             </span>
             <span>
-              <Tooltip title={currentLvl >= maxLvl ? "" : t("Increase Level")}>
+              <Tooltip
+                title={
+                  currentLvl >= maxLvl || increaseDisabled
+                    ? (increaseTooltip ?? "")
+                    : t("Increase Level")
+                }
+              >
                 <span>
                   <IconButton
                     size="small"
                     onClick={onIncrease}
-                    disabled={currentLvl >= maxLvl}
+                    disabled={currentLvl >= maxLvl || increaseDisabled}
                   >
                     <Add
-                      style={{ color: currentLvl >= maxLvl ? "gray" : "white" }}
+                      style={{
+                        color:
+                          currentLvl >= maxLvl || increaseDisabled
+                            ? "gray"
+                            : "white",
+                      }}
                     />
                   </IconButton>
                 </span>

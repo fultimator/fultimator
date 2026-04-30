@@ -1,5 +1,58 @@
 import { Affinities } from "./Misc";
 
+export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
+
+export interface Hoplosphere {
+  id: string;
+  name: string;
+  description: string;
+  coagEffects?: Record<string, string>;
+  socketable: "all" | "weapon";
+  requiredSlots: 1 | 2;
+  cost: number;
+  // changes: HoplosphereChange[] — deferred until effects system designed
+}
+
+export interface MnemosphereSkill {
+  name: string;
+  specialSkill?: string;
+  maxLvl: number;
+  currentLvl: number;
+}
+
+export interface MnemosphereHeroic {
+  name: string;
+  specialSkill?: string;
+}
+
+export interface MnemosphereSpell {
+  name: string;
+  class: string;
+  duration: string;
+  isOffensive: boolean;
+  mpCostTarget: number;
+  maxTargets: number;
+  targetDescription: string;
+  attr1: string;
+  attr2: string;
+  effect1: string;
+  effect2: string;
+  effect3: string;
+  effect4: string;
+  effect5: string;
+  effect6: string;
+  spellType?: string;
+}
+
+export interface Mnemosphere {
+  id: string;
+  class: string;
+  lvl: number;
+  skills: MnemosphereSkill[];
+  heroic: MnemosphereHeroic[];
+  spells: MnemosphereSpell[];
+}
+
 export interface Bonds {
   name: string;
   admiration: boolean;
@@ -111,6 +164,7 @@ export interface HeroicSkills {
 export interface PlayerSettings {
   defaultView?: "compact" | "normal";
   advancement?: boolean;
+  automaticClassLevel?: boolean;
   autoEquipUnarmed?: boolean;
   defaultUnarmedStrikeRef?: SlotRef;
   optionalRules?: {
@@ -118,7 +172,8 @@ export interface PlayerSettings {
     campActivities?: boolean;
     zeroPower?: boolean;
     technospheres?: boolean;
-    technospheresVariant?: boolean;
+    technospheresVariant?: string;
+    innateClasses?: string[];
   };
   specialSkillOverrides?: Record<string, true>;
 }
@@ -253,6 +308,10 @@ export interface CustomWeapons {
 
   // Data type identifier
   dataType?: string;
+
+  // Technospheres
+  slots?: SlotTier;
+  slotted?: string[];
 }
 
 export interface Shields {
@@ -282,6 +341,10 @@ export interface Armor {
   mdef: number;
   init: number;
   isEquipped: boolean;
+
+  // Technospheres
+  slots?: SlotTier;
+  slotted?: string[];
 }
 
 export interface PlayerEquipment {
@@ -290,6 +353,8 @@ export interface PlayerEquipment {
   shields: Shields[];
   accessories: Accessories[];
   armor: Armor[];
+  mnemospheres?: Mnemosphere[];
+  hoplospheres?: Hoplosphere[];
 }
 
 export type AnyEquipmentItem =
