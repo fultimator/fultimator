@@ -18,10 +18,16 @@ import AddIcon from "@mui/icons-material/Add";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import CustomHeader from "../../common/CustomHeader";
-import classList from "../../../libs/classes";
 import PlayerClassCard from "./PlayerClassCard";
 import useUploadJSON from "../../../hooks/useUploadJSON";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import MnemosphereClassCard from "./MnemosphereClassCard";
+import { getSlottedMnemospheres } from "./mnemosphereClassUtils";
+import {
+  getDerivedClassLevel,
+  isAutomaticClassLevelEnabled,
+  syncAutomaticClassLevels,
+} from "./classLevelUtils";
 
 export default function EditPlayerClasses({
   player,
@@ -29,15 +35,44 @@ export default function EditPlayerClasses({
   updateMaxStats,
   isEditMode,
 }) {
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [selectedBook, setSelectedBook] = useState(null);
   const [warnings, setWarnings] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClassName, setNewClassName] = useState("");
   const [compendiumOpen, setCompendiumOpen] = useState(false);
 
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const automaticClassLevel = isAutomaticClassLevelEnabled(player);
+  const canAddMoreClasses = !isTechnospheres || player.classes.length < 3;
+  const slottedMnemospheres = isTechnospheres
+    ? getSlottedMnemospheres(player)
+    : [];
+
   const fileInputRef = useRef(null);
   const customTheme = useCustomTheme();
+
+  const syncInnateClasses = (nextPlayer) => {
+    if (!isTechnospheres) return nextPlayer;
+
+    const innateClasses = (nextPlayer.classes ?? [])
+      .map((cls) => cls.name)
+      .filter(Boolean)
+      .slice(0, 3);
+
+    return {
+      ...nextPlayer,
+      settings: {
+        ...(nextPlayer.settings ?? {}),
+        optionalRules: {
+          ...(nextPlayer.settings?.optionalRules ?? {}),
+          innateClasses,
+        },
+      },
+    };
+  };
+
+  const syncClassLevels = (nextPlayer) =>
+    automaticClassLevel ? syncAutomaticClassLevels(nextPlayer) : nextPlayer;
 
   useEffect(() => {
     checkWarnings();
@@ -47,29 +82,52 @@ export default function EditPlayerClasses({
   const checkWarnings = () => {
     const newWarnings = [];
 
-    // Check if player has at least 2 classes
-    if (!player.classes || player.classes.length < 2) {
-      newWarnings.push("Character must have at least 2 classes.");
-    }
+    if (isTechnospheres) {
+      if (!player.classes || player.classes.length < 3) {
+        newWarnings.push(
+          "Technospheres characters must have exactly 3 innate classes.",
+        );
+      }
+    } else {
+      if (!player.classes || player.classes.length < 2) {
+        newWarnings.push("Character must have at least 2 classes.");
+      }
 
-    // Check if class count exceeds 3 beyond the number of classes at level 10
-    const maxLevelClasses = player.classes
-      ? player.classes.filter((cls) => cls.lvl >= 10).length
-      : 0;
-    if (player.classes && player.classes.length - maxLevelClasses > 3) {
-      newWarnings.push(
-        "The number of classes exceeds the limit beyond the number of classes at level 10.",
-      );
+      // Check if class count exceeds 3 beyond the number of classes at level 10
+      const maxLevelClasses = player.classes
+        ? player.classes.filter((cls) => cls.lvl >= 10).length
+        : 0;
+      if (player.classes && player.classes.length - maxLevelClasses > 3) {
+        newWarnings.push(
+          "The number of classes exceeds the limit beyond the number of classes at level 10.",
+        );
+      }
     }
 
     // Calculate total levels of classes
     const totalLevels = player.classes
-      ? player.classes.reduce((acc, cls) => acc + parseInt(cls.lvl), 0)
+      ? player.classes.reduce(
+          (acc, cls) =>
+            acc +
+            (automaticClassLevel
+              ? getDerivedClassLevel(cls)
+              : parseInt(cls.lvl)),
+          0,
+        )
+      : 0;
+
+    // In technospheres mode, only slotted mnemosphere levels count toward player level.
+    const mnemoLevels = isTechnospheres
+      ? getSlottedMnemospheres(player).reduce((acc, m) => acc + (m.lvl ?? 1), 0)
       : 0;
 
     // Check if sum of levels isn't equal to player level
-    if (totalLevels !== player.lvl) {
-      newWarnings.push("Sum of class levels isn't equal to character level.");
+    if (totalLevels + mnemoLevels !== player.lvl) {
+      newWarnings.push(
+        isTechnospheres
+          ? "Sum of innate class levels and mnemosphere levels isn't equal to character level."
+          : "Sum of class levels isn't equal to character level.",
+      );
     }
 
     setWarnings(newWarnings);
@@ -90,6 +148,12 @@ export default function EditPlayerClasses({
         return;
       }
 
+      if (!canAddMoreClasses) {
+        alert("Technospheres players are limited to 3 innate classes");
+        fileInputRef.current.value = null;
+        return;
+      }
+
       const updatedPlayer = {
         ...player,
         classes: Array.isArray(player.classes) ? player.classes : [],
@@ -105,23 +169,12 @@ export default function EditPlayerClasses({
         isHomebrew: isHomebrew || false,
       });
 
-      setPlayer(updatedPlayer);
+      setPlayer(syncInnateClasses(syncClassLevels(updatedPlayer)));
       updateMaxStats();
-      setSelectedClass(null);
     }
 
     fileInputRef.current.value = null;
   });
-
-  // const handleAddClass = () => {
-  //   if (selectedClass) {
-  //     if (selectedClass.name === "Blank Class") {
-  //       setDialogOpen(true);
-  //     } else {
-  //       addClassToPlayer(selectedClass.name, false);
-  //     }
-  //   }
-  // };
 
   const addClassToPlayer = (name, isHomebrew) => {
     // Check if the selected class type already exists in player's classes
@@ -139,19 +192,11 @@ export default function EditPlayerClasses({
       classes: Array.isArray(player.classes) ? player.classes : [],
     };
 
-    const sortedSkills = selectedClass
-      ? selectedClass.skills.slice().sort((a, b) => {
-          if (a.skillName < b.skillName) return -1;
-          if (a.skillName > b.skillName) return 1;
-          return 0;
-        })
-      : [];
-
     updatedPlayer.classes.push({
       name: name,
       lvl: 1,
-      benefits: selectedClass?.benefits ?? {},
-      skills: sortedSkills,
+      benefits: {},
+      skills: [],
       heroic: {
         name: "",
         description: "",
@@ -160,10 +205,8 @@ export default function EditPlayerClasses({
       isHomebrew: isHomebrew,
     });
 
-    setPlayer(updatedPlayer);
+    setPlayer(syncInnateClasses(syncClassLevels(updatedPlayer)));
     updateMaxStats();
-    setSelectedBook(null);
-    setSelectedClass(null);
     setDialogOpen(false);
     setNewClassName("");
   };
@@ -174,7 +217,7 @@ export default function EditPlayerClasses({
       classes: player.classes.filter((_, i) => i !== index),
     };
 
-    setPlayer(updatedPlayer);
+    setPlayer(syncInnateClasses(syncClassLevels(updatedPlayer)));
     updateMaxStats();
   };
 
@@ -188,7 +231,7 @@ export default function EditPlayerClasses({
         return cls;
       }),
     };
-    setPlayer(updatedPlayer);
+    setPlayer(syncInnateClasses(syncClassLevels(updatedPlayer)));
   };
 
   const handleLevelChange = (index, newLevel) => {
@@ -216,7 +259,7 @@ export default function EditPlayerClasses({
     );
     updatedPlayer.lvl = totalLevels;
 
-    setPlayer(updatedPlayer);
+    setPlayer(syncInnateClasses(updatedPlayer));
     updateMaxStats();
   };
 
@@ -230,7 +273,7 @@ export default function EditPlayerClasses({
         return cls;
       }),
     };
-    setPlayer(updatedPlayer);
+    setPlayer(syncClassLevels(updatedPlayer));
     updateMaxStats();
   };
 
@@ -262,7 +305,7 @@ export default function EditPlayerClasses({
         return cls;
       }),
     };
-    setPlayer(updatedPlayer);
+    setPlayer(syncClassLevels(updatedPlayer));
     updateMaxStats();
   };
 
@@ -300,8 +343,7 @@ export default function EditPlayerClasses({
         return cls;
       }),
     };
-    setPlayer(updatedPlayer);
-    updateMaxStats();
+    setPlayer(syncClassLevels(updatedPlayer));
     updateMaxStats();
   };
 
@@ -318,7 +360,7 @@ export default function EditPlayerClasses({
         return cls;
       }),
     };
-    setPlayer(updatedPlayer);
+    setPlayer(syncClassLevels(updatedPlayer));
     updateMaxStats();
   };
 
@@ -340,7 +382,7 @@ export default function EditPlayerClasses({
         return cls;
       }),
     };
-    setPlayer(updatedPlayer);
+    setPlayer(syncClassLevels(updatedPlayer));
     updateMaxStats();
   };
 
@@ -362,7 +404,7 @@ export default function EditPlayerClasses({
         return cls;
       }),
     };
-    setPlayer(updatedPlayer);
+    setPlayer(syncClassLevels(updatedPlayer));
     updateMaxStats();
   };
 
@@ -418,6 +460,7 @@ export default function EditPlayerClasses({
     updatedPlayer.classes.push({
       name: item.name,
       lvl: 1,
+      _packItemId: item._packItemId,
       benefits: item.benefits,
       skills: sortedSkills,
       heroic: item.heroic || { name: "", description: "" },
@@ -425,17 +468,13 @@ export default function EditPlayerClasses({
       isHomebrew: item.isHomebrew || false,
     });
 
-    setPlayer(updatedPlayer);
+    setPlayer(syncInnateClasses(syncClassLevels(updatedPlayer)));
     updateMaxStats();
   };
 
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
-
-  const _filteredClasses = selectedBook
-    ? classList.filter((cls) => cls.book === selectedBook)
-    : classList;
 
   return (
     <>
@@ -454,12 +493,22 @@ export default function EditPlayerClasses({
               <Grid size={12}>
                 <CustomHeader
                   type="top"
-                  headerText={t("Classes")}
-                  showIconButton={true}
+                  headerText={t(isTechnospheres ? "Innate Classes" : "Classes")}
+                  showIconButton={canAddMoreClasses}
                   icon={AddIcon}
-                  customTooltip={t("Add Blank Class")}
-                  addItem={() => setDialogOpen(true)}
-                  openCompendium={() => setCompendiumOpen(true)}
+                  customTooltip={t(
+                    isTechnospheres
+                      ? "Add Blank Innate Class"
+                      : "Add Blank Class",
+                  )}
+                  addItem={
+                    canAddMoreClasses ? () => setDialogOpen(true) : undefined
+                  }
+                  openCompendium={
+                    canAddMoreClasses
+                      ? () => setCompendiumOpen(true)
+                      : undefined
+                  }
                 />
               </Grid>
               {warnings.map((warning, index) => (
@@ -478,95 +527,6 @@ export default function EditPlayerClasses({
                   </Alert>
                 </Grid>
               ))}
-              {/* <Grid size={12} sm={4}>
-                <Autocomplete
-                  id="book-select"
-                  options={Object.values(classList)
-                    .reduce((books, currentClass) => {
-                      if (!books.includes(currentClass.book)) {
-                        books.push(currentClass.book);
-                      }
-                      return books;
-                    }, [])
-                    .map((book) => ({
-                      original: book,
-                      translated: t(book) || "",
-                    }))
-                    .map((book) => book.original)}
-                  getOptionLabel={(book) => t(book) || ""}
-                  value={selectedBook}
-                  onChange={(event, newValue) => {
-                    setSelectedBook(newValue);
-                    setSelectedClass(null); // Reset selected class when a new book is selected
-                  }}
-                  disabled={player.classes.length >= 7}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label={t("Book")}
-                      placeholder={t("Book")}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 5 }}>
-                <Autocomplete
-                  id="class-select"
-                  options={
-                    selectedBook
-                      ? filteredClasses
-                          .filter(
-                            (classOption) => classOption.book === selectedBook
-                          ) // Filter classes based on selected book
-                          .map((classOption) => ({
-                            original: classOption,
-                            translated: t(classOption.name) || "",
-                          }))
-                          .sort((a, b) =>
-                            a.translated.localeCompare(b.translated)
-                          )
-                          .map((classOption) => classOption.original)
-                      : []
-                  } // Disable options if no book is selected
-                  getOptionLabel={(option) => t(option.name) || ""}
-                  value={selectedClass}
-                  disabled={!selectedBook || player.classes.length >= 7}
-                  onChange={(event, newValue) => setSelectedClass(newValue)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label={t("Class")}
-                      placeholder={t("Class")}
-                      disabled={!selectedBook} // Disable the input if no book is selected
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid size={{ xs: 10, sm: 2 }}>
-                <Button
-                  variant="contained"
-                  onClick={handleAddClass}
-                  sx={{ width: "100%", height: "100%" }}
-                  disabled={
-                    !selectedBook ||
-                    !selectedClass ||
-                    player.classes.length >= 7
-                  } // Disable button if no book or class is selected
-                >
-                  {t("Add")}
-                </Button>
-              </Grid>
-              <Grid size={{ xs: 2, sm: 1 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => fileInputRef.current.click()}
-                  disabled={player.classes.length >= 7}
-                >
-                  {t("Upload JSON")}
-                </Button>
-              </Grid> */}
             </Grid>
             <input
               ref={fileInputRef}
@@ -591,7 +551,11 @@ export default function EditPlayerClasses({
         >
           <Grid size={12}>
             <Typography variant="h3" align="center">
-              {t("No classes added yet")}
+              {t(
+                isTechnospheres
+                  ? "No innate classes added yet"
+                  : "No classes added yet",
+              )}
             </Typography>
           </Grid>
         </Paper>
@@ -601,9 +565,17 @@ export default function EditPlayerClasses({
           <React.Fragment key={index}>
             <PlayerClassCard
               allClasses={player.classes}
-              classItem={{ ...cls, name: cls.name }}
+              classItem={{
+                ...cls,
+                name: cls.name,
+                lvl: automaticClassLevel ? getDerivedClassLevel(cls) : cls.lvl,
+              }}
               onRemove={() => handleRemoveClass(index)}
-              onLevelChange={(newLevel) => handleLevelChange(index, newLevel)}
+              onLevelChange={
+                automaticClassLevel
+                  ? () => {}
+                  : (newLevel) => handleLevelChange(index, newLevel)
+              }
               onSaveBenefits={(benefits) => handleSaveBenefits(index, benefits)}
               onAddSkill={handleAddSkill}
               onEditSkill={handleEditSkill}
@@ -624,10 +596,63 @@ export default function EditPlayerClasses({
               editHeroic={(heroic) => editHeroic(index, heroic)}
               userId={player.uid}
               isHomebrew={cls.isHomebrew === undefined ? true : cls.isHomebrew}
+              isClassLevelReadOnly={automaticClassLevel}
             />
             {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
           </React.Fragment>
         ))}
+      {isTechnospheres && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <Paper
+            elevation={3}
+            sx={{
+              p: "15px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+              mb: 2,
+            }}
+          >
+            <Grid container spacing={2}>
+              <Grid size={12}>
+                <CustomHeader
+                  type="top"
+                  headerText={t("Slotted Mnemospheres")}
+                  showIconButton={false}
+                />
+              </Grid>
+              {slottedMnemospheres.length === 0 ? (
+                <Grid size={12}>
+                  <Typography variant="h3" align="center">
+                    {t("No slotted mnemospheres")}
+                  </Typography>
+                </Grid>
+              ) : (
+                <Grid size={12}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ px: 1 }}
+                  >
+                    {t(
+                      "Mnemosphere levels count toward character level. Invest levels via the Level Up button.",
+                    )}
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+          </Paper>
+          {slottedMnemospheres.map((mnemo, index) => (
+            <React.Fragment key={mnemo.id}>
+              <MnemosphereClassCard item={mnemo} />
+              {index !== slottedMnemospheres.length - 1 && (
+                <Divider sx={{ my: 2 }} />
+              )}
+            </React.Fragment>
+          ))}
+        </>
+      )}
       <CompendiumViewerModal
         open={compendiumOpen}
         onClose={() => setCompendiumOpen(false)}
