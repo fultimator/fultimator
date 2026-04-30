@@ -25,12 +25,14 @@ export type CompendiumItemType =
   | "quality"
   | "class"
   | "heroic"
+  | "mnemosphere"
+  | "hoplosphere"
   | "optional";
 
 export interface CompendiumItem {
   id: string; // crypto.randomUUID() — stable across edits
   type: CompendiumItemType;
-  data: Record<string, unknown>; // narrowly typed at usage sites
+  data: Record<string, unknown> & { fuid?: string }; // narrowly typed at usage sites
   addedAt: number; // Unix ms timestamp
 }
 

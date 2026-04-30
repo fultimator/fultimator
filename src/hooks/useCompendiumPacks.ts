@@ -455,6 +455,8 @@ export function useCompendiumPacks() {
       "quality",
       "class",
       "heroic",
+      "mnemosphere",
+      "hoplosphere",
     ];
     const now = Date.now();
     const packId = crypto.randomUUID();
