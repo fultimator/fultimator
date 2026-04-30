@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
+  Box,
   Button,
   Dialog,
   DialogTitle,
@@ -32,6 +33,9 @@ import ChangeType from "../../../../routes/equip/customWeapons/ChangeType";
 import ChangeCustomizations from "../../../../routes/equip/customWeapons/ChangeCustomizations";
 import SelectQuality from "../../../../routes/equip/weapons/SelectQuality";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
+import SlotTierPicker from "../technospheres/SlotTierPicker";
+import { SLOT_TIERS } from "../technospheres/slotTiers";
+import SlotEditor from "../technospheres/SlotEditor";
 import ChangeModifiers from "../ChangeModifiers";
 import qualities from "../../../../routes/equip/weapons/qualities";
 import {
@@ -42,6 +46,7 @@ import {
   types,
 } from "../../../../routes/equip/customWeapons/libs";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import { buildSphereData } from "../../../../libs/technospheres";
 
 export default function PlayerCustomWeaponModal({
   open,
@@ -50,8 +55,12 @@ export default function PlayerCustomWeaponModal({
   customWeapon,
   onAddCustomWeapon,
   onDeleteCustomWeapon,
+  player,
+  setPlayer,
 }) {
   const { t } = useTranslate();
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
   const fileInputRef = useRef();
 
   // Initialize state from customWeapon prop or defaults
@@ -97,6 +106,10 @@ export default function PlayerCustomWeaponModal({
   } = useEquipmentForm(customWeapon);
 
   // Override states
+  const [slots, setSlots] = useState(customWeapon?.slots ?? "alpha");
+  const [slotted, setSlotted] = useState(customWeapon?.slotted ?? []);
+  const [paidSlots, setPaidSlots] = useState(customWeapon?.slots ?? "alpha");
+
   const [overrideDamageType, setOverrideDamageType] = useState(
     customWeapon?.overrideDamageType || false,
   );
@@ -177,6 +190,9 @@ export default function PlayerCustomWeaponModal({
       setSelectedQuality(customWeapon.selectedQuality || "");
       setQuality(customWeapon.quality || "");
       setQualityCost(customWeapon.qualityCost || 0);
+      setSlots(customWeapon.slots ?? "alpha");
+      setSlotted(customWeapon.slotted ?? []);
+      setPaidSlots(customWeapon.slots ?? "alpha");
       // primary modifier fields handled by useEquipmentForm
       setOverrideDamageType(customWeapon.overrideDamageType || false);
       setCustomDamageType(customWeapon.customDamageType || "physical");
@@ -234,6 +250,8 @@ export default function PlayerCustomWeaponModal({
       setSelectedQuality("");
       setQuality("");
       setQualityCost(0);
+      setSlots("alpha");
+      setSlotted([]);
       clearModifiers();
       setOverrideDamageType(false);
       setCustomDamageType("physical");
@@ -327,6 +345,14 @@ export default function PlayerCustomWeaponModal({
     return hasElementalCustomization() || overrideDamageType;
   };
 
+  const paidSlotTier =
+    SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
+  const selectedSlotTier =
+    SLOT_TIERS.find((t) => t.value === slots) ?? SLOT_TIERS[0];
+  const slotCostDelta = isTechnospheres
+    ? selectedSlotTier.cost - paidSlotTier.cost
+    : 0;
+
   const calculateTotalCost = () => {
     const baseCost = 300; // Custom weapons have base cost of 300
     const customizationCost = hasTransforming ? 100 : 0;
@@ -379,6 +405,9 @@ export default function PlayerCustomWeaponModal({
       secondOverrideDamageType,
       secondCustomDamageType,
       dataType: "weapon",
+      ...(isTechnospheres || customWeapon?.slots || customWeapon?.slotted
+        ? { slots, slotted }
+        : {}),
     };
 
     onAddCustomWeapon(weaponData);
@@ -654,55 +683,150 @@ export default function PlayerCustomWeaponModal({
                 />
               </Grid>
 
-              {/* Quality Section */}
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 8,
-                }}
-              >
-                <SelectQuality
-                  quality={selectedQuality}
-                  setQuality={(e) => {
-                    const qualityData = qualities.find(
-                      (q) => q.name === e.target.value,
-                    );
-                    if (qualityData) {
-                      setSelectedQuality(qualityData.name);
-                      setQuality(qualityData.quality);
-                      setQualityCost(qualityData.cost);
-                    }
-                  }}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 4,
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setSelectedQuality("");
-                    setQuality("");
-                    setQualityCost(0);
-                  }}
-                  disabled={!selectedQuality}
-                  sx={{ height: "100%", minWidth: "40px" }}
-                >
-                  ×
-                </Button>
-              </Grid>
+              {/* Quality / Slot Tier Section */}
+              {isTechnospheres ? (
+                <>
+                  <Grid size={12}>
+                    <SlotTierPicker
+                      value={slots}
+                      onChange={(tier) => {
+                        const newTier = SLOT_TIERS.find(
+                          (t) => t.value === tier,
+                        );
+                        const hoplospheres =
+                          player?.equipment?.[0]?.hoplospheres ?? [];
+                        const kept = [];
+                        let cost = 0;
+                        for (const id of slotted) {
+                          const hoplo = hoplospheres.find((h) => h.id === id);
+                          const slotCost = hoplo?.requiredSlots ?? 1;
+                          if (cost + slotCost <= (newTier?.slots ?? 1)) {
+                            kept.push(id);
+                            cost += slotCost;
+                          }
+                        }
+                        setSlots(tier);
+                        setSlotted(kept);
+                      }}
+                      isWeapon={true}
+                    />
+                    {slotCostDelta !== 0 && (
+                      <Box sx={{ mt: 1 }}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color={slotCostDelta > 0 ? "warning" : "success"}
+                          onClick={() => {
+                            if (setPlayer) {
+                              setPlayer((prev) => ({
+                                ...prev,
+                                info: {
+                                  ...prev.info,
+                                  zenit: Math.max(
+                                    0,
+                                    (prev.info?.zenit ?? 0) - slotCostDelta,
+                                  ),
+                                },
+                              }));
+                            }
+                            setPaidSlots(slots);
+                          }}
+                        >
+                          {slotCostDelta > 0
+                            ? `${t("Buy")} (−${slotCostDelta}z)`
+                            : `${t("Refund")} (+${Math.abs(slotCostDelta)}z)`}
+                        </Button>
+                      </Box>
+                    )}
+                  </Grid>
+                  <Grid size={12}>
+                    <SlotEditor
+                      item={{ slots, slotted }}
+                      onChange={(updated) => setSlotted(updated.slotted)}
+                      player={player}
+                      isWeapon={true}
+                      onAddToBank={
+                        setPlayer
+                          ? (item, type) => {
+                              const key =
+                                type === "mnemospheres"
+                                  ? "mnemospheres"
+                                  : "hoplospheres";
+                              const genId = () =>
+                                Math.random().toString(36).slice(2) +
+                                Date.now().toString(36);
+                              setPlayer((prev) => {
+                                const prevEq0 = prev?.equipment?.[0] ?? {};
+                                const eq0New = {
+                                  ...prevEq0,
+                                  [key]: [
+                                    ...(prevEq0[key] ?? []),
+                                    { ...item, id: item.id ?? genId() },
+                                  ],
+                                };
+                                const equipment = prev?.equipment
+                                  ? [eq0New, ...prev.equipment.slice(1)]
+                                  : [eq0New];
+                                return { ...prev, equipment };
+                              });
+                            }
+                          : undefined
+                      }
+                    />
+                  </Grid>
+                </>
+              ) : (
+                <>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 8,
+                    }}
+                  >
+                    <SelectQuality
+                      quality={selectedQuality}
+                      setQuality={(e) => {
+                        const qualityData = qualities.find(
+                          (q) => q.name === e.target.value,
+                        );
+                        if (qualityData) {
+                          setSelectedQuality(qualityData.name);
+                          setQuality(qualityData.quality);
+                          setQualityCost(qualityData.cost);
+                        }
+                      }}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4,
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        setSelectedQuality("");
+                        setQuality("");
+                        setQualityCost(0);
+                      }}
+                      disabled={!selectedQuality}
+                      sx={{ height: "100%", minWidth: "40px" }}
+                    >
+                      ×
+                    </Button>
+                  </Grid>
 
-              <Grid size={12}>
-                <ChangeQuality
-                  quality={quality}
-                  setQuality={(e) => setQuality(e.target.value)}
-                  qualityCost={qualityCost}
-                  setQualityCost={(e) => setQualityCost(e.target.value)}
-                />
-              </Grid>
+                  <Grid size={12}>
+                    <ChangeQuality
+                      quality={quality}
+                      setQuality={(e) => setQuality(e.target.value)}
+                      qualityCost={qualityCost}
+                      setQualityCost={(e) => setQualityCost(e.target.value)}
+                    />
+                  </Grid>
+                </>
+              )}
 
               {/* Modifiers Section */}
               <Grid size={12}>
@@ -1033,7 +1157,10 @@ export default function PlayerCustomWeaponModal({
                 mDefModifier: parseInt(mDefModifier) || 0,
                 overrideDamageType,
                 customDamageType,
+                slots,
+                slotted,
               }}
+              sphereData={buildSphereData({ slots, slotted }, player)}
             />
 
             {hasTransforming && (
@@ -1059,7 +1186,10 @@ export default function PlayerCustomWeaponModal({
                     mDefModifier: parseInt(secondMDefModifier) || 0,
                     overrideDamageType: secondOverrideDamageType,
                     customDamageType: secondCustomDamageType,
+                    slots,
+                    slotted,
                   }}
+                  sphereData={buildSphereData({ slots, slotted }, player)}
                 />
               </>
             )}

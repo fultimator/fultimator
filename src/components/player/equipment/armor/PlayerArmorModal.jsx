@@ -24,12 +24,16 @@ import ChangeName from "../../../../routes/equip/common/ChangeName";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
 import ApplyRework from "../../../../routes/equip/common/ApplyRework";
 import ChangeModifiers from "../ChangeModifiers";
+import SlotTierPicker from "../technospheres/SlotTierPicker";
+import { SLOT_TIERS } from "../technospheres/slotTiers";
+import SlotEditor from "../technospheres/SlotEditor";
 import { SharedArmorCard } from "../../../../components/shared/itemCards";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useUploadJSON from "../../../../hooks/useUploadJSON";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
+import { buildSphereData } from "../../../../libs/technospheres";
 
 export default function PlayerArmorModal({
   open,
@@ -38,8 +42,12 @@ export default function PlayerArmorModal({
   armorPlayer,
   onAddArmor,
   onDeleteArmor,
+  player,
+  setPlayer,
 }) {
   const { t } = useTranslate();
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
 
   const [base, setBase] = useState(armorPlayer?.base || armor[0]);
   const [name, setName] = useState(armorPlayer?.name || t(armor[0].name));
@@ -51,6 +59,9 @@ export default function PlayerArmorModal({
   );
   const [init, setInit] = useState(armorPlayer?.init || 0);
   const [rework, setRework] = useState(armorPlayer?.rework || false);
+  const [slots, setSlots] = useState(armorPlayer?.slots ?? "alpha");
+  const [slotted, setSlotted] = useState(armorPlayer?.slotted ?? []);
+  const [paidSlots, setPaidSlots] = useState(armorPlayer?.slots ?? "alpha");
   const {
     defModifier,
     setDefModifier,
@@ -99,6 +110,9 @@ export default function PlayerArmorModal({
     setSelectedQuality(armorPlayer?.selectedQuality || "");
     setInit(armorPlayer?.init || 0);
     setRework(armorPlayer?.rework || false);
+    setSlots(armorPlayer?.slots ?? "alpha");
+    setSlotted(armorPlayer?.slotted ?? []);
+    setPaidSlots(armorPlayer?.slots ?? "alpha");
     // modifier fields are handled by useEquipmentForm
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [armorPlayer]);
@@ -188,6 +202,14 @@ export default function PlayerArmorModal({
 
   const cost = calcCost();
 
+  const paidSlotTier =
+    SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
+  const selectedSlotTier =
+    SLOT_TIERS.find((t) => t.value === slots) ?? SLOT_TIERS[0];
+  const slotCostDelta = isTechnospheres
+    ? selectedSlotTier.cost - paidSlotTier.cost
+    : 0;
+
   const handleClearFields = () => {
     setBase(armor[0]);
     setName(armor[0].name);
@@ -197,6 +219,8 @@ export default function PlayerArmorModal({
     setSelectedQuality("");
     setInit(armor[0].init);
     setRework(false);
+    setSlots("alpha");
+    setSlotted([]);
     clearModifiers();
   };
 
@@ -216,6 +240,9 @@ export default function PlayerArmorModal({
       mdef: base.mdef,
       ...modifiers(),
       isEquipped: martial !== armorPlayer?.martial ? false : isEquipped,
+      ...(isTechnospheres || armorPlayer?.slots || armorPlayer?.slotted
+        ? { slots, slotted }
+        : {}),
     };
 
     onAddArmor(updatedArmor);
@@ -278,24 +305,115 @@ export default function PlayerArmorModal({
             {/* <Grid size={2}>
                   <ChangeMartial martial={martial} setMartial={setMartial} />
                 </Grid> */}
-            <Grid
-              size={{
-                xs: 12,
-                md: 4,
-              }}
-            >
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value,
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
+            {isTechnospheres ? (
+              <>
+                <Grid size={{ xs: 12, md: 8 }}>
+                  <SlotTierPicker
+                    value={slots}
+                    onChange={(tier) => {
+                      const newTier = SLOT_TIERS.find((t) => t.value === tier);
+                      const hoplospheres =
+                        player?.equipment?.[0]?.hoplospheres ?? [];
+                      const kept = [];
+                      let cost = 0;
+                      for (const id of slotted) {
+                        const hoplo = hoplospheres.find((h) => h.id === id);
+                        const slotCost = hoplo?.requiredSlots ?? 1;
+                        if (cost + slotCost <= (newTier?.slots ?? 1)) {
+                          kept.push(id);
+                          cost += slotCost;
+                        }
+                      }
+                      setSlots(tier);
+                      setSlotted(kept);
+                    }}
+                    isWeapon={false}
+                  />
+                  {slotCostDelta !== 0 && (
+                    <Box sx={{ mt: 1 }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color={slotCostDelta > 0 ? "warning" : "success"}
+                        onClick={() => {
+                          if (setPlayer) {
+                            setPlayer((prev) => ({
+                              ...prev,
+                              info: {
+                                ...prev.info,
+                                zenit: Math.max(
+                                  0,
+                                  (prev.info?.zenit ?? 0) - slotCostDelta,
+                                ),
+                              },
+                            }));
+                          }
+                          setPaidSlots(slots);
+                        }}
+                      >
+                        {slotCostDelta > 0
+                          ? `${t("Buy")} (−${slotCostDelta}z)`
+                          : `${t("Refund")} (+${Math.abs(slotCostDelta)}z)`}
+                      </Button>
+                    </Box>
+                  )}
+                </Grid>
+                <Grid size={12}>
+                  <SlotEditor
+                    item={{ slots, slotted }}
+                    onChange={(updated) => setSlotted(updated.slotted)}
+                    player={player}
+                    isWeapon={false}
+                    onAddToBank={
+                      setPlayer
+                        ? (item, type) => {
+                            const key =
+                              type === "mnemospheres"
+                                ? "mnemospheres"
+                                : "hoplospheres";
+                            const genId = () =>
+                              Math.random().toString(36).slice(2) +
+                              Date.now().toString(36);
+                            setPlayer((prev) => {
+                              const prevEq0 = prev?.equipment?.[0] ?? {};
+                              const eq0New = {
+                                ...prevEq0,
+                                [key]: [
+                                  ...(prevEq0[key] ?? []),
+                                  { ...item, id: item.id ?? genId() },
+                                ],
+                              };
+                              const equipment = prev?.equipment
+                                ? [eq0New, ...prev.equipment.slice(1)]
+                                : [eq0New];
+                              return { ...prev, equipment };
+                            });
+                          }
+                        : undefined
+                    }
+                  />
+                </Grid>
+              </>
+            ) : (
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 4,
                 }}
-              />
-            </Grid>
+              >
+                <SelectQuality
+                  quality={selectedQuality}
+                  setQuality={(e) => {
+                    const quality = qualities.find(
+                      (el) => el.name === e.target.value,
+                    );
+                    setSelectedQuality(quality.name);
+                    setQuality(quality.quality);
+                    setQualityCost(quality.cost);
+                  }}
+                />
+              </Grid>
+            )}
 
             <Grid
               size={{
@@ -308,14 +426,16 @@ export default function PlayerArmorModal({
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            <Grid size={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-            </Grid>
+            {!isTechnospheres && (
+              <Grid size={12}>
+                <ChangeQuality
+                  quality={quality}
+                  setQuality={(e) => setQuality(e.target.value)}
+                  qualityCost={qualityCost}
+                  setQualityCost={(e) => setQualityCost(e.target.value)}
+                />
+              </Grid>
+            )}
             <Accordion
               sx={{ width: "100%", marginLeft: "10px" }}
               expanded={modifiersExpanded}
@@ -472,7 +592,10 @@ export default function PlayerArmorModal({
                 defModifier: parseInt(defModifier),
                 mDefModifier: parseInt(mDefModifier),
                 initModifier: parseInt(initModifier),
+                slots,
+                slotted,
               }}
+              sphereData={buildSphereData({ slots, slotted }, player)}
             />
           </Grid>
         </DialogContent>

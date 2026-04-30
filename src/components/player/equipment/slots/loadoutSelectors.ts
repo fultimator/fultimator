@@ -3,6 +3,9 @@ import {
   PlayerClass,
   Spells,
   Skills,
+  MnemosphereSkill,
+  MnemosphereHeroic,
+  MnemosphereSpell,
 } from "../../../../types/Players";
 import {
   resolveEffectiveSlot,
@@ -221,6 +224,65 @@ export function getSupportSlots(player: TypePlayer): SupportSlotEntry[] {
       return { ref, module } as SupportSlotEntry;
     })
     .filter((e): e is SupportSlotEntry => e !== null);
+}
+
+// Technosphere benefit application
+
+export interface ActiveMnemosphereData {
+  skills: MnemosphereSkill[];
+  heroic: MnemosphereHeroic[];
+  spells: MnemosphereSpell[];
+}
+
+/**
+ * Collects all mnemosphere skills/heroic/spells from currently equipped player items.
+ * Only runs when technospheres optional rule is active.
+ * Vehicle module slots are excluded (benefits only apply to player items).
+ */
+export function getActiveMnemosphereSkills(
+  player: TypePlayer,
+): ActiveMnemosphereData {
+  const result: ActiveMnemosphereData = { skills: [], heroic: [], spells: [] };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isTechnospheres =
+    (player.settings as any)?.optionalRules?.technospheres ?? false;
+  if (!isTechnospheres) return result;
+
+  const eq0 = player.equipment?.[0];
+  if (!eq0) return result;
+
+  for (const slotKey of [
+    "mainHand",
+    "offHand",
+    "armor",
+    "accessory",
+  ] as const) {
+    const resolved = resolveEffectiveSlot(player, slotKey);
+    if (!resolved || resolved.kind !== "playerItem") continue;
+
+    const ref = player.equippedSlots?.[slotKey];
+    if (!ref) continue;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const arr = ((eq0 as any)[ref.source] ?? []) as {
+      name: string;
+      slotted?: string[];
+    }[];
+    const item =
+      ref.index !== undefined
+        ? arr[ref.index]
+        : arr.find((i) => i.name === ref.name);
+    if (!item || !("slotted" in item) || !item.slotted?.length) continue;
+
+    for (const id of item.slotted) {
+      const mnemo = (eq0.mnemospheres ?? []).find((m) => m.id === id);
+      if (!mnemo) continue;
+      result.skills.push(...mnemo.skills);
+      result.heroic.push(...mnemo.heroic);
+      result.spells.push(...mnemo.spells);
+    }
+  }
+
+  return result;
 }
 
 // Aux hand

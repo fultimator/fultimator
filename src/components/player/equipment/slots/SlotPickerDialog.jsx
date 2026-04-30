@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -18,11 +18,16 @@ import {
   IconButton,
 } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
+import LockIcon from "@mui/icons-material/Lock";
 import CloseIcon from "@mui/icons-material/Close";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import { useTranslate } from "../../../../translation/translate";
 import { resolveEffectiveSlot } from "./equipmentSlots";
-import { equipItemToSlot, clearSlotAction } from "./loadoutActions";
+import {
+  equipItemToSlot,
+  clearSlotAction,
+  getEquipConflicts,
+} from "./loadoutActions";
 import attributes from "../../../../libs/attributes";
 
 function moduleStatLine(module) {
@@ -281,7 +286,17 @@ export default function SlotPickerDialog({
       return true;
     });
 
+  const candidateConflicts = useMemo(() => {
+    const map = new Map();
+    for (const c of candidates) {
+      const conflicts = getEquipConflicts(player, slot, c);
+      if (conflicts.length > 0) map.set(c, conflicts);
+    }
+    return map;
+  }, [candidates, player, slot]);
+
   const handleSelect = (candidate) => {
+    if (candidateConflicts.has(candidate)) return;
     setPlayer((prev) => equipItemToSlot(prev, slot, candidate));
     if (otherHandHasWeaponModule) onClearOtherHandModule?.();
     onClose();
@@ -297,7 +312,7 @@ export default function SlotPickerDialog({
   };
 
   const handleAccept = () => {
-    if (!pendingCandidate) {
+    if (!pendingCandidate || candidateConflicts.has(pendingCandidate)) {
       onClose();
       return;
     }
@@ -627,6 +642,15 @@ export default function SlotPickerDialog({
                           {previewCandidate.item.quality}
                         </Typography>
                       )}
+                    {candidateConflicts.has(previewCandidate) && (
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "error.main", display: "block", mt: 0.5 }}
+                      >
+                        {t("Skill conflict")}:{" "}
+                        {candidateConflicts.get(previewCandidate).join(", ")}
+                      </Typography>
+                    )}
                   </Box>
                 ) : (
                   <Box
@@ -689,6 +713,8 @@ export default function SlotPickerDialog({
                       selectedCandidate?.source === c.source &&
                       selectedCandidate?.index === c.index;
                     const isProficient = checkMartialProficiency(c);
+                    const conflicts = candidateConflicts.get(c);
+                    const hasConflict = !!conflicts;
                     return (
                       <ListItem
                         key={i}
@@ -696,8 +722,9 @@ export default function SlotPickerDialog({
                         onMouseEnter={() => setHoveredCandidate(c)}
                       >
                         <ListItemButton
-                          onClick={() => setPendingCandidate(c)}
-                          onDoubleClick={() => handleSelect(c)}
+                          onClick={() => !hasConflict && setPendingCandidate(c)}
+                          onDoubleClick={() => !hasConflict && handleSelect(c)}
+                          disabled={hasConflict}
                         >
                           <ListItemIcon sx={{ minWidth: 36 }}>
                             <Radio
@@ -737,6 +764,19 @@ export default function SlotPickerDialog({
                                     )}
                                   >
                                     <ErrorIcon
+                                      sx={{
+                                        fontSize: 13,
+                                        color: "error.main",
+                                        verticalAlign: "middle",
+                                      }}
+                                    />
+                                  </Tooltip>
+                                )}
+                                {hasConflict && (
+                                  <Tooltip
+                                    title={`${t("Skill conflict")}: ${conflicts.join(", ")}`}
+                                  >
+                                    <LockIcon
                                       sx={{
                                         fontSize: 13,
                                         color: "error.main",

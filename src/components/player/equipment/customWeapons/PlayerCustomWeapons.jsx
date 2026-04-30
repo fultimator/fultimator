@@ -16,6 +16,7 @@ import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
 import { useTheme } from "@mui/material/styles";
 import { MeleeIcon } from "../../../icons";
+import { buildSphereData } from "../../../../libs/technospheres";
 
 export default function PlayerCustomWeapons({
   player,
@@ -158,6 +159,7 @@ export default function PlayerCustomWeapons({
                         customWeapon.customDamageType || "physical",
                     }}
                     activeForm={customWeapon.activeForm}
+                    sphereData={buildSphereData(customWeapon, player)}
                   />
 
                   {/* Compact Actions Row Below Card */}
@@ -226,48 +228,34 @@ export default function PlayerCustomWeapons({
                                   return null;
                                 }
 
-                                // For regular custom weapons, always show M+O
-                                return "M+O";
+                                // For regular custom weapons, only show M+O when equipped
+                                return customWeapon.isEquipped ? "M+O" : null;
                               })()}
                               color="primary"
                               invisible={(() => {
-                                const badge = (() => {
-                                  const settings = player.settings ?? {};
-                                  const defaultRef =
-                                    settings.defaultUnarmedStrikeRef;
-                                  const autoEquipEnabled =
-                                    settings.autoEquipUnarmed ?? !!defaultRef;
-                                  const isDefaultUnarmed =
-                                    defaultRef &&
-                                    defaultRef.source === "customWeapons" &&
-                                    (defaultRef.index !== undefined
-                                      ? defaultRef.index === index
-                                      : defaultRef.name === customWeapon.name);
+                                const settings = player.settings ?? {};
+                                const defaultRef =
+                                  settings.defaultUnarmedStrikeRef;
+                                const autoEquipEnabled =
+                                  settings.autoEquipUnarmed ?? !!defaultRef;
+                                const isDefaultUnarmed =
+                                  defaultRef &&
+                                  defaultRef.source === "customWeapons" &&
+                                  (defaultRef.index !== undefined
+                                    ? defaultRef.index === index
+                                    : defaultRef.name === customWeapon.name);
 
-                                  if (isDefaultUnarmed && autoEquipEnabled) {
-                                    const slots = player.equippedSlots ?? {};
-                                    // Custom weapons are always 2-handed, check if mainHand has a custom weapon
-                                    const mainHandIsCustomWeapon =
-                                      slots.mainHand?.source ===
-                                      "customWeapons";
+                                if (isDefaultUnarmed && autoEquipEnabled) {
+                                  const slots = player.equippedSlots ?? {};
+                                  const mainHandIsCustomWeapon =
+                                    slots.mainHand?.source === "customWeapons";
+                                  const mainHandEmpty = !slots.mainHand;
+                                  const offHandEmpty =
+                                    !slots.offHand && !mainHandIsCustomWeapon;
+                                  return !(mainHandEmpty || offHandEmpty);
+                                }
 
-                                    const mainHandEmpty = !slots.mainHand;
-                                    const offHandEmpty =
-                                      !slots.offHand && !mainHandIsCustomWeapon;
-
-                                    if (mainHandEmpty && offHandEmpty)
-                                      return "M+O";
-                                    if (mainHandEmpty && !offHandEmpty)
-                                      return "M";
-                                    if (!mainHandEmpty && offHandEmpty)
-                                      return "O";
-                                    return null;
-                                  }
-
-                                  return "M+O";
-                                })();
-
-                                return !badge;
+                                return !customWeapon.isEquipped;
                               })()}
                               sx={{
                                 "& .MuiBadge-badge": {

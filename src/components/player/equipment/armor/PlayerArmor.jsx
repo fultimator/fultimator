@@ -16,6 +16,7 @@ import Export from "../../../Export";
 import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
 import { useTheme } from "@mui/material/styles";
 import { ArmorIcon } from "../../../icons";
+import { buildSphereData } from "../../../../libs/technospheres";
 
 export default function PlayerArmor({
   player,
@@ -98,7 +99,10 @@ export default function PlayerArmor({
             <React.Fragment key={index}>
               <Grid sx={{ mb: 2 }} size={12}>
                 <Box>
-                  <SharedArmorCard item={armorItem} />
+                  <SharedArmorCard
+                    item={armorItem}
+                    sphereData={buildSphereData(armorItem, player)}
+                  />
                 </Box>
 
                 <Box
