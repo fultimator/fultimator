@@ -723,7 +723,11 @@ export default function PlayerClassCard({
         open={heroicCompendiumOpen}
         onClose={() => setHeroicCompendiumOpen(false)}
         onAddItem={(item) => {
-          editHeroic({ name: item.name, description: item.description });
+          editHeroic({
+            name: item.name,
+            description: item.description,
+            _packItemId: item._packItemId,
+          });
         }}
         initialType="heroics"
         restrictToTypes={["heroics"]}

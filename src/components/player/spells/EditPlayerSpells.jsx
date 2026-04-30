@@ -667,6 +667,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               attr2: spell.attr2,
               isMagisphere: spell.isMagisphere || false,
               showInPlayerSheet: true,
+              _packItemId: spell._packItemId,
             },
           ],
         };
@@ -702,6 +703,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
               showInPlayerSheet: true,
+              _packItemId: spell._packItemId,
             },
           ],
         };
@@ -739,6 +741,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
               showInPlayerSheet: true,
+              _packItemId: spell._packItemId,
             },
           ],
         };
@@ -766,6 +769,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             ...cls.spells,
             {
               ...clonedSpell,
+              _packItemId: spell._packItemId,
               showInPlayerSheet:
                 clonedSpell.showInPlayerSheet === undefined
                   ? true
