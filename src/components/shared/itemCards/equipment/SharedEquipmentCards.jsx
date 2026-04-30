@@ -1,19 +1,31 @@
 import React from "react";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Chip, Divider, Grid, Typography } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { styled } from "@mui/system";
 
 import { Martial } from "../../../icons";
+import { SLOT_TIERS } from "../../../player/equipment/technospheres/slotTiers";
+import { getMnemosphereCost } from "../../../../libs/mnemospheres";
 import { OpenBracket, CloseBracket } from "../../../Bracket";
 import Diamond from "../../../Diamond";
 import attributes from "../../../../libs/attributes";
 import types from "../../../../libs/types";
 import { calculateCustomWeaponStats } from "../../../player/common/playerCalculations";
-import { CARD_DEFAULTS, useCardSetup, isImageMode } from "../core-utils";
-import { CardContentWrapper, RowsWithOptionalImage } from "../core";
+import {
+  CARD_DEFAULTS,
+  useCardSetup,
+  isImageMode,
+  headerBoxSx,
+  nameRowSx,
+} from "../core-utils";
+import {
+  CardContentWrapper,
+  HeaderSpacer,
+  RowsWithOptionalImage,
+} from "../core";
 
-const ROW_MIN_HEIGHT = "36px";
+const ROW_MIN_HEIGHT = "38px";
 const ROW_MIN_HEIGHT_NO_IMAGE = "40px";
 
 const StyledMarkdownBase = styled(ReactMarkdown)({
@@ -52,14 +64,13 @@ function rowMinHeight(imageMode) {
 }
 
 function rowPl(imageMode) {
-  return isImageMode(imageMode) ? 0.75 : 2;
+  return isImageMode(imageMode) ? 0.75 : 1;
 }
 
 function headerSx(customTheme, scale, onHeaderClick, imageMode) {
   return {
     alignItems: "center",
     minHeight: "36px",
-    px: 2,
     py: isImageMode(imageMode) ? 0 : 1,
     background: customTheme.primary,
     color: "#ffffff",
@@ -67,7 +78,6 @@ function headerSx(customTheme, scale, onHeaderClick, imageMode) {
     "& .MuiTypography-root": {
       fontSize: scale.header,
       fontWeight: 600,
-      fontFamily: "Antonio",
       textTransform: "uppercase",
       letterSpacing: "0.5px",
       lineHeight: 1.4,
@@ -82,7 +92,7 @@ function dataRowSx(customTheme, imageMode, background, extraSx = {}) {
     minHeight: rowMinHeight(imageMode),
     flexGrow: 1,
     py: isImageMode(imageMode) ? 0.25 : 0.5,
-    px: rowPl(imageMode),
+    pl: rowPl(imageMode),
     width: "100%",
     ...extraSx,
     ...(background ? { background } : {}),
@@ -91,7 +101,8 @@ function dataRowSx(customTheme, imageMode, background, extraSx = {}) {
 
 function qualityRowSx(customTheme, imageMode) {
   return {
-    px: rowPl(imageMode),
+    pl: rowPl(imageMode),
+    pr: rowPl(imageMode),
     py: 0.75,
     borderBottom: `1px solid ${customTheme.secondary}`,
     display: "flex",
@@ -235,35 +246,39 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      <RowsWithOptionalImage
-        header={
-          showHeader && (
-            <Grid
-              container
-              onClick={onHeaderClick}
-              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-            >
-              <Grid size={cols.name}>
-                <Typography>{t("Weapon")}</Typography>
-              </Grid>
-              <Grid size={cols.cost}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Cost")}
-                </Typography>
-              </Grid>
-              <Grid size={cols.accuracy}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Accuracy")}
-                </Typography>
-              </Grid>
-              <Grid size={cols.damage}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Damage")}
-                </Typography>
-              </Grid>
+      {showHeader && (
+        <Grid
+          container
+          onClick={onHeaderClick}
+          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+        >
+          <HeaderSpacer
+            imageMode={imageMode}
+            imageSize={imageSize}
+            imageVisible={imageVisible}
+          />
+          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+            <Grid size={cols.name}>
+              <Typography>{t("Weapon")}</Typography>
             </Grid>
-          )
-        }
+            <Grid size={cols.cost}>
+              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+            </Grid>
+            <Grid size={cols.accuracy}>
+              <Typography sx={{ textAlign: "center" }}>
+                {t("Accuracy")}
+              </Typography>
+            </Grid>
+            <Grid size={cols.damage}>
+              <Typography sx={{ textAlign: "center" }}>
+                {t("Damage")}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+      )}
+
+      <RowsWithOptionalImage
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -427,6 +442,7 @@ function SharedArmorLikeCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
   forceCategory,
+  sphereData = null,
 }) {
   const {
     t,
@@ -462,40 +478,42 @@ function SharedArmorLikeCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      <RowsWithOptionalImage
-        header={
-          showHeader && (
-            <Grid
-              container
-              onClick={onHeaderClick}
-              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-            >
-              <Grid size={cols.name}>
-                <Typography>{t(category)}</Typography>
-              </Grid>
-              <Grid size={cols.cost}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Cost")}
-                </Typography>
-              </Grid>
-              <Grid size={cols.def}>
-                <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
-              </Grid>
-              <Grid size={cols.mdef}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("MDEF")}
-                </Typography>
-              </Grid>
-              {!item.rework && (
-                <Grid size={cols.init}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("INIT")}
-                  </Typography>
-                </Grid>
-              )}
+      {showHeader && (
+        <Grid
+          container
+          onClick={onHeaderClick}
+          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+        >
+          <HeaderSpacer
+            imageMode={imageMode}
+            imageSize={imageSize}
+            imageVisible={imageVisible}
+          />
+          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+            <Grid size={cols.name}>
+              <Typography>{t(category)}</Typography>
             </Grid>
-          )
-        }
+            <Grid size={cols.cost}>
+              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+            </Grid>
+            <Grid size={cols.def}>
+              <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
+            </Grid>
+            <Grid size={cols.mdef}>
+              <Typography sx={{ textAlign: "center" }}>{t("MDEF")}</Typography>
+            </Grid>
+            {!item.rework && (
+              <Grid size={cols.init}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("INIT")}
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+      )}
+
+      <RowsWithOptionalImage
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -576,11 +594,20 @@ function SharedArmorLikeCard({
           )}
         </Grid>
 
-        <QualityRow
-          item={item}
-          customTheme={customTheme}
-          imageMode={imageMode}
-        />
+        {sphereData ? (
+          <SphereDataRow
+            sphereData={sphereData}
+            customTheme={customTheme}
+            imageMode={imageMode}
+            t={t}
+          />
+        ) : (
+          <QualityRow
+            item={item}
+            customTheme={customTheme}
+            imageMode={imageMode}
+          />
+        )}
       </RowsWithOptionalImage>
     </CardContentWrapper>
   );
@@ -618,7 +645,6 @@ function CustomWeaponRows({
       imageVisible={imageVisible}
       imageSlot={imageSlot}
       customTheme={customTheme}
-      imageRowCount={2}
     >
       <Grid
         container
@@ -756,16 +782,9 @@ function CustomWeaponRows({
   );
 }
 
-function CustomizationsAndQualityRow({
-  item,
-  customTheme,
-  imageMode,
-  t,
-  forceVisible = false,
-}) {
+function CustomizationsAndQualityRow({ item, customTheme, imageMode, t }) {
   const customizations = item.customizations || [];
-  if (customizations.length === 0 && !item.quality && !forceVisible)
-    return null;
+  if (customizations.length === 0 && !item.quality) return null;
   return (
     <Box sx={qualityRowSx(customTheme, imageMode)}>
       <Typography
@@ -801,32 +820,70 @@ function CustomizationsAndQualityRow({
   );
 }
 
-function CustomWeaponFormRows({
-  item,
-  rowProps,
-  imageMode,
-  imageSize,
-  imageVisible,
-  imageSlot,
-  customTheme,
-  t,
-}) {
+function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
+  const slottedSpheres = sphereData?.slottedSpheres ?? [];
+  if (slottedSpheres.length === 0) return null;
+
+  const seen = new Set();
+  const uniqueSpheres = slottedSpheres.filter((sphere) => {
+    const key = sphere.coagKey ?? `${sphere.type}:${sphere.id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
   return (
-    <>
-      <CustomWeaponRows
-        item={item}
-        {...rowProps}
-        imageSize={imageSize}
-        imageVisible={imageVisible}
-        imageSlot={imageSlot}
-      />
-      <CustomizationsAndQualityRow
-        item={item}
-        customTheme={customTheme}
-        imageMode={imageMode}
-        t={t}
-      />
-    </>
+    <Box sx={qualityRowSx(customTheme, imageMode)}>
+      <Typography
+        variant="body2"
+        component="div"
+        sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+      >
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+          <Chip
+            label={`${t("Slot Tier")}: ${SLOT_TIERS.find((t) => t.value === (sphereData.slotTier ?? "alpha"))?.label ?? "slot α"}`}
+            size="small"
+            variant="outlined"
+          />
+          {uniqueSpheres.map((sphere) => (
+            <Chip
+              key={`${sphere.type}-${sphere.id}`}
+              label={
+                sphere.type === "hoplosphere" && sphere.coagCount > 1
+                  ? `${sphere.name} (Coag ×${sphere.coagCount})`
+                  : sphere.name
+              }
+              size="small"
+              color={sphere.type === "mnemosphere" ? "primary" : "default"}
+              variant={sphere.type === "mnemosphere" ? "filled" : "outlined"}
+            />
+          ))}
+        </Box>
+        {uniqueSpheres.map((sphere) => (
+          <Box key={`${sphere.type}-detail-${sphere.id}`}>
+            <Typography component="span" sx={{ fontWeight: 700 }}>
+              {sphere.name}
+            </Typography>
+            {sphere.description && (
+              <Typography component="span"> - {sphere.description}</Typography>
+            )}
+            {sphere.coagEffects &&
+              Object.entries(sphere.coagEffects)
+                .sort(([a], [b]) => Number(a) - Number(b))
+                .filter(([threshold]) => sphere.coagCount >= Number(threshold))
+                .map(([threshold, effect]) => (
+                  <Typography
+                    key={threshold}
+                    component="div"
+                    sx={{ pl: 1.5, color: "text.secondary" }}
+                  >
+                    Coag ×{threshold}: {effect}
+                  </Typography>
+                ))}
+          </Box>
+        ))}
+      </Typography>
+    </Box>
   );
 }
 
@@ -870,6 +927,7 @@ export const SharedCustomWeaponCard = React.memo(
     defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
     activeForm = null,
     cardRef = null,
+    sphereData = null,
   }) {
     const {
       t,
@@ -893,12 +951,20 @@ export const SharedCustomWeaponCard = React.memo(
       : { name: 4, cost: 2, accuracy: 3, damage: 3, hands: 3, range: 3 };
 
     const hasStoredSecondForm =
-      (item.secondWeaponName != null && item.secondWeaponName !== "") ||
-      (Array.isArray(item.secondCurrentCustomizations) &&
-        item.secondCurrentCustomizations.length > 0);
+      item.secondWeaponName != null || item.secondCurrentCustomizations != null;
     const secondItem = hasStoredSecondForm ? buildSecondWeaponItem(item) : null;
 
-    const rowProps = { customTheme, scale, background, imageMode, cols, t };
+    const rowProps = {
+      customTheme,
+      scale,
+      background,
+      imageMode,
+      imageSize,
+      imageVisible,
+      imageSlot,
+      cols,
+      t,
+    };
 
     return (
       <CardContentWrapper
@@ -919,28 +985,38 @@ export const SharedCustomWeaponCard = React.memo(
             onClick={onHeaderClick}
             sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
           >
-            <Grid size={cols.name}>
-              <Typography>{t("Custom Weapon")}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-            <Grid size={cols.accuracy}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Accuracy")}
-              </Typography>
-            </Grid>
-            <Grid size={cols.damage}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Damage")}
-              </Typography>
+            <HeaderSpacer
+              imageMode={imageMode}
+              imageSize={imageSize}
+              imageVisible={imageVisible}
+            />
+            <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+              <Grid size={cols.name}>
+                <Typography>{t("Custom Weapon")}</Typography>
+              </Grid>
+              <Grid size={cols.cost}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Cost")}
+                </Typography>
+              </Grid>
+              <Grid size={cols.accuracy}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Accuracy")}
+                </Typography>
+              </Grid>
+              <Grid size={cols.damage}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Damage")}
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
         )}
+
         {secondItem && (
           <Box
             sx={{
-              px: 2,
+              px: 1,
               pt: 0.5,
               pb: 0.25,
               background: customTheme.secondary + "33",
@@ -960,23 +1036,29 @@ export const SharedCustomWeaponCard = React.memo(
           </Box>
         )}
         <Box sx={{ opacity: activeForm === "secondary" ? 0.5 : 1 }}>
-          <CustomWeaponFormRows
-            item={item}
-            rowProps={rowProps}
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-            imageSlot={imageSlot}
-            customTheme={customTheme}
-            t={t}
-          />
+          <CustomWeaponRows item={item} {...rowProps} />
+          {sphereData ? (
+            <SphereDataRow
+              sphereData={sphereData}
+              customTheme={customTheme}
+              imageMode={imageMode}
+              t={t}
+            />
+          ) : (
+            <CustomizationsAndQualityRow
+              item={item}
+              customTheme={customTheme}
+              imageMode={imageMode}
+              t={t}
+            />
+          )}
         </Box>
 
         {secondItem && (
           <>
             <Box
               sx={{
-                px: 2,
+                px: 1,
                 pt: 0.5,
                 pb: 0.25,
                 background: customTheme.secondary + "33",
@@ -996,14 +1078,11 @@ export const SharedCustomWeaponCard = React.memo(
               </Typography>
             </Box>
             <Box sx={{ opacity: activeForm === "primary" ? 0.5 : 1 }}>
-              <CustomWeaponFormRows
+              <CustomWeaponRows item={secondItem} {...rowProps} />
+              <CustomizationsAndQualityRow
                 item={secondItem}
-                rowProps={rowProps}
-                imageMode={imageMode}
-                imageSize={imageSize}
-                imageVisible={imageVisible}
-                imageSlot={imageSlot}
                 customTheme={customTheme}
+                imageMode={imageMode}
                 t={t}
               />
             </Box>
@@ -1063,25 +1142,29 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      <RowsWithOptionalImage
-        header={
-          showHeader && (
-            <Grid
-              container
-              onClick={onHeaderClick}
-              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-            >
-              <Grid size={cols.name}>
-                <Typography>{t("Accessory")}</Typography>
-              </Grid>
-              <Grid size={cols.cost}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Cost")}
-                </Typography>
-              </Grid>
+      {showHeader && (
+        <Grid
+          container
+          onClick={onHeaderClick}
+          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+        >
+          <HeaderSpacer
+            imageMode={imageMode}
+            imageSize={imageSize}
+            imageVisible={imageVisible}
+          />
+          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+            <Grid size={cols.name}>
+              <Typography>{t("Accessory")}</Typography>
             </Grid>
-          )
-        }
+            <Grid size={cols.cost}>
+              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+      )}
+
+      <RowsWithOptionalImage
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -1126,6 +1209,356 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
           imageMode={imageMode}
         />
       </RowsWithOptionalImage>
+    </CardContentWrapper>
+  );
+});
+
+export const SharedMnemosphereCard = React.memo(function SharedMnemosphereCard({
+  item,
+  id = CARD_DEFAULTS.id,
+  onHeaderClick = CARD_DEFAULTS.onHeaderClick,
+  showCard = CARD_DEFAULTS.showCard,
+  variant = CARD_DEFAULTS.variant,
+  actionContent = CARD_DEFAULTS.actionContent,
+}) {
+  const { t, customTheme, scale } = useCardSetup({ variant });
+  const cost = getMnemosphereCost(item.lvl ?? 1);
+  const skills = item.skills ?? [];
+  const heroic = item.heroic ?? [];
+  const spells = item.spells ?? [];
+
+  return (
+    <CardContentWrapper
+      showCard={showCard}
+      id={id}
+      actionContent={actionContent}
+    >
+      <RowsWithOptionalImage
+        header={
+          <Box
+            onClick={onHeaderClick}
+            sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+          >
+            <Typography>{item.name || `${item.class} Mnemosphere`}</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+              <Chip
+                label={t(item.class)}
+                size="small"
+                sx={{
+                  textTransform: "capitalize",
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  color: "#ffffff",
+                  fontWeight: "bold",
+                  fontSize: "0.7rem",
+                  flexShrink: 0,
+                }}
+              />
+              <Chip
+                label={`Lv. ${item.lvl ?? 1}`}
+                size="small"
+                sx={{
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  color: "#ffffff",
+                  fontWeight: "bold",
+                  fontSize: "0.7rem",
+                  flexShrink: 0,
+                }}
+              />
+              <Chip
+                label={`${cost}z`}
+                size="small"
+                sx={{
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                  color: "#ffffff",
+                  fontSize: "0.7rem",
+                  flexShrink: 0,
+                }}
+              />
+            </Box>
+          </Box>
+        }
+        customTheme={customTheme}
+      >
+        <Divider />
+
+        {skills.map((sk, i) => (
+          <Box
+            key={i}
+            sx={{
+              borderBottom:
+                i < skills.length - 1 || heroic.length > 0 || spells.length > 0
+                  ? `1px solid ${customTheme.secondary}`
+                  : undefined,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                px: 2,
+                pt: 0.75,
+                pb: 0.25,
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                {t(sk.name)}
+              </Typography>
+              <Chip
+                label={`Max ${sk.maxLvl}`}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: "0.65rem", height: 18, flexShrink: 0 }}
+              />
+            </Box>
+            {sk.description && (
+              <Box sx={{ px: 2, pb: 0.75 }}>
+                <Typography
+                  variant="body2"
+                  component="div"
+                  sx={{ color: "text.secondary" }}
+                >
+                  <StyledMarkdown
+                    allowedElements={["strong", "em"]}
+                    unwrapDisallowed
+                  >
+                    {t(sk.description)}
+                  </StyledMarkdown>
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        ))}
+
+        {heroic.length > 0 && (
+          <>
+            <Box
+              sx={{
+                borderTop: `1px solid ${customTheme.secondary}`,
+                px: 2,
+                pt: 0.75,
+                pb: 0.25,
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "0.7rem",
+                  letterSpacing: "0.05em",
+                  color: "text.secondary",
+                }}
+              >
+                {t("Heroic Skills")}
+              </Typography>
+            </Box>
+            {heroic.map((h, i) => (
+              <Box key={i} sx={nameRowSx(customTheme)}>
+                <Box>
+                  <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+                    {t(h.name)}
+                  </Typography>
+                  {h.description && (
+                    <Typography
+                      variant="body2"
+                      component="div"
+                      sx={{ color: "text.secondary" }}
+                    >
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed
+                      >
+                        {t(h.description)}
+                      </StyledMarkdown>
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            ))}
+          </>
+        )}
+
+        {spells.length > 0 && (
+          <>
+            <Box
+              sx={{
+                borderTop: `1px solid ${customTheme.secondary}`,
+                px: 2,
+                pt: 0.75,
+                pb: 0.25,
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "0.7rem",
+                  letterSpacing: "0.05em",
+                  color: "text.secondary",
+                }}
+              >
+                {t("Spells")}
+              </Typography>
+            </Box>
+            {spells.map((sp, i) => (
+              <Box
+                key={i}
+                sx={{
+                  borderTop: `1px solid ${customTheme.secondary}`,
+                  px: 2,
+                  py: 0.75,
+                }}
+              >
+                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                  {t(sp.name)}
+                </Typography>
+                {sp.description && (
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{ color: "text.secondary" }}
+                  >
+                    <StyledMarkdown
+                      allowedElements={["strong", "em"]}
+                      unwrapDisallowed
+                    >
+                      {t(sp.description)}
+                    </StyledMarkdown>
+                  </Typography>
+                )}
+              </Box>
+            ))}
+          </>
+        )}
+      </RowsWithOptionalImage>
+    </CardContentWrapper>
+  );
+});
+
+export const SharedHoplosphereCard = React.memo(function SharedHoplosphereCard({
+  item,
+  coagCount = 1,
+  id = CARD_DEFAULTS.id,
+  onHeaderClick = CARD_DEFAULTS.onHeaderClick,
+  showCard = CARD_DEFAULTS.showCard,
+  variant = CARD_DEFAULTS.variant,
+  actionContent = CARD_DEFAULTS.actionContent,
+}) {
+  const { t, customTheme, scale } = useCardSetup({ variant });
+
+  return (
+    <CardContentWrapper
+      showCard={showCard}
+      id={id}
+      actionContent={actionContent}
+    >
+      <Box
+        onClick={onHeaderClick}
+        sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+      >
+        <Typography>{item.name}</Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+          <Chip
+            label={`${item.requiredSlots} slot${item.requiredSlots > 1 ? "s" : ""}`}
+            size="small"
+            sx={{
+              backgroundColor: "rgba(255,255,255,0.2)",
+              color: "#ffffff",
+              fontWeight: "bold",
+              fontSize: "0.7rem",
+            }}
+          />
+          {item.socketable === "weapon" && (
+            <Chip
+              label={t("Weapon only")}
+              size="small"
+              sx={{
+                backgroundColor: "rgba(255,165,0,0.35)",
+                color: "#ffffff",
+                fontWeight: "bold",
+                fontSize: "0.65rem",
+              }}
+            />
+          )}
+          {coagCount > 1 && (
+            <Chip
+              label={`Coag ×${coagCount}`}
+              size="small"
+              sx={{
+                backgroundColor: "rgba(255,255,255,0.15)",
+                color: "#ffffff",
+                fontSize: "0.65rem",
+              }}
+            />
+          )}
+          <Chip
+            label={`${item.cost}z`}
+            size="small"
+            sx={{
+              backgroundColor: "rgba(255,255,255,0.15)",
+              color: "#ffffff",
+              fontSize: "0.7rem",
+            }}
+          />
+        </Box>
+      </Box>
+
+      {item.description && (
+        <Box sx={nameRowSx(customTheme)}>
+          <Typography variant="body2">{item.description}</Typography>
+        </Box>
+      )}
+
+      {item.coagEffects && Object.keys(item.coagEffects).length > 0 && (
+        <Box
+          sx={{
+            px: 2,
+            py: 0.75,
+            borderTop: `1px solid ${customTheme.secondary}`,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: "bold",
+              textTransform: "uppercase",
+              fontSize: "0.7rem",
+              letterSpacing: "0.05em",
+              color: "text.secondary",
+              mb: 0.5,
+            }}
+          >
+            {t("Coagulation")}
+          </Typography>
+          {Object.entries(item.coagEffects)
+            .sort(([a], [b]) => Number(a) - Number(b))
+            .map(([threshold, effect]) => {
+              const active = coagCount >= Number(threshold);
+              return (
+                <Box
+                  key={threshold}
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    alignItems: "baseline",
+                    opacity: active ? 1 : 0.4,
+                    py: 0.25,
+                  }}
+                >
+                  <Chip
+                    label={`×${threshold}`}
+                    size="small"
+                    variant={active ? "filled" : "outlined"}
+                    sx={{ fontSize: "0.6rem", height: 16, flexShrink: 0 }}
+                  />
+                  <Typography variant="body2">{effect}</Typography>
+                </Box>
+              );
+            })}
+        </Box>
+      )}
     </CardContentWrapper>
   );
 });
