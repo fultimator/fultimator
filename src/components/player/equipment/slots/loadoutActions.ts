@@ -71,31 +71,28 @@ function checkMnemosphereConflict(
   slot: string,
   candidate: PickerCandidate,
 ): string[] {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isTechnospheres =
-    (player.settings as any)?.optionalRules?.technospheres ?? false;
+    player.settings?.optionalRules?.technospheres ?? false;
   if (!isTechnospheres) return [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const item = candidate.item as any;
-  if (!item?.slotted?.length) return [];
+  if (!("slotted" in candidate.item) || !candidate.item.slotted?.length)
+    return [];
 
   const eq0 = player.equipment?.[0];
   const existing = getMnemosphereSkillKeys(player, slot);
   const conflicts: string[] = [];
 
-  for (const id of item.slotted ?? []) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mnemo = (eq0?.mnemospheres ?? []).find((m: any) => m.id === id);
+  for (const id of candidate.item.slotted) {
+    const mnemo = (eq0?.mnemospheres ?? []).find(
+      (m: Mnemosphere) => m.id === id,
+    );
     if (!mnemo) continue;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    for (const skill of (mnemo as any).skills ?? []) {
+    for (const skill of mnemo.skills) {
       if (skill.specialSkill && existing.has(skill.specialSkill)) {
         conflicts.push(skill.name);
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    for (const heroic of (mnemo as any).heroic ?? []) {
+    for (const heroic of mnemo.heroic) {
       if (heroic.specialSkill && existing.has(heroic.specialSkill)) {
         conflicts.push(heroic.name);
       }
@@ -296,8 +293,7 @@ export function equipItemToSlot(
     },
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings = (updated as any).settings ?? {};
+  const settings = updated.settings ?? {};
   if (settings.autoEquipUnarmed && isHandSlot && !isTwoHand) {
     const unarmed = resolveUnarmedRef(
       updated,
@@ -334,8 +330,7 @@ export function clearSlotAction(player: TypePlayer, slot: string): TypePlayer {
 
   updated = syncSlots(updated);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings = (updated as any).settings ?? {};
+  const settings = updated.settings ?? {};
   if (
     settings.autoEquipUnarmed &&
     (slot === "mainHand" || slot === "offHand")
