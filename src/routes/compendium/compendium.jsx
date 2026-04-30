@@ -91,7 +91,6 @@ import {
   SharedSpecialRuleCard,
   SharedActionCard,
   SharedClassCard,
-  SharedSkillCard,
   SharedHeroicCard,
   SharedOptionalCard,
   SharedWeaponCard,
@@ -122,6 +121,11 @@ import {
   makeId,
   getNonStaticSpellItems,
 } from "../../libs/compendium";
+
+const INVOKER_WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
+const normalizeWellspring = (value = "") => String(value).trim().toLowerCase();
+const getItemWellspring = (item) =>
+  item?.wellspring ?? item?.Wellspring ?? item?.category ?? "";
 
 // ---------------------------------------------------------------------------
 // Sidebar table columns per type
@@ -239,6 +243,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onModuleTypeChange,
   selectedMagichantSubtype = "",
   onMagichantSubtypeChange,
+  selectedWellspring = "",
+  onWellspringChange,
   selectedQualityFilters,
   onQualityFiltersChange,
   selectedQualityCategories,
@@ -268,6 +274,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   const activeTypes = restrictToTypes?.length
     ? baseTypes.filter((x) => restrictToTypes.includes(x.key))
     : baseTypes;
+  const selectedSpellClassKey = String(selectedSpellClass).trim().toLowerCase();
+  const isPilotSelected = selectedSpellClassKey === "pilot";
+  const isChanterSelected = selectedSpellClassKey === "chanter";
+  const isInvokerSelected = selectedSpellClassKey === "invoker";
 
   return (
     <Box
@@ -478,7 +488,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         )}
 
         {selectedType === "player-spells" &&
-          String(selectedSpellClass).toLowerCase() === "pilot" &&
+          isPilotSelected &&
           typeof onModuleTypeChange === "function" && (
             <FormControl fullWidth size="small">
               <InputLabel>{t("Module Type")}</InputLabel>
@@ -497,7 +507,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           )}
 
         {selectedType === "player-spells" &&
-          String(selectedSpellClass).toLowerCase() === "chanter" &&
+          isChanterSelected &&
           typeof onMagichantSubtypeChange === "function" && (
             <FormControl fullWidth size="small">
               <InputLabel>{t("Chant Type")}</InputLabel>
@@ -512,6 +522,24 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               </Select>
             </FormControl>
           )}
+
+        {selectedType === "player-spells" && isInvokerSelected && (
+          <FormControl fullWidth size="small">
+            <InputLabel>{t("Wellspring")}</InputLabel>
+            <Select
+              value={selectedWellspring}
+              onChange={(e) => onWellspringChange?.(e.target.value)}
+              label={t("Wellspring")}
+            >
+              <MenuItem value="">{t("All")}</MenuItem>
+              {INVOKER_WELLSPRINGS.map((wellspring) => (
+                <MenuItem key={wellspring} value={wellspring}>
+                  {t(wellspring)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
         {(selectedType === "classes" || selectedType === "heroics") && (
           <Autocomplete
@@ -1064,6 +1092,7 @@ function CompendiumViewer() {
   const selectedSpellClass = searchParams.get("class") ?? "";
   const selectedModuleType = searchParams.get("moduleType") ?? "";
   const rawMagichantSubtype = searchParams.get("magichantSubtype") ?? "";
+  const selectedWellspring = searchParams.get("wellspring") ?? "";
   const selectedMagichantSubtype =
     rawMagichantSubtype === "key" || rawMagichantSubtype === "tone"
       ? rawMagichantSubtype
@@ -1072,6 +1101,8 @@ function CompendiumViewer() {
     String(selectedSpellClass).toLowerCase() === "pilot";
   const isChanterClassSelected =
     String(selectedSpellClass).toLowerCase() === "chanter";
+  const isInvokerClassSelected =
+    String(selectedSpellClass).toLowerCase() === "invoker";
   const selectedBook = useMemo(() => {
     const books = searchParams.get("book");
     return books ? books.split(",") : [];
@@ -1164,6 +1195,12 @@ function CompendiumViewer() {
           value.includes(`${filter} module`),
       );
     });
+  }, []);
+
+  const matchesInvokerWellspring = useCallback((item, wellspring) => {
+    const filter = normalizeWellspring(wellspring);
+    if (!filter) return true;
+    return normalizeWellspring(getItemWellspring(item)) === filter;
   }, []);
 
   // Lock page scroll while this route is mounted
@@ -1273,6 +1310,15 @@ function CompendiumViewer() {
           return selectedMagichantSubtype === "key" ? isKey : !isKey;
         });
       }
+      if (
+        selectedType === "player-spells" &&
+        isInvokerClassSelected &&
+        selectedWellspring
+      ) {
+        items = items.filter((item) =>
+          matchesInvokerWellspring(item, selectedWellspring),
+        );
+      }
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -1378,6 +1424,11 @@ function CompendiumViewer() {
         return selectedMagichantSubtype === "key" ? isKey : !isKey;
       });
     }
+    if (isInvokerClassSelected && selectedWellspring) {
+      items = items.filter((item) =>
+        matchesInvokerWellspring(item, selectedWellspring),
+      );
+    }
 
     if (!searchQuery.trim()) return items;
     const q = searchQuery.toLowerCase();
@@ -1401,8 +1452,11 @@ function CompendiumViewer() {
     selectedOptionalSubtypes,
     isPilotClassSelected,
     isChanterClassSelected,
+    isInvokerClassSelected,
     selectedModuleType,
     selectedMagichantSubtype,
+    selectedWellspring,
+    matchesInvokerWellspring,
     matchesPilotModuleType,
   ]);
 
@@ -1480,6 +1534,9 @@ function CompendiumViewer() {
       if (String(cls).toLowerCase() === "chanter" && selectedMagichantSubtype) {
         newParams.magichantSubtype = selectedMagichantSubtype;
       }
+      if (String(cls).toLowerCase() === "invoker" && selectedWellspring) {
+        newParams.wellspring = selectedWellspring;
+      }
       setSearchParams(newParams);
       if (mainRef.current) mainRef.current.scrollTop = 0;
     },
@@ -1489,6 +1546,7 @@ function CompendiumViewer() {
       setSearchParams,
       selectedModuleType,
       selectedMagichantSubtype,
+      selectedWellspring,
     ],
   );
 
@@ -1541,6 +1599,26 @@ function CompendiumViewer() {
       selectedModuleType,
       setSearchParams,
     ],
+  );
+
+  const handleWellspringChange = useCallback(
+    (wellspring) => {
+      setSearchQuery("");
+      setSelectedIdx(null);
+      const base =
+        selectedCompendium !== "official"
+          ? { compendium: selectedCompendium }
+          : {};
+      const newParams = {
+        ...base,
+        type: selectedType,
+        ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+        ...(wellspring ? { wellspring } : {}),
+      };
+      setSearchParams(newParams);
+      if (mainRef.current) mainRef.current.scrollTop = 0;
+    },
+    [selectedCompendium, selectedSpellClass, selectedType, setSearchParams],
   );
 
   const handleBookChange = useCallback(
@@ -1693,6 +1771,7 @@ function CompendiumViewer() {
         ...(selectedMagichantSubtype
           ? { magichantSubtype: selectedMagichantSubtype }
           : {}),
+        ...(selectedWellspring ? { wellspring: selectedWellspring } : {}),
         ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
         ...(selectedQualityFilters.length > 0
           ? { qualityFilters: selectedQualityFilters.join(",") }
@@ -1732,6 +1811,7 @@ function CompendiumViewer() {
       selectedCompendium,
       selectedModuleType,
       selectedMagichantSubtype,
+      selectedWellspring,
       selectedBook,
       selectedQualityFilters,
       selectedQualityCategories,
@@ -1767,6 +1847,7 @@ function CompendiumViewer() {
           ...(selectedMagichantSubtype
             ? { magichantSubtype: selectedMagichantSubtype }
             : {}),
+          ...(selectedWellspring ? { wellspring: selectedWellspring } : {}),
           ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
           ...(selectedQualityFilters.length > 0
             ? { qualityFilters: selectedQualityFilters.join(",") }
@@ -1788,6 +1869,8 @@ function CompendiumViewer() {
       onModuleTypeChange={handleModuleTypeChange}
       selectedMagichantSubtype={selectedMagichantSubtype}
       onMagichantSubtypeChange={handleMagichantSubtypeChange}
+      selectedWellspring={selectedWellspring}
+      onWellspringChange={handleWellspringChange}
       selectedQualityFilters={selectedQualityFilters}
       onQualityFiltersChange={handleQualityFiltersChange}
       selectedQualityCategories={selectedQualityCategories}

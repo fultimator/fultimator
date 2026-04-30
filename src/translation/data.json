@@ -17470,7 +17470,7 @@
   },
   {
     "key": "Cataclysm_desc",
-    "en": "When you cast a spell with a **duration** of “Instantaneous”, if you have an **arcane** weapon equipped, you may **increase the spell’s total MP cost** by up to (SL × 10) Mind Points.\nIf you do so, the spell deals 5 extra damage for every 10 Mind Points by which you increased its cost this way.",
+    "en": "When you cast a spell with a **duration** of “Instantaneous”, if you have an **arcane** weapon equipped, you may **increase the spell’s total MP cost** by up to 【**SL × 10**】 Mind Points.\nIf you do so, the spell deals 5 extra damage for every 10 Mind Points by which you increased its cost this way.",
     "it": "Quando lanci un incantesimo con **durata** “Istantanea”, se hai un’arma **arcana** equipaggiata, puoi **incrementare il costo totale in PM di quell’incantesimo di un ammontare pari o inferiore a** 【**LA × 10**】 Punti Mente. Se lo fai e l’incantesimo infligge danni a una o più creature, l’incantesimo infligge 5 danni extra a ciascuna di esse per ogni 10 Punti Mente di cui ne hai incrementato il costo.",
     "de": "When you cast a spell with a **duration** of “Instantaneous”, if you have an **arcane** weapon equipped, you may **increase the spell’s total MP cost** by up to (SL × 10) Mind Points.\nIf you do so, the spell deals 5 extra damage for every 10 Mind Points by which you increased its cost this way.",
     "pl": "When you cast a spell with a **duration** of “Instantaneous”, if you have an **arcane** weapon equipped, you may **increase the spell’s total MP cost** by up to (SL × 10) Mind Points.\nIf you do so, the spell deals 5 extra damage for every 10 Mind Points by which you increased its cost this way.",
@@ -21045,14 +21045,14 @@
   },
   {
     "key": "IveHeardOfIt_desc",
-    "en": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】v to the Result of that Check.",
+    "en": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】** to the Result of that Check.",
     "it": "Dopo che tu o un alleato in grado di sentirti e comprenderti effettuate un Test per esaminare una creatura, un luogo o un oggetto, puoi spendere 1 Punto Commercio per conferire un bonus pari a **【 LA × 2】** al Risultato di quel Test.",
-    "de": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】v to the Result of that Check.",
-    "pl": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】v to the Result of that Check.",
-    "fr": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to【 SL × 2】 to the Result of that Check.",
-    "es": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】v to the Result of that Check.",
+    "de": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】** to the Result of that Check.",
+    "pl": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】** to the Result of that Check.",
+    "fr": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】** to the Result of that Check.",
+    "es": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】** to the Result of that Check.",
     "pt-BR": "Quando você ou um aliado que possa ouvi-lo e compreendê-lo realizar um Teste para examinar uma criatura, item ou local, você pode gastar 1 Ponto de Comércio para conceder um bônus igual a 【NP × 2】 ao Resultado desse Teste.",
-    "zh": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】v to the Result of that Check."
+    "zh": "When you or an ally who is able to hear and understand you perform a Check to examine a creature, item, or location, you may spend 1 Trade Point to grant a bonus equal to **【 SL × 2】** to the Result of that Check."
   },
   {
     "key": "PrivateStock",
@@ -22772,14 +22772,14 @@
   },
   {
     "key": "pilot_module_claw_desc",
-    "en": "This weapon can be used to interact with\nthe scene as if it were a free hand.",
-    "it": "This weapon can be used to interact with\nthe scene as if it were a free hand.",
-    "de": "This weapon can be used to interact with\nthe scene as if it were a free hand.",
-    "pl": "This weapon can be used to interact with\nthe scene as if it were a free hand.",
-    "fr": "This weapon can be used to interact with\nthe scene as if it were a free hand.",
-    "es": "This weapon can be used to interact with\nthe scene as if it were a free hand.",
+    "en": "This weapon can be used to interact with the scene as if it were a free hand.",
+    "it": "This weapon can be used to interact with the scene as if it were a free hand.",
+    "de": "This weapon can be used to interact with the scene as if it were a free hand.",
+    "pl": "This weapon can be used to interact with the scene as if it were a free hand.",
+    "fr": "This weapon can be used to interact with the scene as if it were a free hand.",
+    "es": "This weapon can be used to interact with the scene as if it were a free hand.",
     "pt-BR": "Esta arma pode ser usada para interagir com a cena como se fosse uma mão livre.",
-    "zh": "This weapon can be used to interact with\nthe scene as if it were a free hand."
+    "zh": "This weapon can be used to interact with the scene as if it were a free hand."
   },
   {
     "key": "pilot_module_claymore",
@@ -23827,7 +23827,7 @@
     "zh": "At the end of your turn, choose an enemy you can see. The Game Master reveals its **Level**, **Rank**, **Species**, **maximum Hit Points**, **maximum Mind Points**, **Traits**, **Attributes**, **Defense**, and **Magic Defense**."
   },
   {
-    "key": "magiseed_hermit_iris_effect_ 2",
+    "key": "magiseed_hermit_iris_effect_2",
     "en": "At the end of your turn, choose an enemy you can see. The Game Master reveals its **Level**, **Rank**, **Species**, **maximum Hit Points**, **maximum Mind Points**, **Traits**, **Attributes**, **Defense**, **Magic Defense**, and **Affinities**.",
     "it": "At the end of your turn, choose an enemy you can see. The Game Master reveals its **Level**, **Rank**, **Species**, **maximum Hit Points**, **maximum Mind Points**, **Traits**, **Attributes**, **Defense**, **Magic Defense**, and **Affinities**.",
     "de": "At the end of your turn, choose an enemy you can see. The Game Master reveals its **Level**, **Rank**, **Species**, **maximum Hit Points**, **maximum Mind Points**, **Traits**, **Attributes**, **Defense**, **Magic Defense**, and **Affinities**.",
@@ -24312,23 +24312,23 @@
   },
   {
     "key": "magiseed_remedy_lily_effect_2",
-    "en": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "it": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "de": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "pl": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "fr": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "es": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
+    "en": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "it": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "de": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "pl": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "fr": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "es": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
     "pt-BR": "No final do seu turno, você e cada aliado que puder ver recuperam uma quantidade de Pontos de Vida igual a 【15 + seu Nível de Habilidade em Cloromancia】.",
     "zh": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **."
   },
   {
     "key": "magiseed_remedy_lily_effect_3",
-    "en": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "it": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "de": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "pl": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "fr": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
-    "es": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **.",
+    "en": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "it": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "de": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "pl": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "fr": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
+    "es": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】**.",
     "pt-BR": "No final do seu turno, você e cada aliado que puder ver recuperam uma quantidade de Pontos de Vida igual a 【15 + seu Nível de Habilidade em Cloromancia】.",
     "zh": "At the end of your turn, you and every ally you can see recover an amount of Hit Points equal to **【15 + your Skill Level in Chloromancy】 **."
   },
@@ -24378,14 +24378,14 @@
   },
   {
     "key": "magiseed_serrated_rose_effect_3",
-    "en": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】v to each enemy you can see who is suffering from **slow**.",
-    "it": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】v to each enemy you can see who is suffering from **slow**.",
-    "de": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】v to each enemy you can see who is suffering from **slow**.",
-    "pl": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】v to each enemy you can see who is suffering from **slow**.",
-    "fr": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】v to each enemy you can see who is suffering from **slow**.",
-    "es": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】v to each enemy you can see who is suffering from **slow**.",
+    "en": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】** to each enemy you can see who is suffering from **slow**.",
+    "it": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】** to each enemy you can see who is suffering from **slow**.",
+    "de": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】** to each enemy you can see who is suffering from **slow**.",
+    "pl": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】** to each enemy you can see who is suffering from **slow**.",
+    "fr": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】** to each enemy you can see who is suffering from **slow**.",
+    "es": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】** to each enemy you can see who is suffering from **slow**.",
     "pt-BR": "No final do seu turno, você causa uma quantidade de dano físico igual a 【15 + seu Nível de Habilidade em Cloromancia】 a cada inimigo que puder ver que esteja sofrendo de lento.",
-    "zh": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】v to each enemy you can see who is suffering from **slow**."
+    "zh": "At the end of your turn, you deal an amount of **physical** damage equal to **【15 + your Skill Level in Chloromancy】** to each enemy you can see who is suffering from **slow**."
   },
   {
     "key": "magiseed_silver_strelitzia",
@@ -24664,36 +24664,36 @@
   },
   {
     "key": "magiseed_wrathful_carnation_effect_2",
-    "en": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "it": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "de": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "pl": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "fr": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "es": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
+    "en": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "it": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "de": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "pl": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "fr": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "es": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
     "pt-BR": "Quando este magigrão deixar seu jardim, escolha até um inimigo que puder ver. Até o final do seu próximo turno, quando o inimigo escolhido realizar um ataque ou conjurar um feitiço ofensivo (⚡), ele deve incluir você entre os alvos desse ataque ou feitiço (se possível). No final do seu turno, você pode remover este magigrão do seu jardim; se o fizer, apague todas as seções do seu Relógio de Crescimento.",
-    "zh": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock."
+    "zh": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock."
   },
   {
     "key": "magiseed_wrathful_carnation_effect_3",
-    "en": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "it": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "de": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "pl": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "fr": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "es": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
+    "en": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "it": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "de": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "pl": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "fr": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "es": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
     "pt-BR": "Quando este magigrão deixar seu jardim, escolha até um inimigo que puder ver. Até o final do seu próximo turno, quando o inimigo escolhido realizar um ataque ou conjurar um feitiço ofensivo (⚡), ele deve incluir você entre os alvos desse ataque ou feitiço (se possível). No final do seu turno, você pode remover este magigrão do seu jardim; se o fizer, apague todas as seções do seu Relógio de Crescimento.",
-    "zh": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock."
+    "zh": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock."
   },
   {
     "key": "magiseed_wrathful_carnation_effect_4",
-    "en": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "it": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "de": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "pl": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "fr": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
-    "es": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock.",
+    "en": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "it": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "de": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "pl": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "fr": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
+    "es": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock.",
     "pt-BR": "Quando este magigrão deixar seu jardim, escolha até um inimigo que puder ver. Até o final do seu próximo turno, quando o inimigo escolhido realizar um ataque ou conjurar um feitiço ofensivo (⚡), ele deve incluir você entre os alvos desse ataque ou feitiço (se possível). No final do seu turno, você pode remover este magigrão do seu jardim; se o fizer, apague todas as seções do seu Relógio de Crescimento.",
-    "zh": "When this magiseed leaves your garden, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this magiseed from your garden; if you do, erase all sections of your Growth Clock."
+    "zh": "When this **magiseed** leaves your **garden**, choose up to one enemy you can see. Until the end of your next turn, when the chosen enemy performs an attack or casts an offensive spell (⚡), they must include you among the targets of that attack of spell (if able). At the end of your turn, you may remove this **magiseed** from your **garden**; if you do, erase **all** sections of your Growth Clock."
   },
   {
     "key": "magiseed_custom",
@@ -27106,25 +27106,25 @@
   },
   {
     "key": "ace_jackpot_desc",
-    "en": "( 4 cards of the same value, none of which is a joker): Any Player Character who has surrendered but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their Surrender); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
-    "it": "",
-    "de": "( 4 cards of the same value, none of which is a joker): Any Player Character who has surrendered but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their Surrender); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
-    "pl": "( 4 cards of the same value, none of which is a joker): Any Player Character who has surrendered but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their Surrender); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
-    "fr": "",
-    "es": "( 4 cards of the same value, none of which is a joker): Any Player Character who has surrendered but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their Surrender); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
+    "en": "(**4 cards** of the **same value**, **none** of which is a **joker**): Any Player Character who has **surrendered** but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their **Surrender**); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
+    "it": "(**4 cards** of the **same value**, **none** of which is a **joker**): Any Player Character who has **surrendered** but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their **Surrender**); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
+    "de": "(**4 cards** of the **same value**, **none** of which is a **joker**): Any Player Character who has **surrendered** but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their **Surrender**); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
+    "pl": "(**4 cards** of the **same value**, **none** of which is a **joker**): Any Player Character who has **surrendered** but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their **Surrender**); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
+    "fr": "(**4 cards** of the **same value**, **none** of which is a **joker**): Any Player Character who has **surrendered** but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their **Surrender**); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
+    "es": "(**4 cards** of the **same value**, **none** of which is a **joker**): Any Player Character who has **surrendered** but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their **Surrender**); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points.",
     "pt-BR": "(4 cartas do mesmo valor, nenhuma delas sendo um curinga): Você e cada aliado presente na cena recuperam 777 Pontos de Vida e 777 Pontos de Mente; quaisquer Personagens Jogadores que tenham se rendido mas ainda façam parte da cena recuperam imediatamente a consciência (isso não cancela os efeitos de sua Rendição).",
-    "zh": "( 4 cards of the same value, none of which is a joker): Any Player Character who has surrendered but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their Surrender); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points."
+    "zh": "(**4 cards** of the **same value**, **none** of which is a **joker**): Any Player Character who has **surrendered** but is still  narratively present on the scene regains consciousness (this does not cancel the effects of their **Surrender**); then, you and every ally you can see recover 777 Hit Points and 777 Mind Points."
   },
   {
     "key": "ace_jackpot_enriched",
-    "en": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have surrendered but are still part of the scene immediately regain consciousness (this does not cancel the effects of their Surrender).",
-    "it": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have surrendered but are still part of the scene immediately regain consciousness (this does not cancel the effects of their Surrender).",
-    "de": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have surrendered but are still part of the scene immediately regain consciousness (this does not cancel the effects of their Surrender).",
-    "pl": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have surrendered but are still part of the scene immediately regain consciousness (this does not cancel the effects of their Surrender).",
-    "fr": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have surrendered but are still part of the scene immediately regain consciousness (this does not cancel the effects of their Surrender).",
-    "es": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have surrendered but are still part of the scene immediately regain consciousness (this does not cancel the effects of their Surrender).",
+    "en": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have **surrendered** but are still part of the scene immediately regain consciousness (this does not cancel the effects of their **Surrender**).",
+    "it": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have **surrendered** but are still part of the scene immediately regain consciousness (this does not cancel the effects of their **Surrender**).",
+    "de": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have **surrendered** but are still part of the scene immediately regain consciousness (this does not cancel the effects of their **Surrender**).",
+    "pl": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have **surrendered** but are still part of the scene immediately regain consciousness (this does not cancel the effects of their **Surrender**).",
+    "fr": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have **surrendered** but are still part of the scene immediately regain consciousness (this does not cancel the effects of their **Surrender**).",
+    "es": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have **surrendered** but are still part of the scene immediately regain consciousness (this does not cancel the effects of their **Surrender**).",
     "pt-BR": "Você e cada aliado presente na cena recuperam 777 Pontos de Vida e 777 Pontos de Mente; quaisquer Personagens Jogadores que tenham se rendido mas ainda façam parte da cena recuperam imediatamente a consciência (isso não cancela os efeitos de sua Rendição).",
-    "zh": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have surrendered but are still part of the scene immediately regain consciousness (this does not cancel the effects of their Surrender)."
+    "zh": "You and every ally present on the scene recover 777 Hit Points and 777 Mind Points; any PCs who have **surrendered** but are still part of the scene immediately regain consciousness (this does not cancel the effects of their **Surrender**)."
   },
   {
     "key": "ace_magic_flush",
@@ -27139,25 +27139,25 @@
   },
   {
     "key": "ace_magic_flush_desc",
-    "en": "(4 cards of consecutive values and of the same suit): You deal damage equal to (25 + the total value of the resolved cards) to every enemy you can see. The type of this damage matches the suit of the resolved cards.",
-    "it": "(4 cards of consecutive values and of the same suit): You deal damage equal to 【25 + the total value of the resolved cards】 to each enemy present on the scene; the type of this damage matches the suit of the resolved cards.",
-    "de": "(4 cards of consecutive values and of the same suit): You deal damage equal to (25 + the total value of the resolved cards) to every enemy you can see. The type of this damage matches the suit of the resolved cards.",
-    "pl": "(4 cards of consecutive values and of the same suit): You deal damage equal to (25 + the total value of the resolved cards) to every enemy you can see. The type of this damage matches the suit of the resolved cards.",
-    "fr": "(4 cards of consecutive values and of the same suit): You deal damage equal to 【25 + the total value of the resolved cards】 to each enemy present on the scene; the type of this damage matches the suit of the resolved cards.",
-    "es": "(4 cards of consecutive values and of the same suit): You deal damage equal to (25 + the total value of the resolved cards) to every enemy you can see. The type of this damage matches the suit of the resolved cards.",
+    "en": "(**4 cards** of **consecutive values** and of the **same suit**): You deal damage equal to 【**25 + the total value of the resolved cards**】 to every enemy you can see. The type of this damage matches the **suit** of the resolved cards.",
+    "it": "(**4 cards** of **consecutive values** and of the **same suit**): You deal damage equal to **(25 + the total value of the resolved cards)** to every enemy you can see. The type of this damage matches the **suit** of the resolved cards.",
+    "de": "(**4 cards** of **consecutive values** and of the **same suit**): You deal damage equal to **(25 + the total value of the resolved cards)** to every enemy you can see. The type of this damage matches the **suit** of the resolved cards.",
+    "pl": "(**4 cards** of **consecutive values** and of the **same suit**): You deal damage equal to **(25 + the total value of the resolved cards)** to every enemy you can see. The type of this damage matches the **suit** of the resolved cards.",
+    "fr": "(**4 cards** of **consecutive values** and of the **same suit**): You deal damage equal to **(25 + the total value of the resolved cards)** to every enemy you can see. The type of this damage matches the **suit** of the resolved cards.",
+    "es": "(**4 cards** of **consecutive values** and of the **same suit**): You deal damage equal to **(25 + the total value of the resolved cards)** to every enemy you can see. The type of this damage matches the **suit** of the resolved cards.",
     "pt-BR": "(4 cartas de valores consecutivos e do mesmo naipe): Você causa uma quantidade de dano igual a 【25 + o valor total das cartas resolvidas】 a cada inimigo presente na cena; o tipo desse dano corresponde ao naipe das cartas resolvidas.",
-    "zh": "(4 cards of consecutive values and of the same suit): You deal damage equal to (25 + the total value of the resolved cards) to every enemy you can see. The type of this damage matches the suit of the resolved cards."
+    "zh": "(**4 cards** of **consecutive values** and of the **same suit**): You deal damage equal to **(25 + the total value of the resolved cards)** to every enemy you can see. The type of this damage matches the **suit** of the resolved cards."
   },
   {
     "key": "ace_magic_flush_enriched",
-    "en": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage matches the {1} suit of the resolved cards.",
-    "it": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage matches the {1} suit of the resolved cards.",
-    "de": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage matches the {1} suit of the resolved cards.",
-    "pl": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage matches the {1} suit of the resolved cards.",
-    "fr": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage matches the {1} suit of the resolved cards.",
-    "es": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage matches the {1} suit of the resolved cards.",
+    "en": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage matches the {1} **suit** of the resolved cards.",
+    "it": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage matches the {1} **suit** of the resolved cards.",
+    "de": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage matches the {1} **suit** of the resolved cards.",
+    "pl": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage matches the {1} **suit** of the resolved cards.",
+    "fr": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage matches the {1} **suit** of the resolved cards.",
+    "es": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage matches the {1} **suit** of the resolved cards.",
     "pt-BR": "Você causa uma quantidade de dano igual a 【{0}】 a cada inimigo presente na cena; o tipo desse dano corresponde ao naipe {1} das cartas resolvidas.",
-    "zh": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage matches the {1} suit of the resolved cards."
+    "zh": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage matches the {1} **suit** of the resolved cards."
   },
   {
     "key": "ace_blinding_flush",
@@ -27172,36 +27172,36 @@
   },
   {
     "key": "ace_blinding_flush_desc",
-    "en": "(4 cards of consecutive values): You deal damage equal to (15 + the total value of the resolved cards) to every enemy you can see. The type of this damage is light if the highest value among those cards is even, or dark if that value is odd.",
-    "it": "(4 cards of consecutive values): You deal damage equal to 【15 + the total value of the resolved cards】 to each enemy present on the scene; the type of this damage is light if that total is even, or dark if that total is odd.",
-    "de": "(4 cards of consecutive values): You deal damage equal to (15 + the total value of the resolved cards) to every enemy you can see. The type of this damage is light if the highest value among those cards is even, or dark if that value is odd.",
-    "pl": "(4 cards of consecutive values): You deal damage equal to (15 + the total value of the resolved cards) to every enemy you can see. The type of this damage is light if the highest value among those cards is even, or dark if that value is odd.",
-    "fr": "(4 cards of consecutive values): You deal damage equal to 【15 + the total value of the resolved cards】 to each enemy present on the scene; the type of this damage is light if that total is even, or dark if that total is odd.",
-    "es": "(4 cards of consecutive values): You deal damage equal to (15 + the total value of the resolved cards) to every enemy you can see. The type of this damage is light if the highest value among those cards is even, or dark if that value is odd.",
+    "en": "(**4 cards** of **consecutive values**): You deal damage equal to 【**15 + the total value of the resolved cards**】 to every enemy you can see. The type of this damage is **light** if the highest value among those cards is **even**, or **dark** if that value is **odd**.",
+    "it": "(**4 cards** of **consecutive values**): You deal damage equal to **(15 + the total value of the resolved cards)** to every enemy you can see. The type of this damage is **light** if the highest value among those cards is **even**, or **dark** if that value is **odd**.",
+    "de": "(**4 cards** of **consecutive values**): You deal damage equal to **(15 + the total value of the resolved cards)** to every enemy you can see. The type of this damage is **light** if the highest value among those cards is **even**, or **dark** if that value is **odd**.",
+    "pl": "(**4 cards** of **consecutive values**): You deal damage equal to **(15 + the total value of the resolved cards)** to every enemy you can see. The type of this damage is **light** if the highest value among those cards is **even**, or **dark** if that value is **odd**.",
+    "fr": "(**4 cards** of **consecutive values**): You deal damage equal to **(15 + the total value of the resolved cards)** to every enemy you can see. The type of this damage is **light** if the highest value among those cards is **even**, or **dark** if that value is **odd**.",
+    "es": "(**4 cards** of **consecutive values**): You deal damage equal to **(15 + the total value of the resolved cards)** to every enemy you can see. The type of this damage is **light** if the highest value among those cards is **even**, or **dark** if that value is **odd**.",
     "pt-BR": "(4 cartas de valores consecutivos): Você causa uma quantidade de dano igual a 【15 + o valor total das cartas resolvidas】 a cada inimigo presente na cena; o tipo desse dano é luz se o total for par, ou trevas se o total for ímpar.",
-    "zh": "(4 cards of consecutive values): You deal damage equal to (15 + the total value of the resolved cards) to every enemy you can see. The type of this damage is light if the highest value among those cards is even, or dark if that value is odd."
+    "zh": "(**4 cards** of **consecutive values**): You deal damage equal to **(15 + the total value of the resolved cards)** to every enemy you can see. The type of this damage is **light** if the highest value among those cards is **even**, or **dark** if that value is **odd**."
   },
   {
     "key": "ace_blinding_flush_desc_light_enriched",
-    "en": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is light (total value is even).",
-    "it": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is light (total value is even).",
-    "de": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is light (total value is even).",
-    "pl": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is light (total value is even).",
-    "fr": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is light (total value is even).",
-    "es": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is light (total value is even).",
+    "en": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **light** (total value is **even**).",
+    "it": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **light** (total value is **even**).",
+    "de": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **light** (total value is **even**).",
+    "pl": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **light** (total value is **even**).",
+    "fr": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **light** (total value is **even**).",
+    "es": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **light** (total value is **even**).",
     "pt-BR": "Você causa uma quantidade de dano igual a 【{0}】 a cada inimigo presente na cena; o tipo desse dano é luz (valor total é par).",
-    "zh": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is light (total value is even)."
+    "zh": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **light** (total value is **even**)."
   },
   {
     "key": "ace_blinding_flush_desc_dark_enriched",
-    "en": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is dark (total value is odd).",
-    "it": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is dark (total value is odd).",
-    "de": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is dark (total value is odd).",
-    "pl": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is dark (total value is odd).",
-    "fr": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is dark (total value is odd).",
-    "es": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is dark (total value is odd).",
+    "en": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **dark** (total value is **odd**).",
+    "it": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **dark** (total value is **odd**).",
+    "de": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **dark** (total value is **odd**).",
+    "pl": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **dark** (total value is **odd**).",
+    "fr": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **dark** (total value is **odd**).",
+    "es": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **dark** (total value is **odd**).",
     "pt-BR": "Você causa uma quantidade de dano igual a 【{0}】 a cada inimigo presente na cena; o tipo desse dano é trevas (valor total é ímpar).",
-    "zh": "You deal damage equal to 【{0}】 to each enemy present on the scene; the type of this damage is dark (total value is odd)."
+    "zh": "You deal damage equal to **【{0}】** to each enemy present on the scene; the type of this damage is **dark** (total value is **odd**)."
   },
   {
     "key": "ace_full_status",
@@ -27216,36 +27216,36 @@
   },
   {
     "key": "ace_full_status_desc",
-    "en": "(3 cards of the same value + 2 cards of the same value): Choose two status effects among dazed, shaken, slow, and weak. If (the highest value among resolved cards) is even, you and every ally you can see recover from the chosen status effects; if odd, every enemy you can see suffers them.",
-    "it": "(3 cards of the same value + 2 cards of the same value): Choose two status effects among dazed, shaken, slow, and weak: if 【the highest value among resolved cards】 is even, you and every ally present on the scene recover from the chosen status effects; if odd, each enemy present on the scene suffers them.",
-    "de": "(3 cards of the same value + 2 cards of the same value): Choose two status effects among dazed, shaken, slow, and weak. If (the highest value among resolved cards) is even, you and every ally you can see recover from the chosen status effects; if odd, every enemy you can see suffers them.",
-    "pl": "(3 cards of the same value + 2 cards of the same value): Choose two status effects among dazed, shaken, slow, and weak. If (the highest value among resolved cards) is even, you and every ally you can see recover from the chosen status effects; if odd, every enemy you can see suffers them.",
-    "fr": "(3 cards of the same value + 2 cards of the same value): Choose two status effects among dazed, shaken, slow, and weak: if 【the highest value among resolved cards】 is even, you and every ally present on the scene recover from the chosen status effects; if odd, each enemy present on the scene suffers them.",
-    "es": "(3 cards of the same value + 2 cards of the same value): Choose two status effects among dazed, shaken, slow, and weak. If (the highest value among resolved cards) is even, you and every ally you can see recover from the chosen status effects; if odd, every enemy you can see suffers them.",
+    "en": "(**3 cards** of the **same value + 2 cards** of the **same value**): Choose **two** status effects among **dazed**, **shaken**, **slow**, and **weak**. If **(the highest value among resolved cards)** is **even**, you and every ally you can see recover from the chosen status effects; if **odd**, every enemy you can see suffers them.",
+    "it": "(**3 cards** of the **same value + 2 cards** of the **same value**): Choose **two** status effects among **dazed**, **shaken**, **slow**, and **weak**. If **(the highest value among resolved cards)** is **even**, you and every ally you can see recover from the chosen status effects; if **odd**, every enemy you can see suffers them.",
+    "de": "(**3 cards** of the **same value + 2 cards** of the **same value**): Choose **two** status effects among **dazed**, **shaken**, **slow**, and **weak**. If **(the highest value among resolved cards)** is **even**, you and every ally you can see recover from the chosen status effects; if **odd**, every enemy you can see suffers them.",
+    "pl": "(**3 cards** of the **same value + 2 cards** of the **same value**): Choose **two** status effects among **dazed**, **shaken**, **slow**, and **weak**. If **(the highest value among resolved cards)** is **even**, you and every ally you can see recover from the chosen status effects; if **odd**, every enemy you can see suffers them.",
+    "fr": "(**3 cards** of the **same value + 2 cards** of the **same value**): Choose **two** status effects among **dazed**, **shaken**, **slow**, and **weak**. If **(the highest value among resolved cards)** is **even**, you and every ally you can see recover from the chosen status effects; if **odd**, every enemy you can see suffers them.",
+    "es": "(**3 cards** of the **same value + 2 cards** of the **same value**): Choose **two** status effects among **dazed**, **shaken**, **slow**, and **weak**. If **(the highest value among resolved cards)** is **even**, you and every ally you can see recover from the chosen status effects; if **odd**, every enemy you can see suffers them.",
     "pt-BR": "(3 cartas do mesmo valor + 2 cartas do mesmo valor): Escolha duas condições entre atordoado, abalado, lento e fraco: se 【o maior valor entre as cartas resolvidas】 for par, você e cada aliado presente na cena se recuperam das condições escolhidas; se for ímpar, cada inimigo presente na cena sofre essas condições.",
-    "zh": "(3 cards of the same value + 2 cards of the same value): Choose two status effects among dazed, shaken, slow, and weak. If (the highest value among resolved cards) is even, you and every ally you can see recover from the chosen status effects; if odd, every enemy you can see suffers them."
+    "zh": "(**3 cards** of the **same value + 2 cards** of the **same value**): Choose **two** status effects among **dazed**, **shaken**, **slow**, and **weak**. If **(the highest value among resolved cards)** is **even**, you and every ally you can see recover from the chosen status effects; if **odd**, every enemy you can see suffers them."
   },
   {
     "key": "ace_effect_full_status_even_enriched",
-    "en": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is even, you and every ally present on the scene recover from the chosen status effects.",
-    "it": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is even, you and every ally present on the scene recover from the chosen status effects.",
-    "de": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is even, you and every ally present on the scene recover from the chosen status effects.",
-    "pl": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is even, you and every ally present on the scene recover from the chosen status effects.",
-    "fr": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is even, you and every ally present on the scene recover from the chosen status effects.",
-    "es": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is even, you and every ally present on the scene recover from the chosen status effects.",
+    "en": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **even**, you and every ally present on the scene recover from the chosen status effects.",
+    "it": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **even**, you and every ally present on the scene recover from the chosen status effects.",
+    "de": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **even**, you and every ally present on the scene recover from the chosen status effects.",
+    "pl": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **even**, you and every ally present on the scene recover from the chosen status effects.",
+    "fr": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **even**, you and every ally present on the scene recover from the chosen status effects.",
+    "es": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **even**, you and every ally present on the scene recover from the chosen status effects.",
     "pt-BR": "Escolha duas condições entre atordoado, abalado, lento e fraco: se 【{0}】 for par, você e cada aliado presente na cena se recuperam das condições escolhidas.",
-    "zh": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is even, you and every ally present on the scene recover from the chosen status effects."
+    "zh": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **even**, you and every ally present on the scene recover from the chosen status effects."
   },
   {
     "key": "ace_effect_full_status_odd_enriched",
-    "en": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is odd, each enemy present on the scene suffers them.",
-    "it": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is odd, each enemy present on the scene suffers them.",
-    "de": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is odd, each enemy present on the scene suffers them.",
-    "pl": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is odd, each enemy present on the scene suffers them.",
-    "fr": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is odd, each enemy present on the scene suffers them.",
-    "es": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is odd, each enemy present on the scene suffers them.",
+    "en": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **odd**, each enemy present on the scene suffers them.",
+    "it": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **odd**, each enemy present on the scene suffers them.",
+    "de": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **odd**, each enemy present on the scene suffers them.",
+    "pl": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **odd**, each enemy present on the scene suffers them.",
+    "fr": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **odd**, each enemy present on the scene suffers them.",
+    "es": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **odd**, each enemy present on the scene suffers them.",
     "pt-BR": "Escolha duas condições entre atordoado, abalado, lento e fraco: se 【{0}】 for ímpar, cada inimigo presente na cena sofre essas condições.",
-    "zh": "Choose two status effects among dazed, shaken, slow, and weak: if 【{0}】 is odd, each enemy present on the scene suffers them."
+    "zh": "Choose two status effects among **dazed**, **shaken**, **slow**, and **weak**: if **【{0}】** is **odd**, each enemy present on the scene suffers them."
   },
   {
     "key": "ace_triple_support",
@@ -27260,25 +27260,25 @@
   },
   {
     "key": "ace_triple_support_desc",
-    "en": "(3 cards of the same value): You and every ally you can see recover an amount of Hit Points equal to (the total value of the resolved cards, multiplied by 3).",
-    "it": "(3 cards of the same value): You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【the total value of the resolved cards, multiplied by 3】.",
-    "de": "(3 cards of the same value): You and every ally you can see recover an amount of Hit Points equal to (the total value of the resolved cards, multiplied by 3).",
-    "pl": "(3 cards of the same value): You and every ally you can see recover an amount of Hit Points equal to (the total value of the resolved cards, multiplied by 3).",
-    "fr": "(3 cards of the same value): You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【the total value of the resolved cards, multiplied by 3】.",
-    "es": "(3 cards of the same value): You and every ally you can see recover an amount of Hit Points equal to (the total value of the resolved cards, multiplied by 3).",
+    "en": "(**3 cards** of the **same value**): You and every ally you can see recover an amount of Hit Points equal to 【**the total value of the resolved cards, multiplied by 3**】.",
+    "it": "(**3 cards** of the **same value**): You and every ally you can see recover an amount of Hit Points equal to **(the total value of the resolved cards, multiplied by 3)**.",
+    "de": "(**3 cards** of the **same value**): You and every ally you can see recover an amount of Hit Points equal to **(the total value of the resolved cards, multiplied by 3)**.",
+    "pl": "(**3 cards** of the **same value**): You and every ally you can see recover an amount of Hit Points equal to **(the total value of the resolved cards, multiplied by 3)**.",
+    "fr": "(**3 cards** of the **same value**): You and every ally you can see recover an amount of Hit Points equal to **(the total value of the resolved cards, multiplied by 3)**.",
+    "es": "(**3 cards** of the **same value**): You and every ally you can see recover an amount of Hit Points equal to **(the total value of the resolved cards, multiplied by 3)**.",
     "pt-BR": "(3 cartas do mesmo valor): Você e cada aliado presente na cena recuperam uma quantidade de Pontos de Vida e Pontos de Mente igual a 【o valor total das cartas resolvidas, multiplicado por 3】.",
-    "zh": "(3 cards of the same value): You and every ally you can see recover an amount of Hit Points equal to (the total value of the resolved cards, multiplied by 3)."
+    "zh": "(**3 cards** of the **same value**): You and every ally you can see recover an amount of Hit Points equal to **(the total value of the resolved cards, multiplied by 3)**."
   },
   {
     "key": "ace_triple_support_enriched",
-    "en": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【{0}】.",
-    "it": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【{0}】.",
-    "de": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【{0}】.",
-    "pl": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【{0}】.",
-    "fr": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【{0}】.",
-    "es": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【{0}】.",
+    "en": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to **【{0}】**.",
+    "it": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to **【{0}】**.",
+    "de": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to **【{0}】**.",
+    "pl": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to **【{0}】**.",
+    "fr": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to **【{0}】**.",
+    "es": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to **【{0}】**.",
     "pt-BR": "Você e cada aliado presente na cena recuperam uma quantidade de Pontos de Vida e Pontos de Mente igual a 【{0}】.",
-    "zh": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to 【{0}】."
+    "zh": "You and every ally present on the scene regain an amount of Hit Points and Mind Points equal to **【{0}】**."
   },
   {
     "key": "ace_double_trouble",
@@ -27293,25 +27293,25 @@
   },
   {
     "key": "ace_double_trouble_desc",
-    "en": "(2 cards of the same value + 2 cards of the same value): You deal damage equal to (10 + the highest value among resolved cards) to each of up to two different enemies you can see. The type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "it": "(2 cards of the same value + 2 cards of the same value): You deal damage equal to 【10 + the highest value among resolved cards】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "de": "(2 cards of the same value + 2 cards of the same value): You deal damage equal to (10 + the highest value among resolved cards) to each of up to two different enemies you can see. The type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "pl": "(2 cards of the same value + 2 cards of the same value): You deal damage equal to (10 + the highest value among resolved cards) to each of up to two different enemies you can see. The type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "fr": "(2 cards of the same value + 2 cards of the same value): You deal damage equal to 【10 + the highest value among resolved cards】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "es": "(2 cards of the same value + 2 cards of the same value): You deal damage equal to (10 + the highest value among resolved cards) to each of up to two different enemies you can see. The type of this damage is one of your choice among those matching the suits of the resolved cards.",
+    "en": "(**2 cards** of the **same value + 2 cards** of the **same value**): You deal damage equal to 【**10 + the highest value among resolved cards**】 to each of **up to two** different enemies you can see. The type of this damage is one of your choice among those matching the **suits** of the resolved cards.",
+    "it": "(**2 cards** of the **same value + 2 cards** of the **same value**): You deal damage equal to **(10 + the highest value among resolved cards)** to each of **up to two** different enemies you can see. The type of this damage is one of your choice among those matching the **suits** of the resolved cards.",
+    "de": "(**2 cards** of the **same value + 2 cards** of the **same value**): You deal damage equal to **(10 + the highest value among resolved cards)** to each of **up to two** different enemies you can see. The type of this damage is one of your choice among those matching the **suits** of the resolved cards.",
+    "pl": "(**2 cards** of the **same value + 2 cards** of the **same value**): You deal damage equal to **(10 + the highest value among resolved cards)** to each of **up to two** different enemies you can see. The type of this damage is one of your choice among those matching the **suits** of the resolved cards.",
+    "fr": "(**2 cards** of the **same value + 2 cards** of the **same value**): You deal damage equal to **(10 + the highest value among resolved cards)** to each of **up to two** different enemies you can see. The type of this damage is one of your choice among those matching the **suits** of the resolved cards.",
+    "es": "(**2 cards** of the **same value + 2 cards** of the **same value**): You deal damage equal to **(10 + the highest value among resolved cards)** to each of **up to two** different enemies you can see. The type of this damage is one of your choice among those matching the **suits** of the resolved cards.",
     "pt-BR": "(2 cartas do mesmo valor + 2 cartas do mesmo valor): Você causa uma quantidade de dano igual a 【10 + o maior valor entre as cartas resolvidas】 a até dois inimigos diferentes que puder ver e que estejam presentes na cena; o tipo desse dano é à sua escolha entre aqueles que correspondem aos naipes das cartas resolvidas.",
-    "zh": "(2 cards of the same value + 2 cards of the same value): You deal damage equal to (10 + the highest value among resolved cards) to each of up to two different enemies you can see. The type of this damage is one of your choice among those matching the suits of the resolved cards."
+    "zh": "(**2 cards** of the **same value + 2 cards** of the **same value**): You deal damage equal to **(10 + the highest value among resolved cards)** to each of **up to two** different enemies you can see. The type of this damage is one of your choice among those matching the **suits** of the resolved cards."
   },
   {
     "key": "ace_double_trouble_enriched",
-    "en": "You deal damage equal to 【{0}】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "it": "You deal damage equal to 【{0}】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "de": "You deal damage equal to 【{0}】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "pl": "You deal damage equal to 【{0}】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "fr": "You deal damage equal to 【{0}】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
-    "es": "You deal damage equal to 【{0}】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
+    "en": "You deal damage equal to **【{0}】** to each of **up to two** different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
+    "it": "You deal damage equal to **【{0}】** to each of **up to two** different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
+    "de": "You deal damage equal to **【{0}】** to each of **up to two** different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
+    "pl": "You deal damage equal to **【{0}】** to each of **up to two** different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
+    "fr": "You deal damage equal to **【{0}】** to each of **up to two** different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
+    "es": "You deal damage equal to **【{0}】** to each of **up to two** different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards.",
     "pt-BR": "Você causa uma quantidade de dano igual a 【{0}】 a até dois inimigos diferentes que puder ver e que estejam presentes na cena; o tipo desse dano é à sua escolha entre aqueles que correspondem aos naipes das cartas resolvidas.",
-    "zh": "You deal damage equal to 【{0}】 to each of up to two different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards."
+    "zh": "You deal damage equal to **【{0}】** to each of **up to two** different enemies you can see that are present on the scene; the type of this damage is one of your choice among those matching the suits of the resolved cards."
   },
   {
     "key": "ace_magic_pair",
@@ -27326,25 +27326,25 @@
   },
   {
     "key": "ace_magic_pair_desc",
-    "en": "(2 cards of the same value): You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "it": "(2 cards of the same value): You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "de": "(2 cards of the same value): You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "pl": "(2 cards of the same value): You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "fr": "(2 cards of the same value): You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "es": "(2 cards of the same value): You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
+    "en": "(**2 cards** of the **same value**): You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "it": "(**2 cards** of the **same value**): You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "de": "(**2 cards** of the **same value**): You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "pl": "(**2 cards** of the **same value**): You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "fr": "(**2 cards** of the **same value**): You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "es": "(**2 cards** of the **same value**): You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
     "pt-BR": "(2 cartas do mesmo valor): Você realiza um ataque gratuito com uma arma que tiver equipada. Se esse ataque causar dano, escolha um naipe entre os das cartas resolvidas; todo o dano causado pelo ataque se torna do tipo correspondente a esse naipe.",
-    "zh": "(2 cards of the same value): You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit."
+    "zh": "(**2 cards** of the **same value**): You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**."
   },
   {
     "key": "ace_magic_pair_enriched",
-    "en": "You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "it": "You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "de": "You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "pl": "You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "fr": "You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
-    "es": "You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit.",
+    "en": "You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "it": "You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "de": "You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "pl": "You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "fr": "You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
+    "es": "You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**.",
     "pt-BR": "Você realiza um ataque gratuito com uma arma que tiver equipada. Se esse ataque causar dano, escolha um naipe entre os das cartas resolvidas; todo o dano causado pelo ataque se torna do tipo correspondente a esse naipe.",
-    "zh": "You perform a free attack with a weapon you have equipped. If this attack deals damage, choose a suit among those of the resolved cards; all damage dealt by the attack becomes of the type matching that suit."
+    "zh": "You perform a **free attack** with a weapon you have equipped. If this attack deals damage, choose a **suit** among those of the resolved cards; all damage dealt by the attack becomes of the type matching that **suit**."
   },
   {
     "key": "ace_unknown_effect",

@@ -230,10 +230,7 @@ const _nonStaticItemsByType = {
   ),
   magiseed: magiseeds.map((ms) => ({ ...ms, spellType: "magiseed" })),
   arcanist: arcanumList.map((arc) => ({ ...arc, spellType: "arcanist" })),
-  "arcanist-rework": arcanumList.map((arc) => ({
-    ...arc,
-    spellType: "arcanist-rework",
-  })),
+  "arcanist-rework": [],
   "tinkerer-alchemy": [
     ...tinkererAlchemy.targets.map((t) => ({
       name:
