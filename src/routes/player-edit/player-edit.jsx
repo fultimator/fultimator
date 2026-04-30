@@ -115,9 +115,12 @@ import {
   applyPostLoadTransforms,
 } from "../../components/player/playerTransforms";
 import classList from "../../libs/classes";
+import { syncAutomaticClassLevels } from "../../components/player/classes/classLevelUtils";
+import { buildMnemosphere } from "../../libs/mnemospheres";
 import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
 import CustomHeader from "../../components/common/CustomHeader";
 import SettingRow from "../../components/common/SettingRow";
+import MigrateFromCompendiumDialog from "../../components/player/settings/MigrateFromCompendiumDialog";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -131,6 +134,7 @@ export default function PlayerEdit() {
     useState(false);
   const [isOptionalRulesModalOpen, setIsOptionalRulesModalOpen] =
     useState(false);
+  const [isMigrateDialogOpen, setIsMigrateDialogOpen] = useState(false);
 
   let params = useParams(); // URL parameters hook
 
@@ -200,6 +204,7 @@ export default function PlayerEdit() {
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
   const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
+  const [mnemoLevelUpId, setMnemoLevelUpId] = useState(null);
 
   // Local players are always owned by whoever is running the app.
   // Cloud players require a matching Firebase UID.
@@ -308,12 +313,16 @@ export default function PlayerEdit() {
     let mpBonus = 0;
     let ipBonus = 0;
 
+    const innateClassesPE =
+      prevPlayer.settings?.optionalRules?.innateClasses ?? [];
+    const isTechnospheresPE =
+      prevPlayer.settings?.optionalRules?.technospheres ?? false;
     (prevPlayer.classes || []).forEach((cls) => {
-      if (cls.benefits) {
-        hpBonus += Number(cls.benefits.hpplus) || 0;
-        mpBonus += Number(cls.benefits.mpplus) || 0;
-        ipBonus += Number(cls.benefits.ipplus) || 0;
-      }
+      if (!cls.benefits) return;
+      if (isTechnospheresPE && !innateClassesPE.includes(cls.name)) return;
+      hpBonus += Number(cls.benefits.hpplus) || 0;
+      mpBonus += Number(cls.benefits.mpplus) || 0;
+      ipBonus += Number(cls.benefits.ipplus) || 0;
     });
 
     if (prevPlayer.modifiers) {
@@ -372,40 +381,6 @@ export default function PlayerEdit() {
     );
   }, [recalculatePlayerMaxStats]);
 
-  // const checkEquipment = () => {
-  //   if (playerTemp) {
-  //     const hasDualShieldBearer = playerTemp.classes.some((playerClass) =>
-  //       playerClass.skills.some(
-  //         (skill) =>
-  //           skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
-  //       )
-  //     );
-
-  //     const inv = playerTemp.equipment?.[0];
-  //     const equippedShields =
-  //       inv?.shields?.filter((shield) => isItemEquipped(playerTemp, shield)) || [];
-
-  //     if (!hasDualShieldBearer && equippedShields.length > 1) {
-  //       // Unequip all shields but the first one
-  //       setPlayerTemp((prevPlayer) => {
-  //         const inv = prevPlayer.equipment?.[0];
-  //         if (!inv) return prevPlayer;
-  //         const newShields = inv.shields.map((shield, index) => ({
-  //           ...shield,
-  //           isEquipped:
-  //             index === inv.shields.findIndex((s) => isItemEquipped(prevPlayer, s)),
-  //         }));
-
-  //         const updatedInv = { ...inv, shields: newShields };
-  //         return {
-  //           ...prevPlayer,
-  //           equipment: [updatedInv, ...(prevPlayer.equipment?.slice(1) ?? [])],
-  //         };
-  //       });
-  //     }
-  //   }
-  // };
-
   const handleBugDialogClose = () => {
     setIsBugDialogOpen(false);
   };
@@ -413,6 +388,9 @@ export default function PlayerEdit() {
   const settings = playerTemp?.settings ?? {};
   const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
   const advancement = settings.advancement ?? false;
+  const automaticClassLevel =
+    (settings.optionalRules?.technospheres ?? false) ||
+    settings.automaticClassLevel !== false;
   const autoEquipUnarmed = settings.autoEquipUnarmed ?? false;
 
   const inv = playerTemp?.equipment?.[0];
@@ -437,25 +415,36 @@ export default function PlayerEdit() {
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
     (playerTemp?.lvl || 0) < 50;
 
-  const handleConfirmLevelUpFromExp = () => {
-    setPlayerTemp((prevPlayer) => {
-      if (!prevPlayer) return prevPlayer;
-
-      const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
-      if (currentExp < 10 || (prevPlayer.lvl || 0) >= 50) return prevPlayer;
-
-      const leveledPlayer = {
-        ...prevPlayer,
-        lvl: Math.min(50, (prevPlayer.lvl || 0) + 1),
-        info: {
-          ...prevPlayer.info,
-          exp: Math.max(0, currentExp - 10),
-        },
+  const applyMnemoLevelUp = (player, mnemoId) => {
+    if (!mnemoId) return player;
+    const eq0 = player.equipment?.[0];
+    if (!eq0) return player;
+    const mnemospheres = (eq0.mnemospheres ?? []).map((m) => {
+      if (m.id !== mnemoId) return m;
+      const newLvl = Math.min(5, (m.lvl ?? 1) + 1);
+      const rebuilt = buildMnemosphere(m.class, newLvl);
+      // Merge any skills that exist in the class definition but not yet on this sphere
+      const existingNames = new Set((m.skills ?? []).map((s) => s.name));
+      const newSkills = rebuilt.skills.filter(
+        (s) => !existingNames.has(s.name),
+      );
+      // Merge heroic the same way as skills, preserve existing, add any new ones
+      const existingHeroicNames = new Set((m.heroic ?? []).map((h) => h.name));
+      const newHeroic = rebuilt.heroic.filter(
+        (h) => !existingHeroicNames.has(h.name),
+      );
+      return {
+        ...m,
+        lvl: newLvl,
+        heroic: [...(m.heroic ?? []), ...newHeroic],
+        skills: [...(m.skills ?? []), ...newSkills],
       };
-      return recalculatePlayerMaxStats(leveledPlayer);
     });
-    setLevelUpDialogOpen(false);
-    setLevelUpCelebrationOpen(true);
+    const equipment = [
+      { ...eq0, mnemospheres },
+      ...(player.equipment?.slice(1) ?? []),
+    ];
+    return { ...player, equipment };
   };
 
   const optionalRules = {
@@ -464,8 +453,10 @@ export default function PlayerEdit() {
     zeroPower: settings.optionalRules?.zeroPower ?? false,
     technospheres: settings.optionalRules?.technospheres ?? false,
     technospheresVariant:
-      settings.optionalRules?.technospheresVariant ?? "none",
+      settings.optionalRules?.technospheresVariant ?? "standard",
+    innateClasses: settings.optionalRules?.innateClasses ?? [],
   };
+  const canInvestMnemosphereLevel = optionalRules.technospheres && advancement;
   const specialSkillOverrides = settings.specialSkillOverrides ?? {};
 
   const updatePlayerSettings = useCallback((updater) => {
@@ -529,13 +520,38 @@ export default function PlayerEdit() {
   };
 
   const handleOptionalRuleChange = (rule, checked) => {
-    updatePlayerSettings((prevSettings) => ({
-      ...prevSettings,
-      optionalRules: {
-        ...(prevSettings.optionalRules ?? {}),
-        [rule]: checked,
-      },
-    }));
+    setPlayerTemp((prev) => {
+      if (!prev) return prev;
+      const prevSettings = prev.settings ?? {};
+      const nextPlayer = {
+        ...prev,
+        settings: {
+          ...prevSettings,
+          optionalRules: {
+            ...(prevSettings.optionalRules ?? {}),
+            [rule]: checked,
+            ...(rule === "technospheres" && checked
+              ? {
+                  innateClasses:
+                    (prevSettings.optionalRules?.innateClasses ?? []).length > 0
+                      ? prevSettings.optionalRules?.innateClasses
+                      : (prev.classes ?? [])
+                          .map((cls) => cls.name)
+                          .filter(Boolean)
+                          .slice(0, 3),
+                }
+              : {}),
+          },
+          ...(rule === "technospheres" && checked
+            ? { automaticClassLevel: true }
+            : {}),
+        },
+      };
+
+      return rule === "technospheres" && checked
+        ? syncAutomaticClassLevels(nextPlayer)
+        : nextPlayer;
+    });
   };
 
   const handleAdvancementChange = (checked) => {
@@ -543,6 +559,20 @@ export default function PlayerEdit() {
       ...prevSettings,
       advancement: checked,
     }));
+  };
+
+  const handleAutomaticClassLevelChange = (checked) => {
+    setPlayerTemp((prev) => {
+      if (!prev) return prev;
+      const nextPlayer = {
+        ...prev,
+        settings: {
+          ...(prev.settings ?? {}),
+          automaticClassLevel: checked,
+        },
+      };
+      return checked ? syncAutomaticClassLevels(nextPlayer) : nextPlayer;
+    });
   };
 
   const handleAutoEquipUnarmedChange = (checked) => {
@@ -840,7 +870,15 @@ export default function PlayerEdit() {
                   onToggleEditMode={
                     isOwner ? () => setIsSheetEditMode((v) => !v) : undefined
                   }
-                  onAddClass={isEditMode ? () => setOpenTab(3) : undefined}
+                  onAddClass={
+                    isEditMode &&
+                    !(
+                      optionalRules.technospheres &&
+                      (playerTemp?.classes?.length ?? 0) >= 3
+                    )
+                      ? () => setOpenTab(3)
+                      : undefined
+                  }
                   onAddFeature={isEditMode ? () => setOpenTab(4) : undefined}
                 />
               </Grid>
@@ -1163,7 +1201,7 @@ export default function PlayerEdit() {
                   <SettingRow
                     label={t("Advancement")}
                     hint={t(
-                      "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, automated class level tracking, and per-level skill management.",
+                      "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, and per-level skill management.",
                     )}
                     compactControl
                   >
@@ -1171,6 +1209,22 @@ export default function PlayerEdit() {
                       checked={advancement}
                       onChange={(e) =>
                         handleAdvancementChange(e.target.checked)
+                      }
+                    />
+                  </SettingRow>
+
+                  <SettingRow
+                    label={t("Automatic Class Leveling")}
+                    hint={t(
+                      "When enabled, class level is read-only and is derived from the total current skill levels in that class.",
+                    )}
+                    compactControl
+                  >
+                    <Checkbox
+                      checked={automaticClassLevel}
+                      disabled={optionalRules.technospheres}
+                      onChange={(e) =>
+                        handleAutomaticClassLevelChange(e.target.checked)
                       }
                     />
                   </SettingRow>
@@ -1256,6 +1310,21 @@ export default function PlayerEdit() {
                       variant="outlined"
                       size="small"
                       onClick={() => setIsOptionalRulesModalOpen(true)}
+                    >
+                      {t("Open")}
+                    </Button>
+                  </SettingRow>
+
+                  <SettingRow
+                    label={t("Migrate from Compendium")}
+                    hint={t(
+                      "Sync compendium-linked items (classes, spells, spheres) with their source, preserving your progression.",
+                    )}
+                  >
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setIsMigrateDialogOpen(true)}
                     >
                       {t("Open")}
                     </Button>
@@ -1372,23 +1441,95 @@ export default function PlayerEdit() {
       </Box>
       <Dialog
         open={levelUpDialogOpen}
-        onClose={() => setLevelUpDialogOpen(false)}
+        onClose={() => {
+          setMnemoLevelUpId(null);
+          setLevelUpDialogOpen(false);
+        }}
         maxWidth="sm"
         fullWidth
       >
         <DialogTitle variant="h4">{t("Level Up Confirmation")}</DialogTitle>
         <DialogContent>
           <Typography>{t("Do you want to use 10 EXP to level up?")}</Typography>
+          {canInvestMnemosphereLevel &&
+            (() => {
+              const investable = (
+                playerTemp?.equipment?.[0]?.mnemospheres ?? []
+              ).filter((m) => (m.lvl ?? 1) < 5);
+              return (
+                <Box sx={{ mt: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
+                    {t(
+                      "Invest this level into an innate class (by spending skill points in the Classes tab) or into a slotted sphere below.",
+                    )}
+                  </Typography>
+                  {investable.length > 0 && (
+                    <>
+                      <Typography variant="h4" sx={{ mb: 1 }}>
+                        {t("Level up a sphere")}
+                      </Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                        {investable.map((m) => (
+                          <Button
+                            key={m.id}
+                            variant={
+                              mnemoLevelUpId === m.id ? "contained" : "outlined"
+                            }
+                            size="small"
+                            onClick={() =>
+                              setMnemoLevelUpId((prev) =>
+                                prev === m.id ? null : m.id,
+                              )
+                            }
+                          >
+                            {t(m.class)} {t("Lv")}.{m.lvl ?? 1} →{" "}
+                            {(m.lvl ?? 1) + 1}
+                          </Button>
+                        ))}
+                      </Box>
+                    </>
+                  )}
+                </Box>
+              );
+            })()}
         </DialogContent>
         <DialogActions>
           <Button
             variant="contained"
             color="error"
-            onClick={() => setLevelUpDialogOpen(false)}
+            onClick={() => {
+              setMnemoLevelUpId(null);
+              setLevelUpDialogOpen(false);
+            }}
           >
             {t("Cancel")}
           </Button>
-          <Button variant="contained" onClick={handleConfirmLevelUpFromExp}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              const selectedMnemoId = canInvestMnemosphereLevel
+                ? mnemoLevelUpId
+                : null;
+              setPlayerTemp((prev) => {
+                if (!prev) return prev;
+                const currentExp = parseInt(prev.info?.exp, 10) || 0;
+                if (currentExp < 10 || (prev.lvl || 0) >= 50) return prev;
+                const leveled = recalculatePlayerMaxStats({
+                  ...prev,
+                  lvl: Math.min(50, (prev.lvl || 0) + 1),
+                  info: { ...prev.info, exp: Math.max(0, currentExp - 10) },
+                });
+                return applyMnemoLevelUp(leveled, selectedMnemoId);
+              });
+              setMnemoLevelUpId(null);
+              setLevelUpDialogOpen(false);
+              setLevelUpCelebrationOpen(true);
+            }}
+          >
             {t("Level Up")}
           </Button>
         </DialogActions>
@@ -1543,7 +1684,7 @@ export default function PlayerEdit() {
             <SettingRow
               label={t("Technospheres")}
               hint={t(
-                "(Placeholder) Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
+                "Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
               )}
               showDivider={false}
               dense
@@ -1556,6 +1697,16 @@ export default function PlayerEdit() {
                 }
               />
             </SettingRow>
+
+            {optionalRules.technospheres && (
+              <Box sx={{ mt: 1, px: 1, mb: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t(
+                    "Manage innate classes from the Classes tab. Add them under Innate Classes with the compendium search or add button.",
+                  )}
+                </Typography>
+              </Box>
+            )}
 
             {optionalRules.technospheres && (
               <SettingRow
@@ -1583,9 +1734,9 @@ export default function PlayerEdit() {
                   }}
                 >
                   <FormControlLabel
-                    value="none"
+                    value="standard"
                     control={<Radio size="small" />}
-                    label={t("None")}
+                    label={t("Standard")}
                     labelPlacement="start"
                   />
                   <FormControlLabel
@@ -1617,6 +1768,12 @@ export default function PlayerEdit() {
           </Button>
         </DialogActions>
       </Dialog>
+      <MigrateFromCompendiumDialog
+        open={isMigrateDialogOpen}
+        onClose={() => setIsMigrateDialogOpen(false)}
+        player={playerTemp}
+        onApply={(updated) => setPlayerTemp(updated)}
+      />
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}

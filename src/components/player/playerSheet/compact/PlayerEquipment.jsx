@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import {
+  Alert,
   Grid,
   Typography,
   Paper,
@@ -21,6 +22,7 @@ import {
   Badge,
   Menu,
   MenuItem,
+  Snackbar,
 } from "@mui/material";
 import { OpenBracket, CloseBracket } from "../../../Bracket";
 import {
@@ -50,14 +52,16 @@ import {
   Add,
   Search as SearchIcon,
   Error as ErrorIcon,
-  WarningAmber as WarningAmberIcon,
 } from "@mui/icons-material";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import {
   calculateAttribute,
   calculateCustomWeaponStats,
 } from "../../common/playerCalculations";
-import { deriveVehicleSlots } from "../../equipment/slots/equipmentSlots";
+import {
+  deriveVehicleSlots,
+  isTwoHandedEquipped,
+} from "../../equipment/slots/equipmentSlots";
 import { clearSlotAction } from "../../equipment/slots/loadoutActions";
 
 // Styled Components
@@ -71,12 +75,12 @@ const StyledTableCell = styled(TableCell)({
 });
 
 const StyledMarkdown = ({ children, ...props }) => (
-  <div sx={{ whiteSpace: "pre-line", display: "inline" }}>
+  <div style={{ whiteSpace: "pre-line", display: "inline" }}>
     <ReactMarkdown
       {...props}
       rehypePlugins={[rehypeRaw]}
       components={{
-        p: (p) => <p sx={{ margin: 0, display: "inline" }} {...p} />,
+        p: (p) => <p style={{ margin: 0, display: "inline" }} {...p} />,
         ul: (p) => <ul style={{ margin: 0 }} {...p} />,
         li: (p) => <li style={{ margin: 0 }} {...p} />,
         strong: (p) => <strong style={{ fontWeight: "bold" }} {...p} />,
@@ -126,7 +130,7 @@ export default function PlayerEquipment({
   searchQuery = "",
   onAddWeapon,
   onEditWeapon,
-  _onAddCustomWeapon,
+  onAddCustomWeapon,
   onEditCustomWeapon,
   onAddArmor,
   onEditArmor,
@@ -144,7 +148,8 @@ export default function PlayerEquipment({
   const [dialogSeverity, setDialogSeverity] = useState("info");
   const [currentWeapon, setCurrentWeapon] = useState(null);
   const [compendiumType, setCompendiumType] = useState(null);
-  const [martialWarning, setMartialWarning] = useState(null);
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
 
   const getSkillLevel = (player, skillName) =>
     player.classes
@@ -280,9 +285,13 @@ export default function PlayerEquipment({
     const items = [];
     if (!inv) return items;
 
-    (inv.weapons || []).forEach((w, i) =>
-      items.push({ ...w, equipType: "weapon", originalIndex: i }),
-    );
+    (inv.weapons || []).forEach((w, i) => {
+      const isUnarmedStrike =
+        w.name === "Unarmed Strike" || w.base?.name === "Unarmed Strike";
+      if (!isTechnospheres || isUnarmedStrike) {
+        items.push({ ...w, equipType: "weapon", originalIndex: i });
+      }
+    });
     (inv.customWeapons || []).forEach((cw, i) =>
       items.push({
         ...formatCustomWeapon(cw),
@@ -290,9 +299,11 @@ export default function PlayerEquipment({
         originalIndex: i,
       }),
     );
-    (inv.shields || []).forEach((s, i) =>
-      items.push({ ...s, equipType: "shield", originalIndex: i }),
-    );
+    if (!isTechnospheres) {
+      (inv.shields || []).forEach((s, i) =>
+        items.push({ ...s, equipType: "shield", originalIndex: i }),
+      );
+    }
     (inv.armor || []).forEach((a, i) =>
       items.push({ ...a, equipType: "armor", originalIndex: i }),
     );
@@ -301,7 +312,7 @@ export default function PlayerEquipment({
     );
 
     return items;
-  }, [inv]);
+  }, [inv, isTechnospheres]);
 
   const equippedShields = useMemo(
     () =>
@@ -353,18 +364,22 @@ export default function PlayerEquipment({
         label: t("Weapons"),
         types: ["weapon", "custom-weapon"],
         key: "weapons",
-        compendium: "weapons",
+        compendium: isTechnospheres ? "custom-weapons" : "weapons",
         col1: t("Accuracy"),
         col2: t("Damage"),
       },
-      {
-        label: t("Shields"),
-        types: ["shield"],
-        key: "shields",
-        compendium: "shields",
-        col1: t("DEF"),
-        col2: t("M.DEF"),
-      },
+      ...(!isTechnospheres
+        ? [
+            {
+              label: t("Shields"),
+              types: ["shield"],
+              key: "shields",
+              compendium: "shields",
+              col1: t("DEF"),
+              col2: t("M.DEF"),
+            },
+          ]
+        : []),
       {
         label: t("Armor"),
         types: ["armor"],
@@ -389,7 +404,7 @@ export default function PlayerEquipment({
         items: filteredItems.filter((it) => g.types.includes(it.equipType)),
       }))
       .filter((g) => g.items.length > 0 || (isEditMode && !isMainTab));
-  }, [filteredItems, isEditMode, isMainTab, t]);
+  }, [filteredItems, isEditMode, isMainTab, isTechnospheres, t]);
 
   // Modifiers
   const equippedArmorItems = allEquipment.filter(
@@ -570,6 +585,7 @@ export default function PlayerEquipment({
   const [slotMenuWeapon, setSlotMenuWeapon] = useState(null);
   const [shieldMenuAnchor, setShieldMenuAnchor] = useState(null);
   const [shieldMenuItem, setShieldMenuItem] = useState(null);
+  const [shieldEquipWarningOpen, setShieldEquipWarningOpen] = useState(false);
 
   const handleWeaponSlotSelect = (slot) => {
     if (slotMenuWeapon)
@@ -634,6 +650,10 @@ export default function PlayerEquipment({
       unequipItem(source, invItem.name);
     } else {
       if (item.equipType === "shield") {
+        if (isTwoHandedEquipped(player) && !checkIfEquippable(item)) {
+          setShieldEquipWarningOpen(true);
+          return;
+        }
         if (hasDualShieldBearer && event) {
           setShieldMenuAnchor({ top: event.clientY, left: event.clientX });
           setShieldMenuItem({ name: invItem.name, index: idx });
@@ -679,10 +699,6 @@ export default function PlayerEquipment({
   };
 
   const handleEquipmentGuarded = (item, event) => {
-    if (!item.isEquipped && !checkIfEquippable(item)) {
-      setMartialWarning({ item, event });
-      return;
-    }
     handleEquipment(item, event);
   };
 
@@ -833,8 +849,10 @@ export default function PlayerEquipment({
   };
 
   const handleAddAction = (group) => {
-    if (group.key === "weapons") onAddWeapon?.();
-    else if (group.key === "armor") onAddArmor?.();
+    if (group.key === "weapons") {
+      if (isTechnospheres) onAddCustomWeapon?.();
+      else onAddWeapon?.();
+    } else if (group.key === "armor") onAddArmor?.();
     else if (group.key === "shields") onAddShield?.();
     else if (group.key === "accessories") onAddAccessory?.();
   };
@@ -1038,54 +1056,22 @@ export default function PlayerEquipment({
         restrictToTypes={compendiumType ? [compendiumType] : undefined}
         context="player"
       />
-      {martialWarning && (
-        <Dialog
-          open
-          onClose={() => setMartialWarning(null)}
-          maxWidth="xs"
-          fullWidth
+      <Snackbar
+        open={shieldEquipWarningOpen}
+        autoHideDuration={3000}
+        onClose={() => setShieldEquipWarningOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="warning"
+          onClose={() => setShieldEquipWarningOpen(false)}
+          sx={{ width: "100%" }}
         >
-          <DialogTitle
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              color: "warning.main",
-            }}
-          >
-            <WarningAmberIcon fontSize="small" />
-            {t("Not Proficient")}
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="body2">
-              <strong>{martialWarning.item?.name}</strong>{" "}
-              {t(
-                "is a martial item and your character is not proficient with it.",
-              )}
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1, color: "text.secondary" }}>
-              {t(
-                "Equipping it without proficiency may be against the rules. Equip anyway?",
-              )}
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setMartialWarning(null)}>
-              {t("Cancel")}
-            </Button>
-            <Button
-              color="warning"
-              variant="contained"
-              onClick={() => {
-                handleEquipment(martialWarning.item, martialWarning.event);
-                setMartialWarning(null);
-              }}
-            >
-              {t("Equip Anyway")}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
+          {t(
+            "Cannot equip a martial shield you are not proficient with while a two-handed weapon is equipped.",
+          )}
+        </Alert>
+      </Snackbar>
       <Dialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}

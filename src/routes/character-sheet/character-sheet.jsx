@@ -184,12 +184,17 @@ export default function CharacterSheet() {
         let mpBonus = 0;
         let ipBonus = 0;
 
+        const innateClassesCS1 =
+          prevPlayer.settings?.optionalRules?.innateClasses ?? [];
+        const isTechnospheresCS1 =
+          prevPlayer.settings?.optionalRules?.technospheres ?? false;
         prevPlayer.classes.forEach((cls) => {
-          if (cls.benefits) {
-            hpBonus += cls.benefits.hpplus || 0;
-            mpBonus += cls.benefits.mpplus || 0;
-            ipBonus += cls.benefits.ipplus || 0;
-          }
+          if (!cls.benefits) return;
+          if (isTechnospheresCS1 && !innateClassesCS1.includes(cls.name))
+            return;
+          hpBonus += cls.benefits.hpplus || 0;
+          mpBonus += cls.benefits.mpplus || 0;
+          ipBonus += cls.benefits.ipplus || 0;
         });
 
         if (prevPlayer.modifiers) {
@@ -352,12 +357,16 @@ export default function CharacterSheet() {
       let mpBonus = 0;
       let ipBonus = 0;
 
+      const innateClassesCS2 =
+        leveledPlayer.settings?.optionalRules?.innateClasses ?? [];
+      const isTechnospheresCS2 =
+        leveledPlayer.settings?.optionalRules?.technospheres ?? false;
       (leveledPlayer.classes || []).forEach((cls) => {
-        if (cls.benefits) {
-          hpBonus += Number(cls.benefits.hpplus) || 0;
-          mpBonus += Number(cls.benefits.mpplus) || 0;
-          ipBonus += Number(cls.benefits.ipplus) || 0;
-        }
+        if (!cls.benefits) return;
+        if (isTechnospheresCS2 && !innateClassesCS2.includes(cls.name)) return;
+        hpBonus += Number(cls.benefits.hpplus) || 0;
+        mpBonus += Number(cls.benefits.mpplus) || 0;
+        ipBonus += Number(cls.benefits.ipplus) || 0;
       });
 
       if (leveledPlayer.modifiers) {

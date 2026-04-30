@@ -35,6 +35,11 @@ import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
+import {
+  getSlottedMnemospheres,
+  getMnemosphereSkillDescription,
+  getMnemosphereHeroicDescription,
+} from "../../classes/mnemosphereClassUtils";
 import SpellDefault from "./spells/SpellDefault";
 import SpellArcanist from "./spells/SpellArcanist";
 import SpellEntropistGamble from "./spells/SpellEntropistGamble";
@@ -104,7 +109,8 @@ const BenefitChip = ({ label, value, tooltipText }) => {
   );
 };
 
-const BenefitChips = ({ benefits, t }) => {
+const BenefitChips = ({ benefits }) => {
+  const { t } = useTranslate();
   const chipConfigs = [
     {
       key: "hpplus",
@@ -386,24 +392,48 @@ export default function PlayerClasses({
   const [_newBlankClassName, _setNewBlankClassName] = useState("");
   const [_classCompendiumOpen, setClassCompendiumOpen] = useState(false);
 
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const slottedMnemospheres = useMemo(
+    () => (isTechnospheres ? getSlottedMnemospheres(player) : []),
+    [isTechnospheres, player],
+  );
+
   const warnings = useMemo(() => {
     const w = [];
-    if (!player.classes || player.classes.length < 2)
-      w.push("Character must have at least 2 classes.");
-    const maxLvlCount = player.classes
-      ? player.classes.filter((c) => c.lvl >= 10).length
-      : 0;
-    if (player.classes && player.classes.length - maxLvlCount > 3)
-      w.push(
-        "The number of classes exceeds the limit beyond the number of classes at level 10.",
+    if (isTechnospheres) {
+      const innateCount = player.classes?.length ?? 0;
+      if (innateCount !== 3)
+        w.push("Technospheres: character must have exactly 3 innate classes.");
+      const innateTotal = player.classes
+        ? player.classes.reduce((s, c) => s + parseInt(c.lvl), 0)
+        : 0;
+      const mnemoTotal = slottedMnemospheres.reduce(
+        (s, m) => s + (m.lvl ?? 0),
+        0,
       );
-    const total = player.classes
-      ? player.classes.reduce((s, c) => s + parseInt(c.lvl), 0)
-      : 0;
-    if (total !== player.lvl)
-      w.push("Sum of class levels isn't equal to character level.");
+      if (innateTotal + mnemoTotal !== player.lvl)
+        w.push(
+          "Sum of innate class levels and mnemosphere levels isn't equal to character level.",
+        );
+    } else {
+      if (!player.classes || player.classes.length < 2)
+        w.push("Character must have at least 2 classes.");
+      const maxLvlCount = player.classes
+        ? player.classes.filter((c) => c.lvl >= 10).length
+        : 0;
+      if (player.classes && player.classes.length - maxLvlCount > 3)
+        w.push(
+          "The number of classes exceeds the limit beyond the number of classes at level 10.",
+        );
+      const total = player.classes
+        ? player.classes.reduce((s, c) => s + parseInt(c.lvl), 0)
+        : 0;
+      if (total !== player.lvl)
+        w.push("Sum of class levels isn't equal to character level.");
+    }
     return w;
-  }, [player.classes, player.lvl]);
+  }, [player.classes, player.lvl, slottedMnemospheres, isTechnospheres]);
 
   const handleAddHeroic = (item) => {
     if (heroicPickerClassIdx === null || !setPlayer) return;
@@ -455,7 +485,7 @@ export default function PlayerClasses({
                   variant="h4"
                   sx={{ textTransform: "uppercase", color: "#fff" }}
                 >
-                  {t("Classes")}
+                  {isTechnospheres ? t("Innate Classes") : t("Classes")}
                 </Typography>
               </StyledTableCellHeader>
               <StyledTableCellHeader sx={{ width: { xs: 70, sm: 80 } }} />
@@ -708,7 +738,7 @@ export default function PlayerClasses({
                                     flexWrap: "wrap",
                                   }}
                                 >
-                                  <BenefitChips benefits={cls.benefits} t={t} />
+                                  <BenefitChips benefits={cls.benefits} />
                                 </Box>
                               </Box>
                             )}
@@ -1189,6 +1219,367 @@ export default function PlayerClasses({
           </TableBody>
         </Table>
       </TableContainer>
+      {/* Mnemosphere classes section */}
+      {isTechnospheres && slottedMnemospheres.length > 0 && (
+        <TableContainer component={Paper} sx={{ mb: 1 }}>
+          <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
+            <TableHead>
+              <TableRow
+                sx={{
+                  background: theme.primary,
+                  "& .MuiTypography-root": {
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    textTransform: "uppercase",
+                  },
+                }}
+              >
+                <StyledTableCellHeader sx={{ width: 36 }} />
+                <StyledTableCellHeader>
+                  <Typography
+                    variant="h4"
+                    sx={{ textTransform: "uppercase", color: "#fff" }}
+                  >
+                    {t("Mnemospheres")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: { xs: 70, sm: 80 } }} />
+                <StyledTableCellHeader
+                  sx={{ width: { xs: 80, sm: 90 }, textAlign: "center" }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      color: "#fff",
+                      opacity: 0.8,
+                      fontSize: "0.65rem",
+                    }}
+                  >
+                    {t("Level")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: { xs: 90, sm: 100 } }} />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {slottedMnemospheres.map((mnemo, mnemoIdx) => {
+                const mnemoKey = `mnemo-class-${mnemo.id}`;
+                const skills = mnemo.skills ?? [];
+                const heroic = mnemo.heroic ?? [];
+
+                return (
+                  <React.Fragment key={mnemoKey}>
+                    <TableRow
+                      sx={{
+                        backgroundColor: openRows.classes[mnemoKey]
+                          ? "rgba(0,0,0,0.02)"
+                          : "inherit",
+                      }}
+                    >
+                      <StyledTableCell sx={{ width: 36 }}>
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleRow("classes", mnemoKey);
+                          }}
+                          size="small"
+                        >
+                          {openRows.classes[mnemoKey] ? (
+                            <KeyboardArrowUp />
+                          ) : (
+                            <KeyboardArrowDown />
+                          )}
+                        </IconButton>
+                      </StyledTableCell>
+                      <StyledTableCell
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleRow("classes", mnemoKey);
+                        }}
+                        sx={{ cursor: "pointer" }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                          {highlightMatch(t(mnemo.class), searchQuery)}
+                        </Typography>
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ width: { xs: 70, sm: 80 } }} />
+                      <StyledTableCell sx={{ width: { xs: 80, sm: 90 } }}>
+                        <Typography sx={{ textAlign: "center" }}>
+                          {mnemo.lvl ?? 1}/5
+                        </Typography>
+                      </StyledTableCell>
+                      <StyledTableCell sx={{ width: { xs: 90, sm: 100 } }} />
+                    </TableRow>
+                    <TableRow>
+                      <StyledTableCell
+                        colSpan={5}
+                        sx={{
+                          p: 0,
+                          borderBottom: openRows.classes[mnemoKey]
+                            ? "1px solid rgba(0,0,0,0.12)"
+                            : "none",
+                        }}
+                      >
+                        <Collapse
+                          in={openRows.classes[mnemoKey]}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          <Box
+                            sx={{
+                              p: 1,
+                              ml: { xs: 1, sm: 4 },
+                              bgcolor: "rgba(0,0,0,0.03)",
+                              mt: 0.5,
+                            }}
+                          >
+                            <Grid container>
+                              <Grid size={12}>
+                                <Table size="small">
+                                  <TableBody>
+                                    {skills
+                                      .filter((s) => (s.currentLvl ?? 0) >= 1)
+                                      .map((skill, skillIdx) => {
+                                        const skillKey = `mnemo-skill-${mnemo.id}-${skillIdx}`;
+                                        const desc = t(
+                                          getMnemosphereSkillDescription(
+                                            mnemo,
+                                            skill,
+                                          ) ?? "",
+                                        );
+                                        const isSkillOpen =
+                                          !!openRows.classes[skillKey] ||
+                                          (!!searchQuery?.trim() &&
+                                            desc
+                                              .toLowerCase()
+                                              .includes(
+                                                searchQuery
+                                                  .trim()
+                                                  .toLowerCase(),
+                                              ));
+                                        return (
+                                          <React.Fragment key={skillKey}>
+                                            <TableRow
+                                              sx={{ "& td": { border: 0 } }}
+                                            >
+                                              <StyledTableCell
+                                                sx={{ width: 36 }}
+                                              >
+                                                <IconButton
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleRow(
+                                                      "classes",
+                                                      skillKey,
+                                                    );
+                                                  }}
+                                                  size="small"
+                                                >
+                                                  {isSkillOpen ? (
+                                                    <KeyboardArrowUp />
+                                                  ) : (
+                                                    <KeyboardArrowDown />
+                                                  )}
+                                                </IconButton>
+                                              </StyledTableCell>
+                                              <StyledTableCell
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  toggleRow(
+                                                    "classes",
+                                                    skillKey,
+                                                  );
+                                                }}
+                                                sx={{ cursor: "pointer" }}
+                                              >
+                                                <Typography
+                                                  variant="body2"
+                                                  sx={{
+                                                    fontWeight: "bold",
+                                                    mr: 0.5,
+                                                  }}
+                                                >
+                                                  {highlightMatch(
+                                                    t(skill.name),
+                                                    searchQuery,
+                                                  )}
+                                                </Typography>
+                                              </StyledTableCell>
+                                              <StyledTableCell
+                                                sx={{ width: 80 }}
+                                              />
+                                              <StyledTableCell
+                                                sx={{ width: 90 }}
+                                              >
+                                                <Typography
+                                                  sx={{ textAlign: "center" }}
+                                                >
+                                                  {skill.currentLvl}/
+                                                  {skill.maxLvl}
+                                                </Typography>
+                                              </StyledTableCell>
+                                              <StyledTableCell
+                                                sx={{ width: 100 }}
+                                              />
+                                            </TableRow>
+                                            <TableRow>
+                                              <StyledTableCell
+                                                colSpan={5}
+                                                sx={{ p: 0 }}
+                                              >
+                                                <Collapse
+                                                  in={isSkillOpen}
+                                                  timeout="auto"
+                                                  unmountOnExit
+                                                >
+                                                  <Box
+                                                    sx={{
+                                                      p: 1,
+                                                      ml: { xs: 1, sm: 4 },
+                                                      bgcolor:
+                                                        "rgba(0,0,0,0.03)",
+                                                    }}
+                                                  >
+                                                    <StyledMarkdown
+                                                      allowedElements={[
+                                                        "strong",
+                                                        "mark",
+                                                      ]}
+                                                      unwrapDisallowed
+                                                    >
+                                                      {highlightMarkdownText(
+                                                        desc,
+                                                        searchQuery,
+                                                      )}
+                                                    </StyledMarkdown>
+                                                  </Box>
+                                                </Collapse>
+                                              </StyledTableCell>
+                                            </TableRow>
+                                          </React.Fragment>
+                                        );
+                                      })}
+                                    {heroic.map((h, hIdx) => {
+                                      const heroicKey = `mnemo-heroic-${mnemo.id}-${hIdx}`;
+                                      const desc = t(
+                                        getMnemosphereHeroicDescription(
+                                          mnemo,
+                                          h,
+                                        ) ?? "",
+                                      );
+                                      const isHeroicOpen =
+                                        !!openRows.classes[heroicKey];
+                                      return (
+                                        <React.Fragment key={heroicKey}>
+                                          <TableRow
+                                            sx={{ "& td": { border: 0 } }}
+                                          >
+                                            <StyledTableCell sx={{ width: 36 }}>
+                                              <IconButton
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  toggleRow(
+                                                    "classes",
+                                                    heroicKey,
+                                                  );
+                                                }}
+                                                size="small"
+                                              >
+                                                {isHeroicOpen ? (
+                                                  <KeyboardArrowUp />
+                                                ) : (
+                                                  <KeyboardArrowDown />
+                                                )}
+                                              </IconButton>
+                                            </StyledTableCell>
+                                            <StyledTableCell
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleRow("classes", heroicKey);
+                                              }}
+                                              sx={{ cursor: "pointer" }}
+                                            >
+                                              <Box
+                                                sx={{
+                                                  display: "flex",
+                                                  alignItems: "center",
+                                                }}
+                                              >
+                                                <Typography
+                                                  variant="body2"
+                                                  sx={{
+                                                    fontWeight: "bold",
+                                                    mr: 0.5,
+                                                  }}
+                                                >
+                                                  {highlightMatch(
+                                                    t(h.name),
+                                                    searchQuery,
+                                                  )}
+                                                </Typography>
+                                                <Star
+                                                  sx={{
+                                                    color: theme.secondary,
+                                                    fontSize: "1rem",
+                                                  }}
+                                                />
+                                              </Box>
+                                            </StyledTableCell>
+                                            <StyledTableCell colSpan={3} />
+                                          </TableRow>
+                                          <TableRow>
+                                            <StyledTableCell
+                                              colSpan={5}
+                                              sx={{ p: 0 }}
+                                            >
+                                              <Collapse
+                                                in={isHeroicOpen}
+                                                timeout="auto"
+                                                unmountOnExit
+                                              >
+                                                <Box
+                                                  sx={{
+                                                    p: 1,
+                                                    ml: { xs: 1, sm: 4 },
+                                                    bgcolor: "rgba(0,0,0,0.03)",
+                                                  }}
+                                                >
+                                                  <StyledMarkdown
+                                                    allowedElements={[
+                                                      "strong",
+                                                      "mark",
+                                                    ]}
+                                                    unwrapDisallowed
+                                                  >
+                                                    {highlightMarkdownText(
+                                                      desc,
+                                                      searchQuery,
+                                                    )}
+                                                  </StyledMarkdown>
+                                                </Box>
+                                              </Collapse>
+                                            </StyledTableCell>
+                                          </TableRow>
+                                        </React.Fragment>
+                                      );
+                                    })}
+                                  </TableBody>
+                                </Table>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        </Collapse>
+                      </StyledTableCell>
+                    </TableRow>
+                  </React.Fragment>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
       {/* Modals remain the same */}
       <CompendiumViewerModal
         open={heroicPickerClassIdx !== null}

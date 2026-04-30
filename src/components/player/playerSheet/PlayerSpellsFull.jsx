@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Paper, Typography, Grid } from "@mui/material";
+import { getActiveMnemosphereSkills } from "../equipment/slots/loadoutSelectors";
 import { useTranslate } from "../../../translation/translate";
 import SpellDefault from "../spells/SpellDefault";
 import SpellArcanist from "../spells/SpellArcanist";
@@ -62,8 +63,16 @@ export default function PlayerSpellsFull({
 
   const canEdit = Boolean(isEditMode && setPlayer);
 
+  const classesList = useMemo(() => {
+    const base = player.classes ?? [];
+    const activeSpells = getActiveMnemosphereSkills(player).spells;
+    if (activeSpells.length === 0) return base;
+    return [...base, { name: "Mnemosphere", spells: activeSpells }];
+  }, [player]);
+
   const handleEditSpell = (classIdx, spellIdx, spell) => {
     if (!canEdit) return;
+    if (classIdx >= (player.classes ?? []).length) return;
     const spellType = spell.spellType;
     let modalName = "default";
     if (spellType === "arcanist" || spellType === "arcanist-rework")
@@ -90,6 +99,7 @@ export default function PlayerSpellsFull({
 
   const handleOpenSpellSubModal = (modalName, classIdx, spellIdx, spell) => {
     if (!canEdit) return;
+    if (classIdx >= (player.classes ?? []).length) return;
     openModal(modalName, spell, classIdx, spellIdx);
   };
 
@@ -140,9 +150,9 @@ export default function PlayerSpellsFull({
 
   return (
     <>
-      {player.classes.length > 0 && (
+      {classesList.length > 0 && (
         <Grid container spacing={0}>
-          {player.classes
+          {classesList
             .filter((c) => c.spells && c.spells.length > 0)
             .map((c, classIndex) => (
               <Grid key={classIndex} size={12}>

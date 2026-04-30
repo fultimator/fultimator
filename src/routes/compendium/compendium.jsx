@@ -99,6 +99,8 @@ import {
   SharedCustomWeaponCard,
   SharedAccessoryCard,
   SharedQualityCard,
+  SharedMnemosphereCard,
+  SharedHoplosphereCard,
 } from "../../components/shared/itemCards";
 
 import classList, { spellList, spellsByClass } from "../../libs/classes";
@@ -127,10 +129,6 @@ const normalizeWellspring = (value = "") => String(value).trim().toLowerCase();
 const getItemWellspring = (item) =>
   item?.wellspring ?? item?.Wellspring ?? item?.category ?? "";
 
-// ---------------------------------------------------------------------------
-// Sidebar table columns per type
-// ---------------------------------------------------------------------------
-
 function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
   if (type === "custom-weapons") return `${item.cost || 300}z`;
@@ -144,6 +142,8 @@ function SidebarSecondaryValue(type, item, t) {
   if (type === "attacks") return t(item.range);
   if (type === "classes") return item.book ?? "";
   if (type === "heroics") return item.book ?? "";
+  if (type === "mnemospheres") return `${item.class ?? ""} Lv.${item.lvl ?? 1}`;
+  if (type === "hoplospheres") return `${item.cost ?? 0}z`;
   if (type === "optionals") return item.subtype ?? "";
   if (type === "special") return item.spCost != null ? `${item.spCost} SP` : "";
   if (type === "actions") return item.spCost != null ? `${item.spCost} SP` : "";
@@ -156,6 +156,8 @@ function SidebarSecondaryLabel(type, t) {
   if (type === "attacks") return t("Range");
   if (type === "classes") return t("Book");
   if (type === "heroics") return t("Book");
+  if (type === "mnemospheres") return t("Class");
+  if (type === "hoplospheres") return t("Cost");
   if (type === "optionals") return t("Subtype");
   return t("Cost");
 }
@@ -977,6 +979,22 @@ export const ItemCard = React.memo(function ItemCard({
     case "heroics":
       return (
         <SharedHeroicCard item={item} id={id} onHeaderClick={onHeaderClick} />
+      );
+    case "mnemospheres":
+      return (
+        <SharedMnemosphereCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
+      );
+    case "hoplospheres":
+      return (
+        <SharedHoplosphereCard
+          item={item}
+          id={id}
+          onHeaderClick={onHeaderClick}
+        />
       );
     case "custom-weapons":
       return (

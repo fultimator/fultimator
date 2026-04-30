@@ -78,6 +78,8 @@ import JSZip from "jszip";
 import useDownload from "../../hooks/useDownload";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import SettingRow from "../../components/common/SettingRow";
+import classList from "../../libs/classes";
+import MnemosphereCreateDialog from "../../components/player/equipment/technospheres/MnemosphereCreateDialog";
 
 export default function PlayerGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -95,6 +97,7 @@ function Personal() {
   const defaultCreatePlayerOptions = {
     name: "",
     advancement: false,
+    automaticClassLevel: true,
     defaultView: "normal",
     autoEquipUnarmed: true,
     optionalRules: {
@@ -102,7 +105,8 @@ function Personal() {
       campActivities: false,
       zeroPower: false,
       technospheres: false,
-      technospheresVariant: "none",
+      technospheresVariant: "standard",
+      innateClasses: [],
     },
   };
   const [name, setName] = useState("");
@@ -113,6 +117,8 @@ function Personal() {
   const [createPlayerOptions, setCreatePlayerOptions] = useState(
     defaultCreatePlayerOptions,
   );
+  const [startingMnemosphereDialogOpen, setStartingMnemosphereDialogOpen] =
+    useState(false);
 
   // Deletion confirmation states
   const playerToDeleteRef = useRef(null);
@@ -212,6 +218,28 @@ function Personal() {
     : [];
 
   const addPlayer = async function (options = defaultCreatePlayerOptions) {
+    const innateClassNames = options.optionalRules?.technospheres
+      ? (options.optionalRules?.innateClasses ?? [])
+      : [];
+    const startingClasses = innateClassNames
+      .map((className) =>
+        classList.find((classDef) => classDef.name === className),
+      )
+      .filter(Boolean)
+      .map((classDef) => ({
+        name: classDef.name,
+        lvl: 1,
+        benefits: classDef.benefits,
+        skills: (classDef.skills ?? []).slice().sort((a, b) => {
+          if (a.skillName < b.skillName) return -1;
+          if (a.skillName > b.skillName) return 1;
+          return 0;
+        }),
+        heroic: classDef.heroic || { name: "", description: "" },
+        spells: classDef.spells || [],
+        isHomebrew: false,
+      }));
+
     const data = {
       name: options.name,
       lvl: 5,
@@ -258,7 +286,7 @@ function Personal() {
         shaken: false,
         poisoned: false,
       },
-      classes: [],
+      classes: startingClasses,
       weapons: [
         {
           base: {
@@ -307,8 +335,8 @@ function Personal() {
       armor: [],
       notes: [],
       modifiers: {
-        hp: 0,
-        mp: 0,
+        hp: options.optionalRules?.technospheres ? 5 : 0,
+        mp: options.optionalRules?.technospheres ? 5 : 0,
         ip: 0,
         def: 0,
         mdef: 0,
@@ -332,11 +360,29 @@ function Personal() {
       settings: {
         defaultView: options.defaultView,
         advancement: options.advancement,
+        automaticClassLevel:
+          options.optionalRules?.technospheres ||
+          options.automaticClassLevel !== false,
         autoEquipUnarmed: options.autoEquipUnarmed ?? true,
         optionalRules: {
           ...options.optionalRules,
         },
+        ...(options.optionalRules?.technospheres
+          ? { specialSkillOverrides: { "Dual Shieldbearer": true } }
+          : {}),
       },
+      ...(options.optionalRules?.technospheres
+        ? {
+            equipment: [
+              {
+                mnemospheres: options.startingMnemosphere
+                  ? [options.startingMnemosphere]
+                  : [],
+                hoplospheres: [],
+              },
+            ],
+          }
+        : {}),
     };
 
     try {
@@ -813,6 +859,9 @@ function Personal() {
   const handleCreateOptionalRuleChange = (rule, checked) => {
     setCreatePlayerOptions((prev) => ({
       ...prev,
+      ...(rule === "technospheres" && checked
+        ? { automaticClassLevel: true }
+        : {}),
       optionalRules: {
         ...prev.optionalRules,
         [rule]: checked,
@@ -838,6 +887,17 @@ function Personal() {
         state: { from: "/pc-gallery" },
       });
     }
+    setCreatePlayerOptions(defaultCreatePlayerOptions);
+  };
+
+  const handleStartingMnemosphereConfirm = (mnemo) => {
+    setStartingMnemosphereDialogOpen(false);
+    setCreatePlayerOptions((prev) => ({ ...prev, startingMnemosphere: mnemo }));
+  };
+
+  const handleStartingMnemosphereSkip = () => {
+    setStartingMnemosphereDialogOpen(false);
+    setCreatePlayerOptions((prev) => ({ ...prev, startingMnemosphere: null }));
   };
 
   const sharePlayer = async (id) => {
@@ -1384,7 +1444,7 @@ function Personal() {
             <SettingRow
               label={t("Advancement")}
               hint={t(
-                "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, automated class level tracking, and per-level skill management.",
+                "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, and per-level skill management.",
               )}
               compactControl
             >
@@ -1393,6 +1453,28 @@ function Personal() {
                 onChange={(evt) =>
                   handleCreatePlayerOptionChange(
                     "advancement",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Automatic Class Leveling")}
+              hint={t(
+                "When enabled, class level is read-only and is derived from the total current skill levels in that class.",
+              )}
+              compactControl
+            >
+              <Checkbox
+                checked={
+                  createPlayerOptions.optionalRules.technospheres ||
+                  createPlayerOptions.automaticClassLevel !== false
+                }
+                disabled={createPlayerOptions.optionalRules.technospheres}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "automaticClassLevel",
                     evt.target.checked,
                   )
                 }
@@ -1484,7 +1566,7 @@ function Personal() {
             <SettingRow
               label={t("Technospheres")}
               hint={t(
-                "(Placeholder) Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
+                "Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
               )}
               showDivider={false}
               dense
@@ -1501,6 +1583,15 @@ function Personal() {
               />
             </SettingRow>
             {createPlayerOptions.optionalRules.technospheres && (
+              <Box sx={{ mt: 1, px: 1, mb: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t(
+                    "Manage innate classes from the Classes tab. Add them under Innate Classes with the compendium search or add button.",
+                  )}
+                </Typography>
+              </Box>
+            )}
+            {createPlayerOptions.optionalRules.technospheres && (
               <SettingRow
                 label={t("Technospheres Alternative Rule")}
                 hint={t("Select which Technospheres variant to use.")}
@@ -1511,7 +1602,7 @@ function Personal() {
                 <RadioGroup
                   value={
                     createPlayerOptions.optionalRules.technospheresVariant ??
-                    "none"
+                    "standard"
                   }
                   onChange={(evt) =>
                     handleCreateOptionalRuleValueChange(
@@ -1529,9 +1620,9 @@ function Personal() {
                   }}
                 >
                   <FormControlLabel
-                    value="none"
+                    value="standard"
                     control={<Radio size="small" />}
-                    label={t("None")}
+                    label={t("Standard")}
                     labelPlacement="start"
                   />
                   <FormControlLabel
@@ -1559,11 +1650,24 @@ function Personal() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseCreatePlayerModal}>{t("Cancel")}</Button>
-          <Button variant="contained" onClick={handleCreatePlayerConfirm}>
+          <Button
+            variant="contained"
+            onClick={handleCreatePlayerConfirm}
+            disabled={
+              createPlayerOptions.optionalRules.technospheres &&
+              (createPlayerOptions.optionalRules.innateClasses ?? []).length !==
+                3
+            }
+          >
             {t("Create Player")}
           </Button>
         </DialogActions>
       </Dialog>
+      <MnemosphereCreateDialog
+        open={startingMnemosphereDialogOpen}
+        onClose={handleStartingMnemosphereSkip}
+        onConfirm={handleStartingMnemosphereConfirm}
+      />
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}

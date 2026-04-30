@@ -78,6 +78,10 @@ import { TypeAffinity } from "../../../types";
 import PlayerEquipment from "./PlayerEquipment";
 import PlayerClasses from "./PlayerClasses";
 import PlayerSpells from "./PlayerSpells";
+import {
+  isAutomaticClassLevelEnabled,
+  syncAutomaticClassLevels,
+} from "../../classes/classLevelUtils";
 import PlayerRituals from "./PlayerRituals";
 import PlayerQuirk from "./PlayerQuirk";
 import PlayerCampActivities from "./PlayerCampActivities";
@@ -88,12 +92,12 @@ import PlayerBonds from "./PlayerBonds";
 import PlayerVehicle from "./PlayerVehicle";
 import PlayerCompanion from "./PlayerCompanion";
 import CompactLoadout from "./CompactLoadout";
+import CompactSphereInventory from "./CompactSphereInventory";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { calculateAttribute } from "../../common/playerCalculations";
 import ExpIcon from "../../../svgs/exp.svg?react";
 import ExpDisabledIcon from "../../../svgs/exp_disabled.svg?react";
 
-// Styled Components
 // const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 // const StyledTableCell = styled(TableCell)({ padding: 0 });
 
@@ -115,7 +119,6 @@ export default function PlayerCardSheet({
     quirks: false,
     campActivities: false,
     zeroPower: false,
-    technospheres: false,
   },
   characterImage,
   id,
@@ -128,6 +131,12 @@ export default function PlayerCardSheet({
   _onAddFeature,
 }) {
   const { t } = useTranslate();
+  const automaticClassLevel = isAutomaticClassLevelEnabled(player);
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+
+  const syncClassLevels = (nextPlayer) =>
+    automaticClassLevel ? syncAutomaticClassLevels(nextPlayer) : nextPlayer;
   const theme = useCustomTheme();
   const muiTheme = useTheme();
   const _isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
@@ -371,28 +380,30 @@ export default function PlayerCardSheet({
       alert(t("This class type already exists for the character"));
       return;
     }
-    setPlayer((prev) => ({
-      ...prev,
-      classes: [
-        ...prev.classes,
-        {
-          name,
-          lvl: 1,
-          benefits: {
-            hpplus: 0,
-            mpplus: 0,
-            ipplus: 0,
-            rituals: {},
-            martials: {},
-            custom: [],
+    setPlayer((prev) =>
+      syncClassLevels({
+        ...prev,
+        classes: [
+          ...prev.classes,
+          {
+            name,
+            lvl: 1,
+            benefits: {
+              hpplus: 0,
+              mpplus: 0,
+              ipplus: 0,
+              rituals: {},
+              martials: {},
+              custom: [],
+            },
+            skills: [],
+            heroic: { name: "", description: "" },
+            spells: [],
+            isHomebrew: true,
           },
-          skills: [],
-          heroic: { name: "", description: "" },
-          spells: [],
-          isHomebrew: true,
-        },
-      ],
-    }));
+        ],
+      }),
+    );
     if (updateMaxStats) updateMaxStats();
   };
 
@@ -434,7 +445,9 @@ export default function PlayerCardSheet({
           spells: [],
           isHomebrew: false,
         };
-    setPlayer((prev) => ({ ...prev, classes: [...prev.classes, newClass] }));
+    setPlayer((prev) =>
+      syncClassLevels({ ...prev, classes: [...prev.classes, newClass] }),
+    );
     if (updateMaxStats) updateMaxStats();
   };
 
@@ -445,6 +458,7 @@ export default function PlayerCardSheet({
 
   // Class edit callbacks (passed to PlayerClassCard)
   const handleClassLevelChange = (classIdx, newLevel) => {
+    if (automaticClassLevel) return;
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((c, i) =>
@@ -454,12 +468,14 @@ export default function PlayerCardSheet({
     if (updateMaxStats) updateMaxStats();
   };
   const handleClassSaveBenefits = (classIdx, benefits) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((c, i) =>
-        i === classIdx ? { ...c, benefits } : c,
-      ),
-    }));
+    setPlayer((prev) =>
+      syncClassLevels({
+        ...prev,
+        classes: prev.classes.map((c, i) =>
+          i === classIdx ? { ...c, benefits } : c,
+        ),
+      }),
+    );
     if (updateMaxStats) updateMaxStats();
   };
   const handleClassAddSkill = (
@@ -469,26 +485,28 @@ export default function PlayerCardSheet({
     description,
     specialSkill,
   ) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((c) =>
-        c.name === className
-          ? {
-              ...c,
-              skills: [
-                ...c.skills,
-                {
-                  skillName,
-                  currentLvl: 1,
-                  maxLvl: maxLevel,
-                  description,
-                  specialSkill,
-                },
-              ],
-            }
-          : c,
-      ),
-    }));
+    setPlayer((prev) =>
+      syncClassLevels({
+        ...prev,
+        classes: prev.classes.map((c) =>
+          c.name === className
+            ? {
+                ...c,
+                skills: [
+                  ...c.skills,
+                  {
+                    skillName,
+                    currentLvl: 1,
+                    maxLvl: maxLevel,
+                    description,
+                    specialSkill,
+                  },
+                ],
+              }
+            : c,
+        ),
+      }),
+    );
     if (updateMaxStats) updateMaxStats();
   };
   const handleClassEditSkill = (
@@ -499,75 +517,83 @@ export default function PlayerCardSheet({
     description,
     specialSkill,
   ) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((c) =>
-        c.name === className
-          ? {
-              ...c,
-              skills: c.skills.map((s, i) =>
-                i === skillIndex
-                  ? {
-                      ...s,
-                      skillName,
-                      maxLvl: parseInt(maxLevel),
-                      currentLvl: Math.min(s.currentLvl, parseInt(maxLevel)),
-                      description,
-                      specialSkill,
-                    }
-                  : s,
-              ),
-            }
-          : c,
-      ),
-    }));
+    setPlayer((prev) =>
+      syncClassLevels({
+        ...prev,
+        classes: prev.classes.map((c) =>
+          c.name === className
+            ? {
+                ...c,
+                skills: c.skills.map((s, i) =>
+                  i === skillIndex
+                    ? {
+                        ...s,
+                        skillName,
+                        maxLvl: parseInt(maxLevel),
+                        currentLvl: Math.min(s.currentLvl, parseInt(maxLevel)),
+                        description,
+                        specialSkill,
+                      }
+                    : s,
+                ),
+              }
+            : c,
+        ),
+      }),
+    );
     if (updateMaxStats) updateMaxStats();
   };
   const handleClassDeleteSkill = (classIdx, skillIndex) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((c, i) =>
-        i === classIdx
-          ? { ...c, skills: c.skills.filter((_, si) => si !== skillIndex) }
-          : c,
-      ),
-    }));
+    setPlayer((prev) =>
+      syncClassLevels({
+        ...prev,
+        classes: prev.classes.map((c, i) =>
+          i === classIdx
+            ? { ...c, skills: c.skills.filter((_, si) => si !== skillIndex) }
+            : c,
+        ),
+      }),
+    );
     if (updateMaxStats) updateMaxStats();
   };
   const handleClassIncreaseSkill = (classIdx, skillIndex) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((c, i) =>
-        i === classIdx
-          ? {
-              ...c,
-              skills: c.skills.map((s, si) =>
-                si === skillIndex && s.currentLvl < s.maxLvl
-                  ? { ...s, currentLvl: s.currentLvl + 1 }
-                  : s,
-              ),
-            }
-          : c,
-      ),
-    }));
+    setPlayer((prev) =>
+      syncClassLevels({
+        ...prev,
+        classes: prev.classes.map((c, i) =>
+          i === classIdx
+            ? {
+                ...c,
+                skills: c.skills.map((s, si) =>
+                  si === skillIndex && s.currentLvl < s.maxLvl
+                    ? { ...s, currentLvl: s.currentLvl + 1 }
+                    : s,
+                ),
+              }
+            : c,
+        ),
+      }),
+    );
     if (updateMaxStats) updateMaxStats();
   };
   const handleClassDecreaseSkill = (classIdx, skillIndex) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((c, i) =>
-        i === classIdx
-          ? {
-              ...c,
-              skills: c.skills.map((s, si) =>
-                si === skillIndex && s.currentLvl > 0
-                  ? { ...s, currentLvl: s.currentLvl - 1 }
-                  : s,
-              ),
-            }
-          : c,
-      ),
-    }));
+    setPlayer((prev) =>
+      syncClassLevels({
+        ...prev,
+        classes: prev.classes.map((c, i) =>
+          i === classIdx
+            ? {
+                ...c,
+                skills: c.skills.map((s, si) =>
+                  si === skillIndex && s.currentLvl > 0
+                    ? { ...s, currentLvl: s.currentLvl - 1 }
+                    : s,
+                ),
+              }
+            : c,
+        ),
+      }),
+    );
     if (updateMaxStats) updateMaxStats();
   };
   const handleClassEditName = (classIdx, newName) => {
@@ -1112,7 +1138,11 @@ export default function PlayerCardSheet({
             onAddSkill={isEditMode ? openAddSkillForClass : undefined}
             onEditSkill={isEditMode ? openEditSkillForClass : undefined}
             onEditSpell={isEditMode ? handleEditSpell : undefined}
-            onLevelChange={isEditMode ? handleClassLevelChange : undefined}
+            onLevelChange={
+              isEditMode && !automaticClassLevel
+                ? handleClassLevelChange
+                : undefined
+            }
             onIncreaseSkillLevel={
               isEditMode ? handleClassIncreaseSkill : undefined
             }
@@ -1137,7 +1167,11 @@ export default function PlayerCardSheet({
             onAddSkill={isEditMode ? openAddSkillForClass : undefined}
             onEditSkill={isEditMode ? openEditSkillForClass : undefined}
             onEditSpell={isEditMode ? handleEditSpell : undefined}
-            onLevelChange={isEditMode ? handleClassLevelChange : undefined}
+            onLevelChange={
+              isEditMode && !automaticClassLevel
+                ? handleClassLevelChange
+                : undefined
+            }
             onIncreaseSkillLevel={
               isEditMode ? handleClassIncreaseSkill : undefined
             }
@@ -1198,7 +1232,9 @@ export default function PlayerCardSheet({
             isCharacterSheet={true}
             isMainTab={false}
             searchQuery={searchQuery}
-            onAddWeapon={isEditMode ? openAddWeapon : undefined}
+            onAddWeapon={
+              isEditMode && !isTechnospheres ? openAddWeapon : undefined
+            }
             onEditWeapon={
               isEditMode
                 ? (idx) => {
@@ -1237,7 +1273,9 @@ export default function PlayerCardSheet({
                   }
                 : undefined
             }
-            onAddShield={isEditMode ? openAddShield : undefined}
+            onAddShield={
+              isEditMode && !isTechnospheres ? openAddShield : undefined
+            }
             onEditShield={
               isEditMode
                 ? (idx) => {
@@ -1276,6 +1314,13 @@ export default function PlayerCardSheet({
             isCharacterSheet={true}
             searchQuery={searchQuery}
           />
+          {isTechnospheres && (
+            <CompactSphereInventory
+              player={player}
+              setPlayer={setPlayer}
+              isEditMode={isEditMode}
+            />
+          )}
         </CustomTabPanel>
         <CustomTabPanel value={value} index={4}>
           <PlayerNotes
@@ -1395,8 +1440,11 @@ export default function PlayerCardSheet({
                 allClasses={player.classes}
                 classItem={player.classes[editClassIndex]}
                 onRemove={handleClassRemove}
-                onLevelChange={(newLevel) =>
-                  handleClassLevelChange(editClassIndex, newLevel)
+                onLevelChange={
+                  automaticClassLevel
+                    ? () => {}
+                    : (newLevel) =>
+                        handleClassLevelChange(editClassIndex, newLevel)
                 }
                 onSaveBenefits={(benefits) =>
                   handleClassSaveBenefits(editClassIndex, benefits)
@@ -1422,6 +1470,7 @@ export default function PlayerCardSheet({
                 editHeroic={(newHeroic) =>
                   handleClassEditHeroic(editClassIndex, newHeroic)
                 }
+                isClassLevelReadOnly={automaticClassLevel}
               />
             </DialogContent>
           </Dialog>
@@ -1586,9 +1635,11 @@ export default function PlayerCardSheet({
         open={Boolean(equipMenuAnchor)}
         onClose={() => setEquipMenuAnchor(null)}
       >
-        <MenuItem onClick={openAddWeapon} sx={{ gap: 1 }}>
-          <MeleeIcon size="1.2em" /> {t("Add Weapon")}
-        </MenuItem>
+        {!isTechnospheres && (
+          <MenuItem onClick={openAddWeapon} sx={{ gap: 1 }}>
+            <MeleeIcon size="1.2em" /> {t("Add Weapon")}
+          </MenuItem>
+        )}
         <MenuItem onClick={openAddCustomWeapon} sx={{ gap: 1 }}>
           <MeleeIcon size="1.2em" /> {t("Add Custom Weapon")}
         </MenuItem>
@@ -1599,13 +1650,15 @@ export default function PlayerCardSheet({
         >
           <ArmorIcon size="1.2em" /> {t("Add Armor")}
         </MenuItem>
-        <MenuItem
-          onClick={openAddShield}
-          sx={{ gap: 1 }}
-          disabled={inv?.shields && inv.shields.length >= 10}
-        >
-          <ShieldIcon size="1.2em" /> {t("Add Shield")}
-        </MenuItem>
+        {!isTechnospheres && (
+          <MenuItem
+            onClick={openAddShield}
+            sx={{ gap: 1 }}
+            disabled={inv?.shields && inv.shields.length >= 10}
+          >
+            <ShieldIcon size="1.2em" /> {t("Add Shield")}
+          </MenuItem>
+        )}
         <MenuItem
           onClick={openAddAccessory}
           sx={{ gap: 1 }}
@@ -1641,6 +1694,8 @@ export default function PlayerCardSheet({
         setCustomWeapon={setCustomWeapon}
         onAddCustomWeapon={handleSaveCustomWeapon}
         onDeleteCustomWeapon={handleDeleteCustomWeapon}
+        player={player}
+        setPlayer={setPlayer}
       />
       <PlayerArmorModal
         open={openNewArmor}
@@ -1654,6 +1709,8 @@ export default function PlayerCardSheet({
         setArmorPlayer={setArmor}
         onAddArmor={handleSaveArmor}
         onDeleteArmor={handleDeleteArmor}
+        player={player}
+        setPlayer={setPlayer}
       />
       <PlayerShieldModal
         open={openNewShields}

@@ -4,8 +4,7 @@ import {
   validateSlots,
   rehydrateIsEquipped,
 } from "./equipment/slots/equipmentSlots";
-
-// Types
+import { syncAutomaticClassLevels } from "./classes/classLevelUtils";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
@@ -63,7 +62,8 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
     campActivities: rawOptionalRules.campActivities ?? false,
     zeroPower: rawOptionalRules.zeroPower ?? false,
     technospheres: rawOptionalRules.technospheres ?? false,
-    technospheresVariant: rawOptionalRules.technospheresVariant ?? "none",
+    technospheresVariant: rawOptionalRules.technospheresVariant ?? "standard",
+    innateClasses: rawOptionalRules.innateClasses ?? [],
   };
 
   const rawOverrides = settings.specialSkillOverrides ?? {};
@@ -75,6 +75,8 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
   const nextSettings: Record<string, any> = {
     ...settings,
     defaultView: settings.defaultView === "compact" ? "compact" : "normal",
+    automaticClassLevel:
+      rawOptionalRules.technospheres || settings.automaticClassLevel !== false,
     advancement: settings.advancement ?? rawOptionalRules.advancement ?? false,
     optionalRules,
   };
@@ -92,6 +94,7 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
 }
 
 const PRE_SAVE_TRANSFORMS: PlayerTransform[] = [
+  syncAutomaticClassLevels,
   normalizeSettingsForSave,
   stripRuntimeEquippedFlags,
 ];
@@ -248,6 +251,48 @@ function restoreRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
 }
 
 /**
+ * Drops any IDs in customWeapon/armor slotted[] arrays that no longer exist in
+ * the sphere banks. Prevents dangling refs after a sphere is deleted.
+ */
+function pruneStaleSlotRefs(player: TypePlayer): TypePlayer {
+  const eq0 = player.equipment?.[0];
+  if (!eq0) return player;
+
+  const validIds = new Set([
+    ...(eq0.mnemospheres ?? []).map((m) => m.id),
+    ...(eq0.hoplospheres ?? []).map((h) => h.id),
+  ]);
+
+  let changed = false;
+
+  const customWeapons = (eq0.customWeapons ?? []).map((w) => {
+    if (!w.slotted?.length) return w;
+    const pruned = w.slotted.filter((id) => validIds.has(id));
+    if (pruned.length === w.slotted.length) return w;
+    changed = true;
+    return { ...w, slotted: pruned };
+  });
+
+  const armor = (eq0.armor ?? []).map((a) => {
+    if (!a.slotted?.length) return a;
+    const pruned = a.slotted.filter((id) => validIds.has(id));
+    if (pruned.length === a.slotted.length) return a;
+    changed = true;
+    return { ...a, slotted: pruned };
+  });
+
+  if (!changed) return player;
+
+  return {
+    ...player,
+    equipment: [
+      { ...eq0, customWeapons, armor },
+      ...(player.equipment?.slice(1) ?? []),
+    ],
+  };
+}
+
+/**
  * Ensures all required properties for TypePlayer are present.
  * Guarantees player.info and player.info.bonds are always defined post-load.
  */
@@ -277,6 +322,28 @@ function normalizeRequiredFields(player: TypePlayer): TypePlayer {
     items: player.items ?? [],
     consumables: player.consumables ?? [],
     affinities: player.affinities ?? {},
+    equipment: (() => {
+      const isTechnospheres =
+        (player.settings as any)?.optionalRules?.technospheres ?? false;
+      const eq0 = player.equipment?.[0];
+      if (!eq0) {
+        // Technospheres players must always have equipment[0] with sphere arrays.
+        // Non-technospheres players with no equipment array stay as-is.
+        if (!isTechnospheres) return player.equipment;
+        return [{ mnemospheres: [], hoplospheres: [] }];
+      }
+      const needsPatch =
+        !Array.isArray(eq0.mnemospheres) || !Array.isArray(eq0.hoplospheres);
+      if (!needsPatch) return player.equipment;
+      return [
+        {
+          ...eq0,
+          mnemospheres: Array.isArray(eq0.mnemospheres) ? eq0.mnemospheres : [],
+          hoplospheres: Array.isArray(eq0.hoplospheres) ? eq0.hoplospheres : [],
+        },
+        ...(player.equipment?.slice(1) ?? []),
+      ];
+    })(),
     modifiers: player.modifiers ?? {
       hp: 0,
       mp: 0,
@@ -362,11 +429,13 @@ const POST_LOAD_TRANSFORMS: PlayerTransform[] = [
   normalizeRequiredFields,
   migrateLegacyEquipment,
   normalizeSkillLevels,
+  syncAutomaticClassLevels,
   normalizeNotes,
   normalizeArmorDefValues,
   migrateEquippedSlots,
   migrateSlotIndexes,
   restoreRuntimeEquippedFlags,
+  pruneStaleSlotRefs,
 ];
 
 /** Run all post-load transforms and return the player ready for in-memory use. */

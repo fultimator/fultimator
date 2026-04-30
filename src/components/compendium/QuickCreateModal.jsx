@@ -29,7 +29,12 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { Close, AutoFixHigh, Delete as DeleteIcon } from "@mui/icons-material";
+import {
+  Add,
+  Close,
+  AutoFixHigh,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
 import LinkIcon from "@mui/icons-material/Link";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -78,6 +83,8 @@ import {
   SharedCustomWeaponCard,
   SharedAccessoryCard,
   SharedQualityCard,
+  SharedMnemosphereCard,
+  SharedHoplosphereCard,
 } from "../shared/itemCards";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
@@ -86,8 +93,13 @@ import CustomTextarea from "../common/CustomTextarea";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { availableFrames } from "../../libs/pilotVehicleData";
 import { availableMagichantKeys } from "../player/spells/spellOptionData";
+import {
+  buildMnemosphere,
+  getMnemosphereCost,
+  MNEMOSPHERE_LEVELS,
+  mnemosphereClassList,
+} from "../../libs/mnemospheres";
 
-// Change* sub-components (reuse from equip routes)
 import ChangeWeaponBase from "../../routes/equip/weapons/ChangeBase";
 import ChangeArmorBase from "../player/equipment/armor/ChangeBase";
 import ChangeShieldBase from "../player/equipment/shields/ChangeBase";
@@ -4799,6 +4811,259 @@ function OptionalPanel() {
 }
 
 // Tab definitions
+function MnemospherePanel() {
+  const { t } = useTranslate();
+  const [selectedClass, setSelectedClass] = useState(
+    mnemosphereClassList[0]?.name ?? "",
+  );
+  const [selectedLvl, setSelectedLvl] = useState(1);
+
+  const data = selectedClass
+    ? buildMnemosphere(selectedClass, Number(selectedLvl))
+    : null;
+
+  return (
+    <PanelLayout
+      formContent={
+        <Stack spacing={2}>
+          <FormControl fullWidth size="small">
+            <InputLabel>{t("Class")}</InputLabel>
+            <Select
+              value={selectedClass}
+              label={t("Class")}
+              onChange={(e) => setSelectedClass(e.target.value)}
+            >
+              {mnemosphereClassList.map((classItem) => (
+                <MenuItem key={classItem.name} value={classItem.name}>
+                  {t(classItem.name)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth size="small">
+            <InputLabel>{t("Level")}</InputLabel>
+            <Select
+              value={selectedLvl}
+              label={t("Level")}
+              onChange={(e) => setSelectedLvl(e.target.value)}
+            >
+              {MNEMOSPHERE_LEVELS.map((lvl) => (
+                <MenuItem key={lvl} value={lvl}>
+                  {lvl}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Typography variant="caption" color="text.secondary">
+            {t("Cost")}: {getMnemosphereCost(selectedLvl)}z
+          </Typography>
+        </Stack>
+      }
+      previewContent={
+        data ? (
+          <SharedMnemosphereCard item={data} />
+        ) : (
+          <Box sx={{ p: 2 }}>
+            <Typography color="text.secondary">
+              {t("Fill in the form to see a preview")}
+            </Typography>
+          </Box>
+        )
+      }
+      addButton={
+        data ? (
+          <AddToCompendiumButton itemType="mnemosphere" data={data} />
+        ) : null
+      }
+      data={data}
+      itemName={data?.name || ""}
+      exportDataType="mnemospheres"
+    />
+  );
+}
+
+function HoplospherePanel() {
+  const { t } = useTranslate();
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [requiredSlots, setRequiredSlots] = useState(1);
+  const [socketable, setSocketable] = useState("all");
+  const [cost, setCost] = useState(500);
+  const [coagEffects, setCoagEffects] = useState([]);
+
+  const handleCoagChange = (index, field, value) => {
+    setCoagEffects((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row)),
+    );
+  };
+
+  const handleAddCoag = () => {
+    setCoagEffects((prev) => [...prev, { threshold: 2, effect: "" }]);
+  };
+
+  const handleRemoveCoag = (index) => {
+    setCoagEffects((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const data = name.trim()
+    ? {
+        name: name.trim(),
+        description,
+        requiredSlots: Number(requiredSlots),
+        socketable,
+        cost: Number(cost) || 0,
+        coagEffects: coagEffects.reduce((acc, row) => {
+          const threshold = Number(row.threshold);
+          const effect = String(row.effect ?? "").trim();
+
+          if (threshold > 1 && effect) {
+            acc[threshold] = effect;
+          }
+
+          return acc;
+        }, {}),
+      }
+    : null;
+
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={2}>
+          <Grid size={12}>
+            <TextField
+              fullWidth
+              size="small"
+              label={t("Name")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Grid>
+          <Grid size={12}>
+            <TextField
+              fullWidth
+              multiline
+              minRows={3}
+              size="small"
+              label={t("Description")}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Slots")}</InputLabel>
+              <Select
+                value={requiredSlots}
+                label={t("Slots")}
+                onChange={(e) => setRequiredSlots(e.target.value)}
+              >
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Socketable")}</InputLabel>
+              <Select
+                value={socketable}
+                label={t("Socketable")}
+                onChange={(e) => setSocketable(e.target.value)}
+              >
+                <MenuItem value="all">{t("All")}</MenuItem>
+                <MenuItem value="weapon">{t("Weapon only")}</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField
+              fullWidth
+              size="small"
+              type="number"
+              label={t("Cost")}
+              value={cost}
+              onChange={(e) => setCost(e.target.value)}
+              slotProps={{ input: { inputProps: { min: 0 } } }}
+            />
+          </Grid>
+          <Grid size={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              {t("Coagulation")}
+            </Typography>
+            <Stack spacing={1}>
+              {coagEffects.map((row, index) => (
+                <Stack
+                  key={index}
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={1}
+                  alignItems={{ xs: "stretch", sm: "flex-start" }}
+                >
+                  <TextField
+                    label={t("Threshold")}
+                    type="number"
+                    size="small"
+                    value={row.threshold}
+                    onChange={(e) =>
+                      handleCoagChange(index, "threshold", e.target.value)
+                    }
+                    sx={{ width: { xs: 1, sm: 140 } }}
+                    slotProps={{ input: { inputProps: { min: 2 } } }}
+                  />
+                  <TextField
+                    label={t("Effect")}
+                    size="small"
+                    multiline
+                    minRows={2}
+                    value={row.effect}
+                    onChange={(e) =>
+                      handleCoagChange(index, "effect", e.target.value)
+                    }
+                    fullWidth
+                  />
+                  <IconButton
+                    aria-label={t("Remove coagulation effect")}
+                    onClick={() => handleRemoveCoag(index)}
+                    size="small"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              ))}
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={handleAddCoag}
+                sx={{ alignSelf: "flex-start" }}
+              >
+                {t("Add Coagulation")}
+              </Button>
+            </Stack>
+          </Grid>
+        </Grid>
+      }
+      previewContent={
+        data ? (
+          <SharedHoplosphereCard item={data} />
+        ) : (
+          <Box sx={{ p: 2 }}>
+            <Typography color="text.secondary">
+              {t("Fill in the form to see a preview")}
+            </Typography>
+          </Box>
+        )
+      }
+      addButton={
+        data ? (
+          <AddToCompendiumButton itemType="hoplosphere" data={data} />
+        ) : null
+      }
+      data={data}
+      itemName={data?.name || ""}
+      exportDataType="hoplospheres"
+    />
+  );
+}
 
 const TABS = [
   { key: "npc-attack", label: "NPC Attack", Panel: NpcAttackPanel },
@@ -4809,6 +5074,8 @@ const TABS = [
   { key: "quality", label: "Quality", Panel: QualityPanel },
   { key: "heroic", label: "Heroic Skill", Panel: HeroicPanel },
   { key: "class", label: "Class", Panel: ClassPanel },
+  { key: "mnemosphere", label: "Mnemosphere", Panel: MnemospherePanel },
+  { key: "hoplosphere", label: "Hoplosphere", Panel: HoplospherePanel },
   { key: "weapon", label: "Weapon", Panel: WeaponPanel },
   { key: "custom-weapon", label: "Custom Weapon", Panel: CustomWeaponPanel },
   { key: "armor", label: "Armor", Panel: ArmorPanel },
@@ -4828,6 +5095,8 @@ const VIEWER_TYPE_TO_TAB_KEY = {
   qualities: "quality",
   heroics: "heroic",
   classes: "class",
+  mnemospheres: "mnemosphere",
+  hoplospheres: "hoplosphere",
   weapons: "weapon",
   "custom-weapons": "custom-weapon",
   armor: "armor",
