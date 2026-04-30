@@ -11,6 +11,7 @@ import classList, {
   arcanumList,
 } from "./classes";
 import { availableFrames, availableModules } from "./pilotVehicleData";
+import { mnemospheres } from "./mnemospheres";
 import { magiseeds } from "./floralistMagiseedData";
 // import { getDelicacyEffects } from "./gourmetCookingData";
 import {
@@ -77,6 +78,16 @@ export const ITEM_TYPES = [
   { key: "player-spells", label: staticT("Spells", true), context: "both" },
   { key: "qualities", label: staticT("Qualities", true), context: "player" },
   { key: "heroics", label: staticT("Heroic Skills", true), context: "player" },
+  {
+    key: "mnemospheres",
+    label: staticT("Mnemospheres", true),
+    context: "player",
+  },
+  {
+    key: "hoplospheres",
+    label: staticT("Hoplospheres", true),
+    context: "player",
+  },
   { key: "optionals", label: staticT("Optionals", true), context: "player" },
 ];
 
@@ -102,6 +113,16 @@ export const PACK_ITEM_TYPES = [
   { key: "qualities", label: staticT("Qualities", true), context: "player" },
   { key: "classes", label: staticT("Classes", true), context: "player" },
   { key: "heroics", label: staticT("Heroic Skills", true), context: "player" },
+  {
+    key: "mnemospheres",
+    label: staticT("Mnemospheres", true),
+    context: "player",
+  },
+  {
+    key: "hoplospheres",
+    label: staticT("Hoplospheres", true),
+    context: "player",
+  },
   { key: "optionals", label: staticT("Optionals", true), context: "player" },
 ];
 
@@ -119,6 +140,8 @@ export const VIEWER_TO_PACK_TYPE = {
   qualities: "quality",
   classes: "class",
   heroics: "heroic",
+  mnemospheres: "mnemosphere",
+  hoplospheres: "hoplosphere",
   optionals: "optional",
 };
 
@@ -142,11 +165,14 @@ export function getItems(type) {
       return qualities;
     case "heroics":
       return heroics;
+    case "mnemospheres":
+      return mnemospheres;
     case "special":
     case "actions":
     case "custom-weapons":
     case "accessories":
     case "optionals":
+    case "hoplospheres":
       return []; // pack-only, no official data
     default:
       return [];
@@ -163,8 +189,10 @@ export function getItemSearchText(item) {
     item.type,
     item.range,
     item.book,
+    item.class,
     skillNames,
     item.quality,
+    item.socketable,
     item.subtype,
     item.description,
     item.effect,
