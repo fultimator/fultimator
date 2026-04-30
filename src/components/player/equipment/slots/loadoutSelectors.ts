@@ -243,9 +243,8 @@ export function getActiveMnemosphereSkills(
   player: TypePlayer,
 ): ActiveMnemosphereData {
   const result: ActiveMnemosphereData = { skills: [], heroic: [], spells: [] };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isTechnospheres =
-    (player.settings as any)?.optionalRules?.technospheres ?? false;
+    player.settings?.optionalRules?.technospheres ?? false;
   if (!isTechnospheres) return result;
 
   const eq0 = player.equipment?.[0];
@@ -262,11 +261,9 @@ export function getActiveMnemosphereSkills(
 
     const ref = player.equippedSlots?.[slotKey];
     if (!ref) continue;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const arr = ((eq0 as any)[ref.source] ?? []) as {
-      name: string;
-      slotted?: string[];
-    }[];
+    const arr =
+      (eq0[ref.source] as { name: string; slotted?: string[] }[] | undefined) ??
+      [];
     const item =
       ref.index !== undefined
         ? arr[ref.index]
