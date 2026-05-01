@@ -66,52 +66,46 @@ const CustomHeaderAccordion = ({
           {headerText}
         </Typography>
       </Box>
-      {openCompendium && (
-        <Tooltip title={`Search ${headerText}`}>
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              openCompendium();
-            }}
-            sx={{
-              color: "#ffffff",
-              "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.3)" },
-            }}
-          >
-            <SearchIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-      {(addItem || openCompendium) && (
-        <Box sx={{ display: "flex", alignItems: "center", mr: 1 }}>
-          {addItem && (
-            <Tooltip title={`Add ${headerText}`}>
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addItem();
-                }}
-                sx={{
-                  color: "#ffffff",
-                  "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.3)" },
-                }}
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
-      )}
-      {actions && (
-        <Box
-          onClick={(e) => e.stopPropagation()}
-          sx={{ display: "flex", alignItems: "center" }}
-        >
-          {actions}
-        </Box>
-      )}
+      <Box
+        onClick={(e) => e.stopPropagation()}
+        sx={{ display: "flex", alignItems: "center", gap: 0.5, mr: 1 }}
+      >
+        {openCompendium && (
+          <Tooltip title={`Search ${headerText}`}>
+            <IconButton
+              onClick={openCompendium}
+              sx={{
+                px: 1,
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "rgba(0,0,0,0.3)",
+                  transition: "background-color 0.3s ease",
+                },
+              }}
+            >
+              <SearchIcon fontSize="large" />
+            </IconButton>
+          </Tooltip>
+        )}
+        {addItem && (
+          <Tooltip title={`Add ${headerText}`}>
+            <IconButton
+              onClick={addItem}
+              sx={{
+                px: 1,
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "rgba(0,0,0,0.3)",
+                  transition: "background-color 0.3s ease",
+                },
+              }}
+            >
+              <AddIcon fontSize="large" />
+            </IconButton>
+          </Tooltip>
+        )}
+        {actions}
+      </Box>
     </AccordionSummary>
   );
 };
