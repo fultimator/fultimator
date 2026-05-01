@@ -3,6 +3,7 @@ import { useTheme } from "@mui/material/styles";
 import {
   Paper,
   Grid,
+  Box,
   TextField,
   Button,
   Divider,
@@ -13,8 +14,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { UnfoldLess, UnfoldMore } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import CustomHeader from "../../common/CustomHeader";
@@ -23,6 +27,7 @@ import useUploadJSON from "../../../hooks/useUploadJSON";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 import MnemosphereClassCard from "./MnemosphereClassCard";
 import { getSlottedMnemospheres } from "./mnemosphereClassUtils";
+import useSphereBank from "../equipment/technospheres/useSphereBank";
 import {
   getDerivedClassLevel,
   isAutomaticClassLevelEnabled,
@@ -35,11 +40,6 @@ export default function EditPlayerClasses({
   updateMaxStats,
   isEditMode,
 }) {
-  const [warnings, setWarnings] = useState([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [newClassName, setNewClassName] = useState("");
-  const [compendiumOpen, setCompendiumOpen] = useState(false);
-
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
   const automaticClassLevel = isAutomaticClassLevelEnabled(player);
@@ -47,6 +47,74 @@ export default function EditPlayerClasses({
   const slottedMnemospheres = isTechnospheres
     ? getSlottedMnemospheres(player)
     : [];
+
+  const [warnings, setWarnings] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newClassName, setNewClassName] = useState("");
+  const [compendiumOpen, setCompendiumOpen] = useState(false);
+  const [expandedClasses, setExpandedClasses] = useState({});
+  const [expandedMnemos, setExpandedMnemos] = useState({});
+  const allExpanded =
+    (player.classes ?? []).every((_, i) => expandedClasses[i]) &&
+    (slottedMnemospheres ?? []).every((m) => expandedMnemos[m.id]);
+
+  const toggleAll = () => {
+    if (allExpanded) {
+      setExpandedClasses({});
+      setExpandedMnemos({});
+    } else {
+      setExpandedClasses(
+        Object.fromEntries((player.classes ?? []).map((_, i) => [i, true])),
+      );
+      setExpandedMnemos(
+        Object.fromEntries(
+          (slottedMnemospheres ?? []).map((m) => [m.id, true]),
+        ),
+      );
+    }
+  };
+
+  const {
+    changeMnemoSkillLevel,
+    getMnemoAvailableLevels,
+    investMnemoLevel,
+    refundMnemoLevel,
+  } = useSphereBank(player, setPlayer);
+
+  const advancement = player?.settings?.advancement ?? false;
+
+  const totalInnateLevel = (player.classes ?? []).reduce(
+    (acc, cls) =>
+      acc +
+      (automaticClassLevel
+        ? getDerivedClassLevel(cls)
+        : parseInt(cls.lvl) || 0),
+    0,
+  );
+  const getMnemoInvested = (m) => (m.lvl ?? 1) - (m.baseLvl ?? m.lvl ?? 1);
+
+  const totalMnemoLevel = slottedMnemospheres.reduce(
+    (acc, m) => acc + getMnemoInvested(m),
+    0,
+  );
+
+  const classSummary = (player.classes ?? [])
+    .map((cls) => {
+      const lvl = automaticClassLevel
+        ? getDerivedClassLevel(cls)
+        : parseInt(cls.lvl) || 0;
+      return `${cls.name || "?"} Lv.${lvl}`;
+    })
+    .join(" · ");
+
+  const mnemoSummary = slottedMnemospheres
+    .map((m) => {
+      const invested = getMnemoInvested(m);
+      return invested > 0
+        ? `${m.class || "?"} Lv.${m.lvl ?? 1} (+${invested})`
+        : `${m.class || "?"} Lv.${m.lvl ?? 1}`;
+    })
+    .join(" · ");
 
   const fileInputRef = useRef(null);
   const customTheme = useCustomTheme();
@@ -116,18 +184,13 @@ export default function EditPlayerClasses({
         )
       : 0;
 
-    // In technospheres mode, only slotted mnemosphere levels count toward player level.
-    const mnemoLevels = isTechnospheres
-      ? getSlottedMnemospheres(player).reduce((acc, m) => acc + (m.lvl ?? 1), 0)
-      : 0;
-
     // Check if sum of levels isn't equal to player level
-    if (totalLevels + mnemoLevels !== player.lvl) {
-      newWarnings.push(
-        isTechnospheres
-          ? "Sum of innate class levels and mnemosphere levels isn't equal to character level."
-          : "Sum of class levels isn't equal to character level.",
-      );
+    if (isTechnospheres) {
+      if (totalLevels > player.lvl) {
+        newWarnings.push("Sum of innate class levels exceeds character level.");
+      }
+    } else if (totalLevels !== player.lvl) {
+      newWarnings.push("Sum of class levels isn't equal to character level.");
     }
 
     setWarnings(newWarnings);
@@ -478,6 +541,74 @@ export default function EditPlayerClasses({
 
   return (
     <>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          backgroundColor: customTheme.primary,
+          color: customTheme.white,
+          fontFamily: "Antonio, sans-serif",
+          textTransform: "uppercase",
+          fontSize: "0.85em",
+          px: "10px",
+          py: "5px",
+          borderRadius: "8px 8px 0 0",
+          mb: 0,
+        }}
+      >
+        <Box sx={{ flex: 1 }}>
+          {classSummary && (
+            <Typography
+              variant="body2"
+              sx={{
+                color: customTheme.white,
+                fontFamily: "inherit",
+                textTransform: "none",
+              }}
+            >
+              {isTechnospheres && <strong>{t("Classes")}: </strong>}
+              {classSummary}
+            </Typography>
+          )}
+          {mnemoSummary && (
+            <Typography
+              variant="body2"
+              sx={{
+                color: "rgba(255,255,255,0.75)",
+                fontFamily: "inherit",
+                textTransform: "none",
+              }}
+            >
+              <strong>{t("Mnemospheres")}: </strong>
+              {mnemoSummary}
+            </Typography>
+          )}
+          {!classSummary && !mnemoSummary && (
+            <Typography
+              variant="body2"
+              sx={{
+                color: "rgba(255,255,255,0.75)",
+                fontFamily: "inherit",
+                textTransform: "none",
+              }}
+            >
+              {t("No classes or mnemospheres yet.")}
+            </Typography>
+          )}
+        </Box>
+        <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
+          <IconButton
+            onClick={toggleAll}
+            size="small"
+            sx={{ color: customTheme.white }}
+          >
+            {allExpanded ? <UnfoldLess /> : <UnfoldMore />}
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Divider sx={{ borderColor: secondary, borderBottomWidth: 2, mb: 2 }} />
+
       {isEditMode ? (
         <>
           <Paper
@@ -494,6 +625,9 @@ export default function EditPlayerClasses({
                 <CustomHeader
                   type="top"
                   headerText={t(isTechnospheres ? "Innate Classes" : "Classes")}
+                  rightLabel={t("Total Invested Levels")}
+                  rightValue={totalInnateLevel}
+                  rightMax={player.lvl}
                   showIconButton={canAddMoreClasses}
                   icon={AddIcon}
                   customTooltip={t(
@@ -561,49 +695,63 @@ export default function EditPlayerClasses({
         </Paper>
       )}
       {player.classes &&
-        player.classes.map((cls, index) => (
-          <React.Fragment key={index}>
-            <PlayerClassCard
-              allClasses={player.classes}
-              classItem={{
-                ...cls,
-                name: cls.name,
-                lvl: automaticClassLevel ? getDerivedClassLevel(cls) : cls.lvl,
-              }}
-              onRemove={() => handleRemoveClass(index)}
-              onLevelChange={
-                automaticClassLevel
-                  ? () => {}
-                  : (newLevel) => handleLevelChange(index, newLevel)
-              }
-              onSaveBenefits={(benefits) => handleSaveBenefits(index, benefits)}
-              onAddSkill={handleAddSkill}
-              onEditSkill={handleEditSkill}
-              onDeleteSkill={(skillIndex) =>
-                handleDeleteSkill(index, skillIndex)
-              }
-              onIncreaseSkillLevel={(skillIndex) =>
-                handleIncreaseSkillLevel(index, skillIndex)
-              }
-              onDecreaseSkillLevel={(skillIndex) =>
-                handleDecreaseSkillLevel(index, skillIndex)
-              }
-              isEditMode={isEditMode}
-              editCompanion={(companion) => editCompanion(index, companion)}
-              editClassName={(newClassName) =>
-                editClassName(index, newClassName)
-              }
-              editHeroic={(heroic) => editHeroic(index, heroic)}
-              userId={player.uid}
-              isHomebrew={cls.isHomebrew === undefined ? true : cls.isHomebrew}
-              isClassLevelReadOnly={automaticClassLevel}
-            />
-            {index !== player.classes.length - 1 && <Divider sx={{ my: 2 }} />}
-          </React.Fragment>
-        ))}
+        player.classes.map((cls, index) => {
+          const clsLvl = automaticClassLevel
+            ? getDerivedClassLevel(cls)
+            : cls.lvl;
+          return (
+            <Box key={index} sx={{ mb: 2 }}>
+              <PlayerClassCard
+                allClasses={player.classes}
+                classItem={{ ...cls, name: cls.name, lvl: clsLvl }}
+                onRemove={() => handleRemoveClass(index)}
+                onLevelChange={
+                  automaticClassLevel
+                    ? () => {}
+                    : (newLevel) => handleLevelChange(index, newLevel)
+                }
+                onSaveBenefits={(benefits) =>
+                  handleSaveBenefits(index, benefits)
+                }
+                onAddSkill={handleAddSkill}
+                onEditSkill={handleEditSkill}
+                onDeleteSkill={(skillIndex) =>
+                  handleDeleteSkill(index, skillIndex)
+                }
+                onIncreaseSkillLevel={(skillIndex) =>
+                  handleIncreaseSkillLevel(index, skillIndex)
+                }
+                onDecreaseSkillLevel={(skillIndex) =>
+                  handleDecreaseSkillLevel(index, skillIndex)
+                }
+                isEditMode={isEditMode}
+                editCompanion={(companion) => editCompanion(index, companion)}
+                editClassName={(newClassName) =>
+                  editClassName(index, newClassName)
+                }
+                editHeroic={(heroic) => editHeroic(index, heroic)}
+                userId={player.uid}
+                isHomebrew={
+                  cls.isHomebrew === undefined ? true : cls.isHomebrew
+                }
+                isClassLevelReadOnly={automaticClassLevel}
+                isAccordion
+                isExpanded={!!expandedClasses[index]}
+                onToggleExpand={() =>
+                  setExpandedClasses((prev) => ({
+                    ...prev,
+                    [index]: !prev[index],
+                  }))
+                }
+              />
+            </Box>
+          );
+        })}
       {isTechnospheres && (
         <>
-          <Divider sx={{ my: 2 }} />
+          <Divider
+            sx={{ borderColor: secondary, borderBottomWidth: 2, mb: 2 }}
+          />
           <Paper
             elevation={3}
             sx={{
@@ -619,6 +767,8 @@ export default function EditPlayerClasses({
                 <CustomHeader
                   type="top"
                   headerText={t("Slotted Mnemospheres")}
+                  rightLabel={t("Total Invested Levels")}
+                  rightValue={totalMnemoLevel}
                   showIconButton={false}
                 />
               </Grid>
@@ -630,26 +780,52 @@ export default function EditPlayerClasses({
                 </Grid>
               ) : (
                 <Grid size={12}>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ px: 1 }}
-                  >
+                  <Alert severity="info" variant="outlined">
                     {t(
-                      "Mnemosphere levels count toward character level. Invest levels via the Level Up button.",
+                      "Each mnemosphere has its own level (1–5). Equipping one grants access to its skills. Use +/- to set its level and allocate skill points within it.",
                     )}
-                  </Typography>
+                  </Alert>
                 </Grid>
               )}
             </Grid>
           </Paper>
-          {slottedMnemospheres.map((mnemo, index) => (
-            <React.Fragment key={mnemo.id}>
-              <MnemosphereClassCard item={mnemo} />
-              {index !== slottedMnemospheres.length - 1 && (
-                <Divider sx={{ my: 2 }} />
-              )}
-            </React.Fragment>
+          <Divider
+            sx={{ borderColor: secondary, borderBottomWidth: 2, mb: 2 }}
+          />
+          {slottedMnemospheres.map((mnemo) => (
+            <Box key={mnemo.id} sx={{ mb: 2 }}>
+              <MnemosphereClassCard
+                item={mnemo}
+                editable={isEditMode}
+                onIncreaseSkillLevel={(skillIndex) =>
+                  changeMnemoSkillLevel(mnemo.id, skillIndex, 1)
+                }
+                onDecreaseSkillLevel={(skillIndex) =>
+                  changeMnemoSkillLevel(mnemo.id, skillIndex, -1)
+                }
+                availableLevels={getMnemoAvailableLevels(mnemo)}
+                onInvestLevel={
+                  isEditMode && !advancement
+                    ? () => investMnemoLevel(mnemo.id)
+                    : null
+                }
+                onRefundLevel={
+                  isEditMode && !advancement
+                    ? () => refundMnemoLevel(mnemo.id)
+                    : null
+                }
+                isAccordion
+                showHeaderMeta
+                isSlotted
+                isExpanded={!!expandedMnemos[mnemo.id]}
+                onToggleExpand={() =>
+                  setExpandedMnemos((prev) => ({
+                    ...prev,
+                    [mnemo.id]: !prev[mnemo.id],
+                  }))
+                }
+              />
+            </Box>
           ))}
         </>
       )}

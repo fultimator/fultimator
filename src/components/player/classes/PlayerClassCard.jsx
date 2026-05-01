@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
+  Accordion,
+  AccordionDetails,
   Paper,
   Grid,
   Typography,
@@ -53,6 +55,9 @@ export default function PlayerClassCard({
   userId,
   isHomebrew,
   isClassLevelReadOnly = false,
+  isAccordion = false,
+  isExpanded = false,
+  onToggleExpand = () => {},
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -366,299 +371,24 @@ export default function PlayerClassCard({
     userId,
   ]);
 
-  return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
-      <Grid container spacing={1}>
-        <Grid size={12}>
-          <CustomHeaderClasses
-            type="top"
-            headerText={t(classItem.name)}
-            rightHeaderText={t("Class Level")}
-            editableNumber={classItem.lvl}
-            readOnlyNumber={10}
-            onLevelChange={onLevelChange}
-            isEditMode={isEditMode}
-            isNumberReadOnly={isClassLevelReadOnly}
-            editClassName={() => handleOpenEditClassNameModal()}
-          />
-        </Grid>
-        {warnings.map((warning, index) => (
-          <Grid key={index} size={12}>
-            <Alert variant="filled" severity="warning">
-              {warning}
-            </Alert>
-          </Grid>
-        ))}
-        {classItem.benefits && (
-          <>
-            <Grid size={12}>
-              <CustomHeader2
-                headerText={`${t(classItem.name)} ${t("Free Benefits")} `}
-                buttonText={t("Edit Benefits")}
-                onButtonClick={() => setOpenEditBenefitsModal(true)}
-                isEditMode={isEditMode}
-              />
-            </Grid>
-            <Grid style={{ margin: "-20px 0 0 0" }} size={12}>
-              <ul>
-                {classItem.benefits.hpplus !== 0 && (
-                  <li>
-                    <Typography>
-                      {t("Permanently increase your maximum Hit Points by")}{" "}
-                      {classItem.benefits.hpplus}.
-                    </Typography>
-                  </li>
-                )}
-                {classItem.benefits.mpplus !== 0 && (
-                  <li>
-                    <Typography>
-                      {t("Permanently increase your maximum Mind Points by")}{" "}
-                      {classItem.benefits.mpplus}.
-                    </Typography>
-                  </li>
-                )}
-                {classItem.benefits.ipplus !== 0 && (
-                  <li>
-                    <Typography>
-                      {t(
-                        "Permanently increase your maximum Inventory Points by",
-                      )}{" "}
-                      {classItem.benefits.ipplus}.
-                    </Typography>
-                  </li>
-                )}
-                {classItem.benefits.rituals && (
-                  <>
-                    {classItem.benefits.rituals.ritualism && (
-                      <li>
-                        <Typography>
-                          {t(
-                            "You may perform Rituals whose effects fall within the Ritualism discipline.",
-                          )}
-                        </Typography>
-                      </li>
-                    )}
-                  </>
-                )}
-                {classItem.benefits.martials && (
-                  <>
-                    {classItem.benefits.martials.melee && (
-                      <li>
-                        <Typography>
-                          {t(
-                            "Gain the ability to equip martial melee weapons.",
-                          )}
-                        </Typography>
-                      </li>
-                    )}
-                    {classItem.benefits.martials.ranged && (
-                      <li>
-                        <Typography>
-                          {t(
-                            "Gain the ability to equip martial ranged weapons.",
-                          )}
-                        </Typography>
-                      </li>
-                    )}
-                    {classItem.benefits.martials.shields && (
-                      <li>
-                        <Typography>
-                          {t("Gain the ability to equip martial shields.")}
-                        </Typography>
-                      </li>
-                    )}
-                    {classItem.benefits.martials.armor && (
-                      <li>
-                        <Typography>
-                          {t("Gain the ability to equip martial armor.")}
-                        </Typography>
-                      </li>
-                    )}
-                    {classItem.benefits.custom &&
-                      classItem.benefits.custom.map((custombenefit, index) => (
-                        <li key={index}>
-                          <Typography>{custombenefit}</Typography>
-                        </li>
-                      ))}
-                  </>
-                )}
-              </ul>
-            </Grid>
-            <Grid size={12}>
-              <Divider />
-            </Grid>
-          </>
-        )}
-        <Grid size={12}>
-          {classItem.skills.length < 5 ? (
-            <CustomHeader2
-              headerText={t("Skills")}
-              buttonText={t("Add Skill")}
-              onButtonClick={() => setOpenAddSkillModal(true)}
-              isEditMode={isEditMode}
-            />
-          ) : (
-            <CustomHeader2 headerText={t("Skills")} />
-          )}
-        </Grid>
-        {classItem.skills &&
-          classItem.skills.map((skill, index) => (
-            <Grid key={index} size={12}>
-              <CustomHeader3
-                headerText={isHomebrew ? skill.skillName : t(skill.skillName)}
-                currentLvl={skill.currentLvl}
-                maxLvl={skill.maxLvl}
-                onIncrease={() => onIncreaseSkillLevel(index)}
-                onDecrease={() => onDecreaseSkillLevel(index)}
-                onEdit={() => handleEditSkill(index)}
-                isEditMode={isEditMode}
-                isHeroicSkill={false}
-              />
-              <StyledMarkdown
-                allowedElements={["strong", "em"]}
-                unwrapDisallowed={true}
-                sx={{
-                  fontFamily: "PT Sans Narrow",
-                  padding: "0 17px",
-                  fontSize: "1rem",
-                }}
-              >
-                {isHomebrew ? skill.description : t(skill.description)}
-              </StyledMarkdown>
-            </Grid>
-          ))}
-        {classItem.lvl === 10 && (
-          <>
-            <Grid size={12}>
-              <Divider />
-            </Grid>
-            <Grid size={12}>
-              <CustomHeader2
-                headerText={t("Heroic Skill")}
-                //buttonText={t("Edit Benefits")}
-                //onButtonClick={() => setOpenEditBenefitsModal(true)}
-                isEditMode={false}
-              />
-            </Grid>
-            <Grid size={12}>
-              <CustomHeader3
-                headerText={classItem.heroic.name}
-                currentLvl={0}
-                maxLvl={0}
-                onIncrease={() => {}}
-                onDecrease={() => {}}
-                onEdit={() => handleEditHeroicSkill()}
-                onOpenCompendium={
-                  isEditMode ? () => setHeroicCompendiumOpen(true) : undefined
-                }
-                isEditMode={isEditMode}
-                isHeroicSkill={true}
-              />
-              <StyledMarkdown
-                allowedElements={["strong", "em"]}
-                unwrapDisallowed={true}
-                sx={{
-                  fontFamily: "PT Sans Narrow",
-                  padding: "0 17px",
-                  fontSize: "1rem",
-                }}
-              >
-                {classItem.heroic.description}
-              </StyledMarkdown>
-            </Grid>
-          </>
-        )}
-        {faithfulCompanionSkills.length ===
-        0 ? null : hasMultipleFaithfulCompanionSkills &&
-          faithfulCompanionSkillsInClassItem.length > 0 ? (
-          <Grid size={12}>
-            <Typography>
-              {t("Error: There are too many Faithful Companion skills")}
-            </Typography>
-          </Grid>
-        ) : (
-          hasSingleFaithfulCompanionSkill && (
-            <>
-              <Grid size={12}>
-                <Divider />
-              </Grid>
-              <Grid size={12}>
-                <CustomHeader2
-                  headerText={t("Faithful Companion")}
-                  isEditMode={isEditMode}
-                  buttonText={t("Select")}
-                  onButtonClick={() => setOpenSelectCompanionModal(true)}
-                />
-                {classItem.companion ? (
-                  <CustomHeader3
-                    headerText={
-                      classItem.companion.name +
-                      " - " +
-                      t("Lvl") +
-                      " " +
-                      classItem.companion.lvl
-                    }
-                    currentLvl={0}
-                    maxLvl={0}
-                    onIncrease={() => {}}
-                    onDecrease={() => {}}
-                    isEditMode={false}
-                    isHeroicSkill={true}
-                  />
-                ) : (
-                  <Typography>{t("No Companion Selected")}</Typography>
-                )}
-                {loading && <Typography>{t("Loading...")}</Typography>}
-                {err && (
-                  <Typography>
-                    {t("Error Loading Companion List") + ": " + err}
-                  </Typography>
-                )}
-              </Grid>
-            </>
-          )
-        )}
-        {isEditMode && (
-          <Grid size={12}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Button
-                variant="contained"
-                color="secondary"
-                sx={{ marginTop: "30px", fontSize: "0.9em" }}
-                onClick={() => setOpenEditSpellClassesModal(true)}
-              >
-                {t("Edit Class Spell Types")}
-              </Button>
+  const header = (
+    <CustomHeaderClasses
+      type="top"
+      headerText={t(classItem.name)}
+      rightHeaderText={t("Class Level")}
+      editableNumber={classItem.lvl}
+      readOnlyNumber={10}
+      onLevelChange={onLevelChange}
+      isEditMode={isEditMode}
+      isNumberReadOnly={isClassLevelReadOnly}
+      editClassName={() => handleOpenEditClassNameModal()}
+      isAccordion={isAccordion}
+      isExpanded={isExpanded}
+    />
+  );
 
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleDelete}
-                sx={{ marginTop: "30px", fontSize: "0.9em" }}
-              >
-                {t("Remove Class")}
-              </Button>
-            </Box>
-          </Grid>
-        )}
-        <Grid size={12}>
-          <Export name={classItem.name} dataType="class" data={classItem} />
-        </Grid>
-      </Grid>
-      {/* Edit Class Name Modal */}
+  const modals = (
+    <>
       <EditClassNameModal
         open={openEditClassNameModal}
         onClose={handleCloseEditClassNameModal}
@@ -666,7 +396,6 @@ export default function PlayerClassCard({
         className={className}
         setClassName={setClassName}
       />
-      {/* Add Skill Modal */}
       <AddSkillModal
         open={openAddSkillModal}
         onClose={() => {
@@ -690,7 +419,6 @@ export default function PlayerClassCard({
         onAddSkill={handleAddSkill}
         onDeleteSkill={handleDeleteSkill}
       />
-      {/* Edit Free Benefits Modal */}
       <EditFreeBenefitsModal
         open={openEditBenefitsModal}
         onClose={() => {
@@ -707,18 +435,14 @@ export default function PlayerClassCard({
         onRemoveCustomBenefit={handleRemoveCustomBenefit}
         t={t}
       />
-      {/* Edit Class Spell Types Modal */}
       <EditSpellClassesModal
         open={openEditSpellClassesModal}
-        onClose={() => {
-          setOpenEditSpellClassesModal(false);
-        }}
+        onClose={() => setOpenEditSpellClassesModal(false)}
         onSave={handleSaveSpellClasses}
         onSpellClassChange={handleSpellClassChange}
         spellClassesList={spellClasses}
         selectedSpellClasses={benefits.spellClasses}
       />
-      {/* Heroic Skill Compendium Picker */}
       <CompendiumViewerModal
         open={heroicCompendiumOpen}
         onClose={() => setHeroicCompendiumOpen(false)}
@@ -733,7 +457,6 @@ export default function PlayerClassCard({
         restrictToTypes={["heroics"]}
         context="player"
       />
-      {/* Edit Heroic Skill Modal */}
       <EditHeroicSkillModal
         open={openEditHeroicSkillModal}
         onClose={() => setOpenEditHeroicSkillModal(false)}
@@ -741,7 +464,6 @@ export default function PlayerClassCard({
         heroic={heroic}
         setHeroic={setHeroic}
       />
-      {/* Select Companion Modal */}
       <SelectCompanionModal
         open={openSelectCompanionModal}
         onClose={() => setOpenSelectCompanionModal(false)}
@@ -764,6 +486,326 @@ export default function PlayerClassCard({
           </Box>
         }
       />
-    </Paper>
+    </>
+  );
+
+  const cardBody = (
+    <Grid container spacing={1}>
+      {!isAccordion && <Grid size={12}>{header}</Grid>}
+      {warnings.map((warning, index) => (
+        <Grid key={index} size={12}>
+          <Alert variant="filled" severity="warning">
+            {warning}
+          </Alert>
+        </Grid>
+      ))}
+      {classItem.benefits && (
+        <>
+          <Grid size={12}>
+            <CustomHeader2
+              headerText={`${t(classItem.name)} ${t("Free Benefits")} `}
+              buttonText={t("Edit Benefits")}
+              onButtonClick={() => setOpenEditBenefitsModal(true)}
+              isEditMode={isEditMode}
+            />
+          </Grid>
+          <Grid style={{ margin: "-20px 0 0 0" }} size={12}>
+            <ul>
+              {classItem.benefits.hpplus !== 0 && (
+                <li>
+                  <Typography>
+                    {t("Permanently increase your maximum Hit Points by")}{" "}
+                    {classItem.benefits.hpplus}.
+                  </Typography>
+                </li>
+              )}
+              {classItem.benefits.mpplus !== 0 && (
+                <li>
+                  <Typography>
+                    {t("Permanently increase your maximum Mind Points by")}{" "}
+                    {classItem.benefits.mpplus}.
+                  </Typography>
+                </li>
+              )}
+              {classItem.benefits.ipplus !== 0 && (
+                <li>
+                  <Typography>
+                    {t("Permanently increase your maximum Inventory Points by")}{" "}
+                    {classItem.benefits.ipplus}.
+                  </Typography>
+                </li>
+              )}
+              {classItem.benefits.rituals && (
+                <>
+                  {classItem.benefits.rituals.ritualism && (
+                    <li>
+                      <Typography>
+                        {t(
+                          "You may perform Rituals whose effects fall within the Ritualism discipline.",
+                        )}
+                      </Typography>
+                    </li>
+                  )}
+                </>
+              )}
+              {classItem.benefits.martials && (
+                <>
+                  {classItem.benefits.martials.melee && (
+                    <li>
+                      <Typography>
+                        {t("Gain the ability to equip martial melee weapons.")}
+                      </Typography>
+                    </li>
+                  )}
+                  {classItem.benefits.martials.ranged && (
+                    <li>
+                      <Typography>
+                        {t("Gain the ability to equip martial ranged weapons.")}
+                      </Typography>
+                    </li>
+                  )}
+                  {classItem.benefits.martials.shields && (
+                    <li>
+                      <Typography>
+                        {t("Gain the ability to equip martial shields.")}
+                      </Typography>
+                    </li>
+                  )}
+                  {classItem.benefits.martials.armor && (
+                    <li>
+                      <Typography>
+                        {t("Gain the ability to equip martial armor.")}
+                      </Typography>
+                    </li>
+                  )}
+                  {classItem.benefits.custom &&
+                    classItem.benefits.custom.map((custombenefit, index) => (
+                      <li key={index}>
+                        <Typography>{custombenefit}</Typography>
+                      </li>
+                    ))}
+                </>
+              )}
+            </ul>
+          </Grid>
+          <Grid size={12}>
+            <Divider />
+          </Grid>
+        </>
+      )}
+      <Grid size={12}>
+        {classItem.skills.length < 5 ? (
+          <CustomHeader2
+            headerText={t("Skills")}
+            buttonText={t("Add Skill")}
+            onButtonClick={() => setOpenAddSkillModal(true)}
+            isEditMode={isEditMode}
+          />
+        ) : (
+          <CustomHeader2 headerText={t("Skills")} />
+        )}
+      </Grid>
+      {classItem.skills &&
+        classItem.skills.map((skill, index) => (
+          <Grid key={index} size={12}>
+            <CustomHeader3
+              headerText={isHomebrew ? skill.skillName : t(skill.skillName)}
+              currentLvl={skill.currentLvl}
+              maxLvl={skill.maxLvl}
+              onIncrease={() => onIncreaseSkillLevel(index)}
+              onDecrease={() => onDecreaseSkillLevel(index)}
+              onEdit={() => handleEditSkill(index)}
+              isEditMode={isEditMode}
+              isHeroicSkill={false}
+            />
+            <StyledMarkdown
+              allowedElements={["strong", "em"]}
+              unwrapDisallowed={true}
+              sx={{
+                fontFamily: "PT Sans Narrow",
+                padding: "0 17px",
+                fontSize: "1rem",
+              }}
+            >
+              {isHomebrew ? skill.description : t(skill.description)}
+            </StyledMarkdown>
+          </Grid>
+        ))}
+      {classItem.lvl === 10 && (
+        <>
+          <Grid size={12}>
+            <Divider />
+          </Grid>
+          <Grid size={12}>
+            <CustomHeader2
+              headerText={t("Heroic Skill")}
+              //buttonText={t("Edit Benefits")}
+              //onButtonClick={() => setOpenEditBenefitsModal(true)}
+              isEditMode={false}
+            />
+          </Grid>
+          <Grid size={12}>
+            <CustomHeader3
+              headerText={classItem.heroic.name}
+              currentLvl={0}
+              maxLvl={0}
+              onIncrease={() => {}}
+              onDecrease={() => {}}
+              onEdit={() => handleEditHeroicSkill()}
+              onOpenCompendium={
+                isEditMode ? () => setHeroicCompendiumOpen(true) : undefined
+              }
+              isEditMode={isEditMode}
+              isHeroicSkill={true}
+            />
+            <StyledMarkdown
+              allowedElements={["strong", "em"]}
+              unwrapDisallowed={true}
+              sx={{
+                fontFamily: "PT Sans Narrow",
+                padding: "0 17px",
+                fontSize: "1rem",
+              }}
+            >
+              {classItem.heroic.description}
+            </StyledMarkdown>
+          </Grid>
+        </>
+      )}
+      {faithfulCompanionSkills.length ===
+      0 ? null : hasMultipleFaithfulCompanionSkills &&
+        faithfulCompanionSkillsInClassItem.length > 0 ? (
+        <Grid size={12}>
+          <Typography>
+            {t("Error: There are too many Faithful Companion skills")}
+          </Typography>
+        </Grid>
+      ) : (
+        hasSingleFaithfulCompanionSkill && (
+          <>
+            <Grid size={12}>
+              <Divider />
+            </Grid>
+            <Grid size={12}>
+              <CustomHeader2
+                headerText={t("Faithful Companion")}
+                isEditMode={isEditMode}
+                buttonText={t("Select")}
+                onButtonClick={() => setOpenSelectCompanionModal(true)}
+              />
+              {classItem.companion ? (
+                <CustomHeader3
+                  headerText={
+                    classItem.companion.name +
+                    " - " +
+                    t("Lvl") +
+                    " " +
+                    classItem.companion.lvl
+                  }
+                  currentLvl={0}
+                  maxLvl={0}
+                  onIncrease={() => {}}
+                  onDecrease={() => {}}
+                  isEditMode={false}
+                  isHeroicSkill={true}
+                />
+              ) : (
+                <Typography>{t("No Companion Selected")}</Typography>
+              )}
+              {loading && <Typography>{t("Loading...")}</Typography>}
+              {err && (
+                <Typography>
+                  {t("Error Loading Companion List") + ": " + err}
+                </Typography>
+              )}
+            </Grid>
+          </>
+        )
+      )}
+      {isEditMode && (
+        <Grid size={12}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ marginTop: "30px", fontSize: "0.9em" }}
+              onClick={() => setOpenEditSpellClassesModal(true)}
+            >
+              {t("Edit Class Spell Types")}
+            </Button>
+
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              sx={{ marginTop: "30px", fontSize: "0.9em" }}
+            >
+              {t("Remove Class")}
+            </Button>
+          </Box>
+        </Grid>
+      )}
+      <Grid size={12}>
+        <Export name={classItem.name} dataType="class" data={classItem} />
+      </Grid>
+    </Grid>
+  );
+
+  if (isAccordion) {
+    return (
+      <>
+        <Accordion
+          elevation={3}
+          expanded={isExpanded}
+          onChange={onToggleExpand}
+          sx={{
+            border: "2px solid",
+            borderColor: secondary,
+            "&.MuiAccordion-root": {
+              borderRadius: "8px !important",
+              "&:before": { display: "none" },
+            },
+            "& .MuiAccordion-heading": {
+              borderRadius: "6px !important",
+            },
+            "&.Mui-expanded .MuiAccordion-heading": {
+              borderRadius: "6px 6px 0 0 !important",
+            },
+            "&.MuiAccordion-root .MuiAccordionSummary-root": {
+              borderRadius: isExpanded
+                ? "6px 6px 0 0 !important"
+                : "6px !important",
+            },
+          }}
+        >
+          {header}
+          <AccordionDetails sx={{ p: "15px" }}>{cardBody}</AccordionDetails>
+        </Accordion>
+        {modals}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Paper
+        elevation={3}
+        sx={{
+          p: "15px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
+        }}
+      >
+        {header}
+        {cardBody}
+      </Paper>
+      {modals}
+    </>
   );
 }
