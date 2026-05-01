@@ -1,6 +1,6 @@
 import classList from "./classes";
 
-export const MNEMOSPHERE_LEVELS = [1, 2, 3, 4, 5];
+export const MNEMOSPHERE_LEVELS = [0, 1, 2, 3, 4, 5];
 
 function genId() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -28,7 +28,10 @@ export function getMnemosphereClassDefinition(className) {
 
 export function buildMnemosphereFromDef(classDef, lvl = 1) {
   const className = classDef?.name ?? "";
-  const numericLvl = Number(lvl) || 1;
+  const parsedLvl = Number(lvl);
+  const numericLvl = Number.isFinite(parsedLvl)
+    ? Math.max(0, Math.min(5, parsedLvl))
+    : 1;
 
   return {
     name: `${className} Mnemosphere`,

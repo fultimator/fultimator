@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputLabel,
@@ -16,10 +18,6 @@ import {
 } from "@mui/material";
 import { Add, Close, Delete } from "@mui/icons-material";
 import { useTranslate } from "../../../../translation/translate";
-
-function genId() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
 
 const initialState = {
   name: "",
@@ -39,9 +37,24 @@ function coagRowsToObject(rows) {
   }, {});
 }
 
-export default function HoplosphereCreateDialog({ open, onClose, onConfirm }) {
+export default function HoplosphereCreateDialog({
+  open,
+  onClose,
+  onConfirm,
+  currentZenit,
+}) {
   const { t } = useTranslate();
   const [formData, setFormData] = useState(initialState);
+  const [isFree, setIsFree] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    if (!open) {
+      setFormData(initialState);
+      setIsFree(false);
+      setQuantity(1);
+    }
+  }, [open]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -72,16 +85,25 @@ export default function HoplosphereCreateDialog({ open, onClose, onConfirm }) {
 
   const thresholds = formData.coagEffects.map((r) => Number(r.threshold));
   const hasDuplicateThresholds = thresholds.length !== new Set(thresholds).size;
+  const quantityValue = Math.max(1, Number(quantity) || 1);
+  const unitCost = Number(formData.cost) || 0;
+  const cost = unitCost * quantityValue;
+  const cannotAfford = !isFree && currentZenit != null && cost > currentZenit;
 
   const handleConfirm = () => {
-    onConfirm({
-      id: genId(),
-      ...formData,
-      requiredSlots: Number(formData.requiredSlots),
-      cost: Number(formData.cost) || 0,
-      coagEffects: coagRowsToObject(formData.coagEffects),
-    });
+    onConfirm(
+      {
+        ...formData,
+        requiredSlots: Number(formData.requiredSlots),
+        cost: unitCost,
+        coagEffects: coagRowsToObject(formData.coagEffects),
+      },
+      isFree ? 0 : cost,
+      quantityValue,
+    );
     setFormData(initialState);
+    setIsFree(false);
+    setQuantity(1);
     onClose();
   };
 
@@ -166,6 +188,21 @@ export default function HoplosphereCreateDialog({ open, onClose, onConfirm }) {
               }}
             />
           </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField
+              fullWidth
+              size="small"
+              type="number"
+              label={t("Quantity")}
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              slotProps={{
+                input: {
+                  inputProps: { min: 1 },
+                },
+              }}
+            />
+          </Grid>
           <Grid size={12}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
               {t("Coagulation")}
@@ -213,6 +250,33 @@ export default function HoplosphereCreateDialog({ open, onClose, onConfirm }) {
               {t("Add Coagulation")}
             </Button>
           </Grid>
+          <Grid size={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isFree}
+                  onChange={(e) => setIsFree(e.target.checked)}
+                  size="small"
+                />
+              }
+              label={t("Free Item?")}
+            />
+          </Grid>
+          <Grid size={12}>
+            <Typography
+              variant="caption"
+              color={cannotAfford ? "error" : "text.secondary"}
+            >
+              {t("Cost")}: {cost}z
+              {currentZenit != null && (
+                <>
+                  {" "}
+                  &nbsp;({t("Current Zenit")}: {currentZenit}z)
+                </>
+              )}
+              {cannotAfford ? ` - ${t("Not enough Zenit")}` : ""}
+            </Typography>
+          </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -220,14 +284,16 @@ export default function HoplosphereCreateDialog({ open, onClose, onConfirm }) {
         <Button
           variant="contained"
           onClick={handleConfirm}
-          disabled={!formData.name.trim() || hasDuplicateThresholds}
+          disabled={
+            !formData.name.trim() || hasDuplicateThresholds || cannotAfford
+          }
           title={
             hasDuplicateThresholds
               ? t("Duplicate coagulation thresholds")
               : undefined
           }
         >
-          {t("Add")}
+          {isFree ? t("Add") : t("Buy")}
         </Button>
       </DialogActions>
     </Dialog>

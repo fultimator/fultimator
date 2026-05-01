@@ -1,11 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   FormControl,
+  FormControlLabel,
   IconButton,
   InputLabel,
   ListSubheader,
@@ -25,7 +27,12 @@ import {
 } from "../../../../libs/mnemospheres";
 import { useCompendiumPacks } from "../../../../hooks/useCompendiumPacks";
 
-export default function MnemosphereCreateDialog({ open, onClose, onConfirm }) {
+export default function MnemosphereCreateDialog({
+  open,
+  onClose,
+  onConfirm,
+  currentZenit,
+}) {
   const { t } = useTranslate();
   const { packs } = useCompendiumPacks();
 
@@ -70,19 +77,35 @@ export default function MnemosphereCreateDialog({ open, onClose, onConfirm }) {
     mnemosphereClassList[0]?.name ?? "",
   );
   const [selectedLvl, setSelectedLvl] = useState(1);
+  const [isFree, setIsFree] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      setSelectedClass(mnemosphereClassList[0]?.name ?? "");
+      setSelectedLvl(1);
+      setIsFree(false);
+    }
+  }, [open]);
+
+  const cost = getMnemosphereCost(selectedLvl);
+  const cannotAfford = !isFree && currentZenit != null && cost > currentZenit;
 
   const handleConfirm = () => {
     const entry = allClasses.find((c) => c.name === selectedClass);
     const classDef =
       entry?.classDef ?? getMnemosphereClassDefinition(selectedClass);
-    const mnemo = createMnemosphereFromDef(
-      classDef ?? { name: selectedClass },
-      selectedLvl,
-    );
-    onConfirm(mnemo);
+    const mnemo = {
+      ...createMnemosphereFromDef(
+        classDef ?? { name: selectedClass },
+        selectedLvl,
+      ),
+      baseLvl: selectedLvl,
+    };
+    onConfirm(mnemo, isFree ? 0 : cost);
     onClose();
     setSelectedClass(mnemosphereClassList[0]?.name ?? "");
     setSelectedLvl(1);
+    setIsFree(false);
   };
 
   const hasCompendium = compendiumClasses.length > 0;
@@ -142,11 +165,11 @@ export default function MnemosphereCreateDialog({ open, onClose, onConfirm }) {
           </Grid>
           <Grid size={12}>
             <FormControl fullWidth size="small">
-              <InputLabel>{t("Level")}</InputLabel>
+              <InputLabel>{t("Base Level")}</InputLabel>
               <Select
                 value={selectedLvl}
                 onChange={(e) => setSelectedLvl(e.target.value)}
-                label={t("Level")}
+                label={t("Base Level")}
               >
                 {MNEMOSPHERE_LEVELS.map((lvl) => (
                   <MenuItem key={lvl} value={lvl}>
@@ -157,8 +180,30 @@ export default function MnemosphereCreateDialog({ open, onClose, onConfirm }) {
             </FormControl>
           </Grid>
           <Grid size={12}>
-            <Typography variant="caption" color="text.secondary">
-              {t("Cost")}: {getMnemosphereCost(selectedLvl)}z
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isFree}
+                  onChange={(e) => setIsFree(e.target.checked)}
+                  size="small"
+                />
+              }
+              label={t("Free Item?")}
+            />
+          </Grid>
+          <Grid size={12}>
+            <Typography
+              variant="caption"
+              color={cannotAfford ? "error" : "text.secondary"}
+            >
+              {t("Cost")}: {cost}z
+              {currentZenit != null && (
+                <>
+                  {" "}
+                  &nbsp;({t("Current Zenit")}: {currentZenit}z)
+                </>
+              )}
+              {cannotAfford ? ` - ${t("Not enough Zenit")}` : ""}
             </Typography>
           </Grid>
         </Grid>
@@ -168,9 +213,9 @@ export default function MnemosphereCreateDialog({ open, onClose, onConfirm }) {
         <Button
           variant="contained"
           onClick={handleConfirm}
-          disabled={!selectedClass}
+          disabled={!selectedClass || cannotAfford}
         >
-          {t("Add")}
+          {isFree ? t("Add") : t("Buy")}
         </Button>
       </DialogActions>
     </Dialog>

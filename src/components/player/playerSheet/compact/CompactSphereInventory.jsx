@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   Collapse,
@@ -13,6 +14,7 @@ import {
   ListItemIcon,
   ListItemText,
   Paper,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -40,12 +42,14 @@ import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import MnemosphereCreateDialog from "../../equipment/technospheres/MnemosphereCreateDialog";
 import HoplosphereCreateDialog from "../../equipment/technospheres/HoplosphereCreateDialog";
+import CompendiumSphereImportDialog from "../../equipment/technospheres/CompendiumSphereImportDialog";
 import {
   getMnemosphereSkillDescription,
   getMnemosphereHeroicDescription,
 } from "../../classes/mnemosphereClassUtils";
 import MnemosphereClassCard from "../../classes/MnemosphereClassCard";
 import useSphereBank from "../../equipment/technospheres/useSphereBank";
+import { getHoplosphereCoagKey } from "../../../../libs/technospheres";
 
 const StyledTableCellHeader = styled(TableCell)({
   padding: "2px 6px",
@@ -61,6 +65,29 @@ function isSphereSlotted(player, id) {
   return [eq0.customWeapons, eq0.armor].some((bank) =>
     (bank ?? []).some((item) => (item.slotted ?? []).includes(id)),
   );
+}
+
+function getAllSlottedIds(player) {
+  const eq0 = player?.equipment?.[0] ?? {};
+  const ids = [];
+  for (const bank of [
+    eq0.customWeapons,
+    eq0.armor,
+    eq0.weapons,
+    eq0.shields,
+    eq0.accessories,
+  ]) {
+    for (const item of bank ?? []) ids.push(...(item.slotted ?? []));
+  }
+  return ids;
+}
+
+function getCoagCount(player, hoplo, hoplospheres) {
+  const key = getHoplosphereCoagKey(hoplo);
+  return getAllSlottedIds(player).filter((id) => {
+    const h = hoplospheres.find((hh) => hh.id === id);
+    return h && getHoplosphereCoagKey(h) === key;
+  }).length;
 }
 
 function SphereDeleteMenu({ id, slotted, onDelete, deleteLabel }) {
@@ -442,6 +469,7 @@ function MnemoRow({
 function HoploRow({
   hoplo,
   player,
+  hoplospheres,
   isEditMode,
   openRows,
   toggleRow,
@@ -451,6 +479,7 @@ function HoploRow({
   const rowKey = `hoplo-${hoplo.id}`;
   const isOpen = !!openRows[rowKey];
   const slotted = isSphereSlotted(player, hoplo.id);
+  const coagCount = getCoagCount(player, hoplo, hoplospheres);
 
   return (
     <React.Fragment>
@@ -487,6 +516,7 @@ function HoploRow({
             noWrap
           >
             {hoplo.name}
+            {coagCount > 1 ? ` ×${coagCount}` : ""}
           </Typography>
         </StyledTableCell>
         <StyledTableCell sx={{ textAlign: "center" }}>
@@ -535,6 +565,28 @@ function HoploRow({
                 {hoplo.cost}z
                 {hoplo.socketable === "weapon" && ` · ${t("Weapon only")}`}
               </Typography>
+              {hoplo.coagEffects &&
+                Object.keys(hoplo.coagEffects).length > 0 && (
+                  <Box sx={{ mt: 0.5 }}>
+                    {Object.entries(hoplo.coagEffects)
+                      .sort(([a], [b]) => Number(a) - Number(b))
+                      .map(([threshold, effect]) => {
+                        const active = coagCount >= Number(threshold);
+                        return (
+                          <Typography
+                            key={threshold}
+                            sx={{
+                              fontSize: "0.7rem",
+                              opacity: active ? 1 : 0.4,
+                              py: 0.1,
+                            }}
+                          >
+                            <strong>×{threshold}:</strong> {effect}
+                          </Typography>
+                        );
+                      })}
+                  </Box>
+                )}
             </Box>
           </Collapse>
         </StyledTableCell>
@@ -555,7 +607,9 @@ export default function CompactSphereInventory({
   const [createMnemoOpen, setCreateMnemoOpen] = useState(false);
   const [createHoploOpen, setCreateHoploOpen] = useState(false);
   const [compendiumType, setCompendiumType] = useState(null);
+  const [compendiumImport, setCompendiumImport] = useState(null);
   const [editMnemoId, setEditMnemoId] = useState(null);
+  const [snackbar, setSnackbar] = useState(null);
 
   const {
     mnemospheres,
@@ -566,7 +620,6 @@ export default function CompactSphereInventory({
     deleteMnemo: handleDeleteMnemo,
     deleteHoplo: handleDeleteHoplo,
     changeMnemoSkillLevel: handleChangeSkillLevel,
-    getMnemoAvailableLevels,
   } = useSphereBank(player, setPlayer);
 
   const headerSx = {
@@ -669,6 +722,77 @@ export default function CompactSphereInventory({
     </TableContainer>
   );
 
+  const handleCompendiumAdd = (item, type) => {
+    if (type === "mnemospheres" || type === "hoplospheres") {
+      setCompendiumImport({ item, type });
+      return;
+    }
+    handleAddFromCompendium(item, type);
+  };
+
+  const handleConfirmCompendiumImport = ({ level, cost, quantity = 1 }) => {
+    if (!compendiumImport) return;
+    const copies =
+      compendiumImport.type === "hoplospheres"
+        ? Math.max(1, Number(quantity) || 1)
+        : 1;
+    for (let i = 0; i < copies; i += 1) {
+      handleAddFromCompendium(compendiumImport.item, compendiumImport.type, {
+        level,
+      });
+    }
+    if (cost > 0) {
+      setPlayer((prev) => ({
+        ...prev,
+        info: {
+          ...prev.info,
+          zenit: Math.max(0, (prev.info?.zenit ?? 0) - cost),
+        },
+      }));
+      setSnackbar({
+        severity: "success",
+        message:
+          compendiumImport.type === "hoplospheres"
+            ? `${t("Hoplosphere purchased for")} ${cost}z`
+            : `${t("Mnemosphere purchased for")} ${cost}z`,
+      });
+    } else {
+      setSnackbar({
+        severity: "success",
+        message:
+          compendiumImport.type === "hoplospheres"
+            ? t("Hoplosphere added for free")
+            : t("Mnemosphere added for free"),
+      });
+    }
+    setCompendiumImport(null);
+  };
+
+  const handleConfirmHoplo = (hoplo, cost = 0, quantity = 1) => {
+    const copies = Math.max(1, Number(quantity) || 1);
+    for (let i = 0; i < copies; i += 1) {
+      handleAddHoplo(hoplo);
+    }
+    if (cost > 0) {
+      setPlayer((prev) => ({
+        ...prev,
+        info: {
+          ...prev.info,
+          zenit: Math.max(0, (prev.info?.zenit ?? 0) - cost),
+        },
+      }));
+      setSnackbar({
+        severity: "success",
+        message: `${t("Hoplosphere purchased for")} ${cost}z`,
+      });
+    } else {
+      setSnackbar({
+        severity: "success",
+        message: t("Hoplosphere added for free"),
+      });
+    }
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       {renderTable(
@@ -697,6 +821,7 @@ export default function CompactSphereInventory({
             key={h.id}
             hoplo={h}
             player={player}
+            hoplospheres={hoplospheres}
             isEditMode={isEditMode}
             openRows={openRows.equipment}
             toggleRow={(key) => toggleRow("equipment", key)}
@@ -710,20 +835,50 @@ export default function CompactSphereInventory({
       <MnemosphereCreateDialog
         open={createMnemoOpen}
         onClose={() => setCreateMnemoOpen(false)}
-        onConfirm={handleAddMnemo}
+        onConfirm={(mnemo, cost) => {
+          handleAddMnemo(mnemo);
+          if (cost > 0) {
+            setPlayer((prev) => ({
+              ...prev,
+              info: {
+                ...prev.info,
+                zenit: Math.max(0, (prev.info?.zenit ?? 0) - cost),
+              },
+            }));
+            setSnackbar({
+              severity: "success",
+              message: `${t("Mnemosphere purchased for")} ${cost}z`,
+            });
+          } else {
+            setSnackbar({
+              severity: "success",
+              message: t("Mnemosphere added for free"),
+            });
+          }
+        }}
+        currentZenit={player?.info?.zenit}
       />
       <HoplosphereCreateDialog
         open={createHoploOpen}
         onClose={() => setCreateHoploOpen(false)}
-        onConfirm={handleAddHoplo}
+        onConfirm={handleConfirmHoplo}
+        currentZenit={player?.info?.zenit}
       />
       <CompendiumViewerModal
         open={Boolean(compendiumType)}
         onClose={() => setCompendiumType(null)}
-        onAddItem={handleAddFromCompendium}
+        onAddItem={handleCompendiumAdd}
         initialType={compendiumType ?? "mnemospheres"}
         restrictToTypes={compendiumType ? [compendiumType] : []}
         context="player"
+      />
+      <CompendiumSphereImportDialog
+        open={Boolean(compendiumImport)}
+        item={compendiumImport?.item}
+        type={compendiumImport?.type}
+        onClose={() => setCompendiumImport(null)}
+        onConfirm={handleConfirmCompendiumImport}
+        currentZenit={player?.info?.zenit}
       />
       {(() => {
         const liveMnemo = editMnemoId
@@ -764,6 +919,20 @@ export default function CompactSphereInventory({
           </Dialog>
         ) : null;
       })()}
+      <Snackbar
+        open={Boolean(snackbar)}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar?.severity ?? "success"}
+          onClose={() => setSnackbar(null)}
+          sx={{ width: "100%" }}
+        >
+          {snackbar?.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

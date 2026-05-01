@@ -1487,8 +1487,9 @@ export const SharedHoplosphereCard = React.memo(function SharedHoplosphereCard({
               label={`Coag ×${coagCount}`}
               size="small"
               sx={{
-                backgroundColor: "rgba(255,255,255,0.15)",
+                backgroundColor: customTheme.secondary,
                 color: "#ffffff",
+                fontWeight: "bold",
                 fontSize: "0.65rem",
               }}
             />
@@ -1551,7 +1552,15 @@ export const SharedHoplosphereCard = React.memo(function SharedHoplosphereCard({
                     label={`×${threshold}`}
                     size="small"
                     variant={active ? "filled" : "outlined"}
-                    sx={{ fontSize: "0.6rem", height: 16, flexShrink: 0 }}
+                    sx={{
+                      fontSize: "0.6rem",
+                      height: 16,
+                      flexShrink: 0,
+                      ...(active && {
+                        backgroundColor: customTheme.secondary,
+                        color: "#ffffff",
+                      }),
+                    }}
                   />
                   <Typography variant="body2">{effect}</Typography>
                 </Box>
