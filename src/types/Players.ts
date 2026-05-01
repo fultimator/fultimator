@@ -278,6 +278,9 @@ export interface CustomWeapons {
   hands?: number;
   martial?: boolean;
   isEquipped?: boolean;
+  rareAccuracyBonus?: boolean;
+  rareDamageBonus?: boolean;
+  overrideAccuracyAttributes?: boolean;
 
   // Primary weapon modifiers (standard format)
   damageModifier?: number;

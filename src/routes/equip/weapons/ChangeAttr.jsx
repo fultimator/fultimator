@@ -13,8 +13,14 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
             labelId="att1"
             id="select-att1"
             value={att1}
-            label="Change Type"
+            label={t("Change Attr 1")}
             onChange={setAtt1}
+            sx={{
+              "& .MuiSelect-select": {
+                minHeight: "1.4375em",
+                py: "16.5px",
+              },
+            }}
           >
             {Object.entries(attributes).map((key, _i) => {
               return (
@@ -33,8 +39,14 @@ function ChangeAttr({ att1, att2, setAtt1, setAtt2 }) {
             labelId="att2"
             id="select-att2"
             value={att2}
-            label="Change Type"
+            label={t("Change Attr 2")}
             onChange={setAtt2}
+            sx={{
+              "& .MuiSelect-select": {
+                minHeight: "1.4375em",
+                py: "16.5px",
+              },
+            }}
           >
             {Object.entries(attributes).map((key, _i) => {
               return (

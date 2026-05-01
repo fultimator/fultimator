@@ -44,6 +44,7 @@ import Export from "../Export";
 import { useTranslate } from "../../translation/translate";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useEquipmentForm } from "../player/common/hooks/useEquipmentForm";
+import { calculateCustomWeaponStats } from "../player/common/playerCalculations";
 import types from "../../libs/types";
 import classList from "../../libs/classes";
 import spellClassesList from "../../libs/spellClasses";
@@ -140,6 +141,39 @@ const ATTRS = [
   { value: "might", label: "MIG" },
   { value: "will", label: "WLP" },
 ];
+const ATTRIBUTE_OPTIONS = ATTRS.map((attr) => attr.value);
+
+function isValidAttribute(value) {
+  return ATTRIBUTE_OPTIONS.includes(value);
+}
+
+function normalizeCustomWeaponAccuracyCheck(
+  value,
+  fallback = cwAccuracyChecks[0],
+) {
+  const att1 = Array.isArray(value) ? value[0] : value?.att1;
+  const att2 = Array.isArray(value) ? value[1] : value?.att2;
+  if (isValidAttribute(att1) && isValidAttribute(att2)) {
+    return { att1, att2 };
+  }
+  return fallback;
+}
+
+function findCustomWeaponPresetAccuracyCheck(value) {
+  const normalized = normalizeCustomWeaponAccuracyCheck(value);
+  return (
+    cwAccuracyChecks.find(
+      (check) =>
+        check.att1 === normalized.att1 && check.att2 === normalized.att2,
+    ) ?? null
+  );
+}
+
+function hasAccurateCustomization(customizationList) {
+  return (customizationList ?? []).some(
+    (customization) => customization.name === "weapon_customization_accurate",
+  );
+}
 
 const DURATION_OPTIONS = ["Scene", "Instantaneous", "Special"];
 const TARGET_OPTIONS = [
@@ -2342,7 +2376,7 @@ function QualityPanel() {
                   sm: 6,
                 }}
               >
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth>
                   <InputLabel>{t("Category")}</InputLabel>
                   <Select
                     value={category}
@@ -2386,7 +2420,7 @@ function QualityPanel() {
                   sm: 6,
                 }}
               >
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth>
                   <InputLabel id="qc-filter-label">
                     {t("Applicable to")}
                   </InputLabel>
@@ -3243,19 +3277,6 @@ function WeaponPanel() {
               }}
             />
           </Grid>
-          <Grid size={6}>
-            <ChangeBonus
-              basePrec={base.prec}
-              precBonus={precBonus}
-              damageBonus={damageBonus}
-              damageReworkBonus={damageReworkBonus}
-              setPrecBonus={setPrecBonus}
-              setDamageBonus={setDamageBonus}
-              setDamageReworkBonus={setDamageReworkBonus}
-              rework={rework}
-              totalBonus={totalBonus}
-            />
-          </Grid>
           <Grid size={12}>
             <ChangeQuality
               quality={quality}
@@ -3274,16 +3295,35 @@ function WeaponPanel() {
             </AccordionSummary>
             <AccordionDetails>
               <Grid container spacing={2}>
+                <Grid size={12}>
+                  <Typography variant="h6">
+                    {t("Rare Weapon Options")}
+                  </Typography>
+                  <Divider sx={{ mt: 0.5 }} />
+                </Grid>
+                <Grid size={12}>
+                  <ChangeBonus
+                    basePrec={base.prec}
+                    precBonus={precBonus}
+                    damageBonus={damageBonus}
+                    damageReworkBonus={damageReworkBonus}
+                    setPrecBonus={setPrecBonus}
+                    setDamageBonus={setDamageBonus}
+                    setDamageReworkBonus={setDamageReworkBonus}
+                    rework={rework}
+                    totalBonus={totalBonus}
+                  />
+                </Grid>
                 {[
+                  {
+                    label: "Accuracy Modifier",
+                    value: precModifier,
+                    set: setPrecModifier,
+                  },
                   {
                     label: "Damage Modifier",
                     value: damageModifier,
                     set: setDamageModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
                   },
                   {
                     label: "DEF Modifier",
@@ -3767,6 +3807,10 @@ function CustomWeaponPanel() {
   const [quality, setQuality] = useState("");
   const [qualityCost, setQualityCost] = useState(0);
   const [selectedQuality, setSelectedQuality] = useState("");
+  const [rareAccuracyBonus, setRareAccuracyBonus] = useState(false);
+  const [rareDamageBonus, setRareDamageBonus] = useState(false);
+  const [overrideAccuracyAttributes, setOverrideAccuracyAttributes] =
+    useState(false);
   const {
     damageModifier,
     setDamageModifier,
@@ -3784,6 +3828,7 @@ function CustomWeaponPanel() {
   const hasTransforming = customizations.some(
     (c) => c.name === "weapon_customization_transforming",
   );
+  const hasAccurate = hasAccurateCustomization(customizations);
 
   useEffect(() => {
     if (hasTransforming && secondCurrentCustomizations.length === 0) {
@@ -3811,7 +3856,22 @@ function CustomWeaponPanel() {
     const baseCost = 300;
     const transformingCost = hasTransforming ? 100 : 0;
     const qualityCostValue = parseInt(qualityCost) || 0;
-    return baseCost + transformingCost + qualityCostValue;
+    const rareAccuracyCost = rareAccuracyBonus ? 100 : 0;
+    const rareDamageCost = rareDamageBonus ? 200 : 0;
+    const damageTypeOverrideCost = overrideDamageType ? 100 : 0;
+    const singleAttributeAccuracyCost =
+      overrideAccuracyAttributes && accuracyCheck.att1 === accuracyCheck.att2
+        ? 50
+        : 0;
+    return (
+      baseCost +
+      transformingCost +
+      qualityCostValue +
+      rareAccuracyCost +
+      rareDamageCost +
+      damageTypeOverrideCost +
+      singleAttributeAccuracyCost
+    );
   };
   const isMartial = () => {
     const martialCustomizations = [
@@ -3819,7 +3879,35 @@ function CustomWeaponPanel() {
       "weapon_customization_magicdefenseboost",
       "weapon_customization_powerful",
     ];
-    return customizations.some((c) => martialCustomizations.includes(c.name));
+    if (customizations.some((c) => martialCustomizations.includes(c.name))) {
+      return true;
+    }
+    const { damage } = calculateCustomWeaponStats(
+      {
+        category,
+        customizations,
+        rareAccuracyBonus,
+        rareDamageBonus,
+        damageModifier,
+        precModifier,
+      },
+      false,
+    );
+    if (damage >= 10) return true;
+    if (!hasTransforming) return false;
+
+    const { damage: secondaryDamage } = calculateCustomWeaponStats(
+      {
+        secondSelectedCategory,
+        secondCurrentCustomizations,
+        rareAccuracyBonus,
+        rareDamageBonus,
+        secondDamageModifier,
+        secondPrecModifier,
+      },
+      true,
+    );
+    return secondaryDamage >= 10;
   };
 
   const weaponObj = {
@@ -3835,12 +3923,19 @@ function CustomWeaponPanel() {
     cost: calculateTotalCost(),
     hands: 2,
     martial: isMartial(),
+    rareAccuracyBonus,
+    rareDamageBonus,
+    overrideAccuracyAttributes,
     secondWeaponName,
     secondSelectedCategory,
     secondSelectedRange,
     secondSelectedAccuracyCheck: {
-      att1: secondSelectedAccuracyCheck.att1,
-      att2: secondSelectedAccuracyCheck.att2,
+      att1: overrideAccuracyAttributes
+        ? accuracyCheck.att1
+        : secondSelectedAccuracyCheck.att1,
+      att2: overrideAccuracyAttributes
+        ? accuracyCheck.att2
+        : secondSelectedAccuracyCheck.att2,
     },
     secondSelectedType,
     secondCurrentCustomizations,
@@ -3886,7 +3981,20 @@ function CustomWeaponPanel() {
     setQuality("");
     setQualityCost(0);
     setSelectedQuality("");
+    setRareAccuracyBonus(false);
+    setRareDamageBonus(false);
+    setOverrideAccuracyAttributes(false);
     clearModifiers();
+  };
+
+  const handleOverrideAccuracyAttributesChange = (checked) => {
+    setOverrideAccuracyAttributes(checked);
+    if (!checked) {
+      setAccuracyCheck(
+        findCustomWeaponPresetAccuracyCheck(accuracyCheck) ??
+          cwAccuracyChecks[0],
+      );
+    }
   };
 
   const handleCategoryChange = (e) => {
@@ -3958,17 +4066,6 @@ function CustomWeaponPanel() {
               sm: 6,
             }}
           >
-            <ChangeAccuracyCheck
-              value={accuracyCheck}
-              onChange={(val) => setAccuracyCheck(val)}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
             <ChangeCWType
               value={
                 isDamageTypeEnabled
@@ -3987,6 +4084,74 @@ function CustomWeaponPanel() {
               disabled={!isDamageTypeEnabled}
             />
           </Grid>
+          {overrideAccuracyAttributes ? (
+            <>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6,
+                }}
+              >
+                <FormControl fullWidth>
+                  <InputLabel>{t("Change Attr 1")}</InputLabel>
+                  <Select
+                    value={accuracyCheck.att1}
+                    label={t("Change Attr 1")}
+                    onChange={(e) =>
+                      setAccuracyCheck((current) => ({
+                        ...normalizeCustomWeaponAccuracyCheck(current),
+                        att1: e.target.value,
+                      }))
+                    }
+                  >
+                    {ATTRS.map((attribute) => (
+                      <MenuItem key={attribute.value} value={attribute.value}>
+                        {t(attribute.label)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6,
+                }}
+              >
+                <FormControl fullWidth>
+                  <InputLabel>{t("Change Attr 2")}</InputLabel>
+                  <Select
+                    value={accuracyCheck.att2}
+                    label={t("Change Attr 2")}
+                    onChange={(e) =>
+                      setAccuracyCheck((current) => ({
+                        ...normalizeCustomWeaponAccuracyCheck(current),
+                        att2: e.target.value,
+                      }))
+                    }
+                  >
+                    {ATTRS.map((attribute) => (
+                      <MenuItem key={attribute.value} value={attribute.value}>
+                        {t(attribute.label)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </>
+          ) : (
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6,
+              }}
+            >
+              <ChangeAccuracyCheck
+                value={accuracyCheck}
+                onChange={(val) => setAccuracyCheck(val)}
+              />
+            </Grid>
+          )}
           <Grid size={12}>
             <ChangeCustomizations
               selectedCustomization={selectedCustomization}
@@ -4000,6 +4165,7 @@ function CustomWeaponPanel() {
               currentCustomizations={customizations}
               selectedCategory={category}
               isSecondForm={false}
+              rareAccuracyBonus={rareAccuracyBonus}
             />
           </Grid>
           {hasTransforming && (
@@ -4041,17 +4207,80 @@ function CustomWeaponPanel() {
                   onChange={(e) => setSecondSelectedRange(e.target.value)}
                 />
               </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <ChangeAccuracyCheck
-                  value={secondSelectedAccuracyCheck}
-                  onChange={(val) => setSecondSelectedAccuracyCheck(val)}
-                />
-              </Grid>
+              {overrideAccuracyAttributes ? (
+                <>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControl fullWidth>
+                      <InputLabel>{t("Change Attr 1")}</InputLabel>
+                      <Select
+                        value={accuracyCheck.att1}
+                        label={t("Change Attr 1")}
+                        onChange={(e) =>
+                          setAccuracyCheck((current) => ({
+                            ...normalizeCustomWeaponAccuracyCheck(current),
+                            att1: e.target.value,
+                          }))
+                        }
+                      >
+                        {ATTRS.map((attribute) => (
+                          <MenuItem
+                            key={attribute.value}
+                            value={attribute.value}
+                          >
+                            {t(attribute.label)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControl fullWidth>
+                      <InputLabel>{t("Change Attr 2")}</InputLabel>
+                      <Select
+                        value={accuracyCheck.att2}
+                        label={t("Change Attr 2")}
+                        onChange={(e) =>
+                          setAccuracyCheck((current) => ({
+                            ...normalizeCustomWeaponAccuracyCheck(current),
+                            att2: e.target.value,
+                          }))
+                        }
+                      >
+                        {ATTRS.map((attribute) => (
+                          <MenuItem
+                            key={attribute.value}
+                            value={attribute.value}
+                          >
+                            {t(attribute.label)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </>
+              ) : (
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                  }}
+                >
+                  <ChangeAccuracyCheck
+                    value={secondSelectedAccuracyCheck}
+                    onChange={(val) => setSecondSelectedAccuracyCheck(val)}
+                  />
+                </Grid>
+              )}
               <Grid
                 size={{
                   xs: 12,
@@ -4126,28 +4355,6 @@ function CustomWeaponPanel() {
                           />
                         </Grid>
                       ))}
-                      <Grid size={6}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={secondOverrideDamageType}
-                              onChange={(e) =>
-                                setSecondOverrideDamageType(e.target.checked)
-                              }
-                            />
-                          }
-                          label={t("override_damage_type")}
-                        />
-                        {secondOverrideDamageType && (
-                          <ChangeCWType
-                            value={secondCustomDamageType}
-                            onChange={(e) =>
-                              setSecondCustomDamageType(e.target.value)
-                            }
-                            disabled={false}
-                          />
-                        )}
-                      </Grid>
                     </Grid>
                   </AccordionDetails>
                 </Accordion>
@@ -4185,6 +4392,92 @@ function CustomWeaponPanel() {
             </AccordionSummary>
             <AccordionDetails>
               <Grid container spacing={2}>
+                <Grid size={12}>
+                  <Typography variant="h6">
+                    {t("Rare Weapon Options")}
+                  </Typography>
+                  <Divider sx={{ mt: 0.5 }} />
+                </Grid>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={overrideDamageType}
+                        onChange={(e) =>
+                          setOverrideDamageType(e.target.checked)
+                        }
+                      />
+                    }
+                    label={`${t("override_damage_type")} (+100z)`}
+                  />
+                </Grid>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={overrideAccuracyAttributes}
+                        onChange={(e) =>
+                          handleOverrideAccuracyAttributesChange(
+                            e.target.checked,
+                          )
+                        }
+                      />
+                    }
+                    label={t("override_accuracy_attributes")}
+                  />
+                </Grid>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={rareAccuracyBonus}
+                        disabled={hasAccurate && !rareAccuracyBonus}
+                        onChange={(e) => {
+                          setRareAccuracyBonus(e.target.checked);
+                          if (
+                            e.target.checked &&
+                            selectedCustomization ===
+                              "weapon_customization_accurate"
+                          ) {
+                            setSelectedCustomization("");
+                          }
+                        }}
+                      />
+                    }
+                    label={`+1 ${t("Accuracy")} (+100z)`}
+                  />
+                </Grid>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={rareDamageBonus}
+                        onChange={(e) => setRareDamageBonus(e.target.checked)}
+                      />
+                    }
+                    label={`+4 ${t("Damage")} (+200z)`}
+                  />
+                </Grid>
                 {[
                   {
                     label: "Damage Modifier",
@@ -4207,7 +4500,13 @@ function CustomWeaponPanel() {
                     set: setMDefModifier,
                   },
                 ].map(({ label, value, set }) => (
-                  <Grid key={label} size={6}>
+                  <Grid
+                    key={label}
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
                     <ChangeModifiers
                       label={label}
                       value={value}
@@ -4215,37 +4514,6 @@ function CustomWeaponPanel() {
                     />
                   </Grid>
                 ))}
-                <Grid size={6}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={overrideDamageType}
-                        onChange={(e) =>
-                          setOverrideDamageType(e.target.checked)
-                        }
-                      />
-                    }
-                    label={t("override_damage_type")}
-                  />
-                </Grid>
-                {overrideDamageType && (
-                  <Grid size={6}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("weapon_damage_type")}</InputLabel>
-                      <Select
-                        value={customDamageType}
-                        onChange={(e) => setCustomDamageType(e.target.value)}
-                        label={t("weapon_damage_type")}
-                      >
-                        {cwTypes.map((damageType) => (
-                          <MenuItem key={damageType} value={damageType}>
-                            {t(damageType)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                )}
               </Grid>
             </AccordionDetails>
           </Accordion>

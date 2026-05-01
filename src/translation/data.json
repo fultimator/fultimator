@@ -13908,6 +13908,18 @@
     "ru": ""
   },
   {
+    "key": "override_accuracy_attributes",
+    "en": "Override Accuracy Attributes",
+    "it": "Override Accuracy Attributes",
+    "de": "Override Accuracy Attributes",
+    "pl": "Override Accuracy Attributes",
+    "fr": "Override Accuracy Attributes",
+    "es": "Override Accuracy Attributes",
+    "pt-BR": "Override Accuracy Attributes",
+    "zh": "Override Accuracy Attributes",
+    "ru": ""
+  },
+  {
     "key": "weapon_damage_type",
     "en": "Weapon Damage Type",
     "it": "Tipo di Danno",

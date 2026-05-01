@@ -99,6 +99,9 @@ export function calculateCustomWeaponStats(customWeapon, isSecondaryForm) {
     }
   }
 
+  if (customWeapon.rareAccuracyBonus) precision += 1;
+  if (customWeapon.rareDamageBonus) damage += 4;
+
   if (isSecondaryForm) {
     damage += parseInt(customWeapon.secondDamageModifier || 0);
     precision += parseInt(customWeapon.secondPrecModifier || 0);

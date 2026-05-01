@@ -149,13 +149,19 @@ function getCustomWeaponDamageType(item) {
 
 function isCustomWeaponMartial(item) {
   if (item.martial) return true;
-  return (item.customizations || []).some((c) =>
-    [
-      "weapon_customization_quick",
-      "weapon_customization_magicdefenseboost",
-      "weapon_customization_powerful",
-    ].includes(c.name),
-  );
+  if (
+    (item.customizations || []).some((c) =>
+      [
+        "weapon_customization_quick",
+        "weapon_customization_magicdefenseboost",
+        "weapon_customization_powerful",
+      ].includes(c.name),
+    )
+  ) {
+    return true;
+  }
+  const { damage } = calculateCustomWeaponStats(item, false);
+  return damage >= 10;
 }
 
 function getCustomWeaponRangeLabel(item, t) {
@@ -888,22 +894,31 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
 }
 
 function buildSecondWeaponItem(item) {
+  const secondHasElemental = (item.secondCurrentCustomizations || []).some(
+    (c) => c.name === "weapon_customization_elemental",
+  );
   return {
     name: item.secondWeaponName || item.name,
     category: item.secondSelectedCategory || item.category,
     range: item.secondSelectedRange || item.range,
-    accuracyCheck: item.secondSelectedAccuracyCheck || item.accuracyCheck,
+    accuracyCheck: item.overrideAccuracyAttributes
+      ? item.accuracyCheck
+      : item.secondSelectedAccuracyCheck || item.accuracyCheck,
     type: item.secondSelectedType || item.type,
     customizations: item.secondCurrentCustomizations || [],
     quality: item.quality,
     qualityCost: item.qualityCost,
     cost: item.cost,
+    rareAccuracyBonus: item.rareAccuracyBonus || false,
+    rareDamageBonus: item.rareDamageBonus || false,
     damageModifier: item.secondDamageModifier || 0,
     precModifier: item.secondPrecModifier || 0,
     defModifier: item.secondDefModifier || 0,
     mDefModifier: item.secondMDefModifier || 0,
-    overrideDamageType: item.secondOverrideDamageType || false,
-    customDamageType: item.secondCustomDamageType || item.customDamageType,
+    overrideDamageType: secondHasElemental
+      ? false
+      : item.secondOverrideDamageType || false,
+    customDamageType: item.secondCustomDamageType || item.type || "physical",
   };
 }
 
@@ -951,7 +966,12 @@ export const SharedCustomWeaponCard = React.memo(
       : { name: 4, cost: 2, accuracy: 3, damage: 3, hands: 3, range: 3 };
 
     const hasStoredSecondForm =
-      item.secondWeaponName != null || item.secondCurrentCustomizations != null;
+      (item.secondWeaponName != null ||
+        item.secondCurrentCustomizations != null) &&
+      Array.isArray(item.customizations) &&
+      item.customizations.some(
+        (c) => c.name === "weapon_customization_transforming",
+      );
     const secondItem = hasStoredSecondForm ? buildSecondWeaponItem(item) : null;
 
     const rowProps = {
