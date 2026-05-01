@@ -1,17 +1,7 @@
 import React, { useRef } from "react";
 import { useTheme } from "@mui/material/styles";
-import {
-  Paper,
-  Grid,
-  Button,
-  Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-} from "@mui/material";
-import { UploadFile, WarningAmber } from "@mui/icons-material";
+import { Paper, Grid, Button, Divider } from "@mui/material";
+import { UploadFile } from "@mui/icons-material";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import { useTranslate } from "../../../translation/translate";
 import useUploadJSON from "../../../hooks/useUploadJSON";
@@ -73,12 +63,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   const inv = player.equipment?.[0] || {};
 
-  const MARTIAL_CUSTOMIZATIONS = [
-    "weapon_customization_quick",
-    "weapon_customization_magicdefenseboost",
-    "weapon_customization_powerful",
-  ];
-
   // Helper: update one source array inside equipment[0] and return a new player.
   const patchInv = (p, source, updater) => {
     const eq0 = {
@@ -87,45 +71,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     };
     const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
     return { ...p, equipment };
-  };
-
-  const hasMartialProficiency = (itemType, item) => {
-    if (!item) return false;
-
-    let isMartial = false;
-    if (itemType === "customWeapons") {
-      isMartial = (item.customizations ?? []).some((c) =>
-        MARTIAL_CUSTOMIZATIONS.includes(c.name),
-      );
-    } else {
-      isMartial = !!item.martial;
-    }
-    if (!isMartial) return true;
-
-    for (const cls of player?.classes ?? []) {
-      const martials = cls.benefits?.martials;
-      if (!martials) continue;
-      const shieldProf = !!(martials.shield || martials.shields);
-      if (itemType === "weapons" && item.melee && martials.melee) return true;
-      if (itemType === "weapons" && item.ranged && martials.ranged) return true;
-      if (
-        itemType === "customWeapons" &&
-        item.range === "weapon_range_ranged" &&
-        martials.ranged
-      )
-        return true;
-      if (
-        itemType === "customWeapons" &&
-        item.range !== "weapon_range_ranged" &&
-        martials.melee
-      )
-        return true;
-      if (itemType === "shields" && shieldProf) return true;
-      if (itemType === "armor" && martials.armor) return true;
-      if (itemType === "accessories") return true;
-    }
-
-    return false;
   };
 
   // For add/edit/delete operations: preserve existing equippedSlots (only clear slots
@@ -847,7 +792,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         isEditMode={isEditMode}
       />
       {isTechnospheres && isEditMode && (
-        <SphereInventory player={player} setPlayer={setPlayer} />
+        <SphereInventory
+          player={player}
+          setPlayer={setPlayer}
+          isEditMode={isEditMode}
+          advancement={player?.settings?.advancement ?? false}
+        />
       )}
       {/* Modals */}
       {!isTechnospheres && (

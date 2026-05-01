@@ -209,6 +209,15 @@ export default function PlayerArmorModal({
   const slotCostDelta = isTechnospheres
     ? selectedSlotTier.cost - paidSlotTier.cost
     : 0;
+  const currentZenit = player?.info?.zenit ?? 0;
+  const cannotAffordSlotTier = slotCostDelta > currentZenit;
+  const slotCostChangeLabel =
+    slotCostDelta > 0
+      ? `${t("Deduct on save")}: ${slotCostDelta}z`
+      : slotCostDelta < 0
+        ? `${t("Refund on save")}: ${Math.abs(slotCostDelta)}z`
+        : "";
+  const currentZenitLabel = `${t("Current Zenit")}: ${currentZenit}z`;
 
   const handleClearFields = () => {
     setBase(armor[0]);
@@ -246,6 +255,15 @@ export default function PlayerArmorModal({
     };
 
     onAddArmor(updatedArmor);
+    if (slotCostDelta !== 0 && setPlayer) {
+      setPlayer((prev) => ({
+        ...prev,
+        info: {
+          ...prev.info,
+          zenit: Math.max(0, (prev.info?.zenit ?? 0) - slotCostDelta),
+        },
+      }));
+    }
   };
 
   const handleDelete = handleDeleteWithConfirm;
@@ -329,34 +347,6 @@ export default function PlayerArmorModal({
                     }}
                     isWeapon={false}
                   />
-                  {slotCostDelta !== 0 && (
-                    <Box sx={{ mt: 1 }}>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color={slotCostDelta > 0 ? "warning" : "success"}
-                        onClick={() => {
-                          if (setPlayer) {
-                            setPlayer((prev) => ({
-                              ...prev,
-                              info: {
-                                ...prev.info,
-                                zenit: Math.max(
-                                  0,
-                                  (prev.info?.zenit ?? 0) - slotCostDelta,
-                                ),
-                              },
-                            }));
-                          }
-                          setPaidSlots(slots);
-                        }}
-                      >
-                        {slotCostDelta > 0
-                          ? `${t("Buy")} (−${slotCostDelta}z)`
-                          : `${t("Refund")} (+${Math.abs(slotCostDelta)}z)`}
-                      </Button>
-                    </Box>
-                  )}
                 </Grid>
                 <Grid size={12}>
                   <SlotEditor
@@ -605,7 +595,25 @@ export default function PlayerArmorModal({
               {t("Delete")}
             </Button>
           )}
-          <Button onClick={handleSave} color="primary" variant="contained">
+          <Box sx={{ flexGrow: 1 }} />
+          {slotCostChangeLabel && (
+            <Typography
+              variant="body2"
+              color={cannotAffordSlotTier ? "error" : "text.secondary"}
+            >
+              {slotCostChangeLabel} ({currentZenitLabel})
+              {cannotAffordSlotTier ? ` - ${t("Not enough Zenit")}` : ""}
+            </Typography>
+          )}
+          <Button onClick={onClose} color="secondary">
+            {t("Cancel")}
+          </Button>
+          <Button
+            onClick={handleSave}
+            color="primary"
+            variant="contained"
+            disabled={cannotAffordSlotTier}
+          >
             {t("Save Changes")}
           </Button>
         </DialogActions>
