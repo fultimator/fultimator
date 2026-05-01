@@ -155,6 +155,16 @@ export default function SlotPickerDialog({
 
     if (!isMartial) return true;
 
+    const isTechnospheresStandard =
+      player?.settings?.optionalRules?.technospheres &&
+      (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+        "standard";
+    if (
+      isTechnospheresStandard &&
+      (itemType === "meleeWeapon" || itemType === "rangedWeapon")
+    )
+      return true;
+
     for (const cls of player?.classes ?? []) {
       const martials = cls.benefits?.martials;
       if (!martials) continue;

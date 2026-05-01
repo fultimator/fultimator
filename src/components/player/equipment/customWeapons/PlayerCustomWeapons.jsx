@@ -55,6 +55,12 @@ export default function PlayerCustomWeapons({
       return true;
     }
 
+    const isTechnospheresStandard =
+      player.settings?.optionalRules?.technospheres &&
+      (player.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+        "standard";
+    if (isTechnospheresStandard) return true;
+
     const isRanged = customWeapon.range === "weapon_range_ranged";
     const isMelee =
       customWeapon.range === "weapon_range_melee" ||

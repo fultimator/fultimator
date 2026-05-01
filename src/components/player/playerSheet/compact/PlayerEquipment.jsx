@@ -684,6 +684,15 @@ export default function PlayerEquipment({
 
   const checkIfEquippable = (item) => {
     if (!item.martial) return true;
+    const isTechnospheresStandard =
+      player.settings?.optionalRules?.technospheres &&
+      (player.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+        "standard";
+    if (
+      isTechnospheresStandard &&
+      (item.equipType === "weapon" || item.equipType === "custom-weapon")
+    )
+      return true;
     return player.classes.some((cls) => {
       const martials = cls.benefits.martials;
       if (!martials) return false;
