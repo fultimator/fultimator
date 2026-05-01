@@ -18,7 +18,7 @@ import ChangeBase from "./ChangeBase";
 import ChangeAttr from "./ChangeAttr";
 import ChangeMartial from "../common/ChangeMartial";
 import ChangeBonus from "./ChangeBonus";
-import ChangeHands from "./ChangeHands";
+import ChangeHands, { RESTRICTED_ONE_HANDED_CATEGORIES } from "./ChangeHands";
 import ChangeName from "../common/ChangeName";
 import ChangeType from "./ChangeType";
 import { SharedWeaponCard } from "../../../components/shared/itemCards";
@@ -203,7 +203,11 @@ function Weapons() {
     let damage = base.damage;
 
     // Changed type
-    if (base.hands === 1 && hands === 2) {
+    if (
+      base.hands === 1 &&
+      hands === 2 &&
+      !RESTRICTED_ONE_HANDED_CATEGORIES.includes(base.category)
+    ) {
       damage += 4;
     }
     if (base.hands === 2 && hands === 1) {

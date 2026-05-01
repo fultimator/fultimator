@@ -142,7 +142,14 @@ function getArmorInit(item) {
 }
 
 function getCustomWeaponDamageType(item) {
-  if ((item.overrideDamageType || item.overrideType) && item.customDamageType)
+  const hasElemental = (item.customizations || []).some(
+    (c) => c.name === "weapon_customization_elemental",
+  );
+  if (
+    !hasElemental &&
+    (item.overrideDamageType || item.overrideType) &&
+    item.customDamageType
+  )
     return item.customDamageType;
   return item.type || "physical";
 }
@@ -917,8 +924,8 @@ function buildSecondWeaponItem(item) {
     mDefModifier: item.secondMDefModifier || 0,
     overrideDamageType: secondHasElemental
       ? false
-      : item.secondOverrideDamageType || false,
-    customDamageType: item.secondCustomDamageType || item.type || "physical",
+      : item.overrideDamageType || false,
+    customDamageType: item.customDamageType || item.type || "physical",
   };
 }
 

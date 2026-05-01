@@ -23,6 +23,7 @@ import ChangeMartial from "../../../../routes/equip/common/ChangeMartial";
 import ChangeName from "../../../../routes/equip/common/ChangeName";
 import ChangeType from "../../../../routes/equip/weapons/ChangeType";
 import ChangeHands from "../../../../routes/equip/weapons/ChangeHands";
+import { RESTRICTED_ONE_HANDED_CATEGORIES } from "../../../../routes/equip/weapons/constants";
 import ChangeAttr from "../../../../routes/equip/weapons/ChangeAttr";
 import SelectQuality from "../../../../routes/equip/weapons/SelectQuality";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
@@ -250,8 +251,11 @@ export default function PlayerWeaponModal({
   const calcDamage = () => {
     let damage = base.damage;
 
-    // Changed type
-    if (base.hands === 1 && hands === 2) {
+    if (
+      base.hands === 1 &&
+      hands === 2 &&
+      !RESTRICTED_ONE_HANDED_CATEGORIES.includes(base.category)
+    ) {
       damage += 4;
     }
     if (base.hands === 2 && hands === 1) {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Box,
   Paper,
   Typography,
   Grid,
@@ -652,86 +653,24 @@ function CustomWeapons() {
               }}
             >
               <ChangeType
-                value={overrideType ? customDamageType : selectedType}
-                onChange={(e) => {
-                  if (overrideType) {
-                    setCustomDamageType(e.target.value);
-                  } else {
-                    setSelectedType(e.target.value);
-                  }
-                }}
-                disabled={!hasElemental && !overrideType}
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                disabled={!hasElemental}
               />
             </Grid>
 
-            {overrideAccuracyAttributes ? (
-              <>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControl fullWidth>
-                    <InputLabel>{t("Change Attr 1")}</InputLabel>
-                    <Select
-                      value={selectedAccuracyCheck.att1}
-                      label={t("Change Attr 1")}
-                      onChange={(e) =>
-                        setSelectedAccuracyCheck((current) => ({
-                          ...normalizeAccuracyCheck(current),
-                          att1: e.target.value,
-                        }))
-                      }
-                    >
-                      {ATTRIBUTE_OPTIONS.map((attribute) => (
-                        <MenuItem key={attribute} value={attribute}>
-                          {attributes[attribute]?.shortcaps}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControl fullWidth>
-                    <InputLabel>{t("Change Attr 2")}</InputLabel>
-                    <Select
-                      value={selectedAccuracyCheck.att2}
-                      label={t("Change Attr 2")}
-                      onChange={(e) =>
-                        setSelectedAccuracyCheck((current) => ({
-                          ...normalizeAccuracyCheck(current),
-                          att2: e.target.value,
-                        }))
-                      }
-                    >
-                      {ATTRIBUTE_OPTIONS.map((attribute) => (
-                        <MenuItem key={attribute} value={attribute}>
-                          {attributes[attribute]?.shortcaps}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </>
-            ) : (
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <ChangeAccuracyCheck
-                  value={selectedAccuracyCheck}
-                  onChange={setSelectedAccuracyCheck}
-                />
-              </Grid>
-            )}
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6,
+              }}
+            >
+              <ChangeAccuracyCheck
+                value={selectedAccuracyCheck}
+                onChange={setSelectedAccuracyCheck}
+                disabled={overrideAccuracyAttributes}
+              />
+            </Grid>
 
             <ChangeCustomizations
               selectedCustomization={selectedCustomization}
@@ -828,6 +767,16 @@ function CustomWeapons() {
                         }
                         label={`${t("Override Damage Type")} (+100z)`}
                       />
+                      {overrideType && !hasElemental && (
+                        <Box sx={{ mt: 1 }}>
+                          <ChangeType
+                            value={customDamageType}
+                            onChange={(e) =>
+                              setCustomDamageType(e.target.value)
+                            }
+                          />
+                        </Box>
+                      )}
                     </Grid>
                     <Grid
                       size={{
@@ -848,6 +797,52 @@ function CustomWeapons() {
                         }
                         label={t("override_accuracy_attributes")}
                       />
+                      {overrideAccuracyAttributes && (
+                        <Grid container spacing={1} sx={{ mt: 1 }}>
+                          <Grid size={6}>
+                            <FormControl fullWidth>
+                              <InputLabel>{t("Change Attr 1")}</InputLabel>
+                              <Select
+                                value={selectedAccuracyCheck.att1}
+                                label={t("Change Attr 1")}
+                                onChange={(e) =>
+                                  setSelectedAccuracyCheck((current) => ({
+                                    ...normalizeAccuracyCheck(current),
+                                    att1: e.target.value,
+                                  }))
+                                }
+                              >
+                                {ATTRIBUTE_OPTIONS.map((attribute) => (
+                                  <MenuItem key={attribute} value={attribute}>
+                                    {attributes[attribute]?.shortcaps}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid size={6}>
+                            <FormControl fullWidth>
+                              <InputLabel>{t("Change Attr 2")}</InputLabel>
+                              <Select
+                                value={selectedAccuracyCheck.att2}
+                                label={t("Change Attr 2")}
+                                onChange={(e) =>
+                                  setSelectedAccuracyCheck((current) => ({
+                                    ...normalizeAccuracyCheck(current),
+                                    att2: e.target.value,
+                                  }))
+                                }
+                              >
+                                {ATTRIBUTE_OPTIONS.map((attribute) => (
+                                  <MenuItem key={attribute} value={attribute}>
+                                    {attributes[attribute]?.shortcaps}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                        </Grid>
+                      )}
                     </Grid>
                     <Grid
                       size={{
@@ -1032,6 +1027,7 @@ function CustomWeapons() {
                   <ChangeAccuracyCheck
                     value={secondSelectedAccuracyCheck}
                     onChange={setSecondSelectedAccuracyCheck}
+                    disabled={overrideAccuracyAttributes}
                   />
                 </Grid>
 

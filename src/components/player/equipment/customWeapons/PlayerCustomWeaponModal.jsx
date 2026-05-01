@@ -14,15 +14,10 @@ import {
   Typography,
   Divider,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import attributes from "../../../../libs/attributes";
 import { Close, ExpandMore } from "@mui/icons-material";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
@@ -409,11 +404,6 @@ export default function PlayerCustomWeaponModal({
     );
   };
 
-  // Check if damage type field should be enabled
-  const isDamageTypeEnabled = () => {
-    return hasElementalCustomization() || overrideDamageType;
-  };
-
   const paidSlotTier =
     SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
   const selectedSlotTier =
@@ -796,94 +786,26 @@ export default function PlayerCustomWeaponModal({
                 }}
               >
                 <ChangeType
-                  value={
-                    isDamageTypeEnabled()
-                      ? overrideDamageType
-                        ? customDamageType
-                        : selectedType
-                      : "physical"
-                  }
-                  onChange={(e) => {
-                    if (overrideDamageType) {
-                      setCustomDamageType(e.target.value);
-                    } else {
-                      setSelectedType(e.target.value);
-                    }
-                  }}
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
                   selectedCategory={selectedCategory}
-                  disabled={!isDamageTypeEnabled()}
+                  disabled={!hasElementalCustomization()}
                 />
               </Grid>
 
               {/* Accuracy Check */}
-              {overrideAccuracyAttributes ? (
-                <>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth>
-                      <InputLabel>{t("Change Attr 1")}</InputLabel>
-                      <Select
-                        value={selectedAccuracyCheck.att1}
-                        label={t("Change Attr 1")}
-                        onChange={(e) =>
-                          setSelectedAccuracyCheck((current) => ({
-                            ...normalizeAccuracyCheck(current),
-                            att1: e.target.value,
-                          }))
-                        }
-                      >
-                        {ATTRIBUTE_OPTIONS.map((attribute) => (
-                          <MenuItem key={attribute} value={attribute}>
-                            {attributes[attribute]?.shortcaps}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth>
-                      <InputLabel>{t("Change Attr 2")}</InputLabel>
-                      <Select
-                        value={selectedAccuracyCheck.att2}
-                        label={t("Change Attr 2")}
-                        onChange={(e) =>
-                          setSelectedAccuracyCheck((current) => ({
-                            ...normalizeAccuracyCheck(current),
-                            att2: e.target.value,
-                          }))
-                        }
-                      >
-                        {ATTRIBUTE_OPTIONS.map((attribute) => (
-                          <MenuItem key={attribute} value={attribute}>
-                            {attributes[attribute]?.shortcaps}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </>
-              ) : (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <ChangeAccuracyCheck
-                    value={selectedAccuracyCheck}
-                    onChange={setSelectedAccuracyCheck}
-                  />
-                </Grid>
-              )}
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6,
+                }}
+              >
+                <ChangeAccuracyCheck
+                  value={selectedAccuracyCheck}
+                  onChange={setSelectedAccuracyCheck}
+                  disabled={overrideAccuracyAttributes}
+                />
+              </Grid>
 
               {/* Customizations */}
               <Grid size={12}>
@@ -1055,6 +977,16 @@ export default function PlayerCustomWeaponModal({
                           }
                           label={`${t("override_damage_type")} (+100z)`}
                         />
+                        {overrideDamageType && !hasElementalCustomization() && (
+                          <Box sx={{ mt: 1 }}>
+                            <ChangeType
+                              value={customDamageType}
+                              onChange={(e) =>
+                                setCustomDamageType(e.target.value)
+                              }
+                            />
+                          </Box>
+                        )}
                       </Grid>
                       <Grid
                         size={{
@@ -1265,6 +1197,7 @@ export default function PlayerCustomWeaponModal({
                     <ChangeAccuracyCheck
                       value={secondSelectedAccuracyCheck}
                       onChange={setSecondSelectedAccuracyCheck}
+                      disabled={overrideAccuracyAttributes}
                     />
                   </Grid>
 
@@ -1429,8 +1362,8 @@ export default function PlayerCustomWeaponModal({
                     precModifier: parseInt(secondPrecModifier) || 0,
                     defModifier: parseInt(secondDefModifier) || 0,
                     mDefModifier: parseInt(secondMDefModifier) || 0,
-                    overrideDamageType: secondOverrideDamageType,
-                    customDamageType: secondCustomDamageType,
+                    overrideDamageType,
+                    customDamageType,
                     slots,
                     slotted,
                   }}
