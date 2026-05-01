@@ -316,6 +316,8 @@ export default function PlayerEdit() {
       prevPlayer.settings?.optionalRules?.innateClasses ?? [];
     const isTechnospheresPE =
       prevPlayer.settings?.optionalRules?.technospheres ?? false;
+    const technospheresVariantPE =
+      prevPlayer.settings?.optionalRules?.technospheresVariant ?? "standard";
     (prevPlayer.classes || []).forEach((cls) => {
       if (!cls.benefits) return;
       if (isTechnospheresPE && !innateClassesPE.includes(cls.name)) return;
@@ -323,6 +325,11 @@ export default function PlayerEdit() {
       mpBonus += Number(cls.benefits.mpplus) || 0;
       ipBonus += Number(cls.benefits.ipplus) || 0;
     });
+
+    if (isTechnospheresPE && technospheresVariantPE === "standard") {
+      hpBonus += 5;
+      mpBonus += 5;
+    }
 
     if (prevPlayer.modifiers) {
       hpBonus += Number(prevPlayer.modifiers.hp) || 0;
