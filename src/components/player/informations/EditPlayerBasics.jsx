@@ -32,6 +32,7 @@ export default function EditPlayerBasics({
   setPlayer,
   updateMaxStats,
   isEditMode,
+  advancement,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -185,6 +186,7 @@ export default function EditPlayerBasics({
             setPlayer={setPlayer}
             isEditMode={isEditMode}
             updateMaxStats={updateMaxStats}
+            advancement={advancement}
           />
         </Grid>
         <Grid size={12}>
@@ -417,7 +419,13 @@ export default function EditPlayerBasics({
   );
 }
 
-function EditPlayerLevel({ player, setPlayer, isEditMode, updateMaxStats }) {
+function EditPlayerLevel({
+  player,
+  setPlayer,
+  isEditMode,
+  updateMaxStats,
+  advancement,
+}) {
   const { t } = useTranslate();
 
   const onRaiseLevel = () => {
@@ -461,7 +469,7 @@ function EditPlayerLevel({ player, setPlayer, isEditMode, updateMaxStats }) {
                 aria-label="increase level"
                 edge="end"
                 onClick={onRaiseLevel}
-                disabled={!isEditMode}
+                disabled={!isEditMode || advancement}
               >
                 <Add />
               </IconButton>
@@ -643,7 +651,9 @@ function ExpAdornment({
             <li>
               <ReactMarkdown>
                 {t(
-                  "You can never have more than **three non-mastered Classes**. If you want to further diversify your character, you must first master some of the Classes you acquired.",
+                  player?.settings?.optionalRules?.technospheres
+                    ? "You can never have more than **three non-mastered innate Classes**. To diversify further, master an innate Class first, or invest levels into a Mnemosphere Class instead."
+                    : "You can never have more than **three non-mastered Classes**. If you want to further diversify your character, you must first master some of the Classes you acquired.",
                 )}
               </ReactMarkdown>
             </li>

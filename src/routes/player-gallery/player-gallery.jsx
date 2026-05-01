@@ -1650,15 +1650,7 @@ function Personal() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseCreatePlayerModal}>{t("Cancel")}</Button>
-          <Button
-            variant="contained"
-            onClick={handleCreatePlayerConfirm}
-            disabled={
-              createPlayerOptions.optionalRules.technospheres &&
-              (createPlayerOptions.optionalRules.innateClasses ?? []).length !==
-                3
-            }
-          >
+          <Button variant="contained" onClick={handleCreatePlayerConfirm}>
             {t("Create Player")}
           </Button>
         </DialogActions>

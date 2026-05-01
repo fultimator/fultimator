@@ -414,7 +414,7 @@ export default function PlayerClasses({
       );
       if (innateTotal + mnemoTotal !== player.lvl)
         w.push(
-          "Sum of innate class levels and mnemosphere levels isn't equal to character level.",
+          "Sum of innate class levels and invested mnemosphere levels isn't equal to character level.",
         );
     } else {
       if (!player.classes || player.classes.length < 2)

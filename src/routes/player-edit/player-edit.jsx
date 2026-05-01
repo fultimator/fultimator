@@ -52,7 +52,6 @@ import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
 import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
 import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
-import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import GenericRolls from "../../components/player/playerSheet/GenericRolls";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
@@ -1037,6 +1036,7 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
             isEditMode={isEditMode}
+            advancement={advancement}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerTraits
@@ -1207,6 +1207,7 @@ export default function PlayerEdit() {
                   >
                     <Checkbox
                       checked={advancement}
+                      disabled={optionalRules.technospheres}
                       onChange={(e) =>
                         handleAdvancementChange(e.target.checked)
                       }
