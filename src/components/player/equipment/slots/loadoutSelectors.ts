@@ -273,9 +273,9 @@ export function getActiveMnemosphereSkills(
     for (const id of item.slotted) {
       const mnemo = (eq0.mnemospheres ?? []).find((m) => m.id === id);
       if (!mnemo) continue;
-      result.skills.push(...mnemo.skills);
-      result.heroic.push(...mnemo.heroic);
-      result.spells.push(...mnemo.spells);
+      result.skills.push(...(mnemo.skills ?? []));
+      result.heroic.push(...(mnemo.heroic ?? []));
+      result.spells.push(...(mnemo.spells ?? []));
     }
   }
 

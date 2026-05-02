@@ -54,10 +54,10 @@ function getMnemosphereSkillKeys(
         (m: Mnemosphere) => m.id === id,
       );
       if (!mnemo) continue;
-      for (const skill of mnemo.skills) {
+      for (const skill of mnemo.skills ?? []) {
         if (skill.specialSkill) keys.add(skill.specialSkill);
       }
-      for (const heroic of mnemo.heroic) {
+      for (const heroic of mnemo.heroic ?? []) {
         if (heroic.specialSkill) keys.add(heroic.specialSkill);
       }
     }
@@ -87,12 +87,12 @@ function checkMnemosphereConflict(
       (m: Mnemosphere) => m.id === id,
     );
     if (!mnemo) continue;
-    for (const skill of mnemo.skills) {
+    for (const skill of mnemo.skills ?? []) {
       if (skill.specialSkill && existing.has(skill.specialSkill)) {
         conflicts.push(skill.name);
       }
     }
-    for (const heroic of mnemo.heroic) {
+    for (const heroic of mnemo.heroic ?? []) {
       if (heroic.specialSkill && existing.has(heroic.specialSkill)) {
         conflicts.push(heroic.name);
       }

@@ -75,8 +75,9 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
   const nextSettings: Record<string, any> = {
     ...settings,
     defaultView: settings.defaultView === "compact" ? "compact" : "normal",
-    automaticClassLevel:
-      rawOptionalRules.technospheres || settings.automaticClassLevel !== false,
+    automaticClassLevel: rawOptionalRules.technospheres
+      ? true
+      : (settings.automaticClassLevel ?? true),
     advancement: settings.advancement ?? rawOptionalRules.advancement ?? false,
     optionalRules,
   };
