@@ -203,7 +203,7 @@ const AddResourceRequestDialog: React.FC<AddResourceRequestDialogProps> = ({
 
     try {
       // Save submission to submissions table
-      const { _data, error } = await supabase
+      const { error } = await supabase
         .from("submissions")
         .insert([
           {
