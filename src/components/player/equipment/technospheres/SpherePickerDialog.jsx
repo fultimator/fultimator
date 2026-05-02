@@ -81,16 +81,30 @@ export default function SpherePickerDialog({
     if (currentMnemoCount >= tier.mnemoMax) return [];
     if (used + 1 > tier.slots) return [];
     return mnemospheres.map((m) => {
+      const alreadySlotted = slotted.includes(m.id);
       const conflict = [...(m.skills ?? []), ...(m.heroic ?? [])].some(
         (sk) => sk.specialSkill && slottedMnemoSkillKeys.has(sk.specialSkill),
       );
+      const disabled = alreadySlotted || conflict;
       return {
         item: m,
-        disabled: conflict,
-        reason: conflict ? t("Skill conflict") : null,
+        disabled,
+        reason: alreadySlotted
+          ? t("Already slotted")
+          : conflict
+            ? t("Skill conflict")
+            : null,
       };
     });
-  }, [mnemospheres, currentMnemoCount, tier, used, slottedMnemoSkillKeys, t]);
+  }, [
+    mnemospheres,
+    currentMnemoCount,
+    tier,
+    used,
+    slottedMnemoSkillKeys,
+    slotted,
+    t,
+  ]);
 
   const filteredHoplospheres = useMemo(() => {
     return hoplospheres.map((h) => {
