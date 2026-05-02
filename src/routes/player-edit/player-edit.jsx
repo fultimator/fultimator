@@ -131,8 +131,10 @@ export default function PlayerEdit() {
 
   const [isSpecialSkillsModalOpen, setIsSpecialSkillsModalOpen] =
     useState(false);
+  const [specialSkillsDraft, setSpecialSkillsDraft] = useState(null);
   const [isOptionalRulesModalOpen, setIsOptionalRulesModalOpen] =
     useState(false);
+  const [optionalRulesDraft, setOptionalRulesDraft] = useState(null);
   const [isMigrateDialogOpen, setIsMigrateDialogOpen] = useState(false);
 
   let params = useParams(); // URL parameters hook
@@ -463,7 +465,6 @@ export default function PlayerEdit() {
     innateClasses: settings.optionalRules?.innateClasses ?? [],
   };
   const canInvestMnemosphereLevel = optionalRules.technospheres && advancement;
-  const specialSkillOverrides = settings.specialSkillOverrides ?? {};
 
   const updatePlayerSettings = useCallback((updater) => {
     setPlayerTemp((prev) => {
@@ -525,41 +526,6 @@ export default function PlayerEdit() {
     setCompactView(value === "compact");
   };
 
-  const handleOptionalRuleChange = (rule, checked) => {
-    setPlayerTemp((prev) => {
-      if (!prev) return prev;
-      const prevSettings = prev.settings ?? {};
-      const nextPlayer = {
-        ...prev,
-        settings: {
-          ...prevSettings,
-          optionalRules: {
-            ...(prevSettings.optionalRules ?? {}),
-            [rule]: checked,
-            ...(rule === "technospheres" && checked
-              ? {
-                  innateClasses:
-                    (prevSettings.optionalRules?.innateClasses ?? []).length > 0
-                      ? prevSettings.optionalRules?.innateClasses
-                      : (prev.classes ?? [])
-                          .map((cls) => cls.name)
-                          .filter(Boolean)
-                          .slice(0, 3),
-                }
-              : {}),
-          },
-          ...(rule === "technospheres" && checked
-            ? { automaticClassLevel: true }
-            : {}),
-        },
-      };
-
-      return rule === "technospheres" && checked
-        ? syncAutomaticClassLevels(nextPlayer)
-        : nextPlayer;
-    });
-  };
-
   const handleAdvancementChange = (checked) => {
     updatePlayerSettings((prevSettings) => ({
       ...prevSettings,
@@ -592,30 +558,6 @@ export default function PlayerEdit() {
     updatePlayerSettings((prev) => ({
       ...prev,
       defaultUnarmedStrikeRef: ref,
-    }));
-  };
-
-  const handleOptionalRuleValueChange = (rule, value) => {
-    updatePlayerSettings((prevSettings) => ({
-      ...prevSettings,
-      optionalRules: {
-        ...(prevSettings.optionalRules ?? {}),
-        [rule]: value,
-      },
-    }));
-  };
-
-  const handleSpecialSkillOverrideChange = (skillName, checked) => {
-    updatePlayerSettings((prevSettings) => ({
-      ...prevSettings,
-      specialSkillOverrides: {
-        ...Object.fromEntries(
-          Object.entries(prevSettings.specialSkillOverrides ?? {}).filter(
-            ([name, value]) => name !== skillName && value === true,
-          ),
-        ),
-        ...(checked ? { [skillName]: true } : {}),
-      },
     }));
   };
 
@@ -1302,7 +1244,12 @@ export default function PlayerEdit() {
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={() => setIsSpecialSkillsModalOpen(true)}
+                      onClick={() => {
+                        setSpecialSkillsDraft(
+                          playerTemp?.settings?.specialSkillOverrides ?? {},
+                        );
+                        setIsSpecialSkillsModalOpen(true);
+                      }}
                     >
                       {t("Open")}
                     </Button>
@@ -1317,7 +1264,12 @@ export default function PlayerEdit() {
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={() => setIsOptionalRulesModalOpen(true)}
+                      onClick={() => {
+                        setOptionalRulesDraft(
+                          playerTemp?.settings?.optionalRules ?? {},
+                        );
+                        setIsOptionalRulesModalOpen(true);
+                      }}
                     >
                       {t("Open")}
                     </Button>
@@ -1598,15 +1550,22 @@ export default function PlayerEdit() {
                   >
                     <Checkbox
                       checked={
-                        isActive || Boolean(specialSkillOverrides[skillName])
+                        isActive ||
+                        Boolean((specialSkillsDraft ?? {})[skillName])
                       }
                       disabled={isActive}
-                      onChange={(e) =>
-                        handleSpecialSkillOverrideChange(
-                          skillName,
-                          e.target.checked,
-                        )
-                      }
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setSpecialSkillsDraft((prev) => {
+                          const next = { ...(prev ?? {}) };
+                          if (checked) {
+                            next[skillName] = true;
+                          } else {
+                            delete next[skillName];
+                          }
+                          return next;
+                        });
+                      }}
                     />
                   </SettingRow>
                 );
@@ -1625,7 +1584,19 @@ export default function PlayerEdit() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsSpecialSkillsModalOpen(false)}>
-            {t("Close")}
+            {t("Cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              updatePlayerSettings((prevSettings) => ({
+                ...prevSettings,
+                specialSkillOverrides: specialSkillsDraft ?? {},
+              }));
+              setIsSpecialSkillsModalOpen(false);
+            }}
+          >
+            {t("Apply")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1648,9 +1619,12 @@ export default function PlayerEdit() {
               compactControl
             >
               <Checkbox
-                checked={optionalRules.quirks}
+                checked={optionalRulesDraft?.quirks ?? false}
                 onChange={(e) =>
-                  handleOptionalRuleChange("quirks", e.target.checked)
+                  setOptionalRulesDraft((prev) => ({
+                    ...(prev ?? {}),
+                    quirks: e.target.checked,
+                  }))
                 }
               />
             </SettingRow>
@@ -1665,9 +1639,12 @@ export default function PlayerEdit() {
               compactControl
             >
               <Checkbox
-                checked={optionalRules.zeroPower}
+                checked={optionalRulesDraft?.zeroPower ?? false}
                 onChange={(e) =>
-                  handleOptionalRuleChange("zeroPower", e.target.checked)
+                  setOptionalRulesDraft((prev) => ({
+                    ...(prev ?? {}),
+                    zeroPower: e.target.checked,
+                  }))
                 }
               />
             </SettingRow>
@@ -1682,9 +1659,12 @@ export default function PlayerEdit() {
               compactControl
             >
               <Checkbox
-                checked={optionalRules.campActivities}
+                checked={optionalRulesDraft?.campActivities ?? false}
                 onChange={(e) =>
-                  handleOptionalRuleChange("campActivities", e.target.checked)
+                  setOptionalRulesDraft((prev) => ({
+                    ...(prev ?? {}),
+                    campActivities: e.target.checked,
+                  }))
                 }
               />
             </SettingRow>
@@ -1699,14 +1679,17 @@ export default function PlayerEdit() {
               compactControl
             >
               <Checkbox
-                checked={optionalRules.technospheres}
+                checked={optionalRulesDraft?.technospheres ?? false}
                 onChange={(e) =>
-                  handleOptionalRuleChange("technospheres", e.target.checked)
+                  setOptionalRulesDraft((prev) => ({
+                    ...(prev ?? {}),
+                    technospheres: e.target.checked,
+                  }))
                 }
               />
             </SettingRow>
 
-            {optionalRules.technospheres && (
+            {(optionalRulesDraft?.technospheres ?? false) && (
               <Box sx={{ mt: 1, px: 1, mb: 1 }}>
                 <Typography variant="caption" color="text.secondary">
                   {t(
@@ -1716,7 +1699,7 @@ export default function PlayerEdit() {
               </Box>
             )}
 
-            {optionalRules.technospheres && (
+            {(optionalRulesDraft?.technospheres ?? false) && (
               <SettingRow
                 label={t("Technospheres Alternative Rule")}
                 hint={t("Select which Technospheres variant to use.")}
@@ -1725,12 +1708,12 @@ export default function PlayerEdit() {
                 compactControl
               >
                 <RadioGroup
-                  value={optionalRules.technospheresVariant}
+                  value={optionalRulesDraft?.technospheresVariant ?? "standard"}
                   onChange={(e) =>
-                    handleOptionalRuleValueChange(
-                      "technospheresVariant",
-                      e.target.value,
-                    )
+                    setOptionalRulesDraft((prev) => ({
+                      ...(prev ?? {}),
+                      technospheresVariant: e.target.value,
+                    }))
                   }
                   sx={{
                     alignItems: "flex-end",
@@ -1772,7 +1755,51 @@ export default function PlayerEdit() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsOptionalRulesModalOpen(false)}>
-            {t("Close")}
+            {t("Cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              const draft = optionalRulesDraft ?? {};
+              const wasEnabled = optionalRules.technospheres;
+              const nowEnabled = draft.technospheres ?? false;
+              setPlayerTemp((prev) => {
+                if (!prev) return prev;
+                const prevSettings = prev.settings ?? {};
+                const nextOptionalRules = {
+                  ...(prevSettings.optionalRules ?? {}),
+                  ...draft,
+                  ...(nowEnabled && !wasEnabled
+                    ? {
+                        innateClasses:
+                          (prevSettings.optionalRules?.innateClasses ?? [])
+                            .length > 0
+                            ? prevSettings.optionalRules?.innateClasses
+                            : (prev.classes ?? [])
+                                .map((cls) => cls.name)
+                                .filter(Boolean)
+                                .slice(0, 3),
+                      }
+                    : {}),
+                };
+                const nextPlayer = {
+                  ...prev,
+                  settings: {
+                    ...prevSettings,
+                    optionalRules: nextOptionalRules,
+                    ...(nowEnabled && !wasEnabled
+                      ? { automaticClassLevel: true }
+                      : {}),
+                  },
+                };
+                return nowEnabled && !wasEnabled
+                  ? syncAutomaticClassLevels(nextPlayer)
+                  : nextPlayer;
+              });
+              setIsOptionalRulesModalOpen(false);
+            }}
+          >
+            {t("Apply")}
           </Button>
         </DialogActions>
       </Dialog>
