@@ -1150,6 +1150,13 @@ export default function PlayerCardSheet({
               isEditMode ? handleClassDecreaseSkill : undefined
             }
           />
+          {isTechnospheres && (
+            <CompactSphereInventory
+              player={player}
+              setPlayer={setPlayer}
+              isEditMode={isEditMode}
+            />
+          )}
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
           <PlayerClasses

@@ -642,7 +642,7 @@ export default function CharacterSheet() {
                     <MnemoReceptaclePanel
                       player={player}
                       setPlayer={handleSetPlayer}
-                      readOnly={true}
+                      readOnly={!isEditMode}
                     />
                   )}
                 {optionalRules.quirks && (

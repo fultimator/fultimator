@@ -149,6 +149,7 @@ export default function MnemoReceptaclePanel({
               <MnemosphereClassCard
                 key={m.id}
                 item={m}
+                showAllSkills={!readOnly}
                 isSlotted={true}
                 isAccordion
                 showHeaderMeta

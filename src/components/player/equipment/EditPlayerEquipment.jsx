@@ -738,6 +738,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           }
         />
       )}
+      {!isTechnospheres && <Divider sx={{ my: 2 }} />}
       <PlayerCustomWeapons
         player={player}
         customWeapons={inv.customWeapons || []}
@@ -752,6 +753,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         }
         isEditMode={isEditMode}
       />
+      <Divider sx={{ my: 2 }} />
       <PlayerArmor
         player={player}
         armor={inv.armor || []}
@@ -765,20 +767,24 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         }
       />
       {!isTechnospheres && (
-        <PlayerShields
-          player={player}
-          shields={inv.shields || []}
-          onEditShield={handleEditShield}
-          onDeleteShield={handleDeleteShield}
-          onEquipShield={handleEquipShield}
-          onUnequipShield={handleUnequipShield}
-          onAddItem={handleOpenNewShield}
-          isEditMode={isEditMode}
-          onOpenCompendium={
-            isEditMode ? () => setOpenShieldCompendium(true) : undefined
-          }
-        />
+        <>
+          <Divider sx={{ my: 2 }} />
+          <PlayerShields
+            player={player}
+            shields={inv.shields || []}
+            onEditShield={handleEditShield}
+            onDeleteShield={handleDeleteShield}
+            onEquipShield={handleEquipShield}
+            onUnequipShield={handleUnequipShield}
+            onAddItem={handleOpenNewShield}
+            isEditMode={isEditMode}
+            onOpenCompendium={
+              isEditMode ? () => setOpenShieldCompendium(true) : undefined
+            }
+          />
+        </>
       )}
+      <Divider sx={{ my: 2 }} />
       <PlayerAccessories
         player={player}
         accessories={inv.accessories || []}
@@ -791,13 +797,16 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         }
         isEditMode={isEditMode}
       />
-      {isTechnospheres && isEditMode && (
-        <SphereInventory
-          player={player}
-          setPlayer={setPlayer}
-          isEditMode={isEditMode}
-          advancement={player?.settings?.advancement ?? false}
-        />
+      {isTechnospheres && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <SphereInventory
+            player={player}
+            setPlayer={setPlayer}
+            isEditMode={isEditMode}
+            advancement={player?.settings?.advancement ?? false}
+          />
+        </>
       )}
       {/* Modals */}
       {!isTechnospheres && (

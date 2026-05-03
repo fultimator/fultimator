@@ -47,6 +47,7 @@ export default function MnemosphereClassCard({
   item,
   isCharacterSheet = false,
   editable = false,
+  showAllSkills = false,
   onIncreaseSkillLevel = () => {},
   onDecreaseSkillLevel = () => {},
   availableLevels = null,
@@ -71,6 +72,12 @@ export default function MnemosphereClassCard({
   const budgetExhausted = availableLevels !== null && availableLevels <= 0;
   const showLevelControls = editable && (onInvestLevel || onRefundLevel);
   const showBaseLevel = baseLvl !== sphereLvl;
+  const visibleSkills = skills
+    .map((skill, index) => ({ skill, index }))
+    .filter(
+      ({ skill }) => editable || showAllSkills || (skill.currentLvl ?? 0) >= 1,
+    );
+
   const headerText =
     showHeaderMeta && isAccordion
       ? `${t(item.class)} - ${getMnemosphereCost(sphereLvl)}z${
@@ -179,36 +186,28 @@ export default function MnemosphereClassCard({
           <CustomHeader2 headerText={t("Skills")} />
         )}
       </Grid>
-      {skills.length === 0 ? (
-        <Grid size={12}>
-          <Typography sx={{ px: 2, pb: 1 }} color="text.secondary">
-            {t("No skills")}
-          </Typography>
+      {visibleSkills.map(({ skill, index }) => (
+        <Grid key={`${skill.name}-${index}`} size={12}>
+          <CustomHeader3
+            headerText={t(skill.name)}
+            currentLvl={skill.currentLvl ?? 0}
+            maxLvl={skill.maxLvl ?? 0}
+            onIncrease={() => onIncreaseSkillLevel(index)}
+            onDecrease={() => onDecreaseSkillLevel(index)}
+            onEdit={() => {}}
+            isEditMode={editable}
+            isHeroicSkill={false}
+            hideEditButton={true}
+            increaseDisabled={budgetExhausted}
+            increaseTooltip={
+              budgetExhausted ? t("No levels available") : undefined
+            }
+          />
+          <DescriptionText>
+            {t(getMnemosphereSkillDescription(item, skill) ?? "")}
+          </DescriptionText>
         </Grid>
-      ) : (
-        skills.map((skill, index) => (
-          <Grid key={`${skill.name}-${index}`} size={12}>
-            <CustomHeader3
-              headerText={t(skill.name)}
-              currentLvl={skill.currentLvl ?? 0}
-              maxLvl={skill.maxLvl ?? 0}
-              onIncrease={() => onIncreaseSkillLevel(index)}
-              onDecrease={() => onDecreaseSkillLevel(index)}
-              onEdit={() => {}}
-              isEditMode={editable}
-              isHeroicSkill={false}
-              hideEditButton={true}
-              increaseDisabled={budgetExhausted}
-              increaseTooltip={
-                budgetExhausted ? t("No levels available") : undefined
-              }
-            />
-            <DescriptionText>
-              {t(getMnemosphereSkillDescription(item, skill) ?? "")}
-            </DescriptionText>
-          </Grid>
-        ))
-      )}
+      ))}
 
       {heroic.length > 0 && (
         <>

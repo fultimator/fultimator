@@ -5,6 +5,7 @@ import {
   AccordionDetails,
   Alert,
   Box,
+  Divider,
   Grid,
   IconButton,
   Menu,
@@ -354,7 +355,10 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
   return (
     <>
       {isIntegrated && (
-        <MnemoReceptaclePanel player={player} setPlayer={setPlayer} />
+        <>
+          <MnemoReceptaclePanel player={player} setPlayer={setPlayer} />
+          <Divider sx={{ my: 3 }} />
+        </>
       )}
 
       <Paper
@@ -371,7 +375,7 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
           <Grid size={12}>
             <CustomHeader
               type="top"
-              headerText={t("Mnemospheres")}
+              headerText={t("Mnemosphere Bank")}
               icon={Add}
               customTooltip={t("Add Mnemosphere")}
               addItem={() => setCreateMnemoOpen(true)}
@@ -427,6 +431,8 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
         </Box>
       ))}
 
+      <Divider sx={{ my: 3 }} />
+
       <Paper
         elevation={3}
         sx={{
@@ -441,7 +447,7 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
           <Grid size={12}>
             <CustomHeader
               type="top"
-              headerText={t("Hoplospheres")}
+              headerText={t("Hoplosphere Bank")}
               icon={Add}
               customTooltip={t("Add Hoplosphere")}
               addItem={() => setCreateHoploOpen(true)}

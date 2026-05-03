@@ -266,112 +266,117 @@ function MnemoRow({
           <Collapse in={isOpen} timeout="auto" unmountOnExit>
             <Table size="small">
               <TableBody>
-                {skills.map((skill, i) => (
-                  <React.Fragment key={i}>
-                    <TableRow>
-                      <TableCell
-                        sx={{ width: 30, borderBottom: "none", py: 0.5 }}
-                      />
-                      <TableCell sx={{ py: 0.5, borderBottom: "none" }}>
-                        <Typography
-                          sx={{ fontWeight: "bold", fontSize: "0.8rem" }}
+                {skills
+                  .filter((skill) => isEditMode || (skill.currentLvl ?? 0) >= 1)
+                  .map((skill, i) => (
+                    <React.Fragment key={i}>
+                      <TableRow>
+                        <TableCell
+                          sx={{ width: 30, borderBottom: "none", py: 0.5 }}
+                        />
+                        <TableCell sx={{ py: 0.5, borderBottom: "none" }}>
+                          <Typography
+                            sx={{ fontWeight: "bold", fontSize: "0.8rem" }}
+                          >
+                            {t(skill.name)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: 32,
+                            textAlign: "center",
+                            borderBottom: "none",
+                            py: 0.5,
+                          }}
                         >
-                          {t(skill.name)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          width: 32,
-                          textAlign: "center",
-                          borderBottom: "none",
-                          py: 0.5,
-                        }}
-                      >
-                        <IconButton
-                          size="small"
-                          sx={{ p: 0.25 }}
-                          disabled={!isEditMode || (skill.currentLvl ?? 0) <= 0}
-                          onClick={() => onChangeSkillLevel(mnemo.id, i, -1)}
+                          <IconButton
+                            size="small"
+                            sx={{ p: 0.25 }}
+                            disabled={
+                              !isEditMode || (skill.currentLvl ?? 0) <= 0
+                            }
+                            onClick={() => onChangeSkillLevel(mnemo.id, i, -1)}
+                          >
+                            <Typography
+                              sx={{
+                                fontSize: "0.85rem",
+                                lineHeight: 1,
+                                fontWeight: "bold",
+                              }}
+                            >
+                              −
+                            </Typography>
+                          </IconButton>
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: 48,
+                            textAlign: "center",
+                            borderBottom: "none",
+                            py: 0.5,
+                          }}
                         >
                           <Typography
-                            sx={{
-                              fontSize: "0.85rem",
-                              lineHeight: 1,
-                              fontWeight: "bold",
-                            }}
+                            sx={{ fontSize: "0.8rem", fontWeight: "bold" }}
                           >
-                            −
+                            {skill.currentLvl ?? 0}/{skill.maxLvl ?? 0}
                           </Typography>
-                        </IconButton>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          width: 48,
-                          textAlign: "center",
-                          borderBottom: "none",
-                          py: 0.5,
-                        }}
-                      >
-                        <Typography
-                          sx={{ fontSize: "0.8rem", fontWeight: "bold" }}
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            width: 32,
+                            textAlign: "center",
+                            borderBottom: "none",
+                            py: 0.5,
+                          }}
                         >
-                          {skill.currentLvl ?? 0}/{skill.maxLvl ?? 0}
-                        </Typography>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          width: 32,
-                          textAlign: "center",
-                          borderBottom: "none",
-                          py: 0.5,
-                        }}
-                      >
-                        <IconButton
-                          size="small"
-                          sx={{ p: 0.25 }}
-                          disabled={
-                            !isEditMode ||
-                            (skill.currentLvl ?? 0) >= (skill.maxLvl ?? 0) ||
-                            usedLevels >= mnemoLvl
-                          }
-                          onClick={() => onChangeSkillLevel(mnemo.id, i, 1)}
-                        >
-                          <Typography
-                            sx={{
-                              fontSize: "0.85rem",
-                              lineHeight: 1,
-                              fontWeight: "bold",
-                            }}
+                          <IconButton
+                            size="small"
+                            sx={{ p: 0.25 }}
+                            disabled={
+                              !isEditMode ||
+                              (skill.currentLvl ?? 0) >= (skill.maxLvl ?? 0) ||
+                              usedLevels >= mnemoLvl
+                            }
+                            onClick={() => onChangeSkillLevel(mnemo.id, i, 1)}
                           >
-                            +
-                          </Typography>
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell sx={{ width: 30, pt: 0 }} />
-                      <TableCell
-                        colSpan={4}
-                        sx={{
-                          pt: 0,
-                          pb: 0.75,
-                          color: "text.secondary",
-                          fontFamily: "PT Sans Narrow",
-                          fontSize: "0.75rem",
-                        }}
-                      >
-                        <ReactMarkdown
-                          allowedElements={["strong", "em"]}
-                          unwrapDisallowed
+                            <Typography
+                              sx={{
+                                fontSize: "0.85rem",
+                                lineHeight: 1,
+                                fontWeight: "bold",
+                              }}
+                            >
+                              +
+                            </Typography>
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ width: 30, pt: 0 }} />
+                        <TableCell
+                          colSpan={4}
+                          sx={{
+                            pt: 0,
+                            pb: 0.75,
+                            color: "text.secondary",
+                            fontFamily: "PT Sans Narrow",
+                            fontSize: "0.75rem",
+                          }}
                         >
-                          {t(
-                            getMnemosphereSkillDescription(mnemo, skill) ?? "",
-                          )}
-                        </ReactMarkdown>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
-                ))}
+                          <ReactMarkdown
+                            allowedElements={["strong", "em"]}
+                            unwrapDisallowed
+                          >
+                            {t(
+                              getMnemosphereSkillDescription(mnemo, skill) ??
+                                "",
+                            )}
+                          </ReactMarkdown>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  ))}
                 {heroic.map((h, i) => (
                   <React.Fragment key={`heroic-${i}`}>
                     <TableRow>
@@ -817,7 +822,7 @@ export default function CompactSphereInventory({
         />
       )}
       {renderTable(
-        t("Mnemospheres"),
+        t("Mnemosphere Bank"),
         mnemospheres.map((m) => (
           <MnemoRow
             key={m.id}
@@ -837,7 +842,7 @@ export default function CompactSphereInventory({
       )}
 
       {renderTable(
-        t("Hoplospheres"),
+        t("Hoplosphere Bank"),
         hoplospheres.map((h) => (
           <HoploRow
             key={h.id}
@@ -919,7 +924,7 @@ export default function CompactSphereInventory({
             <DialogContent sx={{ pt: 1 }}>
               <MnemosphereClassCard
                 item={liveMnemo}
-                editable={true}
+                editable={isEditMode}
                 onIncreaseSkillLevel={(skillIndex) =>
                   handleChangeSkillLevel(editMnemoId, skillIndex, 1)
                 }
