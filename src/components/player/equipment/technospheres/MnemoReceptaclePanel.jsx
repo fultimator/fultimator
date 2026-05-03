@@ -26,10 +26,15 @@ export default function MnemoReceptaclePanel({
   const [expanded, setExpanded] = useState(null);
   const [snackbar, setSnackbar] = useState(null);
 
-  const { addFromCompendium: handleAddFromCompendium } = useSphereBank(
-    player,
-    setPlayer,
-  );
+  const {
+    addFromCompendium: handleAddFromCompendium,
+    changeMnemoSkillLevel: handleChangeMnemoSkillLevel,
+    investMnemoLevel: handleInvestMnemoLevel,
+    refundMnemoLevel: handleRefundMnemoLevel,
+    getMnemoAvailableLevels,
+  } = useSphereBank(player, setPlayer);
+
+  const advancement = player?.settings?.advancement ?? false;
 
   const eq0 = player?.equipment?.[0] ?? {};
   const mnemospheres = eq0.mnemospheres ?? [];
@@ -149,6 +154,7 @@ export default function MnemoReceptaclePanel({
               <MnemosphereClassCard
                 key={m.id}
                 item={m}
+                editable={!readOnly}
                 showAllSkills={!readOnly}
                 isSlotted={true}
                 isAccordion
@@ -156,6 +162,29 @@ export default function MnemoReceptaclePanel({
                 isExpanded={expanded === m.id}
                 onToggleExpand={() =>
                   setExpanded((cur) => (cur === m.id ? null : m.id))
+                }
+                onIncreaseSkillLevel={
+                  !readOnly
+                    ? (skillIndex) =>
+                        handleChangeMnemoSkillLevel(m.id, skillIndex, 1)
+                    : undefined
+                }
+                onDecreaseSkillLevel={
+                  !readOnly
+                    ? (skillIndex) =>
+                        handleChangeMnemoSkillLevel(m.id, skillIndex, -1)
+                    : undefined
+                }
+                availableLevels={!readOnly ? getMnemoAvailableLevels(m) : null}
+                onInvestLevel={
+                  !readOnly && !advancement
+                    ? () => handleInvestMnemoLevel(m.id)
+                    : null
+                }
+                onRefundLevel={
+                  !readOnly && !advancement
+                    ? () => handleRefundMnemoLevel(m.id)
+                    : null
                 }
                 actions={
                   !readOnly ? (
