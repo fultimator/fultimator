@@ -756,14 +756,16 @@ export default function CompactSphereInventory({
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const isIntegrated =
-    (player?.settings?.optionalRules?.technospheres ?? false) &&
-    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-      "integrated";
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const isIntegrated = isTechnospheres && technospheresVariant === "integrated";
   const isMnemospheresOnly =
-    (player?.settings?.optionalRules?.technospheres ?? false) &&
-    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-      "mnemospheres";
+    isTechnospheres && technospheresVariant === "mnemospheres";
+  const isHoplospheresOnly =
+    isTechnospheres && technospheresVariant === "hoplospheres";
+  const mnemoHidden = isMnemospheresOnly || isHoplospheresOnly;
   const advancement = player?.settings?.advancement ?? false;
   const loadedIds = player?.equipment?.[0]?.mnemoReceptacle ?? [];
   const receptacleLimit = getIntegratedMnemoLimit(player?.lvl ?? 1);
@@ -1437,29 +1439,28 @@ export default function CompactSphereInventory({
           )}
         </>
       )}
-      {renderTable(
-        t("Mnemosphere Bank"),
-        mnemospheres.map((m) => (
-          <MnemoRow
-            key={m.id}
-            mnemo={m}
-            player={player}
-            isEditMode={isEditMode}
-            openRows={openRows.equipment}
-            toggleRow={(key) => toggleRow("equipment", key)}
-            onDelete={handleDeleteMnemo}
-            onChangeSkillLevel={handleChangeSkillLevel}
-            onEdit={(m) => setEditMnemoId(m.id)}
-            onUnslot={handleUnslot}
-            onSlotOpen={
-              isIntegrated || isMnemospheresOnly ? null : () => setSlotTarget(m)
-            }
-            isLoaded={loadedIds.includes(m.id)}
-          />
-        )),
-        () => setCreateMnemoOpen(true),
-        "mnemospheres",
-      )}
+      {!mnemoHidden &&
+        renderTable(
+          t("Mnemosphere Bank"),
+          mnemospheres.map((m) => (
+            <MnemoRow
+              key={m.id}
+              mnemo={m}
+              player={player}
+              isEditMode={isEditMode}
+              openRows={openRows.equipment}
+              toggleRow={(key) => toggleRow("equipment", key)}
+              onDelete={handleDeleteMnemo}
+              onChangeSkillLevel={handleChangeSkillLevel}
+              onEdit={(m) => setEditMnemoId(m.id)}
+              onUnslot={handleUnslot}
+              onSlotOpen={isIntegrated ? null : () => setSlotTarget(m)}
+              isLoaded={loadedIds.includes(m.id)}
+            />
+          )),
+          () => setCreateMnemoOpen(true),
+          "mnemospheres",
+        )}
 
       {renderTable(
         t("Hoplosphere Bank"),

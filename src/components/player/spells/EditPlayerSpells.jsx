@@ -66,10 +66,7 @@ import GambleExplain from "./GambleExplain";
 import { VEHICLE_ACTIONS, vehicleReducer } from "./vehicleReducer";
 import { deriveVehicleSlots } from "../equipment/slots/equipmentSlots";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
-import {
-  getSlottedMnemospheres,
-  getReceptacleMnemospheres,
-} from "../classes/mnemosphereClassUtils";
+import { getActiveMnemospheres } from "../classes/mnemosphereClassUtils";
 import { getMnemosphereClassDefinition } from "../../../libs/mnemospheres";
 import useSphereBank from "../equipment/technospheres/useSphereBank";
 
@@ -96,30 +93,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     editingSpellIndex,
   } = useSpellModals();
 
-  const isTechnospheres =
-    player?.settings?.optionalRules?.technospheres ?? false;
-  const technospheresVariant =
-    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
-  const hasReceptacle =
-    isTechnospheres &&
-    (technospheresVariant === "integrated" ||
-      technospheresVariant === "mnemospheres");
-
   const { addMnemoSpell, updateMnemoSpell, deleteMnemoSpell } = useSphereBank(
     player,
     setPlayer,
   );
 
-  const activeMnemospheres = isTechnospheres
-    ? Array.from(
-        new Map(
-          [
-            ...getSlottedMnemospheres(player),
-            ...(hasReceptacle ? getReceptacleMnemospheres(player) : []),
-          ].map((mnemo) => [mnemo.id, mnemo]),
-        ).values(),
-      )
-    : [];
+  const activeMnemospheres = getActiveMnemospheres(player);
 
   const [selectedMnemoTarget, setSelectedMnemoTarget] = useState(null);
   const [selectedMnemoSpellType, setSelectedMnemoSpellType] = useState(null);

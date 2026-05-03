@@ -190,12 +190,14 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
   const secondary = theme.palette.secondary.main;
   const technospheresVariant =
     player?.settings?.optionalRules?.technospheresVariant ?? "standard";
-  const isIntegrated =
-    (player?.settings?.optionalRules?.technospheres ?? false) &&
-    technospheresVariant === "integrated";
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const isIntegrated = isTechnospheres && technospheresVariant === "integrated";
   const isMnemospheresOnly =
-    (player?.settings?.optionalRules?.technospheres ?? false) &&
-    technospheresVariant === "mnemospheres";
+    isTechnospheres && technospheresVariant === "mnemospheres";
+  const isHoplospheresOnly =
+    isTechnospheres && technospheresVariant === "hoplospheres";
+  const mnemoHidden = isMnemospheresOnly || isHoplospheresOnly;
 
   const [mnemoExpanded, setMnemoExpanded] = useState(null);
   const [hoploExpanded, setHoploExpanded] = useState(null);
@@ -366,83 +368,85 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
         </>
       )}
 
-      <Paper
-        elevation={3}
-        sx={{
-          p: "15px",
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: secondary,
-          mb: 2,
-        }}
-      >
-        <Grid container spacing={2}>
-          <Grid size={12}>
-            <CustomHeader
-              type="top"
-              headerText={t("Mnemosphere Bank")}
-              icon={Add}
-              customTooltip={t("Add Mnemosphere")}
-              addItem={() => setCreateMnemoOpen(true)}
-              openCompendium={() => setCompendiumType("mnemospheres")}
-            />
-          </Grid>
-          {mnemospheres.length === 0 && (
-            <Grid size={12}>
-              <Typography variant="h3" align="center">
-                {t("No mnemospheres added yet")}
-              </Typography>
+      {!mnemoHidden && (
+        <>
+          <Paper
+            elevation={3}
+            sx={{
+              p: "15px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+              mb: 2,
+            }}
+          >
+            <Grid container spacing={2}>
+              <Grid size={12}>
+                <CustomHeader
+                  type="top"
+                  headerText={t("Mnemosphere Bank")}
+                  icon={Add}
+                  customTooltip={t("Add Mnemosphere")}
+                  addItem={() => setCreateMnemoOpen(true)}
+                  openCompendium={() => setCompendiumType("mnemospheres")}
+                />
+              </Grid>
+              {mnemospheres.length === 0 && (
+                <Grid size={12}>
+                  <Typography variant="h3" align="center">
+                    {t("No mnemospheres added yet")}
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
-          )}
-        </Grid>
-      </Paper>
+          </Paper>
 
-      {mnemospheres.map((m) => (
-        <Box key={m.id} sx={{ mb: 3 }}>
-          <MnemosphereClassCard
-            item={m}
-            editable={true}
-            isAccordion
-            showHeaderMeta
-            isSlotted={isSphereSlotted(player, m.id)}
-            isExpanded={mnemoExpanded === m.id}
-            onToggleExpand={() =>
-              setMnemoExpanded((current) => (current === m.id ? null : m.id))
-            }
-            actions={
-              <SphereMenu
-                id={m.id}
-                slotted={isSphereSlotted(player, m.id)}
-                onDelete={handleDeleteMnemo}
-                onUnslot={handleUnslot}
-                onSlotOpen={
-                  isIntegrated || isMnemospheresOnly
-                    ? null
-                    : () => setSlotTarget(m)
+          {mnemospheres.map((m) => (
+            <Box key={m.id} sx={{ mb: 3 }}>
+              <MnemosphereClassCard
+                item={m}
+                editable={true}
+                isAccordion
+                showHeaderMeta
+                isSlotted={isSphereSlotted(player, m.id)}
+                isExpanded={mnemoExpanded === m.id}
+                onToggleExpand={() =>
+                  setMnemoExpanded((current) =>
+                    current === m.id ? null : m.id,
+                  )
                 }
-                deleteLabel={`${t(m.class)} Lv.${m.lvl ?? 1}`}
+                actions={
+                  <SphereMenu
+                    id={m.id}
+                    slotted={isSphereSlotted(player, m.id)}
+                    onDelete={handleDeleteMnemo}
+                    onUnslot={handleUnslot}
+                    onSlotOpen={isIntegrated ? null : () => setSlotTarget(m)}
+                    deleteLabel={`${t(m.class)} Lv.${m.lvl ?? 1}`}
+                  />
+                }
+                onIncreaseSkillLevel={(skillIndex) =>
+                  handleChangeMnemoSkillLevel(m.id, skillIndex, 1)
+                }
+                onDecreaseSkillLevel={(skillIndex) =>
+                  handleChangeMnemoSkillLevel(m.id, skillIndex, -1)
+                }
+                availableLevels={getMnemoAvailableLevels(m)}
+                onInvestLevel={
+                  !advancement ? () => handleInvestMnemoLevel(m.id) : null
+                }
+                onRefundLevel={
+                  !advancement ? () => handleRefundMnemoLevel(m.id) : null
+                }
               />
-            }
-            onIncreaseSkillLevel={(skillIndex) =>
-              handleChangeMnemoSkillLevel(m.id, skillIndex, 1)
-            }
-            onDecreaseSkillLevel={(skillIndex) =>
-              handleChangeMnemoSkillLevel(m.id, skillIndex, -1)
-            }
-            availableLevels={getMnemoAvailableLevels(m)}
-            onInvestLevel={
-              !advancement ? () => handleInvestMnemoLevel(m.id) : null
-            }
-            onRefundLevel={
-              !advancement ? () => handleRefundMnemoLevel(m.id) : null
-            }
-          />
-        </Box>
-      ))}
+            </Box>
+          ))}
+        </>
+      )}
 
       {!isMnemospheresOnly && (
         <>
-          <Divider sx={{ my: 3 }} />
+          {!isHoplospheresOnly && <Divider sx={{ my: 3 }} />}
 
           <Paper
             elevation={3}

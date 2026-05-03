@@ -394,9 +394,16 @@ export default function PlayerClasses({
 
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const mnemoHidden =
+    isTechnospheres &&
+    (technospheresVariant === "mnemospheres" ||
+      technospheresVariant === "hoplospheres");
   const slottedMnemospheres = useMemo(
-    () => (isTechnospheres ? getSlottedMnemospheres(player) : []),
-    [isTechnospheres, player],
+    () =>
+      isTechnospheres && !mnemoHidden ? getSlottedMnemospheres(player) : [],
+    [isTechnospheres, mnemoHidden, player],
   );
 
   const warnings = useMemo(() => {

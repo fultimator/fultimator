@@ -175,8 +175,9 @@ export default function SlotPickerDialog({
 
     const isTechnospheresStandard =
       player?.settings?.optionalRules?.technospheres &&
-      (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-        "standard";
+      ["standard", "hoplospheres"].includes(
+        player?.settings?.optionalRules?.technospheresVariant ?? "standard",
+      );
     if (
       isTechnospheresStandard &&
       (itemType === "meleeWeapon" || itemType === "rangedWeapon")

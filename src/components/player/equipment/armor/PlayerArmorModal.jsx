@@ -50,7 +50,10 @@ export default function PlayerArmorModal({
     player?.settings?.optionalRules?.technospheres ?? false;
   const technospheresVariant =
     player?.settings?.optionalRules?.technospheresVariant ?? "standard";
-  const isIntegrated = isTechnospheres && technospheresVariant === "integrated";
+  const isIntegrated =
+    isTechnospheres &&
+    (technospheresVariant === "integrated" ||
+      technospheresVariant === "hoplospheres");
   const isSlotsVariant =
     isTechnospheres && technospheresVariant !== "mnemospheres";
 
