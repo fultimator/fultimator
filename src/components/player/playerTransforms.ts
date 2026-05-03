@@ -282,12 +282,23 @@ function pruneStaleSlotRefs(player: TypePlayer): TypePlayer {
     return { ...a, slotted: pruned };
   });
 
+  const mnemoReceptacle = (eq0.mnemoReceptacle ?? []).filter((id) =>
+    validIds.has(id),
+  );
+  if (mnemoReceptacle.length !== (eq0.mnemoReceptacle ?? []).length)
+    changed = true;
+
   if (!changed) return player;
 
   return {
     ...player,
     equipment: [
-      { ...eq0, customWeapons, armor },
+      {
+        ...eq0,
+        customWeapons,
+        armor,
+        ...(eq0.mnemoReceptacle !== undefined ? { mnemoReceptacle } : {}),
+      },
       ...(player.equipment?.slice(1) ?? []),
     ],
   };
@@ -333,14 +344,22 @@ function normalizeRequiredFields(player: TypePlayer): TypePlayer {
         if (!isTechnospheres) return player.equipment;
         return [{ mnemospheres: [], hoplospheres: [] }];
       }
+      const isIntegrated =
+        (player.settings as any)?.optionalRules?.technospheresVariant ===
+        "integrated";
       const needsPatch =
-        !Array.isArray(eq0.mnemospheres) || !Array.isArray(eq0.hoplospheres);
+        !Array.isArray(eq0.mnemospheres) ||
+        !Array.isArray(eq0.hoplospheres) ||
+        (isIntegrated && !Array.isArray(eq0.mnemoReceptacle));
       if (!needsPatch) return player.equipment;
       return [
         {
           ...eq0,
           mnemospheres: Array.isArray(eq0.mnemospheres) ? eq0.mnemospheres : [],
           hoplospheres: Array.isArray(eq0.hoplospheres) ? eq0.hoplospheres : [],
+          ...(isIntegrated && !Array.isArray(eq0.mnemoReceptacle)
+            ? { mnemoReceptacle: [] }
+            : {}),
         },
         ...(player.equipment?.slice(1) ?? []),
       ];

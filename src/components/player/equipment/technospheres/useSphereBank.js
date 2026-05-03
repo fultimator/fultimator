@@ -76,8 +76,24 @@ export default function useSphereBank(player, setPlayer) {
   );
 
   const deleteMnemo = useCallback(
-    (id) => patchBank("mnemospheres", (arr) => arr.filter((m) => m.id !== id)),
-    [patchBank],
+    (id) =>
+      setPlayer((prev) => {
+        const prevEq0 = prev?.equipment?.[0] ?? {};
+        const eq0New = {
+          ...prevEq0,
+          mnemospheres: (prevEq0.mnemospheres ?? []).filter((m) => m.id !== id),
+          ...(prevEq0.mnemoReceptacle !== undefined && {
+            mnemoReceptacle: prevEq0.mnemoReceptacle.filter(
+              (rid) => rid !== id,
+            ),
+          }),
+        };
+        const equipment = prev?.equipment
+          ? [eq0New, ...prev.equipment.slice(1)]
+          : [eq0New];
+        return { ...prev, equipment };
+      }),
+    [setPlayer],
   );
 
   const deleteHoplo = useCallback(

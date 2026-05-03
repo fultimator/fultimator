@@ -50,6 +50,7 @@ import {
 import MnemosphereClassCard from "../../classes/MnemosphereClassCard";
 import useSphereBank from "../../equipment/technospheres/useSphereBank";
 import { getHoplosphereCoagKey } from "../../../../libs/technospheres";
+import MnemoReceptaclePanel from "../../equipment/technospheres/MnemoReceptaclePanel";
 
 const StyledTableCellHeader = styled(TableCell)({
   padding: "2px 6px",
@@ -62,8 +63,15 @@ const StyledTableCell = styled(TableCell)({
 
 function isSphereSlotted(player, id) {
   const eq0 = player?.equipment?.[0] ?? {};
-  return [eq0.customWeapons, eq0.armor].some((bank) =>
-    (bank ?? []).some((item) => (item.slotted ?? []).includes(id)),
+  const isIntegrated =
+    (player?.settings?.optionalRules?.technospheres ?? false) &&
+    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+      "integrated";
+  return (
+    [eq0.customWeapons, eq0.armor].some((bank) =>
+      (bank ?? []).some((item) => (item.slotted ?? []).includes(id)),
+    ) ||
+    (isIntegrated && (eq0.mnemoReceptacle ?? []).includes(id))
   );
 }
 
@@ -161,6 +169,7 @@ function MnemoRow({
   onDelete,
   onChangeSkillLevel,
   onEdit,
+  isLoaded = false,
 }) {
   const { t } = useTranslate();
   const rowKey = `mnemo-${mnemo.id}`;
@@ -218,10 +227,10 @@ function MnemoRow({
           <Typography
             sx={{
               fontSize: "0.75rem",
-              color: slotted ? "success.main" : "text.secondary",
+              color: slotted || isLoaded ? "success.main" : "text.secondary",
             }}
           >
-            {slotted ? t("Slotted") : "—"}
+            {slotted ? t("Slotted") : isLoaded ? t("Loaded") : "—"}
           </Typography>
         </StyledTableCell>
         <StyledTableCell sx={{ width: { xs: 80, sm: 92 }, textAlign: "right" }}>
@@ -602,6 +611,11 @@ export default function CompactSphereInventory({
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const isIntegrated =
+    (player?.settings?.optionalRules?.technospheres ?? false) &&
+    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+      "integrated";
+  const loadedIds = player?.equipment?.[0]?.mnemoReceptacle ?? [];
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
 
   const [createMnemoOpen, setCreateMnemoOpen] = useState(false);
@@ -795,6 +809,13 @@ export default function CompactSphereInventory({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
+      {isIntegrated && (
+        <MnemoReceptaclePanel
+          player={player}
+          setPlayer={setPlayer}
+          readOnly={!isEditMode}
+        />
+      )}
       {renderTable(
         t("Mnemospheres"),
         mnemospheres.map((m) => (
@@ -808,6 +829,7 @@ export default function CompactSphereInventory({
             onDelete={handleDeleteMnemo}
             onChangeSkillLevel={handleChangeSkillLevel}
             onEdit={(m) => setEditMnemoId(m.id)}
+            isLoaded={loadedIds.includes(m.id)}
           />
         )),
         () => setCreateMnemoOpen(true),

@@ -36,11 +36,19 @@ import CompendiumSphereImportDialog from "./CompendiumSphereImportDialog";
 import HoplosphereCreateDialog from "./HoplosphereCreateDialog";
 import MnemosphereCreateDialog from "./MnemosphereCreateDialog";
 import SlotTargetDialog from "./SlotTargetDialog";
+import MnemoReceptaclePanel from "./MnemoReceptaclePanel";
 
 function isSphereSlotted(player, id) {
   const eq0 = player?.equipment?.[0] ?? {};
-  return [eq0.customWeapons, eq0.armor].some((bank) =>
-    (bank ?? []).some((item) => (item.slotted ?? []).includes(id)),
+  const isIntegrated =
+    (player?.settings?.optionalRules?.technospheres ?? false) &&
+    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+      "integrated";
+  return (
+    [eq0.customWeapons, eq0.armor].some((bank) =>
+      (bank ?? []).some((item) => (item.slotted ?? []).includes(id)),
+    ) ||
+    (isIntegrated && (eq0.mnemoReceptacle ?? []).includes(id))
   );
 }
 
@@ -123,7 +131,7 @@ function SphereMenu({
             </ListItemIcon>
             <ListItemText primary={t("Unslot")} />
           </MenuItem>
-        ) : (
+        ) : onSlotOpen ? (
           <MenuItem
             onClick={() => {
               setAnchor(null);
@@ -135,7 +143,7 @@ function SphereMenu({
             </ListItemIcon>
             <ListItemText primary={t("Slot")} />
           </MenuItem>
-        )}
+        ) : null}
         <Tooltip
           title={slotted ? t("Remove from all slots first") : ""}
           placement="left"
@@ -178,6 +186,10 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const isIntegrated =
+    (player?.settings?.optionalRules?.technospheres ?? false) &&
+    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+      "integrated";
 
   const [mnemoExpanded, setMnemoExpanded] = useState(null);
   const [hoploExpanded, setHoploExpanded] = useState(null);
@@ -221,6 +233,11 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
               : item,
           );
         }
+      }
+      if (isIntegrated && eq0New.mnemoReceptacle?.includes(id)) {
+        eq0New.mnemoReceptacle = eq0New.mnemoReceptacle.filter(
+          (sid) => sid !== id,
+        );
       }
       const equipment = prev?.equipment
         ? [eq0New, ...prev.equipment.slice(1)]
@@ -336,6 +353,10 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
 
   return (
     <>
+      {isIntegrated && (
+        <MnemoReceptaclePanel player={player} setPlayer={setPlayer} />
+      )}
+
       <Paper
         elevation={3}
         sx={{
@@ -385,7 +406,7 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                 slotted={isSphereSlotted(player, m.id)}
                 onDelete={handleDeleteMnemo}
                 onUnslot={handleUnslot}
-                onSlotOpen={() => setSlotTarget(m)}
+                onSlotOpen={isIntegrated ? null : () => setSlotTarget(m)}
                 deleteLabel={`${t(m.class)} Lv.${m.lvl ?? 1}`}
               />
             }

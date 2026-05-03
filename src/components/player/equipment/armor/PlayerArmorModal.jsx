@@ -48,6 +48,10 @@ export default function PlayerArmorModal({
   const { t } = useTranslate();
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
+  const isIntegrated =
+    isTechnospheres &&
+    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+      "integrated";
 
   const [base, setBase] = useState(armorPlayer?.base || armor[0]);
   const [name, setName] = useState(armorPlayer?.name || t(armor[0].name));
@@ -346,6 +350,7 @@ export default function PlayerArmorModal({
                       setSlotted(kept);
                     }}
                     isWeapon={false}
+                    isIntegrated={isIntegrated}
                   />
                 </Grid>
                 <Grid size={12}>

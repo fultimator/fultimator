@@ -89,6 +89,10 @@ export default function PlayerCustomWeaponModal({
   const { t } = useTranslate();
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
+  const isIntegrated =
+    isTechnospheres &&
+    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+      "integrated";
   const fileInputRef = useRef();
 
   // Initialize state from customWeapon prop or defaults
@@ -847,6 +851,7 @@ export default function PlayerCustomWeaponModal({
                         setSlotted(kept);
                       }}
                       isWeapon={true}
+                      isIntegrated={isIntegrated}
                     />
                   </Grid>
                   <Grid size={12}>

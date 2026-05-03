@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -46,7 +46,15 @@ export default function SpherePickerDialog({
   onAddToBank,
 }) {
   const { t } = useTranslate();
-  const [tab, setTab] = useState(0);
+  const isIntegrated =
+    (player?.settings?.optionalRules?.technospheres ?? false) &&
+    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
+      "integrated";
+  const [tab, setTab] = useState(isIntegrated ? 1 : 0);
+  useEffect(() => {
+    setTab(isIntegrated ? 1 : 0);
+    setSelected(null);
+  }, [isIntegrated]);
   const [selected, setSelected] = useState(null);
   const [compendiumType, setCompendiumType] = useState(null);
 
@@ -177,17 +185,20 @@ export default function SpherePickerDialog({
         </IconButton>
         <DialogContent>
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-            <Tabs
-              value={tab}
-              onChange={(_e, v) => {
-                setTab(v);
-                setSelected(null);
-              }}
-              sx={{ flex: 1 }}
-            >
-              <Tab label={t("Mnemospheres")} />
-              <Tab label={t("Hoplospheres")} />
-            </Tabs>
+            {!isIntegrated && (
+              <Tabs
+                value={tab}
+                onChange={(_e, v) => {
+                  setTab(v);
+                  setSelected(null);
+                }}
+                sx={{ flex: 1 }}
+              >
+                <Tab label={t("Mnemospheres")} />
+                <Tab label={t("Hoplospheres")} />
+              </Tabs>
+            )}
+            {isIntegrated && <Box sx={{ flex: 1 }} />}
             {onAddToBank && (
               <Tooltip
                 title={

@@ -358,6 +358,7 @@ export interface PlayerEquipment {
   armor: Armor[];
   mnemospheres?: Mnemosphere[];
   hoplospheres?: Hoplosphere[];
+  mnemoReceptacle?: string[];
 }
 
 export type AnyEquipmentItem =

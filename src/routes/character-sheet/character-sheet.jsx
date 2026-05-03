@@ -36,6 +36,7 @@ import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
 import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFull";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
+import MnemoReceptaclePanel from "../../components/player/equipment/technospheres/MnemoReceptaclePanel";
 import powered_by_fu from "../powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
@@ -635,6 +636,15 @@ export default function CharacterSheet() {
                   isCharacterSheet={true}
                   updateMaxStats={updateMaxStats}
                 />
+                {optionalRules.technospheres &&
+                  (player?.settings?.optionalRules?.technospheresVariant ??
+                    "standard") === "integrated" && (
+                    <MnemoReceptaclePanel
+                      player={player}
+                      setPlayer={handleSetPlayer}
+                      readOnly={true}
+                    />
+                  )}
                 {optionalRules.quirks && (
                   <PlayerQuirk
                     player={player}

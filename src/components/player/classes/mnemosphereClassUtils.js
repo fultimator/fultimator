@@ -36,5 +36,9 @@ export function getSlottedMnemospheres(player) {
     }
   }
 
+  for (const id of eq0.mnemoReceptacle ?? []) {
+    slottedIds.add(id);
+  }
+
   return mnemospheres.filter((mnemo) => slottedIds.has(mnemo.id));
 }

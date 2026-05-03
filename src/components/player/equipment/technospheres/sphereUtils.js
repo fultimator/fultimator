@@ -4,3 +4,7 @@ export function usedSlots(slotted, hoplospheres) {
     return acc + (hoplo?.requiredSlots ?? 1);
   }, 0);
 }
+
+export function getIntegratedMnemoLimit(lvl) {
+  return 1 + Math.floor((lvl ?? 1) / 15);
+}

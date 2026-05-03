@@ -9,11 +9,16 @@ import {
 import { useTranslate } from "../../../../translation/translate";
 import { SLOT_TIERS } from "./slotTiers";
 
-export default function SlotTierPicker({ value, onChange, isWeapon }) {
+export default function SlotTierPicker({
+  value,
+  onChange,
+  isWeapon,
+  isIntegrated,
+}) {
   const { t } = useTranslate();
-  const tiers = isWeapon
-    ? SLOT_TIERS
-    : SLOT_TIERS.filter((tier) => !tier.weaponOnly);
+  const tiers = (
+    isWeapon ? SLOT_TIERS : SLOT_TIERS.filter((tier) => !tier.weaponOnly)
+  ).filter((tier) => !isIntegrated || tier.value !== "delta");
 
   return (
     <Box>
