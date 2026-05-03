@@ -302,6 +302,12 @@ export default function CompactLoadout({
         ]
       : []),
   ];
+  const visibleSlots = isMainTab
+    ? allSlots.filter(({ resolved }) => Boolean(resolved))
+    : allSlots;
+  const visibleSupportSlots = isMainTab
+    ? supportSlots.filter((entry) => Boolean(entry.module))
+    : supportSlots;
 
   return (
     <TableContainer component={Paper} sx={{ mb: 1 }}>
@@ -370,7 +376,7 @@ export default function CompactLoadout({
         </Box>
         {/* Main 4 slots + aux */}
         <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-          {allSlots.map(({ slot, resolved, locked, isAux }) => {
+          {visibleSlots.map(({ slot, resolved, locked, isAux }) => {
             const isEmpty = !resolved;
             const isVehicle = resolved?.kind === "vehicleModule";
             const hasModule =
@@ -537,7 +543,7 @@ export default function CompactLoadout({
           })}
         </Box>
         {/* Vehicle support slots */}
-        {activeVehicle && supportSlots.length > 0 && (
+        {activeVehicle && visibleSupportSlots.length > 0 && (
           <>
             <Divider sx={{ my: 0.25 }}>
               <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
@@ -572,7 +578,7 @@ export default function CompactLoadout({
               </Box>
             </Divider>
             <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-              {supportSlots.map((entry, i) => {
+              {visibleSupportSlots.map((entry, i) => {
                 const isEmpty = !entry.module;
                 const inner = (
                   <Box

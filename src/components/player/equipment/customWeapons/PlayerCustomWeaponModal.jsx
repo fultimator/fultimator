@@ -89,10 +89,11 @@ export default function PlayerCustomWeaponModal({
   const { t } = useTranslate();
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
-  const isIntegrated =
-    isTechnospheres &&
-    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-      "integrated";
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const isIntegrated = isTechnospheres && technospheresVariant === "integrated";
+  const isSlotsVariant =
+    isTechnospheres && technospheresVariant !== "mnemospheres";
   const fileInputRef = useRef();
 
   // Initialize state from customWeapon prop or defaults
@@ -412,7 +413,7 @@ export default function PlayerCustomWeaponModal({
     SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
   const selectedSlotTier =
     SLOT_TIERS.find((t) => t.value === slots) ?? SLOT_TIERS[0];
-  const slotCostDelta = isTechnospheres
+  const slotCostDelta = isSlotsVariant
     ? selectedSlotTier.cost - paidSlotTier.cost
     : 0;
   const currentZenit = player?.info?.zenit ?? 0;
@@ -525,7 +526,7 @@ export default function PlayerCustomWeaponModal({
       secondOverrideDamageType,
       secondCustomDamageType,
       dataType: "weapon",
-      ...(isTechnospheres || customWeapon?.slots || customWeapon?.slotted
+      ...(isSlotsVariant || customWeapon?.slots || customWeapon?.slotted
         ? { slots, slotted }
         : {}),
     };
@@ -826,7 +827,7 @@ export default function PlayerCustomWeaponModal({
               </Grid>
 
               {/* Quality / Slot Tier Section */}
-              {isTechnospheres ? (
+              {isSlotsVariant ? (
                 <>
                   <Grid size={12}>
                     <SlotTierPicker

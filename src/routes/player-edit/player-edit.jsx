@@ -328,7 +328,11 @@ export default function PlayerEdit() {
       ipBonus += Number(cls.benefits.ipplus) || 0;
     });
 
-    if (isTechnospheresPE && technospheresVariantPE === "standard") {
+    if (
+      isTechnospheresPE &&
+      (technospheresVariantPE === "standard" ||
+        technospheresVariantPE === "mnemospheres")
+    ) {
       hpBonus += 5;
       mpBonus += 5;
     }
@@ -422,6 +426,30 @@ export default function PlayerEdit() {
     isOwner &&
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
     (playerTemp?.lvl || 0) < 50;
+
+  const clearAllSlottedState = (player) => {
+    const eq0 = player?.equipment?.[0];
+    if (!eq0) return player;
+    const banks = [
+      "customWeapons",
+      "armor",
+      "weapons",
+      "shields",
+      "accessories",
+    ];
+    const eq0New = { ...eq0, mnemoReceptacle: [] };
+    for (const bank of banks) {
+      if (eq0New[bank]) {
+        eq0New[bank] = eq0New[bank].map((item) =>
+          item.slotted?.length ? { ...item, slotted: [] } : item,
+        );
+      }
+    }
+    const equipment = player.equipment
+      ? [eq0New, ...player.equipment.slice(1)]
+      : [eq0New];
+    return { ...player, equipment };
+  };
 
   const applyMnemoLevelUp = (player, mnemoId) => {
     if (!mnemoId) return player;
@@ -1763,6 +1791,12 @@ export default function PlayerEdit() {
               const draft = optionalRulesDraft ?? {};
               const wasEnabled = optionalRules.technospheres;
               const nowEnabled = draft.technospheres ?? false;
+              const wasVariant =
+                optionalRules.technospheresVariant ?? "standard";
+              const nowVariant = draft.technospheresVariant ?? "standard";
+              const variantChanged =
+                wasEnabled && nowEnabled && wasVariant !== nowVariant;
+              const technospheresDisabled = wasEnabled && !nowEnabled;
               setPlayerTemp((prev) => {
                 if (!prev) return prev;
                 const prevSettings = prev.settings ?? {};
@@ -1782,7 +1816,7 @@ export default function PlayerEdit() {
                       }
                     : {}),
                 };
-                const nextPlayer = {
+                let nextPlayer = {
                   ...prev,
                   settings: {
                     ...prevSettings,
@@ -1792,6 +1826,9 @@ export default function PlayerEdit() {
                       : {}),
                   },
                 };
+                if (variantChanged || technospheresDisabled) {
+                  nextPlayer = clearAllSlottedState(nextPlayer);
+                }
                 return nowEnabled && !wasEnabled
                   ? syncAutomaticClassLevels(nextPlayer)
                   : nextPlayer;

@@ -20,6 +20,14 @@ export function getMnemosphereHeroicDescription(item, heroicSkill) {
 export function getSlottedMnemospheres(player) {
   const eq0 = player?.equipment?.[0] ?? {};
   const mnemospheres = eq0.mnemospheres ?? [];
+  const technospheresEnabled =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const hasReceptacleActiveSet =
+    technospheresEnabled &&
+    (technospheresVariant === "integrated" ||
+      technospheresVariant === "mnemospheres");
   const slottedIds = new Set();
 
   for (const bank of [
@@ -35,10 +43,32 @@ export function getSlottedMnemospheres(player) {
       }
     }
   }
-
-  for (const id of eq0.mnemoReceptacle ?? []) {
-    slottedIds.add(id);
+  if (hasReceptacleActiveSet) {
+    for (const id of eq0.mnemoReceptacle ?? []) {
+      slottedIds.add(id);
+    }
   }
 
   return mnemospheres.filter((mnemo) => slottedIds.has(mnemo.id));
+}
+
+export function getReceptacleMnemospheres(player) {
+  const eq0 = player?.equipment?.[0] ?? {};
+  const mnemospheres = eq0.mnemospheres ?? [];
+  const loadedIds = new Set(eq0.mnemoReceptacle ?? []);
+  return mnemospheres.filter((mnemo) => loadedIds.has(mnemo.id));
+}
+
+export function getActiveMnemospheres(player) {
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  if (!isTechnospheres) return [];
+  const variant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const hasReceptacle = variant === "integrated" || variant === "mnemospheres";
+  const slotted = getSlottedMnemospheres(player);
+  const receptacle = hasReceptacle ? getReceptacleMnemospheres(player) : [];
+  return Array.from(
+    new Map([...slotted, ...receptacle].map((m) => [m.id, m])).values(),
+  );
 }

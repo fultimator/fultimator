@@ -58,6 +58,7 @@ export default function PlayerClassCard({
   isAccordion = false,
   isExpanded = false,
   onToggleExpand = () => {},
+  showHeader = true,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -491,7 +492,7 @@ export default function PlayerClassCard({
 
   const cardBody = (
     <Grid container spacing={1}>
-      {!isAccordion && <Grid size={12}>{header}</Grid>}
+      {!isAccordion && showHeader && <Grid size={12}>{header}</Grid>}
       {warnings.map((warning, index) => (
         <Grid key={index} size={12}>
           <Alert variant="filled" severity="warning">
@@ -783,7 +784,7 @@ export default function PlayerClassCard({
             },
           }}
         >
-          {header}
+          {showHeader ? header : null}
           <AccordionDetails sx={{ p: "15px" }}>{cardBody}</AccordionDetails>
         </Accordion>
         {modals}
@@ -802,7 +803,7 @@ export default function PlayerClassCard({
           borderColor: secondary,
         }}
       >
-        {header}
+        {showHeader ? header : null}
         {cardBody}
       </Paper>
       {modals}

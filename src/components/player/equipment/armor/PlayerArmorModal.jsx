@@ -48,10 +48,11 @@ export default function PlayerArmorModal({
   const { t } = useTranslate();
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
-  const isIntegrated =
-    isTechnospheres &&
-    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-      "integrated";
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const isIntegrated = isTechnospheres && technospheresVariant === "integrated";
+  const isSlotsVariant =
+    isTechnospheres && technospheresVariant !== "mnemospheres";
 
   const [base, setBase] = useState(armorPlayer?.base || armor[0]);
   const [name, setName] = useState(armorPlayer?.name || t(armor[0].name));
@@ -210,7 +211,7 @@ export default function PlayerArmorModal({
     SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
   const selectedSlotTier =
     SLOT_TIERS.find((t) => t.value === slots) ?? SLOT_TIERS[0];
-  const slotCostDelta = isTechnospheres
+  const slotCostDelta = isSlotsVariant
     ? selectedSlotTier.cost - paidSlotTier.cost
     : 0;
   const currentZenit = player?.info?.zenit ?? 0;
@@ -253,7 +254,7 @@ export default function PlayerArmorModal({
       mdef: base.mdef,
       ...modifiers(),
       isEquipped: martial !== armorPlayer?.martial ? false : isEquipped,
-      ...(isTechnospheres || armorPlayer?.slots || armorPlayer?.slotted
+      ...(isSlotsVariant || armorPlayer?.slots || armorPlayer?.slotted
         ? { slots, slotted }
         : {}),
     };
@@ -327,7 +328,7 @@ export default function PlayerArmorModal({
             {/* <Grid size={2}>
                   <ChangeMartial martial={martial} setMartial={setMartial} />
                 </Grid> */}
-            {isTechnospheres ? (
+            {isSlotsVariant ? (
               <>
                 <Grid size={{ xs: 12, md: 8 }}>
                   <SlotTierPicker
@@ -421,7 +422,7 @@ export default function PlayerArmorModal({
                 onChange={(e) => setName(e.target.value)}
               />
             </Grid>
-            {!isTechnospheres && (
+            {!isSlotsVariant && (
               <Grid size={12}>
                 <ChangeQuality
                   quality={quality}

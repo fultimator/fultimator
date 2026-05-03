@@ -704,10 +704,8 @@ export default function PlayerClasses({
                         >
                           <Box
                             sx={{
-                              p: 1,
-                              ml: { xs: 1, sm: 4 },
+                              ml: { xs: 1, sm: 2 },
                               bgcolor: "rgba(0,0,0,0.03)",
-                              mt: 0.5,
                             }}
                           >
                             {/* Benefits Section */}
@@ -1328,10 +1326,8 @@ export default function PlayerClasses({
                         >
                           <Box
                             sx={{
-                              p: 1,
-                              ml: { xs: 1, sm: 4 },
+                              ml: { xs: 1, sm: 2 },
                               bgcolor: "rgba(0,0,0,0.03)",
-                              mt: 0.5,
                             }}
                           >
                             <Grid container>

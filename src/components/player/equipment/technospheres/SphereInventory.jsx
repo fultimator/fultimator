@@ -41,15 +41,16 @@ import MnemoReceptaclePanel from "./MnemoReceptaclePanel";
 
 function isSphereSlotted(player, id) {
   const eq0 = player?.equipment?.[0] ?? {};
-  const isIntegrated =
+  const variant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const hasReceptacle =
     (player?.settings?.optionalRules?.technospheres ?? false) &&
-    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-      "integrated";
+    (variant === "integrated" || variant === "mnemospheres");
   return (
     [eq0.customWeapons, eq0.armor].some((bank) =>
       (bank ?? []).some((item) => (item.slotted ?? []).includes(id)),
     ) ||
-    (isIntegrated && (eq0.mnemoReceptacle ?? []).includes(id))
+    (hasReceptacle && (eq0.mnemoReceptacle ?? []).includes(id))
   );
 }
 
@@ -187,10 +188,14 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
   const isIntegrated =
     (player?.settings?.optionalRules?.technospheres ?? false) &&
-    (player?.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-      "integrated";
+    technospheresVariant === "integrated";
+  const isMnemospheresOnly =
+    (player?.settings?.optionalRules?.technospheres ?? false) &&
+    technospheresVariant === "mnemospheres";
 
   const [mnemoExpanded, setMnemoExpanded] = useState(null);
   const [hoploExpanded, setHoploExpanded] = useState(null);
@@ -354,7 +359,7 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
 
   return (
     <>
-      {isIntegrated && (
+      {(isIntegrated || isMnemospheresOnly) && (
         <>
           <MnemoReceptaclePanel player={player} setPlayer={setPlayer} />
           <Divider sx={{ my: 3 }} />
@@ -410,7 +415,11 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                 slotted={isSphereSlotted(player, m.id)}
                 onDelete={handleDeleteMnemo}
                 onUnslot={handleUnslot}
-                onSlotOpen={isIntegrated ? null : () => setSlotTarget(m)}
+                onSlotOpen={
+                  isIntegrated || isMnemospheresOnly
+                    ? null
+                    : () => setSlotTarget(m)
+                }
                 deleteLabel={`${t(m.class)} Lv.${m.lvl ?? 1}`}
               />
             }
@@ -431,83 +440,88 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
         </Box>
       ))}
 
-      <Divider sx={{ my: 3 }} />
+      {!isMnemospheresOnly && (
+        <>
+          <Divider sx={{ my: 3 }} />
 
-      <Paper
-        elevation={3}
-        sx={{
-          p: "15px",
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: secondary,
-          mb: 2,
-        }}
-      >
-        <Grid container spacing={2}>
-          <Grid size={12}>
-            <CustomHeader
-              type="top"
-              headerText={t("Hoplosphere Bank")}
-              icon={Add}
-              customTooltip={t("Add Hoplosphere")}
-              addItem={() => setCreateHoploOpen(true)}
-              openCompendium={() => setCompendiumType("hoplospheres")}
-            />
-          </Grid>
-          {hoplospheres.length === 0 && (
-            <Grid size={12}>
-              <Typography variant="h3" align="center">
-                {t("No hoplospheres added yet")}
-              </Typography>
-            </Grid>
-          )}
-        </Grid>
-      </Paper>
-
-      {hoplospheres.map((h) => {
-        const slotted = isSphereSlotted(player, h.id);
-        const coagCount = getCoagCount(player, h, hoplospheres);
-        return (
-          <Accordion
-            key={h.id}
+          <Paper
             elevation={3}
-            sx={accordionSx}
-            expanded={hoploExpanded === h.id}
-            onChange={() =>
-              setHoploExpanded((current) => (current === h.id ? null : h.id))
-            }
+            sx={{
+              p: "15px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+              mb: 2,
+            }}
           >
-            <CustomHeaderAccordion
-              isExpanded={hoploExpanded === h.id}
-              headerText={`${h.name}${coagCount > 1 ? ` ×${coagCount}` : ""} - ${h.requiredSlots} ${t("slot")}${
-                h.requiredSlots > 1 ? "s" : ""
-              } - ${h.cost}z${slotted ? ` - ${t("Slotted")}` : ""}`}
-              actions={
-                <SphereMenu
-                  id={h.id}
-                  slotted={slotted}
-                  onDelete={handleDeleteHoplo}
-                  onUnslot={handleUnslot}
-                  onSlotOpen={() => setSlotTarget(h)}
-                  deleteLabel={h.name}
+            <Grid container spacing={2}>
+              <Grid size={12}>
+                <CustomHeader
+                  type="top"
+                  headerText={t("Hoplosphere Bank")}
+                  icon={Add}
+                  customTooltip={t("Add Hoplosphere")}
+                  addItem={() => setCreateHoploOpen(true)}
+                  openCompendium={() => setCompendiumType("hoplospheres")}
                 />
-              }
-            />
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid size={12}>
-                  <SharedHoplosphereCard
-                    item={h}
-                    showCard
-                    variant="sheet"
-                    coagCount={coagCount}
-                  />
-                </Grid>
               </Grid>
-            </AccordionDetails>
-          </Accordion>
-        );
-      })}
+              {hoplospheres.length === 0 && (
+                <Grid size={12}>
+                  <Typography variant="h3" align="center">
+                    {t("No hoplospheres added yet")}
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+          </Paper>
+        </>
+      )}
+
+      {!isMnemospheresOnly &&
+        hoplospheres.map((h) => {
+          const slotted = isSphereSlotted(player, h.id);
+          const coagCount = getCoagCount(player, h, hoplospheres);
+          return (
+            <Accordion
+              key={h.id}
+              elevation={3}
+              sx={accordionSx}
+              expanded={hoploExpanded === h.id}
+              onChange={() =>
+                setHoploExpanded((current) => (current === h.id ? null : h.id))
+              }
+            >
+              <CustomHeaderAccordion
+                isExpanded={hoploExpanded === h.id}
+                headerText={`${h.name}${coagCount > 1 ? ` ×${coagCount}` : ""} - ${h.requiredSlots} ${t("slot")}${
+                  h.requiredSlots > 1 ? "s" : ""
+                } - ${h.cost}z${slotted ? ` - ${t("Slotted")}` : ""}`}
+                actions={
+                  <SphereMenu
+                    id={h.id}
+                    slotted={slotted}
+                    onDelete={handleDeleteHoplo}
+                    onUnslot={handleUnslot}
+                    onSlotOpen={() => setSlotTarget(h)}
+                    deleteLabel={h.name}
+                  />
+                }
+              />
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <Grid size={12}>
+                    <SharedHoplosphereCard
+                      item={h}
+                      showCard
+                      variant="sheet"
+                      coagCount={coagCount}
+                    />
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+          );
+        })}
 
       <MnemosphereCreateDialog
         open={createMnemoOpen}

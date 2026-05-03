@@ -29,6 +29,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const secondary = theme.palette.secondary.main;
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const isSlotsVariant =
+    isTechnospheres && technospheresVariant !== "mnemospheres";
 
   const [openNewWeapon, setOpenNewWeapon] = React.useState(false);
   const [editWeaponIndex, setEditWeaponIndex] = React.useState(null);
@@ -584,7 +588,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
               <Grid container sx={{ justifyContent: "center" }} spacing={2}>
-                {!isTechnospheres && (
+                {!isSlotsVariant && (
                   <Grid
                     container
                     sx={{ justifyContent: "center" }}
@@ -638,7 +642,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Add Armor")}
                   </Button>
                 </Grid>
-                {!isTechnospheres && (
+                {!isSlotsVariant && (
                   <Grid
                     container
                     sx={{ justifyContent: "center" }}
@@ -723,7 +727,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           <Divider sx={{ my: 2 }} />
         </>
       ) : null}
-      {!isTechnospheres && (
+      {!isSlotsVariant && (
         <PlayerWeapons
           player={player}
           weapons={inv.weapons || []}
@@ -738,7 +742,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           }
         />
       )}
-      {!isTechnospheres && <Divider sx={{ my: 2 }} />}
+      {!isSlotsVariant && <Divider sx={{ my: 2 }} />}
       <PlayerCustomWeapons
         player={player}
         customWeapons={inv.customWeapons || []}
@@ -766,7 +770,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           isEditMode ? () => setOpenArmorCompendium(true) : undefined
         }
       />
-      {!isTechnospheres && (
+      {!isSlotsVariant && (
         <>
           <Divider sx={{ my: 2 }} />
           <PlayerShields
@@ -809,7 +813,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         </>
       )}
       {/* Modals */}
-      {!isTechnospheres && (
+      {!isSlotsVariant && (
         <PlayerWeaponModal
           open={openNewWeapon}
           onClose={handleCloseNewWeapon}
@@ -842,7 +846,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         player={player}
         setPlayer={setPlayer}
       />
-      {!isTechnospheres && (
+      {!isSlotsVariant && (
         <PlayerShieldModal
           open={openNewShields}
           onClose={handleCloseNewShield}

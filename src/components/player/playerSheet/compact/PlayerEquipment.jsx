@@ -362,9 +362,17 @@ export default function PlayerEquipment({
     const groups = [
       {
         label: t("Weapons"),
-        types: ["weapon", "custom-weapon"],
+        types: ["weapon"],
         key: "weapons",
-        compendium: isTechnospheres ? "custom-weapons" : "weapons",
+        compendium: "weapons",
+        col1: t("Accuracy"),
+        col2: t("Damage"),
+      },
+      {
+        label: t("Custom Weapons"),
+        types: ["custom-weapon"],
+        key: "customWeapons",
+        compendium: "custom-weapons",
         col1: t("Accuracy"),
         col2: t("Damage"),
       },

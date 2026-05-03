@@ -59,6 +59,7 @@ export default function MnemosphereClassCard({
   actions = null,
   isSlotted = false,
   showHeaderMeta = false,
+  showHeader = true,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -103,7 +104,7 @@ export default function MnemosphereClassCard({
 
   const cardBody = (
     <Grid container spacing={1}>
-      {!isAccordion && <Grid size={12}>{mnemoHeader}</Grid>}
+      {!isAccordion && showHeader && <Grid size={12}>{mnemoHeader}</Grid>}
       <Grid size={12}>
         {showBaseLevel || showLevelControls ? (
           <Box sx={{ position: "relative" }}>
@@ -138,7 +139,11 @@ export default function MnemosphereClassCard({
                     <span>
                       <IconButton
                         size="small"
-                        onClick={onRefundLevel}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onRefundLevel?.();
+                        }}
                         disabled={!onRefundLevel || sphereLvl <= baseLvl}
                         sx={{ p: 0.25 }}
                       >
@@ -161,7 +166,11 @@ export default function MnemosphereClassCard({
                     <span>
                       <IconButton
                         size="small"
-                        onClick={onInvestLevel}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onInvestLevel?.();
+                        }}
                         disabled={!onInvestLevel || sphereLvl >= 5}
                         sx={{ p: 0.25 }}
                       >
@@ -291,7 +300,7 @@ export default function MnemosphereClassCard({
           },
         }}
       >
-        {mnemoHeader}
+        {showHeader ? mnemoHeader : null}
         <AccordionDetails sx={{ p: "15px" }}>{cardBody}</AccordionDetails>
       </Accordion>
     );
@@ -308,7 +317,7 @@ export default function MnemosphereClassCard({
         boxShadow: isCharacterSheet ? "none" : undefined,
       }}
     >
-      {mnemoHeader}
+      {showHeader ? mnemoHeader : null}
       {cardBody}
     </Paper>
   );

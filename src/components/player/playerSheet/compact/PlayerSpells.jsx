@@ -15,6 +15,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import ReactMarkdown from "react-markdown";
 import {
   KeyboardArrowDown,
   KeyboardArrowUp,
@@ -68,6 +69,7 @@ import classList, {
   tinkererInfusion,
 } from "../../../../libs/classes";
 import SpellTinkererMagitechRankModal from "../../spells/SpellTinkererMagitechRankModal";
+import { getSlottedMnemospheres } from "../../classes/mnemosphereClassUtils";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({
@@ -252,6 +254,10 @@ function createBlankSpellForType(spellType) {
   }
 
   return { spellType, showInPlayerSheet: true };
+}
+
+function createLocalSpellId() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
 function collectStringValues(value, bag = []) {
@@ -559,8 +565,14 @@ export default function PlayerSpellsFull({
   const [magitechModalOpen, setMagitechModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [importTargetClassIndex, setImportTargetClassIndex] = useState(null);
+  const [mnemoImportModalOpen, setMnemoImportModalOpen] = useState(false);
+  const [importTargetMnemoId, setImportTargetMnemoId] = useState(null);
   const [addMenuAnchor, setAddMenuAnchor] = useState(null);
   const [addMenuClassIndex, setAddMenuClassIndex] = useState(null);
+  const [mnemoAddMenuAnchor, setMnemoAddMenuAnchor] = useState(null);
+  const [mnemoImportMenuAnchor, setMnemoImportMenuAnchor] = useState(null);
+  const [mnemoSpellModalOpen, setMnemoSpellModalOpen] = useState(false);
+  const [editingMnemoSpell, setEditingMnemoSpell] = useState(null);
 
   const handleEditSpell = (spell, spellIndex, classIndex) => {
     if (spell.spellType === "tinkerer-magitech") {
@@ -865,6 +877,24 @@ export default function PlayerSpellsFull({
     setImportTargetClassIndex(null);
   };
 
+  const handleOpenMnemoAddMenu = (event) => {
+    event.stopPropagation();
+    setMnemoAddMenuAnchor(event.currentTarget);
+  };
+
+  const handleCloseMnemoAddMenu = () => {
+    setMnemoAddMenuAnchor(null);
+  };
+
+  const handleOpenMnemoImportMenu = (event) => {
+    event.stopPropagation();
+    setMnemoImportMenuAnchor(event.currentTarget);
+  };
+
+  const handleCloseMnemoImportMenu = () => {
+    setMnemoImportMenuAnchor(null);
+  };
+
   const normalizeImportedSpell = (spell) => {
     if (!spell || typeof spell !== "object") return null;
 
@@ -962,6 +992,156 @@ export default function PlayerSpellsFull({
     }));
   };
 
+  const addSpellToMnemo = (mnemoId, spell) => {
+    if (!mnemoId || !spell) return;
+    setPlayer((prev) => {
+      const prevEq0 = prev?.equipment?.[0] ?? {};
+      const updatedMnemospheres = (prevEq0.mnemospheres ?? []).map((mnemo) =>
+        mnemo.id === mnemoId
+          ? { ...mnemo, spells: [...(mnemo.spells ?? []), spell] }
+          : mnemo,
+      );
+      const eq0New = { ...prevEq0, mnemospheres: updatedMnemospheres };
+      const equipment = prev?.equipment
+        ? [eq0New, ...prev.equipment.slice(1)]
+        : [eq0New];
+      return { ...prev, equipment };
+    });
+  };
+
+  const updateMnemoSpell = (
+    mnemoId,
+    spellIndex,
+    updater,
+    sourceSpellId = null,
+  ) => {
+    if (!mnemoId || spellIndex == null) return;
+    setPlayer((prev) => {
+      const prevEq0 = prev?.equipment?.[0] ?? {};
+      const updatedMnemospheres = (prevEq0.mnemospheres ?? []).map((mnemo) => {
+        if (mnemo.id !== mnemoId) return mnemo;
+        const nextSpells = [...(mnemo.spells ?? [])];
+        const byIdIndex =
+          sourceSpellId != null
+            ? nextSpells.findIndex(
+                (s) =>
+                  (s?._compactId ?? s?.id ?? s?._id ?? null) === sourceSpellId,
+              )
+            : -1;
+        const targetIndex = byIdIndex >= 0 ? byIdIndex : spellIndex;
+        const curr = nextSpells[targetIndex];
+        if (!curr) return mnemo;
+        nextSpells[targetIndex] = updater(curr);
+        return { ...mnemo, spells: nextSpells };
+      });
+      const eq0New = { ...prevEq0, mnemospheres: updatedMnemospheres };
+      const equipment = prev?.equipment
+        ? [eq0New, ...prev.equipment.slice(1)]
+        : [eq0New];
+      return { ...prev, equipment };
+    });
+  };
+
+  const createBlankMnemoSpell = () => ({
+    _compactId: createLocalSpellId(),
+    spellType: "default",
+    name: t("New Spell"),
+    mp: 0,
+    maxTargets: 0,
+    targetDesc: "",
+    duration: "",
+    description: "",
+    isOffensive: false,
+    attr1: "dexterity",
+    attr2: "dexterity",
+    showInPlayerSheet: true,
+  });
+
+  const normalizeImportedMnemoSpell = (item) => {
+    const normalized = normalizeImportedSpell(item);
+    if (!normalized) return null;
+    return {
+      _compactId:
+        normalized._compactId ?? normalized.id ?? createLocalSpellId(),
+      ...normalized,
+    };
+  };
+
+  const handleCloseMnemoImportModal = () => {
+    setMnemoImportModalOpen(false);
+    setImportTargetMnemoId(null);
+  };
+
+  const handleImportMnemoSpellFromCompendium = (item, selectedType) => {
+    if (selectedType !== "player-spells" || !importTargetMnemoId) return;
+    const spell = normalizeImportedMnemoSpell(item);
+    if (!spell) return;
+    addSpellToMnemo(importTargetMnemoId, spell);
+    handleCloseMnemoImportModal();
+  };
+
+  const handleOpenEditMnemoSpell = (spell) => {
+    setEditingMnemoSpell(spell);
+    setMnemoSpellModalOpen(true);
+  };
+
+  const handleCloseEditMnemoSpell = () => {
+    setMnemoSpellModalOpen(false);
+    setEditingMnemoSpell(null);
+  };
+
+  const handleSaveEditMnemoSpell = (arg1, arg2) => {
+    if (!editingMnemoSpell) return;
+    const updatedSpell = arg2 ?? arg1;
+    if (!updatedSpell || typeof updatedSpell !== "object") return;
+    updateMnemoSpell(
+      editingMnemoSpell.mnemoId,
+      editingMnemoSpell.spellIndex,
+      (curr) => ({
+        ...updatedSpell,
+        _compactId:
+          updatedSpell._compactId ??
+          curr?._compactId ??
+          curr?.id ??
+          curr?._id ??
+          createLocalSpellId(),
+      }),
+      editingMnemoSpell.sourceSpellId ?? null,
+    );
+    handleCloseEditMnemoSpell();
+  };
+
+  const handleDeleteMnemoSpell = (_spellIndex) => {
+    if (!editingMnemoSpell) return;
+    setPlayer((prev) => {
+      const prevEq0 = prev?.equipment?.[0] ?? {};
+      const updatedMnemospheres = (prevEq0.mnemospheres ?? []).map((mnemo) => {
+        if (mnemo.id !== editingMnemoSpell.mnemoId) return mnemo;
+        const nextSpells = [...(mnemo.spells ?? [])];
+        const byIdIndex =
+          editingMnemoSpell.sourceSpellId != null
+            ? nextSpells.findIndex(
+                (s) =>
+                  (s?._compactId ?? s?.id ?? s?._id ?? null) ===
+                  editingMnemoSpell.sourceSpellId,
+              )
+            : -1;
+        const deleteIndex =
+          byIdIndex >= 0 ? byIdIndex : editingMnemoSpell.spellIndex;
+        if (deleteIndex >= 0 && deleteIndex < nextSpells.length) {
+          nextSpells.splice(deleteIndex, 1);
+        }
+        return { ...mnemo, spells: nextSpells };
+      });
+      const eq0New = { ...prevEq0, mnemospheres: updatedMnemospheres };
+      const equipment = prev?.equipment
+        ? [eq0New, ...prev.equipment.slice(1)]
+        : [eq0New];
+      return { ...prev, equipment };
+    });
+    handleCloseEditMnemoSpell();
+  };
+
   const highlightMatch = (text, query) => {
     if (!query) return text;
     const regex = new RegExp(`(${query})`, "ig");
@@ -1030,11 +1210,46 @@ export default function PlayerSpellsFull({
     }
   };
 
-  if (!player.classes?.length) return null;
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const activeMnemospheres = isTechnospheres
+    ? getSlottedMnemospheres(player)
+    : [];
+  const allMnemoSpells = isTechnospheres
+    ? activeMnemospheres
+        .flatMap((mnemo) =>
+          (mnemo.spells ?? [])
+            .map((spell, index) => ({ spell, index }))
+            .filter(({ spell }) => Boolean(spell))
+            .map(({ spell, index }) => ({
+              id: `${mnemo.id}-${index}`,
+              mnemoId: mnemo.id,
+              spellIndex: index,
+              sourceSpellId: spell._compactId ?? spell.id ?? spell._id ?? null,
+              spellType: spell.spellType ?? "default",
+              showInPlayerSheet: spell.showInPlayerSheet,
+              ...spell,
+              name: spell.name ?? spell.spellName ?? "",
+              description: spell.description ?? "",
+              className: mnemo.class,
+            })),
+        )
+        .sort((a, b) => a.name.localeCompare(b.name))
+    : [];
+  const filteredMnemoSpells = filterSpells(allMnemoSpells, searchQuery);
+  const visibleSpellClasses = (player.classes ?? [])
+    .map((cls, originalClassIndex) => ({ cls, originalClassIndex }))
+    .filter(({ cls }) => {
+      const className = cls?.name ?? "";
+      return !/\(Mnemosphere\)\s*$/i.test(className);
+    });
+
+  if (visibleSpellClasses.length === 0 && filteredMnemoSpells.length === 0)
+    return null;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      {player.classes.map((c, classIndex) => {
+      {visibleSpellClasses.map(({ cls: c, originalClassIndex: classIndex }) => {
         const spellsInClass = c.spells
           .map((s) => ({ ...s, className: c.name }))
           .filter(
@@ -1254,6 +1469,197 @@ export default function PlayerSpellsFull({
           </TableContainer>
         );
       })}
+      {filteredMnemoSpells.length > 0 && (
+        <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
+          <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
+            <TableHead>
+              <TableRow sx={{ background: theme.primary }}>
+                <StyledTableCellHeader sx={{ width: 36 }} />
+                <StyledTableCellHeader>
+                  <Typography
+                    variant="h4"
+                    sx={{ textTransform: "uppercase", color: "white" }}
+                  >
+                    {t("Mnemosphere Spells")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader
+                  sx={{
+                    width: { xs: 55, sm: 160 },
+                    textAlign: "left",
+                    display: { xs: "none", sm: "table-cell" },
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      color: "#fff",
+                      opacity: 0.8,
+                      fontSize: "0.65rem",
+                    }}
+                  >
+                    {t("Class")}
+                  </Typography>
+                </StyledTableCellHeader>
+                <StyledTableCellHeader
+                  sx={{
+                    width: { xs: 65, sm: 90 },
+                    display: { xs: "none", sm: "table-cell" },
+                  }}
+                />
+                <StyledTableCellHeader
+                  sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                      gap: 0.5,
+                    }}
+                  >
+                    <Tooltip title={t("Add New Spell")}>
+                      <span>
+                        <IconButton
+                          size="small"
+                          onClick={handleOpenMnemoAddMenu}
+                          disabled={activeMnemospheres.length === 0}
+                          sx={{ color: "#fff", p: 0 }}
+                        >
+                          <Add fontSize="small" />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                    <Tooltip title={t("Search Compendium")}>
+                      <span>
+                        <IconButton
+                          size="small"
+                          onClick={handleOpenMnemoImportMenu}
+                          disabled={activeMnemospheres.length === 0}
+                          sx={{ color: "#fff", p: 0 }}
+                        >
+                          <Search fontSize="small" />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  </Box>
+                </StyledTableCellHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredMnemoSpells.map((spell) => {
+                const rowKey = `mnemo-spell-${spell.id}`;
+                return (
+                  <React.Fragment key={rowKey}>
+                    <TableRow
+                      sx={{
+                        backgroundColor: openRows.spells[rowKey]
+                          ? "rgba(0,0,0,0.02)"
+                          : "inherit",
+                      }}
+                    >
+                      <StyledTableCell sx={{ width: 36 }}>
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleRow("spells", rowKey);
+                          }}
+                          size="small"
+                          sx={{ p: 0.5 }}
+                        >
+                          {openRows.spells[rowKey] ? (
+                            <KeyboardArrowUp fontSize="small" />
+                          ) : (
+                            <KeyboardArrowDown fontSize="small" />
+                          )}
+                        </IconButton>
+                      </StyledTableCell>
+                      <StyledTableCell
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleRow("spells", rowKey);
+                        }}
+                        sx={{ cursor: "pointer" }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: "bold",
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                          }}
+                        >
+                          {highlightMatch(spell.name, searchQuery)}
+                        </Typography>
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{
+                          width: { xs: 55, sm: 160 },
+                          display: { xs: "none", sm: "table-cell" },
+                        }}
+                      >
+                        <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                          {highlightMatch(t(spell.className), searchQuery)}
+                        </Typography>
+                      </StyledTableCell>
+                      <StyledTableCell
+                        sx={{
+                          width: { xs: 65, sm: 90 },
+                          display: { xs: "none", sm: "table-cell" },
+                        }}
+                      />
+                      <StyledTableCell
+                        sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+                      >
+                        <Tooltip title={t("Edit")}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenEditMnemoSpell(spell);
+                            }}
+                            sx={{ p: 0.5 }}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </StyledTableCell>
+                    </TableRow>
+                    <TableRow>
+                      <StyledTableCell colSpan={5} sx={{ p: 0 }}>
+                        <Collapse
+                          in={openRows.spells[rowKey]}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          <Box sx={{ p: 1, ml: { xs: 1, sm: 4 } }}>
+                            <Box
+                              sx={{
+                                color: "text.secondary",
+                                fontFamily: "PT Sans Narrow",
+                                fontSize: "0.9rem",
+                                whiteSpace: "pre-line",
+                              }}
+                            >
+                              <ReactMarkdown
+                                allowedElements={["strong", "em"]}
+                                unwrapDisallowed
+                              >
+                                {t(spell.description || "")}
+                              </ReactMarkdown>
+                            </Box>
+                          </Box>
+                        </Collapse>
+                      </StyledTableCell>
+                    </TableRow>
+                  </React.Fragment>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Menu
         anchorEl={addMenuAnchor}
@@ -1277,6 +1683,45 @@ export default function PlayerSpellsFull({
             }}
           >
             {action.label}
+          </MenuItem>
+        ))}
+      </Menu>
+      <Menu
+        anchorEl={mnemoAddMenuAnchor}
+        open={Boolean(mnemoAddMenuAnchor)}
+        onClose={handleCloseMnemoAddMenu}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        {activeMnemospheres.map((mnemo) => (
+          <MenuItem
+            key={`mnemo-add-${mnemo.id}`}
+            onClick={() => {
+              addSpellToMnemo(mnemo.id, createBlankMnemoSpell());
+              handleCloseMnemoAddMenu();
+            }}
+          >
+            {t("Add to")} {t(mnemo.class)}
+          </MenuItem>
+        ))}
+      </Menu>
+      <Menu
+        anchorEl={mnemoImportMenuAnchor}
+        open={Boolean(mnemoImportMenuAnchor)}
+        onClose={handleCloseMnemoImportMenu}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        {activeMnemospheres.map((mnemo) => (
+          <MenuItem
+            key={`mnemo-import-${mnemo.id}`}
+            onClick={() => {
+              setImportTargetMnemoId(mnemo.id);
+              setMnemoImportModalOpen(true);
+              handleCloseMnemoImportMenu();
+            }}
+          >
+            {t("Import to")} {t(mnemo.class)}
           </MenuItem>
         ))}
       </Menu>
@@ -1312,6 +1757,27 @@ export default function PlayerSpellsFull({
         initialSpellClass={player.classes?.[importTargetClassIndex]?.name || ""}
         context="player"
       />
+      <CompendiumViewerModal
+        open={mnemoImportModalOpen}
+        onClose={handleCloseMnemoImportModal}
+        onAddItem={handleImportMnemoSpellFromCompendium}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        context="player"
+      />
+      {mnemoSpellModalOpen && editingMnemoSpell && (
+        <UnifiedSpellModal
+          open={mnemoSpellModalOpen}
+          onClose={handleCloseEditMnemoSpell}
+          onSave={handleSaveEditMnemoSpell}
+          onDelete={handleDeleteMnemoSpell}
+          spellType={editingMnemoSpell.spellType || "default"}
+          spell={editingMnemoSpell}
+          sections={getSpellModalSections(
+            editingMnemoSpell.spellType || "default",
+          )}
+        />
+      )}
     </Box>
   );
 }

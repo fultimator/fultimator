@@ -201,7 +201,11 @@ export default function CharacterSheet() {
           ipBonus += cls.benefits.ipplus || 0;
         });
 
-        if (isTechnospheresCS1 && technospheresVariantCS1 === "standard") {
+        if (
+          isTechnospheresCS1 &&
+          (technospheresVariantCS1 === "standard" ||
+            technospheresVariantCS1 === "mnemospheres")
+        ) {
           hpBonus += 5;
           mpBonus += 5;
         }
@@ -381,7 +385,11 @@ export default function CharacterSheet() {
         ipBonus += Number(cls.benefits.ipplus) || 0;
       });
 
-      if (isTechnospheresCS2 && technospheresVariantCS2 === "standard") {
+      if (
+        isTechnospheresCS2 &&
+        (technospheresVariantCS2 === "standard" ||
+          technospheresVariantCS2 === "mnemospheres")
+      ) {
         hpBonus += 5;
         mpBonus += 5;
       }
@@ -637,8 +645,10 @@ export default function CharacterSheet() {
                   updateMaxStats={updateMaxStats}
                 />
                 {optionalRules.technospheres &&
-                  (player?.settings?.optionalRules?.technospheresVariant ??
-                    "standard") === "integrated" && (
+                  ["integrated", "mnemospheres"].includes(
+                    player?.settings?.optionalRules?.technospheresVariant ??
+                      "standard",
+                  ) && (
                     <MnemoReceptaclePanel
                       player={player}
                       setPlayer={handleSetPlayer}

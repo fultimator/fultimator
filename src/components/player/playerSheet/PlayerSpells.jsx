@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import {
   Grid,
   Typography,
@@ -42,6 +43,7 @@ import {
   SharedMagichantCard,
 } from "../../shared/itemCards";
 import { spellList } from "../../../libs/classes";
+import { getActiveMnemospheres } from "../classes/mnemosphereClassUtils";
 
 export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -145,6 +147,19 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
         (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.spellName.localeCompare(b.spellName));
+
+  const allMnemoSpells = getActiveMnemospheres(player)
+    .flatMap((mnemo) =>
+      (mnemo.spells ?? []).map((spell) => ({
+        name: spell.name ?? spell.spellName ?? "",
+        description: spell.description ?? "",
+        className: mnemo.class,
+      })),
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const [openMnemoSpellModal, setOpenMnemoSpellModal] = useState(false);
+  const [selectedMnemoSpell, setSelectedMnemoSpell] = useState(null);
 
   const handleOpenModal = (spell) => {
     if (spell.spellType === "default") {
@@ -430,7 +445,9 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
 
   return (
     <>
-      {(defaultSpells.length > 0 || gambleSpells.length > 0) && (
+      {(defaultSpells.length > 0 ||
+        gambleSpells.length > 0 ||
+        allMnemoSpells.length > 0) && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper
@@ -652,6 +669,87 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   )}
                 </Grid>
               )}
+
+              {allMnemoSpells.length > 0 && (
+                <>
+                  <Grid size={12}>
+                    <Divider sx={{ mt: 1 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ textTransform: "uppercase", letterSpacing: 1 }}
+                      >
+                        {t("Mnemospheres")}
+                      </Typography>
+                    </Divider>
+                  </Grid>
+                  {allMnemoSpells.map((spell, index) => (
+                    <Grid
+                      container
+                      spacing={0}
+                      key={`mnemo-${index}`}
+                      sx={{
+                        display: "flex",
+                        alignItems: "stretch",
+                        maxHeight: "40px",
+                      }}
+                      size={{ xs: 12, md: 6 }}
+                    >
+                      <Grid sx={{ display: "flex" }} size={10}>
+                        <Typography
+                          variant="h2"
+                          sx={{
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                            backgroundColor: primary,
+                            padding: "5px",
+                            paddingLeft: "10px",
+                            color: "#fff",
+                            borderRadius: "8px 0 0 8px",
+                            display: "flex",
+                            alignItems: "center",
+                            width: "100%",
+                          }}
+                        >
+                          {t(spell.name)}
+                        </Typography>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          display: "flex",
+                          alignItems: "stretch",
+                          maxHeight: "40px",
+                        }}
+                        size={2}
+                      >
+                        <div
+                          style={{
+                            padding: "10px",
+                            backgroundColor: ternary,
+                            borderRadius: "0 8px 8px 0",
+                            marginRight: "15px",
+                            display: "flex",
+                            alignItems: "center",
+                            flexDirection: "row",
+                          }}
+                        >
+                          <Tooltip title={t("Info")}>
+                            <IconButton
+                              sx={{ padding: "0px" }}
+                              onClick={() => {
+                                setSelectedMnemoSpell(spell);
+                                setOpenMnemoSpellModal(true);
+                              }}
+                            >
+                              <Info />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      </Grid>
+                    </Grid>
+                  ))}
+                </>
+              )}
             </Grid>
             <Dialog
               open={openModal}
@@ -728,96 +826,97 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
               >
                 {t("Spell Rolls")}
               </DialogTitle>
-              <DialogContent sx={{ marginTop: "10px" }}>
-                <DialogContent id="alert-dialog-description">
-                  {!isRolling ? (
-                    <Grid container sx={{ alignItems: "center" }} spacing={1}>
-                      <Grid size={12}>
-                        <Typography variant="body1">
-                          {selectedSpell?.spellType === "default" &&
-                            t("Select number of targets from 1 to")}
-                          {selectedSpell?.spellType === "gamble" &&
-                            t("Select number of dices you want to throw")}{" "}
-                          {selectedSpell?.maxTargets || 1}:
-                        </Typography>
-                      </Grid>
-                      <Grid size={12}>
-                        <Select
-                          value={targets}
-                          onChange={(e) =>
-                            setTargets(parseInt(e.target.value, 10))
-                          }
-                          size="small"
-                          sx={{ width: "100px" }}
-                        >
-                          {Array.from(
-                            { length: selectedSpell?.maxTargets || 1 },
-                            (_, i) => (
-                              <MenuItem key={i} value={i + 1}>
-                                {i + 1}
-                              </MenuItem>
-                            ),
+              <DialogContent
+                sx={{ marginTop: "10px" }}
+                id="alert-dialog-description"
+              >
+                {!isRolling ? (
+                  <Grid container sx={{ alignItems: "center" }} spacing={1}>
+                    <Grid size={12}>
+                      <Typography variant="body1">
+                        {selectedSpell?.spellType === "default" &&
+                          t("Select number of targets from 1 to")}
+                        {selectedSpell?.spellType === "gamble" &&
+                          t("Select number of dices you want to throw")}{" "}
+                        {selectedSpell?.maxTargets || 1}:
+                      </Typography>
+                    </Grid>
+                    <Grid size={12}>
+                      <Select
+                        value={targets}
+                        onChange={(e) =>
+                          setTargets(parseInt(e.target.value, 10))
+                        }
+                        size="small"
+                        sx={{ width: "100px" }}
+                      >
+                        {Array.from(
+                          { length: selectedSpell?.maxTargets || 1 },
+                          (_, i) => (
+                            <MenuItem key={i} value={i + 1}>
+                              {i + 1}
+                            </MenuItem>
+                          ),
+                        )}
+                      </Select>
+                      {useMp && (
+                        <>
+                          <Typography variant="body1">
+                            {t("MP Cost")}
+                            {": "}
+                            {selectedSpell?.mp * targets}
+                          </Typography>
+                          {selectedSpell?.mp * targets >
+                            player.stats.mp.current && (
+                            <Typography variant="body1" color="error">
+                              {t("Not enough MP")}
+                            </Typography>
                           )}
-                        </Select>
-                        {useMp && (
-                          <>
-                            <Typography variant="body1">
-                              {t("MP Cost")}
-                              {": "}
-                              {selectedSpell?.mp * targets}
+                        </>
+                      )}
+                      {selectedSpell?.isMagisphere && useIp && (
+                        <>
+                          <Typography variant="body1">
+                            {t("IP Cost")}
+                            {": "}
+                            {2}
+                          </Typography>
+                          {2 > player.stats.ip.current && (
+                            <Typography variant="body1" color="error">
+                              {t("Not enough IP")}
                             </Typography>
-                            {selectedSpell?.mp * targets >
-                              player.stats.mp.current && (
-                              <Typography variant="body1" color="error">
-                                {t("Not enough MP")}
-                              </Typography>
-                            )}
-                          </>
-                        )}
-                        {selectedSpell?.isMagisphere && useIp && (
-                          <>
-                            <Typography variant="body1">
-                              {t("IP Cost")}
-                              {": "}
-                              {2}
-                            </Typography>
-                            {2 > player.stats.ip.current && (
-                              <Typography variant="body1" color="error">
-                                {t("Not enough IP")}
-                              </Typography>
-                            )}
-                          </>
-                        )}
-                      </Grid>
+                          )}
+                        </>
+                      )}
+                    </Grid>
+                    <Grid size={12}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={useMp}
+                            onChange={(e) => setUseMp(e.target.checked)}
+                          />
+                        }
+                        label={t("Use MP")}
+                      />
+                    </Grid>
+                    {selectedSpell?.isMagisphere && (
                       <Grid size={12}>
                         <FormControlLabel
                           control={
                             <Checkbox
-                              checked={useMp}
-                              onChange={(e) => setUseMp(e.target.checked)}
+                              checked={useIp}
+                              onChange={(e) => setUseIp(e.target.checked)}
                             />
                           }
-                          label={t("Use MP")}
+                          label={t("Use IP")}
                         />
                       </Grid>
-                      {selectedSpell?.isMagisphere && (
-                        <Grid size={12}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={useIp}
-                                onChange={(e) => setUseIp(e.target.checked)}
-                              />
-                            }
-                            label={t("Use IP")}
-                          />
-                        </Grid>
-                      )}
-                    </Grid>
-                  ) : (
-                    <>{dialogMessage}</>
-                  )}
-                </DialogContent>
+                    )}
+                  </Grid>
+                ) : (
+                  <>{dialogMessage}</>
+                )}
               </DialogContent>
               <DialogActions>
                 <Button
@@ -837,6 +936,45 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   color="primary"
                 >
                   {isRolling ? t("Re-Roll") : t("Roll")}
+                </Button>
+              </DialogActions>
+            </Dialog>
+            <Dialog
+              open={openMnemoSpellModal}
+              onClose={() => setOpenMnemoSpellModal(false)}
+              fullWidth
+              maxWidth="sm"
+            >
+              <DialogContent>
+                {selectedMnemoSpell && (
+                  <>
+                    <Typography variant="h2" sx={{ fontWeight: "bold", mb: 1 }}>
+                      {t(selectedMnemoSpell.name)}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block", mb: 1 }}
+                    >
+                      {t(selectedMnemoSpell.className)}
+                    </Typography>
+                    <ReactMarkdown
+                      allowedElements={["strong", "em"]}
+                      unwrapDisallowed
+                    >
+                      {t(selectedMnemoSpell.description)}
+                    </ReactMarkdown>
+                  </>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenMnemoSpellModal(false)}
+                  fullWidth
+                >
+                  {t("Close")}
                 </Button>
               </DialogActions>
             </Dialog>

@@ -66,6 +66,12 @@ import GambleExplain from "./GambleExplain";
 import { VEHICLE_ACTIONS, vehicleReducer } from "./vehicleReducer";
 import { deriveVehicleSlots } from "../equipment/slots/equipmentSlots";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import {
+  getSlottedMnemospheres,
+  getReceptacleMnemospheres,
+} from "../classes/mnemosphereClassUtils";
+import { getMnemosphereClassDefinition } from "../../../libs/mnemospheres";
+import useSphereBank from "../equipment/technospheres/useSphereBank";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -79,6 +85,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const [arcanaReworkCompendiumClass, setArcanaReworkCompendiumClass] =
     useState(null);
   const [systemCompendiumTarget, setSystemCompendiumTarget] = useState(null); // { className, spellType, label }
+  const [mnemoCompendiumTarget, setMnemoCompendiumTarget] = useState(null); // { mnemoId, spellType, label, className }
 
   const {
     isOpen,
@@ -88,6 +95,95 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     editingSpellClass,
     editingSpellIndex,
   } = useSpellModals();
+
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const hasReceptacle =
+    isTechnospheres &&
+    (technospheresVariant === "integrated" ||
+      technospheresVariant === "mnemospheres");
+
+  const { addMnemoSpell, updateMnemoSpell, deleteMnemoSpell } = useSphereBank(
+    player,
+    setPlayer,
+  );
+
+  const activeMnemospheres = isTechnospheres
+    ? Array.from(
+        new Map(
+          [
+            ...getSlottedMnemospheres(player),
+            ...(hasReceptacle ? getReceptacleMnemospheres(player) : []),
+          ].map((mnemo) => [mnemo.id, mnemo]),
+        ).values(),
+      )
+    : [];
+
+  const [selectedMnemoTarget, setSelectedMnemoTarget] = useState(null);
+  const [selectedMnemoSpellType, setSelectedMnemoSpellType] = useState(null);
+
+  const handleMnemoTargetChange = (mnemoId, newValue) => {
+    setSelectedMnemoTarget(mnemoId);
+    setSelectedMnemoSpellType(newValue);
+  };
+
+  const addNewMnemoSpell = (mnemoId, spellType) => {
+    if (!mnemoId || !spellType) return;
+    const newSpell = buildBlankSpell(spellType);
+    if (!newSpell) return;
+    addMnemoSpell(mnemoId, newSpell);
+    setSelectedMnemoTarget(null);
+    setSelectedMnemoSpellType(null);
+  };
+
+  const addMnemoSpellFromCompendium = (mnemoId, spell) => {
+    if (!mnemoId) return;
+    if (spell.spellType === "default") {
+      addMnemoSpell(mnemoId, {
+        spellType: spell.spellType,
+        name: t(spell.name),
+        mp: spell.mp,
+        maxTargets: spell.maxTargets,
+        targetDesc: t(spell.targetDesc),
+        duration: t(spell.duration),
+        description: t(spell.description),
+        isOffensive: spell.isOffensive,
+        attr1: spell.attr1,
+        attr2: spell.attr2,
+        isMagisphere: spell.isMagisphere || false,
+        showInPlayerSheet: true,
+        _packItemId: spell._packItemId,
+      });
+    } else if (spell.spellType === "gamble") {
+      addMnemoSpell(mnemoId, {
+        spellType: spell.spellType,
+        spellName: t(spell.name),
+        mp: spell.mp,
+        maxTargets: spell.maxTargets,
+        targetDesc: t(spell.targetDesc),
+        duration: t(spell.duration),
+        attr: spell.attr,
+        targets: spell.targets,
+        isMagisphere: spell.isMagisphere || false,
+        showInPlayerSheet: true,
+        _packItemId: spell._packItemId,
+      });
+    } else {
+      const clonedSpell = JSON.parse(JSON.stringify(spell));
+      addMnemoSpell(mnemoId, {
+        ...clonedSpell,
+        _packItemId: spell._packItemId,
+        showInPlayerSheet:
+          clonedSpell.showInPlayerSheet === undefined
+            ? true
+            : clonedSpell.showInPlayerSheet,
+      });
+    }
+    setSelectedMnemoTarget(null);
+    setSelectedMnemoSpellType(null);
+  };
 
   const handleClassChange = (event, newValue) => {
     setSelectedClass(
@@ -106,6 +202,136 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     ? player.classes.find((cls) => cls.name === selectedClass)?.benefits
         .spellClasses || []
     : [];
+
+  const buildBlankSpell = (spellType) => {
+    if (spellType === "default")
+      return {
+        spellType,
+        name: "New Spell",
+        mp: 0,
+        maxTargets: 0,
+        targetDesc: "",
+        duration: "",
+        description: "",
+        isOffensive: false,
+        attr1: "dexterity",
+        attr2: "dexterity",
+        showInPlayerSheet: true,
+      };
+    if (spellType === "arcanist")
+      return {
+        spellType,
+        name: "New Arcana",
+        domain: "",
+        description: "",
+        domainDesc: "",
+        merge: "",
+        mergeDesc: "",
+        dismiss: "",
+        dismissDesc: "",
+        showInPlayerSheet: true,
+      };
+    if (spellType === "arcanist-rework")
+      return {
+        spellType,
+        name: "New Arcana",
+        domain: "",
+        description: "",
+        domainDesc: "",
+        merge: "",
+        mergeDesc: "",
+        pulse: "",
+        pulseDesc: "",
+        dismiss: "",
+        dismissDesc: "",
+        showInPlayerSheet: true,
+      };
+    if (spellType === "tinkerer-alchemy")
+      return { spellType, showInPlayerSheet: true, ...tinkererAlchemy };
+    if (spellType === "tinkerer-infusion")
+      return { spellType, showInPlayerSheet: true, ...tinkererInfusion };
+    if (spellType === "tinkerer-magitech")
+      return { spellType, showInPlayerSheet: true, rank: 1, magispheres: [] };
+    if (spellType === "gamble")
+      return {
+        spellType,
+        showInPlayerSheet: true,
+        spellName: "New Gamble",
+        mp: 10,
+        maxTargets: 2,
+        targetDesc: "Special",
+        duration: "Instantaneous",
+        attr: "will",
+        targets: [
+          {
+            rangeFrom: 1,
+            rangeTo: 6,
+            effect: "First Effect",
+            secondRoll: false,
+            secondEffects: [],
+          },
+          {
+            rangeFrom: 7,
+            rangeTo: 12,
+            effect: "Second Effect",
+            secondRoll: false,
+            secondEffects: [],
+          },
+        ],
+      };
+    if (spellType === "magichant")
+      return { spellType, showInPlayerSheet: true, keys: [], tones: [] };
+    if (spellType === "symbol")
+      return { spellType, showInPlayerSheet: true, symbols: [] };
+    if (spellType === "dance")
+      return { spellType, showInPlayerSheet: true, dances: [] };
+    if (spellType === "gift")
+      return { spellType, showInPlayerSheet: true, gifts: [], clock: 0 };
+    if (spellType === "therioform")
+      return { spellType, showInPlayerSheet: true, therioforms: [] };
+    if (spellType === "pilot-vehicle")
+      return { spellType, showInPlayerSheet: true, vehicles: [] };
+    if (spellType === "magiseed")
+      return {
+        spellType,
+        showInPlayerSheet: true,
+        magiseeds: [],
+        currentMagiseed: null,
+        growthClock: 0,
+        gardenDescription: "",
+      };
+    if (spellType === "cooking")
+      return {
+        spellType,
+        spellName: "Cookbook",
+        cookbookEffects: [],
+        showInPlayerSheet: true,
+      };
+    if (spellType === "invocation")
+      return {
+        spellType,
+        spellName: "Invocation",
+        invocations: [],
+        activeWellsprings: [],
+        showInPlayerSheet: true,
+      };
+    if (spellType === "deck")
+      return {
+        spellType,
+        spellName: "Ace of Cards Deck",
+        suitConfiguration: {
+          Air: "air",
+          Earth: "earth",
+          Fire: "fire",
+          Ice: "ice",
+        },
+        cardsInDeck: 30,
+        hand: [],
+        discardPile: [],
+        showInPlayerSheet: true,
+      };
+    return null;
+  };
 
   const addNewSpell = (spell) => {
     setPlayer((prev) => ({
@@ -1094,47 +1320,51 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     });
   };
 
-  const handleSaveEditedSpell = (spellIndex, editedSpell) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((cls) => {
-        if (cls.name === editingSpellClass) {
-          return {
-            ...cls,
-            spells: cls.spells.map((spell, index) => {
-              if (index === spellIndex) {
-                return editedSpell;
-              }
-              return spell;
-            }),
-          };
-        }
-        return cls;
-      }),
-    }));
+  const isMnemoEditingTarget = (id) =>
+    activeMnemospheres.some((m) => m.id === id);
 
+  const handleSaveEditedSpell = (spellIndex, editedSpell) => {
+    if (isMnemoEditingTarget(editingSpellClass)) {
+      updateMnemoSpell(editingSpellClass, spellIndex, editedSpell);
+    } else {
+      setPlayer((prev) => ({
+        ...prev,
+        classes: prev.classes.map((cls) => {
+          if (cls.name === editingSpellClass) {
+            return {
+              ...cls,
+              spells: cls.spells.map((spell, index) => {
+                if (index === spellIndex) {
+                  return editedSpell;
+                }
+                return spell;
+              }),
+            };
+          }
+          return cls;
+        }),
+      }));
+    }
     closeModals();
   };
 
   const handleDeleteSpell = (spellIndex) => {
-    /*console.log(
-      "spellIndex",
-      spellIndex,
-      "editingSpellClass",
-      editingSpellClass
-    );*/
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((cls) => {
-        if (cls.name === editingSpellClass) {
-          return {
-            ...cls,
-            spells: cls.spells.filter((_, index) => index !== spellIndex),
-          };
-        }
-        return cls;
-      }),
-    }));
+    if (isMnemoEditingTarget(editingSpellClass)) {
+      deleteMnemoSpell(editingSpellClass, spellIndex);
+    } else {
+      setPlayer((prev) => ({
+        ...prev,
+        classes: prev.classes.map((cls) => {
+          if (cls.name === editingSpellClass) {
+            return {
+              ...cls,
+              spells: cls.spells.filter((_, index) => index !== spellIndex),
+            };
+          }
+          return cls;
+        }),
+      }));
+    }
     closeModals();
   };
 
@@ -1870,6 +2100,675 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             </React.Fragment>
           );
         })}
+      {isTechnospheres &&
+        activeMnemospheres
+          .filter((mnemo) => {
+            const classDef = getMnemosphereClassDefinition(mnemo.class);
+            return classDef?.benefits?.spellClasses?.length > 0;
+          })
+          .map((mnemo) => {
+            const classDef = getMnemosphereClassDefinition(mnemo.class);
+            const mnemoSpellClasses = classDef?.benefits?.spellClasses ?? [];
+            const mnemoSpells = mnemo.spells ?? [];
+            const mnemoSpellTypeHeaders = {
+              default: false,
+              arcanist: false,
+              arcanistRework: false,
+              tinkererAlchemy: false,
+              tinkererInfusion: false,
+              tinkererMagitech: false,
+              gamble: false,
+              magichant: false,
+              symbol: false,
+              dance: false,
+              gift: false,
+              therioform: false,
+              pilot: false,
+              magiseed: false,
+              cooking: false,
+              invocation: false,
+              deck: false,
+            };
+            return (
+              <React.Fragment key={mnemo.id}>
+                <Paper
+                  elevation={3}
+                  sx={{
+                    p: "15px",
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                  }}
+                >
+                  <Grid container>
+                    <Grid size={12}>
+                      <CustomHeader
+                        type="top"
+                        headerText={
+                          t("Spells") +
+                          " - " +
+                          t(mnemo.class) +
+                          " (" +
+                          t("Mnemosphere") +
+                          ")"
+                        }
+                        showIconButton={false}
+                      />
+                    </Grid>
+                    {isEditMode && (
+                      <Grid container spacing={2}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <Autocomplete
+                            options={mnemoSpellClasses}
+                            value={
+                              selectedMnemoTarget === mnemo.id
+                                ? selectedMnemoSpellType
+                                : null
+                            }
+                            onChange={(_, val) =>
+                              handleMnemoTargetChange(mnemo.id, val)
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label={t("Select Spell")}
+                                variant="outlined"
+                                fullWidth
+                              />
+                            )}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <Button
+                            variant="contained"
+                            sx={{ width: "100%", height: "100%" }}
+                            disabled={
+                              selectedMnemoTarget !== mnemo.id ||
+                              !selectedMnemoSpellType
+                            }
+                            onClick={() =>
+                              addNewMnemoSpell(mnemo.id, selectedMnemoSpellType)
+                            }
+                          >
+                            {t("Add Blank Spell")}
+                          </Button>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <Button
+                            variant="outlined"
+                            sx={{ width: "100%", height: "100%" }}
+                            onClick={() =>
+                              setMnemoCompendiumTarget({
+                                mnemoId: mnemo.id,
+                                spellType:
+                                  selectedMnemoTarget === mnemo.id
+                                    ? selectedMnemoSpellType
+                                    : mnemoSpellClasses[0],
+                                label: t("Spell"),
+                                className: mnemo.class,
+                              })
+                            }
+                          >
+                            {t("Add from Compendium")}
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    )}
+                    <Grid size={12}>
+                      {mnemoSpells
+                        .sort((a, b) =>
+                          (a.spellType ?? "").localeCompare(b.spellType ?? ""),
+                        )
+                        .map((spell, index) => (
+                          <React.Fragment key={index}>
+                            <div
+                              style={{
+                                marginTop:
+                                  index === 0 ||
+                                  spell.spellType === "default" ||
+                                  spell.spellType === "gamble"
+                                    ? 0
+                                    : 50,
+                              }}
+                            >
+                              {spell.spellType === "default" &&
+                                !mnemoSpellTypeHeaders.default && (
+                                  <>
+                                    {renderCompendiumHeader(
+                                      t("Default Spells"),
+                                      () =>
+                                        setMnemoCompendiumTarget({
+                                          mnemoId: mnemo.id,
+                                          spellType: "default",
+                                          label: t("Default Spells"),
+                                          className: mnemo.class,
+                                        }),
+                                    )}
+                                    {(mnemoSpellTypeHeaders.default = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "arcanist" &&
+                                !mnemoSpellTypeHeaders.arcanist && (
+                                  <>
+                                    {renderCompendiumHeader(t("Arcana"), () =>
+                                      setMnemoCompendiumTarget({
+                                        mnemoId: mnemo.id,
+                                        spellType: "arcanist",
+                                        label: t("Arcana"),
+                                        className: mnemo.class,
+                                      }),
+                                    )}
+                                    {(mnemoSpellTypeHeaders.arcanist = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "arcanist-rework" &&
+                                !mnemoSpellTypeHeaders.arcanistRework && (
+                                  <>
+                                    {renderCompendiumHeader(
+                                      t("Arcana - Rework"),
+                                      () =>
+                                        setMnemoCompendiumTarget({
+                                          mnemoId: mnemo.id,
+                                          spellType: "arcanist-rework",
+                                          label: t("Arcana - Rework"),
+                                          className: mnemo.class,
+                                        }),
+                                    )}
+                                    {
+                                      (mnemoSpellTypeHeaders.arcanistRework = true)
+                                    }
+                                  </>
+                                )}
+                              {spell.spellType === "tinkerer-alchemy" &&
+                                !mnemoSpellTypeHeaders.tinkererAlchemy && (
+                                  <>
+                                    <CustomHeader2 headerText={t("Alchemy")} />
+                                    {
+                                      (mnemoSpellTypeHeaders.tinkererAlchemy = true)
+                                    }
+                                  </>
+                                )}
+                              {spell.spellType === "tinkerer-infusion" &&
+                                !mnemoSpellTypeHeaders.tinkererInfusion && (
+                                  <>
+                                    <CustomHeader2
+                                      headerText={t("Infusions")}
+                                    />
+                                    {
+                                      (mnemoSpellTypeHeaders.tinkererInfusion = true)
+                                    }
+                                  </>
+                                )}
+                              {spell.spellType === "tinkerer-magitech" &&
+                                !mnemoSpellTypeHeaders.tinkererMagitech && (
+                                  <>
+                                    <CustomHeader2 headerText={t("Magitech")} />
+                                    {
+                                      (mnemoSpellTypeHeaders.tinkererMagitech = true)
+                                    }
+                                  </>
+                                )}
+                              {spell.spellType === "gamble" &&
+                                !mnemoSpellTypeHeaders.gamble && (
+                                  <>
+                                    <CustomHeader2 headerText={t("Gamble")} />
+                                    {(mnemoSpellTypeHeaders.gamble = true)}
+                                    <GambleExplain />
+                                  </>
+                                )}
+                              {spell.spellType === "magichant" &&
+                                !mnemoSpellTypeHeaders.magichant && (
+                                  <>
+                                    {renderCompendiumHeader(
+                                      t("Magichant"),
+                                      () =>
+                                        setMnemoCompendiumTarget({
+                                          mnemoId: mnemo.id,
+                                          spellType: "magichant",
+                                          label: t("Magichant"),
+                                          className: mnemo.class,
+                                        }),
+                                    )}
+                                    {(mnemoSpellTypeHeaders.magichant = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "symbol" &&
+                                !mnemoSpellTypeHeaders.symbol && (
+                                  <>
+                                    {renderCompendiumHeader(
+                                      t("symbol_symbol"),
+                                      () =>
+                                        setMnemoCompendiumTarget({
+                                          mnemoId: mnemo.id,
+                                          spellType: "symbol",
+                                          label: t("symbol_symbol"),
+                                          className: mnemo.class,
+                                        }),
+                                    )}
+                                    {(mnemoSpellTypeHeaders.symbol = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "dance" &&
+                                !mnemoSpellTypeHeaders.dance && (
+                                  <>
+                                    {renderCompendiumHeader(
+                                      t("dance_dance"),
+                                      () =>
+                                        setMnemoCompendiumTarget({
+                                          mnemoId: mnemo.id,
+                                          spellType: "dance",
+                                          label: t("dance_dance"),
+                                          className: mnemo.class,
+                                        }),
+                                    )}
+                                    {(mnemoSpellTypeHeaders.dance = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "gift" &&
+                                !mnemoSpellTypeHeaders.gift && (
+                                  <>
+                                    {renderCompendiumHeader(
+                                      t("esper_gift"),
+                                      () =>
+                                        setMnemoCompendiumTarget({
+                                          mnemoId: mnemo.id,
+                                          spellType: "gift",
+                                          label: t("esper_gift"),
+                                          className: mnemo.class,
+                                        }),
+                                    )}
+                                    {(mnemoSpellTypeHeaders.gift = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "therioform" &&
+                                !mnemoSpellTypeHeaders.therioform && (
+                                  <>
+                                    {renderCompendiumHeader(
+                                      t("mutant_therioforms"),
+                                      () =>
+                                        setMnemoCompendiumTarget({
+                                          mnemoId: mnemo.id,
+                                          spellType: "therioform",
+                                          label: t("mutant_therioforms"),
+                                          className: mnemo.class,
+                                        }),
+                                    )}
+                                    {(mnemoSpellTypeHeaders.therioform = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "pilot-vehicle" &&
+                                !mnemoSpellTypeHeaders.pilot && (
+                                  <>
+                                    <CustomHeader2
+                                      headerText={t("pilot_vehicles")}
+                                    />
+                                    {(mnemoSpellTypeHeaders.pilot = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "magiseed" &&
+                                !mnemoSpellTypeHeaders.magiseed && (
+                                  <>
+                                    {renderCompendiumHeader(
+                                      t("magiseed_garden"),
+                                      () =>
+                                        setMnemoCompendiumTarget({
+                                          mnemoId: mnemo.id,
+                                          spellType: "magiseed",
+                                          label: t("magiseed_garden"),
+                                          className: mnemo.class,
+                                        }),
+                                    )}
+                                    {(mnemoSpellTypeHeaders.magiseed = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "cooking" &&
+                                !mnemoSpellTypeHeaders.cooking && (
+                                  <>
+                                    <CustomHeader2
+                                      headerText={t("gourmet_cookbook")}
+                                    />
+                                    {(mnemoSpellTypeHeaders.cooking = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "invocation" &&
+                                !mnemoSpellTypeHeaders.invocation && (
+                                  <>
+                                    <CustomHeader2
+                                      headerText={t("invoker_invocation")}
+                                    />
+                                    {(mnemoSpellTypeHeaders.invocation = true)}
+                                  </>
+                                )}
+                              {spell.spellType === "deck" &&
+                                !mnemoSpellTypeHeaders.deck && (
+                                  <>
+                                    <CustomHeader2
+                                      headerText={t("ace_deck_of_cards")}
+                                    />
+                                    {(mnemoSpellTypeHeaders.deck = true)}
+                                  </>
+                                )}
+                            </div>
+                            {spell.spellType === "default" && (
+                              <SpellDefault
+                                spellName={spell.name}
+                                mp={spell.mp}
+                                maxTargets={spell.maxTargets}
+                                targetDesc={spell.targetDesc}
+                                duration={spell.duration}
+                                description={spell.description}
+                                onEdit={() =>
+                                  handleEditDefaultSpell(spell, mnemo.id, index)
+                                }
+                                isEditMode={isEditMode}
+                                isOffensive={spell.isOffensive}
+                                attr1={spell.attr1}
+                                attr2={spell.attr2}
+                                isMagisphere={spell.isMagisphere || false}
+                                showInPlayerSheet={
+                                  spell.showInPlayerSheet ||
+                                  spell.showInPlayerSheet === undefined
+                                }
+                                index={index}
+                                key={index}
+                              />
+                            )}
+                            {(spell.spellType === "arcanist" ||
+                              spell.spellType === "arcanist-rework") && (
+                              <SpellArcanist
+                                arcana={spell}
+                                rework={spell.spellType === "arcanist-rework"}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditArcanistSpell(
+                                    spell,
+                                    mnemo.id,
+                                    index,
+                                  )
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "tinkerer-alchemy" && (
+                              <SpellTinkererAlchemy
+                                alchemy={spell}
+                                key={index}
+                                onEditRank={() =>
+                                  handleEditAlchemyRank(spell, mnemo.id, index)
+                                }
+                                onEditTargets={() =>
+                                  handleEditAlchemyTarget(
+                                    spell,
+                                    mnemo.id,
+                                    index,
+                                  )
+                                }
+                                onEditEffects={() =>
+                                  handleEditAlchemyEffects(
+                                    spell,
+                                    mnemo.id,
+                                    index,
+                                  )
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "tinkerer-infusion" && (
+                              <SpellTinkererInfusion
+                                infusion={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditInfusionSpell(
+                                    spell,
+                                    mnemo.id,
+                                    index,
+                                  )
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "tinkerer-magitech" && (
+                              <SpellTinkererMagitech
+                                magitech={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditMagitechRank(spell, mnemo.id, index)
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "gamble" && (
+                              <SpellEntropistGamble
+                                gamble={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditGambleSpell(spell, mnemo.id, index)
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "magichant" && (
+                              <SpellChanter
+                                magichant={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditChantSpell(spell, mnemo.id, index)
+                                }
+                                onEditKeys={() =>
+                                  handleEditChantKey(spell, mnemo.id, index)
+                                }
+                                onEditTones={() =>
+                                  handleEditChantTone(spell, mnemo.id, index)
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "symbol" && (
+                              <SpellSymbolist
+                                symbol={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditSymbol(spell, mnemo.id, index)
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "dance" && (
+                              <SpellDancer
+                                dance={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditDancer(spell, mnemo.id, index)
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "gift" && (
+                              <SpellGift
+                                gift={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditGift(spell, mnemo.id, index)
+                                }
+                                onClockChange={(newValue) => {
+                                  updateMnemoSpell(mnemo.id, index, {
+                                    ...spell,
+                                    clock: newValue,
+                                  });
+                                }}
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "therioform" && (
+                              <SpellMutant
+                                mutant={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditMutant(spell, mnemo.id, index)
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "pilot-vehicle" && (
+                              <SpellPilot
+                                pilot={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditPilot(spell, mnemo.id, index)
+                                }
+                                onModuleChange={(
+                                  vehicleIndex,
+                                  moduleIndex,
+                                  field,
+                                  value,
+                                ) => {
+                                  const tempState = {
+                                    currentVehicles: spell.vehicles,
+                                    showInPlayerSheet: spell.showInPlayerSheet,
+                                  };
+                                  const newState = vehicleReducer(tempState, {
+                                    type: VEHICLE_ACTIONS.UPDATE_MODULE,
+                                    payload: {
+                                      vehicleIndex,
+                                      moduleIndex,
+                                      field,
+                                      value,
+                                      t,
+                                    },
+                                  });
+                                  updateMnemoSpell(mnemo.id, index, {
+                                    ...spell,
+                                    vehicles: newState.currentVehicles,
+                                  });
+                                }}
+                                onVehicleChange={(
+                                  vehicleIndex,
+                                  field,
+                                  value,
+                                ) => {
+                                  const updatedVehicles = [...spell.vehicles];
+                                  if (field === "enabled")
+                                    updatedVehicles.forEach((v, i) => {
+                                      v.enabled =
+                                        i === vehicleIndex ? value : false;
+                                    });
+                                  else
+                                    updatedVehicles[vehicleIndex] = {
+                                      ...updatedVehicles[vehicleIndex],
+                                      [field]: value,
+                                    };
+                                  updateMnemoSpell(mnemo.id, index, {
+                                    ...spell,
+                                    vehicles: updatedVehicles,
+                                  });
+                                }}
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "magiseed" && (
+                              <SpellMagiseed
+                                magiseed={spell}
+                                key={index}
+                                onEdit={() =>
+                                  handleEditMagiseed(spell, mnemo.id, index)
+                                }
+                                onMagiseedChange={(newMagiseed) =>
+                                  updateMnemoSpell(mnemo.id, index, {
+                                    ...spell,
+                                    currentMagiseed: newMagiseed,
+                                  })
+                                }
+                                onGrowthClockChange={(newValue) =>
+                                  updateMnemoSpell(mnemo.id, index, {
+                                    ...spell,
+                                    growthClock: newValue,
+                                  })
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "cooking" && (
+                              <SpellGourmet
+                                spell={spell}
+                                key={`${mnemo.id}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbookEffects)}`}
+                                onEdit={() =>
+                                  handleEditGourmet(spell, mnemo.id, index)
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "invocation" && (
+                              <SpellInvoker
+                                invoker={spell}
+                                key={`${mnemo.id}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.activeWellsprings)}`}
+                                onEdit={() =>
+                                  handleEditInvoker(spell, mnemo.id, index)
+                                }
+                                onWellspringToggle={(wellspringName) => {
+                                  const currentWellsprings =
+                                    spell.activeWellsprings || [];
+                                  const hasInner =
+                                    spell.innerWellspring &&
+                                    spell.chosenWellspring;
+                                  if (
+                                    hasInner &&
+                                    spell.chosenWellspring === wellspringName
+                                  )
+                                    return;
+                                  let newWellsprings;
+                                  if (
+                                    currentWellsprings.includes(wellspringName)
+                                  ) {
+                                    newWellsprings = currentWellsprings.filter(
+                                      (w) => w !== wellspringName,
+                                    );
+                                  } else if (currentWellsprings.length < 2) {
+                                    newWellsprings = [
+                                      ...currentWellsprings,
+                                      wellspringName,
+                                    ];
+                                  } else {
+                                    newWellsprings = [
+                                      currentWellsprings[1],
+                                      wellspringName,
+                                    ];
+                                  }
+                                  updateMnemoSpell(mnemo.id, index, {
+                                    ...spell,
+                                    activeWellsprings: newWellsprings,
+                                  });
+                                }}
+                                player={player}
+                                index={index}
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                            {spell.spellType === "deck" && (
+                              <SpellDeck
+                                deck={spell}
+                                key={`${mnemo.id}-deck-${index}-${spell.spellName}`}
+                                onEdit={() =>
+                                  handleEditDeckSpell(spell, mnemo.id, index)
+                                }
+                                onDeckUpdate={(updatedDeck) =>
+                                  updateMnemoSpell(mnemo.id, index, {
+                                    ...spell,
+                                    ...updatedDeck,
+                                  })
+                                }
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                          </React.Fragment>
+                        ))}
+                    </Grid>
+                  </Grid>
+                </Paper>
+                <Divider sx={{ my: 2 }} />
+              </React.Fragment>
+            );
+          })}
+
       <SpellDefaultModal
         isEditMode={isEditMode}
         open={isOpen("spellDefault")}
@@ -2326,6 +3225,25 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         initialType="player-spells"
         restrictToTypes={["player-spells"]}
         initialSpellClass={systemCompendiumTarget?.className || ""}
+        context="player"
+      />
+      <CompendiumViewerModal
+        open={mnemoCompendiumTarget !== null}
+        onClose={() => setMnemoCompendiumTarget(null)}
+        onAddItem={(item) => {
+          const { mnemoId, spellType, label } = mnemoCompendiumTarget;
+          if (item?.spellType !== spellType) {
+            if (window.electron)
+              window.electron.alert(`Please select a ${label} spell.`);
+            else alert(`Please select a ${label} spell.`);
+            return;
+          }
+          addMnemoSpellFromCompendium(mnemoId, item);
+          setMnemoCompendiumTarget(null);
+        }}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        initialSpellClass={mnemoCompendiumTarget?.className || ""}
         context="player"
       />
     </>

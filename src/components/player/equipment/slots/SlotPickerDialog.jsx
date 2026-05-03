@@ -21,6 +21,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import LockIcon from "@mui/icons-material/Lock";
 import CloseIcon from "@mui/icons-material/Close";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { useTranslate } from "../../../../translation/translate";
 import { resolveEffectiveSlot } from "./equipmentSlots";
 import {
@@ -29,21 +30,33 @@ import {
   getEquipConflicts,
 } from "./loadoutActions";
 import attributes from "../../../../libs/attributes";
+import { calculateCustomWeaponStats } from "../../common/playerCalculations";
 
-function moduleStatLine(module) {
+function moduleStatLine(module, t) {
   if (!module) return "-";
   if (module.type === "pilot_module_weapon") {
     if (module.isShield)
       return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-    const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
-    const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
+    const a1 = attributes[module.att1]?.shortcaps ?? module.att1 ?? "";
+    const a2 = attributes[module.att2]?.shortcaps ?? module.att2 ?? "";
     const hands = module.cumbersome ? "2H" : "1H";
-    return `${a1}+${a2} / ${module.damage ?? "?"} ${module.damageType ?? ""} / ${hands}`.trim();
+    const parts = [];
+    if (a1 && a2) {
+      parts.push(`${a1}+${a2}`);
+    } else if (module.category) {
+      parts.push(t(module.category));
+    }
+    parts.push(`${module.damage ?? "?"} ${t(module.damageType ?? "")}`.trim());
+    if (module.range) parts.push(t(module.range));
+    parts.push(hands);
+    return parts.join(" / ");
   }
   if (module.type === "pilot_module_armor") {
     return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
   }
-  return module.description ? module.description.slice(0, 40) : "-";
+  if (module.description) return t(module.description).slice(0, 40);
+  if (module.category) return t(module.category);
+  return "-";
 }
 
 // Customizations that make a custom weapon martial
@@ -78,6 +91,11 @@ export default function SlotPickerDialog({
   onClearOtherHandModule,
 }) {
   const { t } = useTranslate();
+  const getModuleLabel = (module) =>
+    module?.customName ||
+    (module?.name ? t(module.name) : "") ||
+    (module?.category ? t(module.category) : "") ||
+    t("Unnamed");
   const [hoveredCandidate, setHoveredCandidate] = useState(null);
   const [pendingCandidate, setPendingCandidate] = useState(null);
 
@@ -198,6 +216,27 @@ export default function SlotPickerDialog({
       const hands = w.hands === 2 || w.isTwoHand ? "2H" : "1H";
       return `${atts} / ${dmg} ${t(w.type || "")} / ${hands}`;
     };
+    const formatCustomWeapon = (w) => {
+      const isSecondary = w.activeForm === "secondary";
+      const stats = calculateCustomWeaponStats(w, isSecondary);
+      const accuracyCheck = isSecondary
+        ? w.secondSelectedAccuracyCheck
+        : w.accuracyCheck;
+      const damageType = isSecondary ? w.secondSelectedType : w.type;
+      const range = isSecondary ? w.secondSelectedRange : w.range;
+      const att1 =
+        attributes[accuracyCheck?.att1]?.shortcaps ??
+        accuracyCheck?.att1 ??
+        "?";
+      const att2 =
+        attributes[accuracyCheck?.att2]?.shortcaps ??
+        accuracyCheck?.att2 ??
+        "?";
+      const hands = "2H";
+      const rangeLabel =
+        range === "weapon_range_ranged" ? t("Ranged") : t("Melee");
+      return `${att1}+${att2} / ${stats.damage ?? "?"} ${t(damageType || "")} / ${rangeLabel} / ${hands}`;
+    };
 
     switch (slot) {
       case "mainHand": {
@@ -208,13 +247,19 @@ export default function SlotPickerDialog({
           item: w,
           index: i,
         }));
-        const customs = (inv.customWeapons ?? []).map((w, i) => ({
-          label: w.name,
-          sub: w.category,
-          source: "customWeapons",
-          item: w,
-          index: i,
-        }));
+        const customs = (inv.customWeapons ?? []).map((w, i) => {
+          const isSecondary = w.activeForm === "secondary";
+          const label = isSecondary
+            ? w.secondWeaponName || w.name || t("Unnamed")
+            : w.name || t("Unnamed");
+          return {
+            label,
+            sub: formatCustomWeapon(w),
+            source: "customWeapons",
+            item: w,
+            index: i,
+          };
+        });
         const shields = hasDualShieldBearer
           ? (inv.shields ?? []).map((s, i) => ({
               label: s.name,
@@ -295,6 +340,36 @@ export default function SlotPickerDialog({
       if (c.inOtherSlot && !isUnarmedStrike(c)) return false;
       return true;
     });
+  const getCandidateSubText = (candidate) => candidate?.sub;
+  const isTransformingCustomWeapon = (candidate) =>
+    candidate?.source === "customWeapons" &&
+    (candidate?.item?.customizations ?? []).some(
+      (c) => c.name === "weapon_customization_transforming",
+    );
+
+  const handleSwapCustomWeaponForm = (candidate) => {
+    if (
+      candidate?.source !== "customWeapons" ||
+      candidate?.index === undefined ||
+      candidate?.index === null
+    )
+      return;
+    setPlayer((prev) => {
+      const prevEq0 = prev?.equipment?.[0] ?? {};
+      const updatedCustomWeapons = [...(prevEq0.customWeapons ?? [])];
+      const cw = updatedCustomWeapons[candidate.index];
+      if (!cw) return prev;
+      updatedCustomWeapons[candidate.index] = {
+        ...cw,
+        activeForm: cw.activeForm === "secondary" ? "primary" : "secondary",
+      };
+      const eq0New = { ...prevEq0, customWeapons: updatedCustomWeapons };
+      const equipment = prev?.equipment
+        ? [eq0New, ...prev.equipment.slice(1)]
+        : [eq0New];
+      return { ...prev, equipment };
+    });
+  };
 
   const candidateConflicts = useMemo(() => {
     const map = new Map();
@@ -414,7 +489,7 @@ export default function SlotPickerDialog({
                         fontWeight: 700,
                       }}
                     >
-                      {previewModule.customName || t(previewModule.name)}
+                      {getModuleLabel(previewModule)}
                     </Typography>
                     <Typography
                       variant="caption"
@@ -424,7 +499,7 @@ export default function SlotPickerDialog({
                         display: "block",
                       }}
                     >
-                      {moduleStatLine(previewModule)}
+                      {moduleStatLine(previewModule, t)}
                     </Typography>
                     {previewModule.description && (
                       <Typography
@@ -502,8 +577,8 @@ export default function SlotPickerDialog({
                           />
                         </ListItemIcon>
                         <ListItemText
-                          primary={m.customName || t(m.name)}
-                          secondary={moduleStatLine(m)}
+                          primary={getModuleLabel(m)}
+                          secondary={moduleStatLine(m, t)}
                           primaryTypographyProps={{
                             variant: "body2",
                             fontWeight: isPending || isActive ? 700 : 400,
@@ -632,7 +707,7 @@ export default function SlotPickerDialog({
                         display: "block",
                       }}
                     >
-                      {previewCandidate.sub}
+                      {getCandidateSubText(previewCandidate)}
                     </Typography>
                     {previewCandidate.item?.quality &&
                       previewCandidate.item.quality !==
@@ -649,7 +724,7 @@ export default function SlotPickerDialog({
                             overflow: "hidden",
                           }}
                         >
-                          {previewCandidate.item.quality}
+                          {t(previewCandidate.item.quality)}
                         </Typography>
                       )}
                     {candidateConflicts.has(previewCandidate) && (
@@ -797,7 +872,7 @@ export default function SlotPickerDialog({
                                 )}
                               </Box>
                             }
-                            secondary={c.sub}
+                            secondary={getCandidateSubText(c)}
                             primaryTypographyProps={{
                               variant: "body2",
                               fontWeight: isPending || isEquipped ? 700 : 400,
@@ -805,6 +880,23 @@ export default function SlotPickerDialog({
                             }}
                             secondaryTypographyProps={{ variant: "caption" }}
                           />
+                          {isChecked && isTransformingCustomWeapon(c) && (
+                            <Tooltip
+                              title={t("weapon_customization_swap_form")}
+                            >
+                              <IconButton
+                                size="small"
+                                sx={{ ml: 0.5 }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSwapCustomWeaponForm(c);
+                                }}
+                                onDoubleClick={(e) => e.stopPropagation()}
+                              >
+                                <SwapHorizIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </ListItemButton>
                       </ListItem>
                     );

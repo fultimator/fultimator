@@ -226,6 +226,38 @@ export default function useSphereBank(player, setPlayer) {
     return (mnemo.lvl ?? 1) - usedLevels;
   }, []);
 
+  const patchMnemoSpells = useCallback(
+    (id, updater) => {
+      patchBank("mnemospheres", (arr) =>
+        arr.map((mnemo) =>
+          mnemo.id !== id
+            ? mnemo
+            : { ...mnemo, spells: updater(mnemo.spells ?? []) },
+        ),
+      );
+    },
+    [patchBank],
+  );
+
+  const addMnemoSpell = useCallback(
+    (id, spell) => patchMnemoSpells(id, (arr) => [...arr, spell]),
+    [patchMnemoSpells],
+  );
+
+  const updateMnemoSpell = useCallback(
+    (id, index, spell) =>
+      patchMnemoSpells(id, (arr) =>
+        arr.map((s, i) => (i === index ? spell : s)),
+      ),
+    [patchMnemoSpells],
+  );
+
+  const deleteMnemoSpell = useCallback(
+    (id, index) =>
+      patchMnemoSpells(id, (arr) => arr.filter((_, i) => i !== index)),
+    [patchMnemoSpells],
+  );
+
   return {
     mnemospheres,
     hoplospheres,
@@ -238,5 +270,8 @@ export default function useSphereBank(player, setPlayer) {
     investMnemoLevel,
     refundMnemoLevel,
     getMnemoAvailableLevels,
+    addMnemoSpell,
+    updateMnemoSpell,
+    deleteMnemoSpell,
   };
 }
