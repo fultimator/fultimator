@@ -57,8 +57,9 @@ export default function PlayerCustomWeapons({
 
     const isTechnospheresStandard =
       player.settings?.optionalRules?.technospheres &&
-      (player.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-        "standard";
+      ["standard", "hoplospheres"].includes(
+        player.settings?.optionalRules?.technospheresVariant ?? "standard",
+      );
     if (isTechnospheresStandard) return true;
 
     const isRanged = customWeapon.range === "weapon_range_ranged";

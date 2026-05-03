@@ -694,8 +694,9 @@ export default function PlayerEquipment({
     if (!item.martial) return true;
     const isTechnospheresStandard =
       player.settings?.optionalRules?.technospheres &&
-      (player.settings?.optionalRules?.technospheresVariant ?? "standard") ===
-        "standard";
+      ["standard", "hoplospheres"].includes(
+        player.settings?.optionalRules?.technospheresVariant ?? "standard",
+      );
     if (
       isTechnospheresStandard &&
       (item.equipType === "weapon" || item.equipType === "custom-weapon")
