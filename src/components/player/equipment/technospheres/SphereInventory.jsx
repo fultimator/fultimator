@@ -242,7 +242,10 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
           );
         }
       }
-      if (isIntegrated && eq0New.mnemoReceptacle?.includes(id)) {
+      if (
+        (isIntegrated || isMnemospheresOnly) &&
+        eq0New.mnemoReceptacle?.includes(id)
+      ) {
         eq0New.mnemoReceptacle = eq0New.mnemoReceptacle.filter(
           (sid) => sid !== id,
         );

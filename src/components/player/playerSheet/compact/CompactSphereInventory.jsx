@@ -815,7 +815,10 @@ export default function CompactSphereInventory({
           );
         }
       }
-      if (isIntegrated && eq0New.mnemoReceptacle?.includes(id)) {
+      if (
+        (isIntegrated || isMnemospheresOnly) &&
+        eq0New.mnemoReceptacle?.includes(id)
+      ) {
         eq0New.mnemoReceptacle = eq0New.mnemoReceptacle.filter(
           (sid) => sid !== id,
         );
@@ -1462,25 +1465,26 @@ export default function CompactSphereInventory({
           "mnemospheres",
         )}
 
-      {renderTable(
-        t("Hoplosphere Bank"),
-        hoplospheres.map((h) => (
-          <HoploRow
-            key={h.id}
-            hoplo={h}
-            player={player}
-            hoplospheres={hoplospheres}
-            isEditMode={isEditMode}
-            openRows={openRows.equipment}
-            toggleRow={(key) => toggleRow("equipment", key)}
-            onDelete={handleDeleteHoplo}
-            onUnslot={handleUnslot}
-            onSlotOpen={() => setSlotTarget(h)}
-          />
-        )),
-        () => setCreateHoploOpen(true),
-        "hoplospheres",
-      )}
+      {!isMnemospheresOnly &&
+        renderTable(
+          t("Hoplosphere Bank"),
+          hoplospheres.map((h) => (
+            <HoploRow
+              key={h.id}
+              hoplo={h}
+              player={player}
+              hoplospheres={hoplospheres}
+              isEditMode={isEditMode}
+              openRows={openRows.equipment}
+              toggleRow={(key) => toggleRow("equipment", key)}
+              onDelete={handleDeleteHoplo}
+              onUnslot={handleUnslot}
+              onSlotOpen={() => setSlotTarget(h)}
+            />
+          )),
+          () => setCreateHoploOpen(true),
+          "hoplospheres",
+        )}
 
       <MnemosphereCreateDialog
         open={createMnemoOpen}
