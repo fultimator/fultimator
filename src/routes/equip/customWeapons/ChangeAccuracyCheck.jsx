@@ -3,7 +3,7 @@ import { useTranslate } from "../../../translation/translate";
 import { accuracyChecks } from "./libs.jsx";
 import { attrNoTranslation } from "../../../libs/attributes";
 
-function ChangeAccuracyCheck({ value, onChange }) {
+function ChangeAccuracyCheck({ value, onChange, disabled }) {
   const { t } = useTranslate();
 
   const handleChange = (event) => {
@@ -20,6 +20,7 @@ function ChangeAccuracyCheck({ value, onChange }) {
         value={`${value.att1}_${value.att2}`}
         label={t("weapon_accuracy_check")}
         onChange={handleChange}
+        disabled={disabled}
       >
         {accuracyChecks.map((check, index) => (
           <MenuItem key={index} value={`${check.att1}_${check.att2}`}>

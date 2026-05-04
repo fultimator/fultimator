@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { TypePlayer } from "../types/Players";
+import { TypePlayer, Vehicle } from "../types/Players";
 import {
   equipItemToSlot,
   clearSlotAction,
@@ -42,7 +42,7 @@ interface LoadoutStore {
   // Vehicle enter / exit
   toggleVehicle: () => void;
   saveVehicles: (updatedPilot: {
-    vehicles: unknown[];
+    vehicles: Vehicle[];
     showInPlayerSheet?: boolean;
   }) => void;
 

@@ -3,6 +3,7 @@ import {
   EquippedSlots,
   SlotRef,
   AnyEquipmentItem,
+  type Mnemosphere,
   PlayerClass,
   Spells,
   VehicleModule,
@@ -12,6 +13,102 @@ import {
 } from "../../../../types/Players";
 import { resolveEffectiveSlot, syncSlots } from "./equipmentSlots";
 import type { PilotSpellInfo } from "./loadoutSelectors";
+
+// Technosphere conflict detection
+
+function getMnemosphereSkillKeys(
+  player: TypePlayer,
+  excludeSlot: string,
+): Set<string> {
+  const keys = new Set<string>();
+  const eq0 = player.equipment?.[0];
+  if (!eq0) return keys;
+
+  // From innate classes
+  const innateClasses: string[] =
+    player.settings?.optionalRules?.innateClasses ?? [];
+  for (const cls of player.classes ?? []) {
+    if (innateClasses.includes(cls.name)) {
+      for (const skill of cls.skills ?? []) {
+        if (skill.specialSkill) keys.add(skill.specialSkill);
+      }
+    }
+  }
+
+  // From mnemospheres in all OTHER equipped slots
+  const slotKeys = (
+    ["mainHand", "offHand", "armor", "accessory"] as const
+  ).filter((s) => s !== excludeSlot);
+
+  for (const slotKey of slotKeys) {
+    const ref = player.equippedSlots?.[slotKey as keyof EquippedSlots];
+    if (!ref) continue;
+    const arr = (eq0[ref.source] as AnyEquipmentItem[] | undefined) ?? [];
+    const item =
+      ref.index !== undefined
+        ? arr[ref.index]
+        : arr.find((i) => i.name === ref.name);
+    if (!item || !("slotted" in item)) continue;
+    for (const id of item.slotted ?? []) {
+      const mnemo = (eq0.mnemospheres ?? []).find(
+        (m: Mnemosphere) => m.id === id,
+      );
+      if (!mnemo) continue;
+      for (const skill of mnemo.skills ?? []) {
+        if (skill.specialSkill) keys.add(skill.specialSkill);
+      }
+      for (const heroic of mnemo.heroic ?? []) {
+        if (heroic.specialSkill) keys.add(heroic.specialSkill);
+      }
+    }
+  }
+
+  return keys;
+}
+
+function checkMnemosphereConflict(
+  player: TypePlayer,
+  slot: string,
+  candidate: PickerCandidate,
+): string[] {
+  const isTechnospheres =
+    player.settings?.optionalRules?.technospheres ?? false;
+  if (!isTechnospheres) return [];
+
+  if (!("slotted" in candidate.item) || !candidate.item.slotted?.length)
+    return [];
+
+  const eq0 = player.equipment?.[0];
+  const existing = getMnemosphereSkillKeys(player, slot);
+  const conflicts: string[] = [];
+
+  for (const id of candidate.item.slotted) {
+    const mnemo = (eq0?.mnemospheres ?? []).find(
+      (m: Mnemosphere) => m.id === id,
+    );
+    if (!mnemo) continue;
+    for (const skill of mnemo.skills ?? []) {
+      if (skill.specialSkill && existing.has(skill.specialSkill)) {
+        conflicts.push(skill.name);
+      }
+    }
+    for (const heroic of mnemo.heroic ?? []) {
+      if (heroic.specialSkill && existing.has(heroic.specialSkill)) {
+        conflicts.push(heroic.name);
+      }
+    }
+  }
+
+  return conflicts;
+}
+
+export function getEquipConflicts(
+  player: TypePlayer,
+  slot: string,
+  candidate: PickerCandidate,
+): string[] {
+  return checkMnemosphereConflict(player, slot, candidate);
+}
 
 // Types
 
@@ -157,6 +254,11 @@ export function equipItemToSlot(
     updated = unequipRef(updated, updated.equippedSlots?.offHand);
   }
 
+  // Block equip if candidate's mnemospheres conflict with existing equipped spheres.
+  // Use `updated` (post-unequip) so the displaced item's spheres don't falsely conflict.
+  const conflicts = checkMnemosphereConflict(updated, slot, candidate);
+  if (conflicts.length > 0) return player;
+
   updated = patchInv(updated, candidate.source, (arr) =>
     arr.map((it, idx) => {
       const match =
@@ -191,8 +293,7 @@ export function equipItemToSlot(
     },
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings = (updated as any).settings ?? {};
+  const settings = updated.settings ?? {};
   if (settings.autoEquipUnarmed && isHandSlot && !isTwoHand) {
     const unarmed = resolveUnarmedRef(
       updated,
@@ -229,8 +330,7 @@ export function clearSlotAction(player: TypePlayer, slot: string): TypePlayer {
 
   updated = syncSlots(updated);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings = (updated as any).settings ?? {};
+  const settings = updated.settings ?? {};
   if (
     settings.autoEquipUnarmed &&
     (slot === "mainHand" || slot === "offHand")

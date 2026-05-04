@@ -1,17 +1,7 @@
 import React, { useRef } from "react";
 import { useTheme } from "@mui/material/styles";
-import {
-  Paper,
-  Grid,
-  Button,
-  Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-} from "@mui/material";
-import { UploadFile, WarningAmber } from "@mui/icons-material";
+import { Paper, Grid, Button, Divider } from "@mui/material";
+import { UploadFile } from "@mui/icons-material";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import { useTranslate } from "../../../translation/translate";
 import useUploadJSON from "../../../hooks/useUploadJSON";
@@ -27,6 +17,7 @@ import PlayerArmorModal from "./armor/PlayerArmorModal";
 import PlayerShieldModal from "./shields/PlayerShieldModal";
 import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import SphereInventory from "./technospheres/SphereInventory";
 
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
 import { deriveVehicleSlots, validateSlots } from "./slots/equipmentSlots";
@@ -36,6 +27,12 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const isSlotsVariant =
+    isTechnospheres && technospheresVariant !== "mnemospheres";
 
   const [openNewWeapon, setOpenNewWeapon] = React.useState(false);
   const [editWeaponIndex, setEditWeaponIndex] = React.useState(null);
@@ -70,12 +67,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   const inv = player.equipment?.[0] || {};
 
-  const MARTIAL_CUSTOMIZATIONS = [
-    "weapon_customization_quick",
-    "weapon_customization_magicdefenseboost",
-    "weapon_customization_powerful",
-  ];
-
   // Helper: update one source array inside equipment[0] and return a new player.
   const patchInv = (p, source, updater) => {
     const eq0 = {
@@ -84,45 +75,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
     };
     const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
     return { ...p, equipment };
-  };
-
-  const hasMartialProficiency = (itemType, item) => {
-    if (!item) return false;
-
-    let isMartial = false;
-    if (itemType === "customWeapons") {
-      isMartial = (item.customizations ?? []).some((c) =>
-        MARTIAL_CUSTOMIZATIONS.includes(c.name),
-      );
-    } else {
-      isMartial = !!item.martial;
-    }
-    if (!isMartial) return true;
-
-    for (const cls of player?.classes ?? []) {
-      const martials = cls.benefits?.martials;
-      if (!martials) continue;
-      const shieldProf = !!(martials.shield || martials.shields);
-      if (itemType === "weapons" && item.melee && martials.melee) return true;
-      if (itemType === "weapons" && item.ranged && martials.ranged) return true;
-      if (
-        itemType === "customWeapons" &&
-        item.range === "weapon_range_ranged" &&
-        martials.ranged
-      )
-        return true;
-      if (
-        itemType === "customWeapons" &&
-        item.range !== "weapon_range_ranged" &&
-        martials.melee
-      )
-        return true;
-      if (itemType === "shields" && shieldProf) return true;
-      if (itemType === "armor" && martials.armor) return true;
-      if (itemType === "accessories") return true;
-    }
-
-    return false;
   };
 
   // For add/edit/delete operations: preserve existing equippedSlots (only clear slots
@@ -636,23 +588,25 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                 />
               </Grid>
               <Grid container sx={{ justifyContent: "center" }} spacing={2}>
-                <Grid
-                  container
-                  sx={{ justifyContent: "center" }}
-                  size={{
-                    xs: 6,
-                    sm: 2.4,
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    onClick={handleOpenNewWeapon}
-                    startIcon={<MeleeIcon />}
-                    size="small"
+                {!isSlotsVariant && (
+                  <Grid
+                    container
+                    sx={{ justifyContent: "center" }}
+                    size={{
+                      xs: 6,
+                      sm: 2.4,
+                    }}
                   >
-                    {t("Add Weapon")}
-                  </Button>
-                </Grid>
+                    <Button
+                      variant="contained"
+                      onClick={handleOpenNewWeapon}
+                      startIcon={<MeleeIcon />}
+                      size="small"
+                    >
+                      {t("Add Weapon")}
+                    </Button>
+                  </Grid>
+                )}
                 <Grid
                   container
                   sx={{ justifyContent: "center" }}
@@ -688,24 +642,26 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
                     {t("Add Armor")}
                   </Button>
                 </Grid>
-                <Grid
-                  container
-                  sx={{ justifyContent: "center" }}
-                  size={{
-                    xs: 6,
-                    sm: 2.4,
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    onClick={handleOpenNewShield}
-                    startIcon={<ShieldIcon />}
-                    disabled={inv.shields && inv.shields.length >= 10}
-                    size="small"
+                {!isSlotsVariant && (
+                  <Grid
+                    container
+                    sx={{ justifyContent: "center" }}
+                    size={{
+                      xs: 6,
+                      sm: 2.4,
+                    }}
                   >
-                    {t("Add Shield")}
-                  </Button>
-                </Grid>
+                    <Button
+                      variant="contained"
+                      onClick={handleOpenNewShield}
+                      startIcon={<ShieldIcon />}
+                      disabled={inv.shields && inv.shields.length >= 10}
+                      size="small"
+                    >
+                      {t("Add Shield")}
+                    </Button>
+                  </Grid>
+                )}
                 <Grid
                   container
                   sx={{ justifyContent: "center" }}
@@ -771,19 +727,22 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           <Divider sx={{ my: 2 }} />
         </>
       ) : null}
-      <PlayerWeapons
-        player={player}
-        weapons={inv.weapons || []}
-        onEditWeapon={handleEditWeapon}
-        onDeleteWeapon={handleDeleteWeapon}
-        onEquipWeapon={handleEquipWeapon}
-        onUnequipWeapon={handleUnequipWeapon}
-        onAddItem={handleOpenNewWeapon}
-        isEditMode={isEditMode}
-        onOpenCompendium={
-          isEditMode ? () => setOpenWeaponCompendium(true) : undefined
-        }
-      />
+      {!isSlotsVariant && (
+        <PlayerWeapons
+          player={player}
+          weapons={inv.weapons || []}
+          onEditWeapon={handleEditWeapon}
+          onDeleteWeapon={handleDeleteWeapon}
+          onEquipWeapon={handleEquipWeapon}
+          onUnequipWeapon={handleUnequipWeapon}
+          onAddItem={handleOpenNewWeapon}
+          isEditMode={isEditMode}
+          onOpenCompendium={
+            isEditMode ? () => setOpenWeaponCompendium(true) : undefined
+          }
+        />
+      )}
+      {!isSlotsVariant && <Divider sx={{ my: 2 }} />}
       <PlayerCustomWeapons
         player={player}
         customWeapons={inv.customWeapons || []}
@@ -798,6 +757,7 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         }
         isEditMode={isEditMode}
       />
+      <Divider sx={{ my: 2 }} />
       <PlayerArmor
         player={player}
         armor={inv.armor || []}
@@ -810,19 +770,25 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           isEditMode ? () => setOpenArmorCompendium(true) : undefined
         }
       />
-      <PlayerShields
-        player={player}
-        shields={inv.shields || []}
-        onEditShield={handleEditShield}
-        onDeleteShield={handleDeleteShield}
-        onEquipShield={handleEquipShield}
-        onUnequipShield={handleUnequipShield}
-        onAddItem={handleOpenNewShield}
-        isEditMode={isEditMode}
-        onOpenCompendium={
-          isEditMode ? () => setOpenShieldCompendium(true) : undefined
-        }
-      />
+      {!isSlotsVariant && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <PlayerShields
+            player={player}
+            shields={inv.shields || []}
+            onEditShield={handleEditShield}
+            onDeleteShield={handleDeleteShield}
+            onEquipShield={handleEquipShield}
+            onUnequipShield={handleUnequipShield}
+            onAddItem={handleOpenNewShield}
+            isEditMode={isEditMode}
+            onOpenCompendium={
+              isEditMode ? () => setOpenShieldCompendium(true) : undefined
+            }
+          />
+        </>
+      )}
+      <Divider sx={{ my: 2 }} />
       <PlayerAccessories
         player={player}
         accessories={inv.accessories || []}
@@ -835,16 +801,29 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         }
         isEditMode={isEditMode}
       />
+      {isTechnospheres && (
+        <>
+          <Divider sx={{ my: 2 }} />
+          <SphereInventory
+            player={player}
+            setPlayer={setPlayer}
+            isEditMode={isEditMode}
+            advancement={player?.settings?.advancement ?? false}
+          />
+        </>
+      )}
       {/* Modals */}
-      <PlayerWeaponModal
-        open={openNewWeapon}
-        onClose={handleCloseNewWeapon}
-        editWeaponIndex={editWeaponIndex}
-        weapon={weapon}
-        setWeapon={setWeapon}
-        onAddWeapon={handleSaveWeapon}
-        onDeleteWeapon={handleDeleteWeapon}
-      />
+      {!isSlotsVariant && (
+        <PlayerWeaponModal
+          open={openNewWeapon}
+          onClose={handleCloseNewWeapon}
+          editWeaponIndex={editWeaponIndex}
+          weapon={weapon}
+          setWeapon={setWeapon}
+          onAddWeapon={handleSaveWeapon}
+          onDeleteWeapon={handleDeleteWeapon}
+        />
+      )}
       <PlayerCustomWeaponModal
         open={openNewCustomWeapon}
         onClose={handleCloseNewCustomWeapon}
@@ -853,6 +832,8 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         setCustomWeapon={setCustomWeapon}
         onAddCustomWeapon={handleSaveCustomWeapon}
         onDeleteCustomWeapon={handleDeleteCustomWeapon}
+        player={player}
+        setPlayer={setPlayer}
       />
       <PlayerArmorModal
         open={openNewArmor}
@@ -862,16 +843,20 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         setArmorPlayer={setArmor}
         onAddArmor={handleSaveArmor}
         onDeleteArmor={handleDeleteArmor}
+        player={player}
+        setPlayer={setPlayer}
       />
-      <PlayerShieldModal
-        open={openNewShields}
-        onClose={handleCloseNewShield}
-        editShieldIndex={editShieldIndex}
-        shield={shields}
-        setShield={setShields}
-        onAddShield={handleSaveShield}
-        onDeleteShield={handleDeleteShield}
-      />
+      {!isSlotsVariant && (
+        <PlayerShieldModal
+          open={openNewShields}
+          onClose={handleCloseNewShield}
+          editShieldIndex={editShieldIndex}
+          shield={shields}
+          setShield={setShields}
+          onAddShield={handleSaveShield}
+          onDeleteShield={handleDeleteShield}
+        />
+      )}
       <PlayerAccessoryModal
         open={openNewAccessory}
         onClose={handleCloseNewAccessory}

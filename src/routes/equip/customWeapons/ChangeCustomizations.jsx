@@ -22,11 +22,16 @@ function ChangeCustomizations({
   currentCustomizations,
   selectedCategory,
   isSecondForm,
+  rareAccuracyBonus,
 }) {
   const { t } = useTranslate();
 
   // Filter out already chosen customizations
   const availableCustomizations = customizations.filter((custom) => {
+    if (custom.name === "weapon_customization_accurate" && rareAccuracyBonus) {
+      return false;
+    }
+
     // Prevent selecting 'powerful' for arcane or dagger weapons
     if (
       custom.name === "weapon_customization_powerful" &&

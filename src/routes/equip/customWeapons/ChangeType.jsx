@@ -1,6 +1,14 @@
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Box,
+  ListItemText,
+} from "@mui/material";
+import types from "../../../libs/types";
 import { useTranslate } from "../../../translation/translate";
-import { types } from "./libs.jsx";
+import { TypeIcon } from "../../../components/types";
 
 function ChangeType({ value, onChange, disabled }) {
   const { t } = useTranslate();
@@ -16,9 +24,34 @@ function ChangeType({ value, onChange, disabled }) {
         onChange={onChange}
         disabled={disabled}
       >
-        {types.map((type) => (
-          <MenuItem key={type} value={type}>
-            {t(type)}
+        {Object.entries(types).map((key) => (
+          <MenuItem
+            key={key[0]}
+            value={key[0]}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              paddingY: "6px",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                minWidth: 70,
+              }}
+            >
+              <TypeIcon type={key[0]} />
+              <ListItemText
+                sx={{
+                  ml: 1,
+                  marginBottom: 0,
+                  textTransform: "capitalize",
+                }}
+              >
+                {key[1].long}
+              </ListItemText>
+            </Box>
           </MenuItem>
         ))}
       </Select>

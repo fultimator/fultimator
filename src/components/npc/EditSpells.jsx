@@ -123,6 +123,7 @@ export default function EditSpells({ npc, setNpc }) {
                 ...(prev.spells || []),
                 {
                   itemType: "spell",
+                  _packItemId: item._packItemId,
                   name: item.name,
                   attr1: item.attr1 || "insight",
                   attr2: item.attr2 || "will",

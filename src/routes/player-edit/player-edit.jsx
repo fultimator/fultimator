@@ -52,7 +52,6 @@ import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
 import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
 import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
-import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
 import GenericRolls from "../../components/player/playerSheet/GenericRolls";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
@@ -115,9 +114,12 @@ import {
   applyPostLoadTransforms,
 } from "../../components/player/playerTransforms";
 import classList from "../../libs/classes";
+import { syncAutomaticClassLevels } from "../../components/player/classes/classLevelUtils";
+import { buildMnemosphere } from "../../libs/mnemospheres";
 import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
 import CustomHeader from "../../components/common/CustomHeader";
 import SettingRow from "../../components/common/SettingRow";
+import MigrateFromCompendiumDialog from "../../components/player/settings/MigrateFromCompendiumDialog";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -129,8 +131,11 @@ export default function PlayerEdit() {
 
   const [isSpecialSkillsModalOpen, setIsSpecialSkillsModalOpen] =
     useState(false);
+  const [specialSkillsDraft, setSpecialSkillsDraft] = useState(null);
   const [isOptionalRulesModalOpen, setIsOptionalRulesModalOpen] =
     useState(false);
+  const [optionalRulesDraft, setOptionalRulesDraft] = useState(null);
+  const [isMigrateDialogOpen, setIsMigrateDialogOpen] = useState(false);
 
   let params = useParams(); // URL parameters hook
 
@@ -200,6 +205,7 @@ export default function PlayerEdit() {
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
   const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
   const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
+  const [mnemoLevelUpId, setMnemoLevelUpId] = useState(null);
 
   // Local players are always owned by whoever is running the app.
   // Cloud players require a matching Firebase UID.
@@ -308,13 +314,30 @@ export default function PlayerEdit() {
     let mpBonus = 0;
     let ipBonus = 0;
 
+    const innateClassesPE =
+      prevPlayer.settings?.optionalRules?.innateClasses ?? [];
+    const isTechnospheresPE =
+      prevPlayer.settings?.optionalRules?.technospheres ?? false;
+    const technospheresVariantPE =
+      prevPlayer.settings?.optionalRules?.technospheresVariant ?? "standard";
+    const usesInnateClassRulesPE =
+      isTechnospheresPE && technospheresVariantPE !== "hoplospheres";
     (prevPlayer.classes || []).forEach((cls) => {
-      if (cls.benefits) {
-        hpBonus += Number(cls.benefits.hpplus) || 0;
-        mpBonus += Number(cls.benefits.mpplus) || 0;
-        ipBonus += Number(cls.benefits.ipplus) || 0;
-      }
+      if (!cls.benefits) return;
+      if (usesInnateClassRulesPE && !innateClassesPE.includes(cls.name)) return;
+      hpBonus += Number(cls.benefits.hpplus) || 0;
+      mpBonus += Number(cls.benefits.mpplus) || 0;
+      ipBonus += Number(cls.benefits.ipplus) || 0;
     });
+
+    if (
+      isTechnospheresPE &&
+      (technospheresVariantPE === "standard" ||
+        technospheresVariantPE === "mnemospheres")
+    ) {
+      hpBonus += 5;
+      mpBonus += 5;
+    }
 
     if (prevPlayer.modifiers) {
       hpBonus += Number(prevPlayer.modifiers.hp) || 0;
@@ -372,40 +395,6 @@ export default function PlayerEdit() {
     );
   }, [recalculatePlayerMaxStats]);
 
-  // const checkEquipment = () => {
-  //   if (playerTemp) {
-  //     const hasDualShieldBearer = playerTemp.classes.some((playerClass) =>
-  //       playerClass.skills.some(
-  //         (skill) =>
-  //           skill.specialSkill === "Dual Shieldbearer" && skill.currentLvl === 1
-  //       )
-  //     );
-
-  //     const inv = playerTemp.equipment?.[0];
-  //     const equippedShields =
-  //       inv?.shields?.filter((shield) => isItemEquipped(playerTemp, shield)) || [];
-
-  //     if (!hasDualShieldBearer && equippedShields.length > 1) {
-  //       // Unequip all shields but the first one
-  //       setPlayerTemp((prevPlayer) => {
-  //         const inv = prevPlayer.equipment?.[0];
-  //         if (!inv) return prevPlayer;
-  //         const newShields = inv.shields.map((shield, index) => ({
-  //           ...shield,
-  //           isEquipped:
-  //             index === inv.shields.findIndex((s) => isItemEquipped(prevPlayer, s)),
-  //         }));
-
-  //         const updatedInv = { ...inv, shields: newShields };
-  //         return {
-  //           ...prevPlayer,
-  //           equipment: [updatedInv, ...(prevPlayer.equipment?.slice(1) ?? [])],
-  //         };
-  //       });
-  //     }
-  //   }
-  // };
-
   const handleBugDialogClose = () => {
     setIsBugDialogOpen(false);
   };
@@ -413,6 +402,9 @@ export default function PlayerEdit() {
   const settings = playerTemp?.settings ?? {};
   const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
   const advancement = settings.advancement ?? false;
+  const automaticClassLevel =
+    (settings.optionalRules?.technospheres ?? false) ||
+    settings.automaticClassLevel !== false;
   const autoEquipUnarmed = settings.autoEquipUnarmed ?? false;
 
   const inv = playerTemp?.equipment?.[0];
@@ -437,25 +429,60 @@ export default function PlayerEdit() {
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
     (playerTemp?.lvl || 0) < 50;
 
-  const handleConfirmLevelUpFromExp = () => {
-    setPlayerTemp((prevPlayer) => {
-      if (!prevPlayer) return prevPlayer;
+  const clearAllSlottedState = (player) => {
+    const eq0 = player?.equipment?.[0];
+    if (!eq0) return player;
+    const banks = [
+      "customWeapons",
+      "armor",
+      "weapons",
+      "shields",
+      "accessories",
+    ];
+    const eq0New = { ...eq0, mnemoReceptacle: [] };
+    for (const bank of banks) {
+      if (eq0New[bank]) {
+        eq0New[bank] = eq0New[bank].map((item) =>
+          item.slotted?.length ? { ...item, slotted: [] } : item,
+        );
+      }
+    }
+    const equipment = player.equipment
+      ? [eq0New, ...player.equipment.slice(1)]
+      : [eq0New];
+    return { ...player, equipment };
+  };
 
-      const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
-      if (currentExp < 10 || (prevPlayer.lvl || 0) >= 50) return prevPlayer;
-
-      const leveledPlayer = {
-        ...prevPlayer,
-        lvl: Math.min(50, (prevPlayer.lvl || 0) + 1),
-        info: {
-          ...prevPlayer.info,
-          exp: Math.max(0, currentExp - 10),
-        },
+  const applyMnemoLevelUp = (player, mnemoId) => {
+    if (!mnemoId) return player;
+    const eq0 = player.equipment?.[0];
+    if (!eq0) return player;
+    const mnemospheres = (eq0.mnemospheres ?? []).map((m) => {
+      if (m.id !== mnemoId) return m;
+      const newLvl = Math.min(5, (m.lvl ?? 1) + 1);
+      const rebuilt = buildMnemosphere(m.class, newLvl);
+      // Merge any skills that exist in the class definition but not yet on this sphere
+      const existingNames = new Set((m.skills ?? []).map((s) => s.name));
+      const newSkills = rebuilt.skills.filter(
+        (s) => !existingNames.has(s.name),
+      );
+      // Merge heroic the same way as skills, preserve existing, add any new ones
+      const existingHeroicNames = new Set((m.heroic ?? []).map((h) => h.name));
+      const newHeroic = rebuilt.heroic.filter(
+        (h) => !existingHeroicNames.has(h.name),
+      );
+      return {
+        ...m,
+        lvl: newLvl,
+        heroic: [...(m.heroic ?? []), ...newHeroic],
+        skills: [...(m.skills ?? []), ...newSkills],
       };
-      return recalculatePlayerMaxStats(leveledPlayer);
     });
-    setLevelUpDialogOpen(false);
-    setLevelUpCelebrationOpen(true);
+    const equipment = [
+      { ...eq0, mnemospheres },
+      ...(player.equipment?.slice(1) ?? []),
+    ];
+    return { ...player, equipment };
   };
 
   const optionalRules = {
@@ -464,9 +491,10 @@ export default function PlayerEdit() {
     zeroPower: settings.optionalRules?.zeroPower ?? false,
     technospheres: settings.optionalRules?.technospheres ?? false,
     technospheresVariant:
-      settings.optionalRules?.technospheresVariant ?? "none",
+      settings.optionalRules?.technospheresVariant ?? "standard",
+    innateClasses: settings.optionalRules?.innateClasses ?? [],
   };
-  const specialSkillOverrides = settings.specialSkillOverrides ?? {};
+  const canInvestMnemosphereLevel = optionalRules.technospheres && advancement;
 
   const updatePlayerSettings = useCallback((updater) => {
     setPlayerTemp((prev) => {
@@ -528,21 +556,25 @@ export default function PlayerEdit() {
     setCompactView(value === "compact");
   };
 
-  const handleOptionalRuleChange = (rule, checked) => {
-    updatePlayerSettings((prevSettings) => ({
-      ...prevSettings,
-      optionalRules: {
-        ...(prevSettings.optionalRules ?? {}),
-        [rule]: checked,
-      },
-    }));
-  };
-
   const handleAdvancementChange = (checked) => {
     updatePlayerSettings((prevSettings) => ({
       ...prevSettings,
       advancement: checked,
     }));
+  };
+
+  const handleAutomaticClassLevelChange = (checked) => {
+    setPlayerTemp((prev) => {
+      if (!prev) return prev;
+      const nextPlayer = {
+        ...prev,
+        settings: {
+          ...(prev.settings ?? {}),
+          automaticClassLevel: checked,
+        },
+      };
+      return checked ? syncAutomaticClassLevels(nextPlayer) : nextPlayer;
+    });
   };
 
   const handleAutoEquipUnarmedChange = (checked) => {
@@ -556,30 +588,6 @@ export default function PlayerEdit() {
     updatePlayerSettings((prev) => ({
       ...prev,
       defaultUnarmedStrikeRef: ref,
-    }));
-  };
-
-  const handleOptionalRuleValueChange = (rule, value) => {
-    updatePlayerSettings((prevSettings) => ({
-      ...prevSettings,
-      optionalRules: {
-        ...(prevSettings.optionalRules ?? {}),
-        [rule]: value,
-      },
-    }));
-  };
-
-  const handleSpecialSkillOverrideChange = (skillName, checked) => {
-    updatePlayerSettings((prevSettings) => ({
-      ...prevSettings,
-      specialSkillOverrides: {
-        ...Object.fromEntries(
-          Object.entries(prevSettings.specialSkillOverrides ?? {}).filter(
-            ([name, value]) => name !== skillName && value === true,
-          ),
-        ),
-        ...(checked ? { [skillName]: true } : {}),
-      },
     }));
   };
 
@@ -840,7 +848,15 @@ export default function PlayerEdit() {
                   onToggleEditMode={
                     isOwner ? () => setIsSheetEditMode((v) => !v) : undefined
                   }
-                  onAddClass={isEditMode ? () => setOpenTab(3) : undefined}
+                  onAddClass={
+                    isEditMode &&
+                    !(
+                      optionalRules.technospheres &&
+                      (playerTemp?.classes?.length ?? 0) >= 3
+                    )
+                      ? () => setOpenTab(3)
+                      : undefined
+                  }
                   onAddFeature={isEditMode ? () => setOpenTab(4) : undefined}
                 />
               </Grid>
@@ -999,6 +1015,7 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
             isEditMode={isEditMode}
+            advancement={advancement}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerTraits
@@ -1163,14 +1180,31 @@ export default function PlayerEdit() {
                   <SettingRow
                     label={t("Advancement")}
                     hint={t(
-                      "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, automated class level tracking, and per-level skill management.",
+                      "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, and per-level skill management.",
                     )}
                     compactControl
                   >
                     <Checkbox
                       checked={advancement}
+                      disabled={optionalRules.technospheres}
                       onChange={(e) =>
                         handleAdvancementChange(e.target.checked)
+                      }
+                    />
+                  </SettingRow>
+
+                  <SettingRow
+                    label={t("Automatic Class Leveling")}
+                    hint={t(
+                      "When enabled, class level is read-only and is derived from the total current skill levels in that class.",
+                    )}
+                    compactControl
+                  >
+                    <Checkbox
+                      checked={automaticClassLevel}
+                      disabled={optionalRules.technospheres}
+                      onChange={(e) =>
+                        handleAutomaticClassLevelChange(e.target.checked)
                       }
                     />
                   </SettingRow>
@@ -1240,7 +1274,12 @@ export default function PlayerEdit() {
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={() => setIsSpecialSkillsModalOpen(true)}
+                      onClick={() => {
+                        setSpecialSkillsDraft(
+                          playerTemp?.settings?.specialSkillOverrides ?? {},
+                        );
+                        setIsSpecialSkillsModalOpen(true);
+                      }}
                     >
                       {t("Open")}
                     </Button>
@@ -1255,7 +1294,27 @@ export default function PlayerEdit() {
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={() => setIsOptionalRulesModalOpen(true)}
+                      onClick={() => {
+                        setOptionalRulesDraft(
+                          playerTemp?.settings?.optionalRules ?? {},
+                        );
+                        setIsOptionalRulesModalOpen(true);
+                      }}
+                    >
+                      {t("Open")}
+                    </Button>
+                  </SettingRow>
+
+                  <SettingRow
+                    label={t("Migrate from Compendium")}
+                    hint={t(
+                      "Sync compendium-linked items (classes, spells, spheres) with their source, preserving your progression.",
+                    )}
+                  >
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setIsMigrateDialogOpen(true)}
                     >
                       {t("Open")}
                     </Button>
@@ -1372,23 +1431,95 @@ export default function PlayerEdit() {
       </Box>
       <Dialog
         open={levelUpDialogOpen}
-        onClose={() => setLevelUpDialogOpen(false)}
+        onClose={() => {
+          setMnemoLevelUpId(null);
+          setLevelUpDialogOpen(false);
+        }}
         maxWidth="sm"
         fullWidth
       >
         <DialogTitle variant="h4">{t("Level Up Confirmation")}</DialogTitle>
         <DialogContent>
           <Typography>{t("Do you want to use 10 EXP to level up?")}</Typography>
+          {canInvestMnemosphereLevel &&
+            (() => {
+              const investable = (
+                playerTemp?.equipment?.[0]?.mnemospheres ?? []
+              ).filter((m) => (m.lvl ?? 1) < 5);
+              return (
+                <Box sx={{ mt: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
+                    {t(
+                      "Invest this level into an innate class (by spending skill points in the Classes tab) or into a slotted sphere below.",
+                    )}
+                  </Typography>
+                  {investable.length > 0 && (
+                    <>
+                      <Typography variant="h4" sx={{ mb: 1 }}>
+                        {t("Level up a sphere")}
+                      </Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                        {investable.map((m) => (
+                          <Button
+                            key={m.id}
+                            variant={
+                              mnemoLevelUpId === m.id ? "contained" : "outlined"
+                            }
+                            size="small"
+                            onClick={() =>
+                              setMnemoLevelUpId((prev) =>
+                                prev === m.id ? null : m.id,
+                              )
+                            }
+                          >
+                            {t(m.class)} {t("Lv")}.{m.lvl ?? 1} →{" "}
+                            {(m.lvl ?? 1) + 1}
+                          </Button>
+                        ))}
+                      </Box>
+                    </>
+                  )}
+                </Box>
+              );
+            })()}
         </DialogContent>
         <DialogActions>
           <Button
             variant="contained"
             color="error"
-            onClick={() => setLevelUpDialogOpen(false)}
+            onClick={() => {
+              setMnemoLevelUpId(null);
+              setLevelUpDialogOpen(false);
+            }}
           >
             {t("Cancel")}
           </Button>
-          <Button variant="contained" onClick={handleConfirmLevelUpFromExp}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              const selectedMnemoId = canInvestMnemosphereLevel
+                ? mnemoLevelUpId
+                : null;
+              setPlayerTemp((prev) => {
+                if (!prev) return prev;
+                const currentExp = parseInt(prev.info?.exp, 10) || 0;
+                if (currentExp < 10 || (prev.lvl || 0) >= 50) return prev;
+                const leveled = recalculatePlayerMaxStats({
+                  ...prev,
+                  lvl: Math.min(50, (prev.lvl || 0) + 1),
+                  info: { ...prev.info, exp: Math.max(0, currentExp - 10) },
+                });
+                return applyMnemoLevelUp(leveled, selectedMnemoId);
+              });
+              setMnemoLevelUpId(null);
+              setLevelUpDialogOpen(false);
+              setLevelUpCelebrationOpen(true);
+            }}
+          >
             {t("Level Up")}
           </Button>
         </DialogActions>
@@ -1449,15 +1580,22 @@ export default function PlayerEdit() {
                   >
                     <Checkbox
                       checked={
-                        isActive || Boolean(specialSkillOverrides[skillName])
+                        isActive ||
+                        Boolean((specialSkillsDraft ?? {})[skillName])
                       }
                       disabled={isActive}
-                      onChange={(e) =>
-                        handleSpecialSkillOverrideChange(
-                          skillName,
-                          e.target.checked,
-                        )
-                      }
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setSpecialSkillsDraft((prev) => {
+                          const next = { ...(prev ?? {}) };
+                          if (checked) {
+                            next[skillName] = true;
+                          } else {
+                            delete next[skillName];
+                          }
+                          return next;
+                        });
+                      }}
                     />
                   </SettingRow>
                 );
@@ -1476,7 +1614,19 @@ export default function PlayerEdit() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsSpecialSkillsModalOpen(false)}>
-            {t("Close")}
+            {t("Cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              updatePlayerSettings((prevSettings) => ({
+                ...prevSettings,
+                specialSkillOverrides: specialSkillsDraft ?? {},
+              }));
+              setIsSpecialSkillsModalOpen(false);
+            }}
+          >
+            {t("Apply")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1499,9 +1649,12 @@ export default function PlayerEdit() {
               compactControl
             >
               <Checkbox
-                checked={optionalRules.quirks}
+                checked={optionalRulesDraft?.quirks ?? false}
                 onChange={(e) =>
-                  handleOptionalRuleChange("quirks", e.target.checked)
+                  setOptionalRulesDraft((prev) => ({
+                    ...(prev ?? {}),
+                    quirks: e.target.checked,
+                  }))
                 }
               />
             </SettingRow>
@@ -1516,9 +1669,12 @@ export default function PlayerEdit() {
               compactControl
             >
               <Checkbox
-                checked={optionalRules.zeroPower}
+                checked={optionalRulesDraft?.zeroPower ?? false}
                 onChange={(e) =>
-                  handleOptionalRuleChange("zeroPower", e.target.checked)
+                  setOptionalRulesDraft((prev) => ({
+                    ...(prev ?? {}),
+                    zeroPower: e.target.checked,
+                  }))
                 }
               />
             </SettingRow>
@@ -1533,9 +1689,12 @@ export default function PlayerEdit() {
               compactControl
             >
               <Checkbox
-                checked={optionalRules.campActivities}
+                checked={optionalRulesDraft?.campActivities ?? false}
                 onChange={(e) =>
-                  handleOptionalRuleChange("campActivities", e.target.checked)
+                  setOptionalRulesDraft((prev) => ({
+                    ...(prev ?? {}),
+                    campActivities: e.target.checked,
+                  }))
                 }
               />
             </SettingRow>
@@ -1543,21 +1702,34 @@ export default function PlayerEdit() {
             <SettingRow
               label={t("Technospheres")}
               hint={t(
-                "(Placeholder) Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
+                "Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
               )}
               showDivider={false}
               dense
               compactControl
             >
               <Checkbox
-                checked={optionalRules.technospheres}
+                checked={optionalRulesDraft?.technospheres ?? false}
                 onChange={(e) =>
-                  handleOptionalRuleChange("technospheres", e.target.checked)
+                  setOptionalRulesDraft((prev) => ({
+                    ...(prev ?? {}),
+                    technospheres: e.target.checked,
+                  }))
                 }
               />
             </SettingRow>
 
-            {optionalRules.technospheres && (
+            {(optionalRulesDraft?.technospheres ?? false) && (
+              <Box sx={{ mt: 1, px: 1, mb: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t(
+                    "Manage innate classes from the Classes tab. Add them under Innate Classes with the compendium search or add button.",
+                  )}
+                </Typography>
+              </Box>
+            )}
+
+            {(optionalRulesDraft?.technospheres ?? false) && (
               <SettingRow
                 label={t("Technospheres Alternative Rule")}
                 hint={t("Select which Technospheres variant to use.")}
@@ -1566,12 +1738,12 @@ export default function PlayerEdit() {
                 compactControl
               >
                 <RadioGroup
-                  value={optionalRules.technospheresVariant}
+                  value={optionalRulesDraft?.technospheresVariant ?? "standard"}
                   onChange={(e) =>
-                    handleOptionalRuleValueChange(
-                      "technospheresVariant",
-                      e.target.value,
-                    )
+                    setOptionalRulesDraft((prev) => ({
+                      ...(prev ?? {}),
+                      technospheresVariant: e.target.value,
+                    }))
                   }
                   sx={{
                     alignItems: "flex-end",
@@ -1583,9 +1755,9 @@ export default function PlayerEdit() {
                   }}
                 >
                   <FormControlLabel
-                    value="none"
+                    value="standard"
                     control={<Radio size="small" />}
-                    label={t("None")}
+                    label={t("Standard")}
                     labelPlacement="start"
                   />
                   <FormControlLabel
@@ -1613,10 +1785,69 @@ export default function PlayerEdit() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsOptionalRulesModalOpen(false)}>
-            {t("Close")}
+            {t("Cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              const draft = optionalRulesDraft ?? {};
+              const wasEnabled = optionalRules.technospheres;
+              const nowEnabled = draft.technospheres ?? false;
+              const wasVariant =
+                optionalRules.technospheresVariant ?? "standard";
+              const nowVariant = draft.technospheresVariant ?? "standard";
+              const variantChanged =
+                wasEnabled && nowEnabled && wasVariant !== nowVariant;
+              const technospheresDisabled = wasEnabled && !nowEnabled;
+              setPlayerTemp((prev) => {
+                if (!prev) return prev;
+                const prevSettings = prev.settings ?? {};
+                const nextOptionalRules = {
+                  ...(prevSettings.optionalRules ?? {}),
+                  ...draft,
+                  ...(nowEnabled && !wasEnabled
+                    ? {
+                        innateClasses:
+                          (prevSettings.optionalRules?.innateClasses ?? [])
+                            .length > 0
+                            ? prevSettings.optionalRules?.innateClasses
+                            : (prev.classes ?? [])
+                                .map((cls) => cls.name)
+                                .filter(Boolean)
+                                .slice(0, 3),
+                      }
+                    : {}),
+                };
+                let nextPlayer = {
+                  ...prev,
+                  settings: {
+                    ...prevSettings,
+                    optionalRules: nextOptionalRules,
+                    ...(nowEnabled && !wasEnabled
+                      ? { automaticClassLevel: true }
+                      : {}),
+                  },
+                };
+                if (variantChanged || technospheresDisabled) {
+                  nextPlayer = clearAllSlottedState(nextPlayer);
+                }
+                return nowEnabled && !wasEnabled
+                  ? syncAutomaticClassLevels(nextPlayer)
+                  : nextPlayer;
+              });
+              setIsOptionalRulesModalOpen(false);
+            }}
+          >
+            {t("Apply")}
           </Button>
         </DialogActions>
       </Dialog>
+      <MigrateFromCompendiumDialog
+        open={isMigrateDialogOpen}
+        onClose={() => setIsMigrateDialogOpen(false)}
+        player={playerTemp}
+        onApply={(updated) => setPlayerTemp(updated)}
+      />
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}

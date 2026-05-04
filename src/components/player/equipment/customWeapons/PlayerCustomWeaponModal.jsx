@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
+  Box,
   Button,
   Dialog,
   DialogTitle,
@@ -13,10 +14,6 @@ import {
   Typography,
   Divider,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
@@ -32,6 +29,9 @@ import ChangeType from "../../../../routes/equip/customWeapons/ChangeType";
 import ChangeCustomizations from "../../../../routes/equip/customWeapons/ChangeCustomizations";
 import SelectQuality from "../../../../routes/equip/weapons/SelectQuality";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
+import SlotTierPicker from "../technospheres/SlotTierPicker";
+import { SLOT_TIERS } from "../technospheres/slotTiers";
+import SlotEditor from "../technospheres/SlotEditor";
 import ChangeModifiers from "../ChangeModifiers";
 import qualities from "../../../../routes/equip/weapons/qualities";
 import {
@@ -42,6 +42,39 @@ import {
   types,
 } from "../../../../routes/equip/customWeapons/libs";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
+import { calculateCustomWeaponStats } from "../../common/playerCalculations";
+import { buildSphereData } from "../../../../libs/technospheres";
+
+const ATTRIBUTE_OPTIONS = ["dexterity", "insight", "might", "will"];
+
+function isValidAttribute(value) {
+  return ATTRIBUTE_OPTIONS.includes(value);
+}
+
+function normalizeAccuracyCheck(value, fallback = accuracyChecks[0]) {
+  const att1 = Array.isArray(value) ? value[0] : value?.att1;
+  const att2 = Array.isArray(value) ? value[1] : value?.att2;
+  if (isValidAttribute(att1) && isValidAttribute(att2)) {
+    return { att1, att2 };
+  }
+  return fallback;
+}
+
+function findPresetAccuracyCheck(value) {
+  const normalized = normalizeAccuracyCheck(value);
+  return (
+    accuracyChecks.find(
+      (check) =>
+        check.att1 === normalized.att1 && check.att2 === normalized.att2,
+    ) ?? null
+  );
+}
+
+function hasAccurateCustomization(customizationList) {
+  return (customizationList ?? []).some(
+    (customization) => customization.name === "weapon_customization_accurate",
+  );
+}
 
 export default function PlayerCustomWeaponModal({
   open,
@@ -50,8 +83,20 @@ export default function PlayerCustomWeaponModal({
   customWeapon,
   onAddCustomWeapon,
   onDeleteCustomWeapon,
+  player,
+  setPlayer,
 }) {
   const { t } = useTranslate();
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const isIntegrated =
+    isTechnospheres &&
+    (technospheresVariant === "integrated" ||
+      technospheresVariant === "hoplospheres");
+  const isSlotsVariant =
+    isTechnospheres && technospheresVariant !== "mnemospheres";
   const fileInputRef = useRef();
 
   // Initialize state from customWeapon prop or defaults
@@ -63,7 +108,10 @@ export default function PlayerCustomWeaponModal({
     customWeapon?.range || range[0],
   );
   const [selectedAccuracyCheck, setSelectedAccuracyCheck] = useState(
-    customWeapon?.accuracyCheck || accuracyChecks[0],
+    customWeapon?.overrideAccuracyAttributes
+      ? normalizeAccuracyCheck(customWeapon?.accuracyCheck)
+      : (findPresetAccuracyCheck(customWeapon?.accuracyCheck) ??
+          accuracyChecks[0]),
   );
   const [selectedType, setSelectedType] = useState(
     customWeapon?.type || types[0],
@@ -78,6 +126,15 @@ export default function PlayerCustomWeaponModal({
   const [quality, setQuality] = useState(customWeapon?.quality || "");
   const [qualityCost, setQualityCost] = useState(
     customWeapon?.qualityCost || 0,
+  );
+  const [rareAccuracyBonus, setRareAccuracyBonus] = useState(
+    customWeapon?.rareAccuracyBonus || false,
+  );
+  const [rareDamageBonus, setRareDamageBonus] = useState(
+    customWeapon?.rareDamageBonus || false,
+  );
+  const [overrideAccuracyAttributes, setOverrideAccuracyAttributes] = useState(
+    customWeapon?.overrideAccuracyAttributes || false,
   );
   const {
     damageModifier,
@@ -97,6 +154,10 @@ export default function PlayerCustomWeaponModal({
   } = useEquipmentForm(customWeapon);
 
   // Override states
+  const [slots, setSlots] = useState(customWeapon?.slots ?? "alpha");
+  const [slotted, setSlotted] = useState(customWeapon?.slotted ?? []);
+  const [paidSlots, setPaidSlots] = useState(customWeapon?.slots ?? "alpha");
+
   const [overrideDamageType, setOverrideDamageType] = useState(
     customWeapon?.overrideDamageType || false,
   );
@@ -163,6 +224,7 @@ export default function PlayerCustomWeaponModal({
   const hasTransforming = currentCustomizations.some(
     (c) => c.name === "weapon_customization_transforming",
   );
+  const hasAccurate = hasAccurateCustomization(currentCustomizations);
 
   // Update state when customWeapon prop changes
   useEffect(() => {
@@ -170,13 +232,26 @@ export default function PlayerCustomWeaponModal({
       setWeaponName(customWeapon.name || "");
       setSelectedCategory(customWeapon.category || categories[0]);
       setSelectedRange(customWeapon.range || range[0]);
-      setSelectedAccuracyCheck(customWeapon.accuracyCheck || accuracyChecks[0]);
+      setSelectedAccuracyCheck(
+        customWeapon.overrideAccuracyAttributes
+          ? normalizeAccuracyCheck(customWeapon.accuracyCheck)
+          : (findPresetAccuracyCheck(customWeapon.accuracyCheck) ??
+              accuracyChecks[0]),
+      );
       setSelectedType(customWeapon.type || types[0]);
       setCurrentCustomizations(customWeapon.customizations || []);
       setSelectedCustomization("");
       setSelectedQuality(customWeapon.selectedQuality || "");
       setQuality(customWeapon.quality || "");
       setQualityCost(customWeapon.qualityCost || 0);
+      setRareAccuracyBonus(customWeapon.rareAccuracyBonus === true);
+      setRareDamageBonus(customWeapon.rareDamageBonus === true);
+      setOverrideAccuracyAttributes(
+        customWeapon.overrideAccuracyAttributes === true,
+      );
+      setSlots(customWeapon.slots ?? "alpha");
+      setSlotted(customWeapon.slotted ?? []);
+      setPaidSlots(customWeapon.slots ?? "alpha");
       // primary modifier fields handled by useEquipmentForm
       setOverrideDamageType(customWeapon.overrideDamageType || false);
       setCustomDamageType(customWeapon.customDamageType || "physical");
@@ -234,6 +309,12 @@ export default function PlayerCustomWeaponModal({
       setSelectedQuality("");
       setQuality("");
       setQualityCost(0);
+      setRareAccuracyBonus(false);
+      setRareDamageBonus(false);
+      setOverrideAccuracyAttributes(false);
+      setSlots("alpha");
+      setSlotted([]);
+      setPaidSlots("alpha");
       clearModifiers();
       setOverrideDamageType(false);
       setCustomDamageType("physical");
@@ -291,6 +372,15 @@ export default function PlayerCustomWeaponModal({
     );
   };
 
+  const handleOverrideAccuracyAttributesChange = (checked) => {
+    setOverrideAccuracyAttributes(checked);
+    if (!checked) {
+      setSelectedAccuracyCheck(
+        (current) => findPresetAccuracyCheck(current) ?? accuracyChecks[0],
+      );
+    }
+  };
+
   // Secondary weapon handlers
   const handleSecondCategoryChange = (e) => {
     const newCategory = e.target.value;
@@ -322,17 +412,45 @@ export default function PlayerCustomWeaponModal({
     );
   };
 
-  // Check if damage type field should be enabled
-  const isDamageTypeEnabled = () => {
-    return hasElementalCustomization() || overrideDamageType;
-  };
+  const paidSlotTier =
+    SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
+  const selectedSlotTier =
+    SLOT_TIERS.find((t) => t.value === slots) ?? SLOT_TIERS[0];
+  const slotCostDelta = isSlotsVariant
+    ? selectedSlotTier.cost - paidSlotTier.cost
+    : 0;
+  const currentZenit = player?.info?.zenit ?? 0;
+  const cannotAffordSlotTier = slotCostDelta > currentZenit;
+  const slotCostChangeLabel =
+    slotCostDelta > 0
+      ? `${t("Deduct on save")}: ${slotCostDelta}z`
+      : slotCostDelta < 0
+        ? `${t("Refund on save")}: ${Math.abs(slotCostDelta)}z`
+        : "";
+  const currentZenitLabel = `${t("Current Zenit")}: ${currentZenit}z`;
 
   const calculateTotalCost = () => {
     const baseCost = 300; // Custom weapons have base cost of 300
     const customizationCost = hasTransforming ? 100 : 0;
     const qualityCostValue = parseInt(qualityCost) || 0;
+    const rareAccuracyCost = rareAccuracyBonus ? 100 : 0;
+    const rareDamageCost = rareDamageBonus ? 200 : 0;
+    const damageTypeOverrideCost = overrideDamageType ? 100 : 0;
+    const singleAttributeAccuracyCost =
+      overrideAccuracyAttributes &&
+      selectedAccuracyCheck.att1 === selectedAccuracyCheck.att2
+        ? 50
+        : 0;
 
-    return baseCost + customizationCost + qualityCostValue;
+    return (
+      baseCost +
+      customizationCost +
+      qualityCostValue +
+      rareAccuracyCost +
+      rareDamageCost +
+      damageTypeOverrideCost +
+      singleAttributeAccuracyCost
+    );
   };
 
   const isMartial = () => {
@@ -341,13 +459,42 @@ export default function PlayerCustomWeaponModal({
       "weapon_customization_magicdefenseboost",
       "weapon_customization_powerful",
     ];
-    return currentCustomizations.some((c) =>
-      martialCustomizations.includes(c.name),
+    if (
+      currentCustomizations.some((c) => martialCustomizations.includes(c.name))
+    ) {
+      return true;
+    }
+    const { damage } = calculateCustomWeaponStats(
+      {
+        category: selectedCategory,
+        customizations: currentCustomizations,
+        rareAccuracyBonus,
+        rareDamageBonus,
+        damageModifier,
+        precModifier,
+      },
+      false,
     );
+    if (damage >= 10) return true;
+    if (!hasTransforming) return false;
+
+    const { damage: secondaryDamage } = calculateCustomWeaponStats(
+      {
+        secondSelectedCategory,
+        secondCurrentCustomizations,
+        rareAccuracyBonus,
+        rareDamageBonus,
+        secondDamageModifier,
+        secondPrecModifier,
+      },
+      true,
+    );
+    return secondaryDamage >= 10;
   };
 
   const handleSave = () => {
     const weaponData = {
+      ...(customWeapon ?? {}),
       name: weaponName,
       category: selectedCategory,
       range: selectedRange,
@@ -360,6 +507,9 @@ export default function PlayerCustomWeaponModal({
       cost: calculateTotalCost(),
       hands: 2, // Custom weapons are always two-handed
       martial: isMartial(),
+      rareAccuracyBonus,
+      rareDamageBonus,
+      overrideAccuracyAttributes,
       ...modifiers(),
       isEquipped: editCustomWeaponIndex !== null ? isEquipped : false,
       overrideDamageType,
@@ -379,9 +529,21 @@ export default function PlayerCustomWeaponModal({
       secondOverrideDamageType,
       secondCustomDamageType,
       dataType: "weapon",
+      ...(isSlotsVariant || customWeapon?.slots || customWeapon?.slotted
+        ? { slots, slotted }
+        : {}),
     };
 
     onAddCustomWeapon(weaponData);
+    if (slotCostDelta !== 0 && setPlayer) {
+      setPlayer((prev) => ({
+        ...prev,
+        info: {
+          ...prev.info,
+          zenit: Math.max(0, (prev.info?.zenit ?? 0) - slotCostDelta),
+        },
+      }));
+    }
     onClose();
   };
 
@@ -396,15 +558,22 @@ export default function PlayerCustomWeaponModal({
       setSelectedRange(
         data.range && range.includes(data.range) ? data.range : range[0],
       );
+      setRareAccuracyBonus(data.rareAccuracyBonus === true);
+      setRareDamageBonus(data.rareDamageBonus === true);
+      const nextOverrideAccuracyAttributes =
+        data.overrideAccuracyAttributes === true;
+      setOverrideAccuracyAttributes(nextOverrideAccuracyAttributes);
 
       // Handle accuracy check
       if (data.accuracyCheck) {
-        const matchingCheck = accuracyChecks.find(
-          (check) =>
-            check.att1 === data.accuracyCheck.att1 &&
-            check.att2 === data.accuracyCheck.att2,
+        const normalizedCheck = normalizeAccuracyCheck(data.accuracyCheck);
+        setSelectedAccuracyCheck(
+          nextOverrideAccuracyAttributes
+            ? normalizedCheck
+            : (findPresetAccuracyCheck(normalizedCheck) ?? accuracyChecks[0]),
         );
-        setSelectedAccuracyCheck(matchingCheck || accuracyChecks[0]);
+      } else {
+        setSelectedAccuracyCheck(accuracyChecks[0]);
       }
 
       setSelectedType(
@@ -507,8 +676,24 @@ export default function PlayerCustomWeaponModal({
     const baseCost = 300; // Custom weapons have base cost of 300
     const customizationCost = hasTransforming ? 100 : 0;
     const qualityCostValue = parseInt(qualityCost) || 0;
+    const rareAccuracyCost = rareAccuracyBonus ? 100 : 0;
+    const rareDamageCost = rareDamageBonus ? 200 : 0;
+    const damageTypeOverrideCost = overrideDamageType ? 100 : 0;
+    const singleAttributeAccuracyCost =
+      overrideAccuracyAttributes &&
+      selectedAccuracyCheck.att1 === selectedAccuracyCheck.att2
+        ? 50
+        : 0;
 
-    return baseCost + customizationCost + qualityCostValue;
+    return (
+      baseCost +
+      customizationCost +
+      qualityCostValue +
+      rareAccuracyCost +
+      rareDamageCost +
+      damageTypeOverrideCost +
+      singleAttributeAccuracyCost
+    );
   };
 
   return (
@@ -601,6 +786,21 @@ export default function PlayerCustomWeaponModal({
                 />
               </Grid>
 
+              {/* Type */}
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6,
+                }}
+              >
+                <ChangeType
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  selectedCategory={selectedCategory}
+                  disabled={!hasElementalCustomization()}
+                />
+              </Grid>
+
               {/* Accuracy Check */}
               <Grid
                 size={{
@@ -611,33 +811,7 @@ export default function PlayerCustomWeaponModal({
                 <ChangeAccuracyCheck
                   value={selectedAccuracyCheck}
                   onChange={setSelectedAccuracyCheck}
-                />
-              </Grid>
-
-              {/* Type */}
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <ChangeType
-                  value={
-                    isDamageTypeEnabled()
-                      ? overrideDamageType
-                        ? customDamageType
-                        : selectedType
-                      : "physical"
-                  }
-                  onChange={(e) => {
-                    if (overrideDamageType) {
-                      setCustomDamageType(e.target.value);
-                    } else {
-                      setSelectedType(e.target.value);
-                    }
-                  }}
-                  selectedCategory={selectedCategory}
-                  disabled={!isDamageTypeEnabled()}
+                  disabled={overrideAccuracyAttributes}
                 />
               </Grid>
 
@@ -651,58 +825,127 @@ export default function PlayerCustomWeaponModal({
                   currentCustomizations={currentCustomizations}
                   selectedCategory={selectedCategory}
                   isSecondForm={false}
+                  rareAccuracyBonus={rareAccuracyBonus}
                 />
               </Grid>
 
-              {/* Quality Section */}
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 8,
-                }}
-              >
-                <SelectQuality
-                  quality={selectedQuality}
-                  setQuality={(e) => {
-                    const qualityData = qualities.find(
-                      (q) => q.name === e.target.value,
-                    );
-                    if (qualityData) {
-                      setSelectedQuality(qualityData.name);
-                      setQuality(qualityData.quality);
-                      setQualityCost(qualityData.cost);
-                    }
-                  }}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 4,
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setSelectedQuality("");
-                    setQuality("");
-                    setQualityCost(0);
-                  }}
-                  disabled={!selectedQuality}
-                  sx={{ height: "100%", minWidth: "40px" }}
-                >
-                  ×
-                </Button>
-              </Grid>
+              {/* Quality / Slot Tier Section */}
+              {isSlotsVariant ? (
+                <>
+                  <Grid size={12}>
+                    <SlotTierPicker
+                      value={slots}
+                      onChange={(tier) => {
+                        const newTier = SLOT_TIERS.find(
+                          (t) => t.value === tier,
+                        );
+                        const hoplospheres =
+                          player?.equipment?.[0]?.hoplospheres ?? [];
+                        const kept = [];
+                        let cost = 0;
+                        for (const id of slotted) {
+                          const hoplo = hoplospheres.find((h) => h.id === id);
+                          const slotCost = hoplo?.requiredSlots ?? 1;
+                          if (cost + slotCost <= (newTier?.slots ?? 1)) {
+                            kept.push(id);
+                            cost += slotCost;
+                          }
+                        }
+                        setSlots(tier);
+                        setSlotted(kept);
+                      }}
+                      isWeapon={true}
+                      isIntegrated={isIntegrated}
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <SlotEditor
+                      item={{ slots, slotted }}
+                      onChange={(updated) => setSlotted(updated.slotted)}
+                      player={player}
+                      isWeapon={true}
+                      onAddToBank={
+                        setPlayer
+                          ? (item, type) => {
+                              const key =
+                                type === "mnemospheres"
+                                  ? "mnemospheres"
+                                  : "hoplospheres";
+                              const genId = () =>
+                                Math.random().toString(36).slice(2) +
+                                Date.now().toString(36);
+                              setPlayer((prev) => {
+                                const prevEq0 = prev?.equipment?.[0] ?? {};
+                                const eq0New = {
+                                  ...prevEq0,
+                                  [key]: [
+                                    ...(prevEq0[key] ?? []),
+                                    { ...item, id: item.id ?? genId() },
+                                  ],
+                                };
+                                const equipment = prev?.equipment
+                                  ? [eq0New, ...prev.equipment.slice(1)]
+                                  : [eq0New];
+                                return { ...prev, equipment };
+                              });
+                            }
+                          : undefined
+                      }
+                    />
+                  </Grid>
+                </>
+              ) : (
+                <>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 8,
+                    }}
+                  >
+                    <SelectQuality
+                      quality={selectedQuality}
+                      setQuality={(e) => {
+                        const qualityData = qualities.find(
+                          (q) => q.name === e.target.value,
+                        );
+                        if (qualityData) {
+                          setSelectedQuality(qualityData.name);
+                          setQuality(qualityData.quality);
+                          setQualityCost(qualityData.cost);
+                        }
+                      }}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 4,
+                    }}
+                  >
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        setSelectedQuality("");
+                        setQuality("");
+                        setQualityCost(0);
+                      }}
+                      disabled={!selectedQuality}
+                      sx={{ height: "100%", minWidth: "40px" }}
+                    >
+                      ×
+                    </Button>
+                  </Grid>
 
-              <Grid size={12}>
-                <ChangeQuality
-                  quality={quality}
-                  setQuality={(e) => setQuality(e.target.value)}
-                  qualityCost={qualityCost}
-                  setQualityCost={(e) => setQualityCost(e.target.value)}
-                />
-              </Grid>
+                  <Grid size={12}>
+                    <ChangeQuality
+                      quality={quality}
+                      setQuality={(e) => setQuality(e.target.value)}
+                      qualityCost={qualityCost}
+                      setQualityCost={(e) => setQualityCost(e.target.value)}
+                    />
+                  </Grid>
+                </>
+              )}
 
               {/* Modifiers Section */}
               <Grid size={12}>
@@ -720,35 +963,18 @@ export default function PlayerCustomWeaponModal({
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
-                      <Grid size={6}>
-                        <ChangeModifiers
-                          label={"Damage Modifier"}
-                          value={damageModifier}
-                          onChange={(e) => setDamageModifier(e.target.value)}
-                        />
+                      <Grid size={12}>
+                        <Typography variant="h6">
+                          {t("Rare Weapon Options")}
+                        </Typography>
+                        <Divider sx={{ mt: 0.5 }} />
                       </Grid>
-                      <Grid size={6}>
-                        <ChangeModifiers
-                          label={"Precision Modifier"}
-                          value={precModifier}
-                          onChange={(e) => setPrecModifier(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid size={6}>
-                        <ChangeModifiers
-                          label={"DEF Modifier"}
-                          value={defModifier}
-                          onChange={(e) => setDefModifier(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid size={6}>
-                        <ChangeModifiers
-                          label={"MDEF Modifier"}
-                          value={mDefModifier}
-                          onChange={(e) => setMDefModifier(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid size={6}>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6,
+                        }}
+                      >
                         <FormControlLabel
                           control={
                             <Checkbox
@@ -758,29 +984,131 @@ export default function PlayerCustomWeaponModal({
                               }
                             />
                           }
-                          label={t("override_damage_type")}
+                          label={`${t("override_damage_type")} (+100z)`}
                         />
-                      </Grid>
-                      {overrideDamageType && (
-                        <Grid size={6}>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>{t("weapon_damage_type")}</InputLabel>
-                            <Select
+                        {overrideDamageType && !hasElementalCustomization() && (
+                          <Box sx={{ mt: 1 }}>
+                            <ChangeType
                               value={customDamageType}
                               onChange={(e) =>
                                 setCustomDamageType(e.target.value)
                               }
-                              label={t("weapon_damage_type")}
-                            >
-                              {types.map((type) => (
-                                <MenuItem key={type} value={type}>
-                                  {t(type)}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                      )}
+                            />
+                          </Box>
+                        )}
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6,
+                        }}
+                      >
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={overrideAccuracyAttributes}
+                              onChange={(e) =>
+                                handleOverrideAccuracyAttributesChange(
+                                  e.target.checked,
+                                )
+                              }
+                            />
+                          }
+                          label={t("override_accuracy_attributes")}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6,
+                        }}
+                      >
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={rareAccuracyBonus}
+                              disabled={hasAccurate && !rareAccuracyBonus}
+                              onChange={(e) => {
+                                setRareAccuracyBonus(e.target.checked);
+                                if (
+                                  e.target.checked &&
+                                  selectedCustomization ===
+                                    "weapon_customization_accurate"
+                                ) {
+                                  setSelectedCustomization("");
+                                }
+                              }}
+                            />
+                          }
+                          label={`+1 ${t("Accuracy")} (+100z)`}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6,
+                        }}
+                      >
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={rareDamageBonus}
+                              onChange={(e) =>
+                                setRareDamageBonus(e.target.checked)
+                              }
+                            />
+                          }
+                          label={`+4 ${t("Damage")} (+200z)`}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Accuracy Modifier"}
+                          value={precModifier}
+                          onChange={(e) => setPrecModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"Damage Modifier"}
+                          value={damageModifier}
+                          onChange={(e) => setDamageModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"DEF Modifier"}
+                          value={defModifier}
+                          onChange={(e) => setDefModifier(e.target.value)}
+                        />
+                      </Grid>
+                      <Grid
+                        size={{
+                          xs: 12,
+                          sm: 6,
+                        }}
+                      >
+                        <ChangeModifiers
+                          label={"MDEF Modifier"}
+                          value={mDefModifier}
+                          onChange={(e) => setMDefModifier(e.target.value)}
+                        />
+                      </Grid>
                     </Grid>
                   </AccordionDetails>
                 </Accordion>
@@ -878,6 +1206,7 @@ export default function PlayerCustomWeaponModal({
                     <ChangeAccuracyCheck
                       value={secondSelectedAccuracyCheck}
                       onChange={setSecondSelectedAccuracyCheck}
+                      disabled={overrideAccuracyAttributes}
                     />
                   </Grid>
 
@@ -971,30 +1300,6 @@ export default function PlayerCustomWeaponModal({
                               }
                             />
                           </Grid>
-                          <Grid size={6}>
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={secondOverrideDamageType}
-                                  onChange={(e) =>
-                                    setSecondOverrideDamageType(
-                                      e.target.checked,
-                                    )
-                                  }
-                                />
-                              }
-                              label={t("override_damage_type")}
-                            />
-                            {secondOverrideDamageType && (
-                              <ChangeType
-                                value={secondCustomDamageType}
-                                onChange={(e) =>
-                                  setSecondCustomDamageType(e.target.value)
-                                }
-                                disabled={false}
-                              />
-                            )}
-                          </Grid>
                         </Grid>
                       </AccordionDetails>
                     </Accordion>
@@ -1027,13 +1332,19 @@ export default function PlayerCustomWeaponModal({
                 cost: calculatePreviewCost(),
                 hands: 2,
                 martial: isMartial(),
+                rareAccuracyBonus,
+                rareDamageBonus,
+                overrideAccuracyAttributes,
                 damageModifier: parseInt(damageModifier) || 0,
                 precModifier: parseInt(precModifier) || 0,
                 defModifier: parseInt(defModifier) || 0,
                 mDefModifier: parseInt(mDefModifier) || 0,
                 overrideDamageType,
                 customDamageType,
+                slots,
+                slotted,
               }}
+              sphereData={buildSphereData({ slots, slotted }, player)}
             />
 
             {hasTransforming && (
@@ -1053,13 +1364,19 @@ export default function PlayerCustomWeaponModal({
                     cost: calculatePreviewCost(),
                     hands: 2,
                     martial: isMartial(),
+                    rareAccuracyBonus,
+                    rareDamageBonus,
+                    overrideAccuracyAttributes,
                     damageModifier: parseInt(secondDamageModifier) || 0,
                     precModifier: parseInt(secondPrecModifier) || 0,
                     defModifier: parseInt(secondDefModifier) || 0,
                     mDefModifier: parseInt(secondMDefModifier) || 0,
-                    overrideDamageType: secondOverrideDamageType,
-                    customDamageType: secondCustomDamageType,
+                    overrideDamageType,
+                    customDamageType,
+                    slots,
+                    slotted,
                   }}
+                  sphereData={buildSphereData({ slots, slotted }, player)}
                 />
               </>
             )}
@@ -1072,10 +1389,25 @@ export default function PlayerCustomWeaponModal({
             {t("Delete")}
           </Button>
         )}
+        <Box sx={{ flexGrow: 1 }} />
+        {slotCostChangeLabel && (
+          <Typography
+            variant="body2"
+            color={cannotAffordSlotTier ? "error" : "text.secondary"}
+          >
+            {slotCostChangeLabel} ({currentZenitLabel})
+            {cannotAffordSlotTier ? ` - ${t("Not enough Zenit")}` : ""}
+          </Typography>
+        )}
         <Button onClick={onClose} color="secondary">
           {t("Cancel")}
         </Button>
-        <Button onClick={handleSave} color="primary" variant="contained">
+        <Button
+          onClick={handleSave}
+          color="primary"
+          variant="contained"
+          disabled={cannotAffordSlotTier}
+        >
           {t("Save")}
         </Button>
       </DialogActions>

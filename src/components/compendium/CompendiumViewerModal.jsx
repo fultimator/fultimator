@@ -74,6 +74,9 @@ const _PLAYER_TYPES = [
 ];
 
 const SIDEBAR_WIDTH = 300;
+const normalizeWellspring = (value = "") => String(value).trim().toLowerCase();
+const getItemWellspring = (item) =>
+  item?.wellspring ?? item?.Wellspring ?? item?.category ?? "";
 
 const CompendiumViewerModal = ({
   open,
@@ -105,6 +108,7 @@ const CompendiumViewerModal = ({
     initialModuleTypeFilter,
   );
   const [selectedMagichantSubtype, setSelectedMagichantSubtype] = useState("");
+  const [selectedWellspring, setSelectedWellspring] = useState("");
   const [selectedBook, setSelectedBook] = useState([]);
   const [selectedQualityFilters, setSelectedQualityFilters] = useState([]);
   const [selectedQualityCategories, setSelectedQualityCategories] = useState(
@@ -162,6 +166,12 @@ const CompendiumViewerModal = ({
           value.includes(`${filter} module`),
       );
     });
+  }, []);
+
+  const matchesInvokerWellspring = useCallback((item, wellspring) => {
+    const filter = normalizeWellspring(wellspring);
+    if (!filter) return true;
+    return normalizeWellspring(getItemWellspring(item)) === filter;
   }, []);
 
   // Pack state
@@ -225,6 +235,7 @@ const CompendiumViewerModal = ({
       setSelectedSpellClass(initialSpellClass);
       setSelectedModuleType(initialModuleTypeFilter);
       setSelectedMagichantSubtype("");
+      setSelectedWellspring("");
       setSelectedBook([]);
       setSelectedQualityFilters([]);
       setSelectedQualityCategories([]);
@@ -252,6 +263,10 @@ const CompendiumViewerModal = ({
     if (selectedType !== "player-spells" || !selectedSpellClass) return null;
     return classList.find((c) => c.name === selectedSpellClass) ?? null;
   }, [selectedType, selectedSpellClass]);
+  const selectedSpellClassKey = String(selectedSpellClass).trim().toLowerCase();
+  const isPilotClassSelected = selectedSpellClassKey === "pilot";
+  const isChanterClassSelected = selectedSpellClassKey === "chanter";
+  const isInvokerClassSelected = selectedSpellClassKey === "invoker";
 
   const filteredItems = useMemo(() => {
     // Pack mode
@@ -309,7 +324,7 @@ const CompendiumViewerModal = ({
       }
       if (
         selectedType === "player-spells" &&
-        String(selectedSpellClass).toLowerCase() === "pilot" &&
+        isPilotClassSelected &&
         selectedModuleType
       ) {
         items = items.filter((item) =>
@@ -318,7 +333,7 @@ const CompendiumViewerModal = ({
       }
       if (
         selectedType === "player-spells" &&
-        String(selectedSpellClass).toLowerCase() === "chanter" &&
+        isChanterClassSelected &&
         selectedMagichantSubtype
       ) {
         items = items.filter((item) => {
@@ -330,6 +345,15 @@ const CompendiumViewerModal = ({
             item.recovery;
           return selectedMagichantSubtype === "key" ? isKey : !isKey;
         });
+      }
+      if (
+        selectedType === "player-spells" &&
+        isInvokerClassSelected &&
+        selectedWellspring
+      ) {
+        items = items.filter((item) =>
+          matchesInvokerWellspring(item, selectedWellspring),
+        );
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -413,8 +437,6 @@ const CompendiumViewerModal = ({
       }
     }
     // Filter by module type (for Pilot spells)
-    const isPilotClassSelected =
-      String(selectedSpellClass).toLowerCase() === "pilot";
     if (
       selectedModuleType &&
       selectedType === "player-spells" &&
@@ -427,7 +449,7 @@ const CompendiumViewerModal = ({
     if (
       selectedMagichantSubtype &&
       selectedType === "player-spells" &&
-      String(selectedSpellClass).toLowerCase() === "chanter"
+      isChanterClassSelected
     ) {
       items = items.filter((item) => {
         const isKey =
@@ -438,6 +460,15 @@ const CompendiumViewerModal = ({
           item.recovery;
         return selectedMagichantSubtype === "key" ? isKey : !isKey;
       });
+    }
+    if (
+      selectedWellspring &&
+      selectedType === "player-spells" &&
+      isInvokerClassSelected
+    ) {
+      items = items.filter((item) =>
+        matchesInvokerWellspring(item, selectedWellspring),
+      );
     }
     if (!searchQuery.trim()) return items;
     const q = searchQuery.toLowerCase();
@@ -460,8 +491,13 @@ const CompendiumViewerModal = ({
     selectedOptionalSubtypes,
     selectedModuleType,
     selectedMagichantSubtype,
+    selectedWellspring,
     selectedSpellClass,
+    isPilotClassSelected,
+    isChanterClassSelected,
+    isInvokerClassSelected,
     matchesPilotModuleType,
+    matchesInvokerWellspring,
   ]);
 
   const itemIds = useMemo(
@@ -505,6 +541,11 @@ const CompendiumViewerModal = ({
       setSelectedType(type);
       setSearchQuery("");
       setSelectedIdx(null);
+      if (type !== "player-spells") {
+        setSelectedModuleType("");
+        setSelectedMagichantSubtype("");
+        setSelectedWellspring("");
+      }
       if (mainRef.current) mainRef.current.scrollTop = 0;
     },
     [restrictToTypes],
@@ -520,11 +561,15 @@ const CompendiumViewerModal = ({
 
   const handleSpellClassChange = useCallback((cls) => {
     setSelectedSpellClass(cls);
-    if (String(cls).toLowerCase() !== "pilot") {
+    const classKey = String(cls).trim().toLowerCase();
+    if (classKey !== "pilot") {
       setSelectedModuleType("");
     }
-    if (String(cls).toLowerCase() !== "chanter") {
+    if (classKey !== "chanter") {
       setSelectedMagichantSubtype("");
+    }
+    if (classKey !== "invoker") {
+      setSelectedWellspring("");
     }
     setSearchQuery("");
     setSelectedIdx(null);
@@ -540,6 +585,13 @@ const CompendiumViewerModal = ({
 
   const handleMagichantSubtypeChange = useCallback((magichantSubtype) => {
     setSelectedMagichantSubtype(magichantSubtype);
+    setSearchQuery("");
+    setSelectedIdx(null);
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, []);
+
+  const handleWellspringChange = useCallback((wellspring) => {
+    setSelectedWellspring(wellspring);
     setSearchQuery("");
     setSelectedIdx(null);
     if (mainRef.current) mainRef.current.scrollTop = 0;
@@ -688,6 +740,8 @@ const CompendiumViewerModal = ({
       onModuleTypeChange={handleModuleTypeChange}
       selectedMagichantSubtype={selectedMagichantSubtype}
       onMagichantSubtypeChange={handleMagichantSubtypeChange}
+      selectedWellspring={selectedWellspring}
+      onWellspringChange={handleWellspringChange}
       selectedQualityFilters={selectedQualityFilters}
       onQualityFiltersChange={handleQualityFiltersChange}
       selectedQualityCategories={selectedQualityCategories}

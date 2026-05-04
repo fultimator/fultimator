@@ -23,6 +23,7 @@ import ChangeMartial from "../../../../routes/equip/common/ChangeMartial";
 import ChangeName from "../../../../routes/equip/common/ChangeName";
 import ChangeType from "../../../../routes/equip/weapons/ChangeType";
 import ChangeHands from "../../../../routes/equip/weapons/ChangeHands";
+import { RESTRICTED_ONE_HANDED_CATEGORIES } from "../../../../routes/equip/weapons/constants";
 import ChangeAttr from "../../../../routes/equip/weapons/ChangeAttr";
 import SelectQuality from "../../../../routes/equip/weapons/SelectQuality";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
@@ -116,6 +117,9 @@ export default function PlayerWeaponModal({
     setQualityCost(weapon?.qualityCost || 0);
     setTotalBonus(weapon?.totalBonus || 0);
     setSelectedQuality(weapon?.selectedQuality || "");
+    if (weapon?.damageBonus || weapon?.damageReworkBonus || weapon?.precBonus) {
+      expandModifiers();
+    }
     // modifier fields are handled by useEquipmentForm
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weapon]);
@@ -178,12 +182,15 @@ export default function PlayerWeaponModal({
       }
       if (damageBonus) {
         setDamageBonus(damageBonus);
+        expandModifiers();
       }
       if (damageReworkBonus) {
         setDamageReworkBonus(damageReworkBonus);
+        expandModifiers();
       }
       if (precBonus) {
         setPrecBonus(precBonus);
+        expandModifiers();
       }
       if (rework) {
         setRework(rework);
@@ -244,8 +251,11 @@ export default function PlayerWeaponModal({
   const calcDamage = () => {
     let damage = base.damage;
 
-    // Changed type
-    if (base.hands === 1 && hands === 2) {
+    if (
+      base.hands === 1 &&
+      hands === 2 &&
+      !RESTRICTED_ONE_HANDED_CATEGORIES.includes(base.category)
+    ) {
       damage += 4;
     }
     if (base.hands === 2 && hands === 1) {
@@ -496,19 +506,6 @@ export default function PlayerWeaponModal({
               />
             </Grid>
             {/* Change Bonus */}
-            <Grid size={6}>
-              <ChangeBonus
-                basePrec={base.prec}
-                precBonus={precBonus}
-                damageBonus={damageBonus}
-                damageReworkBonus={damageReworkBonus}
-                setPrecBonus={setPrecBonus}
-                setDamageBonus={setDamageBonus}
-                setDamageReworkBonus={setDamageReworkBonus}
-                rework={rework}
-                totalBonus={totalBonus}
-              />
-            </Grid>
             <Grid size={12}>
               <ChangeQuality
                 quality={quality}
@@ -531,28 +528,67 @@ export default function PlayerWeaponModal({
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid size={6}>
+                  <Grid size={12}>
+                    <Typography variant="h6">
+                      {t("Rare Weapon Options")}
+                    </Typography>
+                    <Divider sx={{ mt: 0.5 }} />
+                  </Grid>
+                  <Grid size={12}>
+                    <ChangeBonus
+                      basePrec={base.prec}
+                      precBonus={precBonus}
+                      damageBonus={damageBonus}
+                      damageReworkBonus={damageReworkBonus}
+                      setPrecBonus={setPrecBonus}
+                      setDamageBonus={setDamageBonus}
+                      setDamageReworkBonus={setDamageReworkBonus}
+                      rework={rework}
+                      totalBonus={totalBonus}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <ChangeModifiers
+                      label={"Accuracy Modifier"}
+                      value={precModifier}
+                      onChange={(e) => setPrecModifier(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"Damage Modifier"}
                       value={damageModifier}
                       onChange={(e) => setDamageModifier(e.target.value)}
                     />
                   </Grid>
-                  <Grid size={6}>
-                    <ChangeModifiers
-                      label={"Precision Modifier"}
-                      value={precModifier}
-                      onChange={(e) => setPrecModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid size={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"DEF Modifier"}
                       value={defModifier}
                       onChange={(e) => setDefModifier(e.target.value)}
                     />
                   </Grid>
-                  <Grid size={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
                     <ChangeModifiers
                       label={"MDEF Modifier"}
                       value={mDefModifier}

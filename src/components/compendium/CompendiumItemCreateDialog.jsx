@@ -18,13 +18,18 @@ import {
   Typography,
   ListSubheader,
 } from "@mui/material";
-import { Close, Delete as DeleteIcon } from "@mui/icons-material";
+import { Add, Close, Delete as DeleteIcon } from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../icons";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import types from "../../libs/types";
 import classList from "../../libs/classes";
+import {
+  buildMnemosphere,
+  MNEMOSPHERE_LEVELS,
+  mnemosphereClassList,
+} from "../../libs/mnemospheres";
 import spellClassesList from "../../libs/spellClasses";
 import specialSkillsList from "../../libs/skills";
 import { availableFrames } from "../../libs/pilotVehicleData";
@@ -113,6 +118,13 @@ const STANDARD_SPELL_CLASSES = [
   "Entropist",
   "Spiritist",
 ];
+
+function slugify(str) {
+  return (str ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 
 // NPC Attack form
 
@@ -368,6 +380,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
     const payload = {
       itemType: "spell",
       name: name.trim(),
+      fuid: slugify(name.trim()),
       type: isOffensive ? "offensive" : "",
       damagetype: dmgType,
       mp: mp === "" ? undefined : Number(mp),
@@ -1174,6 +1187,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
           })()),
       };
     }
+    payload.fuid = slugify(payload.name ?? name.trim());
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "player-spell", payload);
     setSaving(false);
@@ -2325,6 +2339,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
     setSaving(true);
     const payload = {
       name: name.trim(),
+      fuid: slugify(name.trim()),
       book,
       quote: quote.trim(),
       description: description.trim(),
@@ -2546,6 +2561,7 @@ export function ClassForm({
     setSaving(true);
     const classData = {
       name: name.trim(),
+      fuid: slugify(name.trim()),
       book: book.trim() || "homebrew",
       benefits: {
         hpplus: Number(hpplus) || 0,
@@ -3327,6 +3343,261 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
   );
 }
 
+function MnemosphereForm({ packId, onClose, editData, editItemId }) {
+  const { t } = useTranslate();
+  const { addItem, updateItem } = useCompendiumPacks();
+  const [selectedClass, setSelectedClass] = useState(
+    editData?.class ?? mnemosphereClassList[0]?.name ?? "",
+  );
+  const [selectedLvl, setSelectedLvl] = useState(editData?.lvl ?? 1);
+
+  const handleSave = async () => {
+    const payload = {
+      ...(editData ?? {}),
+      ...buildMnemosphere(selectedClass, Number(selectedLvl)),
+      fuid: slugify(selectedClass),
+      id: editData?.id,
+    };
+    if (editItemId) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "mnemosphere", payload);
+    onClose();
+  };
+
+  return (
+    <>
+      <DialogTitle>
+        {t(editItemId ? "Edit Mnemosphere" : "Add Mnemosphere")}
+      </DialogTitle>
+      <DialogContent>
+        <Grid container spacing={2} sx={{ mt: 0.5 }}>
+          <Grid size={12}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Class")}</InputLabel>
+              <Select
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                label={t("Class")}
+              >
+                {mnemosphereClassList.map((c) => (
+                  <MenuItem key={c.name} value={c.name}>
+                    {t(c.name)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={12}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Level")}</InputLabel>
+              <Select
+                value={selectedLvl}
+                onChange={(e) => setSelectedLvl(e.target.value)}
+                label={t("Level")}
+              >
+                {MNEMOSPHERE_LEVELS.map((lvl) => (
+                  <MenuItem key={lvl} value={lvl}>
+                    {lvl}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t("Cancel")}</Button>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={!selectedClass}
+        >
+          {t("Save")}
+        </Button>
+      </DialogActions>
+    </>
+  );
+}
+
+function HoplosphereForm({ packId, onClose, editData, editItemId }) {
+  const { t } = useTranslate();
+  const { addItem, updateItem } = useCompendiumPacks();
+  const [name, setName] = useState(editData?.name ?? "");
+  const [description, setDescription] = useState(editData?.description ?? "");
+  const [requiredSlots, setRequiredSlots] = useState(
+    editData?.requiredSlots ?? 1,
+  );
+  const [socketable, setSocketable] = useState(editData?.socketable ?? "all");
+  const [cost, setCost] = useState(editData?.cost ?? 500);
+  const [coagEffects, setCoagEffects] = useState(
+    Object.entries(editData?.coagEffects ?? {}).map(([threshold, effect]) => ({
+      threshold,
+      effect,
+    })),
+  );
+
+  const handleCoagChange = (index, field, value) => {
+    setCoagEffects((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row)),
+    );
+  };
+
+  const handleAddCoag = () => {
+    setCoagEffects((prev) => [...prev, { threshold: 2, effect: "" }]);
+  };
+
+  const handleRemoveCoag = (index) => {
+    setCoagEffects((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = async () => {
+    const payload = {
+      ...(editData ?? {}),
+      name: name.trim(),
+      fuid: slugify(name.trim()),
+      description,
+      requiredSlots: Number(requiredSlots),
+      socketable,
+      cost: Number(cost) || 0,
+      coagEffects: coagEffects.reduce((acc, row) => {
+        const threshold = Number(row.threshold);
+        const effect = String(row.effect ?? "").trim();
+        if (threshold > 1 && effect) acc[threshold] = effect;
+        return acc;
+      }, {}),
+    };
+    if (editItemId) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "hoplosphere", payload);
+    onClose();
+  };
+
+  return (
+    <>
+      <DialogTitle>
+        {t(editItemId ? "Edit Hoplosphere" : "Add Hoplosphere")}
+      </DialogTitle>
+      <DialogContent>
+        <Grid container spacing={2} sx={{ mt: 0.5 }}>
+          <Grid size={12}>
+            <TextField
+              autoFocus
+              fullWidth
+              size="small"
+              label={t("Name")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Grid>
+          <Grid size={12}>
+            <TextField
+              fullWidth
+              multiline
+              minRows={3}
+              size="small"
+              label={t("Description")}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Slots")}</InputLabel>
+              <Select
+                label={t("Slots")}
+                value={requiredSlots}
+                onChange={(e) => setRequiredSlots(e.target.value)}
+              >
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("Socketable")}</InputLabel>
+              <Select
+                label={t("Socketable")}
+                value={socketable}
+                onChange={(e) => setSocketable(e.target.value)}
+              >
+                <MenuItem value="all">{t("All")}</MenuItem>
+                <MenuItem value="weapon">{t("Weapon only")}</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField
+              fullWidth
+              size="small"
+              type="number"
+              label={t("Cost")}
+              value={cost}
+              onChange={(e) => setCost(e.target.value)}
+              slotProps={{ input: { inputProps: { min: 0 } } }}
+            />
+          </Grid>
+          <Grid size={12}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+              {t("Coagulation")}
+            </Typography>
+          </Grid>
+          {coagEffects.map((row, index) => (
+            <Grid container spacing={1} size={12} key={index}>
+              <Grid size={{ xs: 4, sm: 3 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="number"
+                  label={t("Threshold")}
+                  value={row.threshold}
+                  onChange={(e) =>
+                    handleCoagChange(index, "threshold", e.target.value)
+                  }
+                  slotProps={{ input: { inputProps: { min: 2 } } }}
+                />
+              </Grid>
+              <Grid size={{ xs: 7, sm: 8 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t("Effect")}
+                  value={row.effect}
+                  onChange={(e) =>
+                    handleCoagChange(index, "effect", e.target.value)
+                  }
+                />
+              </Grid>
+              <Grid size={{ xs: 1, sm: 1 }}>
+                <IconButton
+                  size="small"
+                  onClick={() => handleRemoveCoag(index)}
+                  aria-label={t("Delete")}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Grid>
+            </Grid>
+          ))}
+          <Grid size={12}>
+            <Button size="small" startIcon={<Add />} onClick={handleAddCoag}>
+              {t("Add Coagulation")}
+            </Button>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t("Cancel")}</Button>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={!name.trim()}
+        >
+          {t("Save")}
+        </Button>
+      </DialogActions>
+    </>
+  );
+}
+
 export default function CompendiumItemCreateDialog({
   open,
   onClose,
@@ -3489,6 +3760,22 @@ export default function CompendiumItemCreateDialog({
       )}
       {itemType === "heroic" && (
         <HeroicForm
+          packId={packId}
+          onClose={onClose}
+          editData={editData}
+          editItemId={editItemId}
+        />
+      )}
+      {itemType === "mnemosphere" && (
+        <MnemosphereForm
+          packId={packId}
+          onClose={onClose}
+          editData={editData}
+          editItemId={editItemId}
+        />
+      )}
+      {itemType === "hoplosphere" && (
+        <HoplosphereForm
           packId={packId}
           onClose={onClose}
           editData={editData}

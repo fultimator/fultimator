@@ -14,6 +14,14 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import attributes from "../../../../libs/attributes";
 import { spellsByClass } from "../../../../libs/classes";
 import {
+  getSpellTypeItemCount,
+  INVOCATION_WELLSPRING_GROUPS,
+  PILOT_MODULE_GROUPS,
+  SPELL_TYPE_DESC_KEYS,
+  SPELL_TYPE_ITEMS,
+  TINKERER_SPELL_TYPES,
+} from "./spellTypeAccordionData";
+import {
   useCardSetup,
   headerBoxSx,
   nameRowSx,
@@ -22,29 +30,455 @@ import {
 import { StyledMarkdown, md } from "../markdown";
 import { CardContentWrapper, RowsWithOptionalImage } from "../core";
 
-const SPELL_TYPE_DESC_KEYS = {
-  dance: ["dance_details_1"],
-  symbol: ["symbol_details_1"],
-  magichant: [
-    "magichant_details_1",
-    "magichant_details_2",
-    "magichant_details_3",
-    "magichant_details_4",
-  ],
-  cooking: ["Cooking_desc"],
-  invocation: ["Invocation_desc"],
-  "pilot-vehicle": ["pilot_details_1"],
-  magiseed: ["magiseed_details_1"],
-  gift: [],
-  therioform: [],
-  deck: [],
-  arcanist: [],
-  "arcanist-rework": [],
-  "tinkerer-alchemy": [],
-  "tinkerer-infusion": [],
-  "tinkerer-magitech": [],
-  gamble: [],
-};
+function SpellTypeItemRow({ entry, customTheme, t }) {
+  const [open, setOpen] = useState(false);
+  const hasDetails = entry.details?.length > 0;
+  return (
+    <Accordion
+      disableGutters
+      elevation={0}
+      square
+      expanded={open}
+      onChange={(_, v) => hasDetails && setOpen(v)}
+      sx={{
+        borderTop: `1px solid ${customTheme.secondary}`,
+        "&:before": { display: "none" },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={hasDetails ? <ExpandMoreIcon /> : null}
+        sx={{
+          minHeight: 36,
+          px: 2,
+          cursor: hasDetails ? "pointer" : "default",
+          "& .MuiAccordionSummary-content": {
+            my: 0.5,
+            alignItems: "center",
+            gap: 1,
+          },
+        }}
+      >
+        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+          {t(entry.name)}
+        </Typography>
+        {entry.subtype && (
+          <Chip
+            label={t(entry.subtype)}
+            size="small"
+            sx={{
+              fontSize: "0.6rem",
+              height: 16,
+              backgroundColor: `${customTheme.primary}22`,
+              color: customTheme.primary,
+              fontWeight: "bold",
+            }}
+          />
+        )}
+      </AccordionSummary>
+      {hasDetails && (
+        <AccordionDetails sx={{ p: 0 }}>
+          {entry.details.map((d, i) => (
+            <Box
+              key={i}
+              sx={{
+                px: 2,
+                py: 0.5,
+                borderTop: `1px solid ${customTheme.secondary}`,
+                display: "flex",
+                gap: 1,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: "bold",
+                  color: customTheme.primary,
+                  minWidth: 72,
+                  flexShrink: 0,
+                  pt: "2px",
+                  textTransform: "uppercase",
+                  fontSize: "0.65rem",
+                  letterSpacing: "0.3px",
+                }}
+              >
+                {t(d.label)}
+              </Typography>
+              <Typography
+                variant="body2"
+                component="div"
+                sx={{
+                  color: "text.secondary",
+                  lineHeight: 1.5,
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              >
+                {md(d.rawValue ? d.value : t(d.value))}
+              </Typography>
+            </Box>
+          ))}
+        </AccordionDetails>
+      )}
+    </Accordion>
+  );
+}
+
+function SpellTypeGroupAccordion({ label, descKeys, items, customTheme, t }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Accordion
+      disableGutters
+      elevation={0}
+      square
+      expanded={open}
+      onChange={(_, v) => setOpen(v)}
+      sx={{
+        borderTop: `1px solid ${customTheme.secondary}`,
+        "&:before": { display: "none" },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          minHeight: 36,
+          px: 2,
+          pl: 3,
+          "& .MuiAccordionSummary-content": { my: 0.5 },
+        }}
+      >
+        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+          {t(label)}
+          {items.length > 0 && (
+            <Typography
+              component="span"
+              variant="caption"
+              sx={{ color: "text.secondary", ml: 1 }}
+            >
+              ({items.length})
+            </Typography>
+          )}
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ p: 0 }}>
+        {descKeys.length > 0 && (
+          <Box
+            sx={{
+              borderTop: `1px solid ${customTheme.secondary}`,
+              px: 2,
+              py: 1,
+            }}
+          >
+            {descKeys.map((key) => (
+              <Typography
+                key={key}
+                variant="body2"
+                component="div"
+                sx={{ color: "text.secondary", mb: 0.5 }}
+              >
+                {md(t(key))}
+              </Typography>
+            ))}
+          </Box>
+        )}
+        {items.map((entry) => (
+          <SpellTypeItemRow
+            key={entry.name}
+            entry={entry}
+            customTheme={customTheme}
+            t={t}
+          />
+        ))}
+      </AccordionDetails>
+    </Accordion>
+  );
+}
+
+function ClassSpellRow({ spell, customTheme, t }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Accordion
+      disableGutters
+      elevation={0}
+      square
+      expanded={open}
+      onChange={(_, v) => setOpen(v)}
+      sx={{
+        borderTop: `1px solid ${customTheme.secondary}`,
+        "&:before": { display: "none" },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          minHeight: 36,
+          px: 2,
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+            gap: 0.75,
+            my: 0.5,
+          },
+        }}
+      >
+        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+          {t(spell.name)}
+        </Typography>
+        {spell.spellType !== "gamble" && (
+          <Chip
+            label={spell.isOffensive ? t("Offensive") : t("Support")}
+            size="small"
+            color={spell.isOffensive ? "error" : "success"}
+            variant="outlined"
+            sx={{ fontSize: "0.6rem", height: 16 }}
+          />
+        )}
+        <Typography
+          variant="caption"
+          sx={{ color: "text.secondary", ml: "auto" }}
+        >
+          {spell.mp} MP
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ px: 2, py: 0.75 }}>
+        <Box sx={{ display: "flex", gap: 1, mb: 0.25 }}>
+          <Typography variant="caption" sx={{ color: "text.secondary" }}>
+            {spell.targetDesc}
+          </Typography>
+          <Typography variant="caption" sx={{ color: "text.secondary" }}>
+            ·
+          </Typography>
+          <Typography variant="caption" sx={{ color: "text.secondary" }}>
+            {spell.duration}
+          </Typography>
+          {spell.attr1 && spell.attr2 && (
+            <>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                ·
+              </Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                {attributes[spell.attr1]?.shortcaps} +{" "}
+                {attributes[spell.attr2]?.shortcaps}
+              </Typography>
+            </>
+          )}
+        </Box>
+        {spell.spellType === "gamble" ? (
+          <>
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{ color: "text.secondary", mb: 0.5 }}
+            >
+              {md(t("GambleSpell_desc"))}
+            </Typography>
+            {spell.targets?.map((target, j) => (
+              <Box key={j} sx={{ display: "flex", gap: 1, mb: 0.25 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "text.secondary",
+                    minWidth: 32,
+                    flexShrink: 0,
+                    pt: "1px",
+                  }}
+                >
+                  {target.rangeFrom === target.rangeTo
+                    ? target.rangeFrom
+                    : `${target.rangeFrom}–${target.rangeTo}`}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  component="div"
+                  sx={{ color: "text.secondary" }}
+                >
+                  {md(target.effect)}
+                </Typography>
+              </Box>
+            ))}
+          </>
+        ) : (
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{ color: "text.secondary" }}
+          >
+            <StyledMarkdown allowedElements={["strong", "em"]} unwrapDisallowed>
+              {t(spell.description)}
+            </StyledMarkdown>
+          </Typography>
+        )}
+      </AccordionDetails>
+    </Accordion>
+  );
+}
+
+function InvocationWellspringAccordion({ group, customTheme, t }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Accordion
+      disableGutters
+      elevation={0}
+      square
+      expanded={open}
+      onChange={(_, v) => setOpen(v)}
+      sx={{
+        borderTop: `1px solid ${customTheme.secondary}`,
+        "&:before": { display: "none" },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          minHeight: 36,
+          px: 2,
+          pl: 3,
+          "& .MuiAccordionSummary-content": { my: 0.5 },
+        }}
+      >
+        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+          {group.label}
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{ color: "text.secondary", ml: 1 }}
+          >
+            ({group.items.length})
+          </Typography>
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ p: 0 }}>
+        {group.items.map((entry) => (
+          <SpellTypeItemRow
+            key={entry.name}
+            entry={entry}
+            customTheme={customTheme}
+            t={t}
+          />
+        ))}
+      </AccordionDetails>
+    </Accordion>
+  );
+}
+
+function InvocationWellsprings({ customTheme, t }) {
+  return (
+    <>
+      {INVOCATION_WELLSPRING_GROUPS.map((group) => (
+        <InvocationWellspringAccordion
+          key={group.key}
+          group={group}
+          customTheme={customTheme}
+          t={t}
+        />
+      ))}
+    </>
+  );
+}
+
+function PilotModuleGroupAccordion({ group, customTheme, t }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Accordion
+      disableGutters
+      elevation={0}
+      square
+      expanded={open}
+      onChange={(_, v) => setOpen(v)}
+      sx={{
+        borderTop: `1px solid ${customTheme.secondary}`,
+        "&:before": { display: "none" },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          minHeight: 36,
+          px: 2,
+          pl: 3,
+          "& .MuiAccordionSummary-content": { my: 0.5 },
+        }}
+      >
+        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+          {t(group.label)}
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{ color: "text.secondary", ml: 1 }}
+          >
+            ({group.items.length})
+          </Typography>
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ p: 0 }}>
+        {group.items.map((entry) => (
+          <SpellTypeItemRow
+            key={entry.name}
+            entry={entry}
+            customTheme={customTheme}
+            t={t}
+          />
+        ))}
+      </AccordionDetails>
+    </Accordion>
+  );
+}
+
+function PilotModulesAccordion({ customTheme, t }) {
+  const [open, setOpen] = useState(false);
+  const count = PILOT_MODULE_GROUPS.reduce(
+    (sum, group) => sum + group.items.length,
+    0,
+  );
+
+  return (
+    <Accordion
+      disableGutters
+      elevation={0}
+      square
+      expanded={open}
+      onChange={(_, v) => setOpen(v)}
+      sx={{
+        borderTop: `1px solid ${customTheme.secondary}`,
+        "&:before": { display: "none" },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          minHeight: 38,
+          px: 2,
+          backgroundColor: `${customTheme.primary}0f`,
+          "& .MuiAccordionSummary-content": { my: 0.5 },
+        }}
+      >
+        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+          {t("pilot_modules")}
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{ color: "text.secondary", ml: 1 }}
+          >
+            ({count})
+          </Typography>
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ p: 0 }}>
+        {PILOT_MODULE_GROUPS.map((group) => (
+          <PilotModuleGroupAccordion
+            key={group.key}
+            group={group}
+            customTheme={customTheme}
+            t={t}
+          />
+        ))}
+      </AccordionDetails>
+    </Accordion>
+  );
+}
 
 export const SharedClassCard = React.memo(function SharedClassCard({
   item,
@@ -217,15 +651,23 @@ export const SharedClassCard = React.memo(function SharedClassCard({
             >
               <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                 {t("Spells")}
-                {classSpells.length > 0 && (
-                  <Typography
-                    component="span"
-                    variant="caption"
-                    sx={{ color: "text.secondary", ml: 1 }}
-                  >
-                    ({classSpells.length})
-                  </Typography>
-                )}
+                {(() => {
+                  const count = hasCustomSpells
+                    ? (item.benefits?.spellClasses ?? []).reduce(
+                        (sum, sc) => sum + getSpellTypeItemCount(sc),
+                        0,
+                      )
+                    : classSpells.length;
+                  return count > 0 ? (
+                    <Typography
+                      component="span"
+                      variant="caption"
+                      sx={{ color: "text.secondary", ml: 1 }}
+                    >
+                      ({count})
+                    </Typography>
+                  ) : null;
+                })()}
               </Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ p: 0 }}>
@@ -233,35 +675,72 @@ export const SharedClassCard = React.memo(function SharedClassCard({
                 (hasCustomSpells
                   ? item.benefits.spellClasses.map((sc) => {
                       const descKeys = SPELL_TYPE_DESC_KEYS[sc] ?? [];
-                      const hasDescKeys = descKeys.length > 0;
+                      const items = SPELL_TYPE_ITEMS[sc] ?? [];
+                      if (TINKERER_SPELL_TYPES.has(sc)) {
+                        return (
+                          <SpellTypeGroupAccordion
+                            key={sc}
+                            label={descKeys[0] ?? sc}
+                            descKeys={descKeys.slice(1)}
+                            items={items}
+                            customTheme={customTheme}
+                            t={t}
+                          />
+                        );
+                      }
                       return (
-                        <Box
-                          key={sc}
-                          sx={{
-                            borderTop: `1px solid ${customTheme.secondary}`,
-                          }}
-                        >
-                          <Box sx={{ px: 2, py: 1 }}>
+                        <Box key={sc}>
+                          {descKeys.length > 0 && (
                             <Box
                               sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                                mb: hasDescKeys ? 0.75 : 0,
+                                borderTop: `1px solid ${customTheme.secondary}`,
+                                px: 2,
+                                py: 1,
                               }}
                             >
-                              <Chip
-                                label={sc}
-                                size="small"
+                              {descKeys.map((key) => (
+                                <Typography
+                                  key={key}
+                                  variant="body2"
+                                  component="div"
+                                  sx={{ color: "text.secondary", mb: 0.5 }}
+                                >
+                                  {md(t(key))}
+                                </Typography>
+                              ))}
+                            </Box>
+                          )}
+                          {items.map((entry, i) => (
+                            <SpellTypeItemRow
+                              key={i}
+                              entry={entry}
+                              customTheme={customTheme}
+                              t={t}
+                            />
+                          ))}
+                          {sc === "invocation" && (
+                            <InvocationWellsprings
+                              customTheme={customTheme}
+                              t={t}
+                            />
+                          )}
+                          {sc === "pilot-vehicle" && (
+                            <PilotModulesAccordion
+                              customTheme={customTheme}
+                              t={t}
+                            />
+                          )}
+                          {items.length === 0 &&
+                            descKeys.length === 0 &&
+                            sc !== "pilot-vehicle" &&
+                            !(item.name === "Tinkerer" && sc === "default") && (
+                              <Box
                                 sx={{
-                                  fontSize: "0.65rem",
-                                  textTransform: "capitalize",
-                                  backgroundColor: `${customTheme.primary}22`,
-                                  color: customTheme.primary,
-                                  fontWeight: "bold",
+                                  borderTop: `1px solid ${customTheme.secondary}`,
+                                  px: 2,
+                                  py: 1,
                                 }}
-                              />
-                              {!hasDescKeys && (
+                              >
                                 <Typography
                                   variant="caption"
                                   sx={{
@@ -271,151 +750,18 @@ export const SharedClassCard = React.memo(function SharedClassCard({
                                 >
                                   {t("Defined per character")}
                                 </Typography>
-                              )}
-                            </Box>
-                            {descKeys.map((key) => (
-                              <Typography
-                                key={key}
-                                variant="body2"
-                                component="div"
-                                sx={{ color: "text.secondary", mb: 0.5 }}
-                              >
-                                {md(t(key))}
-                              </Typography>
-                            ))}
-                          </Box>
+                              </Box>
+                            )}
                         </Box>
                       );
                     })
-                  : classSpells.map((spell, i) => (
-                      <Box
-                        key={i}
-                        sx={{
-                          borderTop: `1px solid ${customTheme.secondary}`,
-                          px: 2,
-                          py: 0.75,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.75,
-                            mb: 0.25,
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{ fontWeight: "bold" }}
-                          >
-                            {t(spell.name)}
-                          </Typography>
-                          <Chip
-                            label={
-                              spell.isOffensive ? t("Offensive") : t("Support")
-                            }
-                            size="small"
-                            color={spell.isOffensive ? "error" : "success"}
-                            variant="outlined"
-                            sx={{ fontSize: "0.6rem", height: 16 }}
-                          />
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "text.secondary", ml: "auto" }}
-                          >
-                            {spell.mp} MP
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: "flex", gap: 1, mb: 0.25 }}>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "text.secondary" }}
-                          >
-                            {spell.targetDesc}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "text.secondary" }}
-                          >
-                            ·
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "text.secondary" }}
-                          >
-                            {spell.duration}
-                          </Typography>
-                          {spell.attr1 && spell.attr2 && (
-                            <>
-                              <Typography
-                                variant="caption"
-                                sx={{ color: "text.secondary" }}
-                              >
-                                ·
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                sx={{ color: "text.secondary" }}
-                              >
-                                {attributes[spell.attr1]?.shortcaps} +{" "}
-                                {attributes[spell.attr2]?.shortcaps}
-                              </Typography>
-                            </>
-                          )}
-                        </Box>
-                        {spell.spellType === "gamble" ? (
-                          <>
-                            <Typography
-                              variant="body2"
-                              component="div"
-                              sx={{ color: "text.secondary", mb: 0.5 }}
-                            >
-                              {md(t("GambleSpell_desc"))}
-                            </Typography>
-                            {spell.targets?.map((target, j) => (
-                              <Box
-                                key={j}
-                                sx={{ display: "flex", gap: 1, mb: 0.25 }}
-                              >
-                                <Typography
-                                  variant="caption"
-                                  sx={{
-                                    fontWeight: "bold",
-                                    color: "text.secondary",
-                                    minWidth: 32,
-                                    flexShrink: 0,
-                                    pt: "1px",
-                                  }}
-                                >
-                                  {target.rangeFrom === target.rangeTo
-                                    ? target.rangeFrom
-                                    : `${target.rangeFrom}–${target.rangeTo}`}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  component="div"
-                                  sx={{ color: "text.secondary" }}
-                                >
-                                  {md(target.effect)}
-                                </Typography>
-                              </Box>
-                            ))}
-                          </>
-                        ) : (
-                          <Typography
-                            variant="body2"
-                            component="div"
-                            sx={{ color: "text.secondary" }}
-                          >
-                            <StyledMarkdown
-                              allowedElements={["strong", "em"]}
-                              unwrapDisallowed
-                            >
-                              {t(spell.description)}
-                            </StyledMarkdown>
-                          </Typography>
-                        )}
-                      </Box>
+                  : classSpells.map((spell) => (
+                      <ClassSpellRow
+                        key={spell.name}
+                        spell={spell}
+                        customTheme={customTheme}
+                        t={t}
+                      />
                     )))}
             </AccordionDetails>
           </Accordion>

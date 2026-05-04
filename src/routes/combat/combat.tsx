@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import { Cloud as CloudIcon, Download, AddCircle } from "@mui/icons-material";
 import { useRef, useState } from "react";
-import type { User } from "firebase/auth";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 
@@ -67,16 +66,12 @@ export default function Combat() {
         </Paper>
       )}
 
-      {cloudUser && <AuthCombat user={cloudUser} />}
+      {cloudUser && <AuthCombat />}
     </Layout>
   );
 }
 
-interface AuthCombatProps {
-  user: User;
-}
-
-function AuthCombat({ _user }: AuthCombatProps) {
+function AuthCombat() {
   const { t } = useTranslate();
   const db = useDatabase("cloud");
 

@@ -4,6 +4,8 @@ export {
   SharedArmorCard,
   SharedShieldCard,
   SharedAccessoryCard,
+  SharedMnemosphereCard,
+  SharedHoplosphereCard,
 } from "./equipment/SharedEquipmentCards";
 
 export {

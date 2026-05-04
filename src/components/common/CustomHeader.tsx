@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
 import { useMediaQuery } from "@mui/material";
-import { Grid, Tooltip, Box } from "@mui/material";
+import { Grid, Tooltip, Box, TextField } from "@mui/material";
 import { SvgIconComponent } from "@mui/icons-material";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
@@ -13,6 +13,9 @@ interface CustomHeaderProps {
   addItem: () => void;
   openCompendium: () => void;
   headerText: string;
+  rightLabel?: string;
+  rightValue?: number;
+  rightMax?: number;
   type: "top" | "middle";
   icon?: SvgIconComponent;
   showIconButton?: boolean;
@@ -24,6 +27,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   addItem,
   openCompendium,
   headerText,
+  rightLabel,
+  rightValue,
+  rightMax,
   type,
   icon: Icon = HistoryEduIcon,
   showIconButton = true,
@@ -32,6 +38,52 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 }) => {
   const theme = useCustomTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const fieldColor = theme.mode === "dark" ? "#ffffff" : "#000000";
+  const fieldBg = theme.mode === "dark" ? "#212425" : "#ffffff";
+  const fieldSx = { width: isMobile ? "40px" : "55px" };
+  const fieldInputProps = {
+    inputProps: { readOnly: true, style: { textAlign: "center" as const } },
+    style: {
+      color: fieldColor,
+      fontFamily: "inherit",
+      fontSize: "inherit",
+      backgroundColor: fieldBg,
+    },
+  };
+
+  const rightWidget =
+    rightLabel !== undefined && rightValue !== undefined ? (
+      <Box sx={{ display: "flex", alignItems: "center", gap: "2px", mr: 1 }}>
+        <Box
+          sx={{
+            mr: "6px",
+            fontSize: isMobile ? "0.75em" : "0.85em",
+            textTransform: "uppercase",
+          }}
+        >
+          {rightLabel}
+        </Box>
+        <TextField
+          value={rightValue}
+          variant="outlined"
+          size="small"
+          sx={fieldSx}
+          slotProps={{ input: fieldInputProps }}
+        />
+        {rightMax !== undefined && (
+          <>
+            {" / "}
+            <TextField
+              value={rightMax}
+              variant="outlined"
+              size="small"
+              sx={fieldSx}
+              slotProps={{ input: fieldInputProps }}
+            />
+          </>
+        )}
+      </Box>
+    ) : null;
   const isTop = type === "top";
   const isMiddle = type === "middle";
 
@@ -57,7 +109,8 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
             }}
           >
             <div style={{ marginLeft: "15px" }}>{headerText}</div>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {rightWidget}
               {openCompendium && (
                 <Tooltip title="Open Compendium">
                   <IconButton
@@ -98,9 +151,11 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                   </Tooltip>
                 )
               ) : (
-                <span
-                  style={{ minWidth: "15px", display: "inline-block" }}
-                ></span>
+                !rightWidget && (
+                  <span
+                    style={{ minWidth: "15px", display: "inline-block" }}
+                  ></span>
+                )
               )}
             </Box>
           </Typography>
@@ -144,7 +199,8 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
             }}
           >
             <div style={{ marginLeft: "15px" }}>{headerText}</div>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {rightWidget}
               {openCompendium && (
                 <Tooltip title={customTooltip || "Open Compendium"}>
                   <IconButton
@@ -185,9 +241,11 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                   </Tooltip>
                 )
               ) : (
-                <span
-                  style={{ minWidth: "15px", display: "inline-block" }}
-                ></span>
+                !rightWidget && (
+                  <span
+                    style={{ minWidth: "15px", display: "inline-block" }}
+                  ></span>
+                )
               )}
             </Box>
           </Typography>

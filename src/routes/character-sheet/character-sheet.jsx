@@ -36,6 +36,7 @@ import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
 import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFull";
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
+import MnemoReceptaclePanel from "../../components/player/equipment/technospheres/MnemoReceptaclePanel";
 import powered_by_fu from "../powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
@@ -184,13 +185,32 @@ export default function CharacterSheet() {
         let mpBonus = 0;
         let ipBonus = 0;
 
+        const innateClassesCS1 =
+          prevPlayer.settings?.optionalRules?.innateClasses ?? [];
+        const isTechnospheresCS1 =
+          prevPlayer.settings?.optionalRules?.technospheres ?? false;
+        const technospheresVariantCS1 =
+          prevPlayer.settings?.optionalRules?.technospheresVariant ??
+          "standard";
+        const usesInnateClassRulesCS1 =
+          isTechnospheresCS1 && technospheresVariantCS1 !== "hoplospheres";
         prevPlayer.classes.forEach((cls) => {
-          if (cls.benefits) {
-            hpBonus += cls.benefits.hpplus || 0;
-            mpBonus += cls.benefits.mpplus || 0;
-            ipBonus += cls.benefits.ipplus || 0;
-          }
+          if (!cls.benefits) return;
+          if (usesInnateClassRulesCS1 && !innateClassesCS1.includes(cls.name))
+            return;
+          hpBonus += cls.benefits.hpplus || 0;
+          mpBonus += cls.benefits.mpplus || 0;
+          ipBonus += cls.benefits.ipplus || 0;
         });
+
+        if (
+          isTechnospheresCS1 &&
+          (technospheresVariantCS1 === "standard" ||
+            technospheresVariantCS1 === "mnemospheres")
+        ) {
+          hpBonus += 5;
+          mpBonus += 5;
+        }
 
         if (prevPlayer.modifiers) {
           hpBonus += prevPlayer.modifiers.hp || 0;
@@ -352,13 +372,32 @@ export default function CharacterSheet() {
       let mpBonus = 0;
       let ipBonus = 0;
 
+      const innateClassesCS2 =
+        leveledPlayer.settings?.optionalRules?.innateClasses ?? [];
+      const isTechnospheresCS2 =
+        leveledPlayer.settings?.optionalRules?.technospheres ?? false;
+      const technospheresVariantCS2 =
+        leveledPlayer.settings?.optionalRules?.technospheresVariant ??
+        "standard";
+      const usesInnateClassRulesCS2 =
+        isTechnospheresCS2 && technospheresVariantCS2 !== "hoplospheres";
       (leveledPlayer.classes || []).forEach((cls) => {
-        if (cls.benefits) {
-          hpBonus += Number(cls.benefits.hpplus) || 0;
-          mpBonus += Number(cls.benefits.mpplus) || 0;
-          ipBonus += Number(cls.benefits.ipplus) || 0;
-        }
+        if (!cls.benefits) return;
+        if (usesInnateClassRulesCS2 && !innateClassesCS2.includes(cls.name))
+          return;
+        hpBonus += Number(cls.benefits.hpplus) || 0;
+        mpBonus += Number(cls.benefits.mpplus) || 0;
+        ipBonus += Number(cls.benefits.ipplus) || 0;
       });
+
+      if (
+        isTechnospheresCS2 &&
+        (technospheresVariantCS2 === "standard" ||
+          technospheresVariantCS2 === "mnemospheres")
+      ) {
+        hpBonus += 5;
+        mpBonus += 5;
+      }
 
       if (leveledPlayer.modifiers) {
         hpBonus += Number(leveledPlayer.modifiers.hp) || 0;
@@ -610,6 +649,17 @@ export default function CharacterSheet() {
                   isCharacterSheet={true}
                   updateMaxStats={updateMaxStats}
                 />
+                {optionalRules.technospheres &&
+                  ["integrated", "mnemospheres"].includes(
+                    player?.settings?.optionalRules?.technospheresVariant ??
+                      "standard",
+                  ) && (
+                    <MnemoReceptaclePanel
+                      player={player}
+                      setPlayer={handleSetPlayer}
+                      readOnly={!isEditMode}
+                    />
+                  )}
                 {optionalRules.quirks && (
                   <PlayerQuirk
                     player={player}

@@ -15,6 +15,10 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { Info } from "@mui/icons-material";
 import { SharedSkillCard } from "../../shared/itemCards";
+import {
+  getActiveMnemospheres,
+  getMnemosphereSkillDescription,
+} from "../classes/mnemosphereClassUtils";
 
 export default function PlayerSkills({ player }) {
   const { t } = useTranslate();
@@ -25,6 +29,8 @@ export default function PlayerSkills({ player }) {
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
+  const [openMnemoModal, setOpenMnemoModal] = useState(false);
+  const [selectedMnemoSkill, setSelectedMnemoSkill] = useState(null);
 
   /* All skills with currentLvl > 0 from all classes */
   const allSkills = player.classes
@@ -51,6 +57,20 @@ export default function PlayerSkills({ player }) {
     .filter((skill) => skill.currentLvl > 0)
     .sort((a, b) => a.skillName.localeCompare(b.skillName));
 
+  const allMnemoSkills = getActiveMnemospheres(player)
+    .flatMap((mnemo) =>
+      (mnemo.skills ?? [])
+        .filter((s) => (s.currentLvl ?? 0) > 0)
+        .map((skill) => ({
+          name: skill.name,
+          description: getMnemosphereSkillDescription(mnemo, skill) ?? "",
+          currentLvl: skill.currentLvl,
+          maxLvl: skill.maxLvl,
+          className: mnemo.class,
+        })),
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
+
   const handleOpenModal = (skill) => {
     setSelectedSkill(skill);
     setOpenModal(true);
@@ -60,13 +80,41 @@ export default function PlayerSkills({ player }) {
     setOpenModal(false);
   };
 
-  const handleOK = () => {
-    handleCloseModal();
+  const handleOpenMnemoModal = (skill) => {
+    setSelectedMnemoSkill(skill);
+    setOpenMnemoModal(true);
+  };
+
+  const handleCloseMnemoModal = () => {
+    setOpenMnemoModal(false);
+  };
+
+  const skillPillSx = {
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    backgroundColor: primary,
+    padding: "5px",
+    paddingLeft: "10px",
+    color: "#fff",
+    borderRadius: "8px 0 0 8px",
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+  };
+
+  const skillInfoSx = {
+    padding: "10px",
+    backgroundColor: ternary,
+    borderRadius: "0 8px 8px 0",
+    marginRight: "15px",
+    display: "flex",
+    alignItems: "center",
+    flexDirection: "row",
   };
 
   return (
     <>
-      {allSkills.length > 0 && (
+      {(allSkills.length > 0 || allMnemoSkills.length > 0) && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper
@@ -113,28 +161,10 @@ export default function PlayerSkills({ player }) {
                     alignItems: "stretch",
                     maxHeight: "40px",
                   }}
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
+                  size={{ xs: 12, md: 6 }}
                 >
                   <Grid sx={{ display: "flex" }} size={10}>
-                    <Typography
-                      id="skill-left-name"
-                      variant="h2"
-                      sx={{
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        backgroundColor: primary,
-                        padding: "5px",
-                        paddingLeft: "10px",
-                        color: "#fff",
-                        borderRadius: "8px 0 0 8px",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                      }}
-                    >
+                    <Typography variant="h2" sx={skillPillSx}>
                       {skill.isHomebrew ? skill.skillName : t(skill.skillName)}
                     </Typography>
                   </Grid>
@@ -146,19 +176,7 @@ export default function PlayerSkills({ player }) {
                     }}
                     size={2}
                   >
-                    <div
-                      id="skill-right-controls"
-                      style={{
-                        padding: "10px",
-                        backgroundColor: ternary,
-                        borderRadius: "0 8px 8px 0",
-                        marginRight: "15px",
-                        display: "flex",
-                        alignItems: "center",
-                        flexDirection: "row",
-                      }}
-                      className="skill-right-controls"
-                    >
+                    <div style={skillInfoSx}>
                       <Tooltip title={t("Info")}>
                         <IconButton
                           sx={{ padding: "0px" }}
@@ -171,7 +189,62 @@ export default function PlayerSkills({ player }) {
                   </Grid>
                 </Grid>
               ))}
+
+              {allMnemoSkills.length > 0 && (
+                <>
+                  <Grid size={12}>
+                    <Divider sx={{ mt: 1 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ textTransform: "uppercase", letterSpacing: 1 }}
+                      >
+                        {t("Mnemospheres")}
+                      </Typography>
+                    </Divider>
+                  </Grid>
+                  {allMnemoSkills.map((skill, index) => (
+                    <Grid
+                      container
+                      spacing={0}
+                      key={`mnemo-${index}`}
+                      sx={{
+                        display: "flex",
+                        alignItems: "stretch",
+                        maxHeight: "40px",
+                      }}
+                      size={{ xs: 12, md: 6 }}
+                    >
+                      <Grid sx={{ display: "flex" }} size={10}>
+                        <Typography variant="h2" sx={skillPillSx}>
+                          {t(skill.name)}
+                        </Typography>
+                      </Grid>
+                      <Grid
+                        sx={{
+                          display: "flex",
+                          alignItems: "stretch",
+                          maxHeight: "40px",
+                        }}
+                        size={2}
+                      >
+                        <div style={skillInfoSx}>
+                          <Tooltip title={t("Info")}>
+                            <IconButton
+                              sx={{ padding: "0px" }}
+                              onClick={() => handleOpenMnemoModal(skill)}
+                            >
+                              <Info />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      </Grid>
+                    </Grid>
+                  ))}
+                </>
+              )}
             </Grid>
+
             <Dialog
               open={openModal}
               onClose={handleCloseModal}
@@ -185,7 +258,43 @@ export default function PlayerSkills({ player }) {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleOK}
+                  onClick={handleCloseModal}
+                  fullWidth
+                >
+                  {t("Close")}
+                </Button>
+              </DialogActions>
+            </Dialog>
+            <Dialog
+              open={openMnemoModal}
+              onClose={handleCloseMnemoModal}
+              fullWidth
+              maxWidth="sm"
+            >
+              <DialogContent>
+                {selectedMnemoSkill && (
+                  <>
+                    <Typography variant="h2" sx={{ fontWeight: "bold", mb: 1 }}>
+                      {t(selectedMnemoSkill.name)}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block", mb: 1 }}
+                    >
+                      {t(selectedMnemoSkill.className)} ·{" "}
+                      {selectedMnemoSkill.currentLvl}/
+                      {selectedMnemoSkill.maxLvl}
+                    </Typography>
+                    <Typography>{t(selectedMnemoSkill.description)}</Typography>
+                  </>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCloseMnemoModal}
                   fullWidth
                 >
                   {t("Close")}
