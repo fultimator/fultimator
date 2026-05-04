@@ -50,6 +50,8 @@ import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import {
   Button,
   Dialog,
@@ -1065,13 +1067,19 @@ function CompendiumViewer() {
   } = useCompendiumPacks();
   const [newPackDialogOpen, setNewPackDialogOpen] = useState(false);
   const [newPackName, setNewPackName] = useState("");
+  const [newPackFuid, setNewPackFuid] = useState("");
+  const [newPackFuidTouched, setNewPackFuidTouched] = useState(false);
   const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
   const [editClassItem, setEditClassItem] = useState(null); // { item, packItemId }
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
   const [editingPackName, setEditingPackName] = useState("");
+  const [editingPackFuid, setEditingPackFuid] = useState("");
+  const [editingPackFuidTouched, setEditingPackFuidTouched] = useState(false);
   const [editingDescription, setEditingDescription] = useState("");
   const [editingAuthor, setEditingAuthor] = useState("");
+  const [editingRequires, setEditingRequires] = useState([]);
+  const [editingOptional, setEditingOptional] = useState([]);
 
   // Export meta lives inside the Manage Pack dialog (not a separate dialog)
   const [exportMeta, setExportMeta] = useState({
@@ -1105,6 +1113,34 @@ function CompendiumViewer() {
     selectedCompendium !== "official"
       ? (activePacks.find((p) => p.id === selectedCompendium) ?? null)
       : null;
+  const activePackFuids = useMemo(
+    () =>
+      new Set(
+        activePacks.map((p) => (p.fuid ? toSlug(p.fuid) : "")).filter(Boolean),
+      ),
+    [activePacks],
+  );
+  const normalizedNewPackFuid = toSlug(newPackFuid);
+  const isNewPackFuidDuplicate =
+    normalizedNewPackFuid.length > 0 &&
+    activePackFuids.has(normalizedNewPackFuid);
+  const normalizedEditingPackFuid = toSlug(editingPackFuid);
+  const isEditingPackFuidDuplicate =
+    normalizedEditingPackFuid.length > 0 &&
+    activePacks.some(
+      (p) =>
+        p.id !== activePack?.id &&
+        toSlug(p.fuid || "") === normalizedEditingPackFuid,
+    );
+  const dependencySuggestions = useMemo(() => {
+    const installed = activePacks
+      .map((p) => toSlug(p.fuid || p.name || ""))
+      .filter(Boolean);
+    const unique = Array.from(new Set(installed)).sort((a, b) =>
+      a.localeCompare(b),
+    );
+    return ["official", ...unique.filter((v) => v !== "official")];
+  }, [activePacks]);
 
   const selectedType = searchParams.get("type") ?? "weapons";
   const selectedSpellClass = searchParams.get("class") ?? "";
@@ -1748,11 +1784,14 @@ function CompendiumViewer() {
 
   const handleNewPack = useCallback(async () => {
     if (!newPackName.trim()) return;
-    const id = await createPack(newPackName.trim());
+    const fuid = toSlug(newPackFuid) || toSlug(newPackName) || undefined;
+    const id = await createPack(newPackName.trim(), undefined, fuid);
     setNewPackName("");
+    setNewPackFuid("");
+    setNewPackFuidTouched(false);
     setPendingNavPackId(id); // navigate in onExited
     setNewPackDialogOpen(false);
-  }, [newPackName, createPack]);
+  }, [newPackName, newPackFuid, createPack]);
 
   const handleRemoveFromPack = useCallback(
     async (item) => {
@@ -1905,8 +1944,12 @@ function CompendiumViewer() {
       onNewPack={() => setNewPackDialogOpen(true)}
       onManagePack={() => {
         setEditingPackName(activePack?.name ?? "");
+        setEditingPackFuid(activePack?.fuid ?? toSlug(activePack?.name ?? ""));
+        setEditingPackFuidTouched(false);
         setEditingDescription(activePack?.description ?? "");
         setEditingAuthor(activePack?.author ?? "");
+        setEditingRequires(activePack?.requires ?? []);
+        setEditingOptional(activePack?.optional ?? []);
         setExportMeta({
           version: "1.0.0",
           homepageUrl: "",
@@ -2246,15 +2289,77 @@ function CompendiumViewer() {
         >
           {t("New Compendium Pack")}
         </DialogTitle>
-        <DialogContent sx={{ pt: "16px !important" }}>
+        <DialogContent
+          sx={{
+            pt: "16px !important",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
           <TextField
             label={t("Name")}
             value={newPackName}
-            onChange={(e) => setNewPackName(e.target.value)}
+            onChange={(e) => {
+              const nextName = e.target.value;
+              setNewPackName(nextName);
+              if (!newPackFuidTouched) setNewPackFuid(toSlug(nextName));
+            }}
             autoFocus
             fullWidth
             size="small"
             onKeyDown={(e) => e.key === "Enter" && handleNewPack()}
+          />
+          <TextField
+            label="FUID"
+            value={newPackFuid}
+            onChange={(e) => {
+              setNewPackFuid(e.target.value);
+              setNewPackFuidTouched(true);
+            }}
+            fullWidth
+            size="small"
+            error={isNewPackFuidDuplicate}
+            helperText={
+              isNewPackFuidDuplicate
+                ? "Another pack already uses this FUID"
+                : "Used for cross-pack references"
+            }
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Tooltip title="Copy FUID">
+                      <span>
+                        <IconButton
+                          size="small"
+                          disabled={!normalizedNewPackFuid}
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(
+                              normalizedNewPackFuid,
+                            );
+                            setShareSnackOpen(true);
+                          }}
+                        >
+                          <ContentCopyIcon fontSize="small" />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="Regenerate from name">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setNewPackFuid(toSlug(newPackName));
+                          setNewPackFuidTouched(false);
+                        }}
+                      >
+                        <AutorenewIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -2262,6 +2367,8 @@ function CompendiumViewer() {
             onClick={() => {
               setNewPackDialogOpen(false);
               setNewPackName("");
+              setNewPackFuid("");
+              setNewPackFuidTouched(false);
             }}
           >
             {t("Cancel")}
@@ -2269,7 +2376,11 @@ function CompendiumViewer() {
           <Button
             variant="contained"
             onClick={handleNewPack}
-            disabled={!newPackName.trim()}
+            disabled={
+              !newPackName.trim() ||
+              !normalizedNewPackFuid ||
+              isNewPackFuidDuplicate
+            }
           >
             {t("Create")}
           </Button>
@@ -2306,9 +2417,67 @@ function CompendiumViewer() {
             <TextField
               label={t("Pack name")}
               value={editingPackName}
-              onChange={(e) => setEditingPackName(e.target.value)}
+              onChange={(e) => {
+                const nextName = e.target.value;
+                setEditingPackName(nextName);
+                if (!editingPackFuidTouched)
+                  setEditingPackFuid(toSlug(nextName));
+              }}
               fullWidth
               size="small"
+            />
+          )}
+          {activePack && !activePack.isPersonal && (
+            <TextField
+              label="FUID"
+              value={editingPackFuid}
+              onChange={(e) => {
+                setEditingPackFuid(e.target.value);
+                setEditingPackFuidTouched(true);
+              }}
+              fullWidth
+              size="small"
+              error={isEditingPackFuidDuplicate}
+              helperText={
+                isEditingPackFuidDuplicate
+                  ? "Another pack already uses this FUID"
+                  : "Used for cross-pack references"
+              }
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title="Copy FUID">
+                        <span>
+                          <IconButton
+                            size="small"
+                            disabled={!normalizedEditingPackFuid}
+                            onClick={async () => {
+                              await navigator.clipboard.writeText(
+                                normalizedEditingPackFuid,
+                              );
+                              setShareSnackOpen(true);
+                            }}
+                          >
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Regenerate from name">
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setEditingPackFuid(toSlug(editingPackName));
+                            setEditingPackFuidTouched(false);
+                          }}
+                        >
+                          <AutorenewIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
           )}
           <TextField
@@ -2340,7 +2509,6 @@ function CompendiumViewer() {
               {t("Module Export")}
             </Typography>
           </Divider>
-
           <Box sx={{ display: "flex", gap: 1 }}>
             <TextField
               label={t("Version")}
@@ -2383,6 +2551,60 @@ function CompendiumViewer() {
             size="small"
             placeholder="https://.../compendium.zip"
           />
+          <Divider>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
+              Dependencies
+            </Typography>
+          </Divider>
+          <Autocomplete
+            multiple
+            freeSolo
+            options={dependencySuggestions}
+            value={editingRequires}
+            onChange={(_event, values) => {
+              const next = Array.from(
+                new Set(values.map((v) => toSlug(String(v))).filter(Boolean)),
+              );
+              setEditingRequires(next);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Requires"
+                placeholder="author.pack-fuid"
+                size="small"
+                helperText="Hard dependencies"
+              />
+            )}
+          />
+          <Autocomplete
+            multiple
+            freeSolo
+            options={dependencySuggestions}
+            value={editingOptional}
+            onChange={(_event, values) => {
+              const next = Array.from(
+                new Set(values.map((v) => toSlug(String(v))).filter(Boolean)),
+              );
+              setEditingOptional(next);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Optional"
+                placeholder="author.pack-fuid"
+                size="small"
+                helperText="Soft dependencies"
+              />
+            )}
+          />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "space-between" }}>
           {activePack && !activePack.isPersonal && (
@@ -2422,16 +2644,24 @@ function CompendiumViewer() {
               variant="contained"
               disabled={
                 exporting ||
-                (!activePack?.isPersonal && !editingPackName.trim())
+                (!activePack?.isPersonal &&
+                  (!editingPackName.trim() ||
+                    !normalizedEditingPackFuid ||
+                    isEditingPackFuidDuplicate))
               }
               onClick={async () => {
                 if (!activePack) return;
                 const changes = {
                   ...(!activePack.isPersonal
-                    ? { name: editingPackName.trim() }
+                    ? {
+                        name: editingPackName.trim(),
+                        fuid: normalizedEditingPackFuid,
+                      }
                     : {}),
                   description: editingDescription.trim() || undefined,
                   author: editingAuthor.trim() || undefined,
+                  requires: editingRequires,
+                  optional: editingOptional,
                 };
                 await updatePack(activePack.id, changes);
                 setManageDialogOpen(false);

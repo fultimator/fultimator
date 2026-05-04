@@ -38,6 +38,7 @@ export interface CompendiumItem {
 
 export interface CompendiumPack {
   id: string; // "personal" for singleton; UUID for others
+  fuid?: string; // canonical external identifier (slug), unique across installed packs
   name: string;
   description?: string;
   author?: string;
@@ -48,6 +49,8 @@ export interface CompendiumPack {
   locked?: boolean; // when true, destructive actions are hidden
   fultimatorMinVersion?: string; // minimum Fultimator version required
   homepageUrl?: string; // URL to pack's homepage or repository
+  requires?: string[]; // hard dependencies (canonical pack fuids)
+  optional?: string[]; // soft dependencies (canonical pack fuids)
   createdAt: number;
   updatedAt: number;
   items: CompendiumItem[];

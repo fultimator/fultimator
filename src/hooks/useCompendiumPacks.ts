@@ -17,6 +17,25 @@ import { useThemeStore } from "../store/themeStore";
 
 const STORE = "compendium-packs";
 const PERSONAL_ID = "personal";
+const toFuid = (value: string): string =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+const ensureItemDataFuid = (
+  type: CompendiumItemType,
+  data: Record<string, unknown>,
+  _itemId: string,
+): Record<string, unknown> => {
+  const existing = typeof data.fuid === "string" ? toFuid(data.fuid) : "";
+  if (existing) return { ...data, fuid: existing };
+
+  const namePart =
+    typeof data.name === "string" ? toFuid(data.name) : toFuid(type);
+  const base = namePart || toFuid(type) || "item";
+  return { ...data, fuid: base };
+};
 async function getAllPacks(): Promise<CompendiumPack[]> {
   const db = await getDb();
   return db.getAll(STORE) as Promise<CompendiumPack[]>;
@@ -74,13 +93,21 @@ export function useCompendiumPacks() {
   }, []);
 
   const createPack = useCallback(
-    async (name: string, description?: string): Promise<string> => {
+    async (
+      name: string,
+      description?: string,
+      fuid?: string,
+    ): Promise<string> => {
       const id = crypto.randomUUID();
       const now = Date.now();
+      const computedFuid = toFuid(fuid?.trim() || name);
       const pack: CompendiumPack = {
         id,
+        fuid: computedFuid || id,
         name,
         description,
+        requires: [],
+        optional: [],
         isPersonal: false,
         createdAt: now,
         updatedAt: now,
@@ -96,7 +123,12 @@ export function useCompendiumPacks() {
   const updatePack = useCallback(
     async (
       id: string,
-      changes: Partial<Pick<CompendiumPack, "name" | "description" | "author">>,
+      changes: Partial<
+        Pick<
+          CompendiumPack,
+          "name" | "description" | "author" | "fuid" | "requires" | "optional"
+        >
+      >,
     ): Promise<void> => {
       const all = await getAllPacks();
       const pack = all.find((p) => p.id === id);
@@ -162,10 +194,11 @@ export function useCompendiumPacks() {
         }
       }
 
+      const itemId = crypto.randomUUID();
       const item: CompendiumItem = {
-        id: crypto.randomUUID(),
+        id: itemId,
         type,
-        data: incoming,
+        data: ensureItemDataFuid(type, incoming, itemId),
         addedAt: Date.now(),
       };
       await savePack({
@@ -186,7 +219,14 @@ export function useCompendiumPacks() {
         ...pack,
         items: pack.items.map((i) =>
           i.id === itemId
-            ? { ...i, data: newData as Record<string, unknown> }
+            ? {
+                ...i,
+                data: ensureItemDataFuid(
+                  i.type,
+                  newData as Record<string, unknown>,
+                  i.id,
+                ),
+              }
             : i,
         ),
         updatedAt: Date.now(),
@@ -386,6 +426,7 @@ export function useCompendiumPacks() {
 
       const manifest = {
         id: pack.id,
+        fuid: pack.fuid ?? "",
         name: pack.name,
         version: meta.version ?? "1.0.0",
         type: (pack.type ?? "compendium") as PackType,
@@ -394,6 +435,8 @@ export function useCompendiumPacks() {
         homepageUrl: meta.homepageUrl ?? "",
         manifestUrl: meta.manifestUrl ?? "",
         downloadUrl: meta.downloadUrl ?? "",
+        requires: pack.requires ?? [],
+        optional: pack.optional ?? [],
         fultimatorMinVersion: "2.0.0",
         createdAt: pack.createdAt,
       };
@@ -457,6 +500,7 @@ export function useCompendiumPacks() {
       "heroic",
       "mnemosphere",
       "hoplosphere",
+      "optional",
     ];
     const now = Date.now();
     const packId = crypto.randomUUID();
@@ -479,7 +523,13 @@ export function useCompendiumPacks() {
       } catch {
         continue; // skip corrupt item files silently
       }
-      items.push({ id: crypto.randomUUID(), type, data, addedAt: now });
+      const itemId = crypto.randomUUID();
+      items.push({
+        id: itemId,
+        type,
+        data: ensureItemDataFuid(type, data, itemId),
+        addedAt: now,
+      });
     }
 
     const rawType = manifest.type;
@@ -490,6 +540,20 @@ export function useCompendiumPacks() {
       typeof manifest.name === "string"
         ? manifest.name.trim()
         : "Imported Pack";
+    const importedFuid =
+      typeof manifest.fuid === "string" ? toFuid(manifest.fuid.trim()) : "";
+    const importedRequires = Array.isArray(manifest.requires)
+      ? manifest.requires
+          .filter((v): v is string => typeof v === "string")
+          .map((v) => toFuid(v))
+          .filter(Boolean)
+      : [];
+    const importedOptional = Array.isArray(manifest.optional)
+      ? manifest.optional
+          .filter((v): v is string => typeof v === "string")
+          .map((v) => toFuid(v))
+          .filter(Boolean)
+      : [];
 
     // Import themes from themes/ folder
     const importedThemes: PackTheme[] = [];
@@ -524,6 +588,7 @@ export function useCompendiumPacks() {
 
     const pack: CompendiumPack = {
       id: packId,
+      fuid: importedFuid || toFuid(packName) || packId,
       name: packName,
       description:
         typeof manifest.description === "string"
@@ -538,6 +603,8 @@ export function useCompendiumPacks() {
         typeof manifest.version === "string"
           ? manifest.version.trim() || undefined
           : undefined,
+      requires: importedRequires,
+      optional: importedOptional,
       isPersonal: false,
       createdAt:
         typeof manifest.createdAt === "number" ? manifest.createdAt : now,

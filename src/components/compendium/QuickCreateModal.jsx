@@ -134,6 +134,12 @@ import {
 } from "../../routes/equip/customWeapons/libs.jsx";
 
 // Shared constants
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
 const ATTRS = [
   { value: "dexterity", label: "DEX" },
@@ -4741,11 +4747,22 @@ function OptionalPanel() {
   const [zeroEffect, setZeroEffect] = useState(null);
 
   // Collect zero-trigger / zero-effect items from all active packs
-  const allOptionals = packs.flatMap((p) =>
-    (p.active !== false ? p.items : [])
+  const allOptionals = packs.flatMap((p) => {
+    if (p.active === false) return [];
+    const packFuid = p.fuid || p.name;
+    return p.items
       .filter((i) => i.type === "optional")
-      .map((i) => i.data),
-  );
+      .map((i) => {
+        const itemFuid =
+          typeof i.data?.fuid === "string" && i.data.fuid.trim()
+            ? slugify(i.data.fuid)
+            : i.id;
+        return {
+          ...i.data,
+          _sourceRef: packFuid ? `${slugify(packFuid)}:${itemFuid}` : "",
+        };
+      });
+  });
   const zeroTriggerOptions = allOptionals.filter(
     (i) => i.subtype === "zero-trigger",
   );
@@ -4779,6 +4796,8 @@ function OptionalPanel() {
             ? {
                 subtype,
                 name: name.trim(),
+                zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
+                zeroEffectRef: zeroEffect?._sourceRef ?? "",
                 zeroTrigger: zeroTrigger
                   ? {
                       name: zeroTrigger.name ?? "",
@@ -4964,7 +4983,15 @@ function OptionalPanel() {
                     />
                   )}
                   size="small"
-                  isOptionEqualToValue={(a, b) => a.name === b.name}
+                  isOptionEqualToValue={(a, b) =>
+                    Boolean(
+                      b &&
+                      ((a._sourceRef &&
+                        b._sourceRef &&
+                        a._sourceRef === b._sourceRef) ||
+                        a.name === b.name),
+                    )
+                  }
                 />
               </Grid>
               <Grid size={12}>
@@ -4986,7 +5013,15 @@ function OptionalPanel() {
                     />
                   )}
                   size="small"
-                  isOptionEqualToValue={(a, b) => a.name === b.name}
+                  isOptionEqualToValue={(a, b) =>
+                    Boolean(
+                      b &&
+                      ((a._sourceRef &&
+                        b._sourceRef &&
+                        a._sourceRef === b._sourceRef) ||
+                        a.name === b.name),
+                    )
+                  }
                 />
               </Grid>
             </>
