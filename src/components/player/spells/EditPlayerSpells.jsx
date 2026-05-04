@@ -98,7 +98,11 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setPlayer,
   );
 
-  const activeMnemospheres = getActiveMnemospheres(player);
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
+  const activeMnemospheres = isTechnospheres
+    ? getActiveMnemospheres(player)
+    : [];
 
   const [selectedMnemoTarget, setSelectedMnemoTarget] = useState(null);
   const [selectedMnemoSpellType, setSelectedMnemoSpellType] = useState(null);
