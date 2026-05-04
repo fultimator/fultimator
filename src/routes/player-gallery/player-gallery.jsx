@@ -218,7 +218,18 @@ function Personal() {
     : [];
 
   const addPlayer = async function (options = defaultCreatePlayerOptions) {
-    const innateClassNames = options.optionalRules?.technospheres
+    const technospheresEnabled = options.optionalRules?.technospheres ?? false;
+    const technospheresVariant =
+      options.optionalRules?.technospheresVariant ?? "standard";
+    const usesInnateClassRules =
+      technospheresEnabled && technospheresVariant !== "hoplospheres";
+    const grantsTechnosphereHpMpBonus =
+      technospheresEnabled &&
+      ["standard", "mnemospheres"].includes(technospheresVariant);
+    const enablesMnemospheres =
+      technospheresEnabled && technospheresVariant !== "hoplospheres";
+
+    const innateClassNames = usesInnateClassRules
       ? (options.optionalRules?.innateClasses ?? [])
       : [];
     const startingClasses = innateClassNames
@@ -335,8 +346,8 @@ function Personal() {
       armor: [],
       notes: [],
       modifiers: {
-        hp: options.optionalRules?.technospheres ? 5 : 0,
-        mp: options.optionalRules?.technospheres ? 5 : 0,
+        hp: grantsTechnosphereHpMpBonus ? 5 : 0,
+        mp: grantsTechnosphereHpMpBonus ? 5 : 0,
         ip: 0,
         def: 0,
         mdef: 0,
@@ -371,13 +382,14 @@ function Personal() {
           ? { specialSkillOverrides: { "Dual Shieldbearer": true } }
           : {}),
       },
-      ...(options.optionalRules?.technospheres
+      ...(technospheresEnabled
         ? {
             equipment: [
               {
-                mnemospheres: options.startingMnemosphere
-                  ? [options.startingMnemosphere]
-                  : [],
+                mnemospheres:
+                  enablesMnemospheres && options.startingMnemosphere
+                    ? [options.startingMnemosphere]
+                    : [],
                 hoplospheres: [],
               },
             ],

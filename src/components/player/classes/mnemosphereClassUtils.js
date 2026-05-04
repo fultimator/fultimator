@@ -65,6 +65,7 @@ export function getActiveMnemospheres(player) {
   if (!isTechnospheres) return [];
   const variant =
     player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  if (variant === "hoplospheres") return [];
   const hasReceptacle = variant === "integrated" || variant === "mnemospheres";
   const slotted = getSlottedMnemospheres(player);
   const receptacle = hasReceptacle ? getReceptacleMnemospheres(player) : [];

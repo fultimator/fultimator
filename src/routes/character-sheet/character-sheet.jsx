@@ -192,9 +192,11 @@ export default function CharacterSheet() {
         const technospheresVariantCS1 =
           prevPlayer.settings?.optionalRules?.technospheresVariant ??
           "standard";
+        const usesInnateClassRulesCS1 =
+          isTechnospheresCS1 && technospheresVariantCS1 !== "hoplospheres";
         prevPlayer.classes.forEach((cls) => {
           if (!cls.benefits) return;
-          if (isTechnospheresCS1 && !innateClassesCS1.includes(cls.name))
+          if (usesInnateClassRulesCS1 && !innateClassesCS1.includes(cls.name))
             return;
           hpBonus += cls.benefits.hpplus || 0;
           mpBonus += cls.benefits.mpplus || 0;
@@ -377,9 +379,12 @@ export default function CharacterSheet() {
       const technospheresVariantCS2 =
         leveledPlayer.settings?.optionalRules?.technospheresVariant ??
         "standard";
+      const usesInnateClassRulesCS2 =
+        isTechnospheresCS2 && technospheresVariantCS2 !== "hoplospheres";
       (leveledPlayer.classes || []).forEach((cls) => {
         if (!cls.benefits) return;
-        if (isTechnospheresCS2 && !innateClassesCS2.includes(cls.name)) return;
+        if (usesInnateClassRulesCS2 && !innateClassesCS2.includes(cls.name))
+          return;
         hpBonus += Number(cls.benefits.hpplus) || 0;
         mpBonus += Number(cls.benefits.mpplus) || 0;
         ipBonus += Number(cls.benefits.ipplus) || 0;

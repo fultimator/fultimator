@@ -320,9 +320,11 @@ export default function PlayerEdit() {
       prevPlayer.settings?.optionalRules?.technospheres ?? false;
     const technospheresVariantPE =
       prevPlayer.settings?.optionalRules?.technospheresVariant ?? "standard";
+    const usesInnateClassRulesPE =
+      isTechnospheresPE && technospheresVariantPE !== "hoplospheres";
     (prevPlayer.classes || []).forEach((cls) => {
       if (!cls.benefits) return;
-      if (isTechnospheresPE && !innateClassesPE.includes(cls.name)) return;
+      if (usesInnateClassRulesPE && !innateClassesPE.includes(cls.name)) return;
       hpBonus += Number(cls.benefits.hpplus) || 0;
       mpBonus += Number(cls.benefits.mpplus) || 0;
       ipBonus += Number(cls.benefits.ipplus) || 0;

@@ -42,9 +42,13 @@ export default function EditPlayerClasses({
 }) {
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const usesInnateClassRules =
+    isTechnospheres && technospheresVariant !== "hoplospheres";
   const automaticClassLevel = isAutomaticClassLevelEnabled(player);
-  const canAddMoreClasses = !isTechnospheres || player.classes.length < 3;
-  const slottedMnemospheres = isTechnospheres
+  const canAddMoreClasses = !usesInnateClassRules || player.classes.length < 3;
+  const slottedMnemospheres = usesInnateClassRules
     ? getSlottedMnemospheres(player)
     : [];
 
@@ -120,7 +124,7 @@ export default function EditPlayerClasses({
   const customTheme = useCustomTheme();
 
   const syncInnateClasses = (nextPlayer) => {
-    if (!isTechnospheres) return nextPlayer;
+    if (!usesInnateClassRules) return nextPlayer;
 
     const innateClasses = (nextPlayer.classes ?? [])
       .map((cls) => cls.name)
@@ -150,7 +154,7 @@ export default function EditPlayerClasses({
   const checkWarnings = () => {
     const newWarnings = [];
 
-    if (isTechnospheres) {
+    if (usesInnateClassRules) {
       if (!player.classes || player.classes.length < 3) {
         newWarnings.push(
           "Technospheres characters must have exactly 3 innate classes.",
@@ -185,7 +189,7 @@ export default function EditPlayerClasses({
       : 0;
 
     // Check if sum of levels isn't equal to player level
-    if (isTechnospheres) {
+    if (usesInnateClassRules) {
       if (totalLevels > player.lvl) {
         newWarnings.push("Sum of innate class levels exceeds character level.");
       }
@@ -567,7 +571,7 @@ export default function EditPlayerClasses({
                 textTransform: "none",
               }}
             >
-              {isTechnospheres && <strong>{t("Classes")}: </strong>}
+              {usesInnateClassRules && <strong>{t("Classes")}: </strong>}
               {classSummary}
             </Typography>
           )}
@@ -624,14 +628,16 @@ export default function EditPlayerClasses({
               <Grid size={12}>
                 <CustomHeader
                   type="top"
-                  headerText={t(isTechnospheres ? "Innate Classes" : "Classes")}
+                  headerText={t(
+                    usesInnateClassRules ? "Innate Classes" : "Classes",
+                  )}
                   rightLabel={t("Total Invested Levels")}
                   rightValue={totalInnateLevel}
                   rightMax={player.lvl}
                   showIconButton={canAddMoreClasses}
                   icon={AddIcon}
                   customTooltip={t(
-                    isTechnospheres
+                    usesInnateClassRules
                       ? "Add Blank Innate Class"
                       : "Add Blank Class",
                   )}
@@ -686,7 +692,7 @@ export default function EditPlayerClasses({
           <Grid size={12}>
             <Typography variant="h3" align="center">
               {t(
-                isTechnospheres
+                usesInnateClassRules
                   ? "No innate classes added yet"
                   : "No classes added yet",
               )}
@@ -747,7 +753,7 @@ export default function EditPlayerClasses({
             </Box>
           );
         })}
-      {isTechnospheres && (
+      {usesInnateClassRules && (
         <>
           <Divider
             sx={{ borderColor: secondary, borderBottomWidth: 2, mb: 2 }}

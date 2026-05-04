@@ -396,19 +396,23 @@ export default function PlayerClasses({
     player?.settings?.optionalRules?.technospheres ?? false;
   const technospheresVariant =
     player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const usesInnateClassRules =
+    isTechnospheres && technospheresVariant !== "hoplospheres";
   const mnemoHidden =
     isTechnospheres &&
     (technospheresVariant === "mnemospheres" ||
       technospheresVariant === "hoplospheres");
   const slottedMnemospheres = useMemo(
     () =>
-      isTechnospheres && !mnemoHidden ? getSlottedMnemospheres(player) : [],
-    [isTechnospheres, mnemoHidden, player],
+      usesInnateClassRules && !mnemoHidden
+        ? getSlottedMnemospheres(player)
+        : [],
+    [usesInnateClassRules, mnemoHidden, player],
   );
 
   const warnings = useMemo(() => {
     const w = [];
-    if (isTechnospheres) {
+    if (usesInnateClassRules) {
       const innateCount = player.classes?.length ?? 0;
       if (innateCount !== 3)
         w.push("Technospheres: character must have exactly 3 innate classes.");
@@ -440,7 +444,7 @@ export default function PlayerClasses({
         w.push("Sum of class levels isn't equal to character level.");
     }
     return w;
-  }, [player.classes, player.lvl, slottedMnemospheres, isTechnospheres]);
+  }, [player.classes, player.lvl, slottedMnemospheres, usesInnateClassRules]);
 
   const handleAddHeroic = (item) => {
     if (heroicPickerClassIdx === null || !setPlayer) return;
