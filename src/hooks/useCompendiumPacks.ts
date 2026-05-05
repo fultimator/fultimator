@@ -36,6 +36,62 @@ const ensureItemDataFuid = (
   const base = namePart || toFuid(type) || "item";
   return { ...data, fuid: base };
 };
+const refToPackFuid = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const idx = value.indexOf(":");
+  if (idx <= 0) return null;
+  const packFuid = toFuid(value.slice(0, idx));
+  return packFuid || null;
+};
+const extractReferencedPackFuids = (
+  data: Record<string, unknown>,
+): string[] => {
+  const fuids = new Set<string>();
+  for (const [key, value] of Object.entries(data)) {
+    if (!key.endsWith("Ref")) continue;
+    const fuid = refToPackFuid(value);
+    if (fuid) fuids.add(fuid);
+  }
+  return Array.from(fuids);
+};
+const deriveAutoRequires = (pack: CompendiumPack): string[] => {
+  const currentPackFuid = toFuid(pack.fuid || "");
+  const refs = new Set<string>();
+  for (const item of pack.items) {
+    for (const refPack of extractReferencedPackFuids(item.data)) {
+      if (refPack && refPack !== currentPackFuid) refs.add(refPack);
+    }
+  }
+  return Array.from(refs).sort((a, b) => a.localeCompare(b));
+};
+const normalizeManualRequires = (pack: CompendiumPack): string[] => {
+  const raw = pack.requiresManual ?? pack.requires ?? [];
+  return Array.from(new Set(raw.map((v) => toFuid(v)).filter(Boolean))).sort(
+    (a, b) => a.localeCompare(b),
+  );
+};
+const mergeRequires = (manual: string[], auto: string[]): string[] =>
+  Array.from(new Set([...manual, ...auto])).sort((a, b) => a.localeCompare(b));
+const finalizePackRequires = (pack: CompendiumPack): CompendiumPack => {
+  const requiresManual = normalizeManualRequires(pack);
+  const requiresAuto = deriveAutoRequires(pack);
+  const requires = mergeRequires(requiresManual, requiresAuto);
+  return { ...pack, requiresManual, requiresAuto, requires };
+};
+const normalizePackAndItems = (pack: CompendiumPack): CompendiumPack => {
+  const normalizedItems = pack.items.map((item) => ({
+    ...item,
+    data: ensureItemDataFuid(item.type, item.data, item.id),
+  }));
+  const normalizedPack: CompendiumPack = {
+    ...pack,
+    fuid: toFuid(pack.fuid || pack.name || "") || "pack",
+    items: normalizedItems,
+  };
+  return finalizePackRequires(normalizedPack);
+};
+const packsEquivalent = (a: CompendiumPack, b: CompendiumPack): boolean =>
+  JSON.stringify(a) === JSON.stringify(b);
 async function getAllPacks(): Promise<CompendiumPack[]> {
   const db = await getDb();
   return db.getAll(STORE) as Promise<CompendiumPack[]>;
@@ -53,7 +109,19 @@ export function useCompendiumPacks() {
 
   const reload = useCallback(async () => {
     const all = await getAllPacks();
-    setPacks(all);
+    const normalized = all.map((pack) => normalizePackAndItems(pack));
+    const changed = normalized.filter(
+      (pack, idx) => !packsEquivalent(pack, all[idx]),
+    );
+    if (changed.length > 0) {
+      const db = await getDb();
+      const tx = db.transaction(STORE, "readwrite");
+      for (const pack of changed) {
+        await tx.store.put(pack);
+      }
+      await tx.done;
+    }
+    setPacks(normalized);
     setLoading(false);
   }, []);
 
@@ -103,9 +171,11 @@ export function useCompendiumPacks() {
       const computedFuid = toFuid(fuid?.trim() || name);
       const pack: CompendiumPack = {
         id,
-        fuid: computedFuid || id,
+        fuid: computedFuid || "pack",
         name,
         description,
+        requiresManual: [],
+        requiresAuto: [],
         requires: [],
         optional: [],
         isPersonal: false,
@@ -114,7 +184,7 @@ export function useCompendiumPacks() {
         items: [],
         themes: [],
       };
-      await savePack(pack);
+      await savePack(finalizePackRequires(pack));
       return id;
     },
     [],
@@ -126,14 +196,44 @@ export function useCompendiumPacks() {
       changes: Partial<
         Pick<
           CompendiumPack,
-          "name" | "description" | "author" | "fuid" | "requires" | "optional"
+          | "name"
+          | "description"
+          | "author"
+          | "fuid"
+          | "requires"
+          | "requiresManual"
+          | "optional"
         >
       >,
     ): Promise<void> => {
       const all = await getAllPacks();
       const pack = all.find((p) => p.id === id);
       if (!pack) return;
-      await savePack({ ...pack, ...changes, updatedAt: Date.now() });
+      const normalizedChanges = {
+        ...changes,
+        ...(changes.requires
+          ? {
+              requiresManual: Array.from(
+                new Set(changes.requires.map((v) => toFuid(v)).filter(Boolean)),
+              ),
+            }
+          : {}),
+        ...(changes.requiresManual
+          ? {
+              requiresManual: Array.from(
+                new Set(
+                  changes.requiresManual.map((v) => toFuid(v)).filter(Boolean),
+                ),
+              ),
+            }
+          : {}),
+      };
+      const next = finalizePackRequires({
+        ...pack,
+        ...normalizedChanges,
+        updatedAt: Date.now(),
+      });
+      await savePack(next);
     },
     [],
   );
@@ -201,11 +301,13 @@ export function useCompendiumPacks() {
         data: ensureItemDataFuid(type, incoming, itemId),
         addedAt: Date.now(),
       };
-      await savePack({
-        ...pack,
-        items: [...pack.items, item],
-        updatedAt: Date.now(),
-      });
+      await savePack(
+        finalizePackRequires({
+          ...pack,
+          items: [...pack.items, item],
+          updatedAt: Date.now(),
+        }),
+      );
     },
     [ensurePersonalPack],
   );
@@ -215,22 +317,24 @@ export function useCompendiumPacks() {
       const all = await getAllPacks();
       const pack = all.find((p) => p.id === packId);
       if (!pack) return;
-      await savePack({
-        ...pack,
-        items: pack.items.map((i) =>
-          i.id === itemId
-            ? {
-                ...i,
-                data: ensureItemDataFuid(
-                  i.type,
-                  newData as Record<string, unknown>,
-                  i.id,
-                ),
-              }
-            : i,
-        ),
-        updatedAt: Date.now(),
-      });
+      await savePack(
+        finalizePackRequires({
+          ...pack,
+          items: pack.items.map((i) =>
+            i.id === itemId
+              ? {
+                  ...i,
+                  data: ensureItemDataFuid(
+                    i.type,
+                    newData as Record<string, unknown>,
+                    i.id,
+                  ),
+                }
+              : i,
+          ),
+          updatedAt: Date.now(),
+        }),
+      );
     },
     [],
   );
@@ -240,11 +344,13 @@ export function useCompendiumPacks() {
       const all = await getAllPacks();
       const pack = all.find((p) => p.id === packId);
       if (!pack) return;
-      await savePack({
-        ...pack,
-        items: pack.items.filter((i) => i.id !== itemId),
-        updatedAt: Date.now(),
-      });
+      await savePack(
+        finalizePackRequires({
+          ...pack,
+          items: pack.items.filter((i) => i.id !== itemId),
+          updatedAt: Date.now(),
+        }),
+      );
     },
     [],
   );
@@ -266,14 +372,18 @@ export function useCompendiumPacks() {
       const db = await getDb();
       const tx = db.transaction(STORE, "readwrite");
       await tx.store.put({
-        ...fromPack,
-        items: fromPack.items.filter((i) => i.id !== itemId),
-        updatedAt: Date.now(),
+        ...finalizePackRequires({
+          ...fromPack,
+          items: fromPack.items.filter((i) => i.id !== itemId),
+          updatedAt: Date.now(),
+        }),
       });
       await tx.store.put({
-        ...toPack,
-        items: [...toPack.items, { ...item, addedAt: Date.now() }],
-        updatedAt: Date.now(),
+        ...finalizePackRequires({
+          ...toPack,
+          items: [...toPack.items, { ...item, addedAt: Date.now() }],
+          updatedAt: Date.now(),
+        }),
       });
       await tx.done;
       notifyListeners(STORE);
@@ -424,6 +534,7 @@ export function useCompendiumPacks() {
         }
       }
 
+      const finalized = finalizePackRequires(pack);
       const manifest = {
         id: pack.id,
         fuid: pack.fuid ?? "",
@@ -435,7 +546,7 @@ export function useCompendiumPacks() {
         homepageUrl: meta.homepageUrl ?? "",
         manifestUrl: meta.manifestUrl ?? "",
         downloadUrl: meta.downloadUrl ?? "",
-        requires: pack.requires ?? [],
+        requires: finalized.requires ?? [],
         optional: pack.optional ?? [],
         fultimatorMinVersion: "2.0.0",
         createdAt: pack.createdAt,
@@ -588,7 +699,7 @@ export function useCompendiumPacks() {
 
     const pack: CompendiumPack = {
       id: packId,
-      fuid: importedFuid || toFuid(packName) || packId,
+      fuid: importedFuid || toFuid(packName) || "pack",
       name: packName,
       description:
         typeof manifest.description === "string"
@@ -603,6 +714,8 @@ export function useCompendiumPacks() {
         typeof manifest.version === "string"
           ? manifest.version.trim() || undefined
           : undefined,
+      requiresManual: importedRequires,
+      requiresAuto: [],
       requires: importedRequires,
       optional: importedOptional,
       isPersonal: false,
@@ -612,7 +725,7 @@ export function useCompendiumPacks() {
       items,
       themes: importedThemes,
     };
-    await savePack(pack);
+    await savePack(finalizePackRequires(pack));
 
     return packId;
   }, []);

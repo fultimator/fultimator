@@ -26,6 +26,7 @@ import {
   useMediaQuery,
   InputAdornment,
   Autocomplete,
+  Chip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
@@ -208,6 +209,7 @@ const CompendiumViewerModal = ({
   const [editingDescription, setEditingDescription] = useState("");
   const [editingAuthor, setEditingAuthor] = useState("");
   const [editingRequires, setEditingRequires] = useState([]);
+  const [editingAutoRequires, setEditingAutoRequires] = useState([]);
   const [editingOptional, setEditingOptional] = useState([]);
   const [exportMeta, setExportMeta] = useState({
     version: "1.0.0",
@@ -289,6 +291,13 @@ const CompendiumViewerModal = ({
     );
     return ["official", ...unique.filter((v) => v !== "official")];
   }, [packs]);
+  const mergedEditingRequires = useMemo(
+    () =>
+      Array.from(new Set([...editingRequires, ...editingAutoRequires])).sort(
+        (a, b) => a.localeCompare(b),
+      ),
+    [editingRequires, editingAutoRequires],
+  );
 
   const activeSpellCls = useMemo(() => {
     if (selectedType !== "player-spells" || !selectedSpellClass) return null;
@@ -802,7 +811,10 @@ const CompendiumViewerModal = ({
         setEditingPackFuidTouched(false);
         setEditingDescription(activePack?.description ?? "");
         setEditingAuthor(activePack?.author ?? "");
-        setEditingRequires(activePack?.requires ?? []);
+        setEditingRequires(
+          activePack?.requiresManual ?? activePack?.requires ?? [],
+        );
+        setEditingAutoRequires(activePack?.requiresAuto ?? []);
         setEditingOptional(activePack?.optional ?? []);
         setExportMeta({
           version: "1.0.0",
@@ -1475,13 +1487,38 @@ const CompendiumViewerModal = ({
             multiple
             freeSolo
             options={dependencySuggestions}
-            value={editingRequires}
+            value={mergedEditingRequires}
             onChange={(_event, values) => {
               const next = Array.from(
                 new Set(values.map((v) => toSlug(String(v))).filter(Boolean)),
               );
-              setEditingRequires(next);
+              const manualOnly = next.filter(
+                (dep) => !editingAutoRequires.includes(dep),
+              );
+              setEditingRequires(manualOnly);
             }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => {
+                const isSystem = editingAutoRequires.includes(option);
+                const tagProps = getTagProps({ index });
+                const { onDelete, ...safeTagProps } = tagProps;
+                const chip = (
+                  <Chip
+                    {...safeTagProps}
+                    label={isSystem ? `${option} (system)` : option}
+                    size="small"
+                    onDelete={isSystem ? undefined : onDelete}
+                  />
+                );
+                return isSystem ? (
+                  <Tooltip key={option} title="Required by referenced items">
+                    {chip}
+                  </Tooltip>
+                ) : (
+                  <React.Fragment key={option}>{chip}</React.Fragment>
+                );
+              })
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -1568,7 +1605,7 @@ const CompendiumViewerModal = ({
                     : {}),
                   description: editingDescription.trim() || undefined,
                   author: editingAuthor.trim() || undefined,
-                  requires: editingRequires,
+                  requiresManual: editingRequires,
                   optional: editingOptional,
                 };
                 await updatePack(activePack.id, changes);

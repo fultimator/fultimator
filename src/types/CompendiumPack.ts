@@ -49,6 +49,8 @@ export interface CompendiumPack {
   locked?: boolean; // when true, destructive actions are hidden
   fultimatorMinVersion?: string; // minimum Fultimator version required
   homepageUrl?: string; // URL to pack's homepage or repository
+  requiresManual?: string[]; // user-managed hard dependencies
+  requiresAuto?: string[]; // system-derived hard dependencies from cross-pack refs
   requires?: string[]; // hard dependencies (canonical pack fuids)
   optional?: string[]; // soft dependencies (canonical pack fuids)
   createdAt: number;

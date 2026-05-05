@@ -232,12 +232,50 @@ function slugify(str) {
 export function findPendingMigrations(player, packMap, builtinSources = {}) {
   const results = [];
 
+  function resolveByPackAndItemFuid(packFuid, itemFuid) {
+    if (!packFuid || !itemFuid) return null;
+    const normalizedPackFuid = slugify(packFuid);
+    const normalizedItemFuid = slugify(itemFuid);
+    if (!normalizedPackFuid) return null;
+
+    for (const pack of packMap.values()) {
+      const packSlug = slugify(pack.fuid || pack.name || "");
+      if (packSlug !== normalizedPackFuid) continue;
+
+      // Prefer stable item fuid matching when present.
+      let entry = null;
+      if (normalizedItemFuid) {
+        entry = pack.items.find(
+          (i) => slugify(i.data?.fuid ?? "") === normalizedItemFuid,
+        );
+      }
+
+      // Transition fallback: if the ref's item segment is actually a legacy item id
+      // (or the source item does not have fuid yet), match by item id.
+      if (!entry) {
+        entry = pack.items.find((i) => i.id === itemFuid);
+      }
+
+      if (entry) return entry.data;
+    }
+    return null;
+  }
+
   function resolveSource(packItemId, expectedType) {
     if (!packItemId) return null;
     if (packItemId.startsWith("builtin:")) {
       const list = builtinSources[expectedType] ?? [];
       return list.find((s) => s._packItemId === packItemId) ?? null;
     }
+
+    // New format: "packFuid:itemFuid"
+    if (packItemId.includes(":")) {
+      const [packFuid, itemFuid] = packItemId.split(":", 2);
+      const byFuid = resolveByPackAndItemFuid(packFuid, itemFuid);
+      if (byFuid) return byFuid;
+    }
+
+    // Legacy format: raw pack item UUID
     for (const pack of packMap.values()) {
       const entry = pack.items.find((i) => i.id === packItemId);
       if (entry) return entry.data;
