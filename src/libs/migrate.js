@@ -1,3 +1,5 @@
+import { slugFuid, resolveRef } from "../utils/compendiumRefs";
+
 function clamp(value, max) {
   return Math.min(value, max);
 }
@@ -221,45 +223,10 @@ export function applyMigration(instance, source, type) {
   }
 }
 
-function slugify(str) {
-  return (str ?? "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
 // Returns all player items that have a _packItemId (or a builtin match) and differ from their source.
 export function findPendingMigrations(player, packMap, builtinSources = {}) {
   const results = [];
-
-  function resolveByPackAndItemFuid(packFuid, itemFuid) {
-    if (!packFuid || !itemFuid) return null;
-    const normalizedPackFuid = slugify(packFuid);
-    const normalizedItemFuid = slugify(itemFuid);
-    if (!normalizedPackFuid) return null;
-
-    for (const pack of packMap.values()) {
-      const packSlug = slugify(pack.fuid || pack.name || "");
-      if (packSlug !== normalizedPackFuid) continue;
-
-      // Prefer stable item fuid matching when present.
-      let entry = null;
-      if (normalizedItemFuid) {
-        entry = pack.items.find(
-          (i) => slugify(i.data?.fuid ?? "") === normalizedItemFuid,
-        );
-      }
-
-      // Transition fallback: if the ref's item segment is actually a legacy item id
-      // (or the source item does not have fuid yet), match by item id.
-      if (!entry) {
-        entry = pack.items.find((i) => i.id === itemFuid);
-      }
-
-      if (entry) return entry.data;
-    }
-    return null;
-  }
+  const packs = Array.from(packMap.values());
 
   function resolveSource(packItemId, expectedType) {
     if (!packItemId) return null;
@@ -268,15 +235,11 @@ export function findPendingMigrations(player, packMap, builtinSources = {}) {
       return list.find((s) => s._packItemId === packItemId) ?? null;
     }
 
-    // New format: "packFuid:itemFuid"
-    if (packItemId.includes(":")) {
-      const [packFuid, itemFuid] = packItemId.split(":", 2);
-      const byFuid = resolveByPackAndItemFuid(packFuid, itemFuid);
-      if (byFuid) return byFuid;
-    }
+    const byRef = resolveRef(packItemId, packs);
+    if (byRef) return byRef;
 
     // Legacy format: raw pack item UUID
-    for (const pack of packMap.values()) {
+    for (const pack of packs) {
       const entry = pack.items.find((i) => i.id === packItemId);
       if (entry) return entry.data;
     }
@@ -287,7 +250,7 @@ export function findPendingMigrations(player, packMap, builtinSources = {}) {
     const list = builtinSources["classes"] ?? [];
     return (
       list.find(
-        (s) => s._packItemId === `builtin:${slugify(cls.name ?? "")}`,
+        (s) => s._packItemId === `builtin:${slugFuid(cls.name ?? "")}`,
       ) ?? null
     );
   }

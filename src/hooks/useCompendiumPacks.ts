@@ -14,15 +14,11 @@ import {
   DEFAULT_CUSTOMIZATION,
 } from "../themes/themeCustomization";
 import { useThemeStore } from "../store/themeStore";
+import { slugFuid, collectRefPacks } from "../utils/compendiumRefs";
 
 const STORE = "compendium-packs";
 const PERSONAL_ID = "personal";
-const toFuid = (value: string): string =>
-  value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+const toFuid = (value: string): string => slugFuid(value);
 const ensureItemDataFuid = (
   type: CompendiumItemType,
   data: Record<string, unknown>,
@@ -36,29 +32,11 @@ const ensureItemDataFuid = (
   const base = namePart || toFuid(type) || "item";
   return { ...data, fuid: base };
 };
-const refToPackFuid = (value: unknown): string | null => {
-  if (typeof value !== "string") return null;
-  const idx = value.indexOf(":");
-  if (idx <= 0) return null;
-  const packFuid = toFuid(value.slice(0, idx));
-  return packFuid || null;
-};
-const extractReferencedPackFuids = (
-  data: Record<string, unknown>,
-): string[] => {
-  const fuids = new Set<string>();
-  for (const [key, value] of Object.entries(data)) {
-    if (!key.endsWith("Ref")) continue;
-    const fuid = refToPackFuid(value);
-    if (fuid) fuids.add(fuid);
-  }
-  return Array.from(fuids);
-};
 const deriveAutoRequires = (pack: CompendiumPack): string[] => {
   const currentPackFuid = toFuid(pack.fuid || "");
   const refs = new Set<string>();
   for (const item of pack.items) {
-    for (const refPack of extractReferencedPackFuids(item.data)) {
+    for (const refPack of collectRefPacks(item.data)) {
       if (refPack && refPack !== currentPackFuid) refs.add(refPack);
     }
   }
