@@ -1,5 +1,6 @@
 const armor = [
   {
+    fuid: "no-armor",
     category: "Armor",
     name: "Silk Shirt",
     cost: 100,
@@ -10,6 +11,7 @@ const armor = [
     init: -1,
   },
   {
+    fuid: "travel-garb",
     category: "Armor",
     name: "Travel Garb",
     cost: 100,
@@ -20,6 +22,7 @@ const armor = [
     init: -1,
   },
   {
+    fuid: "combat-tunic",
     category: "Armor",
     name: "Combat Tunic",
     cost: 150,
@@ -30,6 +33,7 @@ const armor = [
     init: 0,
   },
   {
+    fuid: "sage-robe",
     category: "Armor",
     name: "Combat Tunic (Rework)",
     cost: 150,
@@ -40,6 +44,7 @@ const armor = [
     init: 0,
   },
   {
+    fuid: "sage-robe",
     category: "Armor",
     name: "Sage Robe",
     cost: 200,
@@ -50,6 +55,7 @@ const armor = [
     init: -2,
   },
   {
+    fuid: "brigandine",
     category: "Armor",
     name: "Brigandine",
     cost: 150,
@@ -60,6 +66,7 @@ const armor = [
     init: -2,
   },
   {
+    fuid: "bronze-plate",
     category: "Armor",
     name: "Bronze Plate",
     cost: 200,
@@ -70,6 +77,7 @@ const armor = [
     init: -3,
   },
   {
+    fuid: "runic-plate",
     category: "Armor",
     name: "Runic Plate",
     cost: 250,
@@ -80,6 +88,7 @@ const armor = [
     init: -3,
   },
   {
+    fuid: "steel-plate",
     category: "Armor",
     name: "Steel Plate",
     cost: 300,

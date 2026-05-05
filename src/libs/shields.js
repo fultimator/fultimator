@@ -1,5 +1,6 @@
 const shields = [
   {
+    fuid: "bronze-shield",
     category: "Shield",
     name: "Bronze Shield",
     cost: 100,
@@ -9,6 +10,7 @@ const shields = [
     init: 0,
   },
   {
+    fuid: "runic-shield",
     category: "Shield",
     name: "Runic Shield",
     cost: 150,

@@ -8,6 +8,7 @@ export const moduleTypes = [
 // Available vehicle frames
 export const availableFrames = [
   {
+    fuid: "exoskeleton",
     name: "pilot_frame_exoskeleton",
     description: "pilot_frame_exoskeleton_desc",
     passengers: 0,
@@ -19,6 +20,7 @@ export const availableFrames = [
     },
   },
   {
+    fuid: "mecha",
     name: "pilot_frame_mecha",
     description: "pilot_frame_mecha_desc",
     passengers: 0,
@@ -30,6 +32,7 @@ export const availableFrames = [
     },
   },
   {
+    fuid: "steed",
     name: "pilot_frame_steed",
     description: "pilot_frame_steed_desc",
     passengers: 1,
@@ -47,6 +50,7 @@ export const availableModules = {
   // ARMOR MODULES - Occupy armor slot
   armor: [
     {
+      fuid: "flexible-plating",
       name: "pilot_module_flexible_plating",
       type: "pilot_module_armor",
       cost: 500,
@@ -56,6 +60,7 @@ export const availableModules = {
       category: "Armor",
     },
     {
+      fuid: "heavy-plating",
       name: "pilot_module_heavy_plating",
       type: "pilot_module_armor",
       cost: 500,
@@ -65,6 +70,7 @@ export const availableModules = {
       category: "Armor",
     },
     {
+      fuid: "runic-plating",
       name: "pilot_module_runic_plating",
       type: "pilot_module_armor",
       slot: "pilot_slot_armor",
@@ -75,6 +81,7 @@ export const availableModules = {
       category: "Armor",
     },
     {
+      fuid: "standard-plating",
       name: "pilot_module_standard_plating",
       type: "pilot_module_armor",
       cost: 500,
@@ -84,6 +91,7 @@ export const availableModules = {
       category: "Armor",
     },
     {
+      fuid: "custom-armor",
       name: "pilot_custom_armor",
       type: "pilot_module_armor",
       description: "",
@@ -100,6 +108,7 @@ export const availableModules = {
   weapon: [
     // Weapons
     {
+      fuid: "arcane",
       name: "pilot_module_arcane",
       type: "pilot_module_weapon",
       cumbersome: false,
@@ -115,6 +124,7 @@ export const availableModules = {
       att2: "will",
     },
     {
+      fuid: "axe",
       name: "pilot_module_axe",
       type: "pilot_module_weapon",
       cumbersome: false,
@@ -130,6 +140,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "blade",
       name: "pilot_module_blade",
       type: "pilot_module_weapon",
       cumbersome: false,
@@ -145,6 +156,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "bow",
       name: "pilot_module_bow",
       type: "pilot_module_weapon",
       cumbersome: true,
@@ -160,6 +172,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "cannon",
       name: "pilot_module_cannon",
       type: "pilot_module_weapon",
       cumbersome: true,
@@ -175,6 +188,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "claw",
       name: "pilot_module_claw",
       type: "pilot_module_weapon",
       description: "pilot_module_claw_desc",
@@ -191,6 +205,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "claymore",
       name: "pilot_module_claymore",
       type: "pilot_module_weapon",
       cumbersome: true,
@@ -206,6 +221,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "esoteric",
       name: "pilot_module_esoteric",
       type: "pilot_module_weapon",
       cumbersome: true,
@@ -221,6 +237,7 @@ export const availableModules = {
       att2: "will",
     },
     {
+      fuid: "flail",
       name: "pilot_module_flail",
       type: "pilot_module_weapon",
       cumbersome: false,
@@ -236,6 +253,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "flamer",
       name: "pilot_module_flamer",
       type: "pilot_module_weapon",
       cumbersome: false,
@@ -251,6 +269,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "machine-gun",
       name: "pilot_module_machine_gun",
       type: "pilot_module_weapon",
       description: "pilot_module_machine_gun_desc",
@@ -267,6 +286,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "rifle",
       name: "pilot_module_rifle",
       type: "pilot_module_weapon",
       cumbersome: false,
@@ -282,6 +302,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "scythe",
       name: "pilot_module_scythe",
       type: "pilot_module_weapon",
       cumbersome: true,
@@ -298,6 +319,7 @@ export const availableModules = {
     },
     // Shield Module (now a weapon with shield flag)
     {
+      fuid: "shield",
       name: "pilot_module_shield",
       type: "pilot_module_weapon",
       description: "pilot_module_shield_desc",
@@ -314,6 +336,7 @@ export const availableModules = {
       att2: "might",
     },
     {
+      fuid: "spear",
       name: "pilot_module_spear",
       type: "pilot_module_weapon",
       cumbersome: false,
@@ -329,6 +352,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "sword",
       name: "pilot_module_sword",
       type: "pilot_module_weapon",
       cumbersome: false,
@@ -344,6 +368,7 @@ export const availableModules = {
       att2: "insight",
     },
     {
+      fuid: "trident",
       name: "pilot_module_trident",
       type: "pilot_module_weapon",
       cumbersome: true,
@@ -360,6 +385,7 @@ export const availableModules = {
     },
     // Custom Weapon Module
     {
+      fuid: "custom-weapon",
       name: "pilot_custom_weapon",
       type: "pilot_module_weapon",
       quality: "",
@@ -380,6 +406,7 @@ export const availableModules = {
   // SUPPORT MODULES - Special vehicle systems
   support: [
     {
+      fuid: "custom-support",
       name: "pilot_custom_support",
       type: "pilot_module_support",
       description: "",
@@ -387,84 +414,98 @@ export const availableModules = {
       isComplex: false,
     },
     {
+      fuid: "aerial",
       name: "pilot_module_aerial",
       type: "pilot_module_support",
       description: "pilot_module_aerial_desc",
       isComplex: true,
     },
     {
+      fuid: "anti-element",
       name: "pilot_module_anti-element",
       type: "pilot_module_support",
       description: "pilot_module_anti-element_desc",
       isComplex: false,
     },
     {
+      fuid: "advanced-targeting",
       name: "pilot_module_advanced_targeting",
       type: "pilot_module_support",
       description: "pilot_module_advanced_targeting_desc",
       isComplex: false,
     },
     {
+      fuid: "counterstrike",
       name: "pilot_module_counterstrike",
       type: "pilot_module_support",
       description: "pilot_module_counterstrike_desc",
       isComplex: false,
     },
     {
+      fuid: "excavation",
       name: "pilot_module_excavation",
       type: "pilot_module_support",
       description: "pilot_module_excavation_desc",
       isComplex: false,
     },
     {
+      fuid: "expanded-plating",
       name: "pilot_module_expanded_plating",
       type: "pilot_module_support",
       description: "pilot_module_expanded_plating_desc",
       isComplex: false,
     },
     {
+      fuid: "magistatic",
       name: "pilot_module_magistatic",
       type: "pilot_module_support",
       description: "pilot_module_magistatic_desc",
       isComplex: false,
     },
     {
+      fuid: "power",
       name: "pilot_module_power",
       type: "pilot_module_support",
       description: "pilot_module_power_desc",
       isComplex: false,
     },
     {
+      fuid: "rapid-interface",
       name: "pilot_module_rapid_interface",
       type: "pilot_module_support",
       description: "pilot_module_rapid_interface_desc",
       isComplex: false,
     },
     {
+      fuid: "seafarer",
       name: "pilot_module_seafarer",
       type: "pilot_module_support",
       description: "pilot_module_seafarer_desc",
       isComplex: false,
     },
     {
+      fuid: "seat",
       name: "pilot_module_seat",
       type: "pilot_module_support",
       description: "pilot_module_seat_desc",
       isComplex: false,
     },
     {
+      fuid: "secondary-offensive",
       name: "pilot_module_secondary_offensive",
       type: "pilot_module_support",
       description: "pilot_module_secondary_offensive_desc",
       isComplex: false,
     },
     {
+      fuid: "sensor",
       name: "pilot_module_sensor",
       type: "pilot_module_support",
       description: "pilot_module_sensor_desc",
       isComplex: false,
     },
     {
+      fuid: "turbo",
       name: "pilot_module_turbo",
       type: "pilot_module_support",
       description: "pilot_module_turbo_desc",
@@ -472,3 +513,19 @@ export const availableModules = {
     },
   ],
 };
+
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+availableFrames.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});
+Object.values(availableModules).forEach((list) => {
+  list.forEach((item) => {
+    if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+  });
+});

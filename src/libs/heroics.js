@@ -3,6 +3,7 @@ import { t } from "../translation/translate";
 const heroics = [
   // FUCR - core
   {
+    fuid: "adversity",
     name: t("adversity", true),
     quote: t("adversity_quote", true),
     description: t("adversity_desc", true),
@@ -11,6 +12,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "ambidextrous",
     name: t("ambidextrous", true),
     quote: t("ambidextrous_quote", true),
     description: t("ambidextrous_desc", true),
@@ -19,6 +21,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "arcane-echoes",
     name: t("arcane_echoes", true),
     quote: t("arcane_echoes_quote", true),
     description: t("arcane_echoes_desc", true),
@@ -27,6 +30,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "chimeric-mastery",
     name: t("chimeric_mastery", true),
     quote: t("chimeric_mastery_quote", true),
     description: t("chimeric_mastery_desc", true),
@@ -35,6 +39,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "comet",
     name: t("comet", true),
     quote: t("comet_quote", true),
     description: t("comet_desc", true),
@@ -43,6 +48,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "deep-pockets",
     name: t("deep_pockets", true),
     quote: t("deep_pockets_quote", true),
     description: t("deep_pockets_desc", true),
@@ -51,6 +57,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "disarming-rhetoric",
     name: t("disarming_rhetoric", true),
     quote: t("disarming_rhetoric_quote", true),
     description: t("disarming_rhetoric_desc", true),
@@ -59,6 +66,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "extra-hp",
     name: t("extra_hp", true),
     quote: t("extra_hp_quote", true),
     description: t("extra_hp_desc", true),
@@ -67,6 +75,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "extra-ip",
     name: t("extra_ip", true),
     quote: t("extra_ip_quote", true),
     description: t("extra_ip_desc", true),
@@ -75,6 +84,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "extra-mp",
     name: t("extra_mp", true),
     quote: t("extra_mp_quote", true),
     description: t("extra_mp_desc", true),
@@ -83,6 +93,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "extra-spells",
     name: t("extra_spells", true),
     quote: t("extra_spells_quote", true),
     description: t("extra_spells_desc", true),
@@ -91,6 +102,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "heartbreaker",
     name: t("heartbreaker", true),
     quote: t("heartbreaker_quote", true),
     description: t("heartbreaker_desc", true),
@@ -99,6 +111,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "heroic-companion",
     name: t("heroic_companion", true),
     quote: t("heroic_companion_quote", true),
     description: t("heroic_companion_desc", true),
@@ -107,6 +120,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "hope",
     name: t("hope", true),
     quote: t("hope_quote", true),
     description: t("hope_desc", true),
@@ -115,6 +129,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "mathemagic",
     name: t("mathemagic", true),
     quote: t("mathemagic_quote", true),
     description: t("mathemagic_desc", true),
@@ -123,6 +138,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "monkey-grip",
     name: t("monkey_grip", true),
     quote: t("monkey_grip_quote", true),
     description: t("monkey_grip_desc", true),
@@ -131,6 +147,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "perfect-aim",
     name: t("perfect_aim", true),
     quote: t("perfect_aim_quote", true),
     description: t("perfect_aim_desc", true),
@@ -139,6 +156,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "pillage",
     name: t("pillage", true),
     quote: t("pillage_quote", true),
     description: t("pillage_desc", true),
@@ -147,6 +165,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "powerful-shot",
     name: t("powerful_shot", true),
     quote: t("powerful_shot_quote", true),
     description: t("powerful_shot_desc", true),
@@ -155,6 +174,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "powerful-spell",
     name: t("powerful_spell", true),
     quote: t("powerful_spell_quote", true),
     description: t("powerful_spell_desc", true),
@@ -163,6 +183,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "powerful-strike",
     name: t("powerful_strike", true),
     quote: t("powerful_strike_quote", true),
     description: t("powerful_strike_desc", true),
@@ -171,6 +192,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "predictable",
     name: t("predictable", true),
     quote: t("predictable_quote", true),
     description: t("predictable_desc", true),
@@ -179,6 +201,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "rampart",
     name: t("rampart", true),
     quote: t("rampart_quote", true),
     description: t("rampart_desc", true),
@@ -187,6 +210,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "repetition",
     name: t("repetition", true),
     quote: t("repetition_quote", true),
     description: t("repetition_desc", true),
@@ -195,6 +219,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "revelation",
     name: t("revelation", true),
     quote: t("revelation_quote", true),
     description: t("revelation_desc", true),
@@ -203,6 +228,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "status-immunity",
     name: t("status_immunity", true),
     quote: t("status_immunity_quote", true),
     description: t("status_immunity_desc", true),
@@ -211,6 +237,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "tempest-strike",
     name: t("tempest_strike", true),
     quote: t("tempest_strike_quote", true),
     description: t("tempest_strike_desc", true),
@@ -219,6 +246,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "unbreakable",
     name: t("unbreakable", true),
     quote: t("unbreakable_quote", true),
     description: t("unbreakable_desc", true),
@@ -227,6 +255,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "upgrade",
     name: t("upgrade", true),
     quote: t("upgrade_quote", true),
     description: t("upgrade_desc", true),
@@ -235,6 +264,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "vanish",
     name: t("vanish", true),
     quote: t("vanish_quote", true),
     description: t("vanish_desc", true),
@@ -243,6 +273,7 @@ const heroics = [
     book: "core",
   },
   {
+    fuid: "volcano",
     name: t("volcano", true),
     quote: t("volcano_quote", true),
     description: t("volcano_desc", true),
@@ -253,6 +284,7 @@ const heroics = [
 
   // FUHF - high
   {
+    fuid: "arcane-mark",
     name: t("arcane_mark", true),
     quote: t("arcane_mark_quote", true),
     description: t("arcane_mark_desc", true),
@@ -261,6 +293,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "bimagus",
     name: t("bimagus", true),
     quote: t("bimagus_quote", true),
     description: t("bimagus_desc", true),
@@ -269,6 +302,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "blade-adept",
     name: t("blade_adept", true),
     quote: t("blade_adept_quote", true),
     description: t("blade_adept_desc", true),
@@ -277,6 +311,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "bullet-break",
     name: t("bullet_break", true),
     quote: t("bullet_break_quote", true),
     description: t("bullet_break_desc", true),
@@ -285,6 +320,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "ceaseless-battlefield",
     name: t("ceaseless_battlefield", true),
     quote: t("ceaseless_battlefield_quote", true),
     description: t("ceaseless_battlefield_desc", true),
@@ -293,6 +329,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "clean-slate",
     name: t("clean_slate", true),
     quote: t("clean_slate_quote", true),
     description: t("clean_slate_desc", true),
@@ -301,6 +338,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "double-arrow",
     name: t("double_arrow", true),
     quote: t("double_arrow_quote", true),
     description: t("double_arrow_desc", true),
@@ -309,6 +347,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "fast-rituals",
     name: t("fast_rituals", true),
     quote: t("fast_rituals_quote", true),
     description: t("fast_rituals_desc", true),
@@ -317,6 +356,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "fleeting-moment",
     name: t("fleeting_moment", true),
     quote: t("fleeting_moment_quote", true),
     description: t("fleeting_moment_desc", true),
@@ -325,6 +365,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "grand-summoning",
     name: t("grand_summoning", true),
     quote: t("grand_summoning_quote", true),
     description: t("grand_summoning_desc", true),
@@ -333,6 +374,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "hoplite",
     name: t("hoplite", true),
     quote: t("hoplite_quote", true),
     description: t("hoplite_desc", true),
@@ -341,6 +383,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "iron-forest",
     name: t("iron_forest", true),
     quote: t("iron_forest_quote", true),
     description: t("iron_forest_desc", true),
@@ -349,6 +392,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "magic-guard",
     name: t("magic_guard", true),
     quote: t("magic_guard_quote", true),
     description: t("magic_guard_desc", true),
@@ -357,6 +401,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "paso-doble",
     name: t("paso_doble", true),
     quote: t("paso_doble_quote", true),
     description: t("paso_doble_desc", true),
@@ -365,6 +410,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "power-chord",
     name: t("power_chord", true),
     quote: t("power_chord_quote", true),
     description: t("power_chord_desc", true),
@@ -373,6 +419,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "pulverizing-strike",
     name: t("pulverizing_strike", true),
     quote: t("pulverizing_strike_quote", true),
     description: t("pulverizing_strike_desc", true),
@@ -381,6 +428,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "rising-tide",
     name: t("rising_tide", true),
     quote: t("rising_tide_quote", true),
     description: t("rising_tide_desc", true),
@@ -389,6 +437,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "ritual-seals",
     name: t("ritual_seals", true),
     quote: t("ritual_seals_quote", true),
     description: t("ritual_seals_desc", true),
@@ -397,6 +446,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "showstopper",
     name: t("showstopper", true),
     quote: t("showstopper_quote", true),
     description: t("showstopper_desc", true),
@@ -405,14 +455,16 @@ const heroics = [
     book: "high",
   },
   {
-    name: t("spider_s_web", true),
-    quote: t("spider_s_web_quote", true),
-    description: t("spider_s_web_desc", true),
-    source: t("spider_s_web_source", true),
+    fuid: "spiders-web",
+    name: t("spiders_web", true),
+    quote: t("spiders_web_quote", true),
+    description: t("spiders_web_desc", true),
+    source: t("spiders_web_source", true),
     applicableTo: ["Fury", "Weaponmaster"],
     book: "high",
   },
   {
+    fuid: "swirling-swarm",
     name: t("swirling_swarm", true),
     quote: t("swirling_swarm_quote", true),
     description: t("swirling_swarm_desc", true),
@@ -421,6 +473,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "tabula-rasa",
     name: t("tabula_rasa", true),
     quote: t("tabula_rasa_quote", true),
     description: t("tabula_rasa_desc", true),
@@ -429,6 +482,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "theme-song",
     name: t("theme_song", true),
     quote: t("theme_song_quote", true),
     description: t("theme_song_desc", true),
@@ -437,6 +491,7 @@ const heroics = [
     book: "high",
   },
   {
+    fuid: "triple-slash",
     name: t("triple_slash", true),
     quote: t("triple_slash_quote", true),
     description: t("triple_slash_desc", true),
@@ -447,6 +502,7 @@ const heroics = [
 
   // FUTF - techno
   {
+    fuid: "clean-slate",
     name: t("arcane_soldier", true),
     quote: t("arcane_soldier_quote", true),
     description: t("arcane_soldier_desc", true),
@@ -455,6 +511,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "fast-rituals",
     name: t("brainwave_discharge", true),
     quote: t("brainwave_discharge_quote", true),
     description: t("brainwave_discharge_desc", true),
@@ -463,7 +520,8 @@ const heroics = [
     book: "techno",
   },
   {
-    name: t("bullet_time", true),
+    fuid: "fleeting-moment",
+    name: t("fleeting_moment", true),
     quote: t("bullet_time_quote", true),
     description: t("bullet_time_desc", true),
     source: t("bullet_time_source", true),
@@ -471,6 +529,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "decoy-bait",
     name: t("decoy_bait", true),
     quote: t("decoy_bait_quote", true),
     description: t("decoy_bait_desc", true),
@@ -479,6 +538,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "dreamslice",
     name: t("dreamslice", true),
     quote: t("dreamslice_quote", true),
     description: t("dreamslice_desc", true),
@@ -487,6 +547,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "dynamic-synchronization",
     name: t("dynamic_synchronization", true),
     quote: t("dynamic_synchronization_quote", true),
     description: t("dynamic_synchronization_desc", true),
@@ -495,6 +556,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "greater-akromorphosis",
     name: t("greater_akromorphosis", true),
     quote: t("greater_akromorphosis_quote", true),
     description: t("greater_akromorphosis_desc", true),
@@ -503,6 +565,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "greater-ecdysis",
     name: t("greater_ecdysis", true),
     quote: t("greater_ecdysis_quote", true),
     description: t("greater_ecdysis_desc", true),
@@ -511,6 +574,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "greater-theriomorphosis",
     name: t("greater_theriomorphosis", true),
     quote: t("greater_theriomorphosis_quote", true),
     description: t("greater_theriomorphosis_desc", true),
@@ -519,6 +583,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "hit-the-nerve",
     name: t("hit_the_nerve", true),
     quote: t("hit_the_nerve_quote", true),
     description: t("hit_the_nerve_desc", true),
@@ -527,6 +592,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "make-it-or-break-it",
     name: t("make_it_or_break_it", true),
     quote: t("make_it_or_break_it_quote", true),
     description: t("make_it_or_break_it_desc", true),
@@ -535,6 +601,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "mimeoclepsis",
     name: t("mimeoclepsis", true),
     quote: t("mimeoclepsis_quote", true),
     description: t("mimeoclepsis_desc", true),
@@ -543,6 +610,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "nebulization",
     name: t("nebulization", true),
     quote: t("nebulization_quote", true),
     description: t("nebulization_desc", true),
@@ -551,6 +619,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "overload-burst",
     name: t("overload_burst", true),
     quote: t("overload_burst_quote", true),
     description: t("overload_burst_desc", true),
@@ -559,6 +628,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "psychic-field",
     name: t("psychic_field", true),
     quote: t("psychic_field_quote", true),
     description: t("psychic_field_desc", true),
@@ -567,6 +637,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "quantum-magicannon",
     name: t("quantum_magicannon", true),
     quote: t("quantum_magicannon_quote", true),
     description: t("quantum_magicannon_desc", true),
@@ -575,6 +646,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "quick-scan",
     name: t("quick_scan", true),
     quote: t("quick_scan_quote", true),
     description: t("quick_scan_desc", true),
@@ -583,6 +655,7 @@ const heroics = [
     book: "techno",
   },
   {
+    fuid: "steel-witch",
     name: t("steel_witch", true),
     quote: t("steel_witch_quote", true),
     description: t("steel_witch_desc", true),
@@ -593,6 +666,7 @@ const heroics = [
 
   // FUNF - natural
   {
+    fuid: "all-you-can-eat",
     name: t("all_you_can_eat", true),
     quote: t("all_you_can_eat_quote", true),
     description: t("all_you_can_eat_desc", true),
@@ -601,14 +675,16 @@ const heroics = [
     book: "natural",
   },
   {
-    name: t("auramancer_s_refraction", true),
-    quote: t("auramancer_s_refraction_quote", true),
-    description: t("auramancer_s_refraction_desc", true),
-    source: t("auramancer_s_refraction_source", true),
+    fuid: "auramancers-refraction",
+    name: t("auramancers_refraction", true),
+    quote: t("auramancers_refraction_quote", true),
+    description: t("auramancers_refraction_desc", true),
+    source: t("auramancers_refraction_source", true),
     applicableTo: ["Arcanist", "Spiritist"],
     book: "natural",
   },
   {
+    fuid: "bend-magic",
     name: t("bend_magic", true),
     quote: t("bend_magic_quote", true),
     description: t("bend_magic_desc", true),
@@ -617,6 +693,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "brambleheart",
     name: t("brambleheart", true),
     quote: t("brambleheart_quote", true),
     description: t("brambleheart_desc", true),
@@ -625,6 +702,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "brave-bash",
     name: t("brave_bash", true),
     quote: t("brave_bash_quote", true),
     description: t("brave_bash_desc", true),
@@ -633,6 +711,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "cheer-up",
     name: t("cheer_up", true),
     quote: t("cheer_up_quote", true),
     description: t("cheer_up_desc", true),
@@ -641,6 +720,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "chimeric-soul",
     name: t("chimeric_soul", true),
     quote: t("chimeric_soul_quote", true),
     description: t("chimeric_soul_desc", true),
@@ -649,6 +729,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "cleansing-moonlight",
     name: t("cleansing_moonlight", true),
     quote: t("cleansing_moonlight_quote", true),
     description: t("cleansing_moonlight_desc", true),
@@ -657,6 +738,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "ephemeral-tranquility",
     name: t("ephemeral_tranquility", true),
     quote: t("ephemeral_tranquility_quote", true),
     description: t("ephemeral_tranquility_desc", true),
@@ -665,6 +747,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "fitcast",
     name: t("fitcast", true),
     quote: t("fitcast_quote", true),
     description: t("fitcast_desc", true),
@@ -673,6 +756,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "for-a-better-future",
     name: t("for_a_better_future", true),
     quote: t("for_a_better_future_quote", true),
     description: t("for_a_better_future_desc", true),
@@ -681,6 +765,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "greater-chloromancy",
     name: t("greater_chloromancy", true),
     quote: t("greater_chloromancy_quote", true),
     description: t("greater_chloromancy_desc", true),
@@ -689,6 +774,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "green-thumb",
     name: t("green_thumb", true),
     quote: t("green_thumb_quote", true),
     description: t("green_thumb_desc", true),
@@ -697,6 +783,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "inner-wellspring",
     name: t("inner_wellspring", true),
     quote: t("inner_wellspring_quote", true),
     description: t("inner_wellspring_desc", true),
@@ -705,6 +792,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "power-nap",
     name: t("power_nap", true),
     quote: t("power_nap_quote", true),
     description: t("power_nap_desc", true),
@@ -713,6 +801,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "side-by-side",
     name: t("side_by_side", true),
     quote: t("side_by_side_quote", true),
     description: t("side_by_side_desc", true),
@@ -721,6 +810,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "silent-hunter",
     name: t("silent_hunter", true),
     quote: t("silent_hunter_quote", true),
     description: t("silent_hunter_desc", true),
@@ -729,6 +819,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "skillful-dosage",
     name: t("skillful_dosage", true),
     quote: t("skillful_dosage_quote", true),
     description: t("skillful_dosage_desc", true),
@@ -737,6 +828,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "specialty-of-the-house",
     name: t("specialty_of_the_house", true),
     quote: t("specialty_of_the_house_quote", true),
     description: t("specialty_of_the_house_desc", true),
@@ -745,6 +837,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "strength-of-five-wellsprings",
     name: t("strength_of_five_wellsprings", true),
     quote: t("strength_of_five_wellsprings_quote", true),
     description: t("strength_of_five_wellsprings_desc", true),
@@ -753,6 +846,7 @@ const heroics = [
     book: "natural",
   },
   {
+    fuid: "wise-counsel",
     name: t("wise_counsel", true),
     quote: t("wise_counsel_quote", true),
     description: t("wise_counsel_desc", true),
@@ -763,6 +857,7 @@ const heroics = [
 
   // FUBC - bonus
   {
+    fuid: "steel-witch",
     name: t("anatomist", true),
     quote: t("anatomist_quote", true),
     description: t("anatomist_desc", true),
@@ -771,6 +866,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "arcane-sacrifice",
     name: t("arcane_sacrifice", true),
     quote: t("arcane_sacrifice_quote", true),
     description: t("arcane_sacrifice_desc", true),
@@ -779,6 +875,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "birth-of-the-cruel",
     name: t("birth_of_the_cruel", true),
     quote: t("birth_of_the_cruel_quote", true),
     description: t("birth_of_the_cruel_desc", true),
@@ -787,6 +884,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "black-white",
     name: t("black_white", true),
     quote: t("black_white_quote", true),
     description: t("black_white_desc", true),
@@ -795,6 +893,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "broken-wings-tactic",
     name: t("broken_wing_tactic", true),
     quote: t("broken_wing_tactic_quote", true),
     description: t("broken_wing_tactic_desc", true),
@@ -803,6 +902,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "card-vanguard",
     name: t("card_vanguard", true),
     quote: t("card_vanguard_quote", true),
     description: t("card_vanguard_desc", true),
@@ -811,6 +911,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "duel-master",
     name: t("duel_master", true),
     quote: t("duel_master_quote", true),
     description: t("duel_master_desc", true),
@@ -825,6 +926,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "flow-of-yin-and-yang",
     name: t("flow_of_yin_and_yang", true),
     quote: t("flow_of_yin_and_yang_quote", true),
     description: t("flow_of_yin_and_yang_desc", true),
@@ -833,6 +935,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "forbidden-rite",
     name: t("forbidden_rite", true),
     quote: t("forbidden_rite_quote", true),
     description: t("forbidden_rite_desc", true),
@@ -841,14 +944,16 @@ const heroics = [
     book: "bonus",
   },
   {
-    name: t("great_cauldron_s_secret", true),
-    quote: t("great_cauldron_s_secret_quote", true),
-    description: t("great_cauldron_s_secret_desc", true),
-    source: t("great_cauldron_s_secret_source", true),
+    fuid: "great-cauldrons-secret",
+    name: t("great_cauldrons_secret", true),
+    quote: t("great_cauldrons_secret_quote", true),
+    description: t("great_cauldrons_secret_desc", true),
+    source: t("great_cauldrons_secret_source", true),
     applicableTo: ["Tinkerer"],
     book: "bonus",
   },
   {
+    fuid: "harvester-of-sorrow",
     name: t("harvester_of_sorrow", true),
     quote: t("harvester_of_sorrow_quote", true),
     description: t("harvester_of_sorrow_desc", true),
@@ -857,14 +962,16 @@ const heroics = [
     book: "bonus",
   },
   {
-    name: t("hunter_s_trick", true),
-    quote: t("hunter_s_trick_quote", true),
-    description: t("hunter_s_trick_desc", true),
-    source: t("hunter_s_trick_source", true),
+    fuid: "hunters-trick",
+    name: t("hunters_trick", true),
+    quote: t("hunters_trick_quote", true),
+    description: t("hunters_trick_desc", true),
+    source: t("hunters_trick_source", true),
     applicableTo: ["Sharpshooter", "Weaponmaster"],
     book: "bonus",
   },
   {
+    fuid: "impaler-dragon",
     name: t("impaler_dragon", true),
     quote: t("impaler_dragon_quote", true),
     description: t("impaler_dragon_desc", true),
@@ -873,6 +980,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "it-lives",
     name: t("it_lives", true),
     quote: t("it_lives_quote", true),
     description: t("it_lives_desc", true),
@@ -881,6 +989,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "like-an-open-book",
     name: t("like_an_open_book", true),
     quote: t("like_an_open_book_quote", true),
     description: t("like_an_open_book_desc", true),
@@ -889,6 +998,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "nether-slash",
     name: t("nether_slash", true),
     quote: t("nether_slash_quote", true),
     description: t("nether_slash_desc", true),
@@ -897,6 +1007,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "ofuda-mastery",
     name: t("ofuda_mastery", true),
     quote: t("ofuda_mastery_quote", true),
     description: t("ofuda_mastery_desc", true),
@@ -905,6 +1016,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "phagomagus",
     name: t("phagomagus", true),
     quote: t("phagomagus_quote", true),
     description: t("phagomagus_desc", true),
@@ -913,6 +1025,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "pulse-of-the-maggots",
     name: t("pulse_of_the_maggots", true),
     quote: t("pulse_of_the_maggots_quote", true),
     description: t("pulse_of_the_maggots_desc", true),
@@ -921,6 +1034,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "symbiotic-roots",
     name: t("symbiotic_roots", true),
     quote: t("symbiotic_roots_quote", true),
     description: t("symbiotic_roots_desc", true),
@@ -929,6 +1043,7 @@ const heroics = [
     book: "bonus",
   },
   {
+    fuid: "witchvoice",
     name: t("witchvoice", true),
     quote: t("witchvoice_quote", true),
     description: t("witchvoice_desc", true),
@@ -937,5 +1052,16 @@ const heroics = [
     book: "bonus",
   },
 ];
+
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+heroics.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});
 
 export default heroics;

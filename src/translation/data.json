@@ -29570,7 +29570,7 @@
     "zh": "FUHF159"
   },
   {
-    "key": "spider_s_web",
+    "key": "spiders_web",
     "en": "Spider’s Web",
     "it": "Spider’s Web",
     "de": "Spider’s Web",
@@ -29581,7 +29581,7 @@
     "zh": "Spider’s Web"
   },
   {
-    "key": "spider_s_web_quote",
+    "key": "spiders_web_quote",
     "en": "Attack twice with flails",
     "it": "Attack twice with flails",
     "de": "Attack twice with flails",
@@ -29592,7 +29592,7 @@
     "zh": "Attack twice with flails"
   },
   {
-    "key": "spider_s_web_desc",
+    "key": "spiders_web_desc",
     "en": "**Requirements:** you must have mastered one or more classes among **Fury** and **Weaponmaster**.\\nWhen you perform the **Attack** action with a **melee** weapon that belongs to the **flail** Category, if you have **no other weapon equipped**, you may perform two separate attacks instead of one (against the same target or against different targets). If you do, both attacks follow the rules for **two-weapon fighting**: each attack loses the **multi** property and cannot gain it, and you treat the High Roll of each Accuracy Check as being equal to 0 when determining damage.\\nNote that this Heroic Skill **does not stack** with a custom weapon's **quick** customization (using **Spider's Web** with a **quick** flail doesn't allow more than two attacks, in short).",
     "it": "**Requirements:** you must have mastered one or more classes among **Fury** and **Weaponmaster**.\\nWhen you perform the **Attack** action with a **melee** weapon that belongs to the **flail** Category, if you have **no other weapon equipped**, you may perform two separate attacks instead of one (against the same target or against different targets). If you do, both attacks follow the rules for **two-weapon fighting**: each attack loses the **multi** property and cannot gain it, and you treat the High Roll of each Accuracy Check as being equal to 0 when determining damage.\\nNote that this Heroic Skill **does not stack** with a custom weapon's **quick** customization (using **Spider's Web** with a **quick** flail doesn't allow more than two attacks, in short).",
     "de": "**Requirements:** you must have mastered one or more classes among **Fury** and **Weaponmaster**.\\nWhen you perform the **Attack** action with a **melee** weapon that belongs to the **flail** Category, if you have **no other weapon equipped**, you may perform two separate attacks instead of one (against the same target or against different targets). If you do, both attacks follow the rules for **two-weapon fighting**: each attack loses the **multi** property and cannot gain it, and you treat the High Roll of each Accuracy Check as being equal to 0 when determining damage.\\nNote that this Heroic Skill **does not stack** with a custom weapon's **quick** customization (using **Spider's Web** with a **quick** flail doesn't allow more than two attacks, in short).",
@@ -29603,7 +29603,7 @@
     "zh": "**Requirements:** you must have mastered one or more classes among **Fury** and **Weaponmaster**.\\nWhen you perform the **Attack** action with a **melee** weapon that belongs to the **flail** Category, if you have **no other weapon equipped**, you may perform two separate attacks instead of one (against the same target or against different targets). If you do, both attacks follow the rules for **two-weapon fighting**: each attack loses the **multi** property and cannot gain it, and you treat the High Roll of each Accuracy Check as being equal to 0 when determining damage.\\nNote that this Heroic Skill **does not stack** with a custom weapon's **quick** customization (using **Spider's Web** with a **quick** flail doesn't allow more than two attacks, in short)."
   },
   {
-    "key": "spider_s_web_source",
+    "key": "spiders_web_source",
     "en": "FUHF159",
     "it": "FUHF159",
     "de": "FUHF159",
@@ -30626,7 +30626,7 @@
     "zh": "FUNF161"
   },
   {
-    "key": "auramancer_s_refraction",
+    "key": "auramancers_refraction",
     "en": "Auramancer's Refraction",
     "it": "Auramancer's Refraction",
     "de": "Auramancer's Refraction",
@@ -30637,7 +30637,7 @@
     "zh": "Auramancer's Refraction"
   },
   {
-    "key": "auramancer_s_refraction_quote",
+    "key": "auramancers_refraction_quote",
     "en": "Improves Aura and Barrier, and punishes enemies who damage protected targets.",
     "it": "Improves Aura and Barrier, and punishes enemies who damage protected targets.",
     "de": "Improves Aura and Barrier, and punishes enemies who damage protected targets.",
@@ -30648,7 +30648,7 @@
     "zh": "Improves Aura and Barrier, and punishes enemies who damage protected targets."
   },
   {
-    "key": "auramancer_s_refraction_desc",
+    "key": "auramancers_refraction_desc",
     "en": "**Requirements:** you must have mastered one or more Classes among **Arcanist** and **Spiritist**, and must have learned the **Aura** spell and/or the **Barrier** spell.\\nChoose a damage type among **air, bolt, earth, fire, ice,** and **light**.\\nWhen an enemy you can see deals damage to one or more creatures who are affected by an **Aura** and/or **Barrier** spell you cast, the damage suffered by each of those creatures is reduced by an amount equal to **【half your level in the Spiritist Class】** **or** to **【your level, divided by 10】** (use whichever value is **higher**; this reduction is applied **before** damage Affinities). Then, you may deal an amount of damage of the chosen type equal to **【half your level】** to that enemy. If you do, you cannot deal damage this way until the start of your next turn. *Replace below damage type with type chosen.",
     "it": "**Requirements:** you must have mastered one or more Classes among **Arcanist** and **Spiritist**, and must have learned the **Aura** spell and/or the **Barrier** spell.\\nChoose a damage type among **air, bolt, earth, fire, ice,** and **light**.\\nWhen an enemy you can see deals damage to one or more creatures who are affected by an **Aura** and/or **Barrier** spell you cast, the damage suffered by each of those creatures is reduced by an amount equal to **【half your level in the Spiritist Class】** **or** to **【your level, divided by 10】** (use whichever value is **higher**; this reduction is applied **before** damage Affinities). Then, you may deal an amount of damage of the chosen type equal to **【half your level】** to that enemy. If you do, you cannot deal damage this way until the start of your next turn. *Replace below damage type with type chosen.",
     "de": "**Requirements:** you must have mastered one or more Classes among **Arcanist** and **Spiritist**, and must have learned the **Aura** spell and/or the **Barrier** spell.\\nChoose a damage type among **air, bolt, earth, fire, ice,** and **light**.\\nWhen an enemy you can see deals damage to one or more creatures who are affected by an **Aura** and/or **Barrier** spell you cast, the damage suffered by each of those creatures is reduced by an amount equal to **【half your level in the Spiritist Class】** **or** to **【your level, divided by 10】** (use whichever value is **higher**; this reduction is applied **before** damage Affinities). Then, you may deal an amount of damage of the chosen type equal to **【half your level】** to that enemy. If you do, you cannot deal damage this way until the start of your next turn. *Replace below damage type with type chosen.",
@@ -30659,7 +30659,7 @@
     "zh": "**Requirements:** you must have mastered one or more Classes among **Arcanist** and **Spiritist**, and must have learned the **Aura** spell and/or the **Barrier** spell.\\nChoose a damage type among **air, bolt, earth, fire, ice,** and **light**.\\nWhen an enemy you can see deals damage to one or more creatures who are affected by an **Aura** and/or **Barrier** spell you cast, the damage suffered by each of those creatures is reduced by an amount equal to **【half your level in the Spiritist Class】** **or** to **【your level, divided by 10】** (use whichever value is **higher**; this reduction is applied **before** damage Affinities). Then, you may deal an amount of damage of the chosen type equal to **【half your level】** to that enemy. If you do, you cannot deal damage this way until the start of your next turn. *Replace below damage type with type chosen."
   },
   {
-    "key": "auramancer_s_refraction_source",
+    "key": "auramancers_refraction_source",
     "en": "FUNF162",
     "it": "FUNF162",
     "de": "FUNF162",
@@ -31902,7 +31902,7 @@
     "zh": "FUBC11"
   },
   {
-    "key": "great_cauldron_s_secret",
+    "key": "great_cauldrons_secret",
     "en": "Great Cauldron's Secret",
     "it": "Great Cauldron's Secret",
     "de": "Great Cauldron's Secret",
@@ -31913,7 +31913,7 @@
     "zh": "Great Cauldron's Secret"
   },
   {
-    "key": "great_cauldron_s_secret_quote",
+    "key": "great_cauldrons_secret_quote",
     "en": "Choose the type of target when using alchemy.",
     "it": "Choose the type of target when using alchemy.",
     "de": "Choose the type of target when using alchemy.",
@@ -31924,7 +31924,7 @@
     "zh": "Choose the type of target when using alchemy."
   },
   {
-    "key": "great_cauldron_s_secret_desc",
+    "key": "great_cauldrons_secret_desc",
     "en": "**Requirements:** you must have mastered the **Tinkerer** Class, and have acquired the **superior alchemy** benefit from the **Gadgets** Skill.\\nWhen you create a **potion** via **alchemy**, you may treat the die assigned to **\"target\"** as showing a value of **13** or **17** (even if that die shows a different number).",
     "it": "**Requirements:** you must have mastered the **Tinkerer** Class, and have acquired the **superior alchemy** benefit from the **Gadgets** Skill.\\nWhen you create a **potion** via **alchemy**, you may treat the die assigned to **\"target\"** as showing a value of **13** or **17** (even if that die shows a different number).",
     "de": "**Requirements:** you must have mastered the **Tinkerer** Class, and have acquired the **superior alchemy** benefit from the **Gadgets** Skill.\\nWhen you create a **potion** via **alchemy**, you may treat the die assigned to **\"target\"** as showing a value of **13** or **17** (even if that die shows a different number).",
@@ -31935,7 +31935,7 @@
     "zh": "**Requirements:** you must have mastered the **Tinkerer** Class, and have acquired the **superior alchemy** benefit from the **Gadgets** Skill.\\nWhen you create a **potion** via **alchemy**, you may treat the die assigned to **\"target\"** as showing a value of **13** or **17** (even if that die shows a different number)."
   },
   {
-    "key": "great_cauldron_s_secret_source",
+    "key": "great_cauldrons_secret_source",
     "en": "FUBC29",
     "it": "FUBC29",
     "de": "FUBC29",
@@ -31990,7 +31990,7 @@
     "zh": "FUBC14"
   },
   {
-    "key": "hunter_s_trick",
+    "key": "hunters_trick",
     "en": "Hunter's Trick",
     "it": "Hunter's Trick",
     "de": "Hunter's Trick",
@@ -32001,7 +32001,7 @@
     "zh": "Hunter's Trick"
   },
   {
-    "key": "hunter_s_trick_quote",
+    "key": "hunters_trick_quote",
     "en": "Boost the transformations of custom weapons.",
     "it": "Boost the transformations of custom weapons.",
     "de": "Boost the transformations of custom weapons.",
@@ -32012,7 +32012,7 @@
     "zh": "Boost the transformations of custom weapons."
   },
   {
-    "key": "hunter_s_trick_desc",
+    "key": "hunters_trick_desc",
     "en": "**Requirements:** you must have mastered one or more Classes among **Sharpshooter** and **Weaponmaster**.\\nWhen you transform a **transforming custom weapon** on your turn, choose **one** option:\\n- If you have not performed any attacks during this turn, the next attack you perform with this weapon during this turn deals 5 extra damage.\\n- If you hit one or more creatures with an attack using this weapon during this turn, you recover 5 Hit Points and 5 Mind Points.",
     "it": "**Requirements:** you must have mastered one or more Classes among **Sharpshooter** and **Weaponmaster**.\\nWhen you transform a **transforming custom weapon** on your turn, choose **one** option:\\n- If you have not performed any attacks during this turn, the next attack you perform with this weapon during this turn deals 5 extra damage.\\n- If you hit one or more creatures with an attack using this weapon during this turn, you recover 5 Hit Points and 5 Mind Points.",
     "de": "**Requirements:** you must have mastered one or more Classes among **Sharpshooter** and **Weaponmaster**.\\nWhen you transform a **transforming custom weapon** on your turn, choose **one** option:\\n- If you have not performed any attacks during this turn, the next attack you perform with this weapon during this turn deals 5 extra damage.\\n- If you hit one or more creatures with an attack using this weapon during this turn, you recover 5 Hit Points and 5 Mind Points.",
@@ -32023,7 +32023,7 @@
     "zh": "**Requirements:** you must have mastered one or more Classes among **Sharpshooter** and **Weaponmaster**.\\nWhen you transform a **transforming custom weapon** on your turn, choose **one** option:\\n- If you have not performed any attacks during this turn, the next attack you perform with this weapon during this turn deals 5 extra damage.\\n- If you hit one or more creatures with an attack using this weapon during this turn, you recover 5 Hit Points and 5 Mind Points."
   },
   {
-    "key": "hunter_s_trick_source",
+    "key": "hunters_trick_source",
     "en": "FUBC29",
     "it": "FUBC29",
     "de": "FUBC29",
