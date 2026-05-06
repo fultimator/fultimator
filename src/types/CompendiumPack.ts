@@ -42,6 +42,7 @@ export interface CompendiumPack {
   name: string;
   description?: string;
   author?: string;
+  aliases?: string[]; // previous fuids that should still resolve to this pack
   type?: PackType;
   version?: string; // from manifest on import; editable in-app
   active?: boolean; // absent or true = visible in viewer; false = hidden

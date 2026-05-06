@@ -19,6 +19,7 @@ import {
   collectRefPacks,
   parseRef,
   buildRef,
+  resolveRefMeta,
 } from "../utils/compendiumRefs";
 
 const STORE = "compendium-packs";
@@ -66,12 +67,35 @@ const normalizePackAndItems = (pack: CompendiumPack): CompendiumPack => {
     ...item,
     data: ensureItemDataFuid(item.type, item.data, item.id),
   }));
+  const currentFuid = toFuid(pack.fuid || pack.name || "") || "pack";
+  const aliases = Array.from(
+    new Set((pack.aliases ?? []).map((v) => toFuid(v)).filter(Boolean)),
+  ).filter((alias) => alias !== currentFuid);
   const normalizedPack: CompendiumPack = {
     ...pack,
-    fuid: toFuid(pack.fuid || pack.name || "") || "pack",
+    fuid: currentFuid,
+    aliases,
     items: normalizedItems,
   };
   return finalizePackRequires(normalizedPack);
+};
+const rewriteAliasResolvedRefs = (
+  pack: CompendiumPack,
+  packs: CompendiumPack[],
+): CompendiumPack => {
+  const items = pack.items.map((item) => {
+    const nextData: Record<string, unknown> = { ...item.data };
+    let changed = false;
+    for (const [key, value] of Object.entries(nextData)) {
+      if (!key.endsWith("Ref")) continue;
+      const meta = resolveRefMeta(value, packs);
+      if (!meta || !meta.resolvedViaAlias || !meta.canonicalRef) continue;
+      nextData[key] = meta.canonicalRef;
+      changed = true;
+    }
+    return changed ? { ...item, data: nextData } : item;
+  });
+  return { ...pack, items };
 };
 const rewriteSelfRefsForPackFuidChange = (
   pack: CompendiumPack,
@@ -112,7 +136,10 @@ export function useCompendiumPacks() {
 
   const reload = useCallback(async () => {
     const all = await getAllPacks();
-    const normalized = all.map((pack) => normalizePackAndItems(pack));
+    const normalizedBase = all.map((pack) => normalizePackAndItems(pack));
+    const normalized = normalizedBase.map((pack) =>
+      finalizePackRequires(rewriteAliasResolvedRefs(pack, normalizedBase)),
+    );
     const changed = normalized.filter(
       (pack, idx) => !packsEquivalent(pack, all[idx]),
     );
@@ -238,6 +265,12 @@ export function useCompendiumPacks() {
       };
       const previousFuid = toFuid(pack.fuid || "");
       const nextFuid = toFuid(nextCandidate.fuid || "");
+      nextCandidate.aliases = Array.from(
+        new Set([
+          ...(pack.aliases ?? []).map((v) => toFuid(v)).filter(Boolean),
+          ...(previousFuid && previousFuid !== nextFuid ? [previousFuid] : []),
+        ]),
+      ).filter((alias) => alias !== nextFuid);
       const withRewrittenSelfRefs = rewriteSelfRefsForPackFuidChange(
         nextCandidate,
         previousFuid,

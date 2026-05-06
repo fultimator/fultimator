@@ -1,4 +1,9 @@
-import { buildRef, slugFuid, resolveRef } from "../utils/compendiumRefs";
+import {
+  buildRef,
+  slugFuid,
+  resolveRef,
+  resolveRefMeta,
+} from "../utils/compendiumRefs";
 
 function clamp(value, max) {
   return Math.min(value, max);
@@ -391,11 +396,16 @@ export function relinkCompendiumRefs(player, packMap) {
   }
 
   function resolveCandidate(currentRef, candidates, key, entry) {
-    if (
-      typeof currentRef === "string" &&
-      (resolveRef(currentRef, packs) || hasLegacyRawIdRef(currentRef))
-    ) {
-      return currentRef;
+    if (typeof currentRef === "string") {
+      const meta = resolveRefMeta(currentRef, packs);
+      if (meta?.data) {
+        if (meta.resolvedViaAlias && meta.canonicalRef) {
+          relinked += 1;
+          return meta.canonicalRef;
+        }
+        return currentRef;
+      }
+      if (hasLegacyRawIdRef(currentRef)) return currentRef;
     }
 
     const target = labelOf(entry?.[key]);

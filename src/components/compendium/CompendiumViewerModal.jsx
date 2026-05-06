@@ -1497,10 +1497,10 @@ const CompendiumViewerModal = ({
               );
               setEditingRequires(manualOnly);
             }}
-            renderTags={(value, getTagProps) =>
+            renderValue={(value, getItemProps) =>
               value.map((option, index) => {
                 const isSystem = editingAutoRequires.includes(option);
-                const tagProps = getTagProps({ index });
+                const tagProps = getItemProps({ index });
                 const { onDelete, ...safeTagProps } = tagProps;
                 const chip = (
                   <Chip

@@ -34,13 +34,22 @@ export function collectRefPacks(data) {
 }
 
 export function resolveRef(refValue, packs) {
+  return resolveRefMeta(refValue, packs)?.data ?? null;
+}
+
+export function resolveRefMeta(refValue, packs) {
   const parsed = parseRef(refValue);
   if (!parsed) return null;
   const { packFuid, itemFuid } = parsed;
 
   for (const pack of packs) {
     const currentPackFuid = slugFuid(pack?.fuid || pack?.name || "");
-    if (currentPackFuid !== packFuid) continue;
+    const aliasSet = new Set(
+      (pack?.aliases ?? []).map((alias) => slugFuid(alias)).filter(Boolean),
+    );
+    const matchesCanonical = currentPackFuid === packFuid;
+    const matchesAlias = aliasSet.has(packFuid);
+    if (!matchesCanonical && !matchesAlias) continue;
 
     let entry = null;
     if (itemFuid) {
@@ -53,7 +62,13 @@ export function resolveRef(refValue, packs) {
         (i) => i?.id === String(refValue).split(":", 2)[1],
       );
     }
-    if (entry) return entry.data;
+    if (entry) {
+      return {
+        data: entry.data,
+        canonicalRef: buildRef(currentPackFuid, itemFuid),
+        resolvedViaAlias: matchesAlias,
+      };
+    }
   }
   return null;
 }
