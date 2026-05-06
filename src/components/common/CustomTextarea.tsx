@@ -252,7 +252,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
             multiline
             minRows={minRows || 4}
             maxRows={maxRows}
-            maxLength={maxLength}
+            slotProps={{ htmlInput: { maxLength } }}
             placeholder={placeholder}
             helperText={helperText}
             variant="outlined"
