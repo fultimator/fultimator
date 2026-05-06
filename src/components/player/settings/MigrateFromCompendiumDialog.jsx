@@ -23,7 +23,11 @@ import { Close, ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
 import classList from "../../../libs/classes";
-import { findPendingMigrations, applyMigrations } from "../../../libs/migrate";
+import {
+  findPendingMigrations,
+  applyMigrations,
+  relinkCompendiumRefs,
+} from "../../../libs/migrate";
 
 function slugify(str) {
   return (str ?? "")
@@ -82,11 +86,15 @@ export default function MigrateFromCompendiumDialog({
   }, [packs]);
 
   const builtinSources = useMemo(() => buildBuiltinSources(), []);
+  const relinkedPlayer = useMemo(() => {
+    if (!player || loading) return player;
+    return relinkCompendiumRefs(player, packMap).player;
+  }, [player, loading, packMap]);
 
   const migrations = useMemo(() => {
-    if (!player || loading) return [];
-    return findPendingMigrations(player, packMap, builtinSources);
-  }, [player, packMap, builtinSources, loading]);
+    if (!relinkedPlayer || loading) return [];
+    return findPendingMigrations(relinkedPlayer, packMap, builtinSources);
+  }, [relinkedPlayer, packMap, builtinSources, loading]);
 
   useEffect(() => {
     setSelected(new Set(migrations.map((m) => m.instancePath)));
@@ -141,7 +149,7 @@ export default function MigrateFromCompendiumDialog({
   }
 
   function handleApply() {
-    const updated = applyMigrations(player, migrations, selected);
+    const updated = applyMigrations(relinkedPlayer, migrations, selected);
     onApply(updated);
     onClose();
   }
