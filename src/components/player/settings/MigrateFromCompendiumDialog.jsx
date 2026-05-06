@@ -86,10 +86,17 @@ export default function MigrateFromCompendiumDialog({
   }, [packs]);
 
   const builtinSources = useMemo(() => buildBuiltinSources(), []);
-  const relinkedPlayer = useMemo(() => {
-    if (!player || loading) return player;
-    return relinkCompendiumRefs(player, packMap).player;
+  const relinkReport = useMemo(() => {
+    if (!player || loading)
+      return {
+        player,
+        relinked: 0,
+        ambiguous: 0,
+        missing: 0,
+      };
+    return relinkCompendiumRefs(player, packMap);
   }, [player, loading, packMap]);
+  const relinkedPlayer = relinkReport.player;
 
   const migrations = useMemo(() => {
     if (!relinkedPlayer || loading) return [];
@@ -196,6 +203,28 @@ export default function MigrateFromCompendiumDialog({
               <Button size="small" onClick={deselectAll}>
                 {t("Deselect all")}
               </Button>
+            </Box>
+            <Box sx={{ display: "flex", gap: 1, mb: 1.5, flexWrap: "wrap" }}>
+              <Chip
+                size="small"
+                color="success"
+                label={`${t("synced")}: ${selected.size}`}
+              />
+              <Chip
+                size="small"
+                color="info"
+                label={`${t("relinked")}: ${relinkReport.relinked}`}
+              />
+              <Chip
+                size="small"
+                color="warning"
+                label={`${t("missing source")}: ${relinkReport.missing}`}
+              />
+              <Chip
+                size="small"
+                color="warning"
+                label={`${t("ambiguous")}: ${relinkReport.ambiguous}`}
+              />
             </Box>
 
             {activeTypes.map((type) => {

@@ -14,7 +14,12 @@ import {
   DEFAULT_CUSTOMIZATION,
 } from "../themes/themeCustomization";
 import { useThemeStore } from "../store/themeStore";
-import { slugFuid, collectRefPacks } from "../utils/compendiumRefs";
+import {
+  slugFuid,
+  collectRefPacks,
+  parseRef,
+  buildRef,
+} from "../utils/compendiumRefs";
 
 const STORE = "compendium-packs";
 const PERSONAL_ID = "personal";
@@ -67,6 +72,26 @@ const normalizePackAndItems = (pack: CompendiumPack): CompendiumPack => {
     items: normalizedItems,
   };
   return finalizePackRequires(normalizedPack);
+};
+const rewriteSelfRefsForPackFuidChange = (
+  pack: CompendiumPack,
+  previousFuid: string,
+  nextFuid: string,
+): CompendiumPack => {
+  if (!previousFuid || !nextFuid || previousFuid === nextFuid) return pack;
+  const items = pack.items.map((item) => {
+    const nextData: Record<string, unknown> = { ...item.data };
+    let changed = false;
+    for (const [key, value] of Object.entries(nextData)) {
+      if (!key.endsWith("Ref")) continue;
+      const parsed = parseRef(value);
+      if (!parsed || parsed.packFuid !== previousFuid) continue;
+      nextData[key] = buildRef(nextFuid, parsed.itemFuid);
+      changed = true;
+    }
+    return changed ? { ...item, data: nextData } : item;
+  });
+  return { ...pack, items };
 };
 const packsEquivalent = (a: CompendiumPack, b: CompendiumPack): boolean =>
   JSON.stringify(a) === JSON.stringify(b);
@@ -206,11 +231,19 @@ export function useCompendiumPacks() {
             }
           : {}),
       };
-      const next = finalizePackRequires({
+      const nextCandidate = {
         ...pack,
         ...normalizedChanges,
         updatedAt: Date.now(),
-      });
+      };
+      const previousFuid = toFuid(pack.fuid || "");
+      const nextFuid = toFuid(nextCandidate.fuid || "");
+      const withRewrittenSelfRefs = rewriteSelfRefsForPackFuidChange(
+        nextCandidate,
+        previousFuid,
+        nextFuid,
+      );
+      const next = finalizePackRequires(withRewrittenSelfRefs);
       await savePack(next);
     },
     [],
