@@ -2,6 +2,7 @@ import { t } from "../translation/translate";
 
 export const baseWeapons = [
   {
+    fuid: "staff",
     category: "Arcane",
     name: t("Staff", true),
     cost: 100,
@@ -15,6 +16,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "tome",
     category: "Arcane",
     name: t("Tome", true),
     cost: 100,
@@ -28,6 +30,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "crossbow",
     category: "Bow",
     name: t("Crossbow", true),
     cost: 150,
@@ -41,6 +44,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "shortbow",
     category: "Bow",
     name: t("Shortbow", true),
     cost: 200,
@@ -54,6 +58,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "chain-whip",
     category: "Flail",
     name: t("Chain Whip", true),
     cost: 150,
@@ -67,6 +72,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "pistol",
     category: "Firearm",
     name: t("Pistol", true),
     cost: 250,
@@ -80,6 +86,7 @@ export const baseWeapons = [
     martial: true,
   },
   {
+    fuid: "light-spear",
     category: "Spear",
     name: t("Light Spear", true),
     cost: 200,
@@ -93,6 +100,7 @@ export const baseWeapons = [
     martial: true,
   },
   {
+    fuid: "heavy-spear",
     category: "Spear",
     name: t("Heavy Spear", true),
     cost: 200,
@@ -106,6 +114,7 @@ export const baseWeapons = [
     martial: true,
   },
   {
+    fuid: "shuriken",
     category: "Thrown",
     name: t("Shuriken", true),
     cost: 150,
@@ -119,6 +128,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "iron-hammer",
     category: "Heavy",
     name: t("Iron Hammer", true),
     cost: 200,
@@ -132,6 +142,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "broadaxe",
     category: "Heavy",
     name: t("Broadaxe", true),
     cost: 250,
@@ -145,6 +156,7 @@ export const baseWeapons = [
     martial: true,
   },
   {
+    fuid: "waraxe",
     category: "Heavy",
     name: t("Waraxe", true),
     cost: 250,
@@ -158,6 +170,7 @@ export const baseWeapons = [
     martial: true,
   },
   {
+    fuid: "steel-dagger",
     category: "Dagger",
     name: t("Steel Dagger", true),
     cost: 150,
@@ -171,6 +184,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "iron-knuckle",
     category: "Brawling",
     name: t("Iron Knuckle", true),
     cost: 150,
@@ -184,6 +198,7 @@ export const baseWeapons = [
     martial: false,
   },
   {
+    fuid: "katana",
     category: "Sword",
     name: t("Katana", true),
     cost: 200,
@@ -197,6 +212,7 @@ export const baseWeapons = [
     martial: true,
   },
   {
+    fuid: "bronze-sword",
     category: "Sword",
     name: t("Bronze Sword", true),
     cost: 200,
@@ -210,6 +226,7 @@ export const baseWeapons = [
     martial: true,
   },
   {
+    fuid: "greatsword",
     category: "Sword",
     name: t("Greatsword", true),
     cost: 200,
@@ -223,6 +240,7 @@ export const baseWeapons = [
     martial: true,
   },
   {
+    fuid: "rapier",
     category: "Sword",
     name: t("Rapier", true),
     cost: 200,
@@ -239,6 +257,7 @@ export const baseWeapons = [
 
 export const baseArmors = [
   {
+    fuid: "no-armor",
     name: t("No Armor", true),
     cost: 0,
     def: 0,
@@ -249,6 +268,7 @@ export const baseArmors = [
     martial: false,
   },
   {
+    fuid: "travel-garb",
     name: t("Travel Garb", true),
     cost: 100,
     def: 0,
@@ -259,6 +279,7 @@ export const baseArmors = [
     martial: false,
   },
   {
+    fuid: "silk-shirt",
     name: t("Silk Shirt", true),
     cost: 100,
     def: 0,
@@ -269,6 +290,7 @@ export const baseArmors = [
     martial: false,
   },
   {
+    fuid: "combat-tunic",
     name: t("Combat Tunic", true),
     cost: 150,
     def: 0,
@@ -279,6 +301,7 @@ export const baseArmors = [
     martial: false,
   },
   {
+    fuid: "sage-robe",
     name: t("Sage Robe", true),
     cost: 200,
     def: 0,
@@ -289,6 +312,7 @@ export const baseArmors = [
     martial: false,
   },
   {
+    fuid: "briggandine",
     name: t("Brigandine", true),
     cost: 150,
     def: 10,
@@ -299,6 +323,7 @@ export const baseArmors = [
     martial: true,
   },
   {
+    fuid: "bronze-plate",
     name: t("Bronze Plate", true),
     cost: 200,
     def: 11,
@@ -309,6 +334,7 @@ export const baseArmors = [
     martial: true,
   },
   {
+    fuid: "runic-plate",
     name: t("Runic Plate", true),
     cost: 250,
     def: 11,
@@ -319,6 +345,7 @@ export const baseArmors = [
     martial: true,
   },
   {
+    fuid: "steel-plate",
     name: t("Steel Plate", true),
     cost: 300,
     def: 12,
@@ -332,6 +359,7 @@ export const baseArmors = [
 
 export const baseShields = [
   {
+    fuid: "no-shield",
     name: t("No Shield", true),
     cost: 0,
     def: 0,
@@ -342,6 +370,7 @@ export const baseShields = [
     martial: false,
   },
   {
+    fuid: "bronze-shield",
     name: t("Bronze Shield", true),
     cost: 100,
     def: 0,
@@ -352,6 +381,7 @@ export const baseShields = [
     martial: false,
   },
   {
+    fuid: "runic-shield",
     name: t("Runic Shield", true),
     cost: 150,
     def: 0,
@@ -362,3 +392,16 @@ export const baseShields = [
     martial: true,
   },
 ];
+
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+[baseWeapons, baseArmors, baseShields].forEach((list) => {
+  list.forEach((item) => {
+    if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+  });
+});

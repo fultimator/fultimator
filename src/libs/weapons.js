@@ -1,5 +1,6 @@
 const weapons = [
   {
+    fuid: "unarmed-strike",
     category: "Brawling",
     name: "Unarmed Strike",
     cost: 0,
@@ -13,6 +14,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "staff",
     category: "Arcane",
     name: "Staff",
     cost: 100,
@@ -26,6 +28,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "tome",
     category: "Arcane",
     name: "Tome",
     cost: 100,
@@ -39,6 +42,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "crossbow",
     category: "Bow",
     name: "Crossbow",
     cost: 150,
@@ -52,6 +56,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "shortbow",
     category: "Bow",
     name: "Shortbow",
     cost: 200,
@@ -65,6 +70,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "chain-whip",
     category: "Flail",
     name: "Chain Whip",
     cost: 150,
@@ -78,6 +84,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "pistol",
     category: "Firearm",
     name: "Pistol",
     cost: 250,
@@ -91,6 +98,7 @@ const weapons = [
     martial: true,
   },
   {
+    fuid: "light-spear",
     category: "spear_category",
     name: "Light Spear",
     cost: 200,
@@ -104,6 +112,7 @@ const weapons = [
     martial: true,
   },
   {
+    fuid: "heavy-spear",
     category: "spear_category",
     name: "Heavy Spear",
     cost: 200,
@@ -117,6 +126,7 @@ const weapons = [
     martial: true,
   },
   {
+    fuid: "shuriken",
     category: "Thrown",
     name: "Shuriken",
     cost: 150,
@@ -130,6 +140,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "iron-hammer",
     category: "Heavy",
     name: "Iron Hammer",
     cost: 200,
@@ -143,6 +154,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "broadaxe",
     category: "Heavy",
     name: "Broadaxe",
     cost: 250,
@@ -156,6 +168,7 @@ const weapons = [
     martial: true,
   },
   {
+    fuid: "waraxe",
     category: "Heavy",
     name: "Waraxe",
     cost: 250,
@@ -169,6 +182,7 @@ const weapons = [
     martial: true,
   },
   {
+    fuid: "steel-dagger",
     category: "Dagger",
     name: "Steel Dagger",
     cost: 150,
@@ -182,6 +196,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "iron-knuckle",
     category: "Brawling",
     name: "Iron Knuckle",
     cost: 150,
@@ -195,6 +210,7 @@ const weapons = [
     martial: false,
   },
   {
+    fuid: "katana",
     category: "Sword",
     name: "Katana",
     cost: 200,
@@ -208,6 +224,7 @@ const weapons = [
     martial: true,
   },
   {
+    fuid: "bronze-sword",
     category: "Sword",
     name: "Bronze Sword",
     cost: 200,
@@ -221,6 +238,7 @@ const weapons = [
     martial: true,
   },
   {
+    fuid: "greatsword",
     category: "Sword",
     name: "Greatsword",
     cost: 200,
@@ -234,6 +252,7 @@ const weapons = [
     martial: true,
   },
   {
+    fuid: "rapier",
     category: "Sword",
     name: "Rapier",
     cost: 200,
@@ -247,5 +266,16 @@ const weapons = [
     martial: true,
   },
 ];
+
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+weapons.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});
 
 export default weapons;

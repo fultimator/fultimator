@@ -3,6 +3,7 @@ import { t } from "../translation/translate";
 const qualities = [
   // Defensive
   {
+    fuid: "antistatus",
     name: t("Antistatus", true),
     category: "Defensive",
     quality: t("You are immune to a single status", true),
@@ -10,6 +11,7 @@ const qualities = [
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
   },
   {
+    fuid: "resistance",
     name: t("Resistance", true),
     category: "Defensive",
     quality: t(
@@ -20,6 +22,7 @@ const qualities = [
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
   },
   {
+    fuid: "amulet",
     name: t("Amulet", true),
     category: "Defensive",
     quality: t("Get +1 bonus to Magic Defense", true),
@@ -27,6 +30,7 @@ const qualities = [
     filter: ["weapon", "customWeapon", "accessory"],
   },
   {
+    fuid: "bulwark",
     name: t("Bulwark", true),
     category: "Defensive",
     quality: t("You gain a +1 bonus to Defense.", true),
@@ -34,6 +38,7 @@ const qualities = [
     filter: ["weapon", "customWeapon", "accessory"],
   },
   {
+    fuid: "dual-resistance",
     name: t("Dual Resistance", true),
     category: "Defensive",
     quality: t(
@@ -44,6 +49,7 @@ const qualities = [
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
   },
   {
+    fuid: "swordbreaker",
     name: t("Swordbreaker", true),
     category: "Defensive",
     quality: t("You have Resistance to physical damage", true),
@@ -51,6 +57,7 @@ const qualities = [
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
   },
   {
+    fuid: "immunity",
     name: t("Immunity", true),
     category: "Defensive",
     quality: t(
@@ -61,6 +68,7 @@ const qualities = [
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
   },
   {
+    fuid: "omnishield",
     name: t("Omnishield", true),
     category: "Defensive",
     quality: t("Get +1 bonus to Defense and to Magic Defense", true),
@@ -68,6 +76,7 @@ const qualities = [
     filter: ["weapon", "customWeapon", "accessory"],
   },
   {
+    fuid: "perfect-health",
     name: t("Perfect Health", true),
     category: "Defensive",
     quality: t("You are immune to all status effects", true),
@@ -77,6 +86,7 @@ const qualities = [
 
   // Offensive
   {
+    fuid: "magical",
     name: t("Magical", true),
     category: "Offensive",
     quality: t("The Weapon targets Magic Defense instead of Defense", true),
@@ -84,6 +94,7 @@ const qualities = [
     filter: ["weapon", "customWeapon"],
   },
   {
+    fuid: "hunter",
     name: t("Hunter", true),
     category: "Offensive",
     quality: t(
@@ -94,6 +105,7 @@ const qualities = [
     filter: ["weapon", "customWeapon"],
   },
   {
+    fuid: "piercing",
     name: t("Piercing", true),
     category: "Offensive",
     quality: t("Weapon damage ignores Resistances", true),
@@ -101,6 +113,7 @@ const qualities = [
     filter: ["weapon", "customWeapon"],
   },
   {
+    fuid: "dual-hunter",
     name: t("Dual Hunter", true),
     category: "Offensive",
     quality: t(
@@ -111,6 +124,7 @@ const qualities = [
     filter: ["weapon", "customWeapon"],
   },
   {
+    fuid: "multi",
     name: t("Multi", true),
     category: "Offensive",
     quality: t("Weapon attacks have multi (2) property", true),
@@ -118,6 +132,7 @@ const qualities = [
     filter: ["weapon", "customWeapon"],
   },
   {
+    fuid: "status",
     name: t("Status", true),
     category: "Offensive",
     quality: t(
@@ -128,6 +143,7 @@ const qualities = [
     filter: ["weapon", "customWeapon"],
   },
   {
+    fuid: "status-plus",
     name: t("Status Plus", true),
     category: "Offensive",
     quality: t(
@@ -140,6 +156,7 @@ const qualities = [
 
   // Enhancement
   {
+    fuid: "damage-change",
     name: t("Damage Change", true),
     category: "Enhancement",
     quality: t(
@@ -150,6 +167,7 @@ const qualities = [
     filter: ["accessory"],
   },
   {
+    fuid: "initiative-up",
     name: t("Initiative Up", true),
     category: "Enhancement",
     quality: t("You gain a +4 bonus to your Initiative modifier.", true),
@@ -157,6 +175,7 @@ const qualities = [
     filter: ["armor", "shield", "accessory"],
   },
   {
+    fuid: "accuracy-up",
     name: t("Accuracy Up", true),
     category: "Enhancement",
     quality: t("You gain a +1 bonus to your Accuracy Checks.", true),
@@ -164,6 +183,7 @@ const qualities = [
     filter: ["armor", "shield", "accessory"],
   },
   {
+    fuid: "magic-up",
     name: t("Magic Up", true),
     category: "Enhancement",
     quality: t("You gain a +1 bonus to your Magic Checks.", true),
@@ -171,6 +191,7 @@ const qualities = [
     filter: ["armor", "shield", "accessory"],
   },
   {
+    fuid: "vitality-up",
     name: t("Vitality Up", true),
     category: "Enhancement",
     quality: t("When you recover HP, you recover 5 extra HP.", true),
@@ -178,6 +199,7 @@ const qualities = [
     filter: ["armor", "shield", "accessory"],
   },
   {
+    fuid: "healing-up",
     name: t("Healing Up", true),
     category: "Enhancement",
     quality: t(
@@ -188,6 +210,7 @@ const qualities = [
     filter: ["armor", "shield", "accessory"],
   },
   {
+    fuid: "spell-up",
     name: t("Spell Up", true),
     category: "Enhancement",
     quality: t("Spells you cast deal 5 extra damage.", true),
@@ -195,6 +218,7 @@ const qualities = [
     filter: ["armor", "shield", "accessory"],
   },
   {
+    fuid: "weapon-up",
     name: t("Weapon Up", true),
     category: "Enhancement",
     quality: t(
@@ -205,5 +229,16 @@ const qualities = [
     filter: ["armor", "shield", "accessory"],
   },
 ];
+
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+qualities.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});
 
 export default qualities;

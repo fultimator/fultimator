@@ -35,6 +35,7 @@ export function buildMnemosphereFromDef(classDef, lvl = 1) {
 
   return {
     name: `${className} Mnemosphere`,
+    fuid: slugify(className),
     class: className,
     lvl: numericLvl,
     skills: (classDef?.skills ?? []).map((skill) => ({

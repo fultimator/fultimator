@@ -2,6 +2,7 @@ import { t } from "../translation/translate";
 
 export const npcSpells = [
   {
+    fuid: "area-status",
     itemType: "spell",
     name: t("Area Status", true),
     attr1: "insight",
@@ -16,6 +17,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "breath",
     itemType: "spell",
     name: t("Breath", true),
     attr1: "insight",
@@ -30,6 +32,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "curse",
     itemType: "spell",
     name: t("Curse", true),
     attr1: "insight",
@@ -44,6 +47,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "curse-xl",
     itemType: "spell",
     name: t("Curse XL", true),
     attr1: "insight",
@@ -58,6 +62,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "cursed-breath",
     itemType: "spell",
     name: t("Cursed Breath", true),
     attr1: "insight",
@@ -72,6 +77,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "devastation",
     itemType: "spell",
     name: t("Devastation", true),
     attr1: "insight",
@@ -86,6 +92,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "lick-wounds",
     itemType: "spell",
     name: t("Lick Wounds", true),
     attr1: "insight",
@@ -100,6 +107,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "life-theft",
     itemType: "spell",
     name: t("Life Theft", true),
     attr1: "insight",
@@ -114,6 +122,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "mind-theft",
     itemType: "spell",
     name: t("Mind Theft", true),
     attr1: "insight",
@@ -128,6 +137,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "poison",
     itemType: "spell",
     name: t("Poison", true),
     attr1: "insight",
@@ -142,6 +152,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "quicken",
     itemType: "spell",
     name: t("Quicken", true),
     attr1: "insight",
@@ -156,6 +167,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "rage",
     itemType: "spell",
     name: t("Rage", true),
     attr1: "insight",
@@ -170,6 +182,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "shell",
     itemType: "spell",
     name: t("Shell", true),
     attr1: "insight",
@@ -184,6 +197,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "war-cry",
     itemType: "spell",
     name: t("War Cry", true),
     attr1: "insight",
@@ -198,6 +212,7 @@ export const npcSpells = [
     special: [],
   },
   {
+    fuid: "weaken",
     itemType: "spell",
     name: t("Weaken", true),
     attr1: "insight",
@@ -212,3 +227,14 @@ export const npcSpells = [
     special: [],
   },
 ];
+
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+npcSpells.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});

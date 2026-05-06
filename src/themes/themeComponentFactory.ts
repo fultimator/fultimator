@@ -987,6 +987,15 @@ export function createThemeComponents({
                 : "inherit",
           },
         },
+        text: isDark
+          ? {
+              color: secondary,
+              "&:hover": {
+                backgroundColor: alpha(secondary, 0.12),
+                color: secondary,
+              },
+            }
+          : {},
         contained: {
           color: shouldApplyTextEffectColor
             ? tokens.profileButtonTextColor

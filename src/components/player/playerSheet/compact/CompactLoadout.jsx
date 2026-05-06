@@ -527,6 +527,7 @@ export default function CompactLoadout({
             return clickable ? (
               <ButtonBase
                 key={slot}
+                component="div"
                 onClick={() => handleSlotClick(slot)}
                 sx={{
                   display: "block",

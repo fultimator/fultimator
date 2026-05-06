@@ -262,6 +262,179 @@
   - **`qualityCost`**: Integer, Cost of the quality.
   - **`isEquipped`**: Boolean, Indicates if the accessory is equipped.
 
+### `customWeapons`
+
+- **Type:** Array of Objects
+- **Description:** List of custom weapons the character possesses.
+  - **`name`**: String, Name of the custom weapon.
+  - **`category`**: String, Weapon category.
+  - **`range`**: String, Weapon range type.
+  - **`type`**: String, Damage type.
+  - **`accuracyCheck`**: Object, Accuracy attributes.
+    - **`att1`**: String, Primary attribute used by the weapon.
+    - **`att2`**: String, Secondary attribute used by the weapon.
+  - **`customizations`**: Array of Objects, Applied customizations.
+    - **`name`**: String
+    - **`effect`**: String
+    - **`martial`**: Boolean
+    - **`customCost`**: Integer
+  - **`quality`**: String
+  - **`qualityCost`**: Integer
+  - **`selectedQuality`**: String (optional)
+  - **`cost`**: Integer (optional)
+  - **`hands`**: Integer (optional)
+  - **`martial`**: Boolean (optional)
+  - **`isEquipped`**: Boolean (optional)
+  - **`damageModifier`**: Integer (optional)
+  - **`precModifier`**: Integer (optional)
+  - **`defModifier`**: Integer (optional)
+  - **`mDefModifier`**: Integer (optional)
+  - **`overrideDamageType`**: Boolean (optional)
+  - **`customDamageType`**: String (optional)
+  - **`secondWeaponName`**: String (optional)
+  - **`secondSelectedCategory`**: String (optional)
+  - **`secondSelectedRange`**: String (optional)
+  - **`secondSelectedAccuracyCheck`**: Object (optional)
+    - **`att1`**: String
+    - **`att2`**: String
+  - **`secondSelectedType`**: String (optional)
+  - **`secondCurrentCustomizations`**: Array of customization objects (optional)
+  - **`secondSelectedQuality`**: String (optional)
+  - **`secondQuality`**: String (optional)
+  - **`secondQualityCost`**: Integer (optional)
+  - **`secondDamageModifier`**: Integer (optional)
+  - **`secondPrecModifier`**: Integer (optional)
+  - **`secondDefModifier`**: Integer (optional)
+  - **`secondMDefModifier`**: Integer (optional)
+  - **`secondOverrideDamageType`**: Boolean (optional)
+  - **`secondCustomDamageType`**: String (optional)
+  - **`rareAccuracyBonus`**: Boolean (optional)
+  - **`rareDamageBonus`**: Boolean (optional)
+  - **`overrideAccuracyAttributes`**: Boolean (optional)
+  - **`dataType`**: String (optional)
+  - **`slots`**: String (optional), One of: `alpha`, `beta`, `gamma`, `delta`.
+  - **`slotted`**: Array of Strings (optional), Slotted sphere ids.
+
+### `immunities`
+
+- **Type:** Object
+- **Description:** Status immunities.
+  - **`slow`**: Boolean
+  - **`dazed`**: Boolean
+  - **`enraged`**: Boolean
+  - **`weak`**: Boolean
+  - **`shaken`**: Boolean
+  - **`poisoned`**: Boolean
+
+### `affinities`
+
+- **Type:** Object
+- **Description:** Damage-type affinities.
+  - **`physical`**: String
+  - **`wind`**: String
+  - **`bolt`**: String
+  - **`dark`**: String
+  - **`earth`**: String
+  - **`fire`**: String
+  - **`ice`**: String
+  - **`light`**: String
+  - **`poison`**: String
+- **Allowed values:** `rs` (Resistance), `vu` (Vulnerability), `ab` (Absorption), `im` (Immunity), `no` (None).
+
+### `equipment`
+
+- **Type:** Array of Objects
+- **Description:** Inventory container (canonical structure uses `equipment[0]`).
+  - **`weapons`**: Array of weapon objects.
+  - **`customWeapons`**: Array of custom weapon objects.
+  - **`shields`**: Array of shield objects.
+  - **`accessories`**: Array of accessory objects.
+  - **`armor`**: Array of armor objects.
+  - **`mnemospheres`**: Array of Objects (optional).
+  - **`hoplospheres`**: Array of Objects (optional).
+  - **`mnemoReceptacle`**: Array of Strings (optional), Used by integrated technospheres.
+
+### `martials`
+
+- **Type:** Object
+- **Description:** Aggregate martial proficiencies on the character.
+  - **`armor`**: Boolean
+  - **`shields`**: Boolean
+  - **`melee`**: Boolean
+  - **`ranged`**: Boolean
+
+### `rituals`
+
+- **Type:** Object
+- **Description:** Aggregate ritual discipline access on the character.
+  - **`ritualism`**: Boolean
+  - **`arcanism`**: Boolean
+  - **`chimerism`**: Boolean
+  - **`elementalism`**: Boolean
+  - **`entropism`**: Boolean
+  - **`spiritism`**: Boolean
+
+### `items`
+
+- **Type:** Array of Objects
+- **Description:** Generic items carried by the character.
+  - **`name`**: String
+  - **`description`**: String
+  - **`value`**: Integer
+  - **`quantity`**: Integer
+
+### `consumables`
+
+- **Type:** Array of Objects
+- **Description:** Consumables tracked by the character.
+  - **`name`**: String
+  - **`description`**: String
+  - **`ipCost`**: Integer
+
+### `equippedSlots`
+
+- **Type:** Object (optional)
+- **Description:** Active player equipment slot bindings.
+  - **`mainHand`**: Slot reference or `null`.
+  - **`offHand`**: Slot reference or `null`.
+  - **`armor`**: Slot reference or `null`.
+  - **`accessory`**: Slot reference or `null`.
+  - **Slot reference format:**
+    - **`source`**: One of `weapons`, `customWeapons`, `shields`, `armor`, `accessories`.
+    - **`name`**: String
+    - **`index`**: Integer (optional)
+
+### `vehicleSlots`
+
+- **Type:** Object (optional)
+- **Description:** Active vehicle-module slot bindings.
+  - **`mainHand`**: Vehicle module reference or `null`.
+  - **`offHand`**: Vehicle module reference or `null`.
+  - **`armor`**: Vehicle module reference or `null`.
+  - **`accessory`**: Vehicle module reference or `null`.
+  - **`support`**: Array of vehicle module references or `null` (optional).
+  - **Vehicle module reference format:**
+    - **`vehicleName`**: String
+    - **`moduleName`**: String
+
+### `settings`
+
+- **Type:** Object (optional)
+- **Description:** Character sheet behavior and optional-rules settings.
+  - **`defaultView`**: String, One of `compact`, `normal`.
+  - **`advancement`**: Boolean
+  - **`automaticClassLevel`**: Boolean
+  - **`autoEquipUnarmed`**: Boolean
+  - **`defaultUnarmedStrikeRef`**: Slot reference object (optional).
+  - **`optionalRules`**: Object (optional).
+    - **`quirks`**: Boolean
+    - **`campActivities`**: Boolean
+    - **`zeroPower`**: Boolean
+    - **`technospheres`**: Boolean
+    - **`technospheresVariant`**: String, One of `standard`, `integrated`, `mnemospheres`, `hoplospheres`.
+    - **`innateClasses`**: Array of Strings
+  - **`specialSkillOverrides`**: Object (optional), Map of skill names to `true`.
+
 ### `notes`
 
 - **Type:** Array of Objects
@@ -269,7 +442,18 @@
   - **`name`**: String, Name of the note.
   - **`description`**: String, Description of the note.
 
+### `dataType`
+
+- **Type:** String (optional)
+- **Description:** Character document type discriminator (commonly `pc`).
+
 ### `published`
 
-- **Type:** Boolean
+- **Type:** Boolean (optional)
 - **Description:** Indicates whether the character has been published.
+
+## Legacy Compatibility Notes
+
+- `isEquipped` is legacy convenience data; equipped state is authoritative in `equippedSlots` / `vehicleSlots`.
+- Legacy actor shapes are normalized on load: root inventory arrays -> `equipment[0]`, `currentSL` -> `currentLvl`, string notes -> `{ name, description }`, slot refs may be backfilled with `index`.
+- Older actors may lack `_packItemId` links on embedded entries, which limits automatic compendium sync until relinked.

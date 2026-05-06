@@ -162,6 +162,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
   if (isAccordion) {
     return (
       <AccordionSummary
+        component="div"
         expandIcon={<ArrowDownwardIcon sx={{ color: "#ffffff" }} />}
         sx={{
           backgroundColor: theme.primary,

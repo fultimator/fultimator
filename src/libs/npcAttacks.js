@@ -2,6 +2,7 @@ import { t } from "../translation/translate";
 
 export const npcAttacks = [
   {
+    fuid: "staff",
     itemType: "basic",
     category: t("Arcane", true),
     name: t("Staff", true),
@@ -16,6 +17,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "tome",
     itemType: "basic",
     category: t("Arcane", true),
     name: t("Tome", true),
@@ -30,6 +32,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "crossbow",
     itemType: "basic",
     category: t("Bow", true),
     name: t("Crossbow", true),
@@ -44,6 +47,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "shortbow",
     itemType: "basic",
     category: t("Bow", true),
     name: t("Shortbow", true),
@@ -58,6 +62,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "chain-whip",
     itemType: "basic",
     category: t("Flail", true),
     name: t("Chain Whip", true),
@@ -72,6 +77,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "pistol",
     itemType: "basic",
     category: t("Firearm", true),
     name: t("Pistol", true),
@@ -86,6 +92,7 @@ export const npcAttacks = [
     martial: true,
   },
   {
+    fuid: "light-spear",
     itemType: "basic",
     category: t("Spear", true),
     name: t("Light Spear", true),
@@ -100,6 +107,7 @@ export const npcAttacks = [
     martial: true,
   },
   {
+    fuid: "heavy-spear",
     itemType: "basic",
     category: t("Spear", true),
     name: t("Heavy Spear", true),
@@ -114,6 +122,7 @@ export const npcAttacks = [
     martial: true,
   },
   {
+    fuid: "shuriken",
     itemType: "basic",
     category: t("Thrown", true),
     name: t("Shuriken", true),
@@ -128,6 +137,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "iron-hammer",
     itemType: "basic",
     category: t("Heavy", true),
     name: t("Iron Hammer", true),
@@ -142,6 +152,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "broadaxe",
     itemType: "basic",
     category: t("Heavy", true),
     name: t("Broadaxe", true),
@@ -156,6 +167,7 @@ export const npcAttacks = [
     martial: true,
   },
   {
+    fuid: "waraxe",
     itemType: "basic",
     category: t("Heavy", true),
     name: t("Waraxe", true),
@@ -170,6 +182,7 @@ export const npcAttacks = [
     martial: true,
   },
   {
+    fuid: "steel-dagger",
     itemType: "basic",
     category: t("Dagger", true),
     name: t("Steel Dagger", true),
@@ -184,6 +197,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "iron-knuckle",
     itemType: "basic",
     category: t("Brawling", true),
     name: t("Iron Knuckle", true),
@@ -198,6 +212,7 @@ export const npcAttacks = [
     martial: false,
   },
   {
+    fuid: "katana",
     itemType: "basic",
     category: t("Sword", true),
     name: t("Katana", true),
@@ -212,6 +227,7 @@ export const npcAttacks = [
     martial: true,
   },
   {
+    fuid: "bronze-sword",
     itemType: "basic",
     category: t("Sword", true),
     name: t("Bronze Sword", true),
@@ -226,6 +242,7 @@ export const npcAttacks = [
     martial: true,
   },
   {
+    fuid: "greatsword",
     itemType: "basic",
     category: t("Sword", true),
     name: t("Greatsword", true),
@@ -240,6 +257,7 @@ export const npcAttacks = [
     martial: true,
   },
   {
+    fuid: "rapier",
     itemType: "basic",
     category: t("Sword", true),
     name: t("Rapier", true),
@@ -254,5 +272,16 @@ export const npcAttacks = [
     martial: true,
   },
 ];
+
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+npcAttacks.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});
 
 export default npcAttacks;

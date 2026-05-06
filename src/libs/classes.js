@@ -2,6 +2,7 @@ import { t } from "../translation/translate";
 
 const classList = [
   {
+    fuid: "arcanist",
     name: "Arcanist",
     book: "core",
     benefits: {
@@ -59,6 +60,7 @@ const classList = [
     ],
   },
   {
+    fuid: "chimerist",
     name: "Chimerist",
     book: "core",
     benefits: {
@@ -116,6 +118,7 @@ const classList = [
     ],
   },
   {
+    fuid: "darkblade",
     name: "Darkblade",
     book: "core",
     benefits: {
@@ -173,6 +176,7 @@ const classList = [
     ],
   },
   {
+    fuid: "elementalist",
     name: "Elementalist",
     book: "core",
     benefits: {
@@ -230,6 +234,7 @@ const classList = [
     ],
   },
   {
+    fuid: "entropist",
     name: "Entropist",
     book: "core",
     benefits: {
@@ -287,6 +292,7 @@ const classList = [
     ],
   },
   {
+    fuid: "fury",
     name: "Fury",
     book: "core",
     benefits: {
@@ -344,6 +350,7 @@ const classList = [
     ],
   },
   {
+    fuid: "guardian",
     name: "Guardian",
     book: "core",
     benefits: {
@@ -401,6 +408,7 @@ const classList = [
     ],
   },
   {
+    fuid: "loremaster",
     name: "Loremaster",
     book: "core",
     benefits: {
@@ -458,6 +466,7 @@ const classList = [
     ],
   },
   {
+    fuid: "orator",
     name: "Orator",
     book: "core",
     benefits: {
@@ -515,6 +524,7 @@ const classList = [
     ],
   },
   {
+    fuid: "rogue",
     name: "Rogue",
     book: "core",
     benefits: {
@@ -572,6 +582,7 @@ const classList = [
     ],
   },
   {
+    fuid: "sharpshooter",
     name: "Sharpshooter",
     book: "core",
     benefits: {
@@ -629,6 +640,7 @@ const classList = [
     ],
   },
   {
+    fuid: "spiritist",
     name: "Spiritist",
     book: "core",
     benefits: {
@@ -686,6 +698,7 @@ const classList = [
     ],
   },
   {
+    fuid: "tinkerer",
     name: "Tinkerer",
     book: "core",
     benefits: {
@@ -748,6 +761,7 @@ const classList = [
     ],
   },
   {
+    fuid: "wayfarer",
     name: "Wayfarer",
     book: "core",
     benefits: {
@@ -805,6 +819,7 @@ const classList = [
     ],
   },
   {
+    fuid: "weaponmaster",
     name: "Weaponmaster",
     book: "core",
     benefits: {
@@ -862,6 +877,7 @@ const classList = [
     ],
   },
   {
+    fuid: "arcanist-rework",
     name: "Arcanist-Rework",
     book: "rework",
     benefits: {
@@ -883,6 +899,7 @@ const classList = [
     skills: [],
   },
   {
+    fuid: "ace-of-cards",
     name: "Ace of Cards",
     book: "bonus",
     benefits: {
@@ -943,6 +960,7 @@ const classList = [
     ],
   },
   {
+    fuid: "necromancer",
     name: "Necromancer",
     book: "bonus",
     benefits: {
@@ -1003,6 +1021,7 @@ const classList = [
     ],
   },
   {
+    fuid: "chanter",
     name: "Chanter",
     book: "high",
     benefits: {
@@ -1060,6 +1079,7 @@ const classList = [
     ],
   },
   {
+    fuid: "commander",
     name: "Commander",
     book: "high",
     benefits: {
@@ -1117,6 +1137,7 @@ const classList = [
     ],
   },
   {
+    fuid: "dancer",
     name: "Dancer",
     book: "high",
     benefits: {
@@ -1177,6 +1198,7 @@ const classList = [
     ],
   },
   {
+    fuid: "symbolist",
     name: "Symbolist",
     book: "high",
     benefits: {
@@ -1234,6 +1256,7 @@ const classList = [
     ],
   },
   {
+    fuid: "esper",
     name: "Esper",
     book: "techno",
     benefits: {
@@ -1292,6 +1315,7 @@ const classList = [
     ],
   },
   {
+    fuid: "mutant",
     name: "Mutant",
     book: "techno",
     benefits: {
@@ -1349,6 +1373,7 @@ const classList = [
     ],
   },
   {
+    fuid: "pilot",
     name: "Pilot",
     book: "techno",
     benefits: {
@@ -1406,6 +1431,7 @@ const classList = [
     ],
   },
   {
+    fuid: "floralist",
     name: "Floralist",
     book: "natural",
     benefits: {
@@ -1466,6 +1492,7 @@ const classList = [
     ],
   },
   {
+    fuid: "gourmet",
     name: "Gourmet",
     book: "natural",
     benefits: {
@@ -1526,6 +1553,7 @@ const classList = [
     ],
   },
   {
+    fuid: "invoker",
     name: "Invoker",
     book: "natural",
     benefits: {
@@ -1586,6 +1614,7 @@ const classList = [
     ],
   },
   {
+    fuid: "merchant",
     name: "Merchant",
     book: "natural",
     benefits: {
@@ -1643,6 +1672,7 @@ const classList = [
     ],
   },
   {
+    fuid: "blank-class",
     name: "Blank Class",
     book: "homebrew",
     benefits: {
@@ -1876,6 +1906,7 @@ export const tinkererInfusion = {
 
 export const spellList = [
   {
+    fuid: "boulder",
     class: "Elementalist",
     name: "Boulder",
     description: "Boulder_desc",
@@ -1889,6 +1920,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "elemental-shroud",
     class: "Elementalist",
     name: "Elemental Shroud",
     description: "ElementalShroud_desc",
@@ -1902,6 +1934,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "elemental-weapon",
     class: "Elementalist",
     name: "Elemental Weapon",
     description: "ElementalWeapon_desc",
@@ -1915,6 +1948,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "flares",
     class: "Elementalist",
     name: "Flare",
     description: "Flare_desc",
@@ -1928,6 +1962,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "fulgur",
     class: "Elementalist",
     name: "Fulgur",
     description: "Fulgur_desc",
@@ -1941,6 +1976,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "glacies",
     class: "Elementalist",
     name: "Glacies",
     description: "Glacies_desc",
@@ -1954,6 +1990,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "iceberg",
     class: "Elementalist",
     name: "Iceberg",
     description: "Iceberg_desc",
@@ -1967,6 +2004,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "ignis",
     class: "Elementalist",
     name: "Ignis",
     description: "Ignis_desc",
@@ -1980,6 +2018,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "soaring-strike",
     class: "Elementalist",
     name: "Soaring Strike",
     description: "SoaringStrike_desc",
@@ -1993,6 +2032,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "terra",
     class: "Elementalist",
     name: "Terra",
     description: "Terra_desc",
@@ -2006,6 +2046,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "thunderbolt",
     class: "Elementalist",
     name: "Thunderbolt",
     description: "Thunderbolt_desc",
@@ -2019,6 +2060,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "ventus",
     class: "Elementalist",
     name: "Ventus",
     description: "Ventus_desc",
@@ -2032,6 +2074,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "vortex",
     class: "Elementalist",
     name: "Vortex",
     description: "Vortex_desc",
@@ -2045,6 +2088,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "acceleration",
     class: "Entropist",
     name: "Acceleration",
     description: "Acceleration_desc",
@@ -2058,6 +2102,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "anomaly",
     class: "Entropist",
     name: "Anomaly",
     description: "Anomaly_desc",
@@ -2071,6 +2116,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "dark-weapon",
     class: "Entropist",
     name: "Dark Weapon",
     description: "DarkWeapon_desc",
@@ -2084,6 +2130,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "dispel",
     class: "Entropist",
     name: "Dispel",
     description: "Dispel_desc",
@@ -2097,6 +2144,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "divination",
     class: "Entropist",
     name: "Divination",
     description: "Divination_desc",
@@ -2110,6 +2158,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "drain-spirit",
     class: "Entropist",
     name: "Drain Spirit",
     description: "DrainSpirit_desc",
@@ -2123,6 +2172,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "drain-vigor",
     class: "Entropist",
     name: "Drain Vigor",
     description: "DrainVigor_desc",
@@ -2136,6 +2186,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "mirror",
     class: "Entropist",
     name: "Mirror",
     description: "Mirror_desc",
@@ -2149,6 +2200,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "omega",
     class: "Entropist",
     name: "Omega",
     description: "Omega_desc",
@@ -2162,6 +2214,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "stop",
     class: "Entropist",
     name: "Stop",
     description: "Stop_desc",
@@ -2175,6 +2228,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "umbra",
     class: "Entropist",
     name: "Umbra",
     description: "Umbra_desc",
@@ -2188,6 +2242,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "gamble",
     class: "Entropist",
     spellType: "gamble",
     name: "Gamble",
@@ -2260,6 +2315,7 @@ export const spellList = [
     ],
   },
   {
+    fuid: "elemental-shroud",
     class: "Spiritist",
     name: "Aura",
     description: "Aura_desc",
@@ -2273,6 +2329,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "awaken",
     class: "Spiritist",
     name: "Awaken",
     description: "Awaken_desc",
@@ -2286,6 +2343,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "barrier",
     class: "Spiritist",
     name: "Barrier",
     description: "Barrier_desc",
@@ -2299,6 +2357,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "cleanse",
     class: "Spiritist",
     name: "Cleanse",
     description: "Cleanse_desc",
@@ -2312,6 +2371,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "enrage",
     class: "Spiritist",
     name: "Enrage",
     description: "Enrage_desc",
@@ -2325,6 +2385,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "hallucination",
     class: "Spiritist",
     name: "Hallucination",
     description: "Hallucination_desc",
@@ -2338,6 +2399,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "heal",
     class: "Spiritist",
     name: "Heal",
     description: "Heal_desc",
@@ -2351,6 +2413,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "lux",
     class: "Spiritist",
     name: "Lux",
     description: "Lux_desc",
@@ -2364,6 +2427,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "mercy",
     class: "Spiritist",
     name: "Mercy",
     description: "Mercy_desc",
@@ -2377,6 +2441,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "reinforce",
     class: "Spiritist",
     name: "Reinforce",
     description: "Reinforce_desc",
@@ -2390,6 +2455,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "soul-shroud",
     class: "Spiritist",
     name: "Soul Shroud",
     description: "SoulShroud_desc",
@@ -2403,6 +2469,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "soul-weapon",
     class: "Spiritist",
     name: "Soul Weapon",
     description: "SoulWeapon_desc",
@@ -2416,6 +2483,7 @@ export const spellList = [
     spellType: "default",
   },
   {
+    fuid: "torpor",
     class: "Spiritist",
     name: "Torpor",
     description: "Torpor_desc",
@@ -2439,6 +2507,7 @@ export const spellsByClass = spellList.reduce((acc, spell) => {
 
 export const arcanumList = [
   {
+    fuid: "arcanum-of-the-forge",
     name: "Arcanum of the Forge",
     description: "",
     domain: "",
@@ -2452,6 +2521,7 @@ export const arcanumList = [
     mergeDesc: "Arcanum_of_the_Forge_merge",
   },
   {
+    fuid: "arcanum-of-the-frost",
     name: "Arcanum of the Frost",
     description: "",
     domain: "",
@@ -2465,6 +2535,7 @@ export const arcanumList = [
     mergeDesc: "Arcanum_of_the_Frost_merge",
   },
   {
+    fuid: "arcanum-of-the-gate",
     name: "Arcanum of the Gate",
     description: "",
     domain: "",
@@ -2478,6 +2549,7 @@ export const arcanumList = [
     mergeDesc: "Arcanum_of_the_Gate_merge",
   },
   {
+    fuid: "arcanum-of-the-grimoire",
     name: "Arcanum of the Grimoire",
     description: "",
     domain: "",
@@ -2491,6 +2563,7 @@ export const arcanumList = [
     mergeDesc: "Arcanum_of_the_Grimoire_merge",
   },
   {
+    fuid: "arcanum-of-the-oak",
     name: "Arcanum of the Oak",
     description: "",
     domain: "",
@@ -2504,6 +2577,7 @@ export const arcanumList = [
     mergeDesc: "Arcanum_of_the_Oak_merge",
   },
   {
+    fuid: "arcanum-of-the-sky",
     name: "Arcanum of the Sky",
     description: "",
     domain: "",
@@ -2517,6 +2591,7 @@ export const arcanumList = [
     mergeDesc: "Arcanum_of_the_Sky_merge",
   },
   {
+    fuid: "arcanum-of-the-sword",
     name: "Arcanum of the Sword",
     description: "",
     domain: "",
@@ -2530,6 +2605,7 @@ export const arcanumList = [
     mergeDesc: "Arcanum_of_the_Sword_merge",
   },
   {
+    fuid: "arcanum-of-the-tower",
     name: "Arcanum of the Tower",
     description: "",
     domain: "",
@@ -2543,6 +2619,7 @@ export const arcanumList = [
     mergeDesc: "Arcanum_of_the_Tower_merge",
   },
   {
+    fuid: "arcanum-of-the-wheels",
     name: "Arcanum of the Wheel",
     description: "",
     domain: "",
@@ -2558,6 +2635,7 @@ export const arcanumList = [
 ];
 
 export const entropistGamble = {
+  fuid: "gamble",
   spellType: "gamble",
   spellName: t("Gamble"),
   mp: 10,
@@ -2628,5 +2706,22 @@ export const entropistGamble = {
     },
   ],
 };
+
+const slugify = (value = "") =>
+  String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+classList.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});
+spellList.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});
+arcanumList.forEach((item) => {
+  if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+});
 
 export default classList;

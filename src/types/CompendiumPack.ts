@@ -38,9 +38,11 @@ export interface CompendiumItem {
 
 export interface CompendiumPack {
   id: string; // "personal" for singleton; UUID for others
+  fuid?: string; // canonical external identifier (slug), unique across installed packs
   name: string;
   description?: string;
   author?: string;
+  aliases?: string[]; // previous fuids that should still resolve to this pack
   type?: PackType;
   version?: string; // from manifest on import; editable in-app
   active?: boolean; // absent or true = visible in viewer; false = hidden
@@ -48,6 +50,10 @@ export interface CompendiumPack {
   locked?: boolean; // when true, destructive actions are hidden
   fultimatorMinVersion?: string; // minimum Fultimator version required
   homepageUrl?: string; // URL to pack's homepage or repository
+  requiresManual?: string[]; // user-managed hard dependencies
+  requiresAuto?: string[]; // system-derived hard dependencies from cross-pack refs
+  requires?: string[]; // hard dependencies (canonical pack fuids)
+  optional?: string[]; // soft dependencies (canonical pack fuids)
   createdAt: number;
   updatedAt: number;
   items: CompendiumItem[];

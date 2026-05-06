@@ -1,3 +1,10 @@
+import {
+  buildRef,
+  slugFuid,
+  resolveRef,
+  resolveRefMeta,
+} from "../utils/compendiumRefs";
+
 function clamp(value, max) {
   return Math.min(value, max);
 }
@@ -221,16 +228,10 @@ export function applyMigration(instance, source, type) {
   }
 }
 
-function slugify(str) {
-  return (str ?? "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
 // Returns all player items that have a _packItemId (or a builtin match) and differ from their source.
 export function findPendingMigrations(player, packMap, builtinSources = {}) {
   const results = [];
+  const packs = Array.from(packMap.values());
 
   function resolveSource(packItemId, expectedType) {
     if (!packItemId) return null;
@@ -238,7 +239,12 @@ export function findPendingMigrations(player, packMap, builtinSources = {}) {
       const list = builtinSources[expectedType] ?? [];
       return list.find((s) => s._packItemId === packItemId) ?? null;
     }
-    for (const pack of packMap.values()) {
+
+    const byRef = resolveRef(packItemId, packs);
+    if (byRef) return byRef;
+
+    // Legacy format: raw pack item UUID
+    for (const pack of packs) {
       const entry = pack.items.find((i) => i.id === packItemId);
       if (entry) return entry.data;
     }
@@ -249,7 +255,7 @@ export function findPendingMigrations(player, packMap, builtinSources = {}) {
     const list = builtinSources["classes"] ?? [];
     return (
       list.find(
-        (s) => s._packItemId === `builtin:${slugify(cls.name ?? "")}`,
+        (s) => s._packItemId === `builtin:${slugFuid(cls.name ?? "")}`,
       ) ?? null
     );
   }
@@ -345,6 +351,151 @@ export function findPendingMigrations(player, packMap, builtinSources = {}) {
   });
 
   return results;
+}
+
+function labelOf(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .trim();
+}
+
+function collectCandidates(packMap, type) {
+  const candidates = [];
+  for (const pack of packMap.values()) {
+    for (const item of pack.items ?? []) {
+      if (item.type !== type) continue;
+      const packFuid = slugFuid(pack.fuid || pack.name || "");
+      const itemFuid = slugFuid(item.data?.fuid ?? "");
+      if (!packFuid || !itemFuid) continue;
+      candidates.push({
+        ref: buildRef(packFuid, itemFuid),
+        name: labelOf(item.data?.name),
+        className: labelOf(item.data?.class),
+      });
+    }
+  }
+  return candidates;
+}
+
+// Non-destructive legacy relink: only backfill when exactly one safe match exists.
+export function relinkCompendiumRefs(player, packMap) {
+  const packs = Array.from(packMap.values());
+  const classCandidates = collectCandidates(packMap, "class");
+  const mnemoCandidates = collectCandidates(packMap, "mnemosphere");
+  const hoploCandidates = collectCandidates(packMap, "hoplosphere");
+  const spellCandidates = collectCandidates(packMap, "player-spell");
+  const heroicCandidates = collectCandidates(packMap, "heroic");
+
+  let relinked = 0;
+  let ambiguous = 0;
+  let missing = 0;
+
+  function hasLegacyRawIdRef(ref) {
+    if (typeof ref !== "string" || !ref) return false;
+    return packs.some((pack) => (pack.items ?? []).some((i) => i.id === ref));
+  }
+
+  function resolveCandidate(currentRef, candidates, key, entry) {
+    if (typeof currentRef === "string") {
+      const meta = resolveRefMeta(currentRef, packs);
+      if (meta?.data) {
+        if (meta.resolvedViaAlias && meta.canonicalRef) {
+          relinked += 1;
+          return meta.canonicalRef;
+        }
+        return currentRef;
+      }
+      if (hasLegacyRawIdRef(currentRef)) return currentRef;
+    }
+
+    const target = labelOf(entry?.[key]);
+    if (!target) {
+      missing += 1;
+      return currentRef;
+    }
+
+    const matches = candidates.filter((c) =>
+      key === "class" ? c.className === target : c.name === target,
+    );
+
+    if (matches.length === 1) {
+      relinked += 1;
+      return matches[0].ref;
+    }
+    if (matches.length > 1) ambiguous += 1;
+    else missing += 1;
+    return currentRef;
+  }
+
+  const relinkedPlayer = {
+    ...player,
+    classes: (player.classes ?? []).map((cls) => ({
+      ...cls,
+      _packItemId: resolveCandidate(
+        cls?._packItemId,
+        classCandidates,
+        "name",
+        cls,
+      ),
+      spells: (cls.spells ?? []).map((spell) => ({
+        ...spell,
+        _packItemId: resolveCandidate(
+          spell?._packItemId,
+          spellCandidates,
+          "name",
+          spell,
+        ),
+      })),
+      heroic: Array.isArray(cls.heroic)
+        ? cls.heroic.map((h) => ({
+            ...h,
+            _packItemId: resolveCandidate(
+              h?._packItemId,
+              heroicCandidates,
+              "name",
+              h,
+            ),
+          }))
+        : cls.heroic && typeof cls.heroic === "object"
+          ? {
+              ...cls.heroic,
+              _packItemId: resolveCandidate(
+                cls.heroic?._packItemId,
+                heroicCandidates,
+                "name",
+                cls.heroic,
+              ),
+            }
+          : cls.heroic,
+    })),
+    equipment: (player.equipment ?? []).map((eq, idx) =>
+      idx !== 0
+        ? eq
+        : {
+            ...eq,
+            mnemospheres: (eq.mnemospheres ?? []).map((m) => ({
+              ...m,
+              _packItemId: resolveCandidate(
+                m?._packItemId,
+                mnemoCandidates,
+                "class",
+                m,
+              ),
+            })),
+            hoplospheres: (eq.hoplospheres ?? []).map((h) => ({
+              ...h,
+              _packItemId: resolveCandidate(
+                h?._packItemId,
+                hoploCandidates,
+                "name",
+                h,
+              ),
+            })),
+          },
+    ),
+  };
+
+  return { player: relinkedPlayer, relinked, ambiguous, missing };
 }
 
 // Applies selected migrations to a player object, returns updated player.

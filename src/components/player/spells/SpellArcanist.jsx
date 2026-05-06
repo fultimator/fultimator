@@ -77,6 +77,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                 >
                   <Grid size="grow">
                     <Typography
+                      component="div"
                       sx={{
                         fontStyle: "italic",
                       }}
@@ -127,7 +128,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                     py: "8px",
                   }}
                 >
-                  <Typography>
+                  <Typography component="div">
                     {!arcana.domain ? (
                       t("No Domain")
                     ) : (
@@ -218,7 +219,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   }}
                   size={12}
                 >
-                  <Typography>
+                  <Typography component="div">
                     {!arcana.mergeDesc ? (
                       t("No Merge Benefit")
                     ) : (
@@ -303,7 +304,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                       }}
                       size={12}
                     >
-                      <Typography>
+                      <Typography component="div">
                         {!arcana.pulseDesc ? (
                           t("No Pulse Benefit")
                         ) : (
@@ -388,7 +389,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                   }}
                   size={12}
                 >
-                  <Typography>
+                  <Typography component="div">
                     {!arcana.dismissDesc ? (
                       t("No Dismiss Benefit")
                     ) : (

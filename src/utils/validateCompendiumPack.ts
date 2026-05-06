@@ -44,6 +44,20 @@ export function validateManifest(manifest: unknown): ValidationResult {
     errors.push('"author" must be a string');
   }
   if (
+    m.requires !== undefined &&
+    (!Array.isArray(m.requires) ||
+      m.requires.some((dep) => typeof dep !== "string"))
+  ) {
+    errors.push('"requires" must be an array of strings');
+  }
+  if (
+    m.optional !== undefined &&
+    (!Array.isArray(m.optional) ||
+      m.optional.some((dep) => typeof dep !== "string"))
+  ) {
+    errors.push('"optional" must be an array of strings');
+  }
+  if (
     m.fultimatorMinVersion !== undefined &&
     typeof m.fultimatorMinVersion !== "string"
   ) {

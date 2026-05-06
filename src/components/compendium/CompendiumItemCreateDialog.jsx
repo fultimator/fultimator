@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -3003,16 +3003,33 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
-  const allOptionals = packs.flatMap((p) =>
-    (p.active !== false ? p.items : [])
-      .filter((i) => i.type === "optional")
-      .map((i) => i.data),
+  const allOptionals = useMemo(
+    () =>
+      packs.flatMap((p) => {
+        if (p.active === false) return [];
+        const packFuid = p.fuid || p.name;
+        return p.items
+          .filter((i) => i.type === "optional")
+          .map((i) => {
+            const itemFuid =
+              typeof i.data?.fuid === "string" && i.data.fuid.trim()
+                ? slugify(i.data.fuid)
+                : i.id;
+            return {
+              ...i.data,
+              _sourceRef: packFuid ? `${slugify(packFuid)}:${itemFuid}` : "",
+            };
+          });
+      }),
+    [packs],
   );
-  const zeroTriggerOptions = allOptionals.filter(
-    (i) => i.subtype === "zero-trigger",
+  const zeroTriggerOptions = useMemo(
+    () => allOptionals.filter((i) => i.subtype === "zero-trigger"),
+    [allOptionals],
   );
-  const zeroEffectOptions = allOptionals.filter(
-    (i) => i.subtype === "zero-effect",
+  const zeroEffectOptions = useMemo(
+    () => allOptionals.filter((i) => i.subtype === "zero-effect"),
+    [allOptionals],
   );
   const campTargetOptions = [
     t("Yourself"),
@@ -3029,15 +3046,24 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
     setClockSections(editData?.clock?.sections ?? 6);
     setShowClock(Boolean(editData?.clock));
 
-    const triggerMatch = zeroTriggerOptions.find(
-      (o) => o.name === (editData?.zeroTrigger ?? ""),
-    );
-    const effectMatch = zeroEffectOptions.find(
-      (o) => o.name === (editData?.zeroEffect ?? ""),
-    );
+    const triggerName =
+      typeof editData?.zeroTrigger === "string"
+        ? editData.zeroTrigger
+        : (editData?.zeroTrigger?.name ?? "");
+    const effectName =
+      typeof editData?.zeroEffect === "string"
+        ? editData.zeroEffect
+        : (editData?.zeroEffect?.name ?? "");
+    const triggerMatch =
+      zeroTriggerOptions.find(
+        (o) => o._sourceRef === editData?.zeroTriggerRef,
+      ) ?? zeroTriggerOptions.find((o) => o.name === triggerName);
+    const effectMatch =
+      zeroEffectOptions.find((o) => o._sourceRef === editData?.zeroEffectRef) ??
+      zeroEffectOptions.find((o) => o.name === effectName);
     setZeroTrigger(triggerMatch ?? null);
     setZeroEffect(effectMatch ?? null);
-  }, [editData, packs, zeroTriggerOptions, zeroEffectOptions]);
+  }, [editData, zeroTriggerOptions, zeroEffectOptions]);
 
   const buildData = () => {
     if (subtype === "quirk")
@@ -3060,8 +3086,20 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
       return {
         subtype,
         name: name.trim(),
-        zeroTrigger: zeroTrigger?.name ?? "",
-        zeroEffect: zeroEffect?.name ?? "",
+        zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
+        zeroEffectRef: zeroEffect?._sourceRef ?? "",
+        zeroTrigger: zeroTrigger
+          ? {
+              name: zeroTrigger.name ?? "",
+              description: zeroTrigger.description ?? "",
+            }
+          : "",
+        zeroEffect: zeroEffect
+          ? {
+              name: zeroEffect.name ?? "",
+              description: zeroEffect.description ?? "",
+            }
+          : "",
         clock: { sections: Number(clockSections) },
       };
     return {
@@ -3257,7 +3295,15 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                     />
                   )}
                   size="small"
-                  isOptionEqualToValue={(a, b) => a.name === b.name}
+                  isOptionEqualToValue={(a, b) =>
+                    Boolean(
+                      b &&
+                      ((a._sourceRef &&
+                        b._sourceRef &&
+                        a._sourceRef === b._sourceRef) ||
+                        a.name === b.name),
+                    )
+                  }
                 />
               </Grid>
               <Grid size={12}>
@@ -3279,7 +3325,15 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                     />
                   )}
                   size="small"
-                  isOptionEqualToValue={(a, b) => a.name === b.name}
+                  isOptionEqualToValue={(a, b) =>
+                    Boolean(
+                      b &&
+                      ((a._sourceRef &&
+                        b._sourceRef &&
+                        a._sourceRef === b._sourceRef) ||
+                        a.name === b.name),
+                    )
+                  }
                 />
               </Grid>
             </>

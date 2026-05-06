@@ -33,6 +33,7 @@ const CustomHeaderAccordion = ({
   const theme = useCustomTheme();
   return (
     <AccordionSummary
+      component="div"
       expandIcon={<ArrowDownwardIcon sx={{ color: "#ffffff" }} />}
       aria-controls="panel1-content"
       id="panel1-header"

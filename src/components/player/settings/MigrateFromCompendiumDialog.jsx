@@ -23,7 +23,11 @@ import { Close, ExpandLess, ExpandMore } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
 import classList from "../../../libs/classes";
-import { findPendingMigrations, applyMigrations } from "../../../libs/migrate";
+import {
+  findPendingMigrations,
+  applyMigrations,
+  relinkCompendiumRefs,
+} from "../../../libs/migrate";
 
 function slugify(str) {
   return (str ?? "")
@@ -82,11 +86,22 @@ export default function MigrateFromCompendiumDialog({
   }, [packs]);
 
   const builtinSources = useMemo(() => buildBuiltinSources(), []);
+  const relinkReport = useMemo(() => {
+    if (!player || loading)
+      return {
+        player,
+        relinked: 0,
+        ambiguous: 0,
+        missing: 0,
+      };
+    return relinkCompendiumRefs(player, packMap);
+  }, [player, loading, packMap]);
+  const relinkedPlayer = relinkReport.player;
 
   const migrations = useMemo(() => {
-    if (!player || loading) return [];
-    return findPendingMigrations(player, packMap, builtinSources);
-  }, [player, packMap, builtinSources, loading]);
+    if (!relinkedPlayer || loading) return [];
+    return findPendingMigrations(relinkedPlayer, packMap, builtinSources);
+  }, [relinkedPlayer, packMap, builtinSources, loading]);
 
   useEffect(() => {
     setSelected(new Set(migrations.map((m) => m.instancePath)));
@@ -106,7 +121,8 @@ export default function MigrateFromCompendiumDialog({
   function toggleItem(path) {
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(path) ? next.delete(path) : next.add(path);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
       return next;
     });
   }
@@ -133,13 +149,14 @@ export default function MigrateFromCompendiumDialog({
   function toggleExpand(path) {
     setExpanded((prev) => {
       const next = new Set(prev);
-      next.has(path) ? next.delete(path) : next.add(path);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
       return next;
     });
   }
 
   function handleApply() {
-    const updated = applyMigrations(player, migrations, selected);
+    const updated = applyMigrations(relinkedPlayer, migrations, selected);
     onApply(updated);
     onClose();
   }
@@ -186,6 +203,28 @@ export default function MigrateFromCompendiumDialog({
               <Button size="small" onClick={deselectAll}>
                 {t("Deselect all")}
               </Button>
+            </Box>
+            <Box sx={{ display: "flex", gap: 1, mb: 1.5, flexWrap: "wrap" }}>
+              <Chip
+                size="small"
+                color="success"
+                label={`${t("synced")}: ${selected.size}`}
+              />
+              <Chip
+                size="small"
+                color="info"
+                label={`${t("relinked")}: ${relinkReport.relinked}`}
+              />
+              <Chip
+                size="small"
+                color="warning"
+                label={`${t("missing source")}: ${relinkReport.missing}`}
+              />
+              <Chip
+                size="small"
+                color="warning"
+                label={`${t("ambiguous")}: ${relinkReport.ambiguous}`}
+              />
             </Box>
 
             {activeTypes.map((type) => {

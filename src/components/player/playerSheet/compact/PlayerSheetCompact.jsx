@@ -2290,16 +2290,11 @@ function Header({
               borderBottom: borderBottom,
               borderImage: borderImageBody,
               flex: 1,
+              fontFamily: "body1",
+              fontSize: "0.80rem",
             }}
           >
-            <Typography
-              sx={{
-                fontFamily: "body1",
-                fontSize: "0.80rem",
-              }}
-            >
-              <RenderTraits player={player} />
-            </Typography>
+            <RenderTraits player={player} />
           </Box>
         </Box>
       </Box>
