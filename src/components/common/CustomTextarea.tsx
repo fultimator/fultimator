@@ -10,8 +10,8 @@ interface CustomTextareaProps {
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
   onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
-  onMouseOver?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
-  onMouseOut?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
+  onMouseOver?: (event: React.MouseEvent<HTMLElement>) => void;
+  onMouseOut?: (event: React.MouseEvent<HTMLElement>) => void;
   readOnly?: boolean;
   minRows?: number;
   maxRows?: number;
@@ -63,14 +63,14 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   );
 
   const handleMouseOver = useCallback(
-    (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    (e: React.MouseEvent<HTMLElement>) => {
       if (onMouseOver) onMouseOver(e);
     },
     [onMouseOver],
   );
 
   const handleMouseOut = useCallback(
-    (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    (e: React.MouseEvent<HTMLElement>) => {
       if (onMouseOut) onMouseOut(e);
     },
     [onMouseOut],
