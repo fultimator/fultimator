@@ -803,7 +803,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           <TableBody>
             {filteredItems.map((item, idx) => (
               <SidebarRow
-                key={`${selectedType}-${item.name}`}
+                key={`${selectedType}-${idx}-${item.name ?? item.spellName}`}
                 item={item}
                 idx={idx}
                 isSelected={idx === selectedIdx}
