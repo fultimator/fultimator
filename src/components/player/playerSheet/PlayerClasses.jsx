@@ -348,6 +348,7 @@ export default function PlayerClasses({
                       isHeroicSkill={false}
                     />
                     <Typography
+                      component="div"
                       variant="body1"
                       sx={{
                         justifyContent: "flex-start",
@@ -395,6 +396,7 @@ export default function PlayerClasses({
                       }
                     />
                     <Typography
+                      component="div"
                       variant="body1"
                       sx={{
                         justifyContent: "flex-start",
