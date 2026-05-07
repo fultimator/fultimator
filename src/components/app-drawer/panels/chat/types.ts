@@ -35,12 +35,20 @@ export type Attribute = "dex" | "ins" | "mig" | "wlp";
 
 export type CheckModifier = { label: string; value: number };
 
+export const DIFFICULTY_PRESETS: { label: string; value: number }[] = [
+  { label: "Easy", value: 7 },
+  { label: "Normal", value: 10 },
+  { label: "Hard", value: 13 },
+  { label: "Very Hard", value: 16 },
+];
+
 export type CheckIntent = {
   id: string;
   primary: Attribute;
   secondary: Attribute;
   modifiers: CheckModifier[];
   critThreshold: number;
+  difficulty?: number;
   additionalData: Record<string, unknown>;
 };
 
@@ -58,6 +66,7 @@ export type CheckResult = {
   highRoll: number;
   modifierTotal: number;
   result: number;
+  passed?: boolean;
   critical: boolean;
   fumble: boolean;
   additionalData: Record<string, unknown>;

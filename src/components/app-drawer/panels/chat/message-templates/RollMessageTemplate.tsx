@@ -4,6 +4,36 @@ import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
 import type { RollData } from "../types";
 
+const dieCellSx = {
+  display: "flex",
+  flexDirection: "column" as const,
+  alignItems: "center",
+  gap: 0.5,
+  px: 1,
+  py: 0.75,
+  borderRadius: 1.5,
+  border: "1px solid",
+  borderColor: "divider",
+  backgroundColor: "background.default",
+  minWidth: 56,
+};
+
+const badgeSx = {
+  "& .MuiBadge-badge": {
+    fontSize: "0.65rem",
+    fontWeight: 700,
+    minWidth: 18,
+    height: 18,
+    padding: "0 3px",
+    backgroundColor: "action.selected",
+    color: "text.primary",
+    border: "1px solid",
+    borderColor: "divider",
+    top: 6,
+    right: 6,
+  },
+};
+
 interface RollMessageTemplateProps {
   roll: RollData;
 }
@@ -23,7 +53,6 @@ export const RollMessageTemplate: React.FC<RollMessageTemplateProps> = ({
       <Stack
         direction="row"
         spacing={1.5}
-        useFlexGap
         sx={{
           mt: 0.75,
           flexWrap: "wrap",
@@ -32,41 +61,12 @@ export const RollMessageTemplate: React.FC<RollMessageTemplateProps> = ({
         }}
       >
         {roll.results.map((result, index) => (
-          <Box
-            key={`${result.sides}-${result.value}-${index}`}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 0.5,
-              px: 1,
-              py: 0.75,
-              borderRadius: 1.5,
-              border: "1px solid",
-              borderColor: "divider",
-              backgroundColor: "background.default",
-              minWidth: 56,
-            }}
-          >
+          <Box key={`${result.sides}-${result.value}-${index}`} sx={dieCellSx}>
             <Badge
               badgeContent={`d${result.sides}`}
               color="default"
               anchorOrigin={{ vertical: "top", horizontal: "right" }}
-              sx={{
-                "& .MuiBadge-badge": {
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  minWidth: 18,
-                  height: 18,
-                  padding: "0 3px",
-                  backgroundColor: "action.selected",
-                  color: "text.primary",
-                  border: "1px solid",
-                  borderColor: "divider",
-                  top: 2,
-                  right: 2,
-                },
-              }}
+              sx={badgeSx}
             >
               <Box sx={{ p: 0.5, lineHeight: 0 }}>
                 <GiDiceEightFacesEight size={32} />
@@ -78,40 +78,12 @@ export const RollMessageTemplate: React.FC<RollMessageTemplateProps> = ({
           </Box>
         ))}
         {roll.modifier !== 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 0.5,
-              px: 1,
-              py: 0.75,
-              borderRadius: 1.5,
-              border: "1px solid",
-              borderColor: "divider",
-              backgroundColor: "background.default",
-              minWidth: 56,
-            }}
-          >
+          <Box sx={dieCellSx}>
             <Badge
               badgeContent="Mod"
               color="default"
               anchorOrigin={{ vertical: "top", horizontal: "right" }}
-              sx={{
-                "& .MuiBadge-badge": {
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  minWidth: 18,
-                  height: 18,
-                  padding: "0 3px",
-                  backgroundColor: "action.selected",
-                  color: "text.primary",
-                  border: "1px solid",
-                  borderColor: "divider",
-                  top: 2,
-                  right: 2,
-                },
-              }}
+              sx={badgeSx}
             >
               <Box sx={{ p: 0.5, lineHeight: 0 }}>
                 <MdTune size={32} />

@@ -23,7 +23,9 @@ export const ChatPanel: React.FC = () => {
   const { playerDoc, npcDoc } = useRouteActor();
   const contextActorName = useActorName(playerDoc, npcDoc);
   const speakerOptions = resolveSpeakerOptions(contextActorName);
-  const store = useChatStore(selectedSpeaker);
+  const activePlayerDoc =
+    selectedSpeaker === DEFAULT_SPEAKER ? null : playerDoc;
+  const store = useChatStore(selectedSpeaker, activePlayerDoc);
 
   useEffect(() => {
     if (!speakerOptions.includes(selectedSpeaker)) {
@@ -66,12 +68,11 @@ export const ChatPanel: React.FC = () => {
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Box sx={{ p: 2, pb: 1 }} />
-
       <MessageListErrorBoundary>
         <Box
           sx={{
             px: 2,
+            pt: 2,
             pb: 2,
             flex: 1,
             overflowY: "auto",
@@ -105,6 +106,7 @@ export const ChatPanel: React.FC = () => {
         store={store}
         speakerOptions={speakerOptions}
         selectedSpeaker={selectedSpeaker}
+        playerDoc={activePlayerDoc}
         onSpeakerChange={setSelectedSpeaker}
         onExport={handleExport}
         onClearRequest={() => setClearLogsDialogOpen(true)}

@@ -2,6 +2,28 @@ import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { useDatabase } from "../../../../../hooks/useDatabase";
 import { DEFAULT_SPEAKER } from "../constants";
+import type { Attribute } from "../types";
+
+const ATTRIBUTE_KEY: Record<Attribute, string> = {
+  mig: "might",
+  ins: "insight",
+  wlp: "will",
+  dex: "dexterity",
+};
+
+export const resolveAttributeDie = (
+  playerDoc: Record<string, unknown> | null,
+  attribute: Attribute,
+): number => {
+  const attrs =
+    playerDoc &&
+    typeof playerDoc.attributes === "object" &&
+    playerDoc.attributes
+      ? (playerDoc.attributes as Record<string, unknown>)
+      : null;
+  const val = attrs?.[ATTRIBUTE_KEY[attribute]];
+  return typeof val === "number" && val > 0 ? val : 8;
+};
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

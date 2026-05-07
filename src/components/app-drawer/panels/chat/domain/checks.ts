@@ -8,13 +8,6 @@ import type {
   CheckResult,
 } from "../types";
 
-const ATTRIBUTE_DIE: Record<Attribute, number> = {
-  dex: 8,
-  ins: 8,
-  mig: 8,
-  wlp: 8,
-};
-
 function rollDie(sides: number): number {
   return Math.floor(Math.random() * sides) + 1;
 }
@@ -24,6 +17,7 @@ export function prepareCheck(params: {
   secondary: Attribute;
   modifiers?: CheckModifier[];
   critThreshold?: number;
+  difficulty?: number;
   additionalData?: Record<string, unknown>;
 }): CheckIntent {
   return {
@@ -32,23 +26,25 @@ export function prepareCheck(params: {
     secondary: params.secondary,
     modifiers: params.modifiers ?? [],
     critThreshold: params.critThreshold ?? 6,
+    difficulty: params.difficulty,
     additionalData: params.additionalData ?? {},
   };
 }
 
-export function rollCheck(intent: CheckIntent): {
+export function rollCheck(dieSizes: { primary: number; secondary: number }): {
   primaryDie: number;
   secondaryDie: number;
 } {
   return {
-    primaryDie: rollDie(ATTRIBUTE_DIE[intent.primary]),
-    secondaryDie: rollDie(ATTRIBUTE_DIE[intent.secondary]),
+    primaryDie: rollDie(dieSizes.primary),
+    secondaryDie: rollDie(dieSizes.secondary),
   };
 }
 
 export function processCheck(
   intent: CheckIntent,
   rolls: { primaryDie: number; secondaryDie: number },
+  dieSizes: { primary: number; secondary: number },
   speaker?: string,
 ): CheckResult {
   const modifierTotal = intent.modifiers.reduce((sum, m) => sum + m.value, 0);
@@ -57,15 +53,16 @@ export function processCheck(
 
   const primary: CheckDieResult = {
     attribute: intent.primary,
-    die: ATTRIBUTE_DIE[intent.primary],
+    die: dieSizes.primary,
     result: rolls.primaryDie,
   };
   const secondary: CheckDieResult = {
     attribute: intent.secondary,
-    die: ATTRIBUTE_DIE[intent.secondary],
+    die: dieSizes.secondary,
     result: rolls.secondaryDie,
   };
 
+  const total = highRoll + lowRoll + modifierTotal;
   return {
     intent,
     speaker,
@@ -73,7 +70,8 @@ export function processCheck(
     secondary,
     highRoll,
     modifierTotal,
-    result: highRoll + lowRoll + modifierTotal,
+    result: total,
+    passed: intent.difficulty != null ? total >= intent.difficulty : undefined,
     critical:
       rolls.primaryDie === rolls.secondaryDie &&
       rolls.primaryDie >= Math.max(2, intent.critThreshold),

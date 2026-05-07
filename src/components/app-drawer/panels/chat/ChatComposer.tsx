@@ -25,13 +25,24 @@ import {
 } from "@mui/icons-material";
 import { DICE_OPTIONS } from "./constants";
 import { getActiveCommand, matchCommands } from "./domain/commands";
+import { resolveAttributeDie } from "./domain/speakers";
 import type { Command } from "./domain/commands";
+import type { Attribute } from "./types";
+import { DIFFICULTY_PRESETS } from "./types";
 import type { useChatStore } from "./chatStore";
+
+const ATTRIBUTES: { id: Attribute; label: string }[] = [
+  { id: "dex", label: "DEX" },
+  { id: "ins", label: "INS" },
+  { id: "mig", label: "MIG" },
+  { id: "wlp", label: "WLP" },
+];
 
 interface ChatComposerProps {
   store: ReturnType<typeof useChatStore>;
   speakerOptions: string[];
   selectedSpeaker: string;
+  playerDoc: Record<string, unknown> | null;
   onSpeakerChange: (speaker: string) => void;
   onExport: () => void;
   onClearRequest: () => void;
@@ -41,6 +52,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   store,
   speakerOptions,
   selectedSpeaker,
+  playerDoc,
   onSpeakerChange,
   onExport,
   onClearRequest,
@@ -51,12 +63,55 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   const [cmdSuggestions, setCmdSuggestions] = useState<Command[]>([]);
   const [activeSuggestion, setActiveSuggestion] = useState(0);
   const [activeCommand, setActiveCommand] = useState<Command | null>(null);
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const textFieldRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const customModRef = useRef<HTMLInputElement>(null);
+  const customDlRef = useRef<HTMLInputElement>(null);
 
   const canSend = Boolean(input.trim()) || store.hasPendingRoll;
   const hasMessages = store.messages.length > 0;
-  const showPopup = cmdSuggestions.length > 0 || activeCommand !== null;
+  const blockedCommand =
+    activeCommand?.name === "check" && !playerDoc ? activeCommand : null;
+  const showPopup =
+    cmdSuggestions.length > 0 ||
+    (activeCommand !== null && blockedCommand === null);
+
+  // 0 = awaiting primary, 1 = awaiting secondary, 2 = awaiting modifier, 3 = awaiting DL, null = not a check command
+  const checkParamIndex: 0 | 1 | 2 | 3 | null =
+    activeCommand?.name === "check" && playerDoc !== null
+      ? (() => {
+          const after = input.slice(input.indexOf(" ") + 1).trimStart();
+          const parts = after.trim() ? after.trim().split(/\s+/) : [];
+          if (parts.length === 0) return 0;
+          if (parts.length === 1) return 1;
+          if (parts.length === 2) return 2;
+          return 3;
+        })()
+      : null;
+
+  const applyCheckAttribute = (attr: Attribute) => {
+    const next = input.trimEnd() + " " + attr;
+    handleInputChange(next);
+    requestAnimationFrame(() => textareaRef.current?.focus());
+  };
+
+  const applyCheckModifier = (mod: number) => {
+    const parts = input.trimEnd().split(/\s+/);
+    const base = parts.slice(0, 3).join(" ");
+    const next = `${base} ${mod > 0 ? "+" : ""}${mod}`;
+    handleInputChange(next);
+  };
+
+  const applyCheckDifficulty = (dl: number | null) => {
+    const parts = input.trimEnd().split(/\s+/);
+    const base = parts.slice(0, 4).join(" ");
+    const next = dl != null ? `${base} ${dl}` : base;
+    store.send(next);
+    setInput("");
+    dismissPopup();
+  };
 
   const updatePopupState = (value: string) => {
     if (value.startsWith("/") && !value.includes(" ")) {
@@ -89,14 +144,13 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     setActiveCommand(null);
   };
 
-  const insertTrayIntoInput = () => {
+  const buildTrayExpression = (): string | null => {
     const parts = DICE_OPTIONS.flatMap((s) => {
       const count = store.pendingDice[s] ?? 0;
       return count > 0 ? [`${count}d${s}`] : [];
     });
     if (store.pendingD100 > 0) parts.push(`${store.pendingD100}d100`);
-    if (parts.length === 0) return;
-
+    if (parts.length === 0) return null;
     let expr = parts.join("+");
     if (store.pendingModifier !== 0) {
       expr +=
@@ -104,8 +158,13 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           ? `+${store.pendingModifier}`
           : `${store.pendingModifier}`;
     }
+    return `/roll ${expr}`;
+  };
 
-    const token = `/roll ${expr}`;
+  const insertTrayIntoInput = () => {
+    const token = buildTrayExpression();
+    if (!token) return;
+
     const el = textareaRef.current;
     const cursor = el ? (el.selectionStart ?? input.length) : input.length;
     const before = input.slice(0, cursor);
@@ -124,8 +183,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   };
 
   const handleSend = () => {
+    const trayExpr = !input.trim() ? buildTrayExpression() : null;
     store.send(input);
     if (!store.commandError) {
+      const historyEntry = input.trim() || trayExpr;
+      if (historyEntry) {
+        setHistory((prev) => [historyEntry, ...prev].slice(0, 50));
+      }
+      setHistoryIndex(null);
       setInput("");
       dismissPopup();
     }
@@ -152,6 +217,38 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     if (e.key === "Escape") {
       dismissPopup();
       return;
+    }
+    if (e.key === "ArrowUp") {
+      const el = textareaRef.current;
+      const atTop = !el || el.selectionStart === 0;
+      if (atTop && history.length > 0) {
+        e.preventDefault();
+        const next =
+          historyIndex === null
+            ? 0
+            : Math.min(historyIndex + 1, history.length - 1);
+        setHistoryIndex(next);
+        handleInputChange(history[next]);
+        return;
+      }
+    }
+    if (e.key === "ArrowDown") {
+      if (historyIndex !== null) {
+        const el = textareaRef.current;
+        const atBottom = !el || el.selectionStart === el.value.length;
+        if (atBottom) {
+          e.preventDefault();
+          if (historyIndex === 0) {
+            setHistoryIndex(null);
+            handleInputChange("");
+          } else {
+            const next = historyIndex - 1;
+            setHistoryIndex(next);
+            handleInputChange(history[next]);
+          }
+          return;
+        }
+      }
     }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -332,18 +429,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                         </Box>
                       }
                       secondary={
-                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                          <span>{cmd.description}</span>
-                          {cmd.params[0]?.description && (
-                            <Typography
-                              component="span"
-                              variant="caption"
-                              color="text.disabled"
-                            >
-                              — {cmd.params[0].description}
-                            </Typography>
-                          )}
-                        </Box>
+                        cmd.params[0]?.description
+                          ? `${cmd.description}: ${cmd.params[0].description}`
+                          : cmd.description
                       }
                       slotProps={{ secondary: { variant: "caption" } }}
                     />
@@ -387,6 +475,221 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     />
                   </ListItem>
                 )}
+                {(checkParamIndex === 0 || checkParamIndex === 1) && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box sx={{ display: "flex", gap: 0.5, width: "100%" }}>
+                      {ATTRIBUTES.map(({ id, label }) => (
+                        <Button
+                          key={id}
+                          size="small"
+                          variant="outlined"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => applyCheckAttribute(id)}
+                          sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            fontFamily: "monospace",
+                            fontSize: "0.7rem",
+                            py: 0.25,
+                          }}
+                        >
+                          {label} d{resolveAttributeDie(playerDoc, id)}
+                        </Button>
+                      ))}
+                    </Box>
+                  </ListItem>
+                )}
+                {checkParamIndex === 2 && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                        width: "100%",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", gap: 0.5, width: "100%" }}>
+                        {[-3, -2, -1, 0, 1, 2, 3].map((mod) => (
+                          <Button
+                            key={mod}
+                            size="small"
+                            variant="outlined"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => applyCheckModifier(mod)}
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              fontFamily: "monospace",
+                              fontSize: "0.7rem",
+                              py: 0.25,
+                              px: 0,
+                            }}
+                          >
+                            {mod > 0 ? `+${mod}` : mod}
+                          </Button>
+                        ))}
+                      </Box>
+                      <Box sx={{ display: "flex", gap: 0.5 }}>
+                        <InputBase
+                          inputRef={customModRef}
+                          size="small"
+                          placeholder="custom mod"
+                          inputProps={{
+                            inputMode: "numeric",
+                            style: {
+                              textAlign: "center",
+                              fontSize: "0.75rem",
+                              padding: "2px 4px",
+                            },
+                          }}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              const val = parseInt(
+                                (e.target as HTMLInputElement).value,
+                                10,
+                              );
+                              applyCheckModifier(Number.isNaN(val) ? 0 : val);
+                            }
+                          }}
+                          sx={{
+                            flex: 1,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            borderRadius: 1,
+                            px: 0.5,
+                            height: 26,
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            const val = parseInt(
+                              customModRef.current?.value ?? "",
+                              10,
+                            );
+                            applyCheckModifier(Number.isNaN(val) ? 0 : val);
+                          }}
+                          sx={{
+                            fontFamily: "monospace",
+                            fontSize: "0.7rem",
+                            py: 0.25,
+                            px: 1,
+                          }}
+                        >
+                          next
+                        </Button>
+                      </Box>
+                    </Box>
+                  </ListItem>
+                )}
+                {checkParamIndex === 3 && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                        width: "100%",
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        Difficulty
+                      </Typography>
+                      {DIFFICULTY_PRESETS.map(({ value, label }) => (
+                        <Button
+                          key={value}
+                          size="small"
+                          variant="outlined"
+                          fullWidth
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => applyCheckDifficulty(value)}
+                          sx={{
+                            justifyContent: "space-between",
+                            fontFamily: "monospace",
+                            fontSize: "0.75rem",
+                            py: 0.25,
+                            px: 1,
+                          }}
+                        >
+                          <span>{value}</span>
+                          <span>{label}</span>
+                        </Button>
+                      ))}
+                      <Box sx={{ display: "flex", gap: 0.5 }}>
+                        <InputBase
+                          inputRef={customDlRef}
+                          size="small"
+                          placeholder="custom DL"
+                          inputProps={{
+                            inputMode: "numeric",
+                            style: {
+                              textAlign: "center",
+                              fontSize: "0.75rem",
+                              padding: "2px 4px",
+                            },
+                          }}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              const val = parseInt(
+                                (e.target as HTMLInputElement).value,
+                                10,
+                              );
+                              if (!Number.isNaN(val)) applyCheckDifficulty(val);
+                            }
+                          }}
+                          sx={{
+                            flex: 1,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            borderRadius: 1,
+                            px: 0.5,
+                            height: 26,
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            const val = parseInt(
+                              customDlRef.current?.value ?? "",
+                              10,
+                            );
+                            if (!Number.isNaN(val)) applyCheckDifficulty(val);
+                          }}
+                          sx={{
+                            fontFamily: "monospace",
+                            fontSize: "0.7rem",
+                            py: 0.25,
+                            px: 1,
+                          }}
+                        >
+                          roll
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="text"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => applyCheckDifficulty(null)}
+                          sx={{
+                            fontFamily: "monospace",
+                            fontSize: "0.7rem",
+                            py: 0.25,
+                            px: 1,
+                            color: "text.secondary",
+                          }}
+                        >
+                          open
+                        </Button>
+                      </Box>
+                    </Box>
+                  </ListItem>
+                )}
               </List>
             </Paper>
           )}
@@ -413,6 +716,15 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
               sx={{ mt: 0.75, display: "block", px: 0.5 }}
             >
               {store.commandError}
+            </Typography>
+          )}
+          {blockedCommand && (
+            <Typography
+              variant="body2"
+              color="error"
+              sx={{ mt: 0.75, display: "block", px: 0.5 }}
+            >
+              Switch to a character speaker to roll a check.
             </Typography>
           )}
         </Box>
@@ -454,7 +766,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
         {DICE_OPTIONS.map((sides) => (
           <Button
             key={sides}
-            type="button"
             size="small"
             variant={store.pendingDice[sides] ? "contained" : "outlined"}
             onClick={() => store.addDie(sides)}

@@ -5,7 +5,6 @@ import {
   Drawer,
   IconButton,
   Tooltip,
-  Typography,
   useMediaQuery,
 } from "@mui/material";
 import {
@@ -21,12 +20,6 @@ import { SavedThemesPanel } from "./panels/SavedThemesPanel";
 import { useAppDrawerStore, type DrawerTab } from "../../store/appDrawerStore";
 
 const TAB_RAIL_WIDTH = 44;
-
-const TAB_TITLE: Record<DrawerTab, string> = {
-  chat: "Chat",
-  customizer: "Customizer",
-  themes: "Saved Themes",
-};
 
 const TABS: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
   {
@@ -119,6 +112,25 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
             gap: 1,
           }}
         >
+          <Tooltip title="Close" placement="right">
+            <IconButton
+              aria-label="Close drawer"
+              onClick={onClose}
+              size="small"
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: 1,
+                color: "text.secondary",
+                "&:hover": { backgroundColor: "action.hover" },
+              }}
+            >
+              <ChevronRightIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Divider flexItem />
+
           {TABS.map(({ id, label, icon }) => (
             <Tooltip key={id} title={label} placement="right">
               <IconButton
@@ -151,24 +163,6 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
             overflow: "hidden",
           }}
         >
-          <Box
-            sx={{
-              p: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {TAB_TITLE[activeTab]}
-            </Typography>
-            <IconButton onClick={onClose} size="small" sx={{ ml: 1 }}>
-              <ChevronRightIcon />
-            </IconButton>
-          </Box>
-
-          <Divider />
-
           <Box sx={{ flex: 1, overflowY: "auto" }}>
             {activeTab === "chat" && <ChatPanel />}
             {activeTab === "customizer" && <CustomizerPanel />}

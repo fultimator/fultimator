@@ -7,7 +7,10 @@ import type { ChatMessage, DieSides } from "./types";
 
 export type PendingDice = Partial<Record<DieSides, number>>;
 
-export function useChatStore(selectedSpeaker: string) {
+export function useChatStore(
+  selectedSpeaker: string,
+  playerDoc: Record<string, unknown> | null = null,
+) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [pendingDice, setPendingDice] = useState<PendingDice>({});
   const [pendingD100, setPendingD100] = useState(0);
@@ -53,7 +56,10 @@ export function useChatStore(selectedSpeaker: string) {
 
     const next: ChatMessage[] = [];
     if (trimmed) {
-      const result = executeCommand(trimmed, { speaker: selectedSpeaker });
+      const result = executeCommand(trimmed, {
+        speaker: selectedSpeaker,
+        playerDoc,
+      });
       if (result === null) {
         next.push(buildTextMessage(trimmed, selectedSpeaker));
         setCommandError(null);
