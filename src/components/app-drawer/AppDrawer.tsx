@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Divider,
@@ -15,23 +15,22 @@ import {
   Palette as PaletteIcon,
 } from "@mui/icons-material";
 import { APP_DRAWER_WIDTH } from "./constants";
-import { NotesPanel } from "./panels/NotesPanel";
+import { ChatPanel } from "./panels/chat";
 import { CustomizerPanel } from "./panels/CustomizerPanel";
 import { SavedThemesPanel } from "./panels/SavedThemesPanel";
+import { useAppDrawerStore, type DrawerTab } from "../../store/appDrawerStore";
 
 const TAB_RAIL_WIDTH = 44;
 
-type DrawerTab = "notes" | "customizer" | "themes";
-
 const TAB_TITLE: Record<DrawerTab, string> = {
-  notes: "Chat",
+  chat: "Chat",
   customizer: "Customizer",
   themes: "Saved Themes",
 };
 
 const TABS: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
   {
-    id: "notes",
+    id: "chat",
     label: "Chat",
     icon: <ChatBubbleOutlineIcon fontSize="small" />,
   },
@@ -54,7 +53,8 @@ interface AppDrawerProps {
 
 export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const [activeTab, setActiveTab] = useState<DrawerTab>("customizer");
+  const activeTab = useAppDrawerStore((s) => s.activeTab);
+  const setActiveTab = useAppDrawerStore((s) => s.setActiveTab);
 
   return (
     <Drawer
@@ -170,7 +170,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
           <Divider />
 
           <Box sx={{ flex: 1, overflowY: "auto" }}>
-            {activeTab === "notes" && <NotesPanel />}
+            {activeTab === "chat" && <ChatPanel />}
             {activeTab === "customizer" && <CustomizerPanel />}
             {activeTab === "themes" && <SavedThemesPanel />}
           </Box>

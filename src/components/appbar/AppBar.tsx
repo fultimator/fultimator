@@ -10,7 +10,11 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router";
-import { ArrowBack, Search, Tune as TuneIcon } from "@mui/icons-material";
+import {
+  ArrowBack,
+  Search,
+  ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
+} from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import type { ThemeValue, StyleProfileValue } from "../../store/themeStore";
@@ -77,10 +81,11 @@ const AppBar: React.FC<AppBarProps> = ({
               sx={{ alignItems: "center", justifyContent: "space-between" }}
             >
               <Grid
-                size={2}
+                size={{ xs: showGoBackButton ? 2 : 2, sm: 2 }}
                 sx={{
                   textAlign: "left",
                   display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
                   alignItems: "center",
                   justifyContent: "flex-start",
                 }}
@@ -89,6 +94,13 @@ const AppBar: React.FC<AppBarProps> = ({
                   <IconButton color="inherit" onClick={handleNavigation}>
                     <ArrowBack />
                   </IconButton>
+                )}
+                {showGoBackButton && (
+                  <Tooltip title="Open Compendium">
+                    <IconButton color="inherit" onClick={openCompendiumModal}>
+                      <Search />
+                    </IconButton>
+                  </Tooltip>
                 )}
               </Grid>
 
@@ -144,15 +156,10 @@ const AppBar: React.FC<AppBarProps> = ({
                     justifyContent: "flex-end",
                   }}
                 >
-                  <Tooltip title="Open Compendium">
-                    <IconButton color="inherit" onClick={openCompendiumModal}>
-                      <Search />
-                    </IconButton>
-                  </Tooltip>
                   {onOpenDrawer && (
-                    <Tooltip title="Open Drawer">
+                    <Tooltip title="Open Chat">
                       <IconButton color="inherit" onClick={onOpenDrawer}>
-                        <TuneIcon />
+                        <ChatBubbleOutlineIcon />
                       </IconButton>
                     </Tooltip>
                   )}

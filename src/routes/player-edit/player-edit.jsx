@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
+import { useAppDrawerStore } from "../../store/appDrawerStore";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
@@ -193,6 +194,7 @@ export default function PlayerEdit() {
   const [playerTemp, setPlayerTemp] = useState(player);
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const setDrawerIsOpen = useAppDrawerStore((s) => s.setIsOpen);
   const [compactView, setCompactView] = useState(false);
   const [compactViewExpanded, setCompactViewExpanded] = useState(false);
 
@@ -290,6 +292,7 @@ export default function PlayerEdit() {
   const handleTabChange = (event, newValue) => {
     setOpenTab(newValue);
     setDrawerOpen(false);
+    setDrawerIsOpen(false);
   };
 
   const toggleDrawer = (open) => (event) => {
@@ -300,6 +303,7 @@ export default function PlayerEdit() {
       return;
     }
     setDrawerOpen(open);
+    setDrawerIsOpen(open);
   };
 
   const recalculatePlayerMaxStats = useCallback((prevPlayer) => {
@@ -1363,7 +1367,8 @@ export default function PlayerEdit() {
         sx={{
           position: "fixed",
           bottom: 16,
-          right: 16,
+          right: drawerOpen ? 360 + 16 : 16,
+          transition: "right 0.3s ease",
           zIndex: 1200,
           display: "flex",
           flexDirection: "column-reverse",
