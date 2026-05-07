@@ -75,8 +75,8 @@ export function processCheck(
     modifierTotal,
     result: highRoll + lowRoll + modifierTotal,
     critical:
-      rolls.primaryDie >= intent.critThreshold &&
-      rolls.secondaryDie >= intent.critThreshold,
+      rolls.primaryDie === rolls.secondaryDie &&
+      rolls.primaryDie >= Math.max(2, intent.critThreshold),
     fumble: rolls.primaryDie === 1 && rolls.secondaryDie === 1,
     additionalData: intent.additionalData,
   };
