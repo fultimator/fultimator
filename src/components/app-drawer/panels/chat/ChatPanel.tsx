@@ -23,9 +23,9 @@ export const ChatPanel: React.FC = () => {
   const { playerDoc, npcDoc } = useRouteActor();
   const contextActorName = useActorName(playerDoc, npcDoc);
   const speakerOptions = resolveSpeakerOptions(contextActorName);
-  const activePlayerDoc =
-    selectedSpeaker === DEFAULT_SPEAKER ? null : playerDoc;
-  const store = useChatStore(selectedSpeaker, activePlayerDoc);
+  const activeActorDoc =
+    selectedSpeaker === DEFAULT_SPEAKER ? null : (playerDoc ?? npcDoc);
+  const store = useChatStore(selectedSpeaker, activeActorDoc);
 
   useEffect(() => {
     if (!speakerOptions.includes(selectedSpeaker)) {
@@ -106,7 +106,7 @@ export const ChatPanel: React.FC = () => {
         store={store}
         speakerOptions={speakerOptions}
         selectedSpeaker={selectedSpeaker}
-        playerDoc={activePlayerDoc}
+        playerDoc={activeActorDoc}
         onSpeakerChange={setSelectedSpeaker}
         onExport={handleExport}
         onClearRequest={() => setClearLogsDialogOpen(true)}
