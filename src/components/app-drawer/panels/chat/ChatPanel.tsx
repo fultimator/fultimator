@@ -1,30 +1,54 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Divider, Typography } from "@mui/material";
+import { useLocation } from "react-router";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
-import { AUTHOR_NAME, DEFAULT_SPEAKER } from "./constants";
+import { AUTHOR_NAME, DEFAULT_SPEAKER, LOCAL_SPEAKER_KEY } from "./constants";
 import { formatTimeAgo } from "./utils";
 import { useChatStore } from "./chatStore";
 import {
   useRouteActor,
   useActorName,
   resolveSpeakerOptions,
+  useCombatSimActors,
 } from "./domain/speakers";
+import { useCombatEncounterStore } from "../../../../stores/combatEncounterStore";
 import { BaseMessageTemplate } from "./message-templates/BaseMessageTemplate";
 import { MessageContent } from "./message-templates/registry";
 import { MessageListErrorBoundary } from "./MessageListErrorBoundary";
 import { ChatComposer } from "./ChatComposer";
 
 export const ChatPanel: React.FC = () => {
-  const [selectedSpeaker, setSelectedSpeaker] = useState(DEFAULT_SPEAKER);
+  const [selectedSpeaker, setSelectedSpeaker] = useState<string>(
+    () => localStorage.getItem(LOCAL_SPEAKER_KEY) ?? DEFAULT_SPEAKER,
+  );
   const [clearLogsDialogOpen, setClearLogsDialogOpen] = useState(false);
   const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
   const previousMessageCountRef = useRef(0);
 
+  const location = useLocation();
+  const isCombatSim = location.pathname.startsWith("/combat-sim/");
+
   const { playerDoc, npcDoc } = useRouteActor();
   const contextActorName = useActorName(playerDoc, npcDoc);
-  const speakerOptions = resolveSpeakerOptions(contextActorName);
-  const activeActorDoc =
-    selectedSpeaker === DEFAULT_SPEAKER ? null : (playerDoc ?? npcDoc);
+  const combatSimActors = useCombatSimActors();
+  const activeActorName = useCombatEncounterStore((s) => s.activeActorName);
+
+  const speakerOptions = useMemo(
+    () =>
+      isCombatSim
+        ? [DEFAULT_SPEAKER, ...combatSimActors.map((a) => a.name)]
+        : resolveSpeakerOptions(contextActorName),
+    [isCombatSim, combatSimActors, contextActorName],
+  );
+
+  const activeActorDoc = isCombatSim
+    ? selectedSpeaker === DEFAULT_SPEAKER
+      ? null
+      : (combatSimActors.find((a) => a.name === selectedSpeaker)?.doc ?? null)
+    : selectedSpeaker === DEFAULT_SPEAKER
+      ? null
+      : (playerDoc ?? npcDoc);
+
   const store = useChatStore(selectedSpeaker, activeActorDoc);
 
   useEffect(() => {
@@ -32,6 +56,14 @@ export const ChatPanel: React.FC = () => {
       setSelectedSpeaker(DEFAULT_SPEAKER);
     }
   }, [selectedSpeaker, speakerOptions]);
+
+  useEffect(() => {
+    if (!isCombatSim || !activeActorName) return;
+    if (speakerOptions.includes(activeActorName)) {
+      localStorage.setItem(LOCAL_SPEAKER_KEY, activeActorName);
+      setSelectedSpeaker(activeActorName);
+    }
+  }, [activeActorName, isCombatSim, speakerOptions]);
 
   useEffect(() => {
     const prev = previousMessageCountRef.current;
@@ -107,7 +139,10 @@ export const ChatPanel: React.FC = () => {
         speakerOptions={speakerOptions}
         selectedSpeaker={selectedSpeaker}
         playerDoc={activeActorDoc}
-        onSpeakerChange={setSelectedSpeaker}
+        onSpeakerChange={(s) => {
+          localStorage.setItem(LOCAL_SPEAKER_KEY, s);
+          setSelectedSpeaker(s);
+        }}
         onExport={handleExport}
         onClearRequest={() => setClearLogsDialogOpen(true)}
       />

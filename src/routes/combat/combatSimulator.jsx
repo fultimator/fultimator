@@ -28,6 +28,7 @@ import debounce from "lodash.debounce";
 import { globalConfirm } from "../../utility/globalConfirm";
 import { useNavigate } from "react-router";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
+import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
 import { SignIn } from "../../components/auth";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
@@ -207,6 +208,17 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const isDifferentUser = !isLocalMode && encounter?.uid !== user?.uid;
   const isPrivate = encounter?.private && isDifferentUser;
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+
+  // Sync actors to shared store so the chat panel can read them without a Firestore round-trip.
+  const setEncounterActors = useCombatEncounterStore((s) => s.setActors);
+  const setActiveActorName = useCombatEncounterStore(
+    (s) => s.setActiveActorName,
+  );
+  const clearEncounterActors = useCombatEncounterStore((s) => s.clearActors);
+  useEffect(() => {
+    setEncounterActors(id, selectedNPCs, selectedPCs);
+  }, [id, selectedNPCs, selectedPCs]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => clearEncounterActors(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ========== Log States ==========
   const [logs, setLogs] = useState([]);
@@ -630,7 +642,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const handlePcClick = (pcCombatId) => {
     const pc = selectedPCs.find((pc) => pc.combatId === pcCombatId);
     setSelectedPC(pc);
-    setSelectedNPC(null); // clear NPC selection
+    setSelectedNPC(null);
+    setActiveActorName(pc?.name ?? null);
   };
 
   // Handle Update PC Turns
@@ -705,9 +718,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Handle NPC Click in the selected NPCs list
   const handleNpcClick = (npcCombatId) => {
     const npc = selectedNPCs.find((npc) => npc.combatId === npcCombatId);
-    setSelectedNPC(npc); // Set clicked NPC as the selected NPC
-    setSelectedPC(null); // clear PC selection
+    setSelectedNPC(npc);
+    setSelectedPC(null);
     setSelectedStudy(0);
+    setActiveActorName(npc?.name ?? null);
   };
 
   // Handle Study Change

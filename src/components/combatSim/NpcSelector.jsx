@@ -198,7 +198,7 @@ export default function NpcSelector({
         size="small"
         onClick={() => setNpcDrawerOpen(true)}
       >
-        {t("combat_sim_select_npcs")}
+        {t("combat_sim_select_actors")}
       </Button>
       <Drawer
         anchor="left"

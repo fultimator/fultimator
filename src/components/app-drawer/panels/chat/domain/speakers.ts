@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { useDatabase } from "../../../../../hooks/useDatabase";
+import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
 import { DEFAULT_SPEAKER } from "../constants";
 import type { Attribute } from "../types";
 
@@ -32,6 +33,18 @@ export const resolveSpeakerOptions = (contextActorName: string): string[] => [
   DEFAULT_SPEAKER,
   ...(contextActorName ? [contextActorName] : []),
 ];
+
+type ActorEntry = { name: string; doc: Record<string, unknown> };
+
+export const useCombatSimActors = (): ActorEntry[] => {
+  const { selectedNPCs, selectedPCs } = useCombatEncounterStore();
+
+  return useMemo(() => {
+    return [...selectedNPCs, ...selectedPCs]
+      .filter((a) => typeof a.name === "string" && a.name)
+      .map((a) => ({ name: a.name as string, doc: a }));
+  }, [selectedNPCs, selectedPCs]);
+};
 
 export const useRouteActor = (): {
   playerDoc: Record<string, unknown> | null;

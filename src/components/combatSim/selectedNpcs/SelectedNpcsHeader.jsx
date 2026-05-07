@@ -50,7 +50,7 @@ export default function SelectedNpcsHeader({
             msUserSelect: "none",
           }}
         >
-          {t("combat_sim_selected_npcs")}
+          {t("combat_sim_selected_actors")}
         </Typography>
       )}
 

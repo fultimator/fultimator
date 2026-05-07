@@ -33728,7 +33728,7 @@
     "zh": "Select NPCs"
   },
   {
-    "key": "combat_sim_selected_npcs",
+    "key": "combat_sim_selected_pcs",
     "en": "Selected NPCs",
     "it": "PNG Selezionati",
     "de": "Gewählte NSCs",
@@ -33737,6 +33737,50 @@
     "es": "PNJs seleccionados",
     "pt-BR": "PNJs selecionados",
     "zh": "Selected NPCs"
+  },
+  {
+    "key": "combat_sim_select_pcs",
+    "en": "Select PCs",
+    "it": "Seleziona PG",
+    "de": "Wähle SCs",
+    "pl": "Wybierz BGów",
+    "fr": "Sélectionner PJs",
+    "es": "Seleccionar PJs",
+    "pt-BR": "Selecionar PJs",
+    "zh": "Select PCs"
+  },
+  {
+    "key": "combat_sim_selected_pcs",
+    "en": "Selected PCs",
+    "it": "PG Selezionati",
+    "de": "Gewählte SCs",
+    "pl": "Wybrani BGów",
+    "fr": "PJs sélectionnés",
+    "es": "PJs seleccionados",
+    "pt-BR": "PJs selecionados",
+    "zh": "Selected PCs"
+  },
+  {
+    "key": "combat_sim_select_actors",
+    "en": "Select Actor(s)",
+    "it": "Seleziona Attore/i",
+    "de": "Wähle Akteur(e)",
+    "pl": "Wybierz Aktora/ów",
+    "fr": "Sélectionner Acteur(s)",
+    "es": "Seleccionar Actor(es)",
+    "pt-BR": "Selecionar Ator(es)",
+    "zh": "Select Actor(s)"
+  },
+  {
+    "key": "combat_sim_selected_actors",
+    "en": "Selected Actor(s)",
+    "it": "Attore/i Selezionato/i",
+    "de": "Gewählte(r) Akteur(e)",
+    "pl": "Wybrani Aktorzy",
+    "fr": "PNJs sélectionnés",
+    "es": "Acteur(s) sélectionné(s)",
+    "pt-BR": "Ator(es) selecionado(s)",
+    "zh": "Selected Actor(s)"
   },
   {
     "key": "combat_sim_send_log",
