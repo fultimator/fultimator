@@ -1613,7 +1613,7 @@ function Equip({ npc }) {
       {npc.armor && npc.armor.name !== "No Armor" && (
         <Grid sx={{ px: 2, py: 0, alignItems: "center" }} size={12}>
           <strong>{t("Armor:")}</strong> {npc.armor.name}{" "}
-          {npc.armor.martial && <Martial />}
+          {(npc.armor.isMartial ?? npc.armor.martial) && <Martial />}
           <Diamond />{" "}
           {npc.armor.def > 0 ? (
             <strong>
@@ -1629,14 +1629,14 @@ function Equip({ npc }) {
             {t("M.DEF")} + {npc.armor.mdefbonus}
           </strong>{" "}
           <Diamond /> {t("Init.")} <strong>{npc.armor.init}</strong> <Diamond />{" "}
-          <strong>{npc.armor.cost}</strong> {t("zenit")}
+          <strong>{npc.armor.value ?? npc.armor.cost}</strong> {t("zenit")}
         </Grid>
       )}
       {/* Shield */}
       {npc.shield && npc.shield.name !== "No Shield" && (
         <Grid sx={{ px: 2, py: 0 }} size={12}>
           <strong>{t("Shield:")}</strong> {npc.shield.name}{" "}
-          {npc.shield.martial && <Martial />}
+          {(npc.shield.isMartial ?? npc.shield.martial) && <Martial />}
           <Diamond />{" "}
           {npc.shield.def > 0 ? (
             <strong>
@@ -1652,7 +1652,8 @@ function Equip({ npc }) {
             {t("M.DEF")} + {npc.shield.mdefbonus}
           </strong>{" "}
           <Diamond /> {t("Init.")} <strong>{npc.shield.init}</strong>{" "}
-          <Diamond /> <strong>{npc.shield.cost}</strong> {t("zenit")}
+          <Diamond /> <strong>{npc.shield.value ?? npc.shield.cost}</strong>{" "}
+          {t("zenit")}
         </Grid>
       )}
     </Grid>

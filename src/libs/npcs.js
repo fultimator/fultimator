@@ -572,11 +572,11 @@ export function calcUsedSkillsFromEquip(npc) {
     equip = true;
   }
 
-  if (npc.armor && npc.armor.cost !== 0) {
+  if (npc.armor && (npc.armor.value ?? npc.armor.cost) !== 0) {
     equip = true;
   }
 
-  if (npc.shield && npc.shield.cost !== 0) {
+  if (npc.shield && (npc.shield.value ?? npc.shield.cost) !== 0) {
     equip = true;
   }
 

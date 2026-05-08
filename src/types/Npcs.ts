@@ -13,10 +13,13 @@ export interface NpcArmor {
   name: string;
   init: number;
   mdefbonus: number;
-  cost: number;
+  cost?: number;
+  value?: number;
   mdef: number;
   defbonus: number;
-  martial: boolean;
+  martial?: boolean;
+  isMartial?: boolean;
+  quality?: string;
 }
 
 export interface NpcAttack {
@@ -85,6 +88,7 @@ export interface NpcAffinities {
   bolt?: Affinities;
   dark?: Affinities;
   earth?: Affinities;
+  fire?: Affinities;
   ice?: Affinities;
   light?: Affinities;
   poison?: Affinities;
@@ -130,6 +134,7 @@ export interface TypeNpc {
   description?: string;
   armor?: NpcArmor;
   sheild?: NpcArmor;
+  shield?: NpcArmor;
   raregear?: NpcRareGear[];
   label?: string;
   notes?: NpcNotes[];
