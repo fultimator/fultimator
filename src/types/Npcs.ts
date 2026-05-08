@@ -57,13 +57,13 @@ export interface NpcSpell {
 export interface NpcAction {
   name: string;
   effect: string;
-  spCost: number;
+  spCost?: number;
 }
 
 export interface NpcSpecial {
   name: string;
   effect: string;
-  spCost: number;
+  spCost?: number;
 }
 
 export interface NpcRareGear {

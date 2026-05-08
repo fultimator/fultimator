@@ -60,6 +60,29 @@ function normalizeArmorAndShieldFields(npc: TypeNpc): TypeNpc {
   };
 }
 
+function defaultSpCost(npc: TypeNpc): TypeNpc {
+  return {
+    ...npc,
+    actions: npc.actions?.map((a) => ({ ...a, spCost: a.spCost ?? 0 })),
+    special: npc.special?.map((s) => ({ ...s, spCost: s.spCost ?? 0 })),
+  };
+}
+
+function defaultImmunities(npc: TypeNpc): TypeNpc {
+  return {
+    ...npc,
+    immunities: {
+      slow: false,
+      dazed: false,
+      weak: false,
+      shaken: false,
+      enraged: false,
+      poisoned: false,
+      ...npc.immunities,
+    },
+  };
+}
+
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 1,
@@ -76,6 +99,16 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Normalize armor and shield fields (martial to isMartial, cost to value, add quality default)",
     fn: normalizeArmorAndShieldFields,
+  },
+  {
+    version: 4,
+    label: "Default spCost to 0 on actions and special",
+    fn: defaultSpCost,
+  },
+  {
+    version: 5,
+    label: "Default missing immunities keys to false",
+    fn: defaultImmunities,
   },
 ];
 
