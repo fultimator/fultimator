@@ -46,6 +46,10 @@ import TagList from "../../components/TagList";
 import { moderators } from "../../libs/userGroups";
 import blacklist from "../../translation/blacklist.json";
 import deepEqual from "deep-equal";
+import {
+  applyNpcPostLoadTransforms,
+  applyNpcPreSaveTransforms,
+} from "../../components/npc/npcTransforms";
 import { NpcProvider } from "../../components/npc/NpcContext";
 
 // Combine all blacklisted names into a single array
@@ -125,22 +129,21 @@ export default function NpcEdit() {
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
   const [npcTemp, setNpcTemp] = useState(npc); // Temporary NPC state
 
-  // Effect to update temporary NPC state when NPC data changes
+  // Effect to update temporary NPC state when NPC data changes.
+  // Apply post-load transforms so migrations are reflected in the editor.
   useEffect(() => {
     if (npc) {
-      // Perform a deep copy of the npc object
-      const updatedPlayerTemp = JSON.parse(JSON.stringify(npc));
-      setNpcTemp(updatedPlayerTemp);
+      setNpcTemp(applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))));
       setIsUpdated(false);
     }
   }, [npc]);
 
   useEffect(() => {
-    if (!deepEqual(npcTemp, npc)) {
-      setIsUpdated(true);
-    } else {
-      setIsUpdated(false);
-    }
+    const baseline = npc
+      ? applyNpcPreSaveTransforms(JSON.parse(JSON.stringify(npc)))
+      : npc;
+    const current = npcTemp ? applyNpcPreSaveTransforms(npcTemp) : npcTemp;
+    setIsUpdated(!deepEqual(current, baseline));
   }, [npcTemp, npc]);
 
   // Handler for Ctrl+S to save NPC
@@ -148,7 +151,7 @@ export default function NpcEdit() {
     (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
-        activeSetDoc(ref, npcTemp);
+        activeSetDoc(ref, applyNpcPreSaveTransforms(npcTemp));
       }
     },
     [ref, npcTemp, activeSetDoc],
@@ -231,15 +234,18 @@ export default function NpcEdit() {
   // Function to publish NPC
   const publish = () => {
     setIsUpdated(false);
-    activeSetDoc(ref, {
-      ...npcTemp,
-      published: true,
-      searchString: npcTemp.name
-        .replace(/[\W_]+/g, " ")
-        .toLowerCase()
-        .split(" "),
-      publishedAt: Date.now(),
-    });
+    activeSetDoc(
+      ref,
+      applyNpcPreSaveTransforms({
+        ...npcTemp,
+        published: true,
+        searchString: npcTemp.name
+          .replace(/[\W_]+/g, " ")
+          .toLowerCase()
+          .split(" "),
+        publishedAt: Date.now(),
+      }),
+    );
     if (isBlacklisted(npcTemp.name)) {
       sendDiscordWebhook(
         "⚠️ BLACKLISTED NPC NAME PUBLISHED! ⚠️",
@@ -256,7 +262,10 @@ export default function NpcEdit() {
   // Function to update publish language as moderator
   const updatePublishLanguage = async (newLang) => {
     setIsUpdated(false);
-    activeSetDoc(ref, { ...npcTemp, language: newLang });
+    activeSetDoc(
+      ref,
+      applyNpcPreSaveTransforms({ ...npcTemp, language: newLang }),
+    );
 
     // Send message to webhook when updating publish language as moderator
     if (user && isModerator && user.uid !== npc.uid) {
@@ -274,10 +283,10 @@ export default function NpcEdit() {
   // Function to unpublish NPC
   const unPublish = async () => {
     setIsUpdated(false);
-    activeSetDoc(ref, {
-      ...npcTemp,
-      published: false,
-    });
+    activeSetDoc(
+      ref,
+      applyNpcPreSaveTransforms({ ...npcTemp, published: false }),
+    );
 
     // Send message to webhook when unpublishing as moderator
     if (user && isModerator && user.uid !== npc.uid) {
@@ -606,7 +615,7 @@ export default function NpcEdit() {
               sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1200 }}
               onClick={() => {
                 setIsUpdated(false);
-                activeSetDoc(ref, npcTemp);
+                activeSetDoc(ref, applyNpcPreSaveTransforms(npcTemp));
               }}
             >
               <Save />

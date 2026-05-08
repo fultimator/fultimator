@@ -8,6 +8,12 @@ import { syncAutomaticClassLevels } from "./classes/classLevelUtils";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
+interface VersionedTransform {
+  version: number;
+  label: string;
+  fn: PlayerTransform;
+}
+
 // Pre-save transforms
 // Applied before writing to the database. Should produce a clean, minimal
 // representation - no runtime-only fields that are re-derived on load.
@@ -22,25 +28,26 @@ function stripRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
   if (!player.equippedSlots) return player;
   const inv = player.equipment?.[0];
   if (!inv) return player;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const strip = (arr: Array<Record<string, any>>): any[] =>
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    arr.map(({ isEquipped, ...rest }) => rest);
   return {
     ...player,
     equipment: [
       {
         ...inv,
-        weapons: strip(inv.weapons ?? []) as unknown as typeof inv.weapons,
-        shields: strip(inv.shields ?? []) as unknown as typeof inv.shields,
-        armor: strip(inv.armor ?? []) as unknown as typeof inv.armor,
-        accessories: strip(
-          inv.accessories ?? [],
-        ) as unknown as typeof inv.accessories,
-        customWeapons: strip(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (inv.customWeapons ?? []) as Array<Record<string, any>>,
-        ) as unknown as typeof inv.customWeapons,
+        weapons: (inv.weapons ?? []).map(
+          ({ isEquipped: _e, ...rest }) => rest,
+        ) as typeof inv.weapons,
+        shields: (inv.shields ?? []).map(
+          ({ isEquipped: _e, ...rest }) => rest,
+        ) as typeof inv.shields,
+        armor: (inv.armor ?? []).map(
+          ({ isEquipped: _e, ...rest }) => rest,
+        ) as typeof inv.armor,
+        accessories: (inv.accessories ?? []).map(
+          ({ isEquipped: _e, ...rest }) => rest,
+        ) as typeof inv.accessories,
+        customWeapons: (inv.customWeapons ?? []).map(
+          ({ isEquipped: _e, ...rest }) => rest,
+        ) as typeof inv.customWeapons,
       },
       ...(player.equipment?.slice(1) ?? []),
     ],
@@ -53,9 +60,7 @@ function stripRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
  * - Persists only true specialSkillOverrides flags to reduce payload size.
  */
 function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rawPlayer = player as Record<string, any>;
-  const settings = rawPlayer.settings ?? {};
+  const settings = player.settings ?? {};
   const rawOptionalRules = settings.optionalRules ?? {};
   const optionalRules = {
     quirks: rawOptionalRules.quirks ?? false,
@@ -71,22 +76,19 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
     Object.entries(rawOverrides).filter(([, value]) => value === true),
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const nextSettings: Record<string, any> = {
+  const nextSettings: typeof settings = {
     ...settings,
     defaultView: settings.defaultView === "compact" ? "compact" : "normal",
     automaticClassLevel: rawOptionalRules.technospheres
       ? true
       : (settings.automaticClassLevel ?? true),
-    advancement: settings.advancement ?? rawOptionalRules.advancement ?? false,
+    advancement: settings.advancement ?? false,
     optionalRules,
+    specialSkillOverrides:
+      Object.keys(specialSkillOverrides).length > 0
+        ? (specialSkillOverrides as Record<string, true>)
+        : undefined,
   };
-
-  if (Object.keys(specialSkillOverrides).length > 0) {
-    nextSettings.specialSkillOverrides = specialSkillOverrides;
-  } else {
-    delete nextSettings.specialSkillOverrides;
-  }
 
   return {
     ...player,
@@ -108,6 +110,7 @@ export function applyPreSaveTransforms(player: TypePlayer): TypePlayer {
 // Post-load transforms
 // Applied after reading from the database, before putting the player into state.
 // These restore runtime fields and perform one-time schema migrations.
+// Each versioned transform bumps schemaVersion to its declared version when applied.
 
 /**
  * First-time migration for players without equippedSlots:
@@ -131,27 +134,30 @@ function migrateLegacyEquipment(player: TypePlayer): TypePlayer {
     "accessories",
     "customWeapons",
   ] as const;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = player as Record<string, any>;
+  const raw = player as unknown as Record<string, unknown>;
   const hasLegacyData = legacySources.some((key) => Array.isArray(raw[key]));
 
   if (!hasLegacyData) return player;
 
+  const equipment = raw.equipment as unknown[] | undefined;
   const eq0: Record<string, unknown> = {
-    ...(raw.equipment?.[0] ?? {}),
+    ...((equipment?.[0] as Record<string, unknown>) ?? {}),
   };
 
   legacySources.forEach((key) => {
     if (Array.isArray(raw[key])) {
-      eq0[key] = [...((eq0[key] as unknown[]) ?? []), ...raw[key]];
+      eq0[key] = [
+        ...((eq0[key] as unknown[]) ?? []),
+        ...(raw[key] as unknown[]),
+      ];
       delete raw[key];
     }
   });
 
   return {
     ...raw,
-    equipment: [eq0, ...(raw.equipment?.slice(1) ?? [])],
-  } as TypePlayer;
+    equipment: [eq0, ...(equipment?.slice(1) ?? [])],
+  } as unknown as TypePlayer;
 }
 
 /**
@@ -163,8 +169,7 @@ function normalizeSkillLevels(player: TypePlayer): TypePlayer {
     ...cls,
     skills:
       cls.skills?.map((sk) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const raw = sk as Record<string, any>;
+        const raw = sk as unknown as Record<string, unknown>;
         if ("currentSL" in raw && raw.currentSL !== undefined) {
           const { currentSL, ...rest } = raw;
           return { ...rest, currentLvl: currentSL } as typeof sk;
@@ -208,7 +213,7 @@ function normalizeNotes(player: TypePlayer): TypePlayer {
  * Backfill the `index` field on any SlotRef that was saved without one.
  * Legacy equippedSlots entries only contain { source, name }; the index is
  * needed so isItemEquipped can disambiguate items that share the same name.
- * Safe to run on every load — no-ops when index is already present.
+ * Safe to run on every load; no-ops when index is already present.
  */
 function migrateSlotIndexes(player: TypePlayer): TypePlayer {
   const slots = player.equippedSlots;
@@ -220,10 +225,7 @@ function migrateSlotIndexes(player: TypePlayer): TypePlayer {
     ref: SlotRef | null | undefined,
   ): SlotRef | null | undefined => {
     if (!ref || ref.index !== undefined) return ref;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const arr = (inv as Record<string, any> | undefined)?.[ref.source] as
-      | Array<{ name: string }>
-      | undefined;
+    const arr = inv?.[ref.source] as Array<{ name: string }> | undefined;
     const idx = arr?.findIndex((it) => it.name === ref.name) ?? -1;
     return idx >= 0 ? { ...ref, index: idx } : ref;
   };
@@ -309,8 +311,7 @@ function pruneStaleSlotRefs(player: TypePlayer): TypePlayer {
  * Guarantees player.info and player.info.bonds are always defined post-load.
  */
 function normalizeRequiredFields(player: TypePlayer): TypePlayer {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const info: Record<string, any> = player.info ?? {};
+  const info = player.info ?? ({} as typeof player.info);
   return {
     ...player,
     info: {
@@ -336,7 +337,7 @@ function normalizeRequiredFields(player: TypePlayer): TypePlayer {
     affinities: player.affinities ?? {},
     equipment: (() => {
       const isTechnospheres =
-        (player.settings as any)?.optionalRules?.technospheres ?? false;
+        player.settings?.optionalRules?.technospheres ?? false;
       const eq0 = player.equipment?.[0];
       if (!eq0) {
         // Technospheres players must always have equipment[0] with sphere arrays.
@@ -345,8 +346,7 @@ function normalizeRequiredFields(player: TypePlayer): TypePlayer {
         return [{ mnemospheres: [], hoplospheres: [] }];
       }
       const isIntegrated =
-        (player.settings as any)?.optionalRules?.technospheresVariant ===
-        "integrated";
+        player.settings?.optionalRules?.technospheresVariant === "integrated";
       const needsPatch =
         !Array.isArray(eq0.mnemospheres) ||
         !Array.isArray(eq0.hoplospheres) ||
@@ -408,8 +408,18 @@ function normalizeArmorDefValues(player: TypePlayer): TypePlayer {
   if (!inv) return player;
 
   let changed = false;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fix = (arr: Array<Record<string, any>>) =>
+  // `base` is a legacy snapshot field not in the Armor/Shields types yet; cast needed.
+  type ItemWithBase = {
+    def?: number;
+    mdef?: number;
+    base?: {
+      def?: number;
+      defbonus?: number;
+      mdef?: number;
+      mdefbonus?: number;
+    };
+  };
+  const fix = (arr: ItemWithBase[]) =>
     arr.map((item) => {
       const patch: Record<string, unknown> = {};
       if (!item.def) {
@@ -445,80 +455,83 @@ function normalizeArmorDefValues(player: TypePlayer): TypePlayer {
   };
 }
 
-const POST_LOAD_TRANSFORMS: PlayerTransform[] = [
-  normalizeRequiredFields,
-  migrateLegacyEquipment,
-  normalizeSkillLevels,
-  syncAutomaticClassLevels,
-  normalizeNotes,
-  normalizeArmorDefValues,
-  migrateEquippedSlots,
-  migrateSlotIndexes,
-  restoreRuntimeEquippedFlags,
-  pruneStaleSlotRefs,
+// One-time versioned migrations.
+// Each transform brings the player up to its declared schema version.
+// Skipped if schemaVersion is already >= the transform's version.
+// Transforms must be ordered by ascending version.
+const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
+  {
+    version: 1,
+    label: "Fill in missing default fields (stats, rituals, martials, items…)",
+    fn: normalizeRequiredFields,
+  },
+  {
+    version: 2,
+    label: "Move equipment from old root-level arrays into the inventory",
+    fn: migrateLegacyEquipment,
+  },
+  {
+    version: 3,
+    label: "Rename skill field currentSL to currentLvl",
+    fn: normalizeSkillLevels,
+  },
+  {
+    version: 4,
+    label: "Convert legacy string notes to structured note objects",
+    fn: normalizeNotes,
+  },
+  {
+    version: 5,
+    label: "Fix armor and shield defense values that were saved as zero",
+    fn: normalizeArmorDefValues,
+  },
+  {
+    version: 6,
+    label: "Build equipment slot map from legacy isEquipped item flags",
+    fn: migrateEquippedSlots,
+  },
+];
+
+export const PLAYER_CURRENT_SCHEMA_VERSION =
+  POST_LOAD_TRANSFORMS[POST_LOAD_TRANSFORMS.length - 1].version;
+
+// Always-run transforms.
+// Applied on every load regardless of schemaVersion; these guard runtime
+// integrity rather than perform one-time shape changes.
+const ALWAYS_RUN_TRANSFORMS: PlayerTransform[] = [
+  syncAutomaticClassLevels, // class lvl must stay in sync with skill totals
+  migrateSlotIndexes, // new items may be saved without an index
+  restoreRuntimeEquippedFlags, // isEquipped is stripped on save, must be rehydrated
+  pruneStaleSlotRefs, // spheres may be deleted between loads
 ];
 
 /** Run all post-load transforms and return the player ready for in-memory use. */
 export function applyPostLoadTransforms(player: TypePlayer): TypePlayer {
-  return POST_LOAD_TRANSFORMS.reduce((p, fn) => fn(p), player);
+  let result = POST_LOAD_TRANSFORMS.reduce((p, t) => {
+    if (p.schemaVersion !== undefined && p.schemaVersion >= t.version) return p;
+    return { ...t.fn(p), schemaVersion: t.version };
+  }, player);
+  // Stamp version even if all migrations were already applied.
+  if ((result.schemaVersion ?? 0) < PLAYER_CURRENT_SCHEMA_VERSION) {
+    result = { ...result, schemaVersion: PLAYER_CURRENT_SCHEMA_VERSION };
+  }
+  // Always-run transforms execute after versioned migrations, every load.
+  return ALWAYS_RUN_TRANSFORMS.reduce((p, fn) => fn(p), result);
 }
 
 // Migration detection
 
+/** Returns the labels of transforms that would be applied to this player. */
+export function getPendingPlayerMigrations(player: TypePlayer): string[] {
+  const current = player.schemaVersion ?? 0;
+  return POST_LOAD_TRANSFORMS.filter((t) => t.version > current).map(
+    (t) => t.label,
+  );
+}
+
 /**
- * Returns true if the player would be changed by applyPreSaveTransforms +
- * applyPostLoadTransforms. Used by the gallery to detect actors that need a
- * migration pass.
- *
- * A player needs migration when:
- *  - equippedSlots is missing (legacy player - migrateEquippedSlots will add it)
- *  - isEquipped flags are present on inventory items (stripRuntimeEquippedFlags
- *    will remove them on the next save)
+ * Returns true if the player would be changed by applyPostLoadTransforms.
  */
 export function playerNeedsMigration(player: TypePlayer): boolean {
-  // Root-level equipment arrays need nesting into equipment[0]
-  const legacySources = [
-    "weapons",
-    "shields",
-    "armor",
-    "accessories",
-    "customWeapons",
-  ] as const;
-
-  if (
-    legacySources.some((k) =>
-      Array.isArray((player as unknown as Record<string, unknown>)[k]),
-    )
-  )
-    return true;
-
-  // Any skill still using deprecated currentSL
-
-  if (
-    player.classes?.some((cls) =>
-      cls.skills?.some(
-        (sk) =>
-          "currentSL" in sk &&
-          (sk as Record<string, unknown>).currentSL !== undefined,
-      ),
-    )
-  )
-    return true;
-
-  const inv = player.equipment?.[0];
-
-  if (!player.equippedSlots) {
-    // Only a legacy player if equipment[0] exists — new players have no equipment[0]
-    // yet and will get equippedSlots derived on first open/save normally.
-    return !!inv;
-  }
-
-  // Has equippedSlots but isEquipped flags weren't stripped before the last save.
-  if (!inv) return false;
-  return legacySources.some((k) =>
-    ((inv as unknown as Record<string, unknown[]>)[k] ?? []).some(
-      (item: unknown) =>
-        typeof item === "object" && item !== null && "isEquipped" in item,
-    ),
-  );
+  return (player.schemaVersion ?? 0) < PLAYER_CURRENT_SCHEMA_VERSION;
 }

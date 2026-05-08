@@ -32,6 +32,8 @@ import {
   MenuItem,
   CircularProgress,
   Fab,
+  Chip,
+  Box,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
@@ -62,6 +64,7 @@ import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { NPC_CURRENT_SCHEMA_VERSION } from "../../components/npc/npcTransforms";
 import { useTranslate, languageOptions } from "../../translation/translate";
 
 import ReportContentDialog from "../../components/appbar/ReportContentDialog";
@@ -702,7 +705,12 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
 
   return (
     <Grid
-      sx={{ marginBottom: 3 }}
+      sx={{
+        marginBottom: 3,
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
       size={{
         xs: 12,
         md: 12,
@@ -738,9 +746,26 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
         </IconButton>
       </Tooltip>
       <Export name={`${npc.name}`} dataType="npc" data={npc} />
-      <span style={{ fontSize: 14 }}>
-        {t("Created By:")} {npc.createdBy}
-      </span>
+      <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>
+        <span style={{ fontSize: 14 }}>
+          {t("Created By:")} {npc.createdBy}
+        </span>
+        <Tooltip
+          title={`Schema version ${npc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION}`}
+        >
+          <Chip
+            label={
+              NPC_CURRENT_SCHEMA_VERSION > 0
+                ? `v${npc.schemaVersion ?? 0}/${NPC_CURRENT_SCHEMA_VERSION}`
+                : `V${npc.schemaVersion ?? 0}`
+            }
+            size="small"
+            color="default"
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
+      </Box>
     </Grid>
   );
 }

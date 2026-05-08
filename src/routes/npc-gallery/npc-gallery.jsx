@@ -8,6 +8,7 @@ import {
 import {
   Box,
   Button,
+  Chip,
   Divider,
   IconButton,
   ListItemIcon,
@@ -69,6 +70,8 @@ import DeleteConfirmationDialog from "../../components/common/DeleteConfirmation
 import MigrationDialog from "../../components/common/MigrationDialog";
 import {
   npcNeedsMigration,
+  getPendingNpcMigrations,
+  NPC_CURRENT_SCHEMA_VERSION,
   applyNpcPreSaveTransforms,
   applyNpcPostLoadTransforms,
 } from "../../components/npc/npcTransforms";
@@ -1335,6 +1338,7 @@ function Personal() {
         actors={staleNpcs}
         actorType="npc"
         onMigrateAll={handleMigrateAllNpcs}
+        getMigrations={getPendingNpcMigrations}
       />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
@@ -1559,6 +1563,17 @@ function Npc({
         </IconButton>
       </Tooltip>
       <Export name={`${npc.name}`} dataType="npc" data={npc} />
+      <Tooltip
+        title={`Schema version ${npc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION} (${npcNeedsMigration(npc) ? "migration needed" : "up to date"})`}
+      >
+        <Chip
+          label={`v${npc.schemaVersion ?? 0}`}
+          size="small"
+          color={npcNeedsMigration(npc) ? "warning" : "default"}
+          variant="outlined"
+          sx={{ fontSize: "0.85rem" }}
+        />
+      </Tooltip>
     </Grid>
   );
 }

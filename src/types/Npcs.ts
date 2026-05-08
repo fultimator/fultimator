@@ -134,4 +134,5 @@ export interface TypeNpc {
   label?: string;
   notes?: NpcNotes[];
   tags?: NpcTags[];
+  schemaVersion?: number;
 }

@@ -424,6 +424,7 @@ export interface TypePlayer {
   equippedSlots?: EquippedSlots;
   vehicleSlots?: VehicleSlots;
   settings?: PlayerSettings;
+  schemaVersion?: number;
 }
 
 export type EquipmentSource =

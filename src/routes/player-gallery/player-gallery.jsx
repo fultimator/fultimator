@@ -5,6 +5,8 @@ import DeleteConfirmationDialog from "../../components/common/DeleteConfirmation
 import MigrationDialog from "../../components/common/MigrationDialog";
 import {
   playerNeedsMigration,
+  getPendingPlayerMigrations,
+  PLAYER_CURRENT_SCHEMA_VERSION,
   applyPreSaveTransforms,
   applyPostLoadTransforms,
 } from "../../components/player/playerTransforms";
@@ -12,6 +14,7 @@ import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router";
 
 import {
+  Chip,
   Divider,
   IconButton,
   ListItemIcon,
@@ -1377,6 +1380,7 @@ function Personal() {
         actors={stalePlayers}
         actorType="player"
         onMigrateAll={handleMigrateAllPlayers}
+        getMigrations={getPendingPlayerMigrations}
       />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
@@ -1791,6 +1795,17 @@ function PlayerGalleryCardActions({
         </Tooltip>
         <Export name={`${player.name}`} dataType="pc" data={player} />
         <Box sx={{ ml: "auto" }} />
+        <Tooltip
+          title={`Schema version ${player.schemaVersion ?? 0} of ${PLAYER_CURRENT_SCHEMA_VERSION} (${playerNeedsMigration(player) ? "migration needed" : "up to date"})`}
+        >
+          <Chip
+            label={`v${player.schemaVersion ?? 0}`}
+            size="small"
+            color={playerNeedsMigration(player) ? "warning" : "default"}
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
         <Tooltip title={expanded ? t("Collapse Details") : t("Expand Details")}>
           <IconButton onClick={() => setExpanded((prev) => !prev)}>
             {expanded ? <ExpandLess /> : <ExpandMore />}

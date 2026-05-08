@@ -256,9 +256,7 @@ export default function PlayerEdit() {
 
   const playerBaseline = useMemo(() => {
     if (!player) return null;
-    return applyPreSaveTransforms(
-      applyPostLoadTransforms(JSON.parse(JSON.stringify(player))),
-    );
+    return applyPreSaveTransforms(JSON.parse(JSON.stringify(player)));
   }, [player]);
 
   useEffect(() => {

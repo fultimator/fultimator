@@ -1,9 +1,14 @@
 import { TypeNpc } from "../../types/Npcs";
-// Types
-// Pre-save transforms
+
 type NpcTransform = (npc: TypeNpc) => TypeNpc;
-// Post-load transforms
-// Migration detection
+
+interface VersionedTransform {
+  version: number;
+  label: string;
+  fn: NpcTransform;
+}
+
+// Pre-save transforms
 const PRE_SAVE_TRANSFORMS: NpcTransform[] = [
   // No transforms yet - placeholder for future cleanup passes.
 ];
@@ -13,24 +18,40 @@ export function applyNpcPreSaveTransforms(npc: TypeNpc): TypeNpc {
 }
 
 // Post-load transforms
-const POST_LOAD_TRANSFORMS: NpcTransform[] = [
-  // No transforms yet - placeholder for future schema migrations.
+// Each versioned transform brings the NPC up to its declared schema version.
+// Add new transforms here as the schema evolves; order by ascending version.
+
+const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
+  // No migrations yet - placeholder for future schema migrations.
 ];
 
+export const NPC_CURRENT_SCHEMA_VERSION =
+  POST_LOAD_TRANSFORMS.length > 0
+    ? POST_LOAD_TRANSFORMS[POST_LOAD_TRANSFORMS.length - 1].version
+    : 0;
+
 export function applyNpcPostLoadTransforms(npc: TypeNpc): TypeNpc {
-  return POST_LOAD_TRANSFORMS.reduce((n, fn) => fn(n), npc);
+  let result = POST_LOAD_TRANSFORMS.reduce((n, t) => {
+    if (n.schemaVersion !== undefined && n.schemaVersion >= t.version) return n;
+    return { ...t.fn(n), schemaVersion: t.version };
+  }, npc);
+  if ((result.schemaVersion ?? 0) < NPC_CURRENT_SCHEMA_VERSION) {
+    result = { ...result, schemaVersion: NPC_CURRENT_SCHEMA_VERSION };
+  }
+  return result;
 }
 
 // Migration detection
-/**
- * Returns true if the NPC would be changed by applyNpcPostLoadTransforms.
- * Used by the gallery to detect actors that need a migration pass.
- */
+
+/** Returns the labels of transforms that would be applied to this NPC. */
+export function getPendingNpcMigrations(npc: TypeNpc): string[] {
+  const current = npc.schemaVersion ?? 0;
+  return POST_LOAD_TRANSFORMS.filter((t) => t.version > current).map(
+    (t) => t.label,
+  );
+}
+
+/** Returns true if the NPC would be changed by applyNpcPostLoadTransforms. */
 export function npcNeedsMigration(npc: TypeNpc): boolean {
-  // No migrations exist yet for NPCs - always false until a POST_LOAD_TRANSFORMS
-  // entry is added that actually changes the shape.
-  if (POST_LOAD_TRANSFORMS.length === 0) return false;
-  const transformed = applyNpcPostLoadTransforms(npc);
-  // Shallow structural check: if any top-level key differs, migration is needed.
-  return JSON.stringify(transformed) !== JSON.stringify(npc);
+  return (npc.schemaVersion ?? 0) < NPC_CURRENT_SCHEMA_VERSION;
 }
