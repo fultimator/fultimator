@@ -29,7 +29,53 @@ export type RollMessage = {
   roll: RollData;
 };
 
-export type ChatMessage = TextMessage | RollMessage | CheckMessage;
+export type ActionMessage = {
+  id: string;
+  createdAt: number;
+  speaker?: string;
+  kind: "action";
+  action: string; // e.g. "guard", "spell"
+  weapon?: string; // display name, only present for "attack"
+};
+
+export type AccuracyCheckIntent = {
+  id: string;
+  primary: Attribute;
+  secondary: Attribute;
+  modifiers: CheckModifier[]; // accuracy modifiers (prec bonus, etc.)
+  critThreshold: number;
+  weaponName: string;
+  baseDamage: number;
+  damageType: string;
+};
+
+export type AccuracyCheckResult = {
+  intent: AccuracyCheckIntent;
+  speaker?: string;
+  primary: CheckDieResult;
+  secondary: CheckDieResult;
+  highRoll: number;
+  modifierTotal: number; // sum of accuracy modifiers
+  accuracyTotal: number; // HR + LR + modifierTotal
+  damage: number; // HR + baseDamage
+  critical: boolean;
+  fumble: boolean;
+};
+
+export type AccuracyCheckMessage = {
+  id: string;
+  createdAt: number;
+  speaker?: string;
+  kind: "accuracy";
+  check: AccuracyCheckResult;
+};
+
+export type ChatMessage =
+  | TextMessage
+  | RollMessage
+  | CheckMessage
+  | ActionMessage
+  | AccuracyCheckMessage;
 
 export type Attribute = "dex" | "ins" | "mig" | "wlp";
 

@@ -5,7 +5,13 @@ import {
   processCheck,
   buildCheckMessage,
 } from "./checks";
-import { resolveAttributeDie } from "./speakers";
+import {
+  prepareAccuracyCheck,
+  rollAccuracyCheck,
+  processAccuracyCheck,
+  buildAccuracyCheckMessage,
+} from "./accuracy-checks";
+import { resolveAttributeDie, resolveAttackOptions } from "./speakers";
 import type { Attribute, ChatMessage, DieSides } from "../types";
 
 export type CommandContext = {
@@ -165,7 +171,86 @@ const checkCommand: Command = {
   },
 };
 
-const COMMANDS: Command[] = [rollCommand, checkCommand];
+export const ACTION_OPTIONS = [
+  "Attack",
+  "Equipment",
+  "Guard",
+  "Hinder",
+  "Inventory",
+  "Objective",
+  "Spell",
+  "Study",
+  "Skill",
+  "Other",
+] as const;
+
+export type ActionOption = (typeof ACTION_OPTIONS)[number];
+
+const actionCommand: Command = {
+  name: "action",
+  aliases: ["a"],
+  description: "Declare a combat action",
+  params: [
+    {
+      name: "action",
+      description: "attack, guard, spell, …",
+      required: true,
+    },
+  ],
+  execute(args, context) {
+    const action = args.trim();
+    if (!action) {
+      return { error: "Usage: /action <action>  e.g. /action attack" };
+    }
+
+    const spaceIdx = action.indexOf(" ");
+    const subAction = spaceIdx === -1 ? action : action.slice(0, spaceIdx);
+    const rawArg = spaceIdx === -1 ? "" : action.slice(spaceIdx + 1).trim();
+    const weaponArg =
+      rawArg.startsWith('"') && rawArg.endsWith('"')
+        ? rawArg.slice(1, -1)
+        : rawArg || undefined;
+
+    if (subAction.toLowerCase() === "attack" && weaponArg) {
+      const options = resolveAttackOptions(context.playerDoc);
+      const weapon = options.find((o) => o.name === weaponArg);
+      if (!weapon) {
+        return { error: `Unknown weapon "${weaponArg}".` };
+      }
+      const primary = weapon.attr1 ?? "dex";
+      const secondary = weapon.attr2 ?? "ins";
+      const dieSizes = {
+        primary: resolveAttributeDie(context.playerDoc, primary as Attribute),
+        secondary: resolveAttributeDie(
+          context.playerDoc,
+          secondary as Attribute,
+        ),
+      };
+      const intent = prepareAccuracyCheck(weapon);
+      const rolls = rollAccuracyCheck(dieSizes);
+      const result = processAccuracyCheck(
+        intent,
+        rolls,
+        dieSizes,
+        context.speaker,
+      );
+      return [buildAccuracyCheckMessage(result)];
+    }
+
+    return [
+      {
+        id: crypto.randomUUID(),
+        createdAt: Date.now(),
+        speaker: context.speaker,
+        kind: "action",
+        action: subAction.toLowerCase(),
+        ...(weaponArg ? { weapon: weaponArg } : {}),
+      } as import("../types").ChatMessage,
+    ];
+  },
+};
+
+const COMMANDS: Command[] = [rollCommand, checkCommand, actionCommand];
 
 const BY_NAME = new Map<string, Command>(
   COMMANDS.flatMap((cmd) =>

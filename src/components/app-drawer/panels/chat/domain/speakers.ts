@@ -5,6 +5,215 @@ import { useCombatEncounterStore } from "../../../../../stores/combatEncounterSt
 import { DEFAULT_SPEAKER } from "../constants";
 import type { Attribute } from "../types";
 
+export type AttackOption = {
+  arg: string; // quoted-if-needed string to pass as command arg
+  name: string; // display label
+  slot?: "(Main)" | "(Off)";
+  attr1?: Attribute;
+  attr2?: Attribute;
+  baseDamage?: number; // weapon base damage added to HR
+  accuracyBonus?: number; // flat accuracy modifier (weapon prec field)
+  damageType?: string;
+};
+
+function quoteArg(name: string): string {
+  return name.includes(" ") ? `"${name}"` : name;
+}
+
+// Normalizes both long-form (Equipment.Weapon: "dexterity") and short-form ("dex") to Attribute
+const LONG_TO_ATTR: Record<string, Attribute> = {
+  might: "mig",
+  mig: "mig",
+  dexterity: "dex",
+  dex: "dex",
+  insight: "ins",
+  ins: "ins",
+  will: "wlp",
+  willpower: "wlp",
+  wlp: "wlp",
+};
+
+function toAttr(raw: unknown): Attribute | undefined {
+  if (typeof raw !== "string") return undefined;
+  return LONG_TO_ATTR[raw.toLowerCase()] ?? undefined;
+}
+
+function extractPcWeaponStats(
+  item: Record<string, unknown> | undefined,
+  source: string,
+): Pick<
+  AttackOption,
+  "attr1" | "attr2" | "baseDamage" | "accuracyBonus" | "damageType"
+> {
+  if (!item) return {};
+  if (source === "customWeapons") {
+    const ac = item.accuracyCheck as Record<string, unknown> | undefined;
+    return {
+      attr1: toAttr(ac?.att1),
+      attr2: toAttr(ac?.att2),
+      baseDamage:
+        typeof item.damageModifier === "number"
+          ? item.damageModifier
+          : undefined,
+      accuracyBonus:
+        typeof item.precModifier === "number" ? item.precModifier : undefined,
+      damageType:
+        item.overrideDamageType && typeof item.customDamageType === "string"
+          ? item.customDamageType
+          : typeof item.type === "string"
+            ? item.type
+            : undefined,
+    };
+  }
+  // standard Weapons: may use att1/att2 (compendium) or attr1/attr2 (player type)
+  // damage stored as .damage (compendium) or .dmg (player type)
+  const baseDamage =
+    typeof item.damage === "number"
+      ? item.damage
+      : typeof item.dmg === "number"
+        ? item.dmg
+        : undefined;
+  return {
+    attr1: toAttr(item.att1 ?? item.attr1),
+    attr2: toAttr(item.att2 ?? item.attr2),
+    baseDamage,
+    accuracyBonus:
+      typeof item.prec === "number" && item.prec !== 0 ? item.prec : undefined,
+  };
+}
+
+export function resolveAttackOptions(
+  doc: Record<string, unknown> | null,
+): AttackOption[] {
+  if (!doc) return [];
+
+  // NPC: has attacks / weaponattacks arrays
+  const attacks = doc.attacks;
+  const weaponattacks = doc.weaponattacks;
+  if (Array.isArray(attacks) || Array.isArray(weaponattacks)) {
+    const results: AttackOption[] = [];
+    if (Array.isArray(attacks)) {
+      for (const a of attacks) {
+        if (a && typeof a.name === "string" && a.name)
+          results.push({
+            arg: quoteArg(a.name),
+            name: a.name,
+            attr1: toAttr(a.attr1),
+            attr2: toAttr(a.attr2),
+            damageType: typeof a.type === "string" ? a.type : undefined,
+          });
+      }
+    }
+    if (Array.isArray(weaponattacks)) {
+      for (const wa of weaponattacks) {
+        const name =
+          wa && typeof wa.name === "string" && wa.name
+            ? wa.name
+            : wa?.weapon?.name;
+        if (typeof name === "string" && name) {
+          const w = wa?.weapon;
+          results.push({
+            arg: quoteArg(name),
+            name,
+            attr1: toAttr(w?.att1),
+            attr2: toAttr(w?.att2),
+            baseDamage: typeof w?.damage === "number" ? w.damage : undefined,
+            accuracyBonus:
+              typeof w?.prec === "number" && w.prec !== 0 ? w.prec : undefined,
+            damageType: typeof w?.type === "string" ? w.type : undefined,
+          });
+        }
+      }
+    }
+    return results;
+  }
+
+  // PC: read equippedSlots + equipment
+  const equippedSlots =
+    doc.equippedSlots && typeof doc.equippedSlots === "object"
+      ? (doc.equippedSlots as Record<string, unknown>)
+      : null;
+  const equipment =
+    Array.isArray(doc.equipment) && doc.equipment.length > 0
+      ? (doc.equipment[0] as Record<string, unknown>)
+      : null;
+
+  if (!equippedSlots || !equipment) return [];
+
+  const results: AttackOption[] = [];
+  const seen = new Set<string>();
+
+  const resolveSlotItem = (
+    slotKey: "mainHand" | "offHand",
+    label: "(Main)" | "(Off)",
+  ) => {
+    const slotRef = equippedSlots[slotKey];
+    if (!slotRef || typeof slotRef !== "object") return;
+    const ref = slotRef as Record<string, unknown>;
+    const source = ref.source as string | undefined;
+    const itemName = ref.name as string | undefined;
+    if (!source || !itemName) return;
+
+    const collection = equipment[source];
+    if (!Array.isArray(collection)) return;
+
+    // Prefer index lookup; fall back to name match
+    const idx = typeof ref.index === "number" ? ref.index : -1;
+    const item: Record<string, unknown> | undefined =
+      idx >= 0 && idx < collection.length
+        ? collection[idx]
+        : collection.find(
+            (i: unknown) =>
+              i &&
+              typeof i === "object" &&
+              (i as Record<string, unknown>).name === itemName,
+          );
+
+    const name = (item?.name as string | undefined) ?? itemName;
+    const key = `${slotKey}:${name}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      results.push({
+        arg: quoteArg(name),
+        name,
+        slot: label,
+        ...extractPcWeaponStats(item, source),
+      });
+    }
+  };
+
+  resolveSlotItem("mainHand", "(Main)");
+  resolveSlotItem("offHand", "(Off)");
+
+  // Fallback: if no equippedSlots data, list all weapons/customWeapons
+  if (results.length === 0) {
+    const weapons = Array.isArray(equipment.weapons) ? equipment.weapons : [];
+    const customWeapons = Array.isArray(equipment.customWeapons)
+      ? equipment.customWeapons
+      : [];
+    for (const w of weapons) {
+      if (w && typeof w.name === "string" && w.name) {
+        results.push({
+          arg: quoteArg(w.name),
+          name: w.name,
+          ...extractPcWeaponStats(w, "weapons"),
+        });
+      }
+    }
+    for (const w of customWeapons) {
+      if (w && typeof w.name === "string" && w.name) {
+        results.push({
+          arg: quoteArg(w.name),
+          name: w.name,
+          ...extractPcWeaponStats(w, "customWeapons"),
+        });
+      }
+    }
+  }
+
+  return results;
+}
+
 const ATTRIBUTE_KEY: Record<Attribute, string> = {
   mig: "might",
   ins: "insight",

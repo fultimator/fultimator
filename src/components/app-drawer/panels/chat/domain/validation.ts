@@ -26,5 +26,12 @@ export const isValidChatMessage = (item: unknown): item is ChatMessage => {
     );
   }
 
+  if (message.kind === "action") return typeof message.action === "string";
+
+  if (message.kind === "accuracy") {
+    const check = message.check as Record<string, unknown> | undefined;
+    return !!check && typeof check.accuracyTotal === "number";
+  }
+
   return false;
 };

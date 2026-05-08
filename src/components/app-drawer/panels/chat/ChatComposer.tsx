@@ -24,8 +24,12 @@ import {
   Send as SendIcon,
 } from "@mui/icons-material";
 import { DICE_OPTIONS } from "./constants";
-import { getActiveCommand, matchCommands } from "./domain/commands";
-import { resolveAttributeDie } from "./domain/speakers";
+import {
+  getActiveCommand,
+  matchCommands,
+  ACTION_OPTIONS,
+} from "./domain/commands";
+import { resolveAttributeDie, resolveAttackOptions } from "./domain/speakers";
 import type { Command } from "./domain/commands";
 import type { Attribute } from "./types";
 import { DIFFICULTY_PRESETS } from "./types";
@@ -91,6 +95,38 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
         })()
       : null;
 
+  const showActionPicker =
+    activeCommand?.name === "action" &&
+    !input.slice(input.indexOf(" ") + 1).trim();
+
+  const applyAction = (action: string) => {
+    const next = `/action ${action.toLowerCase()}`;
+    // Attack needs a second argument (weapon), so stay in composer
+    if (action.toLowerCase() === "attack") {
+      handleInputChange(next + " ");
+      requestAnimationFrame(() => textareaRef.current?.focus());
+      return;
+    }
+    sendAndRecord(next);
+  };
+
+  // Show weapon/attack picker when "/action attack " is typed (space present, awaiting weapon)
+  const actionArgs =
+    activeCommand?.name === "action"
+      ? input.slice(input.indexOf(" ") + 1).trimStart()
+      : "";
+  const showWeaponPicker =
+    activeCommand?.name === "action" &&
+    actionArgs.toLowerCase().startsWith("attack") &&
+    actionArgs.slice("attack".length).startsWith(" ") &&
+    !actionArgs.slice("attack".length).trim();
+
+  const attackOptions = showWeaponPicker ? resolveAttackOptions(playerDoc) : [];
+
+  const applyWeapon = (arg: string) => {
+    sendAndRecord(`/action attack ${arg}`);
+  };
+
   const applyCheckAttribute = (attr: Attribute) => {
     const next = input.trimEnd() + " " + attr;
     handleInputChange(next);
@@ -108,9 +144,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     const parts = input.trimEnd().split(/\s+/);
     const base = parts.slice(0, 4).join(" ");
     const next = dl != null ? `${base} ${dl}` : base;
-    store.send(next);
-    setInput("");
-    dismissPopup();
+    sendAndRecord(next);
   };
 
   const updatePopupState = (value: string) => {
@@ -180,6 +214,17 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
       el?.focus();
       el?.setSelectionRange(pos, pos);
     });
+  };
+
+  const sendAndRecord = (value: string) => {
+    store.send(value);
+    if (!store.commandError) {
+      const entry = value.trim();
+      if (entry) setHistory((prev) => [entry, ...prev].slice(0, 50));
+      setHistoryIndex(null);
+      setInput("");
+      dismissPopup();
+    }
   };
 
   const handleSend = () => {
@@ -473,6 +518,85 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                       }
                       slotProps={{ secondary: { variant: "caption" } }}
                     />
+                  </ListItem>
+                )}
+                {showActionPicker && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: 0.5,
+                        width: "100%",
+                      }}
+                    >
+                      {ACTION_OPTIONS.map((action) => (
+                        <Button
+                          key={action}
+                          size="small"
+                          variant="outlined"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => applyAction(action)}
+                          sx={{
+                            fontFamily: "monospace",
+                            fontSize: "0.7rem",
+                            py: 0.25,
+                            textTransform: "none",
+                          }}
+                        >
+                          {action}
+                        </Button>
+                      ))}
+                    </Box>
+                  </ListItem>
+                )}
+                {showWeaponPicker && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                        width: "100%",
+                      }}
+                    >
+                      {attackOptions.length === 0 ? (
+                        <Typography variant="caption" color="text.secondary">
+                          No weapons equipped
+                        </Typography>
+                      ) : (
+                        attackOptions.map((opt) => (
+                          <Button
+                            key={opt.arg}
+                            size="small"
+                            variant="outlined"
+                            fullWidth
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => applyWeapon(opt.arg)}
+                            sx={{
+                              justifyContent: "space-between",
+                              fontFamily: "monospace",
+                              fontSize: "0.75rem",
+                              py: 0.25,
+                              px: 1,
+                              textTransform: "none",
+                            }}
+                          >
+                            <span>{opt.name}</span>
+                            {opt.slot && (
+                              <Typography
+                                component="span"
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ fontFamily: "monospace" }}
+                              >
+                                {opt.slot}
+                              </Typography>
+                            )}
+                          </Button>
+                        ))
+                      )}
+                    </Box>
                   </ListItem>
                 )}
                 {(checkParamIndex === 0 || checkParamIndex === 1) && (
