@@ -829,6 +829,7 @@ export function createThemeComponents({
     styleCustomization?.textEffectColor !== undefined;
   const shouldApplyTextEffectColor =
     enableTextEffects && hasCustomTextEffectColor;
+  const defaultDialogTitleTextColor = isDark ? "#f4faff" : "#0f1e3d";
 
   const buttonUppercase =
     styleCustomization?.buttonUppercase ??
@@ -1385,11 +1386,13 @@ export function createThemeComponents({
                 : profile === "regalia" && allowProfileSurfaceColorStyling
                   ? `linear-gradient(${getGradientDirection(styleCustomization)}deg, ${alpha(secondary, 0.9)} 0%, ${alpha(primary, 0.95)} 100%)`
                   : `linear-gradient(${getGradientDirection(styleCustomization)}deg, ${alpha(secondary, 0.9)} 0%, ${alpha(primary, 0.92)} 100%)`,
-          color: shouldApplyTextEffectColor
-            ? profile === "dystopian" && !isDark
-              ? "#0f1e3d"
-              : "#f4faff"
-            : "#f4faff",
+          "&&": {
+            color: shouldApplyTextEffectColor
+              ? !isDark
+                ? defaultDialogTitleTextColor
+                : "#f4faff"
+              : defaultDialogTitleTextColor,
+          },
           borderBottom: `1px solid ${alpha(quaternary, isDark ? 0.8 : 0.5)}`,
         },
       },
