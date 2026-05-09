@@ -42,7 +42,12 @@ export interface NpcWeaponAttack {
 
 export interface NpcSpell {
   effect?: string;
+  /** @deprecated use targetDescription */
   target?: string;
+  /** @deprecated use targetDescription */
+  targetDesc?: string;
+  targetDescription?: string;
+  description?: string;
   duration?: string;
   name: string;
   range: string;
@@ -50,7 +55,11 @@ export interface NpcSpell {
   damagetype: string;
   attr1: string;
   attr2: string;
+  /** @deprecated use mpCostTarget; kept for archival */
   mp?: string;
+  mpCostTarget?: number;
+  damage?: number;
+  maxTargets?: number;
   special: string[];
 }
 

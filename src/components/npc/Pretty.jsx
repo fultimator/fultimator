@@ -1013,8 +1013,8 @@ function Spells({ npc }) {
                       <Diamond />
                     </>
                   )}{" "}
-                  {spell.mp} MP <Diamond /> {spell.target} <Diamond />{" "}
-                  {spell.duration}
+                  {spell.mpCostTarget} MP <Diamond /> {spell.targetDescription}{" "}
+                  <Diamond /> {spell.duration}
                 </strong>
                 <br />
                 <Typography component="span" key={i}>

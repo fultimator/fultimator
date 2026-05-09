@@ -83,6 +83,36 @@ function defaultImmunities(npc: TypeNpc): TypeNpc {
   };
 }
 
+function normalizeSpellFields(npc: TypeNpc): TypeNpc {
+  if (!npc.spells?.length) return npc;
+  return {
+    ...npc,
+    spells: npc.spells.map((spell) => {
+      const s = { ...spell };
+
+      // target + targetDesc -> targetDescription
+      if (s.targetDescription === undefined) {
+        s.targetDescription =
+          (s as unknown as Record<string, string>).targetDesc ?? s.target ?? "";
+      }
+      delete (s as unknown as Record<string, unknown>).target;
+      delete (s as unknown as Record<string, unknown>).targetDesc;
+
+      // mp string -> mpCostTarget number; keep mp as archive
+      if (s.mpCostTarget === undefined && s.mp !== undefined) {
+        const match = String(s.mp).match(/\d+/);
+        s.mpCostTarget = match ? parseInt(match[0], 10) : 0;
+      }
+
+      if (s.damage === undefined) s.damage = 0;
+      if (s.maxTargets === undefined) s.maxTargets = 0;
+      if (s.description === undefined) s.description = "";
+
+      return s;
+    }),
+  };
+}
+
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 1,
@@ -109,6 +139,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     version: 5,
     label: "Default missing immunities keys to false",
     fn: defaultImmunities,
+  },
+  {
+    version: 6,
+    label:
+      "Normalize spell fields: targetDescription, mpCostTarget, damage, maxTargets, description",
+    fn: normalizeSpellFields,
   },
 ];
 

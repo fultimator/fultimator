@@ -179,7 +179,7 @@ export default function EditSpells({ npc, setNpc }) {
 function EditSpell({ spell, setSpell, removeSpell, i }) {
   const { t } = useTranslate();
   const [inputDuration, setInputDuration] = useState(spell.duration || "");
-  const [inputTarget, setInputTarget] = useState(spell.target || "");
+  const [inputTarget, setInputTarget] = useState(spell.targetDescription || "");
 
   const duration = [t("Scene"), t("Instantaneous"), t("Special")];
 
@@ -212,7 +212,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
 
   const handleTargetChange = (event, newValue) => {
     setInputTarget(newValue);
-    handleChange("target", newValue);
+    handleChange("targetDescription", newValue);
   };
 
   return (
@@ -278,12 +278,13 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           fullWidth
           placeholder="10"
           value={
-            spell.mp === null || spell.mp === undefined
+            spell.mpCostTarget === null || spell.mpCostTarget === undefined
               ? ""
-              : spell.mp.toString()
+              : spell.mpCostTarget.toString()
           }
           onChange={(e) => {
-            return setSpell("mp", e.target.value);
+            const val = parseInt(e.target.value, 10);
+            return setSpell("mpCostTarget", isNaN(val) ? 0 : val);
           }}
           size="small"
         />
@@ -349,7 +350,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           <Autocomplete
             id="target-autocomplete"
             options={target}
-            value={inputTarget}
+            value={inputTarget ?? spell.targetDescription ?? ""}
             onChange={handleTargetChange}
             onInputChange={handleTargetChange}
             size="small"
