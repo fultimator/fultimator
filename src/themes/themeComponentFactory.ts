@@ -829,7 +829,8 @@ export function createThemeComponents({
     styleCustomization?.textEffectColor !== undefined;
   const shouldApplyTextEffectColor =
     enableTextEffects && hasCustomTextEffectColor;
-  const defaultDialogTitleTextColor = isDark ? "#f4faff" : "#0f1e3d";
+  const defaultDialogTitleTextColor =
+    isDark || profile !== "noir" ? "#f4faff" : "#0f1e3d";
 
   const buttonUppercase =
     styleCustomization?.buttonUppercase ??

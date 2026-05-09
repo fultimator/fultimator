@@ -6,6 +6,7 @@ import {
   ThemeProvider,
   Icon,
   Tooltip,
+  Box,
 } from "@mui/material";
 import { Edit, VisibilityOff, SettingsSuggest } from "@mui/icons-material";
 import attributes from "../../../libs/attributes";
@@ -127,16 +128,17 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
           </Grid>
         </Grid>
         {isEditMode && (
-          <Grid
-            style={{
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
               display: "flex",
               alignItems: "center",
+              justifyContent: "flex-end",
               flexShrink: 0,
+              ml: 1,
             }}
-            size="grow"
-          >
-            <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
-          </Grid>
+          />
         )}
       </div>
       {/* Row 2 */}
@@ -231,9 +233,15 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
           </Grid>
         </Grid>
         {isEditMode && (
-          <Grid
-            style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            size="grow"
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              flexShrink: 0,
+              minWidth: 40,
+              ml: 1,
+            }}
           >
             {!gamble.showInPlayerSheet && (
               <Tooltip title={t("Spell not shown in player sheet")}>
@@ -245,7 +253,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             <IconButton size="small" onClick={onEdit}>
               <Edit style={{ color: iconColor }} />
             </IconButton>
-          </Grid>
+          </Box>
         )}
       </div>
       {/* Row 3 */}
@@ -262,6 +270,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
           <Grid
             container
             key={index}
+            size={12}
             sx={{
               background: theme.ternary,
               borderTop: `1px solid white`,
@@ -299,40 +308,79 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             {/* Secondary Effects */}
             {target.secondRoll && target.secondEffects?.length > 0 && (
               <>
-                <Grid size={2}>{/* Leave to fill space */}</Grid>
-                <Grid size={10}>
-                  <Grid container>
-                    {target.secondEffects.map((effect, i) => (
-                      <React.Fragment key={i}>
-                        <Grid size={1}>
-                          <Typography
-                            style={{ flexGrow: 1, marginRight: "5px" }}
-                            sx={{
-                              fontSize: { xs: "0.8rem", sm: "1rem" },
-                              fontWeight: "bold",
-                            }}
-                          >
-                            {effect.dieValue}
-                            {"."}
-                          </Typography>
-                        </Grid>
-                        <Grid size={3}>
-                          <Typography
-                            style={{ flexGrow: 1, marginRight: "5px" }}
-                            sx={{
-                              fontSize: { xs: "0.8rem", sm: "1rem" },
-                            }}
-                          >
-                            <ReactMarkdown components={components}>
-                              {effect.effect}
-                            </ReactMarkdown>
-                          </Typography>
-                        </Grid>
-                        {(i + 1) % 3 === 0 && <Grid size={12} />}
-                      </React.Fragment>
-                    ))}
-                  </Grid>
-                </Grid>
+                {target.secondEffects.length >= 4 ? (
+                  <>
+                    <Grid size={2}>
+                      {/* Indent under primary effect text */}
+                    </Grid>
+                    <Grid size={10}>
+                      <Grid container>
+                        {target.secondEffects.map((effect, i) => (
+                          <Grid key={i} size={6}>
+                            <Grid container>
+                              <Grid size={3}>
+                                <Typography
+                                  style={{ flexGrow: 1, marginRight: "5px" }}
+                                  sx={{
+                                    fontSize: { xs: "0.8rem", sm: "1rem" },
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {effect.dieValue}
+                                  {"."}
+                                </Typography>
+                              </Grid>
+                              <Grid size={9}>
+                                <Typography
+                                  style={{ flexGrow: 1, marginRight: "5px" }}
+                                  sx={{
+                                    fontSize: { xs: "0.8rem", sm: "1rem" },
+                                  }}
+                                >
+                                  <ReactMarkdown components={components}>
+                                    {effect.effect}
+                                  </ReactMarkdown>
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Grid>
+                  </>
+                ) : (
+                  target.secondEffects.map((effect, i) => (
+                    <React.Fragment key={i}>
+                      <Grid size={2}>
+                        {/* Indent under primary effect text */}
+                      </Grid>
+                      <Grid size={2}>
+                        <Typography
+                          style={{ flexGrow: 1, marginRight: "5px" }}
+                          sx={{
+                            fontSize: { xs: "0.8rem", sm: "1rem" },
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {effect.dieValue}
+                          {"."}
+                        </Typography>
+                      </Grid>
+                      <Grid size={8}>
+                        <Typography
+                          style={{ flexGrow: 1, marginRight: "5px" }}
+                          sx={{
+                            fontSize: { xs: "0.8rem", sm: "1rem" },
+                          }}
+                        >
+                          <ReactMarkdown components={components}>
+                            {effect.effect}
+                          </ReactMarkdown>
+                        </Typography>
+                      </Grid>
+                    </React.Fragment>
+                  ))
+                )}
               </>
             )}
           </Grid>

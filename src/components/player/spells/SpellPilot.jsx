@@ -688,45 +688,16 @@ function ThemedSpellPilot({
                                   >
                                     {isEditMode && (
                                       <>
-                                        <Button
-                                          variant={
-                                            module.equipped
-                                              ? "contained"
-                                              : "outlined"
-                                          }
-                                          color={
-                                            module.equipped
-                                              ? "success"
-                                              : "primary"
-                                          }
-                                          size="small"
-                                          disabled={
-                                            !module.equipped &&
-                                            !canEquipModule(
-                                              vehicle,
-                                              module.originalIndex,
-                                            )
-                                          }
-                                          onClick={() =>
-                                            onModuleChange &&
-                                            onModuleChange(
-                                              i,
-                                              module.originalIndex,
-                                              "equipped",
-                                              !module.equipped,
-                                            )
-                                          }
-                                          sx={{ minWidth: 60 }}
-                                        >
-                                          {module.equipped
-                                            ? "Equipped"
-                                            : "Equip"}
-                                        </Button>
                                         {/* Hand toggle for equipped weapons */}
                                         {module.equipped &&
                                           module.type ===
                                             "pilot_module_weapon" && (
-                                            <div style={{ marginLeft: 8 }}>
+                                            <div
+                                              style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                              }}
+                                            >
                                               {module.isShield ? (
                                                 // Shields can now be M or O to support Dual Shieldbearer
                                                 <ToggleButtonGroup
@@ -788,8 +759,9 @@ function ThemedSpellPilot({
                                                   size="small"
                                                   disabled
                                                   sx={{
-                                                    minWidth: 40,
+                                                    minWidth: 60,
                                                     fontSize: "0.75rem",
+                                                    px: 1,
                                                   }}
                                                 >
                                                   M+O
@@ -848,6 +820,40 @@ function ThemedSpellPilot({
                                               )}
                                             </div>
                                           )}
+                                        <Button
+                                          variant={
+                                            module.equipped
+                                              ? "contained"
+                                              : "outlined"
+                                          }
+                                          color={
+                                            module.equipped
+                                              ? "success"
+                                              : "primary"
+                                          }
+                                          size="small"
+                                          disabled={
+                                            !module.equipped &&
+                                            !canEquipModule(
+                                              vehicle,
+                                              module.originalIndex,
+                                            )
+                                          }
+                                          onClick={() =>
+                                            onModuleChange &&
+                                            onModuleChange(
+                                              i,
+                                              module.originalIndex,
+                                              "equipped",
+                                              !module.equipped,
+                                            )
+                                          }
+                                          sx={{ minWidth: 60 }}
+                                        >
+                                          {module.equipped
+                                            ? "Equipped"
+                                            : "Equip"}
+                                        </Button>
                                       </>
                                     )}
                                     {!isEditMode && (

@@ -6,6 +6,7 @@ import {
   ThemeProvider,
   Icon,
   Tooltip,
+  Box,
 } from "@mui/material";
 import { Edit, VisibilityOff, SettingsSuggest } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
@@ -114,16 +115,17 @@ function ThemedSpellDefault({
             </Grid>
           </Grid>
           {isEditMode && (
-            <Grid
-              style={{
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "flex-end",
                 flexShrink: 0,
+                ml: 1,
               }}
-              size="grow"
-            >
-              <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
-            </Grid>
+            />
           )}
         </div>
       )}
@@ -220,9 +222,15 @@ function ThemedSpellDefault({
           </Grid>
         </Grid>
         {isEditMode && (
-          <Grid
-            style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            size="grow"
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              flexShrink: 0,
+              minWidth: 40,
+              ml: 1,
+            }}
           >
             {!showInPlayerSheet && (
               <Tooltip title={t("Spell not shown in player sheet")}>
@@ -234,7 +242,7 @@ function ThemedSpellDefault({
             <IconButton size="small" onClick={onEdit}>
               <Edit style={{ color: iconColor }} />
             </IconButton>
-          </Grid>
+          </Box>
         )}
       </div>
       {/* Row 3 */}

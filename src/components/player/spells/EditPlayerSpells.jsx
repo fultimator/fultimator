@@ -1374,7 +1374,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   showIconButton={false}
                 />
               </Grid>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} size={12}>
                 <Grid
                   size={{
                     xs: 12,
@@ -2139,7 +2139,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                       />
                     </Grid>
                     {isEditMode && (
-                      <Grid container spacing={2}>
+                      <Grid container spacing={2} size={12}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                           <Autocomplete
                             options={mnemoSpellClasses}
