@@ -54,15 +54,13 @@ import {
   Error as ErrorIcon,
 } from "@mui/icons-material";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
-import {
-  calculateAttribute,
-  calculateCustomWeaponStats,
-} from "../../common/playerCalculations";
+import { calculateAttribute } from "../../common/playerCalculations";
 import {
   deriveVehicleSlots,
   isTwoHandedEquipped,
 } from "../../equipment/slots/equipmentSlots";
 import { clearSlotAction } from "../../equipment/slots/loadoutActions";
+import { normalizeWeaponLike } from "../../../../libs/weaponNormalization";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({
@@ -228,13 +226,12 @@ export default function PlayerEquipment({
     const weaponName = isSecondaryForm
       ? customWeapon.secondWeaponName || `${customWeapon.name} (Transforming)`
       : customWeapon.name;
-    const stats = calculateCustomWeaponStats(customWeapon, isSecondaryForm);
-    const accuracyCheck = isSecondaryForm
-      ? customWeapon.secondSelectedAccuracyCheck
-      : customWeapon.accuracyCheck;
-    const damageType = isSecondaryForm
-      ? customWeapon.secondSelectedType
-      : customWeapon.type;
+    const accuracy = isSecondaryForm
+      ? (customWeapon.secondAccuracy ?? customWeapon.accuracy)
+      : customWeapon.accuracy;
+    const damage = isSecondaryForm
+      ? (customWeapon.secondDamage ?? customWeapon.damage)
+      : customWeapon.damage;
     const category = isSecondaryForm
       ? customWeapon.secondSelectedCategory
       : customWeapon.category;
@@ -257,11 +254,12 @@ export default function PlayerEquipment({
       name: weaponName,
       cost: customWeapon.cost || 300,
       category: category,
-      att1: accuracyCheck?.att1 || "dexterity",
-      att2: accuracyCheck?.att2 || "might",
-      prec: stats.precision,
-      damage: stats.damage,
-      type: damageType || "physical",
+      accuracy,
+      damage,
+      att1: accuracy?.attr1 || "dexterity",
+      att2: accuracy?.attr2 || "might",
+      prec: accuracy?.value ?? 0,
+      type: damage?.type || "physical",
       hands: 2,
       melee:
         (isSecondaryForm
@@ -747,8 +745,13 @@ export default function PlayerEquipment({
 
   const handleDiceRoll = (weapon) => {
     setCurrentWeapon(weapon);
-    const v1 = attributeMap[weapon.att1],
-      v2 = attributeMap[weapon.att2];
+    const attr1 = weapon.accuracy?.attr1 ?? weapon.att1;
+    const attr2 = weapon.accuracy?.attr2 ?? weapon.att2;
+    const weaponPrec = weapon.accuracy?.value ?? weapon.prec ?? 0;
+    const weaponDamage = weapon.damage?.value ?? weapon.damage ?? 0;
+    const weaponType = weapon.damage?.type ?? weapon.type ?? "physical";
+    const v1 = attributeMap[attr1],
+      v2 = attributeMap[attr2];
     const d1 = Math.floor(Math.random() * v1) + 1,
       d2 = Math.floor(Math.random() * v2) + 1;
     const isCritFail = d1 === 1 && d2 === 1,
@@ -756,11 +759,11 @@ export default function PlayerEquipment({
     const acc =
       d1 +
       d2 +
-      weapon.prec +
+      weaponPrec +
       (weapon.melee ? precMeleeModifier : precRangedModifier);
     const dmg =
       Math.max(d1, d2) +
-      weapon.damage +
+      weaponDamage +
       (weapon.melee ? damageMeleeModifier : damageRangedModifier);
 
     const content = (
@@ -772,13 +775,13 @@ export default function PlayerEquipment({
         <Grid size={6}>
           <Typography variant="h3">{t("Damage")}</Typography>
           <Typography variant="h1">{dmg}</Typography>
-          <Typography variant="h6">{t(weapon.type)}</Typography>
+          <Typography variant="h6">{t(weaponType)}</Typography>
         </Grid>
         <Grid sx={{ mt: 2 }} size={12}>
-          <Typography>{`${d1} [${attributes[weapon.att1].shortcaps}] + ${d2} [${attributes[weapon.att2].shortcaps}] ${weapon.prec !== 0 ? (weapon.prec > 0 ? "+" : "") + weapon.prec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : ""}`}</Typography>
+          <Typography>{`${d1} [${attributes[attr1].shortcaps}] + ${d2} [${attributes[attr2].shortcaps}] ${weaponPrec !== 0 ? (weaponPrec > 0 ? "+" : "") + weaponPrec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : ""}`}</Typography>
           <Typography sx={{ fontWeight: "bold" }}>
             {t("Damage")}:{" "}
-            {`max(${d1}, ${d2}) + ${weapon.damage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : ""}`}
+            {`max(${d1}, ${d2}) + ${weaponDamage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : ""}`}
           </Typography>
         </Grid>
       </Grid>
@@ -831,23 +834,16 @@ export default function PlayerEquipment({
                 : "accessories";
       let newItem;
       if (type === "weapons")
-        newItem = {
+        newItem = normalizeWeaponLike({
+          ...item,
           base: item,
           name: item.name,
           category: item.category || "",
-          melee: item.melee || false,
-          ranged: !item.melee,
-          type: item.type,
-          hands: item.hands,
-          att1: item.att1,
-          att2: item.att2,
           martial: item.martial || false,
           quality: "",
           cost: item.cost || 0,
-          damage: item.damage || 0,
-          prec: item.prec || 0,
           isEquipped: false,
-        };
+        });
       else if (type === "armor" || type === "shields")
         newItem = {
           base: item,
@@ -1216,22 +1212,29 @@ function EquipmentRow({
 
   const renderStats = () => {
     if (item.equipType === "weapon" || item.equipType === "custom-weapon") {
+      const accuracy = item.accuracy ?? {};
+      const damage = item.damage ?? {};
+      const attr1 = accuracy.attr1 ?? item.att1;
+      const attr2 = accuracy.attr2 ?? item.att2;
+      const prec = accuracy.value ?? item.prec ?? 0;
+      const damageValue = damage.value ?? item.damage ?? 0;
+      const damageType = damage.type ?? item.type ?? "physical";
       return (
         <>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               <OpenBracket />
-              {`${attributes[item.att1].shortcaps} + ${attributes[item.att2].shortcaps}`}
+              {`${attributes[attr1].shortcaps} + ${attributes[attr2].shortcaps}`}
               <CloseBracket />
-              {item.prec !== 0 ? (item.prec > 0 ? "+" : "") + item.prec : ""}
+              {prec !== 0 ? (prec > 0 ? "+" : "") + prec : ""}
             </Typography>
           </StyledTableCell>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               <OpenBracket />
-              {t("HR")} {item.damage >= 0 ? "+" : ""} {item.damage}
+              {t("HR")} {damageValue >= 0 ? "+" : ""} {damageValue}
               <CloseBracket />
-              {types[item.type].long}
+              {types[damageType].long}
             </Typography>
           </StyledTableCell>
         </>

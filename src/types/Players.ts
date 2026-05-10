@@ -1,6 +1,19 @@
-import { Affinities, ResourceCost, Accuracy, Damage } from "./Misc";
+import {
+  Affinities,
+  ResourceCost,
+  Accuracy,
+  Damage,
+  Attributes,
+  Elements,
+} from "./Misc";
+import type {
+  Weapon as EquipmentWeapon,
+  CustomWeapon as EquipmentCustomWeapon,
+  CustomWeaponCustomization,
+  SlotTier,
+} from "./Equipment";
 
-export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
+export type { SlotTier, CustomWeaponCustomization };
 
 export interface Hoplosphere {
   id: string;
@@ -243,87 +256,64 @@ export interface PlayerClass {
   spells: Spells[];
 }
 
-export interface Weapons {
-  name: string;
-  quality: string;
-  value: number;
-  isRanged: boolean;
-  isTwoHand: boolean;
-  isMartial: boolean;
-  isExtraPrec: boolean;
-  isExtraDmg: boolean;
-  isCustom: boolean;
-  attr1: string;
-  attr2: string;
-  prec: number;
-  dmg: number;
-  isEquipped: boolean;
-}
-
-export interface CustomWeaponCustomization {
-  name: string;
-  effect: string;
-  martial: boolean;
-  customCost: number;
-}
-
-export interface CustomWeaponAccuracyCheck {
-  att1: string;
-  att2: string;
-}
-
-export interface CustomWeapons {
-  name: string;
-  category: string;
-  range: string;
-  accuracyCheck: CustomWeaponAccuracyCheck;
-  type: string;
-  customizations: CustomWeaponCustomization[];
-  selectedQuality?: string;
-  quality: string;
-  qualityCost: number;
-  cost?: number;
-  hands?: number;
-  martial?: boolean;
+export type Weapons = EquipmentWeapon & {
+  quality?: string;
+  value?: number;
+  isTwoHand?: boolean;
+  isCustom?: boolean;
   isEquipped?: boolean;
-  rareAccuracyBonus?: boolean;
-  rareDamageBonus?: boolean;
-  overrideAccuracyAttributes?: boolean;
-
-  // Primary weapon modifiers (standard format)
-  damageModifier?: number;
-  precModifier?: number;
+  /** @deprecated legacy top-level modifiers */
   defModifier?: number;
+  /** @deprecated legacy top-level modifiers */
   mDefModifier?: number;
-  overrideDamageType?: boolean;
-  customDamageType?: string;
+  /** @deprecated legacy top-level modifiers */
+  damageModifier?: number;
+  /** @deprecated legacy top-level modifiers */
+  precModifier?: number;
+};
 
-  // Secondary weapon data (for transforming weapons)
+export type CustomWeapons = EquipmentCustomWeapon & {
+  selectedQuality?: string;
+  isEquipped?: boolean;
+  /** @deprecated legacy top-level flags */
+  rareAccuracyBonus?: boolean;
+  /** @deprecated legacy top-level flags */
+  rareDamageBonus?: boolean;
+  /** @deprecated legacy top-level flags */
+  overrideAccuracyAttributes?: boolean;
+  /** @deprecated legacy top-level flags */
+  overrideDamageType?: boolean;
+  /** @deprecated legacy top-level modifiers */
+  defModifier?: number;
+  /** @deprecated legacy top-level modifiers */
+  mDefModifier?: number;
+  /** @deprecated legacy top-level modifiers */
+  damageModifier?: number;
+  /** @deprecated legacy top-level modifiers */
+  precModifier?: number;
+  // Secondary weapon legacy fields
   secondWeaponName?: string;
   secondSelectedCategory?: string;
   secondSelectedRange?: string;
-  secondSelectedAccuracyCheck?: CustomWeaponAccuracyCheck;
-  secondSelectedType?: string;
   secondCurrentCustomizations?: CustomWeaponCustomization[];
   secondSelectedQuality?: string;
   secondQuality?: string;
   secondQualityCost?: number;
-
-  // Secondary weapon modifiers
-  secondDamageModifier?: number;
-  secondPrecModifier?: number;
+  /** @deprecated use secondModifiers.def */
   secondDefModifier?: number;
+  /** @deprecated use secondModifiers.mdef */
   secondMDefModifier?: number;
+  /** @deprecated legacy */
   secondOverrideDamageType?: boolean;
-  secondCustomDamageType?: string;
-
+  /** @deprecated legacy */
+  secondCustomDamageType?: Elements;
+  /** @deprecated legacy */
+  secondDamageModifier?: number;
+  /** @deprecated legacy */
+  secondPrecModifier?: number;
   // Data type identifier
   dataType?: string;
-
-  // Technospheres
-  slots?: SlotTier;
-  slotted?: string[];
-}
+};
 
 export interface Shields {
   name: string;

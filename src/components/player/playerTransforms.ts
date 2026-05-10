@@ -5,6 +5,10 @@ import {
   rehydrateIsEquipped,
 } from "./equipment/slots/equipmentSlots";
 import { syncAutomaticClassLevels } from "./classes/classLevelUtils";
+import {
+  normalizeWeaponLike,
+  normalizeCustomWeaponLike,
+} from "../../libs/weaponNormalization";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
@@ -96,9 +100,34 @@ function normalizeSettingsForSave(player: TypePlayer): TypePlayer {
   } as TypePlayer;
 }
 
+/**
+ * Ensures persisted weapon arrays are canonical v8 shape.
+ * Legacy fields may exist in runtime state while UI transitions are in progress.
+ */
+function normalizeWeaponSchemasForSave(player: TypePlayer): TypePlayer {
+  const inv = player.equipment?.[0];
+  if (!inv) return player;
+  return {
+    ...player,
+    equipment: [
+      {
+        ...inv,
+        weapons: (inv.weapons ?? []).map((w) =>
+          normalizeWeaponLike(w as unknown as Record<string, unknown>),
+        ) as typeof inv.weapons,
+        customWeapons: (inv.customWeapons ?? []).map((w) =>
+          normalizeCustomWeaponLike(w as unknown as Record<string, unknown>),
+        ) as typeof inv.customWeapons,
+      },
+      ...(player.equipment?.slice(1) ?? []),
+    ],
+  };
+}
+
 const PRE_SAVE_TRANSFORMS: PlayerTransform[] = [
   syncAutomaticClassLevels,
   normalizeSettingsForSave,
+  normalizeWeaponSchemasForSave,
   stripRuntimeEquippedFlags,
 ];
 
@@ -455,6 +484,63 @@ function normalizeArmorDefValues(player: TypePlayer): TypePlayer {
   };
 }
 
+// Weapon schema helpers
+
+const CATEGORY_DEFENSE: Record<string, "def" | "mdef"> = {};
+// All standard weapon categories target DEF; none currently target MDEF.
+// Kept as a lookup so future categories can opt in without changing call sites.
+function categoryDefense(_category: string): "def" | "mdef" {
+  return CATEGORY_DEFENSE[_category] ?? "def";
+}
+
+function normalizeWeaponCategory(category: string | undefined): string {
+  return category === "spear_category" ? "Spear" : (category ?? "");
+}
+
+function resolveCustomDamageType(
+  customizations: { name: string }[],
+  overrideDamageType: boolean | undefined,
+  customDamageType: string | undefined,
+  fallbackType: string | undefined,
+): string {
+  const hasElemental = customizations.some(
+    (c) => c.name === "weapon_customization_elemental",
+  );
+  if (hasElemental) return customDamageType ?? fallbackType ?? "physical";
+  if (overrideDamageType && customDamageType) return customDamageType;
+  return fallbackType ?? "physical";
+}
+
+function calcCustomWeaponDamage(
+  customizations: { name: string }[],
+  category: string,
+  rareAccuracyBonus: boolean,
+  rareDamageBonus: boolean,
+  damageModifier: number,
+  precModifier: number,
+): { damage: number; precision: number } {
+  let damage = 5;
+  let precision = 0;
+  for (const c of customizations) {
+    switch (c.name) {
+      case "weapon_customization_accurate":
+        precision += 2;
+        break;
+      case "weapon_customization_powerful":
+        damage += category === "weapon_category_heavy" ? 7 : 5;
+        break;
+      case "weapon_customization_elemental":
+        damage += 2;
+        break;
+    }
+  }
+  if (rareAccuracyBonus) precision += 1;
+  if (rareDamageBonus) damage += 4;
+  damage += damageModifier;
+  precision += precModifier;
+  return { damage, precision };
+}
+
 const DAMAGE_SPELL_TYPES = new Set(["default", "arcanist", "arcanist-rework"]);
 
 function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
@@ -515,6 +601,305 @@ function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
   };
 }
 
+function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
+  const inv = player.equipment?.[0];
+  if (!inv) return player;
+
+  type RawWeapon = Record<string, unknown>;
+
+  const migrateWeapon = (w: RawWeapon): RawWeapon => {
+    if (
+      w.accuracy !== undefined &&
+      w.damage !== undefined &&
+      typeof w.damage === "object"
+    ) {
+      return {
+        ...w,
+        category: normalizeWeaponCategory(w.category as string | undefined),
+      };
+    }
+    const attr1 = (w.attr1 as string) ?? "dexterity";
+    const attr2 = (w.attr2 as string) ?? "might";
+    const prec = typeof w.prec === "number" ? w.prec : 0;
+    const dmg = typeof w.dmg === "number" ? w.dmg : 0;
+    const range: "melee" | "ranged" = w.isRanged ? "ranged" : "melee";
+    const next: RawWeapon = { ...w };
+    next.category = normalizeWeaponCategory(w.category as string | undefined);
+    next.accuracy = { attr1, attr2, value: prec, defense: "def" };
+    next.damage = { value: dmg, type: "physical" };
+    next.range = range;
+    next.martial = w.isMartial ?? w.martial ?? false;
+    delete next.attr1;
+    delete next.attr2;
+    delete next.prec;
+    delete next.dmg;
+    delete next.isRanged;
+    delete next.isMartial;
+    delete next.isEquipped;
+    delete next.isExtraPrec;
+    delete next.isExtraDmg;
+    return next;
+  };
+
+  const migrateCustomWeapon = (w: RawWeapon): RawWeapon => {
+    if (
+      w.accuracy !== undefined &&
+      w.damage !== undefined &&
+      typeof w.damage === "object"
+    ) {
+      const rare = (w.rare as Record<string, unknown> | undefined) ?? {};
+      const modifiers =
+        (w.modifiers as Record<string, unknown> | undefined) ?? {};
+      const secondModifiers =
+        (w.secondModifiers as Record<string, unknown> | undefined) ?? {};
+      return {
+        ...w,
+        category: normalizeWeaponCategory(w.category as string | undefined),
+        range:
+          w.range === "ranged" || w.range === "distance" ? "ranged" : "melee",
+        hands:
+          w.hands === 2 || w.hands === 1
+            ? (w.hands as 1 | 2)
+            : w.isTwoHand
+              ? 2
+              : 1,
+        martial: (w.martial as boolean | undefined) ?? false,
+        modifiers: {
+          damage:
+            (modifiers.damage as number | undefined) ??
+            (typeof w.damageModifier === "number" ? w.damageModifier : 0),
+          accuracy:
+            (modifiers.accuracy as number | undefined) ??
+            (typeof w.precModifier === "number" ? w.precModifier : 0),
+          def:
+            (modifiers.def as number | undefined) ??
+            (typeof w.defModifier === "number" ? w.defModifier : 0),
+          mdef:
+            (modifiers.mdef as number | undefined) ??
+            (typeof w.mDefModifier === "number" ? w.mDefModifier : 0),
+        },
+        secondModifiers: {
+          damage:
+            (secondModifiers.damage as number | undefined) ??
+            (typeof w.secondDamageModifier === "number"
+              ? w.secondDamageModifier
+              : 0),
+          accuracy:
+            (secondModifiers.accuracy as number | undefined) ??
+            (typeof w.secondPrecModifier === "number"
+              ? w.secondPrecModifier
+              : 0),
+          def:
+            (secondModifiers.def as number | undefined) ??
+            (typeof w.secondDefModifier === "number" ? w.secondDefModifier : 0),
+          mdef:
+            (secondModifiers.mdef as number | undefined) ??
+            (typeof w.secondMDefModifier === "number"
+              ? w.secondMDefModifier
+              : 0),
+        },
+        rare: {
+          accuracyBonus:
+            (rare.accuracyBonus as boolean | undefined) ??
+            !!w.rareAccuracyBonus,
+          damageBonus:
+            (rare.damageBonus as boolean | undefined) ?? !!w.rareDamageBonus,
+          overrideDamageType:
+            (rare.overrideDamageType as boolean | undefined) ??
+            !!w.overrideDamageType,
+          overrideAccuracyAttributes:
+            (rare.overrideAccuracyAttributes as boolean | undefined) ??
+            !!w.overrideAccuracyAttributes,
+          overrideDamageTypeValue:
+            (rare.overrideDamageTypeValue as string | undefined) ??
+            (w.customDamageType as string | undefined),
+          overrideAccuracyAttr1:
+            (rare.overrideAccuracyAttr1 as string | undefined) ??
+            ((w.accuracy as Record<string, unknown> | undefined)?.attr1 as
+              | string
+              | undefined),
+          overrideAccuracyAttr2:
+            (rare.overrideAccuracyAttr2 as string | undefined) ??
+            ((w.accuracy as Record<string, unknown> | undefined)?.attr2 as
+              | string
+              | undefined),
+        },
+        ...(w.secondSelectedCategory
+          ? {
+              secondSelectedCategory: normalizeWeaponCategory(
+                w.secondSelectedCategory as string | undefined,
+              ),
+            }
+          : {}),
+        ...(w.secondSelectedRange
+          ? {
+              secondSelectedRange:
+                w.secondSelectedRange === "ranged" ||
+                w.secondSelectedRange === "distance"
+                  ? "ranged"
+                  : "melee",
+            }
+          : {}),
+        ...(w.secondCurrentCustomizations !== undefined &&
+        w.secondCustomizations === undefined
+          ? { secondCustomizations: w.secondCurrentCustomizations }
+          : {}),
+      };
+    }
+
+    const ac = w.accuracyCheck as RawWeapon | undefined;
+    const attr1 = (ac?.att1 as string) ?? (w.attr1 as string) ?? "dexterity";
+    const attr2 = (ac?.att2 as string) ?? (w.attr2 as string) ?? "might";
+    const precModifier =
+      typeof w.precModifier === "number" ? w.precModifier : 0;
+    const damageModifier =
+      typeof w.damageModifier === "number" ? w.damageModifier : 0;
+    const customizations = (w.customizations as { name: string }[]) ?? [];
+    const category = normalizeWeaponCategory(w.category as string | undefined);
+
+    const { damage, precision } = calcCustomWeaponDamage(
+      customizations,
+      category,
+      !!w.rareAccuracyBonus,
+      !!w.rareDamageBonus,
+      damageModifier,
+      precModifier,
+    );
+    const damageType = resolveCustomDamageType(
+      customizations,
+      w.overrideDamageType as boolean | undefined,
+      w.customDamageType as string | undefined,
+      w.type as string | undefined,
+    );
+
+    const next: RawWeapon = { ...w };
+    next.category = category;
+    next.hands = w.hands === 2 || w.hands === 1 ? w.hands : w.isTwoHand ? 2 : 1;
+    next.martial = (w.martial as boolean | undefined) ?? false;
+    next.accuracy = {
+      attr1,
+      attr2,
+      value: precision,
+      defense: categoryDefense(category),
+    };
+    next.damage = { value: damage, type: damageType };
+    next.modifiers = {
+      damage: damageModifier,
+      accuracy: precModifier,
+      def: typeof w.defModifier === "number" ? w.defModifier : 0,
+      mdef: typeof w.mDefModifier === "number" ? w.mDefModifier : 0,
+    };
+    next.rare = {
+      accuracyBonus: !!w.rareAccuracyBonus,
+      damageBonus: !!w.rareDamageBonus,
+      overrideDamageType: !!w.overrideDamageType,
+      overrideAccuracyAttributes: !!w.overrideAccuracyAttributes,
+      overrideDamageTypeValue:
+        (w.customDamageType as string | undefined) ??
+        (w.type as string | undefined) ??
+        "physical",
+      overrideAccuracyAttr1: attr1,
+      overrideAccuracyAttr2: attr2,
+    };
+    delete next.accuracyCheck;
+    delete next.precModifier;
+    delete next.damageModifier;
+    delete next.customDamageType;
+    delete next.type;
+    delete next.isEquipped;
+
+    // Secondary form
+    const secondAc = w.secondSelectedAccuracyCheck as RawWeapon | undefined;
+    const hasSecond = !!w.secondWeaponName || !!secondAc;
+    if (hasSecond) {
+      const s2attr1 = (secondAc?.att1 as string) ?? attr1;
+      const s2attr2 = (secondAc?.att2 as string) ?? attr2;
+      const s2precModifier =
+        typeof w.secondPrecModifier === "number" ? w.secondPrecModifier : 0;
+      const s2damageModifier =
+        typeof w.secondDamageModifier === "number" ? w.secondDamageModifier : 0;
+      const s2customizations =
+        (w.secondCurrentCustomizations as { name: string }[]) ?? [];
+      const s2category = normalizeWeaponCategory(
+        (w.secondSelectedCategory as string | undefined) ?? category,
+      );
+      const { damage: s2damage, precision: s2precision } =
+        calcCustomWeaponDamage(
+          s2customizations,
+          s2category,
+          !!w.rareAccuracyBonus,
+          !!w.rareDamageBonus,
+          s2damageModifier,
+          s2precModifier,
+        );
+      const s2damageType = resolveCustomDamageType(
+        s2customizations,
+        w.secondOverrideDamageType as boolean | undefined,
+        (w.secondCustomDamageType as string | undefined) ??
+          (w.customDamageType as string | undefined),
+        (w.secondSelectedType as string | undefined) ??
+          (w.type as string | undefined),
+      );
+      next.secondAccuracy = {
+        attr1: s2attr1,
+        attr2: s2attr2,
+        value: s2precision,
+        defense: categoryDefense(s2category),
+      };
+      next.secondDamage = { value: s2damage, type: s2damageType };
+      next.secondModifiers = {
+        damage: s2damageModifier,
+        accuracy: s2precModifier,
+        def: typeof w.secondDefModifier === "number" ? w.secondDefModifier : 0,
+        mdef:
+          typeof w.secondMDefModifier === "number" ? w.secondMDefModifier : 0,
+      };
+      next.secondSelectedCategory = s2category;
+    }
+    delete next.secondPrecModifier;
+    delete next.secondDamageModifier;
+    delete next.secondDefModifier;
+    delete next.secondMDefModifier;
+    delete next.secondSelectedAccuracyCheck;
+    delete next.secondCustomDamageType;
+    delete next.secondSelectedType;
+    delete next.secondOverrideDamageType;
+    delete next.overrideDamageType;
+    delete next.overrideAccuracyAttributes;
+    delete next.rareAccuracyBonus;
+    delete next.rareDamageBonus;
+    delete next.damageModifier;
+    delete next.precModifier;
+    delete next.defModifier;
+    delete next.mDefModifier;
+    if (
+      next.secondCurrentCustomizations !== undefined &&
+      next.secondCustomizations === undefined
+    ) {
+      next.secondCustomizations = next.secondCurrentCustomizations;
+    }
+    delete next.secondCurrentCustomizations;
+
+    return next;
+  };
+
+  return {
+    ...player,
+    equipment: [
+      {
+        ...inv,
+        weapons: (inv.weapons ?? []).map((w) =>
+          migrateWeapon(w as unknown as RawWeapon),
+        ) as unknown as typeof inv.weapons,
+        customWeapons: (inv.customWeapons ?? []).map((w) =>
+          migrateCustomWeapon(w as unknown as RawWeapon),
+        ) as unknown as typeof inv.customWeapons,
+      },
+      ...(player.equipment?.slice(1) ?? []),
+    ],
+  };
+}
+
 // One-time versioned migrations.
 // Each transform brings the player up to its declared schema version.
 // Skipped if schemaVersion is already >= the transform's version.
@@ -555,6 +940,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Unify spell schema: damage object, range, description, itemType; rename mp->cost, targetDesc->targetDescription",
     fn: unifyPlayerSpellSchema,
+  },
+  {
+    version: 8,
+    label:
+      "Unify weapon schema: accuracy/damage objects, flatten attr1/attr2, resolve damage type and final values",
+    fn: unifyPlayerWeaponSchema,
   },
 ];
 

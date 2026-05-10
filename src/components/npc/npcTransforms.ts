@@ -164,6 +164,121 @@ function unifyNpcSpellSchema(npc: TypeNpc): TypeNpc {
   };
 }
 
+function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
+  type RawAttack = Record<string, unknown>;
+
+  const categoryDefense = (_category: string): "def" | "mdef" => "def";
+
+  const normalizeRange = (range: unknown): "melee" | "ranged" =>
+    range === "ranged" || range === "distance" ? "ranged" : "melee";
+
+  const normalizeWeaponCategory = (category: string | undefined): string =>
+    category === "spear_category" ? "Spear" : (category ?? "");
+
+  const migrateAttack = (a: RawAttack): RawAttack => {
+    if (
+      a.accuracy !== undefined &&
+      a.damage !== undefined &&
+      typeof a.damage === "object"
+    ) {
+      return {
+        ...a,
+        itemType: "attack",
+        range: normalizeRange(a.range),
+        special: Array.isArray(a.special)
+          ? a.special
+          : typeof a.special === "string"
+            ? [a.special]
+            : [],
+      };
+    }
+    const next: RawAttack = { ...a };
+    next.itemType = "attack";
+    next.range = normalizeRange(a.range);
+    next.special = Array.isArray(a.special)
+      ? a.special
+      : typeof a.special === "string"
+        ? [a.special]
+        : [];
+    next.accuracy = {
+      attr1: (a.attr1 as string) ?? "dexterity",
+      attr2: (a.attr2 as string) ?? "might",
+      value: 0,
+      defense: "def",
+    };
+    next.damage = { value: 0, type: (a.type as string) ?? "physical" };
+    delete next.attr1;
+    delete next.attr2;
+    delete next.type;
+    return next;
+  };
+
+  const migrateWeaponAttack = (wa: RawAttack): RawAttack => {
+    if (
+      wa.accuracy !== undefined &&
+      wa.damage !== undefined &&
+      typeof wa.damage === "object"
+    ) {
+      const category = normalizeWeaponCategory(
+        wa.category as string | undefined,
+      );
+      return {
+        ...wa,
+        itemType: "weaponAttack",
+        category,
+        range: normalizeRange(wa.range),
+        special: Array.isArray(wa.special)
+          ? wa.special
+          : typeof wa.special === "string"
+            ? [wa.special]
+            : [],
+        accuracy: {
+          ...(wa.accuracy as Record<string, unknown>),
+          defense: (wa.accuracy as Record<string, unknown>).defense
+            ? ((wa.accuracy as Record<string, unknown>).defense as
+                | "def"
+                | "mdef")
+            : categoryDefense(category),
+        },
+      };
+    }
+    const w = (wa.weapon as RawAttack) ?? {};
+    const next: RawAttack = { ...wa };
+    const category = normalizeWeaponCategory(w.category as string | undefined);
+    next.itemType = "weaponAttack";
+    next.category = category;
+    next.special = Array.isArray(wa.special)
+      ? wa.special
+      : typeof wa.special === "string"
+        ? [wa.special]
+        : [];
+    next.accuracy = {
+      attr1: (w.att1 as string) ?? "dexterity",
+      attr2: (w.att2 as string) ?? "might",
+      value: typeof w.prec === "number" ? w.prec : 0,
+      defense: categoryDefense(category),
+    };
+    next.damage = {
+      value: typeof w.damage === "number" ? w.damage : 0,
+      type: (w.type as string) ?? "physical",
+    };
+    next.range = normalizeRange(w.range ?? wa.range);
+    delete next.weapon;
+    delete next.type;
+    return next;
+  };
+
+  return {
+    ...npc,
+    attacks: (npc.attacks ?? []).map((a) =>
+      migrateAttack(a as unknown as RawAttack),
+    ) as unknown as typeof npc.attacks,
+    weaponattacks: (npc.weaponattacks ?? []).map((wa) =>
+      migrateWeaponAttack(wa as unknown as RawAttack),
+    ) as unknown as typeof npc.weaponattacks,
+  };
+}
+
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 1,
@@ -202,6 +317,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Unify NPC spell schema: isOffensive, damage object, range, itemType, spellType",
     fn: unifyNpcSpellSchema,
+  },
+  {
+    version: 8,
+    label:
+      "Unify NPC attack schema: accuracy/damage objects, flatten attr1/attr2 and weapon fields",
+    fn: unifyNpcAttackSchema,
   },
 ];
 

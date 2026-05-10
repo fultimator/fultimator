@@ -153,10 +153,11 @@ export default function NpcEdit() {
     (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
+        if (!isOwner) return;
         activeSetDoc(ref, applyNpcPreSaveTransforms(npcTemp));
       }
     },
-    [ref, npcTemp, activeSetDoc],
+    [ref, npcTemp, activeSetDoc, isOwner],
   );
 
   // Effect for scroll and keyboard shortcuts
@@ -608,7 +609,7 @@ export default function NpcEdit() {
         )}
         {/* <NpcUgly npc={npcTemp} /> */}
         {/* Save Button, shown if there are unsaved changes */}
-        {isUpdated && (
+        {isUpdated && isOwner && (
           <Tooltip title={t("Save")} placement="left">
             <Fab
               color="primary"

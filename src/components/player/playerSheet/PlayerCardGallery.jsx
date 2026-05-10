@@ -288,12 +288,21 @@ export default function PlayerCardGallery({
     baseDef +
     equippedShields.reduce((acc, s) => acc + (s.def || 0), 0) +
     (player.modifiers?.def || 0) +
-    (armorModule ? 0 : equippedArmor?.defModifier || 0) +
-    equippedShields.reduce((acc, s) => acc + (s.defModifier || 0), 0) +
-    (equippedAccessory?.defModifier || 0) +
-    equippedWeapons.reduce((acc, w) => acc + (w.defModifier || 0), 0) +
+    (armorModule
+      ? 0
+      : (equippedArmor?.modifiers?.def ?? equippedArmor?.defModifier ?? 0)) +
+    equippedShields.reduce(
+      (acc, s) => acc + (s?.modifiers?.def ?? s?.defModifier ?? 0),
+      0,
+    ) +
+    (equippedAccessory?.modifiers?.def ?? equippedAccessory?.defModifier ?? 0) +
+    equippedWeapons.reduce(
+      (acc, w) => acc + (w?.modifiers?.def ?? w?.defModifier ?? 0),
+      0,
+    ) +
     equippedCustomWeapons.reduce(
-      (acc, w) => acc + (parseInt(w.defModifier || 0, 10) || 0),
+      (acc, w) =>
+        acc + (parseInt(w?.modifiers?.def ?? w?.defModifier ?? 0, 10) || 0),
       0,
     ) +
     dodgeBonus;
@@ -310,12 +319,23 @@ export default function PlayerCardGallery({
     baseMDef +
     equippedShields.reduce((acc, s) => acc + (s.mdef || 0), 0) +
     (player.modifiers?.mdef || 0) +
-    (armorModule ? 0 : equippedArmor?.mDefModifier || 0) +
-    equippedShields.reduce((acc, s) => acc + (s.mDefModifier || 0), 0) +
-    (equippedAccessory?.mDefModifier || 0) +
-    equippedWeapons.reduce((acc, w) => acc + (w.mDefModifier || 0), 0) +
+    (armorModule
+      ? 0
+      : (equippedArmor?.modifiers?.mdef ?? equippedArmor?.mDefModifier ?? 0)) +
+    equippedShields.reduce(
+      (acc, s) => acc + (s?.modifiers?.mdef ?? s?.mDefModifier ?? 0),
+      0,
+    ) +
+    (equippedAccessory?.modifiers?.mdef ??
+      equippedAccessory?.mDefModifier ??
+      0) +
+    equippedWeapons.reduce(
+      (acc, w) => acc + (w?.modifiers?.mdef ?? w?.mDefModifier ?? 0),
+      0,
+    ) +
     equippedCustomWeapons.reduce(
-      (acc, w) => acc + (parseInt(w.mDefModifier || 0, 10) || 0),
+      (acc, w) =>
+        acc + (parseInt(w?.modifiers?.mdef ?? w?.mDefModifier ?? 0, 10) || 0),
       0,
     );
 

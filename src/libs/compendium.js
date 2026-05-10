@@ -1,7 +1,8 @@
 import weapons from "./weapons";
+import armor from "./armor";
+import shield from "./shields";
 import heroics from "./heroics";
 import qualities from "./qualities";
-import { baseArmors, baseShields } from "./equip";
 import { npcSpells } from "./npcSpells";
 import { npcAttacks } from "./npcAttacks";
 import classList, {
@@ -48,13 +49,8 @@ export const QUALITY_CATEGORY_OPTIONS = [
   { label: staticT("Enhancement", true), value: "Enhancement" },
 ];
 
-const armors = baseArmors
-  .filter((a) => a.name !== "No Armor")
-  .map((a) => ({ ...a, category: "Armor" }));
-
-const shields = baseShields
-  .filter((s) => s.name !== "No Shield")
-  .map((s) => ({ ...s, category: "Shield" }));
+const armors = armor.map((a) => ({ ...a, category: "Armor" }));
+const shields = shield.map((s) => ({ ...s, category: "Shield" }));
 
 export const ITEM_TYPES = [
   { key: "weapons", label: staticT("Weapons", true), context: "player" },

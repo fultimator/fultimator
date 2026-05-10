@@ -1,5 +1,8 @@
-import { Weapon } from "./Equipment";
 import { Affinities, ResourceCost, Accuracy, Damage } from "./Misc";
+import type {
+  NpcAttack as EquipmentNpcAttack,
+  NpcWeaponAttack as EquipmentNpcWeaponAttack,
+} from "./Equipment";
 
 export interface NpcAttributes {
   might: number;
@@ -22,23 +25,9 @@ export interface NpcArmor {
   quality?: string;
 }
 
-export interface NpcAttack {
-  name: string;
-  range: string;
-  attr1: string;
-  attr2: string;
-  type: string;
-  special: string[];
-  extraDamage?: boolean;
-}
+export type NpcAttack = EquipmentNpcAttack;
 
-export interface NpcWeaponAttack {
-  extraDamage?: false;
-  weapon: Weapon;
-  name: string;
-  type: string;
-  special: string[];
-}
+export type NpcWeaponAttack = EquipmentNpcWeaponAttack;
 
 export interface NpcSpell {
   name: string;

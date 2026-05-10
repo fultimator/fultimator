@@ -190,7 +190,10 @@ export function calcDamage(attack, npc) {
 
   // Equip
   if (attack.weapon) {
-    number = number - 5 + attack.weapon.damage;
+    number =
+      number - 5 + (attack.weapon.damage?.value ?? attack.weapon.damage ?? 0);
+  } else if (attack.damage?.value !== undefined) {
+    number = number - 5 + attack.damage.value;
   }
 
   // Flat Damage Input
@@ -218,9 +221,12 @@ export function calcPrecision(attack, npc) {
     number = number + 3;
   }
 
-  // Equip
+  // Equip (unified schema: accuracy.value flat on attack)
   if (attack.weapon) {
-    number = number + attack.weapon.prec;
+    number =
+      number + (attack.weapon.prec ?? attack.weapon.accuracy?.value ?? 0);
+  } else if (attack.accuracy?.value !== undefined) {
+    number = number + attack.accuracy.value;
   }
 
   // Companion

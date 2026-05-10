@@ -22,6 +22,7 @@ import SphereInventory from "./technospheres/SphereInventory";
 import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
 import { deriveVehicleSlots, validateSlots } from "./slots/equipmentSlots";
 import { clearSlotAction } from "./slots/loadoutActions";
+import { normalizeWeaponLike } from "../../../libs/weaponNormalization";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -213,30 +214,25 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   const handleImportFromCompendium = (equipType, itemData) => {
     if (equipType === "weapon") {
-      handleAddWeapon({
-        base: itemData,
-        name: itemData.name,
-        category: itemData.category || "",
-        melee: itemData.melee || false,
-        ranged: !itemData.melee,
-        type: itemData.type,
-        hands: itemData.hands,
-        att1: itemData.att1,
-        att2: itemData.att2,
-        martial: itemData.martial || false,
-        damageBonus: false,
-        damageReworkBonus: false,
-        precBonus: false,
-        rework: false,
-        quality: "",
-        qualityCost: 0,
-        totalBonus: 0,
-        selectedQuality: "",
-        cost: itemData.cost || 0,
-        damage: itemData.damage || 0,
-        prec: itemData.prec || 0,
-        isEquipped: false,
-      });
+      handleAddWeapon(
+        normalizeWeaponLike({
+          ...itemData,
+          base: itemData,
+          name: itemData.name,
+          category: itemData.category || "",
+          martial: itemData.martial || false,
+          damageBonus: false,
+          damageReworkBonus: false,
+          precBonus: false,
+          rework: false,
+          quality: "",
+          qualityCost: 0,
+          totalBonus: 0,
+          selectedQuality: "",
+          cost: itemData.cost || 0,
+          isEquipped: false,
+        }),
+      );
     } else if (equipType === "armor") {
       handleAddArmor({
         base: itemData,

@@ -31,7 +31,7 @@ function resolvedName(resolved, locked, t) {
     return resolved.module.customName || t(resolved.module.name);
   }
   const item = resolved.item;
-  if ("accuracyCheck" in item && item.activeForm === "secondary") {
+  if ("secondAccuracy" in item && item.activeForm === "secondary") {
     return item.secondWeaponName || `${item.name} (Alt)`;
   }
   return item?.name ?? " - ";

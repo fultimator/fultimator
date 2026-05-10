@@ -37,6 +37,15 @@ import { SharedWeaponCard } from "../../../../components/shared/itemCards";
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
+import {
+  getWeaponAttr1,
+  getWeaponAttr2,
+  getWeaponDamage,
+  getWeaponPrec,
+  getWeaponRange,
+  getWeaponType,
+  normalizeWeaponLike,
+} from "../../../../libs/weaponNormalization";
 
 export default function PlayerWeaponModal({
   open,
@@ -47,14 +56,23 @@ export default function PlayerWeaponModal({
   onDeleteWeapon,
 }) {
   const { t } = useTranslate();
+  const weaponAccuracy = weapon?.accuracy ?? {};
+  const weaponDamage =
+    weapon?.damage && typeof weapon.damage === "object" ? weapon.damage : {};
 
   const [base, setBase] = useState(weapon?.base || weapons[0]);
   const [name, setName] = useState(weapon?.name || weapons[0].name);
   const [category, setCategory] = useState(weapon?.category || "");
-  const [type, setType] = useState(weapon?.type || weapons[0].type);
+  const [type, setType] = useState(
+    weaponDamage.type || weapon?.type || getWeaponType(weapons[0]),
+  );
   const [hands, setHands] = useState(weapon?.hands || weapons[0].hands);
-  const [att1, setAtt1] = useState(weapon?.att1 || weapons[0].att1);
-  const [att2, setAtt2] = useState(weapon?.att2 || weapons[0].att2);
+  const [att1, setAtt1] = useState(
+    weaponAccuracy.attr1 || weapon?.att1 || getWeaponAttr1(weapons[0]),
+  );
+  const [att2, setAtt2] = useState(
+    weaponAccuracy.attr2 || weapon?.att2 || getWeaponAttr2(weapons[0]),
+  );
   const [martial, setMartial] = useState(weapon?.martial || false);
   const [damageBonus, setDamageBonus] = useState(weapon?.damageBonus || false);
   const [damageReworkBonus, setDamageReworkBonus] = useState(
@@ -104,10 +122,10 @@ export default function PlayerWeaponModal({
     setBase(weapon?.base || weapons[0]);
     setName(weapon?.name || t(weapons[0].name));
     setCategory(weapon?.category || weapons[0].category);
-    setType(weapon?.type || weapons[0].type);
+    setType(getWeaponType(weapon) || getWeaponType(weapons[0]));
     setHands(weapon?.hands || weapons[0].hands);
-    setAtt1(weapon?.att1 || weapons[0].att1);
-    setAtt2(weapon?.att2 || weapons[0].att2);
+    setAtt1(getWeaponAttr1(weapon) || getWeaponAttr1(weapons[0]));
+    setAtt2(getWeaponAttr2(weapon) || getWeaponAttr2(weapons[0]));
     setMartial(weapon?.martial || false);
     setDamageBonus(weapon?.damageBonus || false);
     setDamageReworkBonus(weapon?.damageReworkBonus || false);
@@ -126,15 +144,16 @@ export default function PlayerWeaponModal({
 
   const handleFileUpload = (data) => {
     if (data) {
+      const normalized = normalizeWeaponLike(data);
       const {
         base,
         name,
-        att1,
-        att2,
+        accuracy,
         martial,
         category,
-        type,
+        damage,
         hand,
+        hands,
         quality,
         qualityCost,
         damageBonus,
@@ -145,7 +164,7 @@ export default function PlayerWeaponModal({
         mDefModifier,
         precModifier,
         damageModifier,
-      } = data;
+      } = normalized;
 
       handleClearFields();
 
@@ -155,11 +174,11 @@ export default function PlayerWeaponModal({
       if (name) {
         setName(name);
       }
-      if (att1) {
-        setAtt1(att1);
+      if (accuracy?.attr1) {
+        setAtt1(accuracy.attr1);
       }
-      if (att2) {
-        setAtt2(att2);
+      if (accuracy?.attr2) {
+        setAtt2(accuracy.attr2);
       }
       if (martial) {
         setMartial(martial);
@@ -167,11 +186,11 @@ export default function PlayerWeaponModal({
       if (category) {
         setCategory(category);
       }
-      if (type) {
-        setType(type);
+      if (damage?.type) {
+        setType(damage.type);
       }
-      if (hand) {
-        setHands(hand);
+      if (hand || hands) {
+        setHands(hand ?? hands);
       }
       if (quality) {
         setSelectedQuality("");
@@ -224,7 +243,7 @@ export default function PlayerWeaponModal({
     }
 
     // Changed attributes
-    if (base.att1 !== att1 || base.att2 !== att2) {
+    if (getWeaponAttr1(base) !== att1 || getWeaponAttr2(base) !== att2) {
       if (att1 === att2) {
         cost += 50;
       }
@@ -236,10 +255,10 @@ export default function PlayerWeaponModal({
     }
 
     // Bonus precision
-    if (!rework && base.prec !== 1 && precBonus) {
+    if (!rework && getWeaponPrec(base) !== 1 && precBonus) {
       cost += 100;
       // Bonus precision (rework)
-    } else if (rework && base.prec <= 1 && precBonus) {
+    } else if (rework && getWeaponPrec(base) <= 1 && precBonus) {
       cost += 100;
     }
 
@@ -249,7 +268,7 @@ export default function PlayerWeaponModal({
   };
 
   const calcDamage = () => {
-    let damage = base.damage;
+    let damage = getWeaponDamage(base);
 
     if (
       base.hands === 1 &&
@@ -278,7 +297,7 @@ export default function PlayerWeaponModal({
   };
 
   const calcPrec = () => {
-    let prec = base.prec;
+    let prec = getWeaponPrec(base);
 
     // Bonus precision
     if (!rework && prec !== 1 && precBonus) {
@@ -302,12 +321,11 @@ export default function PlayerWeaponModal({
     const damage = calcDamage();
     const prec = calcPrec();
 
-    const updatedWeapon = {
+    const updatedWeapon = normalizeWeaponLike({
       base,
       name,
       category: category,
-      melee: base.melee || false,
-      ranged: base.ranged || false,
+      range: getWeaponRange(base),
       type,
       hands,
       att1,
@@ -330,17 +348,17 @@ export default function PlayerWeaponModal({
         (weapon?.martial || false) !== martial
           ? false
           : isEquipped,
-    };
+    });
     onAddWeapon(updatedWeapon);
   };
   const handleClearFields = () => {
     setBase(weapons[0]);
     setName(weapons[0].name);
     setCategory(weapons[0].category);
-    setType(weapons[0].type);
+    setType(getWeaponType(weapons[0]));
     setHands(weapons[0].hands);
-    setAtt1(weapons[0].att1);
-    setAtt2(weapons[0].att2);
+    setAtt1(getWeaponAttr1(weapons[0]));
+    setAtt2(getWeaponAttr2(weapons[0]));
     setMartial(weapons[0].martial);
     setDamageBonus(false);
     setDamageReworkBonus(false);
@@ -409,13 +427,13 @@ export default function PlayerWeaponModal({
                   setBase(base);
                   setName(t(base.name));
                   setCategory(base.category);
-                  setType(base.type);
+                  setType(getWeaponType(base));
                   setHands(base.hands);
                   setDamageBonus(false);
                   setDamageReworkBonus(false);
                   setPrecBonus(false);
-                  setAtt1(base.att1);
-                  setAtt2(base.att2);
+                  setAtt1(getWeaponAttr1(base));
+                  setAtt2(getWeaponAttr2(base));
                   setMartial(base.martial);
                 }}
               />
@@ -536,7 +554,7 @@ export default function PlayerWeaponModal({
                   </Grid>
                   <Grid size={12}>
                     <ChangeBonus
-                      basePrec={base.prec}
+                      basePrec={getWeaponPrec(base)}
                       precBonus={precBonus}
                       damageBonus={damageBonus}
                       damageReworkBonus={damageReworkBonus}
@@ -660,8 +678,7 @@ export default function PlayerWeaponModal({
                 type: type,
                 hands: hands,
                 category: category,
-                melee: base.melee,
-                ranged: base.ranged,
+                range: getWeaponRange(base),
                 cost: cost,
                 damage: damage,
                 prec: prec,

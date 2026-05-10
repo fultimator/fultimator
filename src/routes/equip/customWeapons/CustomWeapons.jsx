@@ -52,8 +52,18 @@ function isValidAttribute(value) {
 }
 
 function normalizeAccuracyCheck(value, fallback = accuracyChecks[0]) {
-  const att1 = Array.isArray(value) ? value[0] : value?.att1;
-  const att2 = Array.isArray(value) ? value[1] : value?.att2;
+  const att1 = Array.isArray(value)
+    ? value[0]
+    : (value?.accuracy?.attr1 ??
+      value?.attr1 ??
+      value?.att1 ??
+      value?.accuracy?.att1);
+  const att2 = Array.isArray(value)
+    ? value[1]
+    : (value?.accuracy?.attr2 ??
+      value?.attr2 ??
+      value?.att2 ??
+      value?.accuracy?.att2);
   if (isValidAttribute(att1) && isValidAttribute(att2)) {
     return { att1, att2 };
   }
@@ -336,24 +346,27 @@ function CustomWeapons() {
           setMartial(data.martial);
         }
         const nextOverrideAccuracyAttributes =
-          data.overrideAccuracyAttributes === true;
-        setRareAccuracyBonus(data.rareAccuracyBonus === true);
-        setRareDamageBonus(data.rareDamageBonus === true);
+          (data.rare?.overrideAccuracyAttributes ??
+            data.overrideAccuracyAttributes) === true;
+        setRareAccuracyBonus(
+          (data.rare?.accuracyBonus ?? data.rareAccuracyBonus) === true,
+        );
+        setRareDamageBonus(
+          (data.rare?.damageBonus ?? data.rareDamageBonus) === true,
+        );
         setOverrideAccuracyAttributes(nextOverrideAccuracyAttributes);
-        if (
-          data.accuracyCheck &&
-          data.accuracyCheck.att1 &&
-          data.accuracyCheck.att2
-        ) {
-          const normalizedCheck = normalizeAccuracyCheck(data.accuracyCheck);
+        const uploadedAccuracy = data.accuracyCheck ?? data.accuracy;
+        if (uploadedAccuracy) {
+          const normalizedCheck = normalizeAccuracyCheck(uploadedAccuracy);
           setSelectedAccuracyCheck(
             nextOverrideAccuracyAttributes
               ? normalizedCheck
               : (findPresetAccuracyCheck(normalizedCheck) ?? accuracyChecks[0]),
           );
         }
-        if (data.type && types.includes(data.type)) {
-          setSelectedType(data.type);
+        const uploadedType = data.type ?? data.damage?.type;
+        if (uploadedType && types.includes(uploadedType)) {
+          setSelectedType(uploadedType);
         }
         if (data.customizations && Array.isArray(data.customizations)) {
           const validCustomizations = data.customizations.filter((custom) =>
@@ -370,29 +383,52 @@ function CustomWeapons() {
         }
 
         // Handle modifiers (map standard format to generator fields)
-        if (data.damageModifier !== undefined) {
-          setCustomDamageMod(data.damageModifier);
+        const uploadedDamageMod =
+          data.modifiers?.damage ?? data.damageModifier ?? data.damage?.value;
+        const uploadedAccuracyMod =
+          data.modifiers?.accuracy ?? data.precModifier ?? data.accuracy?.value;
+        if (uploadedDamageMod !== undefined) {
+          setCustomDamageMod(uploadedDamageMod);
         }
-        if (data.precModifier !== undefined) {
-          setCustomAccuracyMod(data.precModifier);
+        if (uploadedAccuracyMod !== undefined) {
+          setCustomAccuracyMod(uploadedAccuracyMod);
         }
-        if (data.defModifier !== undefined) {
-          setDefModifier(data.defModifier);
+        if (
+          data.modifiers?.def !== undefined ||
+          data.defModifier !== undefined
+        ) {
+          setDefModifier(data.modifiers?.def ?? data.defModifier);
         }
-        if (data.mDefModifier !== undefined) {
-          setMDefModifier(data.mDefModifier);
+        if (
+          data.modifiers?.mdef !== undefined ||
+          data.mDefModifier !== undefined
+        ) {
+          setMDefModifier(data.modifiers?.mdef ?? data.mDefModifier);
         }
-        if (data.overrideDamageType !== undefined) {
-          setOverrideType(data.overrideDamageType);
+        if (
+          data.rare?.overrideDamageType !== undefined ||
+          data.overrideDamageType !== undefined
+        ) {
+          setOverrideType(
+            data.rare?.overrideDamageType ?? data.overrideDamageType,
+          );
         }
-        if (data.customDamageType !== undefined) {
-          setCustomDamageType(data.customDamageType);
+        if (
+          (data.rare?.overrideDamageTypeValue ??
+            data.customDamageType ??
+            data.damage?.type) !== undefined
+        ) {
+          setCustomDamageType(
+            data.rare?.overrideDamageTypeValue ??
+              data.customDamageType ??
+              data.damage?.type,
+          );
         }
 
         // Auto-expand modifiers if any are set
         setModifiersExpanded(
-          (data.damageModifier && data.damageModifier !== 0) ||
-            (data.precModifier && data.precModifier !== 0) ||
+          (uploadedDamageMod && uploadedDamageMod !== 0) ||
+            (uploadedAccuracyMod && uploadedAccuracyMod !== 0) ||
             (data.defModifier && data.defModifier !== 0) ||
             (data.mDefModifier && data.mDefModifier !== 0) ||
             data.overrideDamageType,
@@ -417,21 +453,25 @@ function CustomWeapons() {
         if (data.secondMartial) {
           setSecondMartial(data.secondMartial);
         }
-        if (data.secondSelectedAccuracyCheck) {
+        const uploadedSecondAccuracy =
+          data.secondSelectedAccuracyCheck ?? data.secondAccuracy;
+        if (uploadedSecondAccuracy) {
+          const normalizedSecond = normalizeAccuracyCheck(
+            uploadedSecondAccuracy,
+          );
           const matchingCheck = accuracyChecks.find(
             (check) =>
-              check.att1 === data.secondSelectedAccuracyCheck.att1 &&
-              check.att2 === data.secondSelectedAccuracyCheck.att2,
+              check.att1 === normalizedSecond.att1 &&
+              check.att2 === normalizedSecond.att2,
           );
           if (matchingCheck) {
             setSecondSelectedAccuracyCheck(matchingCheck);
           }
         }
-        if (
-          data.secondSelectedType &&
-          types.includes(data.secondSelectedType)
-        ) {
-          setSecondSelectedType(data.secondSelectedType);
+        const uploadedSecondType =
+          data.secondSelectedType ?? data.secondDamage?.type;
+        if (uploadedSecondType && types.includes(uploadedSecondType)) {
+          setSecondSelectedType(uploadedSecondType);
         }
         if (
           data.secondCurrentCustomizations &&
@@ -444,11 +484,15 @@ function CustomWeapons() {
         }
 
         // Handle secondary weapon modifiers (map standard format to generator fields)
-        if (data.secondDamageModifier !== undefined) {
-          setSecondCustomDamageMod(data.secondDamageModifier);
+        const uploadedSecondDamageMod =
+          data.secondDamageModifier ?? data.secondDamage?.value;
+        const uploadedSecondAccuracyMod =
+          data.secondPrecModifier ?? data.secondAccuracy?.value;
+        if (uploadedSecondDamageMod !== undefined) {
+          setSecondCustomDamageMod(uploadedSecondDamageMod);
         }
-        if (data.secondPrecModifier !== undefined) {
-          setSecondCustomAccuracyMod(data.secondPrecModifier);
+        if (uploadedSecondAccuracyMod !== undefined) {
+          setSecondCustomAccuracyMod(uploadedSecondAccuracyMod);
         }
         if (data.secondDefModifier !== undefined) {
           setSecondDefModifier(data.secondDefModifier);
@@ -459,14 +503,18 @@ function CustomWeapons() {
         if (data.secondOverrideDamageType !== undefined) {
           setSecondOverrideType(data.secondOverrideDamageType);
         }
-        if (data.secondCustomDamageType !== undefined) {
-          setSecondCustomDamageType(data.secondCustomDamageType);
+        if (
+          (data.secondCustomDamageType ?? data.secondDamage?.type) !== undefined
+        ) {
+          setSecondCustomDamageType(
+            data.secondCustomDamageType ?? data.secondDamage?.type,
+          );
         }
 
         // Auto-expand secondary modifiers if any are set
         setSecondModifiersExpanded(
-          (data.secondDamageModifier && data.secondDamageModifier !== 0) ||
-            (data.secondPrecModifier && data.secondPrecModifier !== 0) ||
+          (uploadedSecondDamageMod && uploadedSecondDamageMod !== 0) ||
+            (uploadedSecondAccuracyMod && uploadedSecondAccuracyMod !== 0) ||
             (data.secondDefModifier && data.secondDefModifier !== 0) ||
             (data.secondMDefModifier && data.secondMDefModifier !== 0) ||
             data.secondOverrideDamageType,
@@ -1168,44 +1216,104 @@ function CustomWeapons() {
         }}
       >
         {(() => {
+          const { precision: pPrec, damage: pDmg } = calculateCustomWeaponStats(
+            {
+              category: selectedCategory,
+              customizations: currentCustomizations,
+              rareAccuracyBonus,
+              rareDamageBonus,
+              damageModifier: customDamageMod,
+              precModifier: customAccuracyMod,
+            },
+            false,
+          );
+          const pHasElemental = currentCustomizations.some(
+            (c) => c.name === "weapon_customization_elemental",
+          );
+          const pType = pHasElemental
+            ? customDamageType
+            : overrideType
+              ? customDamageType
+              : selectedType;
+
           const exportData = {
             name: weaponName,
+            itemType: "customWeapon",
             category: selectedCategory,
             range: selectedRange,
             martial: martial || isCustomWeaponMartial(),
-            accuracyCheck: selectedAccuracyCheck,
-            type: selectedType,
+            accuracy: {
+              attr1: selectedAccuracyCheck.att1,
+              attr2: selectedAccuracyCheck.att2,
+              value: pPrec,
+              defense: "def",
+            },
+            damage: { value: pDmg, type: pType },
+            modifiers: {
+              damage: parseInt(customDamageMod) || 0,
+              accuracy: parseInt(customAccuracyMod) || 0,
+              def: parseInt(defModifier) || 0,
+              mdef: parseInt(mDefModifier) || 0,
+            },
+            rare: {
+              accuracyBonus: rareAccuracyBonus,
+              damageBonus: rareDamageBonus,
+              overrideAccuracyAttributes,
+              overrideDamageType: overrideType,
+              overrideDamageTypeValue: customDamageType,
+              overrideAccuracyAttr1: selectedAccuracyCheck.att1,
+              overrideAccuracyAttr2: selectedAccuracyCheck.att2,
+            },
             customizations: currentCustomizations,
             selectedQuality: selectedQuality,
             quality: quality,
             qualityCost: qualityCost,
             cost: calculateWeaponCost(),
             hands: 2,
-            isEquipped: false,
-            rareAccuracyBonus,
-            rareDamageBonus,
-            overrideAccuracyAttributes,
-            damageModifier: customDamageMod,
-            precModifier: customAccuracyMod,
-            defModifier: defModifier,
-            mDefModifier: mDefModifier,
-            overrideDamageType: overrideType,
-            customDamageType: customDamageType,
-            ...(hasTransforming && {
-              secondWeaponName,
-              secondSelectedCategory,
-              secondSelectedRange,
-              secondMartial,
-              secondSelectedAccuracyCheck,
-              secondSelectedType,
-              secondCurrentCustomizations,
-              secondDamageModifier: secondCustomDamageMod,
-              secondPrecModifier: secondCustomAccuracyMod,
-              secondDefModifier,
-              secondMDefModifier,
-              secondOverrideDamageType: secondOverrideType,
-              secondCustomDamageType,
-            }),
+            dataType: "weapon",
+            ...(hasTransforming &&
+              (() => {
+                const { precision: s2Prec, damage: s2Dmg } =
+                  calculateCustomWeaponStats(
+                    {
+                      secondSelectedCategory,
+                      secondCurrentCustomizations,
+                      rareAccuracyBonus,
+                      rareDamageBonus,
+                      secondDamageModifier: secondCustomDamageMod,
+                      secondPrecModifier: secondCustomAccuracyMod,
+                    },
+                    true,
+                  );
+                const s2HasElemental = secondCurrentCustomizations.some(
+                  (c) => c.name === "weapon_customization_elemental",
+                );
+                const s2Type = s2HasElemental
+                  ? secondCustomDamageType
+                  : secondOverrideType
+                    ? secondCustomDamageType
+                    : secondSelectedType;
+                return {
+                  secondName: secondWeaponName,
+                  secondCategory: secondSelectedCategory,
+                  secondRange: secondSelectedRange,
+                  secondMartial,
+                  secondCustomizations: secondCurrentCustomizations,
+                  secondAccuracy: {
+                    attr1: secondSelectedAccuracyCheck.att1,
+                    attr2: secondSelectedAccuracyCheck.att2,
+                    value: s2Prec,
+                    defense: "def",
+                  },
+                  secondDamage: { value: s2Dmg, type: s2Type },
+                  secondModifiers: {
+                    damage: parseInt(secondCustomDamageMod) || 0,
+                    accuracy: parseInt(secondCustomAccuracyMod) || 0,
+                    def: parseInt(secondDefModifier) || 0,
+                    mdef: parseInt(secondMDefModifier) || 0,
+                  },
+                };
+              })()),
           };
           return (
             <SharedCustomWeaponCard

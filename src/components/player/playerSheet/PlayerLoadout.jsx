@@ -38,10 +38,7 @@ import {
   resolveEffectiveSlot,
   getActiveVehicle,
 } from "../equipment/slots/equipmentSlots";
-import {
-  calculateAttribute,
-  calculateCustomWeaponStats,
-} from "../common/playerCalculations";
+import { calculateAttribute } from "../common/playerCalculations";
 import {
   getSlotLocks,
   getEquippedModulesForSlot,
@@ -59,20 +56,14 @@ import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
 
 function weaponStatLine(item) {
   if (!item) return "-";
-  if (
-    (item.att1 && item.att2) ||
-    (item.accuracyCheck?.att1 && item.accuracyCheck?.att2)
-  ) {
-    const a1 =
-      attributes[item.att1 ?? item.accuracyCheck?.att1]?.shortcaps ??
-      item.att1 ??
-      item.accuracyCheck?.att1;
-    const a2 =
-      attributes[item.att2 ?? item.accuracyCheck?.att2]?.shortcaps ??
-      item.att2 ??
-      item.accuracyCheck?.att2;
+  const acc = item.accuracy;
+  if (acc?.attr1 && acc?.attr2) {
+    const a1 = attributes[acc.attr1]?.shortcaps ?? acc.attr1;
+    const a2 = attributes[acc.attr2]?.shortcaps ?? acc.attr2;
+    const dmg = item.damage?.value ?? item.damage ?? "?";
+    const type = item.damage?.type ?? item.type ?? "";
     const hands = item.hands === 2 || item.isTwoHand ? "2H" : "1H";
-    return `${a1}+${a2} / ${item.dmg ?? item.damage ?? "?"} ${item.type ?? ""} / ${hands}`.trim();
+    return `${a1}+${a2} / ${dmg} ${type} / ${hands}`.trim();
   }
   return item.quality || "-";
 }
@@ -125,7 +116,7 @@ function SlotCard({
     if (isVehicle) return resolved.module.customName || t(resolved.module.name);
     const item = resolved?.item;
     if (!item) return null;
-    if ("accuracyCheck" in item && item.activeForm === "secondary") {
+    if ("secondAccuracy" in item && item.activeForm === "secondary") {
       return item.secondWeaponName || `${item.name} (Alt)`;
     }
     return item.name ?? null;
@@ -136,20 +127,21 @@ function SlotCard({
     if (isVehicle) return moduleStatLine(resolved.module);
     const item = resolved.item;
     // Custom weapon: respect active form
-    if ("accuracyCheck" in item) {
+    if ("secondAccuracy" in item || "accuracy" in item) {
       const isSecondary = item.activeForm === "secondary";
       const acc = isSecondary
-        ? item.secondSelectedAccuracyCheck
-        : item.accuracyCheck;
-      if (acc?.att1 && acc?.att2) {
-        const a1 = attributes[acc.att1]?.shortcaps ?? acc.att1;
-        const a2 = attributes[acc.att2]?.shortcaps ?? acc.att2;
-        const stats = calculateCustomWeaponStats(item, isSecondary);
-        const type = isSecondary ? item.secondSelectedType : item.type;
-        return `${a1}+${a2} / ${stats.damage} ${type ?? ""} / 2H`.trim();
+        ? (item.secondAccuracy ?? item.accuracy)
+        : item.accuracy;
+      const dmg = isSecondary
+        ? (item.secondDamage ?? item.damage)
+        : item.damage;
+      if (acc?.attr1 && acc?.attr2) {
+        const a1 = attributes[acc.attr1]?.shortcaps ?? acc.attr1;
+        const a2 = attributes[acc.attr2]?.shortcaps ?? acc.attr2;
+        return `${a1}+${a2} / ${dmg?.value ?? "?"} ${dmg?.type ?? ""} / 2H`.trim();
       }
     }
-    if ("att1" in item && "att2" in item) return weaponStatLine(item);
+    if ("accuracy" in item) return weaponStatLine(item);
     if ("def" in item && "mdef" in item && !("init" in item))
       return shieldStatLine(item);
     if ("def" in item && "mdef" in item && "init" in item)
@@ -157,15 +149,13 @@ function SlotCard({
     return item.quality || "-";
   })();
 
-  // A slot is weapon-type if it has rollable att1+att2+damage stats
+  // A slot is weapon-type if it has rollable accuracy+damage stats
   const isWeaponType =
     !isEmpty &&
     (isVehicle
       ? resolved.module.type === "pilot_module_weapon" &&
         !resolved.module.isShield
-      : ("att1" in resolved.item && "att2" in resolved.item) ||
-        (resolved.item?.accuracyCheck?.att1 &&
-          resolved.item?.accuracyCheck?.att2));
+      : !!resolved.item?.accuracy?.attr1 && !!resolved.item?.accuracy?.attr2);
 
   const clickable = !locked && !!onClick && !isAux;
   const showRoll = !!onRoll && isWeaponType && !isEmpty;
@@ -525,21 +515,19 @@ export default function PlayerLoadout({
       type = m.damageType ?? "";
     } else {
       const item = resolved.item;
-      att1 = item.att1 ?? item.accuracyCheck?.att1;
-      att2 = item.att2 ?? item.accuracyCheck?.att2;
+      const isSecondary = item.activeForm === "secondary";
+      const acc = isSecondary
+        ? (item.secondAccuracy ?? item.accuracy)
+        : item.accuracy;
+      const dmg = isSecondary
+        ? (item.secondDamage ?? item.damage)
+        : item.damage;
+      att1 = acc?.attr1;
+      att2 = acc?.attr2;
       if (!att1 || !att2) return;
-      if ("accuracyCheck" in item) {
-        // Custom weapon: derive stats from customizations
-        const isSecondary = item.activeForm === "secondary";
-        const stats = calculateCustomWeaponStats(item, isSecondary);
-        prec = stats.precision;
-        damage = stats.damage;
-        type = (isSecondary ? item.secondSelectedType : item.type) ?? "";
-      } else {
-        prec = item.prec ?? 0;
-        damage = item.damage ?? item.dmg ?? 0;
-        type = item.type ?? "";
-      }
+      prec = acc?.value ?? 0;
+      damage = dmg?.value ?? 0;
+      type = dmg?.type ?? "";
     }
 
     const die1 = getAttrDie(att1);

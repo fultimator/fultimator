@@ -911,7 +911,7 @@ export default function PlayerCardSheet({
   const armorDefModifier = armorModule
     ? 0
     : equippedArmor !== null
-      ? equippedArmor.defModifier || 0
+      ? (equippedArmor.modifiers?.def ?? equippedArmor.defModifier ?? 0)
       : 0;
 
   const currDef =
@@ -919,14 +919,21 @@ export default function PlayerCardSheet({
     (equippedShield !== null ? equippedShield.def : 0) +
     (player.modifiers?.def || 0) +
     armorDefModifier +
-    (equippedShield !== null ? equippedShield.defModifier || 0 : 0) +
-    (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
+    (equippedShield !== null
+      ? (equippedShield.modifiers?.def ?? equippedShield.defModifier ?? 0)
+      : 0) +
+    (equippedAccessory !== null
+      ? (equippedAccessory.modifiers?.def ?? equippedAccessory.defModifier ?? 0)
+      : 0) +
     equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.defModifier || 0),
+      (total, weapon) =>
+        total + (weapon.modifiers?.def ?? weapon.defModifier ?? 0),
       0,
     ) +
     equippedCustomWeapons.reduce(
-      (total, weapon) => total + (parseInt(weapon.defModifier || 0, 10) || 0),
+      (total, weapon) =>
+        total +
+        (parseInt(weapon.modifiers?.def ?? weapon.defModifier ?? 0, 10) || 0),
       0,
     ) +
     dodgeBonus;
@@ -942,7 +949,7 @@ export default function PlayerCardSheet({
   const armorMDefModifier = armorModule
     ? 0
     : equippedArmor !== null
-      ? equippedArmor.mDefModifier || 0
+      ? (equippedArmor.modifiers?.mdef ?? equippedArmor.mDefModifier ?? 0)
       : 0;
 
   const currMDef =
@@ -950,14 +957,23 @@ export default function PlayerCardSheet({
     (equippedShield !== null ? equippedShield.mdef : 0) +
     (player.modifiers?.mdef || 0) +
     armorMDefModifier +
-    (equippedShield !== null ? equippedShield.mDefModifier || 0 : 0) +
-    (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
+    (equippedShield !== null
+      ? (equippedShield.modifiers?.mdef ?? equippedShield.mDefModifier ?? 0)
+      : 0) +
+    (equippedAccessory !== null
+      ? (equippedAccessory.modifiers?.mdef ??
+        equippedAccessory.mDefModifier ??
+        0)
+      : 0) +
     equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.mDefModifier || 0),
+      (total, weapon) =>
+        total + (weapon.modifiers?.mdef ?? weapon.mDefModifier ?? 0),
       0,
     ) +
     equippedCustomWeapons.reduce(
-      (total, weapon) => total + (parseInt(weapon.mDefModifier || 0, 10) || 0),
+      (total, weapon) =>
+        total +
+        (parseInt(weapon.modifiers?.mdef ?? weapon.mDefModifier ?? 0, 10) || 0),
       0,
     );
 

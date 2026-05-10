@@ -11,7 +11,6 @@ import { OpenBracket, CloseBracket } from "../../../Bracket";
 import Diamond from "../../../Diamond";
 import attributes from "../../../../libs/attributes";
 import types from "../../../../libs/types";
-import { calculateCustomWeaponStats } from "../../../player/common/playerCalculations";
 import {
   CARD_DEFAULTS,
   useCardSetup,
@@ -141,19 +140,6 @@ function getArmorInit(item) {
   return `${value > 0 ? "+" : ""}${value}`;
 }
 
-function getCustomWeaponDamageType(item) {
-  const hasElemental = (item.customizations || []).some(
-    (c) => c.name === "weapon_customization_elemental",
-  );
-  if (
-    !hasElemental &&
-    (item.overrideDamageType || item.overrideType) &&
-    item.customDamageType
-  )
-    return item.customDamageType;
-  return item.type || "physical";
-}
-
 function isCustomWeaponMartial(item) {
   if (item.martial) return true;
   if (
@@ -167,25 +153,11 @@ function isCustomWeaponMartial(item) {
   ) {
     return true;
   }
-  const { damage } = calculateCustomWeaponStats(item, false);
-  return damage >= 10;
+  return (item.damage?.value ?? 0) >= 10;
 }
 
 function getCustomWeaponRangeLabel(item, t) {
   return item.range === "weapon_range_ranged" ? t("Ranged") : t("Melee");
-}
-
-function resolveAccuracyAttributes(item) {
-  const att1Raw = Array.isArray(item.accuracyCheck)
-    ? item.accuracyCheck[0]
-    : item.accuracyCheck?.att1 || item.att1;
-  const att2Raw = Array.isArray(item.accuracyCheck)
-    ? item.accuracyCheck[1]
-    : item.accuracyCheck?.att2 || item.att2;
-  return {
-    attr1: attributes[att1Raw || "dexterity"],
-    attr2: attributes[att2Raw || "might"],
-  };
 }
 
 function QualityRow({ item, customTheme, imageMode }) {
@@ -239,9 +211,9 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
     imageTempInfoTextKey,
   });
 
-  const attr1 = attributes[item.att1];
-  const attr2 = attributes[item.att2];
-  const dmgType = types[item.type];
+  const attr1 = attributes[item.accuracy?.attr1 ?? item.att1];
+  const attr2 = attributes[item.accuracy?.attr2 ?? item.att2];
+  const dmgType = types[item.damage?.type ?? item.type];
   const withImage = isImageMode(imageMode);
   const cols = withImage
     ? { name: 3, cost: 1, accuracy: 4, damage: 4, hands: 4, range: 3 }
@@ -342,10 +314,10 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
               <OpenBracket />
               {attr1?.shortcaps} + {attr2?.shortcaps}
               <CloseBracket />
-              {item.prec > 0
-                ? `+${item.prec}`
-                : item.prec < 0
-                  ? `${item.prec}`
+              {(item.accuracy?.value ?? item.prec ?? 0) > 0
+                ? `+${item.accuracy?.value ?? item.prec}`
+                : (item.accuracy?.value ?? item.prec ?? 0) < 0
+                  ? `${item.accuracy?.value ?? item.prec}`
                   : ""}
             </Typography>
           </Grid>
@@ -360,7 +332,8 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
               }}
             >
               <OpenBracket />
-              {t("HR")} {item.damage >= 0 ? "+" : ""} {item.damage}
+              {t("HR")} {(item.damage?.value ?? item.damage) >= 0 ? "+" : ""}{" "}
+              {item.damage?.value ?? item.damage}
               <CloseBracket />
               {dmgType?.long}
             </Typography>
@@ -646,9 +619,11 @@ function CustomWeaponRows({
   cols,
   t,
 }) {
-  const { precision, damage } = calculateCustomWeaponStats(item, false);
-  const { attr1, attr2 } = resolveAccuracyAttributes(item);
-  const damageType = types[getCustomWeaponDamageType(item)];
+  const precision = item.accuracy?.value ?? 0;
+  const damage = item.damage?.value ?? 0;
+  const attr1 = attributes[item.accuracy?.attr1 ?? "dexterity"];
+  const attr2 = attributes[item.accuracy?.attr2 ?? "might"];
+  const damageType = types[item.damage?.type ?? "physical"];
   const martial = isCustomWeaponMartial(item);
 
   return (
@@ -901,31 +876,23 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
 }
 
 function buildSecondWeaponItem(item) {
-  const secondHasElemental = (item.secondCurrentCustomizations || []).some(
-    (c) => c.name === "weapon_customization_elemental",
-  );
   return {
     name: item.secondWeaponName || item.name,
     category: item.secondSelectedCategory || item.category,
     range: item.secondSelectedRange || item.range,
-    accuracyCheck: item.overrideAccuracyAttributes
-      ? item.accuracyCheck
-      : item.secondSelectedAccuracyCheck || item.accuracyCheck,
-    type: item.secondSelectedType || item.type,
+    accuracy: item.overrideAccuracyAttributes
+      ? item.accuracy
+      : item.secondAccuracy || item.accuracy,
+    damage: item.secondDamage || item.damage,
     customizations: item.secondCurrentCustomizations || [],
     quality: item.quality,
     qualityCost: item.qualityCost,
     cost: item.cost,
     rareAccuracyBonus: item.rareAccuracyBonus || false,
     rareDamageBonus: item.rareDamageBonus || false,
-    damageModifier: item.secondDamageModifier || 0,
-    precModifier: item.secondPrecModifier || 0,
     defModifier: item.secondDefModifier || 0,
     mDefModifier: item.secondMDefModifier || 0,
-    overrideDamageType: secondHasElemental
-      ? false
-      : item.overrideDamageType || false,
-    customDamageType: item.customDamageType || item.type || "physical",
+    overrideDamageType: item.secondOverrideDamageType || false,
   };
 }
 

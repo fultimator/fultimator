@@ -48,10 +48,7 @@ import {
   getPilotSpellInfo,
 } from "../../equipment/slots/loadoutSelectors";
 import { useLoadoutStore } from "../../../../store/playerLoadoutStore";
-import {
-  calculateAttribute,
-  calculateCustomWeaponStats,
-} from "../../common/playerCalculations";
+import { calculateAttribute } from "../../common/playerCalculations";
 import attributes from "../../../../libs/attributes";
 import SlotPickerDialog from "../../equipment/slots/SlotPickerDialog";
 import SpellPilotVehiclesModal from "../../spells/SpellPilotVehiclesModal";
@@ -102,10 +99,7 @@ function isWeaponResolved(resolved) {
     );
   }
   const item = resolved.item;
-  return (
-    !!(item?.att1 && item?.att2) ||
-    !!(item?.accuracyCheck?.att1 && item?.accuracyCheck?.att2)
-  );
+  return !!(item?.accuracy?.attr1 && item?.accuracy?.attr2);
 }
 
 function hasTransforming(resolved) {
@@ -220,20 +214,19 @@ export default function CompactLoadout({
       type = m.damageType ?? "";
     } else {
       const item = resolved.item;
-      att1 = item.att1 ?? item.accuracyCheck?.att1;
-      att2 = item.att2 ?? item.accuracyCheck?.att2;
+      const isSecondary = item.activeForm === "secondary";
+      const acc = isSecondary
+        ? (item.secondAccuracy ?? item.accuracy)
+        : item.accuracy;
+      const dmg = isSecondary
+        ? (item.secondDamage ?? item.damage)
+        : item.damage;
+      att1 = acc?.attr1;
+      att2 = acc?.attr2;
       if (!att1 || !att2) return;
-      if ("accuracyCheck" in item) {
-        const isSecondary = item.activeForm === "secondary";
-        const stats = calculateCustomWeaponStats(item, isSecondary);
-        prec = stats.precision;
-        damage = stats.damage;
-        type = (isSecondary ? item.secondSelectedType : item.type) ?? "";
-      } else {
-        prec = item.prec ?? 0;
-        damage = item.damage ?? item.dmg ?? 0;
-        type = item.type ?? "";
-      }
+      prec = acc?.value ?? 0;
+      damage = dmg?.value ?? 0;
+      type = dmg?.type ?? "";
     }
 
     const die1 = getAttrDie(att1);
@@ -401,7 +394,7 @@ export default function CompactLoadout({
                   : (() => {
                       const item = resolved.item;
                       if (
-                        "accuracyCheck" in item &&
+                        "secondAccuracy" in item &&
                         item.activeForm === "secondary"
                       )
                         return item.secondWeaponName || `${item.name} (Alt)`;

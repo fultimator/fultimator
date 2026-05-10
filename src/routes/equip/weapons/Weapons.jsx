@@ -34,6 +34,15 @@ import AddToCompendiumButton from "../../../components/compendium/AddToCompendiu
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { Download } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
+import {
+  getWeaponAttr1,
+  getWeaponAttr2,
+  getWeaponDamage,
+  getWeaponPrec,
+  getWeaponRange,
+  getWeaponType,
+  normalizeWeaponLike,
+} from "../../../libs/weaponNormalization";
 
 function Weapons() {
   const { t } = useTranslate();
@@ -41,10 +50,10 @@ function Weapons() {
   const secondary = theme.palette.secondary.main;
   const [base, setBase] = useState(weapons[0]);
   const [name, setName] = useState(weapons[0].name);
-  const [type, setType] = useState(weapons[0].type);
+  const [type, setType] = useState(getWeaponType(weapons[0]));
   const [hands, setHands] = useState(weapons[0].hands);
-  const [att1, setAtt1] = useState(weapons[0].att1);
-  const [att2, setAtt2] = useState(weapons[0].att2);
+  const [att1, setAtt1] = useState(getWeaponAttr1(weapons[0]));
+  const [att2, setAtt2] = useState(getWeaponAttr2(weapons[0]));
   const [martial, setMartial] = useState(false);
   const [damageBonus, setDamageBonus] = useState(false);
   const [damageReworkBonus, setDamageReworkBonus] = useState(false);
@@ -67,21 +76,22 @@ function Weapons() {
 
   const handleFileUpload = (data) => {
     if (data) {
+      const normalized = normalizeWeaponLike(data);
       const {
         base,
         name,
-        att1,
-        att2,
+        accuracy,
         martial,
-        type,
+        damage,
         hand,
+        hands,
         quality,
         qualityCost,
         damageBonus,
         damageReworkBonus,
         precBonus,
         rework,
-      } = data;
+      } = normalized;
 
       if (base) {
         setBase(base);
@@ -89,20 +99,20 @@ function Weapons() {
       if (name) {
         setName(name);
       }
-      if (att1) {
-        setAtt1(att1);
+      if (accuracy?.attr1) {
+        setAtt1(accuracy.attr1);
       }
-      if (att2) {
-        setAtt2(att2);
+      if (accuracy?.attr2) {
+        setAtt2(accuracy.attr2);
       }
       if (martial) {
         setMartial(martial);
       }
-      if (type) {
-        setType(type);
+      if (damage?.type) {
+        setType(damage.type);
       }
-      if (hand) {
-        setHands(hand);
+      if (hand || hands) {
+        setHands(hand ?? hands);
       }
       if (quality) {
         setSelectedQuality("");
@@ -148,10 +158,10 @@ function Weapons() {
   const handleClearFields = () => {
     setBase(weapons[0]);
     setName(t(weapons[0].name)); // Use translated name when clearing
-    setType(weapons[0].type);
+    setType(getWeaponType(weapons[0]));
     setHands(weapons[0].hands);
-    setAtt1(weapons[0].att1);
-    setAtt2(weapons[0].att2);
+    setAtt1(getWeaponAttr1(weapons[0]));
+    setAtt2(getWeaponAttr2(weapons[0]));
     setMartial(weapons[0].martial);
     setDamageBonus(false);
     setDamageReworkBonus(false);
@@ -176,7 +186,7 @@ function Weapons() {
     }
 
     // Changed attributes
-    if (base.att1 !== att1 || base.att2 !== att2) {
+    if (getWeaponAttr1(base) !== att1 || getWeaponAttr2(base) !== att2) {
       if (att1 === att2) {
         cost += 50;
       }
@@ -188,10 +198,10 @@ function Weapons() {
     }
 
     // Bonus prec
-    if (!rework && base.prec !== 1 && precBonus) {
+    if (!rework && getWeaponPrec(base) !== 1 && precBonus) {
       cost += 100;
       // Bonus prec (rework)
-    } else if (rework && base.prec <= 1 && precBonus) {
+    } else if (rework && getWeaponPrec(base) <= 1 && precBonus) {
       cost += 100;
     }
 
@@ -201,7 +211,7 @@ function Weapons() {
   }
 
   function calcDamage() {
-    let damage = base.damage;
+    let damage = getWeaponDamage(base);
 
     // Changed type
     if (
@@ -228,7 +238,7 @@ function Weapons() {
   }
 
   function calcPrec() {
-    let prec = base.prec;
+    let prec = getWeaponPrec(base);
 
     // Bonus prec
     if (!rework && prec !== 1 && precBonus) {
@@ -293,13 +303,13 @@ function Weapons() {
                     setBase(selectedBase);
                     // Set the name to the translated version when base changes
                     setName(t(selectedBase.name));
-                    setType(selectedBase.type);
+                    setType(getWeaponType(selectedBase));
                     setHands(selectedBase.hands);
                     setDamageBonus(false);
                     setDamageReworkBonus(false);
                     setPrecBonus(false);
-                    setAtt1(selectedBase.att1);
-                    setAtt2(selectedBase.att2);
+                    setAtt1(getWeaponAttr1(selectedBase));
+                    setAtt2(getWeaponAttr2(selectedBase));
                     setMartial(selectedBase.martial);
                   }}
                 />
@@ -385,7 +395,7 @@ function Weapons() {
                       </Grid>
                       <Grid size={12}>
                         <ChangeBonus
-                          basePrec={base.prec}
+                          basePrec={getWeaponPrec(base)}
                           precBonus={precBonus}
                           damageBonus={damageBonus}
                           damageReworkBonus={damageReworkBonus}
@@ -498,7 +508,7 @@ function Weapons() {
           }}
         >
           {(() => {
-            const customItem = {
+            const customItem = normalizeWeaponLike({
               base: base,
               name: name,
               att1: att1,
@@ -507,8 +517,7 @@ function Weapons() {
               type: type,
               hands: hands,
               category: base.category,
-              melee: base.melee,
-              ranged: base.ranged,
+              range: getWeaponRange(base),
               cost: cost,
               damage: damage,
               prec: prec,
@@ -524,6 +533,32 @@ function Weapons() {
               precModifier: precModifier,
               defModifier: defModifier,
               mDefModifier: mDefModifier,
+            });
+            const exportItem = {
+              itemType: "weapon",
+              name: customItem.name,
+              category: customItem.category,
+              range: customItem.range,
+              hands: customItem.hands,
+              martial: customItem.martial,
+              accuracy: customItem.accuracy,
+              damage: customItem.damage,
+              modifiers: {
+                damage: parseInt(damageModifier, 10) || 0,
+                accuracy: parseInt(precModifier, 10) || 0,
+                def: parseInt(defModifier, 10) || 0,
+                mdef: parseInt(mDefModifier, 10) || 0,
+              },
+              rare: {
+                accuracyBonus: !!precBonus,
+                damageBonus: !!(rework ? damageReworkBonus : damageBonus),
+              },
+              quality: customItem.quality ?? "",
+              cost: customItem.cost ?? 0,
+              special: Array.isArray(customItem.special)
+                ? customItem.special
+                : [],
+              dataType: "weapon",
             };
             return (
               <div
@@ -560,11 +595,11 @@ function Weapons() {
                         <Export
                           name={name}
                           dataType="weapon"
-                          data={customItem}
+                          data={exportItem}
                         />
                         <AddToCompendiumButton
                           itemType="weapon"
-                          data={customItem}
+                          data={exportItem}
                         />
                       </div>
                     }

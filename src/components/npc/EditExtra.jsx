@@ -15,8 +15,8 @@ import {
   Typography,
 } from "@mui/material";
 import { Martial } from "../icons";
-import { baseArmors } from "../../libs/equip";
-import { baseShields } from "../../libs/equip";
+import armorList from "../../libs/armor";
+import shields from "../../libs/shields";
 import { useTranslate } from "../../translation/translate";
 import React, { useCallback, useMemo } from "react";
 
@@ -504,10 +504,13 @@ const SelectArmor = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
   const onChange = useCallback(
     (e) => {
-      const armor = baseArmors.find((armor) => armor.name === e.target.value);
+      const selectedArmor =
+        armorList.find((item) => item.name === e.target.value) ??
+        armorList.find((item) => item.name === "No Armor") ??
+        armorList[0];
 
       setNpc((prevState) => {
-        const newState = { ...prevState, armor };
+        const newState = { ...prevState, armor: selectedArmor };
         if (!newState.extra) {
           newState.extra = {};
         }
@@ -518,22 +521,22 @@ const SelectArmor = React.memo(({ npc, setNpc }) => {
   );
 
   const options = useMemo(() => {
-    const opts = [<MenuItem key={1} value="" disabled />];
-    for (const armor of baseArmors) {
+    const opts = [];
+    for (const item of armorList) {
       opts.push(
-        <MenuItem key={armor.name} value={armor.name}>
-          {armor.name}
-          {armor.martial && <Martial />}{" "}
+        <MenuItem key={item.name} value={item.name}>
+          {item.name}
+          {item.martial && <Martial />}{" "}
         </MenuItem>,
       );
     }
     return opts;
   }, []);
 
-  let armor = npc.armor;
-  if (!armor) {
-    armor = baseArmors[0];
-  }
+  const selectedArmor =
+    npc.armor ??
+    armorList.find((item) => item.name === "No Armor") ??
+    armorList[0];
 
   const isDefenseOverridden = npc.extra?.defOverride || npc.extra?.mDefOverride;
 
@@ -544,7 +547,7 @@ const SelectArmor = React.memo(({ npc, setNpc }) => {
         size="medium"
         labelId="armor"
         id="select-armor"
-        value={armor.name}
+        value={selectedArmor.name}
         label={t("Armor")}
         onChange={onChange}
         disabled={isDefenseOverridden}
@@ -559,9 +562,10 @@ const SelectShield = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
   const onChange = useCallback(
     (e) => {
-      const shield = baseShields.find(
-        (shield) => shield.name === e.target.value,
-      );
+      const shield =
+        shields.find((item) => item.name === e.target.value) ??
+        shields.find((item) => item.name === "No Shield") ??
+        shields[0];
 
       setNpc((prevState) => {
         const newState = { ...prevState, shield };
@@ -575,8 +579,8 @@ const SelectShield = React.memo(({ npc, setNpc }) => {
   );
 
   const options = useMemo(() => {
-    const opts = [<MenuItem key={1} value="" disabled />];
-    for (const shield of baseShields) {
+    const opts = [];
+    for (const shield of shields) {
       opts.push(
         <MenuItem key={shield.name} value={shield.name}>
           {shield.name}
@@ -587,10 +591,10 @@ const SelectShield = React.memo(({ npc, setNpc }) => {
     return opts;
   }, []);
 
-  let shield = npc.shield;
-  if (!shield) {
-    shield = baseShields[0];
-  }
+  const shield =
+    npc.shield ??
+    shields.find((item) => item.name === "No Shield") ??
+    shields[0];
 
   const isDefenseOverridden = npc.extra?.defOverride || npc.extra?.mDefOverride;
 

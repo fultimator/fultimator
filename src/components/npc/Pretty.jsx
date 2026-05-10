@@ -773,7 +773,9 @@ function Attacks({ npc }) {
             <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 {attack.range === "melee" && <MeleeIcon />}
-                {attack.range === "distance" && <DistanceIcon />}
+                {(attack.range === "distance" || attack.range === "ranged") && (
+                  <DistanceIcon />
+                )}
               </Typography>
             </Grid>
             <Grid sx={{ px: 1, py: 0.5 }} size={11}>
@@ -781,8 +783,11 @@ function Attacks({ npc }) {
                 <strong>{attack.name}</strong> <Diamond />{" "}
                 <strong>
                   <OpenBracket />
-                  {attributes[attack.attr1].shortcaps} {" + "}
-                  {attributes[attack.attr2].shortcaps}
+                  {attributes[attack.accuracy?.attr1]?.shortcaps ??
+                    attack.accuracy?.attr1}{" "}
+                  {" + "}
+                  {attributes[attack.accuracy?.attr2]?.shortcaps ??
+                    attack.accuracy?.attr2}
                   <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}{" "}
@@ -844,24 +849,29 @@ function Attacks({ npc }) {
           <Fragment key={i}>
             <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
-                {attack.weapon.range === "melee" && <MeleeIcon />}
-                {attack.weapon.range === "distance" && <DistanceIcon />}
+                {attack.range === "melee" && <MeleeIcon />}
+                {(attack.range === "distance" || attack.range === "ranged") && (
+                  <DistanceIcon />
+                )}
               </Typography>
             </Grid>
             <Grid sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
-                <strong>
-                  {attack.name} ({attack.weapon.name}){" "}
-                  {/* {attack.martial && <Martial />}{" "} */}
-                </strong>{" "}
-                <Diamond />{" "}
-                {attack.weapon.hands === 1 ? t("1 handed") : t("2 handed")}{" "}
+                <strong>{attack.name} </strong>{" "}
+                {attack.hands && (
+                  <>
+                    <Diamond />{" "}
+                    {attack.hands === 1 ? t("1 handed") : t("2 handed")}{" "}
+                  </>
+                )}
                 <Diamond />{" "}
                 <strong>
                   <OpenBracket />
-                  {attributes[attack.weapon.att1].shortcaps}
+                  {attributes[attack.accuracy?.attr1]?.shortcaps ??
+                    attack.accuracy?.attr1}
                   {" + "}
-                  {attributes[attack.weapon.att2].shortcaps}
+                  {attributes[attack.accuracy?.attr2]?.shortcaps ??
+                    attack.accuracy?.attr2}
                   <CloseBracket />
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}{" "}
@@ -869,14 +879,14 @@ function Attacks({ npc }) {
                   {t("HR")} + {calcDamage(attack, npc)}
                   <CloseBracket />
                 </strong>{" "}
-                {(attack.type || attack.weapon.type) === "physical" ? (
+                {attack.damage?.type === "physical" ? (
                   <span>
                     <SpanMarkdown
                       components={{
                         strong: ({ _node, ...props }) => <strong {...props} />,
                       }}
                     >
-                      {t(damageTypeLabels[attack.type || attack.weapon.type])}
+                      {t(damageTypeLabels[attack.damage?.type])}
                     </SpanMarkdown>
                   </span>
                 ) : (
@@ -889,7 +899,7 @@ function Attacks({ npc }) {
                           ),
                         }}
                       >
-                        {t(damageTypeLabels[attack.type || attack.weapon.type])}
+                        {t(damageTypeLabels[attack.damage?.type])}
                       </SpanMarkdown>
                     </span>
                   </>
@@ -1493,10 +1503,10 @@ function Equip({ npc }) {
   const weapons = [];
 
   npc.weaponattacks?.forEach((attack) => {
-    if (weapons.find((weapon) => weapon.name === attack.weapon.name)) {
+    if (weapons.find((weapon) => weapon.name === attack.name)) {
       return;
     }
-    weapons.push(attack.weapon);
+    weapons.push(attack);
   });
 
   const hasWeapons = weapons.length !== 0;
@@ -1580,22 +1590,26 @@ function Equip({ npc }) {
             <strong>
               {" "}
               <OpenBracket />
-              {attributes[weapon.att1].shortcaps}
+              {attributes[weapon.accuracy?.attr1]?.shortcaps ??
+                weapon.accuracy?.attr1}
               {" + "}
-              {attributes[weapon.att2].shortcaps}
+              {attributes[weapon.accuracy?.attr2]?.shortcaps ??
+                weapon.accuracy?.attr2}
               <CloseBracket />
-              {weapon.prec > 0 && `+${weapon.prec}`} <Diamond /> <OpenBracket />
-              {t("HR")} + {weapon.damage}
+              {(weapon.accuracy?.value ?? 0) > 0 &&
+                `+${weapon.accuracy?.value}`}{" "}
+              <Diamond /> <OpenBracket />
+              {t("HR")} + {weapon.damage?.value ?? 0}
               <CloseBracket />
             </strong>{" "}
-            {weapon.type === "physical" ? (
+            {weapon.damage?.type === "physical" ? (
               <span>
                 <SpanMarkdown
                   components={{
                     strong: ({ _node, ...props }) => <strong {...props} />,
                   }}
                 >
-                  {t(damageTypeLabels[weapon.type])}
+                  {t(damageTypeLabels[weapon.damage?.type])}
                 </SpanMarkdown>
               </span>
             ) : (
@@ -1606,7 +1620,7 @@ function Equip({ npc }) {
                       strong: ({ _node, ...props }) => <strong {...props} />,
                     }}
                   >
-                    {t(damageTypeLabels[weapon.type])}
+                    {t(damageTypeLabels[weapon.damage?.type])}
                   </SpanMarkdown>
                 </span>
               </>

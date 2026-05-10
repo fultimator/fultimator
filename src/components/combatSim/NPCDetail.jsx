@@ -233,8 +233,14 @@ const NPCDetail = ({
             ? "【" + selectedNPC.combatStats.combatNotes + "】"
             : ""),
         attackName: attack.name,
-        range: attackType === "attack" ? attack.range : attack.weapon.range,
-        damageType: attackType === "attack" ? attack.type : attack.weapon.type,
+        range:
+          attackType === "attack"
+            ? attack.range
+            : (attack.range ?? attack.weapon?.range),
+        damageType:
+          attackType === "attack"
+            ? (attack.damage?.type ?? attack.type)
+            : (attack.damage?.type ?? attack.weapon?.type),
         dice1: diceResults.attribute1,
         dice2: diceResults.attribute2,
         prec:
@@ -328,13 +334,13 @@ const NPCDetail = ({
     let attribute1, attribute2, extraDamage, extraPrecision, type;
 
     if (attackType === "weapon") {
-      // For weapon attacks
-      const { att1, att2 } = attack.weapon;
-      attribute1 = attributes[att1];
-      attribute2 = attributes[att2];
+      const attr1 = attack.accuracy?.attr1 ?? attack.weapon?.att1;
+      const attr2 = attack.accuracy?.attr2 ?? attack.weapon?.att2;
+      attribute1 = attributes[attr1];
+      attribute2 = attributes[attr2];
       extraDamage = calcDamage(attack, selectedNPC);
       extraPrecision = calcPrecision(attack, selectedNPC);
-      type = attack.weapon.type;
+      type = attack.damage?.type ?? attack.weapon?.type;
     } else if (attackType === "spell") {
       // For spells
       const { attr1, attr2 } = attack;
@@ -345,12 +351,13 @@ const NPCDetail = ({
       type = "spell";
     } else {
       // For base attacks
-      const { attr1, attr2 } = attack;
+      const attr1 = attack.accuracy?.attr1 ?? attack.attr1;
+      const attr2 = attack.accuracy?.attr2 ?? attack.attr2;
       attribute1 = attributes[attr1];
       attribute2 = attributes[attr2];
       extraDamage = calcDamage(attack, selectedNPC);
       extraPrecision = calcPrecision(attack, selectedNPC);
-      type = attack.type;
+      type = attack.damage?.type ?? attack.type;
     }
 
     if (attribute1 === undefined || attribute2 === undefined) {

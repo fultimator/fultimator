@@ -133,6 +133,16 @@ import {
   customizations as cwCustomizations,
   types as cwTypes,
 } from "../../routes/equip/customWeapons/libs.jsx";
+import {
+  getWeaponAttr1,
+  getWeaponAttr2,
+  getWeaponDamage,
+  getWeaponPrec,
+  getWeaponRange,
+  getWeaponType,
+  normalizeCustomWeaponLike,
+  normalizeWeaponLike,
+} from "../../libs/weaponNormalization";
 
 // Shared constants
 const slugify = (value = "") =>
@@ -3103,10 +3113,10 @@ function WeaponPanel() {
   const [base, setBase] = useState(weapons[0]);
   const [name, setName] = useState(weapons[0].name);
   const [category, setCategory] = useState(weapons[0].category ?? "");
-  const [type, setType] = useState(weapons[0].type);
+  const [type, setType] = useState(getWeaponType(weapons[0]));
   const [hands, setHands] = useState(weapons[0].hands);
-  const [att1, setAtt1] = useState(weapons[0].att1);
-  const [att2, setAtt2] = useState(weapons[0].att2);
+  const [att1, setAtt1] = useState(getWeaponAttr1(weapons[0]));
+  const [att2, setAtt2] = useState(getWeaponAttr2(weapons[0]));
   const [martial, setMartial] = useState(false);
   const [damageBonus, setDamageBonus] = useState(false);
   const [damageReworkBonus, setDamageReworkBonus] = useState(false);
@@ -3134,18 +3144,18 @@ function WeaponPanel() {
   const calcCost = () => {
     let cost = base.cost;
     if (type !== "physical") cost += 100;
-    if (base.att1 !== att1 || base.att2 !== att2) {
+    if (getWeaponAttr1(base) !== att1 || getWeaponAttr2(base) !== att2) {
       if (att1 === att2) cost += 50;
     }
     if (!rework && damageBonus) cost += 200;
-    if (!rework && base.prec !== 1 && precBonus) cost += 100;
-    else if (rework && base.prec <= 1 && precBonus) cost += 100;
+    if (!rework && getWeaponPrec(base) !== 1 && precBonus) cost += 100;
+    else if (rework && getWeaponPrec(base) <= 1 && precBonus) cost += 100;
     cost += parseInt(qualityCost);
     return cost;
   };
 
   const calcDamage = () => {
-    let damage = base.damage;
+    let damage = getWeaponDamage(base);
     if (base.hands === 1 && hands === 2) damage += 4;
     if (base.hands === 2 && hands === 1) damage -= 4;
     if (!rework && damageBonus) damage += 4;
@@ -3156,7 +3166,7 @@ function WeaponPanel() {
   };
 
   const calcPrec = () => {
-    let prec = base.prec;
+    let prec = getWeaponPrec(base);
     if (!rework && prec !== 1 && precBonus) prec = 1;
     if (rework && prec === 1 && precBonus) prec = 2;
     else if (rework && prec === 0 && precBonus) prec = 1;
@@ -3172,12 +3182,11 @@ function WeaponPanel() {
     setTotalBonus(Math.floor(cost / 1000) * 2);
   }, [damageReworkBonus, cost, qualityCost, rework]);
 
-  const weaponObj = {
+  const weaponObj = normalizeWeaponLike({
     base,
     name,
     category,
-    melee: base.melee || false,
-    ranged: base.ranged || false,
+    range: getWeaponRange(base),
     type,
     hands,
     att1,
@@ -3195,16 +3204,16 @@ function WeaponPanel() {
     damage,
     prec,
     ...modifiers(),
-  };
+  });
 
   const handleClear = () => {
     setBase(weapons[0]);
     setName(weapons[0].name);
     setCategory(weapons[0].category ?? "");
-    setType(weapons[0].type);
+    setType(getWeaponType(weapons[0]));
     setHands(weapons[0].hands);
-    setAtt1(weapons[0].att1);
-    setAtt2(weapons[0].att2);
+    setAtt1(getWeaponAttr1(weapons[0]));
+    setAtt2(getWeaponAttr2(weapons[0]));
     setMartial(weapons[0].martial || false);
     setDamageBonus(false);
     setDamageReworkBonus(false);
@@ -3234,10 +3243,10 @@ function WeaponPanel() {
                 setBase(b);
                 setName(t(b.name));
                 setCategory(b.category);
-                setType(b.type);
+                setType(getWeaponType(b));
                 setHands(b.hands);
-                setAtt1(b.att1);
-                setAtt2(b.att2);
+                setAtt1(getWeaponAttr1(b));
+                setAtt2(getWeaponAttr2(b));
                 setMartial(b.martial);
                 setDamageBonus(false);
                 setDamageReworkBonus(false);
@@ -3344,7 +3353,7 @@ function WeaponPanel() {
                 </Grid>
                 <Grid size={12}>
                   <ChangeBonus
-                    basePrec={base.prec}
+                    basePrec={getWeaponPrec(base)}
                     precBonus={precBonus}
                     damageBonus={damageBonus}
                     damageReworkBonus={damageReworkBonus}
@@ -3951,12 +3960,55 @@ function CustomWeaponPanel() {
     return secondaryDamage >= 10;
   };
 
-  const weaponObj = {
+  const { precision, damage } = calculateCustomWeaponStats(
+    {
+      category,
+      customizations,
+      rareAccuracyBonus,
+      rareDamageBonus,
+      damageModifier: parseInt(damageModifier),
+      precModifier: parseInt(precModifier),
+    },
+    false,
+  );
+  const primaryType = customizations.some(
+    (c) => c.name === "weapon_customization_elemental",
+  )
+    ? customDamageType
+    : overrideDamageType
+      ? customDamageType
+      : type;
+  const { precision: secondPrecision, damage: secondDamage } =
+    calculateCustomWeaponStats(
+      {
+        secondSelectedCategory,
+        secondCurrentCustomizations,
+        rareAccuracyBonus,
+        rareDamageBonus,
+        secondDamageModifier,
+        secondPrecModifier,
+      },
+      true,
+    );
+  const secondType = secondCurrentCustomizations.some(
+    (c) => c.name === "weapon_customization_elemental",
+  )
+    ? secondCustomDamageType
+    : secondOverrideDamageType
+      ? secondCustomDamageType
+      : secondSelectedType;
+
+  const weaponObj = normalizeCustomWeaponLike({
     name,
     category,
     range,
-    accuracyCheck: { att1: accuracyCheck.att1, att2: accuracyCheck.att2 },
-    type,
+    accuracy: {
+      attr1: accuracyCheck.att1,
+      attr2: accuracyCheck.att2,
+      value: precision,
+      defense: "def",
+    },
+    damage: { value: damage, type: primaryType },
     customizations,
     quality,
     qualityCost,
@@ -3970,30 +4022,26 @@ function CustomWeaponPanel() {
     secondWeaponName,
     secondSelectedCategory,
     secondSelectedRange,
-    secondSelectedAccuracyCheck: {
-      att1: overrideAccuracyAttributes
+    secondAccuracy: {
+      attr1: overrideAccuracyAttributes
         ? accuracyCheck.att1
         : secondSelectedAccuracyCheck.att1,
-      att2: overrideAccuracyAttributes
+      attr2: overrideAccuracyAttributes
         ? accuracyCheck.att2
         : secondSelectedAccuracyCheck.att2,
+      value: secondPrecision,
+      defense: "def",
     },
-    secondSelectedType,
+    secondDamage: { value: secondDamage, type: secondType },
     secondCurrentCustomizations,
-    secondDamageModifier: parseInt(secondDamageModifier),
-    secondPrecModifier: parseInt(secondPrecModifier),
     secondDefModifier: parseInt(secondDefModifier),
     secondMDefModifier: parseInt(secondMDefModifier),
     secondOverrideDamageType,
-    secondCustomDamageType,
-    damageModifier: parseInt(damageModifier),
-    precModifier: parseInt(precModifier),
     defModifier: parseInt(defModifier),
     mDefModifier: parseInt(mDefModifier),
     overrideDamageType,
-    customDamageType,
     ...modifiers(),
-  };
+  });
 
   const handleClear = () => {
     setName("");

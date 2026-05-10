@@ -332,19 +332,18 @@ function NpcCombatant({ npc }: NpcProps) {
 
     if (attackType === "weapon") {
       // For weapon attacks
-      const { att1, att2 } = attack.weapon;
-      attribute1 = attributes[att1];
-      attribute2 = attributes[att2];
+      attribute1 = attributes[attack.accuracy?.attr1];
+      attribute2 = attributes[attack.accuracy?.attr2];
       extraDamage =
-        attack.weapon.damage +
+        (attack.damage?.value ?? 0) +
         (attack.flatdmg ? parseInt(attack.flatdmg) : 0) +
         (attack.extraDamage ? 5 : 0);
       extraPrecision =
         (npc.extra?.precision ? 3 : 0) +
-        attack.weapon.prec +
+        (attack.accuracy?.value ?? 0) +
         (attack.flathit ? parseInt(attack.flathit) : 0) +
         accuracyLevelBonus;
-      type = attack.weapon.type;
+      type = attack.damage?.type;
     } else if (attackType === "spell") {
       // For spells
       const { attr1, attr2 } = attack;
@@ -416,19 +415,20 @@ function NpcCombatant({ npc }: NpcProps) {
   const generateButtonLabel = (attack) => {
     let translatedAttribute1, translatedAttribute2;
 
-    if (attack.weapon) {
+    if (attack.weapon || attack.accuracy) {
       // For weapon attacks
-      const { name, weapon } = attack;
-      const { att1, att2 } = weapon;
-      const attributeMap = {
+      const name = attack.name ?? attack.weapon?.name;
+      const attr1 = attack.accuracy?.attr1;
+      const attr2 = attack.accuracy?.attr2;
+      const attributeMap: Record<string, string> = {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[att1])} d${attributes[att1]}`;
-      translatedAttribute2 = `${t(attributeMap[att2])} d${attributes[att2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     } else if (attack.spell) {

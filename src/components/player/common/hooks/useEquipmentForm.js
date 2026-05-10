@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 
 /** Returns true if any modifier field on the item is non-zero. */
 function hasAnyModifier(item) {
+  const canonical = item?.modifiers;
   const fields = [
     "defModifier",
     "mDefModifier",
@@ -12,7 +13,13 @@ function hasAnyModifier(item) {
     "damageRangedModifier",
     "damageModifier",
   ];
-  return fields.some((f) => item?.[f] && item[f] !== 0);
+  return (
+    fields.some((f) => item?.[f] && item[f] !== 0) ||
+    (canonical?.damage ?? 0) !== 0 ||
+    (canonical?.accuracy ?? 0) !== 0 ||
+    (canonical?.def ?? 0) !== 0 ||
+    (canonical?.mdef ?? 0) !== 0
+  );
 }
 
 /**
@@ -29,11 +36,17 @@ function hasAnyModifier(item) {
  */
 export function useEquipmentForm(item) {
   // Armor/shield/accessory modifiers
-  const [defModifier, setDefModifier] = useState(item?.defModifier || 0);
-  const [mDefModifier, setMDefModifier] = useState(item?.mDefModifier || 0);
+  const [defModifier, setDefModifier] = useState(
+    item?.modifiers?.def ?? item?.defModifier ?? 0,
+  );
+  const [mDefModifier, setMDefModifier] = useState(
+    item?.modifiers?.mdef ?? item?.mDefModifier ?? 0,
+  );
   const [initModifier, setInitModifier] = useState(item?.initModifier || 0);
   const [magicModifier, setMagicModifier] = useState(item?.magicModifier || 0);
-  const [precModifier, setPrecModifier] = useState(item?.precModifier || 0);
+  const [precModifier, setPrecModifier] = useState(
+    item?.modifiers?.accuracy ?? item?.precModifier ?? 0,
+  );
   const [damageMeleeModifier, setDamageMeleeModifier] = useState(
     item?.damageMeleeModifier || 0,
   );
@@ -42,7 +55,7 @@ export function useEquipmentForm(item) {
   );
   // Weapon-only modifier
   const [damageModifier, setDamageModifier] = useState(
-    item?.damageModifier || 0,
+    item?.modifiers?.damage ?? item?.damageModifier ?? 0,
   );
   // Common UX
   const [isEquipped, setIsEquipped] = useState(item?.isEquipped || false);
@@ -52,14 +65,14 @@ export function useEquipmentForm(item) {
 
   // Reset all state whenever the item being edited changes.
   useEffect(() => {
-    setDefModifier(item?.defModifier || 0);
-    setMDefModifier(item?.mDefModifier || 0);
+    setDefModifier(item?.modifiers?.def ?? item?.defModifier ?? 0);
+    setMDefModifier(item?.modifiers?.mdef ?? item?.mDefModifier ?? 0);
     setInitModifier(item?.initModifier || 0);
     setMagicModifier(item?.magicModifier || 0);
-    setPrecModifier(item?.precModifier || 0);
+    setPrecModifier(item?.modifiers?.accuracy ?? item?.precModifier ?? 0);
     setDamageMeleeModifier(item?.damageMeleeModifier || 0);
     setDamageRangedModifier(item?.damageRangedModifier || 0);
-    setDamageModifier(item?.damageModifier || 0);
+    setDamageModifier(item?.modifiers?.damage ?? item?.damageModifier ?? 0);
     setIsEquipped(item?.isEquipped || false);
     setModifiersExpanded(hasAnyModifier(item));
   }, [item]);

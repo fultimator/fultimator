@@ -21,6 +21,7 @@ import {
   buildRef,
   resolveRefMeta,
 } from "../utils/compendiumRefs";
+import { normalizeCompendiumItemData } from "../libs/weaponNormalization";
 
 const STORE = "compendium-packs";
 const PERSONAL_ID = "personal";
@@ -65,7 +66,14 @@ const finalizePackRequires = (pack: CompendiumPack): CompendiumPack => {
 const normalizePackAndItems = (pack: CompendiumPack): CompendiumPack => {
   const normalizedItems = pack.items.map((item) => ({
     ...item,
-    data: ensureItemDataFuid(item.type, item.data, item.id),
+    data: ensureItemDataFuid(
+      item.type,
+      normalizeCompendiumItemData(item.type, item.data) as Record<
+        string,
+        unknown
+      >,
+      item.id,
+    ),
   }));
   const currentFuid = toFuid(pack.fuid || pack.name || "") || "pack";
   const aliases = Array.from(
@@ -342,7 +350,14 @@ export function useCompendiumPacks() {
       const item: CompendiumItem = {
         id: itemId,
         type,
-        data: ensureItemDataFuid(type, incoming, itemId),
+        data: ensureItemDataFuid(
+          type,
+          normalizeCompendiumItemData(type, incoming) as Record<
+            string,
+            unknown
+          >,
+          itemId,
+        ),
         addedAt: Date.now(),
       };
       await savePack(
@@ -370,7 +385,10 @@ export function useCompendiumPacks() {
                   ...i,
                   data: ensureItemDataFuid(
                     i.type,
-                    newData as Record<string, unknown>,
+                    normalizeCompendiumItemData(i.type, newData) as Record<
+                      string,
+                      unknown
+                    >,
                     i.id,
                   ),
                 }

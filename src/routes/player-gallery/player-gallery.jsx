@@ -1793,7 +1793,11 @@ function PlayerGalleryCardActions({
             <Badge />
           </IconButton>
         </Tooltip>
-        <Export name={`${player.name}`} dataType="pc" data={player} />
+        <Export
+          name={`${player.name}`}
+          dataType="pc"
+          data={applyPreSaveTransforms(applyPostLoadTransforms(player))}
+        />
         <Box sx={{ ml: "auto" }} />
         <Tooltip
           title={`Schema version ${player.schemaVersion ?? 0} of ${PLAYER_CURRENT_SCHEMA_VERSION} (${playerNeedsMigration(player) ? "migration needed" : "up to date"})`}

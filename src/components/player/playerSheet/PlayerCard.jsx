@@ -518,12 +518,21 @@ export default function PlayerCard({
     baseDef +
     equippedShields.reduce((t, s) => t + (s.def || 0), 0) +
     (player.modifiers?.def || 0) +
-    (armorModule ? 0 : equippedArmor?.defModifier || 0) +
-    equippedShields.reduce((t, s) => t + (s.defModifier || 0), 0) +
-    (equippedAccessory?.defModifier || 0) +
-    equippedWeapons.reduce((t, w) => t + (w.defModifier || 0), 0) +
+    (armorModule
+      ? 0
+      : (equippedArmor?.modifiers?.def ?? equippedArmor?.defModifier ?? 0)) +
+    equippedShields.reduce(
+      (t, s) => t + (s?.modifiers?.def ?? s?.defModifier ?? 0),
+      0,
+    ) +
+    (equippedAccessory?.modifiers?.def ?? equippedAccessory?.defModifier ?? 0) +
+    equippedWeapons.reduce(
+      (t, w) => t + (w?.modifiers?.def ?? w?.defModifier ?? 0),
+      0,
+    ) +
     equippedCustomWeapons.reduce(
-      (t, w) => t + (parseInt(w.defModifier || 0, 10) || 0),
+      (t, w) =>
+        t + (parseInt(w?.modifiers?.def ?? w?.defModifier ?? 0, 10) || 0),
       0,
     ) +
     dodgeBonus;
@@ -540,12 +549,23 @@ export default function PlayerCard({
     baseMDef +
     equippedShields.reduce((t, s) => t + (s.mdef || 0), 0) +
     (player.modifiers?.mdef || 0) +
-    (armorModule ? 0 : equippedArmor?.mDefModifier || 0) +
-    equippedShields.reduce((t, s) => t + (s.mDefModifier || 0), 0) +
-    (equippedAccessory?.mDefModifier || 0) +
-    equippedWeapons.reduce((t, w) => t + (w.mDefModifier || 0), 0) +
+    (armorModule
+      ? 0
+      : (equippedArmor?.modifiers?.mdef ?? equippedArmor?.mDefModifier ?? 0)) +
+    equippedShields.reduce(
+      (t, s) => t + (s?.modifiers?.mdef ?? s?.mDefModifier ?? 0),
+      0,
+    ) +
+    (equippedAccessory?.modifiers?.mdef ??
+      equippedAccessory?.mDefModifier ??
+      0) +
+    equippedWeapons.reduce(
+      (t, w) => t + (w?.modifiers?.mdef ?? w?.mDefModifier ?? 0),
+      0,
+    ) +
     equippedCustomWeapons.reduce(
-      (t, w) => t + (parseInt(w.mDefModifier || 0, 10) || 0),
+      (t, w) =>
+        t + (parseInt(w?.modifiers?.mdef ?? w?.mDefModifier ?? 0, 10) || 0),
       0,
     );
 

@@ -30,7 +30,6 @@ import {
   getEquipConflicts,
 } from "./loadoutActions";
 import attributes from "../../../../libs/attributes";
-import { calculateCustomWeaponStats } from "../../common/playerCalculations";
 
 function moduleStatLine(module, t) {
   if (!module) return "-";
@@ -210,33 +209,33 @@ export default function SlotPickerDialog({
   /** Build the list of items valid for the given slot. */
   function getCandidates() {
     const formatWeapon = (w) => {
-      const att1 = attributes[w.att1]?.shortcaps ?? w.att1;
-      const att2 = attributes[w.att2]?.shortcaps ?? w.att2;
+      const acc = w.accuracy;
+      const dmg = w.damage;
+      const att1 =
+        attributes[acc?.attr1 ?? w.att1]?.shortcaps ?? acc?.attr1 ?? w.att1;
+      const att2 =
+        attributes[acc?.attr2 ?? w.att2]?.shortcaps ?? acc?.attr2 ?? w.att2;
       const atts = `${att1}+${att2}`;
-      const dmg = w.dmg ?? w.damage ?? "?";
+      const damage = dmg?.value ?? w.dmg ?? w.damage ?? "?";
+      const damageType = dmg?.type ?? w.type ?? "";
       const hands = w.hands === 2 || w.isTwoHand ? "2H" : "1H";
-      return `${atts} / ${dmg} ${t(w.type || "")} / ${hands}`;
+      return `${atts} / ${damage} ${t(damageType)} / ${hands}`;
     };
     const formatCustomWeapon = (w) => {
       const isSecondary = w.activeForm === "secondary";
-      const stats = calculateCustomWeaponStats(w, isSecondary);
-      const accuracyCheck = isSecondary
-        ? w.secondSelectedAccuracyCheck
-        : w.accuracyCheck;
-      const damageType = isSecondary ? w.secondSelectedType : w.type;
+      const accuracy = isSecondary
+        ? (w.secondAccuracy ?? w.accuracy)
+        : w.accuracy;
+      const damage = isSecondary ? (w.secondDamage ?? w.damage) : w.damage;
       const range = isSecondary ? w.secondSelectedRange : w.range;
       const att1 =
-        attributes[accuracyCheck?.att1]?.shortcaps ??
-        accuracyCheck?.att1 ??
-        "?";
+        attributes[accuracy?.attr1]?.shortcaps ?? accuracy?.attr1 ?? "?";
       const att2 =
-        attributes[accuracyCheck?.att2]?.shortcaps ??
-        accuracyCheck?.att2 ??
-        "?";
+        attributes[accuracy?.attr2]?.shortcaps ?? accuracy?.attr2 ?? "?";
       const hands = "2H";
       const rangeLabel =
         range === "weapon_range_ranged" ? t("Ranged") : t("Melee");
-      return `${att1}+${att2} / ${stats.damage ?? "?"} ${t(damageType || "")} / ${rangeLabel} / ${hands}`;
+      return `${att1}+${att2} / ${damage?.value ?? "?"} ${t(damage?.type || "")} / ${rangeLabel} / ${hands}`;
     };
 
     switch (slot) {

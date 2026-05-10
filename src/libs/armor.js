@@ -2,6 +2,17 @@ const armor = [
   {
     fuid: "no-armor",
     category: "Armor",
+    name: "No Armor",
+    cost: 0,
+    def: 0,
+    mdef: 0,
+    armor: true,
+    martial: false,
+    init: 0,
+  },
+  {
+    fuid: "silk-shirt",
+    category: "Armor",
     name: "Silk Shirt",
     cost: 100,
     def: 0,

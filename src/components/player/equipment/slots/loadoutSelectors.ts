@@ -34,11 +34,13 @@ export type SupportSlotEntry = {
 
 export type AuxHandItem = {
   name: string;
-  att1: string;
-  att2: string;
-  damage: number;
-  prec: number;
-  type: string;
+  accuracy: {
+    attr1: string;
+    attr2: string;
+    value: number;
+    defense: "def" | "mdef";
+  };
+  damage: { value: number; type: string };
   hands: number;
   melee: boolean;
 };
@@ -310,11 +312,8 @@ export function getAuxHandItem(player: TypePlayer): AuxHandItem | null {
 
   return {
     name: "Twin Shields",
-    att1: "might",
-    att2: "might",
-    damage: 5 + defensiveMasteryBonus,
-    prec: 0,
-    type: "physical",
+    accuracy: { attr1: "might", attr2: "might", value: 0, defense: "def" },
+    damage: { value: 5 + defensiveMasteryBonus, type: "physical" },
     hands: 2,
     melee: true,
   };

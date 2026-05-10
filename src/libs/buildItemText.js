@@ -69,18 +69,21 @@ function npcRankLabel(rank) {
 }
 
 function formatAttackDesc(attack, npc, md) {
-  const a1 = ATTR_SHORT[attack.attr1] ?? attack.attr1;
-  const a2 = ATTR_SHORT[attack.attr2] ?? attack.attr2;
+  const attr1 = attack.accuracy?.attr1 ?? attack.attr1;
+  const attr2 = attack.accuracy?.attr2 ?? attack.attr2;
+  const a1 = ATTR_SHORT[attr1] ?? attr1;
+  const a2 = ATTR_SHORT[attr2] ?? attr2;
   const prec = calcPrecision(attack, npc);
   const precStr = prec > 0 ? ` +${prec}` : prec < 0 ? ` ${prec}` : "";
   const checkPart = `[${a1} + ${a2}]${precStr}`;
 
+  const attackType = attack.damage?.type ?? attack.type;
   let desc;
-  if (attack.type === "nodmg") {
+  if (attackType === "nodmg") {
     desc = md ? `**${checkPart}**` : checkPart;
   } else {
     const dmg = calcDamage(attack, npc);
-    const dmgType = DAMAGE_TYPE_LABEL[attack.type] ?? attack.type;
+    const dmgType = DAMAGE_TYPE_LABEL[attackType] ?? attackType;
     const core = `${checkPart} ~ [HR+${dmg}] ${dmgType}`;
     desc = md ? `**${core}** damage` : `${core} damage`;
   }
@@ -144,7 +147,10 @@ function buildNpcText(npc, md) {
   const allAttacks = [...(npc.attacks ?? [])];
   if (allAttacks.length) {
     const lines = allAttacks.map((atk) => {
-      const rangeIcon = atk.range === "distance" ? "[Ranged]" : "[Melee]";
+      const rangeIcon =
+        atk.range === "distance" || atk.range === "ranged"
+          ? "[Ranged]"
+          : "[Melee]";
       const desc = formatAttackDesc(atk, npc, md);
       return `${rangeIcon} ${b(atk.name)}  -  ${desc}`;
     });
@@ -236,7 +242,7 @@ function buildNpcObsidian(npc) {
     (a) => a.range !== "distance",
   );
   const rangedAttacks = (npc.attacks ?? []).filter(
-    (a) => a.range === "distance",
+    (a) => a.range === "distance" || a.range === "ranged",
   );
 
   if (meleeAttacks.length) {
@@ -591,11 +597,12 @@ export function buildItemText(type, item, fmt) {
       return parts.join("\n\n");
     }
     case "weapons": {
-      const attr1 = attributes[item.att1];
-      const attr2 = attributes[item.att2];
-      const dmgType = types[item.type];
+      const attr1 = attributes[item.accuracy?.attr1 ?? item.att1];
+      const attr2 = attributes[item.accuracy?.attr2 ?? item.att2];
+      const dmgType = types[item.damage?.type ?? item.type];
+      const precVal = item.accuracy?.value ?? item.prec ?? 0;
       const precStr =
-        item.prec > 0 ? ` +${item.prec}` : item.prec < 0 ? ` ${item.prec}` : "";
+        precVal > 0 ? ` +${precVal}` : precVal < 0 ? ` ${precVal}` : "";
       const parts = [h1(resolve(item.name))];
       const stats = [
         item.category && field("Category", resolve(item.category)),
@@ -609,8 +616,11 @@ export function buildItemText(type, item, fmt) {
             "Accuracy",
             `[${attr1.shortcaps} + ${attr2.shortcaps}]${precStr}`,
           ),
-        item.damage != null &&
-          field("Damage", `[HR + ${item.damage}] ${dmgType?.long ?? ""}`),
+        (item.damage?.value ?? item.damage) != null &&
+          field(
+            "Damage",
+            `[HR + ${item.damage?.value ?? item.damage}] ${dmgType?.long ?? ""}`,
+          ),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));
       if (item.quality) parts.push(resolve(item.quality));

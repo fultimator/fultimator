@@ -18,7 +18,7 @@ import { Martial } from "../icons";
 import { useState } from "react";
 import types from "../../libs/types";
 import attributes from "../../libs/attributes";
-import { baseWeapons } from "../../libs/equip";
+import weapons from "../../libs/weapons";
 import { CloseBracket, OpenBracket } from "../Bracket";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
@@ -26,6 +26,23 @@ import CustomHeader from "../common/CustomHeader";
 import { Add } from "@mui/icons-material";
 import { TypeIcon } from "../types";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
+
+function weaponToAttackFields(weapon, name = "") {
+  return {
+    name,
+    range: weapon.range ?? "melee",
+    accuracy: {
+      attr1: weapon.accuracy?.attr1 ?? "dexterity",
+      attr2: weapon.accuracy?.attr2 ?? "might",
+      value: weapon.accuracy?.value ?? 0,
+      defense: "def",
+    },
+    damage: {
+      value: weapon.damage?.value ?? 0,
+      type: weapon.damage?.type ?? "physical",
+    },
+  };
+}
 
 export default function EditWeaponAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -36,7 +53,20 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
     return (key, value) => {
       setNpc((prevState) => {
         const newState = Object.assign({}, prevState);
-        newState.weaponattacks[i][key] = value;
+        newState.weaponattacks = [...(prevState.weaponattacks || [])];
+        if (typeof key === "object") {
+          const {
+            weapon: _weapon,
+            type: _type,
+            ...current
+          } = newState.weaponattacks[i];
+          newState.weaponattacks[i] = { ...current, ...key };
+        } else {
+          newState.weaponattacks[i] = {
+            ...newState.weaponattacks[i],
+            [key]: value,
+          };
+        }
         return newState;
       });
     };
@@ -48,9 +78,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
       weaponattacks: [
         ...(prevState.weaponattacks || []),
         {
-          name: "",
-          weapon: baseWeapons[0],
-          type: "physical",
+          ...weaponToAttackFields(weapons[0]),
           special: [],
         },
       ],
@@ -139,6 +167,17 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
 
 function EditAttack({ attack, setAttack, removeAttack, i }) {
   const { t } = useTranslate();
+  const selectedWeapon =
+    attack.weapon ??
+    weapons.find(
+      (weapon) =>
+        weapon.name === attack.name ||
+        (weapon.accuracy?.attr1 === attack.accuracy?.attr1 &&
+          weapon.accuracy?.attr2 === attack.accuracy?.attr2 &&
+          weapon.damage?.value === attack.damage?.value),
+    ) ??
+    weapons[0];
+
   return (
     <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
       <Grid sx={{ p: 0, m: 0 }}>
@@ -161,9 +200,9 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       </Grid>
       <Grid size={5}>
         <SelectWeapon
-          weapon={attack.weapon}
+          weapon={selectedWeapon}
           setWeapon={(value) => {
-            return setAttack("weapon", value);
+            return setAttack(weaponToAttackFields(value, attack.name));
           }}
           size="small"
         />
@@ -206,13 +245,20 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
-            value={attack.type || attack.weapon.type}
+            value={
+              attack.damage?.type || attack.type || selectedWeapon.damage?.type
+            }
             labelId={"attack-" + i + "-type"}
             id={"attack-" + i + "-type"}
             label={t("Type:")}
             size="small"
             onChange={(e) => {
-              return setAttack("type", e.target.value);
+              return setAttack("damage", {
+                ...(attack.damage ?? {}),
+                value:
+                  attack.damage?.value ?? selectedWeapon.damage?.value ?? 0,
+                type: e.target.value,
+              });
             }}
           >
             {Object.keys(types).map((type) => {
@@ -361,21 +407,22 @@ function EditAttackSpecial({ attack, setAttack }) {
 function SelectWeapon({ weapon, setWeapon }) {
   const { t } = useTranslate();
   const onChange = function (e) {
-    const weapon = baseWeapons.find((weapon) => weapon.name === e.target.value);
+    const weapon = weapons.find((weapon) => weapon.name === e.target.value);
 
     setWeapon(weapon);
   };
 
   const options = [<MenuItem key={1} value="" disabled />];
 
-  for (const weapon of baseWeapons) {
+  for (const weapon of weapons) {
     options.push(
       <MenuItem key={weapon.name} value={weapon.name}>
         {weapon.name} {weapon.martial && <Martial />} <OpenBracket />
-        {attributes[weapon.att1].shortcaps}+{attributes[weapon.att2].shortcaps}
-        {weapon.prec > 0 && `+${weapon.prec}`}
+        {attributes[weapon.accuracy?.attr1].shortcaps}+
+        {attributes[weapon.accuracy?.attr2].shortcaps}
+        {weapon.accuracy?.value > 0 && `+${weapon.accuracy?.value}`}
         <CloseBracket /> <OpenBracket />
-        {t("HR +")} {weapon.damage}
+        {t("HR +")} {weapon.damage?.value}
         <CloseBracket />
       </MenuItem>,
     );

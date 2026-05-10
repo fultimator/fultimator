@@ -45,15 +45,12 @@ const RollsTab = ({
     // Determine the source and correct attribute keys
     let attr1, attr2;
 
-    if (attack.weapon) {
-      attr1 = attack.weapon?.att1;
-      attr2 = attack.weapon?.att2;
-    } else if (attack.spell) {
+    if (attack.spell) {
       attr1 = attack.spell.accuracy?.attr1;
       attr2 = attack.spell.accuracy?.attr2;
     } else {
-      attr1 = attack.attr1;
-      attr2 = attack.attr2;
+      attr1 = attack.accuracy?.attr1;
+      attr2 = attack.accuracy?.attr2;
     }
 
     if (!attr1 || !attr2) return "Invalid Attack"; // Handle missing attributes
@@ -148,14 +145,19 @@ const RollsTab = ({
           type: "Attack",
           data: attack,
           extra: attack.special?.length ? attack.special.join("\n\n") : null,
-          icon: attack.range === "distance" ? <DistanceIcon /> : <MeleeIcon />,
+          icon:
+            attack.range === "distance" || attack.range === "ranged" ? (
+              <DistanceIcon />
+            ) : (
+              <MeleeIcon />
+            ),
         })),
         ...(selectedNPC?.weaponattacks || []).map((wattack) => ({
           type: "Weapon Attack",
           data: wattack,
           extra: wattack.special?.length ? wattack.special.join("\n\n") : null,
           icon:
-            wattack.weapon.range === "distance" ? (
+            wattack.range === "distance" || wattack.range === "ranged" ? (
               <DistanceIcon />
             ) : (
               <MeleeIcon />

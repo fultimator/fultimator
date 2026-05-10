@@ -52,8 +52,19 @@ function isValidAttribute(value) {
 }
 
 function normalizeAccuracyCheck(value, fallback = accuracyChecks[0]) {
-  const att1 = Array.isArray(value) ? value[0] : value?.att1;
-  const att2 = Array.isArray(value) ? value[1] : value?.att2;
+  // V8-first: prefers unified accuracy.attr1/attr2, then falls back to legacy shapes.
+  const att1 = Array.isArray(value)
+    ? value[0]
+    : (value?.accuracy?.attr1 ??
+      value?.attr1 ??
+      value?.att1 ??
+      value?.accuracy?.att1);
+  const att2 = Array.isArray(value)
+    ? value[1]
+    : (value?.accuracy?.attr2 ??
+      value?.attr2 ??
+      value?.att2 ??
+      value?.accuracy?.att2);
   if (isValidAttribute(att1) && isValidAttribute(att2)) {
     return { att1, att2 };
   }
@@ -107,14 +118,18 @@ export default function PlayerCustomWeaponModal({
   const [selectedRange, setSelectedRange] = useState(
     customWeapon?.range || range[0],
   );
-  const [selectedAccuracyCheck, setSelectedAccuracyCheck] = useState(
-    customWeapon?.overrideAccuracyAttributes
-      ? normalizeAccuracyCheck(customWeapon?.accuracyCheck)
-      : (findPresetAccuracyCheck(customWeapon?.accuracyCheck) ??
-          accuracyChecks[0]),
-  );
+  const [selectedAccuracyCheck, setSelectedAccuracyCheck] = useState(() => {
+    const ac = customWeapon?.accuracyCheck ?? customWeapon?.accuracy;
+    return (customWeapon?.rare?.overrideAccuracyAttributes ??
+      customWeapon?.overrideAccuracyAttributes)
+      ? normalizeAccuracyCheck(ac)
+      : (findPresetAccuracyCheck(ac) ?? accuracyChecks[0]);
+  });
   const [selectedType, setSelectedType] = useState(
-    customWeapon?.type || types[0],
+    customWeapon?.rare?.overrideDamageTypeValue ??
+      customWeapon?.type ??
+      customWeapon?.damage?.type ??
+      types[0],
   );
   const [currentCustomizations, setCurrentCustomizations] = useState(
     customWeapon?.customizations || [],
@@ -128,13 +143,17 @@ export default function PlayerCustomWeaponModal({
     customWeapon?.qualityCost || 0,
   );
   const [rareAccuracyBonus, setRareAccuracyBonus] = useState(
-    customWeapon?.rareAccuracyBonus || false,
+    customWeapon?.rare?.accuracyBonus ??
+      customWeapon?.rareAccuracyBonus ??
+      false,
   );
   const [rareDamageBonus, setRareDamageBonus] = useState(
-    customWeapon?.rareDamageBonus || false,
+    customWeapon?.rare?.damageBonus ?? customWeapon?.rareDamageBonus ?? false,
   );
   const [overrideAccuracyAttributes, setOverrideAccuracyAttributes] = useState(
-    customWeapon?.overrideAccuracyAttributes || false,
+    customWeapon?.rare?.overrideAccuracyAttributes ??
+      customWeapon?.overrideAccuracyAttributes ??
+      false,
   );
   const {
     damageModifier,
@@ -159,10 +178,15 @@ export default function PlayerCustomWeaponModal({
   const [paidSlots, setPaidSlots] = useState(customWeapon?.slots ?? "alpha");
 
   const [overrideDamageType, setOverrideDamageType] = useState(
-    customWeapon?.overrideDamageType || false,
+    customWeapon?.rare?.overrideDamageType ??
+      customWeapon?.overrideDamageType ??
+      false,
   );
   const [customDamageType, setCustomDamageType] = useState(
-    customWeapon?.customDamageType || "physical",
+    customWeapon?.rare?.overrideDamageTypeValue ??
+      customWeapon?.customDamageType ??
+      customWeapon?.damage?.type ??
+      "physical",
   );
 
   // Secondary weapon state (for transforming weapons)
@@ -176,9 +200,16 @@ export default function PlayerCustomWeaponModal({
     customWeapon?.secondSelectedRange || range[0],
   );
   const [secondSelectedAccuracyCheck, setSecondSelectedAccuracyCheck] =
-    useState(customWeapon?.secondSelectedAccuracyCheck || accuracyChecks[0]);
+    useState(
+      normalizeAccuracyCheck(
+        customWeapon?.secondSelectedAccuracyCheck ??
+          customWeapon?.secondAccuracy,
+      ) ?? accuracyChecks[0],
+    );
   const [secondSelectedType, setSecondSelectedType] = useState(
-    customWeapon?.secondSelectedType || types[0],
+    customWeapon?.secondSelectedType ??
+      customWeapon?.secondDamage?.type ??
+      types[0],
   );
   const [secondCurrentCustomizations, setSecondCurrentCustomizations] =
     useState(customWeapon?.secondCurrentCustomizations || []);
@@ -232,29 +263,48 @@ export default function PlayerCustomWeaponModal({
       setWeaponName(customWeapon.name || "");
       setSelectedCategory(customWeapon.category || categories[0]);
       setSelectedRange(customWeapon.range || range[0]);
+      const ac = customWeapon.accuracyCheck ?? customWeapon.accuracy;
+      const rare = customWeapon.rare ?? {};
       setSelectedAccuracyCheck(
-        customWeapon.overrideAccuracyAttributes
-          ? normalizeAccuracyCheck(customWeapon.accuracyCheck)
-          : (findPresetAccuracyCheck(customWeapon.accuracyCheck) ??
-              accuracyChecks[0]),
+        (rare.overrideAccuracyAttributes ??
+          customWeapon.overrideAccuracyAttributes)
+          ? normalizeAccuracyCheck(ac)
+          : (findPresetAccuracyCheck(ac) ?? accuracyChecks[0]),
       );
-      setSelectedType(customWeapon.type || types[0]);
+      setSelectedType(
+        rare.overrideDamageTypeValue ??
+          customWeapon.type ??
+          customWeapon.damage?.type ??
+          types[0],
+      );
       setCurrentCustomizations(customWeapon.customizations || []);
       setSelectedCustomization("");
       setSelectedQuality(customWeapon.selectedQuality || "");
       setQuality(customWeapon.quality || "");
       setQualityCost(customWeapon.qualityCost || 0);
-      setRareAccuracyBonus(customWeapon.rareAccuracyBonus === true);
-      setRareDamageBonus(customWeapon.rareDamageBonus === true);
+      setRareAccuracyBonus(
+        (rare.accuracyBonus ?? customWeapon.rareAccuracyBonus) === true,
+      );
+      setRareDamageBonus(
+        (rare.damageBonus ?? customWeapon.rareDamageBonus) === true,
+      );
       setOverrideAccuracyAttributes(
-        customWeapon.overrideAccuracyAttributes === true,
+        (rare.overrideAccuracyAttributes ??
+          customWeapon.overrideAccuracyAttributes) === true,
       );
       setSlots(customWeapon.slots ?? "alpha");
       setSlotted(customWeapon.slotted ?? []);
       setPaidSlots(customWeapon.slots ?? "alpha");
       // primary modifier fields handled by useEquipmentForm
-      setOverrideDamageType(customWeapon.overrideDamageType || false);
-      setCustomDamageType(customWeapon.customDamageType || "physical");
+      setOverrideDamageType(
+        (rare.overrideDamageType ?? customWeapon.overrideDamageType) === true,
+      );
+      setCustomDamageType(
+        rare.overrideDamageTypeValue ??
+          customWeapon.customDamageType ??
+          customWeapon.damage?.type ??
+          "physical",
+      );
 
       // Update secondary weapon states
       setSecondWeaponName(customWeapon.secondWeaponName || "");
@@ -263,9 +313,16 @@ export default function PlayerCustomWeaponModal({
       );
       setSecondSelectedRange(customWeapon.secondSelectedRange || range[0]);
       setSecondSelectedAccuracyCheck(
-        customWeapon.secondSelectedAccuracyCheck || accuracyChecks[0],
+        normalizeAccuracyCheck(
+          customWeapon.secondSelectedAccuracyCheck ??
+            customWeapon.secondAccuracy,
+        ) ?? accuracyChecks[0],
       );
-      setSecondSelectedType(customWeapon.secondSelectedType || types[0]);
+      setSecondSelectedType(
+        customWeapon.secondSelectedType ??
+          customWeapon.secondDamage?.type ??
+          types[0],
+      );
       setSecondCurrentCustomizations(
         customWeapon.secondCurrentCustomizations || [],
       );
@@ -280,22 +337,22 @@ export default function PlayerCustomWeaponModal({
         customWeapon.secondOverrideDamageType || false,
       );
       setSecondCustomDamageType(
-        customWeapon.secondCustomDamageType || "physical",
+        customWeapon.secondCustomDamageType ??
+          customWeapon.secondDamage?.type ??
+          "physical",
       );
 
       // hook handles expand for numeric modifiers; also expand for overrideDamageType
       if (customWeapon?.overrideDamageType) setModifiersExpanded(true);
 
       setSecondModifiersExpanded(
-        (customWeapon?.secondDamageModifier &&
-          customWeapon?.secondDamageModifier !== 0) ||
-          (customWeapon?.secondPrecModifier &&
-            customWeapon?.secondPrecModifier !== 0) ||
-          (customWeapon?.secondDefModifier &&
-            customWeapon?.secondDefModifier !== 0) ||
-          (customWeapon?.secondMDefModifier &&
-            customWeapon?.secondMDefModifier !== 0) ||
-          customWeapon?.secondOverrideDamageType,
+        !!(
+          customWeapon?.secondDamageModifier ||
+          customWeapon?.secondPrecModifier ||
+          customWeapon?.secondDefModifier ||
+          customWeapon?.secondMDefModifier ||
+          customWeapon?.secondOverrideDamageType
+        ),
       );
     } else {
       // Reset to defaults when creating new weapon
@@ -493,46 +550,146 @@ export default function PlayerCustomWeaponModal({
   };
 
   const handleSave = () => {
+    const { precision, damage } = calculateCustomWeaponStats(
+      {
+        category: selectedCategory,
+        customizations: currentCustomizations,
+        rareAccuracyBonus,
+        rareDamageBonus,
+        damageModifier: parseInt(modifiers().damageModifier) || 0,
+        precModifier: parseInt(modifiers().precModifier) || 0,
+      },
+      false,
+    );
+
+    const resolvedDamageType = (() => {
+      const hasElemental = currentCustomizations.some(
+        (c) => c.name === "weapon_customization_elemental",
+      );
+      if (hasElemental) return customDamageType;
+      if (overrideDamageType && customDamageType) return customDamageType;
+      return selectedType;
+    })();
+
+    const primaryAccuracy = {
+      attr1: selectedAccuracyCheck.att1,
+      attr2: selectedAccuracyCheck.att2,
+      value: precision,
+      defense: "def",
+    };
+    const primaryDamage = { value: damage, type: resolvedDamageType };
+
+    let secondAccuracy, secondDamage;
+    if (hasTransforming) {
+      const { precision: s2prec, damage: s2dmg } = calculateCustomWeaponStats(
+        {
+          secondSelectedCategory,
+          secondCurrentCustomizations,
+          rareAccuracyBonus,
+          rareDamageBonus,
+          secondDamageModifier: parseInt(secondDamageModifier) || 0,
+          secondPrecModifier: parseInt(secondPrecModifier) || 0,
+        },
+        true,
+      );
+      const s2HasElemental = secondCurrentCustomizations.some(
+        (c) => c.name === "weapon_customization_elemental",
+      );
+      const s2DamageType = (() => {
+        if (s2HasElemental) return secondCustomDamageType;
+        if (secondOverrideDamageType && secondCustomDamageType)
+          return secondCustomDamageType;
+        return secondSelectedType;
+      })();
+      secondAccuracy = {
+        attr1: secondSelectedAccuracyCheck.att1,
+        attr2: secondSelectedAccuracyCheck.att2,
+        value: s2prec,
+        defense: "def",
+      };
+      secondDamage = { value: s2dmg, type: s2DamageType };
+    }
+
+    const { defModifier: dm, mDefModifier: mdm } = modifiers();
+    const parsedDamageMod = parseInt(modifiers().damageModifier) || 0;
+    const parsedPrecMod = parseInt(modifiers().precModifier) || 0;
+    const parsedDefMod = parseInt(dm) || 0;
+    const parsedMdefMod = parseInt(mdm) || 0;
+
     const weaponData = {
       ...(customWeapon ?? {}),
+      itemType: "customWeapon",
       name: weaponName,
       category: selectedCategory,
       range: selectedRange,
-      accuracyCheck: selectedAccuracyCheck,
-      type: selectedType,
+      accuracy: primaryAccuracy,
+      damage: primaryDamage,
+      modifiers: {
+        damage: parsedDamageMod,
+        accuracy: parsedPrecMod,
+        def: parsedDefMod,
+        mdef: parsedMdefMod,
+      },
+      rare: {
+        ...(customWeapon?.rare ?? {}),
+        accuracyBonus: rareAccuracyBonus,
+        damageBonus: rareDamageBonus,
+        overrideDamageType,
+        overrideAccuracyAttributes,
+        overrideDamageTypeValue: customDamageType,
+        overrideAccuracyAttr1: selectedAccuracyCheck.att1,
+        overrideAccuracyAttr2: selectedAccuracyCheck.att2,
+      },
       customizations: currentCustomizations,
       selectedQuality,
       quality,
       qualityCost: parseInt(qualityCost) || 0,
       cost: calculateTotalCost(),
-      hands: 2, // Custom weapons are always two-handed
+      hands: 2,
       martial: isMartial(),
-      rareAccuracyBonus,
-      rareDamageBonus,
-      overrideAccuracyAttributes,
-      ...modifiers(),
       isEquipped: editCustomWeaponIndex !== null ? isEquipped : false,
-      overrideDamageType,
-      customDamageType,
       // Secondary weapon data (for transforming weapons)
-      secondWeaponName,
-      secondSelectedCategory,
-      secondSelectedRange,
-      secondSelectedAccuracyCheck,
-      secondSelectedType,
-      secondCurrentCustomizations,
+      secondName: secondWeaponName,
+      secondCategory: secondSelectedCategory,
+      secondRange: secondSelectedRange,
+      secondCustomizations: secondCurrentCustomizations,
       // Secondary weapon modifiers
-      secondDamageModifier: parseInt(secondDamageModifier) || 0,
-      secondPrecModifier: parseInt(secondPrecModifier) || 0,
-      secondDefModifier: parseInt(secondDefModifier) || 0,
-      secondMDefModifier: parseInt(secondMDefModifier) || 0,
-      secondOverrideDamageType,
-      secondCustomDamageType,
+      secondModifiers: {
+        damage: parseInt(secondDamageModifier) || 0,
+        accuracy: parseInt(secondPrecModifier) || 0,
+        def: parseInt(secondDefModifier) || 0,
+        mdef: parseInt(secondMDefModifier) || 0,
+      },
+      ...(hasTransforming ? { secondAccuracy, secondDamage } : {}),
       dataType: "weapon",
       ...(isSlotsVariant || customWeapon?.slots || customWeapon?.slotted
         ? { slots, slotted }
         : {}),
     };
+    // Drop legacy fields from any pre-v8 spread above
+    delete weaponData.accuracyCheck;
+    delete weaponData.type;
+    delete weaponData.damageModifier;
+    delete weaponData.precModifier;
+    delete weaponData.customDamageType;
+    delete weaponData.rareAccuracyBonus;
+    delete weaponData.rareDamageBonus;
+    delete weaponData.overrideAccuracyAttributes;
+    delete weaponData.overrideDamageType;
+    delete weaponData.defModifier;
+    delete weaponData.mDefModifier;
+    delete weaponData.secondSelectedAccuracyCheck;
+    delete weaponData.secondSelectedType;
+    delete weaponData.secondDamageModifier;
+    delete weaponData.secondPrecModifier;
+    delete weaponData.secondCustomDamageType;
+    delete weaponData.secondWeaponName;
+    delete weaponData.secondSelectedCategory;
+    delete weaponData.secondSelectedRange;
+    delete weaponData.secondCurrentCustomizations;
+    delete weaponData.secondOverrideDamageType;
+    delete weaponData.secondDefModifier;
+    delete weaponData.secondMDefModifier;
 
     onAddCustomWeapon(weaponData);
     if (slotCostDelta !== 0 && setPlayer) {
@@ -558,15 +715,20 @@ export default function PlayerCustomWeaponModal({
       setSelectedRange(
         data.range && range.includes(data.range) ? data.range : range[0],
       );
-      setRareAccuracyBonus(data.rareAccuracyBonus === true);
-      setRareDamageBonus(data.rareDamageBonus === true);
+      const rare = data.rare ?? {};
+      setRareAccuracyBonus(
+        (rare.accuracyBonus ?? data.rareAccuracyBonus) === true,
+      );
+      setRareDamageBonus((rare.damageBonus ?? data.rareDamageBonus) === true);
       const nextOverrideAccuracyAttributes =
-        data.overrideAccuracyAttributes === true;
+        (rare.overrideAccuracyAttributes ?? data.overrideAccuracyAttributes) ===
+        true;
       setOverrideAccuracyAttributes(nextOverrideAccuracyAttributes);
 
-      // Handle accuracy check
-      if (data.accuracyCheck) {
-        const normalizedCheck = normalizeAccuracyCheck(data.accuracyCheck);
+      // Handle accuracy check — accept legacy { att1, att2 } or unified accuracy object
+      const uploadedAc = data.accuracyCheck ?? data.accuracy;
+      if (uploadedAc) {
+        const normalizedCheck = normalizeAccuracyCheck(uploadedAc);
         setSelectedAccuracyCheck(
           nextOverrideAccuracyAttributes
             ? normalizedCheck
@@ -576,8 +738,9 @@ export default function PlayerCustomWeaponModal({
         setSelectedAccuracyCheck(accuracyChecks[0]);
       }
 
+      const uploadedType = data.type ?? data.damage?.type;
       setSelectedType(
-        data.type && types.includes(data.type) ? data.type : types[0],
+        uploadedType && types.includes(uploadedType) ? uploadedType : types[0],
       );
 
       // Handle customizations
@@ -593,61 +756,92 @@ export default function PlayerCustomWeaponModal({
       setSelectedQuality("");
 
       // Handle modifiers
-      setDamageModifier(data.damageModifier || 0);
-      setPrecModifier(data.precModifier || 0);
-      setDefModifier(data.defModifier || 0);
-      setMDefModifier(data.mDefModifier || 0);
+      setDamageModifier((data.modifiers?.damage ?? data.damageModifier) || 0);
+      setPrecModifier((data.modifiers?.accuracy ?? data.precModifier) || 0);
+      setDefModifier((data.modifiers?.def ?? data.defModifier) || 0);
+      setMDefModifier((data.modifiers?.mdef ?? data.mDefModifier) || 0);
 
       // Handle override_damage_type
-      setOverrideDamageType(data.overrideDamageType || false);
-      setCustomDamageType(data.customDamageType || "physical");
+      setOverrideDamageType(
+        (rare.overrideDamageType ?? data.overrideDamageType) === true,
+      );
+      setCustomDamageType(
+        rare.overrideDamageTypeValue ??
+          data.customDamageType ??
+          data.damage?.type ??
+          "physical",
+      );
 
       // Handle secondary weapon data
-      setSecondWeaponName(data.secondWeaponName || "");
+      setSecondWeaponName((data.secondName ?? data.secondWeaponName) || "");
       setSecondSelectedCategory(
-        data.secondSelectedCategory &&
-          categories.includes(data.secondSelectedCategory)
-          ? data.secondSelectedCategory
-          : categories[0],
+        data.secondCategory && categories.includes(data.secondCategory)
+          ? data.secondCategory
+          : data.secondSelectedCategory &&
+              categories.includes(data.secondSelectedCategory)
+            ? data.secondSelectedCategory
+            : categories[0],
       );
       setSecondSelectedRange(
-        data.secondSelectedRange && range.includes(data.secondSelectedRange)
-          ? data.secondSelectedRange
-          : range[0],
+        data.secondRange && range.includes(data.secondRange)
+          ? data.secondRange
+          : data.secondSelectedRange && range.includes(data.secondSelectedRange)
+            ? data.secondSelectedRange
+            : range[0],
       );
 
-      if (data.secondSelectedAccuracyCheck) {
-        const matchingCheck = accuracyChecks.find(
-          (check) =>
-            check.att1 === data.secondSelectedAccuracyCheck.att1 &&
-            check.att2 === data.secondSelectedAccuracyCheck.att2,
+      const uploadedSecondAc =
+        data.secondSelectedAccuracyCheck ?? data.secondAccuracy;
+      if (uploadedSecondAc) {
+        const normalizedSecond = normalizeAccuracyCheck(uploadedSecondAc);
+        setSecondSelectedAccuracyCheck(
+          accuracyChecks.find(
+            (check) =>
+              check.att1 === normalizedSecond.att1 &&
+              check.att2 === normalizedSecond.att2,
+          ) || accuracyChecks[0],
         );
-        setSecondSelectedAccuracyCheck(matchingCheck || accuracyChecks[0]);
       }
 
+      const uploadedSecondType =
+        data.secondSelectedType ?? data.secondDamage?.type;
       setSecondSelectedType(
-        data.secondSelectedType && types.includes(data.secondSelectedType)
-          ? data.secondSelectedType
+        uploadedSecondType && types.includes(uploadedSecondType)
+          ? uploadedSecondType
           : types[0],
       );
 
       if (
-        data.secondCurrentCustomizations &&
-        Array.isArray(data.secondCurrentCustomizations)
+        (data.secondCustomizations &&
+          Array.isArray(data.secondCustomizations)) ||
+        (data.secondCurrentCustomizations &&
+          Array.isArray(data.secondCurrentCustomizations))
       ) {
-        const validCustomizations = data.secondCurrentCustomizations.filter(
-          (custom) => customizations.some((c) => c.name === custom.name),
+        const rawSecondCustomizations =
+          data.secondCustomizations ?? data.secondCurrentCustomizations;
+        const validCustomizations = rawSecondCustomizations.filter((custom) =>
+          customizations.some((c) => c.name === custom.name),
         );
         setSecondCurrentCustomizations(validCustomizations);
       }
 
       // Handle secondary weapon modifiers
-      setSecondDamageModifier(data.secondDamageModifier || 0);
-      setSecondPrecModifier(data.secondPrecModifier || 0);
-      setSecondDefModifier(data.secondDefModifier || 0);
-      setSecondMDefModifier(data.secondMDefModifier || 0);
+      setSecondDamageModifier(
+        (data.secondModifiers?.damage ?? data.secondDamageModifier) || 0,
+      );
+      setSecondPrecModifier(
+        (data.secondModifiers?.accuracy ?? data.secondPrecModifier) || 0,
+      );
+      setSecondDefModifier(
+        (data.secondModifiers?.def ?? data.secondDefModifier) || 0,
+      );
+      setSecondMDefModifier(
+        (data.secondModifiers?.mdef ?? data.secondMDefModifier) || 0,
+      );
       setSecondOverrideDamageType(data.secondOverrideDamageType || false);
-      setSecondCustomDamageType(data.secondCustomDamageType || "physical");
+      setSecondCustomDamageType(
+        data.secondCustomDamageType ?? data.secondDamage?.type ?? "physical",
+      );
 
       // Expand modifiers section if any modifiers are set
       setModifiersExpanded(
@@ -1319,65 +1513,119 @@ export default function PlayerCustomWeaponModal({
             <Typography variant="h6" gutterBottom>
               {t("weapon_customization_transforming_form_preview")}
             </Typography>
-            <SharedCustomWeaponCard
-              item={{
-                ...customWeapon,
-                name: weaponName,
-                category: selectedCategory,
-                range: selectedRange,
-                accuracyCheck: selectedAccuracyCheck,
-                type: selectedType,
-                customizations: currentCustomizations,
-                quality,
-                cost: calculatePreviewCost(),
-                hands: 2,
-                martial: isMartial(),
-                rareAccuracyBonus,
-                rareDamageBonus,
-                overrideAccuracyAttributes,
-                damageModifier: parseInt(damageModifier) || 0,
-                precModifier: parseInt(precModifier) || 0,
-                defModifier: parseInt(defModifier) || 0,
-                mDefModifier: parseInt(mDefModifier) || 0,
-                overrideDamageType,
-                customDamageType,
-                slots,
-                slotted,
-              }}
-              sphereData={buildSphereData({ slots, slotted }, player)}
-            />
-
-            {hasTransforming && (
-              <>
-                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                  {t("weapon_customization_transforming_form_preview")}
-                </Typography>
+            {(() => {
+              const { precision: pPrec, damage: pDmg } =
+                calculateCustomWeaponStats(
+                  {
+                    category: selectedCategory,
+                    customizations: currentCustomizations,
+                    rareAccuracyBonus,
+                    rareDamageBonus,
+                    damageModifier: parseInt(damageModifier) || 0,
+                    precModifier: parseInt(precModifier) || 0,
+                  },
+                  false,
+                );
+              const pHasElemental = currentCustomizations.some(
+                (c) => c.name === "weapon_customization_elemental",
+              );
+              const pType = pHasElemental
+                ? customDamageType
+                : overrideDamageType
+                  ? customDamageType
+                  : selectedType;
+              return (
                 <SharedCustomWeaponCard
                   item={{
                     ...customWeapon,
-                    name: secondWeaponName || `${weaponName} (Transforming)`,
-                    category: secondSelectedCategory,
-                    range: secondSelectedRange,
-                    accuracyCheck: secondSelectedAccuracyCheck,
-                    type: secondSelectedType,
-                    customizations: secondCurrentCustomizations,
+                    name: weaponName,
+                    category: selectedCategory,
+                    range: selectedRange,
+                    accuracy: {
+                      attr1: selectedAccuracyCheck.att1,
+                      attr2: selectedAccuracyCheck.att2,
+                      value: pPrec,
+                      defense: "def",
+                    },
+                    damage: { value: pDmg, type: pType },
+                    customizations: currentCustomizations,
+                    quality,
                     cost: calculatePreviewCost(),
                     hands: 2,
                     martial: isMartial(),
                     rareAccuracyBonus,
                     rareDamageBonus,
                     overrideAccuracyAttributes,
-                    damageModifier: parseInt(secondDamageModifier) || 0,
-                    precModifier: parseInt(secondPrecModifier) || 0,
-                    defModifier: parseInt(secondDefModifier) || 0,
-                    mDefModifier: parseInt(secondMDefModifier) || 0,
                     overrideDamageType,
-                    customDamageType,
+                    defModifier: parseInt(defModifier) || 0,
+                    mDefModifier: parseInt(mDefModifier) || 0,
                     slots,
                     slotted,
                   }}
                   sphereData={buildSphereData({ slots, slotted }, player)}
                 />
+              );
+            })()}
+
+            {hasTransforming && (
+              <>
+                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
+                  {t("weapon_customization_transforming_form_preview")}
+                </Typography>
+                {(() => {
+                  const { precision: s2Prec, damage: s2Dmg } =
+                    calculateCustomWeaponStats(
+                      {
+                        secondSelectedCategory,
+                        secondCurrentCustomizations,
+                        rareAccuracyBonus,
+                        rareDamageBonus,
+                        secondDamageModifier:
+                          parseInt(secondDamageModifier) || 0,
+                        secondPrecModifier: parseInt(secondPrecModifier) || 0,
+                      },
+                      true,
+                    );
+                  const s2HasElemental = secondCurrentCustomizations.some(
+                    (c) => c.name === "weapon_customization_elemental",
+                  );
+                  const s2Type = s2HasElemental
+                    ? secondCustomDamageType
+                    : secondOverrideDamageType
+                      ? secondCustomDamageType
+                      : secondSelectedType;
+                  return (
+                    <SharedCustomWeaponCard
+                      item={{
+                        ...customWeapon,
+                        name:
+                          secondWeaponName || `${weaponName} (Transforming)`,
+                        category: secondSelectedCategory,
+                        range: secondSelectedRange,
+                        accuracy: {
+                          attr1: secondSelectedAccuracyCheck.att1,
+                          attr2: secondSelectedAccuracyCheck.att2,
+                          value: s2Prec,
+                          defense: "def",
+                        },
+                        damage: { value: s2Dmg, type: s2Type },
+                        customizations: secondCurrentCustomizations,
+                        cost: calculatePreviewCost(),
+                        hands: 2,
+                        martial: isMartial(),
+                        rareAccuracyBonus,
+                        rareDamageBonus,
+                        overrideAccuracyAttributes,
+                        secondOverrideDamageType,
+                        defModifier: parseInt(secondDefModifier) || 0,
+                        mDefModifier: parseInt(secondMDefModifier) || 0,
+                        slots,
+                        slotted,
+                      }}
+                      sphereData={buildSphereData({ slots, slotted }, player)}
+                    />
+                  );
+                })()}
               </>
             )}
           </Grid>

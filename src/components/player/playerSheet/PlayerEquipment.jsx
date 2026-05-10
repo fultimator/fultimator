@@ -27,10 +27,7 @@ import {
 import attributes from "../../../libs/attributes";
 // import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import {
-  calculateAttribute,
-  calculateCustomWeaponStats,
-} from "../common/playerCalculations";
+import { calculateAttribute } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import EditPlayerEquipment from "../equipment/EditPlayerEquipment";
 
@@ -188,11 +185,8 @@ export default function PlayerEquipment({
         category:
           customWeapon.secondSelectedCategory || "weapon_category_brawling",
         range: customWeapon.secondSelectedRange || "weapon_range_melee",
-        accuracyCheck: customWeapon.secondSelectedAccuracyCheck || {
-          att1: "dexterity",
-          att2: "might",
-        },
-        type: customWeapon.secondSelectedType || "physical",
+        accuracy: customWeapon.secondAccuracy ?? customWeapon.accuracy,
+        damage: customWeapon.secondDamage ?? customWeapon.damage,
         customizations: customWeapon.secondCurrentCustomizations || [],
         quality: customWeapon.secondQuality || "",
         qualityCost: customWeapon.secondQualityCost || 0,
@@ -248,26 +242,38 @@ export default function PlayerEquipment({
 
   const precMeleeModifier =
     (player.modifiers?.meleePrec || 0) +
-    (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
+    (equippedArmor.length > 0
+      ? (equippedArmor[0].modifiers?.accuracy ??
+        equippedArmor[0].precModifier ??
+        0)
+      : 0) +
     equippedShields.reduce(
-      (total, shield) => total + (shield.precModifier || 0),
+      (total, shield) =>
+        total + (shield.modifiers?.accuracy ?? shield.precModifier ?? 0),
       0,
     ) +
     equippedAccessories.reduce(
-      (total, accessory) => total + (accessory.precModifier || 0),
+      (total, accessory) =>
+        total + (accessory.modifiers?.accuracy ?? accessory.precModifier ?? 0),
       0,
     ) +
     meleeMasteryModifier;
 
   const precRangedModifier =
     (player.modifiers?.rangedPrec || 0) +
-    (equippedArmor.length > 0 ? equippedArmor[0].precModifier || 0 : 0) +
+    (equippedArmor.length > 0
+      ? (equippedArmor[0].modifiers?.accuracy ??
+        equippedArmor[0].precModifier ??
+        0)
+      : 0) +
     equippedShields.reduce(
-      (total, shield) => total + (shield.precModifier || 0),
+      (total, shield) =>
+        total + (shield.modifiers?.accuracy ?? shield.precModifier ?? 0),
       0,
     ) +
     equippedAccessories.reduce(
-      (total, accessory) => total + (accessory.precModifier || 0),
+      (total, accessory) =>
+        total + (accessory.modifiers?.accuracy ?? accessory.precModifier ?? 0),
       0,
     ) +
     rangedMasteryModifier;
@@ -367,28 +373,15 @@ export default function PlayerEquipment({
     setCurrentWeapon(weapon);
 
     // Handle attribute mapping for custom weapons
-    const att1 = weapon.isCustomWeapon
-      ? weapon.accuracyCheck?.att1 || weapon.att1 || "dexterity"
-      : weapon.att1 || "dexterity";
-    const att2 = weapon.isCustomWeapon
-      ? weapon.accuracyCheck?.att2 || weapon.att2 || "might"
-      : weapon.att2 || "might";
+    const att1 = weapon.accuracy?.attr1 || weapon.att1 || "dexterity";
+    const att2 = weapon.accuracy?.attr2 || weapon.att2 || "might";
 
     let att1Value = attributeMap[att1] || 8;
     let att2Value = attributeMap[att2] || 8;
 
     // Calculate weapon stats for custom weapons
-    let weaponPrec = weapon.prec || 0;
-    let weaponDamage = weapon.damage || 5;
-
-    if (weapon.isCustomWeapon) {
-      const stats = calculateCustomWeaponStats(
-        weapon,
-        weapon.activeForm === "secondary",
-      );
-      weaponDamage = stats.damage;
-      weaponPrec = stats.precision;
-    }
+    const weaponPrec = weapon.accuracy?.value ?? weapon.prec ?? 0;
+    const weaponDamage = weapon.damage?.value ?? weapon.damage ?? 5;
 
     const meleeModifier = precMeleeModifier;
     const rangedModifier = precRangedModifier;
@@ -447,7 +440,7 @@ export default function PlayerEquipment({
                 variant="h6"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
               >
-                {t(weapon.type)}
+                {t(weapon.damage?.type ?? weapon.type)}
               </Typography>
             </Grid>
           </Grid>

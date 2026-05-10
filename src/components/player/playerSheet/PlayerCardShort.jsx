@@ -80,11 +80,18 @@ export default function PlayerCardShort({
       : player.attributes.dexterity) +
     (equippedShield !== null ? equippedShield.def : 0) +
     (player.modifiers?.def || 0) +
-    (equippedArmor !== null ? equippedArmor.defModifier || 0 : 0) +
-    (equippedShield !== null ? equippedShield.defModifier || 0 : 0) +
-    (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
+    (equippedArmor !== null
+      ? (equippedArmor.modifiers?.def ?? equippedArmor.defModifier ?? 0)
+      : 0) +
+    (equippedShield !== null
+      ? (equippedShield.modifiers?.def ?? equippedShield.defModifier ?? 0)
+      : 0) +
+    (equippedAccessory !== null
+      ? (equippedAccessory.modifiers?.def ?? equippedAccessory.defModifier ?? 0)
+      : 0) +
     equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.defModifier || 0),
+      (total, weapon) =>
+        total + (weapon.modifiers?.def ?? weapon.defModifier ?? 0),
       0,
     ) +
     dodgeBonus;
@@ -95,11 +102,20 @@ export default function PlayerCardShort({
       : player.attributes.insight) +
     (equippedShield !== null ? equippedShield.mdef : 0) +
     (player.modifiers?.mdef || 0) +
-    (equippedArmor !== null ? equippedArmor.mDefModifier || 0 : 0) +
-    (equippedShield !== null ? equippedShield.mDefModifier || 0 : 0) +
-    (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
+    (equippedArmor !== null
+      ? (equippedArmor.modifiers?.mdef ?? equippedArmor.mDefModifier ?? 0)
+      : 0) +
+    (equippedShield !== null
+      ? (equippedShield.modifiers?.mdef ?? equippedShield.mDefModifier ?? 0)
+      : 0) +
+    (equippedAccessory !== null
+      ? (equippedAccessory.modifiers?.mdef ??
+        equippedAccessory.mDefModifier ??
+        0)
+      : 0) +
     equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.mDefModifier || 0),
+      (total, weapon) =>
+        total + (weapon.modifiers?.mdef ?? weapon.mDefModifier ?? 0),
       0,
     );
 

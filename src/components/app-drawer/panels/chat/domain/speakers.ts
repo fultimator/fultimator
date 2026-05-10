@@ -46,39 +46,29 @@ function extractPcWeaponStats(
   "attr1" | "attr2" | "baseDamage" | "accuracyBonus" | "damageType"
 > {
   if (!item) return {};
+  const acc = item.accuracy as Record<string, unknown> | undefined;
   if (source === "customWeapons") {
-    const ac = item.accuracyCheck as Record<string, unknown> | undefined;
+    const dmg = item.damage as Record<string, unknown> | undefined;
     return {
-      attr1: toAttr(ac?.att1),
-      attr2: toAttr(ac?.att2),
-      baseDamage:
-        typeof item.damageModifier === "number"
-          ? item.damageModifier
-          : undefined,
+      attr1: toAttr(acc?.attr1),
+      attr2: toAttr(acc?.attr2),
+      baseDamage: typeof dmg?.value === "number" ? dmg.value : undefined,
       accuracyBonus:
-        typeof item.precModifier === "number" ? item.precModifier : undefined,
-      damageType:
-        item.overrideDamageType && typeof item.customDamageType === "string"
-          ? item.customDamageType
-          : typeof item.type === "string"
-            ? item.type
-            : undefined,
+        typeof acc?.value === "number" && acc.value !== 0
+          ? acc.value
+          : undefined,
+      damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
     };
   }
-  // standard Weapons: may use att1/att2 (compendium) or attr1/attr2 (player type)
-  // damage stored as .damage (compendium) or .dmg (player type)
-  const baseDamage =
-    typeof item.damage === "number"
-      ? item.damage
-      : typeof item.dmg === "number"
-        ? item.dmg
-        : undefined;
+  // standard Weapons
+  const dmg = item.damage as Record<string, unknown> | undefined;
+  const baseDamage = typeof dmg?.value === "number" ? dmg.value : undefined;
   return {
-    attr1: toAttr(item.att1 ?? item.attr1),
-    attr2: toAttr(item.att2 ?? item.attr2),
+    attr1: toAttr(acc?.attr1),
+    attr2: toAttr(acc?.attr2),
     baseDamage,
     accuracyBonus:
-      typeof item.prec === "number" && item.prec !== 0 ? item.prec : undefined,
+      typeof acc?.value === "number" && acc.value !== 0 ? acc.value : undefined,
   };
 }
 
@@ -94,33 +84,37 @@ export function resolveAttackOptions(
     const results: AttackOption[] = [];
     if (Array.isArray(attacks)) {
       for (const a of attacks) {
-        if (a && typeof a.name === "string" && a.name)
+        if (a && typeof a.name === "string" && a.name) {
+          const acc = a.accuracy as Record<string, unknown> | undefined;
+          const dmg = a.damage as Record<string, unknown> | undefined;
           results.push({
             arg: quoteArg(a.name),
             name: a.name,
-            attr1: toAttr(a.attr1),
-            attr2: toAttr(a.attr2),
-            damageType: typeof a.type === "string" ? a.type : undefined,
+            attr1: toAttr(acc?.attr1),
+            attr2: toAttr(acc?.attr2),
+            damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
           });
+        }
       }
     }
     if (Array.isArray(weaponattacks)) {
       for (const wa of weaponattacks) {
         const name =
-          wa && typeof wa.name === "string" && wa.name
-            ? wa.name
-            : wa?.weapon?.name;
+          wa && typeof wa.name === "string" && wa.name ? wa.name : undefined;
         if (typeof name === "string" && name) {
-          const w = wa?.weapon;
+          const acc = wa.accuracy as Record<string, unknown> | undefined;
+          const dmg = wa.damage as Record<string, unknown> | undefined;
           results.push({
             arg: quoteArg(name),
             name,
-            attr1: toAttr(w?.att1),
-            attr2: toAttr(w?.att2),
-            baseDamage: typeof w?.damage === "number" ? w.damage : undefined,
+            attr1: toAttr(acc?.attr1),
+            attr2: toAttr(acc?.attr2),
+            baseDamage: typeof dmg?.value === "number" ? dmg.value : undefined,
             accuracyBonus:
-              typeof w?.prec === "number" && w.prec !== 0 ? w.prec : undefined,
-            damageType: typeof w?.type === "string" ? w.type : undefined,
+              typeof acc?.value === "number" && acc.value !== 0
+                ? acc.value
+                : undefined,
+            damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
           });
         }
       }
