@@ -51,7 +51,10 @@ function normalizeArmorAndShieldFields(npc: TypeNpc): TypeNpc {
     if (result.quality === undefined) {
       result.quality = "";
     }
-    return result;
+    // Strip undefined values
+    return Object.fromEntries(
+      Object.entries(result).filter(([, v]) => v !== undefined),
+    ) as typeof result;
   };
   return {
     ...npc,
