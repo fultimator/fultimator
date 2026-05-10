@@ -76,6 +76,10 @@ import {
   applyNpcPostLoadTransforms,
 } from "../../components/npc/npcTransforms";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
+import {
+  canonicalizeForTransfer,
+  normalizeOwnershipForTarget,
+} from "../../libs/exportTransforms";
 
 export default function NpcGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -325,10 +329,14 @@ function Personal() {
   const [exportAnchor, setExportAnchor] = useState(null);
 
   // Bulk cross-DB copy / move
-  const bulkCopyToDb = async (npcs, targetDb) => {
+  const bulkCopyToDb = async (npcs, targetDb, target) => {
     for (const npc of npcs) {
-      const data = { ...npc, published: false };
-      delete data.id;
+      const canonical = canonicalizeForTransfer("npc", npc);
+      const data = normalizeOwnershipForTarget(
+        { ...canonical, published: false },
+        target,
+        cloudUser?.uid,
+      );
       await targetDb.addDoc(targetDb.collection("npc-personal"), data);
     }
   };
@@ -342,7 +350,7 @@ function Personal() {
   const copySelectedToLocal = async () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     try {
-      await bulkCopyToDb(selected, localDb);
+      await bulkCopyToDb(selected, localDb, "local");
       notify(t("Copied to Local"));
       setSelectedIds(new Set());
     } catch {
@@ -357,7 +365,7 @@ function Personal() {
     }
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     try {
-      await bulkCopyToDb(selected, cloudDb);
+      await bulkCopyToDb(selected, cloudDb, "cloud");
       notify(t("Copied to Cloud"));
       setSelectedIds(new Set());
     } catch {
@@ -368,7 +376,7 @@ function Personal() {
   const moveSelectedToLocal = async () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     try {
-      await bulkCopyToDb(selected, localDb);
+      await bulkCopyToDb(selected, localDb, "local");
       await bulkDeleteFromDb(selected, db);
       notify(t("Moved to Local"));
       setSelectedIds(new Set());
@@ -384,7 +392,7 @@ function Personal() {
     }
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     try {
-      await bulkCopyToDb(selected, cloudDb);
+      await bulkCopyToDb(selected, cloudDb, "cloud");
       await bulkDeleteFromDb(selected, db);
       notify(t("Moved to Cloud"));
       setSelectedIds(new Set());
@@ -397,7 +405,7 @@ function Personal() {
     if (!window.confirm(`Copy all ${filteredList.length} NPC(s) to Local?`))
       return;
     try {
-      await bulkCopyToDb(filteredList, localDb);
+      await bulkCopyToDb(filteredList, localDb, "local");
       notify(t("Copied to Local"));
     } catch {
       notify(t("Failed to copy to Local"));
@@ -412,7 +420,7 @@ function Personal() {
     if (!window.confirm(`Copy all ${filteredList.length} NPC(s) to Cloud?`))
       return;
     try {
-      await bulkCopyToDb(filteredList, cloudDb);
+      await bulkCopyToDb(filteredList, cloudDb, "cloud");
       notify(t("Copied to Cloud"));
     } catch {
       notify(t("Failed to copy to Cloud"));
@@ -423,7 +431,7 @@ function Personal() {
     if (!window.confirm(`Move all ${filteredList.length} NPC(s) to Local?`))
       return;
     try {
-      await bulkCopyToDb(filteredList, localDb);
+      await bulkCopyToDb(filteredList, localDb, "local");
       await bulkDeleteFromDb(filteredList, db);
       notify(t("Moved to Local"));
     } catch {
@@ -439,7 +447,7 @@ function Personal() {
     if (!window.confirm(`Move all ${filteredList.length} NPC(s) to Cloud?`))
       return;
     try {
-      await bulkCopyToDb(filteredList, cloudDb);
+      await bulkCopyToDb(filteredList, cloudDb, "cloud");
       await bulkDeleteFromDb(filteredList, db);
       notify(t("Moved to Cloud"));
     } catch {
@@ -451,9 +459,10 @@ function Personal() {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     const zip = new JSZip();
     selected.forEach((npc) => {
+      const canonical = canonicalizeForTransfer("npc", npc);
       zip.file(
         `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`,
-        JSON.stringify(npc, null, 2),
+        JSON.stringify(canonical, null, 2),
       );
     });
     const blob = await zip.generateAsync({ type: "blob" });
@@ -470,7 +479,9 @@ function Personal() {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     const separator = fmt === "obsidian" ? "\n\n" : "\n\n---\n\n";
     const text = selected
-      .map((npc) => buildItemText("npc", npc, fmt))
+      .map((npc) =>
+        buildItemText("npc", canonicalizeForTransfer("npc", npc), fmt),
+      )
       .join(separator);
     await navigator.clipboard.writeText(text);
     setExportAnchor(null);
@@ -482,7 +493,11 @@ function Personal() {
     const ext = fmt === "plain" ? "txt" : "md";
     const zip = new JSZip();
     selected.forEach((npc) => {
-      const text = buildItemText("npc", npc, fmt);
+      const text = buildItemText(
+        "npc",
+        canonicalizeForTransfer("npc", npc),
+        fmt,
+      );
       zip.file(`${npc.name.replace(/\s+/g, "_").toLowerCase()}.${ext}`, text);
     });
     const blob = await zip.generateAsync({ type: "blob" });
@@ -590,7 +605,7 @@ function Personal() {
 
   const copyNpcToLocal = (npc) => async () => {
     try {
-      await bulkCopyToDb([npc], localDb);
+      await bulkCopyToDb([npc], localDb, "local");
       notify(t("NPC copied to Local"));
     } catch {
       notify(t("Failed to copy NPC to Local"));
@@ -603,7 +618,7 @@ function Personal() {
       return;
     }
     try {
-      await bulkCopyToDb([npc], cloudDb);
+      await bulkCopyToDb([npc], cloudDb, "cloud");
       notify(t("NPC copied to Cloud"));
     } catch {
       notify(t("Failed to copy NPC to Cloud"));
@@ -612,7 +627,7 @@ function Personal() {
 
   const moveNpcToLocal = (npc) => async () => {
     try {
-      await bulkCopyToDb([npc], localDb);
+      await bulkCopyToDb([npc], localDb, "local");
       await db.deleteDoc(db.doc("npc-personal", npc.id));
       notify(t("NPC moved to Local"));
     } catch {
@@ -626,7 +641,7 @@ function Personal() {
       return;
     }
     try {
-      await bulkCopyToDb([npc], cloudDb);
+      await bulkCopyToDb([npc], cloudDb, "cloud");
       await db.deleteDoc(db.doc("npc-personal", npc.id));
       notify(t("NPC moved to Cloud"));
     } catch {

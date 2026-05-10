@@ -83,6 +83,10 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import SettingRow from "../../components/common/SettingRow";
 import classList from "../../libs/classes";
 import MnemosphereCreateDialog from "../../components/player/equipment/technospheres/MnemosphereCreateDialog";
+import {
+  canonicalizeForTransfer,
+  normalizeOwnershipForTarget,
+} from "../../libs/exportTransforms";
 
 export default function PlayerGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -463,14 +467,24 @@ function Personal() {
     return newName;
   };
 
+  const preparePlayerTransferData = (player, target, nextName) => {
+    const canonical = canonicalizeForTransfer("pc", player);
+    return normalizeOwnershipForTarget(
+      { ...canonical, name: nextName, published: false },
+      target,
+      cloudUser?.uid,
+    );
+  };
+
   const exportSelectedAsJson = async () => {
     const selected = filteredList.filter((p) => selectedIds.has(p.id));
     if (!selected.length) return;
     const zip = new JSZip();
     selected.forEach((p) => {
+      const canonical = canonicalizeForTransfer("pc", p);
       zip.file(
         `${p.name.replace(/\s/g, "_").toLowerCase()}.json`,
-        JSON.stringify(p, null, 2),
+        JSON.stringify(canonical, null, 2),
       );
     });
     const content = await zip.generateAsync({ type: "blob" });
@@ -484,13 +498,7 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      const data = {
-        ...player,
-        name: newName,
-        uid: "local-user",
-        published: false,
-      };
-      delete data.id;
+      const data = preparePlayerTransferData(player, "local", newName);
       await localDb.addDoc(localDb.collection("player-personal"), data);
       notify(t("Copied to Local"));
     } catch {
@@ -509,14 +517,7 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      // Apply migrations before copying to cloud
-      const migrated = applyPostLoadTransforms(player);
-      const data = applyPreSaveTransforms({
-        ...migrated,
-        name: newName,
-        published: false,
-      });
-      delete data.id;
+      const data = preparePlayerTransferData(player, "cloud", newName);
       await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       notify(t("Copied to Cloud"));
     } catch {
@@ -531,13 +532,7 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      const data = {
-        ...player,
-        name: newName,
-        uid: "local-user",
-        published: false,
-      };
-      delete data.id;
+      const data = preparePlayerTransferData(player, "local", newName);
       await localDb.addDoc(localDb.collection("player-personal"), data);
       await db.deleteDoc(db.doc("player-personal", player.id));
       notify(t("Moved to Local"));
@@ -557,14 +552,7 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      // Apply migrations before moving to cloud
-      const migrated = applyPostLoadTransforms(player);
-      const data = applyPreSaveTransforms({
-        ...migrated,
-        name: newName,
-        published: false,
-      });
-      delete data.id;
+      const data = preparePlayerTransferData(player, "cloud", newName);
       await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       await db.deleteDoc(db.doc("player-personal", player.id));
       notify(t("Moved to Cloud"));
@@ -618,13 +606,7 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = {
-          ...p,
-          name: newName,
-          uid: "local-user",
-          published: false,
-        };
-        delete data.id;
+        const data = preparePlayerTransferData(p, "local", newName);
         await localDb.addDoc(localDb.collection("player-personal"), data);
       }
       notify(t("Copied to Local"));
@@ -648,14 +630,7 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        // Apply migrations before copying to cloud
-        const migrated = applyPostLoadTransforms(p);
-        const data = applyPreSaveTransforms({
-          ...migrated,
-          name: newName,
-          published: false,
-        });
-        delete data.id;
+        const data = preparePlayerTransferData(p, "cloud", newName);
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       }
       notify(t("Copied to Cloud"));
@@ -676,13 +651,7 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = {
-          ...p,
-          name: newName,
-          uid: "local-user",
-          published: false,
-        };
-        delete data.id;
+        const data = preparePlayerTransferData(p, "local", newName);
         await localDb.addDoc(localDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
@@ -709,14 +678,7 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        // Apply migrations before moving to cloud
-        const migrated = applyPostLoadTransforms(p);
-        const data = applyPreSaveTransforms({
-          ...migrated,
-          name: newName,
-          published: false,
-        });
-        delete data.id;
+        const data = preparePlayerTransferData(p, "cloud", newName);
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
@@ -736,13 +698,7 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = {
-          ...p,
-          name: newName,
-          uid: "local-user",
-          published: false,
-        };
-        delete data.id;
+        const data = preparePlayerTransferData(p, "local", newName);
         await localDb.addDoc(localDb.collection("player-personal"), data);
       }
       notify(t("Copied to Local"));
@@ -764,14 +720,7 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        // Apply migrations before copying to cloud
-        const migrated = applyPostLoadTransforms(p);
-        const data = applyPreSaveTransforms({
-          ...migrated,
-          name: newName,
-          published: false,
-        });
-        delete data.id;
+        const data = preparePlayerTransferData(p, "cloud", newName);
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       }
       notify(t("Copied to Cloud"));
@@ -791,13 +740,7 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = {
-          ...p,
-          name: newName,
-          uid: "local-user",
-          published: false,
-        };
-        delete data.id;
+        const data = preparePlayerTransferData(p, "local", newName);
         await localDb.addDoc(localDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
@@ -822,14 +765,7 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        // Apply migrations before moving to cloud
-        const migrated = applyPostLoadTransforms(p);
-        const data = applyPreSaveTransforms({
-          ...migrated,
-          name: newName,
-          published: false,
-        });
-        delete data.id;
+        const data = preparePlayerTransferData(p, "cloud", newName);
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
