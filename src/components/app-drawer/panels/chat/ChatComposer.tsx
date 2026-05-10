@@ -15,6 +15,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import {
   PersonOutlineOutlined as PersonOutlineIcon,
   Close as CloseIcon,
@@ -61,6 +62,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onExport,
   onClearRequest,
 }) => {
+  const theme = useTheme();
   const [input, setInput] = useState("");
   const [speakerMenuAnchor, setSpeakerMenuAnchor] =
     useState<null | HTMLElement>(null);
@@ -465,8 +467,13 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                             <Typography
                               key={p.name}
                               variant="caption"
-                              color="text.secondary"
-                              sx={{ fontFamily: "monospace" }}
+                              sx={{
+                                fontFamily: "monospace",
+                                color:
+                                  theme.palette.mode === "dark"
+                                    ? "grey.100"
+                                    : "text.secondary",
+                              }}
                             >
                               {p.required ? `<${p.name}>` : `[${p.name}]`}
                             </Typography>
@@ -503,8 +510,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                             <Typography
                               key={p.name}
                               variant="body2"
-                              color="primary"
-                              sx={{ fontFamily: "monospace" }}
+                              sx={{
+                                fontFamily: "monospace",
+                                fontWeight: 700,
+                                color:
+                                  theme.palette.mode === "dark"
+                                    ? "#cfe8ff"
+                                    : "primary.main",
+                              }}
                             >
                               {p.required ? `<${p.name}>` : `[${p.name}]`}
                             </Typography>

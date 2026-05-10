@@ -192,9 +192,9 @@ export const AccuracyCheckMessageTemplate: React.FC<
           mt: 0.5,
           borderRadius: 1.5,
           border: check.critical
-            ? "2px solid #ffcc56"
+            ? "2px solid"
             : check.fumble
-              ? "2px solid #b087a6"
+              ? "2px solid"
               : "1px solid",
           borderColor: check.critical
             ? "#ffcc56"
