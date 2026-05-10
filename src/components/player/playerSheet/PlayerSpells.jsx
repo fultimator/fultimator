@@ -200,8 +200,8 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
       if (useMp && player.stats.mp.current < usedMp) {
         return;
       } else {
-        const attr1 = selectedSpell.attr1;
-        const attr2 = selectedSpell.attr2;
+        const attr1 = selectedSpell.accuracy?.attr1;
+        const attr2 = selectedSpell.accuracy?.attr2;
 
         let att1Value = attributeMap[attr1];
         let att2Value = attributeMap[attr2];

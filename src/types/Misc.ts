@@ -25,6 +25,18 @@ export enum Elements {
   Poison = "poison",
 }
 
+export interface Damage {
+  value: number;
+  type: Elements;
+}
+
+export interface Accuracy {
+  attr1: string;
+  attr2: string;
+  value: number;
+  defense: "def" | "mdef";
+}
+
 export type CostResource = "mp" | "hp" | "ip" | "fp";
 
 export interface ResourceCost {

@@ -138,8 +138,12 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
 
   const [name, setName] = useState(editData?.name ?? "");
   const [range, setRange] = useState(editData?.range ?? "melee");
-  const [attr1, setAttr1] = useState(editData?.attr1 ?? "dexterity");
-  const [attr2, setAttr2] = useState(editData?.attr2 ?? "dexterity");
+  const [attr1, setAttr1] = useState(
+    editData?.accuracy?.attr1 ?? editData?.attr1 ?? "dexterity",
+  );
+  const [attr2, setAttr2] = useState(
+    editData?.accuracy?.attr2 ?? editData?.attr2 ?? "dexterity",
+  );
   const [dmgType, setDmgType] = useState(editData?.type ?? "physical");
   const [special, setSpecial] = useState(
     Array.isArray(editData?.special)
@@ -349,8 +353,12 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
   const [duration, setDuration] = useState(editData?.duration ?? "");
   const [target, setTarget] = useState(editData?.targetDescription ?? "");
   const [range, setRange] = useState(editData?.range ?? "melee");
-  const [attr1, setAttr1] = useState(editData?.attr1 ?? "dexterity");
-  const [attr2, setAttr2] = useState(editData?.attr2 ?? "dexterity");
+  const [attr1, setAttr1] = useState(
+    editData?.accuracy?.attr1 ?? editData?.attr1 ?? "dexterity",
+  );
+  const [attr2, setAttr2] = useState(
+    editData?.accuracy?.attr2 ?? editData?.attr2 ?? "dexterity",
+  );
   const [dmgType, setDmgType] = useState(editData?.damage?.type ?? "physical");
   const [special, setSpecial] = useState(
     Array.isArray(editData?.special)
@@ -371,8 +379,8 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
     setDuration(editData?.duration ?? "");
     setTarget(editData?.targetDescription ?? "");
     setRange(editData?.range ?? "melee");
-    setAttr1(editData?.attr1 ?? "dexterity");
-    setAttr2(editData?.attr2 ?? "dexterity");
+    setAttr1(editData?.accuracy?.attr1 ?? editData?.attr1 ?? "dexterity");
+    setAttr2(editData?.accuracy?.attr2 ?? editData?.attr2 ?? "dexterity");
     setDmgType(editData?.damage?.type ?? "physical");
     setSpecial(
       Array.isArray(editData?.special)
@@ -395,8 +403,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
       duration: duration || undefined,
       targetDescription: target || undefined,
       range,
-      attr1,
-      attr2,
+      accuracy: { attr1, attr2, value: 0, defense: "mdef" },
       special: special.trim() ? [special.trim()] : [],
     };
     if (isEditing) {
@@ -918,8 +925,12 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     editData?.targetDescription ?? "",
   );
   const [duration, setDuration] = useState(editData?.duration ?? "");
-  const [attr1, setAttr1] = useState(editData?.attr1 ?? "insight");
-  const [attr2, setAttr2] = useState(editData?.attr2 ?? "will");
+  const [attr1, setAttr1] = useState(
+    editData?.accuracy?.attr1 ?? editData?.attr1 ?? "insight",
+  );
+  const [attr2, setAttr2] = useState(
+    editData?.accuracy?.attr2 ?? editData?.attr2 ?? "will",
+  );
   const [effect, setEffect] = useState(editData?.effect ?? "");
   const [event, setEvent] = useState(editData?.event ?? "");
   const [genoclepsis, setGenoclepsis] = useState(editData?.genoclepsis ?? "");
@@ -1020,8 +1031,8 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     );
     setTargetDesc(editData?.targetDescription ?? "");
     setDuration(editData?.duration ?? "");
-    setAttr1(editData?.attr1 ?? "insight");
-    setAttr2(editData?.attr2 ?? "will");
+    setAttr1(editData?.accuracy?.attr1 ?? editData?.attr1 ?? "insight");
+    setAttr2(editData?.accuracy?.attr2 ?? editData?.attr2 ?? "will");
     setEffect(editData?.effect ?? "");
     setEvent(editData?.event ?? "");
     setGenoclepsis(editData?.genoclepsis ?? "");
@@ -1089,8 +1100,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
         maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
         targetDescription: targetDesc.trim() || "One creature",
         duration: duration.trim() || "Instantaneous",
-        attr1,
-        attr2,
+        accuracy: { attr1, attr2, value: 0, defense: "mdef" },
         spellType: "default",
       };
     } else {

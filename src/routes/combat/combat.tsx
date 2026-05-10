@@ -434,7 +434,7 @@ function NpcCombatant({ npc }: NpcProps) {
     } else if (attack.spell) {
       // For spells
       const { name, spell } = attack;
-      const { attr1, attr2 } = spell;
+      const { attr1, attr2 } = spell.accuracy ?? {};
       const attributeMap = {
         dexterity: "DEX",
         insight: "INS",

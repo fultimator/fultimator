@@ -1,5 +1,5 @@
 import { Weapon } from "./Equipment";
-import { Affinities, Elements, ResourceCost } from "./Misc";
+import { Affinities, ResourceCost, Accuracy, Damage } from "./Misc";
 
 export interface NpcAttributes {
   might: number;
@@ -42,10 +42,9 @@ export interface NpcWeaponAttack {
 
 export interface NpcSpell {
   name: string;
-  attr1: string;
-  attr2: string;
+  accuracy: Accuracy;
   isOffensive: boolean;
-  damage: { value: number; type: Elements };
+  damage: Damage;
   cost: ResourceCost;
   maxTargets: number;
   targetDescription: string;

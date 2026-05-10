@@ -468,6 +468,7 @@ function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
       }
       s.cost = { resource: "mp", amount, perTarget: true };
     }
+    delete s.mp;
     if (s.targetDescription === undefined) {
       s.targetDescription = (s.targetDesc as string) ?? "";
       delete s.targetDesc;
@@ -482,6 +483,19 @@ function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
     ) {
       s.damage = { value: 0, type: "physical" };
     }
+
+    // attr1 + attr2 -> accuracy object
+    if (s.accuracy === undefined) {
+      s.accuracy = {
+        attr1: (s.attr1 as string) ?? "insight",
+        attr2: (s.attr2 as string) ?? "will",
+        value: 0,
+        defense: "mdef",
+      };
+    }
+    delete s.attr1;
+    delete s.attr2;
+
     return s as T;
   };
 

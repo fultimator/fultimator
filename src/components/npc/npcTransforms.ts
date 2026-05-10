@@ -98,7 +98,6 @@ function normalizeSpellFields(npc: TypeNpc): TypeNpc {
       delete (s as unknown as Record<string, unknown>).target;
       delete (s as unknown as Record<string, unknown>).targetDesc;
 
-      // mp string / mpCost number -> cost object; keep mp as archive
       {
         const raw = s as unknown as Record<string, unknown>;
         if (raw.cost === undefined) {
@@ -109,6 +108,7 @@ function normalizeSpellFields(npc: TypeNpc): TypeNpc {
           }
           raw.cost = { resource: "mp", amount, perTarget: true };
         }
+        delete raw.mp;
       }
 
       if (s.damage === undefined)
@@ -146,6 +146,18 @@ function unifyNpcSpellSchema(npc: TypeNpc): TypeNpc {
       if (s.spellType === undefined) s.spellType = "npc";
       if (s.description === undefined) s.description = "";
       if (s.special === undefined) s.special = [];
+
+      // attr1 + attr2 -> accuracy object
+      if (s.accuracy === undefined) {
+        s.accuracy = {
+          attr1: (s.attr1 as string) ?? "insight",
+          attr2: (s.attr2 as string) ?? "will",
+          value: 0,
+          defense: "mdef",
+        };
+      }
+      delete s.attr1;
+      delete s.attr2;
 
       return s as unknown as typeof spell;
     }),

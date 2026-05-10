@@ -52,8 +52,8 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
     imageTempInfoTextKey,
   });
 
-  const attr1 = attributes[item.attr1];
-  const attr2 = attributes[item.attr2];
+  const attr1 = attributes[item.accuracy?.attr1];
+  const attr2 = attributes[item.accuracy?.attr2];
   const effectText =
     item.effect ??
     item.description ??
@@ -244,8 +244,8 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
     imageTempInfoTextKey,
   });
 
-  const attr1 = attributes[item.attr1];
-  const attr2 = attributes[item.attr2];
+  const attr1 = attributes[item.accuracy?.attr1];
+  const attr2 = attributes[item.accuracy?.attr2];
 
   return (
     <CardContentWrapper

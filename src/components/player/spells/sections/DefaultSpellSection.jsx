@@ -264,8 +264,17 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
           >
             <Select
               fullWidth
-              value={formState.attr1 || "dexterity"}
-              onChange={(e) => handleChange("attr1", e.target.value)}
+              value={formState.accuracy?.attr1 || "dexterity"}
+              onChange={(e) =>
+                handleChange("accuracy", {
+                  ...(formState.accuracy ?? {
+                    attr2: "dexterity",
+                    value: 0,
+                    defense: "mdef",
+                  }),
+                  attr1: e.target.value,
+                })
+              }
             >
               <MenuItem value={"dexterity"}>
                 {attributes["dexterity"].shortcaps}
@@ -287,8 +296,17 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
           >
             <Select
               fullWidth
-              value={formState.attr2 || "dexterity"}
-              onChange={(e) => handleChange("attr2", e.target.value)}
+              value={formState.accuracy?.attr2 || "dexterity"}
+              onChange={(e) =>
+                handleChange("accuracy", {
+                  ...(formState.accuracy ?? {
+                    attr1: "dexterity",
+                    value: 0,
+                    defense: "mdef",
+                  }),
+                  attr2: e.target.value,
+                })
+              }
             >
               <MenuItem value={"dexterity"}>
                 {attributes["dexterity"].shortcaps}

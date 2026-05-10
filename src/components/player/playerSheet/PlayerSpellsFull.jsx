@@ -215,8 +215,8 @@ export default function PlayerSpellsFull({
                             isEditMode={isEditMode}
                             isOffensive={spell.isOffensive}
                             isMagisphere={spell.isMagisphere || false}
-                            attr1={spell.attr1}
-                            attr2={spell.attr2}
+                            attr1={spell.accuracy?.attr1}
+                            attr2={spell.accuracy?.attr2}
                             showInPlayerSheet={spell.showInPlayerSheet}
                             index={spellIndex}
                             onEdit={() =>

@@ -61,8 +61,12 @@ export default function EditSpells({ npc, setNpc }) {
           spellType: "npc",
           name: "",
           range: "ranged",
-          attr1: "insight",
-          attr2: "will",
+          accuracy: {
+            attr1: "insight",
+            attr2: "will",
+            value: 0,
+            defense: "mdef",
+          },
           isOffensive: false,
           cost: { resource: "mp", amount: 0, perTarget: true },
           maxTargets: 0,
@@ -131,8 +135,12 @@ export default function EditSpells({ npc, setNpc }) {
                   itemType: "spell",
                   _packItemId: item._packItemId,
                   name: item.name,
-                  attr1: item.attr1 || "insight",
-                  attr2: item.attr2 || "will",
+                  accuracy: item.accuracy ?? {
+                    attr1: item.attr1 || "insight",
+                    attr2: item.attr2 || "will",
+                    value: 0,
+                    defense: "mdef",
+                  },
                   isOffensive: !!item.isOffensive,
                   damage: item.damage ?? { value: 0, type: "physical" },
                   cost: item.cost ?? {
@@ -422,13 +430,20 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               {t("Attr 1:")}
             </InputLabel>
             <Select
-              value={spell.attr1}
+              value={spell.accuracy?.attr1 ?? "insight"}
               labelId={"spell-" + i + "-attr1label"}
               id={"spell-" + i + "-attr1"}
               label={t("Attr 1")}
               size="small"
               onChange={(e) => {
-                return setSpell("attr1", e.target.value);
+                return setSpell("accuracy", {
+                  ...(spell.accuracy ?? {
+                    attr2: "will",
+                    value: 0,
+                    defense: "mdef",
+                  }),
+                  attr1: e.target.value,
+                });
               }}
             >
               <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
@@ -451,13 +466,20 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               {t("Attr 2:")}
             </InputLabel>
             <Select
-              value={spell.attr2}
+              value={spell.accuracy?.attr2 ?? "will"}
               labelId={"spell-" + i + "-attr2label"}
               id={"spell-" + i + "-attr2"}
               label={t("Attr 2:")}
               size="small"
               onChange={(e) => {
-                return setSpell("attr2", e.target.value);
+                return setSpell("accuracy", {
+                  ...(spell.accuracy ?? {
+                    attr1: "insight",
+                    value: 0,
+                    defense: "mdef",
+                  }),
+                  attr2: e.target.value,
+                });
               }}
             >
               <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>

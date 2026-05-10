@@ -43,25 +43,18 @@ const RollsTab = ({
     };
 
     // Determine the source and correct attribute keys
-    let source, attrKey1, attrKey2;
+    let attr1, attr2;
 
     if (attack.weapon) {
-      source = attack.weapon;
-      attrKey1 = "att1";
-      attrKey2 = "att2";
+      attr1 = attack.weapon?.att1;
+      attr2 = attack.weapon?.att2;
     } else if (attack.spell) {
-      source = attack.spell;
-      attrKey1 = "attr1";
-      attrKey2 = "attr2";
+      attr1 = attack.spell.accuracy?.attr1;
+      attr2 = attack.spell.accuracy?.attr2;
     } else {
-      source = attack;
-      attrKey1 = "attr1";
-      attrKey2 = "attr2";
+      attr1 = attack.attr1;
+      attr2 = attack.attr2;
     }
-
-    // Extract attributes
-    const attr1 = source?.[attrKey1];
-    const attr2 = source?.[attrKey2];
 
     if (!attr1 || !attr2) return "Invalid Attack"; // Handle missing attributes
 

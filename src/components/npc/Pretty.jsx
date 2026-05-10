@@ -1000,9 +1000,9 @@ function Spells({ npc }) {
                   {spell.isOffensive && (
                     <>
                       <OpenBracket />
-                      {attributes[spell.attr1].shortcaps}
+                      {attributes[spell.accuracy?.attr1]?.shortcaps}
                       {" + "}
-                      {attributes[spell.attr2].shortcaps}
+                      {attributes[spell.accuracy?.attr2]?.shortcaps}
                       <CloseBracket />
                       {calcMagic(npc) > 0 && `+${calcMagic(npc)}`} <Diamond />
                       <OpenBracket />

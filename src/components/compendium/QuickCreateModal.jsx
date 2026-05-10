@@ -532,8 +532,7 @@ function NpcSpellPanel() {
     duration: duration || undefined,
     targetDescription: target || undefined,
     range,
-    attr1,
-    attr2,
+    accuracy: { attr1, attr2, value: 0, defense: "mdef" },
     special: special.trim() ? [special.trim()] : [],
   };
 
@@ -1159,8 +1158,7 @@ function PlayerSpellPanel() {
     maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
     targetDescription: targetDescription.trim() || "One creature",
     duration: duration.trim() || "Instantaneous",
-    attr1,
-    attr2,
+    accuracy: { attr1, attr2, value: 0, defense: "mdef" },
     damage: {
       value: isOffensive && damage !== "" ? Number(damage) : 0,
       type: isOffensive ? damageType : "physical",

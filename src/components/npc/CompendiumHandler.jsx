@@ -13,8 +13,12 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
               {
                 itemType: "spell",
                 name: selectedItem.name,
-                attr1: selectedItem.attr1 || "dexterity",
-                attr2: selectedItem.attr2 || "dexterity",
+                accuracy: selectedItem.accuracy ?? {
+                  attr1: selectedItem.attr1 || "insight",
+                  attr2: selectedItem.attr2 || "will",
+                  value: 0,
+                  defense: "mdef",
+                },
                 isOffensive: !!selectedItem.isOffensive,
                 damage: selectedItem.damage ?? { value: 0, type: "physical" },
                 cost: selectedItem.cost ?? {

@@ -133,8 +133,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         duration: t(spell.duration),
         description: t(spell.description),
         isOffensive: spell.isOffensive,
-        attr1: spell.attr1,
-        attr2: spell.attr2,
+        accuracy: spell.accuracy ?? {
+          attr1: spell.attr1 || "insight",
+          attr2: spell.attr2 || "will",
+          value: 0,
+          defense: "mdef",
+        },
         isMagisphere: spell.isMagisphere || false,
         showInPlayerSheet: true,
         _packItemId: spell._packItemId,
@@ -197,8 +201,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         duration: "",
         description: "",
         isOffensive: false,
-        attr1: "dexterity",
-        attr2: "dexterity",
+        accuracy: {
+          attr1: "dexterity",
+          attr2: "dexterity",
+          value: 0,
+          defense: "mdef",
+        },
         showInPlayerSheet: true,
       };
     if (spellType === "arcanist")
@@ -335,8 +343,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   duration: "",
                   description: "",
                   isOffensive: false,
-                  attr1: "dexterity",
-                  attr2: "dexterity",
+                  accuracy: {
+                    attr1: "insight",
+                    attr2: "will",
+                    value: 0,
+                    defense: "mdef",
+                  },
                   showInPlayerSheet: true,
                 },
               ],
@@ -816,8 +828,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   duration: t(spell.duration),
                   description: t(spell.description),
                   isOffensive: spell.isOffensive,
-                  attr1: spell.attr1,
-                  attr2: spell.attr2,
+                  accuracy: spell.accuracy ?? {
+                    attr1: spell.attr1 || "insight",
+                    attr2: spell.attr2 || "will",
+                    value: 0,
+                    defense: "mdef",
+                  },
                   isMagisphere: spell.isMagisphere || false,
                   showInPlayerSheet: true,
                 },
@@ -884,8 +900,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               duration: t(spell.duration),
               description: t(spell.description),
               isOffensive: spell.isOffensive,
-              attr1: spell.attr1,
-              attr2: spell.attr2,
+              accuracy: spell.accuracy ?? {
+                attr1: "insight",
+                attr2: "will",
+                value: 0,
+                defense: "mdef",
+              },
               isMagisphere: spell.isMagisphere || false,
               showInPlayerSheet: true,
               _packItemId: spell._packItemId,
@@ -1845,8 +1865,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               }
                               isEditMode={isEditMode}
                               isOffensive={spell.isOffensive}
-                              attr1={spell.attr1}
-                              attr2={spell.attr2}
+                              attr1={spell.accuracy?.attr1}
+                              attr2={spell.accuracy?.attr2}
                               isMagisphere={spell.isMagisphere || false}
                               showInPlayerSheet={
                                 spell.showInPlayerSheet ||
@@ -2459,8 +2479,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                 }
                                 isEditMode={isEditMode}
                                 isOffensive={spell.isOffensive}
-                                attr1={spell.attr1}
-                                attr2={spell.attr2}
+                                attr1={spell.accuracy?.attr1}
+                                attr2={spell.accuracy?.attr2}
                                 isMagisphere={spell.isMagisphere || false}
                                 showInPlayerSheet={
                                   spell.showInPlayerSheet ||

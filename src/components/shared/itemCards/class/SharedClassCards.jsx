@@ -251,14 +251,14 @@ function ClassSpellRow({ spell, customTheme, t }) {
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
             {spell.duration}
           </Typography>
-          {spell.attr1 && spell.attr2 && (
+          {spell.accuracy?.attr1 && spell.accuracy?.attr2 && (
             <>
               <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 ·
               </Typography>
               <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                {attributes[spell.attr1]?.shortcaps} +{" "}
-                {attributes[spell.attr2]?.shortcaps}
+                {attributes[spell.accuracy.attr1]?.shortcaps} +{" "}
+                {attributes[spell.accuracy.attr2]?.shortcaps}
               </Typography>
             </>
           )}

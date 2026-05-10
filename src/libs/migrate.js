@@ -101,8 +101,7 @@ export function diffItem(instance, source, type) {
         "duration",
         "description",
         "isOffensive",
-        "attr1",
-        "attr2",
+        "accuracy",
         "opportunity",
         "quality",
       ];
@@ -115,8 +114,7 @@ export function diffItem(instance, source, type) {
     case "npc-spell": {
       const fields = [
         "name",
-        "attr1",
-        "attr2",
+        "accuracy",
         "type",
         "cost",
         "maxTargets",
@@ -191,8 +189,7 @@ export function applyMigration(instance, source, type) {
         "duration",
         "description",
         "isOffensive",
-        "attr1",
-        "attr2",
+        "accuracy",
         "opportunity",
         "quality",
       ];
@@ -206,8 +203,7 @@ export function applyMigration(instance, source, type) {
     case "npc-spell": {
       const fields = [
         "name",
-        "attr1",
-        "attr2",
+        "accuracy",
         "type",
         "cost",
         "maxTargets",

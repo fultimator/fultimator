@@ -508,8 +508,8 @@ function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
           isEditMode={false}
           isOffensive={spell.isOffensive}
           isMagisphere={spell.isMagisphere || false}
-          attr1={spell.attr1}
-          attr2={spell.attr2}
+          attr1={spell.accuracy?.attr1}
+          attr2={spell.accuracy?.attr2}
         />
       );
     case "gamble":
@@ -909,8 +909,7 @@ export default function PlayerSpellsFull({
         duration: t(spell.duration),
         description: t(spell.description),
         isOffensive: spell.isOffensive,
-        attr1: spell.attr1,
-        attr2: spell.attr2,
+        accuracy: spell.accuracy,
         isMagisphere: spell.isMagisphere || false,
         showInPlayerSheet: true,
       };

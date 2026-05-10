@@ -158,8 +158,8 @@ function buildNpcText(npc, md) {
       const magic = calcMagic(npc);
       let header = b(spell.name);
       if (offensive) {
-        const a1 = ATTR_SHORT[spell.attr1] ?? spell.attr1;
-        const a2 = ATTR_SHORT[spell.attr2] ?? spell.attr2;
+        const a1 = ATTR_SHORT[spell.accuracy?.attr1] ?? spell.accuracy?.attr1;
+        const a2 = ATTR_SHORT[spell.accuracy?.attr2] ?? spell.accuracy?.attr2;
         const magicStr = magic > 0 ? ` +${magic}` : "";
         header += ` (Offensive)  -  ${b(`[${a1} + ${a2}]${magicStr}`)}  -  ${spell.cost?.amount} MP  -  ${spell.targetDescription}  -  ${spell.duration}`;
       } else {
@@ -264,8 +264,8 @@ function buildNpcObsidian(npc) {
       const offensive = spell.isOffensive;
       let name = spell.name ?? "";
       if (offensive) {
-        const a1 = ATTR_SHORT[spell.attr1] ?? spell.attr1;
-        const a2 = ATTR_SHORT[spell.attr2] ?? spell.attr2;
+        const a1 = ATTR_SHORT[spell.accuracy?.attr1] ?? spell.accuracy?.attr1;
+        const a2 = ATTR_SHORT[spell.accuracy?.attr2] ?? spell.accuracy?.attr2;
         const magicStr = magic > 0 ? ` +${magic}` : "";
         name += ` ($) ~ [${a1} + ${a2}]${magicStr}`;
       }
@@ -550,11 +550,11 @@ export function buildItemText(type, item, fmt) {
           item.cost?.amount != null && field("MP", item.cost.amount),
           target && field("Target", resolve(target)),
           item.duration && field("Duration", resolve(item.duration)),
-          item.attr1 &&
-            item.attr2 &&
+          item.accuracy?.attr1 &&
+            item.accuracy?.attr2 &&
             field(
               "Roll",
-              `${attributes[item.attr1]?.shortcaps} + ${attributes[item.attr2]?.shortcaps}`,
+              `${attributes[item.accuracy.attr1]?.shortcaps} + ${attributes[item.accuracy.attr2]?.shortcaps}`,
             ),
         ].filter(Boolean);
         if (stats.length) parts.push(stats.join("\n"));
@@ -577,11 +577,11 @@ export function buildItemText(type, item, fmt) {
         item.cost?.amount != null && field("MP", item.cost.amount),
         target && field("Target", resolve(target)),
         item.duration && field("Duration", resolve(item.duration)),
-        item.attr1 &&
-          item.attr2 &&
+        item.accuracy?.attr1 &&
+          item.accuracy?.attr2 &&
           field(
             "Roll",
-            `${attributes[item.attr1]?.shortcaps} + ${attributes[item.attr2]?.shortcaps}`,
+            `${attributes[item.accuracy.attr1]?.shortcaps} + ${attributes[item.accuracy.attr2]?.shortcaps}`,
           ),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));

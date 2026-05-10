@@ -328,9 +328,18 @@ export default function SpellDefaultModal({
                 <FormControl fullWidth>
                   <InputLabel>{t("Attr 1")}</InputLabel>
                   <Select
-                    value={editedSpell.attr1 || "insight"}
+                    value={editedSpell.accuracy?.attr1 || "insight"}
                     label={t("Attr 1")}
-                    onChange={(e) => handleChange("attr1", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("accuracy", {
+                        ...(editedSpell.accuracy ?? {
+                          attr2: "will",
+                          value: 0,
+                          defense: "mdef",
+                        }),
+                        attr1: e.target.value,
+                      })
+                    }
                   >
                     {Object.keys(attributes).map((a) => (
                       <MenuItem key={a} value={a}>
@@ -344,9 +353,18 @@ export default function SpellDefaultModal({
                 <FormControl fullWidth>
                   <InputLabel>{t("Attr 2")}</InputLabel>
                   <Select
-                    value={editedSpell.attr2 || "will"}
+                    value={editedSpell.accuracy?.attr2 || "will"}
                     label={t("Attr 2")}
-                    onChange={(e) => handleChange("attr2", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("accuracy", {
+                        ...(editedSpell.accuracy ?? {
+                          attr1: "insight",
+                          value: 0,
+                          defense: "mdef",
+                        }),
+                        attr2: e.target.value,
+                      })
+                    }
                   >
                     {Object.keys(attributes).map((a) => (
                       <MenuItem key={a} value={a}>
