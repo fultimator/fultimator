@@ -199,6 +199,9 @@ export default function PlayerEdit() {
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerIsOpen = useAppDrawerStore((s) => s.setIsOpen);
+  const setChatActorDocOverride = useAppDrawerStore(
+    (s) => s.setChatActorDocOverride,
+  );
   const [compactView, setCompactView] = useState(false);
   const [compactViewExpanded, setCompactViewExpanded] = useState(false);
 
@@ -257,6 +260,15 @@ export default function PlayerEdit() {
       setCompactView(updatedPlayerTemp?.settings?.defaultView === "compact");
     }
   }, [player]);
+
+  useEffect(() => {
+    setChatActorDocOverride(
+      playerTemp ? JSON.parse(JSON.stringify(playerTemp)) : null,
+    );
+    return () => {
+      setChatActorDocOverride(null);
+    };
+  }, [playerTemp, setChatActorDocOverride]);
 
   const playerBaseline = useMemo(() => {
     if (!player) return null;

@@ -47,6 +47,9 @@ export type AccuracyCheckIntent = {
   weaponName: string;
   baseDamage: number;
   damageType: string;
+  hands?: 1 | 2;
+  category?: string;
+  range?: "melee" | "ranged" | string;
 };
 
 export type AccuracyCheckResult = {

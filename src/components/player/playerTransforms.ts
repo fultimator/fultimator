@@ -131,9 +131,25 @@ const PRE_SAVE_TRANSFORMS: PlayerTransform[] = [
   stripRuntimeEquippedFlags,
 ];
 
+function stripUndefinedDeep<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((v) => stripUndefinedDeep(v)) as T;
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      if (v === undefined) continue;
+      out[k] = stripUndefinedDeep(v);
+    }
+    return out as T;
+  }
+  return value;
+}
+
 /** Run all pre-save transforms and return the player ready to write to the DB. */
 export function applyPreSaveTransforms(player: TypePlayer): TypePlayer {
-  return PRE_SAVE_TRANSFORMS.reduce((p, fn) => fn(p), player);
+  const transformed = PRE_SAVE_TRANSFORMS.reduce((p, fn) => fn(p), player);
+  return stripUndefinedDeep(transformed);
 }
 
 // Post-load transforms
@@ -662,7 +678,7 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
             ? (w.hands as 1 | 2)
             : w.isTwoHand
               ? 2
-              : 1,
+              : 2,
         martial: (w.martial as boolean | undefined) ?? false,
         modifiers: {
           damage:
@@ -774,7 +790,7 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
 
     const next: RawWeapon = { ...w };
     next.category = category;
-    next.hands = w.hands === 2 || w.hands === 1 ? w.hands : w.isTwoHand ? 2 : 1;
+    next.hands = w.hands === 2 || w.hands === 1 ? w.hands : 2;
     next.martial = (w.martial as boolean | undefined) ?? false;
     next.accuracy = {
       attr1,

@@ -147,7 +147,7 @@ export function normalizeCustomWeaponLike(item = {}) {
         ? item.hands
         : item.isTwoHand
           ? 2
-          : 1,
+          : 2,
     martial: item.martial ?? false,
     accuracy: {
       attr1:

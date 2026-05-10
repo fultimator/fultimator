@@ -5,6 +5,7 @@ import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { AUTHOR_NAME, DEFAULT_SPEAKER, LOCAL_SPEAKER_KEY } from "./constants";
 import { formatTimeAgo } from "./utils";
 import { useChatStore } from "./chatStore";
+import { useAppDrawerStore } from "../../../../store/appDrawerStore";
 import {
   useRouteActor,
   useActorName,
@@ -29,6 +30,7 @@ export const ChatPanel: React.FC = () => {
   const isCombatSim = location.pathname.startsWith("/combat-sim/");
 
   const { playerDoc, npcDoc } = useRouteActor();
+  const chatActorDocOverride = useAppDrawerStore((s) => s.chatActorDocOverride);
   const contextActorName = useActorName(playerDoc, npcDoc);
   const combatSimActors = useCombatSimActors();
   const activeActorName = useCombatEncounterStore((s) => s.activeActorName);
@@ -45,9 +47,7 @@ export const ChatPanel: React.FC = () => {
     ? selectedSpeaker === DEFAULT_SPEAKER
       ? null
       : (combatSimActors.find((a) => a.name === selectedSpeaker)?.doc ?? null)
-    : selectedSpeaker === DEFAULT_SPEAKER
-      ? null
-      : (playerDoc ?? npcDoc);
+    : (chatActorDocOverride ?? playerDoc ?? npcDoc);
 
   const store = useChatStore(selectedSpeaker, activeActorDoc);
 
@@ -56,6 +56,14 @@ export const ChatPanel: React.FC = () => {
       setSelectedSpeaker(DEFAULT_SPEAKER);
     }
   }, [selectedSpeaker, speakerOptions]);
+
+  useEffect(() => {
+    if (isCombatSim) return;
+    if (!contextActorName) return;
+    if (selectedSpeaker === contextActorName) return;
+    localStorage.setItem(LOCAL_SPEAKER_KEY, contextActorName);
+    setSelectedSpeaker(contextActorName);
+  }, [isCombatSim, contextActorName, selectedSpeaker]);
 
   useEffect(() => {
     if (!isCombatSim || !activeActorName) return;

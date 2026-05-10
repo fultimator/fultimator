@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import {
   Box,
+  Chip,
   Collapse,
   Divider,
   IconButton,
   Stack,
   Typography,
 } from "@mui/material";
+import { useTheme, alpha } from "@mui/material/styles";
 import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdExpandMore } from "react-icons/md";
 import type { AccuracyCheckResult } from "../types";
 import { TypeIcon } from "../../../../types";
+import Diamond from "../../../../Diamond";
 
 const ATTR_LABEL: Record<string, string> = {
   dex: "DEX",
@@ -23,25 +26,38 @@ const dieCellSx = {
   display: "flex",
   flexDirection: "column" as const,
   alignItems: "center",
-  gap: 0.5,
-  px: 1,
-  pt: 0.5,
-  pb: 0.75,
-  borderRadius: 1.5,
+  gap: 0.25,
+  px: 0.75,
+  py: 0.5,
+  borderRadius: 1.25,
   border: "1px solid",
   backgroundColor: "background.default",
-  minWidth: 56,
+  minWidth: 50,
 };
 
 const gridSx = {
-  px: 1,
-  py: 0.65,
+  px: 0.75,
+  py: 0.5,
   display: "grid",
   gridTemplateColumns: "24px max-content max-content 24px",
   justifyContent: "center",
   alignItems: "center",
   gap: 1,
 };
+
+function formatCategory(category: string): string {
+  const clean = category
+    .replace(/^weapon_category_/, "")
+    .replace(/_/g, " ")
+    .trim();
+  if (!clean) return "Unknown";
+  return clean.replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
+function formatRange(range: string): string {
+  if (range === "ranged" || range === "weapon_range_ranged") return "Ranged";
+  return "Melee";
+}
 
 interface AccuracyCheckMessageTemplateProps {
   check: AccuracyCheckResult;
@@ -50,6 +66,7 @@ interface AccuracyCheckMessageTemplateProps {
 export const AccuracyCheckMessageTemplate: React.FC<
   AccuracyCheckMessageTemplateProps
 > = ({ check }) => {
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
 
   const accentColor = check.critical
@@ -57,6 +74,11 @@ export const AccuracyCheckMessageTemplate: React.FC<
     : check.fumble
       ? "error.main"
       : "primary.main";
+  const accentBackgroundImage = check.critical
+    ? "linear-gradient(to bottom, #f7c754, #d17f10)"
+    : check.fumble
+      ? "linear-gradient(to bottom, #b087a6, #15031e)"
+      : `linear-gradient(to bottom, ${alpha(theme.palette.primary.light, 0.95)}, ${alpha(theme.palette.primary.dark, 0.95)})`;
 
   const rawDamageType = String(check.intent.damageType || "physical")
     .toLowerCase()
@@ -84,6 +106,13 @@ export const AccuracyCheckMessageTemplate: React.FC<
     check.primary.result < check.secondary.result
       ? check.primary.result
       : check.secondary.result;
+  const tags: string[] = [];
+  if (check.intent.category) tags.push(formatCategory(check.intent.category));
+  if (check.intent.range) tags.push(formatRange(check.intent.range));
+  if (check.intent.hands === 2) tags.push("Two-handed");
+  else if (check.intent.hands === 1) tags.push("One-handed");
+  if (check.critical) tags.push("Critical");
+  if (check.fumble) tags.push("Fumble");
 
   return (
     <>
@@ -92,14 +121,42 @@ export const AccuracyCheckMessageTemplate: React.FC<
         color="text.secondary"
         sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
       >
-        Accuracy Check · {check.intent.weaponName}
+        Accuracy Check <Diamond color="inherit" /> {check.intent.weaponName}
       </Typography>
+      {tags.length > 0 && (
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{
+            mt: 0.5,
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "flex-start",
+          }}
+        >
+          {tags.map((tag, i) => (
+            <Chip
+              key={`${tag}-${i}`}
+              size="small"
+              label={tag}
+              sx={{
+                textTransform: "uppercase",
+                height: 22,
+                backgroundColor: "background.default",
+                border: "1px solid",
+                borderColor: "divider",
+                color: "text.primary",
+              }}
+            />
+          ))}
+        </Stack>
+      )}
 
       <Stack
         direction="row"
-        spacing={1.5}
+        spacing={1}
         sx={{
-          mt: 0.75,
+          mt: 0.5,
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "center",
@@ -110,9 +167,12 @@ export const AccuracyCheckMessageTemplate: React.FC<
             key={i}
             sx={{
               ...dieCellSx,
-              borderColor: i === 0 ? "primary.main" : "divider",
+              borderColor: "divider",
             }}
           >
+            <Box sx={{ lineHeight: 0 }}>
+              <GiDiceEightFacesEight size={28} />
+            </Box>
             <Typography
               variant="caption"
               color="text.secondary"
@@ -120,9 +180,6 @@ export const AccuracyCheckMessageTemplate: React.FC<
             >
               {ATTR_LABEL[die.attribute]} d{die.die}
             </Typography>
-            <Box sx={{ lineHeight: 0 }}>
-              <GiDiceEightFacesEight size={32} />
-            </Box>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {die.result}
             </Typography>
@@ -132,15 +189,30 @@ export const AccuracyCheckMessageTemplate: React.FC<
 
       <Box
         sx={{
-          mt: 0.75,
+          mt: 0.5,
           borderRadius: 1.5,
-          border: "1px solid",
-          borderColor: accentColor,
+          border: check.critical
+            ? "2px solid #ffcc56"
+            : check.fumble
+              ? "2px solid #b087a6"
+              : "1px solid",
+          borderColor: check.critical
+            ? "#ffcc56"
+            : check.fumble
+              ? "#b087a6"
+              : accentColor,
           overflow: "hidden",
         }}
       >
         {/* Row 1: accuracy */}
-        <Box sx={{ ...gridSx, backgroundColor: accentColor }}>
+        <Box
+          sx={{
+            ...gridSx,
+            position: "relative",
+            backgroundColor: accentColor,
+            backgroundImage: accentBackgroundImage,
+          }}
+        >
           <Box />
           <Typography
             variant="h4"
@@ -151,6 +223,9 @@ export const AccuracyCheckMessageTemplate: React.FC<
               py: 0.25,
               borderRadius: 1,
               backgroundColor: "background.paper",
+              border: "2px solid",
+              borderColor: "rgba(255,255,255,0.7)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.35)",
               color: "text.primary",
               textAlign: "center",
             }}
@@ -162,8 +237,12 @@ export const AccuracyCheckMessageTemplate: React.FC<
             sx={{
               color: "primary.contrastText",
               textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              fontWeight: 700,
+              letterSpacing: "0.06em",
+              fontWeight: 800,
+              fontSize: "0.9rem",
+              lineHeight: 1.1,
+              textShadow:
+                "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
             }}
           >
             {check.critical
@@ -176,9 +255,14 @@ export const AccuracyCheckMessageTemplate: React.FC<
             size="small"
             onClick={() => setOpen((v) => !v)}
             sx={{
+              position: "absolute",
+              right: 6,
+              top: "50%",
+              transform: open
+                ? "translateY(-50%) rotate(180deg)"
+                : "translateY(-50%) rotate(0deg)",
               p: 0,
               color: "primary.contrastText",
-              transform: open ? "rotate(180deg)" : "rotate(0deg)",
               transition: "transform 0.2s",
             }}
           >
@@ -209,6 +293,9 @@ export const AccuracyCheckMessageTemplate: React.FC<
               py: 0.25,
               borderRadius: 1,
               backgroundColor: "background.paper",
+              border: "2px solid",
+              borderColor: "rgba(255,255,255,0.7)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.35)",
               color: "text.primary",
               textAlign: "center",
             }}

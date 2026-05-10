@@ -16,6 +16,10 @@ import {
   TextField,
   FormControlLabel,
   Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import { Close, ExpandMore } from "@mui/icons-material";
@@ -87,6 +91,25 @@ function hasAccurateCustomization(customizationList) {
   );
 }
 
+const ATTRIBUTE_LABELS = {
+  dexterity: "DEX",
+  insight: "INS",
+  might: "MIG",
+  will: "WLP",
+};
+
+function toPickerRange(value) {
+  if (value === "ranged" || value === "weapon_range_ranged")
+    return "weapon_range_ranged";
+  return "weapon_range_melee";
+}
+
+function toCanonicalRange(value) {
+  return value === "weapon_range_ranged" || value === "ranged"
+    ? "ranged"
+    : "melee";
+}
+
 export default function PlayerCustomWeaponModal({
   open,
   onClose,
@@ -116,7 +139,7 @@ export default function PlayerCustomWeaponModal({
     customWeapon?.category || categories[0],
   );
   const [selectedRange, setSelectedRange] = useState(
-    customWeapon?.range || range[0],
+    toPickerRange(customWeapon?.range),
   );
   const [selectedAccuracyCheck, setSelectedAccuracyCheck] = useState(() => {
     const ac = customWeapon?.accuracyCheck ?? customWeapon?.accuracy;
@@ -197,7 +220,7 @@ export default function PlayerCustomWeaponModal({
     customWeapon?.secondSelectedCategory || categories[0],
   );
   const [secondSelectedRange, setSecondSelectedRange] = useState(
-    customWeapon?.secondSelectedRange || range[0],
+    toPickerRange(customWeapon?.secondSelectedRange),
   );
   const [secondSelectedAccuracyCheck, setSecondSelectedAccuracyCheck] =
     useState(
@@ -262,7 +285,7 @@ export default function PlayerCustomWeaponModal({
     if (customWeapon) {
       setWeaponName(customWeapon.name || "");
       setSelectedCategory(customWeapon.category || categories[0]);
-      setSelectedRange(customWeapon.range || range[0]);
+      setSelectedRange(toPickerRange(customWeapon.range));
       const ac = customWeapon.accuracyCheck ?? customWeapon.accuracy;
       const rare = customWeapon.rare ?? {};
       setSelectedAccuracyCheck(
@@ -311,7 +334,7 @@ export default function PlayerCustomWeaponModal({
       setSecondSelectedCategory(
         customWeapon.secondSelectedCategory || categories[0],
       );
-      setSecondSelectedRange(customWeapon.secondSelectedRange || range[0]);
+      setSecondSelectedRange(toPickerRange(customWeapon.secondSelectedRange));
       setSecondSelectedAccuracyCheck(
         normalizeAccuracyCheck(
           customWeapon.secondSelectedAccuracyCheck ??
@@ -358,7 +381,7 @@ export default function PlayerCustomWeaponModal({
       // Reset to defaults when creating new weapon
       setWeaponName("");
       setSelectedCategory(categories[0]);
-      setSelectedRange(range[0]);
+      setSelectedRange(toPickerRange(range[0]));
       setSelectedAccuracyCheck(accuracyChecks[0]);
       setSelectedType(types[0]);
       setCurrentCustomizations([]);
@@ -379,7 +402,7 @@ export default function PlayerCustomWeaponModal({
       // Reset secondary weapon states
       setSecondWeaponName("");
       setSecondSelectedCategory(categories[0]);
-      setSecondSelectedRange(range[0]);
+      setSecondSelectedRange(toPickerRange(range[0]));
       setSecondSelectedAccuracyCheck(accuracyChecks[0]);
       setSecondSelectedType(types[0]);
       setSecondCurrentCustomizations([]);
@@ -621,7 +644,7 @@ export default function PlayerCustomWeaponModal({
       itemType: "customWeapon",
       name: weaponName,
       category: selectedCategory,
-      range: selectedRange,
+      range: toCanonicalRange(selectedRange),
       accuracy: primaryAccuracy,
       damage: primaryDamage,
       modifiers: {
@@ -651,7 +674,7 @@ export default function PlayerCustomWeaponModal({
       // Secondary weapon data (for transforming weapons)
       secondName: secondWeaponName,
       secondCategory: secondSelectedCategory,
-      secondRange: secondSelectedRange,
+      secondRange: toCanonicalRange(secondSelectedRange),
       secondCustomizations: secondCurrentCustomizations,
       // Secondary weapon modifiers
       secondModifiers: {
@@ -1003,7 +1026,12 @@ export default function PlayerCustomWeaponModal({
                 }}
               >
                 <ChangeAccuracyCheck
-                  value={selectedAccuracyCheck}
+                  value={
+                    overrideAccuracyAttributes
+                      ? (findPresetAccuracyCheck(selectedAccuracyCheck) ??
+                        accuracyChecks[0])
+                      : selectedAccuracyCheck
+                  }
                   onChange={setSelectedAccuracyCheck}
                   disabled={overrideAccuracyAttributes}
                 />
@@ -1210,6 +1238,64 @@ export default function PlayerCustomWeaponModal({
                           }
                           label={t("override_accuracy_attributes")}
                         />
+                        {overrideAccuracyAttributes && (
+                          <Box
+                            sx={{
+                              mt: 1,
+                              display: "grid",
+                              gap: 1,
+                              gridTemplateColumns: {
+                                xs: "1fr",
+                                sm: "1fr 1fr",
+                              },
+                            }}
+                          >
+                            <FormControl fullWidth size="small">
+                              <InputLabel id="override-acc-attr1">
+                                {t("Attribute 1")}
+                              </InputLabel>
+                              <Select
+                                labelId="override-acc-attr1"
+                                value={selectedAccuracyCheck.att1}
+                                label={t("Attribute 1")}
+                                onChange={(e) =>
+                                  setSelectedAccuracyCheck((prev) => ({
+                                    ...prev,
+                                    att1: e.target.value,
+                                  }))
+                                }
+                              >
+                                {ATTRIBUTE_OPTIONS.map((attr) => (
+                                  <MenuItem key={`attr1-${attr}`} value={attr}>
+                                    {ATTRIBUTE_LABELS[attr] ?? attr}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                            <FormControl fullWidth size="small">
+                              <InputLabel id="override-acc-attr2">
+                                {t("Attribute 2")}
+                              </InputLabel>
+                              <Select
+                                labelId="override-acc-attr2"
+                                value={selectedAccuracyCheck.att2}
+                                label={t("Attribute 2")}
+                                onChange={(e) =>
+                                  setSelectedAccuracyCheck((prev) => ({
+                                    ...prev,
+                                    att2: e.target.value,
+                                  }))
+                                }
+                              >
+                                {ATTRIBUTE_OPTIONS.map((attr) => (
+                                  <MenuItem key={`attr2-${attr}`} value={attr}>
+                                    {ATTRIBUTE_LABELS[attr] ?? attr}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Box>
+                        )}
                       </Grid>
                       <Grid
                         size={{
@@ -1398,7 +1484,13 @@ export default function PlayerCustomWeaponModal({
                     }}
                   >
                     <ChangeAccuracyCheck
-                      value={secondSelectedAccuracyCheck}
+                      value={
+                        overrideAccuracyAttributes
+                          ? (findPresetAccuracyCheck(
+                              secondSelectedAccuracyCheck,
+                            ) ?? accuracyChecks[0])
+                          : secondSelectedAccuracyCheck
+                      }
                       onChange={setSecondSelectedAccuracyCheck}
                       disabled={overrideAccuracyAttributes}
                     />

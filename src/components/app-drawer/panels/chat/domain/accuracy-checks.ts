@@ -30,6 +30,9 @@ export function prepareAccuracyCheck(
     weaponName: weapon.name,
     baseDamage: weapon.baseDamage ?? 0,
     damageType: weapon.damageType ?? "physical",
+    hands: weapon.hands,
+    category: weapon.category,
+    range: weapon.range,
   };
 }
 

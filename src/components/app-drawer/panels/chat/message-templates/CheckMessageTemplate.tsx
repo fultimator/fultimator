@@ -1,8 +1,10 @@
 import React from "react";
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
+import { useTheme, alpha } from "@mui/material/styles";
 import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
 import type { CheckResult } from "../types";
+import Diamond from "../../../../Diamond";
 
 const ATTR_LABEL: Record<string, string> = {
   dex: "DEX",
@@ -15,14 +17,23 @@ const dieCellSx = {
   display: "flex",
   flexDirection: "column" as const,
   alignItems: "center",
-  gap: 0.5,
-  px: 1,
-  pt: 0.5,
-  pb: 0.75,
-  borderRadius: 1.5,
+  gap: 0.25,
+  px: 0.75,
+  py: 0.5,
+  borderRadius: 1.25,
   border: "1px solid",
   backgroundColor: "background.default",
-  minWidth: 56,
+  minWidth: 50,
+};
+
+const gridSx = {
+  px: 0.75,
+  py: 0.5,
+  display: "grid",
+  gridTemplateColumns: "24px max-content max-content 24px",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: 1,
 };
 
 interface CheckMessageTemplateProps {
@@ -32,11 +43,27 @@ interface CheckMessageTemplateProps {
 export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
   check,
 }) => {
+  const theme = useTheme();
+  const isSuccess = check.passed === true && !check.critical && !check.fumble;
+  const isFailure = check.passed === false && !check.critical && !check.fumble;
   const accentColor = check.critical
-    ? "success.main"
+    ? "#ffcc56"
     : check.fumble
-      ? "error.main"
-      : "primary.main";
+      ? "#b087a6"
+      : isSuccess
+        ? "#91c469"
+        : isFailure
+          ? "#edb7aa"
+          : "primary.main";
+  const accentBackgroundImage = check.critical
+    ? "linear-gradient(to bottom, #f7c754, #d17f10)"
+    : check.fumble
+      ? "linear-gradient(to bottom, #b087a6, #15031e)"
+      : isSuccess
+        ? "linear-gradient(to bottom, #91c469, #228c22)"
+        : isFailure
+          ? "linear-gradient(to bottom, #d99689, #880012)"
+          : `linear-gradient(to bottom, ${alpha(theme.palette.primary.light, 0.72)}, ${alpha(theme.palette.primary.dark, 0.8)})`;
 
   return (
     <>
@@ -47,15 +74,18 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
       >
         Attribute Check
         {check.intent.difficulty != null && (
-          <> · DL {check.intent.difficulty}</>
+          <>
+            {" "}
+            <Diamond color="inherit" /> DL {check.intent.difficulty}
+          </>
         )}
       </Typography>
 
       <Stack
         direction="row"
-        spacing={1.5}
+        spacing={1}
         sx={{
-          mt: 0.75,
+          mt: 0.5,
           flexWrap: "wrap",
           alignItems: "center",
           justifyContent: "center",
@@ -66,9 +96,12 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
             key={i}
             sx={{
               ...dieCellSx,
-              borderColor: i === 0 ? "primary.main" : "divider",
+              borderColor: "divider",
             }}
           >
+            <Box sx={{ lineHeight: 0 }}>
+              <GiDiceEightFacesEight size={28} />
+            </Box>
             <Typography
               variant="caption"
               color="text.secondary"
@@ -76,9 +109,6 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
             >
               {ATTR_LABEL[die.attribute]} d{die.die}
             </Typography>
-            <Box sx={{ lineHeight: 0 }}>
-              <GiDiceEightFacesEight size={32} />
-            </Box>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {die.result}
             </Typography>
@@ -87,6 +117,9 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
 
         {check.modifierTotal !== 0 && (
           <Box sx={{ ...dieCellSx, borderColor: "divider" }}>
+            <Box sx={{ lineHeight: 0 }}>
+              <MdTune size={28} />
+            </Box>
             <Typography
               variant="caption"
               color="text.secondary"
@@ -94,9 +127,6 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
             >
               Mod
             </Typography>
-            <Box sx={{ lineHeight: 0 }}>
-              <MdTune size={32} />
-            </Box>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {check.modifierTotal > 0
                 ? `+${check.modifierTotal}`
@@ -106,62 +136,74 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         )}
       </Stack>
 
-      {(check.critical || check.fumble) && (
-        <Box sx={{ mt: 0.75, display: "flex", justifyContent: "center" }}>
-          <Chip
-            label={check.critical ? "Critical Hit!" : "Fumble!"}
-            size="small"
-            color={check.critical ? "success" : "error"}
-            sx={{ fontWeight: 700, fontSize: "0.7rem" }}
-          />
-        </Box>
-      )}
-
       <Box
         sx={{
           mt: 1,
-          px: 1,
-          py: 0.65,
           borderRadius: 1.5,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 2,
-          backgroundColor: accentColor,
-          color: "primary.contrastText",
+          border: check.critical
+            ? "2px solid #ffcc56"
+            : check.fumble
+              ? "2px solid #b087a6"
+              : "1px solid",
+          borderColor: check.critical
+            ? "#ffcc56"
+            : check.fumble
+              ? "#b087a6"
+              : accentColor,
+          overflow: "hidden",
         }}
       >
-        <Typography
-          variant="h4"
+        <Box
           sx={{
-            fontWeight: 900,
-            lineHeight: 1,
-            px: 1,
-            py: 0.4,
-            borderRadius: 1,
-            backgroundColor: "background.paper",
-            color: "text.primary",
-            minWidth: 56,
-            textAlign: "center",
+            ...gridSx,
+            backgroundColor: accentColor,
+            backgroundImage: accentBackgroundImage,
           }}
         >
-          {check.result}
-        </Typography>
-
-        {check.passed != null && (
+          <Box />
           <Typography
-            variant="body1"
+            variant="h4"
             sx={{
-              fontWeight: 700,
+              fontWeight: 900,
               lineHeight: 1,
-              color: "primary.contrastText",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
+              px: 1,
+              py: 0.25,
+              borderRadius: 1,
+              backgroundColor: "background.paper",
+              border: "2px solid",
+              borderColor: "rgba(255,255,255,0.7)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.35)",
+              color: "text.primary",
+              textAlign: "center",
             }}
           >
-            {check.passed ? "Success" : "Failure"}
+            {check.result}
           </Typography>
-        )}
+          <Typography
+            variant="caption"
+            sx={{
+              color: "primary.contrastText",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              fontWeight: 800,
+              fontSize: "0.9rem",
+              lineHeight: 1.1,
+              textShadow:
+                "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
+            }}
+          >
+            {check.critical
+              ? "Critical"
+              : check.fumble
+                ? "Fumble!"
+                : check.passed == null
+                  ? "Result"
+                  : check.passed
+                    ? "Success"
+                    : "Failure"}
+          </Typography>
+          <Box />
+        </Box>
       </Box>
     </>
   );

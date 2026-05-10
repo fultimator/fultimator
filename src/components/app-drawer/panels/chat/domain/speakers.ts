@@ -8,12 +8,15 @@ import type { Attribute } from "../types";
 export type AttackOption = {
   arg: string; // quoted-if-needed string to pass as command arg
   name: string; // display label
-  slot?: "(Main)" | "(Off)";
+  slot?: "(Main)" | "(Off)" | "(Both)";
   attr1?: Attribute;
   attr2?: Attribute;
   baseDamage?: number; // weapon base damage added to HR
   accuracyBonus?: number; // flat accuracy modifier (weapon prec field)
   damageType?: string;
+  hands?: 1 | 2;
+  category?: string;
+  range?: "melee" | "ranged" | string;
 };
 
 function quoteArg(name: string): string {
@@ -43,10 +46,24 @@ function extractPcWeaponStats(
   source: string,
 ): Pick<
   AttackOption,
-  "attr1" | "attr2" | "baseDamage" | "accuracyBonus" | "damageType"
+  | "attr1"
+  | "attr2"
+  | "baseDamage"
+  | "accuracyBonus"
+  | "damageType"
+  | "hands"
+  | "category"
+  | "range"
 > {
   if (!item) return {};
   const acc = item.accuracy as Record<string, unknown> | undefined;
+  const normalizedRange =
+    item.range === "ranged" || item.range === "weapon_range_ranged"
+      ? "ranged"
+      : "melee";
+  const category =
+    typeof item.category === "string" ? item.category : undefined;
+  const hands = item.hands === 2 ? 2 : item.hands === 1 ? 1 : undefined;
   if (source === "customWeapons") {
     const dmg = item.damage as Record<string, unknown> | undefined;
     return {
@@ -58,6 +75,9 @@ function extractPcWeaponStats(
           ? acc.value
           : undefined,
       damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
+      hands,
+      category,
+      range: normalizedRange,
     };
   }
   // standard Weapons
@@ -69,6 +89,10 @@ function extractPcWeaponStats(
     baseDamage,
     accuracyBonus:
       typeof acc?.value === "number" && acc.value !== 0 ? acc.value : undefined,
+    damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
+    hands,
+    category,
+    range: normalizedRange,
   };
 }
 
@@ -115,6 +139,12 @@ export function resolveAttackOptions(
                 ? acc.value
                 : undefined,
             damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
+            hands: wa.hands === 2 ? 2 : wa.hands === 1 ? 1 : undefined,
+            category: typeof wa.category === "string" ? wa.category : undefined,
+            range:
+              wa.range === "ranged" || wa.range === "weapon_range_ranged"
+                ? "ranged"
+                : "melee",
           });
         }
       }
@@ -151,29 +181,47 @@ export function resolveAttackOptions(
     const collection = equipment[source];
     if (!Array.isArray(collection)) return;
 
-    // Prefer index lookup; fall back to name match
+    // Prefer name lookup (index can become stale after edits/reordering);
+    // fall back to index when needed.
     const idx = typeof ref.index === "number" ? ref.index : -1;
     const item: Record<string, unknown> | undefined =
-      idx >= 0 && idx < collection.length
-        ? collection[idx]
-        : collection.find(
-            (i: unknown) =>
-              i &&
-              typeof i === "object" &&
-              (i as Record<string, unknown>).name === itemName,
-          );
+      collection.find(
+        (i: unknown) =>
+          i &&
+          typeof i === "object" &&
+          (i as Record<string, unknown>).name === itemName,
+      ) ??
+      (idx >= 0 && idx < collection.length
+        ? (collection[idx] as Record<string, unknown>)
+        : undefined);
 
     const name = (item?.name as string | undefined) ?? itemName;
-    const key = `${slotKey}:${name}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      results.push({
-        arg: quoteArg(name),
-        name,
-        slot: label,
-        ...extractPcWeaponStats(item, source),
-      });
+    const twoHanded = item?.hands === 2;
+    const effectiveLabel: "(Main)" | "(Off)" | "(Both)" = twoHanded
+      ? "(Both)"
+      : label;
+    const byNameIdx = results.findIndex((r) => r.name === name);
+    if (byNameIdx >= 0) {
+      const existing = results[byNameIdx];
+      if (
+        existing.slot === "(Both)" ||
+        effectiveLabel === "(Both)" ||
+        (existing.slot === "(Main)" && effectiveLabel === "(Off)") ||
+        (existing.slot === "(Off)" && effectiveLabel === "(Main)")
+      ) {
+        results[byNameIdx] = { ...existing, slot: "(Both)" };
+      }
+      return;
     }
+    const key = `${slotKey}:${name}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    results.push({
+      arg: quoteArg(name),
+      name,
+      slot: effectiveLabel,
+      ...extractPcWeaponStats(item, source),
+    });
   };
 
   resolveSlotItem("mainHand", "(Main)");
@@ -257,7 +305,9 @@ export const useRouteActor = (): {
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
 
-  const playerIdMatch = location.pathname.match(/^\/player-edit\/([^/]+)$/);
+  const playerIdMatch = location.pathname.match(
+    /^\/(?:player-edit|pc-gallery)\/([^/]+)$/,
+  );
   const npcIdMatch = location.pathname.match(/^\/npc-gallery\/([^/]+)$/);
   const playerId = playerIdMatch?.[1] ?? "";
   const npcId = npcIdMatch?.[1] ?? "";

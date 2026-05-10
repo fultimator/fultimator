@@ -6,8 +6,10 @@ export type DrawerTab = "chat" | "customizer" | "themes";
 interface AppDrawerStore {
   activeTab: DrawerTab;
   isOpen: boolean;
+  chatActorDocOverride: Record<string, unknown> | null;
   setActiveTab: (tab: DrawerTab) => void;
   setIsOpen: (open: boolean) => void;
+  setChatActorDocOverride: (doc: Record<string, unknown> | null) => void;
 }
 
 export const useAppDrawerStore = create<AppDrawerStore>()(
@@ -15,8 +17,10 @@ export const useAppDrawerStore = create<AppDrawerStore>()(
     (set) => ({
       activeTab: "customizer",
       isOpen: false,
+      chatActorDocOverride: null,
       setActiveTab: (tab) => set({ activeTab: tab }),
       setIsOpen: (open) => set({ isOpen: open }),
+      setChatActorDocOverride: (doc) => set({ chatActorDocOverride: doc }),
     }),
     {
       name: "app-drawer-store",
