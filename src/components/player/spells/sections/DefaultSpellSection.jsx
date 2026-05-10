@@ -6,6 +6,7 @@ import {
   ToggleButton,
   FormControlLabel,
   Switch,
+  Tooltip,
   Select,
   MenuItem,
   Autocomplete,
@@ -28,12 +29,14 @@ import attributes from "../../../../libs/attributes";
 
 export default function DefaultSpellSection({ formState, setFormState, t }) {
   const [inputDuration, setInputDuration] = useState(formState.duration || "");
-  const [inputTarget, setInputTarget] = useState(formState.targetDesc || "");
+  const [inputTarget, setInputTarget] = useState(
+    formState.targetDescription || "",
+  );
 
   useEffect(() => {
     setInputDuration(formState.duration || "");
-    setInputTarget(formState.targetDesc || "");
-  }, [formState.duration, formState.targetDesc]);
+    setInputTarget(formState.targetDescription || "");
+  }, [formState.duration, formState.targetDescription]);
 
   const handleChange = (field, value) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
@@ -46,7 +49,7 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
 
   const handleTargetChange = (event, newValue) => {
     setInputTarget(newValue);
-    handleChange("targetDesc", newValue);
+    handleChange("targetDescription", newValue);
   };
 
   const duration = [t("Scene"), t("Instantaneous"), t("Special")];
@@ -103,18 +106,20 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
       <Grid
         size={{
           xs: 6,
-          sm: 2,
+          sm: 3,
         }}
+        sx={{ display: "flex", alignItems: "center", gap: 1 }}
       >
         <TextField
           type="number"
-          label={t("MP x Target")}
+          label={formState.cost?.perTarget ? t("MP x Target") : t("MP")}
           variant="outlined"
-          fullWidth
+          sx={{ flex: 1 }}
           value={
-            formState.mp === null || formState.mp === undefined
+            formState.cost?.amount === null ||
+            formState.cost?.amount === undefined
               ? ""
-              : formState.mp.toString()
+              : formState.cost.amount.toString()
           }
           onChange={(e) => {
             const value = e.target.value;
@@ -122,7 +127,10 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
               value === "" ||
               (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
             ) {
-              handleChange("mp", value === "" ? 0 : parseInt(value, 10));
+              handleChange("cost", {
+                ...(formState.cost ?? { resource: "mp", perTarget: true }),
+                amount: value === "" ? 0 : parseInt(value, 10),
+              });
             }
           }}
           onBlur={(e) => {
@@ -132,9 +140,24 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
             } else if (value > 999) {
               value = 999;
             }
-            handleChange("mp", value);
+            handleChange("cost", {
+              ...(formState.cost ?? { resource: "mp", perTarget: true }),
+              amount: value,
+            });
           }}
         />
+        <Tooltip title={t("Cost is per target hit")}>
+          <Switch
+            size="small"
+            checked={formState.cost?.perTarget ?? true}
+            onChange={(e) =>
+              handleChange("cost", {
+                ...(formState.cost ?? { resource: "mp", amount: 0 }),
+                perTarget: e.target.checked,
+              })
+            }
+          />
+        </Tooltip>
       </Grid>
       <Grid
         size={{
@@ -188,7 +211,7 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
           onChange={handleTargetChange}
           onInputChange={(event, newValue) => {
             setInputTarget(newValue);
-            handleChange("targetDesc", newValue);
+            handleChange("targetDescription", newValue);
           }}
           freeSolo
           renderInput={(params) => (

@@ -64,7 +64,10 @@ import plantToken from "../icons/Plant-token.webp";
 import undeadToken from "../icons/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
-import { NPC_CURRENT_SCHEMA_VERSION } from "../../components/npc/npcTransforms";
+import {
+  NPC_CURRENT_SCHEMA_VERSION,
+  applyNpcPostLoadTransforms,
+} from "../../components/npc/npcTransforms";
 import { useTranslate, languageOptions } from "../../translation/translate";
 
 import ReportContentDialog from "../../components/appbar/ReportContentDialog";
@@ -218,7 +221,7 @@ function Personal({ user }) {
 
   const copyNpc = function (npc) {
     return async function () {
-      const data = Object.assign({}, npc);
+      const data = JSON.parse(JSON.stringify(npc));
       data.uid = user.uid;
       delete data.id;
       data.published = false;
@@ -691,8 +694,9 @@ function Personal({ user }) {
   );
 }
 
-function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
+function Npc({ npc: rawNpc, copyNpc, shareNpc, reportNpc, collapseGet }) {
   const { t } = useTranslate();
+  const npc = applyNpcPostLoadTransforms(rawNpc);
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
 
@@ -751,13 +755,13 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
           {t("Created By:")} {npc.createdBy}
         </span>
         <Tooltip
-          title={`Schema version ${npc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION}`}
+          title={`Schema version ${rawNpc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION}`}
         >
           <Chip
             label={
               NPC_CURRENT_SCHEMA_VERSION > 0
-                ? `v${npc.schemaVersion ?? 0}/${NPC_CURRENT_SCHEMA_VERSION}`
-                : `V${npc.schemaVersion ?? 0}`
+                ? `v${rawNpc.schemaVersion ?? 0}/${NPC_CURRENT_SCHEMA_VERSION}`
+                : `V${rawNpc.schemaVersion ?? 0}`
             }
             size="small"
             color="default"

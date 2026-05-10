@@ -4,6 +4,8 @@ import { RemoveCircleOutlined } from "@mui/icons-material";
 import {
   Grid,
   FormControl,
+  Switch,
+  Tooltip,
   IconButton,
   InputLabel,
   MenuItem,
@@ -56,13 +58,17 @@ export default function EditSpells({ npc, setNpc }) {
         ...(prevState.spells || []),
         {
           itemType: "spell",
+          spellType: "npc",
           name: "",
-          range: "melee",
-          attr1: "dexterity",
-          attr2: "dexterity",
-          type: "",
-          damagetype: "physical",
-          damage: 0,
+          range: "ranged",
+          attr1: "insight",
+          attr2: "will",
+          isOffensive: false,
+          cost: { resource: "mp", amount: 0, perTarget: true },
+          maxTargets: 0,
+          targetDescription: "",
+          duration: "",
+          damage: { value: 0, type: "physical" },
           special: [],
         },
       ],
@@ -127,18 +133,17 @@ export default function EditSpells({ npc, setNpc }) {
                   name: item.name,
                   attr1: item.attr1 || "insight",
                   attr2: item.attr2 || "will",
-                  type: isPlayerSpell
-                    ? item.isOffensive
-                      ? "offensive"
-                      : ""
-                    : item.type || "",
-                  damagetype: item.damagetype || "physical",
-                  damage: item.damage || 0,
-                  mp: String(item.mp ?? ""),
+                  isOffensive: !!item.isOffensive,
+                  damage: item.damage ?? { value: 0, type: "physical" },
+                  cost: item.cost ?? {
+                    resource: "mp",
+                    amount: 0,
+                    perTarget: true,
+                  },
                   maxTargets: item.maxTargets || 0,
-                  target: isPlayerSpell
-                    ? staticT(item.targetDesc || "")
-                    : item.target || "",
+                  targetDescription: isPlayerSpell
+                    ? staticT(item.targetDescription || "")
+                    : item.targetDescription || "",
                   duration: isPlayerSpell
                     ? staticT(item.duration || "")
                     : item.duration || "",
@@ -210,9 +215,26 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
     handleChange("duration", newValue);
   };
 
+  const singleTargetDescriptions = [
+    t("One creature"),
+    t("Self"),
+    t("One equipped weapon"),
+  ];
+
   const handleTargetChange = (event, newValue) => {
     setInputTarget(newValue);
     handleChange("targetDescription", newValue);
+    if (singleTargetDescriptions.includes(newValue)) {
+      handleChange("cost", {
+        ...(spell.cost ?? { resource: "mp", amount: 0 }),
+        perTarget: false,
+      });
+    } else if (newValue.startsWith(t("Up to"))) {
+      handleChange("cost", {
+        ...(spell.cost ?? { resource: "mp", amount: 0 }),
+        perTarget: true,
+      });
+    }
   };
 
   return (
@@ -250,10 +272,9 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
       >
         <FormControl variant="standard" fullWidth style={{ height: "100%" }}>
           <ToggleButton
-            selected={spell.type === "offensive"}
+            selected={spell.isOffensive === true}
             onChange={() => {
-              const newValue = spell.type === "offensive" ? "" : "offensive";
-              setSpell("type", newValue);
+              setSpell("isOffensive", !spell.isOffensive);
             }}
             aria-label="offensive-toggle"
             style={{
@@ -270,24 +291,40 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           sm: 3,
           md: 2,
         }}
+        sx={{ display: "flex", alignItems: "center", gap: 1 }}
       >
         <TextField
           id="mp"
-          label={t("MP x Target")}
+          label={spell.cost?.perTarget ? t("MP x Target") : t("MP")}
           variant="outlined"
-          fullWidth
+          sx={{ flex: 1 }}
           placeholder="10"
           value={
-            spell.mpCostTarget === null || spell.mpCostTarget === undefined
+            spell.cost?.amount === null || spell.cost?.amount === undefined
               ? ""
-              : spell.mpCostTarget.toString()
+              : spell.cost.amount.toString()
           }
           onChange={(e) => {
             const val = parseInt(e.target.value, 10);
-            return setSpell("mpCostTarget", isNaN(val) ? 0 : val);
+            return setSpell("cost", {
+              ...(spell.cost ?? { resource: "mp", perTarget: true }),
+              amount: isNaN(val) ? 0 : val,
+            });
           }}
           size="small"
         />
+        <Tooltip title={t("Cost is per target hit")}>
+          <Switch
+            size="small"
+            checked={spell.cost?.perTarget ?? true}
+            onChange={(e) =>
+              setSpell("cost", {
+                ...(spell.cost ?? { resource: "mp", amount: 0 }),
+                perTarget: e.target.checked,
+              })
+            }
+          />
+        </Tooltip>
       </Grid>
       <Grid
         size={{
@@ -337,36 +374,22 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           sm: 6,
         }}
       >
-        <FormControl variant="outlined" fullWidth>
-          {/* <TextField
-            id="target"
-            label={t("Target:")}
-            value={spell.target}
-            onChange={(e) => {
-              return setSpell("target", e.target.value);
-            }}
-            size="small"
-          ></TextField> */}
-          <Autocomplete
-            id="target-autocomplete"
-            options={target}
-            value={inputTarget ?? spell.targetDescription ?? ""}
-            onChange={handleTargetChange}
-            onInputChange={handleTargetChange}
-            size="small"
-            freeSolo
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("Target Description")}
-                fullWidth
-                slotProps={{
-                  htmlInput: { ...params.inputProps, maxLength: 100 },
-                }}
-              />
-            )}
-          />
-        </FormControl>
+        <Autocomplete
+          id="target-autocomplete"
+          options={target}
+          value={inputTarget ?? spell.targetDescription ?? ""}
+          onChange={handleTargetChange}
+          onInputChange={handleTargetChange}
+          size="small"
+          freeSolo
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t("Target Description")}
+              size="small"
+            />
+          )}
+        />
       </Grid>
       <Grid
         size={{
@@ -374,38 +397,20 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           sm: 6,
         }}
       >
-        <FormControl variant="outlined" fullWidth>
-          {/* <TextField
-            id="duration"
-            label={t("Duration:")}
-            value={spell.duration}
-            onChange={(e) => {
-              return setSpell("duration", e.target.value);
-            }}
-            size="small"
-          ></TextField> */}
-          <Autocomplete
-            id="duration-autocomplete"
-            options={duration}
-            value={inputDuration}
-            onChange={handleDurationChange}
-            onInputChange={handleDurationChange}
-            size="small"
-            freeSolo
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("Duration")}
-                fullWidth
-                slotProps={{
-                  htmlInput: { ...params.inputProps, maxLength: 50 },
-                }}
-              />
-            )}
-          />
-        </FormControl>
+        <Autocomplete
+          id="duration-autocomplete"
+          options={duration}
+          value={inputDuration}
+          onChange={handleDurationChange}
+          onInputChange={handleDurationChange}
+          size="small"
+          freeSolo
+          renderInput={(params) => (
+            <TextField {...params} label={t("Duration")} size="small" />
+          )}
+        />
       </Grid>
-      {spell.type === "offensive" && (
+      {spell.isOffensive && (
         <Grid
           size={{
             xs: 6,
@@ -434,7 +439,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           </FormControl>
         </Grid>
       )}
-      {spell.type === "offensive" && (
+      {spell.isOffensive && (
         <Grid
           size={{
             xs: 6,
@@ -463,7 +468,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           </FormControl>
         </Grid>
       )}
-      {spell.type === "offensive" && (
+      {spell.isOffensive && (
         <Grid
           size={{
             xs: 12,
@@ -473,13 +478,16 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           <FormControl variant="outlined" fullWidth>
             <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
             <Select
-              value={spell.damagetype}
+              value={spell.damage?.type ?? "physical"}
               labelId={"attack-" + i + "-type"}
               id={"attack-" + i + "-type"}
               label={t("Type:")}
               size="small"
               onChange={(e) => {
-                return setSpell("damagetype", e.target.value);
+                return setSpell("damage", {
+                  ...(spell.damage ?? {}),
+                  type: e.target.value,
+                });
               }}
             >
               {Object.keys(types).map((damagetype) => {
@@ -541,7 +549,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
           </FormControl>
         </Grid>
       )}
-      {spell.type === "offensive" && (
+      {spell.isOffensive && (
         <Grid
           size={{
             xs: 12,
@@ -556,9 +564,9 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
             size="small"
             placeholder="0"
             value={
-              spell.damage === null || spell.damage === undefined
+              spell.damage?.value === null || spell.damage?.value === undefined
                 ? ""
-                : spell.damage.toString()
+                : spell.damage.value.toString()
             }
             onChange={(e) => {
               const value = e.target.value;
@@ -566,7 +574,10 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 value === "" ||
                 (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
               ) {
-                handleChange("damage", value === "" ? 0 : parseInt(value, 10));
+                handleChange("damage", {
+                  ...(spell.damage ?? {}),
+                  value: value === "" ? 0 : parseInt(value, 10),
+                });
               }
             }}
             onBlur={(e) => {
@@ -576,7 +587,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               } else if (value > 999) {
                 value = 999;
               }
-              handleChange("damage", value);
+              handleChange("damage", { ...(spell.damage ?? {}), value });
             }}
           />
         </Grid>

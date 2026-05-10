@@ -1,5 +1,5 @@
 import { TypeNpc } from "../../types/Npcs";
-import { Affinities } from "../../types/Misc";
+import { Affinities, Elements } from "../../types/Misc";
 
 type NpcTransform = (npc: TypeNpc) => TypeNpc;
 
@@ -98,17 +98,56 @@ function normalizeSpellFields(npc: TypeNpc): TypeNpc {
       delete (s as unknown as Record<string, unknown>).target;
       delete (s as unknown as Record<string, unknown>).targetDesc;
 
-      // mp string -> mpCostTarget number; keep mp as archive
-      if (s.mpCostTarget === undefined && s.mp !== undefined) {
-        const match = String(s.mp).match(/\d+/);
-        s.mpCostTarget = match ? parseInt(match[0], 10) : 0;
+      // mp string / mpCost number -> cost object; keep mp as archive
+      {
+        const raw = s as unknown as Record<string, unknown>;
+        if (raw.cost === undefined) {
+          let amount = 0;
+          if (raw.mp !== undefined) {
+            const match = String(raw.mp).match(/\d+/);
+            amount = match ? parseInt(match[0], 10) : 0;
+          }
+          raw.cost = { resource: "mp", amount, perTarget: true };
+        }
       }
 
-      if (s.damage === undefined) s.damage = 0;
+      if (s.damage === undefined)
+        s.damage = 0 as unknown as { value: number; type: Elements };
       if (s.maxTargets === undefined) s.maxTargets = 0;
       if (s.description === undefined) s.description = "";
 
       return s;
+    }),
+  };
+}
+
+function unifyNpcSpellSchema(npc: TypeNpc): TypeNpc {
+  if (!npc.spells?.length) return npc;
+  return {
+    ...npc,
+    spells: npc.spells.map((spell) => {
+      const s = { ...spell } as Record<string, unknown>;
+
+      // type -> isOffensive; drop type
+      if (s.isOffensive === undefined) {
+        s.isOffensive = s.type === "offensive";
+      }
+      delete s.type;
+
+      // damage + damagetype -> damage object; drop damagetype
+      const flatDamage = typeof s.damage === "number" ? s.damage : 0;
+      const damageType =
+        typeof s.damagetype === "string" ? s.damagetype : "physical";
+      s.damage = { value: flatDamage, type: damageType as Elements };
+      delete s.damagetype;
+
+      if (s.range === undefined) s.range = "ranged";
+      if (s.itemType === undefined) s.itemType = "spell";
+      if (s.spellType === undefined) s.spellType = "npc";
+      if (s.description === undefined) s.description = "";
+      if (s.special === undefined) s.special = [];
+
+      return s as unknown as typeof spell;
     }),
   };
 }
@@ -143,8 +182,14 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 6,
     label:
-      "Normalize spell fields: targetDescription, mpCostTarget, damage, maxTargets, description",
+      "Normalize spell fields: targetDescription, cost (mp), damage, maxTargets, description",
     fn: normalizeSpellFields,
+  },
+  {
+    version: 7,
+    label:
+      "Unify NPC spell schema: isOffensive, damage object, range, itemType, spellType",
+    fn: unifyNpcSpellSchema,
   },
 ];
 

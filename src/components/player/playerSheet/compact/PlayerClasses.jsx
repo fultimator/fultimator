@@ -317,9 +317,10 @@ function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
       return (
         <SpellDefault
           spellName={highlightMatchFn(spell.name, searchQuery)}
-          mp={spell.mp}
+          mp={spell.cost?.amount}
+          perTarget={spell.cost?.perTarget ?? true}
           maxTargets={spell.maxTargets}
-          targetDesc={spell.targetDesc}
+          targetDescription={spell.targetDescription}
           duration={spell.duration}
           description={highlightMatchFn(spell.description, searchQuery)}
           isEditMode={false}

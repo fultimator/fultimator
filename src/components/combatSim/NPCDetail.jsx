@@ -111,7 +111,9 @@ const NPCDetail = ({
       : 1;
 
   const handleConfirmSpell = (spellData) => {
-    const finalMpCost = spellData.mp * numTargets;
+    const finalMpCost = spellData.cost?.perTarget
+      ? (spellData.cost?.amount ?? 0) * numTargets
+      : (spellData.cost?.amount ?? 0);
 
     if (autoUseMP && finalMpCost > selectedNPC?.combatStats?.currentMp) {
       setError("Not enough MP!");
@@ -740,7 +742,9 @@ const NPCDetail = ({
           >
             {[...Array(maxTargets)].map((_, i) => {
               const targetCount = i + 1;
-              const cost = targetCount * clickedData.mp;
+              const cost = clickedData.cost?.perTarget
+                ? targetCount * (clickedData.cost?.amount ?? 0)
+                : (clickedData.cost?.amount ?? 0);
               return (
                 <MenuItem
                   key={targetCount}

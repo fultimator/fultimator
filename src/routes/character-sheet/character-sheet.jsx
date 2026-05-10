@@ -340,9 +340,7 @@ export default function CharacterSheet() {
   };
 
   const canLevelUpFromExp =
-    isOwner &&
-    (parseInt(player?.info?.exp, 10) || 0) >= 10 &&
-    (player?.lvl || 0) < 50;
+    (parseInt(player?.info?.exp, 10) || 0) >= 10 && (player?.lvl || 0) < 50;
 
   const handleConfirmLevelUpFromExp = () => {
     setPlayer((prevPlayer) => {

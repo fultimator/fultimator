@@ -1,5 +1,5 @@
 import { Weapon } from "./Equipment";
-import { Affinities } from "./Misc";
+import { Affinities, Elements, ResourceCost } from "./Misc";
 
 export interface NpcAttributes {
   might: number;
@@ -41,26 +41,31 @@ export interface NpcWeaponAttack {
 }
 
 export interface NpcSpell {
-  effect?: string;
-  /** @deprecated use targetDescription */
-  target?: string;
-  /** @deprecated use targetDescription */
-  targetDesc?: string;
-  targetDescription?: string;
-  description?: string;
-  duration?: string;
   name: string;
-  range: string;
-  type: string | null;
-  damagetype: string;
   attr1: string;
   attr2: string;
-  /** @deprecated use mpCostTarget; kept for archival */
-  mp?: string;
-  mpCostTarget?: number;
-  damage?: number;
-  maxTargets?: number;
+  isOffensive: boolean;
+  damage: { value: number; type: Elements };
+  cost: ResourceCost;
+  maxTargets: number;
+  targetDescription: string;
+  duration: string;
+  range: "melee" | "ranged";
+  effect: string;
+  description: string;
   special: string[];
+  itemType: "spell";
+  spellType: string;
+  /** @deprecated kept for archival */
+  mp?: string;
+  /** @deprecated */
+  target?: string;
+  /** @deprecated */
+  targetDesc?: string;
+  /** @deprecated */
+  type?: string | null;
+  /** @deprecated */
+  damagetype?: string;
 }
 
 export interface NpcAction {

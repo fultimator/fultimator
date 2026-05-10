@@ -195,7 +195,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
 
   const handleRoll = () => {
     if (!isRolling) {
-      const usedMp = selectedSpell.mp * targets;
+      const usedMp = (selectedSpell.cost?.amount ?? 0) * targets;
 
       if (useMp && player.stats.mp.current < usedMp) {
         return;
@@ -220,7 +220,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
 
         const maxDie = Math.max(die1, die2);
 
-        const usedMp = selectedSpell.mp * targets;
+        const usedMp = (selectedSpell.cost?.amount ?? 0) * targets;
 
         if (isCriticalFailure) {
           setDialogSeverity("error");
@@ -331,7 +331,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
 
   const handleGambleRoll = () => {
     if (!isRolling) {
-      const usedMp = selectedSpell.mp * targets;
+      const usedMp = (selectedSpell.cost?.amount ?? 0) * targets;
 
       // Check if the player has enough MP to cast the spell
       if (useMp && player.stats.mp.current < usedMp) {

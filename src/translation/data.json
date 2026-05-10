@@ -16448,14 +16448,14 @@
   },
   {
     "key": "Devastation_desc",
-    "en": "Choose any number of creatures you can see: each of them suffers 30 **(choose type)** damage. You may only cast this spell **once per turn**.\\nThis spell should only be given to **champion** and **elite** creatures **level 30 or higher**, and said creatures can only cast this spell during their **last turn in the round**.",
+    "en": "You deal 30 **(choose type)** damage to every enemy you can see.\nThis spell should only be given to **champion** and **elite** enemies of **level 30 or higher**, which should only cast it once per turn during **their last turn of the round** (this creates a predictable pattern that Players can anticipate).",
     "it": "Il PNG sceglie un qualsiasi numero di creature a lui visibili: ciascuna subisce 30 danni da **(scegliere il tipo)**. Questo incantesimo può essere lanciato solo **una volta per turno**. Questo incantesimo dovrebbe essere scelto solo per PNG di rango **élite** e **campione** di **livello 30 o più**. Inoltre, tali creature dovrebbero poterlo lanciare solo **nel loro ultimo turno del round**.",
-    "de": "Choose any number of creatures you can see: each of them suffers 30 **(choose type)** damage. You may only cast this spell **once per turn**.\\nThis spell should only be given to **champion** and **elite** creatures **level 30 or higher**, and said creatures can only cast this spell during their **last turn in the round**.",
-    "pl": "Choose any number of creatures you can see: each of them suffers 30 **(choose type)** damage. You may only cast this spell **once per turn**.\\nThis spell should only be given to **champion** and **elite** creatures **level 30 or higher**, and said creatures can only cast this spell during their **last turn in the round**.",
+    "de": "You deal 30 **(choose type)** damage to every enemy you can see.\nThis spell should only be given to **champion** and **elite** enemies of **level 30 or higher**, which should only cast it once per turn during **their last turn of the round** (this creates a predictable pattern that Players can anticipate).",
+    "pl": "You deal 30 **(choose type)** damage to every enemy you can see.\nThis spell should only be given to **champion** and **elite** enemies of **level 30 or higher**, which should only cast it once per turn during **their last turn of the round** (this creates a predictable pattern that Players can anticipate).",
     "fr": "Choisissez autant de créatures que vous voulez parmi celles que vous voyez : chacune subit 30 dégâts de **(choisissez un type)**. Vous ne pouvez lancer ce sort qu'**une fois par tour**. Ce sort ne devrait être confié qu'à des PNJ de type **champion** ou **élite** de **niveau 30 ou plus**, et ceux-ci ne peuvent le lancer que lors de leur **dernier tour du round**. ",
-    "es": "Choose any number of creatures you can see: each of them suffers 30 **(choose type)** damage. You may only cast this spell **once per turn**.\\nThis spell should only be given to **champion** and **elite** creatures **level 30 or higher**, and said creatures can only cast this spell during their **last turn in the round**.",
+    "es": "You deal 30 **(choose type)** damage to every enemy you can see.\nThis spell should only be given to **champion** and **elite** enemies of **level 30 or higher**, which should only cast it once per turn during **their last turn of the round** (this creates a predictable pattern that Players can anticipate).",
     "pt-BR": "Escolha qualquer número de criaturas que você possa ver: cada uma delas sofre 30 **(escolha o tipo)** de dano. Você só pode lançar este feitiço **uma vez por turno**.\\nEste feitiço só deve ser dado a criaturas **campeãs** e de **elite** de **nível 30 ou superior**, e essas criaturas só podem lançar este feitiço feitiço durante seu **último turno na rodada**.",
-    "zh": "Choose any number of creatures you can see: each of them suffers 30 **(choose type)** damage. You may only cast this spell **once per turn**.\\nThis spell should only be given to **champion** and **elite** creatures **level 30 or higher**, and said creatures can only cast this spell during their **last turn in the round**."
+    "zh": "You deal 30 **(choose type)** damage to every enemy you can see.\nThis spell should only be given to **champion** and **elite** enemies of **level 30 or higher**, which should only cast it once per turn during **their last turn of the round** (this creates a predictable pattern that Players can anticipate)."
   },
   {
     "key": "Lick Wounds",
@@ -33728,7 +33728,7 @@
     "zh": "Select NPCs"
   },
   {
-    "key": "combat_sim_selected_pcs",
+    "key": "combat_sim_selected_npcs",
     "en": "Selected NPCs",
     "it": "PNG Selezionati",
     "de": "Gewählte NSCs",

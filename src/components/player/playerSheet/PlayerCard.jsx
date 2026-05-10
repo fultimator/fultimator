@@ -558,6 +558,9 @@ export default function PlayerCard({
     (equippedAccessory?.initModifier || 0);
 
   const inCrisis = player.stats.hp.current <= player.stats.hp.max / 2;
+  const combatStatTextColor = theme.palette.getContrastText(
+    theme.palette.primary.main,
+  );
 
   const onStatusChange = (status) => (event) => {
     setPlayer((prev) => ({
@@ -1533,7 +1536,7 @@ export default function PlayerCard({
                     },
                     letterSpacing: "0.06em",
                     textTransform: "uppercase",
-                    color: theme.palette.text.secondary,
+                    color: combatStatTextColor,
                     lineHeight: 1.2,
                     textAlign: "center",
                   }}
@@ -1551,7 +1554,7 @@ export default function PlayerCard({
                   <FabulaIcon style={{ width: "14px", height: "14px" }} />
                   <IconButton
                     size="small"
-                    sx={{ p: 0.25 }}
+                    sx={{ p: 0.25, color: combatStatTextColor }}
                     onClick={() => bumpInfoNumber("fabulapoints", -1)}
                   >
                     <Remove sx={{ fontSize: "0.95rem" }} />
@@ -1567,20 +1570,36 @@ export default function PlayerCard({
                     }}
                     size="small"
                     variant="standard"
-                    sx={{ width: { xs: "30px", sm: "36px" } }}
+                    sx={{
+                      width: { xs: "30px", sm: "36px" },
+                      "& .MuiInputBase-input": {
+                        color: combatStatTextColor,
+                      },
+                      "& .MuiInput-underline:before": {
+                        borderBottomColor: theme.palette.divider,
+                      },
+                      "& .MuiInput-underline:hover:before": {
+                        borderBottomColor: combatStatTextColor,
+                      },
+                      "& .MuiInput-underline:after": {
+                        borderBottomColor: combatStatTextColor,
+                      },
+                    }}
                     slotProps={{
                       htmlInput: {
                         style: {
                           textAlign: "center",
                           fontFamily: "Antonio",
                           fontWeight: "bold",
+                          color: combatStatTextColor,
+                          WebkitTextFillColor: combatStatTextColor,
                         },
                       },
                     }}
                   />
                   <IconButton
                     size="small"
-                    sx={{ p: 0.25 }}
+                    sx={{ p: 0.25, color: combatStatTextColor }}
                     onClick={() => bumpInfoNumber("fabulapoints", 1)}
                   >
                     <Add sx={{ fontSize: "0.95rem" }} />

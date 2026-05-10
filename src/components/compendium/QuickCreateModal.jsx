@@ -28,6 +28,7 @@ import {
   ListSubheader,
   FormControlLabel,
   Checkbox,
+  Switch,
 } from "@mui/material";
 import {
   Add,
@@ -507,6 +508,7 @@ function NpcSpellPanel() {
   const [name, setName] = useState("");
   const [isOffensive, setIsOffensive] = useState(false);
   const [mp, setMp] = useState("");
+  const [perTarget, setPerTarget] = useState(true);
   const [maxTargets, setMaxTargets] = useState("");
   const [duration, setDuration] = useState("");
   const [target, setTarget] = useState("");
@@ -520,13 +522,15 @@ function NpcSpellPanel() {
   const data = {
     itemType: "spell",
     name: name.trim(),
-    type: isOffensive ? "offensive" : "",
-    damagetype: dmgType,
-    damage: isOffensive && damage !== "" ? Number(damage) : undefined,
-    mp: mp === "" ? undefined : Number(mp),
+    isOffensive,
+    damage: {
+      value: isOffensive && damage !== "" ? Number(damage) : 0,
+      type: dmgType,
+    },
+    cost: { resource: "mp", amount: mp === "" ? 0 : Number(mp), perTarget },
     maxTargets: maxTargets === "" ? undefined : Number(maxTargets),
     duration: duration || undefined,
-    target: target || undefined,
+    targetDescription: target || undefined,
     range,
     attr1,
     attr2,
@@ -537,6 +541,7 @@ function NpcSpellPanel() {
     setName("");
     setIsOffensive(false);
     setMp("");
+    setPerTarget(true);
     setMaxTargets("");
     setDuration("");
     setTarget("");
@@ -591,18 +596,26 @@ function NpcSpellPanel() {
               xs: 6,
               sm: 3,
             }}
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
             <TextField
-              label={t("MP x Target")}
+              label={perTarget ? t("MP x Target") : t("MP")}
               value={mp}
               onChange={(e) => setMp(e.target.value)}
-              fullWidth
+              sx={{ flex: 1 }}
               size="small"
               type="number"
               slotProps={{
                 htmlInput: { min: 0 },
               }}
             />
+            <Tooltip title={t("Cost is per target hit")}>
+              <Switch
+                size="small"
+                checked={perTarget}
+                onChange={(e) => setPerTarget(e.target.checked)}
+              />
+            </Tooltip>
           </Grid>
           <Grid
             size={{
@@ -648,7 +661,12 @@ function NpcSpellPanel() {
               freeSolo
               options={TARGET_OPTIONS.map(t)}
               inputValue={target}
-              onInputChange={(_, v) => setTarget(v)}
+              onInputChange={(_, v) => {
+                setTarget(v);
+                if (["Self", "One creature", "One equipped weapon"].includes(v))
+                  setPerTarget(false);
+                else if (v.startsWith("Up to")) setPerTarget(true);
+              }}
               renderInput={(params) => (
                 <TextField {...params} label={t("Target")} size="small" />
               )}
@@ -1011,8 +1029,9 @@ function PlayerSpellPanel() {
   const [description, setDescription] = useState("");
   const [isOffensive, setIsOffensive] = useState(false);
   const [mp, setMp] = useState("");
+  const [perTarget, setPerTarget] = useState(true);
   const [maxTargets, setMaxTargets] = useState("1");
-  const [targetDesc, setTargetDesc] = useState("");
+  const [targetDescription, setTargetDescription] = useState("");
   const [duration, setDuration] = useState("");
   const [attr1, setAttr1] = useState("insight");
   const [attr2, setAttr2] = useState("will");
@@ -1079,8 +1098,9 @@ function PlayerSpellPanel() {
     setDescription("");
     setIsOffensive(false);
     setMp("");
+    setPerTarget(true);
     setMaxTargets("1");
-    setTargetDesc("");
+    setTargetDescription("");
     setDuration("");
     setAttr1("insight");
     setAttr2("will");
@@ -1135,14 +1155,16 @@ function PlayerSpellPanel() {
     name: name.trim(),
     description: description.trim(),
     isOffensive,
-    mp: mp === "" ? 0 : Number(mp),
+    cost: { resource: "mp", amount: mp === "" ? 0 : Number(mp), perTarget },
     maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
-    targetDesc: targetDesc.trim() || "One creature",
+    targetDescription: targetDescription.trim() || "One creature",
     duration: duration.trim() || "Instantaneous",
     attr1,
     attr2,
-    damage: isOffensive && damage !== "" ? Number(damage) : undefined,
-    damageType: isOffensive ? damageType : undefined,
+    damage: {
+      value: isOffensive && damage !== "" ? Number(damage) : 0,
+      type: isOffensive ? damageType : "physical",
+    },
     spellType: "default",
   };
 
@@ -2127,17 +2149,23 @@ function PlayerSpellPanel() {
                   xs: 6,
                   sm: 3,
                 }}
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
               >
                 <TextField
-                  label={t("MP")}
+                  label={perTarget ? t("MP x Target") : t("MP")}
                   value={mp}
                   onChange={(e) => setMp(e.target.value)}
-                  fullWidth
+                  sx={{ flex: 1 }}
                   size="small"
                   type="number"
                   slotProps={{
                     htmlInput: { min: 0 },
                   }}
+                />
+                <Switch
+                  size="small"
+                  checked={perTarget}
+                  onChange={(e) => setPerTarget(e.target.checked)}
                 />
               </Grid>
               <Grid
@@ -2167,8 +2195,17 @@ function PlayerSpellPanel() {
                 <Autocomplete
                   freeSolo
                   options={TARGET_OPTIONS.map(t)}
-                  inputValue={targetDesc}
-                  onInputChange={(_, v) => setTargetDesc(v)}
+                  inputValue={targetDescription}
+                  onInputChange={(_, v) => {
+                    setTargetDescription(v);
+                    if (
+                      ["Self", "One creature", "One equipped weapon"].includes(
+                        v,
+                      )
+                    )
+                      setPerTarget(false);
+                    else if (v.startsWith("Up to")) setPerTarget(true);
+                  }}
                   renderInput={(params) => (
                     <TextField {...params} label={t("Target")} size="small" />
                   )}

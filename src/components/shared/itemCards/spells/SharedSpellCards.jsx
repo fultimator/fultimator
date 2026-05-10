@@ -60,7 +60,7 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
     (Array.isArray(item.special)
       ? item.special.join("; ")
       : (item.special ?? ""));
-  const targetText = item.target ?? item.targetDesc ?? "";
+  const targetText = item.targetDescription ?? "";
 
   return (
     <CardContentWrapper
@@ -130,7 +130,7 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
               }}
             >
               {t(item.name)}
-              {item.type === "offensive" && (
+              {(item.isOffensive ?? item.type === "offensive") && (
                 <OffensiveSpellIcon fontSize="small" />
               )}
               {item.isMagisphere && (
@@ -145,7 +145,10 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
           </Grid>
           <Grid size={2}>
             <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {item.mp}
+              {item.cost?.amount}
+              {item.cost?.perTarget && item.maxTargets !== 1
+                ? ` × ${t("T")}`
+                : ""}
             </Typography>
           </Grid>
           <Grid size={3}>
@@ -174,17 +177,22 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
               }}
             >
               <span>
-                {item.type === "offensive" && attr1 && attr2 && (
-                  <strong style={{ whiteSpace: "nowrap" }}>
-                    <OpenBracket />
-                    {attr1.shortcaps} + {attr2.shortcaps}
-                    <CloseBracket /> <Diamond /> <OpenBracket />
-                    HR + {item.damage || 0}
-                    <CloseBracket />{" "}
-                    {item.damagetype ? t(item.damagetype) : "physical"}{" "}
-                    <Diamond />{" "}
-                  </strong>
-                )}
+                {(item.isOffensive ?? item.type === "offensive") &&
+                  attr1 &&
+                  attr2 && (
+                    <strong style={{ whiteSpace: "nowrap" }}>
+                      <OpenBracket />
+                      {attr1.shortcaps} + {attr2.shortcaps}
+                      <CloseBracket /> <Diamond /> <OpenBracket />
+                      HR +{" "}
+                      {(typeof item.damage === "object"
+                        ? item.damage?.value
+                        : item.damage) || 0}
+                      <CloseBracket />{" "}
+                      {item.damage?.type ? t(item.damage.type) : "physical"}{" "}
+                      <Diamond />{" "}
+                    </strong>
+                  )}
                 <span style={{ display: "inline" }}>
                   <StyledMarkdown
                     allowedElements={["strong", "em"]}
@@ -320,7 +328,10 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
           </Grid>
           <Grid size={2}>
             <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {item.mp}
+              {item.cost?.amount}
+              {item.cost?.perTarget && item.maxTargets !== 1
+                ? ` × ${t("T")}`
+                : ""}
             </Typography>
           </Grid>
           <Grid size={3}>
@@ -330,7 +341,7 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
           </Grid>
           <Grid size={3}>
             <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {t(item.targetDesc)}
+              {t(item.targetDescription)}
             </Typography>
           </Grid>
         </Grid>
@@ -363,8 +374,12 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
                 <OpenBracket />
                 {attr1.shortcaps} + {attr2.shortcaps}
                 <CloseBracket /> <Diamond /> <OpenBracket />
-                HR + {item.damage || 0}
-                <CloseBracket /> {item.damageType || "physical"}{" "}
+                HR +{" "}
+                {(typeof item.damage === "object"
+                  ? item.damage?.value
+                  : item.damage) || 0}
+                <CloseBracket />{" "}
+                {item.damage?.type || item.damageType || "physical"}{" "}
                 <Diamond />{" "}
               </strong>
             )}
@@ -507,7 +522,10 @@ export const SharedGambleSpellCard = React.memo(function SharedGambleSpellCard({
           </Grid>
           <Grid size={3}>
             <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {item.mp}
+              {item.cost?.amount}
+              {item.cost?.perTarget && item.maxTargets !== 1
+                ? ` × ${t("T")}`
+                : ""}
             </Typography>
           </Grid>
           <Grid size={3}>
@@ -1956,9 +1974,16 @@ export const SharedPilotVehicleCard = React.memo(
                   }}
                 >
                   <OpenBracket />
-                  {t("HR")} + {item.damage ?? 0}
+                  {t("HR")} +{" "}
+                  {(typeof item.damage === "object"
+                    ? item.damage?.value
+                    : item.damage) ?? 0}
                   <CloseBracket />
-                  {item.damageType ? t(item.damageType) : ""}
+                  {item.damage?.type
+                    ? t(item.damage.type)
+                    : item.damageType
+                      ? t(item.damageType)
+                      : ""}
                 </Typography>
               </Grid>
             </Grid>

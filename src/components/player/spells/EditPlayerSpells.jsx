@@ -127,9 +127,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       addMnemoSpell(mnemoId, {
         spellType: spell.spellType,
         name: t(spell.name),
-        mp: spell.mp,
+        cost: spell.cost ?? { resource: "mp", amount: 0, perTarget: true },
         maxTargets: spell.maxTargets,
-        targetDesc: t(spell.targetDesc),
+        targetDescription: t(spell.targetDescription),
         duration: t(spell.duration),
         description: t(spell.description),
         isOffensive: spell.isOffensive,
@@ -143,9 +143,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       addMnemoSpell(mnemoId, {
         spellType: spell.spellType,
         spellName: t(spell.name),
-        mp: spell.mp,
+        cost: spell.cost ?? { resource: "mp", amount: 0, perTarget: true },
         maxTargets: spell.maxTargets,
-        targetDesc: t(spell.targetDesc),
+        targetDescription: t(spell.targetDescription),
         duration: t(spell.duration),
         attr: spell.attr,
         targets: spell.targets,
@@ -191,9 +191,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       return {
         spellType,
         name: "New Spell",
-        mp: 0,
+        cost: { resource: "mp", amount: 0, perTarget: true },
         maxTargets: 0,
-        targetDesc: "",
+        targetDescription: "",
         duration: "",
         description: "",
         isOffensive: false,
@@ -240,9 +240,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         spellType,
         showInPlayerSheet: true,
         spellName: "New Gamble",
-        mp: 10,
+        cost: { resource: "mp", amount: 10, perTarget: true },
         maxTargets: 2,
-        targetDesc: "Special",
+        targetDescription: "Special",
         duration: "Instantaneous",
         attr: "will",
         targets: [
@@ -329,9 +329,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 {
                   spellType: spell,
                   name: "New Spell",
-                  mp: 0,
+                  cost: { resource: "mp", amount: 0, perTarget: true },
                   maxTargets: 0,
-                  targetDesc: "",
+                  targetDescription: "",
                   duration: "",
                   description: "",
                   isOffensive: false,
@@ -483,9 +483,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   showInPlayerSheet: true,
 
                   spellName: "New Gamble",
-                  mp: 10,
+                  cost: { resource: "mp", amount: 10, perTarget: true },
                   maxTargets: 2,
-                  targetDesc: "Special",
+                  targetDescription: "Special",
                   duration: "Instantaneous",
                   attr: "will",
                   targets: [
@@ -806,9 +806,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 {
                   spellType: spell.spellType,
                   name: t(spell.name),
-                  mp: spell.mp,
+                  cost: spell.cost ?? {
+                    resource: "mp",
+                    amount: 0,
+                    perTarget: true,
+                  },
                   maxTargets: spell.maxTargets,
-                  targetDesc: t(spell.targetDesc),
+                  targetDescription: t(spell.targetDescription),
                   duration: t(spell.duration),
                   description: t(spell.description),
                   isOffensive: spell.isOffensive,
@@ -827,9 +831,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 {
                   spellType: spell.spellType,
                   spellName: t(spell.name),
-                  mp: spell.mp,
+                  cost: spell.cost ?? {
+                    resource: "mp",
+                    amount: 0,
+                    perTarget: true,
+                  },
                   maxTargets: spell.maxTargets,
-                  targetDesc: t(spell.targetDesc),
+                  targetDescription: t(spell.targetDescription),
                   duration: t(spell.duration),
                   attr: spell.attr,
                   targets: spell.targets,
@@ -866,9 +874,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             {
               spellType: spell.spellType,
               name: t(spell.name),
-              mp: spell.mp,
+              cost: spell.cost ?? {
+                resource: "mp",
+                amount: 0,
+                perTarget: true,
+              },
               maxTargets: spell.maxTargets,
-              targetDesc: t(spell.targetDesc),
+              targetDescription: t(spell.targetDescription),
               duration: t(spell.duration),
               description: t(spell.description),
               isOffensive: spell.isOffensive,
@@ -1822,9 +1834,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                           {spell.spellType === "default" && (
                             <SpellDefault
                               spellName={spell.name}
-                              mp={spell.mp}
+                              mp={spell.cost?.amount}
+                              perTarget={spell.cost?.perTarget ?? true}
                               maxTargets={spell.maxTargets}
-                              targetDesc={spell.targetDesc}
+                              targetDescription={spell.targetDescription}
                               duration={spell.duration}
                               description={spell.description}
                               onEdit={() =>
@@ -2435,9 +2448,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "default" && (
                               <SpellDefault
                                 spellName={spell.name}
-                                mp={spell.mp}
+                                mp={spell.cost?.amount}
+                                perTarget={spell.cost?.perTarget ?? true}
                                 maxTargets={spell.maxTargets}
-                                targetDesc={spell.targetDesc}
+                                targetDescription={spell.targetDescription}
                                 duration={spell.duration}
                                 description={spell.description}
                                 onEdit={() =>

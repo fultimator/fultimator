@@ -455,6 +455,52 @@ function normalizeArmorDefValues(player: TypePlayer): TypePlayer {
   };
 }
 
+const DAMAGE_SPELL_TYPES = new Set(["default", "arcanist", "arcanist-rework"]);
+
+function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
+  const migrateSpell = <T extends object>(spell: T): T => {
+    const s = { ...spell } as Record<string, unknown>;
+    if (s.cost === undefined) {
+      let amount = 0;
+      if (s.mp !== undefined) {
+        amount =
+          typeof s.mp === "number" ? s.mp : parseInt(String(s.mp), 10) || 0;
+      }
+      s.cost = { resource: "mp", amount, perTarget: true };
+    }
+    if (s.targetDescription === undefined) {
+      s.targetDescription = (s.targetDesc as string) ?? "";
+      delete s.targetDesc;
+    }
+    if (s.range === undefined) s.range = "ranged";
+    if (s.description === undefined) s.description = "";
+    if (s.itemType === undefined) s.itemType = "spell";
+    if (s.special === undefined) s.special = [];
+    if (
+      s.damage === undefined &&
+      DAMAGE_SPELL_TYPES.has(s.spellType as string)
+    ) {
+      s.damage = { value: 0, type: "physical" };
+    }
+    return s as T;
+  };
+
+  return {
+    ...player,
+    classes: player.classes?.map((cls) => ({
+      ...cls,
+      spells: cls.spells?.map(migrateSpell) ?? [],
+    })),
+    equipment: player.equipment?.map((eq) => ({
+      ...eq,
+      mnemospheres: eq.mnemospheres?.map((m) => ({
+        ...m,
+        spells: m.spells?.map(migrateSpell) ?? [],
+      })),
+    })),
+  };
+}
+
 // One-time versioned migrations.
 // Each transform brings the player up to its declared schema version.
 // Skipped if schemaVersion is already >= the transform's version.
@@ -489,6 +535,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     version: 6,
     label: "Build equipment slot map from legacy isEquipped item flags",
     fn: migrateEquippedSlots,
+  },
+  {
+    version: 7,
+    label:
+      "Unify spell schema: damage object, range, description, itemType; rename mp->cost, targetDesc->targetDescription",
+    fn: unifyPlayerSpellSchema,
   },
 ];
 

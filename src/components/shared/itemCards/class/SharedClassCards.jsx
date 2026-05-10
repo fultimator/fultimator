@@ -237,13 +237,13 @@ function ClassSpellRow({ spell, customTheme, t }) {
           variant="caption"
           sx={{ color: "text.secondary", ml: "auto" }}
         >
-          {spell.mp} MP
+          {spell.cost?.amount} MP
         </Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ px: 2, py: 0.75 }}>
         <Box sx={{ display: "flex", gap: 1, mb: 0.25 }}>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            {spell.targetDesc}
+            {spell.targetDescription}
           </Typography>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
             ·

@@ -1,4 +1,4 @@
-import { Affinities } from "./Misc";
+import { Affinities, Elements, ResourceCost } from "./Misc";
 
 export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
 
@@ -30,7 +30,7 @@ export interface MnemosphereSpell {
   class: string;
   duration: string;
   isOffensive: boolean;
-  mpCostTarget: number;
+  cost: ResourceCost;
   maxTargets: number;
   targetDescription: string;
   attr1: string;
@@ -41,6 +41,11 @@ export interface MnemosphereSpell {
   effect4: string;
   effect5: string;
   effect6: string;
+  description: string;
+  special: string[];
+  range: "melee" | "ranged";
+  itemType: "spell";
+  damage?: { value: number; type: Elements };
   spellType?: string;
 }
 
@@ -210,7 +215,7 @@ export interface Spells {
   class: string;
   duration: string;
   isOffensive: boolean;
-  mpCostTarget: number;
+  cost: ResourceCost;
   maxTargets: number;
   targetDescription: string;
   attr1: string;
@@ -221,6 +226,11 @@ export interface Spells {
   effect4: string;
   effect5: string;
   effect6: string;
+  description: string;
+  special: string[];
+  range: "melee" | "ranged";
+  itemType: "spell";
+  damage?: { value: number; type: Elements };
   spellType?: string;
   vehicles?: Vehicle[];
   currentVehicles?: Vehicle[];

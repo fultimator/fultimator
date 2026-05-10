@@ -24,8 +24,9 @@ const StyledMarkdown = styled(ReactMarkdown)({
 function ThemedSpellDefault({
   spellName,
   mp,
+  perTarget,
   maxTargets,
-  targetDesc,
+  targetDescription,
   duration,
   description,
   onEdit,
@@ -179,7 +180,7 @@ function ThemedSpellDefault({
               }}
             >
               {mp}
-              {maxTargets !== 1 ? " × " + t("T") : ""}
+              {perTarget && maxTargets !== 1 ? ` × ${t("T")}` : ""}
             </Typography>
           </Grid>
           <Grid
@@ -198,7 +199,7 @@ function ThemedSpellDefault({
                 fontSize: { xs: "0.7rem", sm: "1rem" },
               }}
             >
-              {targetDesc}
+              {targetDescription}
             </Typography>
           </Grid>
           <Grid

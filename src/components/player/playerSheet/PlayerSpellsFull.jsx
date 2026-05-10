@@ -206,9 +206,10 @@ export default function PlayerSpellsFull({
                           <SpellDefault
                             key={spellIndex}
                             spellName={spell.name}
-                            mp={spell.mp}
+                            mp={spell.cost?.amount}
+                            perTarget={spell.cost?.perTarget ?? true}
                             maxTargets={spell.maxTargets}
-                            targetDesc={spell.targetDesc}
+                            targetDescription={spell.targetDescription}
                             duration={spell.duration}
                             description={spell.description}
                             isEditMode={isEditMode}

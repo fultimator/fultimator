@@ -24,3 +24,11 @@ export enum Elements {
   Light = "light",
   Poison = "poison",
 }
+
+export type CostResource = "mp" | "hp" | "ip" | "fp";
+
+export interface ResourceCost {
+  resource: CostResource;
+  amount: number;
+  perTarget: boolean;
+}

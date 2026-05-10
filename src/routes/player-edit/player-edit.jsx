@@ -191,7 +191,11 @@ export default function PlayerEdit() {
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [playerTemp, setPlayerTemp] = useState(player);
+  const [playerTemp, setPlayerTemp] = useState(() =>
+    player
+      ? applyPostLoadTransforms(JSON.parse(JSON.stringify(player)))
+      : player,
+  );
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerIsOpen = useAppDrawerStore((s) => s.setIsOpen);
@@ -427,7 +431,6 @@ export default function PlayerEdit() {
     unarmedStrikeOptions.find((o) => o.name === "Unarmed Strike") ??
     null;
   const canLevelUpFromExp =
-    isOwner &&
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
     (playerTemp?.lvl || 0) < 50;
 

@@ -738,7 +738,7 @@ function NpcCombatant({ npc }: NpcProps) {
               </Grid>
             ))}
             {npc.spells
-              ?.filter((spell) => spell.type === "offensive")
+              ?.filter((spell) => spell.isOffensive)
               .map((spell, index) => (
                 <Grid key={index}>
                   <Button

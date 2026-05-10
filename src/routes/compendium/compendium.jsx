@@ -138,9 +138,11 @@ function SidebarSecondaryValue(type, item, t) {
   if (type === "shields") return `${item.cost}z`;
   if (type === "accessories") return `${item.cost}z`;
   if (type === "qualities") return `${item.cost}z`;
-  if (type === "spells") return `${item.mp} MP`;
+  if (type === "spells") return `${item.cost?.amount} MP`;
   if (type === "player-spells")
-    return item.mp != null ? `${item.mp} MP` : (item.wellspring ?? "");
+    return item.cost?.amount != null
+      ? `${item.cost.amount} MP`
+      : (item.wellspring ?? "");
   if (type === "attacks") return t(item.range);
   if (type === "classes") return item.book ?? "";
   if (type === "heroics") return item.book ?? "";

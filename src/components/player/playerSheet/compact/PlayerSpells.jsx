@@ -101,9 +101,9 @@ function createBlankSpellForType(spellType) {
     return {
       spellType,
       name: "New Spell",
-      mp: 0,
+      cost: { resource: "mp", amount: 0, perTarget: true },
       maxTargets: 0,
-      targetDesc: "",
+      targetDescription: "",
       duration: "",
       description: "",
       isOffensive: false,
@@ -175,9 +175,9 @@ function createBlankSpellForType(spellType) {
       spellType,
       showInPlayerSheet: true,
       spellName: "New Gamble",
-      mp: 10,
+      cost: { resource: "mp", amount: 10, perTarget: true },
       maxTargets: 2,
-      targetDesc: "Special",
+      targetDescription: "Special",
       duration: "Instantaneous",
       attr: "will",
       targets: [
@@ -499,9 +499,10 @@ function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
       return (
         <SpellDefault
           spellName={highlightMatchFn(spell.name, searchQuery)}
-          mp={spell.mp}
+          mp={spell.cost?.amount}
+          perTarget={spell.cost?.perTarget ?? true}
           maxTargets={spell.maxTargets}
-          targetDesc={spell.targetDesc}
+          targetDescription={spell.targetDescription}
           duration={spell.duration}
           description={highlightMatchFn(spell.description, searchQuery)}
           isEditMode={false}
@@ -902,9 +903,9 @@ export default function PlayerSpellsFull({
       return {
         spellType: spell.spellType,
         name: t(spell.name),
-        mp: spell.mp,
+        cost: spell.cost ?? { resource: "mp", amount: 0, perTarget: true },
         maxTargets: spell.maxTargets,
-        targetDesc: t(spell.targetDesc),
+        targetDescription: t(spell.targetDescription),
         duration: t(spell.duration),
         description: t(spell.description),
         isOffensive: spell.isOffensive,
@@ -919,9 +920,9 @@ export default function PlayerSpellsFull({
       return {
         spellType: spell.spellType,
         spellName: t(spell.name),
-        mp: spell.mp,
+        cost: spell.cost ?? { resource: "mp", amount: 0, perTarget: true },
         maxTargets: spell.maxTargets,
-        targetDesc: t(spell.targetDesc),
+        targetDescription: t(spell.targetDescription),
         duration: t(spell.duration),
         attr: spell.attr,
         targets: spell.targets,
@@ -1046,9 +1047,9 @@ export default function PlayerSpellsFull({
     _compactId: createLocalSpellId(),
     spellType: "default",
     name: t("New Spell"),
-    mp: 0,
+    cost: { resource: "mp", amount: 0, perTarget: true },
     maxTargets: 0,
-    targetDesc: "",
+    targetDescription: "",
     duration: "",
     description: "",
     isOffensive: false,

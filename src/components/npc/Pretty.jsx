@@ -995,10 +995,9 @@ function Spells({ npc }) {
             <Grid sx={{ px: 1, py: 0.5 }} size={11}>
               <Typography component="div">
                 <strong>{spell.name}</strong>{" "}
-                {spell.type === "offensive" && <OffensiveSpellIcon />}{" "}
-                <Diamond />{" "}
+                {spell.isOffensive && <OffensiveSpellIcon />} <Diamond />{" "}
                 <strong>
-                  {spell.type === "offensive" && (
+                  {spell.isOffensive && (
                     <>
                       <OpenBracket />
                       {attributes[spell.attr1].shortcaps}
@@ -1007,14 +1006,21 @@ function Spells({ npc }) {
                       <CloseBracket />
                       {calcMagic(npc) > 0 && `+${calcMagic(npc)}`} <Diamond />
                       <OpenBracket />
-                      HR + {spell.damage || 0}
+                      HR +{" "}
+                      {(typeof spell.damage === "object"
+                        ? spell.damage?.value
+                        : spell.damage) || 0}
                       <CloseBracket />{" "}
-                      {spell.damagetype ? t(spell.damagetype) : "physical"}
+                      {spell.damage?.type ? t(spell.damage.type) : "physical"}
                       <Diamond />
                     </>
                   )}{" "}
-                  {spell.mpCostTarget} MP <Diamond /> {spell.targetDescription}{" "}
-                  <Diamond /> {spell.duration}
+                  {spell.cost?.amount}
+                  {spell.cost?.perTarget && spell.maxTargets !== 1
+                    ? ` × ${t("T")}`
+                    : ""}{" "}
+                  MP <Diamond /> {spell.targetDescription} <Diamond />{" "}
+                  {spell.duration}
                 </strong>
                 <br />
                 <Typography component="span" key={i}>

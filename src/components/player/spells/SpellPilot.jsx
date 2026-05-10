@@ -441,17 +441,6 @@ function ThemedSpellPilot({
                   )}
                 </Grid>
               </Grid>
-              {isEditMode && (
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexShrink: 0,
-                    minHeight: 34,
-                  }}
-                  size="grow"
-                ></Grid>
-              )}
             </div>
 
             {/* Vehicle Modules */}

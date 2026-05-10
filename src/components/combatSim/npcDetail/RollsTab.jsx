@@ -143,7 +143,7 @@ const RollsTab = ({
   // Check if the selected NPC has enough MP to cast the spell for at least 1 target
   const getHasEnoughMP = (selectedNPC, spellData) => {
     if (!autoUseMP) return true;
-    const mpCost = spellData.mp;
+    const mpCost = spellData.cost?.amount ?? 0;
     const currentMp = selectedNPC.combatStats.currentMp;
     return mpCost <= currentMp;
   };
@@ -239,8 +239,8 @@ const RollsTab = ({
                       <Diamond />
                     </>
                   )}{" "}
-                  {data.mp} MP <Diamond /> {data.target} <Diamond />{" "}
-                  {data.duration}
+                  {data.cost?.amount} MP <Diamond /> {data.targetDescription}{" "}
+                  <Diamond /> {data.duration}
                 </>
               )}
             </Typography>

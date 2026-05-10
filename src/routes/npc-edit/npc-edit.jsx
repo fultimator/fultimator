@@ -127,7 +127,9 @@ export default function NpcEdit() {
   const isOwner = isLocalNpc || Boolean(user && npc && user.uid === npc.uid);
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
-  const [npcTemp, setNpcTemp] = useState(npc); // Temporary NPC state
+  const [npcTemp, setNpcTemp] = useState(() =>
+    npc ? applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))) : npc,
+  ); // Temporary NPC state
 
   // Effect to update temporary NPC state when NPC data changes.
   // Apply post-load transforms so migrations are reflected in the editor.

@@ -265,7 +265,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       primary={
                         <>
                           {item.name}
-                          {item.type === "offensive" && <OffensiveSpellIcon />}
+                          {item.isOffensive && <OffensiveSpellIcon />}
                           {item.martial === true && <Martial />}
                         </>
                       }
@@ -347,7 +347,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                 {selectedType === "spell" && (
                   <>
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                      {selectedItem.mp}{" "}
+                      {selectedItem.cost?.amount}{" "}
                       {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""}{" "}
                       {t("MP")}
                       <Box
@@ -362,7 +362,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
-                        {selectedItem.target}
+                        {selectedItem.targetDescription}
                       </StyledMarkdown>
                       <Box
                         component="span"

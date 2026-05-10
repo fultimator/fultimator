@@ -154,16 +154,16 @@ function buildNpcText(npc, md) {
   // Spells
   if (npc.spells?.length) {
     const lines = npc.spells.map((spell) => {
-      const offensive = spell.type === "offensive";
+      const offensive = spell.isOffensive;
       const magic = calcMagic(npc);
       let header = b(spell.name);
       if (offensive) {
         const a1 = ATTR_SHORT[spell.attr1] ?? spell.attr1;
         const a2 = ATTR_SHORT[spell.attr2] ?? spell.attr2;
         const magicStr = magic > 0 ? ` +${magic}` : "";
-        header += ` (Offensive)  -  ${b(`[${a1} + ${a2}]${magicStr}`)}  -  ${spell.mp} MP  -  ${spell.target}  -  ${spell.duration}`;
+        header += ` (Offensive)  -  ${b(`[${a1} + ${a2}]${magicStr}`)}  -  ${spell.cost?.amount} MP  -  ${spell.targetDescription}  -  ${spell.duration}`;
       } else {
-        header += `  -  ${spell.mp} MP  -  ${spell.target}  -  ${spell.duration}`;
+        header += `  -  ${spell.cost?.amount} MP  -  ${spell.targetDescription}  -  ${spell.duration}`;
       }
       return `${header}\n${spell.effect ?? ""}`;
     });
@@ -261,7 +261,7 @@ function buildNpcObsidian(npc) {
     const magic = calcMagic(npc);
     lines.push("\nspells:");
     for (const spell of npc.spells) {
-      const offensive = spell.type === "offensive";
+      const offensive = spell.isOffensive;
       let name = spell.name ?? "";
       if (offensive) {
         const a1 = ATTR_SHORT[spell.attr1] ?? spell.attr1;
@@ -269,7 +269,7 @@ function buildNpcObsidian(npc) {
         const magicStr = magic > 0 ? ` +${magic}` : "";
         name += ` ($) ~ [${a1} + ${a2}]${magicStr}`;
       }
-      name += ` ~ ${spell.mp} MP ~ ${spell.target} ~ ${spell.duration}`;
+      name += ` ~ ${spell.cost?.amount} MP ~ ${spell.targetDescription} ~ ${spell.duration}`;
       lines.push(`  - name: "${name.replace(/"/g, '\\"')}"`);
       lines.push(
         `    desc: "${(spell.effect ?? "").replace(/"/g, '\\"').replace(/\n/g, " ")}"`,
@@ -545,9 +545,9 @@ export function buildItemText(type, item, fmt) {
 
       // Gamble spell
       if (st === "gamble") {
-        const target = item.targetDesc ?? item.target;
+        const target = item.targetDescription;
         const stats = [
-          item.mp != null && field("MP", item.mp),
+          item.cost?.amount != null && field("MP", item.cost.amount),
           target && field("Target", resolve(target)),
           item.duration && field("Duration", resolve(item.duration)),
           item.attr1 &&
@@ -572,9 +572,9 @@ export function buildItemText(type, item, fmt) {
       }
 
       // Default static spell
-      const target = item.targetDesc ?? item.target;
+      const target = item.targetDescription;
       const stats = [
-        item.mp != null && field("MP", item.mp),
+        item.cost?.amount != null && field("MP", item.cost.amount),
         target && field("Target", resolve(target)),
         item.duration && field("Duration", resolve(item.duration)),
         item.attr1 &&
