@@ -403,7 +403,7 @@ const actionCommand: Command = {
 
     if (subAction.toLowerCase() === "spell" && weaponArg) {
       const options = resolveSpellOptions(context.playerDoc);
-      const spell = options.find((o) => o.name === weaponArg);
+      const spell = options.find((o) => o.arg === weaponArg);
       if (!spell) {
         return { error: `Unknown spell "${weaponArg}".` };
       }

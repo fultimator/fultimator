@@ -71,13 +71,14 @@ export function resolveSpellOptions(
       spell.isOffensive === true || spell.type === "offensive";
     const acc = spell.accuracy as Record<string, unknown> | undefined;
     const dmg = spell.damage as Record<string, unknown> | undefined;
+    const spellType =
+      typeof spell.spellType === "string" ? spell.spellType : undefined;
     results.push({
-      arg: quoteArg(name),
+      arg: quoteArg(spellType ? `${name} ${spellType}` : name),
       name,
       description:
         typeof spell.description === "string" ? spell.description : undefined,
-      spellType:
-        typeof spell.spellType === "string" ? spell.spellType : undefined,
+      spellType,
       isOffensive,
       attr1: toAttr(acc?.attr1),
       attr2: toAttr(acc?.attr2),
@@ -123,7 +124,10 @@ export function resolveSpellOptions(
   }
 
   const deduped = new Map<string, SpellOption>();
-  for (const s of results) deduped.set(s.name, s);
+  for (const s of results) {
+    const key = `${s.name}:${s.spellType ?? ""}`;
+    deduped.set(key, s);
+  }
   return [...deduped.values()];
 }
 
