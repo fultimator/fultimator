@@ -33,6 +33,8 @@ import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
 import { SignIn } from "../../components/auth";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
+import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
+import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../components/player/playerTransforms";
 
 export default function CombatSimulator() {
   const { authLoading, dbMode, cloudUser, activeUid } = useDatabaseContext();
@@ -92,7 +94,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // ========== Base States ==========
   const { id } = useParams(); // Get the encounter ID from the URL
   const theme = useTheme();
-  const isDarkMode = theme.palette.mode === "dark"; // Check if dark mode is enabled
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const inputRef = useRef(null);
   const [loading, setLoading] = useState(true); // Loading state
@@ -261,8 +262,16 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     if (encounterData && !initialized) {
       setEncounter(encounterData);
       setEncounterName(encounterData.name || "Unnamed Encounter");
-      setSelectedNPCs(encounterData.selectedNPCs || []);
-      setSelectedPCs(encounterData.selectedPCs || []);
+      setSelectedNPCs(
+        (encounterData.selectedNPCs || []).map((npc) =>
+          applyNpcPostLoadTransforms(npc),
+        ),
+      );
+      setSelectedPCs(
+        (encounterData.selectedPCs || []).map((pc) =>
+          applyPlayerPostLoadTransforms(pc),
+        ),
+      );
       setLogs(encounterData.logs || []);
       setEncounterClocks(encounterData.clocks || []);
       setEncounterNotes(encounterData.notes || []);
@@ -558,23 +567,25 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const handleSelectNPC = async (npcId) => {
     if (selectedNPCs.length < 30) {
       const npc = await getNpc(npcId); // Fetch full NPC data using getNpc
+      if (!npc) return;
+      const normalizedNpc = applyNpcPostLoadTransforms(npc);
 
       // Calculate Ultima value only if the NPC is a villain
       let ultimaValue = null;
-      if (npc.villain === "minor") {
+      if (normalizedNpc.villain === "minor") {
         ultimaValue = 5;
-      } else if (npc.villain === "major") {
+      } else if (normalizedNpc.villain === "major") {
         ultimaValue = 10;
-      } else if (npc.villain === "superme") {
+      } else if (normalizedNpc.villain === "superme") {
         ultimaValue = 15;
       }
 
       // Create combatStats object and conditionally add ultima
       const combatStats = {
         notes: "",
-        currentHp: calcHP(npc),
-        currentMp: calcMP(npc),
-        turns: new Array(getTurnCount(npc.rank)).fill(false),
+        currentHp: calcHP(normalizedNpc),
+        currentMp: calcMP(normalizedNpc),
+        turns: new Array(getTurnCount(normalizedNpc.rank)).fill(false),
         statusEffects: [],
         combatNotes: "",
         ...(ultimaValue !== null && { ultima: ultimaValue }), // Only add ultima if it's not null
@@ -583,16 +594,18 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       setSelectedNPCs((prev) => [
         ...prev,
         {
-          ...npc,
+          ...normalizedNpc,
           id: npcId,
-          combatId: `${npc.id}-${Date.now()}`,
+          sourceDocId: npcId,
+          sourceCollection: "npc-personal",
+          combatId: `${npcId}-${Date.now()}`,
           combatStats: combatStats,
         },
       ]);
 
       if (logNpcAdded) {
         // Add log entry to logs array
-        addLog("combat_sim_log_npc_added", npc.name);
+        addLog("combat_sim_log_npc_added", normalizedNpc.name);
       }
     } else {
       if (window.electron) {
@@ -606,15 +619,18 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Handle Select PC from the player list
   const handleSelectPC = (player) => {
     if (selectedNPCs.length + selectedPCs.length < 30) {
+      const normalizedPlayer = applyPlayerPostLoadTransforms(player);
       setSelectedPCs((prev) => [
         ...prev,
         {
-          ...player,
+          ...normalizedPlayer,
           id: player.id,
+          sourceDocId: player.id,
+          sourceCollection: "player-personal",
           combatId: `${player.id}-${Date.now()}`,
           combatStats: {
-            currentHp: player.stats?.hp?.max ?? 0,
-            currentMp: player.stats?.mp?.max ?? 0,
+            currentHp: normalizedPlayer.stats?.hp?.max ?? 0,
+            currentMp: normalizedPlayer.stats?.mp?.max ?? 0,
             turns: [false],
             statusEffects: [],
             combatNotes: "",

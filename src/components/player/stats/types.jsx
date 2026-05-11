@@ -8,7 +8,7 @@ import {
   LightIcon,
   PhysicalIcon,
   PoisonIcon,
-  WindIcon,
+  AirIcon,
 } from "../../icons";
 import { useTranslate } from "../../../translation/translate";
 // import { typeList } from "../../typeConstants";
@@ -34,7 +34,7 @@ export function TypeIcon({ type, disabled }) {
   return (
     <>
       {type === "physical" && <PhysicalIcon disabled={disabled} />}
-      {type === "air" && <WindIcon disabled={disabled} />}
+      {type === "air" && <AirIcon disabled={disabled} />}
       {type === "bolt" && <BoltIcon disabled={disabled} />}
       {type === "dark" && <DarkIcon disabled={disabled} />}
       {type === "earth" && <EarthIcon disabled={disabled} />}

@@ -130,6 +130,10 @@ function normalizeAttrKey(raw) {
   return "dexterity";
 }
 
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 export default function PlayerEquipment({
   player,
   setPlayer,
@@ -226,7 +230,7 @@ export default function PlayerEquipment({
   const inv = player.equipment?.[0];
 
   const formatCustomWeapon = (customWeapon, forceSecondaryForm = null) => {
-    const isTransforming = customWeapon.customizations?.some(
+    const isTransforming = asArray(customWeapon.customizations).some(
       (c) => c.name === "weapon_customization_transforming",
     );
     const isSecondaryForm =
@@ -254,8 +258,8 @@ export default function PlayerEquipment({
       "weapon_customization_powerful",
     ];
     const customizations = isSecondaryForm
-      ? customWeapon.secondCurrentCustomizations || []
-      : customWeapon.customizations || [];
+      ? asArray(customWeapon.secondCurrentCustomizations)
+      : asArray(customWeapon.customizations);
     const isMartial = customizations.some((c) =>
       martialCustomizations.includes(c.name),
     );
@@ -1473,9 +1477,10 @@ function EquipmentRow({
                   </>
                 )}
                 {item.isCustomWeapon &&
-                  (item.isSecondaryForm
-                    ? item.originalData.secondCurrentCustomizations
-                    : item.originalData.customizations || []
+                  asArray(
+                    item.isSecondaryForm
+                      ? item.originalData?.secondCurrentCustomizations
+                      : item.originalData?.customizations,
                   ).map((c, i) => (
                     <React.Fragment key={i}>
                       <Diamond color={theme.primary} sx={{ mx: 0.5 }} />

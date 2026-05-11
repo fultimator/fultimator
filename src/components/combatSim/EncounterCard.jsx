@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import UpdateIcon from "@mui/icons-material/Update";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -26,6 +27,8 @@ const EncounterCard = ({
   encounter,
   onDelete,
   onClick,
+  onMigrate,
+  hasPendingMigrations = false,
   selectMode = false,
   isSelected = false,
   onToggleSelect,
@@ -34,7 +37,8 @@ const EncounterCard = ({
   const isDarkMode = theme.palette.mode === "dark";
   const {
     isOpen: deleteDialogOpen,
-    closeDialog: setDeleteDialogOpen,
+    openDialog: openDeleteDialog,
+    closeDialog: closeDeleteDialog,
     handleDelete: _handleDelete,
   } = useDeleteConfirmation({
     onConfirm: () => {},
@@ -55,9 +59,9 @@ const EncounterCard = ({
     }
   };
 
-  const openDeleteDialog = (event) => {
+  const handleOpenDeleteDialog = (event) => {
     event.stopPropagation();
-    setDeleteDialogOpen(true);
+    openDeleteDialog();
   };
 
   return (
@@ -203,12 +207,30 @@ const EncounterCard = ({
             </span>
           </Tooltip>
 
+          {hasPendingMigrations && (
+            <Tooltip title={t("Migrate")}>
+              <span>
+                <Button
+                  size="small"
+                  disabled={selectMode}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMigrate?.(encounter.id);
+                  }}
+                  startIcon={<AutorenewIcon fontSize="small" />}
+                >
+                  {t("Migrate")}
+                </Button>
+              </span>
+            </Tooltip>
+          )}
+
           <Tooltip title={t("Delete")}>
             <span>
               <IconButton
                 size="small"
                 disabled={selectMode}
-                onClick={openDeleteDialog}
+                onClick={handleOpenDeleteDialog}
                 sx={{
                   color: theme.palette.error.main,
                   "&:hover": {
@@ -225,7 +247,7 @@ const EncounterCard = ({
       </Card>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={setDeleteDialogOpen}
+        onClose={closeDeleteDialog}
         onConfirm={() => onDelete(encounter.id)}
         title={t("Delete")}
         message={t("Are you sure you want to delete this encounter?")}

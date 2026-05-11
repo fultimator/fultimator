@@ -12,9 +12,18 @@ import {
   Alert,
   Fade,
   CircularProgress,
+  List,
+  ListItem,
+  ListItemText,
+  Chip,
+  Collapse as MuiCollapse,
   ToggleButtonGroup,
   ToggleButton,
   Collapse,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   // TODO: re-enable when cross-db encounter copy/move is solved (NPC refs tied to source db)
   // Divider,
   // ListItemIcon,
@@ -45,6 +54,18 @@ import { SignIn } from "../../components/auth";
 import DriveSync from "../../components/DriveSync";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
+import {
+  applyNpcPostLoadTransforms,
+  getPendingNpcMigrations,
+  npcNeedsMigration,
+} from "../../components/npc/npcTransforms";
+import {
+  applyPostLoadTransforms,
+  getPendingPlayerMigrations,
+  playerNeedsMigration,
+} from "../../components/player/playerTransforms";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 const MAX_ENCOUNTERS = 3;
 
@@ -109,6 +130,12 @@ const CombatSimEncounters = () => {
 
   const [encounters, setEncounters] = useState([]);
   const [encounterName, setEncounterName] = useState("");
+  const [pendingMigrationEncounter, setPendingMigrationEncounter] =
+    useState(null);
+  const [pendingMigrationAction, setPendingMigrationAction] =
+    useState("continue");
+  const [expandedMigrationActorId, setExpandedMigrationActorId] =
+    useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -215,11 +242,6 @@ const CombatSimEncounters = () => {
   };
 
   const handleDeleteEncounter = async (id) => {
-    const confirmDelete = await globalConfirm(
-      t("combat_sim_delete_encounter_confirm"),
-    );
-    if (!confirmDelete) return;
-
     try {
       await db.deleteDoc(db.doc("encounters", id));
       setEncountersList((prev) =>
@@ -234,8 +256,101 @@ const CombatSimEncounters = () => {
     }
   };
 
-  const handleNavigateToEncounter = (id) => {
-    navigate(`/combat-sim/${id}`, { state: { from: "/combat-sim", dbMode } });
+  const getPendingMigrationCounts = (encounter) => {
+    const npcs = Array.isArray(encounter?.selectedNPCs)
+      ? encounter.selectedNPCs
+      : [];
+    const pcs = Array.isArray(encounter?.selectedPCs)
+      ? encounter.selectedPCs
+      : [];
+    const npcCount = npcs.filter((npc) => npcNeedsMigration(npc)).length;
+    const pcCount = pcs.filter((pc) => playerNeedsMigration(pc)).length;
+    return { npcCount, pcCount, total: npcCount + pcCount };
+  };
+
+  const getPendingMigrationActors = (encounter) => {
+    const npcs = Array.isArray(encounter?.selectedNPCs)
+      ? encounter.selectedNPCs
+      : [];
+    const pcs = Array.isArray(encounter?.selectedPCs)
+      ? encounter.selectedPCs
+      : [];
+    return [
+      ...npcs
+        .filter((npc) => npcNeedsMigration(npc))
+        .map((npc) => ({
+          id: `npc-${npc?.combatId ?? npc?.id ?? npc?.name ?? "unknown"}`,
+          kind: "NPC",
+          name: npc?.name || "Unnamed NPC",
+          migrations: getPendingNpcMigrations(npc),
+        })),
+      ...pcs
+        .filter((pc) => playerNeedsMigration(pc))
+        .map((pc) => ({
+          id: `pc-${pc?.combatId ?? pc?.id ?? pc?.name ?? "unknown"}`,
+          kind: "PC",
+          name: pc?.name || "Unnamed PC",
+          migrations: getPendingPlayerMigrations(pc),
+        })),
+    ];
+  };
+
+  const handleNavigateToEncounter = (encounter) => {
+    const pending = getPendingMigrationCounts(encounter);
+    if (pending.total > 0) {
+      setPendingMigrationEncounter(encounter);
+      setPendingMigrationAction("continue");
+      return;
+    }
+    navigate(`/combat-sim/${encounter.id}`, {
+      state: { from: "/combat-sim", dbMode },
+    });
+  };
+
+  const handleMigrateEncounterActors = async (encounter) => {
+    if (!encounter?.id) return;
+    const npcs = Array.isArray(encounter.selectedNPCs)
+      ? encounter.selectedNPCs
+      : [];
+    const pcs = Array.isArray(encounter.selectedPCs)
+      ? encounter.selectedPCs
+      : [];
+    const nextNpcs = npcs.map((npc) =>
+      npcNeedsMigration(npc) ? applyNpcPostLoadTransforms(npc) : npc,
+    );
+    const nextPcs = pcs.map((pc) =>
+      playerNeedsMigration(pc) ? applyPostLoadTransforms(pc) : pc,
+    );
+
+    const changed =
+      JSON.stringify(nextNpcs) !== JSON.stringify(npcs) ||
+      JSON.stringify(nextPcs) !== JSON.stringify(pcs);
+    if (!changed) {
+      showNotification(t("No pending actor migrations in this encounter."));
+      return;
+    }
+
+    const updatedEncounter = {
+      ...encounter,
+      selectedNPCs: nextNpcs,
+      selectedPCs: nextPcs,
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      await db.setDoc(db.doc("encounters", encounter.id), updatedEncounter);
+      setEncountersList((prev) =>
+        prev.map((e) => (e.id === encounter.id ? updatedEncounter : e)),
+      );
+      setEncounters((prev) =>
+        prev.map((e) => (e.id === encounter.id ? updatedEncounter : e)),
+      );
+      showNotification(t("Encounter actors migrated successfully."));
+    } catch (e) {
+      console.error("Error migrating encounter actors:", e);
+      showNotification(t("Failed to migrate encounter actors."), "error");
+      throw e;
+    }
   };
 
   const handleKeyDown = (event) => {
@@ -545,7 +660,14 @@ const CombatSimEncounters = () => {
               <EncounterCard
                 encounter={encounter}
                 onDelete={handleDeleteEncounter}
-                onClick={() => handleNavigateToEncounter(encounter.id)}
+                onClick={() => handleNavigateToEncounter(encounter)}
+                onMigrate={() => {
+                  setPendingMigrationEncounter(encounter);
+                  setPendingMigrationAction("migrate");
+                }}
+                hasPendingMigrations={
+                  getPendingMigrationCounts(encounter).total > 0
+                }
                 selectMode={selectMode}
                 isSelected={selectedIds.has(encounter.id)}
                 onToggleSelect={toggleSelectEncounter}
@@ -564,6 +686,158 @@ const CombatSimEncounters = () => {
         storeSettings={settingsStore.settings}
         resetToDefaults={settingsStore.resetToDefaults}
       />
+      <Dialog
+        open={!!pendingMigrationEncounter}
+        onClose={() => {
+          setPendingMigrationEncounter(null);
+          setPendingMigrationAction("continue");
+          setExpandedMigrationActorId(null);
+        }}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{t("Pending Actor Migrations")}</DialogTitle>
+        <DialogContent>
+          {pendingMigrationEncounter && (
+            <>
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                {(() => {
+                  const { npcCount, pcCount } = getPendingMigrationCounts(
+                    pendingMigrationEncounter,
+                  );
+                  return `This encounter has actors pending migration (${npcCount} NPC, ${pcCount} PC).`;
+                })()}
+              </Typography>
+              <Typography variant="body2" sx={{ mt: 1, fontWeight: 700 }}>
+                Actors to migrate:
+              </Typography>
+              <List dense sx={{ mt: 0.5, maxHeight: 240, overflowY: "auto" }}>
+                {getPendingMigrationActors(pendingMigrationEncounter).map(
+                  (actor) => {
+                    const isExpanded = expandedMigrationActorId === actor.id;
+                    return (
+                      <Box key={actor.id}>
+                        <ListItem
+                          onClick={() =>
+                            setExpandedMigrationActorId((prev) =>
+                              prev === actor.id ? null : actor.id,
+                            )
+                          }
+                          sx={{ cursor: "pointer", userSelect: "none", py: 0 }}
+                          secondaryAction={
+                            <Chip
+                              label={`${actor.migrations.length} steps`}
+                              size="small"
+                              color="warning"
+                              variant="outlined"
+                            />
+                          }
+                        >
+                          <ListItemText
+                            primary={
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 0.5,
+                                }}
+                              >
+                                {isExpanded ? (
+                                  <ExpandLessIcon
+                                    fontSize="small"
+                                    sx={{ color: "text.secondary" }}
+                                  />
+                                ) : (
+                                  <ExpandMoreIcon
+                                    fontSize="small"
+                                    sx={{ color: "text.secondary" }}
+                                  />
+                                )}
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontWeight: 500 }}
+                                >
+                                  {actor.name} ({actor.kind})
+                                </Typography>
+                              </Box>
+                            }
+                          />
+                        </ListItem>
+                        <MuiCollapse in={isExpanded} unmountOnExit>
+                          <Box sx={{ px: 3, pb: 1, pt: 0.25 }}>
+                            {actor.migrations.map((step, idx) => (
+                              <Typography
+                                key={`${actor.id}-step-${idx}`}
+                                variant="body2"
+                                sx={{
+                                  color: "text.secondary",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 0.75,
+                                }}
+                              >
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    width: 6,
+                                    height: 6,
+                                    borderRadius: "50%",
+                                    bgcolor: "warning.main",
+                                    flexShrink: 0,
+                                    display: "inline-block",
+                                  }}
+                                />
+                                {step}
+                              </Typography>
+                            ))}
+                          </Box>
+                        </MuiCollapse>
+                      </Box>
+                    );
+                  },
+                )}
+              </List>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setPendingMigrationEncounter(null);
+              setPendingMigrationAction("continue");
+            }}
+          >
+            {t("Cancel")}
+          </Button>
+          {pendingMigrationAction === "migrate" && (
+            <Button
+              variant="outlined"
+              color="warning"
+              onClick={async () => {
+                if (!pendingMigrationEncounter) return;
+                await handleMigrateEncounterActors(pendingMigrationEncounter);
+                setPendingMigrationEncounter(null);
+                setPendingMigrationAction("continue");
+                setExpandedMigrationActorId(null);
+              }}
+            >
+              {t("Migrate Actors")}
+            </Button>
+          )}
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (!pendingMigrationEncounter) return;
+              navigate(`/combat-sim/${pendingMigrationEncounter.id}`, {
+                state: { from: "/combat-sim", dbMode },
+              });
+              setPendingMigrationEncounter(null);
+            }}
+          >
+            {t("Continue")}
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Notifications */}
       <Snackbar
         open={notification.open}

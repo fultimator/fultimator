@@ -24,7 +24,7 @@ t95.5 153.5q-78 -42 -153.5 -96t-139.5 -116v0z"
   );
 }
 
-export function WindIcon({ disabled }) {
+export function AirIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#bade15";
   const strokeWidth = disabled ? "0" : "100";
 
@@ -48,6 +48,9 @@ t43 533.5q125 -265 -105.5 -489.5t-555.5 -239.5q419 91 558.5 397.5t-169.5 469.5q-
     </svg>
   );
 }
+
+// Backward compatibility while callers migrate.
+export const WindIcon = AirIcon;
 
 export function BoltIcon({ disabled }) {
   const color = disabled ? "#d8d7d7" : "#fff423";

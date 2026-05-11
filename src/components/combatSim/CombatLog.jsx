@@ -475,6 +475,7 @@ export default function CombatLog({
     // Replace other standard icon tags from tagMap with text equivalents
     plainText = plainText.replace(/\{\{physical-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{air-icon\}\}/g, "");
+    plainText = plainText.replace(/\{\{wind-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{bolt-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{dark-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{earth-icon\}\}/g, "");

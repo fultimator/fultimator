@@ -105,6 +105,33 @@ const NPCDetail = ({
     will: calcAttr("Shaken", "Poisoned", "will", selectedNPC),
   };
 
+  const normalizeAttrKey = (raw) => {
+    const key = String(raw || "").toLowerCase();
+    if (key === "dex" || key === "dexterity") return "dexterity";
+    if (key === "ins" || key === "insight") return "insight";
+    if (key === "mig" || key === "might") return "might";
+    if (key === "wlp" || key === "will" || key === "willpower") return "will";
+    return null;
+  };
+
+  const resolveNpcAttributeDie = (raw) => {
+    const key = normalizeAttrKey(raw);
+    const direct = key ? attributes[key] : undefined;
+    if (Number.isFinite(direct) && direct > 0) return direct;
+    const npcAttrs = selectedNPC?.attributes ?? {};
+    const fallback =
+      key === "dexterity"
+        ? npcAttrs.dexterity
+        : key === "insight"
+          ? npcAttrs.insight
+          : key === "might"
+            ? npcAttrs.might
+            : key === "will"
+              ? (npcAttrs.will ?? npcAttrs.willpower)
+              : undefined;
+    return Number.isFinite(fallback) && fallback > 0 ? fallback : 6;
+  };
+
   const maxTargets =
     clickedData.maxTargets && clickedData.maxTargets > 0
       ? clickedData.maxTargets
@@ -128,13 +155,15 @@ const NPCDetail = ({
     }
     if (spellData.type === "offensive") {
       // Roll the attack
+      const rolled = rollAttack(spellData, "spell");
+      if (!rolled) return;
       const {
         diceResults,
         totalHitScore,
         damage,
         isCriticalFailure,
         isCriticalSuccess,
-      } = rollAttack(spellData, "spell");
+      } = rolled;
 
       if (logSpellOffensiveRoll) {
         // log the spell
@@ -215,6 +244,8 @@ const NPCDetail = ({
 
   const handleAttack = (attack, attackType) => {
     // Roll the attack
+    const rolled = rollAttack(attack, attackType);
+    if (!rolled) return;
     const {
       diceResults,
       totalHitScore,
@@ -222,7 +253,7 @@ const NPCDetail = ({
       hr,
       isCriticalFailure,
       isCriticalSuccess,
-    } = rollAttack(attack, attackType);
+    } = rolled;
 
     if (logAttack) {
       // Add the attack to the log
@@ -331,36 +362,35 @@ const NPCDetail = ({
     let attribute1, attribute2, extraDamage, extraPrecision, type;
 
     if (attackType === "weapon") {
-      const attr1 = attack.accuracy?.attr1 ?? attack.weapon?.att1;
-      const attr2 = attack.accuracy?.attr2 ?? attack.weapon?.att2;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
+      const attr1 = normalizeAttrKey(
+        attack.accuracy?.attr1 ?? attack.weapon?.att1,
+      );
+      const attr2 = normalizeAttrKey(
+        attack.accuracy?.attr2 ?? attack.weapon?.att2,
+      );
+      attribute1 = resolveNpcAttributeDie(attr1);
+      attribute2 = resolveNpcAttributeDie(attr2);
       extraDamage = calcDamage(attack, selectedNPC);
       extraPrecision = calcPrecision(attack, selectedNPC);
       type = attack.damage?.type;
     } else if (attackType === "spell") {
       // For spells
-      const { attr1, attr2 } = attack;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
+      const attr1 = normalizeAttrKey(attack.accuracy?.attr1 ?? attack.attr1);
+      const attr2 = normalizeAttrKey(attack.accuracy?.attr2 ?? attack.attr2);
+      attribute1 = resolveNpcAttributeDie(attr1);
+      attribute2 = resolveNpcAttributeDie(attr2);
       extraDamage = 0;
       extraPrecision = calcMagic(selectedNPC);
       type = "spell";
     } else {
       // For base attacks
-      const attr1 = attack.accuracy?.attr1;
-      const attr2 = attack.accuracy?.attr2;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
+      const attr1 = normalizeAttrKey(attack.accuracy?.attr1);
+      const attr2 = normalizeAttrKey(attack.accuracy?.attr2);
+      attribute1 = resolveNpcAttributeDie(attr1);
+      attribute2 = resolveNpcAttributeDie(attr2);
       extraDamage = calcDamage(attack, selectedNPC);
       extraPrecision = calcPrecision(attack, selectedNPC);
       type = attack.damage?.type;
-    }
-
-    if (attribute1 === undefined || attribute2 === undefined) {
-      // Handle the case where attributes are not defined
-      console.error("Attributes not defined");
-      return;
     }
 
     // Simulate rolling the dice for each attribute
