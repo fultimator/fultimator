@@ -7,6 +7,7 @@ import {
   disableModuleForSlot,
   toggleSupportModuleAction,
   toggleActiveVehicle,
+  enterVehicleAction,
   saveVehiclesAction,
   swapTransformingWeaponForm,
   type PickerCandidate,
@@ -41,6 +42,7 @@ interface LoadoutStore {
 
   // Vehicle enter / exit
   toggleVehicle: () => void;
+  enterVehicle: (vehicleIndex: number) => void;
   saveVehicles: (updatedPilot: {
     vehicles: Vehicle[];
     showInPlayerSheet?: boolean;
@@ -115,6 +117,14 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
       const pilotInfo = getPilotSpellInfo(player);
       if (!pilotInfo) return player;
       return toggleActiveVehicle(player, pilotInfo);
+    });
+  },
+
+  enterVehicle: (vehicleIndex) => {
+    get()._setPlayer?.((player) => {
+      const pilotInfo = getPilotSpellInfo(player);
+      if (!pilotInfo) return player;
+      return enterVehicleAction(player, pilotInfo, vehicleIndex);
     });
   },
 

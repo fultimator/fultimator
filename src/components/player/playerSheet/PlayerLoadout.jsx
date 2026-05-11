@@ -44,12 +44,13 @@ import {
   getEquippedModulesForSlot,
   getEquippedModuleForSlot,
   getVehicleModuleUsage,
-  getEquippedSupportModules,
+  getAvailableSupportModules,
   getSupportSlots,
   getAuxHandItem,
 } from "../equipment/slots/loadoutSelectors";
 import { useLoadoutStore } from "../../../store/playerLoadoutStore";
 import SlotPickerDialog from "../equipment/slots/SlotPickerDialog";
+import VehicleEnterDialog from "../equipment/slots/VehicleEnterDialog";
 import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
 
 // Stat line helpers
@@ -471,6 +472,7 @@ export default function PlayerLoadout({
   const [pickerOpenModuleOverride, setPickerOpenModuleOverride] =
     useState(false);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
+  const [vehicleEnterOpen, setVehicleEnterOpen] = useState(false);
   const [supportPickerOpen, setSupportPickerOpen] = useState(false);
   const [rollDialog, setRollDialog] = useState(null);
 
@@ -565,7 +567,7 @@ export default function PlayerLoadout({
   const vs = player?.vehicleSlots;
 
   const vehicleModuleUsage = getVehicleModuleUsage(player);
-  const equippedSupportModules = getEquippedSupportModules(player);
+  const equippedSupportModules = getAvailableSupportModules(player);
   const supportSlots = getSupportSlots(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);
   const pilotSpellInfo = (() => {
@@ -577,9 +579,23 @@ export default function PlayerLoadout({
     }
     return null;
   })();
+  const pilotVehicles = pilotSpellInfo
+    ? Array.isArray(pilotSpellInfo.spell.vehicles)
+      ? pilotSpellInfo.spell.vehicles
+      : Array.isArray(pilotSpellInfo.spell.currentVehicles)
+        ? pilotSpellInfo.spell.currentVehicles
+        : []
+    : [];
 
   const handleToggleVehicle = () => {
-    store.toggleVehicle();
+    if (activeVehicle) {
+      store.toggleVehicle();
+      return;
+    }
+    setVehicleEnterOpen(true);
+  };
+  const handleEnterVehicle = (vehicleIndex) => {
+    store.enterVehicle(vehicleIndex);
   };
   const handleSaveVehicles = (_, updatedPilot) => {
     store.saveVehicles(updatedPilot);
@@ -1111,6 +1127,14 @@ export default function PlayerLoadout({
           onClose={() => setVehicleModalOpen(false)}
           onSave={handleSaveVehicles}
           pilot={pilotSpellInfo.spell}
+        />
+      )}
+      {pilotSpellInfo && (
+        <VehicleEnterDialog
+          open={vehicleEnterOpen}
+          onClose={() => setVehicleEnterOpen(false)}
+          vehicles={pilotVehicles}
+          onEnter={handleEnterVehicle}
         />
       )}
     </Paper>

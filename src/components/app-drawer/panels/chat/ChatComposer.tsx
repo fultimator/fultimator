@@ -65,6 +65,9 @@ interface ChatComposerProps {
   onOpenEquipmentSlot?: (
     slot: "mainHand" | "offHand" | "armor" | "accessory",
   ) => void;
+  onToggleVehicle?: () => void;
+  onSwapVehicle?: () => void;
+  onOpenSupportModules?: () => void;
 }
 
 export const ChatComposer: React.FC<ChatComposerProps> = ({
@@ -76,6 +79,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onExport,
   onClearRequest,
   onOpenEquipmentSlot,
+  onToggleVehicle,
+  onSwapVehicle,
+  onOpenSupportModules,
 }) => {
   const theme = useTheme();
   const [input, setInput] = useState("");
@@ -931,11 +937,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     size="small"
                                     label="Attr1"
                                     value={attackOverrideDraft.attr1}
-                                    slotProps={{
-                                      select: {
-                                        MenuProps: { disablePortal: true },
-                                      },
-                                    }}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
                                         prev
@@ -959,11 +960,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     size="small"
                                     label="Attr2"
                                     value={attackOverrideDraft.attr2}
-                                    slotProps={{
-                                      select: {
-                                        MenuProps: { disablePortal: true },
-                                      },
-                                    }}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
                                         prev
@@ -1027,11 +1023,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     size="small"
                                     label="Range"
                                     value={attackOverrideDraft.range}
-                                    slotProps={{
-                                      select: {
-                                        MenuProps: { disablePortal: true },
-                                      },
-                                    }}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
                                         prev
@@ -1053,11 +1044,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     size="small"
                                     label="Defense"
                                     value={attackOverrideDraft.defense}
-                                    slotProps={{
-                                      select: {
-                                        MenuProps: { disablePortal: true },
-                                      },
-                                    }}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
                                         prev
@@ -1266,44 +1252,29 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                           No equipment to adjust
                         </Typography>
                       ) : (
-                        equipmentSlots.map((slot) => (
-                          <Button
-                            key={slot.slotKey}
-                            size="small"
-                            variant="outlined"
-                            fullWidth
-                            disabled={slot.isLocked}
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => onOpenEquipmentSlot?.(slot.slotKey)}
-                            sx={{
-                              justifyContent: "space-between",
-                              fontFamily: "monospace",
-                              fontSize: "0.75rem",
-                              py: 0.5,
-                              px: 1,
-                              textTransform: "none",
-                              flexDirection: "column",
-                              alignItems: "flex-start",
-                              whiteSpace: "normal",
-                              height: "auto",
-                              opacity: slot.isLocked ? 0.5 : 1,
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                display: "flex",
-                                width: "100%",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 0.5,
-                                }}
-                              >
+                        (() => {
+                          const slotEntries = equipmentSlots.filter(
+                            (slot) => slot.section === "slot",
+                          );
+                          const supportEntries = equipmentSlots.filter(
+                            (slot) => slot.section === "support",
+                          );
+                          const actionEntries = equipmentSlots.filter(
+                            (slot) => slot.section === "action",
+                          );
+
+                          const renderEntry = (
+                            slot: (typeof equipmentSlots)[number],
+                          ) => {
+                            const isClickable =
+                              !slot.isLocked &&
+                              (slot.actionType === "toggleVehicle" ||
+                                slot.actionType === "swapVehicle" ||
+                                slot.actionType === "openSupportModules" ||
+                                Boolean(slot.pickerSlot));
+                            const isSupportRow = slot.section === "support";
+                            const inner = isSupportRow ? (
+                              <>
                                 <Typography
                                   variant="body2"
                                   sx={{
@@ -1311,38 +1282,201 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     fontFamily: "monospace",
                                   }}
                                 >
-                                  {slot.label}
+                                  {t(slot.currentItem?.name || "-")}
                                 </Typography>
-                                {slot.isLocked && (
-                                  <LockIcon
+                                {slot.currentItem?.stats && (
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
                                     sx={{
-                                      fontSize: "0.875rem",
-                                      color: "warning.main",
+                                      mt: 0.2,
+                                      fontFamily: "monospace",
+                                      fontSize: "0.65rem",
                                     }}
-                                  />
+                                  >
+                                    {t(slot.currentItem.stats)}
+                                  </Typography>
                                 )}
-                              </Box>
-                            </Box>
-                            {slot.currentItem && (
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
+                              </>
+                            ) : (
+                              <>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    width: "100%",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="body2"
+                                      sx={{
+                                        fontWeight: 600,
+                                        fontFamily: "monospace",
+                                      }}
+                                    >
+                                      {slot.label}
+                                    </Typography>
+                                    {slot.isLocked && (
+                                      <LockIcon
+                                        sx={{
+                                          fontSize: "0.875rem",
+                                          color: "warning.main",
+                                        }}
+                                      />
+                                    )}
+                                  </Box>
+                                </Box>
+                                {slot.currentItem && (
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{
+                                      mt: 0.25,
+                                      fontFamily: "monospace",
+                                      fontSize: "0.65rem",
+                                    }}
+                                  >
+                                    {t(slot.currentItem.name)}
+                                    {slot.currentItem.stats && (
+                                      <Box component="span" sx={{ ml: 0.5 }}>
+                                        ({t(slot.currentItem.stats)})
+                                      </Box>
+                                    )}
+                                  </Typography>
+                                )}
+                              </>
+                            );
+
+                            if (isClickable) {
+                              return (
+                                <Button
+                                  key={slot.slotKey}
+                                  size="small"
+                                  variant="outlined"
+                                  fullWidth
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => {
+                                    if (slot.actionType === "toggleVehicle") {
+                                      onToggleVehicle?.();
+                                      return;
+                                    }
+                                    if (slot.actionType === "swapVehicle") {
+                                      onSwapVehicle?.();
+                                      return;
+                                    }
+                                    if (
+                                      slot.actionType === "openSupportModules"
+                                    ) {
+                                      onOpenSupportModules?.();
+                                      return;
+                                    }
+                                    if (slot.pickerSlot) {
+                                      onOpenEquipmentSlot?.(slot.pickerSlot);
+                                    }
+                                  }}
+                                  sx={{
+                                    justifyContent: "space-between",
+                                    fontFamily: "monospace",
+                                    fontSize: "0.75rem",
+                                    py: 0.5,
+                                    px: 1,
+                                    textTransform: "none",
+                                    flexDirection: "column",
+                                    alignItems: "flex-start",
+                                    whiteSpace: "normal",
+                                    height: "auto",
+                                    opacity: slot.isLocked ? 0.5 : 1,
+                                  }}
+                                >
+                                  {inner}
+                                </Button>
+                              );
+                            }
+                            return (
+                              <Box
+                                key={slot.slotKey}
                                 sx={{
-                                  mt: 0.25,
+                                  justifyContent: "space-between",
                                   fontFamily: "monospace",
-                                  fontSize: "0.65rem",
+                                  fontSize: "0.75rem",
+                                  py: 0.5,
+                                  px: 1,
+                                  textTransform: "none",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "flex-start",
+                                  whiteSpace: "normal",
+                                  height: "auto",
+                                  opacity: slot.isLocked ? 0.5 : 1,
+                                  border: "1px solid",
+                                  borderColor: "divider",
+                                  borderRadius: 1,
                                 }}
                               >
-                                {slot.currentItem.name}
-                                {slot.currentItem.stats && (
-                                  <Box component="span" sx={{ ml: 0.5 }}>
-                                    ({slot.currentItem.stats})
+                                {inner}
+                              </Box>
+                            );
+                          };
+
+                          return (
+                            <>
+                              {slotEntries.map(renderEntry)}
+                              {supportEntries.length > 0 && (
+                                <Box
+                                  sx={{
+                                    mt: 0.5,
+                                    pt: 0.5,
+                                    borderTop: "1px solid",
+                                    borderColor: "divider",
+                                  }}
+                                >
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{
+                                      display: "block",
+                                      mb: 0.5,
+                                      textTransform: "uppercase",
+                                      letterSpacing: "0.05em",
+                                      fontFamily: "monospace",
+                                    }}
+                                  >
+                                    {t("Support Modules")}
+                                  </Typography>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    {supportEntries.map(renderEntry)}
                                   </Box>
-                                )}
-                              </Typography>
-                            )}
-                          </Button>
-                        ))
+                                </Box>
+                              )}
+                              {actionEntries.length > 0 && (
+                                <Box
+                                  sx={{
+                                    mt: 0.5,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  {actionEntries.map(renderEntry)}
+                                </Box>
+                              )}
+                            </>
+                          );
+                        })()
                       )}
                     </Box>
                   </ListItem>

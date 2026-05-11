@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -101,6 +101,7 @@ export default function SlotPickerDialog({
   const [moduleOverrideOpen, setModuleOverrideOpen] = useState(false);
   const [hoveredModule, setHoveredModule] = useState(null);
   const [pendingModule, setPendingModule] = useState(null);
+  const wasOpenRef = useRef(false);
 
   const currentlyEquipped = useMemo(() => {
     if (!open || !player?.equippedSlots?.[slot]) return null;
@@ -165,7 +166,7 @@ export default function SlotPickerDialog({
   }, [open, slot, player]);
 
   useEffect(() => {
-    if (open) {
+    if (open && !wasOpenRef.current) {
       setModuleOverrideOpen(openModuleOverride);
       setHoveredModule(null);
       setPendingModule(null);
@@ -175,6 +176,7 @@ export default function SlotPickerDialog({
         setPendingCandidate(null);
       }
     }
+    wasOpenRef.current = open;
   }, [open, openModuleOverride, currentlyEquipped]);
 
   const hasDualShieldBearer =

@@ -42,7 +42,7 @@ import {
   getEquippedModulesForSlot,
   getEquippedModuleForSlot,
   getVehicleModuleUsage,
-  getEquippedSupportModules,
+  getAvailableSupportModules,
   getSupportSlots,
   getAuxHandItem,
   getPilotSpellInfo,
@@ -51,6 +51,7 @@ import { useLoadoutStore } from "../../../../store/playerLoadoutStore";
 import { calculateAttribute } from "../../common/playerCalculations";
 import attributes from "../../../../libs/attributes";
 import SlotPickerDialog from "../../equipment/slots/SlotPickerDialog";
+import VehicleEnterDialog from "../../equipment/slots/VehicleEnterDialog";
 import SpellPilotVehiclesModal from "../../spells/SpellPilotVehiclesModal";
 import PlayerEquipment from "./PlayerEquipment";
 
@@ -143,6 +144,7 @@ export default function CompactLoadout({
   const [equipOpen, setEquipOpen] = useState(false);
   const [rollDialog, setRollDialog] = useState(null);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
+  const [vehicleEnterOpen, setVehicleEnterOpen] = useState(false);
   const canClickSlot = isEditMode || !!setPlayer;
 
   const store = useLoadoutStore();
@@ -169,7 +171,14 @@ export default function CompactLoadout({
 
   const vehicleModuleUsage = getVehicleModuleUsage(player);
   const pilotSpellInfo = getPilotSpellInfo(player);
-  const equippedSupportModules = getEquippedSupportModules(player);
+  const pilotVehicles = pilotSpellInfo
+    ? Array.isArray(pilotSpellInfo.spell.vehicles)
+      ? pilotSpellInfo.spell.vehicles
+      : Array.isArray(pilotSpellInfo.spell.currentVehicles)
+        ? pilotSpellInfo.spell.currentVehicles
+        : []
+    : [];
+  const equippedSupportModules = getAvailableSupportModules(player);
   const supportSlots = getSupportSlots(player);
   const auxHandItem = getAuxHandItem(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);
@@ -186,7 +195,14 @@ export default function CompactLoadout({
 
   // Vehicle handlers
   const handleToggleVehicle = () => {
-    store.toggleVehicle();
+    if (activeVehicle) {
+      store.toggleVehicle();
+      return;
+    }
+    setVehicleEnterOpen(true);
+  };
+  const handleEnterVehicle = (vehicleIndex) => {
+    store.enterVehicle(vehicleIndex);
   };
   const handleSaveVehicles = (_, updatedPilot) => {
     store.saveVehicles(updatedPilot);
@@ -880,6 +896,14 @@ export default function CompactLoadout({
             onClose={() => setVehicleModalOpen(false)}
             pilot={pilotSpellInfo.spell}
             onSave={handleSaveVehicles}
+          />
+        )}
+        {pilotSpellInfo && (
+          <VehicleEnterDialog
+            open={vehicleEnterOpen}
+            onClose={() => setVehicleEnterOpen(false)}
+            vehicles={pilotVehicles}
+            onEnter={handleEnterVehicle}
           />
         )}
       </Box>

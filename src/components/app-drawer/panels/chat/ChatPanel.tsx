@@ -5,8 +5,24 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Box, Divider, Typography } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Button,
+} from "@mui/material";
 import { useLocation } from "react-router";
+import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { AUTHOR_NAME, DEFAULT_SPEAKER, LOCAL_SPEAKER_KEY } from "./constants";
 import { formatTimeAgo } from "./utils";
@@ -24,9 +40,26 @@ import { MessageContent } from "./message-templates/registry";
 import { MessageListErrorBoundary } from "./MessageListErrorBoundary";
 import { ChatComposer } from "./ChatComposer";
 import SlotPickerDialog from "../../../player/equipment/slots/SlotPickerDialog";
+import VehicleEnterDialog from "../../../player/equipment/slots/VehicleEnterDialog";
+import NotesMarkdown from "../../../common/NotesMarkdown";
 import { useDatabase } from "../../../../hooks/useDatabase";
 import type { TypePlayer } from "../../../../types/Players";
 import type { ChatMessage } from "./types";
+import {
+  getAvailableSupportModules,
+  getEquippedModuleForSlot,
+  getEquippedModulesForSlot,
+  getPilotSpellInfo,
+} from "../../../player/equipment/slots/loadoutSelectors";
+import {
+  disableModuleForSlot,
+  enterVehicleAction,
+  saveVehiclesAction,
+  selectModuleForSlot,
+  toggleSupportModuleAction,
+  toggleActiveVehicle,
+} from "../../../player/equipment/slots/loadoutActions";
+import { useTranslate } from "../../../../translation/translate";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -52,7 +85,7 @@ const resolveEquippedItemName = (
       : null;
   const equipment =
     Array.isArray(doc.equipment) && doc.equipment.length > 0
-      ? (doc.equipment[0] as Record<string, unknown>)
+      ? (doc.equipment[0] as unknown as Record<string, unknown>)
       : null;
   if (!equippedSlots || !equipment) return null;
 
@@ -117,10 +150,13 @@ const buildEquipmentChangeMessage = ({
 };
 
 export const ChatPanel: React.FC = () => {
+  const { t } = useTranslate();
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>(
     () => localStorage.getItem(LOCAL_SPEAKER_KEY) ?? DEFAULT_SPEAKER,
   );
   const [clearLogsDialogOpen, setClearLogsDialogOpen] = useState(false);
+  const [supportPickerOpen, setSupportPickerOpen] = useState(false);
+  const [vehiclePickerOpen, setVehiclePickerOpen] = useState(false);
   const [equipmentSlotPickerOpen, setEquipmentSlotPickerOpen] = useState<
     "mainHand" | "offHand" | "armor" | "accessory" | null
   >(null);
@@ -161,6 +197,27 @@ export const ChatPanel: React.FC = () => {
     unknown
   > | null>(null);
   const activeActorDoc = activeActorDocOverride ?? baseActiveActorDoc;
+  const activeActorDocRef = useRef(activeActorDoc);
+  activeActorDocRef.current = activeActorDoc;
+  const activeSlotForDialog = equipmentSlotPickerOpen ?? "mainHand";
+  const dialogVehicleModules = useMemo(() => {
+    if (!activeActorDoc || !equipmentSlotPickerOpen) return [];
+    return getEquippedModulesForSlot(
+      activeActorDoc as unknown as TypePlayer,
+      equipmentSlotPickerOpen,
+    );
+  }, [activeActorDoc, equipmentSlotPickerOpen]);
+  const dialogModuleActive = useMemo(() => {
+    if (!activeActorDoc || !equipmentSlotPickerOpen) return false;
+    return !!getEquippedModuleForSlot(
+      activeActorDoc as unknown as TypePlayer,
+      equipmentSlotPickerOpen,
+    );
+  }, [activeActorDoc, equipmentSlotPickerOpen]);
+  const equippedSupportModules = useMemo(() => {
+    if (!activeActorDoc) return [];
+    return getAvailableSupportModules(activeActorDoc as unknown as TypePlayer);
+  }, [activeActorDoc]);
 
   useEffect(() => {
     // When the listener or selected actor changes, prefer upstream data again.
@@ -331,6 +388,55 @@ export const ChatPanel: React.FC = () => {
         onExport={handleExport}
         onClearRequest={() => setClearLogsDialogOpen(true)}
         onOpenEquipmentSlot={setEquipmentSlotPickerOpen}
+        onToggleVehicle={() => {
+          const doc = activeActorDocRef.current;
+          if (!doc) return;
+          const pilotInfo = getPilotSpellInfo(doc as unknown as TypePlayer);
+          if (!pilotInfo) return;
+          const vehicles = Array.isArray(pilotInfo.spell.currentVehicles)
+            ? pilotInfo.spell.currentVehicles
+            : Array.isArray(pilotInfo.spell.vehicles)
+              ? pilotInfo.spell.vehicles
+              : [];
+          const isActive = vehicles.some((v) => v.enabled);
+          if (!isActive) {
+            setVehiclePickerOpen(true);
+            return;
+          }
+          setActiveActorDoc((prev) => {
+            const pi = getPilotSpellInfo(prev);
+            if (!pi) return prev;
+            return toggleActiveVehicle(prev, pi);
+          });
+        }}
+        onSwapVehicle={() => {
+          setActiveActorDoc((prev) => {
+            const pilotInfo = getPilotSpellInfo(prev);
+            if (!pilotInfo) return prev;
+            const vehicles = Array.isArray(pilotInfo.spell.currentVehicles)
+              ? pilotInfo.spell.currentVehicles
+              : Array.isArray(pilotInfo.spell.vehicles)
+                ? pilotInfo.spell.vehicles
+                : [];
+            if (vehicles.length < 2) return prev;
+            const currentIndex = vehicles.findIndex(
+              (vehicle) => vehicle.enabled,
+            );
+            const nextIndex =
+              currentIndex < 0 ? 0 : (currentIndex + 1) % vehicles.length;
+            const updatedVehicles = vehicles.map((vehicle, index) => ({
+              ...vehicle,
+              enabled: index === nextIndex,
+            }));
+            return saveVehiclesAction(prev, pilotInfo, {
+              vehicles: updatedVehicles,
+              showInPlayerSheet: (
+                pilotInfo.spell as { showInPlayerSheet?: boolean }
+              ).showInPlayerSheet,
+            });
+          });
+        }}
+        onOpenSupportModules={() => setSupportPickerOpen(true)}
       />
 
       <DeleteConfirmationDialog
@@ -348,15 +454,163 @@ export const ChatPanel: React.FC = () => {
           onClose={() => {
             setEquipmentSlotPickerOpen(null);
           }}
-          slot={equipmentSlotPickerOpen ?? "mainHand"}
-          player={activeActorDoc as Record<string, unknown>}
+          slot={activeSlotForDialog}
+          player={activeActorDoc as unknown as Record<string, unknown>}
           setPlayer={setActiveActorDoc}
-          vehicleModules={[]}
-          onSelectModule={() => {}}
-          onDisableModule={() => {}}
+          vehicleModules={dialogVehicleModules}
+          openModuleOverride={dialogModuleActive}
+          onSelectModule={(originalIndex) => {
+            setActiveActorDoc((prev) => {
+              const pilotInfo = getPilotSpellInfo(prev);
+              if (!pilotInfo) return prev;
+              return selectModuleForSlot(
+                prev,
+                pilotInfo,
+                activeSlotForDialog,
+                originalIndex,
+              );
+            });
+          }}
+          onDisableModule={() => {
+            setActiveActorDoc((prev) => {
+              const pilotInfo = getPilotSpellInfo(prev);
+              if (!pilotInfo) return prev;
+              return disableModuleForSlot(prev, pilotInfo, activeSlotForDialog);
+            });
+          }}
           onClearOtherHandModule={() => {}}
         />
       )}
+
+      <Dialog
+        open={supportPickerOpen}
+        onClose={() => setSupportPickerOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <PrecisionManufacturingIcon color="success" fontSize="small" />
+          {t("Support Modules")}
+        </DialogTitle>
+        <DialogContent sx={{ pb: 1 }}>
+          {equippedSupportModules.length === 0 ? (
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              {t("No support modules installed on this vehicle.")}
+            </Typography>
+          ) : (
+            <>
+              <Typography
+                variant="caption"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                  display: "block",
+                }}
+              >
+                {t("Enable or disable support modules:")}
+              </Typography>
+              <List dense>
+                {equippedSupportModules.map((module) => (
+                  <ListItem key={module.originalIndex} disablePadding>
+                    <ListItemButton
+                      onClick={() => {
+                        setActiveActorDoc((prev) => {
+                          const pilotInfo = getPilotSpellInfo(prev);
+                          if (!pilotInfo) return prev;
+                          return toggleSupportModuleAction(
+                            prev,
+                            pilotInfo,
+                            module.originalIndex,
+                          );
+                        });
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 36 }}>
+                        <Checkbox
+                          edge="start"
+                          checked={module.enabled ?? false}
+                          disableRipple
+                          size="small"
+                          color="success"
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={module.customName || t(module.name)}
+                        secondary={
+                          <Box
+                            sx={{
+                              color: "text.secondary",
+                              fontSize: "0.75rem",
+                            }}
+                          >
+                            {module.isComplex && (
+                              <Typography
+                                variant="caption"
+                                sx={{ fontWeight: 700, mr: 0.5 }}
+                              >
+                                {t("Complex")} -{" "}
+                              </Typography>
+                            )}
+                            <NotesMarkdown
+                              sx={{
+                                display: "inline",
+                                "& p": { display: "inline", m: 0 },
+                              }}
+                            >
+                              {module.name === "pilot_custom_support"
+                                ? module.description
+                                : t(module.description || "")}
+                            </NotesMarkdown>
+                          </Box>
+                        }
+                        slotProps={{
+                          primary: {
+                            variant: "body2",
+                            sx: { fontWeight: module.enabled ? 700 : 400 },
+                          },
+                          secondary: {
+                            component: "div",
+                          },
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSupportPickerOpen(false)} size="small">
+            {t("Close")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <VehicleEnterDialog
+        open={vehiclePickerOpen}
+        onClose={() => setVehiclePickerOpen(false)}
+        title={t("Enter Vehicle")}
+        vehicles={(() => {
+          if (!activeActorDoc) return [];
+          const pilotInfo = getPilotSpellInfo(
+            activeActorDoc as unknown as TypePlayer,
+          );
+          if (!pilotInfo) return [];
+          return Array.isArray(pilotInfo.spell.vehicles)
+            ? pilotInfo.spell.vehicles
+            : Array.isArray(pilotInfo.spell.currentVehicles)
+              ? pilotInfo.spell.currentVehicles
+              : [];
+        })()}
+        onEnter={(vehicleIndex: number) => {
+          setActiveActorDoc((prev) => {
+            const pilotInfo = getPilotSpellInfo(prev);
+            if (!pilotInfo) return prev;
+            return enterVehicleAction(prev, pilotInfo, vehicleIndex);
+          });
+        }}
+      />
     </Box>
   );
 };

@@ -52,6 +52,7 @@ export type AccuracyCheckIntent = {
   hands?: 1 | 2;
   category?: string;
   range?: "melee" | "ranged" | string;
+  isWeaponModule?: boolean;
   hrZero?: boolean;
 };
 

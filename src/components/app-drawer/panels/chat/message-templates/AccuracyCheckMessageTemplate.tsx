@@ -59,6 +59,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
       ? check.primary.result
       : check.secondary.result;
   const tags: string[] = [];
+  if (check.intent.isWeaponModule) tags.push("Weapon Module");
   if (check.intent.category) tags.push(formatCategory(check.intent.category));
   if (check.intent.range) tags.push(formatRange(check.intent.range));
   if (check.intent.hands === 2) tags.push("Two-handed");

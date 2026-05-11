@@ -141,6 +141,7 @@ export function getSlotLocks(player: TypePlayer): {
   const offHandLocked = (() => {
     if (mainHandResolved?.kind === "vehicleModule") {
       if (mainHandResolved.module.cumbersome) return true;
+      if (isTwoHandedEquipped(player)) return true;
       if (!getEquippedModuleForSlot(player, "offHand")) return true;
       return false;
     }
@@ -202,6 +203,33 @@ export function getEquippedSupportModules(player: TypePlayer): IndexedModule[] {
     .filter(
       (m) => m.equipped && m.type === "pilot_module_support",
     ) as IndexedModule[];
+}
+
+export function getAvailableSupportModules(
+  player: TypePlayer,
+): IndexedModule[] {
+  const pilotInfo = getPilotSpellInfo(player);
+  if (!pilotInfo) return [];
+  const spell = pilotInfo.spell;
+  const vehicles = Array.isArray(spell.vehicles)
+    ? spell.vehicles
+    : Array.isArray(spell.currentVehicles)
+      ? spell.currentVehicles
+      : [];
+  if (vehicles.length === 0) return [];
+  const vehicle =
+    vehicles.find((entry) => entry && entry.enabled) ?? vehicles[0];
+  if (!vehicle || !Array.isArray(vehicle.modules)) return [];
+  return vehicle.modules
+    .map((m, i) => ({ ...m, originalIndex: i }))
+    .filter((m) => {
+      const module = m as Record<string, unknown>;
+      return (
+        module.type === "pilot_module_support" ||
+        module.pilotSubtype === "support" ||
+        module.category === "Support Module"
+      );
+    }) as IndexedModule[];
 }
 
 /**

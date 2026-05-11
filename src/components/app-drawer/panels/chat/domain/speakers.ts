@@ -2,6 +2,13 @@ import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { useDatabase } from "../../../../../hooks/useDatabase";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
+import { resolveEffectiveSlot } from "../../../../player/equipment/slots/equipmentSlots";
+import {
+  getAvailableSupportModules,
+  getPilotSpellInfo,
+  getSlotLocks,
+} from "../../../../player/equipment/slots/loadoutSelectors";
+import type { TypePlayer } from "../../../../../types/Players";
 import { DEFAULT_SPEAKER } from "../constants";
 import type { Attribute } from "../types";
 
@@ -19,6 +26,7 @@ export type AttackOption = {
   hands?: 1 | 2;
   category?: string;
   range?: "melee" | "ranged" | string;
+  isWeaponModule?: boolean;
 };
 
 export type SpellOption = {
@@ -356,6 +364,7 @@ export function resolveAttackOptions(
                 seen.add(key);
 
                 const dmg = module.damage;
+                const prec = module.prec;
                 vehicleWeapons.push({
                   arg: quoteArg(name),
                   name,
@@ -363,10 +372,20 @@ export function resolveAttackOptions(
                   attr1: toAttr(module.att1),
                   attr2: toAttr(module.att2),
                   baseDamage: typeof dmg === "number" ? dmg : undefined,
+                  accuracyBonus:
+                    typeof prec === "number" && prec !== 0 ? prec : undefined,
+                  accuracyDefense: "def",
                   damageType:
                     typeof module.damageType === "string"
                       ? module.damageType
                       : "physical",
+                  damageHrZero: module.hrZero === true,
+                  hands: module.cumbersome ? 2 : 1,
+                  category:
+                    typeof module.category === "string"
+                      ? module.category
+                      : undefined,
+                  isWeaponModule: true,
                   range:
                     module.range === "ranged" || module.range === "Ranged"
                       ? "ranged"
@@ -543,8 +562,14 @@ export const useCombatSimActors = (): ActorEntry[] => {
     const npcs = selectedNPCs.map((a) => ({ ...a, source: "npc" as const }));
     const pcs = selectedPCs.map((a) => ({ ...a, source: "pc" as const }));
     return [...npcs, ...pcs]
-      .filter((a) => typeof a.name === "string" && a.name)
-      .map((a) => ({ name: a.name as string, doc: a, source: a.source }));
+      .filter((a) => {
+        const actor = a as Record<string, unknown>;
+        return typeof actor.name === "string" && actor.name;
+      })
+      .map((a) => {
+        const actor = a as Record<string, unknown>;
+        return { name: actor.name as string, doc: actor, source: a.source };
+      });
   }, [selectedNPCs, selectedPCs]);
 };
 
@@ -623,10 +648,14 @@ export const useActorName = (
 };
 
 export type EquipmentSlot = {
-  slotKey: "mainHand" | "offHand" | "armor" | "accessory";
+  slotKey: string;
+  pickerSlot?: "mainHand" | "offHand" | "armor" | "accessory";
+  actionType?: "toggleVehicle" | "swapVehicle" | "openSupportModules";
+  section?: "slot" | "support" | "action";
   label: string;
   currentItem?: { name: string; stats: string };
   isLocked?: boolean;
+  isVehicleSlot?: boolean;
 };
 
 export function resolveEquipmentSlots(
@@ -634,152 +663,149 @@ export function resolveEquipmentSlots(
 ): EquipmentSlot[] {
   if (!doc) return [];
 
-  const equippedSlots =
-    doc.equippedSlots && typeof doc.equippedSlots === "object"
-      ? (doc.equippedSlots as Record<string, unknown>)
-      : null;
-  const equipment =
-    Array.isArray(doc.equipment) && doc.equipment.length > 0
-      ? (doc.equipment[0] as Record<string, unknown>)
-      : null;
-
-  if (!equipment) return [];
-
-  let mainHandLocked = false;
-  let offHandLocked = false;
-
-  const classes = Array.isArray(doc.classes) ? doc.classes : [];
-  for (const cls of classes) {
-    if (!cls || typeof cls !== "object") continue;
-    const spells = (cls as Record<string, unknown>).spells;
-    if (!Array.isArray(spells)) continue;
-    for (const spell of spells) {
-      if (
-        spell &&
-        typeof spell === "object" &&
-        (spell as Record<string, unknown>).spellType === "pilot-vehicle"
-      ) {
-        const vehicles =
-          (spell as Record<string, unknown>).vehicles ??
-          (spell as Record<string, unknown>).currentVehicles;
-        if (Array.isArray(vehicles)) {
-          const activeVehicle = vehicles.find(
-            (v: unknown) =>
-              v &&
-              typeof v === "object" &&
-              (v as Record<string, unknown>).enabled === true,
-          ) as Record<string, unknown> | undefined;
-
-          if (activeVehicle && Array.isArray(activeVehicle.modules)) {
-            const modules = activeVehicle.modules as Record<string, unknown>[];
-
-            const offHandModule = modules.find(
-              (m) =>
-                m.type === "pilot_module_weapon" &&
-                (m.equippedSlot === "off" || m.equippedSlot === "offHand"),
-            );
-            mainHandLocked = !!offHandModule;
-
-            const mainHandModule = modules.find(
-              (m) =>
-                m.type === "pilot_module_weapon" &&
-                (m.equippedSlot === "main" ||
-                  m.equippedSlot === "mainHand" ||
-                  m.equippedSlot === "both"),
-            ) as Record<string, unknown> | undefined;
-
-            if (mainHandModule?.cumbersome === true) {
-              offHandLocked = true;
-            } else if (mainHandModule) {
-              const mainHandRef = equippedSlots?.mainHand;
-              if (mainHandRef && typeof mainHandRef === "object") {
-                const ref = mainHandRef as Record<string, unknown>;
-                const source = ref.source as string | undefined;
-                const itemName = ref.name as string | undefined;
-                if (source && itemName) {
-                  const collection = equipment[source];
-                  if (Array.isArray(collection)) {
-                    const idx = typeof ref.index === "number" ? ref.index : -1;
-                    const item: Record<string, unknown> | undefined =
-                      collection.find(
-                        (i: unknown) =>
-                          i &&
-                          typeof i === "object" &&
-                          (i as Record<string, unknown>).name === itemName,
-                      ) ??
-                      (idx >= 0 && idx < collection.length
-                        ? (collection[idx] as Record<string, unknown>)
-                        : undefined);
-
-                    if (item && (item.hands === 2 || item.isTwoHand)) {
-                      offHandLocked = true;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        break;
-      }
-    }
-    if (mainHandLocked || offHandLocked) break;
-  }
-
+  const player = doc as unknown as TypePlayer;
+  const { mainHandLocked, offHandLocked } = getSlotLocks(player);
+  const slotConfig: Array<{
+    key: "mainHand" | "offHand" | "armor" | "accessory";
+    label: string;
+    isLocked: boolean;
+  }> = [
+    { key: "mainHand", label: "Main Hand", isLocked: mainHandLocked },
+    { key: "offHand", label: "Off Hand", isLocked: offHandLocked },
+    { key: "armor", label: "Armor", isLocked: false },
+    { key: "accessory", label: "Accessory", isLocked: false },
+  ];
   const slots: EquipmentSlot[] = [
-    { slotKey: "mainHand", label: "Main Hand", isLocked: mainHandLocked },
-    { slotKey: "offHand", label: "Off Hand", isLocked: offHandLocked },
-    { slotKey: "armor", label: "Armor" },
-    { slotKey: "accessory", label: "Accessory" },
+    ...slotConfig.map((slot) => {
+      const resolved = resolveEffectiveSlot(player, slot.key);
+      const isVehicleSlot = resolved?.kind === "vehicleModule";
+      const itemName = (() => {
+        if (!resolved) return undefined;
+        if (resolved.kind === "vehicleModule") {
+          return resolved.module.customName || resolved.module.name || " - ";
+        }
+        return resolved.item?.name || " - ";
+      })();
+      const statLine = (() => {
+        if (!resolved) return "";
+        if (resolved.kind === "vehicleModule") {
+          const module = resolved.module;
+          const parts: string[] = [];
+          if (typeof module.prec === "number" && module.prec !== 0) {
+            parts.push(`${module.prec > 0 ? "+" : ""}${module.prec} Acc`);
+          }
+          if (typeof module.damage === "number" && module.damage !== 0) {
+            parts.push(`${module.damage} DMG`);
+          }
+          if (
+            typeof module.def === "number" ||
+            typeof module.mdef === "number"
+          ) {
+            parts.push(`DEF +${module.def ?? 0} / MDEF +${module.mdef ?? 0}`);
+          }
+          return parts.join(" / ");
+        }
+        const item = resolved.item as unknown as Record<string, unknown>;
+        const source = player.equippedSlots?.[slot.key]?.source;
+        if (source === "weapons" || source === "customWeapons") {
+          const dmg = (item.damage as Record<string, unknown> | undefined)
+            ?.value;
+          const acc = (item.accuracy as Record<string, unknown> | undefined)
+            ?.value;
+          const parts: string[] = [];
+          if (typeof acc === "number" && acc !== 0) parts.push(`+${acc} Acc`);
+          if (typeof dmg === "number" && dmg !== 0) parts.push(`${dmg} DMG`);
+          const hands = item.hands === 2 ? "2H" : "1H";
+          parts.push(hands);
+          return parts.join(" / ");
+        }
+        if (source === "armor") {
+          return `DEF +${item.def ?? 0} / MDEF +${item.mdef ?? 0}`;
+        }
+        if (source === "accessories") {
+          return "Accessory";
+        }
+        return "";
+      })();
+
+      return {
+        slotKey: slot.key,
+        pickerSlot: slot.key,
+        section: "slot" as const,
+        label: slot.label,
+        isLocked: slot.isLocked,
+        isVehicleSlot,
+        currentItem:
+          itemName && !slot.isLocked
+            ? {
+                name: itemName,
+                stats: statLine,
+              }
+            : undefined,
+      };
+    }),
   ];
 
-  for (const slot of slots) {
-    const slotRef = equippedSlots?.[slot.slotKey];
-    if (!slotRef || typeof slotRef !== "object") continue;
+  const pilotInfo = getPilotSpellInfo(player);
+  const pilotVehicles = pilotInfo
+    ? Array.isArray(pilotInfo.spell.currentVehicles)
+      ? pilotInfo.spell.currentVehicles
+      : Array.isArray(pilotInfo.spell.vehicles)
+        ? pilotInfo.spell.vehicles
+        : []
+    : [];
+  const vehicleActive = pilotVehicles.some(
+    (vehicle) => vehicle && vehicle.enabled === true,
+  );
 
-    const ref = slotRef as Record<string, unknown>;
-    const source = ref.source as string | undefined;
-    const itemName = ref.name as string | undefined;
-    if (!source || !itemName) continue;
-
-    const collection = equipment[source];
-    if (!Array.isArray(collection)) continue;
-
-    const idx = typeof ref.index === "number" ? ref.index : -1;
-    const item: Record<string, unknown> | undefined =
-      collection.find(
-        (i: unknown) =>
-          i &&
-          typeof i === "object" &&
-          (i as Record<string, unknown>).name === itemName,
-      ) ??
-      (idx >= 0 && idx < collection.length
-        ? (collection[idx] as Record<string, unknown>)
-        : undefined);
-
-    if (!item) continue;
-
-    const name = (item?.name as string | undefined) ?? itemName;
-
-    let stats = "";
-    if (source === "weapons" || source === "customWeapons") {
-      const dmg = (item.damage as Record<string, unknown> | undefined)?.value;
-      const acc = (item.accuracy as Record<string, unknown> | undefined)?.value;
-      const parts = [];
-      if (acc !== undefined && acc !== 0) parts.push(`+${acc} Acc`);
-      if (dmg !== undefined && dmg !== 0) parts.push(`${dmg} DMG`);
-      const hands = item.hands === 2 ? "2H" : "1H";
-      parts.push(hands);
-      stats = parts.join(" / ");
-    } else if (source === "armor") {
-      const def = item.def ?? 0;
-      const mdef = item.mdef ?? 0;
-      stats = `DEF +${def} / MDEF +${mdef}`;
-    } else if (source === "accessories") {
-      stats = "Accessory";
+  if (vehicleActive) {
+    const supportModules = getAvailableSupportModules(player);
+    const activeSupportModules = supportModules.filter(
+      (module) => module.enabled,
+    );
+    if (activeSupportModules.length > 0) {
+      for (const [idx, module] of activeSupportModules.entries()) {
+        slots.push({
+          slotKey: `support-${module.originalIndex}-${idx}`,
+          section: "support",
+          actionType: "openSupportModules",
+          label: "Support Modules",
+          isVehicleSlot: true,
+          currentItem: {
+            name: module.customName || module.name || " - ",
+            stats: module.isComplex ? "Complex" : "Support",
+          },
+        });
+      }
     }
 
-    slot.currentItem = { name, stats };
+    if (supportModules.length > 0) {
+      slots.push({
+        slotKey: "support-modules-action",
+        section: "action",
+        actionType: "openSupportModules",
+        label: "Support Modules",
+        currentItem: undefined,
+      });
+    }
+  }
+  if (pilotInfo) {
+    slots.push({
+      slotKey: "vehicle-toggle",
+      section: "action",
+      actionType: "toggleVehicle",
+      label: vehicleActive ? "Exit Vehicle" : "Enter Vehicle",
+      currentItem: undefined,
+    });
+    if (pilotVehicles.length > 1) {
+      slots.push({
+        slotKey: "vehicle-swap",
+        section: "action",
+        actionType: "swapVehicle",
+        label: "Swap Vehicle",
+        currentItem: undefined,
+      });
+    }
   }
 
   return slots;
