@@ -77,12 +77,61 @@ export type AccuracyCheckMessage = {
   check: AccuracyCheckResult;
 };
 
+export type MagicCheckIntent = {
+  id: string;
+  primary: Attribute;
+  secondary: Attribute;
+  modifiers: CheckModifier[];
+  critThreshold: number;
+  spellName: string;
+  spellType?: string;
+  baseDamage: number;
+  damageType: string;
+  defense?: "def" | "mdef" | string;
+  hrZero?: boolean;
+};
+
+export type MagicCheckResult = {
+  intent: MagicCheckIntent;
+  speaker?: string;
+  primary: CheckDieResult;
+  secondary: CheckDieResult;
+  highRoll: number;
+  damageHighRoll: number;
+  modifierTotal: number;
+  accuracyTotal: number;
+  damage: number;
+  critical: boolean;
+  fumble: boolean;
+};
+
+export type MagicCheckMessage = {
+  id: string;
+  createdAt: number;
+  speaker?: string;
+  kind: "magic";
+  check: MagicCheckResult;
+};
+
+export type DisplayMessage = {
+  id: string;
+  createdAt: number;
+  speaker?: string;
+  kind: "display";
+  itemType: "spell" | "weapon" | "item" | string;
+  name: string;
+  tags: string[];
+  description?: string;
+};
+
 export type ChatMessage =
   | TextMessage
   | RollMessage
   | CheckMessage
   | ActionMessage
-  | AccuracyCheckMessage;
+  | AccuracyCheckMessage
+  | MagicCheckMessage
+  | DisplayMessage;
 
 export type Attribute = "dex" | "ins" | "mig" | "wlp";
 

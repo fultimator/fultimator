@@ -11,7 +11,17 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "./accuracy-checks";
-import { resolveAttributeDie, resolveAttackOptions } from "./speakers";
+import {
+  prepareMagicCheck,
+  rollMagicCheck,
+  processMagicCheck,
+  buildMagicCheckMessage,
+} from "./magic-checks";
+import {
+  resolveAttributeDie,
+  resolveAttackOptions,
+  resolveSpellOptions,
+} from "./speakers";
 import type {
   Attribute,
   AttackOverrides,
@@ -389,6 +399,46 @@ const actionCommand: Command = {
         context.speaker,
       );
       return [buildAccuracyCheckMessage(result)];
+    }
+
+    if (subAction.toLowerCase() === "spell" && weaponArg) {
+      const options = resolveSpellOptions(context.playerDoc);
+      const spell = options.find((o) => o.name === weaponArg);
+      if (!spell) {
+        return { error: `Unknown spell "${weaponArg}".` };
+      }
+      if (!spell.isOffensive) {
+        return [
+          {
+            id: crypto.randomUUID(),
+            createdAt: Date.now(),
+            speaker: context.speaker,
+            kind: "display",
+            itemType: "spell",
+            name: spell.name,
+            tags: ["Spell", spell.spellType ?? "default", "Non-Offensive"],
+            description: spell.description,
+          } as import("../types").ChatMessage,
+        ];
+      }
+      const primary = spell.attr1 ?? "ins";
+      const secondary = spell.attr2 ?? "wlp";
+      const dieSizes = {
+        primary: resolveAttributeDie(context.playerDoc, primary as Attribute),
+        secondary: resolveAttributeDie(
+          context.playerDoc,
+          secondary as Attribute,
+        ),
+      };
+      const intent = prepareMagicCheck(spell);
+      const rolls = rollMagicCheck(dieSizes);
+      const result = processMagicCheck(
+        intent,
+        rolls,
+        dieSizes,
+        context.speaker,
+      );
+      return [buildMagicCheckMessage(result)];
     }
 
     if (subAction.toLowerCase() === "hinder") {

@@ -33,5 +33,18 @@ export const isValidChatMessage = (item: unknown): item is ChatMessage => {
     return !!check && typeof check.accuracyTotal === "number";
   }
 
+  if (message.kind === "magic") {
+    const check = message.check as Record<string, unknown> | undefined;
+    return !!check && typeof check.accuracyTotal === "number";
+  }
+
+  if (message.kind === "display") {
+    return (
+      typeof message.itemType === "string" &&
+      typeof message.name === "string" &&
+      Array.isArray(message.tags)
+    );
+  }
+
   return false;
 };

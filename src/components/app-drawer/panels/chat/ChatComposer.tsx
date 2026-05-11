@@ -33,7 +33,11 @@ import {
   matchCommands,
   ACTION_OPTIONS,
 } from "./domain/commands";
-import { resolveAttributeDie, resolveAttackOptions } from "./domain/speakers";
+import {
+  resolveAttributeDie,
+  resolveAttackOptions,
+  resolveSpellOptions,
+} from "./domain/speakers";
 import type { Command } from "./domain/commands";
 import type { Attribute, AttackOverrideDraft } from "./types";
 import { DIFFICULTY_PRESETS } from "./types";
@@ -126,9 +130,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
 
   const applyAction = (action: string) => {
     const next = `/action ${action.toLowerCase()}`;
-    // Attack and action-check actions need more inputs, so stay in composer
+    // Attack/spell and action-check actions need more inputs, so stay in composer
     if (
       action.toLowerCase() === "attack" ||
+      action.toLowerCase() === "spell" ||
       action.toLowerCase() === "hinder" ||
       action.toLowerCase() === "study"
     ) {
@@ -149,6 +154,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     actionArgs.toLowerCase().startsWith("attack") &&
     actionArgs.slice("attack".length).startsWith(" ") &&
     !actionArgs.slice("attack".length).trim();
+  const showSpellPicker =
+    activeCommand?.name === "action" &&
+    actionArgs.toLowerCase().startsWith("spell") &&
+    actionArgs.slice("spell".length).startsWith(" ") &&
+    !actionArgs.slice("spell".length).trim();
 
   const actionCheckMode: "hinder" | "study" | null =
     activeCommand?.name === "action"
@@ -173,6 +183,21 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     : null;
 
   const attackOptions = showWeaponPicker ? resolveAttackOptions(playerDoc) : [];
+  const spellOptions = showSpellPicker ? resolveSpellOptions(playerDoc) : [];
+  const offensiveSpellOptions = spellOptions.filter((opt) => opt.isOffensive);
+  const utilitySpellOptions = spellOptions.filter((opt) => !opt.isOffensive);
+
+  const applySpell = (arg: string) => {
+    sendAndRecord(`/action spell ${arg}`);
+  };
+
+  const formatSpellTypeLabel = (spellType?: string) => {
+    const clean = String(spellType || "default")
+      .replace(/_/g, " ")
+      .trim();
+    if (!clean) return "Default";
+    return clean.replace(/\b\w/g, (m) => m.toUpperCase());
+  };
 
   const applyWeapon = (
     arg: string,
@@ -1095,6 +1120,118 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                               )}
                           </Box>
                         ))
+                      )}
+                    </Box>
+                  </ListItem>
+                )}
+                {showSpellPicker && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                        width: "100%",
+                      }}
+                    >
+                      {spellOptions.length === 0 ? (
+                        <Typography variant="caption" color="text.secondary">
+                          No spells available
+                        </Typography>
+                      ) : (
+                        <>
+                          {[
+                            {
+                              label: "Offensive Spells",
+                              items: offensiveSpellOptions,
+                            },
+                            {
+                              label: "Non-Offensive Spells",
+                              items: utilitySpellOptions,
+                            },
+                          ].map((section) =>
+                            section.items.length > 0 ? (
+                              <Box
+                                key={section.label}
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 0.5,
+                                }}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{
+                                    px: 0.5,
+                                    pt: 0.25,
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.06em",
+                                  }}
+                                >
+                                  {section.label}
+                                </Typography>
+                                {Object.entries(
+                                  section.items.reduce<
+                                    Record<string, typeof section.items>
+                                  >((acc, item) => {
+                                    const key = formatSpellTypeLabel(
+                                      item.spellType,
+                                    );
+                                    acc[key] = [...(acc[key] ?? []), item];
+                                    return acc;
+                                  }, {}),
+                                ).map(([spellType, items]) => (
+                                  <Box
+                                    key={`${section.label}-${spellType}`}
+                                    sx={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{ px: 1, opacity: 0.8 }}
+                                    >
+                                      {spellType}
+                                    </Typography>
+                                    {items.map((opt) => (
+                                      <Button
+                                        key={opt.arg}
+                                        size="small"
+                                        variant="outlined"
+                                        fullWidth
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => applySpell(opt.arg)}
+                                        sx={{
+                                          justifyContent: "space-between",
+                                          fontFamily: "monospace",
+                                          fontSize: "0.75rem",
+                                          py: 0.25,
+                                          px: 1,
+                                          textTransform: "none",
+                                        }}
+                                      >
+                                        <span>{opt.name}</span>
+                                        <Typography
+                                          component="span"
+                                          variant="caption"
+                                          color="text.secondary"
+                                          sx={{ fontFamily: "monospace" }}
+                                        >
+                                          {(opt.attr1 ?? "ins").toUpperCase()}+
+                                          {(opt.attr2 ?? "wlp").toUpperCase()}
+                                        </Typography>
+                                      </Button>
+                                    ))}
+                                  </Box>
+                                ))}
+                              </Box>
+                            ) : null,
+                          )}
+                        </>
                       )}
                     </Box>
                   </ListItem>

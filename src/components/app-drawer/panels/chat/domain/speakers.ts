@@ -21,6 +21,21 @@ export type AttackOption = {
   range?: "melee" | "ranged" | string;
 };
 
+export type SpellOption = {
+  arg: string;
+  name: string;
+  description?: string;
+  spellType?: string;
+  isOffensive?: boolean;
+  attr1?: Attribute;
+  attr2?: Attribute;
+  baseDamage?: number;
+  accuracyBonus?: number;
+  accuracyDefense?: "def" | "mdef" | string;
+  damageType?: string;
+  damageHrZero?: boolean;
+};
+
 function quoteArg(name: string): string {
   return name.includes(" ") ? `"${name}"` : name;
 }
@@ -41,6 +56,75 @@ const LONG_TO_ATTR: Record<string, Attribute> = {
 function toAttr(raw: unknown): Attribute | undefined {
   if (typeof raw !== "string") return undefined;
   return LONG_TO_ATTR[raw.toLowerCase()] ?? undefined;
+}
+
+export function resolveSpellOptions(
+  doc: Record<string, unknown> | null,
+): SpellOption[] {
+  if (!doc) return [];
+
+  const results: SpellOption[] = [];
+  const pushSpell = (spell: Record<string, unknown>) => {
+    const name = typeof spell.name === "string" ? spell.name : "";
+    if (!name) return;
+    const isOffensive =
+      spell.isOffensive === true || spell.type === "offensive";
+    const acc = spell.accuracy as Record<string, unknown> | undefined;
+    const dmg = spell.damage as Record<string, unknown> | undefined;
+    results.push({
+      arg: quoteArg(name),
+      name,
+      description:
+        typeof spell.description === "string" ? spell.description : undefined,
+      spellType:
+        typeof spell.spellType === "string" ? spell.spellType : undefined,
+      isOffensive,
+      attr1: toAttr(acc?.attr1),
+      attr2: toAttr(acc?.attr2),
+      baseDamage: typeof dmg?.value === "number" ? dmg.value : 0,
+      accuracyBonus:
+        typeof acc?.value === "number" && acc.value !== 0
+          ? acc.value
+          : undefined,
+      accuracyDefense: typeof acc?.defense === "string" ? acc.defense : "mdef",
+      damageType: typeof dmg?.type === "string" ? dmg.type : "physical",
+      damageHrZero: dmg?.hrZero === true,
+    });
+  };
+
+  if (Array.isArray(doc.spells)) {
+    for (const s of doc.spells) {
+      if (s && typeof s === "object") pushSpell(s as Record<string, unknown>);
+    }
+  }
+  if (Array.isArray(doc.classes)) {
+    for (const cls of doc.classes) {
+      if (!cls || typeof cls !== "object") continue;
+      const spells = (cls as Record<string, unknown>).spells;
+      if (!Array.isArray(spells)) continue;
+      for (const s of spells) {
+        if (s && typeof s === "object") pushSpell(s as Record<string, unknown>);
+      }
+    }
+  }
+  const equipment =
+    Array.isArray(doc.equipment) && doc.equipment.length > 0
+      ? (doc.equipment[0] as Record<string, unknown>)
+      : null;
+  if (equipment && Array.isArray(equipment.mnemospheres)) {
+    for (const mnemo of equipment.mnemospheres) {
+      if (!mnemo || typeof mnemo !== "object") continue;
+      const spells = (mnemo as Record<string, unknown>).spells;
+      if (!Array.isArray(spells)) continue;
+      for (const s of spells) {
+        if (s && typeof s === "object") pushSpell(s as Record<string, unknown>);
+      }
+    }
+  }
+
+  const deduped = new Map<string, SpellOption>();
+  for (const s of results) deduped.set(s.name, s);
+  return [...deduped.values()];
 }
 
 function extractPcWeaponStats(

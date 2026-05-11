@@ -4,6 +4,8 @@ import { RollMessageTemplate } from "./RollMessageTemplate";
 import { CheckMessageTemplate } from "./CheckMessageTemplate";
 import { ActionMessageTemplate } from "./ActionMessageTemplate";
 import { AccuracyCheckMessageTemplate } from "./AccuracyCheckMessageTemplate";
+import { MagicCheckMessageTemplate } from "./MagicCheckMessageTemplate";
+import { DisplayMessageTemplate } from "./DisplayMessageTemplate";
 import type { ChatMessage } from "../types";
 
 type TemplateComponent = React.FC<{ message: ChatMessage }>;
@@ -33,12 +35,24 @@ const AccuracyTemplate: TemplateComponent = ({ message }) => {
   return <AccuracyCheckMessageTemplate check={message.check} />;
 };
 
+const MagicTemplate: TemplateComponent = ({ message }) => {
+  if (message.kind !== "magic") return null;
+  return <MagicCheckMessageTemplate check={message.check} />;
+};
+
+const DisplayTemplate: TemplateComponent = ({ message }) => {
+  if (message.kind !== "display") return null;
+  return <DisplayMessageTemplate message={message} />;
+};
+
 const registry: Record<ChatMessage["kind"], TemplateComponent> = {
   text: TextTemplate,
   generic: RollTemplate,
   check: CheckTemplate,
   action: ActionTemplate,
   accuracy: AccuracyTemplate,
+  magic: MagicTemplate,
+  display: DisplayTemplate,
 };
 
 export const MessageContent: TemplateComponent = ({ message }) => {

@@ -2,11 +2,15 @@ import React, { useState } from "react";
 import { Box, Collapse, Divider, IconButton, Typography } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { MdExpandMore } from "react-icons/md";
-import type { AccuracyCheckResult } from "../types";
+import type { MagicCheckResult } from "../types";
 import { TypeIcon } from "../../../../types";
 import Diamond from "../../../../Diamond";
 import { BreakdownRow, DiceRow, TagRow } from "./primitives";
-import { ATTR_LABEL, normalizeDamageType } from "./primitives-utils";
+import {
+  ATTR_LABEL,
+  formatSpellType,
+  normalizeDamageType,
+} from "./primitives-utils";
 
 const gridSx = {
   px: 0.75,
@@ -18,26 +22,12 @@ const gridSx = {
   gap: 1,
 };
 
-function formatCategory(category: string): string {
-  const clean = category
-    .replace(/^weapon_category_/, "")
-    .replace(/_/g, " ")
-    .trim();
-  if (!clean) return "Unknown";
-  return clean.replace(/\b\w/g, (m) => m.toUpperCase());
+interface MagicCheckMessageTemplateProps {
+  check: MagicCheckResult;
 }
 
-function formatRange(range: string): string {
-  if (range === "ranged" || range === "weapon_range_ranged") return "Ranged";
-  return "Melee";
-}
-
-interface AccuracyCheckMessageTemplateProps {
-  check: AccuracyCheckResult;
-}
-
-export const AccuracyCheckMessageTemplate: React.FC<
-  AccuracyCheckMessageTemplateProps
+export const MagicCheckMessageTemplate: React.FC<
+  MagicCheckMessageTemplateProps
 > = ({ check }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -54,15 +44,13 @@ export const AccuracyCheckMessageTemplate: React.FC<
       : `linear-gradient(to bottom, ${alpha(theme.palette.primary.light, 0.95)}, ${alpha(theme.palette.primary.dark, 0.95)})`;
 
   const normalizedDamageType = normalizeDamageType(check.intent.damageType);
+
   const lowRoll =
     check.primary.result < check.secondary.result
       ? check.primary.result
       : check.secondary.result;
-  const tags: string[] = [];
-  if (check.intent.category) tags.push(formatCategory(check.intent.category));
-  if (check.intent.range) tags.push(formatRange(check.intent.range));
-  if (check.intent.hands === 2) tags.push("Two-handed");
-  else if (check.intent.hands === 1) tags.push("One-handed");
+
+  const tags: string[] = ["Spell", formatSpellType(check.intent.spellType)];
   if (check.intent.hrZero) tags.push("HR0");
   if (check.critical) tags.push("Critical");
   if (check.fumble) tags.push("Fumble");
@@ -74,7 +62,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
         color="text.secondary"
         sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
       >
-        Accuracy Check <Diamond color="inherit" /> {check.intent.weaponName}
+        Magic Check <Diamond color="inherit" /> {check.intent.spellName}
       </Typography>
       <TagRow tags={tags} />
 
@@ -141,7 +129,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
               ? "Critical"
               : check.fumble
                 ? "Fumble!"
-                : `Accuracy vs ${(check.intent.defense ?? "def").toUpperCase()}`}
+                : `Magic vs ${(check.intent.defense ?? "mdef").toUpperCase()}`}
           </Typography>
           <IconButton
             size="small"
@@ -237,7 +225,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
             ))}
             <Divider sx={{ my: 0.25 }} />
             <BreakdownRow
-              label="Accuracy Total"
+              label="Magic Total"
               value={check.accuracyTotal}
               bold
             />
@@ -247,17 +235,10 @@ export const AccuracyCheckMessageTemplate: React.FC<
               value={check.intent.hrZero ? "HR0" : check.damageHighRoll}
             />
             <BreakdownRow
-              label={`Base Damage · ${check.intent.weaponName}`}
+              label={`Base Damage · ${check.intent.spellName}`}
               value={check.intent.baseDamage}
               signed
             />
-            {(check.intent.damageSituationalBonus ?? 0) !== 0 && (
-              <BreakdownRow
-                label="Situational Bonus"
-                value={check.intent.damageSituationalBonus ?? 0}
-                signed
-              />
-            )}
             <Divider sx={{ my: 0.25 }} />
             <BreakdownRow label="Damage Total" value={check.damage} bold />
           </Box>
