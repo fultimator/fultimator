@@ -1,19 +1,44 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import type { ActionMessage } from "../types";
+import { t } from "../../../../../translation/translate";
+import NotesMarkdown from "../../../../common/NotesMarkdown";
 
-const ACTION_LABEL: Record<string, string> = {
-  attack: "Attack",
-  equipment: "Equipment",
-  guard: "Guard",
-  hinder: "Hinder",
-  inventory: "Inventory",
-  objective: "Objective",
-  spell: "Spell",
-  study: "Study",
-  skill: "Skill",
-  other: "Other",
+const ACTION_LABEL_KEY: Record<string, string[]> = {
+  attack: ["attack", "attacks"],
+  equipment: ["equipment"],
+  guard: ["guard"],
+  study: ["study"],
+  study_roll: ["study_roll", "study"],
+  inventory: ["inventory"],
+  hinder: ["hinder"],
+  objective: ["objective"],
+  spell: ["spell"],
+  skill: ["skill"],
+  other: ["other"],
 };
+
+const ACTION_RULE_KEY: Record<string, string[]> = {
+  attack: ["attack_rule"],
+  equipment: ["equipment_rule"],
+  guard: ["guard_rule"],
+  study: ["study_rule"],
+  study_roll: ["study_rule"],
+  inventory: ["inventory_rule"],
+  hinder: ["hinder_rule"],
+  objective: ["objective_rule"],
+  spell: ["spell_rule"],
+  skill: ["skill_rule"],
+  other: ["other_rule"],
+};
+
+function resolveLocalizedKey(candidates: string[], fallback: string): string {
+  for (const key of candidates) {
+    const value = t(key, undefined, true);
+    if (value !== key) return value;
+  }
+  return fallback;
+}
 
 interface ActionMessageTemplateProps {
   message: ActionMessage;
@@ -22,7 +47,11 @@ interface ActionMessageTemplateProps {
 export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
   message,
 }) => {
-  const label = ACTION_LABEL[message.action] ?? message.action;
+  const actionKey = String(message.action || "").toLowerCase();
+  const labelCandidates = ACTION_LABEL_KEY[actionKey] ?? [actionKey];
+  const ruleCandidates = ACTION_RULE_KEY[actionKey] ?? [`${actionKey}_rule`];
+  const label = resolveLocalizedKey(labelCandidates, message.action);
+  const description = resolveLocalizedKey(ruleCandidates, "");
 
   return (
     <>
@@ -55,6 +84,20 @@ export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
           </Typography>
         )}
       </Box>
+      {description && (
+        <Box
+          sx={{
+            mt: 0.5,
+            p: 1,
+            borderRadius: 1.5,
+            backgroundColor: "background.default",
+            border: "1px solid",
+            borderColor: "divider",
+          }}
+        >
+          <NotesMarkdown>{description}</NotesMarkdown>
+        </Box>
+      )}
     </>
   );
 };

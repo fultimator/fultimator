@@ -11,6 +11,7 @@ import {
   Menu,
   MenuItem,
   Paper,
+  Popover,
   TextField,
   Tooltip,
   Typography,
@@ -23,6 +24,7 @@ import {
   KeyboardReturn as InsertIcon,
   SaveAlt as SaveAltIcon,
   Send as SendIcon,
+  DescriptionOutlined as DescriptionIcon,
 } from "@mui/icons-material";
 import { DICE_OPTIONS } from "./constants";
 import {
@@ -35,6 +37,8 @@ import type { Command } from "./domain/commands";
 import type { Attribute } from "./types";
 import { DIFFICULTY_PRESETS } from "./types";
 import type { useChatStore } from "./chatStore";
+import { t } from "../../../../translation/translate";
+import NotesMarkdown from "../../../common/NotesMarkdown";
 
 const ATTRIBUTES: { id: Attribute; label: string }[] = [
   { id: "dex", label: "DEX" },
@@ -69,6 +73,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   const [cmdSuggestions, setCmdSuggestions] = useState<Command[]>([]);
   const [activeSuggestion, setActiveSuggestion] = useState(0);
   const [activeCommand, setActiveCommand] = useState<Command | null>(null);
+  const [actionRuleHint, setActionRuleHint] = useState<{
+    action: string;
+    anchorEl: HTMLElement | null;
+  } | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const textFieldRef = useRef<HTMLDivElement>(null);
@@ -101,10 +109,22 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     activeCommand?.name === "action" &&
     !input.slice(input.indexOf(" ") + 1).trim();
 
+  const getActionRuleDescription = (action: string): string => {
+    const actionKey = action.toLowerCase();
+    const ruleKey =
+      actionKey === "study_roll" ? "study_rule" : `${actionKey}_rule`;
+    const translated = t(ruleKey, undefined, true);
+    return translated === ruleKey ? "" : translated;
+  };
+
   const applyAction = (action: string) => {
     const next = `/action ${action.toLowerCase()}`;
-    // Attack needs a second argument (weapon), so stay in composer
-    if (action.toLowerCase() === "attack") {
+    // Attack and action-check actions need more inputs, so stay in composer
+    if (
+      action.toLowerCase() === "attack" ||
+      action.toLowerCase() === "hinder" ||
+      action.toLowerCase() === "study"
+    ) {
       handleInputChange(next + " ");
       requestAnimationFrame(() => textareaRef.current?.focus());
       return;
@@ -123,10 +143,53 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     actionArgs.slice("attack".length).startsWith(" ") &&
     !actionArgs.slice("attack".length).trim();
 
+  const actionCheckMode: "hinder" | "study" | null =
+    activeCommand?.name === "action"
+      ? (() => {
+          const mode = actionArgs.split(/\s+/)[0]?.toLowerCase();
+          return mode === "hinder" || mode === "study" ? mode : null;
+        })()
+      : null;
+
+  // 0 = awaiting primary, 1 = awaiting secondary, 2 = optional modifier
+  const actionCheckParamIndex: 0 | 1 | 2 | null = actionCheckMode
+    ? (() => {
+        const remainder = actionArgs
+          .slice(actionCheckMode.length)
+          .trim()
+          .toLowerCase();
+        const parts = remainder ? remainder.split(/\s+/) : [];
+        if (parts.length === 0) return 0;
+        if (parts.length === 1) return 1;
+        return 2;
+      })()
+    : null;
+
   const attackOptions = showWeaponPicker ? resolveAttackOptions(playerDoc) : [];
 
   const applyWeapon = (arg: string) => {
     sendAndRecord(`/action attack ${arg}`);
+  };
+
+  const applyActionCheckAttribute = (attr: Attribute) => {
+    const next = input.trimEnd() + " " + attr;
+    handleInputChange(next);
+    requestAnimationFrame(() => textareaRef.current?.focus());
+  };
+
+  const applyStudyDefaultAttributes = () => {
+    handleInputChange("/action study ins ins");
+    requestAnimationFrame(() => textareaRef.current?.focus());
+  };
+
+  const sendActionCheckWithModifier = (mod?: number) => {
+    const parts = input.trimEnd().split(/\s+/);
+    const base = parts.slice(0, 4).join(" ");
+    if (mod == null) {
+      sendAndRecord(base);
+      return;
+    }
+    sendAndRecord(`${base} ${mod > 0 ? "+" : ""}${mod}`);
   };
 
   const applyCheckAttribute = (attr: Attribute) => {
@@ -147,6 +210,19 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     const base = parts.slice(0, 4).join(" ");
     const next = dl != null ? `${base} ${dl}` : base;
     sendAndRecord(next);
+  };
+
+  const openActionHint = () => {
+    handleInputChange("/action ");
+    requestAnimationFrame(() => textareaRef.current?.focus());
+  };
+
+  const closeActionRuleHint = () => {
+    setActionRuleHint(null);
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+      updatePopupState(input);
+    });
   };
 
   const updatePopupState = (value: string) => {
@@ -330,21 +406,33 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             <PersonOutlineIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Typography
-          variant="body2"
-          color="text.secondary"
+        <Button
+          size="small"
+          variant="outlined"
+          onClick={openActionHint}
           sx={{
             flex: 1,
             minWidth: 0,
-            textAlign: "left",
+            justifyContent: "flex-start",
+            textTransform: "none",
+            fontWeight: 500,
+            fontSize: "0.875rem",
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            pl: 0.25,
+            px: 1,
+            py: 0.35,
+            color: "text.secondary",
+            borderColor: "divider",
+            backgroundColor: "transparent",
+            "&:hover": {
+              backgroundColor: "action.hover",
+              borderColor: "divider",
+            },
           }}
         >
           {selectedSpeaker}
-        </Typography>
+        </Button>
         <IconButton
           size="small"
           aria-label="Export chat logs as JSON"
@@ -411,7 +499,12 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           ref={textFieldRef}
           sx={{ flex: 1, position: "relative" }}
           onBlur={(e) => {
-            if (!textFieldRef.current?.contains(e.relatedTarget as Node)) {
+            if (actionRuleHint?.anchorEl) return;
+            const nextTarget = e.relatedTarget;
+            if (
+              !nextTarget ||
+              !textFieldRef.current?.contains(nextTarget as never)
+            ) {
               dismissPopup();
             }
           }}
@@ -420,6 +513,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           {showPopup && (
             <Paper
               elevation={4}
+              onMouseDown={(e) => {
+                // Keep composer focus while interacting with hint content.
+                e.preventDefault();
+              }}
               sx={{
                 position: "absolute",
                 bottom: "100%",
@@ -537,32 +634,108 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                   <ListItem sx={{ py: 0.75, px: 1 }}>
                     <Box
                       sx={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
+                        display: "flex",
+                        flexDirection: "column",
                         gap: 0.5,
                         width: "100%",
                       }}
                     >
-                      {ACTION_OPTIONS.map((action) => (
-                        <Button
-                          key={action}
-                          size="small"
-                          variant="outlined"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => applyAction(action)}
-                          sx={{
-                            fontFamily: "monospace",
-                            fontSize: "0.7rem",
-                            py: 0.25,
-                            textTransform: "none",
-                          }}
-                        >
-                          {action}
-                        </Button>
-                      ))}
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr",
+                          gap: 0.5,
+                          width: "100%",
+                        }}
+                      >
+                        {ACTION_OPTIONS.map((action) => {
+                          const actionKey = action.toLowerCase();
+                          const ruleText = getActionRuleDescription(actionKey);
+                          return (
+                            <Box
+                              key={action}
+                              sx={{
+                                display: "flex",
+                                alignItems: "stretch",
+                                gap: 0.25,
+                              }}
+                            >
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => applyAction(action)}
+                                sx={{
+                                  flex: 1,
+                                  minWidth: 0,
+                                  fontFamily: "monospace",
+                                  fontSize: "0.7rem",
+                                  py: 0.25,
+                                  textTransform: "none",
+                                }}
+                              >
+                                {action}
+                              </Button>
+                              {ruleText && (
+                                <IconButton
+                                  size="small"
+                                  onPointerDown={(e) => e.preventDefault()}
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={(e) => {
+                                    const anchor = e.currentTarget;
+                                    setActionRuleHint({
+                                      action: actionKey,
+                                      anchorEl: anchor,
+                                    });
+                                  }}
+                                  sx={{
+                                    border: "1px solid",
+                                    borderColor: "divider",
+                                    borderRadius: 1,
+                                    p: 0.25,
+                                  }}
+                                >
+                                  <DescriptionIcon sx={{ fontSize: 16 }} />
+                                </IconButton>
+                              )}
+                            </Box>
+                          );
+                        })}
+                      </Box>
                     </Box>
                   </ListItem>
                 )}
+                <Popover
+                  open={Boolean(actionRuleHint?.anchorEl)}
+                  anchorEl={actionRuleHint?.anchorEl}
+                  onClose={closeActionRuleHint}
+                  hideBackdrop={false}
+                  disableAutoFocus
+                  disableEnforceFocus
+                  disableRestoreFocus
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  transformOrigin={{ vertical: "top", horizontal: "right" }}
+                  slotProps={{
+                    backdrop: {
+                      sx: { backgroundColor: "rgba(0, 0, 0, 0.45)" },
+                    },
+                    paper: {
+                      sx: {
+                        maxWidth: 420,
+                        p: 1,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        backgroundColor: "background.default",
+                      },
+                    },
+                  }}
+                >
+                  <NotesMarkdown sx={{ fontSize: "0.8rem", m: 0 }}>
+                    {actionRuleHint
+                      ? getActionRuleDescription(actionRuleHint.action)
+                      : ""}
+                  </NotesMarkdown>
+                </Popover>
                 {showWeaponPicker && (
                   <ListItem sx={{ py: 0.75, px: 1 }}>
                     <Box
@@ -633,6 +806,57 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                           {label} d{resolveAttributeDie(playerDoc, id)}
                         </Button>
                       ))}
+                    </Box>
+                  </ListItem>
+                )}
+                {(actionCheckParamIndex === 0 ||
+                  actionCheckParamIndex === 1) && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                        width: "100%",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", gap: 0.5, width: "100%" }}>
+                        {ATTRIBUTES.map(({ id, label }) => (
+                          <Button
+                            key={id}
+                            size="small"
+                            variant="outlined"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => applyActionCheckAttribute(id)}
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              fontFamily: "monospace",
+                              fontSize: "0.7rem",
+                              py: 0.25,
+                            }}
+                          >
+                            {label} d{resolveAttributeDie(playerDoc, id)}
+                          </Button>
+                        ))}
+                      </Box>
+                      {actionCheckMode === "study" &&
+                        actionCheckParamIndex === 0 && (
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={applyStudyDefaultAttributes}
+                            sx={{
+                              fontFamily: "monospace",
+                              fontSize: "0.7rem",
+                              py: 0.25,
+                              textTransform: "none",
+                            }}
+                          >
+                            Use default (INS + INS)
+                          </Button>
+                        )}
                     </Box>
                   </ListItem>
                 )}
@@ -720,6 +944,54 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                           next
                         </Button>
                       </Box>
+                    </Box>
+                  </ListItem>
+                )}
+                {actionCheckParamIndex === 2 && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                        width: "100%",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", gap: 0.5, width: "100%" }}>
+                        {[-3, -2, -1, 0, 1, 2, 3].map((mod) => (
+                          <Button
+                            key={mod}
+                            size="small"
+                            variant="outlined"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => sendActionCheckWithModifier(mod)}
+                            sx={{
+                              flex: 1,
+                              minWidth: 0,
+                              fontFamily: "monospace",
+                              fontSize: "0.7rem",
+                              py: 0.25,
+                              px: 0,
+                            }}
+                          >
+                            {mod > 0 ? `+${mod}` : mod}
+                          </Button>
+                        ))}
+                      </Box>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => sendActionCheckWithModifier()}
+                        sx={{
+                          fontFamily: "monospace",
+                          fontSize: "0.7rem",
+                          py: 0.25,
+                          textTransform: "none",
+                        }}
+                      >
+                        Roll without mod
+                      </Button>
                     </Box>
                   </ListItem>
                 )}

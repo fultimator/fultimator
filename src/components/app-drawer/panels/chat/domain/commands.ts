@@ -117,6 +117,76 @@ const rollCommand: Command = {
 
 const VALID_ATTRIBUTES = new Set(["dex", "ins", "mig", "wlp"]);
 
+function parseCheckArgs(args: string):
+  | {
+      primary: Attribute;
+      secondary: Attribute;
+      modifier: number;
+      difficulty?: number;
+    }
+  | { error: string } {
+  const parts = args.trim().toLowerCase().split(/\s+/);
+  if (parts.length < 2 || !parts[0] || !parts[1]) {
+    return { error: "Usage: <attr1> <attr2> [modifier] [difficulty]" };
+  }
+  const [a1, a2, modPart] = parts;
+  if (!VALID_ATTRIBUTES.has(a1)) {
+    return { error: `Unknown attribute "${a1}". Valid: dex, ins, mig, wlp` };
+  }
+  if (!VALID_ATTRIBUTES.has(a2)) {
+    return { error: `Unknown attribute "${a2}". Valid: dex, ins, mig, wlp` };
+  }
+  const modifier = modPart ? parseInt(modPart, 10) : 0;
+  if (modPart && Number.isNaN(modifier)) {
+    return {
+      error: `Invalid modifier "${modPart}". Must be a number, e.g. +2 or -1`,
+    };
+  }
+  const dlPart = parts[3];
+  const difficulty = dlPart ? parseInt(dlPart, 10) : undefined;
+  if (dlPart && (Number.isNaN(difficulty!) || difficulty! < 1)) {
+    return {
+      error: `Invalid difficulty "${dlPart}". Must be a positive number, e.g. 10`,
+    };
+  }
+  return {
+    primary: a1 as Attribute,
+    secondary: a2 as Attribute,
+    modifier,
+    difficulty,
+  };
+}
+
+function runCheckFromParams(
+  context: CommandContext,
+  params: {
+    primary: Attribute;
+    secondary: Attribute;
+    modifier?: number;
+    difficulty?: number;
+    additionalData?: Record<string, unknown>;
+  },
+): ChatMessage[] {
+  const dieSizes = {
+    primary: resolveAttributeDie(context.playerDoc, params.primary),
+    secondary: resolveAttributeDie(context.playerDoc, params.secondary),
+  };
+  const modifiers =
+    (params.modifier ?? 0) !== 0
+      ? [{ label: "Modifier", value: params.modifier ?? 0 }]
+      : [];
+  const intent = prepareCheck({
+    primary: params.primary,
+    secondary: params.secondary,
+    modifiers,
+    difficulty: params.difficulty,
+    additionalData: params.additionalData,
+  });
+  const rolls = rollCheck(dieSizes);
+  const result = processCheck(intent, rolls, dieSizes, context.speaker);
+  return [buildCheckMessage(result)];
+}
+
 const checkCommand: Command = {
   name: "check",
   aliases: ["c"],
@@ -132,42 +202,16 @@ const checkCommand: Command = {
     if (!context.playerDoc) {
       return { error: "Switch to a character speaker to roll a check." };
     }
-    const parts = args.trim().toLowerCase().split(/\s+/);
-    if (parts.length < 2 || !parts[0] || !parts[1]) {
+    const parsed = parseCheckArgs(args);
+    if ("error" in parsed) {
       return { error: "Usage: /check <attr1> <attr2>  e.g. /check dex ins" };
     }
-    const [a1, a2, modPart] = parts;
-    if (!VALID_ATTRIBUTES.has(a1)) {
-      return { error: `Unknown attribute "${a1}". Valid: dex, ins, mig, wlp` };
-    }
-    if (!VALID_ATTRIBUTES.has(a2)) {
-      return { error: `Unknown attribute "${a2}". Valid: dex, ins, mig, wlp` };
-    }
-    const modifier = modPart ? parseInt(modPart, 10) : 0;
-    if (modPart && Number.isNaN(modifier)) {
-      return {
-        error: `Invalid modifier "${modPart}". Must be a number, e.g. +2 or -1`,
-      };
-    }
-    const dlPart = parts[3];
-    const difficulty = dlPart ? parseInt(dlPart, 10) : undefined;
-    if (dlPart && (Number.isNaN(difficulty!) || difficulty! < 1)) {
-      return {
-        error: `Invalid difficulty "${dlPart}". Must be a positive number, e.g. 10`,
-      };
-    }
-    const primary = a1 as Attribute;
-    const secondary = a2 as Attribute;
-    const dieSizes = {
-      primary: resolveAttributeDie(context.playerDoc, primary),
-      secondary: resolveAttributeDie(context.playerDoc, secondary),
-    };
-    const modifiers =
-      modifier !== 0 ? [{ label: "Modifier", value: modifier }] : [];
-    const intent = prepareCheck({ primary, secondary, modifiers, difficulty });
-    const rolls = rollCheck(dieSizes);
-    const result = processCheck(intent, rolls, dieSizes, context.speaker);
-    return [buildCheckMessage(result)];
+    return runCheckFromParams(context, {
+      primary: parsed.primary,
+      secondary: parsed.secondary,
+      modifier: parsed.modifier,
+      difficulty: parsed.difficulty,
+    });
   },
 };
 
@@ -235,6 +279,64 @@ const actionCommand: Command = {
         context.speaker,
       );
       return [buildAccuracyCheckMessage(result)];
+    }
+
+    if (subAction.toLowerCase() === "hinder") {
+      if (!context.playerDoc) {
+        return { error: "Switch to a character speaker to roll a check." };
+      }
+      if (!rawArg) {
+        return runCheckFromParams(context, {
+          primary: "ins",
+          secondary: "wlp",
+          difficulty: 10,
+          additionalData: {
+            originAction: "hinder",
+            fixedDifficulty: 10,
+            usedDefaultAttributes: true,
+          },
+        });
+      }
+      const parsed = parseCheckArgs(rawArg);
+      if ("error" in parsed) {
+        return {
+          error:
+            "Usage: /action hinder [attr1 attr2 [modifier]]  e.g. /action hinder ins wlp +1",
+        };
+      }
+      return runCheckFromParams(context, {
+        primary: parsed.primary,
+        secondary: parsed.secondary,
+        modifier: parsed.modifier,
+        difficulty: 10,
+        additionalData: { originAction: "hinder", fixedDifficulty: 10 },
+      });
+    }
+
+    if (subAction.toLowerCase() === "study") {
+      if (!context.playerDoc) {
+        return { error: "Switch to a character speaker to roll a check." };
+      }
+      if (!rawArg) {
+        return runCheckFromParams(context, {
+          primary: "ins",
+          secondary: "ins",
+          additionalData: { originAction: "study", openCheck: true },
+        });
+      }
+      const parsed = parseCheckArgs(rawArg);
+      if ("error" in parsed) {
+        return {
+          error:
+            "Usage: /action study [attr1 attr2 [modifier]]  e.g. /action study ins wlp +1",
+        };
+      }
+      return runCheckFromParams(context, {
+        primary: parsed.primary,
+        secondary: parsed.secondary,
+        modifier: parsed.modifier,
+        additionalData: { originAction: "study", openCheck: true },
+      });
     }
 
     return [

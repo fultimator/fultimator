@@ -44,6 +44,16 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
   check,
 }) => {
   const theme = useTheme();
+  const originAction =
+    typeof check.additionalData?.originAction === "string"
+      ? check.additionalData.originAction
+      : undefined;
+  const originLabel =
+    originAction === "hinder"
+      ? "Hinder"
+      : originAction === "study"
+        ? "Study"
+        : undefined;
   const isSuccess = check.passed === true && !check.critical && !check.fumble;
   const isFailure = check.passed === false && !check.critical && !check.fumble;
   const accentColor = check.critical
@@ -73,6 +83,12 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
       >
         Attribute Check
+        {originLabel && (
+          <>
+            {" "}
+            <Diamond color="inherit" /> {originLabel}
+          </>
+        )}
         {check.intent.difficulty != null && (
           <>
             {" "}
