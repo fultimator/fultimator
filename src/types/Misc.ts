@@ -28,6 +28,7 @@ export enum Elements {
 export interface Damage {
   value: number;
   type: Elements;
+  hrZero: boolean;
 }
 
 export interface Accuracy {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -13,6 +14,7 @@ import {
   Typography,
   Divider,
   Box,
+  FormControlLabel,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import weapons from "../../../../libs/weapons";
@@ -74,6 +76,9 @@ export default function PlayerWeaponModal({
     weaponAccuracy.attr2 || weapon?.att2 || getWeaponAttr2(weapons[0]),
   );
   const [martial, setMartial] = useState(weapon?.martial || false);
+  const [damageHrZero, setDamageHrZero] = useState(
+    weaponDamage.hrZero === true,
+  );
   const [damageBonus, setDamageBonus] = useState(weapon?.damageBonus || false);
   const [damageReworkBonus, setDamageReworkBonus] = useState(
     weapon?.damageReworkBonus || false,
@@ -127,6 +132,7 @@ export default function PlayerWeaponModal({
     setAtt1(getWeaponAttr1(weapon) || getWeaponAttr1(weapons[0]));
     setAtt2(getWeaponAttr2(weapon) || getWeaponAttr2(weapons[0]));
     setMartial(weapon?.martial || false);
+    setDamageHrZero(weapon?.damage?.hrZero === true);
     setDamageBonus(weapon?.damageBonus || false);
     setDamageReworkBonus(weapon?.damageReworkBonus || false);
     setPrecBonus(weapon?.precBonus || false);
@@ -189,6 +195,7 @@ export default function PlayerWeaponModal({
       if (damage?.type) {
         setType(damage.type);
       }
+      setDamageHrZero(damage?.hrZero === true);
       if (hand || hands) {
         setHands(hand ?? hands);
       }
@@ -340,7 +347,7 @@ export default function PlayerWeaponModal({
       totalBonus,
       selectedQuality,
       cost,
-      damage,
+      damage: { value: damage, type, hrZero: damageHrZero },
       prec,
       ...modifiers(),
       isEquipped:
@@ -360,6 +367,7 @@ export default function PlayerWeaponModal({
     setAtt1(getWeaponAttr1(weapons[0]));
     setAtt2(getWeaponAttr2(weapons[0]));
     setMartial(weapons[0].martial);
+    setDamageHrZero(false);
     setDamageBonus(false);
     setDamageReworkBonus(false);
     setPrecBonus(false);
@@ -481,6 +489,22 @@ export default function PlayerWeaponModal({
               <ChangeType
                 value={type}
                 onChange={(e) => setType(e.target.value)}
+              />
+            </Grid>
+            <Grid
+              size={{
+                xs: 6,
+                md: 4,
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={damageHrZero}
+                    onChange={(e) => setDamageHrZero(e.target.checked)}
+                  />
+                }
+                label="HR0"
               />
             </Grid>
             {/* Change Hands */}

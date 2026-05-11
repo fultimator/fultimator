@@ -72,7 +72,7 @@ export default function EditSpells({ npc, setNpc }) {
           maxTargets: 0,
           targetDescription: "",
           duration: "",
-          damage: { value: 0, type: "physical" },
+          damage: { value: 0, type: "physical", hrZero: false },
           special: [],
         },
       ],
@@ -142,7 +142,11 @@ export default function EditSpells({ npc, setNpc }) {
                     defense: "mdef",
                   },
                   isOffensive: !!item.isOffensive,
-                  damage: item.damage ?? { value: 0, type: "physical" },
+                  damage: item.damage ?? {
+                    value: 0,
+                    type: "physical",
+                    hrZero: false,
+                  },
                   cost: item.cost ?? {
                     resource: "mp",
                     amount: 0,
@@ -509,6 +513,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 return setSpell("damage", {
                   ...(spell.damage ?? {}),
                   type: e.target.value,
+                  hrZero: (spell.damage?.hrZero ?? false) === true,
                 });
               }}
             >
@@ -599,6 +604,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
                 handleChange("damage", {
                   ...(spell.damage ?? {}),
                   value: value === "" ? 0 : parseInt(value, 10),
+                  hrZero: (spell.damage?.hrZero ?? false) === true,
                 });
               }
             }}
@@ -612,6 +618,28 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               handleChange("damage", { ...(spell.damage ?? {}), value });
             }}
           />
+        </Grid>
+      )}
+      {spell.isOffensive && (
+        <Grid
+          size={{
+            xs: 12,
+            sm: 4,
+          }}
+        >
+          <Tooltip title={t("Treat damage High Roll as 0")}>
+            <Switch
+              size="small"
+              checked={spell.damage?.hrZero === true}
+              onChange={(e) =>
+                handleChange("damage", {
+                  ...(spell.damage ?? { value: 0, type: "physical" }),
+                  hrZero: e.target.checked,
+                })
+              }
+            />
+          </Tooltip>
+          {t("HR0")}
         </Grid>
       )}
       <Grid size={12}>

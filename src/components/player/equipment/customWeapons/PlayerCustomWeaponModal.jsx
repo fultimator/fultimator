@@ -211,6 +211,9 @@ export default function PlayerCustomWeaponModal({
       customWeapon?.damage?.type ??
       "physical",
   );
+  const [primaryHrZero, setPrimaryHrZero] = useState(
+    customWeapon?.damage?.hrZero === true,
+  );
 
   // Secondary weapon state (for transforming weapons)
   const [secondWeaponName, setSecondWeaponName] = useState(
@@ -260,6 +263,9 @@ export default function PlayerCustomWeaponModal({
   );
   const [secondCustomDamageType, setSecondCustomDamageType] = useState(
     customWeapon?.secondCustomDamageType || "physical",
+  );
+  const [secondaryHrZero, setSecondaryHrZero] = useState(
+    customWeapon?.secondDamage?.hrZero === true,
   );
   const {
     isOpen: deleteDialogOpen,
@@ -328,6 +334,7 @@ export default function PlayerCustomWeaponModal({
           customWeapon.damage?.type ??
           "physical",
       );
+      setPrimaryHrZero(customWeapon.damage?.hrZero === true);
 
       // Update secondary weapon states
       setSecondWeaponName(customWeapon.secondWeaponName || "");
@@ -364,6 +371,7 @@ export default function PlayerCustomWeaponModal({
           customWeapon.secondDamage?.type ??
           "physical",
       );
+      setSecondaryHrZero(customWeapon.secondDamage?.hrZero === true);
 
       // hook handles expand for numeric modifiers; also expand for overrideDamageType
       if (customWeapon?.overrideDamageType) setModifiersExpanded(true);
@@ -384,6 +392,7 @@ export default function PlayerCustomWeaponModal({
       setSelectedRange(toPickerRange(range[0]));
       setSelectedAccuracyCheck(accuracyChecks[0]);
       setSelectedType(types[0]);
+      setPrimaryHrZero(false);
       setCurrentCustomizations([]);
       setSelectedCustomization("");
       setSelectedQuality("");
@@ -405,6 +414,7 @@ export default function PlayerCustomWeaponModal({
       setSecondSelectedRange(toPickerRange(range[0]));
       setSecondSelectedAccuracyCheck(accuracyChecks[0]);
       setSecondSelectedType(types[0]);
+      setSecondaryHrZero(false);
       setSecondCurrentCustomizations([]);
       setSecondSelectedCustomization("");
 
@@ -600,7 +610,11 @@ export default function PlayerCustomWeaponModal({
       value: precision,
       defense: "def",
     };
-    const primaryDamage = { value: damage, type: resolvedDamageType };
+    const primaryDamage = {
+      value: damage,
+      type: resolvedDamageType,
+      hrZero: primaryHrZero,
+    };
 
     let secondAccuracy, secondDamage;
     if (hasTransforming) {
@@ -630,7 +644,11 @@ export default function PlayerCustomWeaponModal({
         value: s2prec,
         defense: "def",
       };
-      secondDamage = { value: s2dmg, type: s2DamageType };
+      secondDamage = {
+        value: s2dmg,
+        type: s2DamageType,
+        hrZero: secondaryHrZero,
+      };
     }
 
     const { defModifier: dm, mDefModifier: mdm } = modifiers();
@@ -765,6 +783,7 @@ export default function PlayerCustomWeaponModal({
       setSelectedType(
         uploadedType && types.includes(uploadedType) ? uploadedType : types[0],
       );
+      setPrimaryHrZero(data.damage?.hrZero === true);
 
       // Handle customizations
       if (data.customizations && Array.isArray(data.customizations)) {
@@ -833,6 +852,7 @@ export default function PlayerCustomWeaponModal({
           ? uploadedSecondType
           : types[0],
       );
+      setSecondaryHrZero(data.secondDamage?.hrZero === true);
 
       if (
         (data.secondCustomizations &&
@@ -1015,6 +1035,22 @@ export default function PlayerCustomWeaponModal({
                   onChange={(e) => setSelectedType(e.target.value)}
                   selectedCategory={selectedCategory}
                   disabled={!hasElementalCustomization()}
+                />
+              </Grid>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6,
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={primaryHrZero}
+                      onChange={(e) => setPrimaryHrZero(e.target.checked)}
+                    />
+                  }
+                  label="HR0"
                 />
               </Grid>
 
@@ -1514,6 +1550,22 @@ export default function PlayerCustomWeaponModal({
                       }
                     />
                   </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={secondaryHrZero}
+                          onChange={(e) => setSecondaryHrZero(e.target.checked)}
+                        />
+                      }
+                      label="HR0"
+                    />
+                  </Grid>
 
                   {/* Secondary Customizations */}
                   <Grid size={12}>
@@ -1639,7 +1691,11 @@ export default function PlayerCustomWeaponModal({
                       value: pPrec,
                       defense: "def",
                     },
-                    damage: { value: pDmg, type: pType },
+                    damage: {
+                      value: pDmg,
+                      type: pType,
+                      hrZero: primaryHrZero,
+                    },
                     customizations: currentCustomizations,
                     quality,
                     cost: calculatePreviewCost(),
@@ -1700,7 +1756,11 @@ export default function PlayerCustomWeaponModal({
                           value: s2Prec,
                           defense: "def",
                         },
-                        damage: { value: s2Dmg, type: s2Type },
+                        damage: {
+                          value: s2Dmg,
+                          type: s2Type,
+                          hrZero: secondaryHrZero,
+                        },
                         customizations: secondCurrentCustomizations,
                         cost: calculatePreviewCost(),
                         hands: 2,

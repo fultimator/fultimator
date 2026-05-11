@@ -174,9 +174,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
 
   const attackOptions = showWeaponPicker ? resolveAttackOptions(playerDoc) : [];
 
-  const applyWeapon = (arg: string, overrides?: AttackOverrideDraft) => {
+  const applyWeapon = (
+    arg: string,
+    overrides?: AttackOverrideDraft,
+    hrZero?: boolean,
+  ) => {
     if (!overrides) {
-      sendAndRecord(`/action attack ${arg}`);
+      const cmd = `/action attack ${arg}${hrZero ? " HR0" : ""}`;
+      sendAndRecord(cmd);
       return;
     }
     const cmd =
@@ -825,7 +830,13 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                 variant="outlined"
                                 fullWidth
                                 onMouseDown={(e) => e.preventDefault()}
-                                onClick={() => applyWeapon(opt.arg)}
+                                onClick={(e) =>
+                                  applyWeapon(
+                                    opt.arg,
+                                    undefined,
+                                    (e as React.MouseEvent).shiftKey,
+                                  )
+                                }
                                 sx={{
                                   justifyContent: "space-between",
                                   fontFamily: "monospace",

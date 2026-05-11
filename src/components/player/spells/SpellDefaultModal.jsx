@@ -383,7 +383,10 @@ export default function SpellDefaultModal({
                   onChange={(e) => {
                     const val = parseInt(e.target.value, 10);
                     handleChange("damage", {
-                      ...(editedSpell.damage ?? { type: "physical" }),
+                      ...(editedSpell.damage ?? {
+                        type: "physical",
+                        hrZero: false,
+                      }),
                       value: isNaN(val) ? 0 : val,
                     });
                   }}
@@ -397,7 +400,7 @@ export default function SpellDefaultModal({
                     label={t("Damage Type")}
                     onChange={(e) =>
                       handleChange("damage", {
-                        ...(editedSpell.damage ?? {}),
+                        ...(editedSpell.damage ?? { value: 0, hrZero: false }),
                         type: e.target.value,
                       })
                     }
@@ -424,6 +427,25 @@ export default function SpellDefaultModal({
                     ))}
                   </Select>
                 </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={editedSpell.damage?.hrZero === true}
+                      onChange={(e) =>
+                        handleChange("damage", {
+                          ...(editedSpell.damage ?? {
+                            value: 0,
+                            type: "physical",
+                          }),
+                          hrZero: e.target.checked,
+                        })
+                      }
+                    />
+                  }
+                  label="HR0"
+                />
               </Grid>
             </>
           ) : null}

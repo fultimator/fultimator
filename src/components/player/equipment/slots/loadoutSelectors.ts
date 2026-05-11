@@ -40,7 +40,7 @@ export type AuxHandItem = {
     value: number;
     defense: "def" | "mdef";
   };
-  damage: { value: number; type: string };
+  damage: { value: number; type: string; hrZero: boolean };
   hands: number;
   melee: boolean;
 };
@@ -313,7 +313,11 @@ export function getAuxHandItem(player: TypePlayer): AuxHandItem | null {
   return {
     name: "Twin Shields",
     accuracy: { attr1: "might", attr2: "might", value: 0, defense: "def" },
-    damage: { value: 5 + defensiveMasteryBonus, type: "physical" },
+    damage: {
+      value: 5 + defensiveMasteryBonus,
+      type: "physical",
+      hrZero: false,
+    },
     hands: 2,
     melee: true,
   };

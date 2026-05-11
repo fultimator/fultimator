@@ -1248,7 +1248,7 @@ function CustomWeapons() {
               value: pPrec,
               defense: "def",
             },
-            damage: { value: pDmg, type: pType },
+            damage: { value: pDmg, type: pType, hrZero: false },
             modifiers: {
               damage: parseInt(customDamageMod) || 0,
               accuracy: parseInt(customAccuracyMod) || 0,
@@ -1305,7 +1305,7 @@ function CustomWeapons() {
                     value: s2Prec,
                     defense: "def",
                   },
-                  secondDamage: { value: s2Dmg, type: s2Type },
+                  secondDamage: { value: s2Dmg, type: s2Type, hrZero: false },
                   secondModifiers: {
                     damage: parseInt(secondCustomDamageMod) || 0,
                     accuracy: parseInt(secondCustomAccuracyMod) || 0,

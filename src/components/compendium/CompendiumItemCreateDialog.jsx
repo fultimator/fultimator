@@ -397,7 +397,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
       name: name.trim(),
       fuid: slugify(name.trim()),
       isOffensive,
-      damage: { value: 0, type: dmgType },
+      damage: { value: 0, type: dmgType, hrZero: false },
       cost: { resource: "mp", amount: mp === "" ? 0 : Number(mp), perTarget },
       maxTargets: maxTargets === "" ? undefined : Number(maxTargets),
       duration: duration || undefined,

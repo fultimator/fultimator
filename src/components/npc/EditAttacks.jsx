@@ -64,6 +64,7 @@ export default function EditAttacks({ npc, setNpc }) {
           attr1: "dexterity",
           attr2: "dexterity",
           type: "physical",
+          damage: { value: 0, type: "physical", hrZero: false },
           special: [],
         },
       ],
@@ -142,6 +143,11 @@ export default function EditAttacks({ npc, setNpc }) {
                 attr1: item.attr1 || "dexterity",
                 attr2: item.attr2 || "dexterity",
                 type: item.type,
+                damage: {
+                  value: item.damage?.value ?? 0,
+                  type: item.damage?.type ?? item.type ?? "physical",
+                  hrZero: item.damage?.hrZero === true,
+                },
                 flathit: item.flathit,
                 flatdmg: item.flatdmg,
                 special: [],
@@ -384,6 +390,24 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       </Grid>
       <Grid size="grow">
         <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="medium"
+                checked={attack.damage?.hrZero === true}
+                onChange={(e) =>
+                  setAttack("damage", {
+                    ...(attack.damage ?? {
+                      value: 0,
+                      type: attack.type ?? "physical",
+                    }),
+                    hrZero: e.target.checked,
+                  })
+                }
+              />
+            }
+            label="HR0"
+          />
           <FormControlLabel
             control={
               <Checkbox

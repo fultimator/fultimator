@@ -115,7 +115,18 @@ function normalizeSpellFields(npc: TypeNpc): TypeNpc {
       }
 
       if (s.damage === undefined)
-        s.damage = 0 as unknown as { value: number; type: Elements };
+        s.damage = 0 as unknown as {
+          value: number;
+          type: Elements;
+          hrZero: boolean;
+        };
+      if (typeof s.damage === "object" && s.damage !== null) {
+        const dmg = s.damage as unknown as Record<string, unknown>;
+        s.damage = {
+          ...dmg,
+          hrZero: dmg.hrZero === true,
+        } as unknown as typeof s.damage;
+      }
       if (s.maxTargets === undefined) s.maxTargets = 0;
       if (s.description === undefined) s.description = "";
 
@@ -141,7 +152,12 @@ function unifyNpcSpellSchema(npc: TypeNpc): TypeNpc {
       const flatDamage = typeof s.damage === "number" ? s.damage : 0;
       const damageType =
         typeof s.damagetype === "string" ? s.damagetype : "physical";
-      s.damage = { value: flatDamage, type: damageType as Elements };
+      s.damage = {
+        value: flatDamage,
+        type: damageType as Elements,
+        hrZero:
+          (s.damage as Record<string, unknown> | undefined)?.hrZero === true,
+      };
       delete s.damagetype;
 
       if (s.range === undefined) s.range = "ranged";
@@ -188,6 +204,10 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
         ...a,
         itemType: "attack",
         range: normalizeRange(a.range),
+        damage: {
+          ...(a.damage as Record<string, unknown>),
+          hrZero: (a.damage as Record<string, unknown>).hrZero === true,
+        },
         special: Array.isArray(a.special)
           ? a.special
           : typeof a.special === "string"
@@ -209,7 +229,11 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
       value: 0,
       defense: "def",
     };
-    next.damage = { value: 0, type: (a.type as string) ?? "physical" };
+    next.damage = {
+      value: 0,
+      type: (a.type as string) ?? "physical",
+      hrZero: false,
+    };
     delete next.attr1;
     delete next.attr2;
     delete next.type;
@@ -243,6 +267,10 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
                 | "mdef")
             : categoryDefense(category),
         },
+        damage: {
+          ...(wa.damage as Record<string, unknown>),
+          hrZero: (wa.damage as Record<string, unknown>).hrZero === true,
+        },
       };
     }
     const w = (wa.weapon as RawAttack) ?? {};
@@ -264,6 +292,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
     next.damage = {
       value: typeof w.damage === "number" ? w.damage : 0,
       type: (w.type as string) ?? "physical",
+      hrZero: false,
     };
     next.range = normalizeRange(w.range ?? wa.range);
     delete next.weapon;

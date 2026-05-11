@@ -583,7 +583,14 @@ function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
       s.damage === undefined &&
       DAMAGE_SPELL_TYPES.has(s.spellType as string)
     ) {
-      s.damage = { value: 0, type: "physical" };
+      s.damage = { value: 0, type: "physical", hrZero: false };
+    }
+    if (typeof s.damage === "object" && s.damage !== null) {
+      const damageObj = s.damage as Record<string, unknown>;
+      s.damage = {
+        ...damageObj,
+        hrZero: damageObj.hrZero === true,
+      };
     }
 
     // attr1 + attr2 -> accuracy object
@@ -629,9 +636,14 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
       w.damage !== undefined &&
       typeof w.damage === "object"
     ) {
+      const damageObj = w.damage as Record<string, unknown>;
       return {
         ...w,
         category: normalizeWeaponCategory(w.category as string | undefined),
+        damage: {
+          ...damageObj,
+          hrZero: damageObj.hrZero === true,
+        },
       };
     }
     const attr1 = (w.attr1 as string) ?? "dexterity";
@@ -642,7 +654,7 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
     const next: RawWeapon = { ...w };
     next.category = normalizeWeaponCategory(w.category as string | undefined);
     next.accuracy = { attr1, attr2, value: prec, defense: "def" };
-    next.damage = { value: dmg, type: "physical" };
+    next.damage = { value: dmg, type: "physical", hrZero: false };
     next.range = range;
     next.martial = w.isMartial ?? w.martial ?? false;
     delete next.attr1;
@@ -663,6 +675,10 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
       w.damage !== undefined &&
       typeof w.damage === "object"
     ) {
+      const damageObj = w.damage as Record<string, unknown>;
+      const secondDamageObj = w.secondDamage as
+        | Record<string, unknown>
+        | undefined;
       const rare = (w.rare as Record<string, unknown> | undefined) ?? {};
       const modifiers =
         (w.modifiers as Record<string, unknown> | undefined) ?? {};
@@ -670,6 +686,18 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
         (w.secondModifiers as Record<string, unknown> | undefined) ?? {};
       return {
         ...w,
+        damage: {
+          ...damageObj,
+          hrZero: damageObj.hrZero === true,
+        },
+        ...(secondDamageObj
+          ? {
+              secondDamage: {
+                ...secondDamageObj,
+                hrZero: secondDamageObj.hrZero === true,
+              },
+            }
+          : {}),
         category: normalizeWeaponCategory(w.category as string | undefined),
         range:
           w.range === "ranged" || w.range === "distance" ? "ranged" : "melee",
@@ -798,7 +826,7 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
       value: precision,
       defense: categoryDefense(category),
     };
-    next.damage = { value: damage, type: damageType };
+    next.damage = { value: damage, type: damageType, hrZero: false };
     next.modifiers = {
       damage: damageModifier,
       accuracy: precModifier,
@@ -862,7 +890,11 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
         value: s2precision,
         defense: categoryDefense(s2category),
       };
-      next.secondDamage = { value: s2damage, type: s2damageType };
+      next.secondDamage = {
+        value: s2damage,
+        type: s2damageType,
+        hrZero: false,
+      };
       next.secondModifiers = {
         damage: s2damageModifier,
         accuracy: s2precModifier,

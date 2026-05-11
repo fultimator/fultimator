@@ -378,7 +378,7 @@ const actionCommand: Command = {
           : [],
         {
           damageSituationalBonus: appliedDamageDelta,
-          hrZero: overrides.hrZero ?? false,
+          hrZero: overrides.hrZero ?? effectiveWeapon.damageHrZero ?? false,
         },
       );
       const rolls = rollAccuracyCheck(dieSizes);

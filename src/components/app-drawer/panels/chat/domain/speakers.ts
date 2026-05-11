@@ -15,6 +15,7 @@ export type AttackOption = {
   accuracyBonus?: number; // flat accuracy modifier (weapon prec field)
   accuracyDefense?: "def" | "mdef" | string;
   damageType?: string;
+  damageHrZero?: boolean;
   hands?: 1 | 2;
   category?: string;
   range?: "melee" | "ranged" | string;
@@ -53,6 +54,7 @@ function extractPcWeaponStats(
   | "accuracyBonus"
   | "accuracyDefense"
   | "damageType"
+  | "damageHrZero"
   | "hands"
   | "category"
   | "range"
@@ -79,6 +81,7 @@ function extractPcWeaponStats(
       accuracyDefense:
         typeof acc?.defense === "string" ? acc.defense : undefined,
       damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
+      damageHrZero: dmg?.hrZero === true,
       hands,
       category,
       range: normalizedRange,
@@ -95,6 +98,7 @@ function extractPcWeaponStats(
       typeof acc?.value === "number" && acc.value !== 0 ? acc.value : undefined,
     accuracyDefense: typeof acc?.defense === "string" ? acc.defense : undefined,
     damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
+    damageHrZero: dmg?.hrZero === true,
     hands,
     category,
     range: normalizedRange,
@@ -122,6 +126,7 @@ export function resolveAttackOptions(
             attr1: toAttr(acc?.attr1),
             attr2: toAttr(acc?.attr2),
             damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
+            damageHrZero: dmg?.hrZero === true,
           });
         }
       }
@@ -146,6 +151,7 @@ export function resolveAttackOptions(
             accuracyDefense:
               typeof acc?.defense === "string" ? acc.defense : undefined,
             damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
+            damageHrZero: dmg?.hrZero === true,
             hands: wa.hands === 2 ? 2 : wa.hands === 1 ? 1 : undefined,
             category: typeof wa.category === "string" ? wa.category : undefined,
             range:

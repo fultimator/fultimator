@@ -336,6 +336,7 @@ function NpcAttackPanel() {
   const [special, setSpecial] = useState("");
   const [flathit, setFlathit] = useState(0);
   const [flatdmg, setFlatdmg] = useState(0);
+  const [hrZero, setHrZero] = useState(false);
 
   const data = {
     itemType: "basic",
@@ -343,9 +344,8 @@ function NpcAttackPanel() {
     range,
     attr1,
     attr2,
-    type: dmgType,
+    damage: { value: Number(flatdmg), type: dmgType, hrZero },
     flathit: Number(flathit),
-    flatdmg: Number(flatdmg),
     martial: false,
     category: range === "melee" ? "Melee Attack" : "Ranged Attack",
     special: special.trim() ? [special.trim()] : [],
@@ -360,6 +360,7 @@ function NpcAttackPanel() {
     setSpecial("");
     setFlathit(0);
     setFlatdmg(0);
+    setHrZero(false);
   };
 
   return (
@@ -476,7 +477,7 @@ function NpcAttackPanel() {
             </Grid>
             <Grid size={6}>
               <TextField
-                label={t("Damage Bonus")}
+                label={t("Damage Value")}
                 value={flatdmg}
                 onChange={(e) => setFlatdmg(e.target.value)}
                 fullWidth
@@ -485,6 +486,18 @@ function NpcAttackPanel() {
                 slotProps={{
                   htmlInput: { min: 0 },
                 }}
+              />
+            </Grid>
+            <Grid size={6}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={hrZero}
+                    onChange={(e) => setHrZero(e.target.checked)}
+                    size="small"
+                  />
+                }
+                label="HR0"
               />
             </Grid>
             <Grid size={12}>
@@ -527,6 +540,7 @@ function NpcSpellPanel() {
   const [attr2, setAttr2] = useState("dexterity");
   const [dmgType, setDmgType] = useState("physical");
   const [damage, setDamage] = useState("");
+  const [hrZero, setHrZero] = useState(false);
   const [special, setSpecial] = useState("");
 
   const data = {
@@ -536,6 +550,7 @@ function NpcSpellPanel() {
     damage: {
       value: isOffensive && damage !== "" ? Number(damage) : 0,
       type: dmgType,
+      hrZero,
     },
     cost: { resource: "mp", amount: mp === "" ? 0 : Number(mp), perTarget },
     maxTargets: maxTargets === "" ? undefined : Number(maxTargets),
@@ -559,6 +574,7 @@ function NpcSpellPanel() {
     setAttr2("dexterity");
     setDmgType("physical");
     setDamage("");
+    setHrZero(false);
     setSpecial("");
   };
 
@@ -739,6 +755,25 @@ function NpcSpellPanel() {
                 slotProps={{
                   htmlInput: { min: 0 },
                 }}
+              />
+            </Grid>
+          )}
+          {isOffensive && (
+            <Grid
+              size={{
+                xs: 6,
+                sm: 3,
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={hrZero}
+                    onChange={(e) => setHrZero(e.target.checked)}
+                    size="small"
+                  />
+                }
+                label="HR0"
               />
             </Grid>
           )}
@@ -1046,6 +1081,7 @@ function PlayerSpellPanel() {
   const [attr2, setAttr2] = useState("will");
   const [damage, setDamage] = useState("");
   const [damageType, setDamageType] = useState("physical");
+  const [hrZero, setHrZero] = useState(false);
   // Non-static type fields
   const [effect, setEffect] = useState("");
   const [event, setEvent] = useState("");
@@ -1115,6 +1151,7 @@ function PlayerSpellPanel() {
     setAttr2("will");
     setDamage("");
     setDamageType("physical");
+    setHrZero(false);
     setEffect("");
     setEvent("");
     setGenoclepsis("");
@@ -1172,6 +1209,7 @@ function PlayerSpellPanel() {
     damage: {
       value: isOffensive && damage !== "" ? Number(damage) : 0,
       type: isOffensive ? damageType : "physical",
+      hrZero,
     },
     spellType: "default",
   };
@@ -2277,6 +2315,68 @@ function PlayerSpellPanel() {
                   </Select>
                 </FormControl>
               </Grid>
+              {isOffensive && (
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                  }}
+                >
+                  <FormControl fullWidth size="small">
+                    <InputLabel>{t("Damage Type")}</InputLabel>
+                    <Select
+                      value={damageType}
+                      label={t("Damage Type")}
+                      onChange={(e) => setDamageType(e.target.value)}
+                    >
+                      {Object.keys(types).map((type) => (
+                        <MenuItem key={type} value={type}>
+                          {types[type].long}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              )}
+              {isOffensive && (
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                  }}
+                >
+                  <TextField
+                    label={t("Damage")}
+                    value={damage}
+                    onChange={(e) => setDamage(e.target.value)}
+                    fullWidth
+                    size="small"
+                    type="number"
+                    slotProps={{
+                      htmlInput: { min: 0 },
+                    }}
+                  />
+                </Grid>
+              )}
+              {isOffensive && (
+                <Grid
+                  size={{
+                    xs: 6,
+                    sm: 3,
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={hrZero}
+                        onChange={(e) => setHrZero(e.target.checked)}
+                        size="small"
+                      />
+                    }
+                    label="HR0"
+                  />
+                </Grid>
+              )}
               <Grid size={12}>
                 <CustomTextarea
                   label={t("Description")}
@@ -3126,6 +3226,7 @@ function WeaponPanel() {
   const [qualityCost, setQualityCost] = useState(0);
   const [totalBonus, setTotalBonus] = useState(0);
   const [selectedQuality, setSelectedQuality] = useState("");
+  const [hrZero, setHrZero] = useState(false);
   const {
     precModifier,
     setPrecModifier,
@@ -3201,7 +3302,11 @@ function WeaponPanel() {
     totalBonus,
     selectedQuality,
     cost,
-    damage,
+    damage: {
+      value: damage,
+      type,
+      hrZero,
+    },
     prec,
     ...modifiers(),
   });
@@ -3223,6 +3328,7 @@ function WeaponPanel() {
     setQualityCost(0);
     setSelectedQuality("");
     setTotalBonus(0);
+    setHrZero(false);
     clearModifiers();
   };
 
@@ -3394,6 +3500,18 @@ function WeaponPanel() {
                     />
                   </Grid>
                 ))}
+                <Grid size={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={hrZero}
+                        onChange={(e) => setHrZero(e.target.checked)}
+                        size="small"
+                      />
+                    }
+                    label="HR0"
+                  />
+                </Grid>
               </Grid>
             </AccordionDetails>
           </Accordion>
@@ -3861,6 +3979,8 @@ function CustomWeaponPanel() {
   const [rareDamageBonus, setRareDamageBonus] = useState(false);
   const [overrideAccuracyAttributes, setOverrideAccuracyAttributes] =
     useState(false);
+  const [primaryHrZero, setPrimaryHrZero] = useState(false);
+  const [secondaryHrZero, setSecondaryHrZero] = useState(false);
   const {
     damageModifier,
     setDamageModifier,
@@ -4008,7 +4128,7 @@ function CustomWeaponPanel() {
       value: precision,
       defense: "def",
     },
-    damage: { value: damage, type: primaryType },
+    damage: { value: damage, type: primaryType, hrZero: primaryHrZero },
     customizations,
     quality,
     qualityCost,
@@ -4032,7 +4152,11 @@ function CustomWeaponPanel() {
       value: secondPrecision,
       defense: "def",
     },
-    secondDamage: { value: secondDamage, type: secondType },
+    secondDamage: {
+      value: secondDamage,
+      type: secondType,
+      hrZero: secondaryHrZero,
+    },
     secondCurrentCustomizations,
     secondDefModifier: parseInt(secondDefModifier),
     secondMDefModifier: parseInt(secondMDefModifier),
@@ -4073,6 +4197,8 @@ function CustomWeaponPanel() {
     setRareAccuracyBonus(false);
     setRareDamageBonus(false);
     setOverrideAccuracyAttributes(false);
+    setPrimaryHrZero(false);
+    setSecondaryHrZero(false);
     clearModifiers();
   };
 
@@ -4603,6 +4729,49 @@ function CustomWeaponPanel() {
                     />
                   </Grid>
                 ))}
+                <Grid size={12}>
+                  <Divider sx={{ my: 1 }} />
+                </Grid>
+                <Grid size={12}>
+                  <Typography variant="h6">{t("Damage Options")}</Typography>
+                  <Divider sx={{ mt: 0.5 }} />
+                </Grid>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={primaryHrZero}
+                        onChange={(e) => setPrimaryHrZero(e.target.checked)}
+                        size="small"
+                      />
+                    }
+                    label="Primary Weapon HR0"
+                  />
+                </Grid>
+                {hasTransforming && (
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={secondaryHrZero}
+                          onChange={(e) => setSecondaryHrZero(e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label="Secondary Weapon HR0"
+                    />
+                  </Grid>
+                )}
               </Grid>
             </AccordionDetails>
           </Accordion>

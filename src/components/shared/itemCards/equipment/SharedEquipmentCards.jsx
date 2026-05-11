@@ -332,8 +332,17 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
               }}
             >
               <OpenBracket />
-              {t("HR")} {(item.damage?.value ?? item.damage) >= 0 ? "+" : ""}{" "}
-              {item.damage?.value ?? item.damage}
+              {item.damage?.hrZero
+                ? (() => {
+                    const val = item.damage?.value ?? item.damage;
+                    return val === 0
+                      ? "HR0"
+                      : `HR0 ${val > 0 ? "+" : ""} ${val}`;
+                  })()
+                : (() => {
+                    const val = item.damage?.value ?? item.damage;
+                    return `${t("HR")} + ${val}`;
+                  })()}
               <CloseBracket />
               {dmgType?.long}
             </Typography>
@@ -696,7 +705,11 @@ function CustomWeaponRows({
             }}
           >
             <OpenBracket />
-            {t("HR +")} {damage}
+            {item.damage?.hrZero
+              ? damage === 0
+                ? "HR0"
+                : `HR0 ${damage > 0 ? "+" : ""} ${damage}`
+              : `${t("HR")} + ${damage}`}
             <CloseBracket />
             {damageType?.long}
           </Typography>

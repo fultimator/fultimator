@@ -40,6 +40,7 @@ function weaponToAttackFields(weapon, name = "") {
     damage: {
       value: weapon.damage?.value ?? 0,
       type: weapon.damage?.type ?? "physical",
+      hrZero: weapon.damage?.hrZero === true,
     },
   };
 }
@@ -258,6 +259,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
                 value:
                   attack.damage?.value ?? selectedWeapon.damage?.value ?? 0,
                 type: e.target.value,
+                hrZero: (attack.damage?.hrZero ?? false) === true,
               });
             }}
           >
@@ -344,6 +346,24 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       </Grid> */}
       <Grid size="grow">
         <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="medium"
+                checked={attack.damage?.hrZero === true}
+                onChange={(e) =>
+                  setAttack("damage", {
+                    ...(attack.damage ?? {
+                      value: selectedWeapon.damage?.value ?? 0,
+                      type: selectedWeapon.damage?.type ?? "physical",
+                    }),
+                    hrZero: e.target.checked,
+                  })
+                }
+              />
+            }
+            label="HR0"
+          />
           <FormControlLabel
             control={
               <Checkbox

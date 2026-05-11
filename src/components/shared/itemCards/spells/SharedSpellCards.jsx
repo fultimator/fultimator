@@ -184,10 +184,17 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
                       <OpenBracket />
                       {attr1.shortcaps} + {attr2.shortcaps}
                       <CloseBracket /> <Diamond /> <OpenBracket />
-                      HR +{" "}
-                      {(typeof item.damage === "object"
-                        ? item.damage?.value
-                        : item.damage) || 0}
+                      {item.damage?.hrZero
+                        ? (() => {
+                            const val =
+                              (typeof item.damage === "object"
+                                ? item.damage?.value
+                                : item.damage) || 0;
+                            return val === 0
+                              ? "HR0"
+                              : `HR0 ${val > 0 ? "+" : ""} ${val}`;
+                          })()
+                        : `HR + ${(typeof item.damage === "object" ? item.damage?.value : item.damage) || 0}`}
                       <CloseBracket />{" "}
                       {item.damage?.type ? t(item.damage.type) : "physical"}{" "}
                       <Diamond />{" "}
@@ -374,10 +381,17 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
                 <OpenBracket />
                 {attr1.shortcaps} + {attr2.shortcaps}
                 <CloseBracket /> <Diamond /> <OpenBracket />
-                HR +{" "}
-                {(typeof item.damage === "object"
-                  ? item.damage?.value
-                  : item.damage) || 0}
+                {item.damage?.hrZero
+                  ? (() => {
+                      const val =
+                        (typeof item.damage === "object"
+                          ? item.damage?.value
+                          : item.damage) || 0;
+                      return val === 0
+                        ? "HR0"
+                        : `HR0 ${val > 0 ? "+" : ""} ${val}`;
+                    })()
+                  : `HR + ${(typeof item.damage === "object" ? item.damage?.value : item.damage) || 0}`}
                 <CloseBracket />{" "}
                 {item.damage?.type || item.damageType || "physical"}{" "}
                 <Diamond />{" "}
@@ -1974,10 +1988,17 @@ export const SharedPilotVehicleCard = React.memo(
                   }}
                 >
                   <OpenBracket />
-                  {t("HR")} +{" "}
-                  {(typeof item.damage === "object"
-                    ? item.damage?.value
-                    : item.damage) ?? 0}
+                  {item.damage?.hrZero
+                    ? (() => {
+                        const val =
+                          (typeof item.damage === "object"
+                            ? item.damage?.value
+                            : item.damage) ?? 0;
+                        return val === 0
+                          ? "HR0"
+                          : `HR0 ${val > 0 ? "+" : ""} ${val}`;
+                      })()
+                    : `${t("HR")} + ${(typeof item.damage === "object" ? item.damage?.value : item.damage) ?? 0}`}
                   <CloseBracket />
                   {item.damage?.type
                     ? t(item.damage.type)

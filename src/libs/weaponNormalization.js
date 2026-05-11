@@ -75,6 +75,7 @@ export function normalizeWeaponLike(item = {}) {
     damage: {
       value: damageValue,
       type: damage.type ?? type ?? "physical",
+      hrZero: damage.hrZero === true,
     },
     modifiers: {
       damage:
@@ -163,6 +164,7 @@ export function normalizeCustomWeaponLike(item = {}) {
     damage: {
       value: damage.value ?? damageModifier ?? 0,
       type: damage.type ?? customDamageType ?? type ?? "physical",
+      hrZero: damage.hrZero === true,
     },
     modifiers: {
       damage:
@@ -232,6 +234,7 @@ export function normalizeCustomWeaponLike(item = {}) {
     next.secondDamage = item.secondDamage ?? {
       value: secondDamageModifier ?? 0,
       type: secondCustomDamageType ?? secondSelectedType ?? next.damage.type,
+      hrZero: item.secondDamage?.hrZero === true,
     };
     next.secondModifiers = {
       damage:
