@@ -13,6 +13,7 @@ export type AttackOption = {
   attr2?: Attribute;
   baseDamage?: number; // weapon base damage added to HR
   accuracyBonus?: number; // flat accuracy modifier (weapon prec field)
+  accuracyDefense?: "def" | "mdef" | string;
   damageType?: string;
   hands?: 1 | 2;
   category?: string;
@@ -50,6 +51,7 @@ function extractPcWeaponStats(
   | "attr2"
   | "baseDamage"
   | "accuracyBonus"
+  | "accuracyDefense"
   | "damageType"
   | "hands"
   | "category"
@@ -74,6 +76,8 @@ function extractPcWeaponStats(
         typeof acc?.value === "number" && acc.value !== 0
           ? acc.value
           : undefined,
+      accuracyDefense:
+        typeof acc?.defense === "string" ? acc.defense : undefined,
       damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
       hands,
       category,
@@ -89,6 +93,7 @@ function extractPcWeaponStats(
     baseDamage,
     accuracyBonus:
       typeof acc?.value === "number" && acc.value !== 0 ? acc.value : undefined,
+    accuracyDefense: typeof acc?.defense === "string" ? acc.defense : undefined,
     damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
     hands,
     category,
@@ -138,6 +143,8 @@ export function resolveAttackOptions(
               typeof acc?.value === "number" && acc.value !== 0
                 ? acc.value
                 : undefined,
+            accuracyDefense:
+              typeof acc?.defense === "string" ? acc.defense : undefined,
             damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
             hands: wa.hands === 2 ? 2 : wa.hands === 1 ? 1 : undefined,
             category: typeof wa.category === "string" ? wa.category : undefined,

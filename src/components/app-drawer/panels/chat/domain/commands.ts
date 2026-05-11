@@ -12,7 +12,12 @@ import {
   buildAccuracyCheckMessage,
 } from "./accuracy-checks";
 import { resolveAttributeDie, resolveAttackOptions } from "./speakers";
-import type { Attribute, ChatMessage, DieSides } from "../types";
+import type {
+  Attribute,
+  AttackOverrides,
+  ChatMessage,
+  DieSides,
+} from "../types";
 
 export type CommandContext = {
   speaker: string;
@@ -116,6 +121,83 @@ const rollCommand: Command = {
 };
 
 const VALID_ATTRIBUTES = new Set(["dex", "ins", "mig", "wlp"]);
+const VALID_RANGE = new Set(["melee", "ranged"]);
+const VALID_DEFENSE = new Set(["def", "mdef"]);
+
+export function parseActionAttackArgs(rawArg: string): {
+  weaponName?: string;
+  overrides: AttackOverrides;
+} {
+  const trimmed = rawArg.trim();
+  if (!trimmed) return { weaponName: undefined, overrides: {} };
+
+  let weaponName = "";
+  let rest = "";
+  if (trimmed.startsWith('"')) {
+    const endQuote = trimmed.indexOf('"', 1);
+    if (endQuote !== -1) {
+      weaponName = trimmed.slice(1, endQuote);
+      rest = trimmed.slice(endQuote + 1).trim();
+    } else {
+      weaponName = trimmed.slice(1);
+      rest = "";
+    }
+  } else {
+    const spaceIdx = trimmed.indexOf(" ");
+    if (spaceIdx === -1) {
+      weaponName = trimmed;
+      rest = "";
+    } else {
+      weaponName = trimmed.slice(0, spaceIdx);
+      rest = trimmed.slice(spaceIdx + 1).trim();
+    }
+  }
+
+  const overrides: AttackOverrides = {};
+  if (!rest) return { weaponName, overrides };
+  const tokens = rest.split(/\s+/);
+  for (let i = 0; i < tokens.length; ) {
+    const rawFlag = tokens[i];
+    if (
+      rawFlag?.toLowerCase() === "hr0" ||
+      rawFlag?.toLowerCase() === "--hr0"
+    ) {
+      overrides.hrZero = true;
+      i += 1;
+      continue;
+    }
+    if (!rawFlag?.startsWith("--")) {
+      i += 1;
+      continue;
+    }
+    const flag = rawFlag.toLowerCase();
+    const value = tokens[i + 1];
+    if (!value || value.startsWith("--")) {
+      i += 1;
+      continue;
+    }
+    if (flag === "--attr1" && VALID_ATTRIBUTES.has(value.toLowerCase())) {
+      overrides.attr1 = value.toLowerCase() as Attribute;
+    } else if (
+      flag === "--attr2" &&
+      VALID_ATTRIBUTES.has(value.toLowerCase())
+    ) {
+      overrides.attr2 = value.toLowerCase() as Attribute;
+    } else if (flag === "--acc") {
+      const n = parseInt(value, 10);
+      if (!Number.isNaN(n)) overrides.accuracyDelta = n;
+    } else if (flag === "--dmg") {
+      const n = parseInt(value, 10);
+      if (!Number.isNaN(n)) overrides.damageDelta = n;
+    } else if (flag === "--range" && VALID_RANGE.has(value.toLowerCase())) {
+      overrides.range = value.toLowerCase() as "melee" | "ranged";
+    } else if (flag === "--defense" && VALID_DEFENSE.has(value.toLowerCase())) {
+      overrides.defense = value.toLowerCase() as "def" | "mdef";
+    }
+    i += 2;
+  }
+  return { weaponName, overrides };
+}
 
 function parseCheckArgs(args: string):
   | {
@@ -250,10 +332,9 @@ const actionCommand: Command = {
     const spaceIdx = action.indexOf(" ");
     const subAction = spaceIdx === -1 ? action : action.slice(0, spaceIdx);
     const rawArg = spaceIdx === -1 ? "" : action.slice(spaceIdx + 1).trim();
-    const weaponArg =
-      rawArg.startsWith('"') && rawArg.endsWith('"')
-        ? rawArg.slice(1, -1)
-        : rawArg || undefined;
+    const { weaponName: parsedWeaponName, overrides } =
+      parseActionAttackArgs(rawArg);
+    const weaponArg = parsedWeaponName || undefined;
 
     if (subAction.toLowerCase() === "attack" && weaponArg) {
       const options = resolveAttackOptions(context.playerDoc);
@@ -261,8 +342,28 @@ const actionCommand: Command = {
       if (!weapon) {
         return { error: `Unknown weapon "${weaponArg}".` };
       }
-      const primary = weapon.attr1 ?? "dex";
-      const secondary = weapon.attr2 ?? "ins";
+      const baseAccuracyBonus = weapon.accuracyBonus ?? 0;
+      const requestedAccuracyDelta = overrides.accuracyDelta ?? 0;
+      const clampedAccuracyBonus = Math.max(
+        0,
+        baseAccuracyBonus + requestedAccuracyDelta,
+      );
+      const appliedAccuracyDelta = clampedAccuracyBonus - baseAccuracyBonus;
+      const baseDamage = weapon.baseDamage ?? 0;
+      const requestedDamageDelta = overrides.damageDelta ?? 0;
+      const clampedDamage = Math.max(0, baseDamage + requestedDamageDelta);
+      const appliedDamageDelta = clampedDamage - baseDamage;
+      const effectiveWeapon = {
+        ...weapon,
+        attr1: overrides.attr1 ?? weapon.attr1,
+        attr2: overrides.attr2 ?? weapon.attr2,
+        range: overrides.range ?? weapon.range,
+        accuracyDefense: overrides.defense ?? weapon.accuracyDefense,
+        accuracyBonus: baseAccuracyBonus,
+        baseDamage,
+      };
+      const primary = effectiveWeapon.attr1 ?? "dex";
+      const secondary = effectiveWeapon.attr2 ?? "ins";
       const dieSizes = {
         primary: resolveAttributeDie(context.playerDoc, primary as Attribute),
         secondary: resolveAttributeDie(
@@ -270,7 +371,16 @@ const actionCommand: Command = {
           secondary as Attribute,
         ),
       };
-      const intent = prepareAccuracyCheck(weapon);
+      const intent = prepareAccuracyCheck(
+        effectiveWeapon,
+        appliedAccuracyDelta !== 0
+          ? [{ label: "Situational Bonus", value: appliedAccuracyDelta }]
+          : [],
+        {
+          damageSituationalBonus: appliedDamageDelta,
+          hrZero: overrides.hrZero ?? false,
+        },
+      );
       const rolls = rollAccuracyCheck(dieSizes);
       const result = processAccuracyCheck(
         intent,

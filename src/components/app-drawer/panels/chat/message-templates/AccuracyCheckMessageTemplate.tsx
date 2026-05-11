@@ -111,6 +111,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
   if (check.intent.range) tags.push(formatRange(check.intent.range));
   if (check.intent.hands === 2) tags.push("Two-handed");
   else if (check.intent.hands === 1) tags.push("One-handed");
+  if (check.intent.hrZero) tags.push("HR0");
   if (check.critical) tags.push("Critical");
   if (check.fumble) tags.push("Fumble");
 
@@ -249,7 +250,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
               ? "Critical"
               : check.fumble
                 ? "Fumble!"
-                : "Accuracy"}
+                : `Accuracy vs ${(check.intent.defense ?? "def").toUpperCase()}`}
           </Typography>
           <IconButton
             size="small"
@@ -352,12 +353,22 @@ export const AccuracyCheckMessageTemplate: React.FC<
               bold
             />
             <Divider sx={{ my: 0.25 }} />
-            <BreakdownRow label="HR (High Roll)" value={check.highRoll} />
+            <BreakdownRow
+              label="HR (High Roll)"
+              value={check.intent.hrZero ? "HR0" : check.damageHighRoll}
+            />
             <BreakdownRow
               label={`Base Damage · ${check.intent.weaponName}`}
               value={check.intent.baseDamage}
               signed
             />
+            {(check.intent.damageSituationalBonus ?? 0) !== 0 && (
+              <BreakdownRow
+                label="Situational Bonus"
+                value={check.intent.damageSituationalBonus ?? 0}
+                signed
+              />
+            )}
             <Divider sx={{ my: 0.25 }} />
             <BreakdownRow label="Damage Total" value={check.damage} bold />
           </Box>
@@ -374,11 +385,14 @@ function BreakdownRow({
   bold,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   signed?: boolean;
   bold?: boolean;
 }) {
-  const display = signed && value > 0 ? `+${value}` : String(value);
+  const display =
+    typeof value === "number" && signed && value > 0
+      ? `+${value}`
+      : String(value);
   return (
     <Box
       sx={{

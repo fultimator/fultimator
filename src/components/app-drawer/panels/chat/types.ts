@@ -46,10 +46,13 @@ export type AccuracyCheckIntent = {
   critThreshold: number;
   weaponName: string;
   baseDamage: number;
+  damageSituationalBonus?: number;
   damageType: string;
+  defense?: "def" | "mdef" | string;
   hands?: 1 | 2;
   category?: string;
   range?: "melee" | "ranged" | string;
+  hrZero?: boolean;
 };
 
 export type AccuracyCheckResult = {
@@ -58,9 +61,10 @@ export type AccuracyCheckResult = {
   primary: CheckDieResult;
   secondary: CheckDieResult;
   highRoll: number;
+  damageHighRoll: number;
   modifierTotal: number; // sum of accuracy modifiers
   accuracyTotal: number; // HR + LR + modifierTotal
-  damage: number; // HR + baseDamage
+  damage: number; // damageHR + baseDamage
   critical: boolean;
   fumble: boolean;
 };
@@ -81,6 +85,18 @@ export type ChatMessage =
   | AccuracyCheckMessage;
 
 export type Attribute = "dex" | "ins" | "mig" | "wlp";
+
+export type AttackOverrideDraft = {
+  attr1: Attribute;
+  attr2: Attribute;
+  accuracyDelta: number;
+  damageDelta: number;
+  range: "melee" | "ranged";
+  defense: "def" | "mdef";
+  hrZero: boolean;
+};
+
+export type AttackOverrides = Partial<AttackOverrideDraft>;
 
 export type CheckModifier = { label: string; value: number };
 

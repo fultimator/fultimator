@@ -16,6 +16,7 @@ function rollDie(sides: number): number {
 export function prepareAccuracyCheck(
   weapon: AttackOption,
   extraModifiers: CheckModifier[] = [],
+  options?: { damageSituationalBonus?: number; hrZero?: boolean },
 ): AccuracyCheckIntent {
   const modifiers: CheckModifier[] = [...extraModifiers];
   if (weapon.accuracyBonus && weapon.accuracyBonus !== 0) {
@@ -29,10 +30,13 @@ export function prepareAccuracyCheck(
     critThreshold: 6,
     weaponName: weapon.name,
     baseDamage: weapon.baseDamage ?? 0,
+    damageSituationalBonus: options?.damageSituationalBonus ?? 0,
     damageType: weapon.damageType ?? "physical",
+    defense: weapon.accuracyDefense ?? "def",
     hands: weapon.hands,
     category: weapon.category,
     range: weapon.range,
+    hrZero: options?.hrZero ?? false,
   };
 }
 
@@ -53,7 +57,9 @@ export function processAccuracyCheck(
   speaker?: string,
 ): AccuracyCheckResult {
   const modifierTotal = intent.modifiers.reduce((sum, m) => sum + m.value, 0);
-  const highRoll = Math.max(rolls.primaryDie, rolls.secondaryDie);
+  const rawHighRoll = Math.max(rolls.primaryDie, rolls.secondaryDie);
+  const highRoll = rawHighRoll;
+  const damageHighRoll = intent.hrZero ? 0 : rawHighRoll;
   const lowRoll = Math.min(rolls.primaryDie, rolls.secondaryDie);
 
   const primary: CheckDieResult = {
@@ -68,7 +74,8 @@ export function processAccuracyCheck(
   };
 
   const accuracyTotal = highRoll + lowRoll + modifierTotal;
-  const damage = highRoll + intent.baseDamage;
+  const damage =
+    damageHighRoll + intent.baseDamage + (intent.damageSituationalBonus ?? 0);
   const critical =
     rolls.primaryDie === rolls.secondaryDie &&
     rolls.primaryDie >= Math.max(2, intent.critThreshold);
@@ -80,6 +87,7 @@ export function processAccuracyCheck(
     primary,
     secondary,
     highRoll,
+    damageHighRoll,
     modifierTotal,
     accuracyTotal,
     damage,

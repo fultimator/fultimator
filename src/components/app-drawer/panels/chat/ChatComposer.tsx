@@ -25,6 +25,7 @@ import {
   SaveAlt as SaveAltIcon,
   Send as SendIcon,
   DescriptionOutlined as DescriptionIcon,
+  EditOutlined as EditIcon,
 } from "@mui/icons-material";
 import { DICE_OPTIONS } from "./constants";
 import {
@@ -34,7 +35,7 @@ import {
 } from "./domain/commands";
 import { resolveAttributeDie, resolveAttackOptions } from "./domain/speakers";
 import type { Command } from "./domain/commands";
-import type { Attribute } from "./types";
+import type { Attribute, AttackOverrideDraft } from "./types";
 import { DIFFICULTY_PRESETS } from "./types";
 import type { useChatStore } from "./chatStore";
 import { t } from "../../../../translation/translate";
@@ -77,9 +78,15 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     action: string;
     anchorEl: HTMLElement | null;
   } | null>(null);
+  const [attackCustomizeTarget, setAttackCustomizeTarget] = useState<
+    string | null
+  >(null);
+  const [attackOverrideDraft, setAttackOverrideDraft] =
+    useState<AttackOverrideDraft | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const textFieldRef = useRef<HTMLDivElement>(null);
+  const hintPaperRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const customModRef = useRef<HTMLInputElement>(null);
   const customDlRef = useRef<HTMLInputElement>(null);
@@ -167,8 +174,34 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
 
   const attackOptions = showWeaponPicker ? resolveAttackOptions(playerDoc) : [];
 
-  const applyWeapon = (arg: string) => {
-    sendAndRecord(`/action attack ${arg}`);
+  const applyWeapon = (arg: string, overrides?: AttackOverrideDraft) => {
+    if (!overrides) {
+      sendAndRecord(`/action attack ${arg}`);
+      return;
+    }
+    const cmd =
+      `/action attack ${arg}` +
+      ` --attr1 ${overrides.attr1}` +
+      ` --attr2 ${overrides.attr2}` +
+      ` --acc ${overrides.accuracyDelta}` +
+      ` --dmg ${overrides.damageDelta}` +
+      ` --range ${overrides.range}` +
+      ` --defense ${overrides.defense}` +
+      (overrides.hrZero ? " HR0" : "");
+    sendAndRecord(cmd);
+  };
+
+  const openAttackCustomizer = (opt: (typeof attackOptions)[number]): void => {
+    setAttackCustomizeTarget(opt.name);
+    setAttackOverrideDraft({
+      attr1: opt.attr1 ?? "dex",
+      attr2: opt.attr2 ?? "ins",
+      accuracyDelta: 0,
+      damageDelta: 0,
+      range: opt.range === "ranged" ? "ranged" : "melee",
+      defense: opt.accuracyDefense === "mdef" ? "mdef" : "def",
+      hrZero: false,
+    });
   };
 
   const applyActionCheckAttribute = (attr: Attribute) => {
@@ -254,6 +287,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   const dismissPopup = () => {
     setCmdSuggestions([]);
     setActiveCommand(null);
+    setAttackCustomizeTarget(null);
+    setAttackOverrideDraft(null);
+    setActionRuleHint(null);
   };
 
   const buildTrayExpression = (): string | null => {
@@ -501,22 +537,39 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           onBlur={(e) => {
             if (actionRuleHint?.anchorEl) return;
             const nextTarget = e.relatedTarget;
-            if (
-              !nextTarget ||
-              !textFieldRef.current?.contains(nextTarget as never)
-            ) {
+            window.setTimeout(() => {
+              const activeEl = document.activeElement;
+              const hasOpenListbox = Boolean(
+                document.querySelector('[role="listbox"]'),
+              );
+              const withinComposer = Boolean(
+                activeEl && textFieldRef.current?.contains(activeEl),
+              );
+              const withinHint = Boolean(
+                activeEl && hintPaperRef.current?.contains(activeEl),
+              );
+              const withinNextTarget = Boolean(
+                nextTarget &&
+                (textFieldRef.current?.contains(nextTarget as never) ||
+                  hintPaperRef.current?.contains(nextTarget as never)),
+              );
+              if (
+                hasOpenListbox ||
+                withinComposer ||
+                withinHint ||
+                withinNextTarget
+              ) {
+                return;
+              }
               dismissPopup();
-            }
+            }, 0);
           }}
           onFocus={() => updatePopupState(input)}
         >
           {showPopup && (
             <Paper
+              ref={hintPaperRef}
               elevation={4}
-              onMouseDown={(e) => {
-                // Keep composer focus while interacting with hint content.
-                e.preventDefault();
-              }}
               sx={{
                 position: "absolute",
                 bottom: "100%",
@@ -752,34 +805,284 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                         </Typography>
                       ) : (
                         attackOptions.map((opt) => (
-                          <Button
+                          <Box
                             key={opt.arg}
-                            size="small"
-                            variant="outlined"
-                            fullWidth
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => applyWeapon(opt.arg)}
                             sx={{
-                              justifyContent: "space-between",
-                              fontFamily: "monospace",
-                              fontSize: "0.75rem",
-                              py: 0.25,
-                              px: 1,
-                              textTransform: "none",
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 0.35,
                             }}
                           >
-                            <span>{opt.name}</span>
-                            {opt.slot && (
-                              <Typography
-                                component="span"
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ fontFamily: "monospace" }}
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "stretch",
+                                gap: 0.35,
+                              }}
+                            >
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                fullWidth
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => applyWeapon(opt.arg)}
+                                sx={{
+                                  justifyContent: "space-between",
+                                  fontFamily: "monospace",
+                                  fontSize: "0.75rem",
+                                  py: 0.25,
+                                  px: 1,
+                                  textTransform: "none",
+                                }}
                               >
-                                {opt.slot}
-                              </Typography>
-                            )}
-                          </Button>
+                                <span>{opt.name}</span>
+                                {opt.slot && (
+                                  <Typography
+                                    component="span"
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ fontFamily: "monospace" }}
+                                  >
+                                    {opt.slot}
+                                  </Typography>
+                                )}
+                              </Button>
+                              <IconButton
+                                size="small"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => openAttackCustomizer(opt)}
+                                sx={{
+                                  border: "1px solid",
+                                  borderColor: "divider",
+                                  borderRadius: 1,
+                                  p: 0.35,
+                                }}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                            {attackCustomizeTarget === opt.name &&
+                              attackOverrideDraft && (
+                                <Box
+                                  sx={{
+                                    p: 0.75,
+                                    borderRadius: 1,
+                                    border: "1px solid",
+                                    borderColor: "divider",
+                                    backgroundColor: "background.default",
+                                    display: "grid",
+                                    gridTemplateColumns: "1fr 1fr",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  <TextField
+                                    select
+                                    size="small"
+                                    label="Attr1"
+                                    value={attackOverrideDraft.attr1}
+                                    slotProps={{
+                                      select: {
+                                        MenuProps: { disablePortal: true },
+                                      },
+                                    }}
+                                    onChange={(e) =>
+                                      setAttackOverrideDraft((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              attr1: e.target
+                                                .value as Attribute,
+                                            }
+                                          : prev,
+                                      )
+                                    }
+                                  >
+                                    {ATTRIBUTES.map((attr) => (
+                                      <MenuItem key={attr.id} value={attr.id}>
+                                        {attr.label}
+                                      </MenuItem>
+                                    ))}
+                                  </TextField>
+                                  <TextField
+                                    select
+                                    size="small"
+                                    label="Attr2"
+                                    value={attackOverrideDraft.attr2}
+                                    slotProps={{
+                                      select: {
+                                        MenuProps: { disablePortal: true },
+                                      },
+                                    }}
+                                    onChange={(e) =>
+                                      setAttackOverrideDraft((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              attr2: e.target
+                                                .value as Attribute,
+                                            }
+                                          : prev,
+                                      )
+                                    }
+                                  >
+                                    {ATTRIBUTES.map((attr) => (
+                                      <MenuItem key={attr.id} value={attr.id}>
+                                        {attr.label}
+                                      </MenuItem>
+                                    ))}
+                                  </TextField>
+                                  <TextField
+                                    size="small"
+                                    type="number"
+                                    label="Acc Δ"
+                                    value={attackOverrideDraft.accuracyDelta}
+                                    onChange={(e) =>
+                                      setAttackOverrideDraft((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              accuracyDelta:
+                                                parseInt(
+                                                  e.target.value || "0",
+                                                  10,
+                                                ) || 0,
+                                            }
+                                          : prev,
+                                      )
+                                    }
+                                  />
+                                  <TextField
+                                    size="small"
+                                    type="number"
+                                    label="Dmg Δ"
+                                    value={attackOverrideDraft.damageDelta}
+                                    onChange={(e) =>
+                                      setAttackOverrideDraft((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              damageDelta:
+                                                parseInt(
+                                                  e.target.value || "0",
+                                                  10,
+                                                ) || 0,
+                                            }
+                                          : prev,
+                                      )
+                                    }
+                                  />
+                                  <TextField
+                                    select
+                                    size="small"
+                                    label="Range"
+                                    value={attackOverrideDraft.range}
+                                    slotProps={{
+                                      select: {
+                                        MenuProps: { disablePortal: true },
+                                      },
+                                    }}
+                                    onChange={(e) =>
+                                      setAttackOverrideDraft((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              range: e.target.value as
+                                                | "melee"
+                                                | "ranged",
+                                            }
+                                          : prev,
+                                      )
+                                    }
+                                  >
+                                    <MenuItem value="melee">Melee</MenuItem>
+                                    <MenuItem value="ranged">Ranged</MenuItem>
+                                  </TextField>
+                                  <TextField
+                                    select
+                                    size="small"
+                                    label="Defense"
+                                    value={attackOverrideDraft.defense}
+                                    slotProps={{
+                                      select: {
+                                        MenuProps: { disablePortal: true },
+                                      },
+                                    }}
+                                    onChange={(e) =>
+                                      setAttackOverrideDraft((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              defense: e.target.value as
+                                                | "def"
+                                                | "mdef",
+                                            }
+                                          : prev,
+                                      )
+                                    }
+                                  >
+                                    <MenuItem value="def">DEF</MenuItem>
+                                    <MenuItem value="mdef">MDEF</MenuItem>
+                                  </TextField>
+                                  <Button
+                                    size="small"
+                                    variant={
+                                      attackOverrideDraft.hrZero
+                                        ? "contained"
+                                        : "outlined"
+                                    }
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() =>
+                                      setAttackOverrideDraft((prev) =>
+                                        prev
+                                          ? { ...prev, hrZero: !prev.hrZero }
+                                          : prev,
+                                      )
+                                    }
+                                    sx={{
+                                      gridColumn: "1 / -1",
+                                      textTransform: "none",
+                                    }}
+                                  >
+                                    HR0{" "}
+                                    {attackOverrideDraft.hrZero ? "On" : "Off"}
+                                  </Button>
+                                  <Box
+                                    sx={{
+                                      gridColumn: "1 / -1",
+                                      display: "flex",
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <Button
+                                      size="small"
+                                      variant="outlined"
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => {
+                                        applyWeapon(
+                                          opt.arg,
+                                          attackOverrideDraft,
+                                        );
+                                      }}
+                                      sx={{ flex: 1, textTransform: "none" }}
+                                    >
+                                      Apply
+                                    </Button>
+                                    <Button
+                                      size="small"
+                                      variant="text"
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => {
+                                        setAttackCustomizeTarget(null);
+                                        setAttackOverrideDraft(null);
+                                      }}
+                                      sx={{ textTransform: "none" }}
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </Box>
+                                </Box>
+                              )}
+                          </Box>
                         ))
                       )}
                     </Box>
