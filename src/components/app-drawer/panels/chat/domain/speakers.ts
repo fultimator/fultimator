@@ -253,6 +253,150 @@ export function resolveAttackOptions(
     return results;
   }
 
+  const classes = Array.isArray(doc.classes) ? doc.classes : [];
+  const vehicleWeapons: AttackOption[] = [];
+
+  for (const cls of classes) {
+    if (!cls || typeof cls !== "object") continue;
+    const spells = (cls as Record<string, unknown>).spells;
+    if (!Array.isArray(spells)) continue;
+    for (const spell of spells) {
+      if (
+        spell &&
+        typeof spell === "object" &&
+        (spell as Record<string, unknown>).spellType === "pilot-vehicle"
+      ) {
+        const vehicles =
+          (spell as Record<string, unknown>).vehicles ??
+          (spell as Record<string, unknown>).currentVehicles;
+        if (Array.isArray(vehicles)) {
+          const activeVehicle = vehicles.find(
+            (v: unknown) =>
+              v &&
+              typeof v === "object" &&
+              (v as Record<string, unknown>).enabled === true,
+          ) as Record<string, unknown> | undefined;
+
+          if (
+            activeVehicle &&
+            typeof activeVehicle === "object" &&
+            Array.isArray((activeVehicle as Record<string, unknown>).modules)
+          ) {
+            const vehicleModules = (activeVehicle as Record<string, unknown>)
+              .modules as Record<string, unknown>[];
+
+            const weaponsBySlot: Record<string, Record<string, unknown>> = {};
+            for (const module of vehicleModules) {
+              if (module.type !== "pilot_module_weapon") continue;
+              const isAvailable =
+                module.equipped === true || module.enabled === true;
+              if (!isAvailable) continue;
+
+              const slot = module.equippedSlot as string | undefined;
+              if (
+                slot &&
+                (slot === "main" || slot === "off" || slot === "both")
+              ) {
+                if (!weaponsBySlot[slot]) {
+                  weaponsBySlot[slot] = module;
+                }
+              }
+            }
+
+            if (Object.keys(weaponsBySlot).length > 0) {
+              const humanizeModuleName = (internalName: string): string => {
+                return internalName
+                  .replace(/^pilot_module_/, "")
+                  .split("_")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ");
+              };
+
+              const seen = new Set<string>();
+              const resolveVehicleWeapon = (
+                slotName: "main" | "off" | "both",
+                label: "(Main)" | "(Off)" | "(Both)",
+              ) => {
+                const module = weaponsBySlot[slotName];
+                if (!module) return;
+
+                let name = "";
+                if (
+                  module.customName &&
+                  typeof module.customName === "string" &&
+                  module.customName.trim()
+                ) {
+                  name = module.customName;
+                } else if (module.name && typeof module.name === "string") {
+                  name = humanizeModuleName(module.name);
+                }
+                if (!name) return;
+
+                const byNameIdx = vehicleWeapons.findIndex(
+                  (r) => r.name === name,
+                );
+                if (byNameIdx >= 0) {
+                  const existing = vehicleWeapons[byNameIdx];
+                  if (
+                    existing.slot === "(Both)" ||
+                    label === "(Both)" ||
+                    (existing.slot === "(Main)" && label === "(Off)") ||
+                    (existing.slot === "(Off)" && label === "(Main)")
+                  ) {
+                    vehicleWeapons[byNameIdx] = {
+                      ...existing,
+                      slot: "(Both)",
+                    };
+                  }
+                  return;
+                }
+
+                const key = `${slotName}:${name}`;
+                if (seen.has(key)) return;
+                seen.add(key);
+
+                const dmg = module.damage;
+                vehicleWeapons.push({
+                  arg: quoteArg(name),
+                  name,
+                  slot: label,
+                  attr1: toAttr(module.att1),
+                  attr2: toAttr(module.att2),
+                  baseDamage: typeof dmg === "number" ? dmg : undefined,
+                  damageType:
+                    typeof module.damageType === "string"
+                      ? module.damageType
+                      : "physical",
+                  range:
+                    module.range === "ranged" || module.range === "Ranged"
+                      ? "ranged"
+                      : "melee",
+                });
+              };
+
+              if (weaponsBySlot["both"]) {
+                resolveVehicleWeapon("both", "(Both)");
+              } else {
+                if (weaponsBySlot["main"]) {
+                  resolveVehicleWeapon("main", "(Main)");
+                }
+                if (weaponsBySlot["off"]) {
+                  resolveVehicleWeapon("off", "(Off)");
+                }
+              }
+            }
+          }
+        }
+        break;
+      }
+    }
+    if (vehicleWeapons.length > 0) break;
+  }
+
+  if (vehicleWeapons.length > 0) {
+    return vehicleWeapons;
+  }
+
   // PC: read equippedSlots + equipment
   const equippedSlots =
     doc.equippedSlots && typeof doc.equippedSlots === "object"
@@ -386,15 +530,21 @@ export const resolveSpeakerOptions = (contextActorName: string): string[] => [
   ...(contextActorName ? [contextActorName] : []),
 ];
 
-type ActorEntry = { name: string; doc: Record<string, unknown> };
+type ActorEntry = {
+  name: string;
+  doc: Record<string, unknown>;
+  source: "pc" | "npc";
+};
 
 export const useCombatSimActors = (): ActorEntry[] => {
   const { selectedNPCs, selectedPCs } = useCombatEncounterStore();
 
   return useMemo(() => {
-    return [...selectedNPCs, ...selectedPCs]
+    const npcs = selectedNPCs.map((a) => ({ ...a, source: "npc" as const }));
+    const pcs = selectedPCs.map((a) => ({ ...a, source: "pc" as const }));
+    return [...npcs, ...pcs]
       .filter((a) => typeof a.name === "string" && a.name)
-      .map((a) => ({ name: a.name as string, doc: a }));
+      .map((a) => ({ name: a.name as string, doc: a, source: a.source }));
   }, [selectedNPCs, selectedPCs]);
 };
 
@@ -471,3 +621,166 @@ export const useActorName = (
     );
   }, [playerDoc, npcDoc]);
 };
+
+export type EquipmentSlot = {
+  slotKey: "mainHand" | "offHand" | "armor" | "accessory";
+  label: string;
+  currentItem?: { name: string; stats: string };
+  isLocked?: boolean;
+};
+
+export function resolveEquipmentSlots(
+  doc: Record<string, unknown> | null,
+): EquipmentSlot[] {
+  if (!doc) return [];
+
+  const equippedSlots =
+    doc.equippedSlots && typeof doc.equippedSlots === "object"
+      ? (doc.equippedSlots as Record<string, unknown>)
+      : null;
+  const equipment =
+    Array.isArray(doc.equipment) && doc.equipment.length > 0
+      ? (doc.equipment[0] as Record<string, unknown>)
+      : null;
+
+  if (!equipment) return [];
+
+  let mainHandLocked = false;
+  let offHandLocked = false;
+
+  const classes = Array.isArray(doc.classes) ? doc.classes : [];
+  for (const cls of classes) {
+    if (!cls || typeof cls !== "object") continue;
+    const spells = (cls as Record<string, unknown>).spells;
+    if (!Array.isArray(spells)) continue;
+    for (const spell of spells) {
+      if (
+        spell &&
+        typeof spell === "object" &&
+        (spell as Record<string, unknown>).spellType === "pilot-vehicle"
+      ) {
+        const vehicles =
+          (spell as Record<string, unknown>).vehicles ??
+          (spell as Record<string, unknown>).currentVehicles;
+        if (Array.isArray(vehicles)) {
+          const activeVehicle = vehicles.find(
+            (v: unknown) =>
+              v &&
+              typeof v === "object" &&
+              (v as Record<string, unknown>).enabled === true,
+          ) as Record<string, unknown> | undefined;
+
+          if (activeVehicle && Array.isArray(activeVehicle.modules)) {
+            const modules = activeVehicle.modules as Record<string, unknown>[];
+
+            const offHandModule = modules.find(
+              (m) =>
+                m.type === "pilot_module_weapon" &&
+                (m.equippedSlot === "off" || m.equippedSlot === "offHand"),
+            );
+            mainHandLocked = !!offHandModule;
+
+            const mainHandModule = modules.find(
+              (m) =>
+                m.type === "pilot_module_weapon" &&
+                (m.equippedSlot === "main" ||
+                  m.equippedSlot === "mainHand" ||
+                  m.equippedSlot === "both"),
+            ) as Record<string, unknown> | undefined;
+
+            if (mainHandModule?.cumbersome === true) {
+              offHandLocked = true;
+            } else if (mainHandModule) {
+              const mainHandRef = equippedSlots?.mainHand;
+              if (mainHandRef && typeof mainHandRef === "object") {
+                const ref = mainHandRef as Record<string, unknown>;
+                const source = ref.source as string | undefined;
+                const itemName = ref.name as string | undefined;
+                if (source && itemName) {
+                  const collection = equipment[source];
+                  if (Array.isArray(collection)) {
+                    const idx = typeof ref.index === "number" ? ref.index : -1;
+                    const item: Record<string, unknown> | undefined =
+                      collection.find(
+                        (i: unknown) =>
+                          i &&
+                          typeof i === "object" &&
+                          (i as Record<string, unknown>).name === itemName,
+                      ) ??
+                      (idx >= 0 && idx < collection.length
+                        ? (collection[idx] as Record<string, unknown>)
+                        : undefined);
+
+                    if (item && (item.hands === 2 || item.isTwoHand)) {
+                      offHandLocked = true;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        break;
+      }
+    }
+    if (mainHandLocked || offHandLocked) break;
+  }
+
+  const slots: EquipmentSlot[] = [
+    { slotKey: "mainHand", label: "Main Hand", isLocked: mainHandLocked },
+    { slotKey: "offHand", label: "Off Hand", isLocked: offHandLocked },
+    { slotKey: "armor", label: "Armor" },
+    { slotKey: "accessory", label: "Accessory" },
+  ];
+
+  for (const slot of slots) {
+    const slotRef = equippedSlots?.[slot.slotKey];
+    if (!slotRef || typeof slotRef !== "object") continue;
+
+    const ref = slotRef as Record<string, unknown>;
+    const source = ref.source as string | undefined;
+    const itemName = ref.name as string | undefined;
+    if (!source || !itemName) continue;
+
+    const collection = equipment[source];
+    if (!Array.isArray(collection)) continue;
+
+    const idx = typeof ref.index === "number" ? ref.index : -1;
+    const item: Record<string, unknown> | undefined =
+      collection.find(
+        (i: unknown) =>
+          i &&
+          typeof i === "object" &&
+          (i as Record<string, unknown>).name === itemName,
+      ) ??
+      (idx >= 0 && idx < collection.length
+        ? (collection[idx] as Record<string, unknown>)
+        : undefined);
+
+    if (!item) continue;
+
+    const name = (item?.name as string | undefined) ?? itemName;
+
+    let stats = "";
+    if (source === "weapons" || source === "customWeapons") {
+      const dmg = (item.damage as Record<string, unknown> | undefined)?.value;
+      const acc = (item.accuracy as Record<string, unknown> | undefined)?.value;
+      const parts = [];
+      if (acc !== undefined && acc !== 0) parts.push(`+${acc} Acc`);
+      if (dmg !== undefined && dmg !== 0) parts.push(`${dmg} DMG`);
+      const hands = item.hands === 2 ? "2H" : "1H";
+      parts.push(hands);
+      stats = parts.join(" / ");
+    } else if (source === "armor") {
+      const def = item.def ?? 0;
+      const mdef = item.mdef ?? 0;
+      stats = `DEF +${def} / MDEF +${mdef}`;
+    } else if (source === "accessories") {
+      stats = "Accessory";
+    }
+
+    slot.currentItem = { name, stats };
+  }
+
+  return slots;
+}

@@ -26,6 +26,7 @@ import {
   Send as SendIcon,
   DescriptionOutlined as DescriptionIcon,
   EditOutlined as EditIcon,
+  Lock as LockIcon,
 } from "@mui/icons-material";
 import { DICE_OPTIONS } from "./constants";
 import {
@@ -37,6 +38,7 @@ import {
   resolveAttributeDie,
   resolveAttackOptions,
   resolveSpellOptions,
+  resolveEquipmentSlots,
 } from "./domain/speakers";
 import type { Command } from "./domain/commands";
 import type { Attribute, AttackOverrideDraft } from "./types";
@@ -60,6 +62,9 @@ interface ChatComposerProps {
   onSpeakerChange: (speaker: string) => void;
   onExport: () => void;
   onClearRequest: () => void;
+  onOpenEquipmentSlot?: (
+    slot: "mainHand" | "offHand" | "armor" | "accessory",
+  ) => void;
 }
 
 export const ChatComposer: React.FC<ChatComposerProps> = ({
@@ -70,6 +75,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onSpeakerChange,
   onExport,
   onClearRequest,
+  onOpenEquipmentSlot,
 }) => {
   const theme = useTheme();
   const [input, setInput] = useState("");
@@ -130,10 +136,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
 
   const applyAction = (action: string) => {
     const next = `/action ${action.toLowerCase()}`;
-    // Attack/spell and action-check actions need more inputs, so stay in composer
+    // Attack/spell, equipment, and action-check actions need more inputs, so stay in composer
     if (
       action.toLowerCase() === "attack" ||
       action.toLowerCase() === "spell" ||
+      action.toLowerCase() === "equipment" ||
       action.toLowerCase() === "hinder" ||
       action.toLowerCase() === "study"
     ) {
@@ -159,6 +166,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     actionArgs.toLowerCase().startsWith("spell") &&
     actionArgs.slice("spell".length).startsWith(" ") &&
     !actionArgs.slice("spell".length).trim();
+  const showEquipmentPicker =
+    activeCommand?.name === "action" &&
+    actionArgs.toLowerCase().startsWith("equipment") &&
+    actionArgs.slice("equipment".length).startsWith(" ") &&
+    !actionArgs.slice("equipment".length).trim();
 
   const actionCheckMode: "hinder" | "study" | null =
     activeCommand?.name === "action"
@@ -186,6 +198,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   const spellOptions = showSpellPicker ? resolveSpellOptions(playerDoc) : [];
   const offensiveSpellOptions = spellOptions.filter((opt) => opt.isOffensive);
   const utilitySpellOptions = spellOptions.filter((opt) => !opt.isOffensive);
+  const equipmentSlots = showEquipmentPicker
+    ? resolveEquipmentSlots(playerDoc)
+    : [];
 
   const applySpell = (arg: string) => {
     sendAndRecord(`/action spell ${arg}`);
@@ -1232,6 +1247,102 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                             ) : null,
                           )}
                         </>
+                      )}
+                    </Box>
+                  </ListItem>
+                )}
+                {showEquipmentPicker && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                        width: "100%",
+                      }}
+                    >
+                      {equipmentSlots.length === 0 ? (
+                        <Typography variant="caption" color="text.secondary">
+                          No equipment to adjust
+                        </Typography>
+                      ) : (
+                        equipmentSlots.map((slot) => (
+                          <Button
+                            key={slot.slotKey}
+                            size="small"
+                            variant="outlined"
+                            fullWidth
+                            disabled={slot.isLocked}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => onOpenEquipmentSlot?.(slot.slotKey)}
+                            sx={{
+                              justifyContent: "space-between",
+                              fontFamily: "monospace",
+                              fontSize: "0.75rem",
+                              py: 0.5,
+                              px: 1,
+                              textTransform: "none",
+                              flexDirection: "column",
+                              alignItems: "flex-start",
+                              whiteSpace: "normal",
+                              height: "auto",
+                              opacity: slot.isLocked ? 0.5 : 1,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: "flex",
+                                width: "100%",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 0.5,
+                                }}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontWeight: 600,
+                                    fontFamily: "monospace",
+                                  }}
+                                >
+                                  {slot.label}
+                                </Typography>
+                                {slot.isLocked && (
+                                  <LockIcon
+                                    sx={{
+                                      fontSize: "0.875rem",
+                                      color: "warning.main",
+                                    }}
+                                  />
+                                )}
+                              </Box>
+                            </Box>
+                            {slot.currentItem && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{
+                                  mt: 0.25,
+                                  fontFamily: "monospace",
+                                  fontSize: "0.65rem",
+                                }}
+                              >
+                                {slot.currentItem.name}
+                                {slot.currentItem.stats && (
+                                  <Box component="span" sx={{ ml: 0.5 }}>
+                                    ({slot.currentItem.stats})
+                                  </Box>
+                                )}
+                              </Typography>
+                            )}
+                          </Button>
+                        ))
                       )}
                     </Box>
                   </ListItem>

@@ -102,13 +102,80 @@ export default function SlotPickerDialog({
   const [hoveredModule, setHoveredModule] = useState(null);
   const [pendingModule, setPendingModule] = useState(null);
 
+  const currentlyEquipped = useMemo(() => {
+    if (!open || !player?.equippedSlots?.[slot]) return null;
+    const currentRef = player.equippedSlots[slot];
+    const inv = player?.equipment?.[0] || {};
+
+    let candidates = [];
+    if (slot === "mainHand") {
+      candidates = [
+        ...(inv.weapons ?? []).map((w, i) => ({
+          label: w.name,
+          source: "weapons",
+          index: i,
+          item: w,
+        })),
+        ...(inv.customWeapons ?? []).map((w, i) => ({
+          label: w.name,
+          source: "customWeapons",
+          index: i,
+          item: w,
+        })),
+      ];
+    } else if (slot === "offHand") {
+      candidates = [
+        ...(inv.weapons ?? []).map((w, i) => ({
+          label: w.name,
+          source: "weapons",
+          index: i,
+          item: w,
+        })),
+        ...(inv.shields ?? []).map((s, i) => ({
+          label: s.name,
+          source: "shields",
+          index: i,
+          item: s,
+        })),
+      ];
+    } else if (slot === "armor") {
+      candidates = (inv.armor ?? []).map((a, i) => ({
+        label: a.name,
+        source: "armor",
+        index: i,
+        item: a,
+      }));
+    } else if (slot === "accessory") {
+      candidates = (inv.accessories ?? []).map((a, i) => ({
+        label: a.name,
+        source: "accessories",
+        index: i,
+        item: a,
+      }));
+    }
+
+    return (
+      candidates.find((c) => {
+        if (c.source !== currentRef?.source) return false;
+        if (c.label !== currentRef?.name) return false;
+        if (currentRef.index !== undefined) return c.index === currentRef.index;
+        return true;
+      }) ?? null
+    );
+  }, [open, slot, player]);
+
   useEffect(() => {
     if (open) {
       setModuleOverrideOpen(openModuleOverride);
       setHoveredModule(null);
       setPendingModule(null);
+      if (currentlyEquipped) {
+        setPendingCandidate(currentlyEquipped);
+      } else {
+        setPendingCandidate(null);
+      }
     }
-  }, [open, openModuleOverride]);
+  }, [open, openModuleOverride, currentlyEquipped]);
 
   const hasDualShieldBearer =
     player?.classes?.some((cls) =>

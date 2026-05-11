@@ -89,6 +89,10 @@ export function useChatStore(
     setMessages((prev) => prev.filter((m) => m.id !== id));
   };
 
+  const addMessage = (message: ChatMessage) => {
+    setMessages((prev) => [...prev, message]);
+  };
+
   const clearAll = () => setMessages([]);
 
   const addDie = (sides: DieSides) => {
@@ -111,6 +115,7 @@ export function useChatStore(
     commandError,
     clearCommandError,
     send,
+    addMessage,
     deleteMessage,
     clearAll,
     addDie,
