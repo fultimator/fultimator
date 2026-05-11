@@ -27,7 +27,7 @@ import SpellTinkererMagitech from "../spells/SpellTinkererMagitech";
 import { syncSlots } from "../equipment/slots/equipmentSlots";
 
 const ranks = ["Basic", "Advanced", "Superior"]; // Define ranks
-const elements = ["physical", "wind", "bolt", "earth", "fire", "ice"];
+const elements = ["physical", "air", "bolt", "earth", "fire", "ice"];
 export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();

@@ -51,7 +51,7 @@ const NotesMarkdown = ({ children, ...props }) => {
 
     // Handle type icons with [ICON:type] syntax
     const typeIconRegex =
-      /\[ICON:(physical|wind|bolt|dark|earth|fire|ice|light|poison)\]/g;
+      /\[ICON:(physical|air|bolt|dark|earth|fire|ice|light|poison)\]/g;
     intermediate = intermediate.replace(
       typeIconRegex,
       (_, type) => `<span class="type-icon" data-type="${type}"></span>`,

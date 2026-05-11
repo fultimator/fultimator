@@ -7044,7 +7044,7 @@
     "ru": ""
   },
   {
-    "key": "wind",
+    "key": "air",
     "en": "air",
     "it": "aria",
     "de": "Luft",
@@ -7477,18 +7477,6 @@
   },
   {
     "key": "air_damage",
-    "en": "**air** damage",
-    "it": "danni da **aria**",
-    "de": "**Luft**schaden",
-    "pl": "**powietrzne** obrażenia",
-    "fr": "dégâts d'**air**",
-    "es": "daño de **aire**",
-    "pt-BR": "dano de **ar**",
-    "zh": "**风系**伤害",
-    "ru": ""
-  },
-  {
-    "key": "wind_damage",
     "en": "**air** damage",
     "it": "danni da **aria**",
     "de": "**Luft**schaden",

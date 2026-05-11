@@ -2643,7 +2643,7 @@ function Stats({
           <AffinityGrid container>
             {[
               "physical",
-              "wind",
+              "air",
               "bolt",
               "dark",
               "earth",

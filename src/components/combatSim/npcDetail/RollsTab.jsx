@@ -67,7 +67,7 @@ const RollsTab = ({
 
   const damageTypeLabels = {
     physical: "physical_damage",
-    wind: "air_damage",
+    air: "air_damage",
     bolt: "bolt_damage",
     dark: "dark_damage",
     earth: "earth_damage",
@@ -75,6 +75,16 @@ const RollsTab = ({
     ice: "ice_damage",
     light: "light_damage",
     poison: "poison_damage",
+  };
+
+  const resolveAttackDamageType = (item, rowType) => {
+    const normalized =
+      item?.damage?.type ??
+      (rowType === "Attack" ? item?.type : item?.weapon?.type) ??
+      "physical";
+    if (normalized === "wind") return "air";
+    if (normalized === "lightning") return "bolt";
+    return normalized;
   };
 
   const StyledMarkdown = ({ children, ...props }) => {
@@ -215,7 +225,7 @@ const RollsTab = ({
                         >
                           {t(
                             damageTypeLabels[
-                              type === "Attack" ? data.type : data.weapon.type
+                              resolveAttackDamageType(data, type)
                             ],
                           )}
                         </StyledMarkdown>

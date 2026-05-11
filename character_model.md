@@ -331,7 +331,7 @@
 - **Type:** Object
 - **Description:** Damage-type affinities.
   - **`physical`**: String
-  - **`wind`**: String
+  - **`air`**: String
   - **`bolt`**: String
   - **`dark`**: String
   - **`earth`**: String

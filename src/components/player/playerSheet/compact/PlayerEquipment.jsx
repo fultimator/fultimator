@@ -120,6 +120,16 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
+function normalizeAttrKey(raw) {
+  const key = String(raw || "").toLowerCase();
+  if (key === "dex" || key === "dexterity") return "dexterity";
+  if (key === "ins" || key === "insight") return "insight";
+  if (key === "mig" || key === "might") return "might";
+  if (key === "wlp" || key === "will" || key === "willpower")
+    return "willpower";
+  return "dexterity";
+}
+
 export default function PlayerEquipment({
   player,
   setPlayer,
@@ -745,13 +755,13 @@ export default function PlayerEquipment({
 
   const handleDiceRoll = (weapon) => {
     setCurrentWeapon(weapon);
-    const attr1 = weapon.accuracy?.attr1;
-    const attr2 = weapon.accuracy?.attr2;
+    const attr1 = normalizeAttrKey(weapon.accuracy?.attr1);
+    const attr2 = normalizeAttrKey(weapon.accuracy?.attr2);
     const weaponPrec = weapon.accuracy?.value ?? 0;
     const weaponDamage = weapon.damage?.value ?? 0;
     const weaponType = weapon.damage?.type ?? "physical";
-    const v1 = attributeMap[attr1],
-      v2 = attributeMap[attr2];
+    const v1 = attributeMap[attr1] ?? currDex,
+      v2 = attributeMap[attr2] ?? currMight;
     const d1 = Math.floor(Math.random() * v1) + 1,
       d2 = Math.floor(Math.random() * v2) + 1;
     const isCritFail = d1 === 1 && d2 === 1,
@@ -778,7 +788,7 @@ export default function PlayerEquipment({
           <Typography variant="h6">{t(weaponType)}</Typography>
         </Grid>
         <Grid sx={{ mt: 2 }} size={12}>
-          <Typography>{`${d1} [${attributes[attr1].shortcaps}] + ${d2} [${attributes[attr2].shortcaps}] ${weaponPrec !== 0 ? (weaponPrec > 0 ? "+" : "") + weaponPrec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : ""}`}</Typography>
+          <Typography>{`${d1} [${attributes[attr1]?.shortcaps ?? "DEX"}] + ${d2} [${attributes[attr2]?.shortcaps ?? "MIG"}] ${weaponPrec !== 0 ? (weaponPrec > 0 ? "+" : "") + weaponPrec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : ""}`}</Typography>
           <Typography sx={{ fontWeight: "bold" }}>
             {t("Damage")}:{" "}
             {`max(${d1}, ${d2}) + ${weaponDamage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : ""}`}
@@ -1214,8 +1224,8 @@ function EquipmentRow({
     if (item.equipType === "weapon" || item.equipType === "custom-weapon") {
       const accuracy = item.accuracy ?? {};
       const damage = item.damage ?? {};
-      const attr1 = accuracy.attr1;
-      const attr2 = accuracy.attr2;
+      const attr1 = normalizeAttrKey(accuracy.attr1);
+      const attr2 = normalizeAttrKey(accuracy.attr2);
       const prec = accuracy.value ?? 0;
       const damageValue = damage.value ?? 0;
       const damageType = damage.type ?? "physical";
@@ -1224,7 +1234,7 @@ function EquipmentRow({
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               <OpenBracket />
-              {`${attributes[attr1].shortcaps} + ${attributes[attr2].shortcaps}`}
+              {`${attributes[attr1]?.shortcaps ?? "DEX"} + ${attributes[attr2]?.shortcaps ?? "MIG"}`}
               <CloseBracket />
               {prec !== 0 ? (prec > 0 ? "+" : "") + prec : ""}
             </Typography>
@@ -1234,7 +1244,7 @@ function EquipmentRow({
               <OpenBracket />
               {t("HR")} {damageValue >= 0 ? "+" : ""} {damageValue}
               <CloseBracket />
-              {types[damageType].long}
+              {types[damageType]?.long ?? types.physical.long}
             </Typography>
           </StyledTableCell>
         </>

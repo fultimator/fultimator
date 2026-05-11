@@ -9,6 +9,14 @@ interface VersionedTransform {
   fn: NpcTransform;
 }
 
+function normalizeElementType(type: unknown): Elements {
+  const raw = String(type ?? "physical")
+    .toLowerCase()
+    .trim();
+  if (raw === "air") return "air" as Elements;
+  return (raw || "physical") as Elements;
+}
+
 // Pre-save transforms
 const PRE_SAVE_TRANSFORMS: NpcTransform[] = [
   // No transforms yet - placeholder for future cleanup passes.
@@ -124,6 +132,7 @@ function normalizeSpellFields(npc: TypeNpc): TypeNpc {
         const dmg = s.damage as unknown as Record<string, unknown>;
         s.damage = {
           ...dmg,
+          type: normalizeElementType(dmg.type),
           hrZero: dmg.hrZero === true,
         } as unknown as typeof s.damage;
       }
@@ -151,7 +160,9 @@ function unifyNpcSpellSchema(npc: TypeNpc): TypeNpc {
       // damage + damagetype -> damage object; drop damagetype
       const flatDamage = typeof s.damage === "number" ? s.damage : 0;
       const damageType =
-        typeof s.damagetype === "string" ? s.damagetype : "physical";
+        typeof s.damagetype === "string"
+          ? normalizeElementType(s.damagetype)
+          : "physical";
       s.damage = {
         value: flatDamage,
         type: damageType as Elements,
@@ -206,6 +217,9 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
         range: normalizeRange(a.range),
         damage: {
           ...(a.damage as Record<string, unknown>),
+          type: normalizeElementType(
+            (a.damage as Record<string, unknown>).type,
+          ),
           hrZero: (a.damage as Record<string, unknown>).hrZero === true,
         },
         special: Array.isArray(a.special)
@@ -231,7 +245,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
     };
     next.damage = {
       value: 0,
-      type: (a.type as string) ?? "physical",
+      type: normalizeElementType((a.type as string) ?? "physical"),
       hrZero: false,
     };
     delete next.attr1;
@@ -269,6 +283,9 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
         },
         damage: {
           ...(wa.damage as Record<string, unknown>),
+          type: normalizeElementType(
+            (wa.damage as Record<string, unknown>).type,
+          ),
           hrZero: (wa.damage as Record<string, unknown>).hrZero === true,
         },
       };
@@ -291,7 +308,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
     };
     next.damage = {
       value: typeof w.damage === "number" ? w.damage : 0,
-      type: (w.type as string) ?? "physical",
+      type: normalizeElementType((w.type as string) ?? "physical"),
       hrZero: false,
     };
     next.range = normalizeRange(w.range ?? wa.range);

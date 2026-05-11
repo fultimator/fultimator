@@ -312,7 +312,7 @@ export function calcAvailableSkillsFromVulnerabilities(npc) {
   if (
     npc.species === "Plant" &&
     (npc.affinities.fire ||
-      npc.affinities.wind ||
+      npc.affinities.air ||
       npc.affinities.ice ||
       npc.affinities.bolt)
   ) {

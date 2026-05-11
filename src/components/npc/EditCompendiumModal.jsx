@@ -46,7 +46,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
 
   const damageTypeLabels = {
     physical: "physical_damage",
-    wind: "air_damage",
+    air: "air_damage",
     bolt: "bolt_damage",
     dark: "dark_damage",
     earth: "earth_damage",

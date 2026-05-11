@@ -131,7 +131,7 @@ export interface PlayerImmunities {
 
 export interface PlayerAffinities {
   physical: Affinities;
-  wind: Affinities;
+  air: Affinities;
   bolt: Affinities;
   dark: Affinities;
   earth: Affinities;

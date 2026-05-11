@@ -561,7 +561,7 @@ function Stats({ npc }) {
                 sx={{ py: 0.4, borderRight: "1px solid #604365" }}
                 size="grow"
               >
-                <TypeAffinity type="wind" affinity={npc.affinities.wind} />
+                <TypeAffinity type="air" affinity={npc.affinities.air} />
               </Grid>
               <Grid
                 sx={{ py: 0.4, borderRight: "1px solid #6f5375" }}
@@ -705,7 +705,7 @@ function Attacks({ npc }) {
       : `linear-gradient(90deg, #6e468d 0%, #ffffff 100%)`; // Light mode gradient
   const damageTypeLabels = {
     physical: "physical_damage",
-    wind: "air_damage",
+    air: "air_damage",
     bolt: "bolt_damage",
     dark: "dark_damage",
     earth: "earth_damage",
@@ -1512,7 +1512,7 @@ function Equip({ npc }) {
   const hasShield = npc.shield && npc.shield.name !== t("No Shield", true);
   const damageTypeLabels = {
     physical: "physical_damage",
-    wind: "air_damage",
+    air: "air_damage",
     bolt: "bolt_damage",
     dark: "dark_damage",
     earth: "earth_damage",

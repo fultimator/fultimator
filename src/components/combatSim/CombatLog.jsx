@@ -32,7 +32,7 @@ const tagMap = {
   "{{physical-icon}}": (
     <TypeIcon type={"physical"} sx={{ verticalAlign: "middle" }} />
   ),
-  "{{wind-icon}}": <TypeIcon type={"wind"} sx={{ verticalAlign: "middle" }} />,
+  "{{air-icon}}": <TypeIcon type={"air"} sx={{ verticalAlign: "middle" }} />,
   "{{bolt-icon}}": <TypeIcon type={"bolt"} sx={{ verticalAlign: "middle" }} />,
   "{{dark-icon}}": <TypeIcon type={"dark"} sx={{ verticalAlign: "middle" }} />,
   "{{earth-icon}}": (
@@ -474,7 +474,7 @@ export default function CombatLog({
 
     // Replace other standard icon tags from tagMap with text equivalents
     plainText = plainText.replace(/\{\{physical-icon\}\}/g, "");
-    plainText = plainText.replace(/\{\{wind-icon\}\}/g, "");
+    plainText = plainText.replace(/\{\{air-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{bolt-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{dark-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{earth-icon\}\}/g, "");

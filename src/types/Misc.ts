@@ -15,7 +15,7 @@ export enum Attributes {
 
 export enum Elements {
   Physical = "physical",
-  Wind = "wind",
+  Air = "air",
   Bolt = "bolt",
   Dark = "dark",
   Earth = "earth",

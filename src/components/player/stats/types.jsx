@@ -18,7 +18,7 @@ export function TypeName({ type }) {
   return (
     <>
       {type === "physical" && t("Physical")}
-      {type === "wind" && t("Air")}
+      {type === "air" && t("Air")}
       {type === "bolt" && t("Bolt")}
       {type === "dark" && t("Dark")}
       {type === "earth" && t("Earth")}
@@ -34,7 +34,7 @@ export function TypeIcon({ type, disabled }) {
   return (
     <>
       {type === "physical" && <PhysicalIcon disabled={disabled} />}
-      {type === "wind" && <WindIcon disabled={disabled} />}
+      {type === "air" && <WindIcon disabled={disabled} />}
       {type === "bolt" && <BoltIcon disabled={disabled} />}
       {type === "dark" && <DarkIcon disabled={disabled} />}
       {type === "earth" && <EarthIcon disabled={disabled} />}

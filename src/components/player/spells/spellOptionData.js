@@ -232,9 +232,9 @@ export const availableMagichantKeys = [
     recovery: "HP",
   },
   {
-    fuid: "wind",
+    fuid: "air",
     name: "magichant_wind",
-    type: "wind",
+    type: "air",
     status: "Slow",
     attribute: "INS",
     recovery: "MP",

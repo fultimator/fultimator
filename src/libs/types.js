@@ -4,8 +4,8 @@ const types = {
   physical: {
     long: t("physical", true),
   },
-  wind: {
-    long: t("wind", true),
+  air: {
+    long: t("air", true),
   },
   bolt: {
     long: t("bolt", true),
@@ -32,7 +32,7 @@ const types = {
 
 export const typesList = [
   "physical",
-  "wind",
+  "air",
   "bolt",
   "dark",
   "earth",

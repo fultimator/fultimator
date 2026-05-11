@@ -25,7 +25,7 @@ const ATTR_SHORT = {
 
 const DAMAGE_TYPE_LABEL = {
   physical: "Physical",
-  wind: "Air",
+  air: "Air",
   bolt: "Bolt",
   dark: "Dark",
   earth: "Earth",
@@ -37,12 +37,9 @@ const DAMAGE_TYPE_LABEL = {
 
 const AFFINITY_LABEL = { vu: "VU", rs: "RS", im: "IM", ab: "AB" };
 
-// "wind" in NPC data → "air" in Obsidian fu-vault format
-const OBSIDIAN_AFFINITY_KEY = { wind: "air" };
-
 const NPC_AFFINITY_ORDER = [
   "physical",
-  "wind",
+  "air",
   "bolt",
   "dark",
   "earth",

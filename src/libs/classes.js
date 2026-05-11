@@ -2360,7 +2360,7 @@ export const spellList = [
         secondEffects: [
           {
             dieValue: 1,
-            effect: t("wind"),
+            effect: t("air"),
           },
           {
             dieValue: 2,
@@ -2791,7 +2791,7 @@ export const entropistGamble = {
       secondEffects: [
         {
           dieValue: 1,
-          effect: t("wind"),
+          effect: t("air"),
         },
         {
           dieValue: 2,

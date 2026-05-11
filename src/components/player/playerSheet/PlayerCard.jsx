@@ -1641,7 +1641,7 @@ export default function PlayerCard({
       <AffinityStrip>
         {[
           "physical",
-          "wind",
+          "air",
           "bolt",
           "dark",
           "earth",

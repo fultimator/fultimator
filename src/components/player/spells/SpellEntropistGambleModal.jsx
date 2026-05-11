@@ -24,7 +24,7 @@ import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 
 const secondEffectsOptions = [
-  { dieValue: 1, effect: "Wind" },
+  { dieValue: 1, effect: "Air" },
   { dieValue: 2, effect: "Bolt" },
   { dieValue: 3, effect: "Dark" },
   { dieValue: 4, effect: "Earth" },

@@ -18,6 +18,15 @@ interface VersionedTransform {
   fn: PlayerTransform;
 }
 
+function normalizeElementType(type: unknown): string {
+  const raw = String(type ?? "physical")
+    .toLowerCase()
+    .trim();
+  if (raw === "air") return "air";
+  if (raw === "lightning") return "bolt";
+  return raw || "physical";
+}
+
 // Pre-save transforms
 // Applied before writing to the database. Should produce a clean, minimal
 // representation - no runtime-only fields that are re-derived on load.
@@ -522,9 +531,11 @@ function resolveCustomDamageType(
   const hasElemental = customizations.some(
     (c) => c.name === "weapon_customization_elemental",
   );
-  if (hasElemental) return customDamageType ?? fallbackType ?? "physical";
-  if (overrideDamageType && customDamageType) return customDamageType;
-  return fallbackType ?? "physical";
+  if (hasElemental)
+    return normalizeElementType(customDamageType ?? fallbackType ?? "physical");
+  if (overrideDamageType && customDamageType)
+    return normalizeElementType(customDamageType);
+  return normalizeElementType(fallbackType ?? "physical");
 }
 
 function calcCustomWeaponDamage(
@@ -589,6 +600,7 @@ function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
       const damageObj = s.damage as Record<string, unknown>;
       s.damage = {
         ...damageObj,
+        type: normalizeElementType(damageObj.type),
         hrZero: damageObj.hrZero === true,
       };
     }
@@ -642,6 +654,7 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
         category: normalizeWeaponCategory(w.category as string | undefined),
         damage: {
           ...damageObj,
+          type: normalizeElementType(damageObj.type),
           hrZero: damageObj.hrZero === true,
         },
       };
@@ -688,12 +701,14 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
         ...w,
         damage: {
           ...damageObj,
+          type: normalizeElementType(damageObj.type),
           hrZero: damageObj.hrZero === true,
         },
         ...(secondDamageObj
           ? {
               secondDamage: {
                 ...secondDamageObj,
+                type: normalizeElementType(secondDamageObj.type),
                 hrZero: secondDamageObj.hrZero === true,
               },
             }

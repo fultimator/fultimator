@@ -86,7 +86,7 @@ export interface NpcExtra {
 
 export interface NpcAffinities {
   physical?: Affinities;
-  wind?: Affinities;
+  air?: Affinities;
   bolt?: Affinities;
   dark?: Affinities;
   earth?: Affinities;
