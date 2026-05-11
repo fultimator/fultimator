@@ -773,9 +773,7 @@ function Attacks({ npc }) {
             <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 {attack.range === "melee" && <MeleeIcon />}
-                {(attack.range === "distance" || attack.range === "ranged") && (
-                  <DistanceIcon />
-                )}
+                {attack.range === "ranged" && <DistanceIcon />}
               </Typography>
             </Grid>
             <Grid sx={{ px: 1, py: 0.5 }} size={11}>
@@ -792,23 +790,25 @@ function Attacks({ npc }) {
                   {calcPrecision(attack, npc) > 0 &&
                     `+${calcPrecision(attack, npc)}`}{" "}
                 </strong>
-                {attack.type !== "nodmg" && (
+                {attack.damage?.type !== "nodmg" && (
                   <>
                     <strong>
                       <Diamond /> <OpenBracket />
-                      {t("HR") + " + " + calcDamage(attack, npc)}
+                      {(attack.damage?.hrZero ? "HR0" : t("HR")) +
+                        " + " +
+                        calcDamage(attack, npc)}
                       <CloseBracket />{" "}
                     </strong>
-                    {attack.type === "physical" ? (
+                    {attack.damage?.type === "physical" ? (
                       <span>
                         <SpanMarkdown>
-                          {t(damageTypeLabels[attack.type])}
+                          {t(damageTypeLabels[attack.damage?.type])}
                         </SpanMarkdown>
                       </span>
                     ) : (
                       <span style={{ textTransform: "lowercase" }}>
                         <SpanMarkdown>
-                          {t(damageTypeLabels[attack.type])}
+                          {t(damageTypeLabels[attack.damage?.type])}
                         </SpanMarkdown>
                       </span>
                     )}
@@ -850,9 +850,7 @@ function Attacks({ npc }) {
             <Grid sx={{ px: 1, py: 0.5 }} size={1}>
               <Typography sx={{ textAlign: "center" }}>
                 {attack.range === "melee" && <MeleeIcon />}
-                {(attack.range === "distance" || attack.range === "ranged") && (
-                  <DistanceIcon />
-                )}
+                {attack.range === "ranged" && <DistanceIcon />}
               </Typography>
             </Grid>
             <Grid sx={{ px: 1, py: 0.5 }} size={11}>

@@ -237,10 +237,7 @@ const NPCDetail = ({
           attackType === "attack"
             ? attack.range
             : (attack.range ?? attack.weapon?.range),
-        damageType:
-          attackType === "attack"
-            ? (attack.damage?.type ?? attack.type)
-            : (attack.damage?.type ?? attack.weapon?.type),
+        damageType: attack.damage?.type,
         dice1: diceResults.attribute1,
         dice2: diceResults.attribute2,
         prec:
@@ -340,7 +337,7 @@ const NPCDetail = ({
       attribute2 = attributes[attr2];
       extraDamage = calcDamage(attack, selectedNPC);
       extraPrecision = calcPrecision(attack, selectedNPC);
-      type = attack.damage?.type ?? attack.weapon?.type;
+      type = attack.damage?.type;
     } else if (attackType === "spell") {
       // For spells
       const { attr1, attr2 } = attack;
@@ -351,13 +348,13 @@ const NPCDetail = ({
       type = "spell";
     } else {
       // For base attacks
-      const attr1 = attack.accuracy?.attr1 ?? attack.attr1;
-      const attr2 = attack.accuracy?.attr2 ?? attack.attr2;
+      const attr1 = attack.accuracy?.attr1;
+      const attr2 = attack.accuracy?.attr2;
       attribute1 = attributes[attr1];
       attribute2 = attributes[attr2];
       extraDamage = calcDamage(attack, selectedNPC);
       extraPrecision = calcPrecision(attack, selectedNPC);
-      type = attack.damage?.type ?? attack.type;
+      type = attack.damage?.type;
     }
 
     if (attribute1 === undefined || attribute2 === undefined) {

@@ -334,14 +334,10 @@ function NpcCombatant({ npc }: NpcProps) {
       // For weapon attacks
       attribute1 = attributes[attack.accuracy?.attr1];
       attribute2 = attributes[attack.accuracy?.attr2];
-      extraDamage =
-        (attack.damage?.value ?? 0) +
-        (attack.flatdmg ? parseInt(attack.flatdmg) : 0) +
-        (attack.extraDamage ? 5 : 0);
+      extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
       extraPrecision =
         (npc.extra?.precision ? 3 : 0) +
         (attack.accuracy?.value ?? 0) +
-        (attack.flathit ? parseInt(attack.flathit) : 0) +
         accuracyLevelBonus;
       type = attack.damage?.type;
     } else if (attackType === "spell") {
@@ -354,12 +350,16 @@ function NpcCombatant({ npc }: NpcProps) {
       type = "spell";
     } else {
       // For base attacks
-      const { attr1, attr2 } = attack;
+      const attr1 = attack.accuracy?.attr1;
+      const attr2 = attack.accuracy?.attr2;
       attribute1 = attributes[attr1];
       attribute2 = attributes[attr2];
-      extraDamage = attack.extraDamage ? 10 : 5;
-      extraPrecision = (npc.extra?.precision ? 3 : 0) + accuracyLevelBonus;
-      type = attack.type;
+      extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
+      extraPrecision =
+        (npc.extra?.precision ? 3 : 0) +
+        (attack.accuracy?.value ?? 0) +
+        accuracyLevelBonus;
+      type = attack.damage?.type;
     }
 
     // Get +5 damage after lvl 20 and another +5 after lvl 40 and another +5 after lvl 60

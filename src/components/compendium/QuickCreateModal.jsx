@@ -334,18 +334,16 @@ function NpcAttackPanel() {
   const [attr2, setAttr2] = useState("dexterity");
   const [dmgType, setDmgType] = useState("physical");
   const [special, setSpecial] = useState("");
-  const [flathit, setFlathit] = useState(0);
-  const [flatdmg, setFlatdmg] = useState(0);
+  const [accuracyValue, setAccuracyValue] = useState(0);
+  const [damageValue, setDamageValue] = useState(0);
   const [hrZero, setHrZero] = useState(false);
 
   const data = {
     itemType: "basic",
     name: name.trim(),
     range,
-    attr1,
-    attr2,
-    damage: { value: Number(flatdmg), type: dmgType, hrZero },
-    flathit: Number(flathit),
+    accuracy: { attr1, attr2, value: Number(accuracyValue), defense: "def" },
+    damage: { value: Number(damageValue), type: dmgType, hrZero },
     martial: false,
     category: range === "melee" ? "Melee Attack" : "Ranged Attack",
     special: special.trim() ? [special.trim()] : [],
@@ -358,8 +356,8 @@ function NpcAttackPanel() {
     setAttr2("dexterity");
     setDmgType("physical");
     setSpecial("");
-    setFlathit(0);
-    setFlatdmg(0);
+    setAccuracyValue(0);
+    setDamageValue(0);
     setHrZero(false);
   };
 
@@ -465,8 +463,8 @@ function NpcAttackPanel() {
             <Grid size={6}>
               <TextField
                 label={t("Accuracy Bonus")}
-                value={flathit}
-                onChange={(e) => setFlathit(e.target.value)}
+                value={accuracyValue}
+                onChange={(e) => setAccuracyValue(e.target.value)}
                 fullWidth
                 size="small"
                 type="number"
@@ -478,8 +476,8 @@ function NpcAttackPanel() {
             <Grid size={6}>
               <TextField
                 label={t("Damage Value")}
-                value={flatdmg}
-                onChange={(e) => setFlatdmg(e.target.value)}
+                value={damageValue}
+                onChange={(e) => setDamageValue(e.target.value)}
                 fullWidth
                 size="small"
                 type="number"

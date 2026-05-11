@@ -61,9 +61,12 @@ export default function EditAttacks({ npc, setNpc }) {
           itemType: "basic",
           name: "",
           range: "melee",
-          attr1: "dexterity",
-          attr2: "dexterity",
-          type: "physical",
+          accuracy: {
+            attr1: "dexterity",
+            attr2: "dexterity",
+            value: 0,
+            defense: "def",
+          },
           damage: { value: 0, type: "physical", hrZero: false },
           special: [],
         },
@@ -139,17 +142,18 @@ export default function EditAttacks({ npc, setNpc }) {
               {
                 itemType: "basic",
                 name: item.name,
-                range: item.ranged === true ? "distance" : "melee",
-                attr1: item.attr1 || "dexterity",
-                attr2: item.attr2 || "dexterity",
-                type: item.type,
+                range: item.ranged === true ? "ranged" : "melee",
+                accuracy: {
+                  attr1: item.accuracy?.attr1 ?? "dexterity",
+                  attr2: item.accuracy?.attr2 ?? "dexterity",
+                  value: item.accuracy?.value ?? 0,
+                  defense: item.accuracy?.defense ?? "def",
+                },
                 damage: {
                   value: item.damage?.value ?? 0,
-                  type: item.damage?.type ?? item.type ?? "physical",
+                  type: item.damage?.type ?? "physical",
                   hrZero: item.damage?.hrZero === true,
                 },
-                flathit: item.flathit,
-                flatdmg: item.flatdmg,
                 special: [],
               },
             ],
@@ -214,13 +218,20 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             {t("Attr 1:")}
           </InputLabel>
           <Select
-            value={attack.attr1}
+            value={attack.accuracy?.attr1 ?? "dexterity"}
             labelId={"attack-" + i + "-attr1label"}
             id={"attack-" + i + "-attr1"}
             label={t("Attr 1:")}
             size="small"
             onChange={(e) => {
-              return setAttack("attr1", e.target.value);
+              return setAttack("accuracy", {
+                ...(attack.accuracy ?? {
+                  attr2: "dexterity",
+                  value: 0,
+                  defense: "def",
+                }),
+                attr1: e.target.value,
+              });
             }}
           >
             <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
@@ -242,13 +253,20 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             {t("Attr 2:")}
           </InputLabel>
           <Select
-            value={attack.attr2}
+            value={attack.accuracy?.attr2 ?? "dexterity"}
             labelId={"attack-" + i + "-attr2label"}
             id={"attack-" + i + "-attr2"}
             label={t("Attr 2:")}
             size="small"
             onChange={(e) => {
-              return setAttack("attr2", e.target.value);
+              return setAttack("accuracy", {
+                ...(attack.accuracy ?? {
+                  attr1: "dexterity",
+                  value: 0,
+                  defense: "def",
+                }),
+                attr2: e.target.value,
+              });
             }}
           >
             <MenuItem value={"dexterity"}>{t("DEX")}</MenuItem>
@@ -267,13 +285,16 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
-            value={attack.type}
+            value={attack.damage?.type ?? "physical"}
             labelId={"attack-" + i + "-type"}
             id={"attack-" + i + "-type"}
             label={t("Type:")}
             size="small"
             onChange={(e) => {
-              return setAttack("type", e.target.value);
+              return setAttack("damage", {
+                ...(attack.damage ?? { value: 0, hrZero: false }),
+                type: e.target.value,
+              });
             }}
           >
             {Object.keys(types).map((type) => {
@@ -348,7 +369,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             <ToggleButton value="melee" aria-label="left aligned">
               <MeleeIcon />
             </ToggleButton>
-            <ToggleButton value="distance" aria-label="right">
+            <ToggleButton value="ranged" aria-label="right">
               <DistanceIcon />
             </ToggleButton>
           </ToggleButtonGroup>
@@ -357,12 +378,19 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       <Grid size={3}>
         <FormControl variant="standard">
           <TextField
-            id="flathit"
+            id="accuracy-value"
             type="number"
             label={t("Acc.")}
-            value={attack.flathit || 0}
+            value={attack.accuracy?.value ?? 0}
             onChange={(e) => {
-              return setAttack("flathit", e.target.value);
+              return setAttack("accuracy", {
+                ...(attack.accuracy ?? {
+                  attr1: "dexterity",
+                  attr2: "dexterity",
+                  defense: "def",
+                }),
+                value: parseInt(e.target.value, 10) || 0,
+              });
             }}
             size="small"
             slotProps={{
@@ -374,12 +402,15 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       <Grid size={3}>
         <FormControl variant="standard">
           <TextField
-            id="flatdmg"
+            id="damage-value"
             type="number"
             label={t("Dmg.")}
-            value={attack.flatdmg || 0}
+            value={attack.damage?.value ?? 0}
             onChange={(e) => {
-              return setAttack("flatdmg", e.target.value);
+              return setAttack("damage", {
+                ...(attack.damage ?? { type: "physical", hrZero: false }),
+                value: parseInt(e.target.value, 10) || 0,
+              });
             }}
             size="small"
             slotProps={{
@@ -399,7 +430,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
                   setAttack("damage", {
                     ...(attack.damage ?? {
                       value: 0,
-                      type: attack.type ?? "physical",
+                      type: "physical",
                     }),
                     hrZero: e.target.checked,
                   })

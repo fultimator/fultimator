@@ -310,11 +310,11 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                       <strong>
                         <OpenBracket />
-                        {selectedItem.attr1 &&
-                          attributes[selectedItem.attr1]?.shortcaps}
+                        {selectedItem.accuracy?.attr1 &&
+                          attributes[selectedItem.accuracy?.attr1]?.shortcaps}
                         {" + "}
-                        {selectedItem.attr2 &&
-                          attributes[selectedItem.attr2]?.shortcaps}
+                        {selectedItem.accuracy?.attr2 &&
+                          attributes[selectedItem.accuracy?.attr2]?.shortcaps}
                         <CloseBracket />
                       </strong>
                       <Box
@@ -327,7 +327,8 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       </Box>
                       <strong>
                         <OpenBracket />
-                        {t("HR")} + {5 + (selectedItem.flatdmg || 0)}
+                        {selectedItem.damage?.hrZero ? "HR0" : t("HR")} +{" "}
+                        {selectedItem.damage?.value ?? 0}
                         <CloseBracket />
                       </strong>{" "}
                       <span>
@@ -335,7 +336,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                           allowedElements={["strong"]}
                           unwrapDisallowed={true}
                         >
-                          {t(damageTypeLabels[selectedItem.type])}
+                          {t(damageTypeLabels[selectedItem.damage?.type])}
                         </ReactMarkdown>
                       </span>
                     </Typography>

@@ -38,7 +38,7 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
         case "basic": {
           let range = "melee";
           if (selectedItem.ranged === true) {
-            range = "distance";
+            range = "ranged";
           } else if (selectedItem.melee === true) {
             range = "melee";
           }
@@ -51,11 +51,17 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
                 itemType: "basic",
                 name: selectedItem.name,
                 range: range,
-                attr1: selectedItem.attr1 || "dexterity",
-                attr2: selectedItem.attr2 || "dexterity",
-                type: selectedItem.type,
-                flathit: selectedItem.flathit,
-                flatdmg: selectedItem.flatdmg,
+                accuracy: {
+                  attr1: selectedItem.accuracy?.attr1 ?? "dexterity",
+                  attr2: selectedItem.accuracy?.attr2 ?? "dexterity",
+                  value: selectedItem.accuracy?.value ?? 0,
+                  defense: selectedItem.accuracy?.defense ?? "def",
+                },
+                damage: {
+                  value: selectedItem.damage?.value ?? 0,
+                  type: selectedItem.damage?.type ?? "physical",
+                  hrZero: selectedItem.damage?.hrZero === true,
+                },
                 special: [],
               },
             ],

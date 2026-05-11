@@ -373,15 +373,15 @@ export default function PlayerEquipment({
     setCurrentWeapon(weapon);
 
     // Handle attribute mapping for custom weapons
-    const att1 = weapon.accuracy?.attr1 || weapon.att1 || "dexterity";
-    const att2 = weapon.accuracy?.attr2 || weapon.att2 || "might";
+    const att1 = weapon.accuracy?.attr1 || "dexterity";
+    const att2 = weapon.accuracy?.attr2 || "might";
 
     let att1Value = attributeMap[att1] || 8;
     let att2Value = attributeMap[att2] || 8;
 
     // Calculate weapon stats for custom weapons
-    const weaponPrec = weapon.accuracy?.value ?? weapon.prec ?? 0;
-    const weaponDamage = weapon.damage?.value ?? weapon.damage ?? 5;
+    const weaponPrec = weapon.accuracy?.value ?? 0;
+    const weaponDamage = weapon.damage?.value ?? 5;
 
     const meleeModifier = precMeleeModifier;
     const rangedModifier = precRangedModifier;
@@ -440,7 +440,7 @@ export default function PlayerEquipment({
                 variant="h6"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
               >
-                {t(weapon.damage?.type ?? weapon.type)}
+                {t(weapon.damage?.type ?? "physical")}
               </Typography>
             </Grid>
           </Grid>

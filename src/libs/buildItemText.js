@@ -69,15 +69,15 @@ function npcRankLabel(rank) {
 }
 
 function formatAttackDesc(attack, npc, md) {
-  const attr1 = attack.accuracy?.attr1 ?? attack.attr1;
-  const attr2 = attack.accuracy?.attr2 ?? attack.attr2;
+  const attr1 = attack.accuracy?.attr1;
+  const attr2 = attack.accuracy?.attr2;
   const a1 = ATTR_SHORT[attr1] ?? attr1;
   const a2 = ATTR_SHORT[attr2] ?? attr2;
   const prec = calcPrecision(attack, npc);
   const precStr = prec > 0 ? ` +${prec}` : prec < 0 ? ` ${prec}` : "";
   const checkPart = `[${a1} + ${a2}]${precStr}`;
 
-  const attackType = attack.damage?.type ?? attack.type;
+  const attackType = attack.damage?.type;
   let desc;
   if (attackType === "nodmg") {
     desc = md ? `**${checkPart}**` : checkPart;
@@ -597,10 +597,10 @@ export function buildItemText(type, item, fmt) {
       return parts.join("\n\n");
     }
     case "weapons": {
-      const attr1 = attributes[item.accuracy?.attr1 ?? item.att1];
-      const attr2 = attributes[item.accuracy?.attr2 ?? item.att2];
-      const dmgType = types[item.damage?.type ?? item.type];
-      const precVal = item.accuracy?.value ?? item.prec ?? 0;
+      const attr1 = attributes[item.accuracy?.attr1];
+      const attr2 = attributes[item.accuracy?.attr2];
+      const dmgType = types[item.damage?.type];
+      const precVal = item.accuracy?.value ?? 0;
       const precStr =
         precVal > 0 ? ` +${precVal}` : precVal < 0 ? ` ${precVal}` : "";
       const parts = [h1(resolve(item.name))];
@@ -703,10 +703,11 @@ export function buildItemText(type, item, fmt) {
       return parts.join("\n\n");
     }
     case "attacks": {
-      const attr1 = attributes[item.attr1];
-      const attr2 = attributes[item.attr2];
-      const dmgType = types[item.type];
-      const hitBonus = item.flathit > 0 ? ` +${item.flathit}` : "";
+      const attr1 = attributes[item.accuracy?.attr1];
+      const attr2 = attributes[item.accuracy?.attr2];
+      const dmgType = types[item.damage?.type];
+      const hitBonus =
+        (item.accuracy?.value ?? 0) > 0 ? ` +${item.accuracy?.value}` : "";
       const parts = [h1(resolve(item.name))];
       const stats = [
         item.category && field("Category", resolve(item.category)),
@@ -718,7 +719,10 @@ export function buildItemText(type, item, fmt) {
               `[${attr1.shortcaps} + ${attr2.shortcaps}]${hitBonus}`,
             )
           : field("Accuracy", " - "),
-        field("Damage", `[HR + ${item.flatdmg ?? 0}] ${dmgType?.long ?? ""}`),
+        field(
+          "Damage",
+          `[${item.damage?.hrZero ? "HR0" : "HR"} + ${item.damage?.value ?? 0}] ${dmgType?.long ?? ""}`,
+        ),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));
       return parts.join("\n\n");

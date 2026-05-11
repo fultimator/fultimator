@@ -196,11 +196,6 @@ export function calcDamage(attack, npc) {
     number = number - 5 + attack.damage.value;
   }
 
-  // Flat Damage Input
-  if (attack.flatdmg) {
-    number += Number(attack.flatdmg);
-  }
-
   // Group Vehicle Rules
   if (npc.rank === "groupvehicle") {
     number = number + 5;
@@ -234,11 +229,6 @@ export function calcPrecision(attack, npc) {
     const sl = npc.companionlvl || 1;
     number = number + sl;
   }
-  //Flat Hit Input
-  if (attack.flathit) {
-    number += Number(attack.flathit);
-  }
-
   return number;
 }
 

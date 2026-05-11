@@ -1920,7 +1920,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 20, type: "earth" },
+    damage: { value: 20, type: "earth", hrZero: false },
   },
   {
     fuid: "elemental-shroud",
@@ -1937,7 +1937,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "elemental-weapon",
@@ -1954,7 +1954,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "flares",
@@ -1971,7 +1971,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 25, type: "fire" },
+    damage: { value: 25, type: "fire", hrZero: false },
   },
   {
     fuid: "fulgur",
@@ -1988,7 +1988,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 15, type: "bolt" },
+    damage: { value: 15, type: "bolt", hrZero: false },
   },
   {
     fuid: "glacies",
@@ -2005,7 +2005,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 15, type: "ice" },
+    damage: { value: 15, type: "ice", hrZero: false },
   },
   {
     fuid: "iceberg",
@@ -2022,7 +2022,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 25, type: "ice" },
+    damage: { value: 25, type: "ice", hrZero: false },
   },
   {
     fuid: "ignis",
@@ -2039,7 +2039,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 15, type: "fire" },
+    damage: { value: 15, type: "fire", hrZero: false },
   },
   {
     fuid: "soaring-strike",
@@ -2056,7 +2056,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "terra",
@@ -2073,7 +2073,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 15, type: "earth" },
+    damage: { value: 15, type: "earth", hrZero: false },
   },
   {
     fuid: "thunderbolt",
@@ -2090,7 +2090,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 25, type: "bolt" },
+    damage: { value: 25, type: "bolt", hrZero: false },
   },
   {
     fuid: "ventus",
@@ -2107,7 +2107,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 15, type: "air" },
+    damage: { value: 15, type: "air", hrZero: false },
   },
   {
     fuid: "vortex",
@@ -2124,7 +2124,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 25, type: "air" },
+    damage: { value: 25, type: "air", hrZero: false },
   },
   {
     fuid: "acceleration",
@@ -2141,7 +2141,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "anomaly",
@@ -2158,7 +2158,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "dark-weapon",
@@ -2175,7 +2175,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "dispel",
@@ -2192,7 +2192,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "divination",
@@ -2209,7 +2209,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "drain-spirit",
@@ -2226,7 +2226,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 20, type: "untyped" },
+    damage: { value: 20, type: "untyped", hrZero: false },
   },
   {
     fuid: "drain-vigor",
@@ -2243,7 +2243,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 15, type: "dark" },
+    damage: { value: 15, type: "dark", hrZero: false },
   },
   {
     fuid: "mirror",
@@ -2260,7 +2260,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "omega",
@@ -2277,7 +2277,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 20, type: "untyped" },
+    damage: { value: 20, type: "untyped", hrZero: false },
   },
   {
     fuid: "stop",
@@ -2294,7 +2294,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "umbra",
@@ -2311,7 +2311,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 15, type: "dark" },
+    damage: { value: 15, type: "dark", hrZero: false },
   },
   {
     fuid: "gamble",
@@ -2401,7 +2401,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "awaken",
@@ -2418,7 +2418,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "barrier",
@@ -2435,7 +2435,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "cleanse",
@@ -2452,7 +2452,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "enrage",
@@ -2469,7 +2469,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "hallucination",
@@ -2486,7 +2486,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "heal",
@@ -2503,7 +2503,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "lux",
@@ -2520,7 +2520,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 15, type: "light" },
+    damage: { value: 15, type: "light", hrZero: false },
   },
   {
     fuid: "mercy",
@@ -2537,7 +2537,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "reinforce",
@@ -2554,7 +2554,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "soul-shroud",
@@ -2571,7 +2571,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "soul-weapon",
@@ -2588,7 +2588,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "torpor",
@@ -2605,7 +2605,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 0, type: "physical" },
+    damage: { value: 0, type: "physical", hrZero: false },
   },
 ];
 

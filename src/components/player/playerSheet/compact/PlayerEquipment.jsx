@@ -745,11 +745,11 @@ export default function PlayerEquipment({
 
   const handleDiceRoll = (weapon) => {
     setCurrentWeapon(weapon);
-    const attr1 = weapon.accuracy?.attr1 ?? weapon.att1;
-    const attr2 = weapon.accuracy?.attr2 ?? weapon.att2;
-    const weaponPrec = weapon.accuracy?.value ?? weapon.prec ?? 0;
-    const weaponDamage = weapon.damage?.value ?? weapon.damage ?? 0;
-    const weaponType = weapon.damage?.type ?? weapon.type ?? "physical";
+    const attr1 = weapon.accuracy?.attr1;
+    const attr2 = weapon.accuracy?.attr2;
+    const weaponPrec = weapon.accuracy?.value ?? 0;
+    const weaponDamage = weapon.damage?.value ?? 0;
+    const weaponType = weapon.damage?.type ?? "physical";
     const v1 = attributeMap[attr1],
       v2 = attributeMap[attr2];
     const d1 = Math.floor(Math.random() * v1) + 1,
@@ -1214,11 +1214,11 @@ function EquipmentRow({
     if (item.equipType === "weapon" || item.equipType === "custom-weapon") {
       const accuracy = item.accuracy ?? {};
       const damage = item.damage ?? {};
-      const attr1 = accuracy.attr1 ?? item.att1;
-      const attr2 = accuracy.attr2 ?? item.att2;
-      const prec = accuracy.value ?? item.prec ?? 0;
-      const damageValue = damage.value ?? item.damage ?? 0;
-      const damageType = damage.type ?? item.type ?? "physical";
+      const attr1 = accuracy.attr1;
+      const attr2 = accuracy.attr2;
+      const prec = accuracy.value ?? 0;
+      const damageValue = damage.value ?? 0;
+      const damageType = damage.type ?? "physical";
       return (
         <>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>

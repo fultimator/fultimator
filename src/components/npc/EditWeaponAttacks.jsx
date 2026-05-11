@@ -56,11 +56,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
         const newState = Object.assign({}, prevState);
         newState.weaponattacks = [...(prevState.weaponattacks || [])];
         if (typeof key === "object") {
-          const {
-            weapon: _weapon,
-            type: _type,
-            ...current
-          } = newState.weaponattacks[i];
+          const { weapon: _weapon, ...current } = newState.weaponattacks[i];
           newState.weaponattacks[i] = { ...current, ...key };
         } else {
           newState.weaponattacks[i] = {
@@ -211,12 +207,19 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       <Grid size={3}>
         <FormControl variant="standard">
           <TextField
-            id="flathit"
+            id="accuracy-value"
             type="number"
             label={t("Acc.")}
-            value={attack.flathit || 0}
+            value={attack.accuracy?.value ?? 0}
             onChange={(e) => {
-              return setAttack("flathit", e.target.value);
+              return setAttack("accuracy", {
+                ...(attack.accuracy ?? {
+                  attr1: selectedWeapon.accuracy?.attr1 ?? "dexterity",
+                  attr2: selectedWeapon.accuracy?.attr2 ?? "might",
+                  defense: "def",
+                }),
+                value: parseInt(e.target.value, 10) || 0,
+              });
             }}
             size="small"
             slotProps={{
@@ -228,12 +231,18 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
       <Grid size={3}>
         <FormControl variant="standard">
           <TextField
-            id="flatdmg"
+            id="damage-value"
             type="number"
             label={t("Dmg.")}
-            value={attack.flatdmg || 0}
+            value={attack.damage?.value ?? 0}
             onChange={(e) => {
-              return setAttack("flatdmg", e.target.value);
+              return setAttack("damage", {
+                ...(attack.damage ?? {
+                  type: selectedWeapon.damage?.type ?? "physical",
+                  hrZero: false,
+                }),
+                value: parseInt(e.target.value, 10) || 0,
+              });
             }}
             size="small"
             slotProps={{
@@ -246,9 +255,7 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
         <FormControl variant="outlined" fullWidth>
           <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
           <Select
-            value={
-              attack.damage?.type || attack.type || selectedWeapon.damage?.type
-            }
+            value={attack.damage?.type || selectedWeapon.damage?.type}
             labelId={"attack-" + i + "-type"}
             id={"attack-" + i + "-type"}
             label={t("Type:")}
@@ -321,29 +328,6 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
           </Select>
         </FormControl>
       </Grid>
-      {/* <Grid size={8} lg={3}>
-        <FormControl variant="outlined" fullWidth>
-          <InputLabel id={"attack-" + i + "-type"}>{t("Type:")}</InputLabel>
-          <Select
-            value={attack.type}
-            labelId={"attack-" + i + "-type"}
-            id={"attack-" + i + "-type"}
-            label={t("Type:")}
-            size="small"
-            onChange={(e, value) => {
-              return setAttack("type", e.target.value);
-            }}
-          >
-            {Object.keys(types).map((type) => {
-              return (
-                <MenuItem key={type} value={type}>
-                  {types[type].long}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-      </Grid> */}
       <Grid size="grow">
         <FormGroup>
           <FormControlLabel
