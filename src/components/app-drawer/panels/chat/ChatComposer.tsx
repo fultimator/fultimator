@@ -27,6 +27,7 @@ import {
   DescriptionOutlined as DescriptionIcon,
   EditOutlined as EditIcon,
   Lock as LockIcon,
+  ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
 import { DICE_OPTIONS } from "./constants";
 import {
@@ -333,6 +334,35 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     setInput(`/${cmd.name} `);
     setCmdSuggestions([]);
     setActiveCommand(cmd);
+  };
+
+  const getCommandParts = () => {
+    const trimmed = input.trimEnd();
+    const firstSpace = trimmed.search(/\s/);
+    if (firstSpace === -1) {
+      return { commandToken: trimmed, args: "" };
+    }
+    return {
+      commandToken: trimmed.slice(0, firstSpace),
+      args: trimmed.slice(firstSpace + 1).trimEnd(),
+    };
+  };
+
+  const isInCommandParameterPart = () => Boolean(getCommandParts().args.trim());
+
+  const goBackCommandStep = () => {
+    const { commandToken, args } = getCommandParts();
+    if (!args.trim()) {
+      handleInputChange("");
+      requestAnimationFrame(() => textareaRef.current?.focus());
+      return;
+    }
+
+    const previousArgs = args.includes(" ")
+      ? args.slice(0, args.lastIndexOf(" ")).trimEnd()
+      : "";
+    handleInputChange(`${commandToken} ${previousArgs}`.trimEnd() + " ");
+    requestAnimationFrame(() => textareaRef.current?.focus());
   };
 
   const dismissPopup = () => {
@@ -692,46 +722,89 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                 ))}
                 {activeCommand && (
                   <ListItem sx={{ py: 0.5 }}>
-                    <ListItemText
-                      primary={
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "baseline",
-                            gap: 1,
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{ fontWeight: 700, fontFamily: "monospace" }}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.75,
+                        width: "100%",
+                      }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "baseline",
+                              gap: 1,
+                            }}
                           >
-                            /{activeCommand.name}
-                          </Typography>
-                          {activeCommand.params.map((p) => (
                             <Typography
-                              key={p.name}
                               variant="body2"
                               sx={{
-                                fontFamily: "monospace",
                                 fontWeight: 700,
-                                color:
-                                  theme.palette.mode === "dark"
-                                    ? "#cfe8ff"
-                                    : "primary.main",
+                                fontFamily: "monospace",
                               }}
                             >
-                              {p.required ? `<${p.name}>` : `[${p.name}]`}
+                              /{activeCommand.name}
                             </Typography>
-                          ))}
-                        </Box>
-                      }
-                      secondary={
-                        activeCommand.params[0]?.description
-                          ? `e.g. ${activeCommand.params[0].description}`
-                          : activeCommand.description
-                      }
-                      slotProps={{ secondary: { variant: "caption" } }}
-                    />
+                            {activeCommand.params.map((p) => (
+                              <Typography
+                                key={p.name}
+                                variant="body2"
+                                sx={{
+                                  fontFamily: "monospace",
+                                  fontWeight: 700,
+                                  color:
+                                    theme.palette.mode === "dark"
+                                      ? "#cfe8ff"
+                                      : "primary.main",
+                                }}
+                              >
+                                {p.required ? `<${p.name}>` : `[${p.name}]`}
+                              </Typography>
+                            ))}
+                          </Box>
+                        }
+                        secondary={
+                          activeCommand.params[0]?.description
+                            ? `e.g. ${activeCommand.params[0].description}`
+                            : activeCommand.description
+                        }
+                        slotProps={{ secondary: { variant: "caption" } }}
+                      />
+                      <Tooltip
+                        title={
+                          isInCommandParameterPart()
+                            ? "Back one step"
+                            : "Clear command"
+                        }
+                      >
+                        <IconButton
+                          size="small"
+                          aria-label={
+                            isInCommandParameterPart()
+                              ? "Back one step"
+                              : "Clear command"
+                          }
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={goBackCommandStep}
+                          sx={{
+                            border: "1px solid",
+                            borderColor: "divider",
+                            borderRadius: 1,
+                            p: 0.35,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {isInCommandParameterPart() ? (
+                            <ArrowBackIcon fontSize="small" />
+                          ) : (
+                            <CloseIcon fontSize="small" />
+                          )}
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </ListItem>
                 )}
                 {showActionPicker && (
