@@ -240,6 +240,21 @@ q-27 0 -63 -26z"
   );
 }
 
+export function UntypedIcon({ disabled }) {
+  const color = disabled ? "#d8d7d7" : "#888888";
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      viewBox="0 0 1000 1000"
+      width="1.2em"
+    >
+      <circle cx="500" cy="500" r="420" fill={color} />
+      <rect x="200" y="440" width="600" height="120" fill="white" />
+    </svg>
+  );
+}
+
 export function MeleeIcon() {
   return (
     <svg

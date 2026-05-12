@@ -28,6 +28,9 @@ const types = {
   poison: {
     long: t("poison", true),
   },
+  untyped: {
+    long: t("untyped", true),
+  },
 };
 
 export const typesList = [
@@ -40,6 +43,7 @@ export const typesList = [
   "ice",
   "light",
   "poison",
+  "untyped",
 ];
 
 export default types;

@@ -9,8 +9,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Stack,
 } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
+import { TypeIcon } from "../../../types";
 import { availableMagichantKeys } from "../spellOptionData";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
@@ -119,17 +121,28 @@ export default function MagichantKeyItem({
                 md: 3,
               }}
             >
-              <TextField
-                fullWidth
-                label={t("magichant_type")}
-                value={isCustom ? item.type || "" : t(item.type || "")}
-                onChange={(e) =>
-                  isCustom && onItemChange(itemIndex, "type", e.target.value)
-                }
-                slotProps={{
-                  input: { readOnly: !isCustom },
-                }}
-              />
+              {isCustom ? (
+                <TextField
+                  fullWidth
+                  label={t("magichant_type")}
+                  value={item.type || ""}
+                  onChange={(e) =>
+                    onItemChange(itemIndex, "type", e.target.value)
+                  }
+                />
+              ) : (
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  sx={{ height: "100%", minHeight: 40 }}
+                >
+                  <TypeIcon type={item.type} />
+                  <span style={{ textTransform: "capitalize" }}>
+                    {item.type || ""}
+                  </span>
+                </Stack>
+              )}
             </Grid>
             <Grid
               size={{

@@ -33,6 +33,7 @@ const DAMAGE_TYPE_LABEL = {
   ice: "Ice",
   light: "Light",
   poison: "Poison",
+  untyped: "Untyped",
 };
 
 const AFFINITY_LABEL = { vu: "VU", rs: "RS", im: "IM", ab: "AB" };
@@ -144,10 +145,7 @@ function buildNpcText(npc, md) {
   const allAttacks = [...(npc.attacks ?? [])];
   if (allAttacks.length) {
     const lines = allAttacks.map((atk) => {
-      const rangeIcon =
-        atk.range === "distance" || atk.range === "ranged"
-          ? "[Ranged]"
-          : "[Melee]";
+      const rangeIcon = atk.range === "ranged" ? "[Ranged]" : "[Melee]";
       const desc = formatAttackDesc(atk, npc, md);
       return `${rangeIcon} ${b(atk.name)}  -  ${desc}`;
     });
@@ -235,12 +233,8 @@ function buildNpcObsidian(npc) {
   }
 
   // Attacks : split melee/ranged
-  const meleeAttacks = (npc.attacks ?? []).filter(
-    (a) => a.range !== "distance",
-  );
-  const rangedAttacks = (npc.attacks ?? []).filter(
-    (a) => a.range === "distance" || a.range === "ranged",
-  );
+  const meleeAttacks = (npc.attacks ?? []).filter((a) => a.range !== "ranged");
+  const rangedAttacks = (npc.attacks ?? []).filter((a) => a.range === "ranged");
 
   if (meleeAttacks.length) {
     lines.push("\nattacks-m:");

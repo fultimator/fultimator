@@ -69,7 +69,7 @@ export default function EditSpells({ npc, setNpc }) {
           },
           isOffensive: false,
           cost: { resource: "mp", amount: 0, perTarget: true },
-          maxTargets: 0,
+          maxTargets: 1,
           targetDescription: "",
           duration: "",
           damage: { value: 0, type: "physical", hrZero: false },
@@ -258,7 +258,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
       </Grid>
       <Grid
         size={{
-          xs: 12,
+          xs: "grow",
           sm: 6,
           md: 6,
         }}
@@ -277,7 +277,7 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
       </Grid>
       <Grid
         size={{
-          xs: 12,
+          xs: "auto",
           sm: 1,
           md: 1,
         }}
@@ -509,6 +509,16 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
               id={"attack-" + i + "-type"}
               label={t("Type:")}
               size="small"
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <TypeIcon type={selected} />
+                  <span style={{ textTransform: "capitalize" }}>
+                    {selected === "nodmg"
+                      ? t("no damage")
+                      : (types[selected]?.long ?? selected)}
+                  </span>
+                </Box>
+              )}
               onChange={(e) => {
                 return setSpell("damage", {
                   ...(spell.damage ?? {}),

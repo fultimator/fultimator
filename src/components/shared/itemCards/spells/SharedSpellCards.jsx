@@ -163,7 +163,7 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
           </Grid>
         </Grid>
 
-        {effectText && (
+        {((item.isOffensive ?? item.type === "offensive") || effectText) && (
           <Box sx={{ px: 2, py: 0.75 }}>
             <Typography
               variant="body2"
@@ -197,17 +197,19 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
                         : `HR + ${(typeof item.damage === "object" ? item.damage?.value : item.damage) || 0}`}
                       <CloseBracket />{" "}
                       {item.damage?.type ? t(item.damage.type) : "physical"}{" "}
-                      <Diamond />{" "}
+                      {effectText && <Diamond />}{" "}
                     </strong>
                   )}
-                <span style={{ display: "inline" }}>
-                  <StyledMarkdown
-                    allowedElements={["strong", "em"]}
-                    unwrapDisallowed
-                  >
-                    {t(effectText)}
-                  </StyledMarkdown>
-                </span>
+                {effectText && (
+                  <span style={{ display: "inline" }}>
+                    <StyledMarkdown
+                      allowedElements={["strong", "em"]}
+                      unwrapDisallowed
+                    >
+                      {t(effectText)}
+                    </StyledMarkdown>
+                  </span>
+                )}
               </span>
             </Typography>
           </Box>

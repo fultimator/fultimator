@@ -9,6 +9,7 @@ import {
   PhysicalIcon,
   PoisonIcon,
   AirIcon,
+  UntypedIcon,
 } from "./icons";
 import { useTranslate } from "../translation/translate";
 
@@ -25,6 +26,7 @@ export function TypeName({ type }) {
       {type === "ice" && t("Ice")}
       {type === "light" && t("Light")}
       {type === "poison" && t("Poison")}
+      {type === "untyped" && t("Untyped")}
     </>
   );
 }
@@ -41,6 +43,7 @@ export function TypeIcon({ type, disabled }) {
       {type === "ice" && <IceIcon disabled={disabled} />}
       {type === "light" && <LightIcon disabled={disabled} />}
       {type === "poison" && <PoisonIcon disabled={disabled} />}
+      {type === "untyped" && <UntypedIcon disabled={disabled} />}
     </>
   );
 }

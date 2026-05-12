@@ -1,12 +1,13 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import { TextField, Button, Box } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 interface CustomTextareaProps {
+  id?: string;
   label: string;
   value: string;
-  helperText: string;
+  helperText?: string;
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
   onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
@@ -20,9 +21,10 @@ interface CustomTextareaProps {
 }
 
 const CustomTextarea: React.FC<CustomTextareaProps> = ({
+  id,
   label,
   value,
-  helperText,
+  helperText = "",
   onChange,
   onFocus,
   onBlur,
@@ -38,6 +40,9 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [pendingFocus, setPendingFocus] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const effectiveMinRows = minRows || 4;
+  const showPreview = !isFocused && !!value;
 
   useEffect(() => {
     if (pendingFocus && textareaRef.current) {
@@ -79,84 +84,68 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   const handleFormat = useCallback(
     (format: string) => {
       const textarea = textareaRef.current;
-
-      if (!textarea) return;
+      if (!textarea || readOnly) return;
 
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       const selectedText = value.substring(start, end);
       let formattedText = "";
+      let cursorOffset = 0;
 
       switch (format) {
         case "bold":
           formattedText = `**${selectedText}**`;
+          cursorOffset = 2;
           break;
         case "italic":
           formattedText = `*${selectedText}*`;
+          cursorOffset = 1;
           break;
         case "brackets":
           formattedText = `【${selectedText}】`;
+          cursorOffset = 1;
           break;
         default:
-          break;
+          return;
       }
 
       const newText = `${value.substring(0, start)}${formattedText}${value.substring(end)}`;
-
       onChange({
         target: { value: newText },
       } as React.ChangeEvent<HTMLTextAreaElement>);
 
-      textarea.setSelectionRange(start + 2, start + 2 + selectedText.length);
-      textarea.focus();
+      requestAnimationFrame(() => {
+        textarea.focus();
+        textarea.setSelectionRange(
+          start + cursorOffset,
+          start + cursorOffset + selectedText.length,
+        );
+      });
     },
-    [value, onChange],
+    [value, onChange, readOnly],
   );
-
-  const showMarkdown = !isFocused && !pendingFocus && !!value;
 
   const textFieldSx = {
     width: "100%",
-    "& .MuiOutlinedInput-root": {
+    "& .MuiOutlinedInput-input": {
       fontFamily: theme.typography.body1.fontFamily,
       fontSize: theme.typography.body1.fontSize,
-      "& fieldset": {
-        borderColor:
-          theme.mode === "dark"
-            ? "rgba(255, 255, 255, 0.23)"
-            : "rgba(0, 0, 0, 0.23)",
-      },
-      "&:hover fieldset": {
-        borderColor: theme.primary,
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: theme.primary,
-      },
-      "&:hover .MuiOutlinedInput-input": {
-        color: theme.text.primary,
-      },
-      "&.Mui-focused .MuiOutlinedInput-input": {
-        color: theme.text.primary,
-      },
-    },
-    "& .MuiOutlinedInput-input": {
-      padding: "14px",
-      resize: "vertical",
-      color: theme.text.primary,
-      fontFamily: theme.typography.body1.fontFamily,
+      lineHeight: "1.4375em",
+      color: showPreview ? "transparent" : theme.text.primary,
+      WebkitTextFillColor: showPreview ? "transparent" : theme.text.primary,
+      textShadow: showPreview ? "none" : "none",
+      caretColor: showPreview ? "transparent" : theme.text.primary,
+      userSelect: showPreview ? "none" : "text",
     },
     "& .MuiOutlinedInput-input::placeholder": {
       color: theme.text.secondary,
       opacity: 0.7,
     },
-    "& .MuiFormLabel-root": {
-      color: theme.text.secondary,
-      "&.Mui-focused": {
-        color: theme.text.primary,
-      },
+    "& .MuiInputBase-input.MuiOutlinedInput-inputMultiline": {
+      color: showPreview ? "transparent !important" : theme.text.primary,
+      WebkitTextFillColor: showPreview ? "transparent" : theme.text.primary,
     },
     "& .MuiFormHelperText-root": {
-      color: theme.text.secondary,
       marginLeft: 0,
       marginRight: 0,
       marginTop: "4px",
@@ -164,138 +153,137 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
     },
   };
 
-  const previewSx = {
-    width: "100%",
-    padding: "14px",
-    fontSize: "1rem",
-    fontFamily: theme.typography.body1.fontFamily,
-    borderRadius: "4px",
-    border: `1px solid ${theme.ternary || theme.primary}`,
-    overflow: "auto",
-    minHeight: "56px",
-    cursor: readOnly ? "not-allowed" : "text",
-    backgroundColor: theme.background.paper,
-    color: theme.text.primary,
-    transition: "border-color 0.3s ease",
-    "&:hover": !readOnly && {
-      borderColor: theme.primary,
-    },
-  };
-
-  const toolbarSx = {
-    display: isFocused ? "flex" : "none",
-    gap: "4px",
-    mt: "8px",
-    mb: isFocused ? "8px" : "0",
-    p: "6px 8px",
-    border: `1px solid ${theme.ternary || theme.primary}`,
-    borderRadius: "50px",
-    backgroundColor: theme.background.paper,
-    boxShadow: `0 1px 3px rgba(0, 0, 0, ${theme.mode === "dark" ? "0.5" : "0.2"})`,
-    width: "fit-content",
-    animation: isFocused ? "slideUp 0.2s ease-out" : undefined,
-    "@keyframes slideUp": {
-      from: {
-        opacity: 0,
-        transform: "translateY(8px)",
-      },
-      to: {
-        opacity: 1,
-        transform: "translateY(0)",
-      },
-    },
-  };
-
-  const buttonSx = {
-    fontSize: "12px",
-    padding: "6px 8px",
-    minWidth: "auto",
-    textTransform: "none",
-    color: theme.text.primary,
-    transition: "background-color 0.2s ease, color 0.2s ease",
-    "&:hover": {
-      backgroundColor:
-        theme.mode === "dark"
-          ? "rgba(255, 255, 255, 0.1)"
-          : "rgba(0, 0, 0, 0.05)",
-      color: theme.primary,
-    },
-    "&:disabled": {
-      opacity: 0.5,
-      color: theme.text.secondary,
-    },
-  };
-
   return (
-    <Box sx={{ my: "5px" }}>
-      {showMarkdown ? (
-        <Box
-          sx={previewSx}
-          onClick={() => {
-            if (!readOnly) setPendingFocus(true);
+    <Box sx={{ my: "5px", position: "relative" }}>
+      <Box
+        sx={{ position: "relative" }}
+        onMouseDown={(e) => {
+          if (showPreview && !readOnly) {
+            e.preventDefault();
+            setIsFocused(true);
+            setPendingFocus(true);
+          }
+        }}
+      >
+        <TextField
+          id={id}
+          inputRef={textareaRef}
+          label={label}
+          value={value}
+          onChange={(e) =>
+            onChange(e as React.ChangeEvent<HTMLTextAreaElement>)
+          }
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onMouseOver={handleMouseOver}
+          onMouseOut={handleMouseOut}
+          disabled={readOnly}
+          multiline
+          minRows={effectiveMinRows}
+          maxRows={maxRows}
+          slotProps={{
+            htmlInput: { maxLength, tabIndex: showPreview ? -1 : 0 },
+          }}
+          placeholder={placeholder}
+          helperText={helperText}
+          variant="outlined"
+          fullWidth
+          sx={textFieldSx}
+        />
+
+        {showPreview ? (
+          <Box
+            sx={{
+              position: "absolute",
+              top: "14px",
+              left: "14px",
+              right: "14px",
+              bottom: helperText ? "26px" : "14px",
+              overflow: "auto",
+              color: theme.text.primary,
+              fontFamily: theme.typography.body1.fontFamily,
+              fontSize: theme.typography.body1.fontSize,
+              lineHeight: "1.4375em",
+              pointerEvents: "none",
+              "& p": { margin: 0 },
+              "& p + p": { marginTop: 0 },
+              "& ul, & ol": {
+                margin: "0 0 0 1.25rem",
+                padding: 0,
+              },
+            }}
+          >
+            <ReactMarkdown>{value}</ReactMarkdown>
+          </Box>
+        ) : null}
+      </Box>
+
+      <Box
+        sx={{
+          display: isFocused ? "flex" : "none",
+          gap: "4px",
+          mt: "8px",
+          mb: isFocused ? "8px" : "0",
+          p: "6px 8px",
+          border: `1px solid ${theme.ternary || theme.primary}`,
+          borderRadius: "50px",
+          backgroundColor: theme.background.paper,
+          boxShadow: `0 1px 3px rgba(0, 0, 0, ${theme.mode === "dark" ? "0.5" : "0.2"})`,
+          width: "fit-content",
+        }}
+      >
+        <Button
+          size="small"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleFormat("bold");
+          }}
+          disabled={readOnly}
+          sx={{
+            fontSize: "12px",
+            padding: "6px 8px",
+            minWidth: "auto",
+            textTransform: "none",
+            color: theme.text.primary,
           }}
         >
-          <ReactMarkdown>{value}</ReactMarkdown>
-        </Box>
-      ) : (
-        <>
-          <TextField
-            inputRef={textareaRef}
-            label={label}
-            value={value}
-            onChange={onChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onMouseOver={handleMouseOver}
-            onMouseOut={handleMouseOut}
-            disabled={readOnly}
-            multiline
-            minRows={minRows || 4}
-            maxRows={maxRows}
-            slotProps={{ htmlInput: { maxLength } }}
-            placeholder={placeholder}
-            helperText={helperText}
-            variant="outlined"
-            fullWidth
-            sx={textFieldSx}
-          />
-          <Box sx={toolbarSx}>
-            <Button
-              size="small"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                handleFormat("bold");
-              }}
-              sx={buttonSx}
-              disabled={readOnly}
-            >
-              Bold
-            </Button>
-            <Button
-              size="small"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                handleFormat("italic");
-              }}
-              sx={buttonSx}
-              disabled={readOnly}
-            >
-              Italic
-            </Button>
-            <Button
-              size="small"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                handleFormat("brackets");
-              }}
-              sx={buttonSx}
-              disabled={readOnly}
-            >
-              【】
-            </Button>
-          </Box>
-        </>
-      )}
+          Bold
+        </Button>
+        <Button
+          size="small"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleFormat("italic");
+          }}
+          disabled={readOnly}
+          sx={{
+            fontSize: "12px",
+            padding: "6px 8px",
+            minWidth: "auto",
+            textTransform: "none",
+            color: theme.text.primary,
+          }}
+        >
+          Italic
+        </Button>
+        <Button
+          size="small"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleFormat("brackets");
+          }}
+          disabled={readOnly}
+          sx={{
+            fontSize: "12px",
+            padding: "6px 8px",
+            minWidth: "auto",
+            textTransform: "none",
+            color: theme.text.primary,
+          }}
+        >
+          【】
+        </Button>
+      </Box>
     </Box>
   );
 };

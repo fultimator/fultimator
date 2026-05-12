@@ -1,5 +1,5 @@
 function normalizeRange(item = {}) {
-  if (item.range === "ranged" || item.range === "distance") return "ranged";
+  if (item.range === "ranged") return "ranged";
   if (item.range === "melee") return "melee";
   if (item.ranged || item.isRanged) return "ranged";
   return "melee";

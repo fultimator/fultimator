@@ -126,6 +126,7 @@ import ChangeCWType from "../../routes/equip/customWeapons/ChangeType";
 import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
 import SelectAccessoryQuality from "../../routes/equip/Accessories/SelectQuality";
 import accessoryQualities from "../../routes/equip/Accessories/qualities";
+import { TypeIcon } from "../types";
 import {
   categories as cwCategories,
   range as cwRange,
@@ -174,6 +175,18 @@ function normalizeCustomWeaponAccuracyCheck(
     return { att1, att2 };
   }
   return fallback;
+}
+
+function renderDamageTypeValue(typeValue, t) {
+  if (!typeValue || typeValue === "nodmg") return t("No Damage");
+  const rawLabel = types[typeValue]?.long ?? typeValue;
+  const label = String(rawLabel).replace(/\b\w/g, (char) => char.toUpperCase());
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <TypeIcon type={typeValue} />
+      <span>{label}</span>
+    </Box>
+  );
 }
 
 function findCustomWeaponPresetAccuracyCheck(value) {
@@ -392,7 +405,7 @@ function NpcAttackPanel() {
                   onChange={(e) => setRange(e.target.value)}
                 >
                   <MenuItem value="melee">{t("Melee")}</MenuItem>
-                  <MenuItem value="distance">{t("Distance")}</MenuItem>
+                  <MenuItem value="ranged">{t("Ranged")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -450,10 +463,20 @@ function NpcAttackPanel() {
                   value={dmgType}
                   label={t("Damage Type")}
                   onChange={(e) => setDmgType(e.target.value)}
+                  renderValue={(selected) => renderDamageTypeValue(selected, t)}
                 >
                   {Object.keys(types).map((type) => (
                     <MenuItem key={type} value={type}>
-                      {types[type].long}
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <TypeIcon type={type} />
+                        <span>
+                          {String(types[type].long).replace(/\b\w/g, (char) =>
+                            char.toUpperCase(),
+                          )}
+                        </span>
+                      </Box>
                     </MenuItem>
                   ))}
                   <MenuItem value="nodmg">{t("No Damage")}</MenuItem>
@@ -528,9 +551,9 @@ function NpcSpellPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
   const [isOffensive, setIsOffensive] = useState(false);
-  const [mp, setMp] = useState("");
+  const [mp, setMp] = useState("1");
   const [perTarget, setPerTarget] = useState(true);
-  const [maxTargets, setMaxTargets] = useState("");
+  const [maxTargets, setMaxTargets] = useState("1");
   const [duration, setDuration] = useState("");
   const [target, setTarget] = useState("");
   const [range, setRange] = useState("melee");
@@ -562,9 +585,9 @@ function NpcSpellPanel() {
   const handleClear = () => {
     setName("");
     setIsOffensive(false);
-    setMp("");
+    setMp("1");
     setPerTarget(true);
-    setMaxTargets("");
+    setMaxTargets("1");
     setDuration("");
     setTarget("");
     setRange("melee");
@@ -709,7 +732,7 @@ function NpcSpellPanel() {
                 onChange={(e) => setRange(e.target.value)}
               >
                 <MenuItem value="melee">{t("Melee")}</MenuItem>
-                <MenuItem value="distance">{t("Distance")}</MenuItem>
+                <MenuItem value="ranged">{t("Ranged")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -726,10 +749,20 @@ function NpcSpellPanel() {
                   value={dmgType}
                   label={t("Damage Type")}
                   onChange={(e) => setDmgType(e.target.value)}
+                  renderValue={(selected) => renderDamageTypeValue(selected, t)}
                 >
                   {Object.keys(types).map((type) => (
                     <MenuItem key={type} value={type}>
-                      {types[type].long}
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <TypeIcon type={type} />
+                        <span>
+                          {String(types[type].long).replace(/\b\w/g, (char) =>
+                            char.toUpperCase(),
+                          )}
+                        </span>
+                      </Box>
                     </MenuItem>
                   ))}
                 </Select>
@@ -852,18 +885,18 @@ function NpcSpecialPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
   const [effect, setEffect] = useState("");
-  const [spCost, setSpCost] = useState("");
+  const [spCost, setSpCost] = useState("1");
 
   const data = {
     name: name.trim(),
     effect: effect.trim(),
-    spCost: spCost === "" ? undefined : Number(spCost),
+    spCost: spCost === "" ? 1 : Number(spCost),
   };
 
   const handleClear = () => {
     setName("");
     setEffect("");
-    setSpCost("");
+    setSpCost("1");
   };
 
   return (
@@ -928,18 +961,18 @@ function NpcActionPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
   const [effect, setEffect] = useState("");
-  const [spCost, setSpCost] = useState("");
+  const [spCost, setSpCost] = useState("1");
 
   const data = {
     name: name.trim(),
     effect: effect.trim(),
-    spCost: spCost === "" ? undefined : Number(spCost),
+    spCost: spCost === "" ? 1 : Number(spCost),
   };
 
   const handleClear = () => {
     setName("");
     setEffect("");
-    setSpCost("");
+    setSpCost("1");
   };
 
   return (
@@ -1969,10 +2002,29 @@ function PlayerSpellPanel() {
                             value={damageType}
                             label={t("Damage Type")}
                             onChange={(e) => setDamageType(e.target.value)}
+                            renderValue={(selected) =>
+                              renderDamageTypeValue(
+                                String(selected).toLowerCase(),
+                                t,
+                              )
+                            }
                           >
                             {PILOT_DAMAGE_TYPES.map((d) => (
                               <MenuItem key={d} value={d}>
-                                {d}
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                  }}
+                                >
+                                  <TypeIcon type={String(d).toLowerCase()} />
+                                  <span>
+                                    {String(d).replace(/\b\w/g, (char) =>
+                                      char.toUpperCase(),
+                                    )}
+                                  </span>
+                                </Box>
                               </MenuItem>
                             ))}
                           </Select>
@@ -2326,10 +2378,27 @@ function PlayerSpellPanel() {
                       value={damageType}
                       label={t("Damage Type")}
                       onChange={(e) => setDamageType(e.target.value)}
+                      renderValue={(selected) =>
+                        renderDamageTypeValue(selected, t)
+                      }
                     >
                       {Object.keys(types).map((type) => (
                         <MenuItem key={type} value={type}>
-                          {types[type].long}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <TypeIcon type={type} />
+                            <span>
+                              {String(types[type].long).replace(
+                                /\b\w/g,
+                                (char) => char.toUpperCase(),
+                              )}
+                            </span>
+                          </Box>
                         </MenuItem>
                       ))}
                     </Select>
@@ -2616,21 +2685,7 @@ function QualityPanel() {
           </Box>
         </Box>
       }
-      previewContent={
-        data.name ? (
-          <SharedQualityCard item={data} />
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography
-              sx={{
-                color: "text.secondary",
-              }}
-            >
-              Fill in the form to see a preview
-            </Typography>
-          </Box>
-        )
-      }
+      previewContent={<SharedQualityCard item={data} />}
       addButton={<AddToCompendiumButton itemType="quality" data={data} />}
       exportDataType="qualities"
     />
@@ -3439,80 +3494,90 @@ function WeaponPanel() {
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
           </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid size={12}>
-                  <Typography variant="h6">
-                    {t("Rare Weapon Options")}
-                  </Typography>
-                  <Divider sx={{ mt: 0.5 }} />
-                </Grid>
-                <Grid size={12}>
-                  <ChangeBonus
-                    basePrec={getWeaponPrec(base)}
-                    precBonus={precBonus}
-                    damageBonus={damageBonus}
-                    damageReworkBonus={damageReworkBonus}
-                    setPrecBonus={setPrecBonus}
-                    setDamageBonus={setDamageBonus}
-                    setDamageReworkBonus={setDamageReworkBonus}
-                    rework={rework}
-                    totalBonus={totalBonus}
-                  />
-                </Grid>
-                {[
-                  {
-                    label: "Accuracy Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "Damage Modifier",
-                    value: damageModifier,
-                    set: setDamageModifier,
-                  },
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid key={label} size={6}>
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
+          <Grid size={12}>
+            <Accordion
+              sx={{ width: "100%" }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <Grid size={12}>
+                    <Typography variant="h6">
+                      {t("Rare Weapon Options")}
+                    </Typography>
+                    <Divider sx={{ mt: 0.5 }} />
+                  </Grid>
+                  <Grid size={12}>
+                    <ChangeBonus
+                      basePrec={getWeaponPrec(base)}
+                      precBonus={precBonus}
+                      damageBonus={damageBonus}
+                      damageReworkBonus={damageReworkBonus}
+                      setPrecBonus={setPrecBonus}
+                      setDamageBonus={setDamageBonus}
+                      setDamageReworkBonus={setDamageReworkBonus}
+                      rework={rework}
+                      totalBonus={totalBonus}
                     />
                   </Grid>
-                ))}
-                <Grid size={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={hrZero}
-                        onChange={(e) => setHrZero(e.target.checked)}
-                        size="small"
+                  <Grid size={12}>
+                    <Typography variant="h6">{t("Modifiers")}</Typography>
+                    <Divider sx={{ mt: 0.5 }} />
+                  </Grid>
+                  {[
+                    {
+                      label: "Accuracy Modifier",
+                      value: precModifier,
+                      set: setPrecModifier,
+                    },
+                    {
+                      label: "Damage Modifier",
+                      value: damageModifier,
+                      set: setDamageModifier,
+                    },
+                    {
+                      label: "DEF Modifier",
+                      value: defModifier,
+                      set: setDefModifier,
+                    },
+                    {
+                      label: "MDEF Modifier",
+                      value: mDefModifier,
+                      set: setMDefModifier,
+                    },
+                  ].map(({ label, value, set }) => (
+                    <Grid key={label} size={6}>
+                      <ChangeModifiers
+                        label={label}
+                        value={value}
+                        onChange={(e) => set(e.target.value)}
                       />
-                    }
-                    label="HR0"
-                  />
+                    </Grid>
+                  ))}
+                  <Grid size={12}>
+                    <Typography variant="h6">{t("Damage Options")}</Typography>
+                    <Divider sx={{ mt: 0.5 }} />
+                  </Grid>
+                  <Grid size={12}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={hrZero}
+                          onChange={(e) => setHrZero(e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label="HR0"
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
           <Grid size={12}>
             <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>
@@ -3651,70 +3716,72 @@ function ArmorPanel() {
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
           </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                {[
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                  {
-                    label: "INIT Modifier",
-                    value: initModifier,
-                    set: setInitModifier,
-                  },
-                  {
-                    label: "Magic Modifier",
-                    value: magicModifier,
-                    set: setMagicModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "Damage (Melee) Modifier",
-                    value: damageMeleeModifier,
-                    set: setDamageMeleeModifier,
-                  },
-                  {
-                    label: "Damage (Ranged) Modifier",
-                    value: damageRangedModifier,
-                    set: setDamageRangedModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid
-                    key={label}
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
+          <Grid size={12}>
+            <Accordion
+              sx={{ width: "100%" }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  {[
+                    {
+                      label: "DEF Modifier",
+                      value: defModifier,
+                      set: setDefModifier,
+                    },
+                    {
+                      label: "MDEF Modifier",
+                      value: mDefModifier,
+                      set: setMDefModifier,
+                    },
+                    {
+                      label: "INIT Modifier",
+                      value: initModifier,
+                      set: setInitModifier,
+                    },
+                    {
+                      label: "Magic Modifier",
+                      value: magicModifier,
+                      set: setMagicModifier,
+                    },
+                    {
+                      label: "Precision Modifier",
+                      value: precModifier,
+                      set: setPrecModifier,
+                    },
+                    {
+                      label: "Damage (Melee) Modifier",
+                      value: damageMeleeModifier,
+                      set: setDamageMeleeModifier,
+                    },
+                    {
+                      label: "Damage (Ranged) Modifier",
+                      value: damageRangedModifier,
+                      set: setDamageRangedModifier,
+                    },
+                  ].map(({ label, value, set }) => (
+                    <Grid
+                      key={label}
+                      size={{
+                        xs: 6,
+                        md: 4,
+                      }}
+                    >
+                      <ChangeModifiers
+                        label={label}
+                        value={value}
+                        onChange={(e) => set(e.target.value)}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
           <Grid size={12}>
             <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>
@@ -3853,70 +3920,72 @@ function ShieldPanel() {
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
           </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                {[
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                  {
-                    label: "INIT Modifier",
-                    value: initModifier,
-                    set: setInitModifier,
-                  },
-                  {
-                    label: "Magic Modifier",
-                    value: magicModifier,
-                    set: setMagicModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "Damage (Melee) Modifier",
-                    value: damageMeleeModifier,
-                    set: setDamageMeleeModifier,
-                  },
-                  {
-                    label: "Damage (Ranged) Modifier",
-                    value: damageRangedModifier,
-                    set: setDamageRangedModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid
-                    key={label}
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
+          <Grid size={12}>
+            <Accordion
+              sx={{ width: "100%" }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  {[
+                    {
+                      label: "DEF Modifier",
+                      value: defModifier,
+                      set: setDefModifier,
+                    },
+                    {
+                      label: "MDEF Modifier",
+                      value: mDefModifier,
+                      set: setMDefModifier,
+                    },
+                    {
+                      label: "INIT Modifier",
+                      value: initModifier,
+                      set: setInitModifier,
+                    },
+                    {
+                      label: "Magic Modifier",
+                      value: magicModifier,
+                      set: setMagicModifier,
+                    },
+                    {
+                      label: "Precision Modifier",
+                      value: precModifier,
+                      set: setPrecModifier,
+                    },
+                    {
+                      label: "Damage (Melee) Modifier",
+                      value: damageMeleeModifier,
+                      set: setDamageMeleeModifier,
+                    },
+                    {
+                      label: "Damage (Ranged) Modifier",
+                      value: damageRangedModifier,
+                      set: setDamageRangedModifier,
+                    },
+                  ].map(({ label, value, set }) => (
+                    <Grid
+                      key={label}
+                      size={{
+                        xs: 6,
+                        md: 4,
+                      }}
+                    >
+                      <ChangeModifiers
+                        label={label}
+                        value={value}
+                        onChange={(e) => set(e.target.value)}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
           <Grid size={12}>
             <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>
@@ -4298,60 +4367,62 @@ function CustomWeaponPanel() {
             />
           </Grid>
           {overrideAccuracyAttributes ? (
-            <>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth>
-                  <InputLabel>{t("Change Attr 1")}</InputLabel>
-                  <Select
-                    value={accuracyCheck.att1}
-                    label={t("Change Attr 1")}
-                    onChange={(e) =>
-                      setAccuracyCheck((current) => ({
-                        ...normalizeCustomWeaponAccuracyCheck(current),
-                        att1: e.target.value,
-                      }))
-                    }
-                  >
-                    {ATTRS.map((attribute) => (
-                      <MenuItem key={attribute.value} value={attribute.value}>
-                        {t(attribute.label)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+            <Grid size={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                  }}
+                >
+                  <FormControl fullWidth>
+                    <InputLabel>{t("Change Attr 1")}</InputLabel>
+                    <Select
+                      value={accuracyCheck.att1}
+                      label={t("Change Attr 1")}
+                      onChange={(e) =>
+                        setAccuracyCheck((current) => ({
+                          ...normalizeCustomWeaponAccuracyCheck(current),
+                          att1: e.target.value,
+                        }))
+                      }
+                    >
+                      {ATTRS.map((attribute) => (
+                        <MenuItem key={attribute.value} value={attribute.value}>
+                          {t(attribute.label)}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                  }}
+                >
+                  <FormControl fullWidth>
+                    <InputLabel>{t("Change Attr 2")}</InputLabel>
+                    <Select
+                      value={accuracyCheck.att2}
+                      label={t("Change Attr 2")}
+                      onChange={(e) =>
+                        setAccuracyCheck((current) => ({
+                          ...normalizeCustomWeaponAccuracyCheck(current),
+                          att2: e.target.value,
+                        }))
+                      }
+                    >
+                      {ATTRS.map((attribute) => (
+                        <MenuItem key={attribute.value} value={attribute.value}>
+                          {t(attribute.label)}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
               </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth>
-                  <InputLabel>{t("Change Attr 2")}</InputLabel>
-                  <Select
-                    value={accuracyCheck.att2}
-                    label={t("Change Attr 2")}
-                    onChange={(e) =>
-                      setAccuracyCheck((current) => ({
-                        ...normalizeCustomWeaponAccuracyCheck(current),
-                        att2: e.target.value,
-                      }))
-                    }
-                  >
-                    {ATTRS.map((attribute) => (
-                      <MenuItem key={attribute.value} value={attribute.value}>
-                        {t(attribute.label)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            </>
+            </Grid>
           ) : (
             <Grid
               size={{
@@ -4380,6 +4451,210 @@ function CustomWeaponPanel() {
               isSecondForm={false}
               rareAccuracyBonus={rareAccuracyBonus}
             />
+          </Grid>
+          <Grid size={12}>
+            <SelectWeaponQuality
+              quality={selectedQuality}
+              setQuality={(e) => {
+                const q = weaponQualities.find(
+                  (el) => el.name === e.target.value,
+                );
+                setSelectedQuality(q.name);
+                setQuality(q.quality);
+                setQualityCost(q.cost);
+              }}
+            />
+          </Grid>
+          <Grid size={12}>
+            <ChangeQuality
+              quality={quality}
+              setQuality={(e) => setQuality(e.target.value)}
+              qualityCost={qualityCost}
+              setQualityCost={(e) => setQualityCost(e.target.value)}
+            />
+          </Grid>
+          <Grid size={12}>
+            <Accordion
+              sx={{ width: "100%" }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <Grid size={12}>
+                    <Typography variant="h6">
+                      {t("Rare Weapon Options")}
+                    </Typography>
+                    <Divider sx={{ mt: 0.5 }} />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={overrideDamageType}
+                          onChange={(e) =>
+                            setOverrideDamageType(e.target.checked)
+                          }
+                        />
+                      }
+                      label={`${t("override_damage_type")} (+100z)`}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={overrideAccuracyAttributes}
+                          onChange={(e) =>
+                            handleOverrideAccuracyAttributesChange(
+                              e.target.checked,
+                            )
+                          }
+                        />
+                      }
+                      label={t("override_accuracy_attributes")}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={rareAccuracyBonus}
+                          disabled={hasAccurate && !rareAccuracyBonus}
+                          onChange={(e) => {
+                            setRareAccuracyBonus(e.target.checked);
+                            if (
+                              e.target.checked &&
+                              selectedCustomization ===
+                                "weapon_customization_accurate"
+                            ) {
+                              setSelectedCustomization("");
+                            }
+                          }}
+                        />
+                      }
+                      label={`+1 ${t("Accuracy")} (+100z)`}
+                    />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={rareDamageBonus}
+                          onChange={(e) => setRareDamageBonus(e.target.checked)}
+                        />
+                      }
+                      label={`+4 ${t("Damage")} (+200z)`}
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <Typography variant="h6">{t("Modifiers")}</Typography>
+                    <Divider sx={{ mt: 0.5 }} />
+                  </Grid>
+                  {[
+                    {
+                      label: "Damage Modifier",
+                      value: damageModifier,
+                      set: setDamageModifier,
+                    },
+                    {
+                      label: "Precision Modifier",
+                      value: precModifier,
+                      set: setPrecModifier,
+                    },
+                    {
+                      label: "DEF Modifier",
+                      value: defModifier,
+                      set: setDefModifier,
+                    },
+                    {
+                      label: "MDEF Modifier",
+                      value: mDefModifier,
+                      set: setMDefModifier,
+                    },
+                  ].map(({ label, value, set }) => (
+                    <Grid
+                      key={label}
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                      }}
+                    >
+                      <ChangeModifiers
+                        label={label}
+                        value={value}
+                        onChange={(e) => set(e.target.value)}
+                      />
+                    </Grid>
+                  ))}
+                  <Grid size={12}>
+                    <Typography variant="h6">{t("Damage Options")}</Typography>
+                    <Divider sx={{ mt: 0.5 }} />
+                  </Grid>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      sm: 6,
+                    }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={primaryHrZero}
+                          onChange={(e) => setPrimaryHrZero(e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label="Primary Weapon HR0"
+                    />
+                  </Grid>
+                  {hasTransforming && (
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                      }}
+                    >
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={secondaryHrZero}
+                            onChange={(e) =>
+                              setSecondaryHrZero(e.target.checked)
+                            }
+                            size="small"
+                          />
+                        }
+                        label="Secondary Weapon HR0"
+                      />
+                    </Grid>
+                  )}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
           </Grid>
           {hasTransforming && (
             <>
@@ -4421,66 +4696,68 @@ function CustomWeaponPanel() {
                 />
               </Grid>
               {overrideAccuracyAttributes ? (
-                <>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth>
-                      <InputLabel>{t("Change Attr 1")}</InputLabel>
-                      <Select
-                        value={accuracyCheck.att1}
-                        label={t("Change Attr 1")}
-                        onChange={(e) =>
-                          setAccuracyCheck((current) => ({
-                            ...normalizeCustomWeaponAccuracyCheck(current),
-                            att1: e.target.value,
-                          }))
-                        }
-                      >
-                        {ATTRS.map((attribute) => (
-                          <MenuItem
-                            key={attribute.value}
-                            value={attribute.value}
-                          >
-                            {t(attribute.label)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                <Grid size={12}>
+                  <Grid container spacing={2}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                      }}
+                    >
+                      <FormControl fullWidth>
+                        <InputLabel>{t("Change Attr 1")}</InputLabel>
+                        <Select
+                          value={accuracyCheck.att1}
+                          label={t("Change Attr 1")}
+                          onChange={(e) =>
+                            setAccuracyCheck((current) => ({
+                              ...normalizeCustomWeaponAccuracyCheck(current),
+                              att1: e.target.value,
+                            }))
+                          }
+                        >
+                          {ATTRS.map((attribute) => (
+                            <MenuItem
+                              key={attribute.value}
+                              value={attribute.value}
+                            >
+                              {t(attribute.label)}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                      }}
+                    >
+                      <FormControl fullWidth>
+                        <InputLabel>{t("Change Attr 2")}</InputLabel>
+                        <Select
+                          value={accuracyCheck.att2}
+                          label={t("Change Attr 2")}
+                          onChange={(e) =>
+                            setAccuracyCheck((current) => ({
+                              ...normalizeCustomWeaponAccuracyCheck(current),
+                              att2: e.target.value,
+                            }))
+                          }
+                        >
+                          {ATTRS.map((attribute) => (
+                            <MenuItem
+                              key={attribute.value}
+                              value={attribute.value}
+                            >
+                              {t(attribute.label)}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
                   </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth>
-                      <InputLabel>{t("Change Attr 2")}</InputLabel>
-                      <Select
-                        value={accuracyCheck.att2}
-                        label={t("Change Attr 2")}
-                        onChange={(e) =>
-                          setAccuracyCheck((current) => ({
-                            ...normalizeCustomWeaponAccuracyCheck(current),
-                            att2: e.target.value,
-                          }))
-                        }
-                      >
-                        {ATTRS.map((attribute) => (
-                          <MenuItem
-                            key={attribute.value}
-                            value={attribute.value}
-                          >
-                            {t(attribute.label)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </>
+                </Grid>
               ) : (
                 <Grid
                   size={{
@@ -4525,7 +4802,7 @@ function CustomWeaponPanel() {
               </Grid>
               <Grid size={12}>
                 <Accordion
-                  sx={{ width: "100%", marginLeft: "10px" }}
+                  sx={{ width: "100%" }}
                   expanded={secondModifiersExpanded}
                   onChange={() =>
                     setSecondModifiersExpanded(!secondModifiersExpanded)
@@ -4574,205 +4851,6 @@ function CustomWeaponPanel() {
               </Grid>
             </>
           )}
-          <Grid size={12}>
-            <SelectWeaponQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const q = weaponQualities.find(
-                  (el) => el.name === e.target.value,
-                );
-                setSelectedQuality(q.name);
-                setQuality(q.quality);
-                setQualityCost(q.cost);
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid size={12}>
-                  <Typography variant="h6">
-                    {t("Rare Weapon Options")}
-                  </Typography>
-                  <Divider sx={{ mt: 0.5 }} />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={overrideDamageType}
-                        onChange={(e) =>
-                          setOverrideDamageType(e.target.checked)
-                        }
-                      />
-                    }
-                    label={`${t("override_damage_type")} (+100z)`}
-                  />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={overrideAccuracyAttributes}
-                        onChange={(e) =>
-                          handleOverrideAccuracyAttributesChange(
-                            e.target.checked,
-                          )
-                        }
-                      />
-                    }
-                    label={t("override_accuracy_attributes")}
-                  />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={rareAccuracyBonus}
-                        disabled={hasAccurate && !rareAccuracyBonus}
-                        onChange={(e) => {
-                          setRareAccuracyBonus(e.target.checked);
-                          if (
-                            e.target.checked &&
-                            selectedCustomization ===
-                              "weapon_customization_accurate"
-                          ) {
-                            setSelectedCustomization("");
-                          }
-                        }}
-                      />
-                    }
-                    label={`+1 ${t("Accuracy")} (+100z)`}
-                  />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={rareDamageBonus}
-                        onChange={(e) => setRareDamageBonus(e.target.checked)}
-                      />
-                    }
-                    label={`+4 ${t("Damage")} (+200z)`}
-                  />
-                </Grid>
-                {[
-                  {
-                    label: "Damage Modifier",
-                    value: damageModifier,
-                    set: setDamageModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid
-                    key={label}
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-                <Grid size={12}>
-                  <Divider sx={{ my: 1 }} />
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="h6">{t("Damage Options")}</Typography>
-                  <Divider sx={{ mt: 0.5 }} />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={primaryHrZero}
-                        onChange={(e) => setPrimaryHrZero(e.target.checked)}
-                        size="small"
-                      />
-                    }
-                    label="Primary Weapon HR0"
-                  />
-                </Grid>
-                {hasTransforming && (
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={secondaryHrZero}
-                          onChange={(e) => setSecondaryHrZero(e.target.checked)}
-                          size="small"
-                        />
-                      }
-                      label="Secondary Weapon HR0"
-                    />
-                  </Grid>
-                )}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -4890,70 +4968,72 @@ function AccessoryPanel() {
               setQualityCost={(e) => setQualityCost(e.target.value)}
             />
           </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                {[
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                  {
-                    label: "INIT Modifier",
-                    value: initModifier,
-                    set: setInitModifier,
-                  },
-                  {
-                    label: "Magic Modifier",
-                    value: magicModifier,
-                    set: setMagicModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "Damage (Melee) Modifier",
-                    value: damageMeleeModifier,
-                    set: setDamageMeleeModifier,
-                  },
-                  {
-                    label: "Damage (Ranged) Modifier",
-                    value: damageRangedModifier,
-                    set: setDamageRangedModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid
-                    key={label}
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
+          <Grid size={12}>
+            <Accordion
+              sx={{ width: "100%" }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  {[
+                    {
+                      label: "DEF Modifier",
+                      value: defModifier,
+                      set: setDefModifier,
+                    },
+                    {
+                      label: "MDEF Modifier",
+                      value: mDefModifier,
+                      set: setMDefModifier,
+                    },
+                    {
+                      label: "INIT Modifier",
+                      value: initModifier,
+                      set: setInitModifier,
+                    },
+                    {
+                      label: "Magic Modifier",
+                      value: magicModifier,
+                      set: setMagicModifier,
+                    },
+                    {
+                      label: "Precision Modifier",
+                      value: precModifier,
+                      set: setPrecModifier,
+                    },
+                    {
+                      label: "Damage (Melee) Modifier",
+                      value: damageMeleeModifier,
+                      set: setDamageMeleeModifier,
+                    },
+                    {
+                      label: "Damage (Ranged) Modifier",
+                      value: damageRangedModifier,
+                      set: setDamageRangedModifier,
+                    },
+                  ].map(({ label, value, set }) => (
+                    <Grid
+                      key={label}
+                      size={{
+                        xs: 6,
+                        md: 4,
+                      }}
+                    >
+                      <ChangeModifiers
+                        label={label}
+                        value={value}
+                        onChange={(e) => set(e.target.value)}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -5342,21 +5422,7 @@ function OptionalPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={
-        data.name ? (
-          <SharedOptionalCard item={data} />
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography
-              sx={{
-                color: "text.secondary",
-              }}
-            >
-              {t("Fill in the form to see a preview")}
-            </Typography>
-          </Box>
-        )
-      }
+      previewContent={<SharedOptionalCard item={data} />}
       addButton={<AddToCompendiumButton itemType="optional" data={data} />}
       exportDataType="optionals"
     />
@@ -5413,15 +5479,15 @@ function MnemospherePanel() {
         </Stack>
       }
       previewContent={
-        data ? (
-          <SharedMnemosphereCard item={data} />
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography color="text.secondary">
-              {t("Fill in the form to see a preview")}
-            </Typography>
-          </Box>
-        )
+        <SharedMnemosphereCard
+          item={
+            data || {
+              name: "",
+              cost: 0,
+              skills: [],
+            }
+          }
+        />
       }
       addButton={
         data ? (
@@ -5596,15 +5662,18 @@ function HoplospherePanel() {
         </Grid>
       }
       previewContent={
-        data ? (
-          <SharedHoplosphereCard item={data} />
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography color="text.secondary">
-              {t("Fill in the form to see a preview")}
-            </Typography>
-          </Box>
-        )
+        <SharedHoplosphereCard
+          item={
+            data || {
+              name: "",
+              description: "",
+              requiredSlots: 1,
+              socketable: "all",
+              cost: 0,
+              coagEffects: {},
+            }
+          }
+        />
       }
       addButton={
         data ? (
@@ -5692,7 +5761,7 @@ export default function QuickCreateModal({
         },
       }}
     >
-      <DialogTitle sx={{ pb: 0 }}>
+      <DialogTitle>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <AutoFixHigh fontSize="small" />
           {t("Quick Create")}

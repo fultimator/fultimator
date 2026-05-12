@@ -23,6 +23,7 @@ export enum Elements {
   Ice = "ice",
   Light = "light",
   Poison = "poison",
+  Untyped = "untyped",
 }
 
 export interface Damage {

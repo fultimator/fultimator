@@ -30,6 +30,7 @@ export default function EditActions({ npc, setNpc }) {
         {
           name: "",
           effect: "",
+          spCost: 1,
         },
       ],
     }));
@@ -84,7 +85,13 @@ export default function EditActions({ npc, setNpc }) {
                   label={t("SP Cost:")}
                   type="number"
                   value={actions?.spCost ?? 1}
-                  onChange={(e) => onChangeActions(i, "spCost", e.target.value)}
+                  onChange={(e) =>
+                    onChangeActions(
+                      i,
+                      "spCost",
+                      parseInt(e.target.value, 10) || 1,
+                    )
+                  }
                   size="small"
                   slotProps={{
                     htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },

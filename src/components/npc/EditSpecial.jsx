@@ -37,6 +37,7 @@ export default function EditSpecial({ npc, setNpc }) {
         {
           name: "",
           effect: "",
+          spCost: 1,
         },
       ],
     }));
@@ -91,7 +92,13 @@ export default function EditSpecial({ npc, setNpc }) {
                   label={t("SP Cost:")}
                   type="number"
                   value={special?.spCost ?? 1}
-                  onChange={(e) => onChangeSpecial(i, "spCost", e.target.value)}
+                  onChange={(e) =>
+                    onChangeSpecial(
+                      i,
+                      "spCost",
+                      parseInt(e.target.value, 10) || 1,
+                    )
+                  }
                   size="small"
                   slotProps={{
                     htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },

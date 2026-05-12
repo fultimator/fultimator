@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { Add, Close, Delete as DeleteIcon } from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../icons";
+import { TypeIcon } from "../types";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
@@ -239,7 +240,7 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
                 onChange={(e) => setRange(e.target.value)}
               >
                 <MenuItem value="melee">{t("Melee")}</MenuItem>
-                <MenuItem value="distance">{t("Distance")}</MenuItem>
+                <MenuItem value="ranged">{t("Ranged")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -297,10 +298,29 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
                 value={dmgType}
                 label={t("Damage Type")}
                 onChange={(e) => setDmgType(e.target.value)}
+                renderValue={(selected) => (
+                  <MuiBox
+                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                  >
+                    <TypeIcon type={selected} />
+                    <span style={{ textTransform: "capitalize" }}>
+                      {selected === "nodmg"
+                        ? t("No Damage")
+                        : (types[selected]?.long ?? selected)}
+                    </span>
+                  </MuiBox>
+                )}
               >
                 {Object.keys(types).map((type) => (
                   <MenuItem key={type} value={type}>
-                    {types[type].long}
+                    <MuiBox
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      <TypeIcon type={type} />
+                      <span style={{ textTransform: "capitalize" }}>
+                        {types[type].long}
+                      </span>
+                    </MuiBox>
                   </MenuItem>
                 ))}
                 <MenuItem value="nodmg">{t("No Damage")}</MenuItem>
@@ -572,7 +592,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
                 onChange={(e) => setRange(e.target.value)}
               >
                 <MenuItem value="melee">{t("Melee")}</MenuItem>
-                <MenuItem value="distance">{t("Distance")}</MenuItem>
+                <MenuItem value="ranged">{t("Ranged")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -589,10 +609,27 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
                   value={dmgType}
                   label={t("Damage Type")}
                   onChange={(e) => setDmgType(e.target.value)}
+                  renderValue={(selected) => (
+                    <MuiBox
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      <TypeIcon type={selected} />
+                      <span style={{ textTransform: "capitalize" }}>
+                        {types[selected]?.long ?? selected}
+                      </span>
+                    </MuiBox>
+                  )}
                 >
                   {Object.keys(types).map((type) => (
                     <MenuItem key={type} value={type}>
-                      {types[type].long}
+                      <MuiBox
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <TypeIcon type={type} />
+                        <span style={{ textTransform: "capitalize" }}>
+                          {types[type].long}
+                        </span>
+                      </MuiBox>
                     </MenuItem>
                   ))}
                 </Select>

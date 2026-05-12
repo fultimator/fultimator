@@ -155,23 +155,13 @@ const RollsTab = ({
           type: "Attack",
           data: attack,
           extra: attack.special?.length ? attack.special.join("\n\n") : null,
-          icon:
-            attack.range === "distance" || attack.range === "ranged" ? (
-              <DistanceIcon />
-            ) : (
-              <MeleeIcon />
-            ),
+          icon: attack.range === "ranged" ? <DistanceIcon /> : <MeleeIcon />,
         })),
         ...(selectedNPC?.weaponattacks || []).map((wattack) => ({
           type: "Weapon Attack",
           data: wattack,
           extra: wattack.special?.length ? wattack.special.join("\n\n") : null,
-          icon:
-            wattack.range === "distance" || wattack.range === "ranged" ? (
-              <DistanceIcon />
-            ) : (
-              <MeleeIcon />
-            ),
+          icon: wattack.range === "ranged" ? <DistanceIcon /> : <MeleeIcon />,
         })),
         ...(selectedNPC?.spells || []).map((spell) => ({
           type: "Spell",

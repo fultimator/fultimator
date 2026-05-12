@@ -290,6 +290,14 @@ function EditAttack({ attack, setAttack, removeAttack, i }) {
             id={"attack-" + i + "-type"}
             label={t("Type:")}
             size="small"
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <TypeIcon type={selected} />
+                <span style={{ textTransform: "capitalize" }}>
+                  {types[selected]?.long ?? selected}
+                </span>
+              </Box>
+            )}
             onChange={(e) => {
               return setAttack("damage", {
                 ...(attack.damage ?? { value: 0, hrZero: false }),
