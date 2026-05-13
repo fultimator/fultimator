@@ -49,6 +49,7 @@ import {
   calcWeaponDamage,
   calcWeaponPrec,
 } from "../../../../libs/weaponNormalization";
+import { validateWeaponPersisted } from "../../../../forms/schema/itemSchemas/weapon";
 
 export default function PlayerWeaponModal({
   open,
@@ -292,6 +293,17 @@ export default function PlayerWeaponModal({
           ? false
           : isEquipped,
     });
+    if (import.meta.env.DEV) {
+      const result = validateWeaponPersisted(updatedWeapon);
+      if (result.success) {
+        console.log("[PlayerWeaponModal] weapon schema ok", result.data);
+      } else {
+        console.warn(
+          "[PlayerWeaponModal] weapon schema validation failed",
+          result.error.issues,
+        );
+      }
+    }
     onAddWeapon(updatedWeapon);
   };
   const handleClearFields = () => {

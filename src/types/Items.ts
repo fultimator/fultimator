@@ -28,12 +28,14 @@ import type {
   PlayerNotes,
 } from "./Players";
 
+import type { Weapon as ZodWeapon } from "../forms/schema/itemSchemas/weapon";
 import type {
-  Weapon,
   CustomWeapon,
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
 } from "./Equipment";
+
+type Weapon = ZodWeapon;
 
 export type { ActorType, AnyActor };
 

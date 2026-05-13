@@ -146,6 +146,7 @@ import {
   calcWeaponDamage,
   calcWeaponPrec,
 } from "../../libs/weaponNormalization";
+import { validateWeaponPersisted } from "../../forms/schema/itemSchemas/weapon";
 
 // Shared constants
 const slugify = (value = "") =>
@@ -3349,6 +3350,18 @@ function WeaponPanel() {
     prec,
     ...modifiers(),
   });
+
+  if (import.meta.env.DEV) {
+    const result = validateWeaponPersisted(weaponObj);
+    if (result.success) {
+      console.log("[QuickCreateModal] weapon schema ok", result.data);
+    } else {
+      console.warn(
+        "[QuickCreateModal] weapon schema validation failed",
+        result.error.issues,
+      );
+    }
+  }
 
   const handleClear = () => {
     setBase(weapons[0]);
