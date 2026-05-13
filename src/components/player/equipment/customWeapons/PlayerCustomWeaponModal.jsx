@@ -48,6 +48,7 @@ import {
 import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 import { calculateCustomWeaponStats } from "../../common/playerCalculations";
 import { buildSphereData } from "../../../../libs/technospheres";
+import { validateCustomWeaponPersisted } from "../../../../forms/schema/itemSchemas/customWeapon";
 
 const ATTRIBUTE_OPTIONS = ["dexterity", "insight", "might", "will"];
 
@@ -732,6 +733,20 @@ export default function PlayerCustomWeaponModal({
     delete weaponData.secondDefModifier;
     delete weaponData.secondMDefModifier;
 
+    if (import.meta.env.DEV) {
+      const result = validateCustomWeaponPersisted(weaponData);
+      if (result.success) {
+        console.log(
+          "[PlayerCustomWeaponModal] customWeapon schema ok",
+          result.data,
+        );
+      } else {
+        console.warn(
+          "[PlayerCustomWeaponModal] customWeapon schema validation failed",
+          result.error.issues,
+        );
+      }
+    }
     onAddCustomWeapon(weaponData);
     if (slotCostDelta !== 0 && setPlayer) {
       setPlayer((prev) => ({

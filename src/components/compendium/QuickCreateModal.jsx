@@ -147,6 +147,7 @@ import {
   calcWeaponPrec,
 } from "../../libs/weaponNormalization";
 import { validateWeaponPersisted } from "../../forms/schema/itemSchemas/weapon";
+import { validateCustomWeaponPersisted } from "../../forms/schema/itemSchemas/customWeapon";
 
 // Shared constants
 const slugify = (value = "") =>
@@ -4232,6 +4233,21 @@ function CustomWeaponPanel() {
     overrideDamageType,
     ...modifiers(),
   });
+
+  if (import.meta.env.DEV) {
+    const result = validateCustomWeaponPersisted(weaponObj);
+    if (result.success) {
+      console.log(
+        "[QuickCreateModal/CustomWeapon] customWeapon schema ok",
+        result.data,
+      );
+    } else {
+      console.warn(
+        "[QuickCreateModal/CustomWeapon] customWeapon schema validation failed",
+        result.error.issues,
+      );
+    }
+  }
 
   const handleClear = () => {
     setName("");

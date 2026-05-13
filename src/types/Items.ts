@@ -29,13 +29,14 @@ import type {
 } from "./Players";
 
 import type { Weapon as ZodWeapon } from "../forms/schema/itemSchemas/weapon";
+import type { CustomWeapon as ZodCustomWeapon } from "../forms/schema/itemSchemas/customWeapon";
 import type {
-  CustomWeapon,
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
 } from "./Equipment";
 
 type Weapon = ZodWeapon;
+type CustomWeapon = ZodCustomWeapon;
 
 export type { ActorType, AnyActor };
 
