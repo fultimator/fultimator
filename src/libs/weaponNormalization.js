@@ -1,3 +1,64 @@
+export const RESTRICTED_ONE_HANDED_CATEGORIES = [
+  "Brawling",
+  "Dagger",
+  "Thrown",
+];
+
+export function calcWeaponCost({
+  base,
+  type,
+  att1,
+  att2,
+  rework,
+  damageBonus,
+  precBonus,
+  qualityCost,
+}) {
+  let cost = base.cost;
+  if (type !== "physical") cost += 100;
+  if (getWeaponAttr1(base) !== att1 || getWeaponAttr2(base) !== att2) {
+    if (att1 === att2) cost += 50;
+  }
+  if (!rework && damageBonus) cost += 200;
+  if (!rework && getWeaponPrec(base) !== 1 && precBonus) cost += 100;
+  else if (rework && getWeaponPrec(base) <= 1 && precBonus) cost += 100;
+  cost += parseInt(qualityCost);
+  return cost;
+}
+
+export function calcWeaponDamage({
+  base,
+  hands,
+  rework,
+  damageBonus,
+  damageReworkBonus,
+  damageModifier,
+  cost,
+}) {
+  let damage = getWeaponDamage(base);
+  if (
+    base.hands === 1 &&
+    hands === 2 &&
+    !RESTRICTED_ONE_HANDED_CATEGORIES.includes(base.category)
+  ) {
+    damage += 4;
+  }
+  if (base.hands === 2 && hands === 1) damage -= 4;
+  if (!rework && damageBonus) damage += 4;
+  if (rework && damageReworkBonus) damage += Math.floor(cost / 1000) * 2;
+  damage += parseInt(damageModifier);
+  return damage;
+}
+
+export function calcWeaponPrec({ base, rework, precBonus, precModifier }) {
+  let prec = getWeaponPrec(base);
+  if (!rework && prec !== 1 && precBonus) prec = 1;
+  if (rework && prec === 1 && precBonus) prec = 2;
+  else if (rework && prec === 0 && precBonus) prec = 1;
+  prec += parseInt(precModifier);
+  return prec;
+}
+
 function normalizeRange(item = {}) {
   if (item.range === "ranged") return "ranged";
   if (item.range === "melee") return "melee";

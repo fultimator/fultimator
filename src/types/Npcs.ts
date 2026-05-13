@@ -44,16 +44,6 @@ export interface NpcSpell {
   special: string[];
   itemType: "spell";
   spellType: string;
-  /** @deprecated kept for archival */
-  mp?: string;
-  /** @deprecated */
-  target?: string;
-  /** @deprecated */
-  targetDesc?: string;
-  /** @deprecated */
-  type?: string | null;
-  /** @deprecated */
-  damagetype?: string;
 }
 
 export interface NpcAction {

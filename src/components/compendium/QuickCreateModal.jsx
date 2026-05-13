@@ -137,12 +137,14 @@ import {
 import {
   getWeaponAttr1,
   getWeaponAttr2,
-  getWeaponDamage,
   getWeaponPrec,
   getWeaponRange,
   getWeaponType,
   normalizeCustomWeaponLike,
   normalizeWeaponLike,
+  calcWeaponCost,
+  calcWeaponDamage,
+  calcWeaponPrec,
 } from "../../libs/weaponNormalization";
 
 // Shared constants
@@ -3295,42 +3297,26 @@ function WeaponPanel() {
     clearModifiers,
   } = useEquipmentForm(null);
 
-  const calcCost = () => {
-    let cost = base.cost;
-    if (type !== "physical") cost += 100;
-    if (getWeaponAttr1(base) !== att1 || getWeaponAttr2(base) !== att2) {
-      if (att1 === att2) cost += 50;
-    }
-    if (!rework && damageBonus) cost += 200;
-    if (!rework && getWeaponPrec(base) !== 1 && precBonus) cost += 100;
-    else if (rework && getWeaponPrec(base) <= 1 && precBonus) cost += 100;
-    cost += parseInt(qualityCost);
-    return cost;
-  };
-
-  const calcDamage = () => {
-    let damage = getWeaponDamage(base);
-    if (base.hands === 1 && hands === 2) damage += 4;
-    if (base.hands === 2 && hands === 1) damage -= 4;
-    if (!rework && damageBonus) damage += 4;
-    if (rework && damageReworkBonus)
-      damage += Math.floor(calcCost() / 1000) * 2;
-    damage += parseInt(damageModifier);
-    return damage;
-  };
-
-  const calcPrec = () => {
-    let prec = getWeaponPrec(base);
-    if (!rework && prec !== 1 && precBonus) prec = 1;
-    if (rework && prec === 1 && precBonus) prec = 2;
-    else if (rework && prec === 0 && precBonus) prec = 1;
-    prec += parseInt(precModifier);
-    return prec;
-  };
-
-  const cost = calcCost();
-  const damage = calcDamage();
-  const prec = calcPrec();
+  const cost = calcWeaponCost({
+    base,
+    type,
+    att1,
+    att2,
+    rework,
+    damageBonus,
+    precBonus,
+    qualityCost,
+  });
+  const damage = calcWeaponDamage({
+    base,
+    hands,
+    rework,
+    damageBonus,
+    damageReworkBonus,
+    damageModifier,
+    cost,
+  });
+  const prec = calcWeaponPrec({ base, rework, precBonus, precModifier });
 
   useEffect(() => {
     setTotalBonus(Math.floor(cost / 1000) * 2);

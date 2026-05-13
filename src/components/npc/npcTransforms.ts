@@ -103,8 +103,8 @@ function normalizeSpellFields(npc: TypeNpc): TypeNpc {
 
       // target + targetDesc -> targetDescription
       if (s.targetDescription === undefined) {
-        s.targetDescription =
-          (s as unknown as Record<string, string>).targetDesc ?? s.target ?? "";
+        const legacy = s as unknown as Record<string, string | undefined>;
+        s.targetDescription = legacy.targetDesc ?? legacy.target ?? "";
       }
       delete (s as unknown as Record<string, unknown>).target;
       delete (s as unknown as Record<string, unknown>).targetDesc;

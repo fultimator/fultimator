@@ -25,7 +25,6 @@ import ChangeMartial from "../../../../routes/equip/common/ChangeMartial";
 import ChangeName from "../../../../routes/equip/common/ChangeName";
 import ChangeType from "../../../../routes/equip/weapons/ChangeType";
 import ChangeHands from "../../../../routes/equip/weapons/ChangeHands";
-import { RESTRICTED_ONE_HANDED_CATEGORIES } from "../../../../routes/equip/weapons/constants";
 import ChangeAttr from "../../../../routes/equip/weapons/ChangeAttr";
 import SelectQuality from "../../../../routes/equip/weapons/SelectQuality";
 import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
@@ -42,11 +41,13 @@ import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import {
   getWeaponAttr1,
   getWeaponAttr2,
-  getWeaponDamage,
   getWeaponPrec,
   getWeaponRange,
   getWeaponType,
   normalizeWeaponLike,
+  calcWeaponCost,
+  calcWeaponDamage,
+  calcWeaponPrec,
 } from "../../../../libs/weaponNormalization";
 
 export default function PlayerWeaponModal({
@@ -241,92 +242,27 @@ export default function PlayerWeaponModal({
     fileInputRef.current.value = null;
   };
 
-  const calcCost = () => {
-    let cost = base.cost;
-
-    // Changed type
-    if (type !== "physical") {
-      cost += 100;
-    }
-
-    // Changed attributes
-    if (getWeaponAttr1(base) !== att1 || getWeaponAttr2(base) !== att2) {
-      if (att1 === att2) {
-        cost += 50;
-      }
-    }
-
-    // Bonus damage
-    if (!rework && damageBonus) {
-      cost += 200;
-    }
-
-    // Bonus precision
-    if (!rework && getWeaponPrec(base) !== 1 && precBonus) {
-      cost += 100;
-      // Bonus precision (rework)
-    } else if (rework && getWeaponPrec(base) <= 1 && precBonus) {
-      cost += 100;
-    }
-
-    // Quality
-    cost += parseInt(qualityCost);
-    return cost;
-  };
-
-  const calcDamage = () => {
-    let damage = getWeaponDamage(base);
-
-    if (
-      base.hands === 1 &&
-      hands === 2 &&
-      !RESTRICTED_ONE_HANDED_CATEGORIES.includes(base.category)
-    ) {
-      damage += 4;
-    }
-    if (base.hands === 2 && hands === 1) {
-      damage -= 4;
-    }
-
-    // Bonus damage
-    if (!rework && damageBonus) {
-      damage += 4;
-    }
-    if (rework && damageReworkBonus) {
-      const bonus = Math.floor(calcCost() / 1000) * 2;
-      damage += bonus;
-    }
-
-    // Damage modifier
-    damage += parseInt(damageModifier);
-
-    return damage;
-  };
-
-  const calcPrec = () => {
-    let prec = getWeaponPrec(base);
-
-    // Bonus precision
-    if (!rework && prec !== 1 && precBonus) {
-      prec = 1;
-    }
-    // Bonus precision (rework)
-    if (rework && prec === 1 && precBonus) {
-      prec = 2;
-    } else if (rework && prec === 0 && precBonus) {
-      prec = 1;
-    }
-
-    // Precision modifier
-    prec += parseInt(precModifier);
-
-    return prec;
-  };
-
   const handleSave = () => {
-    const cost = calcCost();
-    const damage = calcDamage();
-    const prec = calcPrec();
+    const cost = calcWeaponCost({
+      base,
+      type,
+      att1,
+      att2,
+      rework,
+      damageBonus,
+      precBonus,
+      qualityCost,
+    });
+    const damage = calcWeaponDamage({
+      base,
+      hands,
+      rework,
+      damageBonus,
+      damageReworkBonus,
+      damageModifier,
+      cost,
+    });
+    const prec = calcWeaponPrec({ base, rework, precBonus, precModifier });
 
     const updatedWeapon = normalizeWeaponLike({
       base,
@@ -379,9 +315,26 @@ export default function PlayerWeaponModal({
     setTotalBonus(0);
   };
 
-  const cost = calcCost();
-  const damage = calcDamage();
-  const prec = calcPrec();
+  const cost = calcWeaponCost({
+    base,
+    type,
+    att1,
+    att2,
+    rework,
+    damageBonus,
+    precBonus,
+    qualityCost,
+  });
+  const damage = calcWeaponDamage({
+    base,
+    hands,
+    rework,
+    damageBonus,
+    damageReworkBonus,
+    damageModifier,
+    cost,
+  });
+  const prec = calcWeaponPrec({ base, rework, precBonus, precModifier });
 
   // Calculate totalBonus when damageReworkBonus changes
   useEffect(() => {

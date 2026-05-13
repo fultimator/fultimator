@@ -1,11 +1,4 @@
-import {
-  Affinities,
-  ResourceCost,
-  Accuracy,
-  Damage,
-  Attributes,
-  Elements,
-} from "./Misc";
+import { Affinities, ResourceCost, Accuracy, Damage, Attributes } from "./Misc";
 import type {
   Weapon as EquipmentWeapon,
   CustomWeapon as EquipmentCustomWeapon,
@@ -262,55 +255,11 @@ export type Weapons = EquipmentWeapon & {
   isTwoHand?: boolean;
   isCustom?: boolean;
   isEquipped?: boolean;
-  /** @deprecated legacy top-level modifiers */
-  defModifier?: number;
-  /** @deprecated legacy top-level modifiers */
-  mDefModifier?: number;
-  /** @deprecated legacy top-level modifiers */
-  damageModifier?: number;
-  /** @deprecated legacy top-level modifiers */
-  precModifier?: number;
 };
 
 export type CustomWeapons = EquipmentCustomWeapon & {
   selectedQuality?: string;
   isEquipped?: boolean;
-  /** @deprecated legacy top-level flags */
-  rareAccuracyBonus?: boolean;
-  /** @deprecated legacy top-level flags */
-  rareDamageBonus?: boolean;
-  /** @deprecated legacy top-level flags */
-  overrideAccuracyAttributes?: boolean;
-  /** @deprecated legacy top-level flags */
-  overrideDamageType?: boolean;
-  /** @deprecated legacy top-level modifiers */
-  defModifier?: number;
-  /** @deprecated legacy top-level modifiers */
-  mDefModifier?: number;
-  /** @deprecated legacy top-level modifiers */
-  damageModifier?: number;
-  /** @deprecated legacy top-level modifiers */
-  precModifier?: number;
-  // Secondary weapon legacy fields
-  secondWeaponName?: string;
-  secondSelectedCategory?: string;
-  secondSelectedRange?: string;
-  secondCurrentCustomizations?: CustomWeaponCustomization[];
-  secondSelectedQuality?: string;
-  secondQuality?: string;
-  secondQualityCost?: number;
-  /** @deprecated use secondModifiers.def */
-  secondDefModifier?: number;
-  /** @deprecated use secondModifiers.mdef */
-  secondMDefModifier?: number;
-  /** @deprecated legacy */
-  secondOverrideDamageType?: boolean;
-  /** @deprecated legacy */
-  secondCustomDamageType?: Elements;
-  /** @deprecated legacy */
-  secondDamageModifier?: number;
-  /** @deprecated legacy */
-  secondPrecModifier?: number;
   // Data type identifier
   dataType?: string;
 };
