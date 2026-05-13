@@ -1,10 +1,12 @@
 import { describe, it, expect } from "vitest";
 import {
   WeaponSchema,
+  WeaponPersistedSchema,
   validateWeapon,
   validateWeaponPersisted,
   normalizeWeapon,
 } from "../../schema/itemSchemas/weapon";
+import { ITEM_FIELD_PARITY } from "../../schema/fieldParity";
 import {
   calcWeaponCost,
   calcWeaponDamage,
@@ -12,6 +14,10 @@ import {
   RESTRICTED_ONE_HANDED_CATEGORIES,
   normalizeWeaponLike,
 } from "../../../libs/weaponNormalization";
+
+function sortKeys(keys: readonly string[]): string[] {
+  return [...keys].sort();
+}
 
 // Fixtures
 
@@ -166,6 +172,20 @@ describe("normalizeWeapon - defaults", () => {
     const { martial: _, ...noMartial } = VALID_WEAPON;
     const weapon = normalizeWeapon(noMartial);
     expect(weapon.martial).toBe(false);
+  });
+});
+
+describe("weapon field parity", () => {
+  it("keeps QuickCreate/Create/Edit key sets identical", () => {
+    const { quickCreate, create, edit } = ITEM_FIELD_PARITY.weapon;
+    expect(sortKeys(quickCreate)).toEqual(sortKeys(create));
+    expect(sortKeys(quickCreate)).toEqual(sortKeys(edit));
+  });
+
+  it("keeps parity keys aligned with WeaponPersistedSchema", () => {
+    const schemaKeys = sortKeys(Object.keys(WeaponPersistedSchema.shape));
+    const parityKeys = sortKeys(ITEM_FIELD_PARITY.weapon.quickCreate);
+    expect(parityKeys).toEqual(schemaKeys);
   });
 });
 

@@ -23,6 +23,7 @@
     "lint": "eslint . --report-unused-disable-directives-severity warn",
     "format": "prettier --write .",
     "test": "vitest run",
+    "test:parity": "vitest run src/forms/tests/parity",
     "test:watch": "vitest",
     "prepare": "husky"
   },
