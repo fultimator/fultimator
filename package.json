@@ -22,6 +22,8 @@
     "translate": "node DownloadTranslations.js",
     "lint": "eslint . --report-unused-disable-directives-severity warn",
     "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepare": "husky"
   },
   "dependencies": {
@@ -74,6 +76,7 @@
     "semver": "^7.7.1",
     "stream-browserify": "^3.0.0",
     "use-react-screenshot": "^4.0.0",
+    "zod": "^4.4.3",
     "zustand": "^5.0.4"
   },
   "overrides": {
@@ -88,6 +91,7 @@
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/ui": "^4.1.6",
     "electron": "^30.0.1",
     "electron-builder": "^26.8.1",
     "eslint": "^9.0.0",
@@ -103,7 +107,8 @@
     "vite": "^6.0.0",
     "vite-plugin-electron": "^0.28.6",
     "vite-plugin-electron-renderer": "^0.14.5",
-    "vite-plugin-svgr": "^4.3.0"
+    "vite-plugin-svgr": "^4.3.0",
+    "vitest": "^4.1.6"
   },
   "browserslist": {
     "production": [
