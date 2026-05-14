@@ -3,12 +3,8 @@ import type { CustomWeaponPersisted } from "../../../schema/itemSchemas/customWe
 import { calculateCustomWeaponStats } from "../../../../components/player/common/playerCalculations";
 import { Attributes, Elements } from "../../../../types/Misc";
 import { categories } from "../../../../routes/equip/customWeapons/libs";
-import types from "../../../../libs/types";
 import type { SelectOption } from "../../fieldRenderers";
-
-const typeOptions: SelectOption[] = Object.entries(
-  types as Record<string, { long: string }>,
-).map(([key, val]) => ({ value: key, label: val.long }));
+import { typeOptions } from "../typeOptions";
 
 export type CustomWeaponFormState = CustomWeaponPersisted & {
   selectedCategory: string;

@@ -13,7 +13,7 @@ import { Attributes, Elements } from "../../../../types/Misc";
 import weapons from "../../../../libs/weapons";
 import weaponCategories from "../../../../libs/weaponCategories";
 import attributes from "../../../../libs/attributes";
-import types from "../../../../libs/types";
+import { typeOptions } from "../typeOptions";
 import qualities from "../../../../routes/equip/weapons/qualities";
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
@@ -65,10 +65,6 @@ const categoryOptions: SelectOption[] = weaponCategories.map((c: string) => ({
 const attributeOptions: SelectOption[] = Object.entries(
   attributes as Record<string, { shortcaps: string }>,
 ).map(([key, val]) => ({ value: key, label: val.shortcaps }));
-
-const typeOptions: SelectOption[] = Object.entries(
-  types as Record<string, { long: string }>,
-).map(([key, val]) => ({ value: key, label: val.long }));
 
 const handsOptions: SelectOption[] = [
   { value: 1, label: "One Hand" },
