@@ -24,6 +24,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:parity": "vitest run src/forms/tests/parity",
+    "test:roundtrip": "vitest run src/forms/tests/roundtrip",
+    "test:forms": "vitest run src/forms/tests",
     "test:watch": "vitest",
     "prepare": "husky"
   },

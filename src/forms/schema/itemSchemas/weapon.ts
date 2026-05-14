@@ -59,6 +59,7 @@ export const WeaponFormStateSchema = z.object({
   qualityCost: z.coerce.number().int().nonnegative().default(0),
   totalBonus: z.number().int().default(0),
   selectedQuality: z.string().optional(),
+  qualityName: z.string().optional(),
   isEquipped: z.boolean().optional(),
 });
 

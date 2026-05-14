@@ -179,6 +179,7 @@ function Weapons() {
 
   function calcCost() {
     let cost = base.cost;
+    const basePrec = getWeaponPrec(base);
 
     // Changed type
     if (type !== "physical") {
@@ -198,10 +199,10 @@ function Weapons() {
     }
 
     // Bonus prec
-    if (!rework && getWeaponPrec(base) !== 1 && precBonus) {
+    if (!rework && basePrec < 1 && precBonus) {
       cost += 100;
       // Bonus prec (rework)
-    } else if (rework && getWeaponPrec(base) <= 1 && precBonus) {
+    } else if (rework && basePrec < 2 && precBonus) {
       cost += 100;
     }
 
@@ -238,17 +239,16 @@ function Weapons() {
   }
 
   function calcPrec() {
-    let prec = getWeaponPrec(base);
+    const basePrec = getWeaponPrec(base);
+    let prec = basePrec;
 
     // Bonus prec
-    if (!rework && prec !== 1 && precBonus) {
+    if (!rework && basePrec < 1 && precBonus) {
       prec = 1;
     }
     // Bonus prec (rework)
-    if (rework && prec === 1 && precBonus) {
-      prec = 2;
-    } else if (rework && prec === 0 && precBonus) {
-      prec = 1;
+    if (rework && basePrec < 2 && precBonus) {
+      prec = Math.min(basePrec + 1, 2);
     }
 
     return prec;

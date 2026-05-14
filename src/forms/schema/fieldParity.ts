@@ -28,6 +28,7 @@ const WEAPON_FIELDS = [
   "qualityCost",
   "totalBonus",
   "selectedQuality",
+  "qualityName",
   "isEquipped",
 ] as const;
 
@@ -44,6 +45,7 @@ const CUSTOM_WEAPON_FIELDS = [
   "rare",
   "customizations",
   "quality",
+  "qualityName",
   "qualityCost",
   "cost",
   "slots",

@@ -28,22 +28,26 @@ function ChangeBonus({
   return (
     <FormControl variant="outlined" fullWidth>
       <Grid container spacing={2}>
-        {((rework && basePrec <= 1) || (!rework && basePrec === 0)) && (
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox checked={precBonus} onChange={handlePrecChange} />
-              }
-              label={`+1 ${t("Accuracy")} (+100z)`}
-              size="small"
-            />
-          </Grid>
-        )}
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+          }}
+        >
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={precBonus}
+                onChange={handlePrecChange}
+                disabled={
+                  (rework && basePrec >= 2) || (!rework && basePrec >= 1)
+                }
+              />
+            }
+            label={`+1 ${t("Accuracy")} (+100z)`}
+            size="small"
+          />
+        </Grid>
         {!rework && (
           <Grid
             size={{

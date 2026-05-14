@@ -43,6 +43,7 @@ export const CustomWeaponSchema = z.object({
   rare: CustomWeaponRareSchema.optional(),
   customizations: z.array(CustomWeaponCustomizationSchema).default([]),
   quality: z.string().optional(),
+  qualityName: z.string().optional(),
   qualityCost: z.coerce.number().int().nonnegative().optional(),
   cost: z.number().int().nonnegative().optional(),
   slots: z.enum(SlotTierValues).optional(),

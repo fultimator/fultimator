@@ -15,13 +15,14 @@ export function calcWeaponCost({
   qualityCost,
 }) {
   let cost = base.cost;
+  const basePrec = getWeaponPrec(base);
   if (type !== "physical") cost += 100;
   if (getWeaponAttr1(base) !== att1 || getWeaponAttr2(base) !== att2) {
     if (att1 === att2) cost += 50;
   }
   if (!rework && damageBonus) cost += 200;
-  if (!rework && getWeaponPrec(base) !== 1 && precBonus) cost += 100;
-  else if (rework && getWeaponPrec(base) <= 1 && precBonus) cost += 100;
+  if (!rework && basePrec < 1 && precBonus) cost += 100;
+  else if (rework && basePrec < 2 && precBonus) cost += 100;
   cost += parseInt(qualityCost);
   return cost;
 }
@@ -51,10 +52,10 @@ export function calcWeaponDamage({
 }
 
 export function calcWeaponPrec({ base, rework, precBonus, precModifier }) {
-  let prec = getWeaponPrec(base);
-  if (!rework && prec !== 1 && precBonus) prec = 1;
-  if (rework && prec === 1 && precBonus) prec = 2;
-  else if (rework && prec === 0 && precBonus) prec = 1;
+  const basePrec = getWeaponPrec(base);
+  let prec = basePrec;
+  if (!rework && basePrec < 1 && precBonus) prec = 1;
+  if (rework && basePrec < 2 && precBonus) prec = Math.min(basePrec + 1, 2);
   prec += parseInt(precModifier);
   return prec;
 }
