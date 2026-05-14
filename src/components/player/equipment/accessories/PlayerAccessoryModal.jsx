@@ -18,6 +18,7 @@ import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
 import { accessoryFieldConfig } from "../../../../forms/rendering/config/itemConfigs/accessory";
 import { validateAccessoryPersisted } from "../../../../forms/schema/itemSchemas/accessory";
+import { normalizeDefensiveItem } from "../../../../libs/equipmentDefensiveNormalization";
 
 function buildInitialState(accessory) {
   return {
@@ -31,8 +32,7 @@ function buildInitialState(accessory) {
     mDefModifier: accessory?.modifiers?.mdef ?? accessory?.mDefModifier ?? 0,
     initModifier: accessory?.initModifier ?? 0,
     magicModifier: accessory?.magicModifier ?? 0,
-    precModifier:
-      accessory?.modifiers?.accuracy ?? accessory?.precModifier ?? 0,
+    precModifier: accessory?.modifiers?.accuracy ?? 0,
     damageMeleeModifier: accessory?.damageMeleeModifier ?? 0,
     damageRangedModifier: accessory?.damageRangedModifier ?? 0,
     isEquipped: accessory?.isEquipped || false,
@@ -72,8 +72,19 @@ export default function PlayerAccessoryModal({
     },
   });
 
-  const handleFileUpload = (data) => {
+  const handleFileUpload = (rawData) => {
+    const data = normalizeDefensiveItem(rawData);
     if (data) {
+      const normalized = { ...buildInitialState(data), ...data };
+      const validation = validateAccessoryPersisted(normalized);
+      if (!validation.success) {
+        console.warn(
+          "[PlayerAccessoryModal] uploaded accessory failed validation",
+          validation.error.issues,
+        );
+        fileInputRef.current.value = null;
+        return;
+      }
       const next = buildInitialState(null);
       if (data.name) next.name = data.name;
       if (data.quality) {
@@ -85,7 +96,9 @@ export default function PlayerAccessoryModal({
       if (data.mDefModifier) next.mDefModifier = data.mDefModifier;
       if (data.initModifier) next.initModifier = data.initModifier;
       if (data.magicModifier) next.magicModifier = data.magicModifier;
-      if (data.precModifier) next.precModifier = data.precModifier;
+      if (data.modifiers?.accuracy !== undefined) {
+        next.precModifier = data.modifiers.accuracy;
+      }
       if (data.damageMeleeModifier)
         next.damageMeleeModifier = data.damageMeleeModifier;
       if (data.damageRangedModifier)
@@ -99,6 +112,16 @@ export default function PlayerAccessoryModal({
   const handleSave = () => {
     const updatedAccessory = {
       ...formState,
+      modifiers: {
+        ...(formState.modifiers ?? {}),
+        def: parseInt(formState.defModifier),
+        mdef: parseInt(formState.mDefModifier),
+        init: parseInt(formState.initModifier),
+        magic: parseInt(formState.magicModifier),
+        accuracy: parseInt(formState.precModifier),
+        damageMelee: parseInt(formState.damageMeleeModifier),
+        damageRanged: parseInt(formState.damageRangedModifier),
+      },
       defModifier: parseInt(formState.defModifier),
       mDefModifier: parseInt(formState.mDefModifier),
       initModifier: parseInt(formState.initModifier),
@@ -214,7 +237,15 @@ export default function PlayerAccessoryModal({
                     if (file) {
                       const reader = new FileReader();
                       reader.onload = () => {
-                        handleFileUpload(JSON.parse(reader.result));
+                        try {
+                          handleFileUpload(JSON.parse(String(reader.result)));
+                        } catch (error) {
+                          console.warn(
+                            "[PlayerAccessoryModal] invalid JSON upload",
+                            error,
+                          );
+                          fileInputRef.current.value = null;
+                        }
                       };
                       reader.readAsText(file);
                     }

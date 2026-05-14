@@ -2,6 +2,7 @@ import { Affinities, ResourceCost, Accuracy, Damage } from "./Misc";
 import type {
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
+  NpcArmor as EquipmentNpcArmor,
 } from "./Equipment";
 
 export interface NpcAttributes {
@@ -11,19 +12,7 @@ export interface NpcAttributes {
   dexterity: number;
 }
 
-export interface NpcArmor {
-  def: number;
-  name: string;
-  init: number;
-  mdefbonus: number;
-  cost?: number;
-  value?: number;
-  mdef: number;
-  defbonus: number;
-  martial?: boolean;
-  isMartial?: boolean;
-  quality?: string;
-}
+export type NpcArmor = EquipmentNpcArmor;
 
 export type NpcAttack = EquipmentNpcAttack;
 

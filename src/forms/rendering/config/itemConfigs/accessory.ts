@@ -133,13 +133,13 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "precModifier",
     kind: "editable",
-    label: "accessory.modifiers.prec",
+    label: "accessory.modifiers.accuracy",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
     order: 24,
     onChangeEffects: {
-      "modifiers.prec": (s) => s.precModifier,
+      "modifiers.accuracy": (s) => s.precModifier,
     },
   },
   {

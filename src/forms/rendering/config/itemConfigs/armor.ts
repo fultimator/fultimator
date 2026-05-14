@@ -229,13 +229,13 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "precModifier",
     kind: "editable",
-    label: "armor.modifiers.prec",
+    label: "armor.modifiers.accuracy",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
     order: 34,
     onChangeEffects: {
-      "modifiers.prec": (s) => s.precModifier,
+      "modifiers.accuracy": (s) => s.precModifier,
     },
   },
   {

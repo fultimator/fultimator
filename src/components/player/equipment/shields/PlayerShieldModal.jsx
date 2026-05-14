@@ -19,6 +19,7 @@ import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
 import { shieldFieldConfig } from "../../../../forms/rendering/config/itemConfigs/shield";
 import { validateShieldPersisted } from "../../../../forms/schema/itemSchemas/shield";
+import { normalizeDefensiveItem } from "../../../../libs/equipmentDefensiveNormalization";
 
 function buildInitialState(shield) {
   const base = shield?.base || shields[0];
@@ -39,7 +40,7 @@ function buildInitialState(shield) {
     mDefModifier: shield?.modifiers?.mdef ?? shield?.mDefModifier ?? 0,
     initModifier: shield?.initModifier ?? 0,
     magicModifier: shield?.magicModifier ?? 0,
-    precModifier: shield?.modifiers?.accuracy ?? shield?.precModifier ?? 0,
+    precModifier: shield?.modifiers?.accuracy ?? 0,
     damageMeleeModifier: shield?.damageMeleeModifier ?? 0,
     damageRangedModifier: shield?.damageRangedModifier ?? 0,
     isEquipped: shield?.isEquipped || false,
@@ -77,8 +78,19 @@ export default function PlayerShieldModal({
     },
   });
 
-  const handleFileUpload = (data) => {
+  const handleFileUpload = (rawData) => {
+    const data = normalizeDefensiveItem(rawData);
     if (data && data.base?.category === "Shield") {
+      const normalized = { ...buildInitialState(data), ...data };
+      const validation = validateShieldPersisted(normalized);
+      if (!validation.success) {
+        console.warn(
+          "[PlayerShieldModal] uploaded shield failed validation",
+          validation.error.issues,
+        );
+        fileInputRef.current.value = null;
+        return;
+      }
       const next = buildInitialState(null);
       if (data.base) next.base = data.base;
       if (data.name) next.name = data.name;
@@ -91,7 +103,9 @@ export default function PlayerShieldModal({
       if (data.mDefModifier) next.mDefModifier = data.mDefModifier;
       if (data.initModifier) next.initModifier = data.initModifier;
       if (data.magicModifier) next.magicModifier = data.magicModifier;
-      if (data.precModifier) next.precModifier = data.precModifier;
+      if (data.modifiers?.accuracy !== undefined) {
+        next.precModifier = data.modifiers.accuracy;
+      }
       if (data.damageMeleeModifier)
         next.damageMeleeModifier = data.damageMeleeModifier;
       if (data.damageRangedModifier)
@@ -106,6 +120,16 @@ export default function PlayerShieldModal({
     const updatedShield = {
       ...formState,
       category: "Shield",
+      modifiers: {
+        ...(formState.modifiers ?? {}),
+        def: parseInt(formState.defModifier),
+        mdef: parseInt(formState.mDefModifier),
+        init: parseInt(formState.initModifier),
+        magic: parseInt(formState.magicModifier),
+        accuracy: parseInt(formState.precModifier),
+        damageMelee: parseInt(formState.damageMeleeModifier),
+        damageRanged: parseInt(formState.damageRangedModifier),
+      },
       def: formState.base?.def ?? formState.def,
       mdef: formState.base?.mdef ?? formState.mdef,
       defModifier: parseInt(formState.defModifier),
@@ -227,7 +251,15 @@ export default function PlayerShieldModal({
                     if (file) {
                       const reader = new FileReader();
                       reader.onload = () => {
-                        handleFileUpload(JSON.parse(reader.result));
+                        try {
+                          handleFileUpload(JSON.parse(String(reader.result)));
+                        } catch (error) {
+                          console.warn(
+                            "[PlayerShieldModal] invalid JSON upload",
+                            error,
+                          );
+                          fileInputRef.current.value = null;
+                        }
                       };
                       reader.readAsText(file);
                     }

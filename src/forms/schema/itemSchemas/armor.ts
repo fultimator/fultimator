@@ -7,7 +7,7 @@ export const ArmorModifiersSchema = z.object({
   mdef: z.number().int().default(0),
   init: z.number().int().default(0),
   magic: z.number().int().default(0),
-  prec: z.number().int().default(0),
+  accuracy: z.number().int().default(0),
   damageMelee: z.number().int().default(0),
   damageRanged: z.number().int().default(0),
 });

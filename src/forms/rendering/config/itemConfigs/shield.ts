@@ -201,13 +201,13 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "precModifier",
     kind: "editable",
-    label: "shield.modifiers.prec",
+    label: "shield.modifiers.accuracy",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
     order: 24,
     onChangeEffects: {
-      "modifiers.prec": (s) => s.precModifier,
+      "modifiers.accuracy": (s) => s.precModifier,
     },
   },
   {

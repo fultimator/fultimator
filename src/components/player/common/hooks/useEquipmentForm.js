@@ -45,7 +45,7 @@ export function useEquipmentForm(item) {
   const [initModifier, setInitModifier] = useState(item?.initModifier || 0);
   const [magicModifier, setMagicModifier] = useState(item?.magicModifier || 0);
   const [precModifier, setPrecModifier] = useState(
-    item?.modifiers?.accuracy ?? item?.precModifier ?? 0,
+    item?.modifiers?.accuracy ?? 0,
   );
   const [damageMeleeModifier, setDamageMeleeModifier] = useState(
     item?.damageMeleeModifier || 0,
@@ -69,7 +69,7 @@ export function useEquipmentForm(item) {
     setMDefModifier(item?.modifiers?.mdef ?? item?.mDefModifier ?? 0);
     setInitModifier(item?.initModifier || 0);
     setMagicModifier(item?.magicModifier || 0);
-    setPrecModifier(item?.modifiers?.accuracy ?? item?.precModifier ?? 0);
+    setPrecModifier(item?.modifiers?.accuracy ?? 0);
     setDamageMeleeModifier(item?.damageMeleeModifier || 0);
     setDamageRangedModifier(item?.damageRangedModifier || 0);
     setDamageModifier(item?.modifiers?.damage ?? item?.damageModifier ?? 0);

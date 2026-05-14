@@ -4,6 +4,9 @@ import type {
   CustomWeapon as EquipmentCustomWeapon,
   CustomWeaponCustomization,
   SlotTier,
+  EquipmentShield,
+  EquipmentAccessory,
+  EquipmentArmor,
 } from "./Equipment";
 
 export type { SlotTier, CustomWeaponCustomization };
@@ -264,38 +267,11 @@ export type CustomWeapons = EquipmentCustomWeapon & {
   dataType?: string;
 };
 
-export interface Shields {
-  name: string;
-  quality: string;
-  value: number;
-  isMartial: boolean;
-  def: number;
-  mdef: number;
-  init: number;
-  isEquipped: boolean;
-}
+export type Shields = EquipmentShield;
 
-export interface Accessories {
-  name: string;
-  quality: string;
-  value: number;
-  isEquipped: boolean;
-}
+export type Accessories = EquipmentAccessory;
 
-export interface Armor {
-  name: string;
-  quality: string;
-  value: number;
-  isMartial: boolean;
-  def: number;
-  mdef: number;
-  init: number;
-  isEquipped: boolean;
-
-  // Technospheres
-  slots?: SlotTier;
-  slotted?: string[];
-}
+export type Armor = EquipmentArmor;
 
 export interface PlayerEquipment {
   weapons: Weapons[];

@@ -1,5 +1,6 @@
 import { TypeNpc } from "../../types/Npcs";
 import { Affinities, Elements } from "../../types/Misc";
+import { normalizeDefensiveItem } from "../../libs/equipmentDefensiveNormalization";
 
 type NpcTransform = (npc: TypeNpc) => TypeNpc;
 
@@ -328,6 +329,14 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
   };
 }
 
+function unifyNpcDefensiveEquipmentSchema(npc: TypeNpc): TypeNpc {
+  return {
+    ...npc,
+    armor: normalizeDefensiveItem(npc.armor),
+    shield: normalizeDefensiveItem(npc.shield),
+  };
+}
+
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 1,
@@ -372,6 +381,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Unify NPC attack schema: accuracy/damage objects, flatten attr1/attr2 and weapon fields",
     fn: unifyNpcAttackSchema,
+  },
+  {
+    version: 9,
+    label:
+      "Unify NPC armor/shield schema: normalize martial, cost/value, and precision modifier parity",
+    fn: unifyNpcDefensiveEquipmentSchema,
   },
 ];
 

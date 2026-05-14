@@ -21,6 +21,7 @@ import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRend
 import { armorFieldConfig } from "../../../../forms/rendering/config/itemConfigs/armor";
 import { validateArmorPersisted } from "../../../../forms/schema/itemSchemas/armor";
 import { buildSphereData } from "../../../../libs/technospheres";
+import { normalizeDefensiveItem } from "../../../../libs/equipmentDefensiveNormalization";
 
 function buildInitialState(armorPlayer, isSlotsVariant) {
   const base = armorPlayer?.base || armor[0];
@@ -45,8 +46,7 @@ function buildInitialState(armorPlayer, isSlotsVariant) {
       armorPlayer?.modifiers?.mdef ?? armorPlayer?.mDefModifier ?? 0,
     initModifier: armorPlayer?.initModifier ?? 0,
     magicModifier: armorPlayer?.magicModifier ?? 0,
-    precModifier:
-      armorPlayer?.modifiers?.accuracy ?? armorPlayer?.precModifier ?? 0,
+    precModifier: armorPlayer?.modifiers?.accuracy ?? 0,
     damageMeleeModifier: armorPlayer?.damageMeleeModifier ?? 0,
     damageRangedModifier: armorPlayer?.damageRangedModifier ?? 0,
     isEquipped: armorPlayer?.isEquipped || false,
@@ -132,8 +132,22 @@ export default function PlayerArmorModal({
     },
   });
 
-  const handleFileUpload = (data) => {
+  const handleFileUpload = (rawData) => {
+    const data = normalizeDefensiveItem(rawData);
     if (data && data.base?.category === "Armor") {
+      const normalized = {
+        ...buildInitialState(data, isSlotsVariant),
+        ...data,
+      };
+      const validation = validateArmorPersisted(normalized);
+      if (!validation.success) {
+        console.warn(
+          "[PlayerArmorModal] uploaded armor failed validation",
+          validation.error.issues,
+        );
+        fileInputRef.current.value = null;
+        return;
+      }
       const next = buildInitialState(null, isSlotsVariant);
       if (data.base) next.base = data.base;
       if (data.name) next.name = data.name;
@@ -146,7 +160,9 @@ export default function PlayerArmorModal({
       if (data.mDefModifier) next.mDefModifier = data.mDefModifier;
       if (data.initModifier) next.initModifier = data.initModifier;
       if (data.magicModifier) next.magicModifier = data.magicModifier;
-      if (data.precModifier) next.precModifier = data.precModifier;
+      if (data.modifiers?.accuracy !== undefined) {
+        next.precModifier = data.modifiers.accuracy;
+      }
       if (data.damageMeleeModifier)
         next.damageMeleeModifier = data.damageMeleeModifier;
       if (data.damageRangedModifier)
@@ -161,6 +177,16 @@ export default function PlayerArmorModal({
     const updatedArmor = {
       ...formState,
       category: "Armor",
+      modifiers: {
+        ...(formState.modifiers ?? {}),
+        def: parseInt(formState.defModifier),
+        mdef: parseInt(formState.mDefModifier),
+        init: parseInt(formState.initModifier),
+        magic: parseInt(formState.magicModifier),
+        accuracy: parseInt(formState.precModifier),
+        damageMelee: parseInt(formState.damageMeleeModifier),
+        damageRanged: parseInt(formState.damageRangedModifier),
+      },
       def: formState.base?.def ?? formState.def,
       mdef: formState.base?.mdef ?? formState.mdef,
       defModifier: parseInt(formState.defModifier),
@@ -316,7 +342,15 @@ export default function PlayerArmorModal({
                     if (file) {
                       const reader = new FileReader();
                       reader.onload = () => {
-                        handleFileUpload(JSON.parse(reader.result));
+                        try {
+                          handleFileUpload(JSON.parse(String(reader.result)));
+                        } catch (error) {
+                          console.warn(
+                            "[PlayerArmorModal] invalid JSON upload",
+                            error,
+                          );
+                          fileInputRef.current.value = null;
+                        }
                       };
                       reader.readAsText(file);
                     }
