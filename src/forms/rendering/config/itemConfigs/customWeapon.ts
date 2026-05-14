@@ -414,8 +414,24 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
       cost: calcCustomWeaponCost,
     },
   },
-  // Individual att1/att2 override pickers are rendered inline in the modal JSX
-  // (not via SchemaFieldRenderer) because they mutate a nested object field.
+  {
+    key: "selectedAccuracyCheck",
+    kind: "editable",
+    label: "customWeapon.rare.overrideAccuracyAttrs",
+    component: "accuracy-attr-pair",
+    defaultValue: { attr1: Attributes.Dexterity, attr2: Attributes.Insight },
+    group: G.rare,
+    order: 45,
+    fullWidth: true,
+    dependencies: (s) => s.overrideAccuracyAttributes === true,
+    onChangeEffects: {
+      "accuracy.attr1": (s) => s.selectedAccuracyCheck.attr1,
+      "accuracy.attr2": (s) => s.selectedAccuracyCheck.attr2,
+      "rare.overrideAccuracyAttr1": (s) => s.selectedAccuracyCheck.attr1,
+      "rare.overrideAccuracyAttr2": (s) => s.selectedAccuracyCheck.attr2,
+      cost: calcCustomWeaponCost,
+    },
+  },
   // Quality
   {
     key: "selectedQuality",

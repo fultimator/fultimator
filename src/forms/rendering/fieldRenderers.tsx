@@ -4,6 +4,7 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
+  Grid,
   IconButton,
   InputAdornment,
   InputLabel,
@@ -265,6 +266,64 @@ export function TypeSelectRenderer({
         ))}
       </Select>
     </FormControl>
+  );
+}
+
+const ATTRIBUTE_OPTIONS = ["dexterity", "insight", "might", "will"] as const;
+const ATTRIBUTE_LABELS: Record<string, string> = {
+  dexterity: "DEX",
+  insight: "INS",
+  might: "MIG",
+  will: "WLP",
+};
+
+// Free-pick pair of attribute selects for override accuracy. Value is {attr1, attr2}.
+export function AccuracyAttrPairRenderer({
+  value,
+  onCommit,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const v = (value as { attr1: string; attr2: string } | undefined) ?? {
+    attr1: "dexterity",
+    attr2: "insight",
+  };
+  return (
+    <>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="override-acc-attr1">{t("Attribute 1")}</InputLabel>
+          <Select
+            labelId="override-acc-attr1"
+            value={v.attr1}
+            label={t("Attribute 1")}
+            onChange={(e) => onCommit({ ...v, attr1: e.target.value })}
+          >
+            {ATTRIBUTE_OPTIONS.map((attr) => (
+              <MenuItem key={`attr1-${attr}`} value={attr}>
+                {ATTRIBUTE_LABELS[attr] ?? attr}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="override-acc-attr2">{t("Attribute 2")}</InputLabel>
+          <Select
+            labelId="override-acc-attr2"
+            value={v.attr2}
+            label={t("Attribute 2")}
+            onChange={(e) => onCommit({ ...v, attr2: e.target.value })}
+          >
+            {ATTRIBUTE_OPTIONS.map((attr) => (
+              <MenuItem key={`attr2-${attr}`} value={attr}>
+                {ATTRIBUTE_LABELS[attr] ?? attr}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+    </>
   );
 }
 

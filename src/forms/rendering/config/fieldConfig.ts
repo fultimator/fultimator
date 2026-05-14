@@ -14,6 +14,7 @@ export type ComponentToken =
   | "slot-editor"
   | "weapon-base-select"
   | "accuracy-check"
+  | "accuracy-attr-pair"
   | "readonly-number";
 
 export type FieldKind =

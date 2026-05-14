@@ -6,12 +6,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  FormControl,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Typography,
   Accordion,
   AccordionSummary,
@@ -34,14 +30,6 @@ import { buildSphereData } from "../../../../libs/technospheres";
 import { validateCustomWeaponPersisted } from "../../../../forms/schema/itemSchemas/customWeapon";
 import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
 import { customWeaponFieldConfig } from "../../../../forms/rendering/config/itemConfigs/customWeapon";
-
-const ATTRIBUTE_OPTIONS = ["dexterity", "insight", "might", "will"];
-const ATTRIBUTE_LABELS = {
-  dexterity: "DEX",
-  insight: "INS",
-  might: "MIG",
-  will: "WLP",
-};
 
 // Quality grouped options built once at module load.
 const qualityGroups = Object.entries(groupBy(qualities, "category")).map(
@@ -70,7 +58,8 @@ function normalizeAccuracyCheck(
       value?.attr2 ??
       value?.att2 ??
       value?.accuracy?.att2);
-  if (ATTRIBUTE_OPTIONS.includes(attr1) && ATTRIBUTE_OPTIONS.includes(attr2)) {
+  const validAttrs = ["dexterity", "insight", "might", "will"];
+  if (validAttrs.includes(attr1) && validAttrs.includes(attr2)) {
     return { attr1, attr2 };
   }
   return fallback;
@@ -796,82 +785,7 @@ export default function PlayerCustomWeaponModal({
                     label={t("Rare Weapon Options")}
                     cols={2}
                   />
-                  {/* Individual attribute override pickers outside SchemaFieldRenderer
-                      because they mutate a nested {att1, att2} object field. */}
-                  {overrideAccuracyAttributes && (
-                    <>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel id="override-acc-attr1">
-                            {t("Attribute 1")}
-                          </InputLabel>
-                          <Select
-                            labelId="override-acc-attr1"
-                            value={selectedAccuracyCheck.attr1}
-                            label={t("Attribute 1")}
-                            onChange={(e) =>
-                              setFormState((prev) => ({
-                                ...prev,
-                                selectedAccuracyCheck: {
-                                  ...prev.selectedAccuracyCheck,
-                                  attr1: e.target.value,
-                                },
-                                rare: {
-                                  ...prev.rare,
-                                  overrideAccuracyAttr1: e.target.value,
-                                },
-                                accuracy: {
-                                  ...prev.accuracy,
-                                  attr1: e.target.value,
-                                },
-                              }))
-                            }
-                          >
-                            {ATTRIBUTE_OPTIONS.map((attr) => (
-                              <MenuItem key={`attr1-${attr}`} value={attr}>
-                                {ATTRIBUTE_LABELS[attr] ?? attr}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel id="override-acc-attr2">
-                            {t("Attribute 2")}
-                          </InputLabel>
-                          <Select
-                            labelId="override-acc-attr2"
-                            value={selectedAccuracyCheck.attr2}
-                            label={t("Attribute 2")}
-                            onChange={(e) =>
-                              setFormState((prev) => ({
-                                ...prev,
-                                selectedAccuracyCheck: {
-                                  ...prev.selectedAccuracyCheck,
-                                  attr2: e.target.value,
-                                },
-                                rare: {
-                                  ...prev.rare,
-                                  overrideAccuracyAttr2: e.target.value,
-                                },
-                                accuracy: {
-                                  ...prev.accuracy,
-                                  attr2: e.target.value,
-                                },
-                              }))
-                            }
-                          >
-                            {ATTRIBUTE_OPTIONS.map((attr) => (
-                              <MenuItem key={`attr2-${attr}`} value={attr}>
-                                {ATTRIBUTE_LABELS[attr] ?? attr}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                    </>
-                  )}
+
                   <SchemaFieldRenderer
                     config={customWeaponFieldConfig}
                     state={formState}

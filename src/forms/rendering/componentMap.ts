@@ -10,6 +10,7 @@ import {
   GroupedSelectRenderer,
   TypeSelectRenderer,
   AccuracyCheckRenderer,
+  AccuracyAttrPairRenderer,
   CustomizationListRenderer,
   SlotTierPickerRenderer,
   SlotEditorRenderer,
@@ -33,5 +34,6 @@ export const componentMap: Record<ComponentToken, RendererComponent> = {
   // Legacy tokens kept for compatibility during migration.
   "weapon-base-select": GroupedSelectRenderer,
   "accuracy-check": AccuracyCheckRenderer,
+  "accuracy-attr-pair": AccuracyAttrPairRenderer,
   "modifier-block": () => null,
 };
