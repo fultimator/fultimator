@@ -15,6 +15,7 @@ import {
   SlotTierPickerRenderer,
   SlotEditorRenderer,
   ReadonlyNumberRenderer,
+  RareBonusBlockRenderer,
 } from "./fieldRenderers";
 
 type RendererComponent = React.ComponentType<FieldRendererProps>;
@@ -36,4 +37,5 @@ export const componentMap: Record<ComponentToken, RendererComponent> = {
   "accuracy-check": AccuracyCheckRenderer,
   "accuracy-attr-pair": AccuracyAttrPairRenderer,
   "modifier-block": () => null,
+  "rare-bonus-block": RareBonusBlockRenderer,
 };

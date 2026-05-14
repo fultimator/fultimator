@@ -1,32 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslate } from "../../../../translation/translate";
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Grid,
-  Typography,
-  Divider,
   Button,
+  Box,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   IconButton,
-  Box,
+  Typography,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import qualities from "../../../../routes/equip/Accessories/qualities";
-import SelectQuality from "../../../../routes/equip/Accessories/SelectQuality";
-import ChangeName from "../../../../routes/equip/common/ChangeName";
-import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
-import ChangeModifiers from "../ChangeModifiers";
 import { SharedAccessoryCard } from "../../../../components/shared/itemCards";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import useUploadJSON from "../../../../hooks/useUploadJSON";
-import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
+import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
+import { accessoryFieldConfig } from "../../../../forms/rendering/config/itemConfigs/accessory";
+import { validateAccessoryPersisted } from "../../../../forms/schema/itemSchemas/accessory";
+
+function buildInitialState(accessory) {
+  return {
+    itemType: "accessory",
+    name: accessory?.name || "",
+    quality: accessory?.quality || "",
+    qualityCost: accessory?.qualityCost || 0,
+    selectedQuality: accessory?.selectedQuality || "",
+    cost: accessory?.cost ?? 0,
+    defModifier: accessory?.modifiers?.def ?? accessory?.defModifier ?? 0,
+    mDefModifier: accessory?.modifiers?.mdef ?? accessory?.mDefModifier ?? 0,
+    initModifier: accessory?.initModifier ?? 0,
+    magicModifier: accessory?.magicModifier ?? 0,
+    precModifier:
+      accessory?.modifiers?.accuracy ?? accessory?.precModifier ?? 0,
+    damageMeleeModifier: accessory?.damageMeleeModifier ?? 0,
+    damageRangedModifier: accessory?.damageRangedModifier ?? 0,
+    isEquipped: accessory?.isEquipped || false,
+  };
+}
 
 export default function PlayerAccessoryModal({
   open,
@@ -37,38 +48,16 @@ export default function PlayerAccessoryModal({
   onDeleteAccessory,
 }) {
   const { t } = useTranslate();
-
-  const [name, setName] = useState(accessory?.name || "");
-  const [quality, setQuality] = useState(accessory?.quality || "");
-  const [qualityCost, setQualityCost] = useState(accessory?.qualityCost || 0);
-  const [selectedQuality, setSelectedQuality] = useState(
-    accessory?.selectedQuality || "",
+  const [formState, setFormState] = useState(() =>
+    buildInitialState(accessory),
   );
-  const {
-    defModifier,
-    setDefModifier,
-    mDefModifier,
-    setMDefModifier,
-    initModifier,
-    setInitModifier,
-    magicModifier,
-    setMagicModifier,
-    precModifier,
-    setPrecModifier,
-    damageMeleeModifier,
-    setDamageMeleeModifier,
-    damageRangedModifier,
-    setDamageRangedModifier,
-    _isEquipped,
-    _setIsEquipped,
-    modifiersExpanded,
-    setModifiersExpanded,
-    expandModifiers,
-    modifiers,
-    clearModifiers,
-  } = useEquipmentForm(accessory);
-
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setFormState(buildInitialState(accessory));
+  }, [accessory]);
+
+  const { name, quality, cost } = formState;
 
   const {
     isOpen: deleteDialogOpen,
@@ -83,97 +72,59 @@ export default function PlayerAccessoryModal({
     },
   });
 
-  useEffect(() => {
-    setName(accessory?.name || "");
-    setQuality(accessory?.quality || "");
-    setQualityCost(accessory?.qualityCost || 0);
-    setSelectedQuality(accessory?.selectedQuality || "");
-    // modifier fields are handled by useEquipmentForm
-  }, [accessory]);
-
-  const { handleFileUpload } = useUploadJSON((data) => {
+  const handleFileUpload = (data) => {
     if (data) {
-      const {
-        name,
-        quality,
-        qualityCost,
-        defModifier,
-        mDefModifier,
-        initModifier,
-        magicModifier,
-        precModifier,
-        damageMeleeModifier,
-        damageRangedModifier,
-      } = data;
-
-      if (name) {
-        setName(name);
+      const next = buildInitialState(null);
+      if (data.name) next.name = data.name;
+      if (data.quality) {
+        next.selectedQuality = "";
+        next.quality = data.quality;
       }
-      if (quality) {
-        setSelectedQuality("");
-        setQuality(quality);
-      }
-      if (qualityCost) {
-        setQualityCost(qualityCost);
-      }
-      if (defModifier) {
-        setDefModifier(defModifier);
-        expandModifiers();
-      }
-      if (mDefModifier) {
-        setMDefModifier(mDefModifier);
-        expandModifiers();
-      }
-      if (initModifier) {
-        setInitModifier(initModifier);
-        expandModifiers();
-      }
-      if (magicModifier) {
-        setMagicModifier(magicModifier);
-        expandModifiers();
-      }
-      if (precModifier) {
-        setPrecModifier(precModifier);
-        expandModifiers();
-      }
-      if (damageMeleeModifier) {
-        setDamageMeleeModifier(damageMeleeModifier);
-        expandModifiers();
-      }
-      if (damageRangedModifier) {
-        setDamageRangedModifier(damageRangedModifier);
-        expandModifiers();
-      }
+      if (data.qualityCost) next.qualityCost = data.qualityCost;
+      if (data.defModifier) next.defModifier = data.defModifier;
+      if (data.mDefModifier) next.mDefModifier = data.mDefModifier;
+      if (data.initModifier) next.initModifier = data.initModifier;
+      if (data.magicModifier) next.magicModifier = data.magicModifier;
+      if (data.precModifier) next.precModifier = data.precModifier;
+      if (data.damageMeleeModifier)
+        next.damageMeleeModifier = data.damageMeleeModifier;
+      if (data.damageRangedModifier)
+        next.damageRangedModifier = data.damageRangedModifier;
+      next.cost = Number(next.qualityCost) || 0;
+      setFormState(next);
     }
     fileInputRef.current.value = null;
-  });
-
-  function calcCost() {
-    return parseInt(qualityCost);
-  }
-
-  const cost = calcCost();
-
-  const handleClearFields = () => {
-    setName("");
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    clearModifiers();
   };
 
   const handleSave = () => {
     const updatedAccessory = {
-      name,
-      quality,
-      qualityCost,
-      selectedQuality,
-      cost,
-      ...modifiers(),
+      ...formState,
+      defModifier: parseInt(formState.defModifier),
+      mDefModifier: parseInt(formState.mDefModifier),
+      initModifier: parseInt(formState.initModifier),
+      magicModifier: parseInt(formState.magicModifier),
+      precModifier: parseInt(formState.precModifier),
+      damageMeleeModifier: parseInt(formState.damageMeleeModifier),
+      damageRangedModifier: parseInt(formState.damageRangedModifier),
     };
+
+    if (import.meta.env.DEV) {
+      const result = validateAccessoryPersisted(updatedAccessory);
+      if (!result.success) {
+        console.warn(
+          "[PlayerAccessoryModal] accessory schema validation failed",
+          result.error.issues,
+        );
+      }
+    }
 
     onAddAccessory(updatedAccessory);
   };
+
+  const handleClearFields = () => {
+    setFormState(buildInitialState(null));
+  };
+
   return (
     <>
       <Dialog
@@ -181,10 +132,7 @@ export default function PlayerAccessoryModal({
         onClose={onClose}
         slotProps={{
           paper: {
-            sx: {
-              width: "100%",
-              maxWidth: "lg",
-            },
+            sx: { width: "100%", maxWidth: "lg" },
           },
         }}
       >
@@ -204,144 +152,46 @@ export default function PlayerAccessoryModal({
           <Close />
         </IconButton>
         <DialogContent>
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
-            {/* Form */}
+          <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
+            {/* Left column: form fields */}
+            <Grid size={{ xs: 12, md: 7 }}>
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={accessoryFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="core"
+                  label={t("Accessory")}
+                  cols={2}
+                />
+              </Grid>
 
-            {/* Change Base */}
-            <Grid size={6}>
-              <ChangeName
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Grid>
-            <Grid size={6}>
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value,
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
-                }}
-              />
-            </Grid>
-            <Grid size={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-              <Divider />
-            </Grid>
-            <Accordion
-              sx={{ width: "100%", marginLeft: "10px" }}
-              expanded={modifiersExpanded}
-              onChange={() => setModifiersExpanded(!modifiersExpanded)}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography>{t("Modifiers")}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"DEF Modifier"}
-                      value={defModifier}
-                      onChange={(e) => setDefModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"MDEF Modifier"}
-                      value={mDefModifier}
-                      onChange={(e) => setMDefModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"INIT Modifier"}
-                      value={initModifier}
-                      onChange={(e) => setInitModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Magic Modifier"}
-                      value={magicModifier}
-                      onChange={(e) => setMagicModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Precision Modifier"}
-                      value={precModifier}
-                      onChange={(e) => setPrecModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Damage (Melee) Modifier"}
-                      value={damageMeleeModifier}
-                      onChange={(e) => setDamageMeleeModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Damage (Ranged) Modifier"}
-                      value={damageRangedModifier}
-                      onChange={(e) => setDamageRangedModifier(e.target.value)}
-                    />
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-            <Grid size={12}>
-              <Divider />
-            </Grid>
-            <Grid sx={{ py: 0 }} size={12}>
-              <Grid container spacing={2} sx={{ alignItems: "center" }}>
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={accessoryFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="quality"
+                  label={t("Quality")}
+                  cols={2}
+                />
+              </Grid>
+
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={accessoryFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="modifiers"
+                  label={t("Modifiers")}
+                  cols={2}
+                />
+              </Grid>
+
+              <Grid container spacing={1} sx={{ alignItems: "center" }}>
                 <Grid>
                   <Button
                     variant="outlined"
@@ -359,29 +209,25 @@ export default function PlayerAccessoryModal({
                   ref={fileInputRef}
                   type="file"
                   accept=".json"
-                  onChange={handleFileUpload}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        handleFileUpload(JSON.parse(reader.result));
+                      };
+                      reader.readAsText(file);
+                    }
+                  }}
                   style={{ display: "none" }}
                 />
               </Grid>
             </Grid>
-            <Grid size={12}>
-              <Divider sx={{ my: 2 }} />
+
+            {/* Right column: preview card */}
+            <Grid size={{ xs: 12, md: 5 }} sx={{ position: "sticky", top: 0 }}>
+              <SharedAccessoryCard item={{ name, cost, quality }} />
             </Grid>
-          </Grid>
-          {/* Pretty */}
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <SharedAccessoryCard
-              item={{
-                name: name,
-                cost: cost,
-                quality: quality,
-              }}
-            />
           </Grid>
         </DialogContent>
         <DialogActions>

@@ -62,6 +62,75 @@ const CUSTOM_WEAPON_FIELDS = [
   "dataType",
 ] as const;
 
+const ACCESSORY_FIELDS = [
+  "itemType",
+  "name",
+  "quality",
+  "qualityCost",
+  "selectedQuality",
+  "cost",
+  "defModifier",
+  "mDefModifier",
+  "initModifier",
+  "magicModifier",
+  "precModifier",
+  "damageMeleeModifier",
+  "damageRangedModifier",
+  "modifiers",
+  "isEquipped",
+] as const;
+
+const SHIELD_FIELDS = [
+  "itemType",
+  "name",
+  "martial",
+  "def",
+  "mdef",
+  "init",
+  "rework",
+  "quality",
+  "qualityCost",
+  "selectedQuality",
+  "cost",
+  "base",
+  "defModifier",
+  "mDefModifier",
+  "initModifier",
+  "magicModifier",
+  "precModifier",
+  "damageMeleeModifier",
+  "damageRangedModifier",
+  "modifiers",
+  "isEquipped",
+] as const;
+
+const ARMOR_FIELDS = [
+  "itemType",
+  "name",
+  "martial",
+  "def",
+  "mdef",
+  "init",
+  "rework",
+  "quality",
+  "qualityCost",
+  "selectedQuality",
+  "cost",
+  "base",
+  "slots",
+  "slotted",
+  "isSlotsVariant",
+  "defModifier",
+  "mDefModifier",
+  "initModifier",
+  "magicModifier",
+  "precModifier",
+  "damageMeleeModifier",
+  "damageRangedModifier",
+  "modifiers",
+  "isEquipped",
+] as const;
+
 export const ITEM_FIELD_PARITY = {
   weapon: {
     quickCreate: WEAPON_FIELDS,
@@ -72,5 +141,20 @@ export const ITEM_FIELD_PARITY = {
     quickCreate: CUSTOM_WEAPON_FIELDS,
     create: CUSTOM_WEAPON_FIELDS,
     edit: CUSTOM_WEAPON_FIELDS,
+  },
+  accessory: {
+    quickCreate: ACCESSORY_FIELDS,
+    create: ACCESSORY_FIELDS,
+    edit: ACCESSORY_FIELDS,
+  },
+  shield: {
+    quickCreate: SHIELD_FIELDS,
+    create: SHIELD_FIELDS,
+    edit: SHIELD_FIELDS,
+  },
+  armor: {
+    quickCreate: ARMOR_FIELDS,
+    create: ARMOR_FIELDS,
+    edit: ARMOR_FIELDS,
   },
 } satisfies Record<string, SurfaceFieldParity>;

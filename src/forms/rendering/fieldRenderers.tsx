@@ -396,13 +396,94 @@ export function SlotTierPickerRenderer({
   onCommit,
   componentProps,
 }: FieldRendererProps) {
+  const player = componentProps?.player as
+    | { settings?: { optionalRules?: { technospheresVariant?: string } } }
+    | undefined;
+  const variant = player?.settings?.optionalRules?.technospheresVariant;
+  const derivedIsIntegrated =
+    variant === "integrated" || variant === "hoplospheres";
+  const isIntegrated =
+    (componentProps?.isIntegrated as boolean | undefined) ??
+    derivedIsIntegrated;
+
   return (
     <TypedSlotTierPicker
       value={(value as string) ?? "alpha"}
       onChange={(tier) => onCommit(tier)}
       isWeapon={(componentProps?.isWeapon as boolean) ?? true}
-      isIntegrated={(componentProps?.isIntegrated as boolean) ?? false}
+      isIntegrated={isIntegrated}
     />
+  );
+}
+
+export function RareBonusBlockRenderer({
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const v = (value as {
+    precBonus: boolean;
+    damageBonus: boolean;
+    damageReworkBonus: boolean;
+  }) ?? {
+    precBonus: false,
+    damageBonus: false,
+    damageReworkBonus: false,
+  };
+  const rework = (componentProps?.rework as boolean) ?? false;
+  const totalBonus = (componentProps?.totalBonus as number) ?? 0;
+  const basePrec = (componentProps?.basePrec as number) ?? 0;
+
+  const emit = (patch: Partial<typeof v>) => onCommit({ ...v, ...patch });
+
+  return (
+    <FormControl variant="outlined" fullWidth>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={v.precBonus}
+                onChange={(e) => emit({ precBonus: e.target.checked })}
+                disabled={
+                  (rework && basePrec >= 2) || (!rework && basePrec >= 1)
+                }
+              />
+            }
+            label={`+1 ${t("weapon.rare.accuracyBonus.label")} (+100z)`}
+          />
+        </Grid>
+        {!rework && (
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={v.damageBonus}
+                  onChange={(e) => emit({ damageBonus: e.target.checked })}
+                />
+              }
+              label={`+4 ${t("weapon.rare.damageBonus.label")} (+200z)`}
+            />
+          </Grid>
+        )}
+        {rework && (
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={v.damageReworkBonus}
+                  onChange={(e) =>
+                    emit({ damageReworkBonus: e.target.checked })
+                  }
+                />
+              }
+              label={`+${totalBonus} ${t("weapon.rare.damageReworkBonus.label")}`}
+            />
+          </Grid>
+        )}
+      </Grid>
+    </FormControl>
   );
 }
 

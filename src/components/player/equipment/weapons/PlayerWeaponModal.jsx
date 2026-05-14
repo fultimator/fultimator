@@ -7,13 +7,11 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Divider,
   Grid,
   Typography,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import weapons from "../../../../libs/weapons";
-import ChangeBonus from "../../../../routes/equip/weapons/ChangeBonus";
 import { Close } from "@mui/icons-material";
 import { SharedWeaponCard } from "../../../../components/shared/itemCards";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
@@ -51,6 +49,11 @@ function buildInitialState(weapon) {
     damageBonus: weapon?.damageBonus || false,
     damageReworkBonus: weapon?.damageReworkBonus || false,
     precBonus: weapon?.precBonus || false,
+    rareBonuses: {
+      precBonus: weapon?.precBonus || false,
+      damageBonus: weapon?.damageBonus || false,
+      damageReworkBonus: weapon?.damageReworkBonus || false,
+    },
     rework: weapon?.rework || false,
     quality: weapon?.quality || "",
     range: weapon?.range || getWeaponRange(base),
@@ -364,25 +367,20 @@ export default function PlayerWeaponModal({
 
               {/* Rare bonuses */}
               <Grid container spacing={2} sx={{ mb: 2 }}>
-                <Grid size={12}>
-                  <Typography variant="h6">
-                    {t("Rare Weapon Options")}
-                  </Typography>
-                  <Divider sx={{ mt: 0.5, mb: 1 }} />
-                </Grid>
-                <Grid size={12}>
-                  <ChangeBonus
-                    basePrec={getWeaponPrec(base)}
-                    precBonus={precBonus}
-                    damageBonus={damageBonus}
-                    damageReworkBonus={damageReworkBonus}
-                    setPrecBonus={(v) => set("precBonus", v)}
-                    setDamageBonus={(v) => set("damageBonus", v)}
-                    setDamageReworkBonus={(v) => set("damageReworkBonus", v)}
-                    rework={rework}
-                    totalBonus={totalBonus}
-                  />
-                </Grid>
+                <SchemaFieldRenderer
+                  config={weaponFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="rareBonus"
+                  label={t("Rare Weapon Options")}
+                  cols={1}
+                  extraProps={{
+                    rework,
+                    totalBonus,
+                    basePrec: getWeaponPrec(base),
+                  }}
+                />
                 <SchemaFieldRenderer
                   config={weaponFieldConfig}
                   state={formState}

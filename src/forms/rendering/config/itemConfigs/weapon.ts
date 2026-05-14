@@ -18,7 +18,7 @@ import qualities from "../../../../routes/equip/weapons/qualities";
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
 
-// Typed only for what calc functions need; the full type lives in libs/weapons.js (untyped).
+// Full definition lives in libs/weapons.js (untyped).
 interface WeaponBase {
   name: string;
   category: string;
@@ -36,6 +36,12 @@ interface WeaponBase {
   type?: string;
 }
 
+export interface WeaponRareBonuses {
+  precBonus: boolean;
+  damageBonus: boolean;
+  damageReworkBonus: boolean;
+}
+
 export type WeaponFormState = Omit<WeaponPersisted, "base"> & {
   base: WeaponBase | undefined;
   att1: Attributes;
@@ -47,9 +53,10 @@ export type WeaponFormState = Omit<WeaponPersisted, "base"> & {
   defModifier: number;
   mDefModifier: number;
   qualityName: string;
+  rareBonuses: WeaponRareBonuses;
 };
 
-// Pre-built option lists (computed once at module load, not per render).
+// Option lists built once at module load.
 const weaponGroups: SelectGroup[] = Object.entries(
   groupBy(weapons, "category") as Record<string, typeof weapons>,
 ).map(([category, ws]) => ({
@@ -81,7 +88,7 @@ const qualityGroups: SelectGroup[] = Object.entries(
   options: qs.map((q) => ({ value: q.name, label: `${q.name} (${q.cost}z)` })),
 }));
 
-// Groups - controls section ordering in the renderer.
+// Section keys - control rendering order.
 const G = {
   core: "core",
   accuracy: "accuracy",
@@ -104,9 +111,7 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     group: G.core,
     order: 0,
     componentProps: { groups: weaponGroups },
-    // format: object to string name for the select
     format: (v) => (v as WeaponBase | undefined)?.name ?? "",
-    // parse: string name to full weapon object (cast hands to literal type)
     parse: (v) => {
       const w = weapons.find((w) => w.name === v) ?? weapons[0];
       return { ...w, hands: w.hands as 1 | 2 } as WeaponBase;
@@ -303,7 +308,7 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
       "damage.hrZero": (s) => s.damageHrZero,
     },
   },
-  //  Modifiers (accordion section)
+  //  Modifiers
   {
     key: "precModifier",
     kind: "editable",
@@ -404,54 +409,43 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
         ) * 2,
     },
   },
-  // Rare bonuses rendered manually by ChangeBonus, not via SchemaFieldRenderer.
   {
-    key: "precBonus",
+    key: "rareBonuses",
     kind: "form-state",
-    label: "weapon.rare.accuracyBonus",
-    component: "checkbox",
-    defaultValue: false,
+    label: "weapon.rare.bonuses",
+    component: "rare-bonus-block",
+    defaultValue: {
+      precBonus: false,
+      damageBonus: false,
+      damageReworkBonus: false,
+    },
     group: G.rareBonus,
     order: 40,
+    fullWidth: true,
     onChangeEffects: {
-      "rare.accuracyBonus": (s) => s.precBonus,
+      precBonus: (s) => (s.rareBonuses as WeaponRareBonuses).precBonus,
+      damageBonus: (s) => (s.rareBonuses as WeaponRareBonuses).damageBonus,
+      damageReworkBonus: (s) =>
+        (s.rareBonuses as WeaponRareBonuses).damageReworkBonus,
+      "rare.accuracyBonus": (s) =>
+        (s.rareBonuses as WeaponRareBonuses).precBonus,
+      "rare.damageBonus": (s) =>
+        (s.rareBonuses as WeaponRareBonuses).damageBonus,
       "accuracy.value": (s) =>
         calcWeaponPrec({
           base: s.base,
           rework: s.rework,
-          precBonus: s.precBonus,
+          precBonus: (s.rareBonuses as WeaponRareBonuses).precBonus,
           precModifier: s.precModifier,
         }),
-      cost: (s) =>
-        calcWeaponCost({
-          base: s.base,
-          type: s.type,
-          att1: s.att1,
-          att2: s.att2,
-          rework: s.rework,
-          damageBonus: s.damageBonus,
-          precBonus: s.precBonus,
-          qualityCost: s.qualityCost,
-        }),
-    },
-  },
-  {
-    key: "damageBonus",
-    kind: "form-state",
-    label: "weapon.rare.damageBonus",
-    component: "checkbox",
-    defaultValue: false,
-    group: G.rareBonus,
-    order: 41,
-    onChangeEffects: {
-      "rare.damageBonus": (s) => s.damageBonus,
       "damage.value": (s) =>
         calcWeaponDamage({
           base: s.base,
           hands: s.hands,
           rework: s.rework,
-          damageBonus: s.damageBonus,
-          damageReworkBonus: s.damageReworkBonus,
+          damageBonus: (s.rareBonuses as WeaponRareBonuses).damageBonus,
+          damageReworkBonus: (s.rareBonuses as WeaponRareBonuses)
+            .damageReworkBonus,
           damageModifier: s.damageModifier,
           cost: calcWeaponCost({
             base: s.base,
@@ -459,8 +453,8 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
             att1: s.att1,
             att2: s.att2,
             rework: s.rework,
-            damageBonus: s.damageBonus,
-            precBonus: s.precBonus,
+            damageBonus: (s.rareBonuses as WeaponRareBonuses).damageBonus,
+            precBonus: (s.rareBonuses as WeaponRareBonuses).precBonus,
             qualityCost: s.qualityCost,
           }),
         }),
@@ -471,35 +465,13 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
           att1: s.att1,
           att2: s.att2,
           rework: s.rework,
-          damageBonus: s.damageBonus,
-          precBonus: s.precBonus,
+          damageBonus: (s.rareBonuses as WeaponRareBonuses).damageBonus,
+          precBonus: (s.rareBonuses as WeaponRareBonuses).precBonus,
           qualityCost: s.qualityCost,
         }),
     },
   },
-  {
-    key: "damageReworkBonus",
-    kind: "form-state",
-    label: "weapon.rare.damageReworkBonus",
-    component: "checkbox",
-    defaultValue: false,
-    group: G.rareBonus,
-    order: 42,
-    dependencies: (s) => s.rework === true,
-    onChangeEffects: {
-      "damage.value": (s) =>
-        calcWeaponDamage({
-          base: s.base,
-          hands: s.hands,
-          rework: s.rework,
-          damageBonus: s.damageBonus,
-          damageReworkBonus: s.damageReworkBonus,
-          damageModifier: s.damageModifier,
-          cost: s.cost ?? 0,
-        }),
-    },
-  },
-  //  Quality
+
   {
     key: "selectedQuality",
     kind: "form-state",

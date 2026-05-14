@@ -15,7 +15,8 @@ export type ComponentToken =
   | "weapon-base-select"
   | "accuracy-check"
   | "accuracy-attr-pair"
-  | "readonly-number";
+  | "readonly-number"
+  | "rare-bonus-block";
 
 export type FieldKind =
   | "editable" // has a UI control; lands in the payload
