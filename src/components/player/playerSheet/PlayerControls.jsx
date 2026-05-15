@@ -129,13 +129,13 @@ function StatChangeDialog({
     <Dialog
       open={open}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
-          backgroundColor: "background.paper",
-          backdropFilter: "blur(4px)",
-        },
-      }}
       slotProps={{
+        paper: {
+          sx: {
+            backgroundColor: "background.paper",
+            backdropFilter: "blur(4px)",
+          },
+        },
         backdrop: {
           sx: {
             backgroundColor: "rgba(0, 0, 0, 0.7)",

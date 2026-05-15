@@ -452,6 +452,7 @@ export default function NpcEdit() {
           <>
             {/* Edit Basic Information */}
             <Paper
+              id="edit-section-basics"
               elevation={3}
               sx={{
                 p: "15px",
@@ -466,6 +467,7 @@ export default function NpcEdit() {
 
             {/* Edit Affinities and Bonuses */}
             <Paper
+              id="edit-section-affinities"
               elevation={3}
               sx={{
                 p: "15px",
@@ -508,6 +510,7 @@ export default function NpcEdit() {
 
             {/* Edit Base Attacks and Weapon Attacks */}
             <Paper
+              id="edit-section-attacks"
               elevation={3}
               sx={{
                 p: "15px",
@@ -529,6 +532,7 @@ export default function NpcEdit() {
 
             {/* Edit Spells */}
             <Paper
+              id="edit-section-spells"
               elevation={3}
               sx={{
                 p: "15px",
@@ -543,6 +547,7 @@ export default function NpcEdit() {
 
             {/* Edit Extra Features */}
             <Paper
+              id="edit-section-extras"
               elevation={3}
               sx={{
                 p: "15px",
@@ -559,7 +564,7 @@ export default function NpcEdit() {
                     md: 6,
                   }}
                 >
-                  <EditActions npc={npcTemp} setNpc={setNpcTemp} />
+                  <div id="edit-section-actions"><EditActions npc={npcTemp} setNpc={setNpcTemp} /></div>
                 </Grid>
                 {/* Edit Special Rules */}
                 <Grid
@@ -568,7 +573,7 @@ export default function NpcEdit() {
                     md: 6,
                   }}
                 >
-                  <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
+                  <div id="edit-section-special"><EditSpecial npc={npcTemp} setNpc={setNpcTemp} /></div>
                 </Grid>
                 {/* Edit Rare Gear */}
                 <Grid
@@ -577,7 +582,7 @@ export default function NpcEdit() {
                     md: 6,
                   }}
                 >
-                  <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
+                  <div id="edit-section-raregear"><EditRareGear npc={npcTemp} setNpc={setNpcTemp} /></div>
                 </Grid>
                 {/* Edit Notes */}
                 <Grid
@@ -586,7 +591,7 @@ export default function NpcEdit() {
                     md: 6,
                   }}
                 >
-                  <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
+                  <div id="edit-section-notes"><EditNotes npc={npcTemp} setNpc={setNpcTemp} /></div>
                 </Grid>
               </Grid>
             </Paper>
@@ -594,6 +599,7 @@ export default function NpcEdit() {
 
             {/* Attack Chance Generator Section */}
             <Paper
+              id="edit-section-attackchance"
               elevation={3}
               sx={{
                 p: "15px",

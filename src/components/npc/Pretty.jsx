@@ -66,6 +66,7 @@ function NpcPretty({
         {(study === 0 || study === null || study === undefined) && (
           <>
             <div
+              id={`npc-sheet-top-${npc.id}`}
               style={{
                 boxShadow: collapse ? "none" : "1px 1px 5px",
               }}
@@ -74,15 +75,15 @@ function NpcPretty({
             </div>
             {collapse ? (
               <>
-                <Stats npc={npc} />
-                <Immunities npc={npc} />
-                <Attacks npc={npc} />
-                <Spells npc={npc} />
-                <Actions npc={npc} />
-                <Special npc={npc} />
-                <RareGear npc={npc} />
-                <Equip npc={npc} />
-                <Notes npc={npc} />
+                <div id={`npc-section-stats-${npc.id}`}><Stats npc={npc} /></div>
+                <div id={`npc-section-immunities-${npc.id}`}><Immunities npc={npc} /></div>
+                <div id={`npc-section-attacks-${npc.id}`}><Attacks npc={npc} /></div>
+                <div id={`npc-section-spells-${npc.id}`}><Spells npc={npc} /></div>
+                <div id={`npc-section-actions-${npc.id}`}><Actions npc={npc} /></div>
+                <div id={`npc-section-special-${npc.id}`}><Special npc={npc} /></div>
+                <div id={`npc-section-raregear-${npc.id}`}><RareGear npc={npc} /></div>
+                <div id={`npc-section-equip-${npc.id}`}><Equip npc={npc} /></div>
+                <div id={`npc-section-notes-${npc.id}`}><Notes npc={npc} /></div>
               </>
             ) : (
               <Grid container>
@@ -186,7 +187,7 @@ function Header({ npc, npcImage }) {
   };
   return (
     <Grid container sx={{ alignItems: "stretch" }}>
-      <Grid container sx={{ width: 1 }}>
+      <Grid container sx={{ width: 1, flexDirection: { xs: "column", sm: "row" } }}>
         <Grid
           sx={{
             background,
@@ -215,6 +216,7 @@ function Header({ npc, npcImage }) {
             borderBottom: borderBottom,
             borderImage: borderImage,
           }}
+          size={{ xs: 12, sm: "auto" }}
         >
           <Typography
             sx={{
@@ -663,7 +665,7 @@ function Immunities({ npc }) {
           display: "flex",
           alignItems: "center",
         }}
-        size={2}
+        size={{ xs: 3, sm: 2 }}
       >
         <Typography
           sx={{
@@ -686,7 +688,7 @@ function Immunities({ npc }) {
           alignItems: "center",
           background: background,
         }}
-        size={10}
+        size={{ xs: 9, sm: 10 }}
       >
         <Typography sx={{ fontWeight: "bold", margin: "auto 0" }}>
           {immunitiesList}

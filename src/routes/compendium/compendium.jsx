@@ -1888,7 +1888,7 @@ function CompendiumViewer() {
               anchor="left"
               open={drawerOpen}
               onClose={() => setDrawerOpen(false)}
-              PaperProps={{ sx: { width: "85vw", maxWidth: 340 } }}
+              slotProps={{ paper: { sx: { width: "85vw", maxWidth: 340 } } }}
             >
               <Box
                 sx={{

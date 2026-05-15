@@ -906,7 +906,7 @@ const CompendiumViewerModal = ({
             anchor="left"
             open={drawerOpen}
             onClose={() => setDrawerOpen(false)}
-            PaperProps={{ sx: { width: "85vw", maxWidth: 340 } }}
+            slotProps={{ paper: { sx: { width: "85vw", maxWidth: 340 } } }}
             sx={{ zIndex: 1400 }}
           >
             <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
