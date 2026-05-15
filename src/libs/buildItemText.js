@@ -622,18 +622,18 @@ export function buildItemText(type, item, fmt) {
       const parts = [h1(resolve(item.name))];
       const defDisplay =
         item.category === "Shield"
-          ? `+${item.defbonus ?? item.def}`
+          ? `+${item.def}`
           : item.martial
             ? String(item.def)
-            : item.defbonus
-              ? `DEX die +${item.defbonus}`
+            : item.def
+              ? `DEX die +${item.def}`
               : "DEX die";
       const mdefDisplay = item.martial
-        ? item.mdefbonus
-          ? `INS die +${item.mdefbonus}`
+        ? item.mdef
+          ? `INS die +${item.mdef}`
           : "INS die"
-        : item.mdefbonus
-          ? `INS die +${item.mdefbonus}`
+        : item.mdef
+          ? `INS die +${item.mdef}`
           : "INS die";
       const stats = [
         item.category && field("Category", resolve(item.category)),

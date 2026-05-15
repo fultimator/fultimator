@@ -1631,47 +1631,34 @@ function Equip({ npc }) {
       {npc.armor && npc.armor.name !== "No Armor" && (
         <Grid sx={{ px: 2, py: 0, alignItems: "center" }} size={12}>
           <strong>{t("Armor:")}</strong> {npc.armor.name}{" "}
-          {(npc.armor.isMartial ?? npc.armor.martial) && <Martial />}
-          <Diamond />{" "}
-          {npc.armor.def > 0 ? (
-            <strong>
-              {t("DEF")} {npc.armor.def}
-            </strong>
-          ) : (
-            <strong>
-              {t("DEF")} + {npc.armor.defbonus}
-            </strong>
-          )}{" "}
+          {npc.armor.martial && <Martial />}
           <Diamond />{" "}
           <strong>
-            {t("M.DEF")} + {npc.armor.mdefbonus}
+            {t("DEF")} {npc.armor.def}
+          </strong>{" "}
+          <Diamond />{" "}
+          <strong>
+            {t("M.DEF")} {npc.armor.mdef}
           </strong>{" "}
           <Diamond /> {t("Init.")} <strong>{npc.armor.init}</strong> <Diamond />{" "}
-          <strong>{npc.armor.value ?? npc.armor.cost}</strong> {t("zenit")}
+          <strong>{npc.armor.cost}</strong> {t("zenit")}
         </Grid>
       )}
       {/* Shield */}
       {npc.shield && npc.shield.name !== "No Shield" && (
         <Grid sx={{ px: 2, py: 0 }} size={12}>
           <strong>{t("Shield:")}</strong> {npc.shield.name}{" "}
-          {(npc.shield.isMartial ?? npc.shield.martial) && <Martial />}
-          <Diamond />{" "}
-          {npc.shield.def > 0 ? (
-            <strong>
-              {t("DEF")} {npc.shield.def}
-            </strong>
-          ) : (
-            <strong>
-              {t("DEF")} + {npc.shield.defbonus}
-            </strong>
-          )}{" "}
+          {npc.shield.martial && <Martial />}
           <Diamond />{" "}
           <strong>
-            {t("M.DEF")} + {npc.shield.mdefbonus}
+            {t("DEF")} {npc.shield.def}
+          </strong>{" "}
+          <Diamond />{" "}
+          <strong>
+            {t("M.DEF")} {npc.shield.mdef}
           </strong>{" "}
           <Diamond /> {t("Init.")} <strong>{npc.shield.init}</strong>{" "}
-          <Diamond /> <strong>{npc.shield.value ?? npc.shield.cost}</strong>{" "}
-          {t("zenit")}
+          <Diamond /> <strong>{npc.shield.cost}</strong> {t("zenit")}
         </Grid>
       )}
     </Grid>

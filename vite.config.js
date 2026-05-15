@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import path from "path";
@@ -39,5 +39,10 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 500,
+  },
+  test: {
+    environment: "node",
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    setupFiles: ["src/forms/tests/visibility/setup.ts"],
   },
 });

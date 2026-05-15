@@ -128,17 +128,9 @@ export function calcDef(npc) {
     def += npc.armor?.def;
   }
 
-  if (npc.armor?.defbonus) {
-    def += npc.armor?.defbonus;
-  }
-
   // Shield
   if (npc.shield?.def) {
     def += npc.shield?.def;
-  }
-
-  if (npc.shield?.defbonus) {
-    def += npc.shield?.defbonus;
   }
 
   // Skill Extra def (bonus)
@@ -160,13 +152,13 @@ export function calcMDef(npc) {
 
   // Normal calculation when not overridden
   // Armor
-  if (npc.armor?.mdefbonus) {
-    mdef += npc.armor?.mdefbonus;
+  if (npc.armor?.mdef) {
+    mdef += npc.armor?.mdef;
   }
 
   // Shield
-  if (npc.shield?.mdefbonus) {
-    mdef += npc.shield?.mdefbonus;
+  if (npc.shield?.mdef) {
+    mdef += npc.shield?.mdef;
   }
 
   // Skill Extra M def (bonus)
@@ -568,11 +560,11 @@ export function calcUsedSkillsFromEquip(npc) {
     equip = true;
   }
 
-  if (npc.armor && (npc.armor.value ?? npc.armor.cost) !== 0) {
+  if (npc.armor && (npc.armor.cost ?? 0) !== 0) {
     equip = true;
   }
 
-  if (npc.shield && (npc.shield.value ?? npc.shield.cost) !== 0) {
+  if (npc.shield && (npc.shield.cost ?? 0) !== 0) {
     equip = true;
   }
 

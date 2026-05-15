@@ -90,3 +90,81 @@ export interface NpcWeaponAttack {
   special: string[];
   extraDamage?: boolean;
 }
+
+export interface DefensiveModifiers {
+  def?: number;
+  mdef?: number;
+  init?: number;
+  magic?: number;
+  // Canonical nested precision key.
+  accuracy?: number;
+  /** @deprecated Use modifiers.accuracy. */
+  prec?: number;
+  damageMelee?: number;
+  damageRanged?: number;
+}
+
+export interface EquipmentArmor {
+  itemType?: "armor";
+  category?: "Armor" | string;
+  name: string;
+  quality?: string;
+  selectedQuality?: string;
+  qualityCost?: number;
+  /** @deprecated Legacy display-price alias. Use cost. */
+  value?: number;
+  // Canonical persisted price field.
+  cost?: number;
+  // Canonical proficiency flag.
+  martial?: boolean;
+  /** @deprecated Legacy alias. Use martial. */
+  isMartial?: boolean;
+  def: number;
+  mdef: number;
+  init: number;
+  /** @deprecated Legacy bonus-era field. Canonical effective value is def. */
+  defbonus?: number;
+  /** @deprecated Legacy bonus-era field. Canonical effective value is mdef. */
+  mdefbonus?: number;
+  rework?: boolean;
+  modifiers?: DefensiveModifiers;
+  defModifier?: number;
+  mDefModifier?: number;
+  initModifier?: number;
+  magicModifier?: number;
+  precModifier?: number;
+  damageMeleeModifier?: number;
+  damageRangedModifier?: number;
+  isEquipped?: boolean;
+  slots?: SlotTier;
+  slotted?: string[];
+}
+
+export interface EquipmentShield extends Omit<EquipmentArmor, "itemType"> {
+  itemType?: "shield";
+  category?: "Shield" | string;
+}
+
+export interface EquipmentAccessory {
+  itemType?: "accessory";
+  category?: "Accessory" | string;
+  name: string;
+  quality?: string;
+  selectedQuality?: string;
+  qualityCost?: number;
+  /** @deprecated Legacy display-price alias. Use cost. */
+  value?: number;
+  // Canonical persisted price field.
+  cost?: number;
+  modifiers?: DefensiveModifiers;
+  defModifier?: number;
+  mDefModifier?: number;
+  initModifier?: number;
+  magicModifier?: number;
+  precModifier?: number;
+  damageMeleeModifier?: number;
+  damageRangedModifier?: number;
+  isEquipped?: boolean;
+}
+
+export type NpcArmor = EquipmentArmor;

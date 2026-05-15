@@ -1,53 +1,73 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
-  Checkbox,
+  Box,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   IconButton,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Grid,
   Typography,
-  Divider,
-  Box,
-  FormControlLabel,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import weapons from "../../../../libs/weapons";
-import weaponCategories from "../../../../libs/weaponCategories";
-import qualities from "../../../../routes/equip/weapons/qualities";
-import ChangeBase from "../../../../routes/equip/weapons/ChangeBase";
-import ChangeMartial from "../../../../routes/equip/common/ChangeMartial";
-import ChangeName from "../../../../routes/equip/common/ChangeName";
-import ChangeType from "../../../../routes/equip/weapons/ChangeType";
-import ChangeHands from "../../../../routes/equip/weapons/ChangeHands";
-import { RESTRICTED_ONE_HANDED_CATEGORIES } from "../../../../routes/equip/weapons/constants";
-import ChangeAttr from "../../../../routes/equip/weapons/ChangeAttr";
-import SelectQuality from "../../../../routes/equip/weapons/SelectQuality";
-import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
-import ChangeBonus from "../../../../routes/equip/weapons/ChangeBonus";
-import ApplyRework from "../../../../routes/equip/common/ApplyRework";
-import ChangeModifiers from "../ChangeModifiers";
-import ChangeCategory from "./ChangeCategory";
 import { Close } from "@mui/icons-material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { SharedWeaponCard } from "../../../../components/shared/itemCards";
-import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import {
   getWeaponAttr1,
   getWeaponAttr2,
-  getWeaponDamage,
   getWeaponPrec,
   getWeaponRange,
   getWeaponType,
   normalizeWeaponLike,
+  calcWeaponCost,
+  calcWeaponDamage,
+  calcWeaponPrec,
 } from "../../../../libs/weaponNormalization";
+import { validateWeaponPersisted } from "../../../../forms/schema/itemSchemas/weapon";
+import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
+import { weaponFieldConfig } from "../../../../forms/rendering/config/itemConfigs/weapon";
+
+function buildInitialState(weapon) {
+  const weaponAccuracy = weapon?.accuracy ?? {};
+  const weaponDamage =
+    weapon?.damage && typeof weapon.damage === "object" ? weapon.damage : {};
+  const base = weapon?.base || weapons[0];
+  return {
+    base,
+    name: weapon?.name || weapons[0].name,
+    category: weapon?.category || "",
+    type: weaponDamage.type || weapon?.type || getWeaponType(weapons[0]),
+    hands: weapon?.hands || weapons[0].hands,
+    att1: weaponAccuracy.attr1 || weapon?.att1 || getWeaponAttr1(weapons[0]),
+    att2: weaponAccuracy.attr2 || weapon?.att2 || getWeaponAttr2(weapons[0]),
+    martial: weapon?.martial || false,
+    damageHrZero: weaponDamage.hrZero === true,
+    damageBonus: weapon?.damageBonus || false,
+    damageReworkBonus: weapon?.damageReworkBonus || false,
+    precBonus: weapon?.precBonus || false,
+    rareBonuses: {
+      precBonus: weapon?.precBonus || false,
+      damageBonus: weapon?.damageBonus || false,
+      damageReworkBonus: weapon?.damageReworkBonus || false,
+    },
+    rework: weapon?.rework || false,
+    quality: weapon?.quality || "",
+    range: weapon?.range || getWeaponRange(base),
+    qualityName: weapon?.qualityName || weapon?.selectedQuality || "",
+    qualityCost: weapon?.qualityCost || 0,
+    totalBonus: weapon?.totalBonus || 0,
+    selectedQuality: weapon?.selectedQuality || "",
+    precModifier: weapon?.modifiers?.accuracy ?? weapon?.precModifier ?? 0,
+    damageModifier: weapon?.modifiers?.damage ?? weapon?.damageModifier ?? 0,
+    defModifier: weapon?.modifiers?.def ?? weapon?.defModifier ?? 0,
+    mDefModifier: weapon?.modifiers?.mdef ?? weapon?.mDefModifier ?? 0,
+    isEquipped: weapon?.isEquipped || false,
+  };
+}
 
 export default function PlayerWeaponModal({
   open,
@@ -58,57 +78,68 @@ export default function PlayerWeaponModal({
   onDeleteWeapon,
 }) {
   const { t } = useTranslate();
-  const weaponAccuracy = weapon?.accuracy ?? {};
-  const weaponDamage =
-    weapon?.damage && typeof weapon.damage === "object" ? weapon.damage : {};
-
-  const [base, setBase] = useState(weapon?.base || weapons[0]);
-  const [name, setName] = useState(weapon?.name || weapons[0].name);
-  const [category, setCategory] = useState(weapon?.category || "");
-  const [type, setType] = useState(
-    weaponDamage.type || weapon?.type || getWeaponType(weapons[0]),
-  );
-  const [hands, setHands] = useState(weapon?.hands || weapons[0].hands);
-  const [att1, setAtt1] = useState(
-    weaponAccuracy.attr1 || weapon?.att1 || getWeaponAttr1(weapons[0]),
-  );
-  const [att2, setAtt2] = useState(
-    weaponAccuracy.attr2 || weapon?.att2 || getWeaponAttr2(weapons[0]),
-  );
-  const [martial, setMartial] = useState(weapon?.martial || false);
-  const [damageHrZero, setDamageHrZero] = useState(
-    weaponDamage.hrZero === true,
-  );
-  const [damageBonus, setDamageBonus] = useState(weapon?.damageBonus || false);
-  const [damageReworkBonus, setDamageReworkBonus] = useState(
-    weapon?.damageReworkBonus || false,
-  );
-  const [precBonus, setPrecBonus] = useState(weapon?.precBonus || false);
-  const [rework, setRework] = useState(weapon?.rework || false);
-  const [quality, setQuality] = useState(weapon?.quality || "");
-  const [qualityCost, setQualityCost] = useState(weapon?.qualityCost || 0);
-  const [totalBonus, setTotalBonus] = useState(weapon?.totalBonus || 0);
-  const [selectedQuality, setSelectedQuality] = useState(
-    weapon?.selectedQuality || "",
-  );
-  const {
-    precModifier,
-    setPrecModifier,
-    damageModifier,
-    setDamageModifier,
-    defModifier,
-    setDefModifier,
-    mDefModifier,
-    setMDefModifier,
-    isEquipped,
-    _setIsEquipped,
-    modifiersExpanded,
-    setModifiersExpanded,
-    expandModifiers,
-    modifiers,
-    clearModifiers,
-  } = useEquipmentForm(weapon);
+  const [formState, setFormState] = useState(() => buildInitialState(weapon));
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setFormState(buildInitialState(weapon));
+  }, [weapon]);
+
+  const {
+    base,
+    name,
+    category,
+    type,
+    hands,
+    att1,
+    att2,
+    martial,
+    damageHrZero,
+    damageBonus,
+    damageReworkBonus,
+    precBonus,
+    rework,
+    quality,
+    qualityName,
+    qualityCost,
+    totalBonus,
+    selectedQuality,
+    precModifier,
+    damageModifier,
+    defModifier,
+    mDefModifier,
+    isEquipped,
+  } = formState;
+
+  const cost = calcWeaponCost({
+    base,
+    type,
+    att1,
+    att2,
+    rework,
+    damageBonus,
+    precBonus,
+    qualityCost,
+  });
+  const damage = calcWeaponDamage({
+    base,
+    hands,
+    rework,
+    damageBonus,
+    damageReworkBonus,
+    damageModifier,
+    cost,
+  });
+  const prec = calcWeaponPrec({ base, rework, precBonus, precModifier });
+
+  // Keep totalBonus in sync with cost (mirrors the old useEffect).
+  useEffect(() => {
+    const bonus = Math.floor(cost / 1000) * 2;
+    setFormState((prev) => ({ ...prev, totalBonus: bonus }));
+  }, [damageReworkBonus, cost, qualityCost, rework]);
+
+  const set = (key, value) =>
+    setFormState((prev) => ({ ...prev, [key]: value }));
 
   const {
     isOpen: deleteDialogOpen,
@@ -123,215 +154,87 @@ export default function PlayerWeaponModal({
     },
   });
 
-  useEffect(() => {
-    setBase(weapon?.base || weapons[0]);
-    setName(weapon?.name || t(weapons[0].name));
-    setCategory(weapon?.category || weapons[0].category);
-    setType(getWeaponType(weapon) || getWeaponType(weapons[0]));
-    setHands(weapon?.hands || weapons[0].hands);
-    setAtt1(getWeaponAttr1(weapon) || getWeaponAttr1(weapons[0]));
-    setAtt2(getWeaponAttr2(weapon) || getWeaponAttr2(weapons[0]));
-    setMartial(weapon?.martial || false);
-    setDamageHrZero(weapon?.damage?.hrZero === true);
-    setDamageBonus(weapon?.damageBonus || false);
-    setDamageReworkBonus(weapon?.damageReworkBonus || false);
-    setPrecBonus(weapon?.precBonus || false);
-    setRework(weapon?.rework || false);
-    setQuality(weapon?.quality || "");
-    setQualityCost(weapon?.qualityCost || 0);
-    setTotalBonus(weapon?.totalBonus || 0);
-    setSelectedQuality(weapon?.selectedQuality || "");
-    if (weapon?.damageBonus || weapon?.damageReworkBonus || weapon?.precBonus) {
-      expandModifiers();
-    }
-    // modifier fields are handled by useEquipmentForm
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weapon]);
-
   const handleFileUpload = (data) => {
     if (data) {
       const normalized = normalizeWeaponLike(data);
       const {
-        base,
-        name,
+        base: newBase,
+        name: newName,
         accuracy,
-        martial,
-        category,
-        damage,
+        martial: newMartial,
+        category: newCategory,
+        damage: newDamage,
         hand,
-        hands,
-        quality,
-        qualityCost,
-        damageBonus,
-        damageReworkBonus,
-        precBonus,
-        rework,
-        defModifier,
-        mDefModifier,
-        precModifier,
-        damageModifier,
+        hands: newHands,
+        quality: newQuality,
+        qualityCost: newQualityCost,
+        damageBonus: newDamageBonus,
+        damageReworkBonus: newDamageReworkBonus,
+        precBonus: newPrecBonus,
+        rework: newRework,
+        defModifier: newDefModifier,
+        mDefModifier: newMDefModifier,
+        precModifier: newPrecModifier,
+        damageModifier: newDamageModifier,
       } = normalized;
 
-      handleClearFields();
+      const defaults = buildInitialState(null);
+      const next = { ...defaults };
 
-      if (base) {
-        setBase(base);
+      if (newBase) next.base = newBase;
+      if (newName) next.name = newName;
+      if (accuracy?.attr1) next.att1 = accuracy.attr1;
+      if (accuracy?.attr2) next.att2 = accuracy.attr2;
+      if (newMartial) next.martial = newMartial;
+      if (newCategory) next.category = newCategory;
+      if (newDamage?.type) next.type = newDamage.type;
+      next.damageHrZero = newDamage?.hrZero === true;
+      if (hand || newHands) next.hands = hand ?? newHands;
+      if (newQuality) {
+        next.selectedQuality = "";
+        next.quality = newQuality;
       }
-      if (name) {
-        setName(name);
-      }
-      if (accuracy?.attr1) {
-        setAtt1(accuracy.attr1);
-      }
-      if (accuracy?.attr2) {
-        setAtt2(accuracy.attr2);
-      }
-      if (martial) {
-        setMartial(martial);
-      }
-      if (category) {
-        setCategory(category);
-      }
-      if (damage?.type) {
-        setType(damage.type);
-      }
-      setDamageHrZero(damage?.hrZero === true);
-      if (hand || hands) {
-        setHands(hand ?? hands);
-      }
-      if (quality) {
-        setSelectedQuality("");
-        setQuality(quality);
-      }
-      if (qualityCost) {
-        setQualityCost(qualityCost);
-      }
-      if (damageBonus) {
-        setDamageBonus(damageBonus);
-        expandModifiers();
-      }
-      if (damageReworkBonus) {
-        setDamageReworkBonus(damageReworkBonus);
-        expandModifiers();
-      }
-      if (precBonus) {
-        setPrecBonus(precBonus);
-        expandModifiers();
-      }
-      if (rework) {
-        setRework(rework);
-      }
-      if (defModifier) {
-        setDefModifier(defModifier);
-        expandModifiers();
-      }
-      if (mDefModifier) {
-        setMDefModifier(mDefModifier);
-        expandModifiers();
-      }
-      if (precModifier) {
-        setPrecModifier(precModifier);
-        expandModifiers();
-      }
-      if (damageModifier) {
-        setDamageModifier(damageModifier);
-        expandModifiers();
-      }
+      if (newQualityCost) next.qualityCost = newQualityCost;
+      if (newDamageBonus) next.damageBonus = newDamageBonus;
+      if (newDamageReworkBonus) next.damageReworkBonus = newDamageReworkBonus;
+      if (newPrecBonus) next.precBonus = newPrecBonus;
+      if (newRework) next.rework = newRework;
+      if (newDefModifier) next.defModifier = newDefModifier;
+      if (newMDefModifier) next.mDefModifier = newMDefModifier;
+      if (newPrecModifier) next.precModifier = newPrecModifier;
+      if (newDamageModifier) next.damageModifier = newDamageModifier;
+
+      setFormState(next);
     }
     fileInputRef.current.value = null;
   };
 
-  const calcCost = () => {
-    let cost = base.cost;
-
-    // Changed type
-    if (type !== "physical") {
-      cost += 100;
-    }
-
-    // Changed attributes
-    if (getWeaponAttr1(base) !== att1 || getWeaponAttr2(base) !== att2) {
-      if (att1 === att2) {
-        cost += 50;
-      }
-    }
-
-    // Bonus damage
-    if (!rework && damageBonus) {
-      cost += 200;
-    }
-
-    // Bonus precision
-    if (!rework && getWeaponPrec(base) !== 1 && precBonus) {
-      cost += 100;
-      // Bonus precision (rework)
-    } else if (rework && getWeaponPrec(base) <= 1 && precBonus) {
-      cost += 100;
-    }
-
-    // Quality
-    cost += parseInt(qualityCost);
-    return cost;
-  };
-
-  const calcDamage = () => {
-    let damage = getWeaponDamage(base);
-
-    if (
-      base.hands === 1 &&
-      hands === 2 &&
-      !RESTRICTED_ONE_HANDED_CATEGORIES.includes(base.category)
-    ) {
-      damage += 4;
-    }
-    if (base.hands === 2 && hands === 1) {
-      damage -= 4;
-    }
-
-    // Bonus damage
-    if (!rework && damageBonus) {
-      damage += 4;
-    }
-    if (rework && damageReworkBonus) {
-      const bonus = Math.floor(calcCost() / 1000) * 2;
-      damage += bonus;
-    }
-
-    // Damage modifier
-    damage += parseInt(damageModifier);
-
-    return damage;
-  };
-
-  const calcPrec = () => {
-    let prec = getWeaponPrec(base);
-
-    // Bonus precision
-    if (!rework && prec !== 1 && precBonus) {
-      prec = 1;
-    }
-    // Bonus precision (rework)
-    if (rework && prec === 1 && precBonus) {
-      prec = 2;
-    } else if (rework && prec === 0 && precBonus) {
-      prec = 1;
-    }
-
-    // Precision modifier
-    prec += parseInt(precModifier);
-
-    return prec;
-  };
-
   const handleSave = () => {
-    const cost = calcCost();
-    const damage = calcDamage();
-    const prec = calcPrec();
+    const savedCost = calcWeaponCost({
+      base,
+      type,
+      att1,
+      att2,
+      rework,
+      damageBonus,
+      precBonus,
+      qualityCost,
+    });
+    const savedDamage = calcWeaponDamage({
+      base,
+      hands,
+      rework,
+      damageBonus,
+      damageReworkBonus,
+      damageModifier,
+      cost: savedCost,
+    });
+    const savedPrec = calcWeaponPrec({ base, rework, precBonus, precModifier });
 
     const updatedWeapon = normalizeWeaponLike({
       base,
       name,
-      category: category,
+      category,
       range: getWeaponRange(base),
       type,
       hands,
@@ -343,51 +246,39 @@ export default function PlayerWeaponModal({
       precBonus,
       rework,
       quality,
+      qualityName,
       qualityCost,
       totalBonus,
       selectedQuality,
-      cost,
-      damage: { value: damage, type, hrZero: damageHrZero },
-      prec,
-      ...modifiers(),
+      cost: savedCost,
+      damage: { value: savedDamage, type, hrZero: damageHrZero },
+      prec: savedPrec,
+      defModifier: parseInt(defModifier),
+      mDefModifier: parseInt(mDefModifier),
+      precModifier: parseInt(precModifier),
+      damageModifier: parseInt(damageModifier),
       isEquipped:
         (weapon?.hands || weapons[0].hands) !== hands ||
         (weapon?.martial || false) !== martial
           ? false
           : isEquipped,
     });
+
+    if (import.meta.env.DEV) {
+      const result = validateWeaponPersisted(updatedWeapon);
+      if (!result.success) {
+        console.warn(
+          "[PlayerWeaponModal] weapon schema validation failed",
+          result.error.issues,
+        );
+      }
+    }
     onAddWeapon(updatedWeapon);
   };
+
   const handleClearFields = () => {
-    setBase(weapons[0]);
-    setName(weapons[0].name);
-    setCategory(weapons[0].category);
-    setType(getWeaponType(weapons[0]));
-    setHands(weapons[0].hands);
-    setAtt1(getWeaponAttr1(weapons[0]));
-    setAtt2(getWeaponAttr2(weapons[0]));
-    setMartial(weapons[0].martial);
-    setDamageHrZero(false);
-    setDamageBonus(false);
-    setDamageReworkBonus(false);
-    setPrecBonus(false);
-    setRework(false);
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    clearModifiers();
-    setTotalBonus(0);
+    setFormState(buildInitialState(null));
   };
-
-  const cost = calcCost();
-  const damage = calcDamage();
-  const prec = calcPrec();
-
-  // Calculate totalBonus when damageReworkBonus changes
-  useEffect(() => {
-    const bonus = Math.floor(cost / 1000) * 2;
-    setTotalBonus(bonus);
-  }, [damageReworkBonus, cost, qualityCost, rework]);
 
   return (
     <>
@@ -419,232 +310,98 @@ export default function PlayerWeaponModal({
           <Close />
         </IconButton>
         <DialogContent>
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            {/* Change Base */}
-            <Grid
-              size={{
-                xs: 10,
-                md: 4,
-              }}
-            >
-              <ChangeBase
-                value={base.name}
-                onChange={(e) => {
-                  const base = weapons.find((el) => el.name === e.target.value);
+          <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
+            {/* Left column: form fields */}
+            <Grid size={{ xs: 12, md: 7 }}>
+              {/* Core: base, name, category, hands, martial */}
+              <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+                <SchemaFieldRenderer
+                  config={weaponFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="core"
+                  label={t("Weapon")}
+                  cols={2}
+                />
+              </Grid>
 
-                  setBase(base);
-                  setName(t(base.name));
-                  setCategory(base.category);
-                  setType(getWeaponType(base));
-                  setHands(base.hands);
-                  setDamageBonus(false);
-                  setDamageReworkBonus(false);
-                  setPrecBonus(false);
-                  setAtt1(getWeaponAttr1(base));
-                  setAtt2(getWeaponAttr2(base));
-                  setMartial(base.martial);
-                }}
-              />
-            </Grid>
-            {/* Change Martial */}
-            <Grid size={2}>
-              <ChangeMartial martial={martial} setMartial={setMartial} />
-            </Grid>
-            {/* Change Name */}
-            <Grid
-              size={{
-                xs: 12,
-                md: 6,
-              }}
-            >
-              <ChangeName
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Grid>
-            {/* Change Category */}
-            <Grid
-              size={{
-                xs: 12,
-                md: 4,
-              }}
-            >
-              <ChangeCategory
-                value={category}
-                onChange={(e) => {
-                  const category = weaponCategories.find(
-                    (el) => el === e.target.value,
-                  );
-                  setCategory(category);
-                }}
-              />
-            </Grid>
-            {/* Change Type */}
-            <Grid
-              size={{
-                xs: 6,
-                md: 4,
-              }}
-            >
-              <ChangeType
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-              />
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                md: 4,
-              }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={damageHrZero}
-                    onChange={(e) => setDamageHrZero(e.target.checked)}
-                  />
-                }
-                label="HR0"
-              />
-            </Grid>
-            {/* Change Hands */}
-            <Grid
-              size={{
-                xs: 6,
-                md: 4,
-              }}
-            >
-              <ChangeHands
-                value={hands}
-                onChange={(e) => setHands(e.target.value)}
-              />
-            </Grid>
-            {/* Change Attributes */}
-            <Grid
-              size={{
-                xs: 12,
-                md: 12,
-              }}
-            >
-              <ChangeAttr
-                att1={att1}
-                att2={att2}
-                setAtt1={(e) => setAtt1(e.target.value)}
-                setAtt2={(e) => setAtt2(e.target.value)}
-              />
-            </Grid>
-            {/* Change Quality */}
-            <Grid size={6}>
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value,
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
-                }}
-              />
-            </Grid>
-            {/* Change Bonus */}
-            <Grid size={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-            </Grid>
-            <Accordion
-              sx={{ width: "100%", marginLeft: "10px" }}
-              expanded={modifiersExpanded}
-              onChange={() => setModifiersExpanded(!modifiersExpanded)}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography>{t("Modifiers")}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  <Grid size={12}>
-                    <Typography variant="h6">
-                      {t("Rare Weapon Options")}
-                    </Typography>
-                    <Divider sx={{ mt: 0.5 }} />
-                  </Grid>
-                  <Grid size={12}>
-                    <ChangeBonus
-                      basePrec={getWeaponPrec(base)}
-                      precBonus={precBonus}
-                      damageBonus={damageBonus}
-                      damageReworkBonus={damageReworkBonus}
-                      setPrecBonus={setPrecBonus}
-                      setDamageBonus={setDamageBonus}
-                      setDamageReworkBonus={setDamageReworkBonus}
-                      rework={rework}
-                      totalBonus={totalBonus}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Accuracy Modifier"}
-                      value={precModifier}
-                      onChange={(e) => setPrecModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Damage Modifier"}
-                      value={damageModifier}
-                      onChange={(e) => setDamageModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"DEF Modifier"}
-                      value={defModifier}
-                      onChange={(e) => setDefModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"MDEF Modifier"}
-                      value={mDefModifier}
-                      onChange={(e) => setMDefModifier(e.target.value)}
-                    />
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-            <Grid size={12}>
-              <Divider />
-            </Grid>
-            <Grid size={12}>
-              <Grid container spacing={1} sx={{ alignItems: "center" }}>
+              {/* Accuracy: att1, att2 */}
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={weaponFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="accuracy"
+                  label={t("Accuracy")}
+                  cols={2}
+                />
+              </Grid>
+
+              {/* Damage: type, hrZero */}
+              <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+                <SchemaFieldRenderer
+                  config={weaponFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="damage"
+                  label={t("Damage")}
+                  cols={2}
+                />
+              </Grid>
+
+              {/* Quality: preset, text, cost */}
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={weaponFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="quality"
+                  label={t("Quality")}
+                  cols={2}
+                />
+              </Grid>
+
+              {/* Rare bonuses */}
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={weaponFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="rareBonus"
+                  label={t("Rare Weapon Options")}
+                  cols={1}
+                  extraProps={{
+                    rework,
+                    totalBonus,
+                    basePrec: getWeaponPrec(base),
+                  }}
+                />
+                <SchemaFieldRenderer
+                  config={weaponFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="rare"
+                  cols={2}
+                />
+                <SchemaFieldRenderer
+                  config={weaponFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="modifiers"
+                  label={t("Modifiers")}
+                  cols={2}
+                />
+              </Grid>
+
+              {/* Controls: upload, clear */}
+              <Grid container spacing={1} sx={{ alignItems: "center", mb: 1 }}>
                 <Grid>
                   <Button
                     variant="outlined"
@@ -657,10 +414,6 @@ export default function PlayerWeaponModal({
                   <Button variant="outlined" onClick={handleClearFields}>
                     {t("Clear All Fields")}
                   </Button>
-                </Grid>
-                {/* Rework */}
-                <Grid size="grow">
-                  <ApplyRework rework={rework} setRework={setRework} />
                 </Grid>
                 <input
                   ref={fileInputRef}
@@ -681,39 +434,32 @@ export default function PlayerWeaponModal({
                 />
               </Grid>
             </Grid>
-            <Grid size={12}>
-              <Divider sx={{ my: 2 }} />
-            </Grid>
-          </Grid>
 
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <SharedWeaponCard
-              item={{
-                base: base,
-                name: name,
-                att1: att1,
-                att2: att2,
-                martial: martial,
-                type: type,
-                hands: hands,
-                category: category,
-                range: getWeaponRange(base),
-                cost: cost,
-                damage: damage,
-                prec: prec,
-                quality: quality,
-                qualityCost: qualityCost,
-                damageBonus: damageBonus,
-                damageReworkBonus: damageReworkBonus,
-                precBonus: precBonus,
-                rework: rework,
-              }}
-            />
+            {/* Right column: preview card (sticky so it stays visible while scrolling) */}
+            <Grid size={{ xs: 12, md: 5 }} sx={{ position: "sticky", top: 0 }}>
+              <SharedWeaponCard
+                item={{
+                  base,
+                  name,
+                  att1,
+                  att2,
+                  martial,
+                  type,
+                  hands,
+                  category,
+                  range: getWeaponRange(base),
+                  cost,
+                  damage: { value: damage, type, hrZero: damageHrZero },
+                  prec,
+                  quality,
+                  qualityCost,
+                  damageBonus,
+                  damageReworkBonus,
+                  precBonus,
+                  rework,
+                }}
+              />
+            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -726,9 +472,7 @@ export default function PlayerWeaponModal({
             onClick={handleSave}
             color="primary"
             variant="contained"
-            disabled={
-              /* disable if the weapon has a value "magitech" === true */ weapon?.magicannon
-            }
+            disabled={weapon?.magicannon}
           >
             {t("Save Changes")}
           </Button>

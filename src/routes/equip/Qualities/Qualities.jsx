@@ -21,6 +21,7 @@ import { SharedQualityCard } from "../../../components/shared/itemCards";
 import ChangeName from "../common/ChangeName";
 import ChangeQuality from "../common/ChangeQuality";
 import { useTranslate } from "../../../translation/translate";
+import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import useUploadJSON from "../../../hooks/useUploadJSON";
 import QualitiesGenerator from "./QualitiesGenerator";
@@ -42,6 +43,7 @@ const FILTER_OPTIONS = [
 function Qualities() {
   const { t } = useTranslate();
   const theme = useTheme();
+  const stickyTop = useStickyTop();
   const secondary = theme.palette.secondary.main;
 
   const [tab, setTab] = useState(0);
@@ -274,6 +276,7 @@ function Qualities() {
           xs: 12,
           sm: 6,
         }}
+        sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
       >
         <div ref={cardRef}>
           <SharedQualityCard

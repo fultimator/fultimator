@@ -8,11 +8,17 @@ import { Grid } from "@mui/material";
 interface CustomHeaderAltProps {
   headerText: string;
   icon: React.ReactElement;
+  actionIcon?: React.ReactElement;
+  onAction?: () => void;
+  actionTooltip?: string;
 }
 
 const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({
   headerText,
   icon,
+  actionIcon,
+  onAction,
+  actionTooltip,
 }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -38,6 +44,15 @@ const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({
         >
           <IconButton sx={{ px: 1, color: white }}>{icon}</IconButton>
           {headerText}
+          {actionIcon && (
+            <IconButton
+              sx={{ px: 1, ml: "auto", color: white }}
+              onClick={onAction}
+              title={actionTooltip}
+            >
+              {actionIcon}
+            </IconButton>
+          )}
         </Typography>
         <Divider
           orientation="horizontal"

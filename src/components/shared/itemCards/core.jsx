@@ -76,6 +76,7 @@ export function ImageToggleRow({
   return (
     <Paper
       variant="outlined"
+      data-html2canvas-ignore="true"
       sx={{
         display: "flex",
         justifyContent: "space-between",

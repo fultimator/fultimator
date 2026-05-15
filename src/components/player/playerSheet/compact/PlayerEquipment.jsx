@@ -437,11 +437,14 @@ export default function PlayerEquipment({
   const precMeleeModifier =
     (player.modifiers?.meleePrec || 0) +
     (equippedArmorItems.length > 0
-      ? equippedArmorItems[0].precModifier || 0
+      ? (equippedArmorItems[0].modifiers?.accuracy ?? 0)
       : 0) +
-    equippedShields.reduce((total, s) => total + (s.precModifier || 0), 0) +
+    equippedShields.reduce(
+      (total, s) => total + (s.modifiers?.accuracy ?? 0),
+      0,
+    ) +
     equippedAccessoryItems.reduce(
-      (total, a) => total + (a.precModifier || 0),
+      (total, a) => total + (a.modifiers?.accuracy ?? 0),
       0,
     ) +
     meleeMasteryModifier;
@@ -449,11 +452,14 @@ export default function PlayerEquipment({
   const precRangedModifier =
     (player.modifiers?.rangedPrec || 0) +
     (equippedArmorItems.length > 0
-      ? equippedArmorItems[0].precModifier || 0
+      ? (equippedArmorItems[0].modifiers?.accuracy ?? 0)
       : 0) +
-    equippedShields.reduce((total, s) => total + (s.precModifier || 0), 0) +
+    equippedShields.reduce(
+      (total, s) => total + (s.modifiers?.accuracy ?? 0),
+      0,
+    ) +
     equippedAccessoryItems.reduce(
-      (total, a) => total + (a.precModifier || 0),
+      (total, a) => total + (a.modifiers?.accuracy ?? 0),
       0,
     ) +
     rangedMasteryModifier;
@@ -865,8 +871,8 @@ export default function PlayerEquipment({
           quality: "",
           category: type === "armor" ? "Armor" : "Shield",
           martial: item.martial || false,
-          def: item.def || item.defbonus || 0,
-          mdef: item.mdef || item.mdefbonus || 0,
+          def: item.def || 0,
+          mdef: item.mdef || 0,
           init: item.init || 0,
           cost: item.cost || 0,
           isEquipped: false,

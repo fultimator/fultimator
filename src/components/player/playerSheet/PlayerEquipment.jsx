@@ -243,18 +243,14 @@ export default function PlayerEquipment({
   const precMeleeModifier =
     (player.modifiers?.meleePrec || 0) +
     (equippedArmor.length > 0
-      ? (equippedArmor[0].modifiers?.accuracy ??
-        equippedArmor[0].precModifier ??
-        0)
+      ? (equippedArmor[0].modifiers?.accuracy ?? 0)
       : 0) +
     equippedShields.reduce(
-      (total, shield) =>
-        total + (shield.modifiers?.accuracy ?? shield.precModifier ?? 0),
+      (total, shield) => total + (shield.modifiers?.accuracy ?? 0),
       0,
     ) +
     equippedAccessories.reduce(
-      (total, accessory) =>
-        total + (accessory.modifiers?.accuracy ?? accessory.precModifier ?? 0),
+      (total, accessory) => total + (accessory.modifiers?.accuracy ?? 0),
       0,
     ) +
     meleeMasteryModifier;
@@ -262,18 +258,14 @@ export default function PlayerEquipment({
   const precRangedModifier =
     (player.modifiers?.rangedPrec || 0) +
     (equippedArmor.length > 0
-      ? (equippedArmor[0].modifiers?.accuracy ??
-        equippedArmor[0].precModifier ??
-        0)
+      ? (equippedArmor[0].modifiers?.accuracy ?? 0)
       : 0) +
     equippedShields.reduce(
-      (total, shield) =>
-        total + (shield.modifiers?.accuracy ?? shield.precModifier ?? 0),
+      (total, shield) => total + (shield.modifiers?.accuracy ?? 0),
       0,
     ) +
     equippedAccessories.reduce(
-      (total, accessory) =>
-        total + (accessory.modifiers?.accuracy ?? accessory.precModifier ?? 0),
+      (total, accessory) => total + (accessory.modifiers?.accuracy ?? 0),
       0,
     ) +
     rangedMasteryModifier;

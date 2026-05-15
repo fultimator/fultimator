@@ -1060,9 +1060,23 @@ export function createThemeComponents({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
+          backgroundColor: isDark ? alpha(ternary, 0.65) : alpha(ternary, 0.7),
+          borderRadius: controlRadius,
           color: isDark ? "#edf2f8" : "#243446",
           "&:hover": { color: isDark ? "#edf2f8" : "#243446" },
           "&.Mui-focused": { color: isDark ? "#edf2f8" : "#243446" },
+          "&.MuiInputBase-multiline": {
+            borderRadius: multilineRadius,
+          },
+          "& fieldset": {
+            borderColor: alpha(quaternary, 0.6),
+          },
+          "&:hover fieldset": {
+            borderColor: alpha(secondary, isDark ? 0.92 : 0.85),
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: alpha(secondary, isDark ? 1 : 0.95),
+          },
         },
         input: {
           color: isDark ? "#edf2f8" : "#243446",
@@ -1073,35 +1087,7 @@ export function createThemeComponents({
     },
     MuiTextField: {
       styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            backgroundColor: isDark
-              ? alpha(ternary, 0.65)
-              : alpha(ternary, 0.7),
-            borderRadius: controlRadius,
-            "&.MuiInputBase-multiline": {
-              borderRadius: multilineRadius,
-            },
-            "& fieldset": {
-              borderColor: alpha(quaternary, 0.6),
-            },
-            "&:hover fieldset": {
-              borderColor: alpha(secondary, isDark ? 0.92 : 0.85),
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: alpha(secondary, isDark ? 1 : 0.95),
-            },
-            "& .MuiInputBase-input": {
-              color: isDark ? "#edf2f8" : "#243446",
-            },
-            "&:hover .MuiInputBase-input": {
-              color: isDark ? "#edf2f8" : "#243446",
-            },
-            "&.Mui-focused .MuiInputBase-input": {
-              color: isDark ? "#edf2f8" : "#243446",
-            },
-          },
-        },
+        root: {},
       },
     },
     MuiInput: {
@@ -1134,11 +1120,6 @@ export function createThemeComponents({
         select: {
           color: isDark ? "#edf2f8" : "#243446",
         },
-        root: () => ({
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: alpha(secondary, 0.95),
-          },
-        }),
       },
     },
     MuiMenu: {

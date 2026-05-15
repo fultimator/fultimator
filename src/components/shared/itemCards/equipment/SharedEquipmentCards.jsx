@@ -157,7 +157,9 @@ function isCustomWeaponMartial(item) {
 }
 
 function getCustomWeaponRangeLabel(item, t) {
-  return item.range === "weapon_range_ranged" ? t("Ranged") : t("Melee");
+  return item.range === "weapon_range_ranged" || item.range === "ranged"
+    ? t("Ranged")
+    : t("Melee");
 }
 
 function QualityRow({ item, customTheme, imageMode }) {
@@ -842,7 +844,7 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
       >
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
           <Chip
-            label={`${t("Slot Tier")}: ${SLOT_TIERS.find((t) => t.value === (sphereData.slotTier ?? "alpha"))?.label ?? "slot α"}`}
+            label={`${t("Slot Tier")}: ${SLOT_TIERS.find((t) => t.value === (sphereData.slotTier ?? "alpha"))?.label ?? "slot alpha"}`}
             size="small"
             variant="outlined"
           />
@@ -851,7 +853,7 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
               key={`${sphere.type}-${sphere.id}`}
               label={
                 sphere.type === "hoplosphere" && sphere.coagCount > 1
-                  ? `${sphere.name} (Coag ×${sphere.coagCount})`
+                  ? `${sphere.name} (Coag x${sphere.coagCount})`
                   : sphere.name
               }
               size="small"
@@ -878,7 +880,7 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
                     component="div"
                     sx={{ pl: 1.5, color: "text.secondary" }}
                   >
-                    Coag ×{threshold}: {effect}
+                    Coag x{threshold}: {effect}
                   </Typography>
                 ))}
           </Box>
@@ -1491,7 +1493,7 @@ export const SharedHoplosphereCard = React.memo(function SharedHoplosphereCard({
           )}
           {coagCount > 1 && (
             <Chip
-              label={`Coag ×${coagCount}`}
+              label={`Coag x${coagCount}`}
               size="small"
               sx={{
                 backgroundColor: customTheme.secondary,
@@ -1556,7 +1558,7 @@ export const SharedHoplosphereCard = React.memo(function SharedHoplosphereCard({
                   }}
                 >
                   <Chip
-                    label={`×${threshold}`}
+                    label={`x${threshold}`}
                     size="small"
                     variant={active ? "filled" : "outlined"}
                     sx={{

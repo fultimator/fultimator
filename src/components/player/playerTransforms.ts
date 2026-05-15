@@ -9,6 +9,7 @@ import {
   normalizeWeaponLike,
   normalizeCustomWeaponLike,
 } from "../../libs/weaponNormalization";
+import { normalizeDefensiveList } from "../../libs/equipmentDefensiveNormalization";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
@@ -963,6 +964,28 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
   };
 }
 
+function unifyPlayerDefensiveEquipmentSchema(player: TypePlayer): TypePlayer {
+  const inv = player.equipment?.[0];
+  if (!inv) return player;
+
+  return {
+    ...player,
+    equipment: [
+      {
+        ...inv,
+        armor: normalizeDefensiveList(inv.armor ?? []) as typeof inv.armor,
+        shields: normalizeDefensiveList(
+          inv.shields ?? [],
+        ) as typeof inv.shields,
+        accessories: normalizeDefensiveList(
+          inv.accessories ?? [],
+        ) as typeof inv.accessories,
+      },
+      ...(player.equipment?.slice(1) ?? []),
+    ],
+  };
+}
+
 // One-time versioned migrations.
 // Each transform brings the player up to its declared schema version.
 // Skipped if schemaVersion is already >= the transform's version.
@@ -1009,6 +1032,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Unify weapon schema: accuracy/damage objects, flatten attr1/attr2, resolve damage type and final values",
     fn: unifyPlayerWeaponSchema,
+  },
+  {
+    version: 9,
+    label:
+      "Unify armor/shield/accessory schema: normalize martial, cost/value, and precision modifier parity",
+    fn: unifyPlayerDefensiveEquipmentSchema,
   },
 ];
 
