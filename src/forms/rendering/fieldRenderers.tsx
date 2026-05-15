@@ -288,7 +288,7 @@ export function AccuracyAttrPairRenderer({
     attr2: "insight",
   };
   return (
-    <>
+    <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 6 }}>
         <FormControl fullWidth size="small">
           <InputLabel id="override-acc-attr1">{t("Attribute 1")}</InputLabel>
@@ -323,7 +323,7 @@ export function AccuracyAttrPairRenderer({
           </Select>
         </FormControl>
       </Grid>
-    </>
+    </Grid>
   );
 }
 
