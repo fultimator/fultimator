@@ -96,6 +96,7 @@ const CompendiumViewerModal = ({
   initialSearchQuery = "",
   initialModuleTypeFilter = "",
   initialQualityFilters = [],
+  initialCompendium = "official",
 }) => {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
@@ -107,7 +108,13 @@ const CompendiumViewerModal = ({
   const [selectedType, setSelectedType] = useState(initialType);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [selectedIdx, setSelectedIdx] = useState(null);
-  const [selectedCompendium, setSelectedCompendium] = useState("official");
+  const [selectedCompendium, setSelectedCompendium] =
+    useState(initialCompendium);
+
+  useEffect(() => {
+    if (open) setSelectedCompendium(initialCompendium);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [selectedSpellClass, setSelectedSpellClass] =
     useState(initialSpellClass);
   const [selectedModuleType, setSelectedModuleType] = useState(

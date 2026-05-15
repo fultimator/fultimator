@@ -6,6 +6,7 @@ import CompactAppBar from "./appbar/CompactAppBar";
 import { AppDrawer } from "./app-drawer/AppDrawer";
 import { APP_DRAWER_WIDTH } from "./app-drawer/constants";
 import { useThemeStore } from "../store/themeStore";
+import { ChatToastOverlay } from "./chat/ChatToastOverlay";
 import type { ThemeValue, StyleProfileValue } from "../store/themeStore";
 import { globalConfirm } from "../utility/globalConfirm";
 import { useTranslate } from "../translation/translate";
@@ -190,6 +191,8 @@ const Layout: React.FC<LayoutProps> = ({
       )}
 
       <AppDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+
+      <ChatToastOverlay />
 
       <Box
         sx={{

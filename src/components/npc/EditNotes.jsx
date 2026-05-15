@@ -1,12 +1,79 @@
-import { RemoveCircleOutlined } from "@mui/icons-material";
-
-import { Grid, FormControl, IconButton, TextField } from "@mui/material";
+import {
+  Grid,
+  FormControl,
+  IconButton,
+  TextField,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+} from "@mui/material";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
-import { Add } from "@mui/icons-material";
+import { Add, Menu as MenuIcon, Casino, Delete } from "@mui/icons-material";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useState } from "react";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
+
+function NoteContextMenu({ note, npcName, onDelete }) {
+  const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const open = (e) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
+  const close = () => setAnchorEl(null);
+
+  return (
+    <>
+      <IconButton size="small" onClick={open}>
+        <MenuIcon fontSize="small" />
+      </IconButton>
+
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
+        <MenuItem
+          onClick={() => {
+            addMessage({
+              id: crypto.randomUUID(),
+              createdAt: Date.now(),
+              speaker: npcName || "NPC",
+              kind: "display",
+              itemType: "note",
+              name: note.name,
+              tags: [],
+              description: note.effect,
+            });
+            close();
+          }}
+        >
+          <ListItemIcon>
+            <Casino fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Roll")}</ListItemText>
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            close();
+            onDelete();
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <Delete fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+}
 
 export default function EditNotes({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -56,10 +123,21 @@ export default function EditNotes({ npc, setNpc }) {
       {npc.notes?.map((notes, i) => {
         return (
           <Grid container key={i} spacing={1}>
-            <Grid sx={{ p: 0, m: 0 }}>
-              <IconButton onClick={() => openDeleteDialog(i)}>
-                <RemoveCircleOutlined />
-              </IconButton>
+            <Grid
+              sx={{
+                p: 0,
+                m: 0,
+                display: "flex",
+                alignItems: "center",
+                alignSelf: "flex-start",
+                pt: "4px",
+              }}
+            >
+              <NoteContextMenu
+                note={notes}
+                npcName={npc.name}
+                onDelete={() => openDeleteDialog(i)}
+              />
             </Grid>
             <Grid size="grow">
               <FormControl variant="standard" fullWidth>
@@ -76,17 +154,6 @@ export default function EditNotes({ npc, setNpc }) {
             </Grid>
             <Grid size={12}>
               <FormControl variant="standard" fullWidth>
-                {/* <TextField
-                  id="effect"
-                  label={t("Details:")}
-                  value={notes.effect}
-                  onChange={(e) => {
-                    return onChangeNotes(i, "effect", e.target.value);
-                  }}
-                  size="small"
-                  sx={{ mb: 2 }}
-                ></TextField> */}
-
                 <CustomTextarea
                   label={t("Details:")}
                   value={notes.effect}

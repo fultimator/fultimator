@@ -1,6 +1,5 @@
 import { useState } from "react";
 import types from "../../libs/types";
-import { RemoveCircleOutlined } from "@mui/icons-material";
 import {
   Grid,
   FormControl,
@@ -16,15 +15,216 @@ import {
   Autocomplete,
   Box,
   ListItemText,
+  Menu,
+  ListItemIcon,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { OffensiveSpellIcon } from "../icons";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
-import { Add } from "@mui/icons-material";
+import {
+  Add,
+  Menu as MenuIcon,
+  Casino,
+  Delete,
+  LibraryAdd,
+} from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { TypeIcon } from "../types";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
+import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import {
+  prepareMagicCheck,
+  rollMagicCheck,
+  processMagicCheck,
+  buildMagicCheckMessage,
+} from "../app-drawer/panels/chat/domain/magic-checks";
+
+const ATTR_SHORT = {
+  dexterity: "dex",
+  insight: "ins",
+  might: "mig",
+  will: "wlp",
+};
+
+function SpellContextMenu({ spell, npc, onDelete }) {
+  const { t } = useTranslate();
+  const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [packMenuAnchor, setPackMenuAnchor] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const personalPack = packs.find((p) => p.isPersonal) ?? null;
+  const unlockedNonPersonal = packs.filter((p) => !p.isPersonal && !p.locked);
+
+  const open = (e) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
+  const close = () => setAnchorEl(null);
+
+  const doAdd = async (packId) => {
+    try {
+      await addItem(packId, "npc-spell", spell);
+      setSnackbar({
+        open: true,
+        message: t("Added to compendium"),
+        severity: "success",
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: err?.message ?? t("Failed to add"),
+        severity: "error",
+      });
+    }
+  };
+
+  const handleAddToCompendium = async (e) => {
+    close();
+    if (unlockedNonPersonal.length > 0) {
+      setPackMenuAnchor(e.currentTarget);
+    } else if (personalPack && !personalPack.locked) {
+      await doAdd(personalPack.id);
+    } else {
+      const personal = await ensurePersonalPack();
+      await doAdd(personal.id);
+    }
+  };
+
+  const handleRoll = () => {
+    if (!spell.isOffensive) {
+      addMessage({
+        id: crypto.randomUUID(),
+        createdAt: Date.now(),
+        speaker: npc.name || "NPC",
+        kind: "display",
+        itemType: "spell",
+        name: spell.name,
+        tags: [],
+        description: spell.special?.[0] || "",
+      });
+      close();
+      return;
+    }
+    const attr1Short = ATTR_SHORT[spell.accuracy?.attr1] ?? "ins";
+    const attr2Short = ATTR_SHORT[spell.accuracy?.attr2] ?? "wlp";
+    const dieSizes = {
+      primary: npc.attributes?.[spell.accuracy?.attr1] ?? 6,
+      secondary: npc.attributes?.[spell.accuracy?.attr2] ?? 6,
+    };
+    const intent = prepareMagicCheck({
+      attr1: attr1Short,
+      attr2: attr2Short,
+      accuracyBonus: spell.accuracy?.value ?? 0,
+      name: spell.name,
+      baseDamage: spell.damage?.value ?? 0,
+      damageType: spell.damage?.type ?? "physical",
+      accuracyDefense: "mdef",
+      damageHrZero: spell.damage?.hrZero === true,
+      spellType: spell.spellType ?? "npc",
+    });
+    const rolls = rollMagicCheck(dieSizes);
+    const result = processMagicCheck(
+      intent,
+      rolls,
+      dieSizes,
+      npc.name || "NPC",
+    );
+    addMessage(buildMagicCheckMessage(result));
+    close();
+  };
+
+  return (
+    <>
+      <IconButton size="small" onClick={open}>
+        <MenuIcon fontSize="small" />
+      </IconButton>
+
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
+        <MenuItem onClick={handleRoll}>
+          <ListItemIcon>
+            <Casino fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Roll")}</ListItemText>
+        </MenuItem>
+
+        <MenuItem onClick={handleAddToCompendium}>
+          <ListItemIcon>
+            <LibraryAdd fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Add to Compendium")}</ListItemText>
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            close();
+            onDelete();
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <Delete fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      <Menu
+        anchorEl={packMenuAnchor}
+        open={Boolean(packMenuAnchor)}
+        onClose={() => setPackMenuAnchor(null)}
+      >
+        {personalPack && !personalPack.locked && (
+          <MenuItem
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(personalPack.id);
+            }}
+          >
+            <ListItemText>{t("Personal")}</ListItemText>
+          </MenuItem>
+        )}
+        {unlockedNonPersonal.map((pack) => (
+          <MenuItem
+            key={pack.id}
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(pack.id);
+            }}
+          >
+            <ListItemText>{pack.name}</ListItemText>
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2500}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
+  );
+}
 
 export default function EditSpells({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -108,6 +308,7 @@ export default function EditSpells({ npc, setNpc }) {
                 spell={spell}
                 setSpell={onChangeSpells(i)}
                 removeSpell={() => openDeleteDialog(i)}
+                npc={npc}
               />
             </Grid>
             {i !== npc.spells.length - 1 && (
@@ -193,7 +394,7 @@ export default function EditSpells({ npc, setNpc }) {
   );
 }
 
-function EditSpell({ spell, setSpell, removeSpell, i }) {
+function EditSpell({ spell, setSpell, removeSpell, npc, i }) {
   const { t } = useTranslate();
   const [inputDuration, setInputDuration] = useState(spell.duration || "");
   const [inputTarget, setInputTarget] = useState(spell.targetDescription || "");
@@ -251,10 +452,17 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
 
   return (
     <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
-      <Grid sx={{ p: 0, m: 0 }}>
-        <IconButton onClick={removeSpell}>
-          <RemoveCircleOutlined />
-        </IconButton>
+      <Grid
+        sx={{
+          p: 0,
+          m: 0,
+          display: "flex",
+          alignItems: "center",
+          alignSelf: "flex-start",
+          pt: "4px",
+        }}
+      >
+        <SpellContextMenu spell={spell} npc={npc} onDelete={removeSpell} />
       </Grid>
       <Grid
         size={{
@@ -654,13 +862,6 @@ function EditSpell({ spell, setSpell, removeSpell, i }) {
       )}
       <Grid size={12}>
         <FormControl variant="outlined" fullWidth>
-          {/* <TextField id="effect" label={t("Effect:")} value={spell.effect}
-            onChange={(e) => {
-              return setSpell("effect", e.target.value);
-            }}
-            size="small"
-          ></TextField> */}
-
           <CustomTextarea
             id="special"
             label={t("Special:")}

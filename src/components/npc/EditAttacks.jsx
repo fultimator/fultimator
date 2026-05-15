@@ -1,4 +1,3 @@
-import { RemoveCircleOutlined } from "@mui/icons-material";
 import {
   Grid,
   FormControl,
@@ -15,6 +14,10 @@ import {
   Checkbox,
   Box,
   ListItemText,
+  Menu,
+  ListItemIcon,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useState } from "react";
 import types from "../../libs/types";
@@ -22,10 +25,193 @@ import { DistanceIcon, MeleeIcon } from "../icons";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
-import { Add } from "@mui/icons-material";
+import {
+  Add,
+  Menu as MenuIcon,
+  Casino,
+  Delete,
+  LibraryAdd,
+} from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { TypeIcon } from "../types";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
+import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import {
+  prepareAccuracyCheck,
+  rollAccuracyCheck,
+  processAccuracyCheck,
+  buildAccuracyCheckMessage,
+} from "../app-drawer/panels/chat/domain/accuracy-checks";
+
+const ATTR_SHORT = {
+  dexterity: "dex",
+  insight: "ins",
+  might: "mig",
+  will: "wlp",
+};
+
+function AttackContextMenu({ attack, npc, onDelete }) {
+  const { t } = useTranslate();
+  const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [packMenuAnchor, setPackMenuAnchor] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const personalPack = packs.find((p) => p.isPersonal) ?? null;
+  const unlockedNonPersonal = packs.filter((p) => !p.isPersonal && !p.locked);
+
+  const open = (e) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
+  const close = () => setAnchorEl(null);
+
+  const doAdd = async (packId) => {
+    try {
+      await addItem(packId, "npc-attack", attack);
+      setSnackbar({
+        open: true,
+        message: t("Added to compendium"),
+        severity: "success",
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: err?.message ?? t("Failed to add"),
+        severity: "error",
+      });
+    }
+  };
+
+  const handleAddToCompendium = async (e) => {
+    close();
+    if (unlockedNonPersonal.length > 0) {
+      setPackMenuAnchor(e.currentTarget);
+    } else if (personalPack && !personalPack.locked) {
+      await doAdd(personalPack.id);
+    } else {
+      const personal = await ensurePersonalPack();
+      await doAdd(personal.id);
+    }
+  };
+
+  const handleRoll = () => {
+    const attr1Short = ATTR_SHORT[attack.accuracy?.attr1] ?? "dex";
+    const attr2Short = ATTR_SHORT[attack.accuracy?.attr2] ?? "dex";
+    const dieSizes = {
+      primary: npc.attributes?.[attack.accuracy?.attr1] ?? 6,
+      secondary: npc.attributes?.[attack.accuracy?.attr2] ?? 6,
+    };
+    const intent = prepareAccuracyCheck({
+      attr1: attr1Short,
+      attr2: attr2Short,
+      accuracyBonus: attack.accuracy?.value ?? 0,
+      name: attack.name,
+      baseDamage: attack.damage?.value ?? 0,
+      damageType: attack.damage?.type ?? "physical",
+      accuracyDefense: "def",
+      range: attack.range,
+      hrZero: attack.damage?.hrZero === true,
+    });
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(
+      intent,
+      rolls,
+      dieSizes,
+      npc.name || "NPC",
+    );
+    addMessage(buildAccuracyCheckMessage(result));
+    close();
+  };
+
+  return (
+    <>
+      <IconButton size="small" onClick={open}>
+        <MenuIcon fontSize="small" />
+      </IconButton>
+
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
+        <MenuItem onClick={handleRoll}>
+          <ListItemIcon>
+            <Casino fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Roll")}</ListItemText>
+        </MenuItem>
+
+        <MenuItem onClick={handleAddToCompendium}>
+          <ListItemIcon>
+            <LibraryAdd fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Add to Compendium")}</ListItemText>
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            close();
+            onDelete();
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <Delete fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      <Menu
+        anchorEl={packMenuAnchor}
+        open={Boolean(packMenuAnchor)}
+        onClose={() => setPackMenuAnchor(null)}
+      >
+        {personalPack && !personalPack.locked && (
+          <MenuItem
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(personalPack.id);
+            }}
+          >
+            <ListItemText>{t("Personal")}</ListItemText>
+          </MenuItem>
+        )}
+        {unlockedNonPersonal.map((pack) => (
+          <MenuItem
+            key={pack.id}
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(pack.id);
+            }}
+          >
+            <ListItemText>{pack.name}</ListItemText>
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2500}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
+  );
+}
 
 export default function EditAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
@@ -108,6 +294,7 @@ export default function EditAttacks({ npc, setNpc }) {
                 attack={attack}
                 setAttack={onChangeAttacks(i)}
                 removeAttack={() => openDeleteDialog(i)}
+                npc={npc}
               />
             </Grid>
             <Grid
@@ -184,14 +371,21 @@ export default function EditAttacks({ npc, setNpc }) {
   );
 }
 
-function EditAttack({ attack, setAttack, removeAttack, i }) {
+function EditAttack({ attack, setAttack, removeAttack, npc, i }) {
   const { t } = useTranslate();
   return (
     <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
-      <Grid sx={{ p: 0, m: 0 }}>
-        <IconButton onClick={removeAttack}>
-          <RemoveCircleOutlined />
-        </IconButton>
+      <Grid
+        sx={{
+          p: 0,
+          m: 0,
+          display: "flex",
+          alignItems: "center",
+          alignSelf: "flex-start",
+          pt: "4px",
+        }}
+      >
+        <AttackContextMenu attack={attack} npc={npc} onDelete={removeAttack} />
       </Grid>
       <Grid size={10}>
         <FormControl variant="standard" fullWidth>
@@ -485,15 +679,6 @@ function EditAttackSpecial({ attack, setAttack }) {
     <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
       <Grid size={12}>
         <FormControl variant="standard" fullWidth>
-          {/* <TextField
-            id="special"
-            label={t("Special:")}
-            value={specials}
-            onChange={onChange}
-            size="small"
-            helperText={t("Adding a special effect cost 1 skill point")}
-          ></TextField> */}
-
           <CustomTextarea
             id="special"
             label={t("Special:")}
