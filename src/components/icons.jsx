@@ -474,6 +474,7 @@ export function NotesIcon() {
       fillRule="evenodd"
       clipRule="evenodd"
       viewBox="0 0 412 511.87"
+      width="1.2em"
     >
       <path
         fillRule="nonzero"

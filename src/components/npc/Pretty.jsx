@@ -360,7 +360,6 @@ function Rank({ npc }) {
 function Stats({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const isMobile = window.innerWidth < 900;
   const borderImage = `linear-gradient(45deg, #b9a9be, ${theme.transparent}) 1`;
   return (
     <Typography
@@ -369,19 +368,21 @@ function Stats({ npc }) {
         fontFamily: "Antonio",
         fontWeight: "bold",
         textAlign: "center",
-        fontSize: isMobile ? "0.74rem" : "0.9rem",
+        fontSize: "0.9rem",
       }}
     >
-      <Grid container>
+      <Grid container sx={{ flexWrap: "wrap" }}>
         <Grid
           sx={{
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
             borderRight: "1px solid #281127",
             borderImage: "linear-gradient(90deg, #341b35, #6d5072) 1;",
-            mr: isMobile ? "1px" : "2px",
+            mr: "2px",
             my: "2px",
-            flexBasis: "calc(50% - 2px)",
+            flexBasis: { xs: "100%", sm: "calc(50% - 2px)" },
+            flexShrink: 0,
+            order: { xs: 1, sm: 1 },
           }}
         >
           <Grid
@@ -444,20 +445,22 @@ function Stats({ npc }) {
             borderTop: "1px solid #281127",
             borderLeft: "1px solid #281127",
             borderImage: "linear-gradient(90deg, #6d5072, #ffffff) 1;",
-            ml: isMobile ? "1px" : "2px",
+            ml: "2px",
             my: "2px",
-            flexBasis: "calc(50% - 2px)",
+            flexBasis: { xs: "calc(65% - 2px)", sm: "calc(50% - 2px)" },
+            flexShrink: 0,
+            order: { xs: 3, sm: 2 },
           }}
         >
           <Grid
             container
             sx={{ alignItems: "stretch", justifyContent: "space-between" }}
           >
-            <Grid sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>{t("HP")}</Grid>
+            <Grid sx={{ px: 1, py: 0.4 }}>{t("HP")}</Grid>
             <Grid
               sx={{
                 py: 0.4,
-                px: isMobile ? 0.75 : 1.5,
+                px: 1.5,
                 color: "white.main",
                 bgcolor: "red.main",
               }}
@@ -465,10 +468,10 @@ function Stats({ npc }) {
               {calcHP(npc)} <Diamond color="white.main" />{" "}
               {Math.floor(calcHP(npc) / 2)}
             </Grid>
-            <Grid sx={{ px: isMobile ? 0.5 : 1, py: 0.4 }}>{t("MP")}</Grid>
+            <Grid sx={{ px: 1, py: 0.4 }}>{t("MP")}</Grid>
             <Grid
               sx={{
-                px: isMobile ? 0.75 : 1.5,
+                px: 1.5,
                 py: 0.4,
                 color: "white.main",
                 bgcolor: "cyan.main",
@@ -487,8 +490,12 @@ function Stats({ npc }) {
             borderTop: "1px solid #281127",
             borderRight: "1px solid #281127",
             borderImage,
-            mr: isMobile ? "1px" : "2px",
-            flexBasis: "calc(25% - 2px)",
+            mr: "2px",
+            my: "2px",
+            flexBasis: { xs: "calc(35% - 2px)", sm: "calc(25% - 2px)" },
+            flexShrink: 0,
+            order: { xs: 2, sm: 3 },
+
           }}
         >
           <Grid
@@ -543,10 +550,11 @@ function Stats({ npc }) {
             borderTop: "1px solid #281127",
             borderLeft: "1px solid #281127",
             borderImage,
-            ml: isMobile ? "1px" : "2px",
-            mt: 0,
+            ml: "2px",
+            my: "2px",
+            flex: { xs: "1 0 100%", sm: "1 1 0" },
+            order: { xs: 4, sm: 4 },
           }}
-          size="grow"
         >
           {npc.affinities && (
             <Grid container>
