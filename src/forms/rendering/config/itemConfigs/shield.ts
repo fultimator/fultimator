@@ -1,7 +1,8 @@
 import type { ItemFieldConfig } from "../fieldConfig";
 import type { ShieldPersisted } from "../../../schema/itemSchemas/shield";
 import shields from "../../../../libs/shields";
-import qualities from "../../../../routes/equip/ArmorShield/qualities";
+import allQualities from "../../../../libs/qualities";
+const qualities = allQualities.filter((q) => q.filter?.includes("shield"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
 
@@ -35,6 +36,7 @@ const qualityGroups: SelectGroup[] = Object.entries(
 }));
 
 const G = {
+  base: "base",
   core: "core",
   quality: "quality",
   modifiers: "modifiers",
@@ -48,8 +50,9 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     label: "shield.base",
     component: "select",
     defaultValue: undefined,
-    group: G.core,
+    group: G.base,
     order: 0,
+    gridSize: "grow",
     componentProps: { options: shieldOptions },
     format: (v) => (v as ShieldBase | undefined)?.name ?? "",
     parse: (v) => {
@@ -81,10 +84,11 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     key: "martial",
     kind: "editable",
     label: "shield.martial",
-    component: "checkbox",
+    component: "martial-toggle",
     defaultValue: false,
-    group: G.core,
+    group: G.base,
     order: 2,
+    gridSize: "auto",
   },
   {
     key: "rework",
@@ -92,7 +96,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     label: "shield.rework",
     component: "checkbox",
     defaultValue: false,
-    group: G.core,
+    group: G.modifiers,
     order: 3,
   },
   {

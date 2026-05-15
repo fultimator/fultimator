@@ -830,208 +830,85 @@ export const ItemCard = React.memo(function ItemCard({
   item,
   id,
   onHeaderClick,
+  actionContent,
+  imageMode = "slot",
+  showImageToggle = false,
 }) {
+  const sharedProps = {
+    item,
+    id,
+    onHeaderClick,
+    actionContent,
+    imageMode,
+    showImageToggle,
+  };
   switch (type) {
     case "weapons":
-      return (
-        <SharedWeaponCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedWeaponCard {...sharedProps} />;
     case "armor":
-      return (
-        <SharedArmorCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedArmorCard {...sharedProps} />;
     case "shields":
-      return (
-        <SharedShieldCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedShieldCard {...sharedProps} />;
     case "spells":
-      return (
-        <SharedSpellCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedSpellCard {...sharedProps} />;
     case "player-spells":
       if (!item.spellType || item.spellType === "default") {
-        return (
-          <SharedPlayerSpellCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedPlayerSpellCard {...sharedProps} />;
       } else if (item.spellType === "gamble") {
-        return (
-          <SharedGambleSpellCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedGambleSpellCard {...sharedProps} />;
       } else if (item.spellType === "gift") {
-        return (
-          <SharedGiftCard item={item} id={id} onHeaderClick={onHeaderClick} />
-        );
+        return <SharedGiftCard {...sharedProps} />;
       } else if (item.spellType === "dance") {
-        return (
-          <SharedDanceCard item={item} id={id} onHeaderClick={onHeaderClick} />
-        );
+        return <SharedDanceCard {...sharedProps} />;
       } else if (item.spellType === "therioform") {
-        return (
-          <SharedTherioformCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedTherioformCard {...sharedProps} />;
       } else if (item.spellType === "magichant") {
-        return (
-          <SharedMagichantCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedMagichantCard {...sharedProps} />;
       } else if (item.spellType === "symbol") {
-        return (
-          <SharedSymbolCard item={item} id={id} onHeaderClick={onHeaderClick} />
-        );
+        return <SharedSymbolCard {...sharedProps} />;
       } else if (item.spellType === "invocation") {
-        return (
-          <SharedInvocationCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedInvocationCard {...sharedProps} />;
       } else if (item.spellType === "magiseed") {
-        return (
-          <SharedMagiseedCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedMagiseedCard {...sharedProps} />;
       } else if (item.spellType === "tinkerer-alchemy") {
-        return (
-          <SharedAlchemyCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedAlchemyCard {...sharedProps} />;
       } else if (item.spellType === "tinkerer-infusion") {
-        return (
-          <SharedInfusionCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedInfusionCard {...sharedProps} />;
       } else if (item.spellType === "tinkerer-magitech") {
-        return (
-          <SharedMagitechCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedMagitechCard {...sharedProps} />;
       } else if (item.spellType === "cooking") {
-        return (
-          <SharedCookingCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedCookingCard {...sharedProps} />;
       } else if (item.spellType === "pilot-vehicle") {
-        return (
-          <SharedPilotVehicleCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedPilotVehicleCard {...sharedProps} />;
       } else if (
         item.spellType === "arcanist" ||
         item.spellType === "arcanist-rework"
       ) {
-        return (
-          <SharedArcanumCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedArcanumCard {...sharedProps} />;
       }
-      return (
-        <SharedPlayerSpellCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedPlayerSpellCard {...sharedProps} />;
     case "attacks":
-      return (
-        <SharedAttackCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedAttackCard {...sharedProps} />;
     case "qualities":
-      return (
-        <SharedQualityCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedQualityCard {...sharedProps} />;
     case "classes":
-      return (
-        <SharedClassCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedClassCard {...sharedProps} />;
     case "heroics":
-      return (
-        <SharedHeroicCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedHeroicCard {...sharedProps} />;
     case "mnemospheres":
-      return (
-        <SharedMnemosphereCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedMnemosphereCard {...sharedProps} />;
     case "hoplospheres":
-      return (
-        <SharedHoplosphereCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedHoplosphereCard {...sharedProps} />;
     case "custom-weapons":
-      return (
-        <SharedCustomWeaponCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedCustomWeaponCard {...sharedProps} />;
     case "accessories":
-      return (
-        <SharedAccessoryCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedAccessoryCard {...sharedProps} />;
     case "special":
-      return (
-        <SharedSpecialRuleCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedSpecialRuleCard {...sharedProps} />;
     case "actions":
-      return (
-        <SharedActionCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedActionCard {...sharedProps} />;
     case "optionals":
-      return (
-        <SharedOptionalCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedOptionalCard {...sharedProps} />;
     default:
       return null;
   }

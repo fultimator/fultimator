@@ -1,6 +1,13 @@
 import { Grid, Paper, Button, useTheme, Typography } from "@mui/material";
-import { AutoAwesome, ArrowDownward, Download } from "@mui/icons-material";
+import { useStickyTop } from "../../../hooks/useStickyTop";
+import {
+  AutoAwesome,
+  ArrowDownward,
+  Download,
+  Search,
+} from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
+import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useEffect, useRef } from "react";
 import weapons from "../../../libs/weapons";
@@ -64,8 +71,28 @@ function Weapons() {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const stickyTop = useStickyTop();
 
   const [formState, setFormState] = useState(() => buildInitialState(null));
+  const [qualityBrowserOpen, setQualityBrowserOpen] = useState(false);
+  const [baseBrowserOpen, setBaseBrowserOpen] = useState(false);
+
+  const handleBaseSelected = (item) => {
+    setFormState(buildInitialState({ base: item }));
+    setBaseBrowserOpen(false);
+  };
+
+  const handleQualitySelected = (item) => {
+    setFormState((prev) => ({
+      ...prev,
+      selectedQuality: item.name,
+      qualityName: item.name,
+      quality: item.quality ?? "",
+      qualityCost: item.cost ?? 0,
+      cost: (prev.cost ?? 0) - (prev.qualityCost ?? 0) + (item.cost ?? 0),
+    }));
+    setQualityBrowserOpen(false);
+  };
 
   const fileInputRef = useRef(null);
   const cardRef = useRef(null);
@@ -189,7 +216,7 @@ function Weapons() {
     category: base.category,
     range: getWeaponRange(base),
     cost,
-    damage,
+    damage: { value: damage, type, hrZero: damageHrZero },
     prec,
     quality,
     qualityCost,
@@ -247,8 +274,19 @@ function Weapons() {
             <CustomHeaderAlt
               headerText={t("Rare Weapons")}
               icon={<AutoAwesome fontSize="large" />}
+              actionIcon={<Search fontSize="large" />}
+              onAction={() => setBaseBrowserOpen(true)}
+              actionTooltip={t("Browse Compendium")}
             />
             <Grid container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="base"
+                cols={1}
+              />
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
                 state={formState}
@@ -290,6 +328,7 @@ function Weapons() {
                 group="quality"
                 label={t("Quality")}
                 cols={2}
+                extraProps={{ onBrowse: () => setQualityBrowserOpen(true) }}
               />
             </Grid>
             <Grid container spacing={2} sx={{ mb: 2 }}>
@@ -330,17 +369,22 @@ function Weapons() {
                 cols={2}
               />
             </Grid>
-            <Grid container spacing={1} sx={{ alignItems: "center" }}>
-              <Grid>
+            <Grid container spacing={2}>
+              <Grid size={6}>
                 <Button
                   variant="outlined"
+                  fullWidth
                   onClick={() => fileInputRef.current.click()}
                 >
                   {t("Upload JSON")}
                 </Button>
               </Grid>
-              <Grid>
-                <Button variant="outlined" onClick={handleClearFields}>
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={handleClearFields}
+                >
                   {t("Clear All Fields")}
                 </Button>
               </Grid>
@@ -370,7 +414,7 @@ function Weapons() {
         {/* Preview */}
         <Grid
           size={{ xs: 12, sm: 6 }}
-          sx={{ position: "sticky", top: 16, alignSelf: "flex-start" }}
+          sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <SharedWeaponCard
@@ -414,6 +458,21 @@ function Weapons() {
         </Grid>
       </Grid>
       {downloadSnackbar}
+      <CompendiumViewerModal
+        open={qualityBrowserOpen}
+        onClose={() => setQualityBrowserOpen(false)}
+        onAddItem={handleQualitySelected}
+        initialType="qualities"
+        restrictToTypes={["qualities"]}
+        initialQualityFilters={["weapon"]}
+      />
+      <CompendiumViewerModal
+        open={baseBrowserOpen}
+        onClose={() => setBaseBrowserOpen(false)}
+        onAddItem={handleBaseSelected}
+        initialType="weapons"
+        restrictToTypes={["weapons"]}
+      />
     </>
   );
 }

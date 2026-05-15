@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   IconButton,
   Box,
   Tabs,
@@ -3275,9 +3276,67 @@ function buildWeaponPanelState() {
   };
 }
 
+function QualityPickerDialog({ open, onClose, onSelect, filterType }) {
+  const { t } = useTranslate();
+  const filtered = qualities.filter((q) => q.filter?.includes(filterType));
+  const [search, setSearch] = useState("");
+  const visible = search
+    ? filtered.filter((q) =>
+        q.name.toLowerCase().includes(search.toLowerCase()),
+      )
+    : filtered;
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{t("Browse Qualities")}</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          fullWidth
+          size="small"
+          placeholder={t("Search...")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{ mb: 2, mt: 1 }}
+        />
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          {visible.map((q) => (
+            <Box
+              key={q.fuid}
+              onClick={() => {
+                onSelect(q);
+                onClose();
+              }}
+              sx={{
+                p: 1.5,
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 1,
+                cursor: "pointer",
+                "&:hover": { bgcolor: "action.hover" },
+              }}
+            >
+              <Typography variant="subtitle2">
+                {q.name} ({q.cost}z)
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {q.quality}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t("Cancel")}</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 function WeaponPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildWeaponPanelState);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const {
     base,
@@ -3373,109 +3432,126 @@ function WeaponPanel() {
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={12}
-            container
-            spacing={2}
-            sx={{ mb: 2, alignItems: "center" }}
-          >
-            <SchemaFieldRenderer
-              config={weaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="core"
-              label={t("Weapon")}
-              cols={2}
-            />
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            <Grid
+              size={12}
+              container
+              spacing={2}
+              sx={{ mb: 2, alignItems: "center" }}
+            >
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Weapon")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="accuracy"
+                label={t("Accuracy")}
+                cols={2}
+              />
+            </Grid>
+            <Grid
+              size={12}
+              container
+              spacing={2}
+              sx={{ mb: 2, alignItems: "center" }}
+            >
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="damage"
+                label={t("Damage")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                label={t("Quality")}
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="rareBonus"
+                label={t("Rare Weapon Options")}
+                cols={1}
+                extraProps={{
+                  rework,
+                  totalBonus,
+                  basePrec: getWeaponPrec(base),
+                }}
+              />
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="rare"
+                cols={2}
+              />
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                label={t("Modifiers")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12}>
+              <Button size="small" variant="outlined" onClick={handleClear}>
+                {t("Clear All Fields")}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={weaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="accuracy"
-              label={t("Accuracy")}
-              cols={2}
-            />
-          </Grid>
-          <Grid
-            size={12}
-            container
-            spacing={2}
-            sx={{ mb: 2, alignItems: "center" }}
-          >
-            <SchemaFieldRenderer
-              config={weaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="damage"
-              label={t("Damage")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={weaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="quality"
-              label={t("Quality")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={weaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="rareBonus"
-              label={t("Rare Weapon Options")}
-              cols={1}
-              extraProps={{
-                rework,
-                totalBonus,
-                basePrec: getWeaponPrec(base),
-              }}
-            />
-            <SchemaFieldRenderer
-              config={weaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="rare"
-              cols={2}
-            />
-            <SchemaFieldRenderer
-              config={weaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="modifiers"
-              label={t("Modifiers")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12}>
-            <Button size="small" variant="outlined" onClick={handleClear}>
-              {t("Clear All Fields")}
-            </Button>
-          </Grid>
-        </Grid>
-      }
-      previewContent={<SharedWeaponCard item={weaponObj} />}
-      addButton={<AddToCompendiumButton itemType="weapon" data={weaponObj} />}
-      data={weaponObj}
-      itemName={weaponObj.name || ""}
-      exportDataType="weapons"
-    />
+        }
+        previewContent={<SharedWeaponCard item={weaponObj} />}
+        addButton={<AddToCompendiumButton itemType="weapon" data={weaponObj} />}
+        data={weaponObj}
+        itemName={weaponObj.name || ""}
+        exportDataType="weapons"
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="weapon"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+          }))
+        }
+      />
+    </>
   );
 }
 
@@ -3513,6 +3589,7 @@ function buildArmorPanelState() {
 function ArmorPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildArmorPanelState);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { base, name, quality, cost } = formState;
 
@@ -3550,55 +3627,72 @@ function ArmorPanel() {
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={armorFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="core"
-              label={t("Armor")}
-              cols={2}
-            />
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={armorFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Armor")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={armorFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                label={t("Quality")}
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={armorFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                label={t("Modifiers")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12}>
+              <Button size="small" variant="outlined" onClick={handleClear}>
+                {t("Clear All Fields")}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={armorFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="quality"
-              label={t("Quality")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={armorFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="modifiers"
-              label={t("Modifiers")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12}>
-            <Button size="small" variant="outlined" onClick={handleClear}>
-              {t("Clear All Fields")}
-            </Button>
-          </Grid>
-        </Grid>
-      }
-      previewContent={<SharedArmorCard item={armorObj} />}
-      addButton={<AddToCompendiumButton itemType="armor" data={armorObj} />}
-      data={armorObj}
-      itemName={armorObj.name || ""}
-      exportDataType="armor"
-    />
+        }
+        previewContent={<SharedArmorCard item={armorObj} />}
+        addButton={<AddToCompendiumButton itemType="armor" data={armorObj} />}
+        data={armorObj}
+        itemName={armorObj.name || ""}
+        exportDataType="armor"
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="armor"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+          }))
+        }
+      />
+    </>
   );
 }
 
@@ -3633,6 +3727,7 @@ function buildShieldPanelState() {
 function ShieldPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildShieldPanelState);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { base, name, quality, cost } = formState;
 
@@ -3670,55 +3765,72 @@ function ShieldPanel() {
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={shieldFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="core"
-              label={t("Shield")}
-              cols={2}
-            />
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={shieldFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Shield")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={shieldFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                label={t("Quality")}
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={shieldFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                label={t("Modifiers")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12}>
+              <Button size="small" variant="outlined" onClick={handleClear}>
+                {t("Clear All Fields")}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={shieldFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="quality"
-              label={t("Quality")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={shieldFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="modifiers"
-              label={t("Modifiers")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12}>
-            <Button size="small" variant="outlined" onClick={handleClear}>
-              {t("Clear All Fields")}
-            </Button>
-          </Grid>
-        </Grid>
-      }
-      previewContent={<SharedShieldCard item={shieldObj} />}
-      addButton={<AddToCompendiumButton itemType="shield" data={shieldObj} />}
-      data={shieldObj}
-      itemName={shieldObj.name || ""}
-      exportDataType="shields"
-    />
+        }
+        previewContent={<SharedShieldCard item={shieldObj} />}
+        addButton={<AddToCompendiumButton itemType="shield" data={shieldObj} />}
+        data={shieldObj}
+        itemName={shieldObj.name || ""}
+        exportDataType="shields"
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="shield"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+          }))
+        }
+      />
+    </>
   );
 }
 
@@ -3803,6 +3915,7 @@ function CustomWeaponPanel() {
   const [formState, setFormState] = useState(buildCWPanelState);
   const [modifiersExpanded, setModifiersExpanded] = useState(false);
   const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const {
     selectedCategory,
@@ -3966,152 +4079,169 @@ function CustomWeaponPanel() {
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={12}
-            container
-            spacing={2}
-            sx={{ mb: 2, alignItems: "center" }}
-          >
-            <SchemaFieldRenderer
-              config={customWeaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="core"
-              label={t("Custom Weapon")}
-              cols={2}
-              extraProps={coreExtraProps}
-            />
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            <Grid
+              size={12}
+              container
+              spacing={2}
+              sx={{ mb: 2, alignItems: "center" }}
+            >
+              <SchemaFieldRenderer
+                config={customWeaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Custom Weapon")}
+                cols={2}
+                extraProps={coreExtraProps}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={customWeaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="accuracy"
+                label={t("Accuracy")}
+                cols={2}
+              />
+            </Grid>
+            <Grid
+              size={12}
+              container
+              spacing={2}
+              sx={{ mb: 2, alignItems: "center" }}
+            >
+              <SchemaFieldRenderer
+                config={customWeaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="damage"
+                label={t("Damage")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={customWeaponFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                label={t("Quality")}
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Accordion
+              sx={{ width: "100%", mb: 2 }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <SchemaFieldRenderer
+                    config={customWeaponFieldConfig}
+                    state={formState}
+                    onChange={setFormState}
+                    surface="edit"
+                    group="rare"
+                    label={t("Rare Weapon Options")}
+                    cols={2}
+                  />
+                  <SchemaFieldRenderer
+                    config={customWeaponFieldConfig}
+                    state={formState}
+                    onChange={setFormState}
+                    surface="edit"
+                    group="modifiers"
+                    label={t("Modifiers")}
+                    cols={2}
+                  />
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+            {hasTransforming && (
+              <>
+                <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                  <SchemaFieldRenderer
+                    config={customWeaponFieldConfig}
+                    state={formState}
+                    onChange={setFormState}
+                    surface="edit"
+                    group="secondary"
+                    label={t("weapon_customization_transforming_form")}
+                    cols={2}
+                    extraProps={secondaryExtraProps}
+                  />
+                </Grid>
+                <Accordion
+                  sx={{ width: "100%", mb: 2 }}
+                  expanded={secondModifiersExpanded}
+                  onChange={() =>
+                    setSecondModifiersExpanded(!secondModifiersExpanded)
+                  }
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>
+                      {t("weapon_customization_transforming_form_modifiers")}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Grid container spacing={2}>
+                      <SchemaFieldRenderer
+                        config={customWeaponFieldConfig}
+                        state={formState}
+                        onChange={setFormState}
+                        surface="edit"
+                        group="secondaryModifiers"
+                        cols={2}
+                        extraProps={secondaryExtraProps}
+                      />
+                    </Grid>
+                  </AccordionDetails>
+                </Accordion>
+              </>
+            )}
+            <Grid size={12}>
+              <Button size="small" variant="outlined" onClick={handleClear}>
+                {t("Clear All Fields")}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={customWeaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="accuracy"
-              label={t("Accuracy")}
-              cols={2}
-            />
-          </Grid>
-          <Grid
-            size={12}
-            container
-            spacing={2}
-            sx={{ mb: 2, alignItems: "center" }}
-          >
-            <SchemaFieldRenderer
-              config={customWeaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="damage"
-              label={t("Damage")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={customWeaponFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="quality"
-              label={t("Quality")}
-              cols={2}
-            />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", mb: 2 }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <SchemaFieldRenderer
-                  config={customWeaponFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="rare"
-                  label={t("Rare Weapon Options")}
-                  cols={2}
-                />
-                <SchemaFieldRenderer
-                  config={customWeaponFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="modifiers"
-                  label={t("Modifiers")}
-                  cols={2}
-                />
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          {hasTransforming && (
-            <>
-              <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={customWeaponFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="secondary"
-                  label={t("weapon_customization_transforming_form")}
-                  cols={2}
-                  extraProps={secondaryExtraProps}
-                />
-              </Grid>
-              <Accordion
-                sx={{ width: "100%", mb: 2 }}
-                expanded={secondModifiersExpanded}
-                onChange={() =>
-                  setSecondModifiersExpanded(!secondModifiersExpanded)
-                }
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>
-                    {t("weapon_customization_transforming_form_modifiers")}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={2}>
-                    <SchemaFieldRenderer
-                      config={customWeaponFieldConfig}
-                      state={formState}
-                      onChange={setFormState}
-                      surface="edit"
-                      group="secondaryModifiers"
-                      cols={2}
-                      extraProps={secondaryExtraProps}
-                    />
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-            </>
-          )}
-          <Grid size={12}>
-            <Button size="small" variant="outlined" onClick={handleClear}>
-              {t("Clear All Fields")}
-            </Button>
-          </Grid>
-        </Grid>
-      }
-      previewContent={<SharedCustomWeaponCard item={weaponObj} />}
-      addButton={
-        <AddToCompendiumButton itemType="custom-weapon" data={weaponObj} />
-      }
-      data={weaponObj}
-      itemName={weaponObj.name || ""}
-      exportDataType="custom-weapons"
-    />
+        }
+        previewContent={<SharedCustomWeaponCard item={weaponObj} />}
+        addButton={
+          <AddToCompendiumButton itemType="custom-weapon" data={weaponObj} />
+        }
+        data={weaponObj}
+        itemName={weaponObj.name || ""}
+        exportDataType="custom-weapons"
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="customWeapon"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+          }))
+        }
+      />
+    </>
   );
 }
 
@@ -4139,6 +4269,7 @@ function buildAccessoryPanelState() {
 function AccessoryPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildAccessoryPanelState);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { name, quality, cost } = formState;
 
@@ -4171,57 +4302,74 @@ function AccessoryPanel() {
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={accessoryFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="core"
-              label={t("Accessory")}
-              cols={2}
-            />
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={accessoryFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Accessory")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={accessoryFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                label={t("Quality")}
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={accessoryFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                label={t("Modifiers")}
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12}>
+              <Button size="small" variant="outlined" onClick={handleClear}>
+                {t("Clear All Fields")}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={accessoryFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="quality"
-              label={t("Quality")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-            <SchemaFieldRenderer
-              config={accessoryFieldConfig}
-              state={formState}
-              onChange={setFormState}
-              surface="edit"
-              group="modifiers"
-              label={t("Modifiers")}
-              cols={2}
-            />
-          </Grid>
-          <Grid size={12}>
-            <Button size="small" variant="outlined" onClick={handleClear}>
-              {t("Clear All Fields")}
-            </Button>
-          </Grid>
-        </Grid>
-      }
-      previewContent={<SharedAccessoryCard item={accessoryObj} />}
-      addButton={
-        <AddToCompendiumButton itemType="accessory" data={accessoryObj} />
-      }
-      data={accessoryObj}
-      itemName={accessoryObj.name || ""}
-      exportDataType="accessories"
-    />
+        }
+        previewContent={<SharedAccessoryCard item={accessoryObj} />}
+        addButton={
+          <AddToCompendiumButton itemType="accessory" data={accessoryObj} />
+        }
+        data={accessoryObj}
+        itemName={accessoryObj.name || ""}
+        exportDataType="accessories"
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="accessory"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+          }))
+        }
+      />
+    </>
   );
 }
 

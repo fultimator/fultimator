@@ -6,6 +6,7 @@ import {
   CustomTextareaRenderer,
   NumberRenderer,
   CheckboxRenderer,
+  MartialToggleRenderer,
   SelectRenderer,
   GroupedSelectRenderer,
   TypeSelectRenderer,
@@ -38,4 +39,5 @@ export const componentMap: Record<ComponentToken, RendererComponent> = {
   "accuracy-attr-pair": AccuracyAttrPairRenderer,
   "modifier-block": () => null,
   "rare-bonus-block": RareBonusBlockRenderer,
+  "martial-toggle": MartialToggleRenderer,
 };

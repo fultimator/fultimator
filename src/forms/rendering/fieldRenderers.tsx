@@ -14,7 +14,8 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import { Clear } from "@mui/icons-material";
+import { Clear, Search } from "@mui/icons-material";
+import { Martial, MartialOutline } from "../../components/icons";
 import CustomTextarea from "../../components/common/CustomTextarea";
 import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
 import ChangeAccuracyCheck from "../../routes/equip/customWeapons/ChangeAccuracyCheck";
@@ -88,7 +89,7 @@ export function TextRenderer({
       onChange={(e) => onCommit(e.target.value)}
       disabled={disabled}
       fullWidth
-      variant="standard"
+      variant="outlined"
     />
   );
 }
@@ -115,12 +116,13 @@ export function NumberRenderer({ label, value, onCommit }: FieldRendererProps) {
   const { t } = useTranslate();
   const n = (value as number) ?? 0;
   return (
-    <FormControl variant="standard" fullWidth>
+    <FormControl fullWidth>
       <TextField
         label={t(label)}
         value={n}
         onChange={(e) => onCommit(Number(e.target.value))}
         type="number"
+        variant="outlined"
         color={n > 0 ? "success" : n < 0 ? "error" : "primary"}
         focused={n !== 0}
       />
@@ -149,6 +151,32 @@ export function CheckboxRenderer({
   );
 }
 
+export function MartialToggleRenderer({
+  value,
+  onCommit,
+  disabled,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const active = (value as boolean) ?? false;
+  return (
+    <IconButton
+      onClick={() => onCommit(!active)}
+      disabled={disabled}
+      title={t("Martial")}
+      color={active ? "secondary" : "default"}
+      sx={{
+        border: "1px solid",
+        borderColor: active ? "secondary.main" : "divider",
+        borderRadius: 1,
+        p: 1,
+        "& svg": { width: 28, height: 28 },
+      }}
+    >
+      {active ? <Martial /> : <MartialOutline />}
+    </IconButton>
+  );
+}
+
 // Flat select renderer.
 export function SelectRenderer({
   label,
@@ -159,6 +187,7 @@ export function SelectRenderer({
   const { t } = useTranslate();
   const options = (componentProps?.options as SelectOption[]) ?? [];
   const disabled = (componentProps?.disabled as boolean) ?? false;
+  const onBrowse = componentProps?.onBrowse as (() => void) | undefined;
   const labelId = `select-${label}`;
   return (
     <FormControl variant="outlined" fullWidth>
@@ -169,6 +198,22 @@ export function SelectRenderer({
         label={t(label)}
         onChange={(e) => onCommit(e.target.value)}
         disabled={disabled}
+        startAdornment={
+          onBrowse ? (
+            <InputAdornment position="start">
+              <IconButton
+                size="small"
+                edge="start"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBrowse();
+                }}
+              >
+                <Search fontSize="small" />
+              </IconButton>
+            </InputAdornment>
+          ) : undefined
+        }
       >
         {options.map((opt) => (
           <MenuItem key={opt.value} value={opt.value}>
@@ -205,6 +250,8 @@ export function GroupedSelectRenderer({
       );
     }
   }
+  const onBrowse = componentProps?.onBrowse as (() => void) | undefined;
+
   return (
     <FormControl variant="outlined" fullWidth>
       <InputLabel id={labelId}>{t(label)}</InputLabel>
@@ -213,6 +260,22 @@ export function GroupedSelectRenderer({
         value={current}
         label={t(label)}
         onChange={(e) => onCommit(e.target.value)}
+        startAdornment={
+          onBrowse ? (
+            <InputAdornment position="start">
+              <IconButton
+                size="small"
+                edge="start"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBrowse();
+                }}
+              >
+                <Search fontSize="small" />
+              </IconButton>
+            </InputAdornment>
+          ) : undefined
+        }
         endAdornment={
           allowClear && current ? (
             <InputAdornment position="end" sx={{ mr: 2 }}>
@@ -239,29 +302,37 @@ export function TypeSelectRenderer({
   const { t } = useTranslate();
   const options = (componentProps?.options as SelectOption[]) ?? [];
   const labelId = `type-select-${label}`;
+  const current = (value as string) ?? "";
   return (
     <FormControl variant="outlined" fullWidth>
       <InputLabel id={labelId}>{t(label)}</InputLabel>
       <Select
         labelId={labelId}
-        value={(value as string) ?? ""}
+        value={current}
         label={t(label)}
         onChange={(e) => onCommit(e.target.value)}
+        renderValue={(v) => {
+          const opt = options.find((o) => o.value === v);
+          return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <TypeIcon type={v as string} disabled={false} />
+              <span style={{ textTransform: "capitalize" }}>
+                {opt ? t(opt.label) : v}
+              </span>
+            </Box>
+          );
+        }}
       >
         {options.map((opt) => (
           <MenuItem
             key={opt.value}
             value={opt.value}
-            sx={{ display: "flex", alignItems: "center", paddingY: "6px" }}
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", minWidth: 70 }}>
-              <TypeIcon type={opt.value as string} disabled={false} />
-              <ListItemText
-                sx={{ ml: 1, marginBottom: 0, textTransform: "capitalize" }}
-              >
-                {t(opt.label)}
-              </ListItemText>
-            </Box>
+            <TypeIcon type={opt.value as string} disabled={false} />
+            <ListItemText sx={{ marginBottom: 0, textTransform: "capitalize" }}>
+              {t(opt.label)}
+            </ListItemText>
           </MenuItem>
         ))}
       </Select>
@@ -290,7 +361,7 @@ export function AccuracyAttrPairRenderer({
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <FormControl fullWidth size="small">
+        <FormControl variant="outlined" fullWidth>
           <InputLabel id="override-acc-attr1">{t("Attribute 1")}</InputLabel>
           <Select
             labelId="override-acc-attr1"
@@ -307,7 +378,7 @@ export function AccuracyAttrPairRenderer({
         </FormControl>
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <FormControl fullWidth size="small">
+        <FormControl variant="outlined" fullWidth>
           <InputLabel id="override-acc-attr2">{t("Attribute 2")}</InputLabel>
           <Select
             labelId="override-acc-attr2"
@@ -358,7 +429,7 @@ export function ReadonlyNumberRenderer({ label, value }: FieldRendererProps) {
       value={(value as number) ?? 0}
       slotProps={{ input: { readOnly: true } }}
       fullWidth
-      variant="standard"
+      variant="outlined"
     />
   );
 }

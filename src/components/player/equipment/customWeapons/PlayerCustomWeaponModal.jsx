@@ -19,7 +19,8 @@ import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { SharedCustomWeaponCard } from "../../../../components/shared/itemCards";
 import { SLOT_TIERS } from "../technospheres/slotTiers";
-import qualities from "../../../../routes/equip/weapons/qualities";
+import allQualities from "../../../../libs/qualities";
+const qualities = allQualities.filter((q) => q.filter?.includes("weapon"));
 import groupBy from "../../../../libs/groupby";
 import {
   categories,

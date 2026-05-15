@@ -1,7 +1,8 @@
 import type { ItemFieldConfig } from "../fieldConfig";
 import type { ArmorPersisted } from "../../../schema/itemSchemas/armor";
 import armor from "../../../../libs/armor";
-import qualities from "../../../../routes/equip/ArmorShield/qualities";
+import allQualities from "../../../../libs/qualities";
+const qualities = allQualities.filter((q) => q.filter?.includes("armor"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
 
@@ -35,6 +36,7 @@ const qualityGroups: SelectGroup[] = Object.entries(
 }));
 
 const G = {
+  base: "base",
   core: "core",
   quality: "quality",
   slots: "slots",
@@ -49,8 +51,9 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     label: "armor.base",
     component: "select",
     defaultValue: undefined,
-    group: G.core,
+    group: G.base,
     order: 0,
+    gridSize: "grow",
     componentProps: { options: armorOptions },
     format: (v) => (v as ArmorBase | undefined)?.name ?? "",
     parse: (v) => {
@@ -82,10 +85,11 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     key: "martial",
     kind: "editable",
     label: "armor.martial",
-    component: "checkbox",
+    component: "martial-toggle",
     defaultValue: false,
-    group: G.core,
+    group: G.base,
     order: 2,
+    gridSize: "auto",
   },
   {
     key: "rework",
@@ -93,7 +97,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     label: "armor.rework",
     component: "checkbox",
     defaultValue: false,
-    group: G.core,
+    group: G.modifiers,
     order: 3,
   },
   // Quality — hidden when technospheres slots variant is active

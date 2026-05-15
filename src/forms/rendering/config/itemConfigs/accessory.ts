@@ -1,6 +1,7 @@
 import type { ItemFieldConfig } from "../fieldConfig";
 import type { AccessoryPersisted } from "../../../schema/itemSchemas/accessory";
-import qualities from "../../../../routes/equip/Accessories/qualities";
+import allQualities from "../../../../libs/qualities";
+const qualities = allQualities.filter((q) => q.filter?.includes("accessory"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectGroup } from "../../fieldRenderers";
 

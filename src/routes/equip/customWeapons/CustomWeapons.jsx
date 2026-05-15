@@ -1,26 +1,23 @@
 import React, { useState, useRef } from "react";
 import {
-  Box,
   Paper,
-  Typography,
   Grid,
   Button,
-  Divider,
   useTheme,
   IconButton,
   Tooltip,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
-import { AutoAwesome, Download, ExpandMore } from "@mui/icons-material";
+import { useStickyTop } from "../../../hooks/useStickyTop";
+import { AutoAwesome, Download, Search } from "@mui/icons-material";
+import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import { SharedCustomWeaponCard } from "../../../components/shared/itemCards";
 import Export from "../../../components/Export";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
-import qualities from "../weapons/qualities";
+import allQualities from "../../../libs/qualities";
+const qualities = allQualities.filter((q) => q.filter?.includes("weapon"));
 import groupBy from "../../../libs/groupby";
 import { calculateCustomWeaponStats } from "../../../components/player/common/playerCalculations";
 import { categories, accuracyChecks } from "./libs.jsx";
@@ -244,12 +241,32 @@ function buildInitialState(data) {
 
 function CustomWeapons() {
   const { t } = useTranslate();
+  const stickyTop = useStickyTop();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const weaponCardsRef = React.useRef();
   const fileInputRef = React.useRef();
 
   const [formState, setFormState] = useState(() => buildInitialState(null));
+  const [qualityBrowserOpen, setQualityBrowserOpen] = useState(false);
+  const [baseBrowserOpen, setBaseBrowserOpen] = useState(false);
+
+  const handleBaseSelected = (item) => {
+    setFormState(buildInitialState(item));
+    setBaseBrowserOpen(false);
+  };
+
+  const handleQualitySelected = (item) => {
+    setFormState((prev) => ({
+      ...prev,
+      selectedQuality: item.name,
+      qualityName: item.name,
+      quality: item.quality ?? "",
+      qualityCost: item.cost ?? 0,
+      cost: (prev.cost ?? 0) - (prev.qualityCost ?? 0) + (item.cost ?? 0),
+    }));
+    setQualityBrowserOpen(false);
+  };
 
   const [downloadImage, downloadSnackbar] = useDownloadImage(
     formState.name || "Custom Weapon",
@@ -419,50 +436,12 @@ function CustomWeapons() {
           <CustomHeaderAlt
             headerText={t("Custom Weapons")}
             icon={<AutoAwesome fontSize="large" />}
-          />
-
-          <Grid container spacing={2} sx={{ mb: 2 }}>
-            <Grid size={6}>
-              <Button
-                variant="outlined"
-                fullWidth
-                onClick={() => fileInputRef.current.click()}
-              >
-                {t("Upload JSON")}
-              </Button>
-            </Grid>
-            <Grid size={6}>
-              <Button variant="outlined" fullWidth onClick={handleClearFields}>
-                {t("Clear All Fields")}
-              </Button>
-            </Grid>
-          </Grid>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                  try {
-                    handleFileUpload(JSON.parse(reader.result));
-                  } catch {
-                    // ignore malformed JSON
-                  }
-                };
-                reader.readAsText(file);
-              }
-            }}
-            style={{ display: "none" }}
+            actionIcon={<Search fontSize="large" />}
+            onAction={() => setBaseBrowserOpen(true)}
+            actionTooltip={t("Browse Compendium")}
           />
 
           {/* Primary Weapon Form */}
-          <Typography variant="h6" gutterBottom>
-            {t("Primary Weapon")}
-          </Typography>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <SchemaFieldRenderer
               config={customWeaponFieldConfig}
@@ -470,6 +449,7 @@ function CustomWeapons() {
               onChange={setFormState}
               surface="edit"
               group="core"
+              label={t("Primary Weapon")}
               cols={2}
               extraProps={{
                 selectedCategory,
@@ -509,60 +489,47 @@ function CustomWeapons() {
               group="quality"
               label={t("Quality")}
               cols={2}
-              extraProps={{ groups: qualityGroups }}
+              extraProps={{
+                groups: qualityGroups,
+                onBrowse: () => setQualityBrowserOpen(true),
+              }}
             />
           </Grid>
 
-          {/* Advanced Overrides */}
-          <Accordion sx={{ mb: 2 }}>
-            <AccordionSummary expandIcon={<ExpandMore />}>
-              <Typography variant="h6">{t("Advanced Overrides")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <Grid size={12}>
-                  <Typography variant="h6">
-                    {t("Rare Weapon Options")}
-                  </Typography>
-                  <Divider sx={{ mt: 0.5 }} />
-                </Grid>
-                <SchemaFieldRenderer
-                  config={customWeaponFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="rare"
-                  cols={2}
-                />
-              </Grid>
-              <Grid container spacing={2}>
-                <SchemaFieldRenderer
-                  config={customWeaponFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="modifiers"
-                  label={t("Modifiers")}
-                  cols={2}
-                />
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <SchemaFieldRenderer
+              config={customWeaponFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="rare"
+              label={t("Rare Weapon Options")}
+              cols={2}
+            />
+          </Grid>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <SchemaFieldRenderer
+              config={customWeaponFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="modifiers"
+              label={t("Modifiers")}
+              cols={2}
+            />
+          </Grid>
 
           {/* Secondary Weapon Form (transforming only) */}
           {hasTransforming && (
             <>
-              <Divider sx={{ my: 3 }} />
-              <Typography variant="h6" gutterBottom>
-                {t("Transforming Form")}
-              </Typography>
-              <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
                 <SchemaFieldRenderer
                   config={customWeaponFieldConfig}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
                   group="secondary"
+                  label={t("Transforming Form")}
                   cols={2}
                   extraProps={{
                     selectedCategory: secondSelectedCategory,
@@ -584,13 +551,49 @@ function CustomWeapons() {
               </Grid>
             </>
           )}
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid size={6}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => fileInputRef.current.click()}
+              >
+                {t("Upload JSON")}
+              </Button>
+            </Grid>
+            <Grid size={6}>
+              <Button variant="outlined" fullWidth onClick={handleClearFields}>
+                {t("Clear All Fields")}
+              </Button>
+            </Grid>
+          </Grid>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  try {
+                    handleFileUpload(JSON.parse(reader.result));
+                  } catch {
+                    // ignore malformed JSON
+                  }
+                };
+                reader.readAsText(file);
+              }
+            }}
+            style={{ display: "none" }}
+          />
         </Paper>
       </Grid>
 
       {/* Right side - Weapon Preview */}
       <Grid
         size={{ xs: 12, md: 6 }}
-        sx={{ position: "sticky", top: 16, alignSelf: "flex-start" }}
+        sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
       >
         <SharedCustomWeaponCard
           variant="equip"
@@ -619,6 +622,21 @@ function CustomWeapons() {
         />
       </Grid>
       {downloadSnackbar}
+      <CompendiumViewerModal
+        open={qualityBrowserOpen}
+        onClose={() => setQualityBrowserOpen(false)}
+        onAddItem={handleQualitySelected}
+        initialType="qualities"
+        restrictToTypes={["qualities"]}
+        initialQualityFilters={["weapon", "customWeapon"]}
+      />
+      <CompendiumViewerModal
+        open={baseBrowserOpen}
+        onClose={() => setBaseBrowserOpen(false)}
+        onAddItem={handleBaseSelected}
+        initialType="custom-weapons"
+        restrictToTypes={["custom-weapons"]}
+      />
     </Grid>
   );
 }

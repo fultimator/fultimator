@@ -1,15 +1,11 @@
+import { Grid, Paper, useTheme, Button, Typography } from "@mui/material";
+import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import {
-  Grid,
-  Paper,
-  useTheme,
-  Button,
-  Typography,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
-import { AutoAwesome, ArrowDownward, Download } from "@mui/icons-material";
+  AutoAwesome,
+  ArrowDownward,
+  Download,
+  Search,
+} from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useRef } from "react";
@@ -19,6 +15,7 @@ import {
   SharedShieldCard,
 } from "../../../components/shared/itemCards";
 import { useTranslate } from "../../../translation/translate";
+import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
@@ -26,23 +23,23 @@ import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRendere
 import { armorFieldConfig } from "../../../forms/rendering/config/itemConfigs/armor";
 import { shieldFieldConfig } from "../../../forms/rendering/config/itemConfigs/shield";
 
-const defaultBase = allBases[0];
+const armorBases = allBases.filter((b) => b.category !== "Shield");
+const shieldBases = allBases.filter((b) => b.category === "Shield");
 
-function buildInitialState(base) {
-  const b = base ?? defaultBase;
+function buildState(base) {
   return {
-    itemType: b.category === "Shield" ? "shield" : "armor",
-    base: b,
-    name: b.name,
-    martial: b.martial ?? false,
-    def: b.def ?? 0,
-    mdef: b.mdef ?? 0,
-    init: b.init ?? 0,
+    itemType: base.category === "Shield" ? "shield" : "armor",
+    base,
+    name: base.name,
+    martial: base.martial ?? false,
+    def: base.def ?? 0,
+    mdef: base.mdef ?? 0,
+    init: base.init ?? 0,
     rework: false,
     quality: "",
     qualityCost: 0,
     selectedQuality: "",
-    cost: b.cost ?? 0,
+    cost: base.cost ?? 0,
     defModifier: 0,
     mDefModifier: 0,
     initModifier: 0,
@@ -66,12 +63,50 @@ function buildInitialState(base) {
   };
 }
 
-function ArmorShield() {
+function applyFileUpload(rawData, bases) {
+  const baseMatch = rawData.base
+    ? (bases.find((b) => b.name === rawData.base?.name) ?? bases[0])
+    : bases[0];
+  const next = buildState(baseMatch);
+  if (rawData.name) next.name = rawData.name;
+  if (rawData.quality) {
+    next.selectedQuality = "";
+    next.quality = rawData.quality;
+  }
+  if (rawData.martial !== undefined) next.martial = rawData.martial;
+  if (rawData.qualityCost) next.qualityCost = rawData.qualityCost;
+  if (rawData.rework) next.rework = rawData.rework;
+  if (rawData.defModifier) next.defModifier = rawData.defModifier;
+  if (rawData.mDefModifier) next.mDefModifier = rawData.mDefModifier;
+  if (rawData.initModifier) next.initModifier = rawData.initModifier;
+  if (rawData.magicModifier) next.magicModifier = rawData.magicModifier;
+  if (rawData.precModifier ?? rawData.modifiers?.accuracy)
+    next.precModifier = rawData.modifiers?.accuracy ?? rawData.precModifier;
+  if (rawData.damageMeleeModifier)
+    next.damageMeleeModifier = rawData.damageMeleeModifier;
+  if (rawData.damageRangedModifier)
+    next.damageRangedModifier = rawData.damageRangedModifier;
+  next.cost = (baseMatch.cost ?? 0) + (Number(next.qualityCost) || 0);
+  return next;
+}
+
+function ItemPanel({ title, bases, fieldConfig, SharedCard, itemTypeFilter }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const stickyTop = useStickyTop();
 
-  const [formState, setFormState] = useState(() => buildInitialState(null));
+  const [formState, setFormState] = useState(() => buildState(bases[0]));
+  const [qualityBrowserOpen, setQualityBrowserOpen] = useState(false);
+  const [baseBrowserOpen, setBaseBrowserOpen] = useState(false);
+
+  const handleBaseSelected = (item) => {
+    const matched =
+      bases.find((b) => b.name === item.base?.name || b.name === item.name) ??
+      bases[0];
+    setFormState(applyFileUpload(item, bases.length ? bases : [matched]));
+    setBaseBrowserOpen(false);
+  };
 
   const fileInputRef = useRef(null);
   const cardRef = useRef(null);
@@ -80,56 +115,29 @@ function ArmorShield() {
     cardRef,
   );
 
-  const isShield = formState.base?.category === "Shield";
-  const fieldConfig = isShield ? shieldFieldConfig : armorFieldConfig;
-  const SharedCard = isShield ? SharedShieldCard : SharedArmorCard;
-  const itemType = isShield ? "shield" : "armor";
-
-  const handleBaseChange = (e) => {
-    const selected = allBases.find((b) => b.name === e.target.value);
-    if (!selected) return;
-    setFormState(buildInitialState(selected));
+  const handleQualitySelected = (item) => {
+    setFormState((prev) => ({
+      ...prev,
+      selectedQuality: item.name,
+      qualityName: item.name,
+      quality: item.quality ?? "",
+      qualityCost: item.cost ?? 0,
+      cost: (prev.cost ?? 0) - (prev.qualityCost ?? 0) + (item.cost ?? 0),
+    }));
+    setQualityBrowserOpen(false);
   };
 
   const handleFileUpload = (rawData) => {
     if (!rawData) return;
-    const baseMatch = rawData.base
-      ? (allBases.find((b) => b.name === rawData.base?.name) ?? defaultBase)
-      : defaultBase;
-    const next = buildInitialState(baseMatch);
-    if (rawData.name) next.name = rawData.name;
-    if (rawData.quality) {
-      next.selectedQuality = "";
-      next.quality = rawData.quality;
-    }
-    if (rawData.martial !== undefined) next.martial = rawData.martial;
-    if (rawData.qualityCost) next.qualityCost = rawData.qualityCost;
-    if (rawData.rework) next.rework = rawData.rework;
-    if (rawData.defModifier) next.defModifier = rawData.defModifier;
-    if (rawData.mDefModifier) next.mDefModifier = rawData.mDefModifier;
-    if (rawData.initModifier) next.initModifier = rawData.initModifier;
-    if (rawData.magicModifier) next.magicModifier = rawData.magicModifier;
-    if (rawData.precModifier ?? rawData.modifiers?.accuracy)
-      next.precModifier = rawData.modifiers?.accuracy ?? rawData.precModifier;
-    if (rawData.damageMeleeModifier)
-      next.damageMeleeModifier = rawData.damageMeleeModifier;
-    if (rawData.damageRangedModifier)
-      next.damageRangedModifier = rawData.damageRangedModifier;
-    next.cost = (baseMatch.cost ?? 0) + (Number(next.qualityCost) || 0);
-    setFormState(next);
+    setFormState(applyFileUpload(rawData, bases));
   };
 
-  const handleClearFields = () => setFormState(buildInitialState(null));
-
-  const customItem = {
-    ...formState.base,
-    ...formState,
-  };
+  const customItem = { ...formState.base, ...formState };
+  const itemType = formState.itemType;
 
   return (
     <>
       <Grid container spacing={2}>
-        {/* Form */}
         <Grid size={{ xs: 12, sm: 6 }}>
           <Paper
             elevation={3}
@@ -141,26 +149,21 @@ function ArmorShield() {
             }}
           >
             <CustomHeaderAlt
-              headerText={t("Armor and Shield")}
+              headerText={t(title)}
               icon={<AutoAwesome fontSize="large" />}
+              actionIcon={<Search fontSize="large" />}
+              onAction={() => setBaseBrowserOpen(true)}
+              actionTooltip={t("Browse Compendium")}
             />
             <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid size={12}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t("Base")}</InputLabel>
-                  <Select
-                    value={formState.base?.name ?? ""}
-                    label={t("Base")}
-                    onChange={handleBaseChange}
-                  >
-                    {allBases.map((b) => (
-                      <MenuItem key={b.name} value={b.name}>
-                        {b.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+              <SchemaFieldRenderer
+                config={fieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="base"
+                cols={1}
+              />
               <SchemaFieldRenderer
                 config={fieldConfig}
                 state={formState}
@@ -179,6 +182,7 @@ function ArmorShield() {
                 group="quality"
                 label={t("Quality")}
                 cols={2}
+                extraProps={{ onBrowse: () => setQualityBrowserOpen(true) }}
               />
             </Grid>
             <Grid container spacing={2} sx={{ mb: 2 }}>
@@ -192,17 +196,22 @@ function ArmorShield() {
                 cols={2}
               />
             </Grid>
-            <Grid container spacing={2} sx={{ alignItems: "center" }}>
-              <Grid>
+            <Grid container spacing={2}>
+              <Grid size={6}>
                 <Button
                   variant="outlined"
+                  fullWidth
                   onClick={() => fileInputRef.current.click()}
                 >
                   {t("Upload JSON")}
                 </Button>
               </Grid>
-              <Grid>
-                <Button variant="outlined" onClick={handleClearFields}>
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => setFormState(buildState(bases[0]))}
+                >
                   {t("Clear All Fields")}
                 </Button>
               </Grid>
@@ -229,10 +238,9 @@ function ArmorShield() {
             />
           </Paper>
         </Grid>
-        {/* Preview */}
         <Grid
           size={{ xs: 12, sm: 6 }}
-          sx={{ position: "sticky", top: 16, alignSelf: "flex-start" }}
+          sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <SharedCard
@@ -280,7 +288,60 @@ function ArmorShield() {
         </Grid>
       </Grid>
       {downloadSnackbar}
+      <CompendiumViewerModal
+        open={qualityBrowserOpen}
+        onClose={() => setQualityBrowserOpen(false)}
+        onAddItem={handleQualitySelected}
+        initialType="qualities"
+        restrictToTypes={["qualities"]}
+        initialQualityFilters={[itemTypeFilter]}
+      />
+      <CompendiumViewerModal
+        open={baseBrowserOpen}
+        onClose={() => setBaseBrowserOpen(false)}
+        onAddItem={handleBaseSelected}
+        initialType={itemTypeFilter === "armor" ? "armor" : "shields"}
+        restrictToTypes={[itemTypeFilter === "armor" ? "armor" : "shields"]}
+      />
     </>
   );
 }
+
+export function ArmorPanel() {
+  return (
+    <ItemPanel
+      title="Armor"
+      bases={armorBases}
+      fieldConfig={armorFieldConfig}
+      SharedCard={SharedArmorCard}
+      itemTypeFilter="armor"
+    />
+  );
+}
+
+export function ShieldPanel() {
+  return (
+    <ItemPanel
+      title="Shield"
+      bases={shieldBases}
+      fieldConfig={shieldFieldConfig}
+      SharedCard={SharedShieldCard}
+      itemTypeFilter="shield"
+    />
+  );
+}
+
+function ArmorShield() {
+  return (
+    <Grid container spacing={4}>
+      <Grid size={12}>
+        <ArmorPanel />
+      </Grid>
+      <Grid size={12}>
+        <ShieldPanel />
+      </Grid>
+    </Grid>
+  );
+}
+
 export default ArmorShield;

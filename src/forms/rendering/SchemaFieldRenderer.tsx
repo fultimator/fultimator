@@ -1,5 +1,5 @@
 import React from "react";
-import { Divider, Grid, Typography } from "@mui/material";
+import { Box, Divider, Grid, Typography } from "@mui/material";
 import type { ItemFieldConfig } from "./config/fieldConfig";
 import type { FormSurface } from "../schema/fieldParity";
 import { componentMap } from "./componentMap";
@@ -13,6 +13,8 @@ interface SchemaFieldRendererProps<TFormState extends Record<string, unknown>> {
   group?: string;
   // Optional section heading.
   label?: string;
+  // Optional action element rendered beside the section label (e.g. a search icon button).
+  labelAction?: React.ReactNode;
   // Fields per row on md+ screens.
   cols?: 1 | 2 | 3 | 4;
   // Extra props merged into each field's component props.
@@ -66,6 +68,7 @@ export function SchemaFieldRenderer<
   surface,
   group,
   label,
+  labelAction,
   cols = 2,
   extraProps,
 }: SchemaFieldRendererProps<TFormState>) {
@@ -86,7 +89,10 @@ export function SchemaFieldRenderer<
     <>
       {label && (
         <Grid size={12}>
-          <Typography variant="h6">{label}</Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <Typography variant="h6">{label}</Typography>
+            {labelAction}
+          </Box>
           <Divider sx={{ mt: 0.5, mb: 1 }} />
         </Grid>
       )}
@@ -120,7 +126,17 @@ export function SchemaFieldRenderer<
         return (
           <Grid
             key={field.key}
-            size={{ xs: 12, md: field.fullWidth ? 12 : mdSize }}
+            size={
+              field.gridSize !== undefined
+                ? field.gridSize
+                : { xs: 12, md: field.fullWidth ? 12 : mdSize }
+            }
+            sx={
+              field.component === "checkbox" ||
+              field.component === "martial-toggle"
+                ? { display: "flex", alignItems: "center" }
+                : undefined
+            }
           >
             <Component
               fieldKey={field.key}

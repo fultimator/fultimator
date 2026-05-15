@@ -14,7 +14,8 @@ import weapons from "../../../../libs/weapons";
 import weaponCategories from "../../../../libs/weaponCategories";
 import attributes from "../../../../libs/attributes";
 import { typeOptions } from "../typeOptions";
-import qualities from "../../../../routes/equip/weapons/qualities";
+import allQualities from "../../../../libs/qualities";
+const qualities = allQualities.filter((q) => q.filter?.includes("weapon"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
 
@@ -90,6 +91,7 @@ const qualityGroups: SelectGroup[] = Object.entries(
 
 // Section keys - control rendering order.
 const G = {
+  base: "base",
   core: "core",
   accuracy: "accuracy",
   damage: "damage",
@@ -108,8 +110,9 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     label: "weapon.base",
     component: "grouped-select",
     defaultValue: undefined,
-    group: G.core,
+    group: G.base,
     order: 0,
+    gridSize: "grow",
     componentProps: { groups: weaponGroups },
     format: (v) => (v as WeaponBase | undefined)?.name ?? "",
     parse: (v) => {
@@ -203,10 +206,11 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     key: "martial",
     kind: "editable",
     label: "weapon.martial",
-    component: "checkbox",
+    component: "martial-toggle",
     defaultValue: false,
-    group: G.core,
+    group: G.base,
     order: 4,
+    gridSize: "auto",
   },
   // Accuracy
   {

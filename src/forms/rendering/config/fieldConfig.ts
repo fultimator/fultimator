@@ -16,7 +16,8 @@ export type ComponentToken =
   | "accuracy-check"
   | "accuracy-attr-pair"
   | "readonly-number"
-  | "rare-bonus-block";
+  | "rare-bonus-block"
+  | "martial-toggle";
 
 export type FieldKind =
   | "editable" // has a UI control; lands in the payload
@@ -49,6 +50,7 @@ export interface FieldConfig<TFormState extends Record<string, unknown>> {
   onChangeEffects?: OnChangeEffects<TFormState>;
   validationHints?: { min?: number; max?: number; required?: boolean };
   fullWidth?: boolean;
+  gridSize?: "auto" | "grow" | number;
 }
 
 export type ItemFieldConfig<TFormState extends Record<string, unknown>> =

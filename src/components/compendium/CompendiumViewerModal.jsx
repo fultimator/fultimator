@@ -95,6 +95,7 @@ const CompendiumViewerModal = ({
   initialSpellClass = "",
   initialSearchQuery = "",
   initialModuleTypeFilter = "",
+  initialQualityFilters = [],
 }) => {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
@@ -115,7 +116,9 @@ const CompendiumViewerModal = ({
   const [selectedMagichantSubtype, setSelectedMagichantSubtype] = useState("");
   const [selectedWellspring, setSelectedWellspring] = useState("");
   const [selectedBook, setSelectedBook] = useState([]);
-  const [selectedQualityFilters, setSelectedQualityFilters] = useState([]);
+  const [selectedQualityFilters, setSelectedQualityFilters] = useState(
+    initialQualityFilters,
+  );
   const [selectedQualityCategories, setSelectedQualityCategories] = useState(
     [],
   );
@@ -249,7 +252,7 @@ const CompendiumViewerModal = ({
       setSelectedMagichantSubtype("");
       setSelectedWellspring("");
       setSelectedBook([]);
-      setSelectedQualityFilters([]);
+      setSelectedQualityFilters(initialQualityFilters);
       setSelectedQualityCategories([]);
       setSelectedHeroicClasses([]);
       setSelectedOptionalSubtypes(initialOptionalSubtypes);
@@ -263,6 +266,7 @@ const CompendiumViewerModal = ({
     initialSpellClass,
     initialModuleTypeFilter,
     initialOptionalSubtypes,
+    initialQualityFilters,
     restrictToTypes,
   ]);
 
@@ -941,122 +945,118 @@ const CompendiumViewerModal = ({
             </Typography>
           ) : (
             <Grid container spacing={2}>
-              {filteredItems.map((item, idx) => (
-                <Grid
-                  key={itemIds[idx]}
-                  size={{
-                    xs: 12,
-                    lg: selectedType === "classes" ? 12 : 6,
-                  }}
-                >
-                  <Box
-                    ref={idx === selectedIdx ? selectedCardRef : null}
-                    sx={{
-                      borderRadius: 1,
-                      outline:
-                        idx === selectedIdx
-                          ? `2px solid ${customTheme.primary}`
-                          : "2px solid transparent",
-                      transition: "outline 0.15s ease",
+              {filteredItems.map((item, idx) => {
+                const isSelected = idx === selectedIdx;
+                const itemActionContent = isSelected ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
                     }}
                   >
-                    <ItemCard
-                      type={selectedType}
-                      item={item}
-                      id={itemIds[idx]}
-                      onHeaderClick={() => handleItemClick(item, idx)}
+                    <Tooltip title={t("Share URL")}>
+                      <IconButton size="small" onClick={handleShareUrl}>
+                        <LinkIcon sx={{ fontSize: "small" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t("Download as Image")}>
+                      <IconButton size="small" onClick={downloadSelectedImage}>
+                        <DownloadIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Export
+                      name={item.name}
+                      dataType={selectedType}
+                      data={item}
+                      size="small"
                     />
-                  </Box>
-                  {idx === selectedIdx && (
+                    {selectedCompendium !== "official" &&
+                      item._packItemId &&
+                      !activePack?.locked &&
+                      VIEWER_TO_PACK_TYPE[selectedType] && (
+                        <Tooltip title={t("Edit")}>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              setEditPackItem({
+                                item,
+                                packItemId: item._packItemId,
+                                itemType: VIEWER_TO_PACK_TYPE[selectedType],
+                              })
+                            }
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    {VIEWER_TO_PACK_TYPE[selectedType] && (
+                      <AddToCompendiumButton
+                        itemType={VIEWER_TO_PACK_TYPE[selectedType]}
+                        data={item}
+                        excludePackId={
+                          selectedCompendium !== "official"
+                            ? selectedCompendium
+                            : undefined
+                        }
+                        tooltipOverride={
+                          selectedType === "classes" &&
+                          selectedCompendium === "official"
+                            ? t("Clone to Custom")
+                            : undefined
+                        }
+                      />
+                    )}
+                    {selectedCompendium !== "official" &&
+                      item._packItemId &&
+                      !activePack?.locked && (
+                        <Tooltip title={t("Remove from pack")}>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() =>
+                              setDeletePackItem({
+                                item,
+                                packItemId: item._packItemId,
+                              })
+                            }
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                  </div>
+                ) : null;
+                return (
+                  <Grid
+                    key={itemIds[idx]}
+                    size={{
+                      xs: 12,
+                      lg: selectedType === "classes" ? 12 : 6,
+                    }}
+                  >
                     <Box
+                      ref={isSelected ? selectedCardRef : null}
                       sx={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        gap: 0.5,
-                        mt: 0.5,
+                        borderRadius: 1,
+                        outline: isSelected
+                          ? `2px solid ${customTheme.primary}`
+                          : "2px solid transparent",
+                        transition: "outline 0.15s ease",
                       }}
                     >
-                      <Tooltip title={t("Share URL")}>
-                        <IconButton size="small" onClick={handleShareUrl}>
-                          <LinkIcon
-                            sx={{
-                              fontSize: "small",
-                            }}
-                          />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t("Download as Image")}>
-                        <IconButton
-                          size="small"
-                          onClick={downloadSelectedImage}
-                        >
-                          <DownloadIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Export
-                        name={item.name}
-                        dataType={selectedType}
-                        data={item}
-                        size="small"
+                      <ItemCard
+                        type={selectedType}
+                        item={item}
+                        id={itemIds[idx]}
+                        onHeaderClick={() => handleItemClick(item, idx)}
+                        actionContent={itemActionContent}
+                        showImageToggle={isSelected}
                       />
-                      {selectedCompendium !== "official" &&
-                        item._packItemId &&
-                        !activePack?.locked &&
-                        VIEWER_TO_PACK_TYPE[selectedType] && (
-                          <Tooltip title={t("Edit")}>
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                setEditPackItem({
-                                  item,
-                                  packItemId: item._packItemId,
-                                  itemType: VIEWER_TO_PACK_TYPE[selectedType],
-                                })
-                              }
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      {VIEWER_TO_PACK_TYPE[selectedType] && (
-                        <AddToCompendiumButton
-                          itemType={VIEWER_TO_PACK_TYPE[selectedType]}
-                          data={item}
-                          excludePackId={
-                            selectedCompendium !== "official"
-                              ? selectedCompendium
-                              : undefined
-                          }
-                          tooltipOverride={
-                            selectedType === "classes" &&
-                            selectedCompendium === "official"
-                              ? t("Clone to Custom")
-                              : undefined
-                          }
-                        />
-                      )}
-                      {selectedCompendium !== "official" &&
-                        item._packItemId &&
-                        !activePack?.locked && (
-                          <Tooltip title={t("Remove from pack")}>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() =>
-                                setDeletePackItem({
-                                  item,
-                                  packItemId: item._packItemId,
-                                })
-                              }
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
                     </Box>
-                  )}
-                </Grid>
-              ))}
+                  </Grid>
+                );
+              })}
             </Grid>
           )}
         </Box>

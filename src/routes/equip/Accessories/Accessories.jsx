@@ -1,10 +1,12 @@
 import { Grid, Paper, Button, useTheme } from "@mui/material";
 import { AutoAwesome, Download } from "@mui/icons-material";
+import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import { IconButton, Tooltip } from "@mui/material";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useRef } from "react";
 import { SharedAccessoryCard } from "../../../components/shared/itemCards";
 import { useTranslate } from "../../../translation/translate";
+import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
@@ -34,8 +36,22 @@ function Accessories() {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const stickyTop = useStickyTop();
 
   const [formState, setFormState] = useState(buildInitialState);
+  const [qualityBrowserOpen, setQualityBrowserOpen] = useState(false);
+
+  const handleQualitySelected = (item) => {
+    setFormState((prev) => ({
+      ...prev,
+      selectedQuality: item.name,
+      qualityName: item.name,
+      quality: item.quality ?? "",
+      qualityCost: item.cost ?? 0,
+      cost: (prev.cost ?? 0) - (prev.qualityCost ?? 0) + (item.cost ?? 0),
+    }));
+    setQualityBrowserOpen(false);
+  };
 
   const fileInputRef = useRef(null);
   const cardRef = useRef(null);
@@ -108,6 +124,7 @@ function Accessories() {
                 group="quality"
                 label={t("Quality")}
                 cols={2}
+                extraProps={{ onBrowse: () => setQualityBrowserOpen(true) }}
               />
             </Grid>
             <Grid container spacing={2} sx={{ mb: 2 }}>
@@ -121,17 +138,22 @@ function Accessories() {
                 cols={2}
               />
             </Grid>
-            <Grid container spacing={2} sx={{ alignItems: "center" }}>
-              <Grid>
+            <Grid container spacing={2}>
+              <Grid size={6}>
                 <Button
                   variant="outlined"
+                  fullWidth
                   onClick={() => fileInputRef.current.click()}
                 >
                   {t("Upload JSON")}
                 </Button>
               </Grid>
-              <Grid>
-                <Button variant="outlined" onClick={handleClearFields}>
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={handleClearFields}
+                >
                   {t("Clear All Fields")}
                 </Button>
               </Grid>
@@ -161,7 +183,7 @@ function Accessories() {
         {/* Preview */}
         <Grid
           size={{ xs: 12, sm: 6 }}
-          sx={{ position: "sticky", top: 16, alignSelf: "flex-start" }}
+          sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
         >
           <div ref={cardRef}>
             <SharedAccessoryCard
@@ -194,6 +216,14 @@ function Accessories() {
         </Grid>
       </Grid>
       {downloadSnackbar}
+      <CompendiumViewerModal
+        open={qualityBrowserOpen}
+        onClose={() => setQualityBrowserOpen(false)}
+        onAddItem={handleQualitySelected}
+        initialType="qualities"
+        restrictToTypes={["qualities"]}
+        initialQualityFilters={["accessory"]}
+      />
     </>
   );
 }
