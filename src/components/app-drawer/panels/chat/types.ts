@@ -125,15 +125,6 @@ export type DisplayMessage = {
   description?: string;
 };
 
-export type ChatMessage =
-  | TextMessage
-  | RollMessage
-  | CheckMessage
-  | ActionMessage
-  | AccuracyCheckMessage
-  | MagicCheckMessage
-  | DisplayMessage;
-
 export type Attribute = "dex" | "ins" | "mig" | "wlp";
 
 export type AttackOverrideDraft = {
@@ -187,10 +178,45 @@ export type CheckResult = {
   additionalData: Record<string, unknown>;
 };
 
-export type CheckMessage = {
+export type AttributeCheckMessage = {
   id: string;
   createdAt: number;
   speaker?: string;
-  kind: "check";
+  kind: "attribute";
   check: CheckResult;
 };
+
+export type OpenCheckMessage = {
+  id: string;
+  createdAt: number;
+  speaker?: string;
+  kind: "open";
+  check: CheckResult;
+};
+
+export type OpposedCheckResult = CheckResult & {
+  opposedToId: string;
+  opposedToResult: number;
+  opposedToSpeaker?: string;
+  opposedToCritical?: boolean;
+  opposedToFumble?: boolean;
+};
+
+export type OpposedCheckMessage = {
+  id: string;
+  createdAt: number;
+  speaker?: string;
+  kind: "opposed";
+  check: OpposedCheckResult;
+};
+
+export type ChatMessage =
+  | TextMessage
+  | RollMessage
+  | AttributeCheckMessage
+  | OpenCheckMessage
+  | OpposedCheckMessage
+  | ActionMessage
+  | AccuracyCheckMessage
+  | MagicCheckMessage
+  | DisplayMessage;

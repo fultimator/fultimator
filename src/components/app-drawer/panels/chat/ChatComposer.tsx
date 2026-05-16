@@ -116,18 +116,35 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     cmdSuggestions.length > 0 ||
     (activeCommand !== null && blockedCommand === null);
 
-  // 0 = awaiting primary, 1 = awaiting secondary, 2 = awaiting modifier, 3 = awaiting DL, null = not a check command
-  const checkParamIndex: 0 | 1 | 2 | 3 | null =
+  const CHECK_KIND_OPTIONS = ["open", "attribute", "opposed"] as const;
+  type CheckKindOption = (typeof CHECK_KIND_OPTIONS)[number];
+
+  // -1 = awaiting kind, 0 = awaiting primary, 1 = awaiting secondary, 2 = awaiting modifier, 3 = awaiting DL, null = not a check command
+  const checkParamIndex: -1 | 0 | 1 | 2 | 3 | null =
     activeCommand?.name === "check" && playerDoc !== null
       ? (() => {
           const after = input.slice(input.indexOf(" ") + 1).trimStart();
           const parts = after.trim() ? after.trim().split(/\s+/) : [];
-          if (parts.length === 0) return 0;
-          if (parts.length === 1) return 1;
-          if (parts.length === 2) return 2;
+          if (parts.length === 0) return -1;
+          const firstIsKind = (CHECK_KIND_OPTIONS as readonly string[]).includes(
+            parts[0]?.toLowerCase() ?? "",
+          );
+          const attrParts = firstIsKind ? parts.slice(1) : parts;
+          if (attrParts.length === 0) return 0;
+          if (attrParts.length === 1) return 1;
+          if (attrParts.length === 2) return 2;
           return 3;
         })()
       : null;
+
+  const checkSelectedKind: "open" | "attribute" | "opposed" | null = (() => {
+    if (activeCommand?.name !== "check") return null;
+    const after = input.slice(input.indexOf(" ") + 1).trimStart();
+    const first = after.trim().split(/\s+/)[0]?.toLowerCase() ?? "";
+    return (CHECK_KIND_OPTIONS as readonly string[]).includes(first)
+      ? (first as "open" | "attribute" | "opposed")
+      : null;
+  })();
 
   const showActionPicker =
     activeCommand?.name === "action" &&
@@ -142,6 +159,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   };
 
   const applyAction = (action: string) => {
+    if (action.toLowerCase() === "check") {
+      handleInputChange("/check ");
+      requestAnimationFrame(() => textareaRef.current?.focus());
+      return;
+    }
     const next = `/action ${action.toLowerCase()}`;
     // Attack/spell, equipment, and action-check actions need more inputs, so stay in composer
     if (
@@ -277,22 +299,40 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     sendAndRecord(`${base} ${mod > 0 ? "+" : ""}${mod}`);
   };
 
+  const applyCheckKind = (kind: string) => {
+    const next = input.trimEnd() + " " + kind + " ";
+    handleInputChange(next);
+    requestAnimationFrame(() => textareaRef.current?.focus());
+  };
+
   const applyCheckAttribute = (attr: Attribute) => {
     const next = input.trimEnd() + " " + attr;
     handleInputChange(next);
     requestAnimationFrame(() => textareaRef.current?.focus());
   };
 
+  const checkHasKindPrefix = (): boolean => {
+    const after = input.slice(input.indexOf(" ") + 1).trimStart();
+    const first = after.trim().split(/\s+/)[0]?.toLowerCase() ?? "";
+    return (CHECK_KIND_OPTIONS as readonly string[]).includes(first);
+  };
+
   const applyCheckModifier = (mod: number) => {
     const parts = input.trimEnd().split(/\s+/);
-    const base = parts.slice(0, 3).join(" ");
-    const next = `${base} ${mod > 0 ? "+" : ""}${mod}`;
-    handleInputChange(next);
+    const keepCount = checkHasKindPrefix() ? 4 : 3;
+    const base = parts.slice(0, keepCount).join(" ");
+    const withMod = `${base} ${mod > 0 ? "+" : ""}${mod}`;
+    if (checkSelectedKind === "open" || checkSelectedKind === "opposed") {
+      sendAndRecord(withMod);
+    } else {
+      handleInputChange(withMod);
+    }
   };
 
   const applyCheckDifficulty = (dl: number | null) => {
     const parts = input.trimEnd().split(/\s+/);
-    const base = parts.slice(0, 4).join(" ");
+    const keepCount = checkHasKindPrefix() ? 5 : 4;
+    const base = parts.slice(0, keepCount).join(" ");
     const next = dl != null ? `${base} ${dl}` : base;
     sendAndRecord(next);
   };
@@ -1554,6 +1594,31 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     </Box>
                   </ListItem>
                 )}
+                {checkParamIndex === -1 && (
+                  <ListItem sx={{ py: 0.75, px: 1 }}>
+                    <Box sx={{ display: "flex", gap: 0.5, width: "100%" }}>
+                      {CHECK_KIND_OPTIONS.map((kind) => (
+                        <Button
+                          key={kind}
+                          size="small"
+                          variant="outlined"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => applyCheckKind(kind)}
+                          sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            fontFamily: "monospace",
+                            fontSize: "0.7rem",
+                            py: 0.25,
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {kind}
+                        </Button>
+                      ))}
+                    </Box>
+                  </ListItem>
+                )}
                 {(checkParamIndex === 0 || checkParamIndex === 1) && (
                   <ListItem sx={{ py: 0.75, px: 1 }}>
                     <Box sx={{ display: "flex", gap: 0.5, width: "100%" }}>
@@ -1710,7 +1775,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                             px: 1,
                           }}
                         >
-                          next
+                          {checkSelectedKind === "open" ||
+                          checkSelectedKind === "opposed"
+                            ? "roll"
+                            : "next"}
                         </Button>
                       </Box>
                     </Box>
@@ -1764,7 +1832,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     </Box>
                   </ListItem>
                 )}
-                {checkParamIndex === 3 && (
+                {checkParamIndex === 3 &&
+                  checkSelectedKind !== "open" &&
+                  checkSelectedKind !== "opposed" && (
                   <ListItem sx={{ py: 0.75, px: 1 }}>
                     <Box
                       sx={{
@@ -1867,7 +1937,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                       </Box>
                     </Box>
                   </ListItem>
-                )}
+                  )}
               </List>
             </Paper>
           )}

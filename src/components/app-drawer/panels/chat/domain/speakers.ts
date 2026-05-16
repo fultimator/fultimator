@@ -537,7 +537,8 @@ export const resolveAttributeDie = (
     playerDoc.attributes
       ? (playerDoc.attributes as Record<string, unknown>)
       : null;
-  const val = attrs?.[ATTRIBUTE_KEY[attribute]];
+  const raw = attrs?.[ATTRIBUTE_KEY[attribute]];
+  const val = raw && typeof raw === "object" ? (raw as Record<string, unknown>).base : raw;
   return typeof val === "number" && val > 0 ? val : 8;
 };
 

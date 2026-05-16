@@ -1106,7 +1106,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Calculate Current Attribute Value based on Status Effects
   function calcAttr(statusEffect1, statusEffect2, attribute, npc) {
     // Define the base attribute value (e.g., dexterity)
-    let attributeValue = npc?.attributes?.[attribute] || 6; // Default to 6 if attribute is missing
+    const rawAttr = npc?.attributes?.[attribute];
+    let attributeValue = (rawAttr && typeof rawAttr === "object" ? rawAttr.base : rawAttr) || 6;
 
     // Check in npc.combatStats.statusEffects for the status effects
     if (npc.combatStats.statusEffects?.includes(statusEffect1)) {

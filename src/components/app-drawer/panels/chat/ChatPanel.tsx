@@ -37,6 +37,9 @@ import {
 import { useCombatEncounterStore } from "../../../../stores/combatEncounterStore";
 import { BaseMessageTemplate } from "./message-templates/BaseMessageTemplate";
 import { MessageContent } from "./message-templates/registry";
+import { ChatActionsProvider } from "./ChatActionsContext";
+import type { OpposeTarget } from "./ChatActionsContext.shared";
+import type { OpposedCheckMessage } from "./types";
 import { MessageListErrorBoundary } from "./MessageListErrorBoundary";
 import { ChatComposer } from "./ChatComposer";
 import SlotPickerDialog from "../../../player/equipment/slots/SlotPickerDialog";
@@ -48,6 +51,13 @@ import { applyPostLoadTransforms } from "../../../../components/player/playerTra
 import { applyNpcPostLoadTransforms } from "../../../../components/npc/npcTransforms";
 import type { TypeNpc } from "../../../../types/Npcs";
 import type { ChatMessage } from "./types";
+import {
+  prepareCheck,
+  rollCheck,
+  processOpposedCheck,
+  buildOpposedCheckMessage,
+} from "./domain/checks";
+import { resolveAttributeDie } from "./domain/speakers";
 import {
   getAvailableSupportModules,
   getEquippedModuleForSlot,
@@ -230,6 +240,56 @@ export const ChatPanel: React.FC = () => {
   const store = useChatStore(selectedSpeaker, activeActorDoc);
   const { addMessage } = store;
 
+  const handleOppose = useCallback(
+    (target: OpposeTarget) => {
+      const { primary, secondary } = target.check.intent;
+      const dieSizes = {
+        primary: resolveAttributeDie(activeActorDoc, primary),
+        secondary: resolveAttributeDie(activeActorDoc, secondary),
+      };
+      const intent = prepareCheck({ primary, secondary });
+      const rolls = rollCheck(dieSizes);
+      const result = processOpposedCheck(
+        intent,
+        rolls,
+        dieSizes,
+        selectedSpeaker,
+        target.id,
+        target.check.result,
+        target.speaker,
+        target.check.critical,
+        target.check.fumble,
+      );
+      addMessage(buildOpposedCheckMessage(result));
+    },
+    [activeActorDoc, selectedSpeaker, addMessage],
+  );
+
+  const handleRerollOpposed = useCallback(
+    (target: OpposedCheckMessage) => {
+      const { primary, secondary } = target.check.intent;
+      const dieSizes = {
+        primary: resolveAttributeDie(activeActorDoc, primary),
+        secondary: resolveAttributeDie(activeActorDoc, secondary),
+      };
+      const intent = prepareCheck({ primary, secondary });
+      const rolls = rollCheck(dieSizes);
+      const result = processOpposedCheck(
+        intent,
+        rolls,
+        dieSizes,
+        selectedSpeaker,
+        target.id,
+        target.check.opposedToResult,
+        target.check.opposedToSpeaker,
+        target.check.opposedToCritical,
+        target.check.opposedToFumble,
+      );
+      addMessage(buildOpposedCheckMessage(result));
+    },
+    [activeActorDoc, selectedSpeaker, addMessage],
+  );
+
   // Create a setPlayer callback that persists changes to the database
   const setActiveActorDoc = useCallback(
     async (updater: TypePlayer | ((prev: TypePlayer) => TypePlayer)) => {
@@ -354,37 +414,45 @@ export const ChatPanel: React.FC = () => {
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <MessageListErrorBoundary>
-        <Box
-          sx={{
-            px: 2,
-            pt: 2,
-            pb: 2,
-            flex: 1,
-            overflowY: "auto",
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-          }}
-        >
-          {store.messages.length === 0 && (
-            <Typography variant="body2" color="text.secondary">
-              Start chatting or roll from the dice tray below.
-            </Typography>
-          )}
-          {store.messages.map((message) => (
-            <BaseMessageTemplate
-              key={message.id}
-              speaker={message.speaker || AUTHOR_NAME}
-              timeAgo={formatTimeAgo(message.createdAt)}
-              onDelete={() => store.deleteMessage(message.id)}
-            >
-              <MessageContent message={message} />
-            </BaseMessageTemplate>
-          ))}
-          <Box ref={endOfMessagesRef} />
-        </Box>
-      </MessageListErrorBoundary>
+      <ChatActionsProvider
+        value={{
+          onOppose: activeActorDoc ? handleOppose : null,
+          onRerollOpposed: activeActorDoc ? handleRerollOpposed : null,
+          selectedSpeaker,
+        }}
+      >
+        <MessageListErrorBoundary>
+          <Box
+            sx={{
+              px: 2,
+              pt: 2,
+              pb: 2,
+              flex: 1,
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+            }}
+          >
+            {store.messages.length === 0 && (
+              <Typography variant="body2" color="text.secondary">
+                Start chatting or roll from the dice tray below.
+              </Typography>
+            )}
+            {store.messages.map((message) => (
+              <BaseMessageTemplate
+                key={message.id}
+                speaker={message.speaker || AUTHOR_NAME}
+                timeAgo={formatTimeAgo(message.createdAt)}
+                onDelete={() => store.deleteMessage(message.id)}
+              >
+                <MessageContent message={message} />
+              </BaseMessageTemplate>
+            ))}
+            <Box ref={endOfMessagesRef} />
+          </Box>
+        </MessageListErrorBoundary>
+      </ChatActionsProvider>
 
       <Divider />
 

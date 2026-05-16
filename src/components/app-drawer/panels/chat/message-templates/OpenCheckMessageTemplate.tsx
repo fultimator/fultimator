@@ -5,75 +5,42 @@ import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
 import type { CheckResult } from "../types";
 import Diamond from "../../../../Diamond";
+import {
+  ATTR_LABEL,
+  STUDY_TIERS,
+  dieCellSx,
+  gridSx,
+} from "./openCheckTemplate.constants";
 
-const ATTR_LABEL: Record<string, string> = {
-  dex: "DEX",
-  ins: "INS",
-  mig: "MIG",
-  wlp: "WLP",
-};
-
-const dieCellSx = {
-  display: "flex",
-  flexDirection: "column" as const,
-  alignItems: "center",
-  gap: 0.25,
-  px: 0.75,
-  py: 0.5,
-  borderRadius: 1.25,
-  border: "1px solid",
-  backgroundColor: "background.default",
-  minWidth: 50,
-};
-
-const gridSx = {
-  px: 0.75,
-  py: 0.5,
-  display: "grid",
-  gridTemplateColumns: "24px max-content max-content 24px",
-  justifyContent: "center",
-  alignItems: "center",
-  gap: 1,
-};
-
-interface CheckMessageTemplateProps {
+interface OpenCheckMessageTemplateProps {
   check: CheckResult;
+  onOppose?: () => void;
 }
 
-export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
-  check,
-}) => {
+export const OpenCheckMessageTemplate: React.FC<
+  OpenCheckMessageTemplateProps
+> = ({ check, onOppose }) => {
   const theme = useTheme();
   const originAction =
     typeof check.additionalData?.originAction === "string"
       ? check.additionalData.originAction
       : undefined;
-  const originLabel =
-    originAction === "hinder"
-      ? "Hinder"
-      : originAction === "study"
-        ? "Study"
-        : undefined;
-  const isSuccess = check.passed === true && !check.critical && !check.fumble;
-  const isFailure = check.passed === false && !check.critical && !check.fumble;
+  const isStudy = originAction === "study";
+
   const accentColor = check.critical
     ? "#ffcc56"
     : check.fumble
       ? "#b087a6"
-      : isSuccess
-        ? "#91c469"
-        : isFailure
-          ? "#edb7aa"
-          : "primary.main";
+      : `primary.main`;
   const accentBackgroundImage = check.critical
     ? "linear-gradient(to bottom, #f7c754, #d17f10)"
     : check.fumble
       ? "linear-gradient(to bottom, #b087a6, #15031e)"
-      : isSuccess
-        ? "linear-gradient(to bottom, #91c469, #228c22)"
-        : isFailure
-          ? "linear-gradient(to bottom, #d99689, #880012)"
-          : `linear-gradient(to bottom, ${alpha(theme.palette.primary.light, 0.72)}, ${alpha(theme.palette.primary.dark, 0.8)})`;
+      : `linear-gradient(to bottom, ${alpha(theme.palette.primary.light, 0.72)}, ${alpha(theme.palette.primary.dark, 0.8)})`;
+
+  const studyTier = isStudy
+    ? STUDY_TIERS.find((t) => check.result >= t.threshold)
+    : null;
 
   return (
     <>
@@ -82,17 +49,11 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         color="text.secondary"
         sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
       >
-        Attribute Check
-        {originLabel && (
+        Open Check
+        {isStudy && (
           <>
             {" "}
-            <Diamond color="inherit" /> {originLabel}
-          </>
-        )}
-        {check.intent.difficulty != null && (
-          <>
-            {" "}
-            <Diamond color="inherit" /> DL {check.intent.difficulty}
+            <Diamond color="inherit" /> Study
           </>
         )}
       </Typography>
@@ -156,16 +117,12 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         sx={{
           mt: 1,
           borderRadius: 1.5,
-          border: check.critical
-            ? "2px solid"
-            : check.fumble
-              ? "2px solid"
-              : "1px solid",
+          border: check.critical || check.fumble ? "2px solid" : "1px solid",
           borderColor: check.critical
             ? "#ffcc56"
             : check.fumble
               ? "#b087a6"
-              : accentColor,
+              : "primary.main",
           overflow: "hidden",
         }}
       >
@@ -208,19 +165,82 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
                 "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
             }}
           >
-            {check.critical
-              ? "Critical"
-              : check.fumble
-                ? "Fumble!"
-                : check.passed == null
-                  ? "Result"
-                  : check.passed
-                    ? "Success"
-                    : "Failure"}
+            {check.critical ? "Critical" : check.fumble ? "Fumble!" : "Result"}
           </Typography>
           <Box />
         </Box>
+
+        {isStudy && (
+          <Box sx={{ px: 1, py: 0.75, borderTop: "1px solid", borderColor: "divider" }}>
+            {STUDY_TIERS.map((tier) => {
+              const reached = check.result >= tier.threshold;
+              const isActive = studyTier?.threshold === tier.threshold;
+              return (
+                <Box
+                  key={tier.threshold}
+                  sx={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "space-between",
+                    py: 0.25,
+                    opacity: reached ? 1 : 0.35,
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: isActive ? 800 : 600,
+                      minWidth: 24,
+                      color: isActive ? "text.primary" : "text.secondary",
+                    }}
+                  >
+                    {tier.threshold}+
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: isActive ? 800 : 600,
+                      color: isActive ? "text.primary" : "text.secondary",
+                      flex: 1,
+                      textAlign: "right",
+                    }}
+                  >
+                    {tier.label}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+        )}
       </Box>
+
+      {onOppose && (
+        <Typography
+          component="button"
+          variant="caption"
+          onClick={onOppose}
+          sx={{
+            mt: 0.75,
+            display: "block",
+            width: "100%",
+            cursor: "pointer",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            px: 1,
+            py: 0.5,
+            background: "none",
+            color: "text.secondary",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            fontWeight: 700,
+            textAlign: "center",
+            "&:hover": { borderColor: "text.primary", color: "text.primary" },
+          }}
+        >
+          Oppose
+        </Typography>
+      )}
     </>
   );
 };

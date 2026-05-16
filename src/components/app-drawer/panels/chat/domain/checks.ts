@@ -1,11 +1,14 @@
 import { createId } from "./rolls";
 import type {
   Attribute,
+  AttributeCheckMessage,
   CheckDieResult,
   CheckIntent,
-  CheckMessage,
   CheckModifier,
   CheckResult,
+  OpenCheckMessage,
+  OpposedCheckMessage,
+  OpposedCheckResult,
 } from "../types";
 
 function rollDie(sides: number): number {
@@ -80,12 +83,68 @@ export function processCheck(
   };
 }
 
-export function buildCheckMessage(check: CheckResult): CheckMessage {
+export function buildAttributeCheckMessage(
+  check: CheckResult,
+): AttributeCheckMessage {
   return {
     id: createId(),
     createdAt: Date.now(),
     speaker: check.speaker,
-    kind: "check",
+    kind: "attribute",
     check,
   };
+}
+
+export function buildOpenCheckMessage(check: CheckResult): OpenCheckMessage {
+  return {
+    id: createId(),
+    createdAt: Date.now(),
+    speaker: check.speaker,
+    kind: "open",
+    check,
+  };
+}
+
+export function buildOpposedCheckMessage(
+  check: OpposedCheckResult,
+): OpposedCheckMessage {
+  return {
+    id: createId(),
+    createdAt: Date.now(),
+    speaker: check.speaker,
+    kind: "opposed",
+    check,
+  };
+}
+
+export function processOpposedCheck(
+  intent: CheckIntent,
+  rolls: { primaryDie: number; secondaryDie: number },
+  dieSizes: { primary: number; secondary: number },
+  speaker: string | undefined,
+  opposedToId: string,
+  opposedToResult: number,
+  opposedToSpeaker: string | undefined,
+  opposedToCritical?: boolean,
+  opposedToFumble?: boolean,
+): OpposedCheckResult {
+  const base = processCheck(intent, rolls, dieSizes, speaker);
+  return {
+    ...base,
+    opposedToId,
+    opposedToResult,
+    opposedToSpeaker,
+    opposedToCritical,
+    opposedToFumble,
+  };
+}
+
+export function isOpposedTied(check: OpposedCheckResult): boolean {
+  // Both crit or both fumble > must reroll
+  if (check.critical && check.opposedToCritical) return true;
+  if (check.fumble && check.opposedToFumble) return true;
+  // Fumble always loses, critical always wins > not a tie
+  if (check.fumble || check.critical || check.opposedToCritical || check.opposedToFumble)
+    return false;
+  return check.result === check.opposedToResult;
 }

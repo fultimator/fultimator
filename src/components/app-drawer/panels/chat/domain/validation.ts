@@ -1,5 +1,11 @@
 import type { ChatMessage } from "../types";
 
+const isCheckResult = (check: unknown): boolean => {
+  if (!check || typeof check !== "object") return false;
+  const c = check as Record<string, unknown>;
+  return typeof c.result === "number" && typeof c.critical === "boolean";
+};
+
 export const isValidChatMessage = (item: unknown): item is ChatMessage => {
   if (!item || typeof item !== "object") return false;
   const message = item as Record<string, unknown>;
@@ -27,6 +33,20 @@ export const isValidChatMessage = (item: unknown): item is ChatMessage => {
   }
 
   if (message.kind === "action") return typeof message.action === "string";
+
+  if (message.kind === "attribute" || message.kind === "open") {
+    return isCheckResult(message.check);
+  }
+
+  if (message.kind === "opposed") {
+    const check = message.check as Record<string, unknown> | undefined;
+    return (
+      isCheckResult(check) &&
+      !!check &&
+      typeof check.opposedToId === "string" &&
+      typeof check.opposedToResult === "number"
+    );
+  }
 
   if (message.kind === "accuracy") {
     const check = message.check as Record<string, unknown> | undefined;

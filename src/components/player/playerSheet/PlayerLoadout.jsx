@@ -487,7 +487,7 @@ export default function PlayerLoadout({
   // Roll
   const getAttrDie = (key) => {
     const normKey = key === "will" ? "willpower" : key;
-    const base = player?.attributes?.[normKey] ?? 8;
+    const base = player?.attributes?.[normKey]?.base ?? 8;
     const cfg = {
       dexterity: [["slow", "enraged"], ["dexUp"]],
       insight: [["dazed", "enraged"], ["insUp"]],

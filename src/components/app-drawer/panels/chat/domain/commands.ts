@@ -3,7 +3,8 @@ import {
   prepareCheck,
   rollCheck,
   processCheck,
-  buildCheckMessage,
+  buildAttributeCheckMessage,
+  buildOpenCheckMessage,
 } from "./checks";
 import {
   prepareAccuracyCheck,
@@ -257,6 +258,7 @@ function runCheckFromParams(
     modifier?: number;
     difficulty?: number;
     additionalData?: Record<string, unknown>;
+    forceKind?: "attribute" | "open";
   },
 ): ChatMessage[] {
   const dieSizes = {
@@ -276,8 +278,16 @@ function runCheckFromParams(
   });
   const rolls = rollCheck(dieSizes);
   const result = processCheck(intent, rolls, dieSizes, context.speaker);
-  return [buildCheckMessage(result)];
+  const kind =
+    params.forceKind ?? (params.difficulty != null ? "attribute" : "open");
+  return [
+    kind === "attribute"
+      ? buildAttributeCheckMessage(result)
+      : buildOpenCheckMessage(result),
+  ];
 }
+
+const CHECK_KINDS = new Set(["open", "attribute", "opposed"]);
 
 const checkCommand: Command = {
   name: "check",
@@ -285,8 +295,8 @@ const checkCommand: Command = {
   description: "Roll an attribute check",
   params: [
     {
-      name: "attr1 attr2",
-      description: "dex ins (valid: dex, ins, mig, wlp)",
+      name: "[open|attribute] attr1 attr2",
+      description: "open dex ins  or  attribute dex ins [modifier] [difficulty]",
       required: true,
     },
   ],
@@ -294,15 +304,27 @@ const checkCommand: Command = {
     if (!context.playerDoc) {
       return { error: "Switch to a character speaker to roll a check." };
     }
-    const parsed = parseCheckArgs(args);
+    const trimmed = args.trim();
+    const firstWord = trimmed.split(/\s+/)[0]?.toLowerCase() ?? "";
+    let forceKind: "open" | "attribute" | undefined;
+    let rest = trimmed;
+    if (CHECK_KINDS.has(firstWord)) {
+      forceKind = firstWord === "attribute" ? "attribute" : "open";
+      rest = trimmed.slice(firstWord.length).trim();
+    }
+    const parsed = parseCheckArgs(rest);
     if ("error" in parsed) {
-      return { error: "Usage: /check <attr1> <attr2>  e.g. /check dex ins" };
+      return {
+        error:
+          "Usage: /check [open|attribute] <attr1> <attr2> [modifier] [difficulty]  e.g. /check open dex ins",
+      };
     }
     return runCheckFromParams(context, {
       primary: parsed.primary,
       secondary: parsed.secondary,
       modifier: parsed.modifier,
       difficulty: parsed.difficulty,
+      forceKind,
     });
   },
 };
@@ -318,6 +340,7 @@ export const ACTION_OPTIONS = [
   "Study",
   "Skill",
   "Other",
+  "Check",
 ] as const;
 
 export type ActionOption = (typeof ACTION_OPTIONS)[number];
@@ -453,6 +476,7 @@ const actionCommand: Command = {
           primary: "ins",
           secondary: "wlp",
           difficulty: 10,
+          forceKind: "attribute",
           additionalData: {
             originAction: "hinder",
             fixedDifficulty: 10,
@@ -472,6 +496,7 @@ const actionCommand: Command = {
         secondary: parsed.secondary,
         modifier: parsed.modifier,
         difficulty: 10,
+        forceKind: "attribute",
         additionalData: { originAction: "hinder", fixedDifficulty: 10 },
       });
     }
@@ -484,7 +509,8 @@ const actionCommand: Command = {
         return runCheckFromParams(context, {
           primary: "ins",
           secondary: "ins",
-          additionalData: { originAction: "study", openCheck: true },
+          forceKind: "open",
+          additionalData: { originAction: "study" },
         });
       }
       const parsed = parseCheckArgs(rawArg);
@@ -498,7 +524,8 @@ const actionCommand: Command = {
         primary: parsed.primary,
         secondary: parsed.secondary,
         modifier: parsed.modifier,
-        additionalData: { originAction: "study", openCheck: true },
+        forceKind: "open",
+        additionalData: { originAction: "study" },
       });
     }
 

@@ -1,12 +1,20 @@
 import React from "react";
 import { TextMessageTemplate } from "./TextMessageTemplate";
 import { RollMessageTemplate } from "./RollMessageTemplate";
-import { CheckMessageTemplate } from "./CheckMessageTemplate";
+import { AttributeCheckMessageTemplate } from "./AttributeCheckMessageTemplate";
+import { OpenCheckMessageTemplate } from "./OpenCheckMessageTemplate";
+import { OpposedCheckMessageTemplate } from "./OpposedCheckMessageTemplate";
 import { ActionMessageTemplate } from "./ActionMessageTemplate";
 import { AccuracyCheckMessageTemplate } from "./AccuracyCheckMessageTemplate";
 import { MagicCheckMessageTemplate } from "./MagicCheckMessageTemplate";
 import { DisplayMessageTemplate } from "./DisplayMessageTemplate";
-import type { ChatMessage } from "../types";
+import type {
+  ChatMessage,
+  AttributeCheckMessage,
+  OpenCheckMessage,
+  OpposedCheckMessage,
+} from "../types";
+import { useChatActions } from "../ChatActionsContext.shared";
 
 type TemplateComponent = React.FC<{ message: ChatMessage }>;
 
@@ -20,9 +28,49 @@ const RollTemplate: TemplateComponent = ({ message }) => {
   return <RollMessageTemplate roll={message.roll} />;
 };
 
-const CheckTemplate: TemplateComponent = ({ message }) => {
-  if (message.kind !== "check") return null;
-  return <CheckMessageTemplate check={message.check} />;
+const OpenCheckTemplate: TemplateComponent = ({ message }) => {
+  const { onOppose, selectedSpeaker } = useChatActions();
+  if (message.kind !== "open") return null;
+  const canOppose =
+    onOppose != null && message.speaker !== selectedSpeaker;
+  return (
+    <OpenCheckMessageTemplate
+      check={message.check}
+      onOppose={
+        canOppose ? () => onOppose(message as OpenCheckMessage) : undefined
+      }
+    />
+  );
+};
+
+const AttributeCheckWithOpposeTemplate: TemplateComponent = ({ message }) => {
+  const { onOppose, selectedSpeaker } = useChatActions();
+  if (message.kind !== "attribute") return null;
+  const canOppose =
+    onOppose != null && message.speaker !== selectedSpeaker;
+  return (
+    <AttributeCheckMessageTemplate
+      check={message.check}
+      onOppose={
+        canOppose ? () => onOppose(message as AttributeCheckMessage) : undefined
+      }
+    />
+  );
+};
+
+const OpposedCheckTemplate: TemplateComponent = ({ message }) => {
+  const { onRerollOpposed } = useChatActions();
+  if (message.kind !== "opposed") return null;
+  return (
+    <OpposedCheckMessageTemplate
+      check={message.check}
+      onReroll={
+        onRerollOpposed != null
+          ? () => onRerollOpposed(message as OpposedCheckMessage)
+          : undefined
+      }
+    />
+  );
 };
 
 const ActionTemplate: TemplateComponent = ({ message }) => {
@@ -48,7 +96,9 @@ const DisplayTemplate: TemplateComponent = ({ message }) => {
 const registry: Record<ChatMessage["kind"], TemplateComponent> = {
   text: TextTemplate,
   generic: RollTemplate,
-  check: CheckTemplate,
+  attribute: AttributeCheckWithOpposeTemplate,
+  open: OpenCheckTemplate,
+  opposed: OpposedCheckTemplate,
   action: ActionTemplate,
   accuracy: AccuracyTemplate,
   magic: MagicTemplate,

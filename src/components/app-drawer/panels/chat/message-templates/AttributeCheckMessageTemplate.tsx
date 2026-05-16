@@ -36,24 +36,22 @@ const gridSx = {
   gap: 1,
 };
 
-interface CheckMessageTemplateProps {
+interface AttributeCheckMessageTemplateProps {
   check: CheckResult;
+  onOppose?: () => void;
 }
 
-export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
-  check,
-}) => {
+export const AttributeCheckMessageTemplate: React.FC<
+  AttributeCheckMessageTemplateProps
+> = ({ check, onOppose }) => {
   const theme = useTheme();
   const originAction =
     typeof check.additionalData?.originAction === "string"
       ? check.additionalData.originAction
       : undefined;
   const originLabel =
-    originAction === "hinder"
-      ? "Hinder"
-      : originAction === "study"
-        ? "Study"
-        : undefined;
+    originAction === "hinder" ? "Hinder" : undefined;
+
   const isSuccess = check.passed === true && !check.critical && !check.fumble;
   const isFailure = check.passed === false && !check.critical && !check.fumble;
   const accentColor = check.critical
@@ -156,11 +154,7 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         sx={{
           mt: 1,
           borderRadius: 1.5,
-          border: check.critical
-            ? "2px solid"
-            : check.fumble
-              ? "2px solid"
-              : "1px solid",
+          border: check.critical || check.fumble ? "2px solid" : "1px solid",
           borderColor: check.critical
             ? "#ffcc56"
             : check.fumble
@@ -221,6 +215,34 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
           <Box />
         </Box>
       </Box>
+
+      {onOppose && (
+        <Typography
+          component="button"
+          variant="caption"
+          onClick={onOppose}
+          sx={{
+            mt: 0.75,
+            display: "block",
+            width: "100%",
+            cursor: "pointer",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            px: 1,
+            py: 0.5,
+            background: "none",
+            color: "text.secondary",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            fontWeight: 700,
+            textAlign: "center",
+            "&:hover": { borderColor: "text.primary", color: "text.primary" },
+          }}
+        >
+          Oppose
+        </Typography>
+      )}
     </>
   );
 };

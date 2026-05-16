@@ -127,8 +127,8 @@ function SpellContextMenu({ spell, npc, onDelete }) {
     const attr1Short = ATTR_SHORT[spell.accuracy?.attr1] ?? "ins";
     const attr2Short = ATTR_SHORT[spell.accuracy?.attr2] ?? "wlp";
     const dieSizes = {
-      primary: npc.attributes?.[spell.accuracy?.attr1] ?? 6,
-      secondary: npc.attributes?.[spell.accuracy?.attr2] ?? 6,
+      primary: npc.attributes?.[spell.accuracy?.attr1]?.base ?? 6,
+      secondary: npc.attributes?.[spell.accuracy?.attr2]?.base ?? 6,
     };
     const intent = prepareMagicCheck({
       attr1: attr1Short,

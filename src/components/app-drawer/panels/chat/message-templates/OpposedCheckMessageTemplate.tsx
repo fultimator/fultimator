@@ -3,8 +3,9 @@ import { Box, Stack, Typography } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
-import type { CheckResult } from "../types";
+import type { OpposedCheckResult } from "../types";
 import Diamond from "../../../../Diamond";
+import { isOpposedTied } from "../domain/checks";
 
 const ATTR_LABEL: Record<string, string> = {
   dex: "DEX",
@@ -36,44 +37,54 @@ const gridSx = {
   gap: 1,
 };
 
-interface CheckMessageTemplateProps {
-  check: CheckResult;
+interface OpposedCheckMessageTemplateProps {
+  check: OpposedCheckResult;
+  onReroll?: () => void;
 }
 
-export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
-  check,
-}) => {
+export const OpposedCheckMessageTemplate: React.FC<
+  OpposedCheckMessageTemplateProps
+> = ({ check, onReroll }) => {
   const theme = useTheme();
-  const originAction =
-    typeof check.additionalData?.originAction === "string"
-      ? check.additionalData.originAction
-      : undefined;
-  const originLabel =
-    originAction === "hinder"
-      ? "Hinder"
-      : originAction === "study"
-        ? "Study"
-        : undefined;
-  const isSuccess = check.passed === true && !check.critical && !check.fumble;
-  const isFailure = check.passed === false && !check.critical && !check.fumble;
+
+  const tied = isOpposedTied(check);
+  const won = tied
+    ? false
+    : check.fumble
+      ? false
+      : check.critical
+        ? true
+        : check.result > check.opposedToResult;
+
   const accentColor = check.critical
     ? "#ffcc56"
     : check.fumble
       ? "#b087a6"
-      : isSuccess
+      : won
         ? "#91c469"
-        : isFailure
-          ? "#edb7aa"
-          : "primary.main";
+        : tied
+          ? "primary.main"
+          : "#edb7aa";
+
   const accentBackgroundImage = check.critical
     ? "linear-gradient(to bottom, #f7c754, #d17f10)"
     : check.fumble
       ? "linear-gradient(to bottom, #b087a6, #15031e)"
-      : isSuccess
+      : won
         ? "linear-gradient(to bottom, #91c469, #228c22)"
-        : isFailure
-          ? "linear-gradient(to bottom, #d99689, #880012)"
-          : `linear-gradient(to bottom, ${alpha(theme.palette.primary.light, 0.72)}, ${alpha(theme.palette.primary.dark, 0.8)})`;
+        : tied
+          ? `linear-gradient(to bottom, ${alpha(theme.palette.primary.light, 0.72)}, ${alpha(theme.palette.primary.dark, 0.8)})`
+          : "linear-gradient(to bottom, #d99689, #880012)";
+
+  const outcomeLabel = check.critical
+    ? "Critical"
+    : check.fumble
+      ? "Fumble!"
+      : won
+        ? "Victory"
+        : tied
+          ? "Tied"
+          : "Defeated";
 
   return (
     <>
@@ -82,17 +93,11 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         color="text.secondary"
         sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
       >
-        Attribute Check
-        {originLabel && (
+        Opposed Check
+        {check.opposedToSpeaker && (
           <>
             {" "}
-            <Diamond color="inherit" /> {originLabel}
-          </>
-        )}
-        {check.intent.difficulty != null && (
-          <>
-            {" "}
-            <Diamond color="inherit" /> DL {check.intent.difficulty}
+            <Diamond color="inherit" /> vs {check.opposedToSpeaker}
           </>
         )}
       </Typography>
@@ -156,11 +161,7 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         sx={{
           mt: 1,
           borderRadius: 1.5,
-          border: check.critical
-            ? "2px solid"
-            : check.fumble
-              ? "2px solid"
-              : "1px solid",
+          border: check.critical || check.fumble ? "2px solid" : "1px solid",
           borderColor: check.critical
             ? "#ffcc56"
             : check.fumble
@@ -208,19 +209,76 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
                 "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
             }}
           >
-            {check.critical
-              ? "Critical"
-              : check.fumble
-                ? "Fumble!"
-                : check.passed == null
-                  ? "Result"
-                  : check.passed
-                    ? "Success"
-                    : "Failure"}
+            {outcomeLabel}
           </Typography>
           <Box />
         </Box>
+
+        <Box
+          sx={{
+            px: 1,
+            py: 0.5,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            display: "flex",
+            justifyContent: "center",
+            gap: 0.5,
+          }}
+        >
+          <Typography variant="caption" color="text.secondary">
+            vs
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 700 }}
+            color="text.primary"
+          >
+            {check.opposedToResult}
+          </Typography>
+          {check.opposedToSpeaker && (
+            <Typography variant="caption" color="text.secondary">
+              ({check.opposedToSpeaker})
+            </Typography>
+          )}
+        </Box>
       </Box>
+
+      {tied && onReroll && (
+        <Typography
+          component="button"
+          variant="caption"
+          onClick={onReroll}
+          sx={{
+            mt: 0.75,
+            display: "block",
+            width: "100%",
+            cursor: "pointer",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            px: 1,
+            py: 0.5,
+            background: "none",
+            color: "text.secondary",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            fontWeight: 700,
+            textAlign: "center",
+            "&:hover": { borderColor: "text.primary", color: "text.primary" },
+          }}
+        >
+          Tied - Reroll
+        </Typography>
+      )}
+      {tied && !onReroll && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 0.75, display: "block", textAlign: "center" }}
+        >
+          Tied - awaiting reroll
+        </Typography>
+      )}
     </>
   );
 };

@@ -31,8 +31,8 @@ function AttackRow({ attack, npc, attackType, showRoll }) {
     const attr1Short = ATTR_SHORT[attack.accuracy?.attr1] ?? "dex";
     const attr2Short = ATTR_SHORT[attack.accuracy?.attr2] ?? "dex";
     const dieSizes = {
-      primary: npc.attributes?.[attack.accuracy?.attr1] ?? 6,
-      secondary: npc.attributes?.[attack.accuracy?.attr2] ?? 6,
+      primary: npc.attributes?.[attack.accuracy?.attr1]?.base ?? 6,
+      secondary: npc.attributes?.[attack.accuracy?.attr2]?.base ?? 6,
     };
     const intent = prepareAccuracyCheck({
       attr1: attr1Short,

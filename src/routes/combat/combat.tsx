@@ -342,8 +342,8 @@ function NpcCombatant({ npc }: NpcProps) {
 
     if (attackType === "weapon") {
       // For weapon attacks
-      attribute1 = attributes[attack.accuracy?.attr1];
-      attribute2 = attributes[attack.accuracy?.attr2];
+      attribute1 = attributes[attack.accuracy?.attr1]?.base ?? attributes[attack.accuracy?.attr1];
+      attribute2 = attributes[attack.accuracy?.attr2]?.base ?? attributes[attack.accuracy?.attr2];
       extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
       extraPrecision =
         (npc.features?.precision?.enabled ? 3 : 0) +
@@ -353,8 +353,8 @@ function NpcCombatant({ npc }: NpcProps) {
     } else if (attackType === "spell") {
       // For spells
       const { attr1, attr2 } = attack;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
+      attribute1 = attributes[attr1]?.base ?? attributes[attr1];
+      attribute2 = attributes[attr2]?.base ?? attributes[attr2];
       extraDamage = 0;
       extraPrecision =
         (npc.features?.magic?.enabled ? 3 : 0) + accuracyLevelBonus;
@@ -363,8 +363,8 @@ function NpcCombatant({ npc }: NpcProps) {
       // For base attacks
       const attr1 = attack.accuracy?.attr1;
       const attr2 = attack.accuracy?.attr2;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
+      attribute1 = attributes[attr1]?.base ?? attributes[attr1];
+      attribute2 = attributes[attr2]?.base ?? attributes[attr2];
       extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
       extraPrecision =
         (npc.features?.precision?.enabled ? 3 : 0) +
@@ -438,8 +438,8 @@ function NpcCombatant({ npc }: NpcProps) {
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
-      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     } else if (attack.spell) {
@@ -453,8 +453,8 @@ function NpcCombatant({ npc }: NpcProps) {
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
-      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     }
@@ -468,8 +468,8 @@ function NpcCombatant({ npc }: NpcProps) {
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
-      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     }

@@ -116,10 +116,11 @@ const NPCDetail = ({
 
   const resolveNpcAttributeDie = (raw) => {
     const key = normalizeAttrKey(raw);
-    const direct = key ? attributes[key] : undefined;
+    const rawDirect = key ? attributes[key] : undefined;
+    const direct = rawDirect && typeof rawDirect === "object" ? rawDirect.base : rawDirect;
     if (Number.isFinite(direct) && direct > 0) return direct;
     const npcAttrs = selectedNPC?.attributes ?? {};
-    const fallback =
+    const rawFallback =
       key === "dexterity"
         ? npcAttrs.dexterity
         : key === "insight"
@@ -129,6 +130,7 @@ const NPCDetail = ({
             : key === "will"
               ? (npcAttrs.will ?? npcAttrs.willpower)
               : undefined;
+    const fallback = rawFallback && typeof rawFallback === "object" ? rawFallback.base : rawFallback;
     return Number.isFinite(fallback) && fallback > 0 ? fallback : 6;
   };
 
