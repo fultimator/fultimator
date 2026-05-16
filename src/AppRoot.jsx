@@ -18,6 +18,7 @@ import { useShallow } from "zustand/react/shallow";
 import { DatabaseProvider } from "./context/DatabaseContext";
 import ErrorBoundary from "./ErrorBoundary";
 import LoadingPage from "./components/common/LoadingPage";
+import { ConfirmDialogProvider } from "./components/common/ConfirmDialogProvider";
 
 const NpcGallery = React.lazy(() => import("./routes/npc-gallery/npc-gallery"));
 const NpcEdit = React.lazy(() => import("./routes/npc-edit/npc-edit"));
@@ -101,6 +102,7 @@ export const App = () => {
       <ThemeProvider theme={currentTheme}>
         <CssBaseline />
         <Router>
+          <ConfirmDialogProvider>
           <ErrorBoundary>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -242,6 +244,7 @@ export const App = () => {
               />
             </Routes>
           </ErrorBoundary>
+          </ConfirmDialogProvider>
         </Router>
       </ThemeProvider>
     </React.StrictMode>

@@ -26,10 +26,10 @@ import CombatLog from "../../components/combatSim/CombatLog";
 import { Cloud as CloudIcon, DragHandle } from "@mui/icons-material";
 import debounce from "lodash.debounce";
 import { globalConfirm } from "../../utility/globalConfirm";
-import { useNavigate } from "react-router";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
+import NpcEditModal from "../../components/combatSim/NpcEditModal";
 import { SignIn } from "../../components/auth";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
@@ -98,7 +98,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const inputRef = useRef(null);
   const [loading, setLoading] = useState(true); // Loading state
   const [initialized, setInitialized] = useState(false); // Initialized state
-  const navigate = useNavigate();
 
   // ========== DB (active adapter - uid auto-injected in cloud mode) ==========
   const [encounterData, setEncounterData] = useState(null);
@@ -209,6 +208,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const isDifferentUser = !isLocalMode && encounter?.uid !== user?.uid;
   const isPrivate = encounter?.private && isDifferentUser;
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [npcEditModalOpen, setNpcEditModalOpen] = useState(false);
 
   // Sync actors to shared store so the chat panel can read them without a Firestore round-trip.
   const setEncounterActors = useCombatEncounterStore((s) => s.setActors);
@@ -1226,20 +1226,22 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     }
   };
 
-  const handleEditNPC = async () => {
+  const handleEditNPC = () => {
     if (!selectedNPC) return;
-    if (isDirty) {
-      const confirm = await globalConfirm(
-        "You have unsaved changes. Are you sure you want to leave?",
-      );
-      if (!confirm) return;
-    }
-    // Navigate to the NPC editor at /npc-gallery/:npcId
-    navigate(`/npc-gallery/${selectedNPC.id}`, {
-      state: {
-        from: `/combat-sim/${id}`,
-      },
-    });
+    setNpcEditModalOpen(true);
+  };
+
+  const handleNpcEditSaved = (updatedNpc) => {
+    setSelectedNPCs((prev) =>
+      prev.map((npc) =>
+        npc.combatId === selectedNPC.combatId
+          ? { ...npc, ...updatedNpc, combatId: npc.combatId, combatStats: npc.combatStats }
+          : npc,
+      ),
+    );
+    setSelectedNPC((prev) =>
+      prev ? { ...prev, ...updatedNpc, combatId: prev.combatId, combatStats: prev.combatStats } : prev,
+    );
   };
 
   const handleSaveClock = (newClock) => {
@@ -1581,6 +1583,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         </Snackbar>
       )}
       {downloadSnackbar}
+      <NpcEditModal
+        npcId={selectedNPC?.id}
+        open={npcEditModalOpen}
+        onClose={() => setNpcEditModalOpen(false)}
+        onSaved={handleNpcEditSaved}
+      />
     </Box>
   );
 };
