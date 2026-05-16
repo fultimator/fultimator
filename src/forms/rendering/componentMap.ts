@@ -17,6 +17,11 @@ import {
   SlotEditorRenderer,
   ReadonlyNumberRenderer,
   RareBonusBlockRenderer,
+  NpcAttrSliderRenderer,
+  NpcAffinitySliderRenderer,
+  NpcArmorSelectRenderer,
+  NpcImmunitiesRenderer,
+  NpcDefenseRadioRenderer,
 } from "./fieldRenderers";
 
 type RendererComponent = React.ComponentType<FieldRendererProps>;
@@ -40,4 +45,9 @@ export const componentMap: Record<ComponentToken, RendererComponent> = {
   "modifier-block": () => null,
   "rare-bonus-block": RareBonusBlockRenderer,
   "martial-toggle": MartialToggleRenderer,
+  "npc-attr-slider": NpcAttrSliderRenderer,
+  "npc-affinity-slider": NpcAffinitySliderRenderer,
+  "npc-armor-select": NpcArmorSelectRenderer,
+  "npc-immunities": NpcImmunitiesRenderer,
+  "npc-defense-radio": NpcDefenseRadioRenderer,
 };

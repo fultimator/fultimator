@@ -1,4 +1,4 @@
-import { imperativeConfirm } from "../components/common/ConfirmDialogProvider";
+import { imperativeConfirm } from "../components/common/imperativeConfirm";
 
 const CONFIRM_TIMEOUT_MS = 1500;
 

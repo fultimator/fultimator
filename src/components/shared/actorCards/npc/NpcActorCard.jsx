@@ -35,6 +35,7 @@ export default function NpcActorCard({
       sx={
         actorSheetEffectsEnabled === false
           ? {
+              width: "100%",
               background: theme.palette.background.paper,
               boxShadow: "none",
               borderTop: "",
@@ -43,7 +44,7 @@ export default function NpcActorCard({
               borderRight: "",
               containerType: "inline-size",
             }
-          : { containerType: "inline-size" }
+          : { width: "100%", containerType: "inline-size" }
       }
     >
       <div

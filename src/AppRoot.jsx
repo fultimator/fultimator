@@ -103,147 +103,147 @@ export const App = () => {
         <CssBaseline />
         <Router>
           <ConfirmDialogProvider>
-          <ErrorBoundary>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route
-                path="/pc-gallery/:playerId"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <PlayerEdit />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/player-edit/:playerId"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <PlayerEdit />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/pc-gallery"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <PlayerGallery />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/player-edit"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <PlayerGallery />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/player-gallery"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <PlayerGallery />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/npc-gallery/:npcId"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <NpcEdit />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/npc-gallery"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <NpcGallery />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/npc-compedium"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <NpcCompedium />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/generate"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <Generator />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/roller"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <Roller />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/roller/:scope"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <RollerScoped />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/combat-sim"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <CombatSimulatorEncounters />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/combat-sim/:id"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <CombatSimulator />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/character-sheet/:playerId"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <CharacterSheet />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/resources"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <Resources />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/compendium"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <CompendiumViewer />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="/debug-menu"
-                element={
-                  <Suspense fallback={<LoadingPage />}>
-                    <DebugMenu />
-                  </Suspense>
-                }
-              />
-            </Routes>
-          </ErrorBoundary>
+            <ErrorBoundary>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route
+                  path="/pc-gallery/:playerId"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <PlayerEdit />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/player-edit/:playerId"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <PlayerEdit />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/pc-gallery"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <PlayerGallery />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/player-edit"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <PlayerGallery />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/player-gallery"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <PlayerGallery />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/npc-gallery/:npcId"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <NpcEdit />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/npc-gallery"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <NpcGallery />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/npc-compedium"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <NpcCompedium />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/generate"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <Generator />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/roller"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <Roller />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/roller/:scope"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <RollerScoped />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/combat-sim"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <CombatSimulatorEncounters />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/combat-sim/:id"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <CombatSimulator />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/character-sheet/:playerId"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <CharacterSheet />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/resources"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <Resources />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/compendium"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <CompendiumViewer />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/debug-menu"
+                  element={
+                    <Suspense fallback={<LoadingPage />}>
+                      <DebugMenu />
+                    </Suspense>
+                  }
+                />
+              </Routes>
+            </ErrorBoundary>
           </ConfirmDialogProvider>
         </Router>
       </ThemeProvider>

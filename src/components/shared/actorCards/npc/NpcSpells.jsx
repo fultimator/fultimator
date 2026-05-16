@@ -24,10 +24,13 @@ function SpellRow({ spell, npc, showRoll }) {
   const handleAction = (e) => {
     e.stopPropagation();
     if (!isOffensive) {
-      const mpCost = spell.cost?.amount != null
-        ? `${spell.cost.amount}${spell.cost.perTarget && spell.maxTargets !== 1 ? " × T" : ""} MP`
-        : null;
-      const tags = [mpCost, spell.targetDescription, spell.duration].filter(Boolean);
+      const mpCost =
+        spell.cost?.amount != null
+          ? `${spell.cost.amount}${spell.cost.perTarget && spell.maxTargets !== 1 ? " × T" : ""} MP`
+          : null;
+      const tags = [mpCost, spell.targetDescription, spell.duration].filter(
+        Boolean,
+      );
       const description = spell.effect || "";
       addMessage({
         id: crypto.randomUUID(),

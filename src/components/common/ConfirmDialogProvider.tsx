@@ -1,14 +1,9 @@
-import React, { createContext, useContext, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import ConfirmConfirmationDialog from "./ConfirmConfirmationDialog";
-
-interface ConfirmOptions {
-  title?: string;
-  message: string;
-}
-
-type ConfirmFn = (options: string | ConfirmOptions) => Promise<boolean>;
-
-const ConfirmDialogContext = createContext<ConfirmFn | null>(null);
+import { setImperativeConfirm } from "./imperativeConfirm";
+import type { ConfirmFn } from "./imperativeConfirm";
+import { ConfirmDialogContext } from "./ConfirmDialogContext";
+import type { ConfirmOptions } from "./ConfirmDialogContext";
 
 interface PendingConfirm {
   options: ConfirmOptions;
@@ -34,8 +29,9 @@ export const ConfirmDialogProvider: React.FC<{ children: React.ReactNode }> = ({
   // Register so globalConfirm.js can call it imperatively
   React.useEffect(() => {
     setImperativeConfirm(confirm);
-    return () => { _imperativeConfirm = null; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      setImperativeConfirm(null);
+    };
   }, []);
 
   const handleClose = () => {
@@ -62,19 +58,3 @@ export const ConfirmDialogProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useConfirm = (): ConfirmFn => {
-  const ctx = useContext(ConfirmDialogContext);
-  if (!ctx) throw new Error("useConfirm must be used within ConfirmDialogProvider");
-  return ctx;
-};
-
-// Imperative escape hatch — set by the provider, consumed by globalConfirm.js
-let _imperativeConfirm: ConfirmFn | null = null;
-
-export const setImperativeConfirm = (fn: ConfirmFn) => {
-  _imperativeConfirm = fn;
-};
-
-export const imperativeConfirm = (options: string | ConfirmOptions): Promise<boolean> | null => {
-  return _imperativeConfirm ? _imperativeConfirm(options) : null;
-};

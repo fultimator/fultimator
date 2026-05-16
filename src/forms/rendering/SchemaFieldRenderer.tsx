@@ -102,7 +102,14 @@ export function SchemaFieldRenderer<
 
         const handleCommit = (newValue: unknown) => {
           const parsed = field.parse ? field.parse(newValue) : newValue;
-          let next: TFormState = { ...state, [field.key]: parsed };
+          let next: TFormState;
+          if (field.key.includes(".")) {
+            next = applyEffects(state, {
+              [field.key]: () => parsed,
+            } as Record<string, (s: TFormState) => unknown>);
+          } else {
+            next = { ...state, [field.key]: parsed };
+          }
           if (field.onChangeEffects) {
             next = applyEffects(
               next,
@@ -115,9 +122,20 @@ export function SchemaFieldRenderer<
           onChange(next);
         };
 
-        const displayValue = field.format
-          ? field.format(state[field.key] as TFormState[keyof TFormState])
+        const rawValue = field.key.includes(".")
+          ? field.key
+              .split(".")
+              .reduce<unknown>(
+                (cur, k) =>
+                  cur != null && typeof cur === "object"
+                    ? (cur as Record<string, unknown>)[k]
+                    : undefined,
+                state,
+              )
           : state[field.key];
+        const displayValue = field.format
+          ? field.format(rawValue as TFormState[keyof TFormState])
+          : rawValue;
 
         const mergedProps = extraProps
           ? { ...field.componentProps, ...extraProps }
