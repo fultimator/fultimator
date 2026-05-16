@@ -37,7 +37,7 @@ import {
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 // import NpcUgly from "../../components/npc/Ugly";
 import {
   ArrowRight,
@@ -720,14 +720,13 @@ function Npc({ npc: rawNpc, copyNpc, shareNpc, reportNpc, collapseGet }) {
         md: 12,
       }}
     >
-      <NpcPretty
+      <NpcActorCard
         npc={npc}
-        ref={ref}
+        cardRef={ref}
         npcImage={""}
         collapse={collapse}
-        onClick={() => {
-          setCollapse(!collapse);
-        }}
+        variant="interactive"
+        onClick={() => setCollapse(!collapse)}
       />
       <Tooltip title={t("Copy to adversary designer")}>
         <IconButton onClick={copyNpc(npc)}>

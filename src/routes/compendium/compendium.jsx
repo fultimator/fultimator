@@ -2039,6 +2039,7 @@ function CompendiumViewer() {
                         item={item}
                         id={itemIds[idx]}
                         onHeaderClick={itemClickHandlers[idx]}
+                        showImageToggle={idx === selectedIdx}
                       />
                     </Box>
                     {idx === selectedIdx && (

@@ -204,7 +204,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const prevClocksRef = useRef(null);
   const prevNotesRef = useRef(null);
   const [tabIndex, setTabIndex] = useState(0); // NPC sheet tab index
-  const [selectedStudy, setSelectedStudy] = useState(0); // NPC study level
+  const [selectedStudy, setSelectedStudy] = useState(0); // NPC study level (0 = full sheet, 1-3 = study tiers)
   const [isSaveSnackbarOpen, setIsSaveSnackbarOpen] = useState(false); // Save notification state
   const isDifferentUser = !isLocalMode && encounter?.uid !== user?.uid;
   const isPrivate = encounter?.private && isDifferentUser;

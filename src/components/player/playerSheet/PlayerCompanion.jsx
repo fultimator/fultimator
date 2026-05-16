@@ -3,7 +3,7 @@ import { Grid, Typography, Paper, Divider, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { useNavigate } from "react-router"; // Use useNavigate instead of useHistory
-import Pretty from "../../npc/Pretty";
+import NpcActorCard from "../../shared/actorCards/npc/NpcActorCard";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
 export default function PlayerCompanion({
@@ -122,7 +122,7 @@ export default function PlayerCompanion({
                 </Grid>
               )}
               <Grid size={12}>
-                <Pretty npc={companion} collapse={true} />
+                <NpcActorCard npc={companion} collapse={true} />
               </Grid>
               {isEditMode && (
                 <>

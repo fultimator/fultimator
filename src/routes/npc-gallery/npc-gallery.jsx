@@ -34,7 +34,7 @@ import {
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 import {
   Delete,
   Download,
@@ -1468,11 +1468,12 @@ function Npc({
             : {}
         }
       >
-        <NpcPretty
+        <NpcActorCard
           npc={npc}
-          ref={ref}
+          cardRef={ref}
           npcImage={npc.imgurl}
           collapse={collapse}
+          variant="interactive"
           onClick={() => {
             if (selectMode) onToggleSelect(npc.id);
             else setCollapse(!collapse);

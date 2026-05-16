@@ -101,7 +101,12 @@ function SpellContextMenu({ spell, npc, onDelete }) {
   };
 
   const handleRoll = () => {
-    if (!spell.isOffensive) {
+    const isOffensive = spell.isOffensive === true || spell.type === "offensive";
+    if (!isOffensive) {
+      const mpCost = spell.cost?.amount != null
+        ? `${spell.cost.amount}${spell.cost.perTarget && spell.maxTargets !== 1 ? " × T" : ""} MP`
+        : null;
+      const tags = [mpCost, spell.targetDescription, spell.duration].filter(Boolean);
       addMessage({
         id: crypto.randomUUID(),
         createdAt: Date.now(),
@@ -109,8 +114,8 @@ function SpellContextMenu({ spell, npc, onDelete }) {
         kind: "display",
         itemType: "spell",
         name: spell.name,
-        tags: [],
-        description: spell.special?.[0] || "",
+        tags,
+        description: spell.effect || "",
       });
       close();
       return;

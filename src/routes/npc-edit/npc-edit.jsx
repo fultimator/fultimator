@@ -22,7 +22,7 @@ import {
   ContentCopy,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 // import NpcUgly from "../../components/npc/Ugly";
 import EditBasics from "../../components/npc/EditBasics";
 import ExplainSkills from "../../components/npc/ExplainSkills";
@@ -361,11 +361,12 @@ export default function NpcEdit() {
               md: 8,
             }}
           >
-            <NpcPretty
+            <NpcActorCard
               npc={npcTemp}
-              ref={prettyRef}
+              cardRef={prettyRef}
               npcImage={npcTemp.imgurl}
               collapse={true}
+              variant="interactive"
             />
           </Grid>
 
@@ -564,7 +565,9 @@ export default function NpcEdit() {
                     md: 6,
                   }}
                 >
-                  <div id="edit-section-actions"><EditActions npc={npcTemp} setNpc={setNpcTemp} /></div>
+                  <div id="edit-section-actions">
+                    <EditActions npc={npcTemp} setNpc={setNpcTemp} />
+                  </div>
                 </Grid>
                 {/* Edit Special Rules */}
                 <Grid
@@ -573,7 +576,9 @@ export default function NpcEdit() {
                     md: 6,
                   }}
                 >
-                  <div id="edit-section-special"><EditSpecial npc={npcTemp} setNpc={setNpcTemp} /></div>
+                  <div id="edit-section-special">
+                    <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
+                  </div>
                 </Grid>
                 {/* Edit Rare Gear */}
                 <Grid
@@ -582,7 +587,9 @@ export default function NpcEdit() {
                     md: 6,
                   }}
                 >
-                  <div id="edit-section-raregear"><EditRareGear npc={npcTemp} setNpc={setNpcTemp} /></div>
+                  <div id="edit-section-raregear">
+                    <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
+                  </div>
                 </Grid>
                 {/* Edit Notes */}
                 <Grid
@@ -591,7 +598,9 @@ export default function NpcEdit() {
                     md: 6,
                   }}
                 >
-                  <div id="edit-section-notes"><EditNotes npc={npcTemp} setNpc={setNpcTemp} /></div>
+                  <div id="edit-section-notes">
+                    <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
+                  </div>
                 </Grid>
               </Grid>
             </Paper>

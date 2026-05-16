@@ -207,7 +207,10 @@ export default function ExplainSkillsSimplified({ npc }) {
                 [t("Special Rules"), calcUsedSkillsFromSpecial],
                 [t("Other Actions"), calcUsedSkillsFromOtherActions],
                 [t("Equipment"), calcUsedSkillsFromEquip],
-                [t("Status Effect Immunities"), calcUsedSkillsFromStatusImmunity],
+                [
+                  t("Status Effect Immunities"),
+                  calcUsedSkillsFromStatusImmunity,
+                ],
               ].map(
                 ([innerLabel, calculator]) =>
                   calculator(npc) > 0 && (
@@ -259,7 +262,10 @@ export default function ExplainSkillsSimplified({ npc }) {
                   >
                     <ListItemText
                       primary={label}
-                      primaryTypographyProps={{ fontSize: "0.9rem", fontWeight: 500 }}
+                      primaryTypographyProps={{
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                      }}
                     />
                   </ListItemButton>
                 );

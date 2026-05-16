@@ -25,7 +25,7 @@ import {
   Edit,
   Download,
 } from "@mui/icons-material";
-import NpcPretty from "../npc/Pretty";
+import NpcActorCard from "../shared/actorCards/npc/NpcActorCard";
 import StatsTab from "./npcDetail/StatsTab";
 import NotesTab from "./npcDetail/NotesTab";
 import AttributeSection from "./npcDetail/AttributeSection";
@@ -618,12 +618,13 @@ const NPCDetail = ({
 
       <Box sx={{ flexGrow: 1, overflowY: "auto", paddingTop: 1 }}>
         {tabIndex === 0 && (
-          <NpcPretty
+          <NpcActorCard
             npc={selectedNPC}
             npcImage={selectedNPC.imgurl}
             collapse={true}
             study={selectedStudy}
-            ref={npcRef}
+            cardRef={npcRef}
+            variant="interactive"
           />
         )}
         {tabIndex === 1 && (
@@ -686,7 +687,7 @@ const NPCDetail = ({
                 },
               }}
             >
-              <MenuItem value={0}>{t("combat_sim_study")}</MenuItem>
+              <MenuItem value={0}>-</MenuItem>
               <MenuItem value={1}>
                 {studyValues === "default" ? "10+" : "7+"}
               </MenuItem>
@@ -859,7 +860,7 @@ const NPCDetail = ({
                 {/* Left side: Select + Download */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Select
-                    value={selectedStudy}
+                    value={selectedStudy ?? "sheet"}
                     onChange={handleStudyChange}
                     size="small"
                     sx={{
@@ -868,7 +869,7 @@ const NPCDetail = ({
                       },
                     }}
                   >
-                    <MenuItem value={0}>{t("combat_sim_study")}</MenuItem>
+                    <MenuItem value="sheet">{t("Sheet")}</MenuItem>
                     <MenuItem value={1}>
                       {studyValues === "default" ? "10+" : "7+"}
                     </MenuItem>

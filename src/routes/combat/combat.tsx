@@ -22,7 +22,7 @@ import { useDatabase } from "../../hooks/useDatabase";
 
 import { SignIn } from "../../components/auth";
 import Layout from "../../components/Layout";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 import PointBar from "../../components/PointBar";
 import { calcHP, calcMP } from "../../libs/npcs";
 import { useEffect } from "react";
@@ -467,12 +467,13 @@ function NpcCombatant({ npc }: NpcProps) {
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid size={6}>
-        <NpcPretty
+        <NpcActorCard
           npc={npc}
           study={selectedStudy}
           npcImage={npc.imgurl}
-          ref={ref}
+          cardRef={ref}
           collapse={true}
+          variant="interactive"
         />
         <Grid container size={12} sx={{ mt: 5 }}>
           <Grid size={2}>
@@ -487,9 +488,9 @@ function NpcCombatant({ npc }: NpcProps) {
               fullWidth
             >
               <MenuItem value={0}>-</MenuItem>
-              <MenuItem value={1}>7+</MenuItem>
-              <MenuItem value={2}>10+</MenuItem>
-              <MenuItem value={3}>13+</MenuItem>
+              <MenuItem value={1}>10+</MenuItem>
+              <MenuItem value={2}>13+</MenuItem>
+              <MenuItem value={3}>16+</MenuItem>
             </Select>
           </Grid>
           {/* Download Button */}
