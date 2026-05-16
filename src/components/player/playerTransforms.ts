@@ -986,6 +986,39 @@ function unifyPlayerDefensiveEquipmentSchema(player: TypePlayer): TypePlayer {
   };
 }
 
+function actorAlignmentV10Player(player: TypePlayer): TypePlayer {
+  const rawAttrs = player.attributes as unknown as Record<string, unknown>;
+  return {
+    ...player,
+    attributes: {
+      might: {
+        base:
+          (rawAttrs.might as { base?: number } | undefined)?.base ??
+          (rawAttrs.might as number | undefined) ??
+          8,
+      },
+      insight: {
+        base:
+          (rawAttrs.insight as { base?: number } | undefined)?.base ??
+          (rawAttrs.insight as number | undefined) ??
+          8,
+      },
+      will: {
+        base:
+          (rawAttrs.will as { base?: number } | undefined)?.base ??
+          (rawAttrs.will as number | undefined) ??
+          8,
+      },
+      dexterity: {
+        base:
+          (rawAttrs.dexterity as { base?: number } | undefined)?.base ??
+          (rawAttrs.dexterity as number | undefined) ??
+          8,
+      },
+    },
+  };
+}
+
 // One-time versioned migrations.
 // Each transform brings the player up to its declared schema version.
 // Skipped if schemaVersion is already >= the transform's version.
@@ -1038,6 +1071,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Unify armor/shield/accessory schema: normalize martial, cost/value, and precision modifier parity",
     fn: unifyPlayerDefensiveEquipmentSchema,
+  },
+  {
+    version: 10,
+    label:
+      "Actor alignment v10: shared interfaces; attributes { base } shape introduced",
+    fn: actorAlignmentV10Player,
   },
 ];
 

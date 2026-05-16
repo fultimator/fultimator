@@ -46,3 +46,44 @@ export interface ResourceCost {
   amount: number;
   perTarget: boolean;
 }
+
+export interface ActorAttributeValue {
+  base: number;
+}
+
+export interface ActorAttributes {
+  might: ActorAttributeValue;
+  insight: ActorAttributeValue;
+  will: ActorAttributeValue;
+  dexterity: ActorAttributeValue;
+}
+
+export interface ActorAffinities {
+  physical: Affinities;
+  air: Affinities;
+  bolt: Affinities;
+  dark: Affinities;
+  earth: Affinities;
+  fire: Affinities;
+  ice: Affinities;
+  light: Affinities;
+  poison: Affinities;
+}
+
+export interface ActorImmunities {
+  slow: boolean;
+  dazed: boolean;
+  weak: boolean;
+  shaken: boolean;
+  enraged: boolean;
+  poisoned: boolean;
+}
+
+export interface ActorStatuses {
+  slow: boolean;
+  dazed: boolean;
+  weak: boolean;
+  shaken: boolean;
+  enraged: boolean;
+  poisoned: boolean;
+}

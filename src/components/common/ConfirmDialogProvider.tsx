@@ -57,4 +57,3 @@ export const ConfirmDialogProvider: React.FC<{ children: React.ReactNode }> = ({
     </ConfirmDialogContext.Provider>
   );
 };
-

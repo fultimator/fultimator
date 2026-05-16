@@ -217,8 +217,13 @@ function NpcCombatant({ npc }: NpcProps) {
     };
   };
 
-  const adjustAttribute = (attribute = 0, amount = 0, min = 6) => {
-    return attribute + amount <= min ? min : attribute + amount;
+  const adjustAttribute = (
+    attr: { base: number },
+    amount: number,
+    min = 6,
+  ): { base: number } => {
+    const next = attr.base + amount;
+    return { base: next <= min ? min : next };
   };
 
   useEffect(() => {

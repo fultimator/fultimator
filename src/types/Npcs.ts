@@ -1,16 +1,19 @@
-import { Affinities, ResourceCost, Accuracy, Damage } from "./Misc";
+import {
+  ResourceCost,
+  Accuracy,
+  Damage,
+  ActorAttributes,
+  ActorAffinities,
+  ActorImmunities,
+  ActorStatuses,
+} from "./Misc";
 import type {
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
   NpcArmor as EquipmentNpcArmor,
 } from "./Equipment";
 
-export interface NpcAttributes {
-  might: number;
-  insight: number;
-  will: number;
-  dexterity: number;
-}
+export type NpcAttributes = ActorAttributes;
 
 export type NpcArmor = EquipmentNpcArmor;
 
@@ -55,36 +58,33 @@ export interface NpcRareGear {
 export interface NpcExtra {
   init?: boolean;
   precision?: boolean;
-  hp?: number;
-  mp?: number;
   magic?: boolean;
-  def?: number;
-  mDef?: number;
-  defOverride?: boolean;
-  mDefOverride?: boolean;
-  extrainit?: number;
   statusImmunity?: number;
 }
 
-export interface NpcAffinities {
-  physical?: Affinities;
-  air?: Affinities;
-  bolt?: Affinities;
-  dark?: Affinities;
-  earth?: Affinities;
-  fire?: Affinities;
-  ice?: Affinities;
-  light?: Affinities;
-  poison?: Affinities;
+export type NpcAffinities = ActorAffinities;
+
+export type NpcImmunities = ActorImmunities;
+
+export interface NpcResourcePool {
+  current: number;
+  bonus: number;
 }
 
-export interface NpcImmunities {
-  slow: boolean;
-  dazed: boolean;
-  weak: boolean;
-  shaken: boolean;
-  enraged: boolean;
-  poisoned: boolean;
+export interface NpcResources {
+  hp: NpcResourcePool;
+  mp: NpcResourcePool;
+}
+
+export interface NpcDerivedStat {
+  bonus: number;
+  override?: number;
+}
+
+export interface NpcDerived {
+  def: NpcDerivedStat;
+  mdef: NpcDerivedStat;
+  init: { bonus: number };
 }
 
 export interface NpcNotes {
@@ -122,7 +122,6 @@ export interface TypeNpc {
   weaponattacks?: NpcWeaponAttack[];
   description?: string;
   armor?: NpcArmor;
-  sheild?: NpcArmor;
   shield?: NpcArmor;
   raregear?: NpcRareGear[];
   label?: string;
@@ -132,4 +131,7 @@ export interface TypeNpc {
   createdBy?: string;
   language?: string;
   published?: boolean;
+  statuses?: ActorStatuses;
+  resources?: NpcResources;
+  derived?: NpcDerived;
 }

@@ -14,11 +14,15 @@ const NpcAffinitiesSchema = z.object({
   poison: AffinityValueSchema.optional(),
 });
 
+const NpcAttributeValueSchema = z.object({
+  base: z.number().int().min(6).max(12),
+});
+
 const NpcAttributesSchema = z.object({
-  dexterity: z.number().int().min(6).max(12),
-  insight: z.number().int().min(6).max(12),
-  might: z.number().int().min(6).max(12),
-  will: z.number().int().min(6).max(12),
+  dexterity: NpcAttributeValueSchema,
+  insight: NpcAttributeValueSchema,
+  might: NpcAttributeValueSchema,
+  will: NpcAttributeValueSchema,
 });
 
 const NpcImmunitiesSchema = z.object({
@@ -33,15 +37,29 @@ const NpcImmunitiesSchema = z.object({
 const NpcExtraSchema = z.object({
   init: z.boolean().optional(),
   precision: z.boolean().optional(),
-  hp: z.number().optional(),
-  mp: z.number().optional(),
   magic: z.boolean().optional(),
-  def: z.number().optional(),
-  mDef: z.number().optional(),
-  defOverride: z.boolean().optional(),
-  mDefOverride: z.boolean().optional(),
-  extrainit: z.number().optional(),
   statusImmunity: z.number().int().min(0).max(3).optional(),
+});
+
+const NpcResourcePoolSchema = z.object({
+  current: z.number(),
+  bonus: z.number(),
+});
+
+const NpcResourcesSchema = z.object({
+  hp: NpcResourcePoolSchema,
+  mp: NpcResourcePoolSchema,
+});
+
+const NpcDerivedStatSchema = z.object({
+  bonus: z.number(),
+  override: z.number().optional(),
+});
+
+const NpcDerivedSchema = z.object({
+  def: NpcDerivedStatSchema,
+  mdef: NpcDerivedStatSchema,
+  init: z.object({ bonus: z.number() }),
 });
 
 const NpcArmorSchema = z
@@ -161,7 +179,6 @@ export const NpcPersistedSchema = z.object({
   extra: NpcExtraSchema.optional(),
   armor: NpcArmorSchema.optional(),
   shield: NpcArmorSchema.optional(),
-  sheild: NpcArmorSchema.optional(),
   attacks: z.array(NpcAttackSchema).default([]),
   weaponattacks: z.array(NpcWeaponAttackSchema).default([]),
   spells: z.array(NpcSpellSchema).default([]),
@@ -175,6 +192,8 @@ export const NpcPersistedSchema = z.object({
   createdBy: z.string().optional(),
   language: z.string().optional(),
   published: z.boolean().optional(),
+  resources: NpcResourcesSchema.optional(),
+  derived: NpcDerivedSchema.optional(),
 });
 
 export type NpcPersisted = z.infer<typeof NpcPersistedSchema>;

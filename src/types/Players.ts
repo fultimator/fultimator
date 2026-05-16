@@ -1,4 +1,12 @@
-import { Affinities, ResourceCost, Accuracy, Damage, Attributes } from "./Misc";
+import {
+  ResourceCost,
+  Accuracy,
+  Damage,
+  ActorAttributes,
+  ActorAffinities,
+  ActorImmunities,
+  ActorStatuses,
+} from "./Misc";
 import type {
   Weapon as EquipmentWeapon,
   CustomWeapon as EquipmentCustomWeapon,
@@ -89,12 +97,7 @@ export interface PlayerInfo {
   imgurl: string;
 }
 
-export interface PlayerAttributes {
-  might: number;
-  insight: number;
-  will: number;
-  dexterity: number;
-}
+export type PlayerAttributes = ActorAttributes;
 
 export interface StatValues {
   base: number;
@@ -107,35 +110,11 @@ export interface PlayerStats {
   ip: StatValues;
 }
 
-export interface PlayerStatuses {
-  slow: boolean;
-  dazed: boolean;
-  enraged: boolean;
-  weak: boolean;
-  shaken: boolean;
-  poisoned: boolean;
-}
+export type PlayerStatuses = ActorStatuses;
 
-export interface PlayerImmunities {
-  slow: boolean;
-  dazed: boolean;
-  weak: boolean;
-  shaken: boolean;
-  enraged: boolean;
-  poisoned: boolean;
-}
+export type PlayerImmunities = ActorImmunities;
 
-export interface PlayerAffinities {
-  physical: Affinities;
-  air: Affinities;
-  bolt: Affinities;
-  dark: Affinities;
-  earth: Affinities;
-  fire: Affinities;
-  ice: Affinities;
-  light: Affinities;
-  poison: Affinities;
-}
+export type PlayerAffinities = ActorAffinities;
 
 export interface OtherBenefits {
   description: string;

@@ -15,21 +15,38 @@ const BLANK_IMMUNITIES: NpcImmunities = {
   poisoned: false,
 };
 
+const BLANK_AFFINITIES: NpcAffinities = {
+  physical: Affinities.None,
+  air: Affinities.None,
+  bolt: Affinities.None,
+  dark: Affinities.None,
+  earth: Affinities.None,
+  fire: Affinities.None,
+  ice: Affinities.None,
+  light: Affinities.None,
+  poison: Affinities.None,
+};
+
 const SPECIES_EFFECTS: Record<string, SpeciesEffect> = {
   Construct: {
-    affinities: { poison: Affinities.Immunity, earth: Affinities.Resistance },
+    affinities: {
+      ...BLANK_AFFINITIES,
+      poison: Affinities.Immunity,
+      earth: Affinities.Resistance,
+    },
     immunities: { poisoned: true },
   },
   Elemental: {
-    affinities: { poison: Affinities.Immunity },
+    affinities: { ...BLANK_AFFINITIES, poison: Affinities.Immunity },
     immunities: { poisoned: true },
   },
   Plant: {
-    affinities: {},
+    affinities: { ...BLANK_AFFINITIES },
     immunities: { dazed: true, shaken: true, enraged: true },
   },
   Undead: {
     affinities: {
+      ...BLANK_AFFINITIES,
       dark: Affinities.Immunity,
       poison: Affinities.Immunity,
       light: Affinities.Vulnerability,
@@ -39,7 +56,12 @@ const SPECIES_EFFECTS: Record<string, SpeciesEffect> = {
 };
 
 export function getSpeciesEffect(species: string): SpeciesEffect {
-  return SPECIES_EFFECTS[species] ?? { affinities: {}, immunities: {} };
+  return (
+    SPECIES_EFFECTS[species] ?? {
+      affinities: { ...BLANK_AFFINITIES },
+      immunities: {},
+    }
+  );
 }
 
 export function applySpeciesEffects(species: string): {

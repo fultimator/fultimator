@@ -1,10 +1,12 @@
 export function calcHP(npc) {
   if (!npc || !npc.attributes) return 0;
-  let hp = 2 * npc.lvl + 5 * npc.attributes.might;
+  const might = npc.attributes.might?.base ?? npc.attributes.might ?? 8;
+  let hp = 2 * npc.lvl + 5 * might;
 
   // Skill Extra HP
-  if (npc.extra?.hp) {
-    hp += parseInt(npc.extra.hp);
+  const hpBonus = npc.resources?.hp.bonus ?? npc.extra?.hp ?? 0;
+  if (hpBonus) {
+    hp += parseInt(hpBonus);
   }
 
   // Rank
@@ -35,8 +37,9 @@ export function calcHP(npc) {
   if (npc.rank === "companion") {
     const sl = npc.companionlvl || 1;
     const lvl = npc.companionpclvl || 5;
-    const extraHP = npc.extra && npc.extra.hp ? parseInt(npc.extra.hp) : 0;
-    hp = sl * npc.attributes.might + Math.floor(lvl / 2) + extraHP;
+    const extraHP =
+      npc.resources?.hp.bonus ?? (npc.extra?.hp ? parseInt(npc.extra.hp) : 0);
+    hp = sl * might + Math.floor(lvl / 2) + extraHP;
   }
 
   if (npc.rank === "groupvehicle") {
@@ -48,10 +51,12 @@ export function calcHP(npc) {
 
 export function calcMP(npc) {
   if (!npc || !npc.attributes) return 0;
-  let mp = npc.lvl + 5 * npc.attributes.will;
+  const will = npc.attributes.will?.base ?? npc.attributes.will ?? 8;
+  let mp = npc.lvl + 5 * will;
   // Skill Extra MP
-  if (npc.extra?.mp) {
-    mp += parseInt(npc.extra.mp);
+  const mpBonus = npc.resources?.mp.bonus ?? npc.extra?.mp ?? 0;
+  if (mpBonus) {
+    mp += parseInt(mpBonus);
   }
   // Rank
   if (
@@ -70,10 +75,14 @@ export function calcMP(npc) {
 
 export function calcInit(npc) {
   if (!npc || !npc.attributes) return 0;
-  let init = (npc.attributes.dexterity + npc.attributes.insight) / 2;
+  const dexterity =
+    npc.attributes.dexterity?.base ?? npc.attributes.dexterity ?? 8;
+  const insight = npc.attributes.insight?.base ?? npc.attributes.insight ?? 8;
+  let init = (dexterity + insight) / 2;
 
   // Skill Extra Init
-  let flatinit = Number(npc.extra?.extrainit);
+  const initBonus = npc.derived?.init.bonus ?? npc.extra?.extrainit ?? 0;
+  let flatinit = Number(initBonus);
   if (!isNaN(flatinit)) {
     init += flatinit;
   }
@@ -117,10 +126,9 @@ export function calcDef(npc) {
   let def = 0;
 
   // Check if DEF is overridden
-  if (npc.extra?.defOverride) {
-    // When overridden, only use the override value
-    return npc.extra?.def || 0;
-  }
+  const d = npc.derived?.def;
+  if (d?.override !== undefined) return d.override;
+  if (!d && npc.extra?.defOverride) return npc.extra?.def || 0; // pre-v10 fallback
 
   // Normal calculation when not overridden
   // Armor
@@ -134,9 +142,7 @@ export function calcDef(npc) {
   }
 
   // Skill Extra def (bonus)
-  if (npc.extra?.def) {
-    def += npc.extra?.def;
-  }
+  def += d?.bonus ?? npc.extra?.def ?? 0;
 
   return def;
 }
@@ -145,10 +151,9 @@ export function calcMDef(npc) {
   let mdef = 0;
 
   // Check if M.DEF is overridden
-  if (npc.extra?.mDefOverride) {
-    // When overridden, only use the override value
-    return npc.extra?.mDef || 0;
-  }
+  const d = npc.derived?.mdef;
+  if (d?.override !== undefined) return d.override;
+  if (!d && npc.extra?.mDefOverride) return npc.extra?.mDef || 0; // pre-v10 fallback
 
   // Normal calculation when not overridden
   // Armor
@@ -162,9 +167,7 @@ export function calcMDef(npc) {
   }
 
   // Skill Extra M def (bonus)
-  if (npc.extra?.mDef) {
-    mdef += npc.extra?.mDef;
-  }
+  mdef += d?.bonus ?? npc.extra?.mDef ?? 0;
 
   return mdef;
 }

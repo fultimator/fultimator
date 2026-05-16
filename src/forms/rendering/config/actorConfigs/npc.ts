@@ -54,8 +54,8 @@ const notCompanion = (s: NpcFormState) => s.rank !== "companion";
 const isCompanion = (s: NpcFormState) => s.rank === "companion";
 const isGroupVehicle = (s: NpcFormState) => s.rank === "groupvehicle";
 const noDefOverride = (s: NpcFormState) =>
-  !(s.extra as TypeNpc["extra"])?.defOverride &&
-  !(s.extra as TypeNpc["extra"])?.mDefOverride;
+  s.derived?.def?.override === undefined &&
+  s.derived?.mdef?.override === undefined;
 
 const ATTR_SLIDER = { min: 6, max: 12, step: 2, showMarks: false };
 

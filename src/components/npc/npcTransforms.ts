@@ -1,6 +1,12 @@
-import { TypeNpc } from "../../types/Npcs";
+import {
+  TypeNpc,
+  NpcAttributes,
+  NpcResources,
+  NpcDerived,
+} from "../../types/Npcs";
 import { Affinities, Elements } from "../../types/Misc";
 import { normalizeDefensiveItem } from "../../libs/equipmentDefensiveNormalization";
+import { calcHP, calcMP } from "../../libs/npcs";
 
 type NpcTransform = (npc: TypeNpc) => TypeNpc;
 
@@ -32,8 +38,9 @@ export function applyNpcPreSaveTransforms(npc: TypeNpc): TypeNpc {
 // Add new transforms here as the schema evolves; order by ascending version.
 
 function fixSheildTypo(npc: TypeNpc): TypeNpc {
-  if (!("sheild" in npc)) return npc;
-  const { sheild, ...rest } = npc as TypeNpc & { sheild?: TypeNpc["sheild"] };
+  const raw = npc as TypeNpc & { sheild?: TypeNpc["shield"] };
+  if (!("sheild" in raw)) return npc;
+  const { sheild, ...rest } = raw;
   return sheild !== undefined ? { ...rest, shield: sheild } : rest;
 }
 
@@ -337,6 +344,111 @@ function unifyNpcDefensiveEquipmentSchema(npc: TypeNpc): TypeNpc {
   };
 }
 
+const ALL_AFFINITY_KEYS = [
+  "physical",
+  "air",
+  "bolt",
+  "dark",
+  "earth",
+  "fire",
+  "ice",
+  "light",
+  "poison",
+] as const;
+
+function actorAlignmentV10(npc: TypeNpc): TypeNpc {
+  // 1. Fill any affinity keys still missing after v2 (which only guaranteed fire)
+  const affinities = { ...npc.affinities };
+  for (const key of ALL_AFFINITY_KEYS) {
+    if (affinities[key] === undefined) affinities[key] = Affinities.None;
+  }
+
+  // 2. Migrate attribute flat numbers to { base } shape
+  const rawAttrs = npc.attributes as unknown as Record<string, unknown>;
+  const attributes: NpcAttributes = {
+    might: {
+      base:
+        (rawAttrs.might as { base?: number } | undefined)?.base ??
+        (rawAttrs.might as number | undefined) ??
+        8,
+    },
+    insight: {
+      base:
+        (rawAttrs.insight as { base?: number } | undefined)?.base ??
+        (rawAttrs.insight as number | undefined) ??
+        8,
+    },
+    will: {
+      base:
+        (rawAttrs.will as { base?: number } | undefined)?.base ??
+        (rawAttrs.will as number | undefined) ??
+        8,
+    },
+    dexterity: {
+      base:
+        (rawAttrs.dexterity as { base?: number } | undefined)?.base ??
+        (rawAttrs.dexterity as number | undefined) ??
+        8,
+    },
+  };
+
+  // 3. Migrate numeric NpcExtra fields into resources / derived
+  const extra =
+    (npc.extra as typeof npc.extra & {
+      hp?: number;
+      mp?: number;
+      def?: number;
+      mDef?: number;
+      defOverride?: boolean;
+      mDefOverride?: boolean;
+      extrainit?: number;
+    }) ?? {};
+
+  const resources: NpcResources = {
+    hp: {
+      current: npc.resources?.hp.current ?? calcHP({ ...npc, attributes }),
+      bonus: extra.hp ?? 0,
+    },
+    mp: {
+      current: npc.resources?.mp.current ?? calcMP({ ...npc, attributes }),
+      bonus: extra.mp ?? 0,
+    },
+  };
+
+  const derived: NpcDerived = {
+    def: {
+      bonus: extra.defOverride ? 0 : (extra.def ?? 0),
+      ...(extra.defOverride ? { override: extra.def ?? 0 } : {}),
+    },
+    mdef: {
+      bonus: extra.mDefOverride ? 0 : (extra.mDef ?? 0),
+      ...(extra.mDefOverride ? { override: extra.mDef ?? 0 } : {}),
+    },
+    init: { bonus: extra.extrainit ?? 0 },
+  };
+
+  // 4. Strip migrated fields from extra; keep feature flags + statusImmunity
+  const {
+    hp: _hp,
+    mp: _mp,
+    def: _def,
+    mDef: _mDef,
+    defOverride: _defOv,
+    mDefOverride: _mDefOv,
+    extrainit: _ei,
+    ...remainingExtra
+  } = extra;
+
+  return {
+    ...npc,
+    affinities,
+    attributes,
+    resources,
+    derived,
+    extra: Object.keys(remainingExtra).length > 0 ? remainingExtra : undefined,
+  };
+}
+
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 1,
@@ -387,6 +499,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Unify NPC armor/shield schema: normalize martial, cost/value, and precision modifier parity",
     fn: unifyNpcDefensiveEquipmentSchema,
+  },
+  {
+    version: 10,
+    label:
+      "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; NpcExtra numeric fields migrated",
+    fn: actorAlignmentV10,
   },
 ];
 
