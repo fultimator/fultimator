@@ -17,7 +17,13 @@ export type ComponentToken =
   | "accuracy-attr-pair"
   | "readonly-number"
   | "rare-bonus-block"
-  | "martial-toggle";
+  | "martial-toggle"
+  // NPC-specific tokens
+  | "npc-attr-slider"
+  | "npc-affinity-slider"
+  | "npc-armor-select"
+  | "npc-immunities"
+  | "npc-defense-radio";
 
 export type FieldKind =
   | "editable" // has a UI control; lands in the payload

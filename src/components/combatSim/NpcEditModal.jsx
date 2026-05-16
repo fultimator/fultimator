@@ -47,14 +47,14 @@ import { calcAvailableSkills, calcUsedSkills } from "../../libs/npcs";
 import deepEqual from "deep-equal";
 
 const SECTIONS = [
-  { id: "npc-modal-basics",     label: "Basic Information" },
+  { id: "npc-modal-basics", label: "Basic Information" },
   { id: "npc-modal-affinities", label: "Affinities & Bonuses" },
-  { id: "npc-modal-attacks",    label: "Attacks" },
-  { id: "npc-modal-spells",     label: "Spells" },
-  { id: "npc-modal-actions",    label: "Other Actions" },
-  { id: "npc-modal-special",    label: "Special Rules" },
-  { id: "npc-modal-raregear",   label: "Rare Equipment" },
-  { id: "npc-modal-notes",      label: "Notes" },
+  { id: "npc-modal-attacks", label: "Attacks" },
+  { id: "npc-modal-spells", label: "Spells" },
+  { id: "npc-modal-actions", label: "Other Actions" },
+  { id: "npc-modal-special", label: "Special Rules" },
+  { id: "npc-modal-raregear", label: "Rare Equipment" },
+  { id: "npc-modal-notes", label: "Notes" },
 ];
 
 export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
@@ -119,7 +119,7 @@ export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
     setBaselineRef(toSave);
     onSaved?.(npcTemp);
     onClose();
-  }, [db, npcId, npcTemp, onSaved, onClose]);  
+  }, [db, npcId, npcTemp, onSaved, onClose]);
 
   const handleClose = useCallback(async () => {
     if (isUpdated) {
@@ -155,7 +155,9 @@ export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
       fullScreen={isSmallScreen}
       PaperProps={{ sx: { height: isSmallScreen ? "100%" : "90vh" } }}
     >
-      <DialogTitle sx={{ borderBottom: "none" }}>{npcTemp?.name ?? t("Edit NPC")}</DialogTitle>
+      <DialogTitle sx={{ borderBottom: "none" }}>
+        {npcTemp?.name ?? t("Edit NPC")}
+      </DialogTitle>
 
       {/* Tab bar row with SP chip + nav menu on the right */}
       <Box
@@ -173,7 +175,12 @@ export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
           <Tabs
             value={tab}
             onChange={(_, v) => setTab(v)}
-            sx={{ flex: 1, background: "transparent", boxShadow: "none", border: "none" }}
+            sx={{
+              flex: 1,
+              background: "transparent",
+              boxShadow: "none",
+              border: "none",
+            }}
           >
             <Tab label={t("Editor")} />
             <Tab label={t("Preview")} />
@@ -220,7 +227,11 @@ export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
         </Menu>
       </Box>
 
-      <DialogContent dividers sx={{ overflowY: "auto", px: 0 }} ref={contentRef}>
+      <DialogContent
+        dividers
+        sx={{ overflowY: "auto", px: 0 }}
+        ref={contentRef}
+      >
         {loading && (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <CircularProgress />
@@ -230,7 +241,14 @@ export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
         {!loading && npcTemp && (
           <NpcProvider npcData={npcTemp}>
             {isSideBySide ? (
-              <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start", px: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  alignItems: "flex-start",
+                  px: 3,
+                }}
+              >
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <EditorPanels
                     npcTemp={npcTemp}
@@ -286,7 +304,13 @@ function EditorPanels({ npcTemp, setNpcTemp, secondary, isSmallScreen, t }) {
       <Paper
         id="npc-modal-basics"
         elevation={3}
-        sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: secondary, mb: 2 }}
+        sx={{
+          p: "15px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
+          mb: 2,
+        }}
       >
         <EditBasics npc={npcTemp} setNpc={setNpcTemp} />
       </Paper>
@@ -294,11 +318,21 @@ function EditorPanels({ npcTemp, setNpcTemp, secondary, isSmallScreen, t }) {
       <Paper
         id="npc-modal-affinities"
         elevation={3}
-        sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: secondary, mb: 2 }}
+        sx={{
+          p: "15px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
+          mb: 2,
+        }}
       >
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
-            <CustomHeader type="top" headerText={t("Affinity")} showIconButton={false} />
+            <CustomHeader
+              type="top"
+              headerText={t("Affinity")}
+              showIconButton={false}
+            />
             <ExplainAffinities npc={npcTemp} />
             <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
           </Grid>
@@ -316,7 +350,13 @@ function EditorPanels({ npcTemp, setNpcTemp, secondary, isSmallScreen, t }) {
       <Paper
         id="npc-modal-attacks"
         elevation={3}
-        sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: secondary, mb: 2 }}
+        sx={{
+          p: "15px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
+          mb: 2,
+        }}
       >
         <Grid container>
           <Grid size={12}>
@@ -331,14 +371,26 @@ function EditorPanels({ npcTemp, setNpcTemp, secondary, isSmallScreen, t }) {
       <Paper
         id="npc-modal-spells"
         elevation={3}
-        sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: secondary, mb: 2 }}
+        sx={{
+          p: "15px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
+          mb: 2,
+        }}
       >
         <EditSpells npc={npcTemp} setNpc={setNpcTemp} />
       </Paper>
 
       <Paper
         elevation={3}
-        sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: secondary, mb: 2 }}
+        sx={{
+          p: "15px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: secondary,
+          mb: 2,
+        }}
       >
         <Grid container spacing={2}>
           <Grid id="npc-modal-actions" size={{ xs: 12, md: 6 }}>

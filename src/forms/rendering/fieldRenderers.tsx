@@ -4,6 +4,8 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
+  FormGroup,
+  FormLabel,
   Grid,
   IconButton,
   InputAdornment,
@@ -11,8 +13,12 @@ import {
   ListItemText,
   ListSubheader,
   MenuItem,
+  Radio,
+  RadioGroup,
   Select,
+  Slider,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Clear, Search } from "@mui/icons-material";
 import { Martial, MartialOutline } from "../../components/icons";
@@ -21,9 +27,10 @@ import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomi
 import ChangeAccuracyCheck from "../../routes/equip/customWeapons/ChangeAccuracyCheck";
 import SlotTierPicker from "../../components/player/equipment/technospheres/SlotTierPicker";
 import SlotEditor from "../../components/player/equipment/technospheres/SlotEditor";
-import { TypeIcon } from "../../components/types";
+import { TypeIcon, TypeName } from "../../components/types";
 import { useTranslate } from "../../translation/translate";
 import type { FieldRendererProps } from "./fieldRendererProps";
+import { affinityStrToNum, affinityNumToStr } from "./npcAffinityUtils";
 
 // Typed wrapper for untyped JSX components.
 interface ChangeAccuracyCheckProps {
@@ -575,5 +582,246 @@ export function SlotEditorRenderer({
       isWeapon={(componentProps?.isWeapon as boolean) ?? true}
       onAddToBank={componentProps?.onAddToBank as unknown}
     />
+  );
+}
+
+// NPC-specific renderers
+
+// Attribute slider (d6–d12, step 2). componentProps: { label: string }
+// The label is shown inline as a short tag (DEX / INS / MIG / WLP).
+export function NpcAttrSliderRenderer({
+  label,
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const min = (componentProps?.min as number) ?? 6;
+  const max = (componentProps?.max as number) ?? 12;
+  const step = (componentProps?.step as number) ?? 2;
+  const showMarks = (componentProps?.showMarks as boolean) ?? false;
+  const marks = showMarks
+    ? [
+        { value: 6, label: "d6" },
+        { value: 8, label: "d8" },
+        { value: 10, label: "d10" },
+        { value: 12, label: "d12" },
+      ]
+    : true;
+
+  return (
+    <Grid container spacing={1} sx={{ pr: 2, alignItems: "center" }}>
+      <Grid size={2}>
+        <InputLabel sx={{ fontSize: "20px", fontWeight: 400 }}>
+          {t(label)}
+        </InputLabel>
+      </Grid>
+      <Grid size={10}>
+        <FormControl variant="standard" fullWidth>
+          <Slider
+            marks={marks}
+            min={min}
+            max={max}
+            step={step}
+            size="medium"
+            value={(value as number) ?? min}
+            onChange={(_e, v) => onCommit(v)}
+          />
+        </FormControl>
+      </Grid>
+    </Grid>
+  );
+}
+
+// Affinity slider. value is the string key ("vu"|"rs"|"im"|"ab"|"").
+// label is the element type key (e.g. "physical", "air") - used to show TypeIcon.
+// componentProps: { showLabels?: boolean }
+export function NpcAffinitySliderRenderer({
+  label,
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const showLabels = (componentProps?.showLabels as boolean) ?? false;
+
+  const marks = showLabels
+    ? [
+        { value: 0, label: t("Vulnerability", true) },
+        { value: 1, label: " " },
+        { value: 2, label: t("Resistance", true) },
+        { value: 3, label: t("Immunity", true) },
+        { value: 4, label: t("Absorption", true) },
+      ]
+    : true;
+
+  const numValue = affinityStrToNum(value as string | undefined);
+  // label is the element key ("Physical", "Air", etc.) - lower-case for TypeIcon
+  const typeKey = label.toLowerCase();
+
+  return (
+    <Grid container spacing={1} sx={{ pr: 2, alignItems: "center" }}>
+      <Grid size={3}>
+        <InputLabel sx={{ fontSize: "20px", fontWeight: 400 }}>
+          <TypeIcon type={typeKey} disabled={false} />{" "}
+          <TypeName type={typeKey} />
+        </InputLabel>
+      </Grid>
+      <Grid size={9}>
+        <FormControl variant="standard" fullWidth>
+          <Slider
+            marks={marks}
+            min={0}
+            max={4}
+            step={1}
+            size="medium"
+            value={numValue}
+            onChange={(_e, v) => onCommit(affinityNumToStr(v as number))}
+          />
+        </FormControl>
+      </Grid>
+    </Grid>
+  );
+}
+
+// Armor or shield select. componentProps: { items: {name, martial?}[], label: string }
+export function NpcArmorSelectRenderer({
+  label,
+  value,
+  onCommit,
+  componentProps,
+  disabled,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const items =
+    (componentProps?.items as { name: string; martial?: boolean }[]) ?? [];
+  const currentName =
+    (value as { name?: string } | undefined)?.name ?? items[0]?.name ?? "";
+
+  return (
+    <FormControl fullWidth disabled={disabled}>
+      <InputLabel>{t(label)}</InputLabel>
+      <Select
+        value={currentName}
+        label={t(label)}
+        onChange={(e) => {
+          const found = items.find((i) => i.name === e.target.value);
+          if (found) onCommit(found);
+        }}
+      >
+        {items.map((item) => (
+          <MenuItem key={item.name} value={item.name}>
+            {item.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+}
+
+// Status immunities checkbox group.
+// componentProps: { freeImmunities?: Record<string,boolean> }
+// value is NpcImmunities record.
+const IMMUNITY_KEYS = [
+  "slow",
+  "dazed",
+  "weak",
+  "shaken",
+  "enraged",
+  "poisoned",
+] as const;
+
+export function NpcImmunitiesRenderer({
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const immunities = (value as Record<string, boolean>) ?? {};
+  const freeImmunities =
+    (componentProps?.freeImmunities as Record<string, boolean>) ?? {};
+
+  const handleChange = (key: string, checked: boolean) => {
+    onCommit({ ...immunities, [key]: checked });
+  };
+
+  return (
+    <FormGroup>
+      <FormLabel>{t("Immunities")}</FormLabel>
+      {IMMUNITY_KEYS.map((key) => {
+        const isFree = !!freeImmunities[key];
+        return (
+          <FormControlLabel
+            key={key}
+            control={
+              <Checkbox
+                checked={!!immunities[key]}
+                onChange={(e) => handleChange(key, e.target.checked)}
+                name={key}
+              />
+            }
+            label={
+              <Typography
+                sx={{
+                  color: isFree ? "success.main" : "inherit",
+                  fontWeight: isFree ? "bold" : "inherit",
+                }}
+              >
+                {t(key.charAt(0).toUpperCase() + key.slice(1), true)}
+              </Typography>
+            }
+          />
+        );
+      })}
+    </FormGroup>
+  );
+}
+
+// Defense radio group (+def / +mDef pairs).
+// value is { def: number, mDef: number }.
+const DEFENSE_COMBOS = [
+  { code: "00", def: 0, mDef: 0 },
+  { code: "12", def: 1, mDef: 2 },
+  { code: "21", def: 2, mDef: 1 },
+  { code: "33", def: 3, mDef: 3 },
+  { code: "24", def: 2, mDef: 4 },
+  { code: "42", def: 4, mDef: 2 },
+] as const;
+
+function defenseCode(def?: number, mDef?: number): string {
+  const match = DEFENSE_COMBOS.find((c) => c.def === def && c.mDef === mDef);
+  return match?.code ?? "00";
+}
+
+// value is the full `extra` object. Commits a merged extra with updated def/mDef.
+export function NpcDefenseRadioRenderer({
+  value,
+  onCommit,
+  disabled,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const extra = (value as Record<string, unknown>) ?? {};
+  const code = defenseCode(extra.def as number, extra.mDef as number);
+
+  return (
+    <FormControl disabled={disabled}>
+      <FormLabel>{t("Defenses")}</FormLabel>
+      <RadioGroup
+        value={code}
+        onChange={(e) => {
+          const combo = DEFENSE_COMBOS.find((c) => c.code === e.target.value);
+          if (combo) onCommit({ ...extra, def: combo.def, mDef: combo.mDef });
+        }}
+      >
+        {DEFENSE_COMBOS.map((c) => (
+          <FormControlLabel
+            key={c.code}
+            value={c.code}
+            control={<Radio size="small" sx={{ py: 0.8 }} />}
+            label={`+${c.def} ${t("DEF", true)} / +${c.mDef} ${t("M.DEF", true)}`}
+          />
+        ))}
+      </RadioGroup>
+    </FormControl>
   );
 }

@@ -55,12 +55,15 @@ export interface NpcRareGear {
 export interface NpcExtra {
   init?: boolean;
   precision?: boolean;
-  hp?: string;
+  hp?: number;
+  mp?: number;
   magic?: boolean;
   def?: number;
   mDef?: number;
   defOverride?: boolean;
   mDefOverride?: boolean;
+  extrainit?: number;
+  statusImmunity?: number;
 }
 
 export interface NpcAffinities {
@@ -109,6 +112,11 @@ export interface TypeNpc {
   actions?: NpcAction[];
   extra?: NpcExtra;
   rank?: string;
+  phases?: number;
+  villain?: string;
+  companionlvl?: number;
+  companionpclvl?: number;
+  multipart?: string;
   spells?: NpcSpell[];
   special?: NpcSpecial[];
   weaponattacks?: NpcWeaponAttack[];
@@ -121,4 +129,7 @@ export interface TypeNpc {
   notes?: NpcNotes[];
   tags?: NpcTags[];
   schemaVersion?: number;
+  createdBy?: string;
+  language?: string;
+  published?: boolean;
 }

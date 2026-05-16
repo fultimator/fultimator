@@ -1235,12 +1235,24 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     setSelectedNPCs((prev) =>
       prev.map((npc) =>
         npc.combatId === selectedNPC.combatId
-          ? { ...npc, ...updatedNpc, combatId: npc.combatId, combatStats: npc.combatStats }
+          ? {
+              ...npc,
+              ...updatedNpc,
+              combatId: npc.combatId,
+              combatStats: npc.combatStats,
+            }
           : npc,
       ),
     );
     setSelectedNPC((prev) =>
-      prev ? { ...prev, ...updatedNpc, combatId: prev.combatId, combatStats: prev.combatStats } : prev,
+      prev
+        ? {
+            ...prev,
+            ...updatedNpc,
+            combatId: prev.combatId,
+            combatStats: prev.combatStats,
+          }
+        : prev,
     );
   };
 

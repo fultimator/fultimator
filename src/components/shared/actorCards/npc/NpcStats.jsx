@@ -38,11 +38,16 @@ export function NpcStudyStats({ npc }) {
         }}
       >
         <Grid sx={{ px: 1.5, py: 0.4 }}>{t("HP")}</Grid>
-        <Grid sx={{ py: 0.4, px: 1.5, color: "white.main", bgcolor: "red.main" }}>
-          {calcHP(npc)} <Diamond color="white.main" /> {Math.floor(calcHP(npc) / 2)}
+        <Grid
+          sx={{ py: 0.4, px: 1.5, color: "white.main", bgcolor: "red.main" }}
+        >
+          {calcHP(npc)} <Diamond color="white.main" />{" "}
+          {Math.floor(calcHP(npc) / 2)}
         </Grid>
         <Grid sx={{ px: 1.5, py: 0.4 }}>{t("MP")}</Grid>
-        <Grid sx={{ py: 0.4, px: 1.5, color: "white.main", bgcolor: "cyan.main" }}>
+        <Grid
+          sx={{ py: 0.4, px: 1.5, color: "white.main", bgcolor: "cyan.main" }}
+        >
           {calcMP(npc)}
         </Grid>
       </Grid>
@@ -81,7 +86,8 @@ export function NpcStats({ npc }) {
         <Grid
           sx={{
             bgcolor: theme.mode === "dark" ? "#1E2122" : "#efecf5",
-            borderRight: theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
+            borderRight:
+              theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
             py: 0.4,
           }}
           size="grow"
@@ -91,7 +97,8 @@ export function NpcStats({ npc }) {
         <Grid
           sx={{
             bgcolor: theme.mode === "dark" ? "#1E2122" : "#f3f0f7",
-            borderRight: theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
+            borderRight:
+              theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
             py: 0.4,
           }}
           size="grow"
@@ -101,7 +108,8 @@ export function NpcStats({ npc }) {
         <Grid
           sx={{
             bgcolor: theme.mode === "dark" ? "#1D1F20" : "#f6f4f9",
-            borderRight: theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
+            borderRight:
+              theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
             py: 0.4,
           }}
           size="grow"
@@ -133,33 +141,52 @@ export function NpcStats({ npc }) {
         <Grid
           sx={{
             bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
-            borderRight: theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
+            borderRight:
+              theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
             py: 0.4,
             px: 0.5,
           }}
         >
-          {npc.armor?.def > 0 || npc.extra?.defOverride
-            ? <>{t("DEF")} {calcDef(npc)}</>
-            : <>{t("DEF")} +{calcDef(npc)}</>}
+          {npc.armor?.def > 0 || npc.extra?.defOverride ? (
+            <>
+              {t("DEF")} {calcDef(npc)}
+            </>
+          ) : (
+            <>
+              {t("DEF")} +{calcDef(npc)}
+            </>
+          )}
         </Grid>
         <Grid
           sx={{
             bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#efecf5",
-            borderRight: theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
+            borderRight:
+              theme.mode === "dark" ? "1px solid #42484B" : "1px solid #ffffff",
             py: 0.4,
             px: 0.5,
           }}
         >
-          {npc.extra?.mDefOverride
-            ? <>{t("M.DEF")} {calcMDef(npc)}</>
-            : <>{t("M.DEF")} +{calcMDef(npc)}</>}
+          {npc.extra?.mDefOverride ? (
+            <>
+              {t("M.DEF")} {calcMDef(npc)}
+            </>
+          ) : (
+            <>
+              {t("M.DEF")} +{calcMDef(npc)}
+            </>
+          )}
         </Grid>
         <Grid sx={{ px: 1, py: 0.4 }}>{t("HP")}</Grid>
-        <Grid sx={{ py: 0.4, px: 1.5, color: "white.main", bgcolor: "red.main" }}>
-          {calcHP(npc)} <Diamond color="white.main" /> {Math.floor(calcHP(npc) / 2)}
+        <Grid
+          sx={{ py: 0.4, px: 1.5, color: "white.main", bgcolor: "red.main" }}
+        >
+          {calcHP(npc)} <Diamond color="white.main" />{" "}
+          {Math.floor(calcHP(npc) / 2)}
         </Grid>
         <Grid sx={{ px: 1, py: 0.4 }}>{t("MP")}</Grid>
-        <Grid sx={{ px: 1.5, py: 0.4, color: "white.main", bgcolor: "cyan.main" }}>
+        <Grid
+          sx={{ px: 1.5, py: 0.4, color: "white.main", bgcolor: "cyan.main" }}
+        >
           {calcMP(npc)}
         </Grid>
         <Grid sx={{ py: 0.4 }} size="grow">
