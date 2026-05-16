@@ -261,16 +261,18 @@ function Personal() {
 
   const handleFileUpload = async (jsonData) => {
     try {
-      if (!validateNpc(jsonData)) {
+      const data = applyNpcPostLoadTransforms(jsonData);
+
+      if (!validateNpc(data)) {
         console.error("Invalid NPC data.");
         alert(t("Invalid NPC JSON data."));
         return;
       }
 
-      delete jsonData.id;
-      jsonData.published = false;
+      delete data.id;
+      data.published = false;
 
-      const res = await db.addDoc(db.collection("npc-personal"), jsonData);
+      const res = await db.addDoc(db.collection("npc-personal"), applyNpcPreSaveTransforms(data));
       console.debug("Document added with ID: ", res.id);
     } catch (error) {
       console.error("Error uploading NPC from JSON:", error);

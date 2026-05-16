@@ -92,7 +92,7 @@ export function NpcStats({ npc }) {
           }}
           size="grow"
         >
-          {t("DEX")} d{npc.attributes?.dexterity}
+          {t("DEX")} d{npc.attributes?.dexterity?.base}
         </Grid>
         <Grid
           sx={{
@@ -103,7 +103,7 @@ export function NpcStats({ npc }) {
           }}
           size="grow"
         >
-          {t("INS")} d{npc.attributes?.insight}
+          {t("INS")} d{npc.attributes?.insight?.base}
         </Grid>
         <Grid
           sx={{
@@ -114,7 +114,7 @@ export function NpcStats({ npc }) {
           }}
           size="grow"
         >
-          {t("MIG")} d{npc.attributes?.might}
+          {t("MIG")} d{npc.attributes?.might?.base}
         </Grid>
         <Grid
           sx={{
@@ -123,7 +123,7 @@ export function NpcStats({ npc }) {
           }}
           size="grow"
         >
-          {t("WLP")} d{npc.attributes?.will}
+          {t("WLP")} d{npc.attributes?.will?.base}
         </Grid>
       </Grid>
       {/* Row 2: HP / MP / Init / DEF / M.DEF */}

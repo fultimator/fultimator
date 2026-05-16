@@ -13,8 +13,8 @@ export default function NpcText({ npc }) {
       Typical Traits: {npc.traits}
       <br />
       <br />
-      Dex d{npc.attributes.dexterity} · Ins d{npc.attributes.insight} · Mig d
-      {npc.attributes.might} · Wip d{npc.attributes.willpower} ⬥ HP{" "}
+      Dex d{npc.attributes.dexterity?.base} · Ins d{npc.attributes.insight?.base} · Mig d
+      {npc.attributes.might?.base} · Wip d{npc.attributes.willpower?.base} ⬥ HP{" "}
       {calcHP(npc)} · MP {calcMP(npc)} · Init {calcInit(npc)}
       <br />
       Def +{calcDef(npc)} · D. Mag +{calcMDef(npc)} ⬥{" "}

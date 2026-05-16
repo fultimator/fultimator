@@ -56,10 +56,10 @@ const RollsTab = ({
     if (!attr1 || !attr2) return "Invalid Attack"; // Handle missing attributes
 
     const translatedAttribute1 = `${t(attributeMap[attr1])} d${
-      selectedNPC.attributes[attr1]
+      selectedNPC.attributes[attr1]?.base
     }`;
     const translatedAttribute2 = `${t(attributeMap[attr2])} d${
-      selectedNPC.attributes[attr2]
+      selectedNPC.attributes[attr2]?.base
     }`;
 
     return `【${translatedAttribute1} + ${translatedAttribute2}】`;

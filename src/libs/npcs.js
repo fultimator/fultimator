@@ -1,6 +1,6 @@
 export function calcHP(npc) {
   if (!npc || !npc.attributes) return 0;
-  const might = npc.attributes.might?.base ?? npc.attributes.might ?? 8;
+  const might = npc.attributes.might?.base ?? 8;
   let hp = 2 * npc.lvl + 5 * might;
 
   // Skill Extra HP
@@ -51,7 +51,7 @@ export function calcHP(npc) {
 
 export function calcMP(npc) {
   if (!npc || !npc.attributes) return 0;
-  const will = npc.attributes.will?.base ?? npc.attributes.will ?? 8;
+  const will = npc.attributes.will?.base ?? 8;
   let mp = npc.lvl + 5 * will;
   // Skill Extra MP
   const mpBonus = npc.resources?.mp.bonus ?? npc.extra?.mp ?? 0;
@@ -76,8 +76,8 @@ export function calcMP(npc) {
 export function calcInit(npc) {
   if (!npc || !npc.attributes) return 0;
   const dexterity =
-    npc.attributes.dexterity?.base ?? npc.attributes.dexterity ?? 8;
-  const insight = npc.attributes.insight?.base ?? npc.attributes.insight ?? 8;
+    npc.attributes.dexterity?.base ?? 8;
+  const insight = npc.attributes.insight?.base ?? 8;
   let init = (dexterity + insight) / 2;
 
   // Skill Extra Init
@@ -87,7 +87,7 @@ export function calcInit(npc) {
     init += flatinit;
   }
 
-  if (npc.extra?.init) {
+  if (npc.features?.init?.enabled ?? npc.extra?.init) {
     init += 4;
   }
 
@@ -207,7 +207,7 @@ export function calcPrecision(attack, npc) {
   number = number + Math.floor(npc.lvl / 10);
 
   // Extra Precision
-  if (npc.extra?.precision) {
+  if (npc.features?.precision?.enabled ?? npc.extra?.precision) {
     number = number + 3;
   }
 
@@ -233,8 +233,8 @@ export function calcMagic(npc) {
   // Level
   number = number + Math.floor(npc.lvl / 10);
 
-  // Extra Precision
-  if (npc.extra?.magic) {
+  // Extra Magic
+  if (npc.features?.magic?.enabled ?? npc.extra?.magic) {
     number = number + 3;
   }
 
@@ -446,24 +446,15 @@ export function calcUsedSkillsFromExtraMP(npc) {
 }
 
 export function calcUsedSkillsFromExtraInit(npc) {
-  if (!npc.extra?.init) {
-    return 0;
-  }
-  return 1;
+  return (npc.features?.init?.enabled ?? npc.extra?.init) ? 1 : 0;
 }
 
 export function calcUsedSkillsFromExtraPrecision(npc) {
-  if (!npc.extra?.precision) {
-    return 0;
-  }
-  return 1;
+  return (npc.features?.precision?.enabled ?? npc.extra?.precision) ? 1 : 0;
 }
 
 export function calcUsedSkillsFromExtraMagic(npc) {
-  if (!npc.extra?.magic) {
-    return 0;
-  }
-  return 1;
+  return (npc.features?.magic?.enabled ?? npc.extra?.magic) ? 1 : 0;
 }
 
 export function calcUsedSkillsFromResistances(npc) {

@@ -175,8 +175,8 @@ export default function CharacterSheet() {
     if (player) {
       setPlayer((prevPlayer) => {
         const lvl = Number(prevPlayer.lvl) || 0;
-        const might = Number(prevPlayer.attributes?.might) || 0;
-        const willpower = Number(prevPlayer.attributes?.willpower) || 0;
+        const might = Number(prevPlayer.attributes?.might?.base) || 0;
+        const willpower = Number(prevPlayer.attributes?.willpower?.base) || 0;
 
         const baseMaxHP = lvl + might * 5;
         const baseMaxMP = lvl + willpower * 5;
@@ -213,8 +213,10 @@ export default function CharacterSheet() {
         }
 
         if (prevPlayer.modifiers) {
-          hpBonus += prevPlayer.modifiers.hp || 0;
-          mpBonus += prevPlayer.modifiers.mp || 0;
+          hpBonus +=
+            prevPlayer.resources?.hp.bonus ?? prevPlayer.modifiers.hp ?? 0;
+          mpBonus +=
+            prevPlayer.resources?.mp.bonus ?? prevPlayer.modifiers.mp ?? 0;
           ipBonus += prevPlayer.modifiers.ip || 0;
         }
 
@@ -359,8 +361,8 @@ export default function CharacterSheet() {
       };
 
       // Recalculate max stats for the new level
-      const mig = Number(leveledPlayer.attributes?.might) || 0;
-      const wil = Number(leveledPlayer.attributes?.willpower) || 0;
+      const mig = Number(leveledPlayer.attributes?.might?.base) || 0;
+      const wil = Number(leveledPlayer.attributes?.willpower?.base) || 0;
       const lvl = Number(leveledPlayer.lvl) || 0;
 
       const baseMaxHP = mig * 5 + lvl;
@@ -398,8 +400,14 @@ export default function CharacterSheet() {
       }
 
       if (leveledPlayer.modifiers) {
-        hpBonus += Number(leveledPlayer.modifiers.hp) || 0;
-        mpBonus += Number(leveledPlayer.modifiers.mp) || 0;
+        hpBonus +=
+          Number(
+            leveledPlayer.resources?.hp.bonus ?? leveledPlayer.modifiers.hp,
+          ) || 0;
+        mpBonus +=
+          Number(
+            leveledPlayer.resources?.mp.bonus ?? leveledPlayer.modifiers.mp,
+          ) || 0;
         ipBonus += Number(leveledPlayer.modifiers.ip) || 0;
       }
 

@@ -12,25 +12,25 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
       label: "DEX",
       value: calcAttr("Slow", "Enraged", "dexterity", selectedNPC),
       color: theme.palette.info.main,
-      originalValue: selectedNPC.attributes?.dexterity,
+      originalValue: selectedNPC.attributes?.dexterity?.base,
     },
     {
       label: "INS",
       value: calcAttr("Dazed", "Enraged", "insight", selectedNPC),
       color: theme.palette.secondary.main,
-      originalValue: selectedNPC.attributes?.insight,
+      originalValue: selectedNPC.attributes?.insight?.base,
     },
     {
       label: "MIG",
       value: calcAttr("Weak", "Poisoned", "might", selectedNPC),
       color: theme.palette.error.light,
-      originalValue: selectedNPC.attributes?.might,
+      originalValue: selectedNPC.attributes?.might?.base,
     },
     {
       label: "WLP",
       value: calcAttr("Shaken", "Poisoned", "will", selectedNPC),
       color: theme.palette.warning.main,
-      originalValue: selectedNPC.attributes?.will,
+      originalValue: selectedNPC.attributes?.will?.base,
     },
   ];
 

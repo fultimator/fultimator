@@ -988,6 +988,7 @@ function unifyPlayerDefensiveEquipmentSchema(player: TypePlayer): TypePlayer {
 
 function actorAlignmentV10Player(player: TypePlayer): TypePlayer {
   const rawAttrs = player.attributes as unknown as Record<string, unknown>;
+  const m = player.modifiers;
   return {
     ...player,
     attributes: {
@@ -1003,8 +1004,10 @@ function actorAlignmentV10Player(player: TypePlayer): TypePlayer {
           (rawAttrs.insight as number | undefined) ??
           8,
       },
-      will: {
+      willpower: {
         base:
+          (rawAttrs.willpower as { base?: number } | undefined)?.base ??
+          (rawAttrs.willpower as number | undefined) ??
           (rawAttrs.will as { base?: number } | undefined)?.base ??
           (rawAttrs.will as number | undefined) ??
           8,
@@ -1015,6 +1018,15 @@ function actorAlignmentV10Player(player: TypePlayer): TypePlayer {
           (rawAttrs.dexterity as number | undefined) ??
           8,
       },
+    },
+    resources: player.resources ?? {
+      hp: { current: player.stats.hp.current, bonus: m.hp },
+      mp: { current: player.stats.mp.current, bonus: m.mp },
+    },
+    derived: player.derived ?? {
+      def: { bonus: m.def },
+      mdef: { bonus: m.mdef },
+      init: { bonus: m.init },
     },
   };
 }
@@ -1075,7 +1087,7 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 10,
     label:
-      "Actor alignment v10: shared interfaces; attributes { base } shape introduced",
+      "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; modifiers migrated; will renamed to willpower",
     fn: actorAlignmentV10Player,
   },
 ];

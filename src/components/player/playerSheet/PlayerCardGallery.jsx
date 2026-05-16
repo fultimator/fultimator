@@ -199,7 +199,7 @@ export default function PlayerCardGallery({
 
   const currDex = calculateAttribute(
     player,
-    player.attributes.dexterity,
+    player.attributes.dexterity?.base,
     ["slow", "enraged"],
     ["dexUp"],
     6,
@@ -207,7 +207,7 @@ export default function PlayerCardGallery({
   );
   const currInsight = calculateAttribute(
     player,
-    player.attributes.insight,
+    player.attributes.insight?.base,
     ["dazed", "enraged"],
     ["insUp"],
     6,
@@ -215,7 +215,7 @@ export default function PlayerCardGallery({
   );
   const currMight = calculateAttribute(
     player,
-    player.attributes.might,
+    player.attributes.might?.base,
     ["weak", "poisoned"],
     ["migUp"],
     6,
@@ -223,7 +223,7 @@ export default function PlayerCardGallery({
   );
   const currWillpower = calculateAttribute(
     player,
-    player.attributes.willpower,
+    player.attributes.willpower?.base,
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
@@ -754,7 +754,7 @@ export default function PlayerCardGallery({
                     fontFamily: "'Antonio', fantasy, sans-serif",
                     fontSize: { xs: "0.78rem", md: "0.9rem", lg: "0.98rem" },
                     fontWeight: "bold",
-                    color: getAttributeColor(player.attributes[key], curr),
+                    color: getAttributeColor(player.attributes[key]?.base, curr),
                     lineHeight: 1,
                     whiteSpace: "nowrap",
                   }}

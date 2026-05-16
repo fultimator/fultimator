@@ -6,6 +6,10 @@ import {
   ActorAffinities,
   ActorImmunities,
   ActorStatuses,
+  ActorResourcePool,
+  ActorResources,
+  ActorDerivedStat,
+  ActorDerived,
 } from "./Misc";
 import type {
   NpcAttack as EquipmentNpcAttack,
@@ -56,36 +60,27 @@ export interface NpcRareGear {
 }
 
 export interface NpcExtra {
-  init?: boolean;
-  precision?: boolean;
-  magic?: boolean;
   statusImmunity?: number;
+}
+
+export interface NpcFeature {
+  enabled: boolean;
+}
+
+export interface NpcFeatures {
+  init?: NpcFeature;
+  precision?: NpcFeature;
+  magic?: NpcFeature;
 }
 
 export type NpcAffinities = ActorAffinities;
 
 export type NpcImmunities = ActorImmunities;
 
-export interface NpcResourcePool {
-  current: number;
-  bonus: number;
-}
-
-export interface NpcResources {
-  hp: NpcResourcePool;
-  mp: NpcResourcePool;
-}
-
-export interface NpcDerivedStat {
-  bonus: number;
-  override?: number;
-}
-
-export interface NpcDerived {
-  def: NpcDerivedStat;
-  mdef: NpcDerivedStat;
-  init: { bonus: number };
-}
+export type NpcResourcePool = ActorResourcePool;
+export type NpcResources = ActorResources;
+export type NpcDerivedStat = ActorDerivedStat;
+export type NpcDerived = ActorDerived;
 
 export interface NpcNotes {
   name: string;
@@ -134,4 +129,5 @@ export interface TypeNpc {
   statuses?: ActorStatuses;
   resources?: NpcResources;
   derived?: NpcDerived;
+  features?: NpcFeatures;
 }

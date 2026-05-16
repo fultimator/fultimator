@@ -183,7 +183,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
 
   // attributes
   {
-    key: "attributes.dexterity",
+    key: "attributes.dexterity.base",
     kind: "editable",
     label: "DEX",
     component: "npc-attr-slider",
@@ -193,7 +193,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     componentProps: ATTR_SLIDER,
   },
   {
-    key: "attributes.insight",
+    key: "attributes.insight.base",
     kind: "editable",
     label: "INS",
     component: "npc-attr-slider",
@@ -203,7 +203,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     componentProps: ATTR_SLIDER,
   },
   {
-    key: "attributes.might",
+    key: "attributes.might.base",
     kind: "editable",
     label: "MIG",
     component: "npc-attr-slider",
@@ -213,7 +213,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     componentProps: ATTR_SLIDER,
   },
   {
-    key: "attributes.will",
+    key: "attributes.will.base",
     kind: "editable",
     label: "WLP",
     component: "npc-attr-slider",
@@ -352,7 +352,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
 
   // stats
   {
-    key: "extra.hp",
+    key: "resources.hp.bonus",
     kind: "editable",
     label: "Extra HP:",
     component: "number",
@@ -363,7 +363,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     parse: (v) => Number(v) || 0,
   },
   {
-    key: "extra.mp",
+    key: "resources.mp.bonus",
     kind: "editable",
     label: "Extra MP:",
     component: "number",
@@ -374,7 +374,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     parse: (v) => Number(v) || 0,
   },
   {
-    key: "extra.extrainit",
+    key: "derived.init.bonus",
     kind: "editable",
     label: "Extra Init:",
     component: "number",
@@ -385,7 +385,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     parse: (v) => Number(v) || 0,
   },
   {
-    key: "extra.init",
+    key: "features.init.enabled",
     kind: "editable",
     label: "+4 Initiative",
     component: "checkbox",
@@ -394,7 +394,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     fullWidth: true,
   },
   {
-    key: "extra.precision",
+    key: "features.precision.enabled",
     kind: "editable",
     label: "+3 bonus to all Accuracy Checks",
     component: "checkbox",
@@ -403,7 +403,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     fullWidth: true,
   },
   {
-    key: "extra.magic",
+    key: "features.magic.enabled",
     kind: "editable",
     label: "+3 bonus to all Magic Checks",
     component: "checkbox",

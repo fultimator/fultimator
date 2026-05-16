@@ -35,10 +35,17 @@ const NpcImmunitiesSchema = z.object({
 });
 
 const NpcExtraSchema = z.object({
-  init: z.boolean().optional(),
-  precision: z.boolean().optional(),
-  magic: z.boolean().optional(),
   statusImmunity: z.number().int().min(0).max(3).optional(),
+});
+
+const NpcFeatureSchema = z.object({
+  enabled: z.boolean(),
+});
+
+const NpcFeaturesSchema = z.object({
+  init: NpcFeatureSchema.optional(),
+  precision: NpcFeatureSchema.optional(),
+  magic: NpcFeatureSchema.optional(),
 });
 
 const NpcResourcePoolSchema = z.object({
@@ -194,6 +201,7 @@ export const NpcPersistedSchema = z.object({
   published: z.boolean().optional(),
   resources: NpcResourcesSchema.optional(),
   derived: NpcDerivedSchema.optional(),
+  features: NpcFeaturesSchema.optional(),
 });
 
 export type NpcPersisted = z.infer<typeof NpcPersistedSchema>;

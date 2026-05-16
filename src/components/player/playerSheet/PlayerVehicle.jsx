@@ -91,7 +91,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
 
   const currDex = calculateAttribute(
     player,
-    player.attributes.dexterity,
+    player.attributes.dexterity?.base,
     ["slow", "enraged"],
     ["dexUp"],
     6,
@@ -99,7 +99,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
   );
   const currInsight = calculateAttribute(
     player,
-    player.attributes.insight,
+    player.attributes.insight?.base,
     ["dazed", "enraged"],
     ["insUp"],
     6,
@@ -107,7 +107,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
   );
   const currMight = calculateAttribute(
     player,
-    player.attributes.might,
+    player.attributes.might?.base,
     ["weak", "poisoned"],
     ["migUp"],
     6,
@@ -115,7 +115,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
   );
   const currWillpower = calculateAttribute(
     player,
-    player.attributes.willpower,
+    player.attributes.willpower?.base,
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,

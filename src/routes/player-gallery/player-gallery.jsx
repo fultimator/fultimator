@@ -207,6 +207,7 @@ function Personal() {
 
   const filteredList = personalList
     ? personalList
+        .map(applyPostLoadTransforms)
         .filter((item) => {
           if (
             name !== "" &&
@@ -1732,7 +1733,7 @@ function PlayerGalleryCardActions({
         <Export
           name={`${player.name}`}
           dataType="pc"
-          data={applyPreSaveTransforms(applyPostLoadTransforms(player))}
+          data={applyPreSaveTransforms(player)}
         />
         <Box sx={{ ml: "auto" }} />
         <Tooltip

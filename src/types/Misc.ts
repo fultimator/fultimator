@@ -87,3 +87,24 @@ export interface ActorStatuses {
   enraged: boolean;
   poisoned: boolean;
 }
+
+export interface ActorResourcePool {
+  current: number;
+  bonus: number;
+}
+
+export interface ActorResources {
+  hp: ActorResourcePool;
+  mp: ActorResourcePool;
+}
+
+export interface ActorDerivedStat {
+  bonus: number;
+  override?: number;
+}
+
+export interface ActorDerived {
+  def: ActorDerivedStat;
+  mdef: ActorDerivedStat;
+  init: { bonus: number };
+}

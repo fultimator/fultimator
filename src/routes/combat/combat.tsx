@@ -25,6 +25,7 @@ import Layout from "../../components/Layout";
 import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 import PointBar from "../../components/PointBar";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
 import { useEffect } from "react";
 import React from "react";
 import { TypeNpc } from "../../types/Npcs";
@@ -85,7 +86,11 @@ function AuthCombat() {
       db.orderBy("name", "asc"),
     );
     db.getDocs(q)
-      .then((docs) => setPersonalList((docs as TypeNpc[]) ?? []))
+      .then((docs) =>
+        setPersonalList(
+          ((docs as TypeNpc[]) ?? []).map(applyNpcPostLoadTransforms),
+        ),
+      )
       .catch((e) => console.error("Error loading NPCs:", e))
       .finally(() => setLoading(false));
   }, [db]);
@@ -341,7 +346,7 @@ function NpcCombatant({ npc }: NpcProps) {
       attribute2 = attributes[attack.accuracy?.attr2];
       extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
       extraPrecision =
-        (npc.extra?.precision ? 3 : 0) +
+        (npc.features?.precision?.enabled ? 3 : 0) +
         (attack.accuracy?.value ?? 0) +
         accuracyLevelBonus;
       type = attack.damage?.type;
@@ -351,7 +356,8 @@ function NpcCombatant({ npc }: NpcProps) {
       attribute1 = attributes[attr1];
       attribute2 = attributes[attr2];
       extraDamage = 0;
-      extraPrecision = (npc.extra?.magic ? 3 : 0) + accuracyLevelBonus;
+      extraPrecision =
+        (npc.features?.magic?.enabled ? 3 : 0) + accuracyLevelBonus;
       type = "spell";
     } else {
       // For base attacks
@@ -361,7 +367,7 @@ function NpcCombatant({ npc }: NpcProps) {
       attribute2 = attributes[attr2];
       extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
       extraPrecision =
-        (npc.extra?.precision ? 3 : 0) +
+        (npc.features?.precision?.enabled ? 3 : 0) +
         (attack.accuracy?.value ?? 0) +
         accuracyLevelBonus;
       type = attack.damage?.type;
@@ -583,22 +589,22 @@ function NpcCombatant({ npc }: NpcProps) {
           <Grid container size={12}>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("DEX:")} d{attributes.dexterity}
+                {t("DEX:")} d{attributes.dexterity?.base}
               </Typography>
             </Grid>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("INS:")} d{attributes.insight}
+                {t("INS:")} d{attributes.insight?.base}
               </Typography>
             </Grid>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("MIG:")} d{attributes.might}
+                {t("MIG:")} d{attributes.might?.base}
               </Typography>
             </Grid>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("WIL:")} d{attributes.will}
+                {t("WIL:")} d{attributes.will?.base}
               </Typography>
             </Grid>
           </Grid>

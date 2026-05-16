@@ -3,6 +3,7 @@ import {
   NpcAttributes,
   NpcResources,
   NpcDerived,
+  NpcFeatures,
 } from "../../types/Npcs";
 import { Affinities, Elements } from "../../types/Misc";
 import { normalizeDefensiveItem } from "../../libs/equipmentDefensiveNormalization";
@@ -392,7 +393,7 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
     },
   };
 
-  // 3. Migrate numeric NpcExtra fields into resources / derived
+  // 3. Migrate numeric and boolean NpcExtra fields into resources / derived / features
   const extra =
     (npc.extra as typeof npc.extra & {
       hp?: number;
@@ -402,6 +403,9 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
       defOverride?: boolean;
       mDefOverride?: boolean;
       extrainit?: number;
+      init?: boolean;
+      precision?: boolean;
+      magic?: boolean;
     }) ?? {};
 
   const resources: NpcResources = {
@@ -427,7 +431,17 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
     init: { bonus: extra.extrainit ?? 0 },
   };
 
-  // 4. Strip migrated fields from extra; keep feature flags + statusImmunity
+  const incomingFeatures: NpcFeatures = {
+    ...(extra.init ? { init: { enabled: true } } : {}),
+    ...(extra.precision ? { precision: { enabled: true } } : {}),
+    ...(extra.magic ? { magic: { enabled: true } } : {}),
+  };
+  const features =
+    Object.keys(incomingFeatures).length > 0
+      ? { ...npc.features, ...incomingFeatures }
+      : npc.features;
+
+  // 4. Strip all migrated fields from extra; keep only statusImmunity
   const {
     hp: _hp,
     mp: _mp,
@@ -436,6 +450,9 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
     defOverride: _defOv,
     mDefOverride: _mDefOv,
     extrainit: _ei,
+    init: _i,
+    precision: _p,
+    magic: _m,
     ...remainingExtra
   } = extra;
 
@@ -445,6 +462,7 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
     attributes,
     resources,
     derived,
+    features,
     extra: Object.keys(remainingExtra).length > 0 ? remainingExtra : undefined,
   };
 }
@@ -503,7 +521,7 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 10,
     label:
-      "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; NpcExtra numeric fields migrated",
+      "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; NpcExtra numeric/boolean fields migrated",
     fn: actorAlignmentV10,
   },
 ];

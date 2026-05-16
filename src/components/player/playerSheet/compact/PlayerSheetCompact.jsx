@@ -828,7 +828,7 @@ export default function PlayerCardSheet({
 
   const currDex = calculateAttribute(
     player,
-    player.attributes.dexterity,
+    player.attributes.dexterity?.base,
     ["slow", "enraged"],
     ["dexUp"],
     6,
@@ -836,7 +836,7 @@ export default function PlayerCardSheet({
   );
   const currInsight = calculateAttribute(
     player,
-    player.attributes.insight,
+    player.attributes.insight?.base,
     ["dazed", "enraged"],
     ["insUp"],
     6,
@@ -844,7 +844,7 @@ export default function PlayerCardSheet({
   );
   const currMight = calculateAttribute(
     player,
-    player.attributes.might,
+    player.attributes.might?.base,
     ["weak", "poisoned"],
     ["migUp"],
     6,
@@ -852,7 +852,7 @@ export default function PlayerCardSheet({
   );
   const currWillpower = calculateAttribute(
     player,
-    player.attributes.willpower,
+    player.attributes.willpower?.base,
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
@@ -2395,7 +2395,7 @@ function Stats({
   const handleAttrChange = (key) => (e) => {
     setPlayer((p) => ({
       ...p,
-      attributes: { ...p.attributes, [key]: e.target.value },
+      attributes: { ...p.attributes, [key]: { ...p.attributes[key], base: e.target.value } },
     }));
     if (updateMaxStats) updateMaxStats();
   };
@@ -2487,13 +2487,13 @@ function Stats({
                       {label}{" "}
                     </Typography>
                     <Select
-                      value={player.attributes[key]}
+                      value={player.attributes[key]?.base}
                       onChange={handleAttrChange(key)}
                       variant="outlined"
                       size="small"
                       sx={{
                         ...attrSelectSx,
-                        color: getAttributeColor(player.attributes[key], curr),
+                        color: getAttributeColor(player.attributes[key]?.base, curr),
                       }}
                     >
                       {[6, 8, 10, 12].map((v) => (
@@ -2517,7 +2517,7 @@ function Stats({
                     style={{
                       fontFamily: "'Antonio', fantasy, sans-serif",
                       fontSize: key === "willpower" ? "0.9rem" : "0.875rem",
-                      color: getAttributeColor(player.attributes[key], curr),
+                      color: getAttributeColor(player.attributes[key]?.base, curr),
                     }}
                   >
                     {label} d{curr}

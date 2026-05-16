@@ -321,8 +321,8 @@ export default function PlayerEdit() {
   };
 
   const recalculatePlayerMaxStats = useCallback((prevPlayer) => {
-    const mig = Number(prevPlayer.attributes?.might) || 0;
-    const wil = Number(prevPlayer.attributes?.willpower) || 0;
+    const mig = Number(prevPlayer.attributes?.might?.base) || 0;
+    const wil = Number(prevPlayer.attributes?.willpower?.base) || 0;
     const lvl = Number(prevPlayer.lvl) || 0;
 
     const baseMaxHP = mig * 5 + lvl;
@@ -358,8 +358,10 @@ export default function PlayerEdit() {
     }
 
     if (prevPlayer.modifiers) {
-      hpBonus += Number(prevPlayer.modifiers.hp) || 0;
-      mpBonus += Number(prevPlayer.modifiers.mp) || 0;
+      hpBonus +=
+        Number(prevPlayer.resources?.hp.bonus ?? prevPlayer.modifiers.hp) || 0;
+      mpBonus +=
+        Number(prevPlayer.resources?.mp.bonus ?? prevPlayer.modifiers.mp) || 0;
       ipBonus += Number(prevPlayer.modifiers.ip) || 0;
     }
 

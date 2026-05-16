@@ -426,7 +426,7 @@ export default function PlayerCard({
 
   const currDex = calculateAttribute(
     player,
-    player.attributes.dexterity,
+    player.attributes.dexterity?.base,
     ["slow", "enraged"],
     ["dexUp"],
     6,
@@ -434,7 +434,7 @@ export default function PlayerCard({
   );
   const currInsight = calculateAttribute(
     player,
-    player.attributes.insight,
+    player.attributes.insight?.base,
     ["dazed", "enraged"],
     ["insUp"],
     6,
@@ -442,7 +442,7 @@ export default function PlayerCard({
   );
   const currMight = calculateAttribute(
     player,
-    player.attributes.might,
+    player.attributes.might?.base,
     ["weak", "poisoned"],
     ["migUp"],
     6,
@@ -450,7 +450,7 @@ export default function PlayerCard({
   );
   const currWillpower = calculateAttribute(
     player,
-    player.attributes.willpower,
+    player.attributes.willpower?.base,
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
@@ -1422,13 +1422,13 @@ export default function PlayerCard({
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     {isEditMode ? (
                       <Select
-                        value={player.attributes[key]}
+                        value={player.attributes[key]?.base}
                         onChange={(e) => {
                           setPlayer((p) => ({
                             ...p,
                             attributes: {
                               ...p.attributes,
-                              [key]: e.target.value,
+                              [key]: { ...p.attributes[key], base: e.target.value },
                             },
                           }));
                           updateMaxStats?.();
@@ -1470,7 +1470,7 @@ export default function PlayerCard({
                           },
                           fontWeight: "bold",
                           color: getAttributeColor(
-                            player.attributes[key],
+                            player.attributes[key]?.base,
                             curr,
                           ),
                           lineHeight: 1,

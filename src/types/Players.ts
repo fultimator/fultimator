@@ -2,10 +2,12 @@ import {
   ResourceCost,
   Accuracy,
   Damage,
-  ActorAttributes,
+  ActorAttributeValue,
   ActorAffinities,
   ActorImmunities,
   ActorStatuses,
+  ActorResources,
+  ActorDerived,
 } from "./Misc";
 import type {
   Weapon as EquipmentWeapon,
@@ -97,7 +99,12 @@ export interface PlayerInfo {
   imgurl: string;
 }
 
-export type PlayerAttributes = ActorAttributes;
+export interface PlayerAttributes {
+  might: ActorAttributeValue;
+  insight: ActorAttributeValue;
+  willpower: ActorAttributeValue;
+  dexterity: ActorAttributeValue;
+}
 
 export interface StatValues {
   base: number;
@@ -327,6 +334,8 @@ export interface TypePlayer {
   vehicleSlots?: VehicleSlots;
   settings?: PlayerSettings;
   schemaVersion?: number;
+  resources?: ActorResources;
+  derived?: ActorDerived;
 }
 
 export type EquipmentSource =

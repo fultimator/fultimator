@@ -44,6 +44,9 @@ import VehicleEnterDialog from "../../../player/equipment/slots/VehicleEnterDial
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import { useDatabase } from "../../../../hooks/useDatabase";
 import type { TypePlayer } from "../../../../types/Players";
+import { applyPostLoadTransforms } from "../../../../components/player/playerTransforms";
+import { applyNpcPostLoadTransforms } from "../../../../components/npc/npcTransforms";
+import type { TypeNpc } from "../../../../types/Npcs";
 import type { ChatMessage } from "./types";
 import {
   getAvailableSupportModules,
@@ -242,10 +245,19 @@ export const ChatPanel: React.FC = () => {
 
       try {
         const fallbackBase = activeActorDoc as unknown as TypePlayer;
-        const base =
-          typeof updater === "function"
-            ? (((await db.getDoc(docRef)) as TypePlayer | null) ?? fallbackBase)
+        let base: TypePlayer;
+        if (typeof updater === "function") {
+          const raw = (await db.getDoc(docRef)) as TypePlayer | TypeNpc | null;
+          base = raw
+            ? isNpc
+              ? (applyNpcPostLoadTransforms(
+                  raw as TypeNpc,
+                ) as unknown as TypePlayer)
+              : applyPostLoadTransforms(raw as TypePlayer)
             : fallbackBase;
+        } else {
+          base = fallbackBase;
+        }
         const updated = typeof updater === "function" ? updater(base) : updater;
         setActiveActorDocOverride(
           updated as unknown as Record<string, unknown>,
