@@ -9,7 +9,8 @@ import {
 import { IconButton, Tooltip } from "@mui/material";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useRef } from "react";
-import allBases from "./base";
+import armorBases from "../../../libs/armor";
+import shieldBases from "../../../libs/shields";
 import {
   SharedArmorCard,
   SharedShieldCard,
@@ -23,8 +24,6 @@ import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRendere
 import { armorFieldConfig } from "../../../forms/rendering/config/itemConfigs/armor";
 import { shieldFieldConfig } from "../../../forms/rendering/config/itemConfigs/shield";
 
-const armorBases = allBases.filter((b) => b.category !== "Shield");
-const shieldBases = allBases.filter((b) => b.category === "Shield");
 
 function buildState(base) {
   return {
