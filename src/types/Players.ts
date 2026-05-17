@@ -10,6 +10,7 @@ import {
   ActorDerived,
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
+import type { ItemEffect, ActorEffect, AppliesEffect } from "./Effects";
 import type {
   Weapon as EquipmentWeapon,
   CustomWeapon as EquipmentCustomWeapon,
@@ -30,7 +31,7 @@ export interface Hoplosphere {
   socketable: "all" | "weapon";
   requiredSlots: 1 | 2;
   cost: number;
-  // changes: HoplosphereChange[] — deferred until effects system designed
+  effects?: ItemEffect[];
 }
 
 export interface MnemosphereSkill {
@@ -38,11 +39,15 @@ export interface MnemosphereSkill {
   specialSkill?: string;
   maxLvl: number;
   currentLvl: number;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface MnemosphereHeroic {
   name: string;
   specialSkill?: string;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface MnemosphereSpell {
@@ -66,6 +71,8 @@ export interface MnemosphereSpell {
   itemType: "spell";
   damage?: Damage;
   spellType?: string;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface Mnemosphere {
@@ -141,6 +148,8 @@ export interface Skills {
   currentLvl: number;
   maxLvl: number;
   specialSkill?: string;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface PlayerModifiers {
@@ -159,6 +168,8 @@ export interface HeroicSkills {
   name: string;
   quote: string;
   description: string;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface PlayerSettings {
@@ -228,6 +239,8 @@ export interface Spells {
   spellType?: string;
   vehicles?: Vehicle[];
   currentVehicles?: Vehicle[];
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface PlayerClass {
@@ -339,6 +352,7 @@ export interface TypePlayer {
   derived?: ActorDerived;
   bonuses?: ActorBonuses;
   multipliers?: ActorMultipliers;
+  effects?: ActorEffect[];
 }
 
 export type EquipmentSource =

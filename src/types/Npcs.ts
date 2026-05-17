@@ -12,6 +12,7 @@ import {
   ActorDerived,
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
+import type { ItemEffect, ActorEffect, AppliesEffect } from "./Effects";
 import type {
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
@@ -41,23 +42,31 @@ export interface NpcSpell {
   special: string[];
   itemType: "spell";
   spellType: string;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface NpcAction {
   name: string;
   effect: string;
   spCost?: number;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface NpcSpecial {
   name: string;
   effect: string;
   spCost?: number;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface NpcRareGear {
   name: string;
   effect: string;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
 }
 
 export interface NpcExtra {
@@ -133,4 +142,5 @@ export interface TypeNpc {
   features?: NpcFeatures;
   bonuses?: ActorBonuses;
   multipliers?: ActorMultipliers;
+  effects?: ActorEffect[];
 }
