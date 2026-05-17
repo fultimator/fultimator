@@ -1,4 +1,5 @@
 import { t } from "../translation/translate";
+import { slugify } from "./slugify";
 
 const classList = [
   {
@@ -2818,12 +2819,7 @@ export const entropistGamble = {
   ],
 };
 
-const slugify = (value = "") =>
-  String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+
 
 classList.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);

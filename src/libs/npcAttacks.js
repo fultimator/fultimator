@@ -1,4 +1,5 @@
 import { t } from "../translation/translate";
+import { slugify } from "./slugify";
 
 export const npcAttacks = [
   {
@@ -259,12 +260,7 @@ export const npcAttacks = [
   },
 ];
 
-const slugify = (value = "") =>
-  String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+
 
 npcAttacks.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);

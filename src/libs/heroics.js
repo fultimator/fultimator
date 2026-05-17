@@ -1,4 +1,5 @@
 import { t } from "../translation/translate";
+import { slugify } from "./slugify";
 
 const heroics = [
   // FUCR - core
@@ -1053,12 +1054,7 @@ const heroics = [
   },
 ];
 
-const slugify = (value = "") =>
-  String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+
 
 heroics.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);

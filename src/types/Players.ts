@@ -25,6 +25,7 @@ export type { SlotTier, CustomWeaponCustomization };
 
 export interface Hoplosphere {
   id: string;
+  fuid?: string;
   name: string;
   description: string;
   coagEffects?: Record<string, string>;
@@ -35,6 +36,7 @@ export interface Hoplosphere {
 }
 
 export interface MnemosphereSkill {
+  fuid?: string;
   name: string;
   specialSkill?: string;
   maxLvl: number;
@@ -44,6 +46,7 @@ export interface MnemosphereSkill {
 }
 
 export interface MnemosphereHeroic {
+  fuid?: string;
   name: string;
   specialSkill?: string;
   effects?: ItemEffect[];
@@ -51,6 +54,7 @@ export interface MnemosphereHeroic {
 }
 
 export interface MnemosphereSpell {
+  fuid?: string;
   name: string;
   class: string;
   duration: string;
@@ -77,6 +81,7 @@ export interface MnemosphereSpell {
 
 export interface Mnemosphere {
   id: string;
+  fuid?: string;
   class: string;
   lvl: number;
   skills: MnemosphereSkill[];
@@ -143,6 +148,7 @@ export interface Benefits {
 }
 
 export interface Skills {
+  fuid?: string;
   name: string;
   description: string;
   currentLvl: number;
@@ -165,6 +171,7 @@ export interface PlayerModifiers {
 }
 
 export interface HeroicSkills {
+  fuid?: string;
   name: string;
   quote: string;
   description: string;
@@ -190,6 +197,7 @@ export interface PlayerSettings {
 }
 
 export interface VehicleModule {
+  fuid?: string;
   name: string;
   type: string;
   equippedSlot: string | null;
@@ -217,6 +225,7 @@ export interface Vehicle {
 }
 
 export interface Spells {
+  fuid?: string;
   name: string;
   class: string;
   duration: string;
@@ -244,6 +253,7 @@ export interface Spells {
 }
 
 export interface PlayerClass {
+  fuid?: string;
   name: string;
   lvl: number;
   benefits: Benefits;
@@ -308,6 +318,7 @@ export interface Rituals {
 }
 
 export interface PlayerItems {
+  fuid?: string;
   name: string;
   description: string;
   value: number;
@@ -315,12 +326,14 @@ export interface PlayerItems {
 }
 
 export interface PlayerConsumables {
+  fuid?: string;
   name: string;
   description: string;
   ipCost: number;
 }
 
 export interface PlayerNotes {
+  fuid?: string;
   name: string;
   description: string;
 }

@@ -1,4 +1,5 @@
 import classList from "./classes";
+import { slugify } from "./slugify";
 
 export const MNEMOSPHERE_LEVELS = [0, 1, 2, 3, 4, 5];
 
@@ -6,12 +7,7 @@ function genId() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-function slugify(str) {
-  return str
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
+
 
 export const mnemosphereClassList = classList.map((classDef) => ({
   name: classDef.name,

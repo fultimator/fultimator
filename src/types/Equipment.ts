@@ -31,6 +31,7 @@ export interface CustomWeaponRare extends WeaponRare {
 }
 
 export interface Weapon {
+  fuid?: string;
   itemType: "weapon";
   category: string;
   name: string;
@@ -48,6 +49,7 @@ export interface Weapon {
 }
 
 export interface CustomWeapon {
+  fuid?: string;
   itemType: "customWeapon";
   name: string;
   category: string;
@@ -75,6 +77,7 @@ export interface CustomWeapon {
 }
 
 export interface NpcAttack {
+  fuid?: string;
   itemType?: "attack";
   name: string;
   range: "melee" | "ranged";
@@ -86,6 +89,7 @@ export interface NpcAttack {
 }
 
 export interface NpcWeaponAttack {
+  fuid?: string;
   itemType?: "weaponAttack";
   name: string;
   range: "melee" | "ranged";
@@ -110,6 +114,7 @@ export interface DefensiveModifiers {
 }
 
 export interface EquipmentArmor {
+  fuid?: string;
   itemType?: "armor";
   category?: "Armor" | string;
   name: string;
@@ -152,6 +157,7 @@ export interface EquipmentShield extends Omit<EquipmentArmor, "itemType"> {
 }
 
 export interface EquipmentAccessory {
+  fuid?: string;
   itemType?: "accessory";
   category?: "Accessory" | string;
   name: string;

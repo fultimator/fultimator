@@ -1,3 +1,5 @@
+import { slugify } from "./slugify";
+
 // Available module types (slot is determined by type)
 export const moduleTypes = [
   "pilot_module_armor",
@@ -514,12 +516,7 @@ export const availableModules = {
   ],
 };
 
-const slugify = (value = "") =>
-  String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+
 
 availableFrames.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);

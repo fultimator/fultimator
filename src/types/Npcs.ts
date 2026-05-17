@@ -28,6 +28,7 @@ export type NpcAttack = EquipmentNpcAttack;
 export type NpcWeaponAttack = EquipmentNpcWeaponAttack;
 
 export interface NpcSpell {
+  fuid?: string;
   name: string;
   accuracy: Accuracy;
   isOffensive: boolean;
@@ -47,6 +48,7 @@ export interface NpcSpell {
 }
 
 export interface NpcAction {
+  fuid?: string;
   name: string;
   effect: string;
   spCost?: number;
@@ -55,6 +57,7 @@ export interface NpcAction {
 }
 
 export interface NpcSpecial {
+  fuid?: string;
   name: string;
   effect: string;
   spCost?: number;
@@ -63,6 +66,7 @@ export interface NpcSpecial {
 }
 
 export interface NpcRareGear {
+  fuid?: string;
   name: string;
   effect: string;
   effects?: ItemEffect[];
