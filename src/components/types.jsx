@@ -49,7 +49,7 @@ export function TypeIcon({ type, disabled }) {
 }
 
 export function TypeAffinity({ type, affinity }) {
-  if (!affinity) {
+  if (!affinity || affinity === "no") {
     affinity = "";
   }
   const disabled = affinity === "";
