@@ -11,11 +11,15 @@ import {
   type ResourceDelta,
 } from "../types/Bonuses";
 
-export function getActorBonuses(actor: { bonuses?: ActorBonuses }): ActorBonuses {
+export function getActorBonuses(actor: {
+  bonuses?: ActorBonuses;
+}): ActorBonuses {
   return actor.bonuses ?? zeroActorBonuses();
 }
 
-export function getActorMultipliers(actor: { multipliers?: ActorMultipliers }): ActorMultipliers {
+export function getActorMultipliers(actor: {
+  multipliers?: ActorMultipliers;
+}): ActorMultipliers {
   return actor.multipliers ?? oneActorMultipliers();
 }
 
@@ -34,21 +38,29 @@ function byPriority(a: EffectRecord, b: EffectRecord): number {
   return (a.priority ?? 0) - (b.priority ?? 0);
 }
 
-function numericTarget(payload: Record<string, unknown>): { target: string; value: number } | null {
+function numericTarget(
+  payload: Record<string, unknown>,
+): { target: string; value: number } | null {
   const target = payload.target;
   const value = payload.value;
   if (typeof target !== "string" || typeof value !== "number") return null;
   return { target, value };
 }
 
-function resourceValue(payload: Record<string, unknown>): { resource: string; value: number } | null {
+function resourceValue(
+  payload: Record<string, unknown>,
+): { resource: string; value: number } | null {
   const resource = payload.resource;
   const value = payload.value;
   if (typeof resource !== "string" || typeof value !== "number") return null;
   return { resource, value };
 }
 
-function addToAccuracy(acc: AccuracyBonuses, target: string, value: number): void {
+function addToAccuracy(
+  acc: AccuracyBonuses,
+  target: string,
+  value: number,
+): void {
   if (target in acc) {
     (acc as unknown as Record<string, number>)[target] += value;
   }
@@ -60,7 +72,11 @@ function addToDamage(dmg: DamageBonuses, target: string, value: number): void {
   }
 }
 
-function addToResource(delta: ResourceDelta, resource: string, value: number): void {
+function addToResource(
+  delta: ResourceDelta,
+  resource: string,
+  value: number,
+): void {
   if (resource === "hp" || resource === "mp" || resource === "ip") {
     delta[resource] += value;
   }
@@ -85,22 +101,26 @@ export function computeBonuses(effects: EffectRecord[]): ActorBonuses {
       }
       case "incoming-damage-bonus": {
         const parsed = numericTarget(p);
-        if (parsed) addToDamage(out.incomingDamage, parsed.target, parsed.value);
+        if (parsed)
+          addToDamage(out.incomingDamage, parsed.target, parsed.value);
         break;
       }
       case "incoming-recovery-bonus": {
         const parsed = resourceValue(p);
-        if (parsed) addToResource(out.incomingRecovery, parsed.resource, parsed.value);
+        if (parsed)
+          addToResource(out.incomingRecovery, parsed.resource, parsed.value);
         break;
       }
       case "incoming-loss-bonus": {
         const parsed = resourceValue(p);
-        if (parsed) addToResource(out.incomingLoss, parsed.resource, parsed.value);
+        if (parsed)
+          addToResource(out.incomingLoss, parsed.resource, parsed.value);
         break;
       }
       case "outgoing-recovery-bonus": {
         const parsed = resourceValue(p);
-        if (parsed) addToResource(out.outgoingRecovery, parsed.resource, parsed.value);
+        if (parsed)
+          addToResource(out.outgoingRecovery, parsed.resource, parsed.value);
         break;
       }
     }
@@ -118,8 +138,8 @@ export function totalIncomingDamageBonus(
   return (
     (dmg.all ?? 0) +
     (opts.category ? (dmg[opts.category] ?? 0) : 0) +
-    (opts.element  ? (dmg[opts.element]  ?? 0) : 0) +
-    (opts.species  ? (dmg[opts.species]  ?? 0) : 0)
+    (opts.element ? (dmg[opts.element] ?? 0) : 0) +
+    (opts.species ? (dmg[opts.species] ?? 0) : 0)
   );
 }
 
@@ -132,8 +152,8 @@ export function totalOutgoingDamageBonus(
   return (
     (dmg.all ?? 0) +
     (opts.category ? (dmg[opts.category] ?? 0) : 0) +
-    (opts.element  ? (dmg[opts.element]  ?? 0) : 0) +
-    (opts.species  ? (dmg[opts.species]  ?? 0) : 0)
+    (opts.element ? (dmg[opts.element] ?? 0) : 0) +
+    (opts.species ? (dmg[opts.species] ?? 0) : 0)
   );
 }
 

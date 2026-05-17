@@ -342,8 +342,12 @@ function NpcCombatant({ npc }: NpcProps) {
 
     if (attackType === "weapon") {
       // For weapon attacks
-      attribute1 = attributes[attack.accuracy?.attr1]?.base ?? attributes[attack.accuracy?.attr1];
-      attribute2 = attributes[attack.accuracy?.attr2]?.base ?? attributes[attack.accuracy?.attr2];
+      attribute1 =
+        attributes[attack.accuracy?.attr1]?.base ??
+        attributes[attack.accuracy?.attr1];
+      attribute2 =
+        attributes[attack.accuracy?.attr2]?.base ??
+        attributes[attack.accuracy?.attr2];
       extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
       extraPrecision =
         (npc.features?.precision?.enabled ? 3 : 0) +

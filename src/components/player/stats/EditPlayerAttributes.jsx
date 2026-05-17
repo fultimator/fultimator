@@ -25,7 +25,10 @@ export default function EditPlayerAttributes({
     return (e, value) => {
       setPlayer((prevState) => {
         const newState = { ...prevState };
-        newState.attributes = { ...newState.attributes, [key]: { ...newState.attributes[key], base: value } };
+        newState.attributes = {
+          ...newState.attributes,
+          [key]: { ...newState.attributes[key], base: value },
+        };
         return newState;
       });
       updateMaxStats();

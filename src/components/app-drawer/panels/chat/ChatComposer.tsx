@@ -126,9 +126,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           const after = input.slice(input.indexOf(" ") + 1).trimStart();
           const parts = after.trim() ? after.trim().split(/\s+/) : [];
           if (parts.length === 0) return -1;
-          const firstIsKind = (CHECK_KIND_OPTIONS as readonly string[]).includes(
-            parts[0]?.toLowerCase() ?? "",
-          );
+          const firstIsKind = (
+            CHECK_KIND_OPTIONS as readonly string[]
+          ).includes(parts[0]?.toLowerCase() ?? "");
           const attrParts = firstIsKind ? parts.slice(1) : parts;
           if (attrParts.length === 0) return 0;
           if (attrParts.length === 1) return 1;
@@ -1835,108 +1835,109 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                 {checkParamIndex === 3 &&
                   checkSelectedKind !== "open" &&
                   checkSelectedKind !== "opposed" && (
-                  <ListItem sx={{ py: 0.75, px: 1 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 0.5,
-                        width: "100%",
-                      }}
-                    >
-                      <Typography variant="caption" color="text.secondary">
-                        Difficulty
-                      </Typography>
-                      {DIFFICULTY_PRESETS.map(({ value, label }) => (
-                        <Button
-                          key={value}
-                          size="small"
-                          variant="outlined"
-                          fullWidth
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => applyCheckDifficulty(value)}
-                          sx={{
-                            justifyContent: "space-between",
-                            fontFamily: "monospace",
-                            fontSize: "0.75rem",
-                            py: 0.25,
-                            px: 1,
-                          }}
-                        >
-                          <span>{value}</span>
-                          <span>{label}</span>
-                        </Button>
-                      ))}
-                      <Box sx={{ display: "flex", gap: 0.5 }}>
-                        <InputBase
-                          inputRef={customDlRef}
-                          size="small"
-                          placeholder="custom DL"
-                          inputProps={{
-                            inputMode: "numeric",
-                            style: {
-                              textAlign: "center",
+                    <ListItem sx={{ py: 0.75, px: 1 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 0.5,
+                          width: "100%",
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          Difficulty
+                        </Typography>
+                        {DIFFICULTY_PRESETS.map(({ value, label }) => (
+                          <Button
+                            key={value}
+                            size="small"
+                            variant="outlined"
+                            fullWidth
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => applyCheckDifficulty(value)}
+                            sx={{
+                              justifyContent: "space-between",
+                              fontFamily: "monospace",
                               fontSize: "0.75rem",
-                              padding: "2px 4px",
-                            },
-                          }}
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
+                              py: 0.25,
+                              px: 1,
+                            }}
+                          >
+                            <span>{value}</span>
+                            <span>{label}</span>
+                          </Button>
+                        ))}
+                        <Box sx={{ display: "flex", gap: 0.5 }}>
+                          <InputBase
+                            inputRef={customDlRef}
+                            size="small"
+                            placeholder="custom DL"
+                            inputProps={{
+                              inputMode: "numeric",
+                              style: {
+                                textAlign: "center",
+                                fontSize: "0.75rem",
+                                padding: "2px 4px",
+                              },
+                            }}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                const val = parseInt(
+                                  (e.target as HTMLInputElement).value,
+                                  10,
+                                );
+                                if (!Number.isNaN(val))
+                                  applyCheckDifficulty(val);
+                              }
+                            }}
+                            sx={{
+                              flex: 1,
+                              border: "1px solid",
+                              borderColor: "divider",
+                              borderRadius: 1,
+                              px: 0.5,
+                              height: 26,
+                            }}
+                          />
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
                               const val = parseInt(
-                                (e.target as HTMLInputElement).value,
+                                customDlRef.current?.value ?? "",
                                 10,
                               );
                               if (!Number.isNaN(val)) applyCheckDifficulty(val);
-                            }
-                          }}
-                          sx={{
-                            flex: 1,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            borderRadius: 1,
-                            px: 0.5,
-                            height: 26,
-                          }}
-                        />
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => {
-                            const val = parseInt(
-                              customDlRef.current?.value ?? "",
-                              10,
-                            );
-                            if (!Number.isNaN(val)) applyCheckDifficulty(val);
-                          }}
-                          sx={{
-                            fontFamily: "monospace",
-                            fontSize: "0.7rem",
-                            py: 0.25,
-                            px: 1,
-                          }}
-                        >
-                          roll
-                        </Button>
-                        <Button
-                          size="small"
-                          variant="text"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => applyCheckDifficulty(null)}
-                          sx={{
-                            fontFamily: "monospace",
-                            fontSize: "0.7rem",
-                            py: 0.25,
-                            px: 1,
-                            color: "text.secondary",
-                          }}
-                        >
-                          open
-                        </Button>
+                            }}
+                            sx={{
+                              fontFamily: "monospace",
+                              fontSize: "0.7rem",
+                              py: 0.25,
+                              px: 1,
+                            }}
+                          >
+                            roll
+                          </Button>
+                          <Button
+                            size="small"
+                            variant="text"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => applyCheckDifficulty(null)}
+                            sx={{
+                              fontFamily: "monospace",
+                              fontSize: "0.7rem",
+                              py: 0.25,
+                              px: 1,
+                              color: "text.secondary",
+                            }}
+                          >
+                            open
+                          </Button>
+                        </Box>
                       </Box>
-                    </Box>
-                  </ListItem>
+                    </ListItem>
                   )}
               </List>
             </Paper>

@@ -75,8 +75,7 @@ export function calcMP(npc) {
 
 export function calcInit(npc) {
   if (!npc || !npc.attributes) return 0;
-  const dexterity =
-    npc.attributes.dexterity?.base ?? 8;
+  const dexterity = npc.attributes.dexterity?.base ?? 8;
   const insight = npc.attributes.insight?.base ?? 8;
   let init = (dexterity + insight) / 2;
 

@@ -171,7 +171,14 @@ export const OpenCheckMessageTemplate: React.FC<
         </Box>
 
         {isStudy && (
-          <Box sx={{ px: 1, py: 0.75, borderTop: "1px solid", borderColor: "divider" }}>
+          <Box
+            sx={{
+              px: 1,
+              py: 0.75,
+              borderTop: "1px solid",
+              borderColor: "divider",
+            }}
+          >
             {STUDY_TIERS.map((tier) => {
               const reached = check.result >= tier.threshold;
               const isActive = studyTier?.threshold === tier.threshold;

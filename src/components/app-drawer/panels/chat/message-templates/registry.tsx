@@ -31,8 +31,7 @@ const RollTemplate: TemplateComponent = ({ message }) => {
 const OpenCheckTemplate: TemplateComponent = ({ message }) => {
   const { onOppose, selectedSpeaker } = useChatActions();
   if (message.kind !== "open") return null;
-  const canOppose =
-    onOppose != null && message.speaker !== selectedSpeaker;
+  const canOppose = onOppose != null && message.speaker !== selectedSpeaker;
   return (
     <OpenCheckMessageTemplate
       check={message.check}
@@ -46,8 +45,7 @@ const OpenCheckTemplate: TemplateComponent = ({ message }) => {
 const AttributeCheckWithOpposeTemplate: TemplateComponent = ({ message }) => {
   const { onOppose, selectedSpeaker } = useChatActions();
   if (message.kind !== "attribute") return null;
-  const canOppose =
-    onOppose != null && message.speaker !== selectedSpeaker;
+  const canOppose = onOppose != null && message.speaker !== selectedSpeaker;
   return (
     <AttributeCheckMessageTemplate
       check={message.check}

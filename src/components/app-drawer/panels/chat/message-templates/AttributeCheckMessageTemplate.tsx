@@ -49,8 +49,7 @@ export const AttributeCheckMessageTemplate: React.FC<
     typeof check.additionalData?.originAction === "string"
       ? check.additionalData.originAction
       : undefined;
-  const originLabel =
-    originAction === "hinder" ? "Hinder" : undefined;
+  const originLabel = originAction === "hinder" ? "Hinder" : undefined;
 
   const isSuccess = check.passed === true && !check.critical && !check.fumble;
   const isFailure = check.passed === false && !check.critical && !check.fumble;

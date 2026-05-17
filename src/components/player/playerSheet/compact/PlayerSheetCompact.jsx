@@ -2395,7 +2395,10 @@ function Stats({
   const handleAttrChange = (key) => (e) => {
     setPlayer((p) => ({
       ...p,
-      attributes: { ...p.attributes, [key]: { ...p.attributes[key], base: e.target.value } },
+      attributes: {
+        ...p.attributes,
+        [key]: { ...p.attributes[key], base: e.target.value },
+      },
     }));
     if (updateMaxStats) updateMaxStats();
   };
@@ -2493,7 +2496,10 @@ function Stats({
                       size="small"
                       sx={{
                         ...attrSelectSx,
-                        color: getAttributeColor(player.attributes[key]?.base, curr),
+                        color: getAttributeColor(
+                          player.attributes[key]?.base,
+                          curr,
+                        ),
                       }}
                     >
                       {[6, 8, 10, 12].map((v) => (
@@ -2517,7 +2523,10 @@ function Stats({
                     style={{
                       fontFamily: "'Antonio', fantasy, sans-serif",
                       fontSize: key === "willpower" ? "0.9rem" : "0.875rem",
-                      color: getAttributeColor(player.attributes[key]?.base, curr),
+                      color: getAttributeColor(
+                        player.attributes[key]?.base,
+                        curr,
+                      ),
                     }}
                   >
                     {label} d{curr}

@@ -754,7 +754,10 @@ export default function PlayerCardGallery({
                     fontFamily: "'Antonio', fantasy, sans-serif",
                     fontSize: { xs: "0.78rem", md: "0.9rem", lg: "0.98rem" },
                     fontWeight: "bold",
-                    color: getAttributeColor(player.attributes[key]?.base, curr),
+                    color: getAttributeColor(
+                      player.attributes[key]?.base,
+                      curr,
+                    ),
                     lineHeight: 1,
                     whiteSpace: "nowrap",
                   }}

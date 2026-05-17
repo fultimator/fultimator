@@ -72,7 +72,9 @@ export const validateCharacter = (character) => {
     for (const prop of attributeProps) {
       if (
         !Object.prototype.hasOwnProperty.call(character.attributes, prop) ||
-        typeof (character.attributes[prop]?.base ?? character.attributes[prop]) !== "number"
+        typeof (
+          character.attributes[prop]?.base ?? character.attributes[prop]
+        ) !== "number"
       ) {
         errors.push(`Missing or invalid: ${prop} in attributes`);
       }

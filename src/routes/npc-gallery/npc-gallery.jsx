@@ -272,7 +272,10 @@ function Personal() {
       delete data.id;
       data.published = false;
 
-      const res = await db.addDoc(db.collection("npc-personal"), applyNpcPreSaveTransforms(data));
+      const res = await db.addDoc(
+        db.collection("npc-personal"),
+        applyNpcPreSaveTransforms(data),
+      );
       console.debug("Document added with ID: ", res.id);
     } catch (error) {
       console.error("Error uploading NPC from JSON:", error);

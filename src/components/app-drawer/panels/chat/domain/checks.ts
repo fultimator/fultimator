@@ -144,7 +144,12 @@ export function isOpposedTied(check: OpposedCheckResult): boolean {
   if (check.critical && check.opposedToCritical) return true;
   if (check.fumble && check.opposedToFumble) return true;
   // Fumble always loses, critical always wins > not a tie
-  if (check.fumble || check.critical || check.opposedToCritical || check.opposedToFumble)
+  if (
+    check.fumble ||
+    check.critical ||
+    check.opposedToCritical ||
+    check.opposedToFumble
+  )
     return false;
   return check.result === check.opposedToResult;
 }

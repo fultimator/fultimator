@@ -23,6 +23,12 @@ import {
   resolveAttackOptions,
   resolveSpellOptions,
 } from "./speakers";
+import {
+  accuracyModifiersFromEffects,
+  isActorInCrisis,
+} from "./effect-modifiers";
+import type { TypePlayer } from "../../../../../types/Players";
+import type { TypeNpc } from "../../../../../types/Npcs";
 import type {
   Attribute,
   AttackOverrides,
@@ -296,7 +302,8 @@ const checkCommand: Command = {
   params: [
     {
       name: "[open|attribute] attr1 attr2",
-      description: "open dex ins  or  attribute dex ins [modifier] [difficulty]",
+      description:
+        "open dex ins  or  attribute dex ins [modifier] [difficulty]",
       required: true,
     },
   ],
@@ -404,11 +411,25 @@ const actionCommand: Command = {
           secondary as Attribute,
         ),
       };
-      const intent = prepareAccuracyCheck(
-        effectiveWeapon,
+      const effectModifiers = context.playerDoc
+        ? accuracyModifiersFromEffects(
+            context.playerDoc as unknown as TypePlayer | TypeNpc,
+            {
+              range: effectiveWeapon.range,
+              category: effectiveWeapon.category,
+              inCrisis: isActorInCrisis(
+                context.playerDoc as unknown as TypePlayer | TypeNpc,
+              ),
+            },
+          )
+        : [];
+      const situational =
         appliedAccuracyDelta !== 0
           ? [{ label: "Situational Bonus", value: appliedAccuracyDelta }]
-          : [],
+          : [];
+      const intent = prepareAccuracyCheck(
+        effectiveWeapon,
+        [...effectModifiers, ...situational],
         {
           damageSituationalBonus: appliedDamageDelta,
           hrZero: overrides.hrZero ?? effectiveWeapon.damageHrZero ?? false,

@@ -1001,10 +1001,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     // Add incoming-damage-bonus effects on this target before affinity scaling
     // so resistance/vulnerability applies to the full boosted total.
     // Passes element and species context so category-specific bonuses resolve.
-    const incomingBonus = totalIncomingDamageBonus(
-      npc.effects ?? [],
-      { element: damageType || undefined, species: npc.species || undefined },
-    );
+    const incomingBonus = totalIncomingDamageBonus(npc.effects ?? [], {
+      element: damageType || undefined,
+      species: npc.species || undefined,
+    });
     const damage = (parseInt(damageValue, 10) || 0) + incomingBonus;
 
     // Default damage value
@@ -1115,7 +1115,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   function calcAttr(statusEffect1, statusEffect2, attribute, npc) {
     // Define the base attribute value (e.g., dexterity)
     const rawAttr = npc?.attributes?.[attribute];
-    let attributeValue = (rawAttr && typeof rawAttr === "object" ? rawAttr.base : rawAttr) || 6;
+    let attributeValue =
+      (rawAttr && typeof rawAttr === "object" ? rawAttr.base : rawAttr) || 6;
 
     // Check in npc.combatStats.statusEffects for the status effects
     if (npc.combatStats.statusEffects?.includes(statusEffect1)) {

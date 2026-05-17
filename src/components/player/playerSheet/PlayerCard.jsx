@@ -1428,7 +1428,10 @@ export default function PlayerCard({
                             ...p,
                             attributes: {
                               ...p.attributes,
-                              [key]: { ...p.attributes[key], base: e.target.value },
+                              [key]: {
+                                ...p.attributes[key],
+                                base: e.target.value,
+                              },
                             },
                           }));
                           updateMaxStats?.();
