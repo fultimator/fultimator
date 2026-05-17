@@ -118,7 +118,7 @@ import {
 } from "../../libs/weaponNormalization";
 import { validateWeaponPersisted } from "../../forms/schema/itemSchemas/weapon";
 import { validateCustomWeaponPersisted } from "../../forms/schema/itemSchemas/customWeapon";
-import { QUICK_CREATE_TAB_KEYS } from "./quickCreateTabKeys";
+import { QUICK_CREATE_TAB_KEYS, VIEWER_TYPE_TO_TAB_KEY } from "./quickCreateTabKeys";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
 import { weaponFieldConfig } from "../../forms/rendering/config/itemConfigs/weapon";
 import { armorFieldConfig } from "../../forms/rendering/config/itemConfigs/armor";
@@ -5149,27 +5149,6 @@ const TAB_CONFIG = {
 };
 
 const TABS = QUICK_CREATE_TAB_KEYS.map((key) => ({ key, ...TAB_CONFIG[key] }));
-
-// Viewer type to Quick Create tab key
-
-const VIEWER_TYPE_TO_TAB_KEY = {
-  attacks: "npc-attack",
-  spells: "npc-spell",
-  special: "npc-special",
-  actions: "npc-action",
-  "player-spells": "player-spell",
-  qualities: "quality",
-  heroics: "heroic",
-  classes: "class",
-  mnemospheres: "mnemosphere",
-  hoplospheres: "hoplosphere",
-  weapons: "weapon",
-  "custom-weapons": "custom-weapon",
-  armor: "armor",
-  shields: "shield",
-  accessories: "accessory",
-  optionals: "optional",
-};
 
 // Main component
 
