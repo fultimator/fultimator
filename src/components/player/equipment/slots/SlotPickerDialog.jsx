@@ -36,8 +36,10 @@ function moduleStatLine(module, t) {
   if (module.type === "pilot_module_weapon") {
     if (module.isShield)
       return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-    const a1 = attributes[module.att1]?.shortcaps ?? module.att1 ?? "";
-    const a2 = attributes[module.att2]?.shortcaps ?? module.att2 ?? "";
+    const a1Key = module.accuracy?.attr1;
+    const a2Key = module.accuracy?.attr2;
+    const a1 = attributes[a1Key]?.shortcaps ?? a1Key ?? "";
+    const a2 = attributes[a2Key]?.shortcaps ?? a2Key ?? "";
     const hands = module.cumbersome ? "2H" : "1H";
     const parts = [];
     if (a1 && a2) {
@@ -45,7 +47,8 @@ function moduleStatLine(module, t) {
     } else if (module.category) {
       parts.push(t(module.category));
     }
-    parts.push(`${module.damage ?? "?"} ${t(module.damageType ?? "")}`.trim());
+    const damageType = module.damage?.type;
+    parts.push(`${module.damage?.value ?? "?"} ${t(damageType ?? "")}`.trim());
     if (module.range) parts.push(t(module.range));
     parts.push(hands);
     return parts.join(" / ");

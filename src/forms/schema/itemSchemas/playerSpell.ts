@@ -37,6 +37,19 @@ const DamageSchema = z.object({
   hrZero: z.boolean(),
 });
 
+const WeaponModuleAccuracySchema = z.object({
+  attr1: z.string(),
+  attr2: z.string(),
+  value: z.number().int(),
+  defense: z.enum(["def", "mdef"]),
+});
+
+const WeaponModuleDamageSchema = z.object({
+  value: z.number().int(),
+  type: z.string(),
+  hrZero: z.boolean(),
+});
+
 const CostSchema = z.object({
   resource: z.literal("mp"),
   amount: z.number().int().nonnegative(),
@@ -201,13 +214,10 @@ export const PlayerSpellPilotVehicleWeaponSchema =
     type: z.literal("pilot_module_weapon"),
     category: z.string(),
     cost: z.number().int(),
-    damage: z.number().int(),
+    accuracy: WeaponModuleAccuracySchema,
+    damage: WeaponModuleDamageSchema,
     range: z.string(),
-    damageType: z.string(),
-    prec: z.number().int(),
     cumbersome: z.boolean(),
-    att1: z.string(),
-    att2: z.string(),
     quality: z.string(),
     qualityCost: z.number().int(),
     isShield: z.boolean(),

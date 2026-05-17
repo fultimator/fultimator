@@ -1859,8 +1859,9 @@ export const SharedPilotVehicleCard = React.memo(
       }[pilotSubtype] ?? t("Pilot Vehicle");
 
     if (pilotSubtype === "weapon") {
-      const attr1 = attributes[item.att1];
-      const attr2 = attributes[item.att2];
+      const accuracy = item.accuracy || {};
+      const attr1 = attributes[accuracy.attr1];
+      const attr2 = attributes[accuracy.attr2];
       const ROW_MIN_HEIGHT = "36px";
       const pl = 2;
       const rowSx = (bg, extra = {}) => ({
@@ -1972,10 +1973,10 @@ export const SharedPilotVehicleCard = React.memo(
                   <OpenBracket />
                   {attr1?.shortcaps ?? "?"} + {attr2?.shortcaps ?? "?"}
                   <CloseBracket />
-                  {item.prec > 0
-                    ? `+${item.prec}`
-                    : item.prec < 0
-                      ? `${item.prec}`
+                  {(accuracy.value ?? 0) > 0
+                    ? `+${accuracy.value}`
+                    : (accuracy.value ?? 0) < 0
+                      ? `${accuracy.value}`
                       : ""}
                 </Typography>
               </Grid>
@@ -2002,11 +2003,7 @@ export const SharedPilotVehicleCard = React.memo(
                       })()
                     : `${t("HR")} + ${(typeof item.damage === "object" ? item.damage?.value : item.damage) ?? 0}`}
                   <CloseBracket />
-                  {item.damage?.type
-                    ? t(item.damage.type)
-                    : item.damageType
-                      ? t(item.damageType)
-                      : ""}
+                  {item.damage?.type ? t(item.damage.type) : ""}
                 </Typography>
               </Grid>
             </Grid>

@@ -209,12 +209,9 @@ export interface VehicleModule {
   cumbersome?: boolean;
   def?: number;
   mdef?: number;
-  damage?: number;
-  prec?: number;
+  damage?: Damage;
+  accuracy?: Accuracy;
   range?: string;
-  damageType?: string;
-  att1?: string;
-  att2?: string;
   customName?: string;
   description?: string;
   isComplex?: boolean;

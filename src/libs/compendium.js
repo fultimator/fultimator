@@ -289,13 +289,11 @@ const _nonStaticItemsByType = {
       .map((m) => ({
         ...m,
         spellType: "pilot-vehicle",
-        category: "Armor Module",
         pilotSubtype: "armor",
       })),
     ...availableModules.weapon.map((m) => ({
       ...m,
       spellType: "pilot-vehicle",
-      category: "Weapon Module",
       pilotSubtype: "weapon",
     })),
     ...availableModules.support
@@ -303,7 +301,6 @@ const _nonStaticItemsByType = {
       .map((m) => ({
         ...m,
         spellType: "pilot-vehicle",
-        category: "Support Module",
         pilotSubtype: "support",
       })),
   ],

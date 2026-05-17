@@ -583,19 +583,11 @@ function ThemedSpellPilot({
                                         }}
                                       >
                                         {t("Accuracy")}: [
-                                        {
-                                          attributes[module.att1 || "might"]
-                                            .shortcaps
-                                        }{" "}
+                                        {attributes[module.accuracy?.attr1 || "might"].shortcaps}{" "}
                                         +{" "}
-                                        {
-                                          attributes[module.att2 || "dexterity"]
-                                            .shortcaps
-                                        }
+                                        {attributes[module.accuracy?.attr2 || "dexterity"].shortcaps}
                                         ]{" "}
-                                        {(module.prec || 0) >= 0
-                                          ? `+${module.prec || 0}`
-                                          : module.prec}
+                                        {(module.accuracy?.value ?? 0) >= 0 ? `+${module.accuracy?.value ?? 0}` : module.accuracy?.value ?? 0}
                                       </Typography>
                                       <Typography
                                         sx={{
@@ -604,7 +596,7 @@ function ThemedSpellPilot({
                                         }}
                                       >
                                         {t("Damage")}: [HR +{" "}
-                                        {module.damage || 0}]
+                                        {module.damage?.value ?? 0}]
                                       </Typography>
                                       <div
                                         style={{

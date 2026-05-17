@@ -32,12 +32,9 @@ export type ResolvedVehicleModule = {
   cumbersome?: boolean;
   def?: number;
   mdef?: number;
-  damage?: number;
-  prec?: number;
+  damage?: { value: number; type: string; hrZero: boolean };
+  accuracy?: { attr1: string; attr2: string; value: number; defense: "def" | "mdef" };
   range?: string;
-  damageType?: string;
-  att1?: string;
-  att2?: string;
   customName?: string;
   description?: string;
   isComplex?: boolean;

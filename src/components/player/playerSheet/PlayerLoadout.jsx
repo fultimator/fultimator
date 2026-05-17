@@ -85,10 +85,12 @@ function moduleStatLine(module) {
   if (module.type === "pilot_module_weapon") {
     if (module.isShield)
       return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-    const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
-    const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
+    const acc = module.accuracy ?? {};
+    const dmg = module.damage ?? {};
+    const a1 = attributes[acc.attr1]?.shortcaps ?? acc.attr1 ?? "might";
+    const a2 = attributes[acc.attr2]?.shortcaps ?? acc.attr2 ?? "dexterity";
     const hands = module.cumbersome ? "2H" : "1H";
-    return `${a1}+${a2} / ${module.damage ?? "?"} ${module.damageType ?? ""} / ${hands}`.trim();
+    return `${a1}+${a2} / ${dmg.value ?? "?"} ${dmg.type ?? ""} / ${hands}`.trim();
   }
   if (module.type === "pilot_module_armor") {
     return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
@@ -510,11 +512,14 @@ export default function PlayerLoadout({
     if (resolved.kind === "vehicleModule") {
       const m = resolved.module;
       if (m.type !== "pilot_module_weapon" || m.isShield) return;
-      att1 = m.att1;
-      att2 = m.att2;
-      prec = m.prec ?? 0;
-      damage = m.damage ?? 0;
-      type = m.damageType ?? "";
+      const acc = m.accuracy;
+      const dmg = m.damage;
+      att1 = acc?.attr1;
+      att2 = acc?.attr2;
+      if (!att1 || !att2) return;
+      prec = acc?.value ?? 0;
+      damage = dmg?.value ?? 0;
+      type = dmg?.type ?? "";
     } else {
       const item = resolved.item;
       const isSecondary = item.activeForm === "secondary";

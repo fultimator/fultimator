@@ -226,8 +226,7 @@ export function getAvailableSupportModules(
       const module = m as Record<string, unknown>;
       return (
         module.type === "pilot_module_support" ||
-        module.pilotSubtype === "support" ||
-        module.category === "Support Module"
+        module.pilotSubtype === "support"
       );
     }) as IndexedModule[];
 }

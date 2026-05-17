@@ -1019,11 +1019,17 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     Boolean(editData?.martial),
   );
   const [moduleDamage, setModuleDamage] = useState(
-    editData?.damage != null ? String(editData.damage) : "",
+    editData?.damage?.value != null
+      ? String(editData.damage.value)
+      : "",
   );
   const [moduleRange, setModuleRange] = useState(editData?.range ?? "Melee");
   const [modulePrec, setModulePrec] = useState(
-    editData?.prec != null ? String(editData.prec) : "0",
+    editData?.accuracy?.value != null
+      ? String(editData.accuracy.value)
+      : editData?.prec != null
+        ? String(editData.prec)
+        : "0",
   );
   const [moduleCost, setModuleCost] = useState(
     editData?.cost != null ? String(editData.cost) : "0",
@@ -1035,10 +1041,19 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     editData?.category ?? "Heavy",
   );
   const [damageType, setDamageType] = useState(
-    editData?.damageType ?? "Physical",
+    editData?.damage?.type
+      ? String(editData.damage.type).replace(
+          /^./,
+          String(editData.damage.type).charAt(0).toUpperCase(),
+        )
+      : editData?.damageType ?? "Physical",
   );
-  const [pilotAtt1, setPilotAtt1] = useState(editData?.att1 ?? "might");
-  const [pilotAtt2, setPilotAtt2] = useState(editData?.att2 ?? "dexterity");
+  const [pilotAtt1, setPilotAtt1] = useState(
+    editData?.accuracy?.attr1 ?? editData?.att1 ?? "might",
+  );
+  const [pilotAtt2, setPilotAtt2] = useState(
+    editData?.accuracy?.attr2 ?? editData?.att2 ?? "dexterity",
+  );
   const [pilotQuality, setPilotQuality] = useState(editData?.quality ?? "");
   const [pilotQualityCost, setPilotQualityCost] = useState(
     editData?.qualityCost != null ? String(editData.qualityCost) : "0",
@@ -1106,15 +1121,32 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     setModuleDef(editData?.def != null ? String(editData.def) : "");
     setModuleMdef(editData?.mdef != null ? String(editData.mdef) : "");
     setModuleMartial(Boolean(editData?.martial));
-    setModuleDamage(editData?.damage != null ? String(editData.damage) : "");
+    setModuleDamage(
+      editData?.damage?.value != null
+        ? String(editData.damage.value)
+        : "",
+    );
     setModuleRange(editData?.range ?? "Melee");
-    setModulePrec(editData?.prec != null ? String(editData.prec) : "0");
+    setModulePrec(
+      editData?.accuracy?.value != null
+        ? String(editData.accuracy.value)
+        : editData?.prec != null
+          ? String(editData.prec)
+          : "0",
+    );
     setModuleCost(editData?.cost != null ? String(editData.cost) : "0");
     setModuleDescription(editData?.description ?? "");
     setWeaponCategory(editData?.category ?? "Heavy");
-    setDamageType(editData?.damageType ?? "Physical");
-    setPilotAtt1(editData?.att1 ?? "might");
-    setPilotAtt2(editData?.att2 ?? "dexterity");
+    setDamageType(
+      editData?.damage?.type
+        ? String(editData.damage.type).replace(
+            /^./,
+            String(editData.damage.type).charAt(0).toUpperCase(),
+          )
+        : editData?.damageType ?? "Physical",
+    );
+    setPilotAtt1(editData?.accuracy?.attr1 ?? editData?.att1 ?? "might");
+    setPilotAtt2(editData?.accuracy?.attr2 ?? editData?.att2 ?? "dexterity");
     setPilotQuality(editData?.quality ?? "");
     setPilotQualityCost(
       editData?.qualityCost != null ? String(editData.qualityCost) : "0",
@@ -1236,13 +1268,19 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                 type: "pilot_module_weapon",
                 category: weaponCategory,
                 cost: Number(moduleCost) || 0,
-                damage: Number(moduleDamage) || 0,
+                accuracy: {
+                  attr1: pilotAtt1,
+                  attr2: pilotAtt2,
+                  value: Number(modulePrec) || 0,
+                  defense: "def",
+                },
+                damage: {
+                  value: Number(moduleDamage) || 0,
+                  type: String(damageType || "Physical").toLowerCase(),
+                  hrZero: false,
+                },
                 range: moduleRange || "Melee",
-                damageType,
-                prec: Number(modulePrec) || 0,
                 cumbersome: moduleCumbersome,
-                att1: pilotAtt1,
-                att2: pilotAtt2,
                 quality: pilotQuality.trim(),
                 qualityCost: Number(pilotQualityCost) || 0,
                 isShield,

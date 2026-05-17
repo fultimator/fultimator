@@ -19,8 +19,6 @@ const createDefaultModule = (moduleType) => {
     enabled: false,
     equipped: false,
     equippedSlot: null,
-    // Ensure all data fields are present from the base module
-    ...baseModule,
   };
 };
 
@@ -361,6 +359,13 @@ export const vehicleReducer = (state, action) => {
           }
           ensureShieldConstraints(vehicle);
         }
+      } else if (typeof field === "string" && field.includes(".")) {
+        const [root, child] = field.split(".");
+        const module = vehicle.modules[moduleIndex];
+        if (!module[root] || typeof module[root] !== "object") {
+          module[root] = {};
+        }
+        module[root][child] = value;
       } else {
         vehicle.modules[moduleIndex][field] = value;
       }

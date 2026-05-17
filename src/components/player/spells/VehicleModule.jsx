@@ -1,4 +1,11 @@
-import { memo } from "react";
+import { memo, forwardRef } from "react";
+
+const AccordionSummaryDiv = forwardRef(function AccordionSummaryDiv(
+  { focusRipple: _focusRipple, disableRipple: _disableRipple, internalNativeButton: _internalNativeButton, focusVisibleClassName: _focusVisibleClassName, ...props },
+  ref,
+) {
+  return <div ref={ref} {...props} />;
+});
 import {
   Grid,
   Accordion,
@@ -44,7 +51,7 @@ const VehicleModule = memo(
       closeDialog: setDeleteDialogOpen,
       handleDelete,
     } = useDeleteConfirmation({
-      onConfirm: () => {},
+      onConfirm: () => onDeleteModule(vehicleIndex, moduleIndex),
     });
 
     const handleEquipToggle = (e) => {
@@ -75,7 +82,7 @@ const VehicleModule = memo(
     return (
       <>
         <Accordion>
-          <AccordionSummary expandIcon={<ExpandMore />}>
+          <AccordionSummary slots={{ root: AccordionSummaryDiv }} expandIcon={<ExpandMore />}>
             <Grid
               container
               spacing={2}
@@ -223,7 +230,10 @@ const VehicleModule = memo(
                   sm: 2,
                 }}
               >
-                <div style={{ display: "flex", gap: 8 }}>
+                <div
+                  style={{ display: "flex", gap: 8 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Button
                     onClick={handleDelete}
                     variant="outlined"
@@ -621,12 +631,12 @@ const VehicleModule = memo(
                     <FormControl fullWidth>
                       <InputLabel>{t("First Attribute")}</InputLabel>
                       <Select
-                        value={module.att1 || "might"}
+                        value={module.accuracy?.attr1 || "might"}
                         onChange={(e) =>
                           onModuleChange(
                             vehicleIndex,
                             moduleIndex,
-                            "att1",
+                            "accuracy.attr1",
                             e.target.value,
                           )
                         }
@@ -650,12 +660,12 @@ const VehicleModule = memo(
                     <FormControl fullWidth>
                       <InputLabel>{t("Second Attribute")}</InputLabel>
                       <Select
-                        value={module.att2 || "dexterity"}
+                        value={module.accuracy?.attr2 || "dexterity"}
                         onChange={(e) =>
                           onModuleChange(
                             vehicleIndex,
                             moduleIndex,
-                            "att2",
+                            "accuracy.attr2",
                             e.target.value,
                           )
                         }
@@ -680,12 +690,12 @@ const VehicleModule = memo(
                       fullWidth
                       label={t("Precision Modifier")}
                       type="number"
-                      value={module.prec || 0}
+                      value={module.accuracy?.value || 0}
                       onChange={(e) =>
                         onModuleChange(
                           vehicleIndex,
                           moduleIndex,
-                          "prec",
+                          "accuracy.value",
                           parseInt(e.target.value) || 0,
                         )
                       }
@@ -703,12 +713,12 @@ const VehicleModule = memo(
                       fullWidth
                       label={t("Damage Modifier")}
                       type="number"
-                      value={module.damage || 0}
+                      value={module.damage?.value || 0}
                       onChange={(e) =>
                         onModuleChange(
                           vehicleIndex,
                           moduleIndex,
-                          "damage",
+                          "damage.value",
                           parseInt(e.target.value) || 0,
                         )
                       }
@@ -751,26 +761,26 @@ const VehicleModule = memo(
                     <FormControl fullWidth>
                       <InputLabel>{t("Type")}</InputLabel>
                       <Select
-                        value={module.damageType || "Physical"}
+                        value={module.damage?.type || "physical"}
                         onChange={(e) =>
                           onModuleChange(
                             vehicleIndex,
                             moduleIndex,
-                            "damageType",
+                            "damage.type",
                             e.target.value,
                           )
                         }
                         disabled={!isCustomModule}
                       >
-                        <MenuItem value="Physical">{t("Physical")}</MenuItem>
-                        <MenuItem value="Air">{t("Air")}</MenuItem>
-                        <MenuItem value="Bolt">{t("Bolt")}</MenuItem>
-                        <MenuItem value="Dark">{t("Dark")}</MenuItem>
-                        <MenuItem value="Earth">{t("Earth")}</MenuItem>
-                        <MenuItem value="Fire">{t("Fire")}</MenuItem>
-                        <MenuItem value="Ice">{t("Ice")}</MenuItem>
-                        <MenuItem value="Light">{t("Light")}</MenuItem>
-                        <MenuItem value="Poison">{t("Poison")}</MenuItem>
+                        <MenuItem value="physical">{t("Physical")}</MenuItem>
+                        <MenuItem value="air">{t("Air")}</MenuItem>
+                        <MenuItem value="bolt">{t("Bolt")}</MenuItem>
+                        <MenuItem value="dark">{t("Dark")}</MenuItem>
+                        <MenuItem value="earth">{t("Earth")}</MenuItem>
+                        <MenuItem value="fire">{t("Fire")}</MenuItem>
+                        <MenuItem value="ice">{t("Ice")}</MenuItem>
+                        <MenuItem value="light">{t("Light")}</MenuItem>
+                        <MenuItem value="poison">{t("Poison")}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
