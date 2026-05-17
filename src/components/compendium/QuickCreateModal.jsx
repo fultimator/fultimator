@@ -118,6 +118,7 @@ import {
 } from "../../libs/weaponNormalization";
 import { validateWeaponPersisted } from "../../forms/schema/itemSchemas/weapon";
 import { validateCustomWeaponPersisted } from "../../forms/schema/itemSchemas/customWeapon";
+import { QUICK_CREATE_TAB_KEYS } from "./quickCreateTabKeys";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
 import { weaponFieldConfig } from "../../forms/rendering/config/itemConfigs/weapon";
 import { armorFieldConfig } from "../../forms/rendering/config/itemConfigs/armor";
@@ -5128,24 +5129,26 @@ function HoplospherePanel() {
   );
 }
 
-const TABS = [
-  { key: "npc-attack", label: "NPC Attack", Panel: NpcAttackPanel },
-  { key: "npc-spell", label: "NPC Spell", Panel: NpcSpellPanel },
-  { key: "npc-special", label: "Special Rule", Panel: NpcSpecialPanel },
-  { key: "npc-action", label: "Other Action", Panel: NpcActionPanel },
-  { key: "player-spell", label: "Player Spell", Panel: PlayerSpellPanel },
-  { key: "quality", label: "Quality", Panel: QualityPanel },
-  { key: "heroic", label: "Heroic Skill", Panel: HeroicPanel },
-  { key: "class", label: "Class", Panel: ClassPanel },
-  { key: "mnemosphere", label: "Mnemosphere", Panel: MnemospherePanel },
-  { key: "hoplosphere", label: "Hoplosphere", Panel: HoplospherePanel },
-  { key: "weapon", label: "Weapon", Panel: WeaponPanel },
-  { key: "custom-weapon", label: "Custom Weapon", Panel: CustomWeaponPanel },
-  { key: "armor", label: "Armor", Panel: ArmorPanel },
-  { key: "shield", label: "Shield", Panel: ShieldPanel },
-  { key: "accessory", label: "Accessory", Panel: AccessoryPanel },
-  { key: "optional", label: "Optional", Panel: OptionalPanel },
-];
+const TAB_CONFIG = {
+  "npc-attack": { label: "NPC Attack", Panel: NpcAttackPanel },
+  "npc-spell": { label: "NPC Spell", Panel: NpcSpellPanel },
+  "npc-special": { label: "Special Rule", Panel: NpcSpecialPanel },
+  "npc-action": { label: "Other Action", Panel: NpcActionPanel },
+  "player-spell": { label: "Player Spell", Panel: PlayerSpellPanel },
+  quality: { label: "Quality", Panel: QualityPanel },
+  heroic: { label: "Heroic Skill", Panel: HeroicPanel },
+  class: { label: "Class", Panel: ClassPanel },
+  mnemosphere: { label: "Mnemosphere", Panel: MnemospherePanel },
+  hoplosphere: { label: "Hoplosphere", Panel: HoplospherePanel },
+  weapon: { label: "Weapon", Panel: WeaponPanel },
+  "custom-weapon": { label: "Custom Weapon", Panel: CustomWeaponPanel },
+  armor: { label: "Armor", Panel: ArmorPanel },
+  shield: { label: "Shield", Panel: ShieldPanel },
+  accessory: { label: "Accessory", Panel: AccessoryPanel },
+  optional: { label: "Optional", Panel: OptionalPanel },
+};
+
+const TABS = QUICK_CREATE_TAB_KEYS.map((key) => ({ key, ...TAB_CONFIG[key] }));
 
 // Viewer type to Quick Create tab key
 
