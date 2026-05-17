@@ -118,6 +118,7 @@ import {
 } from "../../libs/weaponNormalization";
 import { validateWeaponPersisted } from "../../forms/schema/itemSchemas/weapon";
 import { validateCustomWeaponPersisted } from "../../forms/schema/itemSchemas/customWeapon";
+import { itemFormRegistry } from "../../forms/registry";
 import { QUICK_CREATE_TAB_KEYS, VIEWER_TYPE_TO_TAB_KEY } from "./quickCreateTabKeys";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
 import { weaponFieldConfig } from "../../forms/rendering/config/itemConfigs/weapon";
@@ -5130,25 +5131,29 @@ function HoplospherePanel() {
 }
 
 const TAB_CONFIG = {
-  "npc-attack": { label: "NPC Attack", Panel: NpcAttackPanel },
-  "npc-spell": { label: "NPC Spell", Panel: NpcSpellPanel },
-  "npc-special": { label: "Special Rule", Panel: NpcSpecialPanel },
-  "npc-action": { label: "Other Action", Panel: NpcActionPanel },
-  "player-spell": { label: "Player Spell", Panel: PlayerSpellPanel },
-  quality: { label: "Quality", Panel: QualityPanel },
-  heroic: { label: "Heroic Skill", Panel: HeroicPanel },
-  class: { label: "Class", Panel: ClassPanel },
-  mnemosphere: { label: "Mnemosphere", Panel: MnemospherePanel },
-  hoplosphere: { label: "Hoplosphere", Panel: HoplospherePanel },
-  weapon: { label: "Weapon", Panel: WeaponPanel },
-  "custom-weapon": { label: "Custom Weapon", Panel: CustomWeaponPanel },
-  armor: { label: "Armor", Panel: ArmorPanel },
-  shield: { label: "Shield", Panel: ShieldPanel },
-  accessory: { label: "Accessory", Panel: AccessoryPanel },
-  optional: { label: "Optional", Panel: OptionalPanel },
+  "npc-attack": { Panel: NpcAttackPanel },
+  "npc-spell": { Panel: NpcSpellPanel },
+  "npc-special": { Panel: NpcSpecialPanel },
+  "npc-action": { Panel: NpcActionPanel },
+  "player-spell": { Panel: PlayerSpellPanel },
+  quality: { Panel: QualityPanel },
+  heroic: { Panel: HeroicPanel },
+  class: { Panel: ClassPanel },
+  mnemosphere: { Panel: MnemospherePanel },
+  hoplosphere: { Panel: HoplospherePanel },
+  weapon: { Panel: WeaponPanel },
+  "custom-weapon": { Panel: CustomWeaponPanel },
+  armor: { Panel: ArmorPanel },
+  shield: { Panel: ShieldPanel },
+  accessory: { Panel: AccessoryPanel },
+  optional: { Panel: OptionalPanel },
 };
 
-const TABS = QUICK_CREATE_TAB_KEYS.map((key) => ({ key, ...TAB_CONFIG[key] }));
+const TABS = QUICK_CREATE_TAB_KEYS.map((key) => ({
+  key,
+  label: itemFormRegistry[key].label,
+  ...TAB_CONFIG[key],
+}));
 
 // Main component
 
