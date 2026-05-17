@@ -11,6 +11,8 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { Close } from "@mui/icons-material";
+import FuidField from "../../common/FuidField";
+import { slugify } from "../../../libs/slugify";
 
 export default function EditHeroicSkillModal({
   open,
@@ -54,10 +56,16 @@ export default function EditHeroicSkillModal({
         <Close />
       </IconButton>
       <DialogContent>
+        <FuidField
+          value={heroic.fuid}
+          name={heroic.name}
+          onChange={(fuid) => setHeroic({ ...heroic, fuid })}
+        />
         <TextField
           label={t("Heroic Name")}
           value={heroic.name}
           onChange={(e) => setHeroic({ ...heroic, name: e.target.value })}
+          onBlur={() => { if (!heroic.fuid) setHeroic({ ...heroic, fuid: slugify(heroic.name) }); }}
           fullWidth
           margin="normal"
           slotProps={{

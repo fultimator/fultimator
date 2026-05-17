@@ -50,6 +50,7 @@ function buildInitialState(armorPlayer, isSlotsVariant) {
     damageMeleeModifier: armorPlayer?.damageMeleeModifier ?? 0,
     damageRangedModifier: armorPlayer?.damageRangedModifier ?? 0,
     isEquipped: armorPlayer?.isEquipped || false,
+    fuid: armorPlayer?.fuid,
   };
 }
 

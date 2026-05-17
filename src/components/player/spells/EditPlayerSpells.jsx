@@ -141,6 +141,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         },
         isMagisphere: spell.isMagisphere || false,
         showInPlayerSheet: true,
+        fuid: spell.fuid,
         _packItemId: spell._packItemId,
       });
     } else if (spell.spellType === "gamble") {
@@ -155,6 +156,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         targets: spell.targets,
         isMagisphere: spell.isMagisphere || false,
         showInPlayerSheet: true,
+        fuid: spell.fuid,
         _packItemId: spell._packItemId,
       });
     } else {
@@ -908,6 +910,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               },
               isMagisphere: spell.isMagisphere || false,
               showInPlayerSheet: true,
+              fuid: spell.fuid,
               _packItemId: spell._packItemId,
             },
           ],
@@ -944,6 +947,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
               showInPlayerSheet: true,
+              fuid: spell.fuid,
               _packItemId: spell._packItemId,
             },
           ],
@@ -982,6 +986,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
               showInPlayerSheet: true,
+              fuid: spell.fuid,
               _packItemId: spell._packItemId,
             },
           ],

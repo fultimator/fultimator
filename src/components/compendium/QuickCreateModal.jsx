@@ -121,6 +121,7 @@ import { validateCustomWeaponPersisted } from "../../forms/schema/itemSchemas/cu
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
 import { weaponFieldConfig } from "../../forms/rendering/config/itemConfigs/weapon";
 import { armorFieldConfig } from "../../forms/rendering/config/itemConfigs/armor";
+import FuidField from "../common/FuidField";
 import { shieldFieldConfig } from "../../forms/rendering/config/itemConfigs/shield";
 import { accessoryFieldConfig } from "../../forms/rendering/config/itemConfigs/accessory";
 import { customWeaponFieldConfig } from "../../forms/rendering/config/itemConfigs/customWeapon";
@@ -322,6 +323,7 @@ function PanelLayout({
 function NpcAttackPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [range, setRange] = useState("melee");
   const [attr1, setAttr1] = useState("dexterity");
   const [attr2, setAttr2] = useState("dexterity");
@@ -334,6 +336,7 @@ function NpcAttackPanel() {
   const data = {
     itemType: "basic",
     name: name.trim(),
+    fuid: fuid || undefined,
     range,
     accuracy: { attr1, attr2, value: Number(accuracyValue), defense: "def" },
     damage: { value: Number(damageValue), type: dmgType, hrZero },
@@ -344,6 +347,7 @@ function NpcAttackPanel() {
 
   const handleClear = () => {
     setName("");
+    setFuid(undefined);
     setRange("melee");
     setAttr1("dexterity");
     setAttr2("dexterity");
@@ -366,10 +370,14 @@ function NpcAttackPanel() {
                 label={t("Name")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
                 fullWidth
                 size="small"
                 autoFocus
               />
+            </Grid>
+            <Grid size={12} sx={{ order: -1 }}>
+              <FuidField value={fuid} name={name} onChange={setFuid} />
             </Grid>
             <Grid
               size={{
@@ -530,6 +538,7 @@ function NpcAttackPanel() {
 function NpcSpellPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [isOffensive, setIsOffensive] = useState(false);
   const [mp, setMp] = useState("1");
   const [perTarget, setPerTarget] = useState(true);
@@ -547,6 +556,7 @@ function NpcSpellPanel() {
   const data = {
     itemType: "spell",
     name: name.trim(),
+    fuid: fuid || undefined,
     isOffensive,
     damage: {
       value: isOffensive && damage !== "" ? Number(damage) : 0,
@@ -564,6 +574,7 @@ function NpcSpellPanel() {
 
   const handleClear = () => {
     setName("");
+    setFuid(undefined);
     setIsOffensive(false);
     setMp("1");
     setPerTarget(true);
@@ -593,6 +604,7 @@ function NpcSpellPanel() {
               label={t("Name")}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
               fullWidth
               size="small"
               autoFocus
@@ -600,6 +612,9 @@ function NpcSpellPanel() {
                 htmlInput: { maxLength: 50 },
               }}
             />
+          </Grid>
+          <Grid size={12} sx={{ order: -1 }}>
+            <FuidField value={fuid} name={name} onChange={setFuid} />
           </Grid>
           <Grid
             size={{
@@ -864,17 +879,20 @@ function NpcSpellPanel() {
 function NpcSpecialPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [effect, setEffect] = useState("");
   const [spCost, setSpCost] = useState("1");
 
   const data = {
     name: name.trim(),
+    fuid: fuid || undefined,
     effect: effect.trim(),
     spCost: spCost === "" ? 1 : Number(spCost),
   };
 
   const handleClear = () => {
     setName("");
+    setFuid(undefined);
     setEffect("");
     setSpCost("1");
   };
@@ -888,10 +906,14 @@ function NpcSpecialPanel() {
               label={t("Name")}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
               fullWidth
               size="small"
               autoFocus
             />
+          </Grid>
+          <Grid size={12} sx={{ order: -1 }}>
+            <FuidField value={fuid} name={name} onChange={setFuid} />
           </Grid>
           <Grid
             size={{
@@ -940,17 +962,20 @@ function NpcSpecialPanel() {
 function NpcActionPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [effect, setEffect] = useState("");
   const [spCost, setSpCost] = useState("1");
 
   const data = {
     name: name.trim(),
+    fuid: fuid || undefined,
     effect: effect.trim(),
     spCost: spCost === "" ? 1 : Number(spCost),
   };
 
   const handleClear = () => {
     setName("");
+    setFuid(undefined);
     setEffect("");
     setSpCost("1");
   };
@@ -964,10 +989,14 @@ function NpcActionPanel() {
               label={t("Name")}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
               fullWidth
               size="small"
               autoFocus
             />
+          </Grid>
+          <Grid size={12} sx={{ order: -1 }}>
+            <FuidField value={fuid} name={name} onChange={setFuid} />
           </Grid>
           <Grid
             size={{
@@ -1081,6 +1110,7 @@ function PlayerSpellPanel() {
   const [spellType, setSpellType] = useState("default");
   const [spellClass, setSpellClass] = useState(spellClasses[0] ?? "");
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [description, setDescription] = useState("");
   const [isOffensive, setIsOffensive] = useState(false);
   const [mp, setMp] = useState("");
@@ -1151,6 +1181,7 @@ function PlayerSpellPanel() {
     setSpellType("default");
     setSpellClass(spellClasses[0] ?? "");
     setName("");
+    setFuid(undefined);
     setDescription("");
     setIsOffensive(false);
     setMp("");
@@ -1210,6 +1241,7 @@ function PlayerSpellPanel() {
   const data = {
     class: spellClass,
     name: name.trim(),
+    fuid: fuid || undefined,
     description: description.trim(),
     isOffensive,
     cost: { resource: "mp", amount: mp === "" ? 0 : Number(mp), perTarget },
@@ -1230,6 +1262,7 @@ function PlayerSpellPanel() {
       ? null
       : {
           name: name.trim(),
+          fuid: fuid || undefined,
           spellType: spellType === "magichant-key" ? "magichant" : spellType,
           magichantSubtype:
             spellType === "magichant-key"
@@ -1415,10 +1448,14 @@ function PlayerSpellPanel() {
                   label={t("Name")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
                   fullWidth
                   size="small"
                   autoFocus
                 />
+              </Grid>
+              <Grid size={12} sx={{ order: -1 }}>
+                <FuidField value={fuid} name={name} onChange={setFuid} />
               </Grid>
 
               {/* Gift */}
@@ -2199,10 +2236,14 @@ function PlayerSpellPanel() {
                   label={t("Name")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
                   fullWidth
                   size="small"
                   autoFocus
                 />
+              </Grid>
+              <Grid size={12} sx={{ order: -1 }}>
+                <FuidField value={fuid} name={name} onChange={setFuid} />
               </Grid>
               <Grid
                 size={{
@@ -2492,6 +2533,7 @@ function PlayerSpellPanel() {
 function QualityPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [category, setCategory] = useState(QUALITY_CATEGORIES[0]);
   const [quality, setQuality] = useState("");
   const [cost, setCost] = useState(0);
@@ -2500,6 +2542,7 @@ function QualityPanel() {
 
   const data = {
     name: name.trim(),
+    fuid: fuid || undefined,
     category,
     quality: quality.trim(),
     cost: Number(cost),
@@ -2508,6 +2551,7 @@ function QualityPanel() {
 
   const handleClear = () => {
     setName("");
+    setFuid(undefined);
     setCategory(QUALITY_CATEGORIES[0]);
     setQuality("");
     setCost(0);
@@ -2563,10 +2607,14 @@ function QualityPanel() {
                   label={t("Name")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
                   fullWidth
                   size="small"
                   autoFocus
                 />
+              </Grid>
+              <Grid size={12} sx={{ order: -1 }}>
+                <FuidField value={fuid} name={name} onChange={setFuid} />
               </Grid>
               <Grid
                 size={{
@@ -2677,6 +2725,7 @@ function QualityPanel() {
 function HeroicPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [book, setBook] = useState("");
   const [quote, setQuote] = useState("");
   const [description, setDescription] = useState("");
@@ -2684,6 +2733,7 @@ function HeroicPanel() {
 
   const data = {
     name: name.trim(),
+    fuid: fuid || undefined,
     book,
     quote: quote.trim(),
     description: description.trim(),
@@ -2692,6 +2742,7 @@ function HeroicPanel() {
 
   const handleClear = () => {
     setName("");
+    setFuid(undefined);
     setBook("");
     setQuote("");
     setDescription("");
@@ -2707,6 +2758,7 @@ function HeroicPanel() {
               label={t("Name")}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
               fullWidth
               size="small"
               autoFocus
@@ -2714,6 +2766,9 @@ function HeroicPanel() {
                 htmlInput: { maxLength: 50 },
               }}
             />
+          </Grid>
+          <Grid size={12} sx={{ order: -1 }}>
+            <FuidField value={fuid} name={name} onChange={setFuid} />
           </Grid>
           <Grid
             size={{
@@ -2816,6 +2871,7 @@ function HeroicPanel() {
 
 const BLANK_SKILL = {
   skillName: "",
+  fuid: undefined,
   maxLvl: 1,
   description: "",
   specialSkill: "",
@@ -2825,6 +2881,7 @@ const BLANK_SKILL = {
 function ClassPanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [book, setBook] = useState("homebrew");
   const [hpplus, setHpplus] = useState(0);
   const [mpplus, setMpplus] = useState(0);
@@ -2850,6 +2907,7 @@ function ClassPanel() {
 
   const classData = {
     name: name.trim(),
+    fuid: fuid || undefined,
     book: book.trim() || "homebrew",
     benefits: {
       hpplus: Number(hpplus) || 0,
@@ -2866,6 +2924,7 @@ function ClassPanel() {
 
   const handleClear = () => {
     setName("");
+    setFuid(undefined);
     setBook("homebrew");
     setHpplus(0);
     setMpplus(0);
@@ -2893,6 +2952,7 @@ function ClassPanel() {
                 label={t("Class Name")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
                 fullWidth
                 size="small"
                 autoFocus
@@ -2921,6 +2981,9 @@ function ClassPanel() {
                   />
                 )}
               />
+            </Grid>
+            <Grid size={12} sx={{ order: -1 }}>
+              <FuidField value={fuid} name={name} onChange={setFuid} />
             </Grid>
 
             <Grid size={12}>
@@ -3123,6 +3186,10 @@ function ClassPanel() {
                         onChange={(e) =>
                           updateSkillField(i, "skillName", e.target.value)
                         }
+                        onBlur={() => {
+                          if (!skill.fuid && skill.skillName)
+                            updateSkillField(i, "fuid", slugify(skill.skillName));
+                        }}
                         fullWidth
                         size="small"
                         slotProps={{
@@ -3152,6 +3219,13 @@ function ClassPanel() {
                         slotProps={{
                           htmlInput: { min: 1, max: 10 },
                         }}
+                      />
+                    </Grid>
+                    <Grid size={12} sx={{ order: -1 }}>
+                      <FuidField
+                        value={skill.fuid}
+                        name={skill.skillName}
+                        onChange={(v) => updateSkillField(i, "fuid", v)}
                       />
                     </Grid>
                     <Grid size={12}>
@@ -3336,6 +3410,7 @@ function QualityPickerDialog({ open, onClose, onSelect, filterType }) {
 function WeaponPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildWeaponPanelState);
+  const [fuid, setFuid] = useState(undefined);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const {
@@ -3393,6 +3468,7 @@ function WeaponPanel() {
   const weaponObj = normalizeWeaponLike({
     base,
     name,
+    fuid: fuid || undefined,
     category,
     range: getWeaponRange(base),
     type,
@@ -3429,6 +3505,7 @@ function WeaponPanel() {
 
   const handleClear = () => {
     setFormState(buildWeaponPanelState());
+    setFuid(undefined);
   };
 
   return (
@@ -3451,6 +3528,9 @@ function WeaponPanel() {
                 label={t("Weapon")}
                 cols={2}
               />
+            </Grid>
+            <Grid size={12} sx={{ order: -1 }}>
+              <FuidField value={fuid} name={name} onChange={setFuid} />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -3589,6 +3669,7 @@ function buildArmorPanelState() {
 function ArmorPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildArmorPanelState);
+  const [fuid, setFuid] = useState(undefined);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { base, name, quality, cost } = formState;
@@ -3597,6 +3678,7 @@ function ArmorPanel() {
     base,
     ...base,
     name,
+    fuid: fuid || undefined,
     cost,
     quality,
     qualityCost: formState.qualityCost,
@@ -3624,6 +3706,7 @@ function ArmorPanel() {
 
   const handleClear = () => {
     setFormState(buildArmorPanelState());
+    setFuid(undefined);
   };
 
   return (
@@ -3641,6 +3724,9 @@ function ArmorPanel() {
                 label={t("Armor")}
                 cols={2}
               />
+            </Grid>
+            <Grid size={12} sx={{ order: -1 }}>
+              <FuidField value={fuid} name={name} onChange={setFuid} />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -3727,6 +3813,7 @@ function buildShieldPanelState() {
 function ShieldPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildShieldPanelState);
+  const [fuid, setFuid] = useState(undefined);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { base, name, quality, cost } = formState;
@@ -3735,6 +3822,7 @@ function ShieldPanel() {
     base,
     ...base,
     name,
+    fuid: fuid || undefined,
     cost,
     quality,
     qualityCost: formState.qualityCost,
@@ -3762,6 +3850,7 @@ function ShieldPanel() {
 
   const handleClear = () => {
     setFormState(buildShieldPanelState());
+    setFuid(undefined);
   };
 
   return (
@@ -3779,6 +3868,9 @@ function ShieldPanel() {
                 label={t("Shield")}
                 cols={2}
               />
+            </Grid>
+            <Grid size={12} sx={{ order: -1 }}>
+              <FuidField value={fuid} name={name} onChange={setFuid} />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -3913,6 +4005,7 @@ function buildCWPanelState() {
 function CustomWeaponPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildCWPanelState);
+  const [fuid, setFuid] = useState(undefined);
   const [modifiersExpanded, setModifiersExpanded] = useState(false);
   const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
@@ -4003,6 +4096,7 @@ function CustomWeaponPanel() {
 
   const weaponObj = normalizeCustomWeaponLike({
     name: formState.name,
+    fuid: fuid || undefined,
     category: selectedCategory,
     range: formState.selectedRange,
     accuracy: {
@@ -4063,6 +4157,7 @@ function CustomWeaponPanel() {
 
   const handleClear = () => {
     setFormState(buildCWPanelState());
+    setFuid(undefined);
     setModifiersExpanded(false);
     setSecondModifiersExpanded(false);
   };
@@ -4099,6 +4194,9 @@ function CustomWeaponPanel() {
                 cols={2}
                 extraProps={coreExtraProps}
               />
+            </Grid>
+            <Grid size={12} sx={{ order: -1 }}>
+              <FuidField value={fuid} name={formState.name} onChange={setFuid} />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -4269,12 +4367,14 @@ function buildAccessoryPanelState() {
 function AccessoryPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildAccessoryPanelState);
+  const [fuid, setFuid] = useState(undefined);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { name, quality, cost } = formState;
 
   const accessoryObj = {
     name,
+    fuid: fuid || undefined,
     cost,
     quality,
     qualityCost: formState.qualityCost,
@@ -4299,6 +4399,7 @@ function AccessoryPanel() {
 
   const handleClear = () => {
     setFormState(buildAccessoryPanelState());
+    setFuid(undefined);
   };
 
   return (
@@ -4316,6 +4417,9 @@ function AccessoryPanel() {
                 label={t("Accessory")}
                 cols={2}
               />
+            </Grid>
+            <Grid size={12} sx={{ order: -1 }}>
+              <FuidField value={fuid} name={name} onChange={setFuid} />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -4389,6 +4493,7 @@ function OptionalPanel() {
   const { packs } = useCompendiumPacks();
   const [subtype, setSubtype] = useState("quirk");
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [description, setDescription] = useState("");
   const [effect, setEffect] = useState("");
   const [targetDescription, setTargetDescription] = useState("");
@@ -4431,6 +4536,7 @@ function OptionalPanel() {
       ? {
           subtype,
           name: name.trim(),
+          fuid: fuid || undefined,
           description: description.trim(),
           effect: effect.trim(),
         }
@@ -4438,15 +4544,17 @@ function OptionalPanel() {
         ? {
             subtype,
             name: name.trim(),
+            fuid: fuid || undefined,
             targetDescription: targetDescription.trim(),
             effect: effect.trim(),
           }
         : subtype === "zero-trigger" || subtype === "zero-effect"
-          ? { subtype, name: name.trim(), description: description.trim() }
+          ? { subtype, name: name.trim(), fuid: fuid || undefined, description: description.trim() }
           : subtype === "zero-power"
             ? {
                 subtype,
                 name: name.trim(),
+                fuid: fuid || undefined,
                 zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
                 zeroEffectRef: zeroEffect?._sourceRef ?? "",
                 zeroTrigger: zeroTrigger
@@ -4466,6 +4574,7 @@ function OptionalPanel() {
             : /* other */ {
                 subtype,
                 name: name.trim(),
+                fuid: fuid || undefined,
                 description: description.trim(),
                 effect: effect.trim(),
                 ...(showClock
@@ -4476,6 +4585,7 @@ function OptionalPanel() {
   const handleClear = () => {
     setSubtype("quirk");
     setName("");
+    setFuid(undefined);
     setDescription("");
     setEffect("");
     setTargetDescription("");
@@ -4501,10 +4611,14 @@ function OptionalPanel() {
               label={t("Name")}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
               fullWidth
               size="small"
               autoFocus
             />
+          </Grid>
+          <Grid size={12} sx={{ order: -1 }}>
+            <FuidField value={fuid} name={name} onChange={setFuid} />
           </Grid>
           <Grid
             size={{
@@ -4825,6 +4939,7 @@ function MnemospherePanel() {
 function HoplospherePanel() {
   const { t } = useTranslate();
   const [name, setName] = useState("");
+  const [fuid, setFuid] = useState(undefined);
   const [description, setDescription] = useState("");
   const [requiredSlots, setRequiredSlots] = useState(1);
   const [socketable, setSocketable] = useState("all");
@@ -4848,6 +4963,7 @@ function HoplospherePanel() {
   const data = name.trim()
     ? {
         name: name.trim(),
+        fuid: fuid || undefined,
         description,
         requiredSlots: Number(requiredSlots),
         socketable,
@@ -4876,7 +4992,11 @@ function HoplospherePanel() {
               label={t("Name")}
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onBlur={() => { if (!fuid) setFuid(slugify(name)); }}
             />
+          </Grid>
+          <Grid size={12} sx={{ order: -1 }}>
+            <FuidField value={fuid} name={name} onChange={setFuid} />
           </Grid>
           <Grid size={12}>
             <TextField

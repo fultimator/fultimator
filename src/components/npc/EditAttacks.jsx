@@ -328,6 +328,7 @@ export default function EditAttacks({ npc, setNpc }) {
               ...(prev.attacks || []),
               {
                 itemType: "basic",
+                fuid: item.fuid,
                 name: item.name,
                 range: item.ranged === true ? "ranged" : "melee",
                 accuracy: {

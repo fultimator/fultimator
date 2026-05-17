@@ -4,6 +4,7 @@ import {
   resolveRef,
   resolveRefMeta,
 } from "../utils/compendiumRefs";
+import skills from "./skills";
 
 function clamp(value, max) {
   return Math.min(value, max);
@@ -23,6 +24,8 @@ export function diffItem(instance, source, type) {
     case "class": {
       if (changed(instance.name, source.name))
         diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
 
       const instSkills = instance.skills ?? [];
       const srcSkills = source.skills ?? [];
@@ -44,6 +47,13 @@ export function diffItem(instance, source, type) {
                 ? ` (your level will be reduced to ${srcSkill.maxLvl})`
                 : ""),
           );
+        }
+        if (!instSkill.fuid) {
+          const skillName = srcSkill.skillName ?? srcSkill.name ?? "";
+          const expectedFuid =
+            srcSkill.fuid ?? skills.find((s) => s.name === skillName)?.fuid;
+          if (expectedFuid)
+            diffs.push(`Skill "${skillName}": ID missing -> "${expectedFuid}"`);
         }
       });
       if (instSkills.length > srcSkills.length)
@@ -67,6 +77,8 @@ export function diffItem(instance, source, type) {
     case "hoplosphere": {
       if (changed(instance.name, source.name))
         diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
       if (changed(instance.description, source.description))
         diffs.push("Description changed");
       if (changed(instance.cost, source.cost))
@@ -87,6 +99,8 @@ export function diffItem(instance, source, type) {
     case "heroic": {
       if (changed(instance.name, source.name))
         diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
       if (changed(instance.description, source.description))
         diffs.push("Description changed");
       break;
@@ -108,6 +122,8 @@ export function diffItem(instance, source, type) {
       for (const f of fields) {
         if (changed(instance[f], source[f])) diffs.push(`${f}: changed`);
       }
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
       break;
     }
 
@@ -126,6 +142,8 @@ export function diffItem(instance, source, type) {
       for (const f of fields) {
         if (changed(instance[f], source[f])) diffs.push(`${f}: changed`);
       }
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
       break;
     }
 
@@ -148,14 +166,21 @@ export function applyMigration(instance, source, type) {
       const mergedSkills = srcSkills.map((srcSkill, i) => {
         const inst = instSkills[i] ?? {};
         const newMaxLvl = srcSkill.maxLvl ?? inst.maxLvl ?? 0;
+        const skillName = srcSkill.skillName ?? srcSkill.name ?? "";
+        const skillFuid =
+          inst.fuid ??
+          srcSkill.fuid ??
+          skills.find((s) => s.name === skillName)?.fuid;
         return {
           ...srcSkill,
           currentLvl: clamp(inst.currentLvl ?? 0, newMaxLvl),
+          ...(skillFuid && { fuid: skillFuid }),
         };
       });
       return {
         ...instance,
         name: source.name ?? instance.name,
+        fuid: source.fuid ?? instance.fuid,
         skills: mergedSkills,
         ...(source.heroic !== undefined && { heroic: source.heroic }),
         ...(source.spells !== undefined && { spells: source.spells }),
@@ -166,6 +191,7 @@ export function applyMigration(instance, source, type) {
       return {
         ...instance,
         name: source.name ?? instance.name,
+        fuid: source.fuid ?? instance.fuid,
         description: source.description ?? instance.description,
         cost: source.cost ?? instance.cost,
         requiredSlots: source.requiredSlots ?? instance.requiredSlots,
@@ -177,6 +203,7 @@ export function applyMigration(instance, source, type) {
       return {
         ...instance,
         name: source.name ?? instance.name,
+        fuid: source.fuid ?? instance.fuid,
         description: source.description ?? instance.description,
       };
 
@@ -197,6 +224,7 @@ export function applyMigration(instance, source, type) {
       for (const f of fields) {
         if (source[f] !== undefined) patch[f] = source[f];
       }
+      if (source.fuid) patch.fuid = source.fuid;
       return { ...instance, ...patch };
     }
 
@@ -216,6 +244,7 @@ export function applyMigration(instance, source, type) {
       for (const f of fields) {
         if (source[f] !== undefined) patch[f] = source[f];
       }
+      if (source.fuid) patch.fuid = source.fuid;
       return { ...instance, ...patch };
     }
 

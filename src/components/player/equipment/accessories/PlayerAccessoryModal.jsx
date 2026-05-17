@@ -36,6 +36,7 @@ function buildInitialState(accessory) {
     damageMeleeModifier: accessory?.damageMeleeModifier ?? 0,
     damageRangedModifier: accessory?.damageRangedModifier ?? 0,
     isEquipped: accessory?.isEquipped || false,
+    fuid: accessory?.fuid,
   };
 }
 

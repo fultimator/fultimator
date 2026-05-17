@@ -80,6 +80,7 @@ export default function PlayerClassCard({
     useState(false);
   const [editSkillIndex, setEditSkillIndex] = useState(null);
   const [skillName, setSkillName] = useState("");
+  const [skillFuid, setSkillFuid] = useState(undefined);
   const [maxLevel, setMaxLevel] = useState(1);
   const [description, setDescription] = useState("");
   const [specialSkill, setSpecialSkill] = useState("");
@@ -96,9 +97,11 @@ export default function PlayerClassCard({
   const [heroic, setHeroic] = useState({
     name: classItem.heroic ? classItem.heroic.name : "",
     description: classItem.heroic ? classItem.heroic.description : "",
+    fuid: classItem.heroic ? classItem.heroic.fuid : undefined,
   });
 
   const [className, setClassName] = useState(classItem.name);
+  const [classFuid, setClassFuid] = useState(classItem.fuid);
 
   const [selectedCompanion, setSelectedCompanion] = useState(
     classItem.companion ? classItem.companion : null,
@@ -131,8 +134,9 @@ export default function PlayerClassCard({
   };
 
   const handleOpenEditClassNameModal = () => {
-    setOpenEditClassNameModal(true);
     setClassName(classItem.name);
+    setClassFuid(classItem.fuid);
+    setOpenEditClassNameModal(true);
   };
 
   const handleCloseEditClassNameModal = () => {
@@ -140,7 +144,7 @@ export default function PlayerClassCard({
   };
 
   const handleSaveClassName = () => {
-    editClassName(className);
+    editClassName(className, classFuid);
     setOpenEditClassNameModal(false);
   };
 
@@ -254,7 +258,6 @@ export default function PlayerClassCard({
 
   const handleAddSkill = () => {
     if (editSkillIndex !== null) {
-      // Edit existing skill
       onEditSkill(
         classItem.name,
         editSkillIndex,
@@ -262,21 +265,22 @@ export default function PlayerClassCard({
         maxLevel,
         description,
         specialSkill,
+        skillFuid,
       );
     } else {
-      // Add new skill
       onAddSkill(
         classItem.name,
         skillName,
         maxLevel,
         description,
         specialSkill,
+        skillFuid,
       );
     }
 
-    // Reset the state and close the modal
     setOpenAddSkillModal(false);
     setSkillName("");
+    setSkillFuid(undefined);
     setMaxLevel(1);
     setDescription("");
     setEditSkillIndex(null);
@@ -286,6 +290,7 @@ export default function PlayerClassCard({
   const handleEditSkill = (index) => {
     const skill = classItem.skills[index];
     setSkillName(skill.skillName);
+    setSkillFuid(skill.fuid);
     setMaxLevel(skill.maxLvl);
     setDescription(skill.description);
     setEditSkillIndex(index);
@@ -298,14 +303,15 @@ export default function PlayerClassCard({
     setOpenAddSkillModal(false);
     setEditSkillIndex(null);
     setSkillName("");
+    setSkillFuid(undefined);
     setMaxLevel(1);
     setDescription("");
     setSpecialSkill("");
   };
 
   const handleEditHeroicSkill = () => {
+    setHeroic(classItem.heroic ?? { name: "", description: "", fuid: undefined });
     setOpenEditHeroicSkillModal(true);
-    setHeroic(heroic);
   };
 
   const handleSaveHeroicSkill = () => {
@@ -396,6 +402,9 @@ export default function PlayerClassCard({
         onSave={handleSaveClassName}
         className={className}
         setClassName={setClassName}
+        classFuid={classFuid}
+        setClassFuid={setClassFuid}
+        isHomebrew={isHomebrew}
       />
       <AddSkillModal
         open={openAddSkillModal}
@@ -411,6 +420,8 @@ export default function PlayerClassCard({
         editSkillIndex={editSkillIndex}
         skillName={skillName}
         setSkillName={setSkillName}
+        skillFuid={skillFuid}
+        setSkillFuid={setSkillFuid}
         maxLevel={maxLevel}
         setMaxLevel={setMaxLevel}
         description={description}
@@ -451,6 +462,7 @@ export default function PlayerClassCard({
           editHeroic({
             name: item.name,
             description: item.description,
+            fuid: item.fuid,
             _packItemId: item._packItemId,
           });
         }}
@@ -628,7 +640,7 @@ export default function PlayerClassCard({
                 fontSize: "1rem",
               }}
             >
-              {isHomebrew ? skill.description : t(skill.description)}
+              {t(skill.description)}
             </StyledMarkdown>
           </Grid>
         ))}

@@ -44,6 +44,7 @@ function buildInitialState(shield) {
     damageMeleeModifier: shield?.damageMeleeModifier ?? 0,
     damageRangedModifier: shield?.damageRangedModifier ?? 0,
     isEquipped: shield?.isEquipped || false,
+    fuid: shield?.fuid,
   };
 }
 

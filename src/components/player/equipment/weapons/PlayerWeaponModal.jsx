@@ -66,6 +66,7 @@ function buildInitialState(weapon) {
     defModifier: weapon?.modifiers?.def ?? weapon?.defModifier ?? 0,
     mDefModifier: weapon?.modifiers?.mdef ?? weapon?.mDefModifier ?? 0,
     isEquipped: weapon?.isEquipped || false,
+    fuid: weapon?.fuid,
   };
 }
 

@@ -33,6 +33,8 @@ import {
   isAutomaticClassLevelEnabled,
   syncAutomaticClassLevels,
 } from "./classLevelUtils";
+import FuidField from "../../common/FuidField";
+import { slugify } from "../../../libs/slugify";
 
 export default function EditPlayerClasses({
   player,
@@ -55,6 +57,7 @@ export default function EditPlayerClasses({
   const [warnings, setWarnings] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClassName, setNewClassName] = useState("");
+  const [newClassFuid, setNewClassFuid] = useState(undefined);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
   const [expandedClasses, setExpandedClasses] = useState({});
   const [expandedMnemos, setExpandedMnemos] = useState({});
@@ -243,7 +246,7 @@ export default function EditPlayerClasses({
     fileInputRef.current.value = null;
   });
 
-  const addClassToPlayer = (name, isHomebrew) => {
+  const addClassToPlayer = (name, isHomebrew, fuid) => {
     // Check if the selected class type already exists in player's classes
     const classExists = player.classes.some(
       (cls) => cls.name.toLowerCase() === name.toLowerCase(),
@@ -261,6 +264,7 @@ export default function EditPlayerClasses({
 
     updatedPlayer.classes.push({
       name: name,
+      fuid: fuid,
       lvl: 1,
       benefits: {},
       skills: [],
@@ -276,6 +280,7 @@ export default function EditPlayerClasses({
     updateMaxStats();
     setDialogOpen(false);
     setNewClassName("");
+    setNewClassFuid(undefined);
   };
 
   const handleRemoveClass = (index) => {
@@ -288,12 +293,12 @@ export default function EditPlayerClasses({
     updateMaxStats();
   };
 
-  const editClassName = (index, newClassName) => {
+  const editClassName = (index, newClassName, newFuid) => {
     const updatedPlayer = {
       ...player,
       classes: player.classes.map((cls, i) => {
         if (i === index) {
-          return { ...cls, name: newClassName };
+          return { ...cls, name: newClassName, fuid: newFuid };
         }
         return cls;
       }),
@@ -350,6 +355,7 @@ export default function EditPlayerClasses({
     maxLevel,
     description,
     specialSkill,
+    fuid,
   ) => {
     const updatedPlayer = {
       ...player,
@@ -362,9 +368,10 @@ export default function EditPlayerClasses({
               {
                 skillName: skillName,
                 currentLvl: 1,
-                maxLvl: maxLevel, // Ensure maxLevel is parsed as a number
+                maxLvl: maxLevel,
                 description: description,
                 specialSkill: specialSkill,
+                fuid: fuid,
               },
             ],
           };
@@ -383,6 +390,7 @@ export default function EditPlayerClasses({
     maxLevel,
     description,
     specialSkill,
+    fuid,
   ) => {
     const updatedPlayer = {
       ...player,
@@ -392,8 +400,8 @@ export default function EditPlayerClasses({
             ...cls,
             skills: cls.skills.map((skill, index) => {
               if (index === skillIndex) {
-                const newMaxLevel = parseInt(maxLevel); // Ensure maxLevel is parsed as a number
-                const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel); // Adjust current level if necessary
+                const newMaxLevel = parseInt(maxLevel);
+                const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel);
                 return {
                   ...skill,
                   skillName,
@@ -401,6 +409,7 @@ export default function EditPlayerClasses({
                   currentLvl: newCurrentLevel,
                   description,
                   specialSkill,
+                  fuid,
                 };
               }
               return skill;
@@ -526,6 +535,7 @@ export default function EditPlayerClasses({
 
     updatedPlayer.classes.push({
       name: item.name,
+      fuid: item.fuid,
       lvl: 1,
       _packItemId: item._packItemId,
       benefits: item.benefits,
@@ -732,14 +742,12 @@ export default function EditPlayerClasses({
                 }
                 isEditMode={isEditMode}
                 editCompanion={(companion) => editCompanion(index, companion)}
-                editClassName={(newClassName) =>
-                  editClassName(index, newClassName)
+                editClassName={(newClassName, newFuid) =>
+                  editClassName(index, newClassName, newFuid)
                 }
                 editHeroic={(heroic) => editHeroic(index, heroic)}
                 userId={player.uid}
-                isHomebrew={
-                  cls.isHomebrew === undefined ? true : cls.isHomebrew
-                }
+                isHomebrew={cls.isHomebrew ?? false}
                 isClassLevelReadOnly={automaticClassLevel}
                 isAccordion
                 isExpanded={!!expandedClasses[index]}
@@ -849,6 +857,11 @@ export default function EditPlayerClasses({
           <DialogContentText>
             {t("Please enter the name for the new class")}.
           </DialogContentText>
+          <FuidField
+            value={newClassFuid}
+            name={newClassName}
+            onChange={setNewClassFuid}
+          />
           <TextField
             autoFocus
             margin="dense"
@@ -856,6 +869,7 @@ export default function EditPlayerClasses({
             fullWidth
             value={newClassName}
             onChange={(e) => setNewClassName(e.target.value)}
+            onBlur={() => { if (!newClassFuid) setNewClassFuid(slugify(newClassName)); }}
             sx={{ mt: 2 }}
           />
         </DialogContent>
@@ -868,7 +882,7 @@ export default function EditPlayerClasses({
             {t("Cancel")}
           </Button>
           <Button
-            onClick={() => addClassToPlayer(newClassName, true)}
+            onClick={() => addClassToPlayer(newClassName, true, newClassFuid)}
             color="primary"
             variant="contained"
             disabled={!newClassName}

@@ -343,6 +343,7 @@ export default function EditSpells({ npc, setNpc }) {
                 ...(prev.spells || []),
                 {
                   itemType: "spell",
+                  fuid: item.fuid,
                   _packItemId: item._packItemId,
                   name: item.name,
                   accuracy: item.accuracy ?? {
