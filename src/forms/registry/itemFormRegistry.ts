@@ -6,6 +6,8 @@ import { CustomWeaponPersistedSchema } from "../schema/itemSchemas/customWeapon"
 import { ArmorPersistedSchema } from "../schema/itemSchemas/armor";
 import { ShieldPersistedSchema } from "../schema/itemSchemas/shield";
 import { AccessoryPersistedSchema } from "../schema/itemSchemas/accessory";
+import { NpcSpecialSchema } from "../schema/itemSchemas/npcSpecial";
+import { NpcActionSchema } from "../schema/itemSchemas/npcAction";
 import { weaponFieldConfig } from "../rendering/config/itemConfigs/weapon";
 import { customWeaponFieldConfig } from "../rendering/config/itemConfigs/customWeapon";
 import { armorFieldConfig } from "../rendering/config/itemConfigs/armor";
@@ -90,6 +92,24 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     fields: accessoryFieldConfig,
     defaultState: () => createDefaultStateFromFields(accessoryFieldConfig),
     buildPayload: createSchemaPayloadBuilder(AccessoryPersistedSchema),
+  },
+  "npc-special": {
+    key: "npc-special",
+    label: labelByKey["npc-special"],
+    implementation: "quick-create-panel",
+    addItemType: "npc-special",
+    exportDataType: "special",
+    schema: NpcSpecialSchema,
+    buildPayload: createSchemaPayloadBuilder(NpcSpecialSchema),
+  },
+  "npc-action": {
+    key: "npc-action",
+    label: labelByKey["npc-action"],
+    implementation: "quick-create-panel",
+    addItemType: "npc-action",
+    exportDataType: "actions",
+    schema: NpcActionSchema,
+    buildPayload: createSchemaPayloadBuilder(NpcActionSchema),
   },
 };
 
