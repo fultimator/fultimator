@@ -13,6 +13,12 @@ type PayloadBuilder<TState, TPayload> = (
   context: FormContext,
 ) => TPayload | null;
 
+export interface ItemSubtypeDefinition<TState = unknown, TPayload = unknown> {
+  schema: ZodType<TPayload>;
+  defaultState?: () => TState;
+  buildPayload?: PayloadBuilder<TState, TPayload>;
+}
+
 export interface ItemFormDefinition<TState = unknown, TPayload = unknown> {
   key: CompendiumItemType;
   label: string;
@@ -21,6 +27,8 @@ export interface ItemFormDefinition<TState = unknown, TPayload = unknown> {
   defaultState?: () => TState;
   fields?: unknown;
   buildPayload?: PayloadBuilder<TState, TPayload>;
+  discriminatorKey?: string;
+  subtypeDefinitions?: Record<string, ItemSubtypeDefinition<TState, TPayload>>;
   preview?: (payload: TPayload | null) => ReactNode;
   addItemType: CompendiumItemType;
   exportDataType: string;

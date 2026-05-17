@@ -3080,7 +3080,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
   const [description, setDescription] = useState(editData?.description ?? "");
   const [effect, setEffect] = useState(editData?.effect ?? "");
   const [targetDescription, setTargetDescription] = useState(
-    editData?.targetDescription ?? "",
+    editData?.description ?? "",
   );
   const [clockSections, setClockSections] = useState(
     editData?.clock?.sections ?? 6,
@@ -3130,7 +3130,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
     setName(editData?.name ?? "");
     setDescription(editData?.description ?? "");
     setEffect(editData?.effect ?? "");
-    setTargetDescription(editData?.targetDescription ?? "");
+    setTargetDescription(editData?.description ?? "");
     setClockSections(editData?.clock?.sections ?? 6);
     setShowClock(Boolean(editData?.clock));
 
@@ -3165,7 +3165,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
       return {
         subtype,
         name: name.trim(),
-        targetDescription: targetDescription.trim(),
+        description: targetDescription.trim(),
         effect: effect.trim(),
       };
     if (subtype === "zero-trigger" || subtype === "zero-effect")

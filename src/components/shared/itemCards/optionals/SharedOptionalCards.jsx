@@ -757,7 +757,7 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
 
         {item.subtype === "camp-activities" && (
           <>
-            {item.targetDescription && (
+            {item.description && (
               <Box
                 sx={{
                   px: 2,
@@ -766,7 +766,7 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
                 }}
               >
                 <Typography variant="body2">
-                  <strong>{t("Target")}:</strong> {item.targetDescription}
+                  <strong>{t("Target")}:</strong> {item.description}
                 </Typography>
               </Box>
             )}

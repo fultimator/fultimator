@@ -23,7 +23,7 @@ import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 const CAMP_ACTIVITY_SUBTYPES = ["camp-activities"];
 
 function emptyCampActivity() {
-  return { name: "", targetDescription: "", effect: "" };
+  return { name: "", description: "", effect: "" };
 }
 
 export default function EditPlayerCampActivities({
@@ -90,7 +90,7 @@ export default function EditPlayerCampActivities({
             ? {
                 ...activity,
                 name: item.name ?? "",
-                targetDescription: item.targetDescription ?? "",
+                description: item.description ?? "",
                 effect: item.effect ?? "",
               }
             : activity,
@@ -203,15 +203,14 @@ export default function EditPlayerCampActivities({
                   <Autocomplete
                     freeSolo
                     options={targetOptions}
-                    value={activity.targetDescription ?? ""}
+                    value={activity.description ?? ""}
                     onInputChange={(_, value) =>
-                      onChangeActivity(index, "targetDescription")(value)
+                      onChangeActivity(index, "description")(value)
                     }
                     onChange={(_, value) =>
-                      onChangeActivity(
-                        index,
-                        "targetDescription",
-                      )(typeof value === "string" ? value : "")
+                      onChangeActivity(index, "description")(
+                        typeof value === "string" ? value : "",
+                      )
                     }
                     renderInput={(params) => (
                       <TextField
@@ -225,7 +224,7 @@ export default function EditPlayerCampActivities({
                 ) : (
                   <TextField
                     label={t("Target") + ":"}
-                    value={activity.targetDescription ?? ""}
+                    value={activity.description ?? ""}
                     fullWidth
                     size="small"
                     slotProps={{

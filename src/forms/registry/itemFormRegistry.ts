@@ -8,6 +8,18 @@ import { ShieldPersistedSchema } from "../schema/itemSchemas/shield";
 import { AccessoryPersistedSchema } from "../schema/itemSchemas/accessory";
 import { NpcSpecialSchema } from "../schema/itemSchemas/npcSpecial";
 import { NpcActionSchema } from "../schema/itemSchemas/npcAction";
+import { QualitySchema } from "../schema/itemSchemas/quality";
+import { HeroicSchema } from "../schema/itemSchemas/heroic";
+import { NpcAttackSchema } from "../schema/itemSchemas/npcAttack";
+import { NpcSpellSchema } from "../schema/itemSchemas/npcSpell";
+import { ClassSchema } from "../schema/itemSchemas/class";
+import { OptionalSchema, OptionalSubtypeSchemas } from "../schema/itemSchemas/optional";
+import { MnemosphereSchema } from "../schema/itemSchemas/mnemosphere";
+import { HoplosphereSchema } from "../schema/itemSchemas/hoplosphere";
+import {
+  PlayerSpellSchema,
+  PlayerSpellSubtypeSchemas,
+} from "../schema/itemSchemas/playerSpell";
 import { weaponFieldConfig } from "../rendering/config/itemConfigs/weapon";
 import { customWeaponFieldConfig } from "../rendering/config/itemConfigs/customWeapon";
 import { armorFieldConfig } from "../rendering/config/itemConfigs/armor";
@@ -16,6 +28,7 @@ import { accessoryFieldConfig } from "../rendering/config/itemConfigs/accessory"
 import {
   createDefaultStateFromFields,
   createSchemaPayloadBuilder,
+  createSubtypePayloadBuilder,
 } from "./helpers";
 
 const labelByKey: Record<CompendiumItemType, string> = {
@@ -110,6 +123,121 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "actions",
     schema: NpcActionSchema,
     buildPayload: createSchemaPayloadBuilder(NpcActionSchema),
+  },
+  quality: {
+    key: "quality",
+    label: labelByKey.quality,
+    implementation: "quick-create-panel",
+    addItemType: "quality",
+    exportDataType: "qualities",
+    schema: QualitySchema,
+    buildPayload: createSchemaPayloadBuilder(QualitySchema),
+  },
+  heroic: {
+    key: "heroic",
+    label: labelByKey.heroic,
+    implementation: "quick-create-panel",
+    addItemType: "heroic",
+    exportDataType: "heroics",
+    schema: HeroicSchema,
+    buildPayload: createSchemaPayloadBuilder(HeroicSchema),
+  },
+  "npc-attack": {
+    key: "npc-attack",
+    label: labelByKey["npc-attack"],
+    implementation: "quick-create-panel",
+    addItemType: "npc-attack",
+    exportDataType: "attacks",
+    schema: NpcAttackSchema,
+    buildPayload: createSchemaPayloadBuilder(NpcAttackSchema),
+  },
+  "npc-spell": {
+    key: "npc-spell",
+    label: labelByKey["npc-spell"],
+    implementation: "quick-create-panel",
+    addItemType: "npc-spell",
+    exportDataType: "spells",
+    schema: NpcSpellSchema,
+    buildPayload: createSchemaPayloadBuilder(NpcSpellSchema),
+  },
+  class: {
+    key: "class",
+    label: labelByKey.class,
+    implementation: "quick-create-panel",
+    addItemType: "class",
+    exportDataType: "classes",
+    schema: ClassSchema,
+    buildPayload: createSchemaPayloadBuilder(ClassSchema),
+  },
+  optional: {
+    key: "optional",
+    label: labelByKey.optional,
+    implementation: "quick-create-panel",
+    addItemType: "optional",
+    exportDataType: "optionals",
+    schema: OptionalSchema,
+    discriminatorKey: "subtype",
+    subtypeDefinitions: Object.fromEntries(
+      Object.entries(OptionalSubtypeSchemas).map(([subtype, schema]) => [
+        subtype,
+        { schema, buildPayload: createSchemaPayloadBuilder(schema) },
+      ]),
+    ),
+    buildPayload: createSubtypePayloadBuilder("subtype", OptionalSubtypeSchemas),
+  },
+  mnemosphere: {
+    key: "mnemosphere",
+    label: labelByKey.mnemosphere,
+    implementation: "quick-create-panel",
+    addItemType: "mnemosphere",
+    exportDataType: "mnemospheres",
+    schema: MnemosphereSchema,
+    buildPayload: createSchemaPayloadBuilder(MnemosphereSchema),
+  },
+  hoplosphere: {
+    key: "hoplosphere",
+    label: labelByKey.hoplosphere,
+    implementation: "quick-create-panel",
+    addItemType: "hoplosphere",
+    exportDataType: "hoplospheres",
+    schema: HoplosphereSchema,
+    buildPayload: createSchemaPayloadBuilder(HoplosphereSchema),
+  },
+  "player-spell": {
+    key: "player-spell",
+    label: labelByKey["player-spell"],
+    implementation: "quick-create-panel",
+    addItemType: "player-spell",
+    exportDataType: "player-spells",
+    schema: PlayerSpellSchema,
+    discriminatorKey: "spellType",
+    subtypeDefinitions: Object.fromEntries(
+      Object.entries(PlayerSpellSubtypeSchemas).map(([subtype, schema]) => [
+        subtype,
+        { schema, buildPayload: createSchemaPayloadBuilder(schema) },
+      ]),
+    ),
+    buildPayload: (state: unknown) => {
+      if (!state || typeof state !== "object") return null;
+      const payload = state as Record<string, unknown>;
+      const spellType = payload.spellType;
+      if (typeof spellType !== "string") return null;
+
+      const subtypeKey =
+        spellType === "magichant"
+          ? payload.magichantSubtype === "key"
+            ? "magichant-key"
+            : "magichant"
+          : spellType;
+
+      const schema =
+        PlayerSpellSubtypeSchemas[
+          subtypeKey as keyof typeof PlayerSpellSubtypeSchemas
+        ];
+      if (!schema) return null;
+      const parsed = schema.safeParse(payload);
+      return parsed.success ? parsed.data : null;
+    },
   },
 };
 

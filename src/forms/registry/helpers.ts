@@ -20,3 +20,20 @@ export function createSchemaPayloadBuilder<TState, TPayload>(
     return parsed.success ? parsed.data : null;
   };
 }
+
+export function createSubtypePayloadBuilder<TPayload>(
+  discriminatorKey: string,
+  subtypeSchemas: Record<string, ZodType<TPayload>>,
+) {
+  return (state: unknown): TPayload | null => {
+    const rawSubtype =
+      state && typeof state === "object"
+        ? (state as Record<string, unknown>)[discriminatorKey]
+        : undefined;
+    const subtype = typeof rawSubtype === "string" ? rawSubtype : "";
+    const schema = subtypeSchemas[subtype];
+    if (!schema) return null;
+    const parsed = schema.safeParse(state);
+    return parsed.success ? parsed.data : null;
+  };
+}

@@ -4587,7 +4587,7 @@ function OptionalPanel() {
             subtype,
             name: name.trim(),
             fuid: fuid || undefined,
-            targetDescription: targetDescription.trim(),
+            description: targetDescription.trim(),
             effect: effect.trim(),
           }
         : subtype === "zero-trigger" || subtype === "zero-effect"
@@ -4967,11 +4967,6 @@ function MnemospherePanel() {
             }
           }
         />
-      }
-      addButton={
-        data ? (
-          <AddToCompendiumButton itemType="mnemosphere" data={data} />
-        ) : null
       }
       addButton={
         data ? (
