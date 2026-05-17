@@ -35,6 +35,7 @@ import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
 import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../components/player/playerTransforms";
+import { totalIncomingDamageBonus } from "../../libs/actorBonuses";
 
 export default function CombatSimulator() {
   const { authLoading, dbMode, cloudUser, activeUid } = useDatabaseContext();
@@ -997,7 +998,14 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     isGuarding = false,
   ) {
     const affinities = npc.affinities || {};
-    const damage = parseInt(damageValue, 10) || 0;
+    // Add incoming-damage-bonus effects on this target before affinity scaling
+    // so resistance/vulnerability applies to the full boosted total.
+    // Passes element and species context so category-specific bonuses resolve.
+    const incomingBonus = totalIncomingDamageBonus(
+      npc.effects ?? [],
+      { element: damageType || undefined, species: npc.species || undefined },
+    );
+    const damage = (parseInt(damageValue, 10) || 0) + incomingBonus;
 
     // Default damage value
     let finalDamage = damage;

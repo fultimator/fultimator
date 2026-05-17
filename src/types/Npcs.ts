@@ -11,6 +11,7 @@ import {
   ActorDerivedStat,
   ActorDerived,
 } from "./Misc";
+import type { ActorBonuses } from "./Bonuses";
 import type {
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
@@ -130,4 +131,5 @@ export interface TypeNpc {
   resources?: NpcResources;
   derived?: NpcDerived;
   features?: NpcFeatures;
+  bonuses?: ActorBonuses;
 }
