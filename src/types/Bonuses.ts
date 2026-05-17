@@ -33,6 +33,7 @@ export type NpcSpecies =
 
 export interface AccuracyBonuses {
   all: number;
+  accuracyCheck: number;
   melee: number;
   ranged: number;
   magic: number;
@@ -90,6 +91,18 @@ export interface ResourceDelta {
   ip: number;
 }
 
+export interface ResourceMultiplier {
+  hp: number;
+  mp: number;
+  ip: number;
+}
+
+export interface ActorMultipliers {
+  incomingRecovery: ResourceMultiplier;
+  incomingLoss: ResourceMultiplier;
+  outgoingRecovery: ResourceMultiplier;
+}
+
 export interface ActorBonuses {
   incomingRecovery: ResourceDelta;
   incomingLoss: ResourceDelta;
@@ -101,7 +114,7 @@ export interface ActorBonuses {
 
 export function zeroAccuracyBonuses(): AccuracyBonuses {
   return {
-    all: 0, melee: 0, ranged: 0, magic: 0, opposed: 0, open: 0,
+    all: 0, accuracyCheck: 0, melee: 0, ranged: 0, magic: 0, opposed: 0, open: 0,
     arcane: 0, bow: 0, brawling: 0, dagger: 0, firearm: 0,
     flail: 0, heavy: 0, spear: 0, sword: 0, thrown: 0,
   };
@@ -121,6 +134,18 @@ export function zeroDamageBonuses(): DamageBonuses {
 
 export function zeroResourceDelta(): ResourceDelta {
   return { hp: 0, mp: 0, ip: 0 };
+}
+
+export function oneResourceMultiplier(): ResourceMultiplier {
+  return { hp: 1, mp: 1, ip: 1 };
+}
+
+export function oneActorMultipliers(): ActorMultipliers {
+  return {
+    incomingRecovery: oneResourceMultiplier(),
+    incomingLoss: oneResourceMultiplier(),
+    outgoingRecovery: oneResourceMultiplier(),
+  };
 }
 
 export function zeroActorBonuses(): ActorBonuses {

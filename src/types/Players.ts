@@ -9,7 +9,7 @@ import {
   ActorResources,
   ActorDerived,
 } from "./Misc";
-import type { ActorBonuses } from "./Bonuses";
+import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
 import type {
   Weapon as EquipmentWeapon,
   CustomWeapon as EquipmentCustomWeapon,
@@ -338,6 +338,7 @@ export interface TypePlayer {
   resources?: ActorResources;
   derived?: ActorDerived;
   bonuses?: ActorBonuses;
+  multipliers?: ActorMultipliers;
 }
 
 export type EquipmentSource =

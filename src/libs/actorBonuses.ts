@@ -3,14 +3,20 @@
 
 import {
   zeroActorBonuses,
+  oneActorMultipliers,
   type AccuracyBonuses,
   type ActorBonuses,
+  type ActorMultipliers,
   type DamageBonuses,
   type ResourceDelta,
 } from "../types/Bonuses";
 
 export function getActorBonuses(actor: { bonuses?: ActorBonuses }): ActorBonuses {
   return actor.bonuses ?? zeroActorBonuses();
+}
+
+export function getActorMultipliers(actor: { multipliers?: ActorMultipliers }): ActorMultipliers {
+  return actor.multipliers ?? oneActorMultipliers();
 }
 
 interface EffectRecord {
