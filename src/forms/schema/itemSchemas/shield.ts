@@ -13,6 +13,8 @@ export const ShieldModifiersSchema = z.object({
 export const ShieldSchema = z.object({
   itemType: z.literal("shield"),
   name: z.string().min(1),
+  description: z.string().optional(),
+  book: z.string().default("homebrew"),
   martial: z.boolean().default(false),
   def: z.number().int().default(0),
   mdef: z.number().int().default(0),

@@ -28,6 +28,7 @@ export interface Hoplosphere {
   fuid?: string;
   name: string;
   description: string;
+  book?: string;
   coagEffects?: Record<string, string>;
   socketable: "all" | "weapon";
   requiredSlots: 1 | 2;
@@ -175,6 +176,7 @@ export interface HeroicSkills {
   name: string;
   quote: string;
   description: string;
+  book?: string;
   effects?: ItemEffect[];
   appliesEffect?: AppliesEffect;
 }
@@ -227,6 +229,7 @@ export interface Vehicle {
 export interface Spells {
   fuid?: string;
   name: string;
+  book?: string;
   class: string;
   duration: string;
   isOffensive: boolean;

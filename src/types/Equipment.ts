@@ -33,8 +33,10 @@ export interface CustomWeaponRare extends WeaponRare {
 export interface Weapon {
   fuid?: string;
   itemType: "weapon";
-  category: string;
   name: string;
+  description?: string;
+  book?: string;
+  category: string;
   range: "melee" | "ranged";
   hands: 1 | 2;
   martial: boolean;
@@ -52,6 +54,8 @@ export interface CustomWeapon {
   fuid?: string;
   itemType: "customWeapon";
   name: string;
+  description?: string;
+  book?: string;
   category: string;
   range: "melee" | "ranged";
   hands: 1 | 2;
@@ -80,6 +84,7 @@ export interface NpcAttack {
   fuid?: string;
   itemType?: "attack";
   name: string;
+  description?: string;
   range: "melee" | "ranged";
   accuracy: Accuracy;
   damage: Damage;
@@ -92,6 +97,7 @@ export interface NpcWeaponAttack {
   fuid?: string;
   itemType?: "weaponAttack";
   name: string;
+  description?: string;
   range: "melee" | "ranged";
   accuracy: Accuracy;
   damage: Damage;
@@ -116,8 +122,10 @@ export interface DefensiveModifiers {
 export interface EquipmentArmor {
   fuid?: string;
   itemType?: "armor";
-  category?: "Armor" | string;
   name: string;
+  description?: string;
+  book?: string;
+  category?: "Armor" | string;
   quality?: string;
   selectedQuality?: string;
   qualityCost?: number;
@@ -159,8 +167,10 @@ export interface EquipmentShield extends Omit<EquipmentArmor, "itemType"> {
 export interface EquipmentAccessory {
   fuid?: string;
   itemType?: "accessory";
-  category?: "Accessory" | string;
   name: string;
+  description?: string;
+  book?: string;
+  category?: "Accessory" | string;
   quality?: string;
   selectedQuality?: string;
   qualityCost?: number;

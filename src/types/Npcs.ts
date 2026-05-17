@@ -30,6 +30,8 @@ export type NpcWeaponAttack = EquipmentNpcWeaponAttack;
 export interface NpcSpell {
   fuid?: string;
   name: string;
+  description: string;
+  book?: string;
   accuracy: Accuracy;
   isOffensive: boolean;
   damage: Damage;
@@ -39,7 +41,6 @@ export interface NpcSpell {
   duration: string;
   range: "melee" | "ranged";
   effect: string;
-  description: string;
   special: string[];
   itemType: "spell";
   spellType: string;
@@ -50,6 +51,8 @@ export interface NpcSpell {
 export interface NpcAction {
   fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
   spCost?: number;
   effects?: ItemEffect[];
@@ -59,6 +62,8 @@ export interface NpcAction {
 export interface NpcSpecial {
   fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
   spCost?: number;
   effects?: ItemEffect[];
@@ -68,6 +73,8 @@ export interface NpcSpecial {
 export interface NpcRareGear {
   fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
   effects?: ItemEffect[];
   appliesEffect?: AppliesEffect;

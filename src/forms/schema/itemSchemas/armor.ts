@@ -15,6 +15,8 @@ export const ArmorModifiersSchema = z.object({
 export const ArmorSchema = z.object({
   itemType: z.literal("armor"),
   name: z.string().min(1),
+  description: z.string().optional(),
+  book: z.string().default("homebrew"),
   martial: z.boolean().default(false),
   def: z.number().int().default(0),
   mdef: z.number().int().default(0),
