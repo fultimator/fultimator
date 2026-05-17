@@ -90,7 +90,16 @@ export function SchemaFieldRenderer<
       {label && (
         <Grid size={12}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Typography variant="subtitle2" sx={{ textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}>{label}</Typography>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                color: "text.secondary",
+              }}
+            >
+              {label}
+            </Typography>
             {labelAction}
           </Box>
           <Divider sx={{ mt: 0.5, mb: 1 }} />

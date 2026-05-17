@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Attributes, Elements } from "../../../types/Misc";
+import { MetaSchema } from "../meta";
 import {
   WeaponAccuracySchema,
   WeaponDamageSchema,
@@ -57,6 +58,7 @@ export const CustomWeaponSchema = z.object({
   secondDamage: WeaponDamageSchema.optional(),
   secondModifiers: WeaponModifiersSchema.optional(),
   secondCustomizations: z.array(CustomWeaponCustomizationSchema).optional(),
+  meta: MetaSchema.optional(),
 });
 
 export type CustomWeapon = z.infer<typeof CustomWeaponSchema>;

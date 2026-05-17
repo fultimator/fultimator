@@ -1,4 +1,5 @@
 import type { ItemFieldConfig } from "../fieldConfig";
+import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { ShieldPersisted } from "../../../schema/itemSchemas/shield";
 import shields from "../../../../libs/shields";
 import allQualities from "../../../../libs/qualities";
@@ -41,6 +42,7 @@ const G = {
   quality: "quality",
   modifiers: "modifiers",
   meta: "meta",
+  source: "source",
 } as const;
 
 export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
@@ -255,4 +257,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     group: G.meta,
     order: 31,
   },
+  ...(metaFieldConfigWithGroup(
+    G.source,
+  ) as unknown as ItemFieldConfig<ShieldFormState>),
 ];

@@ -13,6 +13,7 @@ import {
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
 import type { ItemEffect, ActorEffect, AppliesEffect } from "./Effects";
+import type { Meta } from "../forms/schema/meta";
 import type {
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
@@ -55,6 +56,7 @@ export interface NpcAction {
   book?: string;
   effect: string;
   spCost?: number;
+  meta?: Meta;
   effects?: ItemEffect[];
   appliesEffect?: AppliesEffect;
 }
@@ -66,6 +68,7 @@ export interface NpcSpecial {
   book?: string;
   effect: string;
   spCost?: number;
+  meta?: Meta;
   effects?: ItemEffect[];
   appliesEffect?: AppliesEffect;
 }

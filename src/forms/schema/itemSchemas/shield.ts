@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 export const ShieldModifiersSchema = z.object({
   def: z.number().int().default(0),
@@ -23,6 +24,7 @@ export const ShieldSchema = z.object({
   quality: z.string().optional(),
   cost: z.number().int().nonnegative().optional(),
   modifiers: ShieldModifiersSchema.optional(),
+  meta: MetaSchema.optional(),
 });
 
 export type Shield = z.infer<typeof ShieldSchema>;

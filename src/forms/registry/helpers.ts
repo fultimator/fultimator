@@ -4,15 +4,24 @@ import type { ItemFieldConfig } from "../rendering/config/fieldConfig";
 export function createDefaultStateFromFields<
   TState extends Record<string, unknown>,
 >(fields: ItemFieldConfig<TState>): TState {
-  return fields.reduce(
-    (acc, field) => {
-      if ("defaultValue" in field) {
-        acc[field.key] = field.defaultValue;
+  const acc: Record<string, unknown> = {};
+  for (const field of fields) {
+    if (!("defaultValue" in field)) continue;
+    if (field.key.includes(".")) {
+      const parts = field.key.split(".");
+      let cursor = acc;
+      for (let i = 0; i < parts.length - 1; i++) {
+        if (cursor[parts[i]] == null || typeof cursor[parts[i]] !== "object") {
+          cursor[parts[i]] = {};
+        }
+        cursor = cursor[parts[i]] as Record<string, unknown>;
       }
-      return acc;
-    },
-    {} as Record<string, unknown>,
-  ) as TState;
+      cursor[parts[parts.length - 1]] = field.defaultValue;
+    } else {
+      acc[field.key] = field.defaultValue;
+    }
+  }
+  return acc as TState;
 }
 
 export function createSchemaPayloadBuilder<TState, TPayload>(

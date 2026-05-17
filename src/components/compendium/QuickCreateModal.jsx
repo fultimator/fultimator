@@ -907,6 +907,24 @@ function NpcSpecialPanel() {
             state={formState}
             onChange={setFormState}
             surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            label="Metadata"
             cols={2}
           />
           <Grid size={12}>
@@ -963,6 +981,24 @@ function NpcActionPanel() {
             state={formState}
             onChange={setFormState}
             surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            label="Metadata"
             cols={2}
           />
           <Grid size={12}>

@@ -2,23 +2,9 @@ import type { ItemFieldConfig } from "../fieldConfig";
 import type { Heroic } from "../../../schema/itemSchemas/heroic";
 import classList from "../../../../libs/classes";
 import type { SelectOption } from "../../fieldRenderers";
+import { metaFieldConfig } from "../metaFieldConfig";
 
 export type HeroicFormState = Heroic;
-
-const HEROIC_BOOK_OPTIONS = [
-  "core",
-  "rework",
-  "bonus",
-  "high",
-  "techno",
-  "natural",
-  "homebrew",
-];
-
-const bookOptions: SelectOption[] = [
-  { value: "", label: "None" },
-  ...HEROIC_BOOK_OPTIONS.map((b) => ({ value: b, label: b })),
-];
 
 const classOptions: SelectOption[] = (classList as { name: string }[]).map(
   (c) => ({ value: c.name, label: c.name }),
@@ -27,7 +13,6 @@ const classOptions: SelectOption[] = (classList as { name: string }[]).map(
 const G = {
   core: "core",
   body: "body",
-  meta: "meta",
 } as const;
 
 export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
@@ -73,37 +58,5 @@ export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
     order: 4,
     fullWidth: true,
   },
-  {
-    key: "book",
-    kind: "editable",
-    label: "Book",
-    component: "select",
-    defaultValue: "",
-    group: G.meta,
-    order: 5,
-    gridSize: 6,
-    componentProps: { options: bookOptions },
-  },
-  {
-    key: "page",
-    kind: "editable",
-    label: "Page",
-    component: "number",
-    defaultValue: undefined,
-    group: G.meta,
-    order: 6,
-    gridSize: 6,
-    parse: (v) => (v === "" || v == null ? undefined : Number(v)),
-  },
-  {
-    key: "bookName",
-    kind: "editable",
-    label: "Book Name",
-    component: "text",
-    defaultValue: "",
-    group: G.meta,
-    order: 7,
-    fullWidth: true,
-    dependencies: (s) => s.book === "homebrew",
-  },
+  ...(metaFieldConfig as unknown as ItemFieldConfig<HeroicFormState>),
 ];

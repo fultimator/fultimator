@@ -10,6 +10,7 @@ const qualities = [
     quality: t("You are immune to a single status", true),
     cost: 500,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "resistance",
@@ -21,6 +22,7 @@ const qualities = [
     ),
     cost: 700,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "amulet",
@@ -29,6 +31,7 @@ const qualities = [
     quality: t("Get +1 bonus to Magic Defense", true),
     cost: 800,
     filter: ["weapon", "customWeapon", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "bulwark",
@@ -37,6 +40,7 @@ const qualities = [
     quality: t("You gain a +1 bonus to Defense.", true),
     cost: 800,
     filter: ["weapon", "customWeapon", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "dual-resistance",
@@ -48,6 +52,7 @@ const qualities = [
     ),
     cost: 1000,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "swordbreaker",
@@ -56,6 +61,7 @@ const qualities = [
     quality: t("You have Resistance to physical damage", true),
     cost: 1000,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "immunity",
@@ -67,6 +73,7 @@ const qualities = [
     ),
     cost: 1500,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "omnishield",
@@ -75,6 +82,7 @@ const qualities = [
     quality: t("Get +1 bonus to Defense and to Magic Defense", true),
     cost: 2000,
     filter: ["weapon", "customWeapon", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "perfect-health",
@@ -83,6 +91,7 @@ const qualities = [
     quality: t("You are immune to all status effects", true),
     cost: 2000,
     filter: ["weapon", "customWeapon", "armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
 
   // Offensive
@@ -93,6 +102,7 @@ const qualities = [
     quality: t("The Weapon targets Magic Defense instead of Defense", true),
     cost: 100,
     filter: ["weapon", "customWeapon"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "hunter",
@@ -104,6 +114,7 @@ const qualities = [
     ),
     cost: 300,
     filter: ["weapon", "customWeapon"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "piercing",
@@ -112,6 +123,7 @@ const qualities = [
     quality: t("Weapon damage ignores Resistances", true),
     cost: 400,
     filter: ["weapon", "customWeapon"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "dual-hunter",
@@ -123,6 +135,7 @@ const qualities = [
     ),
     cost: 500,
     filter: ["weapon", "customWeapon"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "multi",
@@ -131,6 +144,7 @@ const qualities = [
     quality: t("Weapon attacks have multi (2) property", true),
     cost: 1000,
     filter: ["weapon", "customWeapon"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "status",
@@ -142,6 +156,7 @@ const qualities = [
     ),
     cost: 1500,
     filter: ["weapon", "customWeapon"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "status-plus",
@@ -153,6 +168,7 @@ const qualities = [
     ),
     cost: 2000,
     filter: ["weapon", "customWeapon"],
+    meta: { book: "", page: "", isOfficial: false },
   },
 
   // Enhancement
@@ -166,6 +182,7 @@ const qualities = [
     ),
     cost: 300,
     filter: ["accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "initiative-up",
@@ -174,6 +191,7 @@ const qualities = [
     quality: t("You gain a +4 bonus to your Initiative modifier.", true),
     cost: 500,
     filter: ["armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "accuracy-up",
@@ -182,6 +200,7 @@ const qualities = [
     quality: t("You gain a +1 bonus to your Accuracy Checks.", true),
     cost: 1000,
     filter: ["armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "magic-up",
@@ -190,6 +209,7 @@ const qualities = [
     quality: t("You gain a +1 bonus to your Magic Checks.", true),
     cost: 1000,
     filter: ["armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "vitality-up",
@@ -198,6 +218,7 @@ const qualities = [
     quality: t("When you recover HP, you recover 5 extra HP.", true),
     cost: 1000,
     filter: ["armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "healing-up",
@@ -209,6 +230,7 @@ const qualities = [
     ),
     cost: 1500,
     filter: ["armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "spell-up",
@@ -217,6 +239,7 @@ const qualities = [
     quality: t("Spells you cast deal 5 extra damage.", true),
     cost: 2000,
     filter: ["armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
   {
     fuid: "weapon-up",
@@ -228,6 +251,7 @@ const qualities = [
     ),
     cost: 2000,
     filter: ["armor", "shield", "accessory"],
+    meta: { book: "", page: "", isOfficial: false },
   },
 ];
 

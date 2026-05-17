@@ -1,4 +1,5 @@
 import type { ItemFieldConfig } from "../fieldConfig";
+import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { CustomWeaponPersisted } from "../../../schema/itemSchemas/customWeapon";
 import { calculateCustomWeaponStats } from "../../../../components/player/common/playerCalculations";
 import { Attributes, Elements } from "../../../../types/Misc";
@@ -113,6 +114,7 @@ const G = {
   secondary: "secondary",
   secondaryModifiers: "secondaryModifiers",
   meta: "meta",
+  source: "source",
 } as const;
 
 export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
@@ -736,4 +738,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     group: G.meta,
     order: 82,
   },
+  ...(metaFieldConfigWithGroup(
+    G.source,
+  ) as unknown as ItemFieldConfig<CustomWeaponFormState>),
 ];

@@ -9,6 +9,7 @@ const armor = [
     armor: true,
     martial: false,
     init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "silk-shirt",
@@ -20,6 +21,7 @@ const armor = [
     armor: true,
     martial: false,
     init: -1,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "travel-garb",
@@ -31,6 +33,7 @@ const armor = [
     armor: true,
     martial: false,
     init: -1,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "combat-tunic",
@@ -42,6 +45,7 @@ const armor = [
     armor: true,
     martial: false,
     init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "sage-robe",
@@ -53,6 +57,7 @@ const armor = [
     armor: true,
     martial: false,
     init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "sage-robe",
@@ -64,6 +69,7 @@ const armor = [
     armor: true,
     martial: false,
     init: -2,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "brigandine",
@@ -75,6 +81,7 @@ const armor = [
     armor: true,
     martial: true,
     init: -2,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "bronze-plate",
@@ -86,6 +93,7 @@ const armor = [
     armor: true,
     martial: true,
     init: -3,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "runic-plate",
@@ -97,6 +105,7 @@ const armor = [
     armor: true,
     martial: true,
     init: -3,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "steel-plate",
@@ -108,6 +117,7 @@ const armor = [
     armor: true,
     martial: true,
     init: -4,
+    meta: { book: "core", page: "", isOfficial: true },
   },
 ];
 

@@ -88,7 +88,11 @@ export default function EditHeroicSkillModal({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={() => onSave(heroic)}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => onSave(heroic)}
+        >
           {t("Save Changes")}
         </Button>
       </DialogActions>

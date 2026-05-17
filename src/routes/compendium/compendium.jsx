@@ -145,7 +145,7 @@ function SidebarSecondaryValue(type, item, t) {
       : (item.wellspring ?? "");
   if (type === "attacks") return t(item.range);
   if (type === "classes") return item.book ?? "";
-  if (type === "heroics") return item.book ?? "";
+  if (type === "heroics") return item.meta?.book ?? item.book ?? "";
   if (type === "mnemospheres") return `${item.class ?? ""} Lv.${item.lvl ?? 1}`;
   if (type === "hoplospheres") return `${item.cost ?? 0}z`;
   if (type === "optionals") return item.subtype ?? "";
@@ -1198,7 +1198,9 @@ function CompendiumViewer() {
       }
 
       if (selectedType === "heroics" && selectedBook.length > 0) {
-        items = items.filter((item) => selectedBook.includes(item.book));
+        items = items.filter((item) =>
+          selectedBook.includes(item.meta?.book ?? item.book),
+        );
       }
 
       if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
@@ -1301,7 +1303,9 @@ function CompendiumViewer() {
       }
 
       if (selectedType === "heroics" && selectedBook.length > 0) {
-        items = items.filter((item) => selectedBook.includes(item.book));
+        items = items.filter((item) =>
+          selectedBook.includes(item.meta?.book ?? item.book),
+        );
       }
 
       if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {

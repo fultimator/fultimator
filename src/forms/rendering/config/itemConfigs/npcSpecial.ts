@@ -1,5 +1,6 @@
 import type { ItemFieldConfig } from "../fieldConfig";
 import type { NpcSpecial } from "../../../schema/itemSchemas/npcSpecial";
+import { metaFieldConfig } from "../metaFieldConfig";
 
 export type NpcSpecialFormState = NpcSpecial;
 
@@ -42,4 +43,5 @@ export const npcSpecialFieldConfig: ItemFieldConfig<NpcSpecialFormState> = [
     order: 2,
     fullWidth: true,
   },
+  ...(metaFieldConfig as unknown as ItemFieldConfig<NpcSpecialFormState>),
 ];

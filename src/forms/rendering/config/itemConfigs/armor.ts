@@ -1,4 +1,5 @@
 import type { ItemFieldConfig } from "../fieldConfig";
+import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { ArmorPersisted } from "../../../schema/itemSchemas/armor";
 import armor from "../../../../libs/armor";
 import allQualities from "../../../../libs/qualities";
@@ -42,6 +43,7 @@ const G = {
   slots: "slots",
   modifiers: "modifiers",
   meta: "meta",
+  source: "source",
 } as const;
 
 export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
@@ -292,4 +294,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     group: G.meta,
     order: 42,
   },
+  ...(metaFieldConfigWithGroup(
+    G.source,
+  ) as unknown as ItemFieldConfig<ArmorFormState>),
 ];

@@ -49,6 +49,8 @@ import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
 import { qualityFieldConfig } from "../../forms/rendering/config/itemConfigs/quality";
 import { heroicFieldConfig } from "../../forms/rendering/config/itemConfigs/heroic";
+import { npcActionFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAction";
+import { npcSpecialFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpecial";
 import { createDefaultStateFromFields } from "../../forms/registry/helpers";
 
 // Shared attribute options
@@ -712,28 +714,23 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState(editData?.name ?? "");
-  const [effect, setEffect] = useState(editData?.effect ?? "");
-  const [spCost, setSpCost] = useState(
-    editData?.spCost != null ? String(editData.spCost) : "",
-  );
+  const buildState = () => ({
+    ...createDefaultStateFromFields(npcSpecialFieldConfig),
+    ...(editData ?? {}),
+  });
+
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setName(editData?.name ?? "");
-    setEffect(editData?.effect ?? "");
-    setSpCost(editData?.spCost != null ? String(editData.spCost) : "");
+    setFormState(buildState());
   }, [editData]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!formState.name?.trim()) return;
     setSaving(true);
-    const payload = {
-      name: name.trim(),
-      effect: effect.trim(),
-      spCost: spCost === "" ? undefined : Number(spCost),
-    };
+    const payload = { ...formState, name: formState.name.trim() };
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "npc-special", payload);
     setSaving(false);
@@ -752,7 +749,7 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
           py: 1.25,
         }}
       >
-        {t("New Special Rule")}
+        {t(isEditing ? "Edit Special Rule" : "New Special Rule")}
         <IconButton
           size="small"
           onClick={onClose}
@@ -768,42 +765,31 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 4,
-            }}
-          >
-            <TextField
-              label={t("SP Cost")}
-              value={spCost}
-              onChange={(e) => setSpCost(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Effect")}
-              value={effect}
-              onChange={(e) => setEffect(e.target.value)}
-              helperText=""
-            />
-          </Grid>
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            label="Metadata"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -811,7 +797,7 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!formState.name?.trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -825,28 +811,23 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState(editData?.name ?? "");
-  const [effect, setEffect] = useState(editData?.effect ?? "");
-  const [spCost, setSpCost] = useState(
-    editData?.spCost != null ? String(editData.spCost) : "",
-  );
+  const buildState = () => ({
+    ...createDefaultStateFromFields(npcActionFieldConfig),
+    ...(editData ?? {}),
+  });
+
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setName(editData?.name ?? "");
-    setEffect(editData?.effect ?? "");
-    setSpCost(editData?.spCost != null ? String(editData.spCost) : "");
+    setFormState(buildState());
   }, [editData]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!formState.name?.trim()) return;
     setSaving(true);
-    const payload = {
-      name: name.trim(),
-      effect: effect.trim(),
-      spCost: spCost === "" ? undefined : Number(spCost),
-    };
+    const payload = { ...formState, name: formState.name.trim() };
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "npc-action", payload);
     setSaving(false);
@@ -865,7 +846,7 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
           py: 1.25,
         }}
       >
-        {t("New Other Action")}
+        {t(isEditing ? "Edit Other Action" : "New Other Action")}
         <IconButton
           size="small"
           onClick={onClose}
@@ -881,42 +862,31 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 4,
-            }}
-          >
-            <TextField
-              label={t("SP Cost")}
-              value={spCost}
-              onChange={(e) => setSpCost(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Effect")}
-              value={effect}
-              onChange={(e) => setEffect(e.target.value)}
-              helperText=""
-            />
-          </Grid>
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            label="Metadata"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -924,7 +894,7 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!formState.name?.trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -2243,7 +2213,9 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
-  useEffect(() => { setFormState(buildState()); }, [editData]);
+  useEffect(() => {
+    setFormState(buildState());
+  }, [editData]);
 
   const handleSave = async () => {
     if (!formState.name?.trim()) return;
@@ -2271,7 +2243,12 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
         <IconButton
           size="small"
           onClick={onClose}
-          sx={{ position: "absolute", right: 8, top: 8, color: "rgba(255,255,255,0.8)" }}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "rgba(255,255,255,0.8)",
+          }}
         >
           <Close fontSize="small" />
         </IconButton>
@@ -2283,6 +2260,24 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
             state={formState}
             onChange={setFormState}
             surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={qualityFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={qualityFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            label="Metadata"
             cols={2}
           />
         </Grid>
@@ -2317,7 +2312,9 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
-  useEffect(() => { setFormState(buildState()); }, [editData]);
+  useEffect(() => {
+    setFormState(buildState());
+  }, [editData]);
 
   const handleSave = async () => {
     if (!formState.name?.trim()) return;
@@ -2349,7 +2346,12 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
         <IconButton
           size="small"
           onClick={onClose}
-          sx={{ position: "absolute", right: 8, top: 8, color: "rgba(255,255,255,0.8)" }}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "rgba(255,255,255,0.8)",
+          }}
         >
           <Close fontSize="small" />
         </IconButton>

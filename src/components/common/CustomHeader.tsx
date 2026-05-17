@@ -133,7 +133,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                     <ExpandMoreIcon
                       fontSize="large"
                       sx={{
-                        transform: allExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                        transform: allExpanded
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
                         transition: "transform 0.2s",
                       }}
                     />
@@ -247,7 +249,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
                     <ExpandMoreIcon
                       fontSize="large"
                       sx={{
-                        transform: allExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                        transform: allExpanded
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
                         transition: "transform 0.2s",
                       }}
                     />

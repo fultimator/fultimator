@@ -1,4 +1,5 @@
 import type { ItemFieldConfig } from "../fieldConfig";
+import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { AccessoryPersisted } from "../../../schema/itemSchemas/accessory";
 import allQualities from "../../../../libs/qualities";
 const qualities = allQualities.filter((q) => q.filter?.includes("accessory"));
@@ -22,6 +23,7 @@ const G = {
   quality: "quality",
   modifiers: "modifiers",
   meta: "meta",
+  source: "source",
 } as const;
 
 export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
@@ -184,4 +186,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
     group: G.meta,
     order: 31,
   },
+  ...(metaFieldConfigWithGroup(
+    G.source,
+  ) as unknown as ItemFieldConfig<AccessoryFormState>),
 ];

@@ -56,9 +56,17 @@ function ActionContextMenu({ action, npcName, onDelete }) {
   const doAdd = async (packId) => {
     try {
       await addItem(packId, "npc-action", action);
-      setSnackbar({ open: true, message: t("Added to compendium"), severity: "success" });
+      setSnackbar({
+        open: true,
+        message: t("Added to compendium"),
+        severity: "success",
+      });
     } catch (err) {
-      setSnackbar({ open: true, message: err?.message ?? t("Failed to add"), severity: "error" });
+      setSnackbar({
+        open: true,
+        message: err?.message ?? t("Failed to add"),
+        severity: "error",
+      });
     }
   };
 
@@ -82,14 +90,24 @@ function ActionContextMenu({ action, npcName, onDelete }) {
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
         <MenuItem onClick={handleAddToCompendium}>
-          <ListItemIcon><LibraryAdd fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <LibraryAdd fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
         </MenuItem>
 
         <Divider />
 
-        <MenuItem onClick={() => { close(); onDelete(); }} sx={{ color: "error.main" }}>
-          <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            close();
+            onDelete();
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <Delete fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
       </Menu>
@@ -100,12 +118,23 @@ function ActionContextMenu({ action, npcName, onDelete }) {
         onClose={() => setPackMenuAnchor(null)}
       >
         {personalPack && !personalPack.locked && (
-          <MenuItem onClick={async () => { setPackMenuAnchor(null); await doAdd(personalPack.id); }}>
+          <MenuItem
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(personalPack.id);
+            }}
+          >
             <ListItemText>{t("Personal")}</ListItemText>
           </MenuItem>
         )}
         {unlockedNonPersonal.map((pack) => (
-          <MenuItem key={pack.id} onClick={async () => { setPackMenuAnchor(null); await doAdd(pack.id); }}>
+          <MenuItem
+            key={pack.id}
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(pack.id);
+            }}
+          >
             <ListItemText>{pack.name}</ListItemText>
           </MenuItem>
         ))}
@@ -117,7 +146,11 @@ function ActionContextMenu({ action, npcName, onDelete }) {
         onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -146,12 +179,9 @@ export default function EditActions({ npc, setNpc }) {
 
   const toggleAll = () => {
     setExpandedSet(
-      allExpanded
-        ? new Set()
-        : new Set(npc.actions?.map((_, i) => i) ?? []),
+      allExpanded ? new Set() : new Set(npc.actions?.map((_, i) => i) ?? []),
     );
   };
-
 
   const addActions = () => {
     const newIndex = npc.actions?.length ?? 0;
@@ -209,7 +239,12 @@ export default function EditActions({ npc, setNpc }) {
         >
           <AccordionSummary
             expandIcon={<ExpandMore />}
-            sx={{ "& .MuiAccordionSummary-content": { alignItems: "center", overflow: "hidden" } }}
+            sx={{
+              "& .MuiAccordionSummary-content": {
+                alignItems: "center",
+                overflow: "hidden",
+              },
+            }}
           >
             <Box
               sx={{ display: "flex", alignItems: "center" }}
@@ -261,6 +296,37 @@ export default function EditActions({ npc, setNpc }) {
                   });
                 }}
                 surface="edit"
+                group="core"
+                cols={2}
+              />
+              <SchemaFieldRenderer
+                config={npcActionFieldConfig}
+                state={action}
+                onChange={(next) => {
+                  setNpc((prev) => {
+                    const actions = [...(prev.actions || [])];
+                    actions[i] = next;
+                    return { ...prev, actions };
+                  });
+                }}
+                surface="edit"
+                group="body"
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={npcActionFieldConfig}
+                state={action}
+                onChange={(next) => {
+                  setNpc((prev) => {
+                    const actions = [...(prev.actions || [])];
+                    actions[i] = next;
+                    return { ...prev, actions };
+                  });
+                }}
+                surface="edit"
+                group="meta"
+                label="Metadata"
+                cols={2}
               />
             </Grid>
           </AccordionDetails>

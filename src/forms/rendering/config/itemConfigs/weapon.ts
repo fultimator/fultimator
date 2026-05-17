@@ -1,4 +1,5 @@
 import type { ItemFieldConfig } from "../fieldConfig";
+import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { WeaponPersisted } from "../../../schema/itemSchemas/weapon";
 import {
   calcWeaponCost,
@@ -100,6 +101,7 @@ const G = {
   rareBonus: "rareBonus",
   quality: "quality",
   meta: "meta",
+  source: "source",
 } as const;
 
 export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
@@ -575,4 +577,7 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     group: G.meta,
     order: 62,
   },
+  ...(metaFieldConfigWithGroup(
+    G.source,
+  ) as unknown as ItemFieldConfig<WeaponFormState>),
 ];

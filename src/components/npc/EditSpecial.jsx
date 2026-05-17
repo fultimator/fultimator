@@ -180,9 +180,7 @@ export default function EditSpecial({ npc, setNpc }) {
 
   const toggleAll = () => {
     setExpandedSet(
-      allExpanded
-        ? new Set()
-        : new Set(npc.special?.map((_, i) => i) ?? []),
+      allExpanded ? new Set() : new Set(npc.special?.map((_, i) => i) ?? []),
     );
   };
 
@@ -242,7 +240,12 @@ export default function EditSpecial({ npc, setNpc }) {
         >
           <AccordionSummary
             expandIcon={<ExpandMore />}
-            sx={{ "& .MuiAccordionSummary-content": { alignItems: "center", overflow: "hidden" } }}
+            sx={{
+              "& .MuiAccordionSummary-content": {
+                alignItems: "center",
+                overflow: "hidden",
+              },
+            }}
           >
             <Box
               sx={{ display: "flex", alignItems: "center" }}
@@ -294,6 +297,37 @@ export default function EditSpecial({ npc, setNpc }) {
                   });
                 }}
                 surface="edit"
+                group="core"
+                cols={2}
+              />
+              <SchemaFieldRenderer
+                config={npcSpecialFieldConfig}
+                state={special}
+                onChange={(next) => {
+                  setNpc((prev) => {
+                    const special = [...(prev.special || [])];
+                    special[i] = next;
+                    return { ...prev, special };
+                  });
+                }}
+                surface="edit"
+                group="body"
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={npcSpecialFieldConfig}
+                state={special}
+                onChange={(next) => {
+                  setNpc((prev) => {
+                    const special = [...(prev.special || [])];
+                    special[i] = next;
+                    return { ...prev, special };
+                  });
+                }}
+                surface="edit"
+                group="meta"
+                label="Metadata"
+                cols={2}
               />
             </Grid>
           </AccordionDetails>

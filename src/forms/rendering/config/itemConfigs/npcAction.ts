@@ -1,5 +1,6 @@
 import type { ItemFieldConfig } from "../fieldConfig";
 import type { NpcAction } from "../../../schema/itemSchemas/npcAction";
+import { metaFieldConfig } from "../metaFieldConfig";
 
 export type NpcActionFormState = NpcAction;
 
@@ -42,4 +43,5 @@ export const npcActionFieldConfig: ItemFieldConfig<NpcActionFormState> = [
     order: 2,
     fullWidth: true,
   },
+  ...(metaFieldConfig as unknown as ItemFieldConfig<NpcActionFormState>),
 ];

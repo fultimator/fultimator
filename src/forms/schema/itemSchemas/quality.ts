@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 export const QualitySchema = z.object({
   fuid: z.string().optional(),
@@ -7,6 +8,7 @@ export const QualitySchema = z.object({
   quality: z.string().default(""),
   cost: z.number().int().nonnegative().default(0),
   filter: z.array(z.string()).default([]),
+  meta: MetaSchema.optional(),
 });
 
 export type Quality = z.infer<typeof QualitySchema>;

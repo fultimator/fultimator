@@ -1,5 +1,6 @@
 import type { Accuracy, Damage, Attributes, Elements } from "./Misc";
 import type { ItemEffect } from "./Effects";
+import type { Meta } from "../forms/schema/meta";
 
 export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
 
@@ -47,6 +48,7 @@ export interface Weapon {
   quality?: string;
   cost?: number;
   special?: string[];
+  meta?: Meta;
   effects?: ItemEffect[];
 }
 
@@ -66,6 +68,7 @@ export interface CustomWeapon {
   rare?: CustomWeaponRare;
   customizations: CustomWeaponCustomization[];
   quality?: string;
+  qualityName?: string;
   qualityCost?: number;
   cost?: number;
   slots?: SlotTier;
@@ -77,6 +80,7 @@ export interface CustomWeapon {
   secondDamage?: Damage;
   secondModifiers?: WeaponModifiers;
   secondCustomizations?: CustomWeaponCustomization[];
+  meta?: Meta;
   effects?: ItemEffect[];
 }
 

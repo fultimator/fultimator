@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 const SlotTierValues = ["alpha", "beta", "gamma", "delta"] as const;
 
@@ -27,6 +28,7 @@ export const ArmorSchema = z.object({
   modifiers: ArmorModifiersSchema.optional(),
   slots: z.enum(SlotTierValues).optional(),
   slotted: z.array(z.string()).optional(),
+  meta: MetaSchema.optional(),
 });
 
 export type Armor = z.infer<typeof ArmorSchema>;

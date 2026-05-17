@@ -343,11 +343,13 @@ const CompendiumViewerModal = ({
             item.category && selectedQualityCategories.includes(item.category),
         );
       }
-      if (
-        (selectedType === "classes" || selectedType === "heroics") &&
-        selectedBook.length > 0
-      ) {
+      if (selectedType === "classes" && selectedBook.length > 0) {
         items = items.filter((item) => selectedBook.includes(item.book));
+      }
+      if (selectedType === "heroics" && selectedBook.length > 0) {
+        items = items.filter((item) =>
+          selectedBook.includes(item.meta?.book ?? item.book),
+        );
       }
       if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
         items = items.filter(
@@ -441,7 +443,9 @@ const CompendiumViewerModal = ({
         );
       }
       if (selectedType === "heroics" && selectedBook.length > 0) {
-        items = items.filter((item) => selectedBook.includes(item.book));
+        items = items.filter((item) =>
+          selectedBook.includes(item.meta?.book ?? item.book),
+        );
       }
       if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
         items = items.filter(

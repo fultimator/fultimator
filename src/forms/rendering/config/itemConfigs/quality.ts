@@ -1,6 +1,7 @@
 import type { ItemFieldConfig } from "../fieldConfig";
 import type { Quality } from "../../../schema/itemSchemas/quality";
 import type { SelectOption } from "../../fieldRenderers";
+import { metaFieldConfig } from "../metaFieldConfig";
 
 export type QualityFormState = Quality;
 
@@ -79,4 +80,5 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
     fullWidth: true,
     componentProps: { options: FILTER_OPTIONS, multiple: true },
   },
+  ...(metaFieldConfig as unknown as ItemFieldConfig<QualityFormState>),
 ];
