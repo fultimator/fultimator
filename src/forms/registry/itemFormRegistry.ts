@@ -1,6 +1,6 @@
-import type { ZodType } from "zod";
 import type { CompendiumItemType } from "../../types/CompendiumPack";
 import { QUICK_CREATE_TAB_KEYS } from "../../components/compendium/quickCreateTabKeys";
+import type { ItemFormDefinition } from "./types";
 import { WeaponPersistedSchema } from "../schema/itemSchemas/weapon";
 import { CustomWeaponPersistedSchema } from "../schema/itemSchemas/customWeapon";
 import { ArmorPersistedSchema } from "../schema/itemSchemas/armor";
@@ -12,21 +12,29 @@ import { armorFieldConfig } from "../rendering/config/itemConfigs/armor";
 import { shieldFieldConfig } from "../rendering/config/itemConfigs/shield";
 import { accessoryFieldConfig } from "../rendering/config/itemConfigs/accessory";
 
-type FormImplementation = "schema-config" | "quick-create-panel";
+const labelByKey: Record<CompendiumItemType, string> = {
+  "npc-attack": "NPC Attack",
+  "npc-spell": "NPC Spell",
+  "npc-special": "Special Rule",
+  "npc-action": "Other Action",
+  "player-spell": "Player Spell",
+  quality: "Quality",
+  heroic: "Heroic Skill",
+  class: "Class",
+  mnemosphere: "Mnemosphere",
+  hoplosphere: "Hoplosphere",
+  weapon: "Weapon",
+  "custom-weapon": "Custom Weapon",
+  armor: "Armor",
+  shield: "Shield",
+  accessory: "Accessory",
+  optional: "Optional",
+};
 
-export interface ItemFormRegistryEntry {
-  key: CompendiumItemType;
-  implementation: FormImplementation;
-  addItemType: CompendiumItemType;
-  exportDataType: string;
-  schema?: ZodType;
-  fields?: unknown;
-}
-
-const schemaEntries: Partial<Record<CompendiumItemType, ItemFormRegistryEntry>> =
-  {
+const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     weapon: {
       key: "weapon",
+      label: labelByKey.weapon,
       implementation: "schema-config",
       addItemType: "weapon",
       exportDataType: "weapons",
@@ -35,6 +43,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormRegistryEntry>> 
     },
     "custom-weapon": {
       key: "custom-weapon",
+      label: labelByKey["custom-weapon"],
       implementation: "schema-config",
       addItemType: "custom-weapon",
       exportDataType: "custom-weapons",
@@ -43,6 +52,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormRegistryEntry>> 
     },
     armor: {
       key: "armor",
+      label: labelByKey.armor,
       implementation: "schema-config",
       addItemType: "armor",
       exportDataType: "armor",
@@ -51,6 +61,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormRegistryEntry>> 
     },
     shield: {
       key: "shield",
+      label: labelByKey.shield,
       implementation: "schema-config",
       addItemType: "shield",
       exportDataType: "shields",
@@ -59,6 +70,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormRegistryEntry>> 
     },
     accessory: {
       key: "accessory",
+      label: labelByKey.accessory,
       implementation: "schema-config",
       addItemType: "accessory",
       exportDataType: "accessories",
@@ -86,17 +98,18 @@ const exportDataTypeByKey: Record<CompendiumItemType, string> = {
   optional: "optionals",
 };
 
-export const itemFormRegistry: Record<CompendiumItemType, ItemFormRegistryEntry> =
+export const itemFormRegistry: Record<CompendiumItemType, ItemFormDefinition> =
   Object.fromEntries(
     QUICK_CREATE_TAB_KEYS.map((key) => [
       key,
       schemaEntries[key] ?? {
         key,
+        label: labelByKey[key],
         implementation: "quick-create-panel",
         addItemType: key,
         exportDataType: exportDataTypeByKey[key],
       },
     ]),
-  ) as Record<CompendiumItemType, ItemFormRegistryEntry>;
+  ) as Record<CompendiumItemType, ItemFormDefinition>;
 
 export const ITEM_FORM_REGISTRY_KEYS = QUICK_CREATE_TAB_KEYS;
