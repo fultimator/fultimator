@@ -11,6 +11,10 @@ import { customWeaponFieldConfig } from "../rendering/config/itemConfigs/customW
 import { armorFieldConfig } from "../rendering/config/itemConfigs/armor";
 import { shieldFieldConfig } from "../rendering/config/itemConfigs/shield";
 import { accessoryFieldConfig } from "../rendering/config/itemConfigs/accessory";
+import {
+  createDefaultStateFromFields,
+  createSchemaPayloadBuilder,
+} from "./helpers";
 
 const labelByKey: Record<CompendiumItemType, string> = {
   "npc-attack": "NPC Attack",
@@ -32,52 +36,62 @@ const labelByKey: Record<CompendiumItemType, string> = {
 };
 
 const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
-    weapon: {
-      key: "weapon",
-      label: labelByKey.weapon,
-      implementation: "schema-config",
-      addItemType: "weapon",
-      exportDataType: "weapons",
-      schema: WeaponPersistedSchema,
-      fields: weaponFieldConfig,
-    },
-    "custom-weapon": {
-      key: "custom-weapon",
-      label: labelByKey["custom-weapon"],
-      implementation: "schema-config",
-      addItemType: "custom-weapon",
-      exportDataType: "custom-weapons",
-      schema: CustomWeaponPersistedSchema,
-      fields: customWeaponFieldConfig,
-    },
-    armor: {
-      key: "armor",
-      label: labelByKey.armor,
-      implementation: "schema-config",
-      addItemType: "armor",
-      exportDataType: "armor",
-      schema: ArmorPersistedSchema,
-      fields: armorFieldConfig,
-    },
-    shield: {
-      key: "shield",
-      label: labelByKey.shield,
-      implementation: "schema-config",
-      addItemType: "shield",
-      exportDataType: "shields",
-      schema: ShieldPersistedSchema,
-      fields: shieldFieldConfig,
-    },
-    accessory: {
-      key: "accessory",
-      label: labelByKey.accessory,
-      implementation: "schema-config",
-      addItemType: "accessory",
-      exportDataType: "accessories",
-      schema: AccessoryPersistedSchema,
-      fields: accessoryFieldConfig,
-    },
-  };
+  weapon: {
+    key: "weapon",
+    label: labelByKey.weapon,
+    implementation: "schema-config",
+    addItemType: "weapon",
+    exportDataType: "weapons",
+    schema: WeaponPersistedSchema,
+    fields: weaponFieldConfig,
+    defaultState: () => createDefaultStateFromFields(weaponFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(WeaponPersistedSchema),
+  },
+  "custom-weapon": {
+    key: "custom-weapon",
+    label: labelByKey["custom-weapon"],
+    implementation: "schema-config",
+    addItemType: "custom-weapon",
+    exportDataType: "custom-weapons",
+    schema: CustomWeaponPersistedSchema,
+    fields: customWeaponFieldConfig,
+    defaultState: () => createDefaultStateFromFields(customWeaponFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(CustomWeaponPersistedSchema),
+  },
+  armor: {
+    key: "armor",
+    label: labelByKey.armor,
+    implementation: "schema-config",
+    addItemType: "armor",
+    exportDataType: "armor",
+    schema: ArmorPersistedSchema,
+    fields: armorFieldConfig,
+    defaultState: () => createDefaultStateFromFields(armorFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(ArmorPersistedSchema),
+  },
+  shield: {
+    key: "shield",
+    label: labelByKey.shield,
+    implementation: "schema-config",
+    addItemType: "shield",
+    exportDataType: "shields",
+    schema: ShieldPersistedSchema,
+    fields: shieldFieldConfig,
+    defaultState: () => createDefaultStateFromFields(shieldFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(ShieldPersistedSchema),
+  },
+  accessory: {
+    key: "accessory",
+    label: labelByKey.accessory,
+    implementation: "schema-config",
+    addItemType: "accessory",
+    exportDataType: "accessories",
+    schema: AccessoryPersistedSchema,
+    fields: accessoryFieldConfig,
+    defaultState: () => createDefaultStateFromFields(accessoryFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(AccessoryPersistedSchema),
+  },
+};
 
 const exportDataTypeByKey: Record<CompendiumItemType, string> = {
   "npc-attack": "attacks",
