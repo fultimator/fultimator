@@ -114,17 +114,19 @@ export const PlayerSpellGiftSchema = PlayerSpellNonStaticBaseSchema.extend({
 export const PlayerSpellDanceSchema = PlayerSpellNonStaticBaseSchema.extend({
   spellType: z.literal("dance"),
 });
-export const PlayerSpellTherioformSchema = PlayerSpellNonStaticBaseSchema.extend({
-  spellType: z.literal("therioform"),
-});
+export const PlayerSpellTherioformSchema =
+  PlayerSpellNonStaticBaseSchema.extend({
+    spellType: z.literal("therioform"),
+  });
 export const PlayerSpellSymbolSchema = PlayerSpellNonStaticBaseSchema.extend({
   spellType: z.literal("symbol"),
 });
-export const PlayerSpellInvocationSchema = PlayerSpellNonStaticBaseSchema.extend({
-  spellType: z.literal("invocation"),
-  wellspring: z.string().optional(),
-  type: z.string().optional(),
-});
+export const PlayerSpellInvocationSchema =
+  PlayerSpellNonStaticBaseSchema.extend({
+    spellType: z.literal("invocation"),
+    wellspring: z.string().optional(),
+    type: z.string().optional(),
+  });
 export const PlayerSpellArcanistSchema = PlayerSpellNonStaticBaseSchema.extend({
   spellType: z.literal("arcanist"),
 });
@@ -160,14 +162,15 @@ export const PlayerSpellMagiseedSchema = PlayerSpellNonStaticBaseSchema.extend({
   effects: z.record(z.unknown()),
 });
 
-export const PlayerSpellMagichantKeySchema = PlayerSpellNonStaticBaseSchema.extend({
-  spellType: z.literal("magichant"),
-  magichantSubtype: z.literal("key"),
-  status: z.string().optional(),
-  attribute: z.string().optional(),
-  recovery: z.string().optional(),
-  type: z.string().optional(),
-});
+export const PlayerSpellMagichantKeySchema =
+  PlayerSpellNonStaticBaseSchema.extend({
+    spellType: z.literal("magichant"),
+    magichantSubtype: z.literal("key"),
+    status: z.string().optional(),
+    attribute: z.string().optional(),
+    recovery: z.string().optional(),
+    type: z.string().optional(),
+  });
 
 export const PlayerSpellMagichantToneSchema =
   PlayerSpellNonStaticBaseSchema.extend({
@@ -176,14 +179,16 @@ export const PlayerSpellMagichantToneSchema =
     type: z.string().optional(),
   });
 
-const PlayerSpellPilotVehicleBaseSchema = PlayerSpellNonStaticBaseSchema.extend({
-  spellType: z.literal("pilot-vehicle"),
-  pilotSubtype: PilotVehicleSubtypeSchema,
-  customName: z.string(),
-  enabled: z.boolean(),
-  equipped: z.boolean(),
-  equippedSlot: z.string().nullable(),
-});
+const PlayerSpellPilotVehicleBaseSchema = PlayerSpellNonStaticBaseSchema.extend(
+  {
+    spellType: z.literal("pilot-vehicle"),
+    pilotSubtype: PilotVehicleSubtypeSchema,
+    customName: z.string(),
+    enabled: z.boolean(),
+    equipped: z.boolean(),
+    equippedSlot: z.string().nullable(),
+  },
+);
 
 export const PlayerSpellPilotVehicleFrameSchema =
   PlayerSpellPilotVehicleBaseSchema.extend({

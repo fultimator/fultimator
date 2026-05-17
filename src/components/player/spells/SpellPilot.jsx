@@ -583,11 +583,22 @@ function ThemedSpellPilot({
                                         }}
                                       >
                                         {t("Accuracy")}: [
-                                        {attributes[module.accuracy?.attr1 || "might"].shortcaps}{" "}
+                                        {
+                                          attributes[
+                                            module.accuracy?.attr1 || "might"
+                                          ].shortcaps
+                                        }{" "}
                                         +{" "}
-                                        {attributes[module.accuracy?.attr2 || "dexterity"].shortcaps}
+                                        {
+                                          attributes[
+                                            module.accuracy?.attr2 ||
+                                              "dexterity"
+                                          ].shortcaps
+                                        }
                                         ]{" "}
-                                        {(module.accuracy?.value ?? 0) >= 0 ? `+${module.accuracy?.value ?? 0}` : module.accuracy?.value ?? 0}
+                                        {(module.accuracy?.value ?? 0) >= 0
+                                          ? `+${module.accuracy?.value ?? 0}`
+                                          : (module.accuracy?.value ?? 0)}
                                       </Typography>
                                       <Typography
                                         sx={{

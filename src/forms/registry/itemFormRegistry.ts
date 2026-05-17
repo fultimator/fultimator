@@ -13,7 +13,10 @@ import { HeroicSchema } from "../schema/itemSchemas/heroic";
 import { NpcAttackSchema } from "../schema/itemSchemas/npcAttack";
 import { NpcSpellSchema } from "../schema/itemSchemas/npcSpell";
 import { ClassSchema } from "../schema/itemSchemas/class";
-import { OptionalSchema, OptionalSubtypeSchemas } from "../schema/itemSchemas/optional";
+import {
+  OptionalSchema,
+  OptionalSubtypeSchemas,
+} from "../schema/itemSchemas/optional";
 import { MnemosphereSchema } from "../schema/itemSchemas/mnemosphere";
 import { HoplosphereSchema } from "../schema/itemSchemas/hoplosphere";
 import {
@@ -25,6 +28,10 @@ import { customWeaponFieldConfig } from "../rendering/config/itemConfigs/customW
 import { armorFieldConfig } from "../rendering/config/itemConfigs/armor";
 import { shieldFieldConfig } from "../rendering/config/itemConfigs/shield";
 import { accessoryFieldConfig } from "../rendering/config/itemConfigs/accessory";
+import { npcSpecialFieldConfig } from "../rendering/config/itemConfigs/npcSpecial";
+import { npcActionFieldConfig } from "../rendering/config/itemConfigs/npcAction";
+import { qualityFieldConfig } from "../rendering/config/itemConfigs/quality";
+import { heroicFieldConfig } from "../rendering/config/itemConfigs/heroic";
 import {
   createDefaultStateFromFields,
   createSchemaPayloadBuilder,
@@ -109,37 +116,45 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
   "npc-special": {
     key: "npc-special",
     label: labelByKey["npc-special"],
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "npc-special",
     exportDataType: "special",
     schema: NpcSpecialSchema,
+    fields: npcSpecialFieldConfig,
+    defaultState: () => createDefaultStateFromFields(npcSpecialFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcSpecialSchema),
   },
   "npc-action": {
     key: "npc-action",
     label: labelByKey["npc-action"],
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "npc-action",
     exportDataType: "actions",
     schema: NpcActionSchema,
+    fields: npcActionFieldConfig,
+    defaultState: () => createDefaultStateFromFields(npcActionFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcActionSchema),
   },
   quality: {
     key: "quality",
     label: labelByKey.quality,
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "quality",
     exportDataType: "qualities",
     schema: QualitySchema,
+    fields: qualityFieldConfig,
+    defaultState: () => createDefaultStateFromFields(qualityFieldConfig),
     buildPayload: createSchemaPayloadBuilder(QualitySchema),
   },
   heroic: {
     key: "heroic",
     label: labelByKey.heroic,
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "heroic",
     exportDataType: "heroics",
     schema: HeroicSchema,
+    fields: heroicFieldConfig,
+    defaultState: () => createDefaultStateFromFields(heroicFieldConfig),
     buildPayload: createSchemaPayloadBuilder(HeroicSchema),
   },
   "npc-attack": {
@@ -183,7 +198,10 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         { schema, buildPayload: createSchemaPayloadBuilder(schema) },
       ]),
     ),
-    buildPayload: createSubtypePayloadBuilder("subtype", OptionalSubtypeSchemas),
+    buildPayload: createSubtypePayloadBuilder(
+      "subtype",
+      OptionalSubtypeSchemas,
+    ),
   },
   mnemosphere: {
     key: "mnemosphere",

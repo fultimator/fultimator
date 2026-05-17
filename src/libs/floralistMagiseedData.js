@@ -265,8 +265,6 @@ const magiseeds = [
   },
 ];
 
-
-
 magiseeds.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
 });

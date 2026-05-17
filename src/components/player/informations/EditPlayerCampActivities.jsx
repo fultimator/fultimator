@@ -208,9 +208,10 @@ export default function EditPlayerCampActivities({
                       onChangeActivity(index, "description")(value)
                     }
                     onChange={(_, value) =>
-                      onChangeActivity(index, "description")(
-                        typeof value === "string" ? value : "",
-                      )
+                      onChangeActivity(
+                        index,
+                        "description",
+                      )(typeof value === "string" ? value : "")
                     }
                     renderInput={(params) => (
                       <TextField

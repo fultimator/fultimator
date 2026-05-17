@@ -1,7 +1,13 @@
 import { memo, forwardRef } from "react";
 
 const AccordionSummaryDiv = forwardRef(function AccordionSummaryDiv(
-  { focusRipple: _focusRipple, disableRipple: _disableRipple, internalNativeButton: _internalNativeButton, focusVisibleClassName: _focusVisibleClassName, ...props },
+  {
+    focusRipple: _focusRipple,
+    disableRipple: _disableRipple,
+    internalNativeButton: _internalNativeButton,
+    focusVisibleClassName: _focusVisibleClassName,
+    ...props
+  },
   ref,
 ) {
   return <div ref={ref} {...props} />;
@@ -82,7 +88,10 @@ const VehicleModule = memo(
     return (
       <>
         <Accordion>
-          <AccordionSummary slots={{ root: AccordionSummaryDiv }} expandIcon={<ExpandMore />}>
+          <AccordionSummary
+            slots={{ root: AccordionSummaryDiv }}
+            expandIcon={<ExpandMore />}
+          >
             <Grid
               container
               spacing={2}

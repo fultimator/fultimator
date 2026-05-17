@@ -70,7 +70,9 @@ export default function EditClassNameModal({
           label={t("Class Name")}
           value={className}
           onChange={(e) => setClassName(e.target.value)}
-          onBlur={() => { if (!classFuid) setClassFuid(slugify(className)); }}
+          onBlur={() => {
+            if (!classFuid) setClassFuid(slugify(className));
+          }}
           slotProps={{
             htmlInput: { maxLength: 50 },
           }}

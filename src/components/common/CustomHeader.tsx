@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useMediaQuery } from "@mui/material";
 import { Grid, Tooltip, Box, TextField } from "@mui/material";
 import { SvgIconComponent } from "@mui/icons-material";
@@ -21,6 +22,8 @@ interface CustomHeaderProps {
   showIconButton?: boolean;
   disableIconButton?: boolean;
   customTooltip?: string;
+  onExpandCollapse?: () => void;
+  allExpanded?: boolean;
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
@@ -35,6 +38,8 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   showIconButton = true,
   disableIconButton = false,
   customTooltip = "",
+  onExpandCollapse,
+  allExpanded = false,
 }) => {
   const theme = useCustomTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -111,6 +116,30 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
             <div style={{ marginLeft: "15px" }}>{headerText}</div>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {rightWidget}
+              {onExpandCollapse && (
+                <Tooltip title={allExpanded ? "Collapse All" : "Expand All"}>
+                  <IconButton
+                    sx={{
+                      px: 1,
+                      color: theme.white,
+                      "&:hover": {
+                        backgroundColor: "rgba(0, 0, 0, 0.3)",
+                        transition: "background-color 0.3s ease",
+                      },
+                    }}
+                    onClick={onExpandCollapse}
+                    aria-label={allExpanded ? "Collapse All" : "Expand All"}
+                  >
+                    <ExpandMoreIcon
+                      fontSize="large"
+                      sx={{
+                        transform: allExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                        transition: "transform 0.2s",
+                      }}
+                    />
+                  </IconButton>
+                </Tooltip>
+              )}
               {openCompendium && (
                 <Tooltip title="Open Compendium">
                   <IconButton
@@ -201,6 +230,30 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
             <div style={{ marginLeft: "15px" }}>{headerText}</div>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {rightWidget}
+              {onExpandCollapse && (
+                <Tooltip title={allExpanded ? "Collapse All" : "Expand All"}>
+                  <IconButton
+                    sx={{
+                      px: 1,
+                      color: theme.white,
+                      "&:hover": {
+                        backgroundColor: "rgba(0, 0, 0, 0.3)",
+                        transition: "background-color 0.3s ease",
+                      },
+                    }}
+                    onClick={onExpandCollapse}
+                    aria-label={allExpanded ? "Collapse All" : "Expand All"}
+                  >
+                    <ExpandMoreIcon
+                      fontSize="large"
+                      sx={{
+                        transform: allExpanded ? "rotate(180deg)" : "rotate(0deg)",
+                        transition: "transform 0.2s",
+                      }}
+                    />
+                  </IconButton>
+                </Tooltip>
+              )}
               {openCompendium && (
                 <Tooltip title={customTooltip || "Open Compendium"}>
                   <IconButton

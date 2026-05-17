@@ -44,7 +44,11 @@ export default function PlayerClasses({
         i === heroicPickerClassIdx
           ? {
               ...cls,
-              heroic: { name: item.name, description: item.description, fuid: item.fuid },
+              heroic: {
+                name: item.name,
+                description: item.description,
+                fuid: item.fuid,
+              },
             }
           : cls,
       ),
@@ -332,9 +336,7 @@ export default function PlayerClasses({
                   <React.Fragment key={skillIndex}>
                     <CustomHeader3
                       headerText={
-                        (c.isHomebrew ?? false)
-                          ? s.skillName
-                          : t(s.skillName)
+                        (c.isHomebrew ?? false) ? s.skillName : t(s.skillName)
                       }
                       currentLvl={s.currentLvl}
                       maxLvl={s.maxLvl}

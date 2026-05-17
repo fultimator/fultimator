@@ -1043,9 +1043,7 @@ function migratePilotWeaponModuleSchemaV11(player: TypePlayer): TypePlayer {
     const legacyPrec = typeof s.prec === "number" ? s.prec : 0;
     const legacyDamage = typeof s.damage === "number" ? s.damage : 0;
     const legacyDamageType =
-      typeof s.damageType === "string"
-        ? s.damageType
-        : "physical";
+      typeof s.damageType === "string" ? s.damageType : "physical";
 
     const accuracy =
       typeof s.accuracy === "object" && s.accuracy !== null
@@ -1053,13 +1051,18 @@ function migratePilotWeaponModuleSchemaV11(player: TypePlayer): TypePlayer {
         : null;
     s.accuracy = {
       attr1:
-        typeof accuracy?.attr1 === "string" ? (accuracy.attr1 as string) : legacyAtt1,
+        typeof accuracy?.attr1 === "string"
+          ? (accuracy.attr1 as string)
+          : legacyAtt1,
       attr2:
-        typeof accuracy?.attr2 === "string" ? (accuracy.attr2 as string) : legacyAtt2,
+        typeof accuracy?.attr2 === "string"
+          ? (accuracy.attr2 as string)
+          : legacyAtt2,
       value:
-        typeof accuracy?.value === "number" ? (accuracy.value as number) : legacyPrec,
-      defense:
-        accuracy?.defense === "mdef" ? "mdef" : "def",
+        typeof accuracy?.value === "number"
+          ? (accuracy.value as number)
+          : legacyPrec,
+      defense: accuracy?.defense === "mdef" ? "mdef" : "def",
     };
 
     s.damage = {
@@ -1153,8 +1156,7 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   },
   {
     version: 11,
-    label:
-      "Normalize pilot weapon modules to nested accuracy/damage schema",
+    label: "Normalize pilot weapon modules to nested accuracy/damage schema",
     fn: migratePilotWeaponModuleSchemaV11,
   },
 ];

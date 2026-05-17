@@ -4,15 +4,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
+  Grid,
   IconButton,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
-import CustomTextarea from "../../common/CustomTextarea";
 import { Close } from "@mui/icons-material";
 import FuidField from "../../common/FuidField";
-import { slugify } from "../../../libs/slugify";
+import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
+import { heroicFieldConfig } from "../../../forms/rendering/config/itemConfigs/heroic";
 
 export default function EditHeroicSkillModal({
   open,
@@ -22,10 +22,6 @@ export default function EditHeroicSkillModal({
   setHeroic,
 }) {
   const { t } = useTranslate();
-
-  const handleSave = () => {
-    onSave(heroic);
-  };
 
   return (
     <Dialog
@@ -56,45 +52,43 @@ export default function EditHeroicSkillModal({
         <Close />
       </IconButton>
       <DialogContent>
-        <FuidField
-          value={heroic.fuid}
-          name={heroic.name}
-          onChange={(fuid) => setHeroic({ ...heroic, fuid })}
-        />
-        <TextField
-          label={t("Heroic Name")}
-          value={heroic.name}
-          onChange={(e) => setHeroic({ ...heroic, name: e.target.value })}
-          onBlur={() => { if (!heroic.fuid) setHeroic({ ...heroic, fuid: slugify(heroic.name) }); }}
-          fullWidth
-          margin="normal"
-          slotProps={{
-            htmlInput: { maxLength: 50 },
-          }}
-        />
-        <TextField
-          label={t("Quote")}
-          value={heroic.quote || ""}
-          onChange={(e) => setHeroic({ ...heroic, quote: e.target.value })}
-          fullWidth
-          margin="normal"
-          slotProps={{
-            htmlInput: { maxLength: 200 },
-          }}
-        />
-        <CustomTextarea
-          label={t("Description")}
-          fullWidth
-          value={heroic.description}
-          onChange={(e) =>
-            setHeroic({ ...heroic, description: e.target.value })
-          }
-          maxLength={1500}
-          maxRows={10}
-        />
+        <Grid container spacing={2}>
+          <Grid size={12}>
+            <FuidField
+              value={heroic.fuid}
+              name={heroic.name}
+              onChange={(fuid) => setHeroic({ ...heroic, fuid })}
+            />
+          </Grid>
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            state={heroic}
+            onChange={setHeroic}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            state={heroic}
+            onChange={setHeroic}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            state={heroic}
+            onChange={setHeroic}
+            surface="edit"
+            group="meta"
+            label="Metadata"
+            cols={2}
+          />
+        </Grid>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={handleSave}>
+        <Button variant="contained" color="secondary" onClick={() => onSave(heroic)}>
           {t("Save Changes")}
         </Button>
       </DialogActions>

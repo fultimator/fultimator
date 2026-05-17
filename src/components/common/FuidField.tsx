@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { InputAdornment, IconButton, TextField, Tooltip } from "@mui/material";
 import { Refresh, ContentCopy } from "@mui/icons-material";
 import { slugify } from "../../libs/slugify";
@@ -8,10 +9,24 @@ interface Props {
   name: string;
   onChange: (fuid: string) => void;
   disabled?: boolean;
+  autoSync?: boolean;
 }
 
-export default function FuidField({ value, name, onChange, disabled = false }: Props) {
+export default function FuidField({
+  value,
+  name,
+  onChange,
+  disabled = false,
+  autoSync = false,
+}: Props) {
   const { t } = useTranslate();
+
+  useEffect(() => {
+    if (!autoSync) return;
+    const derived = slugify(name);
+    if (value !== derived) onChange(derived || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, autoSync]);
 
   const handleCopy = () => {
     if (value) navigator.clipboard.writeText(value);
@@ -30,7 +45,11 @@ export default function FuidField({ value, name, onChange, disabled = false }: P
             <InputAdornment position="end">
               <Tooltip title={t("Copy ID")}>
                 <span>
-                  <IconButton size="small" onClick={handleCopy} disabled={!value}>
+                  <IconButton
+                    size="small"
+                    onClick={handleCopy}
+                    disabled={!value}
+                  >
                     <ContentCopy fontSize="small" />
                   </IconButton>
                 </span>

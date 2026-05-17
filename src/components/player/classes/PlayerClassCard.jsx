@@ -310,7 +310,9 @@ export default function PlayerClassCard({
   };
 
   const handleEditHeroicSkill = () => {
-    setHeroic(classItem.heroic ?? { name: "", description: "", fuid: undefined });
+    setHeroic(
+      classItem.heroic ?? { name: "", description: "", fuid: undefined },
+    );
     setOpenEditHeroicSkillModal(true);
   };
 

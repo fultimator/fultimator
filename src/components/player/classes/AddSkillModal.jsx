@@ -110,7 +110,9 @@ export default function AddSkillModal({
               fullWidth
               value={skillName}
               onChange={(e) => setSkillName(e.target.value)}
-              onBlur={() => { if (!skillFuid) setSkillFuid(slugify(skillName)); }}
+              onBlur={() => {
+                if (!skillFuid) setSkillFuid(slugify(skillName));
+              }}
               slotProps={{
                 htmlInput: { maxLength: 50 },
               }}

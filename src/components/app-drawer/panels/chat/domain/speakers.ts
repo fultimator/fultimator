@@ -363,8 +363,17 @@ export function resolveAttackOptions(
                 if (seen.has(key)) return;
                 seen.add(key);
 
-                const dmg = module.damage as { value?: number; type?: string; hrZero?: boolean } | undefined;
-                const acc = module.accuracy as { attr1?: string; attr2?: string; value?: number; defense?: string } | undefined;
+                const dmg = module.damage as
+                  | { value?: number; type?: string; hrZero?: boolean }
+                  | undefined;
+                const acc = module.accuracy as
+                  | {
+                      attr1?: string;
+                      attr2?: string;
+                      value?: number;
+                      defense?: string;
+                    }
+                  | undefined;
                 const prec = acc?.value;
                 vehicleWeapons.push({
                   arg: quoteArg(name),
@@ -372,15 +381,13 @@ export function resolveAttackOptions(
                   slot: label,
                   attr1: toAttr(acc?.attr1),
                   attr2: toAttr(acc?.attr2),
-                  baseDamage: typeof dmg?.value === "number" ? dmg.value : undefined,
+                  baseDamage:
+                    typeof dmg?.value === "number" ? dmg.value : undefined,
                   accuracyBonus:
                     typeof prec === "number" && prec !== 0 ? prec : undefined,
-                  accuracyDefense:
-                    acc?.defense === "mdef" ? "mdef" : "def",
+                  accuracyDefense: acc?.defense === "mdef" ? "mdef" : "def",
                   damageType:
-                    typeof dmg?.type === "string"
-                      ? dmg.type
-                      : "physical",
+                    typeof dmg?.type === "string" ? dmg.type : "physical",
                   damageHrZero: module.hrZero === true,
                   hands: module.cumbersome ? 2 : 1,
                   category:
@@ -705,7 +712,10 @@ export function resolveEquipmentSlots(
               `${module.accuracy.value > 0 ? "+" : ""}${module.accuracy.value} Acc`,
             );
           }
-          if (typeof module.damage?.value === "number" && module.damage.value !== 0) {
+          if (
+            typeof module.damage?.value === "number" &&
+            module.damage.value !== 0
+          ) {
             parts.push(`${module.damage.value} DMG`);
           }
           if (

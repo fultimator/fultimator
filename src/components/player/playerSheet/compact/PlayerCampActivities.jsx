@@ -171,7 +171,10 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                               sx={{ fontSize: "0.85rem", mb: 0.5 }}
                             >
                               <strong>{t("Target")}: </strong>
-                              {highlightMatch(activity.description, searchQuery)}
+                              {highlightMatch(
+                                activity.description,
+                                searchQuery,
+                              )}
                             </Typography>
                           )}
                           {activity.effect && (

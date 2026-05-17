@@ -1,26 +1,31 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Box,
+  Divider,
   Grid,
-  FormControl,
   IconButton,
-  TextField,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
-  Divider,
+  Menu,
+  MenuItem,
   Snackbar,
-  Alert,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
+import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { npcActionFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAction";
 import {
   Add,
-  Menu as MenuIcon,
   Casino,
   Delete,
+  ExpandMore,
   LibraryAdd,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
@@ -30,7 +35,6 @@ import { useChatMessagesStore } from "../../store/chatMessagesStore";
 function ActionContextMenu({ action, npcName, onDelete }) {
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [anchorEl, setAnchorEl] = useState(null);
   const [packMenuAnchor, setPackMenuAnchor] = useState(null);
   const [snackbar, setSnackbar] = useState({
@@ -52,24 +56,15 @@ function ActionContextMenu({ action, npcName, onDelete }) {
   const doAdd = async (packId) => {
     try {
       await addItem(packId, "npc-action", action);
-      setSnackbar({
-        open: true,
-        message: t("Added to compendium"),
-        severity: "success",
-      });
+      setSnackbar({ open: true, message: t("Added to compendium"), severity: "success" });
     } catch (err) {
-      setSnackbar({
-        open: true,
-        message: err?.message ?? t("Failed to add"),
-        severity: "error",
-      });
+      setSnackbar({ open: true, message: err?.message ?? t("Failed to add"), severity: "error" });
     }
   };
 
   const handleAddToCompendium = async (e) => {
     close();
     if (unlockedNonPersonal.length > 0) {
-      // multiple pack targets — show sub-menu
       setPackMenuAnchor(e.currentTarget);
     } else if (personalPack && !personalPack.locked) {
       await doAdd(personalPack.id);
@@ -86,74 +81,31 @@ function ActionContextMenu({ action, npcName, onDelete }) {
       </IconButton>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
-        <MenuItem
-          onClick={() => {
-            addMessage({
-              id: crypto.randomUUID(),
-              createdAt: Date.now(),
-              speaker: npcName || "NPC",
-              kind: "display",
-              itemType: "action",
-              name: action.name,
-              tags: [`SP: ${action.spCost ?? 1}`],
-              description: action.effect,
-            });
-            close();
-          }}
-        >
-          <ListItemIcon>
-            <Casino fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t("Roll")}</ListItemText>
-        </MenuItem>
-
         <MenuItem onClick={handleAddToCompendium}>
-          <ListItemIcon>
-            <LibraryAdd fontSize="small" />
-          </ListItemIcon>
+          <ListItemIcon><LibraryAdd fontSize="small" /></ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
         </MenuItem>
 
         <Divider />
 
-        <MenuItem
-          onClick={() => {
-            close();
-            onDelete();
-          }}
-          sx={{ color: "error.main" }}
-        >
-          <ListItemIcon>
-            <Delete fontSize="small" color="error" />
-          </ListItemIcon>
+        <MenuItem onClick={() => { close(); onDelete(); }} sx={{ color: "error.main" }}>
+          <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
       </Menu>
 
-      {/* Pack picker shown when multiple targets exist */}
       <Menu
         anchorEl={packMenuAnchor}
         open={Boolean(packMenuAnchor)}
         onClose={() => setPackMenuAnchor(null)}
       >
         {personalPack && !personalPack.locked && (
-          <MenuItem
-            onClick={async () => {
-              setPackMenuAnchor(null);
-              await doAdd(personalPack.id);
-            }}
-          >
+          <MenuItem onClick={async () => { setPackMenuAnchor(null); await doAdd(personalPack.id); }}>
             <ListItemText>{t("Personal")}</ListItemText>
           </MenuItem>
         )}
         {unlockedNonPersonal.map((pack) => (
-          <MenuItem
-            key={pack.id}
-            onClick={async () => {
-              setPackMenuAnchor(null);
-              await doAdd(pack.id);
-            }}
-          >
+          <MenuItem key={pack.id} onClick={async () => { setPackMenuAnchor(null); await doAdd(pack.id); }}>
             <ListItemText>{pack.name}</ListItemText>
           </MenuItem>
         ))}
@@ -165,11 +117,7 @@ function ActionContextMenu({ action, npcName, onDelete }) {
         onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
+        <Alert severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -179,35 +127,53 @@ function ActionContextMenu({ action, npcName, onDelete }) {
 
 export default function EditActions({ npc, setNpc }) {
   const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [modalOpen, setModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingActionIndex, setPendingActionIndex] = useState(null);
-  const onChangeActions = (i, key, value) => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      newState.actions[i][key] = value;
-      return newState;
+  const [expandedSet, setExpandedSet] = useState(new Set());
+
+  const allExpanded =
+    npc.actions?.length > 0 && expandedSet.size === npc.actions.length;
+
+  const toggleExpanded = (i) => {
+    setExpandedSet((prev) => {
+      const s = new Set(prev);
+      s.has(i) ? s.delete(i) : s.add(i);
+      return s;
     });
   };
 
+  const toggleAll = () => {
+    setExpandedSet(
+      allExpanded
+        ? new Set()
+        : new Set(npc.actions?.map((_, i) => i) ?? []),
+    );
+  };
+
+
   const addActions = () => {
-    setNpc((prevState) => ({
-      ...prevState,
-      actions: [
-        ...(prevState.actions || []),
-        {
-          name: "",
-          effect: "",
-          spCost: 1,
-        },
-      ],
+    const newIndex = npc.actions?.length ?? 0;
+    setExpandedSet((prev) => new Set([...prev, newIndex]));
+    setNpc((prev) => ({
+      ...prev,
+      actions: [...(prev.actions || []), { name: "", effect: "", spCost: 1 }],
     }));
   };
 
   const removeActions = (i) => {
-    setNpc((prevState) => ({
-      ...prevState,
-      actions: (prevState.actions || []).filter((_, index) => index !== i),
+    setExpandedSet((prev) => {
+      const s = new Set();
+      for (const idx of prev) {
+        if (idx < i) s.add(idx);
+        else if (idx > i) s.add(idx - 1);
+      }
+      return s;
+    });
+    setNpc((prev) => ({
+      ...prev,
+      actions: (prev.actions || []).filter((_, index) => index !== i),
     }));
   };
 
@@ -224,75 +190,82 @@ export default function EditActions({ npc, setNpc }) {
         headerText={t("Other Actions")}
         icon={Add}
         openCompendium={() => setModalOpen(true)}
+        onExpandCollapse={toggleAll}
+        allExpanded={allExpanded}
       />
-      {npc.actions?.map((actions, i) => {
-        return (
-          <Grid container key={i} spacing={1}>
-            <Grid
-              sx={{
-                p: 0,
-                m: 0,
-                display: "flex",
-                alignItems: "center",
-                alignSelf: "flex-start",
-                pt: "4px",
-              }}
+      {npc.actions?.map((action, i) => (
+        <Accordion
+          key={i}
+          expanded={expandedSet.has(i)}
+          onChange={() => toggleExpanded(i)}
+          disableGutters
+          elevation={0}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            "&:before": { display: "none" },
+            mb: 0.5,
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMore />}
+            sx={{ "& .MuiAccordionSummary-content": { alignItems: "center", overflow: "hidden" } }}
+          >
+            <Box
+              sx={{ display: "flex", alignItems: "center" }}
+              onClick={(e) => e.stopPropagation()}
             >
+              <IconButton
+                size="small"
+                onClick={() =>
+                  addMessage({
+                    id: crypto.randomUUID(),
+                    createdAt: Date.now(),
+                    speaker: npc.name || "NPC",
+                    kind: "display",
+                    itemType: "action",
+                    name: action.name,
+                    tags: [`SP: ${action.spCost ?? 1}`],
+                    description: action.effect,
+                  })
+                }
+              >
+                <Casino fontSize="small" />
+              </IconButton>
               <ActionContextMenu
-                action={actions}
+                action={action}
                 npcName={npc.name}
                 onDelete={() => openDeleteDialog(i)}
               />
+            </Box>
+            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+              <Typography noWrap>{action.name || t("(unnamed)")}</Typography>
+            </Box>
+            <Typography
+              variant="body2"
+              sx={{ color: "text.secondary", whiteSpace: "nowrap", mr: 1 }}
+            >
+              SP: {action.spCost ?? 1}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={1}>
+              <SchemaFieldRenderer
+                config={npcActionFieldConfig}
+                state={action}
+                onChange={(next) => {
+                  setNpc((prev) => {
+                    const actions = [...(prev.actions || [])];
+                    actions[i] = next;
+                    return { ...prev, actions };
+                  });
+                }}
+                surface="edit"
+              />
             </Grid>
-            <Grid size="grow">
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="name"
-                  label={t("Name:")}
-                  value={actions.name}
-                  onChange={(e) => {
-                    return onChangeActions(i, "name", e.target.value);
-                  }}
-                  size="small"
-                ></TextField>
-              </FormControl>
-            </Grid>
-            <Grid size={3}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="spCost"
-                  label={t("SP Cost:")}
-                  type="number"
-                  value={actions?.spCost ?? 1}
-                  onChange={(e) =>
-                    onChangeActions(
-                      i,
-                      "spCost",
-                      parseInt(e.target.value, 10) || 1,
-                    )
-                  }
-                  size="small"
-                  slotProps={{
-                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
-                  }}
-                />
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <CustomTextarea
-                  id="effect"
-                  label={t("Effect:")}
-                  value={actions.effect}
-                  onChange={(e) => {
-                    return onChangeActions(i, "effect", e.target.value);
-                  }}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        );
-      })}
+          </AccordionDetails>
+        </Accordion>
+      ))}
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

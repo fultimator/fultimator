@@ -24,7 +24,6 @@ import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRendere
 import { armorFieldConfig } from "../../../forms/rendering/config/itemConfigs/armor";
 import { shieldFieldConfig } from "../../../forms/rendering/config/itemConfigs/shield";
 
-
 function buildState(base) {
   return {
     itemType: base.category === "Shield" ? "shield" : "armor",

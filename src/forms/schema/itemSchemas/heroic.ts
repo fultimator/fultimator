@@ -4,6 +4,8 @@ export const HeroicSchema = z.object({
   fuid: z.string().optional(),
   name: z.string().min(1),
   book: z.string().default(""),
+  bookName: z.string().optional(),
+  page: z.number().optional(),
   quote: z.string().default(""),
   description: z.string().default(""),
   applicableTo: z.array(z.string()).default([]),

@@ -18,6 +18,7 @@ export type ComponentToken =
   | "readonly-number"
   | "rare-bonus-block"
   | "martial-toggle"
+  | "autocomplete"
   // NPC-specific tokens
   | "npc-attr-slider"
   | "npc-affinity-slider"

@@ -22,6 +22,7 @@ import {
   NpcArmorSelectRenderer,
   NpcImmunitiesRenderer,
   NpcDefenseRadioRenderer,
+  AutocompleteRenderer,
 } from "./fieldRenderers";
 
 type RendererComponent = React.ComponentType<FieldRendererProps>;
@@ -34,6 +35,7 @@ export const componentMap: Record<ComponentToken, RendererComponent> = {
   select: SelectRenderer,
   "grouped-select": GroupedSelectRenderer,
   "type-select": TypeSelectRenderer,
+  autocomplete: AutocompleteRenderer,
   "customization-list": CustomizationListRenderer,
   "slot-tier-picker": SlotTierPickerRenderer,
   "slot-editor": SlotEditorRenderer,

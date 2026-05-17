@@ -12,22 +12,21 @@ export const ClassSchema = z.object({
   name: z.string().min(1),
   fuid: z.string().optional(),
   book: z.string().default("homebrew"),
-  benefits: z
-    .looseObject({
-      hpplus: z.number().int().default(0),
-      mpplus: z.number().int().default(0),
-      ipplus: z.number().int().default(0),
-      isCustomBenefit: z.boolean().default(false),
-      martials: z.looseObject({
-        armor: z.boolean().default(false),
-        shields: z.boolean().default(false),
-        melee: z.boolean().default(false),
-        ranged: z.boolean().default(false),
-      }),
-      rituals: z.looseObject({ ritualism: z.boolean().default(false) }),
-      custom: z.array(z.unknown()).default([]),
-      spellClasses: z.array(z.string()).default([]),
+  benefits: z.looseObject({
+    hpplus: z.number().int().default(0),
+    mpplus: z.number().int().default(0),
+    ipplus: z.number().int().default(0),
+    isCustomBenefit: z.boolean().default(false),
+    martials: z.looseObject({
+      armor: z.boolean().default(false),
+      shields: z.boolean().default(false),
+      melee: z.boolean().default(false),
+      ranged: z.boolean().default(false),
     }),
+    rituals: z.looseObject({ ritualism: z.boolean().default(false) }),
+    custom: z.array(z.unknown()).default([]),
+    spellClasses: z.array(z.string()).default([]),
+  }),
   skills: z.array(SkillSchema).default([]),
 });
 

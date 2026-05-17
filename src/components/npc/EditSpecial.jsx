@@ -1,27 +1,32 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Box,
+  Divider,
   Grid,
-  FormControl,
   IconButton,
-  TextField,
-  useMediaQuery,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
-  Divider,
+  Menu,
+  MenuItem,
   Snackbar,
-  Alert,
+  Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
+import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { npcSpecialFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpecial";
 import {
   Add,
-  Menu as MenuIcon,
   Casino,
   Delete,
+  ExpandMore,
   LibraryAdd,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
@@ -31,7 +36,6 @@ import { useChatMessagesStore } from "../../store/chatMessagesStore";
 function SpecialContextMenu({ special, npcName, onDelete }) {
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [anchorEl, setAnchorEl] = useState(null);
   const [packMenuAnchor, setPackMenuAnchor] = useState(null);
   const [snackbar, setSnackbar] = useState({
@@ -85,27 +89,6 @@ function SpecialContextMenu({ special, npcName, onDelete }) {
       </IconButton>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
-        <MenuItem
-          onClick={() => {
-            addMessage({
-              id: crypto.randomUUID(),
-              createdAt: Date.now(),
-              speaker: npcName || "NPC",
-              kind: "display",
-              itemType: "special",
-              name: special.name,
-              tags: [`SP: ${special.spCost ?? 1}`],
-              description: special.effect,
-            });
-            close();
-          }}
-        >
-          <ListItemIcon>
-            <Casino fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t("Roll")}</ListItemText>
-        </MenuItem>
-
         <MenuItem onClick={handleAddToCompendium}>
           <ListItemIcon>
             <LibraryAdd fontSize="small" />
@@ -177,33 +160,53 @@ function SpecialContextMenu({ special, npcName, onDelete }) {
 
 export default function EditSpecial({ npc, setNpc }) {
   const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const isSmallScreen = useMediaQuery("(max-width: 899px)");
   const [modalOpen, setModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingSpecialIndex, setPendingSpecialIndex] = useState(null);
+  const [expandedSet, setExpandedSet] = useState(new Set());
 
-  const onChangeSpecial = (i, key, value) => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      newState.special[i][key] = value;
-      return newState;
+  const allExpanded =
+    npc.special?.length > 0 && expandedSet.size === npc.special.length;
+
+  const toggleExpanded = (i) => {
+    setExpandedSet((prev) => {
+      const s = new Set(prev);
+      s.has(i) ? s.delete(i) : s.add(i);
+      return s;
     });
   };
 
+  const toggleAll = () => {
+    setExpandedSet(
+      allExpanded
+        ? new Set()
+        : new Set(npc.special?.map((_, i) => i) ?? []),
+    );
+  };
+
   const addSpecial = () => {
-    setNpc((prevState) => ({
-      ...prevState,
-      special: [
-        ...(prevState.special || []),
-        { name: "", effect: "", spCost: 1 },
-      ],
+    const newIndex = npc.special?.length ?? 0;
+    setExpandedSet((prev) => new Set([...prev, newIndex]));
+    setNpc((prev) => ({
+      ...prev,
+      special: [...(prev.special || []), { name: "", effect: "", spCost: 1 }],
     }));
   };
 
   const removeSpecial = (i) => {
-    setNpc((prevState) => ({
-      ...prevState,
-      special: (prevState.special || []).filter((_, index) => index !== i),
+    setExpandedSet((prev) => {
+      const s = new Set();
+      for (const idx of prev) {
+        if (idx < i) s.add(idx);
+        else if (idx > i) s.add(idx - 1);
+      }
+      return s;
+    });
+    setNpc((prev) => ({
+      ...prev,
+      special: (prev.special || []).filter((_, index) => index !== i),
     }));
   };
 
@@ -220,71 +223,82 @@ export default function EditSpecial({ npc, setNpc }) {
         headerText={t("Special Rules")}
         icon={Add}
         openCompendium={() => setModalOpen(true)}
+        onExpandCollapse={toggleAll}
+        allExpanded={allExpanded}
       />
-      {npc.special?.map((special, i) => {
-        return (
-          <Grid container key={i} spacing={1}>
-            <Grid
-              sx={{
-                p: 0,
-                m: 0,
-                display: "flex",
-                alignItems: "center",
-                alignSelf: "flex-start",
-                pt: "4px",
-              }}
+      {npc.special?.map((special, i) => (
+        <Accordion
+          key={i}
+          expanded={expandedSet.has(i)}
+          onChange={() => toggleExpanded(i)}
+          disableGutters
+          elevation={0}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            "&:before": { display: "none" },
+            mb: 0.5,
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMore />}
+            sx={{ "& .MuiAccordionSummary-content": { alignItems: "center", overflow: "hidden" } }}
+          >
+            <Box
+              sx={{ display: "flex", alignItems: "center" }}
+              onClick={(e) => e.stopPropagation()}
             >
+              <IconButton
+                size="small"
+                onClick={() =>
+                  addMessage({
+                    id: crypto.randomUUID(),
+                    createdAt: Date.now(),
+                    speaker: npc.name || "NPC",
+                    kind: "display",
+                    itemType: "special",
+                    name: special.name,
+                    tags: [`SP: ${special.spCost ?? 1}`],
+                    description: special.effect,
+                  })
+                }
+              >
+                <Casino fontSize="small" />
+              </IconButton>
               <SpecialContextMenu
                 special={special}
                 npcName={npc.name}
                 onDelete={() => openDeleteDialog(i)}
               />
+            </Box>
+            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+              <Typography noWrap>{special.name || t("(unnamed)")}</Typography>
+            </Box>
+            <Typography
+              variant="body2"
+              sx={{ color: "text.secondary", whiteSpace: "nowrap", mr: 1 }}
+            >
+              SP: {special.spCost ?? 1}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={1}>
+              <SchemaFieldRenderer
+                config={npcSpecialFieldConfig}
+                state={special}
+                onChange={(next) => {
+                  setNpc((prev) => {
+                    const special = [...(prev.special || [])];
+                    special[i] = next;
+                    return { ...prev, special };
+                  });
+                }}
+                surface="edit"
+              />
             </Grid>
-            <Grid size="grow">
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="name"
-                  label={t("Name:")}
-                  value={special.name}
-                  onChange={(e) => onChangeSpecial(i, "name", e.target.value)}
-                  size="small"
-                />
-              </FormControl>
-            </Grid>
-            <Grid size={3}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="spCost"
-                  label={t("SP Cost:")}
-                  type="number"
-                  value={special?.spCost ?? 1}
-                  onChange={(e) =>
-                    onChangeSpecial(
-                      i,
-                      "spCost",
-                      parseInt(e.target.value, 10) || 1,
-                    )
-                  }
-                  size="small"
-                  slotProps={{
-                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
-                  }}
-                />
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <CustomTextarea
-                  id="effect"
-                  label={t("Effect:")}
-                  value={special.effect}
-                  onChange={(e) => onChangeSpecial(i, "effect", e.target.value)}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        );
-      })}
+          </AccordionDetails>
+        </Accordion>
+      ))}
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

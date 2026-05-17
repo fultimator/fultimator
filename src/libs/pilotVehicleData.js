@@ -132,7 +132,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 0, type: "physical", hrZero: false },
     },
     {
@@ -145,7 +150,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 1, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
       damage: { value: 6, type: "physical", hrZero: false },
     },
     {
@@ -158,7 +168,12 @@ export const availableModules = {
       cost: 500,
       range: "Ranged",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 1, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
       damage: { value: 12, type: "physical", hrZero: false },
     },
     {
@@ -171,7 +186,12 @@ export const availableModules = {
       cost: 500,
       range: "Ranged",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 14, type: "physical", hrZero: false },
     },
     {
@@ -185,7 +205,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 8, type: "physical", hrZero: false },
     },
     {
@@ -198,7 +223,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 1, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
       damage: { value: 14, type: "physical", hrZero: false },
     },
     {
@@ -224,7 +254,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 10, type: "physical", hrZero: false },
     },
     {
@@ -237,7 +272,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 10, type: "fire", hrZero: false },
     },
     {
@@ -251,7 +291,12 @@ export const availableModules = {
       cost: 500,
       range: "Ranged",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 10, type: "physical", hrZero: false },
     },
     {
@@ -264,7 +309,12 @@ export const availableModules = {
       cost: 500,
       range: "Ranged",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 10, type: "physical", hrZero: false },
     },
     {
@@ -277,7 +327,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 16, type: "physical", hrZero: false },
     },
     // Shield Module (now a weapon with shield flag)
@@ -305,7 +360,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 10, type: "physical", hrZero: false },
     },
     {
@@ -318,7 +378,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 1, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
       damage: { value: 8, type: "physical", hrZero: false },
     },
     {
@@ -331,7 +396,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 1, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
       damage: { value: 14, type: "physical", hrZero: false },
     },
     // Custom Weapon Module
@@ -346,7 +416,12 @@ export const availableModules = {
       qualityCost: 0,
       equipped: false,
       equippedSlot: "main",
-      accuracy: { attr1: "might", attr2: "dexterity", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "might",
+        attr2: "dexterity",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 0, type: "physical", hrZero: false },
     },
   ],
@@ -462,8 +537,6 @@ export const availableModules = {
   ],
 };
 
-
-
 availableFrames.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
 });
@@ -472,4 +545,3 @@ Object.values(availableModules).forEach((list) => {
     if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
   });
 });
-

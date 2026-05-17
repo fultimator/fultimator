@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import {
+  Autocomplete,
   Box,
   Checkbox,
+  Chip,
   FormControl,
   FormControlLabel,
   FormGroup,
@@ -20,6 +22,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import type { AutocompleteRenderGetTagProps } from "@mui/material";
 import { Clear, Search } from "@mui/icons-material";
 import { Martial, MartialOutline } from "../../components/icons";
 import CustomTextarea from "../../components/common/CustomTextarea";
@@ -194,15 +197,22 @@ export function SelectRenderer({
   const { t } = useTranslate();
   const options = (componentProps?.options as SelectOption[]) ?? [];
   const disabled = (componentProps?.disabled as boolean) ?? false;
+  const multiple = (componentProps?.multiple as boolean) ?? false;
   const onBrowse = componentProps?.onBrowse as (() => void) | undefined;
   const labelId = `select-${label}`;
+
+  const normalizedValue = multiple
+    ? ((value as string[]) ?? [])
+    : ((value as string | number) ?? "");
+
   return (
     <FormControl variant="outlined" fullWidth>
       <InputLabel id={labelId}>{t(label)}</InputLabel>
       <Select
         labelId={labelId}
-        value={(value as string | number) ?? ""}
+        value={normalizedValue}
         label={t(label)}
+        multiple={multiple}
         onChange={(e) => onCommit(e.target.value)}
         disabled={disabled}
         startAdornment={
@@ -224,7 +234,17 @@ export function SelectRenderer({
       >
         {options.map((opt) => (
           <MenuItem key={opt.value} value={opt.value}>
-            {t(opt.label)}
+            {multiple && (
+              <Checkbox
+                checked={
+                  Array.isArray(normalizedValue) &&
+                  normalizedValue.includes(opt.value as string)
+                }
+                size="small"
+                sx={{ p: 0, mr: 1 }}
+              />
+            )}
+            <ListItemText primary={t(opt.label)} />
           </MenuItem>
         ))}
       </Select>
@@ -823,5 +843,62 @@ export function NpcDefenseRadioRenderer({
         ))}
       </RadioGroup>
     </FormControl>
+  );
+}
+
+// Multi-value autocomplete with optional free-solo entry.
+// componentProps: { options: SelectOption[], freeSolo?: boolean }
+export function AutocompleteRenderer({
+  label,
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const options = (componentProps?.options as SelectOption[]) ?? [];
+  const freeSolo = (componentProps?.freeSolo as boolean) ?? false;
+  const optionLabels = options.map((o) => o.value as string);
+  const selected = (value as string[]) ?? [];
+
+  const renderTags = (
+    tags: string[],
+    getTagProps: AutocompleteRenderGetTagProps,
+  ) => (
+    <>
+      {tags.map((tag, index) => {
+        const found = options.find((o) => o.value === tag);
+        return (
+          <Chip
+            key={tag}
+            label={found ? t(found.label) : tag}
+            size="small"
+            {...getTagProps({ index })}
+          />
+        );
+      })}
+    </>
+  );
+
+  // Cast needed: MUI Autocomplete freeSolo generic can't be satisfied with a
+  // runtime boolean — the FreeSolo type param must be a literal true/false.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const AC = Autocomplete as any;
+  return (
+    <AC
+      multiple
+      freeSolo={freeSolo}
+      options={optionLabels}
+      value={selected}
+      onChange={(_: unknown, newValue: string[]) => onCommit(newValue)}
+      getOptionLabel={(opt: string) => {
+        const found = options.find((o) => o.value === opt);
+        return found ? t(found.label) : String(opt);
+      }}
+      renderTags={renderTags}
+      renderInput={(params: object) => (
+        <TextField {...(params as object)} label={t(label)} size="small" />
+      )}
+      size="small"
+    />
   );
 }

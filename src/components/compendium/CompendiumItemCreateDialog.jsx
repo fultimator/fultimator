@@ -46,6 +46,10 @@ import PlayerCustomWeaponModal from "../player/equipment/customWeapons/PlayerCus
 import PlayerAccessoryModal from "../player/equipment/accessories/PlayerAccessoryModal";
 import CustomTextarea from "../common/CustomTextarea";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
+import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { qualityFieldConfig } from "../../forms/rendering/config/itemConfigs/quality";
+import { heroicFieldConfig } from "../../forms/rendering/config/itemConfigs/heroic";
+import { createDefaultStateFromFields } from "../../forms/registry/helpers";
 
 // Shared attribute options
 const ATTRS = [
@@ -1019,9 +1023,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     Boolean(editData?.martial),
   );
   const [moduleDamage, setModuleDamage] = useState(
-    editData?.damage?.value != null
-      ? String(editData.damage.value)
-      : "",
+    editData?.damage?.value != null ? String(editData.damage.value) : "",
   );
   const [moduleRange, setModuleRange] = useState(editData?.range ?? "Melee");
   const [modulePrec, setModulePrec] = useState(
@@ -1046,7 +1048,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
           /^./,
           String(editData.damage.type).charAt(0).toUpperCase(),
         )
-      : editData?.damageType ?? "Physical",
+      : (editData?.damageType ?? "Physical"),
   );
   const [pilotAtt1, setPilotAtt1] = useState(
     editData?.accuracy?.attr1 ?? editData?.att1 ?? "might",
@@ -1122,9 +1124,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     setModuleMdef(editData?.mdef != null ? String(editData.mdef) : "");
     setModuleMartial(Boolean(editData?.martial));
     setModuleDamage(
-      editData?.damage?.value != null
-        ? String(editData.damage.value)
-        : "",
+      editData?.damage?.value != null ? String(editData.damage.value) : "",
     );
     setModuleRange(editData?.range ?? "Melee");
     setModulePrec(
@@ -1143,7 +1143,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
             /^./,
             String(editData.damage.type).charAt(0).toUpperCase(),
           )
-        : editData?.damageType ?? "Physical",
+        : (editData?.damageType ?? "Physical"),
     );
     setPilotAtt1(editData?.accuracy?.attr1 ?? editData?.att1 ?? "might");
     setPilotAtt2(editData?.accuracy?.attr2 ?? editData?.att2 ?? "dexterity");
@@ -2229,59 +2229,30 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
 
 // Quality form
 
-const QUALITY_CATEGORIES = ["Offensive", "Defensive", "Enhancement"];
-const FILTER_OPTIONS = [
-  { label: "Weapons", value: "weapon" },
-  { label: "Custom Weapons", value: "customWeapon" },
-  { label: "Armor", value: "armor" },
-  { label: "Shields", value: "shield" },
-  { label: "Accessories", value: "accessory" },
-];
-
 function QualityForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState(editData?.name ?? "");
-  const [category, setCategory] = useState(
-    editData?.category ?? QUALITY_CATEGORIES[0],
-  );
-  const [quality, setQuality] = useState(editData?.quality ?? "");
-  const [cost, setCost] = useState(editData?.cost ?? 0);
-  const [filter, setFilter] = useState(editData?.filter ?? []);
+  const buildState = () => ({
+    ...createDefaultStateFromFields(qualityFieldConfig),
+    ...(editData ?? {}),
+  });
+
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
-  useEffect(() => {
-    setName(editData?.name ?? "");
-    setCategory(editData?.category ?? QUALITY_CATEGORIES[0]);
-    setQuality(editData?.quality ?? "");
-    setCost(editData?.cost ?? 0);
-    setFilter(editData?.filter ?? []);
-  }, [editData]);
+  useEffect(() => { setFormState(buildState()); }, [editData]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!formState.name?.trim()) return;
     setSaving(true);
-    const payload = {
-      name: name.trim(),
-      category,
-      quality: quality.trim(),
-      cost: Number(cost),
-      filter,
-    };
+    const payload = { ...formState, name: formState.name.trim() };
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "quality", payload);
     setSaving(false);
     onClose();
-  };
-
-  const handleFilterChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setFilter(typeof value === "string" ? value.split(",") : value);
   };
 
   return (
@@ -2296,119 +2267,24 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
           py: 1.25,
         }}
       >
-        {t("New Quality")}
+        {t(isEditing ? "Edit Quality" : "New Quality")}
         <IconButton
           size="small"
           onClick={onClose}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: "rgba(255,255,255,0.8)",
-          }}
+          sx={{ position: "absolute", right: 8, top: 8, color: "rgba(255,255,255,0.8)" }}
         >
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Category")}</InputLabel>
-              <Select
-                value={category}
-                label={t("Category")}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                {QUALITY_CATEGORIES.map((cat) => (
-                  <MenuItem key={cat} value={cat}>
-                    {t(cat)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Quality Effect")}
-              value={quality}
-              onChange={(e) => setQuality(e.target.value)}
-              helperText=""
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <TextField
-              label={t("Cost")}
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel id="filter-label">{t("Applicable to")}</InputLabel>
-              <Select
-                labelId="filter-label"
-                id="filter-select"
-                multiple
-                value={filter}
-                onChange={handleFilterChange}
-                input={<OutlinedInput label={t("Applicable to")} />}
-                renderValue={(selected) => (
-                  <MuiBox sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((value) => (
-                      <Chip
-                        key={value}
-                        label={t(
-                          FILTER_OPTIONS.find((o) => o.value === value)
-                            ?.label || value,
-                        )}
-                        size="small"
-                      />
-                    ))}
-                  </MuiBox>
-                )}
-              >
-                {FILTER_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {t(option.label)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
+          <SchemaFieldRenderer
+            config={qualityFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -2416,7 +2292,7 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!formState.name?.trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -2427,49 +2303,29 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
 
 // Heroic form
 
-const CLASS_NAME_OPTIONS = classList.map((c) => c.name);
-const HEROIC_BOOK_OPTIONS = [
-  "core",
-  "rework",
-  "bonus",
-  "high",
-  "techno",
-  "natural",
-];
-
 function HeroicForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState(editData?.name ?? "");
-  const [book, setBook] = useState(editData?.book ?? "");
-  const [quote, setQuote] = useState(editData?.quote ?? "");
-  const [description, setDescription] = useState(editData?.description ?? "");
-  const [applicableTo, setApplicableTo] = useState(
-    editData?.applicableTo ?? [],
-  );
+  const buildState = () => ({
+    ...createDefaultStateFromFields(heroicFieldConfig),
+    ...(editData ?? {}),
+  });
+
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
-  useEffect(() => {
-    setName(editData?.name ?? "");
-    setBook(editData?.book ?? "");
-    setQuote(editData?.quote ?? "");
-    setDescription(editData?.description ?? "");
-    setApplicableTo(editData?.applicableTo ?? []);
-  }, [editData]);
+  useEffect(() => { setFormState(buildState()); }, [editData]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!formState.name?.trim()) return;
     setSaving(true);
     const payload = {
-      name: name.trim(),
-      fuid: slugify(name.trim()),
-      book,
-      quote: quote.trim(),
-      description: description.trim(),
-      applicableTo,
+      ...formState,
+      name: formState.name.trim(),
+      fuid: slugify(formState.name.trim()),
     };
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "heroic", payload);
@@ -2489,109 +2345,42 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
           py: 1.25,
         }}
       >
-        {t("New Heroic Skill")}
+        {t(isEditing ? "Edit Heroic Skill" : "New Heroic Skill")}
         <IconButton
           size="small"
           onClick={onClose}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: "rgba(255,255,255,0.8)",
-          }}
+          sx={{ position: "absolute", right: 8, top: 8, color: "rgba(255,255,255,0.8)" }}
         >
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Book")}</InputLabel>
-              <Select
-                value={book}
-                label={t("Book")}
-                onChange={(e) => setBook(e.target.value)}
-              >
-                <MenuItem value="">{t("None")}</MenuItem>
-                {HEROIC_BOOK_OPTIONS.map((b) => (
-                  <MenuItem
-                    key={b}
-                    value={b}
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {b}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <Autocomplete
-              multiple
-              options={CLASS_NAME_OPTIONS}
-              value={applicableTo}
-              onChange={(_, newValue) => setApplicableTo(newValue)}
-              freeSolo
-              renderValue={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    key={option}
-                    label={option}
-                    size="small"
-                    {...getTagProps({ index })}
-                  />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t("Applicable To")}
-                  size="small"
-                  placeholder={t("Select classes...")}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              label={t("Quote")}
-              value={quote}
-              onChange={(e) => setQuote(e.target.value)}
-              fullWidth
-              size="small"
-              slotProps={{
-                htmlInput: { maxLength: 200 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Description")}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              helperText=""
-              maxLength={1500}
-            />
-          </Grid>
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            label="Metadata"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -2599,7 +2388,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!formState.name?.trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
