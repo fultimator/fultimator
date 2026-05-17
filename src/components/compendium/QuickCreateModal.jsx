@@ -120,6 +120,8 @@ import { validateWeaponPersisted } from "../../forms/schema/itemSchemas/weapon";
 import { validateCustomWeaponPersisted } from "../../forms/schema/itemSchemas/customWeapon";
 import { itemFormRegistry } from "../../forms/registry";
 import { QUICK_CREATE_TAB_KEYS, VIEWER_TYPE_TO_TAB_KEY } from "./quickCreateTabKeys";
+
+const REG = itemFormRegistry;
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
 import { weaponFieldConfig } from "../../forms/rendering/config/itemConfigs/weapon";
 import { armorFieldConfig } from "../../forms/rendering/config/itemConfigs/armor";
@@ -528,8 +530,13 @@ function NpcAttackPanel() {
           </Grid>
         }
         previewContent={<SharedAttackCard item={data} />}
-        addButton={<AddToCompendiumButton itemType="npc-attack" data={data} />}
-        exportDataType="attacks"
+        addButton={
+          <AddToCompendiumButton
+            itemType={REG["npc-attack"].addItemType}
+            data={data}
+          />
+        }
+        exportDataType={REG["npc-attack"].exportDataType}
       />
     </>
   );
@@ -868,10 +875,15 @@ function NpcSpellPanel() {
           item={{ ...data, effect: data.special?.join("; ") ?? "" }}
         />
       }
-      addButton={<AddToCompendiumButton itemType="npc-spell" data={data} />}
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG["npc-spell"].addItemType}
+          data={data}
+        />
+      }
       data={data}
       itemName={data.name}
-      exportDataType="spells"
+      exportDataType={REG["npc-spell"].exportDataType}
     />
   );
 }
@@ -951,10 +963,15 @@ function NpcSpecialPanel() {
         </Grid>
       }
       previewContent={<SharedSpecialRuleCard item={data} />}
-      addButton={<AddToCompendiumButton itemType="npc-special" data={data} />}
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG["npc-special"].addItemType}
+          data={data}
+        />
+      }
       data={data}
       itemName={data.name || ""}
-      exportDataType="special"
+      exportDataType={REG["npc-special"].exportDataType}
     />
   );
 }
@@ -1034,10 +1051,15 @@ function NpcActionPanel() {
         </Grid>
       }
       previewContent={<SharedActionCard item={data} />}
-      addButton={<AddToCompendiumButton itemType="npc-action" data={data} />}
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG["npc-action"].addItemType}
+          data={data}
+        />
+      }
       data={data}
       itemName={data.name || ""}
-      exportDataType="actions"
+      exportDataType={REG["npc-action"].exportDataType}
     />
   );
 }
@@ -2521,11 +2543,11 @@ function PlayerSpellPanel() {
       }
       addButton={
         <AddToCompendiumButton
-          itemType="player-spell"
+          itemType={REG["player-spell"].addItemType}
           data={spellType === "default" ? data : nonStaticData}
         />
       }
-      exportDataType="player-spells"
+      exportDataType={REG["player-spell"].exportDataType}
     />
   );
 }
@@ -2716,8 +2738,10 @@ function QualityPanel() {
         </Box>
       }
       previewContent={<SharedQualityCard item={data} />}
-      addButton={<AddToCompendiumButton itemType="quality" data={data} />}
-      exportDataType="qualities"
+      addButton={
+        <AddToCompendiumButton itemType={REG.quality.addItemType} data={data} />
+      }
+      exportDataType={REG.quality.exportDataType}
     />
   );
 }
@@ -2854,10 +2878,12 @@ function HeroicPanel() {
         </Grid>
       }
       previewContent={<SharedHeroicCard item={data} />}
-      addButton={<AddToCompendiumButton itemType="heroic" data={data} />}
+      addButton={
+        <AddToCompendiumButton itemType={REG.heroic.addItemType} data={data} />
+      }
       data={data}
       itemName={data.name || ""}
-      exportDataType="heroics"
+      exportDataType={REG.heroic.exportDataType}
     />
   );
 }
@@ -3286,10 +3312,12 @@ function ClassPanel() {
             }}
           />
         }
-        addButton={<AddToCompendiumButton itemType="class" data={classData} />}
+        addButton={
+          <AddToCompendiumButton itemType={REG.class.addItemType} data={classData} />
+        }
         data={classData}
         itemName={classData.name || ""}
-        exportDataType="classes"
+        exportDataType={REG.class.exportDataType}
       />
       <DeleteConfirmationDialog
         open={customBenefitToDelete !== null}
@@ -3614,10 +3642,12 @@ function WeaponPanel() {
           </Grid>
         }
         previewContent={<SharedWeaponCard item={weaponObj} />}
-        addButton={<AddToCompendiumButton itemType="weapon" data={weaponObj} />}
+        addButton={
+          <AddToCompendiumButton itemType={REG.weapon.addItemType} data={weaponObj} />
+        }
         data={weaponObj}
         itemName={weaponObj.name || ""}
-        exportDataType="weapons"
+        exportDataType={REG.weapon.exportDataType}
       />
       <QualityPickerDialog
         open={qualityPickerOpen}
@@ -3761,10 +3791,12 @@ function ArmorPanel() {
           </Grid>
         }
         previewContent={<SharedArmorCard item={armorObj} />}
-        addButton={<AddToCompendiumButton itemType="armor" data={armorObj} />}
+        addButton={
+          <AddToCompendiumButton itemType={REG.armor.addItemType} data={armorObj} />
+        }
         data={armorObj}
         itemName={armorObj.name || ""}
-        exportDataType="armor"
+        exportDataType={REG.armor.exportDataType}
       />
       <QualityPickerDialog
         open={qualityPickerOpen}
@@ -3905,10 +3937,12 @@ function ShieldPanel() {
           </Grid>
         }
         previewContent={<SharedShieldCard item={shieldObj} />}
-        addButton={<AddToCompendiumButton itemType="shield" data={shieldObj} />}
+        addButton={
+          <AddToCompendiumButton itemType={REG.shield.addItemType} data={shieldObj} />
+        }
         data={shieldObj}
         itemName={shieldObj.name || ""}
-        exportDataType="shields"
+        exportDataType={REG.shield.exportDataType}
       />
       <QualityPickerDialog
         open={qualityPickerOpen}
@@ -4321,11 +4355,14 @@ function CustomWeaponPanel() {
         }
         previewContent={<SharedCustomWeaponCard item={weaponObj} />}
         addButton={
-          <AddToCompendiumButton itemType="custom-weapon" data={weaponObj} />
+          <AddToCompendiumButton
+            itemType={REG["custom-weapon"].addItemType}
+            data={weaponObj}
+          />
         }
         data={weaponObj}
         itemName={weaponObj.name || ""}
-        exportDataType="custom-weapons"
+        exportDataType={REG["custom-weapon"].exportDataType}
       />
       <QualityPickerDialog
         open={qualityPickerOpen}
@@ -4455,11 +4492,14 @@ function AccessoryPanel() {
         }
         previewContent={<SharedAccessoryCard item={accessoryObj} />}
         addButton={
-          <AddToCompendiumButton itemType="accessory" data={accessoryObj} />
+          <AddToCompendiumButton
+            itemType={REG.accessory.addItemType}
+            data={accessoryObj}
+          />
         }
         data={accessoryObj}
         itemName={accessoryObj.name || ""}
-        exportDataType="accessories"
+        exportDataType={REG.accessory.exportDataType}
       />
       <QualityPickerDialog
         open={qualityPickerOpen}
@@ -4860,8 +4900,10 @@ function OptionalPanel() {
         </Grid>
       }
       previewContent={<SharedOptionalCard item={data} />}
-      addButton={<AddToCompendiumButton itemType="optional" data={data} />}
-      exportDataType="optionals"
+      addButton={
+        <AddToCompendiumButton itemType={REG.optional.addItemType} data={data} />
+      }
+      exportDataType={REG.optional.exportDataType}
     />
   );
 }
@@ -4931,9 +4973,17 @@ function MnemospherePanel() {
           <AddToCompendiumButton itemType="mnemosphere" data={data} />
         ) : null
       }
+      addButton={
+        data ? (
+          <AddToCompendiumButton
+            itemType={REG.mnemosphere.addItemType}
+            data={data}
+          />
+        ) : null
+      }
       data={data}
       itemName={data?.name || ""}
-      exportDataType="mnemospheres"
+      exportDataType={REG.mnemosphere.exportDataType}
     />
   );
 }
@@ -5120,12 +5170,15 @@ function HoplospherePanel() {
       }
       addButton={
         data ? (
-          <AddToCompendiumButton itemType="hoplosphere" data={data} />
+          <AddToCompendiumButton
+            itemType={REG.hoplosphere.addItemType}
+            data={data}
+          />
         ) : null
       }
       data={data}
       itemName={data?.name || ""}
-      exportDataType="hoplospheres"
+      exportDataType={REG.hoplosphere.exportDataType}
     />
   );
 }
