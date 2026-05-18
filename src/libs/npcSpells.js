@@ -16,7 +16,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("AreaStatus_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -33,7 +32,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("Breath_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -50,7 +48,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("Curse_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -67,7 +64,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("CurseXL_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -84,7 +80,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("CursedBreath_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -101,7 +96,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("Devastation_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -118,7 +112,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("LickWounds_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -135,7 +128,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("LifeTheft_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -152,7 +144,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("MindTheft_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -169,7 +160,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("Poison_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -186,7 +176,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("Quicken_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -203,7 +192,6 @@ export const npcSpells = [
     duration: t("Instantaneous"),
     range: "ranged",
     effect: t("Rage_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -220,7 +208,6 @@ export const npcSpells = [
     duration: t("Scene"),
     range: "ranged",
     effect: t("Shell_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -237,7 +224,6 @@ export const npcSpells = [
     duration: t("Scene"),
     range: "ranged",
     effect: t("WarCry_desc", true),
-    special: [],
     description: "",
   },
   {
@@ -254,7 +240,6 @@ export const npcSpells = [
     duration: t("Scene"),
     range: "ranged",
     effect: t("Weaken_desc", true),
-    special: [],
     description: "",
   },
 ];

@@ -203,7 +203,7 @@ export default function EditSpells({ npc, setNpc }) {
             targetDescription: "",
             duration: "",
             damage: { value: 0, type: "physical", hrZero: false },
-            special: [],
+            effect: "",
           },
         ],
       };
@@ -263,7 +263,7 @@ export default function EditSpells({ npc, setNpc }) {
               itemType: "spell",
               name: spell.name,
               tags,
-              description: spell.special?.[0] ?? spell.effect ?? "",
+              description: spell.effect ?? spell.special?.[0] ?? "",
             });
             return;
           }
@@ -277,7 +277,7 @@ export default function EditSpells({ npc, setNpc }) {
             attr2: attrMap[spell.accuracy?.attr2] ?? "wlp",
             accuracyBonus: accBonus,
             name: spell.name,
-            description: spell.special?.[0] ?? spell.effect ?? undefined,
+            description: spell.effect ?? spell.special?.[0] ?? undefined,
             baseDamage: dmgValue,
             damageType: dmgType,
             accuracyDefense: "mdef",
@@ -424,7 +424,7 @@ export default function EditSpells({ npc, setNpc }) {
                   });
                 }}
                 surface="edit"
-                group="special"
+                group="effect"
                 label={t("Effect")}
                 cols={1}
               />
@@ -470,8 +470,7 @@ export default function EditSpells({ npc, setNpc }) {
                     : item.duration || "",
                   effect: isPlayerSpell
                     ? staticT(item.description || "")
-                    : item.effect || "",
-                  special: item.special || [],
+                    : item.effect || item.special?.[0] || "",
                 },
               ],
             };

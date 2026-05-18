@@ -92,7 +92,7 @@ export interface NpcAttack {
   range: "melee" | "ranged";
   accuracy: Accuracy;
   damage: Damage;
-  special: string[];
+  effect?: string;
   extraDamage?: boolean;
   effects?: ItemEffect[];
 }
@@ -105,7 +105,7 @@ export interface NpcWeaponAttack {
   range: "melee" | "ranged";
   accuracy: Accuracy;
   damage: Damage;
-  special: string[];
+  effect?: string;
   extraDamage?: boolean;
   effects?: ItemEffect[];
 }

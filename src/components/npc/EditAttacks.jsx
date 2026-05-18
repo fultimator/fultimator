@@ -178,7 +178,7 @@ export default function EditAttacks({ npc, setNpc }) {
             range: "melee",
             accuracy: { attr1: "dexterity", attr2: "dexterity", value: 0, defense: "def" },
             damage: { value: 0, type: "physical", hrZero: false },
-            special: [],
+            effect: "",
           },
         ],
       };
@@ -236,7 +236,7 @@ export default function EditAttacks({ npc, setNpc }) {
             attr2: ATTR_ROLL[attack.accuracy?.attr2] ?? "dex",
             accuracyBonus: accBonus,
             name: attack.name,
-            description: attack.special?.[0] ?? undefined,
+            description: attack.effect ?? attack.special?.[0] ?? undefined,
             baseDamage: dmgValue,
             damageType: dmgType,
             accuracyDefense: attack.accuracy?.defense ?? "def",
@@ -346,10 +346,10 @@ export default function EditAttacks({ npc, setNpc }) {
                       return { ...prev, attacks };
                     });
                   }}
-                  surface="edit"
-                  group="special"
-                  label={t("Special")}
-                  cols={1}
+                surface="edit"
+                group="effect"
+                label={t("Effect")}
+                cols={1}
                 />
                 <SchemaFieldRenderer
                   config={npcAttackFieldConfig}
@@ -400,7 +400,7 @@ export default function EditAttacks({ npc, setNpc }) {
                   type: item.damage?.type ?? "physical",
                   hrZero: item.damage?.hrZero === true,
                 },
-                special: [],
+                effect: item.effect || item.special?.[0] || "",
               },
             ],
           }));

@@ -229,7 +229,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
         ...prev,
         weaponattacks: [
           ...(prev.weaponattacks || []),
-          { ...weaponToAttackFields(weapons[0]), name: "", fuid: "", special: [] },
+          { ...weaponToAttackFields(weapons[0]), name: "", fuid: "", effect: "" },
         ],
       };
     });
@@ -285,7 +285,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
             attr2: ATTR_ROLL[attack.accuracy?.attr2] ?? "dex",
             accuracyBonus: accBonus,
             name: attack.name,
-            description: attack.special?.[0] ?? undefined,
+            description: attack.effect ?? attack.special?.[0] ?? undefined,
             baseDamage: dmgValue,
             damageType: dmgType,
             accuracyDefense: attack.accuracy?.defense ?? "def",
@@ -386,10 +386,10 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
                   config={npcAttackFieldConfig}
                   state={attack}
                   onChange={updateAttack}
-                  surface="edit"
-                  group="special"
-                  label={t("Special")}
-                  cols={1}
+                surface="edit"
+                group="effect"
+                label={t("Effect")}
+                cols={1}
                 />
                 <SchemaFieldRenderer
                   config={npcAttackFieldConfig}

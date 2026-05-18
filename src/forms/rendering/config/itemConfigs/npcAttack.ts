@@ -9,7 +9,7 @@ const G = {
   core: "core",
   accuracy: "accuracy",
   damage: "damage",
-  special: "special",
+  effect: "effect",
 } as const;
 
 export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
@@ -165,19 +165,14 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
     gridSize: { xs: 12, md: 4 },
   },
   {
-    key: "special",
+    key: "effect",
     kind: "editable",
-    label: "Special",
+    label: "Effect",
     component: "textarea",
-    defaultValue: [],
-    group: G.special,
+    defaultValue: "",
+    group: G.effect,
     order: 30,
     fullWidth: true,
-    parse: (v) => {
-      const text = String(v ?? "").trim();
-      return text ? [text] : [];
-    },
-    format: (v) => (Array.isArray(v) ? String(v[0] ?? "") : String(v ?? "")),
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcAttackFormState>),
 ];

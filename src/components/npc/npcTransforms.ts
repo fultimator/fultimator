@@ -25,6 +25,14 @@ function normalizeElementType(type: unknown): Elements {
   return (raw || "physical") as Elements;
 }
 
+function firstSpecialText(special: unknown): string {
+  if (Array.isArray(special)) {
+    const first = special.find((entry) => typeof entry === "string" && entry.trim());
+    return typeof first === "string" ? first.trim() : "";
+  }
+  return typeof special === "string" ? special.trim() : "";
+}
+
 // Pre-save transforms
 const PRE_SAVE_TRANSFORMS: NpcTransform[] = [
   // No transforms yet - placeholder for future cleanup passes.
@@ -184,7 +192,11 @@ function unifyNpcSpellSchema(npc: TypeNpc): TypeNpc {
       if (s.itemType === undefined) s.itemType = "spell";
       if (s.spellType === undefined) s.spellType = "npc";
       if (s.description === undefined) s.description = "";
-      if (s.special === undefined) s.special = [];
+      if (s.effect === undefined || String(s.effect).trim() === "") {
+        const specialText = firstSpecialText(s.special);
+        if (specialText) s.effect = specialText;
+      }
+      delete s.special;
 
       // attr1 + attr2 -> accuracy object
       if (s.accuracy === undefined) {
@@ -220,7 +232,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
       a.damage !== undefined &&
       typeof a.damage === "object"
     ) {
-      return {
+      const next: RawAttack = {
         ...a,
         itemType: "attack",
         range: normalizeRange(a.range),
@@ -231,21 +243,21 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
           ),
           hrZero: (a.damage as Record<string, unknown>).hrZero === true,
         },
-        special: Array.isArray(a.special)
-          ? a.special
-          : typeof a.special === "string"
-            ? [a.special]
-            : [],
+        effect:
+          typeof a.effect === "string" && a.effect.trim()
+            ? a.effect
+            : firstSpecialText(a.special),
       };
+      delete next.special;
+      return next;
     }
     const next: RawAttack = { ...a };
     next.itemType = "attack";
     next.range = normalizeRange(a.range);
-    next.special = Array.isArray(a.special)
-      ? a.special
-      : typeof a.special === "string"
-        ? [a.special]
-        : [];
+    next.effect =
+      typeof a.effect === "string" && a.effect.trim()
+        ? a.effect
+        : firstSpecialText(a.special);
     next.accuracy = {
       attr1: (a.attr1 as string) ?? "dexterity",
       attr2: (a.attr2 as string) ?? "might",
@@ -260,6 +272,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
     delete next.attr1;
     delete next.attr2;
     delete next.type;
+    delete next.special;
     return next;
   };
 
@@ -272,16 +285,15 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
       const category = normalizeWeaponCategory(
         wa.category as string | undefined,
       );
-      return {
+      const next: RawAttack = {
         ...wa,
         itemType: "weaponAttack",
         category,
         range: normalizeRange(wa.range),
-        special: Array.isArray(wa.special)
-          ? wa.special
-          : typeof wa.special === "string"
-            ? [wa.special]
-            : [],
+        effect:
+          typeof wa.effect === "string" && wa.effect.trim()
+            ? wa.effect
+            : firstSpecialText(wa.special),
         accuracy: {
           ...(wa.accuracy as Record<string, unknown>),
           defense: (wa.accuracy as Record<string, unknown>).defense
@@ -298,17 +310,18 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
           hrZero: (wa.damage as Record<string, unknown>).hrZero === true,
         },
       };
+      delete next.special;
+      return next;
     }
     const w = (wa.weapon as RawAttack) ?? {};
     const next: RawAttack = { ...wa };
     const category = normalizeWeaponCategory(w.category as string | undefined);
     next.itemType = "weaponAttack";
     next.category = category;
-    next.special = Array.isArray(wa.special)
-      ? wa.special
-      : typeof wa.special === "string"
-        ? [wa.special]
-        : [];
+    next.effect =
+      typeof wa.effect === "string" && wa.effect.trim()
+        ? wa.effect
+        : firstSpecialText(wa.special);
     next.accuracy = {
       attr1: (w.att1 as string) ?? "dexterity",
       attr2: (w.att2 as string) ?? "might",
@@ -323,6 +336,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
     next.range = normalizeRange(w.range ?? wa.range);
     delete next.weapon;
     delete next.type;
+    delete next.special;
     return next;
   };
 

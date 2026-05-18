@@ -86,11 +86,12 @@ function formatAttackDesc(attack, npc, md) {
     desc = md ? `**${core}** damage` : `${core} damage`;
   }
 
-  const specials = Array.isArray(attack.special)
-    ? attack.special.filter(Boolean).join("; ")
-    : typeof attack.special === "string"
-      ? attack.special
-      : "";
+  const specials = attack.effect
+    || (Array.isArray(attack.special)
+      ? attack.special.filter(Boolean).join("; ")
+      : typeof attack.special === "string"
+        ? attack.special
+        : "");
   if (specials) desc += `, ${specials}`;
   return desc;
 }

@@ -275,19 +275,18 @@ function localizeImportedClassItem(item) {
 function normalizeImportedNpcSpellItem(item) {
   if (!item || typeof item !== "object") return item;
   const next = { ...item };
-  if (Array.isArray(next.special)) return next;
-  if (typeof next.special === "string" && next.special.trim()) {
-    next.special = [next.special.trim()];
+  if (typeof next.effect === "string" && next.effect.trim()) return next;
+  if (Array.isArray(next.special) && typeof next.special[0] === "string") {
+    next.effect = next.special[0].trim();
     return next;
   }
-  const fallback =
-    typeof next.effect === "string" && next.effect.trim()
-      ? next.effect.trim()
-      : typeof next.description === "string" && next.description.trim()
-        ? next.description.trim()
-        : "";
-  if (fallback) next.special = [fallback];
-  else delete next.special;
+  if (typeof next.special === "string" && next.special.trim()) {
+    next.effect = next.special.trim();
+    return next;
+  }
+  if (typeof next.description === "string" && next.description.trim()) {
+    next.effect = next.description.trim();
+  }
   return next;
 }
 // Only classes that use standard spells (spellType: "default")
@@ -394,9 +393,6 @@ function NpcAttackPanel() {
     ...formState,
     name: String(formState.name ?? "").trim(),
     fuid: formState.fuid || undefined,
-    effect: Array.isArray(formState.special)
-      ? String(formState.special[0] ?? "")
-      : String(formState.special ?? ""),
   };
 
   const handleClear = () => {
@@ -447,7 +443,7 @@ function NpcAttackPanel() {
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="special"
+            group="effect"
             cols={1}
           />
           <SchemaFieldRenderer
@@ -548,7 +544,7 @@ function NpcSpellPanel() {
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="special"
+            group="effect"
             cols={1}
           />
           <SchemaFieldRenderer
@@ -568,7 +564,7 @@ function NpcSpellPanel() {
         </Grid>
       }
       previewContent={
-        <SharedSpellCard item={{ ...data, effect: data.special?.join("; ") ?? "" }} />
+        <SharedSpellCard item={data} />
       }
       addButton={
         <AddToCompendiumButton itemType={REG["npc-spell"].addItemType} data={data} />

@@ -42,7 +42,6 @@ export interface NpcSpell {
   duration: string;
   range: "melee" | "ranged";
   effect: string;
-  special: string[];
   itemType: "spell";
   spellType: string;
   effects?: ItemEffect[];

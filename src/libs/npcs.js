@@ -393,17 +393,13 @@ export function calcUsedSkillsFromOtherActions(npc) {
 export function calcUsedSkillsFromSpecialAttacks(npc) {
   let sum = 0;
   npc.attacks?.forEach((attack) => {
-    sum += attack.special.length;
-    if (attack.extraDamage) {
-      sum++;
-    }
+    if (attack.effect || attack.special?.length) sum++;
+    if (attack.extraDamage) sum++;
   });
 
   npc.weaponattacks?.forEach((attack) => {
-    sum += attack.special.length;
-    if (attack.extraDamage) {
-      sum++;
-    }
+    if (attack.effect || attack.special?.length) sum++;
+    if (attack.extraDamage) sum++;
   });
 
   return sum;

@@ -10,7 +10,7 @@ const G = {
   accuracy: "accuracy",
   damage: "damage",
   details: "details",
-  special: "special",
+  effect: "effect",
 } as const;
 
 export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
@@ -226,19 +226,14 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     gridSize: 6,
   },
   {
-    key: "special",
+    key: "effect",
     kind: "editable",
-    label: "Special",
+    label: "Effect",
     component: "textarea",
-    defaultValue: [],
-    group: G.special,
+    defaultValue: "",
+    group: G.effect,
     order: 40,
     fullWidth: true,
-    parse: (v) => {
-      const text = String(v ?? "").trim();
-      return text ? [text] : [];
-    },
-    format: (v) => (Array.isArray(v) ? String(v[0] ?? "") : String(v ?? "")),
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcSpellFormState>),
 ];

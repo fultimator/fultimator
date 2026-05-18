@@ -32,7 +32,7 @@ export const NpcSpellSchema = z.object({
   targetDescription: z.string().optional(),
   range: z.enum(["melee", "ranged"]),
   accuracy: AccuracySchema,
-  special: z.array(z.string()).default([]),
+  effect: z.string().default(""),
   meta: MetaSchema.optional(),
 });
 

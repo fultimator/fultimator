@@ -288,11 +288,11 @@ const NPCDetail = ({
         attackType,
         effect:
           attackType === "attack"
-            ? showBaseAttackEffect && attack.special[0]
-              ? attack.special[0]
+            ? showBaseAttackEffect && (attack.effect || attack.special?.[0])
+              ? attack.effect || attack.special[0]
               : ""
-            : showWeaponAttackEffect && attack.special[0]
-              ? attack.special[0]
+            : showWeaponAttackEffect && (attack.effect || attack.special?.[0])
+              ? attack.effect || attack.special[0]
               : "",
       });
     }
