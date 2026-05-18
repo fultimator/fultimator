@@ -15,10 +15,12 @@ function visibleKeys(state: Partial<S>, group?: string): string[] {
 describe("shield core fields", () => {
   it("shows base picker, name, martial, and rework", () => {
     const keys = visibleKeys({}, "core");
-    expect(keys).toContain("base");
+    const baseKeys = visibleKeys({}, "base");
+    const modifierKeys = visibleKeys({}, "modifiers");
+    expect(baseKeys).toContain("base");
     expect(keys).toContain("name");
     expect(keys).toContain("martial");
-    expect(keys).toContain("rework");
+    expect(modifierKeys).toContain("rework");
   });
 });
 

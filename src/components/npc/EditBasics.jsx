@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   Button,
@@ -33,6 +33,14 @@ export default function EditBasics({ npc, setNpc }) {
   const [isImageError, setIsImageError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const [snackOpen, setSnackOpen] = React.useState(false);
+  const identityFields = React.useMemo(
+    () => npcFieldConfig.filter((field) => field.group !== "basics" || field.order <= 1),
+    [],
+  );
+  const detailFields = React.useMemo(
+    () => npcFieldConfig.filter((field) => field.group !== "basics" || field.order > 1),
+    [],
+  );
 
   const checkImageSize = useCallback(async (imageUrl) => {
     try {
@@ -71,7 +79,7 @@ export default function EditBasics({ npc, setNpc }) {
       </Grid>
 
       <SchemaFieldRenderer
-        config={npcFieldConfig}
+        config={identityFields}
         state={npc}
         onChange={setNpc}
         surface="edit"
@@ -79,71 +87,82 @@ export default function EditBasics({ npc, setNpc }) {
         cols={2}
       />
 
-      <Grid size={4}>
+      <Grid size={{ xs: 12, sm: 3 }}>
         <EditLevel npc={npc} setnpc={setNpc} />
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 8 }}>
-        <TextField
-          label={t("Image URL") + ":"}
-          value={imgUrlTemp}
-          onChange={(e) => {
-            setImgUrlTemp(e.target.value);
-            setIsImageError(false);
-            setErrorMessage("");
-          }}
-          fullWidth
-          error={imgUrlTemp.length > 0 && isImageError}
-          helperText={
-            isImageError && imgUrlTemp.length > 0
-              ? errorMessage
-              : t(
-                  "Please ensure to credit the artist in the description or notes section.",
-                )
-          }
-        />
-      </Grid>
-      <Grid size={{ xs: 6, sm: 2 }}>
-        <Button
-          variant="contained"
-          onClick={() => {
-            checkImageSize(imgUrlTemp).then((ok) => {
-              if (ok) {
-                setNpc((prev) => ({ ...prev, imgurl: imgUrlTemp }));
-                setSnackOpen(true);
-              }
-            });
-          }}
-          sx={{ height: "56px", width: "100%" }}
-        >
-          {t("Update Image")}
-        </Button>
-        <Snackbar
-          open={snackOpen}
-          autoHideDuration={3000}
-          onClose={() => setSnackOpen(false)}
-          message={t("Image uploaded successfully!")}
-        />
-      </Grid>
-      <Grid size={{ xs: 6, sm: 2 }}>
-        <Button
-          variant="outlined"
-          onClick={() => {
-            setImgUrlTemp("");
-            setIsImageError(false);
-            setErrorMessage("");
-            setNpc((prev) => ({ ...prev, imgurl: "" }));
-          }}
-          sx={{ height: "56px", width: "100%" }}
-        >
-          {t("Remove Image")}
-        </Button>
+      <SchemaFieldRenderer
+        config={detailFields}
+        state={npc}
+        onChange={setNpc}
+        surface="edit"
+        group="basics"
+        cols={2}
+      />
+
+      <Grid size={12} container spacing={2} sx={{ alignItems: "flex-start" }}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <TextField
+            label={t("Image URL") + ":"}
+            value={imgUrlTemp}
+            onChange={(e) => {
+              setImgUrlTemp(e.target.value);
+              setIsImageError(false);
+              setErrorMessage("");
+            }}
+            fullWidth
+            error={imgUrlTemp.length > 0 && isImageError}
+            helperText={
+              isImageError && imgUrlTemp.length > 0
+                ? errorMessage
+                : t(
+                    "Please ensure to credit the artist in the description or notes section.",
+                  )
+            }
+          />
+        </Grid>
+        <Grid size={{ xs: 6, md: 2 }}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              checkImageSize(imgUrlTemp).then((ok) => {
+                if (ok) {
+                  setNpc((prev) => ({ ...prev, imgurl: imgUrlTemp }));
+                  setSnackOpen(true);
+                }
+              });
+            }}
+            sx={{ height: "56px", width: "100%" }}
+          >
+            {t("Update Image")}
+          </Button>
+          <Snackbar
+            open={snackOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackOpen(false)}
+            message={t("Image uploaded successfully!")}
+          />
+        </Grid>
+        <Grid size={{ xs: 6, md: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setImgUrlTemp("");
+              setIsImageError(false);
+              setErrorMessage("");
+              setNpc((prev) => ({ ...prev, imgurl: "" }));
+            }}
+            sx={{ height: "56px", width: "100%" }}
+          >
+            {t("Remove Image")}
+          </Button>
+        </Grid>
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <EditAttributes npc={npc} setNpc={setNpc} />
       </Grid>
-      <Grid size={{ xs: 12, sm: 6 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Card sx={{ p: 1.61, background }}>
           <Typography>
             <strong>{t("Jack of All Trades")}</strong>: d8, d8, d8, d8
@@ -274,20 +293,48 @@ export default function EditBasics({ npc, setNpc }) {
 
 function EditLevel({ npc, setnpc }) {
   const { t } = useTranslate();
+  const [levelInput, setLevelInput] = React.useState(String(npc.lvl ?? ""));
+
+  useEffect(() => {
+    setLevelInput(String(npc.lvl ?? ""));
+  }, [npc.lvl]);
+
+  const normalizeLevel = (value, rank = npc.rank) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return npc.lvl;
+    const min = rank === "groupvehicle" ? 1 : 5;
+    const step = rank === "groupvehicle" ? 1 : 5;
+    const stepped = min + Math.round((parsed - min) / step) * step;
+    return Math.min(60, Math.max(min, stepped));
+  };
+
+  const commitLevel = () => {
+    const next = normalizeLevel(levelInput);
+    setLevelInput(String(next));
+    setnpc((prev) => ({ ...prev, lvl: next }));
+  };
 
   const onRaiseLevel = () => {
     setnpc((prev) => {
       if (prev.lvl >= 60) return prev;
       const step = prev.rank === "groupvehicle" ? 1 : 5;
-      return { ...prev, lvl: prev.lvl + step };
+      const min = prev.rank === "groupvehicle" ? 1 : 5;
+      const next = min + Math.floor((prev.lvl - min) / step + 1) * step;
+      const lvl = Math.min(60, next);
+      setLevelInput(String(lvl));
+      return { ...prev, lvl };
     });
   };
 
   const onLowerLevel = () => {
     setnpc((prev) => {
-      if (prev.lvl <= 5) return prev;
       const step = prev.rank === "groupvehicle" ? 1 : 5;
-      return { ...prev, lvl: prev.lvl - step };
+      const min = prev.rank === "groupvehicle" ? 1 : 5;
+      if (prev.lvl <= min) return prev;
+      const next = min + Math.ceil((prev.lvl - min) / step - 1) * step;
+      const lvl = Math.max(min, next);
+      setLevelInput(String(lvl));
+      return { ...prev, lvl };
     });
   };
 
@@ -295,20 +342,28 @@ function EditLevel({ npc, setnpc }) {
     <FormControl variant="standard" fullWidth>
       <TextField
         label={t("Level:")}
+        size="small"
         min={5}
         max={60}
-        value={npc.lvl}
+        value={levelInput}
+        type="number"
+        onChange={(e) => setLevelInput(e.target.value)}
+        onBlur={commitLevel}
         slotProps={{
+          htmlInput: {
+            min: npc.rank === "groupvehicle" ? 1 : 5,
+            max: 60,
+            step: npc.rank === "groupvehicle" ? 1 : 5,
+          },
           input: {
-            readOnly: true,
             startAdornment: (
-              <IconButton edge="start" onClick={onLowerLevel}>
-                <Remove />
+              <IconButton edge="start" size="small" onClick={onLowerLevel}>
+                <Remove fontSize="small" />
               </IconButton>
             ),
             endAdornment: (
-              <IconButton edge="end" onClick={onRaiseLevel}>
-                <Add />
+              <IconButton edge="end" size="small" onClick={onRaiseLevel}>
+                <Add fontSize="small" />
               </IconButton>
             ),
           },

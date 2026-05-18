@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 const AccuracySchema = z.object({
   attr1: z.string(),
@@ -23,6 +24,7 @@ export const NpcAttackSchema = z.object({
   martial: z.boolean().default(false),
   category: z.string().default("Melee Attack"),
   special: z.array(z.string()).default([]),
+  meta: MetaSchema.optional(),
 });
 
 export type NpcAttack = z.infer<typeof NpcAttackSchema>;

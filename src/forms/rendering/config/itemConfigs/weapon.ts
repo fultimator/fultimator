@@ -137,6 +137,16 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     },
   },
   {
+    key: "fuid",
+    kind: "editable",
+    label: "ID",
+    component: "fuid",
+    defaultValue: "",
+    group: G.core,
+    order: -1,
+    gridSize: 12,
+  },
+  {
     key: "name",
     kind: "editable",
     label: "weapon.name",
@@ -145,6 +155,17 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     group: G.core,
     order: 1,
     validationHints: { required: true },
+    gridSize: "grow",
+  },
+  {
+    key: "martial",
+    kind: "editable",
+    label: "weapon.martial",
+    component: "martial-toggle",
+    defaultValue: false,
+    group: G.core,
+    order: 2,
+    gridSize: "auto",
   },
   {
     key: "category",
@@ -153,7 +174,8 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     component: "select",
     defaultValue: "Sword",
     group: G.core,
-    order: 2,
+    order: 3,
+    gridSize: 4,
     componentProps: { options: categoryOptions },
   },
   {
@@ -163,7 +185,8 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     component: "select",
     defaultValue: 1,
     group: G.core,
-    order: 3,
+    order: 4,
+    gridSize: 4,
     componentProps: { options: handsOptions },
     parse: (v) => Number(v) as 1 | 2,
     onChangeEffects: {
@@ -195,7 +218,8 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     component: "select",
     defaultValue: "melee",
     group: G.core,
-    order: 3,
+    order: 5,
+    gridSize: 4,
     componentProps: {
       options: [
         { value: "melee", label: "weapon_range_melee" },
@@ -203,16 +227,6 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
       ],
       disabled: true,
     },
-  },
-  {
-    key: "martial",
-    kind: "editable",
-    label: "weapon.martial",
-    component: "martial-toggle",
-    defaultValue: false,
-    group: G.base,
-    order: 4,
-    gridSize: "auto",
   },
   // Accuracy
   {

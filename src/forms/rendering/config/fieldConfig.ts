@@ -1,6 +1,7 @@
 import type { FormSurface } from "../../schema/fieldParity";
 
 export type ComponentToken =
+  | "fuid"
   | "text"
   | "textarea"
   | "number"
@@ -18,6 +19,7 @@ export type ComponentToken =
   | "readonly-number"
   | "rare-bonus-block"
   | "martial-toggle"
+  | "offensive-toggle"
   | "autocomplete"
   // NPC-specific tokens
   | "npc-attr-slider"
@@ -41,23 +43,29 @@ export type OnChangeEffects<TFormState extends Record<string, unknown>> = {
   [K in keyof TFormState]?: (values: TFormState) => TFormState[K];
 } & { [path: string]: (values: TFormState) => unknown };
 
+export type FieldGridSize =
+  | "auto"
+  | "grow"
+  | number
+  | Partial<Record<"xs" | "sm" | "md" | "lg" | "xl", "auto" | "grow" | number>>;
+
 export interface FieldConfig<TFormState extends Record<string, unknown>> {
-  key: keyof TFormState & string;
+  key: string;
   kind: FieldKind;
-  label: string; // i18n key
+  label: string | ((state: TFormState) => string);
   component?: ComponentToken; // required for kind === "editable"
-  defaultValue?: TFormState[keyof TFormState];
+  defaultValue?: unknown;
   surfaces?: FormSurface[]; // omit to mean all three
   group?: string;
   order: number;
   componentProps?: Record<string, unknown>;
-  parse?: (raw: unknown) => TFormState[keyof TFormState];
-  format?: (value: TFormState[keyof TFormState]) => unknown;
+  parse?: (raw: unknown) => unknown;
+  format?: (value: unknown) => unknown;
   dependencies?: DependencyPredicate<TFormState>;
   onChangeEffects?: OnChangeEffects<TFormState>;
   validationHints?: { min?: number; max?: number; required?: boolean };
   fullWidth?: boolean;
-  gridSize?: "auto" | "grow" | number;
+  gridSize?: FieldGridSize;
 }
 
 export type ItemFieldConfig<TFormState extends Record<string, unknown>> =

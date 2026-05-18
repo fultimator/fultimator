@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 export const HoplosphereSchema = z.object({
   name: z.string().min(1),
@@ -7,7 +8,8 @@ export const HoplosphereSchema = z.object({
   requiredSlots: z.union([z.literal(1), z.literal(2)]),
   socketable: z.enum(["all", "weapon"]),
   cost: z.number().int().nonnegative(),
-  coagEffects: z.record(z.string()).default({}),
+  coagEffects: z.record(z.string(), z.string()).default({}),
+  meta: MetaSchema.optional(),
 });
 
 export type Hoplosphere = z.infer<typeof HoplosphereSchema>;

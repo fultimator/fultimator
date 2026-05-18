@@ -32,6 +32,11 @@ import { npcSpecialFieldConfig } from "../rendering/config/itemConfigs/npcSpecia
 import { npcActionFieldConfig } from "../rendering/config/itemConfigs/npcAction";
 import { qualityFieldConfig } from "../rendering/config/itemConfigs/quality";
 import { heroicFieldConfig } from "../rendering/config/itemConfigs/heroic";
+import { npcAttackFieldConfig } from "../rendering/config/itemConfigs/npcAttack";
+import { npcSpellFieldConfig } from "../rendering/config/itemConfigs/npcSpell";
+import { optionalFieldConfig } from "../rendering/config/itemConfigs/optional";
+import { mnemosphereFieldConfig } from "../rendering/config/itemConfigs/mnemosphere";
+import { hoplosphereFieldConfig } from "../rendering/config/itemConfigs/hoplosphere";
 import {
   createDefaultStateFromFields,
   createSchemaPayloadBuilder,
@@ -160,19 +165,23 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
   "npc-attack": {
     key: "npc-attack",
     label: labelByKey["npc-attack"],
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "npc-attack",
     exportDataType: "attacks",
     schema: NpcAttackSchema,
+    fields: npcAttackFieldConfig,
+    defaultState: () => createDefaultStateFromFields(npcAttackFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcAttackSchema),
   },
   "npc-spell": {
     key: "npc-spell",
     label: labelByKey["npc-spell"],
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "npc-spell",
     exportDataType: "spells",
     schema: NpcSpellSchema,
+    fields: npcSpellFieldConfig,
+    defaultState: () => createDefaultStateFromFields(npcSpellFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcSpellSchema),
   },
   class: {
@@ -187,15 +196,22 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
   optional: {
     key: "optional",
     label: labelByKey.optional,
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "optional",
     exportDataType: "optionals",
     schema: OptionalSchema,
+    fields: optionalFieldConfig,
+    defaultState: () => createDefaultStateFromFields(optionalFieldConfig),
     discriminatorKey: "subtype",
     subtypeDefinitions: Object.fromEntries(
       Object.entries(OptionalSubtypeSchemas).map(([subtype, schema]) => [
         subtype,
-        { schema, buildPayload: createSchemaPayloadBuilder(schema) },
+        {
+          schema: schema as unknown as typeof OptionalSchema,
+          buildPayload: createSchemaPayloadBuilder(
+            schema as unknown as typeof OptionalSchema,
+          ),
+        },
       ]),
     ),
     buildPayload: createSubtypePayloadBuilder(
@@ -206,19 +222,23 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
   mnemosphere: {
     key: "mnemosphere",
     label: labelByKey.mnemosphere,
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "mnemosphere",
     exportDataType: "mnemospheres",
     schema: MnemosphereSchema,
+    fields: mnemosphereFieldConfig,
+    defaultState: () => createDefaultStateFromFields(mnemosphereFieldConfig),
     buildPayload: createSchemaPayloadBuilder(MnemosphereSchema),
   },
   hoplosphere: {
     key: "hoplosphere",
     label: labelByKey.hoplosphere,
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "hoplosphere",
     exportDataType: "hoplospheres",
     schema: HoplosphereSchema,
+    fields: hoplosphereFieldConfig,
+    defaultState: () => createDefaultStateFromFields(hoplosphereFieldConfig),
     buildPayload: createSchemaPayloadBuilder(HoplosphereSchema),
   },
   "player-spell": {
@@ -232,7 +252,12 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     subtypeDefinitions: Object.fromEntries(
       Object.entries(PlayerSpellSubtypeSchemas).map(([subtype, schema]) => [
         subtype,
-        { schema, buildPayload: createSchemaPayloadBuilder(schema) },
+        {
+          schema: schema as unknown as typeof PlayerSpellSchema,
+          buildPayload: createSchemaPayloadBuilder(
+            schema as unknown as typeof PlayerSpellSchema,
+          ),
+        },
       ]),
     ),
     buildPayload: (state: unknown) => {

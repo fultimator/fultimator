@@ -9,6 +9,8 @@ export interface SurfaceFieldParity {
 const WEAPON_FIELDS = [
   "itemType",
   "name",
+  "description",
+  "book",
   "category",
   "range",
   "hands",
@@ -20,6 +22,7 @@ const WEAPON_FIELDS = [
   "quality",
   "cost",
   "special",
+  "meta",
   "base",
   "damageBonus",
   "damageReworkBonus",
@@ -35,6 +38,8 @@ const WEAPON_FIELDS = [
 const CUSTOM_WEAPON_FIELDS = [
   "itemType",
   "name",
+  "description",
+  "book",
   "category",
   "range",
   "hands",
@@ -57,6 +62,7 @@ const CUSTOM_WEAPON_FIELDS = [
   "secondDamage",
   "secondModifiers",
   "secondCustomizations",
+  "meta",
   "selectedQuality",
   "isEquipped",
   "dataType",

@@ -29,6 +29,7 @@ export function prepareMagicCheck(
     critThreshold: 6,
     spellName: spell.name,
     spellType: spell.spellType,
+    description: spell.description,
     baseDamage: spell.baseDamage ?? 0,
     damageType: spell.damageType ?? "physical",
     defense: spell.accuracyDefense ?? "mdef",

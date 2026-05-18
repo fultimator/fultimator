@@ -24,7 +24,8 @@ import {
 } from "@mui/material";
 import type { AutocompleteRenderGetTagProps } from "@mui/material";
 import { Clear, Search } from "@mui/icons-material";
-import { Martial, MartialOutline } from "../../components/icons";
+import { Martial, MartialOutline, OffensiveSpellIcon } from "../../components/icons";
+import FuidField from "../../components/common/FuidField";
 import CustomTextarea from "../../components/common/CustomTextarea";
 import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
 import ChangeAccuracyCheck from "../../routes/equip/customWeapons/ChangeAccuracyCheck";
@@ -85,6 +86,24 @@ export interface SelectGroup {
   options: SelectOption[];
 }
 
+export function FuidRenderer({
+  value,
+  onCommit,
+  componentProps,
+  disabled,
+}: FieldRendererProps) {
+  const name = (componentProps?.name as string) ?? "";
+  return (
+    <FuidField
+      value={(value as string | undefined)}
+      name={name}
+      onChange={(v) => onCommit(v)}
+      disabled={disabled}
+      autoSync
+    />
+  );
+}
+
 export function TextRenderer({
   label,
   value,
@@ -100,6 +119,7 @@ export function TextRenderer({
       disabled={disabled}
       fullWidth
       variant="outlined"
+      size="small"
     />
   );
 }
@@ -126,13 +146,14 @@ export function NumberRenderer({ label, value, onCommit }: FieldRendererProps) {
   const { t } = useTranslate();
   const n = (value as number) ?? 0;
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth size="small">
       <TextField
         label={t(label)}
         value={n}
         onChange={(e) => onCommit(Number(e.target.value))}
         type="number"
         variant="outlined"
+        size="small"
         color={n > 0 ? "success" : n < 0 ? "error" : "primary"}
         focused={n !== 0}
       />
@@ -178,11 +199,39 @@ export function MartialToggleRenderer({
         border: "1px solid",
         borderColor: active ? "secondary.main" : "divider",
         borderRadius: 1,
-        p: 1,
-        "& svg": { width: 28, height: 28 },
+        width: 40,
+        height: 40,
+        "& svg": { width: 20, height: 20 },
       }}
     >
       {active ? <Martial /> : <MartialOutline />}
+    </IconButton>
+  );
+}
+
+export function OffensiveToggleRenderer({
+  value,
+  onCommit,
+  disabled,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const active = (value as boolean) ?? false;
+  return (
+    <IconButton
+      onClick={() => onCommit(!active)}
+      disabled={disabled}
+      title={t("Offensive")}
+      color={active ? "secondary" : "default"}
+      sx={{
+        border: "1px solid",
+        borderColor: active ? "secondary.main" : "divider",
+        borderRadius: 1,
+        width: 40,
+        height: 40,
+        "& svg": { width: 20, height: 20 },
+      }}
+    >
+      <OffensiveSpellIcon />
     </IconButton>
   );
 }
@@ -204,9 +253,11 @@ export function SelectRenderer({
   const normalizedValue = multiple
     ? ((value as string[]) ?? [])
     : ((value as string | number) ?? "");
+  const labelForValue = (selected: string | number) =>
+    t(options.find((opt) => opt.value === selected)?.label ?? String(selected));
 
   return (
-    <FormControl variant="outlined" fullWidth>
+    <FormControl variant="outlined" fullWidth size="small">
       <InputLabel id={labelId}>{t(label)}</InputLabel>
       <Select
         labelId={labelId}
@@ -215,6 +266,12 @@ export function SelectRenderer({
         multiple={multiple}
         onChange={(e) => onCommit(e.target.value)}
         disabled={disabled}
+        renderValue={(selected) => {
+          if (Array.isArray(selected)) {
+            return selected.map((entry) => labelForValue(entry)).join(", ");
+          }
+          return labelForValue(selected as string | number);
+        }}
         startAdornment={
           onBrowse ? (
             <InputAdornment position="start">
@@ -244,7 +301,11 @@ export function SelectRenderer({
                 sx={{ p: 0, mr: 1 }}
               />
             )}
-            <ListItemText primary={t(opt.label)} />
+            {multiple ? (
+              <ListItemText primary={t(opt.label)} />
+            ) : (
+              t(opt.label)
+            )}
           </MenuItem>
         ))}
       </Select>
@@ -280,7 +341,7 @@ export function GroupedSelectRenderer({
   const onBrowse = componentProps?.onBrowse as (() => void) | undefined;
 
   return (
-    <FormControl variant="outlined" fullWidth>
+    <FormControl variant="outlined" fullWidth size="small">
       <InputLabel id={labelId}>{t(label)}</InputLabel>
       <Select
         labelId={labelId}
@@ -331,7 +392,7 @@ export function TypeSelectRenderer({
   const labelId = `type-select-${label}`;
   const current = (value as string) ?? "";
   return (
-    <FormControl variant="outlined" fullWidth>
+    <FormControl variant="outlined" fullWidth size="small">
       <InputLabel id={labelId}>{t(label)}</InputLabel>
       <Select
         labelId={labelId}
@@ -388,7 +449,7 @@ export function AccuracyAttrPairRenderer({
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <FormControl variant="outlined" fullWidth>
+        <FormControl variant="outlined" fullWidth size="small">
           <InputLabel id="override-acc-attr1">{t("Attribute 1")}</InputLabel>
           <Select
             labelId="override-acc-attr1"
@@ -405,7 +466,7 @@ export function AccuracyAttrPairRenderer({
         </FormControl>
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <FormControl variant="outlined" fullWidth>
+        <FormControl variant="outlined" fullWidth size="small">
           <InputLabel id="override-acc-attr2">{t("Attribute 2")}</InputLabel>
           <Select
             labelId="override-acc-attr2"
@@ -719,7 +780,7 @@ export function NpcArmorSelectRenderer({
     (value as { name?: string } | undefined)?.name ?? items[0]?.name ?? "";
 
   return (
-    <FormControl fullWidth disabled={disabled}>
+    <FormControl fullWidth size="small" disabled={disabled}>
       <InputLabel>{t(label)}</InputLabel>
       <Select
         value={currentName}

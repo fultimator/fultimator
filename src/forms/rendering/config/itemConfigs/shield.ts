@@ -73,6 +73,16 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     },
   },
   {
+    key: "fuid",
+    kind: "editable",
+    label: "ID",
+    component: "fuid",
+    defaultValue: "",
+    group: G.core,
+    order: -1,
+    gridSize: 12,
+  },
+  {
     key: "name",
     kind: "editable",
     label: "shield.name",
@@ -81,6 +91,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     group: G.core,
     order: 1,
     validationHints: { required: true },
+    gridSize: "grow",
   },
   {
     key: "martial",
@@ -88,7 +99,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     label: "shield.martial",
     component: "martial-toggle",
     defaultValue: false,
-    group: G.base,
+    group: G.core,
     order: 2,
     gridSize: "auto",
   },

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 export const MnemosphereSchema = z.looseObject({
   fuid: z.string().optional(),
@@ -9,6 +10,7 @@ export const MnemosphereSchema = z.looseObject({
   skills: z.array(z.unknown()).optional(),
   heroic: z.array(z.unknown()).optional(),
   spells: z.array(z.unknown()).optional(),
+  meta: MetaSchema.optional(),
 });
 
 export type Mnemosphere = z.infer<typeof MnemosphereSchema>;

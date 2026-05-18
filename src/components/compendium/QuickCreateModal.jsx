@@ -18,14 +18,12 @@ import {
   ToggleButton,
   Autocomplete,
   Chip,
-  OutlinedInput,
   Button,
   Stack,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Tooltip,
-  Divider,
   ListSubheader,
   FormControlLabel,
   Checkbox,
@@ -47,7 +45,6 @@ import { useTranslate } from "../../translation/translate";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { calculateCustomWeaponStats } from "../player/common/playerCalculations";
 import types from "../../libs/types";
-import classList from "../../libs/classes";
 import spellClassesList from "../../libs/spellClasses";
 import specialSkillsList from "../../libs/skills";
 import weapons from "../../libs/weapons";
@@ -134,9 +131,13 @@ import { accessoryFieldConfig } from "../../forms/rendering/config/itemConfigs/a
 import { customWeaponFieldConfig } from "../../forms/rendering/config/itemConfigs/customWeapon";
 import { npcActionFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAction";
 import { npcSpecialFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpecial";
+import { npcAttackFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAttack";
+import { npcSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpell";
 import { qualityFieldConfig } from "../../forms/rendering/config/itemConfigs/quality";
 import { heroicFieldConfig } from "../../forms/rendering/config/itemConfigs/heroic";
+import { hoplosphereFieldConfig } from "../../forms/rendering/config/itemConfigs/hoplosphere";
 import { createDefaultStateFromFields } from "../../forms/registry/helpers";
+import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
 
 // Shared constants
 const slugify = (value = "") =>
@@ -152,23 +153,6 @@ const ATTRS = [
   { value: "might", label: "MIG" },
   { value: "will", label: "WLP" },
 ];
-const ATTRIBUTE_OPTIONS = ATTRS.map((attr) => attr.value);
-
-function isValidAttribute(value) {
-  return ATTRIBUTE_OPTIONS.includes(value);
-}
-
-function normalizeCustomWeaponAccuracyCheck(
-  value,
-  fallback = cwAccuracyChecks[0],
-) {
-  const att1 = Array.isArray(value) ? value[0] : value?.att1;
-  const att2 = Array.isArray(value) ? value[1] : value?.att2;
-  if (isValidAttribute(att1) && isValidAttribute(att2)) {
-    return { att1, att2 };
-  }
-  return fallback;
-}
 
 function renderDamageTypeValue(typeValue, t) {
   if (!typeValue || typeValue === "nodmg") return t("No Damage");
@@ -179,22 +163,6 @@ function renderDamageTypeValue(typeValue, t) {
       <TypeIcon type={typeValue} />
       <span>{label}</span>
     </Box>
-  );
-}
-
-function findCustomWeaponPresetAccuracyCheck(value) {
-  const normalized = normalizeCustomWeaponAccuracyCheck(value);
-  return (
-    cwAccuracyChecks.find(
-      (check) =>
-        check.att1 === normalized.att1 && check.att2 === normalized.att2,
-    ) ?? null
-  );
-}
-
-function hasAccurateCustomization(customizationList) {
-  return (customizationList ?? []).some(
-    (customization) => customization.name === "weapon_customization_accurate",
   );
 }
 
@@ -224,6 +192,16 @@ const CLASS_BOOK_SUGGESTIONS = [
   "natural",
   "homebrew",
 ];
+
+function createMetaFromBook(bookValue = "homebrew") {
+  const book = String(bookValue ?? "").trim() || "homebrew";
+  return {
+    book,
+    page: undefined,
+    bookName: "",
+    isOfficial: deriveIsOfficial(book),
+  };
+}
 // Only classes that use standard spells (spellType: "default")
 const STANDARD_SPELL_CLASSES = [
   "Chimerist",
@@ -314,218 +292,81 @@ function PanelLayout({
 
 function NpcAttackPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [fuid, setFuid] = useState(undefined);
-  const [range, setRange] = useState("melee");
-  const [attr1, setAttr1] = useState("dexterity");
-  const [attr2, setAttr2] = useState("dexterity");
-  const [dmgType, setDmgType] = useState("physical");
-  const [special, setSpecial] = useState("");
-  const [accuracyValue, setAccuracyValue] = useState(0);
-  const [damageValue, setDamageValue] = useState(0);
-  const [hrZero, setHrZero] = useState(false);
-
+  const buildState = () => createDefaultStateFromFields(npcAttackFieldConfig);
+  const [formState, setFormState] = useState(() => buildState());
   const data = {
-    itemType: "basic",
-    name: name.trim(),
-    fuid: fuid || undefined,
-    range,
-    accuracy: { attr1, attr2, value: Number(accuracyValue), defense: "def" },
-    damage: { value: Number(damageValue), type: dmgType, hrZero },
-    martial: false,
-    category: range === "melee" ? "Melee Attack" : "Ranged Attack",
-    special: special.trim() ? [special.trim()] : [],
+    ...formState,
+    name: String(formState.name ?? "").trim(),
+    fuid: formState.fuid || undefined,
   };
 
   const handleClear = () => {
-    setName("");
-    setFuid(undefined);
-    setRange("melee");
-    setAttr1("dexterity");
-    setAttr2("dexterity");
-    setDmgType("physical");
-    setSpecial("");
-    setAccuracyValue(0);
-    setDamageValue(0);
-    setHrZero(false);
+    setFormState(buildState());
   };
 
   return (
-    <>
-      <PanelLayout
-        data={data}
-        itemName={data.name || ""}
-        formContent={
-          <Grid container spacing={2}>
-            <Grid size={12}>
-              <TextField
-                label={t("Name")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                fullWidth
-                size="small"
-                autoFocus
-              />
-            </Grid>
-            <Grid size={12} sx={{ order: -1 }}>
-              <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
-            </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Range")}</InputLabel>
-                <Select
-                  value={range}
-                  label={t("Range")}
-                  onChange={(e) => setRange(e.target.value)}
-                >
-                  <MenuItem value="melee">{t("Melee")}</MenuItem>
-                  <MenuItem value="ranged">{t("Ranged")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                sm: 3,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Attr 1")}</InputLabel>
-                <Select
-                  value={attr1}
-                  label={t("Attr 1")}
-                  onChange={(e) => setAttr1(e.target.value)}
-                >
-                  {ATTRS.map((a) => (
-                    <MenuItem key={a.value} value={a.value}>
-                      {a.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                sm: 3,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Attr 2")}</InputLabel>
-                <Select
-                  value={attr2}
-                  label={t("Attr 2")}
-                  onChange={(e) => setAttr2(e.target.value)}
-                >
-                  {ATTRS.map((a) => (
-                    <MenuItem key={a.value} value={a.value}>
-                      {a.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Damage Type")}</InputLabel>
-                <Select
-                  value={dmgType}
-                  label={t("Damage Type")}
-                  onChange={(e) => setDmgType(e.target.value)}
-                  renderValue={(selected) => renderDamageTypeValue(selected, t)}
-                >
-                  {Object.keys(types).map((type) => (
-                    <MenuItem key={type} value={type}>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <TypeIcon type={type} />
-                        <span>
-                          {String(types[type].long).replace(/\b\w/g, (char) =>
-                            char.toUpperCase(),
-                          )}
-                        </span>
-                      </Box>
-                    </MenuItem>
-                  ))}
-                  <MenuItem value="nodmg">{t("No Damage")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                label={t("Accuracy Bonus")}
-                value={accuracyValue}
-                onChange={(e) => setAccuracyValue(e.target.value)}
-                fullWidth
-                size="small"
-                type="number"
-                slotProps={{
-                  htmlInput: { min: 0 },
-                }}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                label={t("Damage Value")}
-                value={damageValue}
-                onChange={(e) => setDamageValue(e.target.value)}
-                fullWidth
-                size="small"
-                type="number"
-                slotProps={{
-                  htmlInput: { min: 0 },
-                }}
-              />
-            </Grid>
-            <Grid size={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={hrZero}
-                    onChange={(e) => setHrZero(e.target.checked)}
-                    size="small"
-                  />
-                }
-                label="HR0"
-              />
-            </Grid>
-            <Grid size={12}>
-              <CustomTextarea
-                label={t("Special")}
-                value={special}
-                onChange={(e) => setSpecial(e.target.value)}
-                helperText=""
-                placeholder={t("Optional special effect description")}
-              />
-            </Grid>
-            <Grid size={12}>
-              <Button size="small" variant="outlined" onClick={handleClear}>
-                {t("Clear All Fields")}
-              </Button>
-            </Grid>
-          </Grid>
-        }
-        previewContent={<SharedAttackCard item={data} />}
-        addButton={
-          <AddToCompendiumButton
-            itemType={REG["npc-attack"].addItemType}
-            data={data}
+    <PanelLayout
+      data={data}
+      itemName={data.name || ""}
+      formContent={
+        <Grid container spacing={2}>
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+            extraProps={{ name: String(formState.name ?? "") }}
           />
-        }
-        exportDataType={REG["npc-attack"].exportDataType}
-      />
-    </>
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="accuracy"
+            label={t("Accuracy")}
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="damage"
+            label={t("Damage")}
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="special"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            label={t("Metadata")}
+            cols={2}
+          />
+          <Grid size={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>
+              {t("Clear All Fields")}
+            </Button>
+          </Grid>
+        </Grid>
+      }
+      previewContent={<SharedAttackCard item={data} />}
+      addButton={
+        <AddToCompendiumButton itemType={REG["npc-attack"].addItemType} data={data} />
+      }
+      exportDataType={REG["npc-attack"].exportDataType}
+    />
   );
 }
 
@@ -533,322 +374,75 @@ function NpcAttackPanel() {
 
 function NpcSpellPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [fuid, setFuid] = useState(undefined);
-  const [isOffensive, setIsOffensive] = useState(false);
-  const [mp, setMp] = useState("1");
-  const [perTarget, setPerTarget] = useState(true);
-  const [maxTargets, setMaxTargets] = useState("1");
-  const [duration, setDuration] = useState("");
-  const [target, setTarget] = useState("");
-  const [range, setRange] = useState("melee");
-  const [attr1, setAttr1] = useState("dexterity");
-  const [attr2, setAttr2] = useState("dexterity");
-  const [dmgType, setDmgType] = useState("physical");
-  const [damage, setDamage] = useState("");
-  const [hrZero, setHrZero] = useState(false);
-  const [special, setSpecial] = useState("");
-
+  const buildState = () => createDefaultStateFromFields(npcSpellFieldConfig);
+  const [formState, setFormState] = useState(() => buildState());
   const data = {
-    itemType: "spell",
-    name: name.trim(),
-    fuid: fuid || undefined,
-    isOffensive,
-    damage: {
-      value: isOffensive && damage !== "" ? Number(damage) : 0,
-      type: dmgType,
-      hrZero,
-    },
-    cost: { resource: "mp", amount: mp === "" ? 0 : Number(mp), perTarget },
-    maxTargets: maxTargets === "" ? undefined : Number(maxTargets),
-    duration: duration || undefined,
-    targetDescription: target || undefined,
-    range,
-    accuracy: { attr1, attr2, value: 0, defense: "mdef" },
-    special: special.trim() ? [special.trim()] : [],
+    ...formState,
+    name: String(formState.name ?? "").trim(),
+    fuid: formState.fuid || undefined,
   };
 
   const handleClear = () => {
-    setName("");
-    setFuid(undefined);
-    setIsOffensive(false);
-    setMp("1");
-    setPerTarget(true);
-    setMaxTargets("1");
-    setDuration("");
-    setTarget("");
-    setRange("melee");
-    setAttr1("dexterity");
-    setAttr2("dexterity");
-    setDmgType("physical");
-    setDamage("");
-    setHrZero(false);
-    setSpecial("");
+    setFormState(buildState());
   };
 
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 10,
-              sm: 11,
-            }}
-          >
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid size={12} sx={{ order: -1 }}>
-            <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
-          </Grid>
-          <Grid
-            size={{
-              xs: 2,
-              sm: 1,
-            }}
-          >
-            <ToggleButton
-              value="offensive"
-              selected={isOffensive}
-              onChange={() => setIsOffensive((v) => !v)}
-              size="small"
-              sx={{ width: "100%" }}
-            >
-              <OffensiveSpellIcon />
-            </ToggleButton>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
-          >
-            <TextField
-              label={perTarget ? t("MP x Target") : t("MP")}
-              value={mp}
-              onChange={(e) => setMp(e.target.value)}
-              sx={{ flex: 1 }}
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-            <Tooltip title={t("Cost is per target hit")}>
-              <Switch
-                size="small"
-                checked={perTarget}
-                onChange={(e) => setPerTarget(e.target.checked)}
-              />
-            </Tooltip>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <TextField
-              label={t("Max Targets")}
-              value={maxTargets}
-              onChange={(e) => setMaxTargets(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <Autocomplete
-              freeSolo
-              options={DURATION_OPTIONS.map(t)}
-              inputValue={duration}
-              onInputChange={(_, v) => setDuration(v)}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Duration")} size="small" />
-              )}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <Autocomplete
-              freeSolo
-              options={TARGET_OPTIONS.map(t)}
-              inputValue={target}
-              onInputChange={(_, v) => {
-                setTarget(v);
-                if (["Self", "One creature", "One equipped weapon"].includes(v))
-                  setPerTarget(false);
-                else if (v.startsWith("Up to")) setPerTarget(true);
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Target")} size="small" />
-              )}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Range")}</InputLabel>
-              <Select
-                value={range}
-                label={t("Range")}
-                onChange={(e) => setRange(e.target.value)}
-              >
-                <MenuItem value="melee">{t("Melee")}</MenuItem>
-                <MenuItem value="ranged">{t("Ranged")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          {isOffensive && (
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Damage Type")}</InputLabel>
-                <Select
-                  value={dmgType}
-                  label={t("Damage Type")}
-                  onChange={(e) => setDmgType(e.target.value)}
-                  renderValue={(selected) => renderDamageTypeValue(selected, t)}
-                >
-                  {Object.keys(types).map((type) => (
-                    <MenuItem key={type} value={type}>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <TypeIcon type={type} />
-                        <span>
-                          {String(types[type].long).replace(/\b\w/g, (char) =>
-                            char.toUpperCase(),
-                          )}
-                        </span>
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
-          {isOffensive && (
-            <Grid
-              size={{
-                xs: 6,
-                sm: 3,
-              }}
-            >
-              <TextField
-                label={t("Damage")}
-                value={damage}
-                onChange={(e) => setDamage(e.target.value)}
-                fullWidth
-                size="small"
-                type="number"
-                slotProps={{
-                  htmlInput: { min: 0 },
-                }}
-              />
-            </Grid>
-          )}
-          {isOffensive && (
-            <Grid
-              size={{
-                xs: 6,
-                sm: 3,
-              }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={hrZero}
-                    onChange={(e) => setHrZero(e.target.checked)}
-                    size="small"
-                  />
-                }
-                label="HR0"
-              />
-            </Grid>
-          )}
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 1")}</InputLabel>
-              <Select
-                value={attr1}
-                label={t("Attr 1")}
-                onChange={(e) => setAttr1(e.target.value)}
-              >
-                {ATTRS.map((a) => (
-                  <MenuItem key={a.value} value={a.value}>
-                    {a.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 2")}</InputLabel>
-              <Select
-                value={attr2}
-                label={t("Attr 2")}
-                onChange={(e) => setAttr2(e.target.value)}
-              >
-                {ATTRS.map((a) => (
-                  <MenuItem key={a.value} value={a.value}>
-                    {a.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Special")}
-              value={special}
-              onChange={(e) => setSpecial(e.target.value)}
-              helperText=""
-              placeholder={t("Spell effect description")}
-            />
-          </Grid>
+        <Grid container spacing={2}>
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+            extraProps={{ name: String(formState.name ?? "") }}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="accuracy"
+            label={t("Accuracy")}
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="damage"
+            label={t("Damage")}
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="details"
+            label={t("Details")}
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="special"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            label={t("Metadata")}
+            cols={2}
+          />
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -857,15 +451,10 @@ function NpcSpellPanel() {
         </Grid>
       }
       previewContent={
-        <SharedSpellCard
-          item={{ ...data, effect: data.special?.join("; ") ?? "" }}
-        />
+        <SharedSpellCard item={{ ...data, effect: data.special?.join("; ") ?? "" }} />
       }
       addButton={
-        <AddToCompendiumButton
-          itemType={REG["npc-spell"].addItemType}
-          data={data}
-        />
+        <AddToCompendiumButton itemType={REG["npc-spell"].addItemType} data={data} />
       }
       data={data}
       itemName={data.name}
@@ -881,27 +470,17 @@ function NpcSpecialPanel() {
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(npcSpecialFieldConfig),
   );
-  const [fuid, setFuid] = useState(undefined);
 
-  const data = { ...formState, fuid: fuid || undefined };
+  const data = { ...formState, fuid: formState.fuid || undefined };
 
   const handleClear = () => {
     setFormState(createDefaultStateFromFields(npcSpecialFieldConfig));
-    setFuid(undefined);
   };
 
   return (
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
-          <Grid size={12} sx={{ order: -1 }}>
-            <FuidField
-              value={fuid}
-              name={formState.name}
-              onChange={setFuid}
-              autoSync
-            />
-          </Grid>
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
             state={formState}
@@ -909,6 +488,7 @@ function NpcSpecialPanel() {
             surface="edit"
             group="core"
             cols={2}
+            extraProps={{ name: String(formState.name ?? "") }}
           />
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
@@ -955,27 +535,17 @@ function NpcActionPanel() {
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(npcActionFieldConfig),
   );
-  const [fuid, setFuid] = useState(undefined);
 
-  const data = { ...formState, fuid: fuid || undefined };
+  const data = { ...formState, fuid: formState.fuid || undefined };
 
   const handleClear = () => {
     setFormState(createDefaultStateFromFields(npcActionFieldConfig));
-    setFuid(undefined);
   };
 
   return (
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
-          <Grid size={12} sx={{ order: -1 }}>
-            <FuidField
-              value={fuid}
-              name={formState.name}
-              onChange={setFuid}
-              autoSync
-            />
-          </Grid>
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
             state={formState}
@@ -983,6 +553,7 @@ function NpcActionPanel() {
             surface="edit"
             group="core"
             cols={2}
+            extraProps={{ name: String(formState.name ?? "") }}
           />
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
@@ -1344,7 +915,6 @@ function PlayerSpellPanel() {
                   type: "pilot_module_weapon",
                   category: weaponCategory,
                   cost: Number(moduleCost) || 0,
-                  damage: Number(moduleDamage) || 0,
                   accuracy: {
                     attr1: pilotAtt1,
                     attr2: pilotAtt2,
@@ -1433,6 +1003,14 @@ function PlayerSpellPanel() {
               sx={{ alignItems: "center", mt: 0, ml: 0 }}
             >
               <Grid size={12}>
+                <FuidField
+                  value={fuid}
+                  name={name}
+                  onChange={setFuid}
+                  autoSync
+                />
+              </Grid>
+              <Grid size={12}>
                 <TextField
                   label={t("Name")}
                   value={name}
@@ -1440,14 +1018,6 @@ function PlayerSpellPanel() {
                   fullWidth
                   size="small"
                   autoFocus
-                />
-              </Grid>
-              <Grid size={12} sx={{ order: -1 }}>
-                <FuidField
-                  value={fuid}
-                  name={name}
-                  onChange={setFuid}
-                  autoSync
                 />
               </Grid>
 
@@ -2219,6 +1789,14 @@ function PlayerSpellPanel() {
             </Grid>
           ) : (
             <>
+              <Grid size={12}>
+                <FuidField
+                  value={fuid}
+                  name={name}
+                  onChange={setFuid}
+                  autoSync
+                />
+              </Grid>
               <Grid
                 size={{
                   xs: 10,
@@ -2232,14 +1810,6 @@ function PlayerSpellPanel() {
                   fullWidth
                   size="small"
                   autoFocus
-                />
-              </Grid>
-              <Grid size={12} sx={{ order: -1 }}>
-                <FuidField
-                  value={fuid}
-                  name={name}
-                  onChange={setFuid}
-                  autoSync
                 />
               </Grid>
               <Grid
@@ -2532,14 +2102,12 @@ function QualityPanel() {
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(qualityFieldConfig),
   );
-  const [fuid, setFuid] = useState(undefined);
   const [qualityTab, setQualityTab] = useState(0);
 
-  const data = { ...formState, fuid: fuid || undefined };
+  const data = { ...formState, fuid: formState.fuid || undefined };
 
   const handleClear = () => {
     setFormState(createDefaultStateFromFields(qualityFieldConfig));
-    setFuid(undefined);
   };
 
   return (
@@ -2584,14 +2152,6 @@ function QualityPanel() {
                   size="small"
                 />
               </Grid>
-              <Grid size={12} sx={{ order: -1 }}>
-                <FuidField
-                  value={fuid}
-                  name={formState.name}
-                  onChange={setFuid}
-                  autoSync
-                />
-              </Grid>
               <SchemaFieldRenderer
                 config={qualityFieldConfig}
                 state={formState}
@@ -2599,6 +2159,7 @@ function QualityPanel() {
                 surface="edit"
                 group="core"
                 cols={2}
+                extraProps={{ name: String(formState.name ?? "") }}
               />
               <SchemaFieldRenderer
                 config={qualityFieldConfig}
@@ -2648,27 +2209,17 @@ function HeroicPanel() {
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(heroicFieldConfig),
   );
-  const [fuid, setFuid] = useState(undefined);
 
-  const data = { ...formState, fuid: fuid || undefined };
+  const data = { ...formState, fuid: formState.fuid || undefined };
 
   const handleClear = () => {
     setFormState(createDefaultStateFromFields(heroicFieldConfig));
-    setFuid(undefined);
   };
 
   return (
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
-          <Grid size={12} sx={{ order: -1 }}>
-            <FuidField
-              value={fuid}
-              name={formState.name}
-              onChange={setFuid}
-              autoSync
-            />
-          </Grid>
           <SchemaFieldRenderer
             config={heroicFieldConfig}
             state={formState}
@@ -2676,6 +2227,7 @@ function HeroicPanel() {
             surface="edit"
             group="core"
             cols={2}
+            extraProps={{ name: String(formState.name ?? "") }}
           />
           <SchemaFieldRenderer
             config={heroicFieldConfig}
@@ -2761,6 +2313,7 @@ function ClassPanel() {
     name: name.trim(),
     fuid: fuid || undefined,
     book: book.trim() || "homebrew",
+    meta: createMetaFromBook(book),
     benefits: {
       hpplus: Number(hpplus) || 0,
       mpplus: Number(mpplus) || 0,
@@ -2794,6 +2347,9 @@ function ClassPanel() {
       <PanelLayout
         formContent={
           <Grid container spacing={2}>
+            <Grid size={12}>
+              <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
+            </Grid>
             <Grid
               size={{
                 xs: 8,
@@ -2832,9 +2388,6 @@ function ClassPanel() {
                   />
                 )}
               />
-            </Grid>
-            <Grid size={12} sx={{ order: -1 }}>
-              <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
             </Grid>
 
             <Grid size={12}>
@@ -3025,6 +2578,13 @@ function ClassPanel() {
                   }}
                 >
                   <Grid container spacing={1}>
+                    <Grid size={12}>
+                      <FuidField
+                        value={skill.fuid}
+                        name={skill.skillName}
+                        onChange={(v) => updateSkillField(i, "fuid", v)}
+                      />
+                    </Grid>
                     <Grid
                       size={{
                         xs: 9,
@@ -3074,13 +2634,6 @@ function ClassPanel() {
                         slotProps={{
                           htmlInput: { min: 1, max: 10 },
                         }}
-                      />
-                    </Grid>
-                    <Grid size={12} sx={{ order: -1 }}>
-                      <FuidField
-                        value={skill.fuid}
-                        name={skill.skillName}
-                        onChange={(v) => updateSkillField(i, "fuid", v)}
                       />
                     </Grid>
                     <Grid size={12}>
@@ -3178,6 +2731,7 @@ function ClassPanel() {
 function buildWeaponPanelState() {
   const base = weapons[0];
   return {
+    fuid: undefined,
     base,
     name: base.name,
     category: base.category ?? "",
@@ -3270,7 +2824,6 @@ function QualityPickerDialog({ open, onClose, onSelect, filterType }) {
 function WeaponPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildWeaponPanelState);
-  const [fuid, setFuid] = useState(undefined);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const {
@@ -3328,7 +2881,7 @@ function WeaponPanel() {
   const weaponObj = normalizeWeaponLike({
     base,
     name,
-    fuid: fuid || undefined,
+    fuid: formState.fuid || undefined,
     category,
     range: getWeaponRange(base),
     type,
@@ -3365,7 +2918,6 @@ function WeaponPanel() {
 
   const handleClear = () => {
     setFormState(buildWeaponPanelState());
-    setFuid(undefined);
   };
 
   return (
@@ -3387,10 +2939,8 @@ function WeaponPanel() {
                 group="core"
                 label={t("Weapon")}
                 cols={2}
+                extraProps={{ name: String(name ?? "") }}
               />
-            </Grid>
-            <Grid size={12} sx={{ order: -1 }}>
-              <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -3505,6 +3055,7 @@ function WeaponPanel() {
 function buildArmorPanelState() {
   const base = armor[0];
   return {
+    fuid: undefined,
     itemType: "armor",
     base,
     name: base.name,
@@ -3534,7 +3085,6 @@ function buildArmorPanelState() {
 function ArmorPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildArmorPanelState);
-  const [fuid, setFuid] = useState(undefined);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { base, name, quality, cost } = formState;
@@ -3543,7 +3093,7 @@ function ArmorPanel() {
     base,
     ...base,
     name,
-    fuid: fuid || undefined,
+    fuid: formState.fuid || undefined,
     cost,
     quality,
     qualityCost: formState.qualityCost,
@@ -3571,7 +3121,6 @@ function ArmorPanel() {
 
   const handleClear = () => {
     setFormState(buildArmorPanelState());
-    setFuid(undefined);
   };
 
   return (
@@ -3588,10 +3137,8 @@ function ArmorPanel() {
                 group="core"
                 label={t("Armor")}
                 cols={2}
+                extraProps={{ name: String(name ?? "") }}
               />
-            </Grid>
-            <Grid size={12} sx={{ order: -1 }}>
-              <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -3657,6 +3204,7 @@ function ArmorPanel() {
 function buildShieldPanelState() {
   const base = shields[0];
   return {
+    fuid: undefined,
     itemType: "shield",
     base,
     name: base.name,
@@ -3683,7 +3231,6 @@ function buildShieldPanelState() {
 function ShieldPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildShieldPanelState);
-  const [fuid, setFuid] = useState(undefined);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { base, name, quality, cost } = formState;
@@ -3692,7 +3239,7 @@ function ShieldPanel() {
     base,
     ...base,
     name,
-    fuid: fuid || undefined,
+    fuid: formState.fuid || undefined,
     cost,
     quality,
     qualityCost: formState.qualityCost,
@@ -3720,7 +3267,6 @@ function ShieldPanel() {
 
   const handleClear = () => {
     setFormState(buildShieldPanelState());
-    setFuid(undefined);
   };
 
   return (
@@ -3737,10 +3283,8 @@ function ShieldPanel() {
                 group="core"
                 label={t("Shield")}
                 cols={2}
+                extraProps={{ name: String(name ?? "") }}
               />
-            </Grid>
-            <Grid size={12} sx={{ order: -1 }}>
-              <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -3805,6 +3349,7 @@ function ShieldPanel() {
 
 function buildCWPanelState() {
   return {
+    fuid: undefined,
     itemType: "customWeapon",
     name: "",
     category: cwCategories[0],
@@ -3880,7 +3425,6 @@ function buildCWPanelState() {
 function CustomWeaponPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildCWPanelState);
-  const [fuid, setFuid] = useState(undefined);
   const [modifiersExpanded, setModifiersExpanded] = useState(false);
   const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
@@ -3971,7 +3515,7 @@ function CustomWeaponPanel() {
 
   const weaponObj = normalizeCustomWeaponLike({
     name: formState.name,
-    fuid: fuid || undefined,
+    fuid: formState.fuid || undefined,
     category: selectedCategory,
     range: formState.selectedRange,
     accuracy: {
@@ -4032,7 +3576,6 @@ function CustomWeaponPanel() {
 
   const handleClear = () => {
     setFormState(buildCWPanelState());
-    setFuid(undefined);
     setModifiersExpanded(false);
     setSecondModifiersExpanded(false);
   };
@@ -4067,15 +3610,7 @@ function CustomWeaponPanel() {
                 group="core"
                 label={t("Custom Weapon")}
                 cols={2}
-                extraProps={coreExtraProps}
-              />
-            </Grid>
-            <Grid size={12} sx={{ order: -1 }}>
-              <FuidField
-                value={fuid}
-                name={formState.name}
-                onChange={setFuid}
-                autoSync
+                extraProps={{ ...coreExtraProps, name: String(formState.name ?? "") }}
               />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
@@ -4230,6 +3765,7 @@ function CustomWeaponPanel() {
 
 function buildAccessoryPanelState() {
   return {
+    fuid: undefined,
     itemType: "accessory",
     name: "",
     quality: "",
@@ -4250,14 +3786,13 @@ function buildAccessoryPanelState() {
 function AccessoryPanel() {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(buildAccessoryPanelState);
-  const [fuid, setFuid] = useState(undefined);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const { name, quality, cost } = formState;
 
   const accessoryObj = {
     name,
-    fuid: fuid || undefined,
+    fuid: formState.fuid || undefined,
     cost,
     quality,
     qualityCost: formState.qualityCost,
@@ -4282,7 +3817,6 @@ function AccessoryPanel() {
 
   const handleClear = () => {
     setFormState(buildAccessoryPanelState());
-    setFuid(undefined);
   };
 
   return (
@@ -4299,10 +3833,8 @@ function AccessoryPanel() {
                 group="core"
                 label={t("Accessory")}
                 cols={2}
+                extraProps={{ name: String(name ?? "") }}
               />
-            </Grid>
-            <Grid size={12} sx={{ order: -1 }}>
-              <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
@@ -4425,6 +3957,7 @@ function OptionalPanel() {
           fuid: fuid || undefined,
           description: description.trim(),
           effect: effect.trim(),
+          meta: createMetaFromBook("homebrew"),
         }
       : subtype === "camp-activities"
         ? {
@@ -4433,6 +3966,7 @@ function OptionalPanel() {
             fuid: fuid || undefined,
             description: targetDescription.trim(),
             effect: effect.trim(),
+            meta: createMetaFromBook("homebrew"),
           }
         : subtype === "zero-trigger" || subtype === "zero-effect"
           ? {
@@ -4440,6 +3974,7 @@ function OptionalPanel() {
               name: name.trim(),
               fuid: fuid || undefined,
               description: description.trim(),
+              meta: createMetaFromBook("homebrew"),
             }
           : subtype === "zero-power"
             ? {
@@ -4461,6 +3996,7 @@ function OptionalPanel() {
                     }
                   : "",
                 clock: { sections: Number(clockSections) },
+                meta: createMetaFromBook("homebrew"),
               }
             : /* other */ {
                 subtype,
@@ -4471,6 +4007,7 @@ function OptionalPanel() {
                 ...(showClock
                   ? { clock: { sections: Number(clockSections) } }
                   : {}),
+                meta: createMetaFromBook("homebrew"),
               };
 
   const handleClear = () => {
@@ -4492,6 +4029,9 @@ function OptionalPanel() {
       itemName={data.name || ""}
       formContent={
         <Grid container spacing={2}>
+          <Grid size={12}>
+            <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
+          </Grid>
           <Grid
             size={{
               xs: 12,
@@ -4506,9 +4046,6 @@ function OptionalPanel() {
               size="small"
               autoFocus
             />
-          </Grid>
-          <Grid size={12} sx={{ order: -1 }}>
-            <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
           </Grid>
           <Grid
             size={{
@@ -4768,7 +4305,10 @@ function MnemospherePanel() {
   const [selectedLvl, setSelectedLvl] = useState(1);
 
   const data = selectedClass
-    ? buildMnemosphere(selectedClass, Number(selectedLvl))
+    ? {
+        ...buildMnemosphere(selectedClass, Number(selectedLvl)),
+        meta: createMetaFromBook("homebrew"),
+      }
     : null;
 
   return (
@@ -4836,12 +4376,9 @@ function MnemospherePanel() {
 
 function HoplospherePanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [fuid, setFuid] = useState(undefined);
-  const [description, setDescription] = useState("");
-  const [requiredSlots, setRequiredSlots] = useState(1);
-  const [socketable, setSocketable] = useState("all");
-  const [cost, setCost] = useState(500);
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(hoplosphereFieldConfig),
+  );
   const [coagEffects, setCoagEffects] = useState([]);
 
   const handleCoagChange = (index, field, value) => {
@@ -4858,14 +4395,19 @@ function HoplospherePanel() {
     setCoagEffects((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const data = name.trim()
+  const handleClear = () => {
+    setFormState(createDefaultStateFromFields(hoplosphereFieldConfig));
+    setCoagEffects([]);
+  };
+
+  const data = String(formState.name ?? "").trim()
     ? {
-        name: name.trim(),
-        fuid: fuid || undefined,
-        description,
-        requiredSlots: Number(requiredSlots),
-        socketable,
-        cost: Number(cost) || 0,
+        name: String(formState.name ?? "").trim(),
+        fuid: formState.fuid || undefined,
+        description: formState.description,
+        requiredSlots: Number(formState.requiredSlots),
+        socketable: formState.socketable,
+        cost: Number(formState.cost) || 0,
         coagEffects: coagEffects.reduce((acc, row) => {
           const threshold = Number(row.threshold);
           const effect = String(row.effect ?? "").trim();
@@ -4876,6 +4418,7 @@ function HoplospherePanel() {
 
           return acc;
         }, {}),
+        meta: createMetaFromBook("homebrew"),
       }
     : null;
 
@@ -4883,18 +4426,15 @@ function HoplospherePanel() {
     <PanelLayout
       formContent={
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              fullWidth
-              size="small"
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Grid>
-          <Grid size={12} sx={{ order: -1 }}>
-            <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
-          </Grid>
+          <SchemaFieldRenderer
+            config={hoplosphereFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+            extraProps={{ name: String(formState.name ?? "") }}
+          />
           <Grid size={12}>
             <TextField
               fullWidth
@@ -4902,45 +4442,10 @@ function HoplospherePanel() {
               minRows={3}
               size="small"
               label={t("Description")}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Slots")}</InputLabel>
-              <Select
-                value={requiredSlots}
-                label={t("Slots")}
-                onChange={(e) => setRequiredSlots(e.target.value)}
-              >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Socketable")}</InputLabel>
-              <Select
-                value={socketable}
-                label={t("Socketable")}
-                onChange={(e) => setSocketable(e.target.value)}
-              >
-                <MenuItem value="all">{t("All")}</MenuItem>
-                <MenuItem value="weapon">{t("Weapon only")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              fullWidth
-              size="small"
-              type="number"
-              label={t("Cost")}
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
-              slotProps={{ input: { inputProps: { min: 0 } } }}
+              value={formState.description ?? ""}
+              onChange={(e) =>
+                setFormState((prev) => ({ ...prev, description: e.target.value }))
+              }
             />
           </Grid>
           <Grid size={12}>
@@ -4996,6 +4501,11 @@ function HoplospherePanel() {
                 {t("Add Coagulation")}
               </Button>
             </Stack>
+          </Grid>
+          <Grid size={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>
+              {t("Clear All Fields")}
+            </Button>
           </Grid>
         </Grid>
       }

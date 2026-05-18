@@ -11,6 +11,16 @@ const G = {
 
 export const npcSpecialFieldConfig: ItemFieldConfig<NpcSpecialFormState> = [
   {
+    key: "fuid",
+    kind: "editable",
+    label: "ID",
+    component: "fuid",
+    defaultValue: "",
+    group: G.core,
+    order: -1,
+    gridSize: 12,
+  },
+  {
     key: "name",
     kind: "editable",
     label: "Name",

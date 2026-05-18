@@ -32,7 +32,7 @@ import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
-function ActionContextMenu({ action, npcName, onDelete }) {
+function ActionContextMenu({ action, npcName: _npcName, onDelete }) {
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -172,7 +172,11 @@ export default function EditActions({ npc, setNpc }) {
   const toggleExpanded = (i) => {
     setExpandedSet((prev) => {
       const s = new Set(prev);
-      s.has(i) ? s.delete(i) : s.add(i);
+      if (s.has(i)) {
+        s.delete(i);
+      } else {
+        s.add(i);
+      }
       return s;
     });
   };
@@ -223,9 +227,11 @@ export default function EditActions({ npc, setNpc }) {
         onExpandCollapse={toggleAll}
         allExpanded={allExpanded}
       />
-      {npc.actions?.map((action, i) => (
+      <Grid container spacing={1}>
+      {npc.actions?.map((action, i) => {
+        return (
+        <Grid key={i} size={12}>
         <Accordion
-          key={i}
           expanded={expandedSet.has(i)}
           onChange={() => toggleExpanded(i)}
           disableGutters
@@ -298,6 +304,7 @@ export default function EditActions({ npc, setNpc }) {
                 surface="edit"
                 group="core"
                 cols={2}
+                extraProps={{ name: String(action.name ?? "") }}
               />
               <SchemaFieldRenderer
                 config={npcActionFieldConfig}
@@ -327,11 +334,15 @@ export default function EditActions({ npc, setNpc }) {
                 group="meta"
                 label="Metadata"
                 cols={2}
+                hidden
               />
             </Grid>
           </AccordionDetails>
         </Accordion>
-      ))}
+        </Grid>
+        );
+      })}
+      </Grid>
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

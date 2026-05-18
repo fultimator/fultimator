@@ -87,7 +87,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     component: "select",
     group: "basics",
     order: 3,
-    gridSize: 4,
+    gridSize: 3,
     componentProps: { options: SPECIES_OPTIONS },
     onChangeEffects: {
       affinities: (s) => applySpeciesEffects(s.species as string).affinities,
@@ -101,7 +101,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     component: "select",
     group: "basics",
     order: 4,
-    gridSize: 4,
+    gridSize: 3,
     componentProps: { options: RANK_OPTIONS },
   },
   {
@@ -111,7 +111,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     component: "number",
     group: "basics",
     order: 5,
-    gridSize: 4,
+    gridSize: 3,
     defaultValue: 0,
     parse: (v) => Number(v) || 0,
   },

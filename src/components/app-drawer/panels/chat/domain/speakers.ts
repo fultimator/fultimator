@@ -27,6 +27,7 @@ export type AttackOption = {
   category?: string;
   range?: "melee" | "ranged" | string;
   isWeaponModule?: boolean;
+  description?: string;
 };
 
 export type SpellOption = {

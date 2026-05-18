@@ -22,10 +22,12 @@ function base(overrides: Partial<S> = {}): Partial<S> {
 describe("armor core fields", () => {
   it("shows base picker, name, martial, and rework", () => {
     const keys = visibleKeys(base(), "core");
-    expect(keys).toContain("base");
+    const baseKeys = visibleKeys(base(), "base");
+    const modifierKeys = visibleKeys(base(), "modifiers");
+    expect(baseKeys).toContain("base");
     expect(keys).toContain("name");
     expect(keys).toContain("martial");
-    expect(keys).toContain("rework");
+    expect(modifierKeys).toContain("rework");
   });
 });
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 const SkillSchema = z.looseObject({
   fuid: z.string().optional(),
@@ -12,6 +13,7 @@ export const ClassSchema = z.object({
   name: z.string().min(1),
   fuid: z.string().optional(),
   book: z.string().default("homebrew"),
+  meta: MetaSchema.optional(),
   benefits: z.looseObject({
     hpplus: z.number().int().default(0),
     mpplus: z.number().int().default(0),

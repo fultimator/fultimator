@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 const AccuracySchema = z.object({
   attr1: z.string(),
@@ -32,6 +33,7 @@ export const NpcSpellSchema = z.object({
   range: z.enum(["melee", "ranged"]),
   accuracy: AccuracySchema,
   special: z.array(z.string()).default([]),
+  meta: MetaSchema.optional(),
 });
 
 export type NpcSpell = z.infer<typeof NpcSpellSchema>;

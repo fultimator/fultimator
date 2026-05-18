@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 export const OptionalSubtypeSchema = z.enum([
   "quirk",
@@ -12,6 +13,7 @@ export const OptionalSubtypeSchema = z.enum([
 const OptionalSharedSchema = z.object({
   name: z.string().min(1),
   fuid: z.string().optional(),
+  meta: MetaSchema.optional(),
 });
 
 const ClockSchema = z.object({ sections: z.number().int().min(2) });

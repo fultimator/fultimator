@@ -74,6 +74,16 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     },
   },
   {
+    key: "fuid",
+    kind: "editable",
+    label: "ID",
+    component: "fuid",
+    defaultValue: "",
+    group: G.core,
+    order: -1,
+    gridSize: 12,
+  },
+  {
     key: "name",
     kind: "editable",
     label: "armor.name",
@@ -82,6 +92,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     group: G.core,
     order: 1,
     validationHints: { required: true },
+    gridSize: "grow",
   },
   {
     key: "martial",
@@ -89,7 +100,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     label: "armor.martial",
     component: "martial-toggle",
     defaultValue: false,
-    group: G.base,
+    group: G.core,
     order: 2,
     gridSize: "auto",
   },

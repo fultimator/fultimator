@@ -24,7 +24,8 @@ export default function FuidField({
   useEffect(() => {
     if (!autoSync) return;
     const derived = slugify(name);
-    if (value !== derived) onChange(derived || "");
+    if (!derived) return;
+    if (value !== derived) onChange(derived);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, autoSync]);
 

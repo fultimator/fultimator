@@ -2,11 +2,13 @@ import React from "react";
 import type { ComponentToken } from "./config/fieldConfig";
 import type { FieldRendererProps } from "./fieldRendererProps";
 import {
+  FuidRenderer,
   TextRenderer,
   CustomTextareaRenderer,
   NumberRenderer,
   CheckboxRenderer,
   MartialToggleRenderer,
+  OffensiveToggleRenderer,
   SelectRenderer,
   GroupedSelectRenderer,
   TypeSelectRenderer,
@@ -28,6 +30,7 @@ import {
 type RendererComponent = React.ComponentType<FieldRendererProps>;
 
 export const componentMap: Record<ComponentToken, RendererComponent> = {
+  fuid: FuidRenderer,
   text: TextRenderer,
   textarea: CustomTextareaRenderer,
   number: NumberRenderer,
@@ -47,6 +50,7 @@ export const componentMap: Record<ComponentToken, RendererComponent> = {
   "modifier-block": () => null,
   "rare-bonus-block": RareBonusBlockRenderer,
   "martial-toggle": MartialToggleRenderer,
+  "offensive-toggle": OffensiveToggleRenderer,
   "npc-attr-slider": NpcAttrSliderRenderer,
   "npc-affinity-slider": NpcAffinitySliderRenderer,
   "npc-armor-select": NpcArmorSelectRenderer,

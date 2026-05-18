@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 export const PlayerSpellTypeSchema = z.enum([
   "default",
@@ -60,6 +61,7 @@ export const PlayerSpellDefaultSchema = z.object({
   class: z.string(),
   name: z.string().min(1),
   fuid: z.string().optional(),
+  meta: MetaSchema.optional(),
   description: z.string(),
   isOffensive: z.boolean(),
   cost: CostSchema,
@@ -74,6 +76,7 @@ export const PlayerSpellDefaultSchema = z.object({
 const PlayerSpellNonStaticBaseSchema = z.looseObject({
   name: z.string().min(1),
   fuid: z.string().optional(),
+  meta: MetaSchema.optional(),
   spellType: z.enum([
     "gift",
     "dance",
@@ -150,7 +153,7 @@ export const PlayerSpellCookingSchema = PlayerSpellNonStaticBaseSchema.extend({
     z.object({
       id: z.number().int(),
       effect: z.string(),
-      customChoices: z.record(z.unknown()),
+      customChoices: z.record(z.string(), z.unknown()),
     }),
   ),
 });
@@ -159,7 +162,7 @@ export const PlayerSpellMagiseedSchema = PlayerSpellNonStaticBaseSchema.extend({
   description: z.string(),
   rangeStart: z.number().int(),
   rangeEnd: z.number().int(),
-  effects: z.record(z.unknown()),
+  effects: z.record(z.string(), z.unknown()),
 });
 
 export const PlayerSpellMagichantKeySchema =

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Divider, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import type { ItemFieldConfig } from "./config/fieldConfig";
 import type { FormSurface } from "../schema/fieldParity";
 import { componentMap } from "./componentMap";
@@ -19,6 +19,8 @@ interface SchemaFieldRendererProps<TFormState extends Record<string, unknown>> {
   cols?: 1 | 2 | 3 | 4;
   // Extra props merged into each field's component props.
   extraProps?: Record<string, unknown>;
+  // When true, renders nothing (useful for conditionally hiding entire sections).
+  hidden?: boolean;
 }
 
 // Resolve a nested path (for example "damage.value") to [parent, leafKey].
@@ -71,7 +73,9 @@ export function SchemaFieldRenderer<
   labelAction,
   cols = 2,
   extraProps,
+  hidden,
 }: SchemaFieldRendererProps<TFormState>) {
+  if (hidden) return null;
   const mdSize = Math.floor(12 / cols) as 3 | 4 | 6 | 12;
 
   const visible = config
@@ -93,16 +97,16 @@ export function SchemaFieldRenderer<
             <Typography
               variant="subtitle2"
               sx={{
+                fontWeight: "bold",
                 textTransform: "uppercase",
+                fontSize: "0.75rem",
                 letterSpacing: "0.05em",
-                color: "text.secondary",
               }}
             >
               {label}
             </Typography>
             {labelAction}
           </Box>
-          <Divider sx={{ mt: 0.5, mb: 1 }} />
         </Grid>
       )}
       {visible.map((field) => {
@@ -160,14 +164,15 @@ export function SchemaFieldRenderer<
             }
             sx={
               field.component === "checkbox" ||
-              field.component === "martial-toggle"
+              field.component === "martial-toggle" ||
+              field.component === "offensive-toggle"
                 ? { display: "flex", alignItems: "center" }
                 : undefined
             }
           >
             <Component
               fieldKey={field.key}
-              label={field.label}
+              label={typeof field.label === "function" ? field.label(state) : field.label}
               value={displayValue}
               onCommit={handleCommit}
               componentProps={mergedProps}
