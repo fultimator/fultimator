@@ -1007,7 +1007,7 @@ export function AutocompleteRenderer({
         const found = options.find((o) => o.value === opt);
         return found ? t(found.label) : String(opt);
       }}
-      renderTags={multiple ? renderTags : undefined}
+      {...(multiple ? { renderTags } : {})}
       renderInput={(params: object) => (
         <TextField {...(params as object)} label={t(label)} size="small" />
       )}

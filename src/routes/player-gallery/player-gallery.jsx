@@ -1756,7 +1756,7 @@ function PlayerGalleryCardActions({
           anchorEl={actionsAnchor}
           open={Boolean(actionsAnchor)}
           onClose={closeMenus}
-          TransitionProps={{ onExited: () => setActionsSubmenu(null) }}
+          slotProps={{ transition: { onExited: () => setActionsSubmenu(null) } }}
         >
           {actionsSubmenu === null && [
             <MenuItem

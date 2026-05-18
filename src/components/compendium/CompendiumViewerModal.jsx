@@ -847,10 +847,18 @@ const CompendiumViewerModal = ({
     />
   );
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && selectedItem && !contextMismatch) {
+      e.preventDefault();
+      handleAddItem();
+    }
+  };
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
+      onKeyDown={handleKeyDown}
       maxWidth="xl"
       fullWidth
       fullScreen={!isDesktop}
@@ -1136,7 +1144,14 @@ const CompendiumViewerModal = ({
       <QuickCreateModal
         open={quickCreateOpen}
         onClose={() => setQuickCreateOpen(false)}
-        lockedToViewerType={restrictToTypes?.length ? selectedType : undefined}
+        lockedToViewerType={selectedType}
+        initialSubtype={
+          selectedType === "player-spells"
+            ? selectedSpellClass ?? undefined
+            : selectedType === "optionals" && selectedOptionalSubtypes?.length === 1
+            ? selectedOptionalSubtypes[0]
+            : undefined
+        }
       />
       {/* Create item dialog */}
       {activePack && (

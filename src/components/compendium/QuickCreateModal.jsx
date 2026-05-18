@@ -306,6 +306,12 @@ function useQuickCreateImport() {
   return ctx;
 }
 
+const QuickCreateSubtypeContext = React.createContext(null);
+
+function useQuickCreateSubtype() {
+  return React.useContext(QuickCreateSubtypeContext);
+}
+
 // Shared panel layout
 
 function PanelLayout({
@@ -792,8 +798,11 @@ const MAGICHANT_KEY_RECOVERIES = Array.from(
 function PlayerSpellPanel() {
   const { t } = useTranslate();
   const { openImport } = useQuickCreateImport();
+  const initialSubtype = useQuickCreateSubtype();
   const [spellType, setSpellType] = useState("default");
-  const [spellClass, setSpellClass] = useState(spellClasses[0] ?? "");
+  const [spellClass, setSpellClass] = useState(
+    initialSubtype && spellClasses.includes(initialSubtype) ? initialSubtype : (spellClasses[0] ?? "")
+  );
   const [name, setName] = useState("");
   const [fuid, setFuid] = useState(undefined);
   const [description, setDescription] = useState("");
@@ -3839,7 +3848,11 @@ function OptionalPanel() {
   const { t } = useTranslate();
   const { openImport } = useQuickCreateImport();
   const { packs } = useCompendiumPacks();
-  const [subtype, setSubtype] = useState("quirk");
+  const initialSubtype = useQuickCreateSubtype();
+  const validOptionalSubtypes = OPTIONAL_SUBTYPES.map((s) => s.value);
+  const [subtype, setSubtype] = useState(
+    initialSubtype && validOptionalSubtypes.includes(initialSubtype) ? initialSubtype : "quirk"
+  );
   const [name, setName] = useState("");
   const [fuid, setFuid] = useState(undefined);
   const [description, setDescription] = useState("");
@@ -4560,6 +4573,7 @@ export default function QuickCreateModal({
   open,
   onClose,
   lockedToViewerType,
+  initialSubtype,
 }) {
   const { t } = useTranslate();
   const tabsWrapRef = useRef(null);
@@ -4580,7 +4594,7 @@ export default function QuickCreateModal({
   const [importRequest, setImportRequest] = useState(null);
 
   useEffect(() => {
-    if (open && lockedTabIdx >= 0) setTab(lockedTabIdx);
+    if (open) setTab(lockedTabIdx >= 0 ? lockedTabIdx : 0);
   }, [open, lockedTabIdx]);
 
   const getTabsScroller = () =>
@@ -4666,19 +4680,21 @@ export default function QuickCreateModal({
             <Tab
               key={item.key}
               label={t(item.label)}
-              disabled={lockedTabIdx >= 0 && idx !== lockedTabIdx}
+              disabled={false}
             />
           ))}
         </Tabs>
       </Box>
       <QuickCreateImportContext.Provider value={{ openImport }}>
-        <DialogContent sx={{ p: 0, flex: 1, overflow: "auto" }}>
-          {TABS.map(({ key, Panel }, idx) => (
-            <Box key={key} hidden={tab !== idx} sx={{ height: "100%" }}>
-              {tab === idx && <Panel />}
-            </Box>
-          ))}
-        </DialogContent>
+        <QuickCreateSubtypeContext.Provider value={initialSubtype ?? null}>
+          <DialogContent sx={{ p: 0, flex: 1, overflow: "auto" }}>
+            {TABS.map(({ key, Panel }, idx) => (
+              <Box key={key} hidden={tab !== idx} sx={{ height: "100%" }}>
+                {tab === idx && <Panel />}
+              </Box>
+            ))}
+          </DialogContent>
+        </QuickCreateSubtypeContext.Provider>
       </QuickCreateImportContext.Provider>
       <CompendiumViewerModal
         open={Boolean(importRequest)}

@@ -150,8 +150,13 @@ export function SchemaFieldRenderer<
           ? field.format(rawValue as TFormState[keyof TFormState])
           : rawValue;
 
-        const mergedProps = extraProps
-          ? { ...field.componentProps, ...extraProps }
+        const filteredExtra = extraProps
+          ? field.component === "fuid" || field.component === "grouped-select" || field.component === "autocomplete"
+            ? extraProps
+            : Object.fromEntries(Object.entries(extraProps).filter(([k]) => k !== "onBrowse"))
+          : undefined;
+        const mergedProps = filteredExtra
+          ? { ...field.componentProps, ...filteredExtra }
           : field.componentProps;
         const componentPropsWithNestedRenderer = {
           ...(mergedProps ?? {}),

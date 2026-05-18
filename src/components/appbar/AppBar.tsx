@@ -95,13 +95,11 @@ const AppBar: React.FC<AppBarProps> = ({
                     <ArrowBack />
                   </IconButton>
                 )}
-                {showGoBackButton && (
-                  <Tooltip title="Open Compendium">
-                    <IconButton color="inherit" onClick={openCompendiumModal}>
-                      <Search />
-                    </IconButton>
-                  </Tooltip>
-                )}
+                <Tooltip title="Open Compendium">
+                  <IconButton color="inherit" onClick={openCompendiumModal}>
+                    <Search />
+                  </IconButton>
+                </Tooltip>
               </Grid>
 
               {!isNpcEdit && (
