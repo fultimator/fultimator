@@ -618,6 +618,43 @@ function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
     delete s.attr1;
     delete s.attr2;
 
+    // pilot-vehicle weapon modules: legacy flat att1/att2/prec/damageType -> nested objects
+    if (s.spellType === "pilot-vehicle" && s.pilotSubtype === "weapon") {
+      const legacyAtt1 = typeof s.att1 === "string" ? s.att1 : "might";
+      const legacyAtt2 = typeof s.att2 === "string" ? s.att2 : "dexterity";
+      const legacyPrec = typeof s.prec === "number" ? s.prec : 0;
+      const legacyDamage = typeof s.damage === "number" ? s.damage : 0;
+      const legacyDamageType =
+        typeof s.damageType === "string" ? s.damageType : "physical";
+
+      const accuracy =
+        typeof s.accuracy === "object" && s.accuracy !== null
+          ? (s.accuracy as Record<string, unknown>)
+          : null;
+      s.accuracy = {
+        attr1:
+          typeof accuracy?.attr1 === "string" ? accuracy.attr1 : legacyAtt1,
+        attr2:
+          typeof accuracy?.attr2 === "string" ? accuracy.attr2 : legacyAtt2,
+        value:
+          typeof accuracy?.value === "number" ? accuracy.value : legacyPrec,
+        defense: accuracy?.defense === "mdef" ? "mdef" : "def",
+      };
+
+      if (typeof s.damage !== "object" || s.damage === null) {
+        s.damage = {
+          value: legacyDamage,
+          type: normalizeElementType(legacyDamageType),
+          hrZero: false,
+        };
+      }
+
+      delete s.att1;
+      delete s.att2;
+      delete s.prec;
+      delete s.damageType;
+    }
+
     return s as T;
   };
 
@@ -1031,70 +1068,6 @@ function actorAlignmentV10Player(player: TypePlayer): TypePlayer {
   };
 }
 
-function migratePilotWeaponModuleSchemaV11(player: TypePlayer): TypePlayer {
-  const normalizePilotWeaponSpell = <T extends object>(spell: T): T => {
-    const s = { ...spell } as Record<string, unknown>;
-    if (s.spellType !== "pilot-vehicle" || s.pilotSubtype !== "weapon") {
-      return s as T;
-    }
-
-    const legacyAtt1 = typeof s.att1 === "string" ? s.att1 : "might";
-    const legacyAtt2 = typeof s.att2 === "string" ? s.att2 : "dexterity";
-    const legacyPrec = typeof s.prec === "number" ? s.prec : 0;
-    const legacyDamage = typeof s.damage === "number" ? s.damage : 0;
-    const legacyDamageType =
-      typeof s.damageType === "string" ? s.damageType : "physical";
-
-    const accuracy =
-      typeof s.accuracy === "object" && s.accuracy !== null
-        ? (s.accuracy as Record<string, unknown>)
-        : null;
-    s.accuracy = {
-      attr1:
-        typeof accuracy?.attr1 === "string"
-          ? (accuracy.attr1 as string)
-          : legacyAtt1,
-      attr2:
-        typeof accuracy?.attr2 === "string"
-          ? (accuracy.attr2 as string)
-          : legacyAtt2,
-      value:
-        typeof accuracy?.value === "number"
-          ? (accuracy.value as number)
-          : legacyPrec,
-      defense: accuracy?.defense === "mdef" ? "mdef" : "def",
-    };
-
-    s.damage = {
-      value: legacyDamage,
-      type: normalizeElementType(legacyDamageType),
-      hrZero: false,
-    };
-
-    delete s.att1;
-    delete s.att2;
-    delete s.prec;
-    delete s.damageType;
-
-    return s as T;
-  };
-
-  return {
-    ...player,
-    classes: player.classes?.map((cls) => ({
-      ...cls,
-      spells: cls.spells?.map(normalizePilotWeaponSpell) ?? [],
-    })),
-    equipment: player.equipment?.map((eq) => ({
-      ...eq,
-      mnemospheres: eq.mnemospheres?.map((m) => ({
-        ...m,
-        spells: m.spells?.map(normalizePilotWeaponSpell) ?? [],
-      })),
-    })),
-  };
-}
-
 // One-time versioned migrations.
 // Each transform brings the player up to its declared schema version.
 // Skipped if schemaVersion is already >= the transform's version.
@@ -1153,11 +1126,6 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; modifiers migrated; will renamed to willpower",
     fn: actorAlignmentV10Player,
-  },
-  {
-    version: 11,
-    label: "Normalize pilot weapon modules to nested accuracy/damage schema",
-    fn: migratePilotWeaponModuleSchemaV11,
   },
 ];
 
