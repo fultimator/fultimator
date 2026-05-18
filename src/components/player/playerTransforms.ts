@@ -10,6 +10,7 @@ import {
   normalizeCustomWeaponLike,
 } from "../../libs/weaponNormalization";
 import { normalizeDefensiveList } from "../../libs/equipmentDefensiveNormalization";
+import { availableModules } from "../../libs/pilotVehicleData";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
@@ -1132,6 +1133,139 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
 export const PLAYER_CURRENT_SCHEMA_VERSION =
   POST_LOAD_TRANSFORMS[POST_LOAD_TRANSFORMS.length - 1].version;
 
+const CUSTOM_MODULE_NAMES = new Set([
+  "pilot_custom_weapon",
+  "pilot_custom_armor",
+  "pilot_custom_support",
+]);
+
+// Built once at module load - maps module name -> current static entry.
+const STATIC_MODULE_BY_NAME = new Map<string, Record<string, unknown>>();
+for (const group of Object.values(
+  availableModules as Record<string, Record<string, unknown>[]>,
+)) {
+  for (const entry of group) {
+    if (typeof entry.name === "string")
+      STATIC_MODULE_BY_NAME.set(entry.name, entry);
+  }
+}
+
+const MODULE_INSTANCE_FIELDS = new Set([
+  "enabled",
+  "equipped",
+  "equippedSlot",
+  "customName",
+  "quality",
+  "qualityCost",
+]);
+
+/**
+ * Re-hydrates non-custom vehicle modules from static pilotVehicleData on every
+ * load so stats are always authoritative regardless of when the player was saved.
+ * Custom modules fall back to flat-field migration if still in legacy shape.
+ * Also backfills missing pilotSubtype on the frame spell and collapses
+ * currentVehicles -> vehicles.
+ */
+function rehydrateVehicleModules(player: TypePlayer): TypePlayer {
+  if (!player.classes) return player;
+
+  const migrateModule = (m: Record<string, unknown>): Record<string, unknown> => {
+    const name = m.name as string | undefined;
+    const isCustom = !name || CUSTOM_MODULE_NAMES.has(name);
+
+    if (!isCustom) {
+      const staticEntry = STATIC_MODULE_BY_NAME.get(name!);
+      if (staticEntry) {
+        const instanceState: Record<string, unknown> = {};
+        for (const key of MODULE_INSTANCE_FIELDS) {
+          if (m[key] !== undefined) instanceState[key] = m[key];
+        }
+        return { ...staticEntry, ...instanceState };
+      }
+    }
+
+    // Custom module or unknown name: migrate flat fields if not yet nested.
+    if (
+      typeof m.accuracy === "object" &&
+      m.accuracy !== null &&
+      typeof m.damage === "object" &&
+      m.damage !== null
+    )
+      return m;
+
+    const acc = m.accuracyCheck as Record<string, unknown> | undefined;
+    const attr1 =
+      (acc?.att1 as string) ??
+      (m.att1 as string) ??
+      (m.attr1 as string) ??
+      "dexterity";
+    const attr2 =
+      (acc?.att2 as string) ??
+      (m.att2 as string) ??
+      (m.attr2 as string) ??
+      "might";
+    const prec = typeof m.prec === "number" ? m.prec : 0;
+    const dmg =
+      typeof m.damage === "number"
+        ? m.damage
+        : typeof m.dmg === "number"
+          ? m.dmg
+          : 0;
+    const dmgType = normalizeElementType(
+      m.damageType ?? m.weaponType ?? "physical",
+    );
+    const next = { ...m };
+    next.accuracy = { attr1, attr2, value: prec, defense: "def" };
+    next.damage = { value: dmg, type: dmgType, hrZero: false };
+    next.range = m.isRanged ? "ranged" : (m.range ?? "melee");
+    next.cumbersome = m.isTwoHand ?? m.cumbersome ?? false;
+    delete next.att1;
+    delete next.att2;
+    delete next.attr1;
+    delete next.attr2;
+    delete next.prec;
+    delete next.dmg;
+    delete next.isRanged;
+    delete next.isTwoHand;
+    delete next.damageType;
+    delete next.accuracyCheck;
+    return next;
+  };
+
+  const classes = player.classes.map((cls) => ({
+    ...cls,
+    spells: (cls.spells ?? []).map((spell) => {
+      const s = spell as unknown as Record<string, unknown>;
+      if (s.spellType !== "pilot-vehicle") return spell;
+
+      // Backfill missing pilotSubtype on the frame spell.
+      if (s.pilotSubtype === undefined) {
+        s.pilotSubtype = "frame";
+      }
+
+      if (s.pilotSubtype !== "frame") return spell;
+
+      const raw = s.vehicles ?? s.currentVehicles;
+      if (!Array.isArray(raw)) return spell;
+
+      const vehicles = (raw as Record<string, unknown>[]).map((v) => {
+        const modules = v.modules;
+        if (!Array.isArray(modules)) return v;
+        return {
+          ...v,
+          modules: (modules as Record<string, unknown>[]).map(migrateModule),
+        };
+      });
+
+      const next = { ...s, vehicles } as Record<string, unknown>;
+      delete next.currentVehicles;
+      return next as unknown as typeof spell;
+    }),
+  }));
+
+  return { ...player, classes };
+}
+
 // Always-run transforms.
 // Applied on every load regardless of schemaVersion; these guard runtime
 // integrity rather than perform one-time shape changes.
@@ -1140,6 +1274,7 @@ const ALWAYS_RUN_TRANSFORMS: PlayerTransform[] = [
   migrateSlotIndexes, // new items may be saved without an index
   restoreRuntimeEquippedFlags, // isEquipped is stripped on save, must be rehydrated
   pruneStaleSlotRefs, // spheres may be deleted between loads
+  rehydrateVehicleModules, // re-hydrate module stats from static data every load
 ];
 
 /** Run all post-load transforms and return the player ready for in-memory use. */
