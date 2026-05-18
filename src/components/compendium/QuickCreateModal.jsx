@@ -24,7 +24,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   Tooltip,
-  ListSubheader,
   FormControlLabel,
   Checkbox,
   Switch,
@@ -41,12 +40,10 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { OffensiveSpellIcon } from "../icons";
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { calculateCustomWeaponStats } from "../player/common/playerCalculations";
 import types from "../../libs/types";
-import spellClassesList from "../../libs/spellClasses";
-import specialSkillsList from "../../libs/skills";
 import weapons from "../../libs/weapons";
 import armor from "../../libs/armor";
 import shields from "../../libs/shields";
@@ -89,6 +86,7 @@ import CustomTextarea from "../common/CustomTextarea";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { availableFrames } from "../../libs/pilotVehicleData";
 import { availableMagichantKeys } from "../player/spells/spellOptionData";
+import CompendiumViewerModal from "./CompendiumViewerModal";
 import {
   buildMnemosphere,
   getMnemosphereCost,
@@ -135,6 +133,7 @@ import { npcAttackFieldConfig } from "../../forms/rendering/config/itemConfigs/n
 import { npcSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpell";
 import { qualityFieldConfig } from "../../forms/rendering/config/itemConfigs/quality";
 import { heroicFieldConfig } from "../../forms/rendering/config/itemConfigs/heroic";
+import { classFieldConfig } from "../../forms/rendering/config/itemConfigs/class";
 import { hoplosphereFieldConfig } from "../../forms/rendering/config/itemConfigs/hoplosphere";
 import { createDefaultStateFromFields } from "../../forms/registry/helpers";
 import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
@@ -178,21 +177,6 @@ const TARGET_OPTIONS = [
   "Special",
 ];
 
-const GROUPED_SPECIAL_SKILLS = specialSkillsList.reduce((acc, skill) => {
-  if (!acc[skill.class]) acc[skill.class] = [];
-  acc[skill.class].push(skill);
-  return acc;
-}, {});
-const CLASS_BOOK_SUGGESTIONS = [
-  "core",
-  "rework",
-  "bonus",
-  "high",
-  "techno",
-  "natural",
-  "homebrew",
-];
-
 function createMetaFromBook(bookValue = "homebrew") {
   const book = String(bookValue ?? "").trim() || "homebrew";
   return {
@@ -201,6 +185,110 @@ function createMetaFromBook(bookValue = "homebrew") {
     bookName: "",
     isOfficial: deriveIsOfficial(book),
   };
+}
+
+function isPlainObject(value) {
+  return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+function mergeImportedIntoDefaults(defaultState, imported) {
+  if (Array.isArray(imported)) return [...imported];
+  if (!isPlainObject(imported)) return imported;
+  const base = isPlainObject(defaultState) ? { ...defaultState } : {};
+  for (const [key, value] of Object.entries(imported)) {
+    const existing = base[key];
+    if (Array.isArray(value)) {
+      base[key] = [...value];
+    } else if (isPlainObject(value)) {
+      base[key] = mergeImportedIntoDefaults(existing, value);
+    } else {
+      base[key] = value;
+    }
+  }
+  return base;
+}
+
+function stripPrivateFields(value) {
+  if (Array.isArray(value)) return value.map(stripPrivateFields);
+  if (!isPlainObject(value)) return value;
+  const next = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (key.startsWith("_")) continue;
+    next[key] = stripPrivateFields(entry);
+  }
+  return next;
+}
+
+function importIntoSchemaForm(fieldConfig, setFormState, item, transform = null) {
+  const defaults = createDefaultStateFromFields(fieldConfig);
+  const prepared = stripPrivateFields(transform ? transform(item) : item);
+  const merged = mergeImportedIntoDefaults(defaults, prepared);
+  setFormState(merged);
+}
+
+const QUICK_CREATE_TAB_TO_VIEWER_TYPE = {
+  "npc-attack": "attacks",
+  "npc-spell": "spells",
+  "npc-special": "special",
+  "npc-action": "actions",
+  "player-spell": "player-spells",
+  quality: "qualities",
+  heroic: "heroics",
+  class: "classes",
+  mnemosphere: "mnemospheres",
+  hoplosphere: "hoplospheres",
+  weapon: "weapons",
+  "custom-weapon": "custom-weapons",
+  armor: "armor",
+  shield: "shields",
+  accessory: "accessories",
+  optional: "optionals",
+};
+
+function localizeImportedClassItem(item) {
+  if (!item || typeof item !== "object") return item;
+  const next = { ...item };
+  if (Array.isArray(next.skills)) {
+    next.skills = next.skills.map((skill) =>
+      skill && typeof skill === "object"
+        ? {
+            ...skill,
+            description:
+              typeof skill.description === "string"
+                ? staticT(skill.description)
+                : skill.description,
+          }
+        : skill,
+    );
+  }
+  if (next.benefits && typeof next.benefits === "object" && Array.isArray(next.benefits.custom)) {
+    next.benefits = {
+      ...next.benefits,
+      custom: next.benefits.custom.map((entry) =>
+        typeof entry === "string" ? staticT(entry) : entry,
+      ),
+    };
+  }
+  return next;
+}
+
+function normalizeImportedNpcSpellItem(item) {
+  if (!item || typeof item !== "object") return item;
+  const next = { ...item };
+  if (Array.isArray(next.special)) return next;
+  if (typeof next.special === "string" && next.special.trim()) {
+    next.special = [next.special.trim()];
+    return next;
+  }
+  const fallback =
+    typeof next.effect === "string" && next.effect.trim()
+      ? next.effect.trim()
+      : typeof next.description === "string" && next.description.trim()
+        ? next.description.trim()
+        : "";
+  if (fallback) next.special = [fallback];
+  else delete next.special;
+  return next;
 }
 // Only classes that use standard spells (spellType: "default")
 const STANDARD_SPELL_CLASSES = [
@@ -211,6 +299,13 @@ const STANDARD_SPELL_CLASSES = [
   "Spiritist",
 ];
 const spellClasses = STANDARD_SPELL_CLASSES;
+const QuickCreateImportContext = React.createContext(null);
+
+function useQuickCreateImport() {
+  const ctx = React.useContext(QuickCreateImportContext);
+  if (!ctx) throw new Error("useQuickCreateImport must be used within QuickCreateImportContext");
+  return ctx;
+}
 
 // Shared panel layout
 
@@ -292,12 +387,16 @@ function PanelLayout({
 
 function NpcAttackPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const buildState = () => createDefaultStateFromFields(npcAttackFieldConfig);
   const [formState, setFormState] = useState(() => buildState());
   const data = {
     ...formState,
     name: String(formState.name ?? "").trim(),
     fuid: formState.fuid || undefined,
+    effect: Array.isArray(formState.special)
+      ? String(formState.special[0] ?? "")
+      : String(formState.special ?? ""),
   };
 
   const handleClear = () => {
@@ -317,7 +416,13 @@ function NpcAttackPanel() {
             surface="edit"
             group="core"
             cols={2}
-            extraProps={{ name: String(formState.name ?? "") }}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-attack"], (item) =>
+                  importIntoSchemaForm(npcAttackFieldConfig, setFormState, item),
+                ),
+            }}
           />
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
@@ -374,6 +479,7 @@ function NpcAttackPanel() {
 
 function NpcSpellPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const buildState = () => createDefaultStateFromFields(npcSpellFieldConfig);
   const [formState, setFormState] = useState(() => buildState());
   const data = {
@@ -397,7 +503,18 @@ function NpcSpellPanel() {
             surface="edit"
             group="core"
             cols={2}
-            extraProps={{ name: String(formState.name ?? "") }}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-spell"], (item) =>
+                  importIntoSchemaForm(
+                    npcSpellFieldConfig,
+                    setFormState,
+                    item,
+                    normalizeImportedNpcSpellItem,
+                  ),
+                ),
+            }}
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
@@ -467,6 +584,7 @@ function NpcSpellPanel() {
 
 function NpcSpecialPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(npcSpecialFieldConfig),
   );
@@ -488,7 +606,13 @@ function NpcSpecialPanel() {
             surface="edit"
             group="core"
             cols={2}
-            extraProps={{ name: String(formState.name ?? "") }}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-special"], (item) =>
+                  importIntoSchemaForm(npcSpecialFieldConfig, setFormState, item),
+                ),
+            }}
           />
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
@@ -532,6 +656,7 @@ function NpcSpecialPanel() {
 
 function NpcActionPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(npcActionFieldConfig),
   );
@@ -553,7 +678,13 @@ function NpcActionPanel() {
             surface="edit"
             group="core"
             cols={2}
-            extraProps={{ name: String(formState.name ?? "") }}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-action"], (item) =>
+                  importIntoSchemaForm(npcActionFieldConfig, setFormState, item),
+                ),
+            }}
           />
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
@@ -660,6 +791,7 @@ const MAGICHANT_KEY_RECOVERIES = Array.from(
 
 function PlayerSpellPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [spellType, setSpellType] = useState("default");
   const [spellClass, setSpellClass] = useState(spellClasses[0] ?? "");
   const [name, setName] = useState("");
@@ -789,6 +921,53 @@ function PlayerSpellPanel() {
     setQuality("");
     setQualityCost(0);
     setIsShield(false);
+  };
+
+  const handleImportPlayerSpell = (item) => {
+    const imported = stripPrivateFields(item ?? {});
+    const importedType = String(imported.spellType ?? "default");
+    const nextSpellType =
+      importedType === "magichant" && imported.magichantSubtype === "key"
+        ? "magichant-key"
+        : importedType;
+
+    setSpellType(nextSpellType || "default");
+    setName(String(imported.name ?? ""));
+    setFuid(imported.fuid || undefined);
+    setSpellClass(String(imported.class ?? spellClasses[0] ?? ""));
+
+    setDescription(String(imported.description ?? ""));
+    setEffect(String(imported.effect ?? imported.description ?? ""));
+    setEvent(String(imported.event ?? ""));
+    setGenoclepsis(String(imported.genoclepsis ?? ""));
+
+    setDuration(String(imported.duration ?? ""));
+    setTargetDescription(String(imported.targetDescription ?? ""));
+    setMaxTargets(String(imported.maxTargets ?? "1"));
+    setPerTarget(Boolean(imported.cost?.perTarget ?? true));
+    setMp(String(imported.cost?.amount ?? ""));
+    setIsOffensive(Boolean(imported.isOffensive ?? false));
+    setDamage(String(imported.damage?.value ?? ""));
+    setDamageType(String(imported.damage?.type ?? "physical"));
+    setHrZero(Boolean(imported.damage?.hrZero ?? false));
+    setAttr1(String(imported.accuracy?.attr1 ?? "insight"));
+    setAttr2(String(imported.accuracy?.attr2 ?? "will"));
+
+    setDomain(String(imported.domain ?? ""));
+    setDomainDesc(String(imported.domainDesc ?? ""));
+    setMerge(String(imported.merge ?? ""));
+    setMergeDesc(String(imported.mergeDesc ?? ""));
+    setDismiss(String(imported.dismiss ?? ""));
+    setDismissDesc(String(imported.dismissDesc ?? ""));
+    setPulse(String(imported.pulse ?? ""));
+    setPulseDesc(String(imported.pulseDesc ?? ""));
+
+    setWellspring(String(imported.wellspring ?? ""));
+    setInvType(String(imported.type ?? ""));
+    setItemCategory(String(imported.category ?? ""));
+    setInfusionRank(
+      imported.infusionRank === undefined ? "" : String(imported.infusionRank),
+    );
   };
 
   const data = {
@@ -1007,6 +1186,12 @@ function PlayerSpellPanel() {
                   value={fuid}
                   name={name}
                   onChange={setFuid}
+                  onBrowse={() =>
+                    openImport(
+                      QUICK_CREATE_TAB_TO_VIEWER_TYPE["player-spell"],
+                      handleImportPlayerSpell,
+                    )
+                  }
                   autoSync
                 />
               </Grid>
@@ -1794,6 +1979,12 @@ function PlayerSpellPanel() {
                   value={fuid}
                   name={name}
                   onChange={setFuid}
+                  onBrowse={() =>
+                    openImport(
+                      QUICK_CREATE_TAB_TO_VIEWER_TYPE["player-spell"],
+                      handleImportPlayerSpell,
+                    )
+                  }
                   autoSync
                 />
               </Grid>
@@ -2099,6 +2290,7 @@ function PlayerSpellPanel() {
 
 function QualityPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(qualityFieldConfig),
   );
@@ -2159,7 +2351,13 @@ function QualityPanel() {
                 surface="edit"
                 group="core"
                 cols={2}
-                extraProps={{ name: String(formState.name ?? "") }}
+                extraProps={{
+                  name: String(formState.name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.quality, (item) =>
+                      importIntoSchemaForm(qualityFieldConfig, setFormState, item),
+                    ),
+                }}
               />
               <SchemaFieldRenderer
                 config={qualityFieldConfig}
@@ -2206,6 +2404,7 @@ function QualityPanel() {
 
 function HeroicPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(heroicFieldConfig),
   );
@@ -2227,7 +2426,13 @@ function HeroicPanel() {
             surface="edit"
             group="core"
             cols={2}
-            extraProps={{ name: String(formState.name ?? "") }}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.heroic, (item) =>
+                  importIntoSchemaForm(heroicFieldConfig, setFormState, item),
+                ),
+            }}
           />
           <SchemaFieldRenderer
             config={heroicFieldConfig}
@@ -2273,73 +2478,42 @@ function HeroicPanel() {
 //   custom: [], spellClasses: [],
 // };
 
-const BLANK_SKILL = {
-  skillName: "",
-  fuid: undefined,
-  maxLvl: 1,
-  description: "",
-  specialSkill: "",
-  currentLvl: 0,
-};
-
 function ClassPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [fuid, setFuid] = useState(undefined);
-  const [book, setBook] = useState("homebrew");
-  const [hpplus, setHpplus] = useState(0);
-  const [mpplus, setMpplus] = useState(0);
-  const [ipplus, setIpplus] = useState(0);
-  const [martials, setMartials] = useState({
-    armor: false,
-    shields: false,
-    melee: false,
-    ranged: false,
-  });
-  const [ritualism, setRitualism] = useState(false);
-  const [customBenefits, setCustomBenefits] = useState([]);
-  const [customBenefitToDelete, setCustomBenefitToDelete] = useState(null);
-  const [spellClassesSelected, setSpellClassesSelected] = useState([]);
-  const [skills, setSkills] = useState(
-    Array.from({ length: 5 }, () => ({ ...BLANK_SKILL })),
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(classFieldConfig),
   );
 
-  const updateSkillField = (idx, field, value) =>
-    setSkills((prev) =>
-      prev.map((s, i) => (i === idx ? { ...s, [field]: value } : s)),
-    );
+  const normalizedCustomBenefits = Array.isArray(formState.benefits?.custom)
+    ? formState.benefits.custom
+        .map((entry) => {
+          if (typeof entry === "string") return entry;
+          if (entry && typeof entry === "object") {
+            const value = entry.value;
+            return typeof value === "string" ? value : "";
+          }
+          return "";
+        })
+        .filter((entry) => entry.trim())
+    : [];
 
   const classData = {
-    name: name.trim(),
-    fuid: fuid || undefined,
-    book: book.trim() || "homebrew",
-    meta: createMetaFromBook(book),
+    ...formState,
+    name: String(formState.name ?? "").trim(),
+    fuid: formState.fuid || undefined,
+    book: String(formState.book ?? "").trim() || "homebrew",
+    meta: createMetaFromBook(formState.book),
     benefits: {
-      hpplus: Number(hpplus) || 0,
-      mpplus: Number(mpplus) || 0,
-      ipplus: Number(ipplus) || 0,
-      isCustomBenefit: customBenefits.length > 0,
-      martials,
-      rituals: { ritualism },
-      custom: customBenefits,
-      spellClasses: spellClassesSelected,
+      ...(formState.benefits ?? {}),
+      custom: normalizedCustomBenefits,
+      isCustomBenefit: normalizedCustomBenefits.length > 0,
     },
-    skills,
+    skills: Array.isArray(formState.skills) ? formState.skills : [],
   };
 
   const handleClear = () => {
-    setName("");
-    setFuid(undefined);
-    setBook("homebrew");
-    setHpplus(0);
-    setMpplus(0);
-    setIpplus(0);
-    setMartials({ armor: false, shields: false, melee: false, ranged: false });
-    setRitualism(false);
-    setCustomBenefits([]);
-    setCustomBenefitToDelete(null);
-    setSpellClassesSelected([]);
-    setSkills(Array.from({ length: 5 }, () => ({ ...BLANK_SKILL })));
+    setFormState(createDefaultStateFromFields(classFieldConfig));
   };
 
   return (
@@ -2347,336 +2521,68 @@ function ClassPanel() {
       <PanelLayout
         formContent={
           <Grid container spacing={2}>
-            <Grid size={12}>
-              <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
-            </Grid>
-            <Grid
-              size={{
-                xs: 8,
-                sm: 9,
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="core"
+              cols={2}
+              extraProps={{
+                name: String(formState.name ?? ""),
+                onBrowse: () =>
+                  openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.class, (item) =>
+                    importIntoSchemaForm(
+                      classFieldConfig,
+                      setFormState,
+                      item,
+                      localizeImportedClassItem,
+                    ),
+                  ),
               }}
-            >
-              <TextField
-                label={t("Class Name")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                fullWidth
-                size="small"
-                autoFocus
-                slotProps={{
-                  htmlInput: { maxLength: 50 },
-                }}
-              />
-            </Grid>
-            <Grid
-              size={{
-                xs: 4,
-                sm: 3,
-              }}
-            >
-              <Autocomplete
-                freeSolo
-                options={CLASS_BOOK_SUGGESTIONS}
-                inputValue={book}
-                onInputChange={(_, v) => setBook(v)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("Book")}
-                    size="small"
-                    placeholder="homebrew"
-                  />
-                )}
-              />
-            </Grid>
-
-            <Grid size={12}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "0.75rem",
-                  letterSpacing: "0.05em",
-                  mb: 0.5,
-                }}
-              >
-                {t("Free Benefits")}
-              </Typography>
-            </Grid>
-            <Grid size={4}>
-              <TextField
-                label={t("HP+")}
-                type="number"
-                value={hpplus}
-                onChange={(e) => setHpplus(Number(e.target.value))}
-                fullWidth
-                size="small"
-                slotProps={{
-                  htmlInput: { min: 0, step: 5 },
-                }}
-              />
-            </Grid>
-            <Grid size={4}>
-              <TextField
-                label={t("MP+")}
-                type="number"
-                value={mpplus}
-                onChange={(e) => setMpplus(Number(e.target.value))}
-                fullWidth
-                size="small"
-                slotProps={{
-                  htmlInput: { min: 0, step: 5 },
-                }}
-              />
-            </Grid>
-            <Grid size={4}>
-              <TextField
-                label={t("IP+")}
-                type="number"
-                value={ipplus}
-                onChange={(e) => setIpplus(Number(e.target.value))}
-                fullWidth
-                size="small"
-                slotProps={{
-                  htmlInput: { min: 0, step: 2 },
-                }}
-              />
-            </Grid>
-
-            <Grid size={12}>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {[
-                  { key: "melee", label: t("Martial Melee") },
-                  { key: "ranged", label: t("Martial Ranged") },
-                  { key: "shields", label: t("Martial Shields") },
-                  { key: "armor", label: t("Martial Armor") },
-                ].map(({ key, label }) => (
-                  <Chip
-                    key={key}
-                    label={label}
-                    size="small"
-                    clickable
-                    color={martials[key] ? "primary" : "default"}
-                    variant={martials[key] ? "filled" : "outlined"}
-                    onClick={() =>
-                      setMartials((m) => ({ ...m, [key]: !m[key] }))
-                    }
-                  />
-                ))}
-                <Chip
-                  label={t("Ritualism")}
-                  size="small"
-                  clickable
-                  color={ritualism ? "primary" : "default"}
-                  variant={ritualism ? "filled" : "outlined"}
-                  onClick={() => setRitualism((v) => !v)}
-                />
-              </Box>
-            </Grid>
-
-            {customBenefits.map((cb, i) => (
-              <Grid
-                key={i}
-                sx={{ display: "flex", gap: 1, alignItems: "center" }}
-                size={12}
-              >
-                <TextField
-                  label={`${t("Custom Benefit")} ${i + 1}`}
-                  value={cb}
-                  onChange={(e) =>
-                    setCustomBenefits((arr) =>
-                      arr.map((v, j) => (j === i ? e.target.value : v)),
-                    )
-                  }
-                  fullWidth
-                  size="small"
-                  slotProps={{
-                    htmlInput: { maxLength: 500 },
-                  }}
-                />
-                <IconButton
-                  size="small"
-                  color="error"
-                  onClick={() => setCustomBenefitToDelete(i)}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Grid>
-            ))}
-            <Grid size={12}>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => setCustomBenefits((arr) => [...arr, ""])}
-              >
-                + {t("Add Custom Benefit")}
-              </Button>
-            </Grid>
-
-            <Grid size={12}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "0.75rem",
-                  letterSpacing: "0.05em",
-                  mb: 0.5,
-                }}
-              >
-                {t("Spell Types")}
-              </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {spellClassesList.map((sc) => (
-                  <Chip
-                    key={sc}
-                    label={t(sc)}
-                    size="small"
-                    clickable
-                    color={
-                      spellClassesSelected.includes(sc)
-                        ? "secondary"
-                        : "default"
-                    }
-                    variant={
-                      spellClassesSelected.includes(sc) ? "filled" : "outlined"
-                    }
-                    onClick={() =>
-                      setSpellClassesSelected((prev) =>
-                        prev.includes(sc)
-                          ? prev.filter((s) => s !== sc)
-                          : [...prev, sc],
-                      )
-                    }
-                  />
-                ))}
-              </Box>
-            </Grid>
-
-            <Grid size={12}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "0.75rem",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                {t("Skills")}
-              </Typography>
-            </Grid>
-            {skills.map((skill, i) => (
-              <Grid key={i} size={12}>
-                <Box
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                    borderRadius: 1,
-                    p: 1.5,
-                  }}
-                >
-                  <Grid container spacing={1}>
-                    <Grid size={12}>
-                      <FuidField
-                        value={skill.fuid}
-                        name={skill.skillName}
-                        onChange={(v) => updateSkillField(i, "fuid", v)}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 9,
-                        sm: 10,
-                      }}
-                    >
-                      <TextField
-                        label={`${t("Skill Name")} ${i + 1}`}
-                        value={skill.skillName}
-                        onChange={(e) =>
-                          updateSkillField(i, "skillName", e.target.value)
-                        }
-                        onBlur={() => {
-                          if (!skill.fuid && skill.skillName)
-                            updateSkillField(
-                              i,
-                              "fuid",
-                              slugify(skill.skillName),
-                            );
-                        }}
-                        fullWidth
-                        size="small"
-                        slotProps={{
-                          htmlInput: { maxLength: 50 },
-                        }}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 3,
-                        sm: 2,
-                      }}
-                    >
-                      <TextField
-                        label={t("Max Lvl")}
-                        type="number"
-                        value={skill.maxLvl}
-                        onChange={(e) =>
-                          updateSkillField(
-                            i,
-                            "maxLvl",
-                            Math.max(1, Math.min(10, Number(e.target.value))),
-                          )
-                        }
-                        fullWidth
-                        size="small"
-                        slotProps={{
-                          htmlInput: { min: 1, max: 10 },
-                        }}
-                      />
-                    </Grid>
-                    <Grid size={12}>
-                      <CustomTextarea
-                        label={t("Description")}
-                        value={skill.description}
-                        onChange={(e) =>
-                          updateSkillField(i, "description", e.target.value)
-                        }
-                        helperText=""
-                        maxLength={1500}
-                      />
-                    </Grid>
-                    <Grid size={12}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>{t("Special Skill Effect")}</InputLabel>
-                        <Select
-                          value={skill.specialSkill}
-                          onChange={(e) =>
-                            updateSkillField(i, "specialSkill", e.target.value)
-                          }
-                          label={t("Special Skill Effect")}
-                        >
-                          <MenuItem value="">
-                            <em>{t("None")}</em>
-                          </MenuItem>
-                          {Object.keys(GROUPED_SPECIAL_SKILLS)
-                            .sort((a, b) => t(a).localeCompare(t(b)))
-                            .flatMap((cls) => [
-                              <ListSubheader key={cls}>{t(cls)}</ListSubheader>,
-                              ...GROUPED_SPECIAL_SKILLS[cls].map((s) => (
-                                <MenuItem key={s.name} value={s.name}>
-                                  {t(s.name)}
-                                </MenuItem>
-                              )),
-                            ])}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Grid>
-            ))}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="benefits"
+              label="Free Benefits"
+              cols={3}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="martials"
+              cols={1}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="spellClasses"
+              cols={1}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="skills"
+              cols={1}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="meta"
+              label="Metadata"
+              cols={2}
+            />
             <Grid size={12}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
@@ -2688,39 +2594,16 @@ function ClassPanel() {
           <SharedClassCard
             item={{
               ...classData,
-              skills: classData.skills.filter((s) => s.skillName.trim()),
+              skills: classData.skills.filter((s) => s.skillName?.trim?.()),
             }}
           />
         }
         addButton={
-          <AddToCompendiumButton
-            itemType={REG.class.addItemType}
-            data={classData}
-          />
+          <AddToCompendiumButton itemType={REG.class.addItemType} data={classData} />
         }
         data={classData}
         itemName={classData.name || ""}
         exportDataType={REG.class.exportDataType}
-      />
-      <DeleteConfirmationDialog
-        open={customBenefitToDelete !== null}
-        onClose={() => setCustomBenefitToDelete(null)}
-        onConfirm={() => {
-          if (customBenefitToDelete !== null) {
-            setCustomBenefits((arr) =>
-              arr.filter((_, j) => j !== customBenefitToDelete),
-            );
-          }
-        }}
-        title={t("Delete")}
-        message={t("Are you sure you want to delete this custom benefit?")}
-        itemPreview={
-          customBenefitToDelete !== null ? (
-            <Typography variant="h4">
-              {customBenefits[customBenefitToDelete] || t("Custom Benefit")}
-            </Typography>
-          ) : null
-        }
       />
     </>
   );
@@ -2823,6 +2706,7 @@ function QualityPickerDialog({ open, onClose, onSelect, filterType }) {
 
 function WeaponPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(buildWeaponPanelState);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
@@ -2939,7 +2823,15 @@ function WeaponPanel() {
                 group="core"
                 label={t("Weapon")}
                 cols={2}
-                extraProps={{ name: String(name ?? "") }}
+                extraProps={{
+                  name: String(name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.weapon, (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(buildWeaponPanelState(), stripPrivateFields(item)),
+                      ),
+                    ),
+                }}
               />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
@@ -3084,6 +2976,7 @@ function buildArmorPanelState() {
 
 function ArmorPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(buildArmorPanelState);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
@@ -3137,7 +3030,15 @@ function ArmorPanel() {
                 group="core"
                 label={t("Armor")}
                 cols={2}
-                extraProps={{ name: String(name ?? "") }}
+                extraProps={{
+                  name: String(name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.armor, (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(buildArmorPanelState(), stripPrivateFields(item)),
+                      ),
+                    ),
+                }}
               />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
@@ -3230,6 +3131,7 @@ function buildShieldPanelState() {
 
 function ShieldPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(buildShieldPanelState);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
@@ -3283,7 +3185,15 @@ function ShieldPanel() {
                 group="core"
                 label={t("Shield")}
                 cols={2}
-                extraProps={{ name: String(name ?? "") }}
+                extraProps={{
+                  name: String(name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.shield, (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(buildShieldPanelState(), stripPrivateFields(item)),
+                      ),
+                    ),
+                }}
               />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
@@ -3424,6 +3334,7 @@ function buildCWPanelState() {
 
 function CustomWeaponPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(buildCWPanelState);
   const [modifiersExpanded, setModifiersExpanded] = useState(false);
   const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
@@ -3610,7 +3521,16 @@ function CustomWeaponPanel() {
                 group="core"
                 label={t("Custom Weapon")}
                 cols={2}
-                extraProps={{ ...coreExtraProps, name: String(formState.name ?? "") }}
+                extraProps={{
+                  ...coreExtraProps,
+                  name: String(formState.name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["custom-weapon"], (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(buildCWPanelState(), stripPrivateFields(item)),
+                      ),
+                    ),
+                }}
               />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
@@ -3785,6 +3705,7 @@ function buildAccessoryPanelState() {
 
 function AccessoryPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(buildAccessoryPanelState);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
@@ -3833,7 +3754,15 @@ function AccessoryPanel() {
                 group="core"
                 label={t("Accessory")}
                 cols={2}
-                extraProps={{ name: String(name ?? "") }}
+                extraProps={{
+                  name: String(name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.accessory, (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(buildAccessoryPanelState(), stripPrivateFields(item)),
+                      ),
+                    ),
+                }}
               />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
@@ -3908,6 +3837,7 @@ const OPTIONAL_SUBTYPES = [
 
 function OptionalPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const { packs } = useCompendiumPacks();
   const [subtype, setSubtype] = useState("quirk");
   const [name, setName] = useState("");
@@ -4023,6 +3953,23 @@ function OptionalPanel() {
     setZeroEffect(null);
   };
 
+  const handleImportOptional = (item) => {
+    const imported = stripPrivateFields(item ?? {});
+    setSubtype(String(imported.subtype ?? "quirk"));
+    setName(String(imported.name ?? ""));
+    setFuid(imported.fuid || undefined);
+    setDescription(String(imported.description ?? ""));
+    setEffect(String(imported.effect ?? ""));
+    setTargetDescription(String(imported.targetDescription ?? ""));
+    const sections =
+      imported?.clock?.sections ?? imported?.clockSections ?? imported?.clock;
+    const parsedSections = Number(sections);
+    if (Number.isFinite(parsedSections) && parsedSections > 0) {
+      setClockSections(parsedSections);
+      setShowClock(true);
+    }
+  };
+
   return (
     <PanelLayout
       data={data}
@@ -4030,7 +3977,18 @@ function OptionalPanel() {
       formContent={
         <Grid container spacing={2}>
           <Grid size={12}>
-            <FuidField value={fuid} name={name} onChange={setFuid} autoSync />
+            <FuidField
+              value={fuid}
+              name={name}
+              onChange={setFuid}
+              onBrowse={() =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE.optional,
+                  handleImportOptional,
+                )
+              }
+              autoSync
+            />
           </Grid>
           <Grid
             size={{
@@ -4376,6 +4334,7 @@ function MnemospherePanel() {
 
 function HoplospherePanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(() =>
     createDefaultStateFromFields(hoplosphereFieldConfig),
   );
@@ -4433,7 +4392,27 @@ function HoplospherePanel() {
             surface="edit"
             group="core"
             cols={2}
-            extraProps={{ name: String(formState.name ?? "") }}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.hoplosphere, (item) => {
+                  const defaults = createDefaultStateFromFields(hoplosphereFieldConfig);
+                  const merged = mergeImportedIntoDefaults(defaults, stripPrivateFields(item));
+                  setFormState(merged);
+                  const importedCoag = merged?.coagEffects;
+                  if (importedCoag && typeof importedCoag === "object") {
+                    const rows = Object.entries(importedCoag)
+                      .map(([threshold, effect]) => ({
+                        threshold: Number(threshold),
+                        effect: String(effect ?? ""),
+                      }))
+                      .filter((row) => row.threshold > 1 && row.effect.trim());
+                    setCoagEffects(rows);
+                  } else {
+                    setCoagEffects([]);
+                  }
+                }),
+            }}
           />
           <Grid size={12}>
             <TextField
@@ -4571,6 +4550,12 @@ export default function QuickCreateModal({
   lockedToViewerType,
 }) {
   const { t } = useTranslate();
+  const tabsWrapRef = useRef(null);
+  const tabsDragRef = useRef({
+    active: false,
+    startX: 0,
+    startScrollLeft: 0,
+  });
 
   const lockedTabKey = lockedToViewerType
     ? VIEWER_TYPE_TO_TAB_KEY[lockedToViewerType]
@@ -4580,10 +4565,50 @@ export default function QuickCreateModal({
   const initialTab = lockedTabIdx >= 0 ? lockedTabIdx : 0;
 
   const [tab, setTab] = useState(initialTab);
+  const [importRequest, setImportRequest] = useState(null);
 
   useEffect(() => {
     if (open && lockedTabIdx >= 0) setTab(lockedTabIdx);
   }, [open, lockedTabIdx]);
+
+  const getTabsScroller = () =>
+    tabsWrapRef.current?.querySelector?.(".MuiTabs-scroller") ?? null;
+
+  const handleTabsPointerDown = (event) => {
+    const scroller = getTabsScroller();
+    if (!scroller) return;
+    tabsDragRef.current = {
+      active: true,
+      startX: event.clientX,
+      startScrollLeft: scroller.scrollLeft,
+    };
+  };
+
+  const handleTabsPointerMove = (event) => {
+    const scroller = getTabsScroller();
+    if (!scroller || !tabsDragRef.current.active) return;
+    const deltaX = event.clientX - tabsDragRef.current.startX;
+    scroller.scrollLeft = tabsDragRef.current.startScrollLeft - deltaX;
+  };
+
+  const stopTabsDrag = () => {
+    tabsDragRef.current.active = false;
+  };
+
+  const handleTabsWheel = (event) => {
+    const scroller = getTabsScroller();
+    if (!scroller) return;
+    if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+      scroller.scrollLeft += event.deltaY;
+      event.preventDefault();
+    }
+  };
+
+  const openImport = (viewerType, onImport) => {
+    setImportRequest({ viewerType, onImport });
+  };
+
+  const closeImport = () => setImportRequest(null);
 
   return (
     <Dialog
@@ -4610,7 +4635,15 @@ export default function QuickCreateModal({
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Box
+        ref={tabsWrapRef}
+        sx={{ borderBottom: 1, borderColor: "divider" }}
+        onPointerDown={handleTabsPointerDown}
+        onPointerMove={handleTabsPointerMove}
+        onPointerUp={stopTabsDrag}
+        onPointerLeave={stopTabsDrag}
+        onWheel={handleTabsWheel}
+      >
         <Tabs
           value={tab}
           onChange={(_, v) => setTab(v)}
@@ -4626,13 +4659,29 @@ export default function QuickCreateModal({
           ))}
         </Tabs>
       </Box>
-      <DialogContent sx={{ p: 0, flex: 1, overflow: "auto" }}>
-        {TABS.map(({ key, Panel }, idx) => (
-          <Box key={key} hidden={tab !== idx} sx={{ height: "100%" }}>
-            {tab === idx && <Panel />}
-          </Box>
-        ))}
-      </DialogContent>
+      <QuickCreateImportContext.Provider value={{ openImport }}>
+        <DialogContent sx={{ p: 0, flex: 1, overflow: "auto" }}>
+          {TABS.map(({ key, Panel }, idx) => (
+            <Box key={key} hidden={tab !== idx} sx={{ height: "100%" }}>
+              {tab === idx && <Panel />}
+            </Box>
+          ))}
+        </DialogContent>
+      </QuickCreateImportContext.Provider>
+      <CompendiumViewerModal
+        open={Boolean(importRequest)}
+        onClose={closeImport}
+        onAddItem={(item) => {
+          importRequest?.onImport?.(item);
+          closeImport();
+        }}
+        initialType={
+          importRequest?.viewerType ?? QUICK_CREATE_TAB_TO_VIEWER_TYPE.class
+        }
+        restrictToTypes={
+          importRequest?.viewerType ? [importRequest.viewerType] : undefined
+        }
+      />
     </Dialog>
   );
 }

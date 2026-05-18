@@ -98,7 +98,7 @@ function AttackContextMenu({ attack, onDelete }) {
 
   return (
     <>
-      <IconButton size="small" onClick={open}>
+      <IconButton component="span" size="small" onClick={open}>
         <MenuIcon fontSize="small" />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
@@ -269,7 +269,7 @@ export default function EditAttacks({ npc, setNpc }) {
             >
               <Box sx={{ display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
                 <Tooltip title={t("Roll")}>
-                  <IconButton size="small" onClick={handleRoll}>
+                  <IconButton component="span" size="small" onClick={handleRoll}>
                     <Casino fontSize="small" />
                   </IconButton>
                 </Tooltip>

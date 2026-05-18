@@ -34,6 +34,7 @@ import { qualityFieldConfig } from "../rendering/config/itemConfigs/quality";
 import { heroicFieldConfig } from "../rendering/config/itemConfigs/heroic";
 import { npcAttackFieldConfig } from "../rendering/config/itemConfigs/npcAttack";
 import { npcSpellFieldConfig } from "../rendering/config/itemConfigs/npcSpell";
+import { classFieldConfig } from "../rendering/config/itemConfigs/class";
 import { optionalFieldConfig } from "../rendering/config/itemConfigs/optional";
 import { mnemosphereFieldConfig } from "../rendering/config/itemConfigs/mnemosphere";
 import { hoplosphereFieldConfig } from "../rendering/config/itemConfigs/hoplosphere";
@@ -187,10 +188,12 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
   class: {
     key: "class",
     label: labelByKey.class,
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "class",
     exportDataType: "classes",
     schema: ClassSchema,
+    fields: classFieldConfig,
+    defaultState: () => createDefaultStateFromFields(classFieldConfig),
     buildPayload: createSchemaPayloadBuilder(ClassSchema),
   },
   optional: {

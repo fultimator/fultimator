@@ -157,7 +157,7 @@ function WeaponAttackContextMenu({ attack, onDelete }) {
 
   return (
     <>
-      <IconButton size="small" onClick={open}>
+      <IconButton component="span" size="small" onClick={open}>
         <MenuIcon fontSize="small" />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
@@ -326,7 +326,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
             >
               <Box sx={{ display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
                 <Tooltip title={t("Roll")}>
-                  <IconButton size="small" onClick={handleRoll}>
+                  <IconButton component="span" size="small" onClick={handleRoll}>
                     <Casino fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -348,7 +348,7 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
             </AccordionSummary>
             <AccordionDetails>
               <Grid container spacing={1}>
-                {/* Weapon preset picker — not in schema config */}
+                {/* Weapon preset picker, not in schema config */}
                 <Grid size={12}>
                   <SelectWeapon
                     attack={attack}

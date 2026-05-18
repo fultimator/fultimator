@@ -21,6 +21,9 @@ export type ComponentToken =
   | "martial-toggle"
   | "offensive-toggle"
   | "autocomplete"
+  | "toggle-group"
+  | "chip-multi-select"
+  | "object-list"
   // NPC-specific tokens
   | "npc-attr-slider"
   | "npc-affinity-slider"

@@ -92,7 +92,7 @@ function SpellTypeItemRow({ entry, customTheme, t }) {
                 variant="caption"
                 sx={{
                   fontWeight: "bold",
-                  color: customTheme.primary,
+                  color: "text.primary",
                   minWidth: 72,
                   flexShrink: 0,
                   pt: "2px",

@@ -153,6 +153,30 @@ export function SchemaFieldRenderer<
         const mergedProps = extraProps
           ? { ...field.componentProps, ...extraProps }
           : field.componentProps;
+        const componentPropsWithNestedRenderer = {
+          ...(mergedProps ?? {}),
+          renderNestedFields: ({
+            config,
+            state,
+            onChange,
+            surface = "edit",
+            cols = 2,
+          }: {
+            config: ItemFieldConfig<Record<string, unknown>>;
+            state: Record<string, unknown>;
+            onChange: (next: Record<string, unknown>) => void;
+            surface?: FormSurface;
+            cols?: 1 | 2 | 3 | 4;
+          }) => (
+            <SchemaFieldRenderer
+              config={config}
+              state={state}
+              onChange={onChange}
+              surface={surface}
+              cols={cols}
+            />
+          ),
+        };
 
         return (
           <Grid
@@ -175,7 +199,7 @@ export function SchemaFieldRenderer<
               label={typeof field.label === "function" ? field.label(state) : field.label}
               value={displayValue}
               onCommit={handleCommit}
-              componentProps={mergedProps}
+              componentProps={componentPropsWithNestedRenderer}
             />
           </Grid>
         );

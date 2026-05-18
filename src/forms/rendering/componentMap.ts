@@ -25,6 +25,9 @@ import {
   NpcImmunitiesRenderer,
   NpcDefenseRadioRenderer,
   AutocompleteRenderer,
+  ToggleGroupRenderer,
+  ChipMultiSelectRenderer,
+  ObjectListRenderer,
 } from "./fieldRenderers";
 
 type RendererComponent = React.ComponentType<FieldRendererProps>;
@@ -56,4 +59,7 @@ export const componentMap: Record<ComponentToken, RendererComponent> = {
   "npc-armor-select": NpcArmorSelectRenderer,
   "npc-immunities": NpcImmunitiesRenderer,
   "npc-defense-radio": NpcDefenseRadioRenderer,
+  "toggle-group": ToggleGroupRenderer,
+  "chip-multi-select": ChipMultiSelectRenderer,
+  "object-list": ObjectListRenderer,
 };
