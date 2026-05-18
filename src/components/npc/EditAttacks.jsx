@@ -303,6 +303,7 @@ export default function EditAttacks({ npc, setNpc }) {
                   }}
                   surface="edit"
                   group="core"
+                  label={t("Attack")}
                   cols={2}
                   extraProps={{ name: String(attack.name ?? "") }}
                 />

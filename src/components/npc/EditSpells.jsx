@@ -363,6 +363,7 @@ export default function EditSpells({ npc, setNpc }) {
                 }}
                 surface="edit"
                 group="core"
+                label={t("Spell")}
                 cols={2}
                 extraProps={{ name: String(spell.name ?? "") }}
               />

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   Button,
@@ -338,9 +338,30 @@ function EditLevel({ npc, setnpc }) {
     });
   };
 
+  const inputRef = useRef(null);
+  const onRaiseLevelRef = useRef(onRaiseLevel);
+  const onLowerLevelRef = useRef(onLowerLevel);
+  onRaiseLevelRef.current = onRaiseLevel;
+  onLowerLevelRef.current = onLowerLevel;
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const handler = (e) => {
+      if (document.activeElement !== el) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.deltaY < 0) onRaiseLevelRef.current();
+      else onLowerLevelRef.current();
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, []);
+
   return (
     <FormControl variant="standard" fullWidth>
       <TextField
+        inputRef={inputRef}
         label={t("Level:")}
         size="small"
         min={5}

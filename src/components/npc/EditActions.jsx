@@ -303,6 +303,7 @@ export default function EditActions({ npc, setNpc }) {
                 }}
                 surface="edit"
                 group="core"
+                label={t("Other Action")}
                 cols={2}
                 extraProps={{ name: String(action.name ?? "") }}
               />

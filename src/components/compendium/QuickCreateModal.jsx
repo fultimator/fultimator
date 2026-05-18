@@ -411,6 +411,7 @@ function NpcAttackPanel() {
             onChange={setFormState}
             surface="edit"
             group="core"
+            label={t("NPC Attack")}
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -498,6 +499,7 @@ function NpcSpellPanel() {
             onChange={setFormState}
             surface="edit"
             group="core"
+            label={t("NPC Spell")}
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -601,6 +603,7 @@ function NpcSpecialPanel() {
             onChange={setFormState}
             surface="edit"
             group="core"
+            label={t("Special Rule")}
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -673,6 +676,7 @@ function NpcActionPanel() {
             onChange={setFormState}
             surface="edit"
             group="core"
+            label={t("Other Action")}
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -3973,6 +3977,21 @@ function OptionalPanel() {
       formContent={
         <Grid container spacing={2}>
           <Grid size={12}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "0.75rem",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {t("Optional Rule")}
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid size={12}>
             <FuidField
               value={fuid}
               name={name}
@@ -4446,16 +4465,13 @@ function HoplospherePanel() {
                     sx={{ width: { xs: 1, sm: 140 } }}
                     slotProps={{ input: { inputProps: { min: 2 } } }}
                   />
-                  <TextField
+                  <CustomTextarea
                     label={t("Effect")}
-                    size="small"
-                    multiline
-                    minRows={2}
                     value={row.effect}
                     onChange={(e) =>
                       handleCoagChange(index, "effect", e.target.value)
                     }
-                    fullWidth
+                    helperText=""
                   />
                   <IconButton
                     aria-label={t("Remove coagulation effect")}

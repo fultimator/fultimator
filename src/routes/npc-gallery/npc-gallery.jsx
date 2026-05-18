@@ -252,8 +252,8 @@ function Personal() {
       affinities: {},
     };
     try {
-      const res = await db.addDoc(db.collection("npc-personal"), data);
-      console.debug(res);
+      const docRef = await db.addDoc(db.collection("npc-personal"), data);
+      navigate(`/npc-gallery/${docRef.id}`);
     } catch (e) {
       console.debug(e);
     }
@@ -288,9 +288,7 @@ function Personal() {
     try {
       const docRef = await db.addDoc(db.collection("npc-personal"), data);
       notify(t("NPC copied"));
-      setTimeout(() => {
-        window.location.href = `/npc-gallery/${docRef.id}`;
-      }, 800);
+      navigate(`/npc-gallery/${docRef.id}`);
     } catch {
       notify(t("Failed to copy NPC"));
     }

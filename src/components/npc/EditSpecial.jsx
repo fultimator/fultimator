@@ -304,6 +304,7 @@ export default function EditSpecial({ npc, setNpc }) {
                 }}
                 surface="edit"
                 group="core"
+                label={t("Special Rule")}
                 cols={2}
                 extraProps={{ name: String(special.name ?? "") }}
               />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -21,6 +21,7 @@ import {
   Select,
   Slider,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
@@ -159,13 +160,31 @@ export function CustomTextareaRenderer({
   );
 }
 
-// Number input with sign-based color.
+// Number input with sign-based color and scroll-wheel stepping.
 export function NumberRenderer({ label, value, onCommit }: FieldRendererProps) {
   const { t } = useTranslate();
   const n = (value as number) ?? 0;
+  const nRef = useRef(n);
+  nRef.current = n;
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      if (document.activeElement !== el) return;
+      e.preventDefault();
+      e.stopPropagation();
+      onCommit(nRef.current + (e.deltaY < 0 ? 1 : -1));
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, [onCommit]);
+
   return (
     <FormControl fullWidth size="small">
       <TextField
+        inputRef={inputRef}
         label={t(label)}
         value={n}
         onChange={(e) => onCommit(Number(e.target.value))}
@@ -208,22 +227,25 @@ export function MartialToggleRenderer({
   const { t } = useTranslate();
   const active = (value as boolean) ?? false;
   return (
-    <IconButton
-      onClick={() => onCommit(!active)}
-      disabled={disabled}
-      title={t("Martial")}
-      color={active ? "secondary" : "default"}
-      sx={{
-        border: "1px solid",
-        borderColor: active ? "secondary.main" : "divider",
-        borderRadius: 1,
-        width: 40,
-        height: 40,
-        "& svg": { width: 20, height: 20 },
-      }}
-    >
-      {active ? <Martial /> : <MartialOutline />}
-    </IconButton>
+    <Tooltip title={t("Martial")} placement="top">
+      <span>
+        <IconButton
+          onClick={() => onCommit(!active)}
+          disabled={disabled}
+          color={active ? "secondary" : "default"}
+          sx={{
+            border: "1px solid",
+            borderColor: active ? "secondary.main" : "divider",
+            borderRadius: 1,
+            width: 40,
+            height: 40,
+            "& svg": { width: 20, height: 20 },
+          }}
+        >
+          {active ? <Martial /> : <MartialOutline />}
+        </IconButton>
+      </span>
+    </Tooltip>
   );
 }
 
@@ -235,22 +257,25 @@ export function OffensiveToggleRenderer({
   const { t } = useTranslate();
   const active = (value as boolean) ?? false;
   return (
-    <IconButton
-      onClick={() => onCommit(!active)}
-      disabled={disabled}
-      title={t("Offensive")}
-      color={active ? "secondary" : "default"}
-      sx={{
-        border: "1px solid",
-        borderColor: active ? "secondary.main" : "divider",
-        borderRadius: 1,
-        width: 40,
-        height: 40,
-        "& svg": { width: 20, height: 20 },
-      }}
-    >
-      <OffensiveSpellIcon />
-    </IconButton>
+    <Tooltip title={t("Offensive")} placement="top">
+      <span>
+        <IconButton
+          onClick={() => onCommit(!active)}
+          disabled={disabled}
+          color={active ? "secondary" : "default"}
+          sx={{
+            border: "1px solid",
+            borderColor: active ? "secondary.main" : "divider",
+            borderRadius: 1,
+            width: 40,
+            height: 40,
+            "& svg": { width: 20, height: 20 },
+          }}
+        >
+          <OffensiveSpellIcon />
+        </IconButton>
+      </span>
+    </Tooltip>
   );
 }
 
