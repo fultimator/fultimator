@@ -1,20 +1,25 @@
 import {
-  Grid,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Divider,
   FormControl,
+  Grid,
   IconButton,
-  TextField,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
-  Divider,
+  Menu,
+  MenuItem,
+  TextField,
+  Typography,
 } from "@mui/material";
+import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
-import { Add, Menu as MenuIcon, Casino, Delete } from "@mui/icons-material";
+import { Add, Casino, Delete, ExpandMore, Menu as MenuIcon } from "@mui/icons-material";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useState } from "react";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
 function NoteContextMenu({ note, npcName, onDelete }) {
@@ -30,8 +35,8 @@ function NoteContextMenu({ note, npcName, onDelete }) {
 
   return (
     <>
-      <IconButton size="small" onClick={open}>
-        <MenuIcon fontSize="small" />
+      <IconButton onClick={open}>
+        <MenuIcon />
       </IconButton>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
@@ -50,24 +55,14 @@ function NoteContextMenu({ note, npcName, onDelete }) {
             close();
           }}
         >
-          <ListItemIcon>
-            <Casino fontSize="small" />
-          </ListItemIcon>
+          <ListItemIcon><Casino /></ListItemIcon>
           <ListItemText>{t("Roll")}</ListItemText>
         </MenuItem>
 
         <Divider />
 
-        <MenuItem
-          onClick={() => {
-            close();
-            onDelete();
-          }}
-          sx={{ color: "error.main" }}
-        >
-          <ListItemIcon>
-            <Delete fontSize="small" color="error" />
-          </ListItemIcon>
+        <MenuItem onClick={() => { close(); onDelete(); }} sx={{ color: "error.main" }}>
+          <ListItemIcon><Delete color="error" /></ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
       </Menu>
@@ -77,38 +72,34 @@ function NoteContextMenu({ note, npcName, onDelete }) {
 
 export default function EditNotes({ npc, setNpc }) {
   const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingNoteIndex, setPendingNoteIndex] = useState(null);
-  const onChangeNotes = (i, key, value) => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      newState.notes[i][key] = value;
-      return newState;
+
+  const onChange = (i, key, value) => {
+    setNpc((prev) => {
+      const notes = [...(prev.notes || [])];
+      notes[i] = { ...notes[i], [key]: value };
+      return { ...prev, notes };
     });
   };
 
-  const addNotes = () => {
-    setNpc((prevState) => ({
-      ...prevState,
-      notes: [
-        ...(prevState.notes || []),
-        {
-          name: "",
-          effect: "",
-        },
-      ],
+  const addNote = () => {
+    setNpc((prev) => ({
+      ...prev,
+      notes: [...(prev.notes || []), { name: "", effect: "" }],
     }));
   };
 
-  const removeNotes = (i) => {
-    setNpc((prevState) => ({
-      ...prevState,
-      notes: (prevState.notes || []).filter((_, index) => index !== i),
+  const removeNote = (i) => {
+    setNpc((prev) => ({
+      ...prev,
+      notes: (prev.notes || []).filter((_, idx) => idx !== i),
     }));
   };
 
-  const openDeleteDialog = (index) => {
-    setPendingNoteIndex(index);
+  const openDeleteDialog = (i) => {
+    setPendingNoteIndex(i);
     setIsDeleteDialogOpen(true);
   };
 
@@ -116,65 +107,84 @@ export default function EditNotes({ npc, setNpc }) {
     <>
       <CustomHeader
         type="middle"
-        addItem={addNotes}
+        addItem={addNote}
         headerText={t("Notes")}
         icon={Add}
       />
-      {npc.notes?.map((notes, i) => {
-        return (
-          <Grid container key={i} spacing={1}>
-            <Grid
-              sx={{
-                p: 0,
-                m: 0,
-                display: "flex",
-                alignItems: "center",
-                alignSelf: "flex-start",
-                pt: "4px",
-              }}
-            >
+      {npc.notes?.map((note, i) => (
+        <Accordion
+          key={i}
+          disableGutters
+          elevation={0}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            "&:before": { display: "none" },
+            mb: 0.5,
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMore />}
+            sx={{ "& .MuiAccordionSummary-content": { alignItems: "center", overflow: "hidden" } }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+              <IconButton
+                onClick={() =>
+                  addMessage({
+                    id: crypto.randomUUID(),
+                    createdAt: Date.now(),
+                    speaker: npc.name || "NPC",
+                    kind: "display",
+                    itemType: "note",
+                    name: note.name,
+                    tags: [],
+                    description: note.effect,
+                  })
+                }
+              >
+                <Casino />
+              </IconButton>
               <NoteContextMenu
-                note={notes}
+                note={note}
                 npcName={npc.name}
                 onDelete={() => openDeleteDialog(i)}
               />
+            </Box>
+            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+              <Typography noWrap>{note.name || t("(unnamed)")}</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={1}>
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <TextField
+                    label={t("Name:")}
+                    value={note.name}
+                    onChange={(e) => onChange(i, "name", e.target.value)}
+                    size="small"
+                  />
+                </FormControl>
+              </Grid>
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <CustomTextarea
+                    label={t("Details:")}
+                    value={note.effect}
+                    onChange={(e) => onChange(i, "effect", e.target.value)}
+                  />
+                </FormControl>
+              </Grid>
             </Grid>
-            <Grid size="grow">
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="name"
-                  label={t("Name:")}
-                  value={notes.name}
-                  onChange={(e) => {
-                    return onChangeNotes(i, "name", e.target.value);
-                  }}
-                  size="small"
-                ></TextField>
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <CustomTextarea
-                  label={t("Details:")}
-                  value={notes.effect}
-                  onChange={(e) => {
-                    return onChangeNotes(i, "effect", e.target.value);
-                  }}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        );
-      })}
+          </AccordionDetails>
+        </Accordion>
+      ))}
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setPendingNoteIndex(null);
-        }}
+        onClose={() => { setIsDeleteDialogOpen(false); setPendingNoteIndex(null); }}
         onConfirm={() => {
           if (pendingNoteIndex === null) return;
-          removeNotes(pendingNoteIndex);
+          removeNote(pendingNoteIndex);
           setIsDeleteDialogOpen(false);
           setPendingNoteIndex(null);
         }}

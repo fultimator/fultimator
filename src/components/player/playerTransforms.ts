@@ -23,7 +23,7 @@ function normalizeElementType(type: unknown): string {
   const raw = String(type ?? "physical")
     .toLowerCase()
     .trim();
-  if (raw === "air") return "air";
+  if (raw === "wind") return "air";
   if (raw === "lightning") return "bolt";
   return raw || "physical";
 }

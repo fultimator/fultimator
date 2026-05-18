@@ -192,7 +192,7 @@ export default function EditSkillModal({
                     </ListSubheader>,
                     groupedSkills[skillClass].map((groupedSkill) => (
                       <MenuItem
-                        key={groupedSkill.name}
+                        key={`${skillClass}-${groupedSkill.name}`}
                         value={groupedSkill.name}
                       >
                         {t(groupedSkill.name)}

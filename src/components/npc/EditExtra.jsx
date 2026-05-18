@@ -1,10 +1,8 @@
 import {
   Grid,
-  Stack,
   FormControl,
   TextField,
   FormLabel,
-  Typography,
 } from "@mui/material";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
 import { npcFieldConfig } from "../../forms/rendering/config/actorConfigs/npc";
@@ -50,35 +48,18 @@ export default function EditExtra({ npc, setNpc }) {
   );
 
   return (
-    <>
-      <Grid container spacing={2}>
-        <Grid size={6}>
-          <Stack spacing={1}>
-            <SchemaFieldRenderer
-              config={npcFieldConfig}
-              state={npc}
-              onChange={setNpc}
-              surface="edit"
-              group="defenses"
-              cols={1}
-            />
-          </Stack>
-        </Grid>
-        <Grid size={6}>
-          <Stack spacing={1}>
-            <SchemaFieldRenderer
-              config={npcFieldConfig}
-              state={npc}
-              onChange={setNpc}
-              surface="edit"
-              group="stats"
-              cols={1}
-            />
-          </Stack>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} sx={{ mt: 1 }}>
-        <Grid size={6}>
+    <Grid container spacing={2}>
+      {/* Left: Defenses + Immunities */}
+      <Grid size={6}>
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={npcFieldConfig}
+            state={npc}
+            onChange={setNpc}
+            surface="edit"
+            group="defenses"
+            cols={1}
+          />
           <SchemaFieldRenderer
             config={npcFieldConfig}
             state={npc}
@@ -89,9 +70,21 @@ export default function EditExtra({ npc, setNpc }) {
             extraProps={{ freeImmunities }}
           />
         </Grid>
-        <Grid size={6}>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <FormLabel>{t("Overrides")}</FormLabel>
+      </Grid>
+
+      {/* Right: Stats + Overrides */}
+      <Grid size={6}>
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={npcFieldConfig}
+            state={npc}
+            onChange={setNpc}
+            surface="edit"
+            group="stats"
+            cols={3}
+          />
+          <Grid size={12}>
+            <FormLabel sx={{ display: "block", mb: 1 }}>{t("Overrides")}</FormLabel>
             <FormControl variant="standard" fullWidth>
               <TextField
                 type="number"
@@ -116,9 +109,9 @@ export default function EditExtra({ npc, setNpc }) {
                 helperText={`${t("Gain 2 Immunities per 1 SP")} — ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
               />
             </FormControl>
-          </Stack>
+          </Grid>
         </Grid>
       </Grid>
-    </>
+    </Grid>
   );
 }

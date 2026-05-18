@@ -13,6 +13,7 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
+  OutlinedInput,
   ListItemText,
   ListSubheader,
   MenuItem,
@@ -142,6 +143,7 @@ export function TextRenderer({
     />
   );
 }
+
 
 export function CustomTextareaRenderer({
   label,
@@ -433,7 +435,9 @@ export function TypeSelectRenderer({
   const { t } = useTranslate();
   const options = (componentProps?.options as SelectOption[]) ?? [];
   const labelId = `type-select-${label}`;
-  const current = (value as string) ?? "";
+  const DAMAGE_TYPE_ALIASES: Record<string, string> = { wind: "air" };
+  const raw = (value as string) ?? "";
+  const current = DAMAGE_TYPE_ALIASES[raw] ?? raw;
   return (
     <FormControl variant="outlined" fullWidth size="small">
       <InputLabel id={labelId}>{t(label)}</InputLabel>
@@ -441,7 +445,7 @@ export function TypeSelectRenderer({
         labelId={labelId}
         value={current}
         label={t(label)}
-        onChange={(e) => onCommit(e.target.value)}
+        onChange={(e) => onCommit(DAMAGE_TYPE_ALIASES[e.target.value] ?? e.target.value)}
         renderValue={(v) => {
           const opt = options.find((o) => o.value === v);
           return (

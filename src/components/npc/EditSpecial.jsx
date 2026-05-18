@@ -84,14 +84,14 @@ function SpecialContextMenu({ special, npcName: _npcName, onDelete }) {
 
   return (
     <>
-      <IconButton size="small" onClick={open}>
-        <MenuIcon fontSize="small" />
+      <IconButton onClick={open}>
+        <MenuIcon />
       </IconButton>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
         <MenuItem onClick={handleAddToCompendium}>
           <ListItemIcon>
-            <LibraryAdd fontSize="small" />
+            <LibraryAdd />
           </ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
         </MenuItem>
@@ -106,7 +106,7 @@ function SpecialContextMenu({ special, npcName: _npcName, onDelete }) {
           sx={{ color: "error.main" }}
         >
           <ListItemIcon>
-            <Delete fontSize="small" color="error" />
+            <Delete color="error" />
           </ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
@@ -258,7 +258,7 @@ export default function EditSpecial({ npc, setNpc }) {
               onClick={(e) => e.stopPropagation()}
             >
               <IconButton
-                size="small"
+
                 onClick={() =>
                   addMessage({
                     id: crypto.randomUUID(),
@@ -272,7 +272,7 @@ export default function EditSpecial({ npc, setNpc }) {
                   })
                 }
               >
-                <Casino fontSize="small" />
+                <Casino />
               </IconButton>
               <SpecialContextMenu
                 special={special}

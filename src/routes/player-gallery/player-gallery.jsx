@@ -52,6 +52,9 @@ import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import {
   ContentPaste,
+  ChevronLeft,
+  ChevronRight,
+  Code,
   Delete,
   Download,
   DriveFileMove,
@@ -64,6 +67,7 @@ import {
   BugReport,
   ExpandLess,
   ExpandMore,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
@@ -82,6 +86,7 @@ import useDownload from "../../hooks/useDownload";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import SettingRow from "../../components/common/SettingRow";
 import classList from "../../libs/classes";
+import { buildItemText } from "../../libs/buildItemText";
 import MnemosphereCreateDialog from "../../components/player/equipment/technospheres/MnemosphereCreateDialog";
 import {
   canonicalizeForTransfer,
@@ -225,7 +230,10 @@ function Personal() {
         })
     : [];
 
-  const addPlayer = async function (options = defaultCreatePlayerOptions) {
+  const addPlayer = async function (
+    options = defaultCreatePlayerOptions,
+    forcedId = null,
+  ) {
     const technospheresEnabled = options.optionalRules?.technospheres ?? false;
     const technospheresVariant =
       options.optionalRules?.technospheresVariant ?? "standard";
@@ -403,6 +411,7 @@ function Personal() {
             ],
           }
         : {}),
+      ...(activeUid ? { uid: activeUid } : {}),
     };
 
     try {
@@ -410,11 +419,11 @@ function Personal() {
       const normalizedData = applyPreSaveTransforms(
         applyPostLoadTransforms(data),
       );
-      const res = await db.addDoc(
-        db.collection("player-personal"),
-        normalizedData,
-      );
-      console.debug(res);
+      if (forcedId) {
+        await db.setDoc(db.doc("player-personal", forcedId), normalizedData);
+        return forcedId;
+      }
+      const res = await db.addDoc(db.collection("player-personal"), normalizedData);
       return res.id;
     } catch (e) {
       console.debug(e);
@@ -832,13 +841,16 @@ function Personal() {
   };
 
   const handleCreatePlayerConfirm = async () => {
-    const newPlayerId = await addPlayer(createPlayerOptions);
+    const newPlayerId = crypto.randomUUID();
     handleCloseCreatePlayerModal();
-    if (newPlayerId) {
-      navigate(`/player-edit/${newPlayerId}`, {
-        state: { from: "/pc-gallery" },
-      });
-    }
+    navigate(`/player-edit/${newPlayerId}`, {
+      state: { from: "/pc-gallery", creating: true },
+    });
+    void addPlayer(createPlayerOptions, newPlayerId).then((savedId) => {
+      if (!savedId) {
+        console.error("Failed to persist newly created player", newPlayerId);
+      }
+    });
     setCreatePlayerOptions(defaultCreatePlayerOptions);
   };
 
@@ -1666,7 +1678,54 @@ function PlayerGalleryCardActions({
 }) {
   const cardRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
+  const [actionsAnchor, setActionsAnchor] = useState(null);
+  const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
   const [downloadImage] = useDownloadImage(player?.name || "player", cardRef);
+  const exportData = canonicalizeForTransfer("pc", applyPreSaveTransforms(player));
+
+  const closeMenus = () => {
+    setActionsAnchor(null);
+    setActionsSubmenu(null);
+  };
+
+  const copyJsonToClipboard = async () => {
+    await navigator.clipboard.writeText(JSON.stringify({ ...exportData, dataType: "pc" }, null, 2));
+    closeMenus();
+  };
+
+  const downloadJson = () => {
+    const safeName = (player?.name || "player").replace(/\s+/g, "_").toLowerCase();
+    const blob = new Blob([JSON.stringify({ ...exportData, dataType: "pc" }, null, 2)], {
+      type: "application/json;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
+
+  const copyText = async (fmt) => {
+    const text = buildItemText("pc", exportData, fmt);
+    await navigator.clipboard.writeText(text);
+    closeMenus();
+  };
+
+  const downloadText = (fmt) => {
+    const text = buildItemText("pc", exportData, fmt);
+    const ext = fmt === "plain" ? "txt" : "md";
+    const safeName = (player?.name || "player").replace(/\s+/g, "_").toLowerCase();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
 
   return (
     <>
@@ -1683,11 +1742,120 @@ function PlayerGalleryCardActions({
           mt: "3px",
           display: "flex",
           alignItems: "center",
-          gap: 0.25,
+          gap: 1,
           flexWrap: "wrap",
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        <Tooltip title={t("Actions")}>
+          <IconButton onClick={(e) => setActionsAnchor(e.currentTarget)}>
+            <MenuIcon />
+          </IconButton>
+        </Tooltip>
+        <MuiMenu
+          anchorEl={actionsAnchor}
+          open={Boolean(actionsAnchor)}
+          onClose={closeMenus}
+          TransitionProps={{ onExited: () => setActionsSubmenu(null) }}
+        >
+          {actionsSubmenu === null && [
+            <MenuItem
+              key="edit"
+              onClick={() => { closeMenus(); handleNavigation(`/player-edit/${player.id}`); }}
+            >
+              <ListItemIcon><Edit fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Edit")} />
+            </MenuItem>,
+            <MenuItem
+              key="sheet"
+              onClick={() => { closeMenus(); handleNavigation(`/character-sheet/${player.id}`); }}
+            >
+              <ListItemIcon><Badge fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Player Sheet")} />
+            </MenuItem>,
+            <MenuItem key="export" onClick={() => setActionsSubmenu("export")}>
+              <ListItemIcon><Code fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Export")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem key="transfer" onClick={() => setActionsSubmenu("transfer")}>
+              <ListItemIcon><FileCopy fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="delete"
+              onClick={() => { closeMenus(); deletePlayer(player)(); }}
+            >
+              <ListItemIcon><Delete fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Delete")} />
+            </MenuItem>,
+            <MenuItem
+              key="share"
+              disabled={dbMode === "local"}
+              onClick={() => { closeMenus(); sharePlayer(player.id); }}
+            >
+              <ListItemIcon><Share fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Share URL")} />
+            </MenuItem>,
+            <MenuItem
+              key="download"
+              onClick={() => { closeMenus(); downloadImage(); }}
+            >
+              <ListItemIcon><Download fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Download as Image")} />
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "export" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon><ChevronLeft fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Export")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem key="copy-json" onClick={copyJsonToClipboard}>{t("copy_json_clipboard")}</MenuItem>,
+            <MenuItem key="dl-json" onClick={downloadJson}>{t("export_json_file")}</MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem key="copy-md" onClick={() => copyText("markdown")}>{t("Copy Markdown to Clipboard")}</MenuItem>,
+            <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>{t("Export as Markdown (.md)")}</MenuItem>,
+            <Divider key="div3" />,
+            <MenuItem key="copy-plain" onClick={() => copyText("plain")}>{t("Copy Plaintext to Clipboard")}</MenuItem>,
+            <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>{t("Export as Plaintext (.txt)")}</MenuItem>,
+          ]}
+          {actionsSubmenu === "transfer" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon><ChevronLeft fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem key="copy-local" onClick={() => { closeMenus(); copyPlayerToLocal(player)(); }}>
+              <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Copy to Local")} />
+            </MenuItem>,
+            <MenuItem key="copy-cloud" onClick={() => { closeMenus(); copyPlayerToCloud(player)(); }}>
+              <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Copy to Cloud")} />
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem key="move-local" onClick={() => { closeMenus(); movePlayerToLocal(player)(); }}>
+              <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>,
+            <MenuItem key="move-cloud" onClick={() => { closeMenus(); movePlayerToCloud(player)(); }}>
+              <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>,
+          ]}
+        </MuiMenu>
+        <Tooltip title={t("Edit")}>
+          <IconButton onClick={() => handleNavigation(`/player-edit/${player.id}`)}>
+            <Edit />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("Player Sheet")}>
+          <IconButton onClick={() => handleNavigation(`/character-sheet/${player.id}`)}>
+            <Badge />
+          </IconButton>
+        </Tooltip>
         <PlayerTransferButton
           player={player}
           copyPlayerToLocal={copyPlayerToLocal}
@@ -1696,18 +1864,6 @@ function PlayerGalleryCardActions({
           movePlayerToCloud={movePlayerToCloud}
           t={t}
         />
-        <Tooltip title={t("Download")}>
-          <IconButton onClick={downloadImage}>
-            <Download />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t("Edit")}>
-          <IconButton
-            onClick={() => handleNavigation(`/player-edit/${player.id}`)}
-          >
-            <Edit />
-          </IconButton>
-        </Tooltip>
         <Tooltip title={t("Delete")}>
           <IconButton onClick={deletePlayer(player)}>
             <Delete />
@@ -1723,11 +1879,9 @@ function PlayerGalleryCardActions({
             </IconButton>
           </span>
         </Tooltip>
-        <Tooltip title={t("Player Sheet")}>
-          <IconButton
-            onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
-          >
-            <Badge />
+        <Tooltip title={t("Download as Image")}>
+          <IconButton onClick={downloadImage}>
+            <Download />
           </IconButton>
         </Tooltip>
         <Export

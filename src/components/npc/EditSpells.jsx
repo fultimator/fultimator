@@ -103,18 +103,18 @@ function SpellContextMenu({ spell, onDelete }) {
 
   return (
     <>
-      <IconButton component="span" size="small" onClick={open}>
-        <MenuIcon fontSize="small" />
+      <IconButton component="span" onClick={open}>
+        <MenuIcon />
       </IconButton>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
         <MenuItem onClick={handleAddToCompendium}>
-          <ListItemIcon><LibraryAdd fontSize="small" /></ListItemIcon>
+          <ListItemIcon><LibraryAdd /></ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem onClick={() => { close(); onDelete(); }} sx={{ color: "error.main" }}>
-          <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
+          <ListItemIcon><Delete color="error" /></ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
       </Menu>
@@ -319,8 +319,8 @@ export default function EditSpells({ npc, setNpc }) {
               onClick={(e) => e.stopPropagation()}
             >
               <Tooltip title={t("Roll")}>
-                <IconButton component="span" size="small" onClick={handleRoll}>
-                  <Casino fontSize="small" />
+                <IconButton component="span" onClick={handleRoll}>
+                  <Casino />
                 </IconButton>
               </Tooltip>
               <SpellContextMenu spell={spell} onDelete={() => openDeleteDialog(i)} />

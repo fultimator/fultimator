@@ -21,7 +21,7 @@ function normalizeElementType(type: unknown): Elements {
   const raw = String(type ?? "physical")
     .toLowerCase()
     .trim();
-  if (raw === "air") return "air" as Elements;
+  if (raw === "wind") return "air" as Elements;
   return (raw || "physical") as Elements;
 }
 
@@ -481,6 +481,29 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
   };
 }
 
+function renameWindToAir(npc: TypeNpc): TypeNpc {
+  const affinities = { ...(npc.affinities as unknown as Record<string, unknown>) };
+  if ("wind" in affinities) {
+    if (affinities["air"] === undefined) affinities["air"] = affinities["wind"];
+    delete affinities["wind"];
+  }
+
+  const fixDamage = (damage: { type?: unknown } | undefined) =>
+    damage ? { ...damage, type: normalizeElementType(damage.type) } : damage;
+
+  const attacks = (npc.attacks ?? []).map((a) => ({ ...a, damage: fixDamage(a.damage) }));
+  const weaponattacks = (npc.weaponattacks ?? []).map((a) => ({ ...a, damage: fixDamage(a.damage) }));
+  const spells = (npc.spells ?? []).map((s) => ({ ...s, damage: fixDamage(s.damage) }));
+
+  return {
+    ...npc,
+    affinities: affinities as unknown as TypeNpc["affinities"],
+    attacks: attacks as TypeNpc["attacks"],
+    weaponattacks: weaponattacks as TypeNpc["weaponattacks"],
+    spells: spells as TypeNpc["spells"],
+  };
+}
+
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 1,
@@ -553,7 +576,7 @@ export function applyNpcPostLoadTransforms(npc: TypeNpc): TypeNpc {
   if ((result.schemaVersion ?? 0) < NPC_CURRENT_SCHEMA_VERSION) {
     result = { ...result, schemaVersion: NPC_CURRENT_SCHEMA_VERSION };
   }
-  return result;
+  return renameWindToAir(result);
 }
 
 // Migration detection
