@@ -51,8 +51,8 @@ describe("itemFormRegistry", () => {
     }
   });
 
-  it("player-spell uses quick-create-panel implementation", () => {
-    expect(itemFormRegistry["player-spell"].implementation).toBe("quick-create-panel");
+  it("player-spell uses schema-config implementation", () => {
+    expect(itemFormRegistry["player-spell"].implementation).toBe("schema-config");
   });
 
   it("player-spell has subtypeDefinitions for all spell subtypes", () => {

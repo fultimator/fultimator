@@ -22,6 +22,11 @@ import { HoplosphereSchema } from "../schema/itemSchemas/hoplosphere";
 import {
   PlayerSpellSchema,
   PlayerSpellSubtypeSchemas,
+  PlayerSpellDefaultSchema,
+  PlayerSpellArcanistSchema,
+  PlayerSpellArcanistReworkSchema,
+  PlayerSpellTinkererAlchemySchema,
+  PlayerSpellTinkererInfusionSchema,
 } from "../schema/itemSchemas/playerSpell";
 import { weaponFieldConfig } from "../rendering/config/itemConfigs/weapon";
 import { customWeaponFieldConfig } from "../rendering/config/itemConfigs/customWeapon";
@@ -38,6 +43,10 @@ import { classFieldConfig } from "../rendering/config/itemConfigs/class";
 import { optionalFieldConfig } from "../rendering/config/itemConfigs/optional";
 import { mnemosphereFieldConfig } from "../rendering/config/itemConfigs/mnemosphere";
 import { hoplosphereFieldConfig } from "../rendering/config/itemConfigs/hoplosphere";
+import {
+  playerSpellFieldConfig,
+  type PlayerSpellFormState,
+} from "../rendering/config/itemConfigs/playerSpell";
 import {
   createDefaultStateFromFields,
   createSchemaPayloadBuilder,
@@ -247,10 +256,12 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
   "player-spell": {
     key: "player-spell",
     label: labelByKey["player-spell"],
-    implementation: "quick-create-panel",
+    implementation: "schema-config",
     addItemType: "player-spell",
     exportDataType: "player-spells",
     schema: PlayerSpellSchema,
+    fields: playerSpellFieldConfig,
+    defaultState: () => createDefaultStateFromFields(playerSpellFieldConfig),
     discriminatorKey: "spellType",
     subtypeDefinitions: Object.fromEntries(
       Object.entries(PlayerSpellSubtypeSchemas).map(([subtype, schema]) => [
@@ -263,26 +274,123 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         },
       ]),
     ),
-    buildPayload: (state: unknown) => {
+    buildPayload: (state: unknown): unknown | null => {
       if (!state || typeof state !== "object") return null;
-      const payload = state as Record<string, unknown>;
-      const spellType = payload.spellType;
-      if (typeof spellType !== "string") return null;
+      const s = state as PlayerSpellFormState;
+      const spellType = s.spellType;
+      if (!spellType) return null;
 
-      const subtypeKey =
-        spellType === "magichant"
-          ? payload.magichantSubtype === "key"
-            ? "magichant-key"
-            : "magichant"
-          : spellType;
+      const metaObj = s["meta.book"]
+        ? {
+            book: s["meta.book"],
+            page: s["meta.page"],
+            bookName: s["meta.bookName"] || undefined,
+            isOfficial: s["meta.isOfficial"],
+          }
+        : undefined;
 
-      const schema =
-        PlayerSpellSubtypeSchemas[
-          subtypeKey as keyof typeof PlayerSpellSubtypeSchemas
-        ];
-      if (!schema) return null;
-      const parsed = schema.safeParse(payload);
-      return parsed.success ? parsed.data : null;
+      // default spell: flat fields from form state
+      if (spellType === "default") {
+        const payload = {
+          spellType: "default" as const,
+          class: s.class,
+          name: s.name.trim(),
+          fuid: s.fuid || undefined,
+          meta: metaObj,
+          showInPlayerSheet: true,
+          description: s.description.trim(),
+          isOffensive: s.isOffensive,
+          cost: {
+            resource: "mp" as const,
+            amount: s["cost.amount"],
+            perTarget: s["cost.perTarget"],
+          },
+          maxTargets: s.maxTargets,
+          targetDescription: s.targetDescription.trim() || "One creature",
+          duration: s.duration.trim() || "Instantaneous",
+          accuracy: {
+            attr1: s["accuracy.attr1"],
+            attr2: s["accuracy.attr2"],
+            value: 0,
+            defense: "mdef" as const,
+          },
+          damage: {
+            value: s.isOffensive ? s["damage.value"] : 0,
+            type: s.isOffensive ? s["damage.type"] : "physical",
+            hrZero: s["damage.hrZero"],
+          },
+        };
+        const parsed = PlayerSpellDefaultSchema.safeParse(payload);
+        return parsed.success ? parsed.data : null;
+      }
+
+      const base = {
+        name: s.name.trim(),
+        fuid: s.fuid || undefined,
+        meta: metaObj,
+        showInPlayerSheet: true,
+        spellType,
+      };
+
+      // arcanist: flat domain/merge/dismiss fields from form state
+      if (spellType === "arcanist") {
+        const payload = {
+          ...base,
+          spellType: "arcanist" as const,
+          description: s.description.trim(),
+          domain: s.domain.trim(),
+          domainDesc: s.domainDesc.trim(),
+          merge: s.merge.trim(),
+          mergeDesc: s.mergeDesc.trim(),
+          dismiss: s.dismiss.trim(),
+          dismissDesc: s.dismissDesc.trim(),
+        };
+        const parsed = PlayerSpellArcanistSchema.safeParse(payload);
+        return parsed.success ? parsed.data : null;
+      }
+
+      if (spellType === "arcanist-rework") {
+        const payload = {
+          ...base,
+          spellType: "arcanist-rework" as const,
+          description: s.description.trim(),
+          domain: s.domain.trim(),
+          domainDesc: s.domainDesc.trim(),
+          merge: s.merge.trim(),
+          mergeDesc: s.mergeDesc.trim(),
+          dismiss: s.dismiss.trim(),
+          dismissDesc: s.dismissDesc.trim(),
+          pulse: s.pulse.trim(),
+          pulseDesc: s.pulseDesc.trim(),
+        };
+        const parsed = PlayerSpellArcanistReworkSchema.safeParse(payload);
+        return parsed.success ? parsed.data : null;
+      }
+
+      if (spellType === "tinkerer-alchemy") {
+        const payload = {
+          ...base,
+          spellType: "tinkerer-alchemy" as const,
+          category: s.category.trim() || undefined,
+        };
+        const parsed = PlayerSpellTinkererAlchemySchema.safeParse(payload);
+        return parsed.success ? parsed.data : null;
+      }
+
+      if (spellType === "tinkerer-infusion") {
+        const payload = {
+          ...base,
+          spellType: "tinkerer-infusion" as const,
+          infusionRank: s.infusionRank != null ? s.infusionRank : undefined,
+        };
+        const parsed = PlayerSpellTinkererInfusionSchema.safeParse(payload);
+        return parsed.success ? parsed.data : null;
+      }
+
+      // All container/bespoke types (gift, dance, symbol, therioform, magichant,
+      // invocation, cooking, magiseed, pilot-vehicle, gamble, deck, tinkerer-magitech)
+      // are edited via their own bespoke UI and save directly - buildPayload is not used.
+      return null;
     },
   },
 };
