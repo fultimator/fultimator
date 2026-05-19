@@ -411,7 +411,7 @@ export const availableModules = {
       type: "pilot_module_weapon",
       quality: "",
       category: "Heavy",
-      cost: 0,
+      cost: 500,
       range: "Melee",
       qualityCost: 0,
       equipped: false,
@@ -435,6 +435,7 @@ export const availableModules = {
       description: "",
       customName: "",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "aerial",
@@ -442,6 +443,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_aerial_desc",
       isComplex: true,
+      cost: 1000,
     },
     {
       fuid: "anti-element",
@@ -449,6 +451,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_anti-element_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "advanced-targeting",
@@ -456,6 +459,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_advanced_targeting_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "counterstrike",
@@ -463,6 +467,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_counterstrike_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "excavation",
@@ -470,6 +475,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_excavation_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "expanded-plating",
@@ -477,6 +483,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_expanded_plating_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "magistatic",
@@ -484,6 +491,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_magistatic_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "power",
@@ -491,6 +499,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_power_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "rapid-interface",
@@ -498,6 +507,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_rapid_interface_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "seafarer",
@@ -505,6 +515,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_seafarer_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "seat",
@@ -512,6 +523,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_seat_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "secondary-offensive",
@@ -519,6 +531,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_secondary_offensive_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "sensor",
@@ -526,6 +539,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_sensor_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "turbo",
@@ -533,6 +547,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_turbo_desc",
       isComplex: false,
+      cost: 1000,
     },
   ],
 };
@@ -545,3 +560,8 @@ Object.values(availableModules).forEach((list) => {
     if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
   });
 });
+
+availableModules.support = availableModules.support.map((module) => ({
+  ...module,
+  cost: module.cost ?? 1000,
+}));

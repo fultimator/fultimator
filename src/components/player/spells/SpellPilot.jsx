@@ -18,6 +18,7 @@ import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import attributes from "../../../libs/attributes";
 import { availableFrames } from "../../../libs/pilotVehicleData";
+import { Martial } from "../../icons";
 
 function ThemedSpellPilot({
   pilot,
@@ -59,115 +60,103 @@ function ThemedSpellPilot({
   };
 
   const getEquippedCount = (vehicle, moduleType) => {
-    if (!vehicle.modules) return 0;
-    return vehicle.modules
-      .filter((m) => m.equipped && getModuleTypeForLimits(m) === moduleType)
-      .reduce((count, module) => {
-        // Complex support modules take 2 slots
-        return (
-          count +
-          (getModuleTypeForLimits(module) === "support" && module.isComplex
-            ? 2
-            : 1)
-        );
+    const s = vehicle.slots ?? {};
+    if (moduleType === "armor") {
+      return s.armor ? 1 : 0;
+    }
+    if (moduleType === "weapon") {
+      const weaponKeys = new Set([s.main, s.off].filter(Boolean));
+      return weaponKeys.size;
+    }
+    if (moduleType === "support") {
+      return (s.support ?? []).reduce((count, key) => {
+        const mod = (vehicle.modules || []).find((m) => (m.key ?? m.name) === key);
+        return count + (mod?.isComplex ? 2 : 1);
       }, 0);
+    }
+    return 0;
   };
 
   const canEquipModule = (vehicle, moduleIndex) => {
     const module = vehicle.modules[moduleIndex];
+    const moduleKey = module.key ?? module.name;
     const frameLimits = getFrameLimits(vehicle);
     const maxEnabledModules = vehicle.maxEnabledModules || 3;
+    const s = vehicle.slots ?? {};
 
-    // Determine slot cost using isComplex from pilotVehicleData
     const frameType = getModuleTypeForLimits(module);
     const slotsNeeded = frameType === "support" && module.isComplex ? 2 : 1;
 
-    // Count total slots used
+    const isCurrentlyEquipped =
+      s.main === moduleKey ||
+      s.off === moduleKey ||
+      s.armor === moduleKey ||
+      (s.support ?? []).includes(moduleKey);
+
+    // Count total slots used by other modules
     const totalUsedSlots = vehicle.modules.reduce((count, m, idx) => {
-      if (!m.equipped || idx === moduleIndex) return count;
+      if (idx === moduleIndex) return count;
+      const mk = m.key ?? m.name;
+      const mEquipped =
+        s.main === mk || s.off === mk || s.armor === mk || (s.support ?? []).includes(mk);
+      if (!mEquipped) return count;
       const mType = getModuleTypeForLimits(m);
       return count + (mType === "support" && m.isComplex ? 2 : 1);
     }, 0);
 
-    // Block when slots needed would exceed the limit
-    if (!module.equipped && totalUsedSlots + slotsNeeded > maxEnabledModules) {
+    if (!isCurrentlyEquipped && totalUsedSlots + slotsNeeded > maxEnabledModules) {
       return false;
     }
 
-    // Check if unlimited slots for this type
-    if (frameLimits[frameType] === -1) return true; // Unlimited
+    if (frameLimits[frameType] === -1) return true;
 
-    // For weapons, check hand slot availability
     if (frameType === "weapon") {
-      const equippedWeapons = vehicle.modules.filter(
-        (m, idx) =>
-          idx !== moduleIndex &&
-          m.equipped &&
-          getModuleTypeForLimits(m) === "weapon",
-      );
+      const hasBothHandsWeapon = s.main && s.main === s.off;
+      if (hasBothHandsWeapon && !isCurrentlyEquipped) return false;
 
-      // Check if any equipped weapon uses both hands (M+O)
-      const hasBothHandsWeapon = equippedWeapons.some(
-        (m) => m.equippedSlot === "both",
-      );
-
-      // If there's a both-hands weapon, no other weapons can be equipped
-      if (hasBothHandsWeapon) return false;
-
-      // For unequipped modules
-      if (!module.equipped) {
-        const mainOccupied = equippedWeapons.some(
-          (m) => (m.equippedSlot || (m.isShield ? "off" : "main")) === "main",
-        );
-        const offOccupied = equippedWeapons.some(
-          (m) => (m.equippedSlot || (m.isShield ? "off" : "main")) === "off",
-        );
+      if (!isCurrentlyEquipped) {
+        const mainOccupied = Boolean(s.main);
+        const offOccupied = Boolean(s.off);
 
         if (module.isShield) {
-          // Shield can be equipped if off hand is free or if off hand is taken by another shield (so it goes to main)
           if (!offOccupied) return true;
-
-          const offHandShield = equippedWeapons.find(
-            (m) => m.isShield && (m.equippedSlot === "off" || !m.equippedSlot),
-          );
-          return !!offHandShield && !mainOccupied;
+          const offMod = (vehicle.modules || []).find((m) => (m.key ?? m.name) === s.off);
+          return !!offMod?.isShield && !mainOccupied;
         }
 
-        // Regular weapon needs either hand free
         return !mainOccupied || !offOccupied;
       }
 
-      // For already equipped modules being re-evaluated
+      // Already equipped - check slot validity
       const proposedSlot =
-        module.equippedSlot || (module.isShield ? "off" : "main");
-
+        s.main === moduleKey && s.off === moduleKey ? "both"
+        : s.main === moduleKey ? "main"
+        : s.off === moduleKey ? "off"
+        : null;
+      if (!proposedSlot) return false;
       if (proposedSlot === "both") {
-        return equippedWeapons.length === 0;
+        const otherWeaponEquipped = (vehicle.modules || []).some((m, idx) => {
+          if (idx === moduleIndex) return false;
+          const mk = m.key ?? m.name;
+          return getModuleTypeForLimits(m) === "weapon" && (s.main === mk || s.off === mk);
+        });
+        return !otherWeaponEquipped;
       }
-
-      const occupiedSlots = equippedWeapons.map(
-        (m) => m.equippedSlot || (m.isShield ? "off" : "main"),
-      );
-
-      return !occupiedSlots.includes(proposedSlot);
+      return true;
     }
 
     const currentlyEquippedSlots = vehicle.modules
-      .filter(
-        (m, idx) =>
-          idx !== moduleIndex &&
-          m.equipped &&
-          getModuleTypeForLimits(m) === frameType,
-      )
+      .filter((m, idx) => {
+        if (idx === moduleIndex) return false;
+        const mk = m.key ?? m.name;
+        const mEquipped =
+          s.main === mk || s.off === mk || s.armor === mk || (s.support ?? []).includes(mk);
+        return mEquipped && getModuleTypeForLimits(m) === frameType;
+      })
       .reduce((count, m) => {
-        // Complex support modules take 2 slots
-        return (
-          count +
-          (getModuleTypeForLimits(m) === "support" && m.isComplex ? 2 : 1)
-        );
+        return count + (getModuleTypeForLimits(m) === "support" && m.isComplex ? 2 : 1);
       }, 0);
 
-    // Check if this module would fit
     return currentlyEquippedSlots + slotsNeeded <= frameLimits[frameType];
   };
 
@@ -383,38 +372,53 @@ function ThemedSpellPilot({
                   size={5}
                 >
                   <Typography style={{ flexGrow: 1, marginRight: "5px" }}>
-                    {vehicle.modules &&
-                    vehicle.modules.filter((m) => m.equipped).length > 0
-                      ? vehicle.modules
-                          .filter((m) => m.equipped)
-                          .map((m) => {
-                            const moduleName =
-                              m.name === "pilot_custom_armor" ||
-                              m.name === "pilot_custom_weapon" ||
-                              m.name === "pilot_custom_support"
-                                ? m.customName
-                                : t(m.name);
-                            let slotInfo = "";
-                            if (m.type === "pilot_module_weapon") {
-                              // Show hand information for weapons
-                              const handText = m.cumbersome
+                    {(() => {
+                      const vSlots = vehicle.slots ?? {};
+                      const equippedModules = (vehicle.modules || []).filter((m) => {
+                        const mk = m.key ?? m.name;
+                        return (
+                          vSlots.main === mk ||
+                          vSlots.off === mk ||
+                          vSlots.armor === mk ||
+                          (vSlots.support ?? []).includes(mk)
+                        );
+                      });
+                      // Deduplicate (cumbersome weapons appear in both main and off)
+                      const seen = new Set();
+                      const dedupedModules = equippedModules.filter((m) => {
+                        const mk = m.key ?? m.name;
+                        if (seen.has(mk)) return false;
+                        seen.add(mk);
+                        return true;
+                      });
+                      if (dedupedModules.length === 0) return t("No modules equipped");
+                      return dedupedModules
+                        .map((m) => {
+                          const moduleName =
+                            m.name === "pilot_custom_armor" ||
+                            m.name === "pilot_custom_weapon" ||
+                            m.name === "pilot_custom_support"
+                              ? m.customName
+                              : t(m.name);
+                          const mk = m.key ?? m.name;
+                          let slotInfo = "";
+                          if (m.type === "pilot_module_weapon") {
+                            const handText =
+                              vSlots.main === mk && vSlots.off === mk
                                 ? "M+O"
-                                : m.equippedSlot === "main"
-                                  ? "M"
-                                  : "O";
-                              slotInfo = `[${handText}]`;
-                            } else if (
-                              m.type === "pilot_module_support" &&
-                              m.isComplex
-                            ) {
-                              slotInfo = "(2 slots)";
-                            } else {
-                              slotInfo = "(1 slot)";
-                            }
-                            return `${moduleName} ${slotInfo}`;
-                          })
-                          .join(", ")
-                      : t("No modules equipped")}
+                                : vSlots.main === mk
+                                ? "M"
+                                : "O";
+                            slotInfo = `[${handText}]`;
+                          } else if (m.type === "pilot_module_support" && m.isComplex) {
+                            slotInfo = "(2 slots)";
+                          } else {
+                            slotInfo = "(1 slot)";
+                          }
+                          return `${moduleName} ${slotInfo}`;
+                        })
+                        .join(", ");
+                    })()}
                   </Typography>
                 </Grid>
                 <Grid
@@ -541,16 +545,31 @@ function ThemedSpellPilot({
                         </div>,
                         // Type modules
                         ...modulesByType[moduleType].map(
-                          (module, moduleIndex) => (
+                          (module, moduleIndex) => {
+                            const mKey = module.key ?? module.name;
+                            const vs = vehicle.slots ?? {};
+                            const isEquipped =
+                              vs.main === mKey ||
+                              vs.off === mKey ||
+                              vs.armor === mKey ||
+                              (vs.support ?? []).includes(mKey);
+                            const moduleSlot =
+                              vs.main === mKey && vs.off === mKey ? "both"
+                              : vs.main === mKey ? "main"
+                              : vs.off === mKey ? "off"
+                              : vs.armor === mKey ? "armor"
+                              : (vs.support ?? []).includes(mKey) ? "support"
+                              : null;
+                            return (
                             <div
                               key={`${moduleType}-${moduleIndex}`}
                               style={{
                                 padding: "3px 17px",
                                 borderBottom: `1px solid ${theme.secondary}`,
-                                backgroundColor: module.enabled
+                                backgroundColor: isEquipped
                                   ? theme.ternary + "20"
                                   : "transparent",
-                                borderLeft: module.enabled
+                                borderLeft: isEquipped
                                   ? `4px solid ${theme.primary}`
                                   : "none",
                               }}
@@ -559,7 +578,7 @@ function ThemedSpellPilot({
                                 <Grid size={4}>
                                   <Typography
                                     sx={{
-                                      fontWeight: module.enabled
+                                      fontWeight: isEquipped
                                         ? "bold"
                                         : "normal",
                                       fontSize: "1em",
@@ -570,6 +589,7 @@ function ThemedSpellPilot({
                                     module.name === "pilot_custom_support"
                                       ? module.customName
                                       : t(module.name)}
+                                    {module.martial && <Martial />}
                                     {module.cumbersome && " ⚠"}
                                   </Typography>
                                 </Grid>
@@ -681,7 +701,7 @@ function ThemedSpellPilot({
                                     {isEditMode && (
                                       <>
                                         {/* Hand toggle for equipped weapons */}
-                                        {module.equipped &&
+                                        {isEquipped &&
                                           module.type ===
                                             "pilot_module_weapon" && (
                                             <div
@@ -691,11 +711,8 @@ function ThemedSpellPilot({
                                               }}
                                             >
                                               {module.isShield ? (
-                                                // Shields can now be M or O to support Dual Shieldbearer
                                                 <ToggleButtonGroup
-                                                  value={
-                                                    module.equippedSlot || "off"
-                                                  }
+                                                  value={moduleSlot || "off"}
                                                   exclusive
                                                   onChange={(e, newValue) => {
                                                     if (
@@ -716,13 +733,14 @@ function ThemedSpellPilot({
                                                     value="main"
                                                     disabled={
                                                       !vehicle.modules.some(
-                                                        (m) =>
-                                                          m.equipped &&
-                                                          m.isShield &&
-                                                          (m.equippedSlot ===
-                                                            "off" ||
-                                                            !m.equippedSlot) &&
-                                                          m !== module,
+                                                        (m) => {
+                                                          const mk = m.key ?? m.name;
+                                                          return (
+                                                            m.isShield &&
+                                                            vs.off === mk &&
+                                                            mk !== mKey
+                                                          );
+                                                        },
                                                       )
                                                     }
                                                     sx={{
@@ -745,7 +763,6 @@ function ThemedSpellPilot({
                                                   </ToggleButton>
                                                 </ToggleButtonGroup>
                                               ) : module.cumbersome ? (
-                                                // Cumbersome weapons use both hands
                                                 <Button
                                                   variant="contained"
                                                   size="small"
@@ -759,12 +776,8 @@ function ThemedSpellPilot({
                                                   M+O
                                                 </Button>
                                               ) : (
-                                                // Regular weapons can toggle between main/off
                                                 <ToggleButtonGroup
-                                                  value={
-                                                    module.equippedSlot ||
-                                                    "main"
-                                                  }
+                                                  value={moduleSlot || "main"}
                                                   exclusive
                                                   onChange={(e, newValue) => {
                                                     if (
@@ -794,11 +807,14 @@ function ThemedSpellPilot({
                                                   <ToggleButton
                                                     value="off"
                                                     disabled={vehicle.modules.some(
-                                                      (m) =>
-                                                        m.equipped &&
-                                                        m.isShield &&
-                                                        m.equippedSlot ===
-                                                          "off",
+                                                      (m) => {
+                                                        const mk2 = m.key ?? m.name;
+                                                        return (
+                                                          m.isShield &&
+                                                          vs.off === mk2 &&
+                                                          mk2 !== mKey
+                                                        );
+                                                      },
                                                     )}
                                                     sx={{
                                                       minWidth: 30,
@@ -814,18 +830,18 @@ function ThemedSpellPilot({
                                           )}
                                         <Button
                                           variant={
-                                            module.equipped
+                                            isEquipped
                                               ? "contained"
                                               : "outlined"
                                           }
                                           color={
-                                            module.equipped
+                                            isEquipped
                                               ? "success"
                                               : "primary"
                                           }
                                           size="small"
                                           disabled={
-                                            !module.equipped &&
+                                            !isEquipped &&
                                             !canEquipModule(
                                               vehicle,
                                               module.originalIndex,
@@ -837,12 +853,12 @@ function ThemedSpellPilot({
                                               i,
                                               module.originalIndex,
                                               "equipped",
-                                              !module.equipped,
+                                              !isEquipped,
                                             )
                                           }
                                           sx={{ minWidth: 60 }}
                                         >
-                                          {module.equipped
+                                          {isEquipped
                                             ? "Equipped"
                                             : "Equip"}
                                         </Button>
@@ -851,24 +867,24 @@ function ThemedSpellPilot({
                                     {!isEditMode && (
                                       <Typography
                                         sx={{
-                                          color: module.enabled
+                                          color: isEquipped
                                             ? "success.main"
                                             : "text.disabled",
-                                          fontWeight: module.enabled
+                                          fontWeight: isEquipped
                                             ? "bold"
                                             : "normal",
                                           fontSize: "0.85em",
                                         }}
                                       >
-                                        {module.enabled ? "Active" : "Inactive"}
+                                        {isEquipped ? "Active" : "Inactive"}
                                       </Typography>
                                     )}
                                   </div>
                                 </Grid>
                               </Grid>
                             </div>
-                          ),
-                        ),
+                          );
+                          }),
                       ];
                     })
                     .flat()

@@ -1,4 +1,3 @@
-import { availableFrames } from "../../../../../libs/pilotVehicleData";
 import { availableMagichantKeys } from "../../../../../components/player/spells/spellOptionData";
 
 export const SPELL_TYPE_OPTIONS = [
@@ -64,53 +63,6 @@ export const INV_TYPE_OPTIONS = ["Blast", "Hex", "Utility"].map((t) => ({
   value: t,
   label: t,
 }));
-
-export const PILOT_SUBTYPE_OPTIONS = [
-  { value: "frame", label: "Vehicle Frame" },
-  { value: "armor", label: "Armor Module" },
-  { value: "weapon", label: "Weapon Module" },
-  { value: "support", label: "Support Module" },
-];
-
-export const PILOT_WEAPON_CATEGORY_OPTIONS = [
-  "Arcane",
-  "Brawling",
-  "Bow",
-  "Dagger",
-  "Firearm",
-  "Flail",
-  "Heavy",
-  "Spear",
-  "Sword",
-].map((c) => ({ value: c, label: c }));
-
-export const PILOT_DAMAGE_TYPE_OPTIONS = [
-  "Physical",
-  "Air",
-  "Bolt",
-  "Dark",
-  "Earth",
-  "Fire",
-  "Ice",
-  "Light",
-  "Poison",
-].map((d) => ({ value: d.toLowerCase(), label: d }));
-
-export const PILOT_ATTR_OPTIONS = [
-  { value: "dexterity", label: "DEX" },
-  { value: "insight", label: "INS" },
-  { value: "might", label: "MIG" },
-  { value: "willpower", label: "WLP" },
-];
-
-export const PILOT_RANGE_OPTIONS = [
-  { value: "Melee", label: "Melee" },
-  { value: "Ranged", label: "Ranged" },
-];
-
-export const FRAME_OPTIONS = (availableFrames as Array<Record<string, unknown>>).map(
-  (f) => ({ value: f.name as string, label: f.name as string }),
-);
 
 const mkKeyOptions = (key: string) =>
   Array.from(

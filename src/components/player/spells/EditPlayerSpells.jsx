@@ -1807,9 +1807,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "pilot-vehicle" &&
                               !spellTypeHeaders.pilot && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("pilot_vehicles")}
-                                  />
+                                  {renderCompendiumHeader(
+                                    t("pilot_vehicles"),
+                                    () =>
+                                      setSystemCompendiumTarget({
+                                        className: cls.name,
+                                        spellType: "pilot-vehicle",
+                                        label: t("pilot_vehicles"),
+                                      }),
+                                  )}
                                   {(spellTypeHeaders.pilot = true)}
                                 </>
                               )}

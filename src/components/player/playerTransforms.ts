@@ -1071,6 +1071,169 @@ function actorAlignmentV10Player(player: TypePlayer): TypePlayer {
 
 // One-time versioned migrations.
 // Each transform brings the player up to its declared schema version.
+function migrateSpellV11(spell: Record<string, unknown>): Record<string, unknown> {
+  const s = spell;
+  const type = s.spellType as string | undefined;
+
+  // Container sub-item name -> key (gift, dance, symbol, therioform, magiseed)
+  const containerArrayKey: Record<string, string> = {
+    gift: "gifts",
+    dance: "dances",
+    symbol: "symbols",
+    therioform: "therioforms",
+    magiseed: "magiseeds",
+  };
+  const arrayKey = type ? containerArrayKey[type] : undefined;
+  if (arrayKey && Array.isArray(s[arrayKey])) {
+    return {
+      ...s,
+      [arrayKey]: (s[arrayKey] as Record<string, unknown>[]).map((item) =>
+        item.key !== undefined ? item : { ...item, key: item.name, name: undefined },
+      ),
+    };
+  }
+
+  // magichant: name -> key on both keys[] and tones[]
+  if (type === "magichant") {
+    const renameKey = (item: Record<string, unknown>) =>
+      item.key !== undefined ? item : { ...item, key: item.name, name: undefined };
+    return {
+      ...s,
+      keys: Array.isArray(s.keys) ? s.keys.map(renameKey) : s.keys,
+      tones: Array.isArray(s.tones) ? s.tones.map(renameKey) : s.tones,
+    };
+  }
+
+  // invocation: flat tracker fields -> tracker: {}; sub-item name -> key
+  if (type === "invocation") {
+    const tracker = (s.tracker as Record<string, unknown>) ?? {
+      innerWellspring: s.innerWellspring ?? false,
+      chosenWellspring: s.chosenWellspring ?? null,
+      activeWellsprings: s.activeWellsprings ?? [],
+    };
+    return {
+      ...s,
+      tracker,
+      innerWellspring: undefined,
+      chosenWellspring: undefined,
+      activeWellsprings: undefined,
+      invocations: Array.isArray(s.invocations)
+        ? (s.invocations as Record<string, unknown>[]).map((item) =>
+            item.key !== undefined ? item : { ...item, key: item.name, name: undefined },
+          )
+        : s.invocations,
+    };
+  }
+
+  // cooking: flat cookbookEffects + ingredientInventory -> cookbook: {}
+  if (type === "cooking") {
+    if (s.cookbook) return s; // already migrated
+    const rawEffects = s.cookbookEffects ?? {};
+    const effects = Array.isArray(rawEffects)
+      ? rawEffects
+      : Object.values(rawEffects as Record<string, unknown>).map((data) => {
+          const d = data as Record<string, unknown>;
+          return {
+            taste1: d.taste1 ?? "",
+            taste2: d.taste2 ?? "",
+            effect: d.effect ?? "",
+            customChoices: d.customChoices ?? {},
+          };
+        });
+    return {
+      ...s,
+      cookbook: { effects, ingredientInventory: s.ingredientInventory ?? [] },
+      cookbookEffects: undefined,
+      ingredientInventory: undefined,
+    };
+  }
+
+  // pilot-vehicle: reconstruct vehicle.slots from legacy module flags; clean up modules
+  if (type === "pilot-vehicle" && Array.isArray(s.vehicles)) {
+    return {
+      ...s,
+      vehicles: (s.vehicles as Record<string, unknown>[]).map((v) => {
+        const veh = v as Record<string, unknown>;
+        const modules = Array.isArray(veh.modules)
+          ? (veh.modules as Record<string, unknown>[])
+          : [];
+
+        const slots = (veh.slots as Record<string, unknown>) ?? (() => {
+          const result: Record<string, unknown> = { main: null, off: null, armor: null, support: [] };
+          for (const m of modules) {
+            if (!m.equipped) continue;
+            const key = (m.key ?? m.name) as string;
+            if (m.type === "pilot_module_armor") {
+              result.armor = key;
+            } else if (m.type === "pilot_module_support") {
+              (result.support as string[]).push(key);
+            } else if (m.type === "pilot_module_weapon") {
+              const slot = (m.equippedSlot as string) ?? "main";
+              if (slot === "both") { result.main = key; result.off = key; }
+              else result[slot] = key;
+            }
+          }
+          return result;
+        })();
+
+        return {
+          ...veh,
+          key: veh.key ?? veh.name,
+          name: undefined,
+          enabledModules: undefined,
+          slots,
+          modules: modules.map((m) => {
+            const base: Record<string, unknown> = {
+              ...m,
+              key: m.key ?? m.name,
+              name: undefined,
+              equipped: undefined,
+              equippedSlot: undefined,
+              enabled: undefined,
+            };
+            if (m.type === "pilot_module_weapon" && !m.accuracy) {
+              return {
+                ...base,
+                accuracy: {
+                  attr1: m.att1 ?? "dexterity",
+                  attr2: m.att2 ?? "insight",
+                  value: m.prec ?? 0,
+                  defense: "def",
+                },
+                damage: {
+                  value: m.damage ?? 0,
+                  type: typeof m.damageType === "string"
+                    ? m.damageType.toLowerCase()
+                    : "physical",
+                  hrZero: false,
+                },
+                att1: undefined, att2: undefined, prec: undefined, damageType: undefined,
+              };
+            }
+            if (m.type === "pilot_module_armor") {
+              return { ...base, att1: undefined, att2: undefined, prec: undefined, damageType: undefined, range: undefined };
+            }
+            return base;
+          }),
+        };
+      }),
+    };
+  }
+
+  return s;
+}
+
+function migratePlayerSpellsV11(player: TypePlayer): TypePlayer {
+  const migrate = (spell: Record<string, unknown>) => migrateSpellV11(spell);
+  return {
+    ...player,
+    classes: player.classes?.map((cls) => ({
+      ...cls,
+      spells: cls.spells?.map(migrate as never) ?? [],
+    })),
+  };
+}
+
 // Skipped if schemaVersion is already >= the transform's version.
 // Transforms must be ordered by ascending version.
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
@@ -1127,6 +1290,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; modifiers migrated; will renamed to willpower",
     fn: actorAlignmentV10Player,
+  },
+  {
+    version: 11,
+    label:
+      "Spell v11: sub-item name->key on container types; invocation tracker grouping; cooking cookbook namespace; pilot-vehicle slots reconstruction",
+    fn: migratePlayerSpellsV11,
   },
 ];
 

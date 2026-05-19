@@ -2143,7 +2143,48 @@ export const SharedPilotVehicleCard = React.memo(
                 onClick={onHeaderClick}
                 sx={headerBoxSx(customTheme, scale, onHeaderClick)}
               >
-                <Typography>{typeLabel}</Typography>
+                {pilotSubtype === "armor" ? (
+                  <Grid container sx={{ flex: 1 }}>
+                    <Grid size={5}>
+                      <Typography>{typeLabel}</Typography>
+                    </Grid>
+                    <Grid size={2}>
+                      <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+                    </Grid>
+                    <Grid size={2}>
+                      <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
+                    </Grid>
+                    <Grid size={3}>
+                      <Typography sx={{ textAlign: "center" }}>{t("MDEF")}</Typography>
+                    </Grid>
+                  </Grid>
+                ) : pilotSubtype === "support" ? (
+                  <Grid container sx={{ flex: 1 }}>
+                    <Grid size={9}>
+                      <Typography>{typeLabel}</Typography>
+                    </Grid>
+                    <Grid size={3}>
+                      <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+                    </Grid>
+                  </Grid>
+                ) : pilotSubtype === "frame" ? (
+                  <Grid container sx={{ flex: 1 }}>
+                    <Grid size={4}>
+                      <Typography>{typeLabel}</Typography>
+                    </Grid>
+                    <Grid size={3}>
+                      <Typography sx={{ textAlign: "center" }}>{t("Frame")}</Typography>
+                    </Grid>
+                    <Grid size={2}>
+                      <Typography sx={{ textAlign: "center" }}>{t("Passengers")}</Typography>
+                    </Grid>
+                    <Grid size={3}>
+                      <Typography sx={{ textAlign: "center" }}>{t("Distance")}</Typography>
+                    </Grid>
+                  </Grid>
+                ) : (
+                  <Typography>{typeLabel}</Typography>
+                )}
               </Box>
             )
           }
@@ -2153,41 +2194,73 @@ export const SharedPilotVehicleCard = React.memo(
           imageSlot={imageSlot}
           customTheme={customTheme}
         >
-          <Box sx={nameRowSx(customTheme)}>
-            <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
-              {t(item.name)}
-            </Typography>
-          </Box>
-          <Box sx={bodyBoxSx()}>
-            {pilotSubtype === "frame" && (
-              <>
-                {item.frame && (
+          {pilotSubtype === "frame" && (
+            <>
+              <Grid
+                container
+                sx={{
+                  alignItems: "center",
+                  minHeight: "36px",
+                  py: 0.5,
+                  pl: 2,
+                  pr: 2,
+                  width: "100%",
+                  borderBottom: `1px solid ${customTheme.secondary}`,
+                  ...(background ? { background } : {}),
+                }}
+              >
+                <Grid size={4} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography
-                    variant="caption"
                     sx={{
-                      color: "text.secondary",
-                      textTransform: "uppercase",
                       fontWeight: 600,
-                      display: "block",
-                      mb: 0.5,
+                      fontSize: scale.headingRow,
+                      lineHeight: 1,
+                      margin: 0,
                     }}
                   >
-                    {t(item.frame)}
+                    {item.customName || t(item.name)}
                   </Typography>
-                )}
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: "text.secondary",
-                    display: "block",
-                    mb: 0.75,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {t("Passengers")}: {item.passengers ?? " - "} ·{" "}
-                  {t("Distance")}: {item.distance ?? " - "}
-                </Typography>
-                {item.description && (
+                </Grid>
+                <Grid size={3}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      fontWeight: 600,
+                      fontSize: scale.body,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {item.frame ? t(item.frame) : "—"}
+                  </Typography>
+                </Grid>
+                <Grid size={2}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      fontSize: scale.body,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {item.passengers ?? "—"}
+                  </Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      fontSize: scale.body,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {item.distance ?? "—"}
+                  </Typography>
+                </Grid>
+              </Grid>
+              {item.description && (
+                <Box sx={{ pl: 2, pr: 2, py: 0.75, borderBottom: `1px solid ${customTheme.secondary}` }}>
                   <Typography
                     variant="body2"
                     component="div"
@@ -2195,45 +2268,143 @@ export const SharedPilotVehicleCard = React.memo(
                   >
                     {md(t(item.description))}
                   </Typography>
-                )}
-              </>
-            )}
-            {pilotSubtype === "armor" && (
-              <>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: "text.secondary",
-                    display: "block",
-                    mb: 0.75,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  DEF {item.def ?? " - "} · MDEF {item.mdef ?? " - "}
-                  {item.martial ? " · Martial" : ""}
-                  {item.cost ? ` · ${item.cost}z` : ""}
-                </Typography>
-                {item.description && (
-                  <Typography
-                    variant="body2"
-                    component="div"
-                    sx={{ color: "text.secondary", lineHeight: 1.5 }}
-                  >
-                    {md(t(item.description))}
-                  </Typography>
-                )}
-              </>
-            )}
-            {pilotSubtype === "support" && item.description && (
-              <Typography
-                variant="body2"
-                component="div"
-                sx={{ color: "text.secondary", lineHeight: 1.5 }}
+                </Box>
+              )}
+            </>
+          )}
+          {pilotSubtype === "support" && (
+            <>
+              <Grid
+                container
+                sx={{
+                  alignItems: "center",
+                  minHeight: "36px",
+                  py: 0.5,
+                  pl: 2,
+                  pr: 2,
+                  width: "100%",
+                  borderBottom: `1px solid ${customTheme.secondary}`,
+                  ...(background ? { background } : {}),
+                }}
               >
-                {md(t(item.description))}
-              </Typography>
-            )}
-          </Box>
+                <Grid size={9} sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: scale.headingRow,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {item.customName || t(item.name)}
+                  </Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      fontSize: scale.body,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {`${item.cost ?? 1000}z`}
+                  </Typography>
+                </Grid>
+              </Grid>
+              {item.description && (
+                <Box sx={{ pl: 2, pr: 2, py: 0.75, borderBottom: `1px solid ${customTheme.secondary}` }}>
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{ color: "text.secondary", lineHeight: 1.5 }}
+                  >
+                    {md(t(item.description))}
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
+          {pilotSubtype === "armor" && (
+            <>
+              <Grid
+                container
+                sx={{
+                  alignItems: "center",
+                  minHeight: "36px",
+                  py: 0.5,
+                  pl: 2,
+                  pr: 2,
+                  width: "100%",
+                  borderBottom: `1px solid ${customTheme.secondary}`,
+                  ...(background ? { background } : {}),
+                }}
+              >
+                <Grid size={5} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: scale.headingRow,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {item.customName || t(item.name)}
+                  </Typography>
+                  {item.martial && <Martial />}
+                </Grid>
+                <Grid size={2}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      fontSize: scale.body,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {`${item.cost ?? 500}z`}
+                  </Typography>
+                </Grid>
+                <Grid size={2}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      fontWeight: 600,
+                      fontSize: scale.body,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {item.martial ? (item.def ?? "-") : `${t("DEX die")} + ${item.def ?? 0}`}
+                  </Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      fontWeight: 600,
+                      fontSize: scale.body,
+                      lineHeight: 1,
+                      margin: 0,
+                    }}
+                  >
+                    {item.martial ? (item.mdef ?? "-") : `${t("INS die")} + ${item.mdef ?? 0}`}
+                  </Typography>
+                </Grid>
+              </Grid>
+              {item.description && (
+                <Box sx={{ pl: 2, pr: 2, py: 0.75, borderBottom: `1px solid ${customTheme.secondary}` }}>
+                  <Typography
+                    variant="body2"
+                    component="div"
+                    sx={{ color: "text.secondary", lineHeight: 1.5 }}
+                  >
+                    {md(t(item.description))}
+                  </Typography>
+                </Box>
+              )}
+            </>
+          )}
         </RowsWithOptionalImage>
       </CardContentWrapper>
     );

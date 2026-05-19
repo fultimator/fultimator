@@ -723,7 +723,7 @@ function Npc({ npc: rawNpc, copyNpc, shareNpc, reportNpc, collapseGet }) {
       <NpcActorCard
         npc={npc}
         cardRef={ref}
-        npcImage={""}
+        npcImage={npc.imgurl}
         collapse={collapse}
         variant="interactive"
         onClick={() => setCollapse(!collapse)}

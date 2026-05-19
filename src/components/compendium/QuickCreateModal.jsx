@@ -16,6 +16,7 @@ import {
   Select,
   MenuItem,
   ToggleButton,
+  ToggleButtonGroup,
   Autocomplete,
   Chip,
   Button,
@@ -37,7 +38,7 @@ import {
 import DownloadIcon from "@mui/icons-material/Download";
 import LinkIcon from "@mui/icons-material/Link";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { OffensiveSpellIcon } from "../icons";
+import { OffensiveSpellIcon, Martial } from "../icons";
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
 import { useTranslate, t as staticT } from "../../translation/translate";
@@ -732,6 +733,29 @@ function NpcActionPanel() {
 
 // Player Spell panel
 
+const SPELL_TYPE_TO_CLASS = {
+  gift: "Esper",
+  dance: "Dancer",
+  therioform: "Mutant",
+  "magichant-key": "Chanter",
+  magichant: "Chanter",
+  symbol: "Symbolist",
+  invocation: "Invoker",
+  arcanist: "Arcanist",
+  "arcanist-rework": "Arcanist-Rework",
+  "tinkerer-alchemy": "Tinkerer",
+  "tinkerer-infusion": "Tinkerer",
+  cooking: "Gourmet",
+  magiseed: "Floralist",
+  "pilot-vehicle": "Pilot",
+};
+
+const PILOT_MODULE_BASE_COST = {
+  armor: 500,
+  weapon: 500,
+  support: 1000,
+};
+
 const NON_STATIC_TYPES = [
   { value: "default", label: "Standard Spell" },
   { value: "gift", label: "Gift" },
@@ -780,7 +804,6 @@ const PILOT_DAMAGE_TYPES = [
   "Light",
   "Poison",
 ];
-const PILOT_ATTRS = ["dexterity", "insight", "might", "willpower"];
 const PILOT_RANGES = ["Melee", "Ranged"];
 const MAGICHANT_KEY_TYPES = Array.from(
   new Set(availableMagichantKeys.map((k) => k.type).filter(Boolean)),
@@ -861,7 +884,7 @@ function PlayerSpellPanel() {
   const [moduleRange, setModuleRange] = useState("");
   const [modulePrec, setModulePrec] = useState(0);
   const [moduleCumbersome, setModuleCumbersome] = useState(false);
-  const [moduleCost, setModuleCost] = useState(0);
+  const [moduleCost, setModuleCost] = useState(PILOT_MODULE_BASE_COST.armor);
   const [moduleDescription, setModuleDescription] = useState("");
   // weapon-specific
   const [weaponCategory, setWeaponCategory] = useState("Heavy");
@@ -921,7 +944,7 @@ function PlayerSpellPanel() {
     setModuleRange("");
     setModulePrec(0);
     setModuleCumbersome(false);
-    setModuleCost(0);
+    setModuleCost(PILOT_MODULE_BASE_COST.armor);
     setModuleDescription("");
     setWeaponCategory("Heavy");
     setDamageType("Physical");
@@ -1090,7 +1113,7 @@ function PlayerSpellPanel() {
                   name: "pilot_custom_armor",
                   type: "pilot_module_armor",
                   category: "Armor",
-                  cost: Number(moduleCost) || 0,
+                  cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.armor,
                   def: Number(moduleDef) || 0,
                   mdef: Number(moduleMdef) || 0,
                   martial: moduleMartial,
@@ -1102,7 +1125,7 @@ function PlayerSpellPanel() {
                   name: "pilot_custom_weapon",
                   type: "pilot_module_weapon",
                   category: weaponCategory,
-                  cost: Number(moduleCost) || 0,
+                  cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.weapon,
                   accuracy: {
                     attr1: pilotAtt1,
                     attr2: pilotAtt2,
@@ -1128,7 +1151,7 @@ function PlayerSpellPanel() {
                 type: "pilot_module_support",
                 description: effect.trim(),
                 isComplex: true,
-                cost: Number(moduleCost) || 0,
+                cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.support,
               };
             })()),
         };
@@ -1199,6 +1222,12 @@ function PlayerSpellPanel() {
                     openImport(
                       QUICK_CREATE_TAB_TO_VIEWER_TYPE["player-spell"],
                       handleImportPlayerSpell,
+                      {
+                        initialSpellClass: SPELL_TYPE_TO_CLASS[spellType] ?? "",
+                        ...(spellType === "pilot-vehicle"
+                          ? { initialModuleTypeFilter: pilotSubtype }
+                          : {}),
+                      },
                     )
                   }
                   autoSync
@@ -1620,122 +1649,143 @@ function PlayerSpellPanel() {
               {spellType === "pilot-vehicle" && (
                 <>
                   <Grid size={12}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("Component Type")}</InputLabel>
-                      <Select
-                        value={pilotSubtype}
-                        label={t("Component Type")}
-                        onChange={(e) => setPilotSubtype(e.target.value)}
-                      >
-                        {PILOT_SUBTYPES.map((s) => (
-                          <MenuItem key={s.value} value={s.value}>
-                            {t(s.label)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                    <ToggleButtonGroup
+                      value={pilotSubtype}
+                      exclusive
+                      onChange={(_, v) => {
+                        if (v !== null) {
+                          setPilotSubtype(v);
+                          if (v === "armor" || v === "weapon" || v === "support") {
+                            setModuleCost(PILOT_MODULE_BASE_COST[v]);
+                          }
+                        }
+                      }}
+                      size="small"
+                      fullWidth
+                    >
+                      {PILOT_SUBTYPES.map((s) => (
+                        <ToggleButton key={s.value} value={s.value}>
+                          {t(s.label)}
+                        </ToggleButton>
+                      ))}
+                    </ToggleButtonGroup>
                   </Grid>
 
                   {/* Frame */}
                   {pilotSubtype === "frame" && (
-                    <Grid size={12}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>{t("Frame")}</InputLabel>
-                        <Select
-                          value={vehicleFrame}
-                          label={t("Frame")}
-                          onChange={(e) => setVehicleFrame(e.target.value)}
-                        >
-                          {availableFrames.map((f) => (
-                            <MenuItem key={f.name} value={f.name}>
-                              {t(f.name)} - {t("Passengers")}: {f.passengers} |{" "}
-                              {t("Distance")}: {f.distance}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                    <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                      <Grid size={12}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                          {t("Frame")}
+                        </Typography>
+                      </Grid>
+                      <Grid size={12}>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>{t("Frame")}</InputLabel>
+                          <Select
+                            value={vehicleFrame}
+                            label={t("Frame")}
+                            onChange={(e) => setVehicleFrame(e.target.value)}
+                          >
+                            {availableFrames.map((f) => (
+                              <MenuItem key={f.name} value={f.name}>
+                                {t(f.name)} - {t("Passengers")}: {f.passengers} |{" "}
+                                {t("Distance")}: {f.distance}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
                     </Grid>
                   )}
 
-                  {/* Cost : shown for all module types */}
-                  {pilotSubtype !== "frame" && (
-                    <Grid
-                      size={{
-                        xs: 6,
-                        sm: 4,
-                      }}
-                    >
-                      <TextField
-                        label={t("Cost")}
-                        value={moduleCost}
-                        type="number"
-                        fullWidth
-                        size="small"
-                        onChange={(e) => setModuleCost(e.target.value)}
-                        slotProps={{
-                          htmlInput: { min: 0 },
-                        }}
-                      />
+                  {/* Support Module */}
+                  {pilotSubtype === "support" && (
+                    <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                      <Grid size={12}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                          {t("Support Module")}
+                        </Typography>
+                      </Grid>
+                      <Grid size={{ xs: 6, sm: 4 }}>
+                        <TextField
+                          label={t("Cost")}
+                          value={moduleCost}
+                          type="number"
+                          fullWidth
+                          size="small"
+                          onChange={(e) => setModuleCost(e.target.value)}
+                          slotProps={{ htmlInput: { min: 0 } }}
+                        />
+                      </Grid>
                     </Grid>
                   )}
 
                   {/* Armor Module */}
                   {pilotSubtype === "armor" && (
                     <>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 3,
-                        }}
-                      >
-                        <TextField
-                          label="DEF"
-                          value={moduleDef}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModuleDef(e.target.value)}
-                        />
+                      <Grid size={12} container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+                        <Grid size={12}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                            {t("Armor")}
+                          </Typography>
+                        </Grid>
+                        <Grid size="auto" sx={{ display: "flex", alignItems: "center" }}>
+                          <ToggleButton
+                            value="martial"
+                            selected={moduleMartial}
+                            onChange={() => setModuleMartial((v) => !v)}
+                            size="small"
+                          >
+                            <Martial />
+                          </ToggleButton>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <TextField
+                            label={moduleMartial ? "DEF" : t("DEX die") + " + DEF"}
+                            value={moduleDef}
+                            type="number"
+                            fullWidth
+                            size="small"
+                            onChange={(e) => setModuleDef(e.target.value)}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <TextField
+                            label={moduleMartial ? "MDEF" : t("INS die") + " + MDEF"}
+                            value={moduleMdef}
+                            type="number"
+                            fullWidth
+                            size="small"
+                            onChange={(e) => setModuleMdef(e.target.value)}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <TextField
+                            label={t("Cost")}
+                            value={moduleCost}
+                            type="number"
+                            fullWidth
+                            size="small"
+                            onChange={(e) => setModuleCost(e.target.value)}
+                            slotProps={{ htmlInput: { min: 0 } }}
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 3,
-                        }}
-                      >
-                        <TextField
-                          label="MDEF"
-                          value={moduleMdef}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModuleMdef(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        sx={{ display: "flex", alignItems: "center" }}
-                        size={{
-                          xs: 4,
-                          sm: 2,
-                        }}
-                      >
-                        <ToggleButton
-                          value="martial"
-                          selected={moduleMartial}
-                          onChange={() => setModuleMartial((v) => !v)}
-                          size="small"
-                          sx={{ width: "100%" }}
-                        >
-                          {t("Martial")}
-                        </ToggleButton>
-                      </Grid>
-                      <Grid size={12}>
-                        <CustomTextarea
-                          label={t("Description (optional)")}
-                          value={moduleDescription}
-                          onChange={(e) => setModuleDescription(e.target.value)}
-                          helperText=""
-                        />
+                      <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                        <Grid size={12}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                            {t("Description")}
+                          </Typography>
+                        </Grid>
+                        <Grid size={12}>
+                          <CustomTextarea
+                            label={t("Description (optional)")}
+                            value={moduleDescription}
+                            onChange={(e) => setModuleDescription(e.target.value)}
+                            helperText=""
+                          />
+                        </Grid>
                       </Grid>
                     </>
                   )}
@@ -1743,211 +1793,122 @@ function PlayerSpellPanel() {
                   {/* Weapon Module */}
                   {pilotSubtype === "weapon" && (
                     <>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 4,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Category")}</InputLabel>
-                          <Select
-                            value={weaponCategory}
-                            label={t("Category")}
-                            onChange={(e) => setWeaponCategory(e.target.value)}
-                          >
-                            {PILOT_WEAPON_CATEGORIES.map((c) => (
-                              <MenuItem key={c} value={c}>
-                                {c}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
+                      <Grid size={12} container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+                        <Grid size={12}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                            {t("Weapon")}
+                          </Typography>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 4 }}>
+                          <FormControl fullWidth size="small">
+                            <InputLabel>{t("Category")}</InputLabel>
+                            <Select
+                              value={weaponCategory}
+                              label={t("Category")}
+                              onChange={(e) => setWeaponCategory(e.target.value)}
+                            >
+                              {PILOT_WEAPON_CATEGORIES.map((c) => (
+                                <MenuItem key={c} value={c}>{c}</MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 4 }}>
+                          <FormControl fullWidth size="small">
+                            <InputLabel>{t("Range")}</InputLabel>
+                            <Select
+                              value={moduleRange || "Melee"}
+                              label={t("Range")}
+                              onChange={(e) => setModuleRange(e.target.value)}
+                            >
+                              {PILOT_RANGES.map((r) => (
+                                <MenuItem key={r} value={r}>{r}</MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 2 }} sx={{ display: "flex", alignItems: "center" }}>
+                          <ToggleButton value="cumbersome" selected={moduleCumbersome} onChange={() => setModuleCumbersome((v) => !v)} size="small" sx={{ width: "100%" }}>
+                            {t("Cumbersome")}
+                          </ToggleButton>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 2 }} sx={{ display: "flex", alignItems: "center" }}>
+                          <ToggleButton value="isShield" selected={isShield} onChange={() => setIsShield((v) => !v)} size="small" sx={{ width: "100%" }}>
+                            {t("Shield")}
+                          </ToggleButton>
+                        </Grid>
                       </Grid>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 4,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Damage Type")}</InputLabel>
-                          <Select
-                            value={damageType}
-                            label={t("Damage Type")}
-                            onChange={(e) => setDamageType(e.target.value)}
-                            renderValue={(selected) =>
-                              renderDamageTypeValue(
-                                String(selected).toLowerCase(),
-                                t,
-                              )
-                            }
-                          >
-                            {PILOT_DAMAGE_TYPES.map((d) => (
-                              <MenuItem key={d} value={d}>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 1,
-                                  }}
-                                >
-                                  <TypeIcon type={String(d).toLowerCase()} />
-                                  <span>
-                                    {String(d).replace(/\b\w/g, (char) =>
-                                      char.toUpperCase(),
-                                    )}
-                                  </span>
-                                </Box>
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
+                      <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                        <Grid size={12}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                            {t("Accuracy")}
+                          </Typography>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <FormControl fullWidth size="small">
+                            <InputLabel>{t("Att 1")}</InputLabel>
+                            <Select value={pilotAtt1} label={t("Att 1")} onChange={(e) => setPilotAtt1(e.target.value)}>
+                              {ATTRS.map((a) => (<MenuItem key={a.value} value={a.value}>{t(a.label)}</MenuItem>))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <FormControl fullWidth size="small">
+                            <InputLabel>{t("Att 2")}</InputLabel>
+                            <Select value={pilotAtt2} label={t("Att 2")} onChange={(e) => setPilotAtt2(e.target.value)}>
+                              {ATTRS.map((a) => (<MenuItem key={a.value} value={a.value}>{t(a.label)}</MenuItem>))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <TextField label={t("+Acc")} value={modulePrec} type="number" fullWidth size="small" onChange={(e) => setModulePrec(e.target.value)} />
+                        </Grid>
                       </Grid>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 4,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Range")}</InputLabel>
-                          <Select
-                            value={moduleRange || "Melee"}
-                            label={t("Range")}
-                            onChange={(e) => setModuleRange(e.target.value)}
-                          >
-                            {PILOT_RANGES.map((r) => (
-                              <MenuItem key={r} value={r}>
-                                {r}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
+                      <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                        <Grid size={12}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                            {t("Damage")}
+                          </Typography>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 4 }}>
+                          <FormControl fullWidth size="small">
+                            <InputLabel>{t("Damage Type")}</InputLabel>
+                            <Select
+                              value={damageType}
+                              label={t("Damage Type")}
+                              onChange={(e) => setDamageType(e.target.value)}
+                              renderValue={(selected) => renderDamageTypeValue(String(selected).toLowerCase(), t)}
+                            >
+                              {PILOT_DAMAGE_TYPES.map((d) => (
+                                <MenuItem key={d} value={d}>
+                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <TypeIcon type={String(d).toLowerCase()} />
+                                    <span>{String(d).replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+                                  </Box>
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 2 }}>
+                          <TextField label="HR+" value={moduleDamage} type="number" fullWidth size="small" onChange={(e) => setModuleDamage(e.target.value)} />
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small" onChange={(e) => setModuleCost(e.target.value)} slotProps={{ htmlInput: { min: 0 } }} />
+                        </Grid>
                       </Grid>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 3,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Att 1")}</InputLabel>
-                          <Select
-                            value={pilotAtt1}
-                            label={t("Att 1")}
-                            onChange={(e) => setPilotAtt1(e.target.value)}
-                          >
-                            {PILOT_ATTRS.map((a) => (
-                              <MenuItem key={a} value={a}>
-                                {t(a)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 3,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Att 2")}</InputLabel>
-                          <Select
-                            value={pilotAtt2}
-                            label={t("Att 2")}
-                            onChange={(e) => setPilotAtt2(e.target.value)}
-                          >
-                            {PILOT_ATTRS.map((a) => (
-                              <MenuItem key={a} value={a}>
-                                {t(a)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 2,
-                        }}
-                      >
-                        <TextField
-                          label="HR+"
-                          value={moduleDamage}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModuleDamage(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 2,
-                        }}
-                      >
-                        <TextField
-                          label={t("+Acc")}
-                          value={modulePrec}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModulePrec(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 2,
-                        }}
-                      >
-                        <TextField
-                          label={t("Quality Cost")}
-                          value={qualityCost}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setQualityCost(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid size={12}>
-                        <TextField
-                          label={t("Quality")}
-                          value={quality}
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setQuality(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        sx={{ display: "flex", alignItems: "center" }}
-                        size={6}
-                      >
-                        <ToggleButton
-                          value="cumbersome"
-                          selected={moduleCumbersome}
-                          onChange={() => setModuleCumbersome((v) => !v)}
-                          size="small"
-                          sx={{ width: "100%" }}
-                        >
-                          {t("Cumbersome")}
-                        </ToggleButton>
-                      </Grid>
-                      <Grid
-                        sx={{ display: "flex", alignItems: "center" }}
-                        size={6}
-                      >
-                        <ToggleButton
-                          value="isShield"
-                          selected={isShield}
-                          onChange={() => setIsShield((v) => !v)}
-                          size="small"
-                          sx={{ width: "100%" }}
-                        >
-                          {t("Shield")}
-                        </ToggleButton>
+                      <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                        <Grid size={12}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                            {t("Quality")}
+                          </Typography>
+                        </Grid>
+                        <Grid size={{ xs: 6, sm: 3 }}>
+                          <TextField label={t("Quality Cost")} value={qualityCost} type="number" fullWidth size="small" onChange={(e) => setQualityCost(e.target.value)} />
+                        </Grid>
+                        <Grid size={12}>
+                          <TextField label={t("Quality")} value={quality} fullWidth size="small" onChange={(e) => setQuality(e.target.value)} />
+                        </Grid>
                       </Grid>
                     </>
                   )}
@@ -1966,18 +1927,27 @@ function PlayerSpellPanel() {
                   spellType === "pilot-vehicle" &&
                   (pilotSubtype === "armor" || pilotSubtype === "weapon")
                 ) && (
-                  <Grid size={12}>
-                    <CustomTextarea
-                      label={
-                        spellType === "therioform" ||
-                        spellType === "pilot-vehicle"
-                          ? t("Description")
-                          : t("Effect")
-                      }
-                      value={effect}
-                      onChange={(e) => setEffect(e.target.value)}
-                      helperText=""
-                    />
+                  <Grid size={12} container spacing={2} sx={{ mb: spellType === "pilot-vehicle" ? 2 : 0 }}>
+                    {spellType === "pilot-vehicle" && (
+                      <Grid size={12}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                          {pilotSubtype === "support" ? t("Effect") : t("Description")}
+                        </Typography>
+                      </Grid>
+                    )}
+                    <Grid size={12}>
+                      <CustomTextarea
+                        label={
+                          spellType === "therioform" ||
+                          spellType === "pilot-vehicle"
+                            ? t("Description")
+                            : t("Effect")
+                        }
+                        value={effect}
+                        onChange={(e) => setEffect(e.target.value)}
+                        helperText=""
+                      />
+                    </Grid>
                   </Grid>
                 )}
             </Grid>
@@ -1992,6 +1962,7 @@ function PlayerSpellPanel() {
                     openImport(
                       QUICK_CREATE_TAB_TO_VIEWER_TYPE["player-spell"],
                       handleImportPlayerSpell,
+                      { initialSpellClass: spellClass },
                     )
                   }
                   autoSync
@@ -4630,8 +4601,8 @@ export default function QuickCreateModal({
     }
   };
 
-  const openImport = (viewerType, onImport) => {
-    setImportRequest({ viewerType, onImport });
+  const openImport = (viewerType, onImport, extraProps = {}) => {
+    setImportRequest({ viewerType, onImport, extraProps });
   };
 
   const closeImport = () => setImportRequest(null);
@@ -4709,6 +4680,7 @@ export default function QuickCreateModal({
         restrictToTypes={
           importRequest?.viewerType ? [importRequest.viewerType] : undefined
         }
+        {...(importRequest?.extraProps ?? {})}
       />
     </Dialog>
   );

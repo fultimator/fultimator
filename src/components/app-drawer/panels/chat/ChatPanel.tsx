@@ -72,6 +72,7 @@ import {
   toggleSupportModuleAction,
   toggleActiveVehicle,
 } from "../../../player/equipment/slots/loadoutActions";
+import { getActiveVehicle } from "../../../player/equipment/slots/equipmentSlots";
 import { useTranslate } from "../../../../translation/translate";
 
 const UUID_RE =
@@ -230,6 +231,12 @@ export const ChatPanel: React.FC = () => {
   const equippedSupportModules = useMemo(() => {
     if (!activeActorDoc) return [];
     return getAvailableSupportModules(activeActorDoc as unknown as TypePlayer);
+  }, [activeActorDoc]);
+  const activeSupportModuleKeys = useMemo(() => {
+    if (!activeActorDoc) return new Set<string>();
+    const vehicle = getActiveVehicle(activeActorDoc as unknown as TypePlayer);
+    const support: string[] = vehicle?.slots?.support ?? [];
+    return new Set<string>(support);
   }, [activeActorDoc]);
 
   useEffect(() => {
@@ -608,7 +615,7 @@ export const ChatPanel: React.FC = () => {
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <Checkbox
                           edge="start"
-                          checked={module.enabled ?? false}
+                          checked={activeSupportModuleKeys.has(module.key ?? module.name)}
                           disableRipple
                           size="small"
                           color="success"
@@ -646,7 +653,7 @@ export const ChatPanel: React.FC = () => {
                         slotProps={{
                           primary: {
                             variant: "body2",
-                            sx: { fontWeight: module.enabled ? 700 : 400 },
+                            sx: { fontWeight: activeSupportModuleKeys.has(module.key ?? module.name) ? 700 : 400 },
                           },
                           secondary: {
                             component: "div",

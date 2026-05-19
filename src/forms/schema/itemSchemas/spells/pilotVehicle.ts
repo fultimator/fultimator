@@ -1,70 +1,68 @@
 import { z } from "zod";
 import { PlayerSpellNonStaticBaseSchema, WeaponModuleAccuracySchema, WeaponModuleDamageSchema } from "./shared";
-import { PilotVehicleSubtypeSchema } from "./types";
 
-const PlayerSpellPilotVehicleBaseSchema = PlayerSpellNonStaticBaseSchema.extend(
-  {
-    spellType: z.literal("pilot-vehicle"),
-    pilotSubtype: PilotVehicleSubtypeSchema,
-    customName: z.string(),
-    enabled: z.boolean(),
-    equipped: z.boolean(),
-    equippedSlot: z.string().nullable(),
-  },
-);
+const VehicleSlotsSchema = z.object({
+  main: z.string().nullable().default(null),
+  off: z.string().nullable().default(null),
+  armor: z.string().nullable().default(null),
+  support: z.array(z.string()).default([]),
+});
 
-export const PlayerSpellPilotVehicleFrameSchema =
-  PlayerSpellPilotVehicleBaseSchema.extend({
-    pilotSubtype: z.literal("frame"),
-    frame: z.string(),
-    passengers: z.number().int(),
-    distance: z.number().int(),
-    description: z.string(),
-  });
+const VehicleModuleBaseSchema = z.object({
+  fuid: z.string().optional(),
+  key: z.string(),
+  customName: z.string().default(""),
+  cost: z.number().int().default(500),
+});
 
-export const PlayerSpellPilotVehicleArmorSchema =
-  PlayerSpellPilotVehicleBaseSchema.extend({
-    pilotSubtype: z.literal("armor"),
-    name: z.literal("pilot_custom_armor"),
-    type: z.literal("pilot_module_armor"),
-    category: z.literal("Armor"),
-    cost: z.number().int(),
-    def: z.number().int(),
-    mdef: z.number().int(),
-    martial: z.boolean(),
-    description: z.string().optional(),
-  });
+export const VehicleModuleArmorSchema = VehicleModuleBaseSchema.extend({
+  type: z.literal("pilot_module_armor"),
+  category: z.literal("Armor"),
+  def: z.number().int(),
+  mdef: z.number().int(),
+  martial: z.boolean(),
+  description: z.string().optional(),
+});
 
-export const PlayerSpellPilotVehicleWeaponSchema =
-  PlayerSpellPilotVehicleBaseSchema.extend({
-    pilotSubtype: z.literal("weapon"),
-    name: z.literal("pilot_custom_weapon"),
-    type: z.literal("pilot_module_weapon"),
-    category: z.string(),
-    cost: z.number().int(),
-    accuracy: WeaponModuleAccuracySchema,
-    damage: WeaponModuleDamageSchema,
-    range: z.string(),
-    cumbersome: z.boolean(),
-    quality: z.string(),
-    qualityCost: z.number().int(),
-    isShield: z.boolean(),
-    equippedSlot: z.literal("main"),
-  });
+export const VehicleModuleWeaponSchema = VehicleModuleBaseSchema.extend({
+  type: z.literal("pilot_module_weapon"),
+  category: z.string(),
+  range: z.string(),
+  cumbersome: z.boolean().default(false),
+  isShield: z.boolean().default(false),
+  takesTwoHands: z.boolean().default(false),
+  quality: z.string().default(""),
+  qualityCost: z.number().int().default(0),
+  accuracy: WeaponModuleAccuracySchema,
+  damage: WeaponModuleDamageSchema,
+});
 
-export const PlayerSpellPilotVehicleSupportSchema =
-  PlayerSpellPilotVehicleBaseSchema.extend({
-    pilotSubtype: z.literal("support"),
-    name: z.literal("pilot_custom_support"),
-    type: z.literal("pilot_module_support"),
-    description: z.string(),
-    isComplex: z.literal(true),
-    cost: z.number().int(),
-  });
+export const VehicleModuleSupportSchema = VehicleModuleBaseSchema.extend({
+  type: z.literal("pilot_module_support"),
+  cost: z.number().int().default(1000),
+  description: z.string().optional(),
+  isComplex: z.boolean().default(false),
+});
 
-export const PlayerSpellPilotVehicleSchema = z.union([
-  PlayerSpellPilotVehicleFrameSchema,
-  PlayerSpellPilotVehicleArmorSchema,
-  PlayerSpellPilotVehicleWeaponSchema,
-  PlayerSpellPilotVehicleSupportSchema,
+export const VehicleModuleSchema = z.discriminatedUnion("type", [
+  VehicleModuleArmorSchema,
+  VehicleModuleWeaponSchema,
+  VehicleModuleSupportSchema,
 ]);
+
+export const VehicleSchema = z.object({
+  key: z.string().optional(),
+  customName: z.string().default(""),
+  frame: z.string(),
+  description: z.string().default(""),
+  enabled: z.boolean().default(false),
+  maxEnabledModules: z.number().int().default(3),
+  slots: VehicleSlotsSchema.default({ main: null, off: null, armor: null, support: [] }),
+  modules: z.array(VehicleModuleSchema).default([]),
+});
+
+export const PlayerSpellPilotVehicleSchema = PlayerSpellNonStaticBaseSchema.extend({
+  spellType: z.literal("pilot-vehicle"),
+  showInPlayerSheet: z.boolean().default(true),
+  vehicles: z.array(VehicleSchema).default([]),
+});

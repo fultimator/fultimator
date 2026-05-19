@@ -20,9 +20,3 @@ export const PlayerSpellTypeSchema = z.enum([
   "deck",
 ]);
 
-export const PilotVehicleSubtypeSchema = z.enum([
-  "frame",
-  "armor",
-  "weapon",
-  "support",
-]);

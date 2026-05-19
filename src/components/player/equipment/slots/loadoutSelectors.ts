@@ -13,9 +13,9 @@ import {
   isTwoHandedEquipped,
   isItemEquipped,
   ResolvedVehicleModule,
+  type VehicleSlotMap,
 } from "./equipmentSlots";
 import { availableFrames } from "../../../../libs/pilotVehicleData";
-import { getModuleTypeForLimits } from "../../spells/vehicleReducer";
 
 // Types
 
@@ -65,8 +65,8 @@ export function getPilotSpellInfo(player: TypePlayer): PilotSpellInfo | null {
 // Vehicle module queries
 
 /**
- * All modules installed on the active vehicle that are relevant for `slot`
- * (regardless of enabled/equipped state), with their original array index attached.
+ * All modules installed on the active vehicle that are equipped in `slot`,
+ * with their original array index attached.
  */
 export function getEquippedModulesForSlot(
   player: TypePlayer,
@@ -74,46 +74,43 @@ export function getEquippedModulesForSlot(
 ): IndexedModule[] {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return [];
+  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
   return vehicle.modules
     .map((m, originalIndex) => ({ ...m, originalIndex }))
     .filter((m) => {
-      if (slot === "armor") return m.type === "pilot_module_armor";
-      if (slot === "mainHand" || slot === "offHand")
-        return m.type === "pilot_module_weapon";
+      const key = m.key ?? m.name;
+      if (slot === "armor") return s.armor === key;
+      if (slot === "mainHand") return s.main === key || s.off === key;
+      if (slot === "offHand") return s.main === key || s.off === key;
       return false;
     }) as IndexedModule[];
 }
 
 /**
- * The single active module for `slot` (the one whose equippedSlot matches),
- * or the first installed module for that slot type, or null.
+ * The single active module for `slot` derived from vehicle.slots, or null.
  */
 export function getEquippedModuleForSlot(
   player: TypePlayer,
   slot: string,
 ): IndexedModule | null {
-  const mods = getEquippedModulesForSlot(player, slot);
-  const activeMods = mods.filter((m) => m.enabled || m.equipped);
-  return (
-    activeMods.find((m) => {
-      if (slot === "armor") return m.equippedSlot === "armor";
-      if (slot === "mainHand")
-        return (
-          m.equippedSlot === "main" ||
-          m.equippedSlot === "mainHand" ||
-          m.equippedSlot === "both"
-        );
-      if (slot === "offHand")
-        return (
-          m.equippedSlot === "off" ||
-          m.equippedSlot === "offHand" ||
-          m.equippedSlot === "both"
-        );
-      return false;
-    }) ??
-    activeMods[0] ??
-    null
-  );
+  const vehicle = getActiveVehicle(player);
+  if (!vehicle) return null;
+  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
+  const mods = vehicle.modules.map((m, originalIndex) => ({ ...m, originalIndex }));
+
+  if (slot === "armor") {
+    const found = mods.find((m) => (m.key ?? m.name) === s.armor);
+    return (found as IndexedModule) ?? null;
+  }
+  if (slot === "mainHand") {
+    const found = mods.find((m) => (m.key ?? m.name) === s.main);
+    return (found as IndexedModule) ?? null;
+  }
+  if (slot === "offHand") {
+    const found = mods.find((m) => (m.key ?? m.name) === s.off);
+    return (found as IndexedModule) ?? null;
+  }
+  return null;
 }
 
 // Slot locks
@@ -176,13 +173,25 @@ export function getVehicleModuleUsage(
       unknown
     >);
 
+  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
   const counts: Record<string, number> = { weapon: 0, armor: 0, support: 0 };
-  for (const m of vehicle.modules) {
-    if (!m.equipped) continue;
-    const type = getModuleTypeForLimits(m);
-    if (type === "custom") continue;
-    counts[type] += type === "support" && m.isComplex ? 2 : 1;
+
+  // Count weapons from slots.main/off (deduplicated for "both" case)
+  const weaponKeys = new Set<string>(
+    [s.main, s.off].filter((k): k is string => Boolean(k)),
+  );
+  for (const key of weaponKeys) {
+    const mod = vehicle.modules.find((m) => (m.key ?? m.name) === key);
+    if (mod) counts.weapon++;
   }
+
+  if (s.armor) counts.armor = 1;
+
+  for (const key of s.support) {
+    const mod = vehicle.modules.find((m) => (m.key ?? m.name) === key);
+    if (mod) counts.support += mod.isComplex ? 2 : 1;
+  }
+
   return {
     counts,
     limits: (frame as Record<string, unknown>).limits as Record<string, number>,
@@ -192,16 +201,18 @@ export function getVehicleModuleUsage(
 // Support modules
 
 /**
- * All support modules that are installed (equipped) on the active vehicle,
+ * All support modules that are in vehicle.slots.support on the active vehicle,
  * with their original array index for update purposes.
  */
 export function getEquippedSupportModules(player: TypePlayer): IndexedModule[] {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return [];
+  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
+  const supportKeys = new Set<string>(s.support);
   return vehicle.modules
     .map((m, i) => ({ ...m, originalIndex: i }))
     .filter(
-      (m) => m.equipped && m.type === "pilot_module_support",
+      (m) => supportKeys.has(m.key ?? m.name) && m.type === "pilot_module_support",
     ) as IndexedModule[];
 }
 
@@ -248,7 +259,7 @@ export function getSupportSlots(player: TypePlayer): SupportSlotEntry[] {
       if (seen.has(key)) return null;
       seen.add(key);
       const module =
-        vehicle?.modules.find((m) => m.name === ref.moduleName && m.enabled) ??
+        vehicle?.modules.find((m) => (m.key ?? m.name) === ref.moduleName) ??
         null;
       return { ref, module } as SupportSlotEntry;
     })

@@ -51,25 +51,6 @@ export type PlayerSpellFormState = {
   // tinkerer fields
   category: string;
   infusionRank: number | null;
-  // pilot fields (pending schema rewrite)
-  pilotSubtype: "frame" | "armor" | "weapon" | "support";
-  vehicleFrame: string;
-  moduleCost: number;
-  moduleDef: number;
-  moduleMdef: number;
-  moduleMartial: boolean;
-  moduleDamage: number;
-  moduleRange: string;
-  modulePrec: number;
-  moduleDescription: string;
-  weaponCategory: string;
-  pilotDamageType: string;
-  pilotAtt1: string;
-  pilotAtt2: string;
-  quality: string;
-  qualityCost: number;
-  isShield: boolean;
-  moduleCumbersome: boolean;
   // meta fields
   "meta.book": string;
   "meta.page": number | undefined;

@@ -34,6 +34,7 @@ import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import CustomTextarea from "../../common/CustomTextarea";
 import attributes from "../../../libs/attributes";
+import { Martial } from "../../icons";
 import weaponCategories from "../../../libs/weaponCategories";
 import { moduleTypes } from "../../../libs/pilotVehicleData";
 import ModuleDropdown from "./ModuleDropdown";
@@ -60,9 +61,30 @@ const VehicleModule = memo(
       onConfirm: () => onDeleteModule(vehicleIndex, moduleIndex),
     });
 
+    // Derive equipped state from vehicle.slots
+    const moduleKey = module.key ?? module.name;
+    const vehicleSlots = vehicle?.slots ?? {};
+    const isEquipped =
+      vehicleSlots.main === moduleKey ||
+      vehicleSlots.off === moduleKey ||
+      vehicleSlots.armor === moduleKey ||
+      (vehicleSlots.support ?? []).includes(moduleKey);
+    const moduleSlot =
+      vehicleSlots.main === moduleKey && vehicleSlots.off === moduleKey
+        ? "both"
+        : vehicleSlots.main === moduleKey
+        ? "main"
+        : vehicleSlots.off === moduleKey
+        ? "off"
+        : vehicleSlots.armor === moduleKey
+        ? "armor"
+        : (vehicleSlots.support ?? []).includes(moduleKey)
+        ? "support"
+        : null;
+
     const handleEquipToggle = (e) => {
       e.stopPropagation();
-      onModuleChange(vehicleIndex, moduleIndex, "equipped", !module.equipped);
+      onModuleChange(vehicleIndex, moduleIndex, "equipped", !isEquipped);
     };
 
     const handleClone = (e) => {
@@ -104,13 +126,13 @@ const VehicleModule = memo(
                 }}
               >
                 <Button
-                  variant={module.equipped ? "contained" : "outlined"}
-                  color={module.equipped ? "success" : "primary"}
-                  disabled={!module.equipped && !canEquip}
+                  variant={isEquipped ? "contained" : "outlined"}
+                  color={isEquipped ? "success" : "primary"}
+                  disabled={!isEquipped && !canEquip}
                   onClick={handleEquipToggle}
                   sx={{ minWidth: 80 }}
                 >
-                  {module.equipped ? t("Equipped") : t("Equip")}
+                  {isEquipped ? t("Equipped") : t("Equip")}
                 </Button>
               </Grid>
 
@@ -128,13 +150,13 @@ const VehicleModule = memo(
                 </Typography>
                 <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   {t(module.type)}
-                  {module.equipped && module.type === "pilot_module_weapon" && (
+                  {isEquipped && module.type === "pilot_module_weapon" && (
                     <>
                       {" "}
                       |{" "}
                       {module.cumbersome
                         ? t("both_hand")
-                        : module.equippedSlot === "main"
+                        : moduleSlot === "main"
                           ? t("main_hand")
                           : t("off_hand")}
                     </>
@@ -149,11 +171,11 @@ const VehicleModule = memo(
                   sm: 3,
                 }}
               >
-                {module.equipped &&
+                {isEquipped &&
                   module.type === "pilot_module_weapon" &&
                   (module.isShield ? (
                     <ToggleButtonGroup
-                      value={module.equippedSlot || "off"}
+                      value={moduleSlot || "off"}
                       exclusive
                       onChange={(e, newValue) => {
                         e.stopPropagation();
@@ -171,13 +193,14 @@ const VehicleModule = memo(
                       <ToggleButton
                         value="main"
                         disabled={
-                          !vehicle.modules.some(
-                            (m) =>
-                              m.equipped &&
+                          !vehicle.modules.some((m) => {
+                            const mk = m.key ?? m.name;
+                            return (
                               m.isShield &&
-                              (m.equippedSlot === "off" || !m.equippedSlot) &&
-                              m !== module,
-                          )
+                              vehicleSlots.off === mk &&
+                              mk !== moduleKey
+                            );
+                          })
                         }
                         sx={{ minWidth: 35 }}
                       >
@@ -198,7 +221,7 @@ const VehicleModule = memo(
                     </Button>
                   ) : (
                     <ToggleButtonGroup
-                      value={module.equippedSlot || "main"}
+                      value={moduleSlot || "main"}
                       exclusive
                       onChange={(e, newValue) => {
                         e.stopPropagation();
@@ -218,12 +241,10 @@ const VehicleModule = memo(
                       </ToggleButton>
                       <ToggleButton
                         value="off"
-                        disabled={vehicle.modules.some(
-                          (m) =>
-                            m.equipped &&
-                            m.isShield &&
-                            m.equippedSlot === "off",
-                        )}
+                        disabled={vehicle.modules.some((m) => {
+                          const mk = m.key ?? m.name;
+                          return m.isShield && vehicleSlots.off === mk && mk !== moduleKey;
+                        })}
                         sx={{ minWidth: 35 }}
                       >
                         {t("o_abbr")}
@@ -334,7 +355,7 @@ const VehicleModule = memo(
               )}
 
               {/* Equipment Slot Selection for Weapons */}
-              {module.equipped && module.type === "pilot_module_weapon" && (
+              {isEquipped && module.type === "pilot_module_weapon" && (
                 <Grid
                   size={{
                     xs: 12,
@@ -352,10 +373,7 @@ const VehicleModule = memo(
                       {t("Hand")}
                     </Typography>
                     <ToggleButtonGroup
-                      value={
-                        module.equippedSlot ||
-                        (module.isShield ? "off" : "main")
-                      }
+                      value={moduleSlot || (module.isShield ? "off" : "main")}
                       exclusive
                       onChange={(e, newValue) => {
                         if (newValue !== null) {
@@ -374,12 +392,10 @@ const VehicleModule = memo(
                         value="off"
                         disabled={
                           !module.isShield &&
-                          vehicle.modules.some(
-                            (m) =>
-                              m.equipped &&
-                              m.isShield &&
-                              m.equippedSlot === "off",
-                          )
+                          vehicle.modules.some((m) => {
+                            const mk = m.key ?? m.name;
+                            return m.isShield && vehicleSlots.off === mk && mk !== moduleKey;
+                          })
                         }
                       >
                         {t("o_abbr")}
@@ -393,7 +409,7 @@ const VehicleModule = memo(
                         color: "text.secondary",
                       }}
                     >
-                      {module.equippedSlot === "off"
+                      {moduleSlot === "off"
                         ? t("off_hand")
                         : t("main_hand")}
                     </Typography>
@@ -872,23 +888,29 @@ const VehicleModule = memo(
                       sm: 2,
                     }}
                   >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={module.martial || false}
-                          onChange={(e) =>
-                            onModuleChange(
-                              vehicleIndex,
-                              moduleIndex,
-                              "martial",
-                              e.target.checked,
-                            )
-                          }
-                          disabled={!isCustomModule}
-                        />
+                    <ToggleButton
+                      value="martial"
+                      selected={module.martial || false}
+                      onChange={() =>
+                        onModuleChange(
+                          vehicleIndex,
+                          moduleIndex,
+                          "martial",
+                          !(module.martial || false),
+                        )
                       }
-                      label={t("Martial")}
-                    />
+                      size="small"
+                      disabled={!isCustomModule}
+                      sx={{
+                        minWidth: 56,
+                        height: 40,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Martial />
+                    </ToggleButton>
                   </Grid>
                   <Grid
                     size={{
