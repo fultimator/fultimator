@@ -1,17 +1,17 @@
 import type { ItemFieldConfig } from "../../fieldConfig";
 import type { PlayerSpellFormState } from "./types";
-import { isGift } from "./predicates";
+import { isDance } from "./predicates";
 
-export const giftFields: ItemFieldConfig<PlayerSpellFormState> = [
+export const danceFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
-    key: "event",
+    key: "effect",
     kind: "editable",
-    label: "spell.gift.event",
+    label: "spell.dance.effect",
     component: "textarea",
     defaultValue: "",
     group: "effect",
     order: 70,
     fullWidth: true,
-    dependencies: isGift,
+    dependencies: isDance,
   },
 ];

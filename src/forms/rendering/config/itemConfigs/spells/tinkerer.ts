@@ -6,7 +6,7 @@ export const tinkererFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "category",
     kind: "editable",
-    label: "Category",
+    label: "spell.tinkerer.category",
     component: "text",
     defaultValue: "",
     group: "effect",
@@ -17,7 +17,7 @@ export const tinkererFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "infusionRank",
     kind: "editable",
-    label: "Rank",
+    label: "spell.tinkerer.infusionRank",
     component: "number",
     defaultValue: null,
     group: "effect",

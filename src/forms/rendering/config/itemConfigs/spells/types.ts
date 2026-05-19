@@ -51,6 +51,26 @@ export type PlayerSpellFormState = {
   // tinkerer fields
   category: string;
   infusionRank: number | null;
+  // gift fields
+  event: string;
+  // therioform fields
+  genoclepsis: string;
+  // magichant-key fields
+  keyType: string;
+  keyStatus: string;
+  keyAttribute: string;
+  keyRecovery: string;
+  // magichant tone / dance / symbol / gift effect
+  effect: string;
+  // invocation fields
+  wellspring: string;
+  invType: string;
+  // cooking fields - array of { effect: string } objects for object-list renderer
+  cookingEffects: Array<{ effect: string }>;
+  // magiseed fields
+  seedDescription: string;
+  seedRangeStart: number;
+  seedRangeEnd: number;
   // meta fields
   "meta.book": string;
   "meta.page": number | undefined;

@@ -133,6 +133,7 @@ import { npcSpecialFieldConfig } from "../../forms/rendering/config/itemConfigs/
 import { npcAttackFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAttack";
 import { npcSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpell";
 import { qualityFieldConfig } from "../../forms/rendering/config/itemConfigs/quality";
+import { playerSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/playerSpell";
 import { heroicFieldConfig } from "../../forms/rendering/config/itemConfigs/heroic";
 import { classFieldConfig } from "../../forms/rendering/config/itemConfigs/class";
 import { hoplosphereFieldConfig } from "../../forms/rendering/config/itemConfigs/hoplosphere";
@@ -147,36 +148,6 @@ const slugify = (value = "") =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const ATTRS = [
-  { value: "dexterity", label: "DEX" },
-  { value: "insight", label: "INS" },
-  { value: "might", label: "MIG" },
-  { value: "will", label: "WLP" },
-];
-
-function renderDamageTypeValue(typeValue, t) {
-  if (!typeValue || typeValue === "nodmg") return t("No Damage");
-  const rawLabel = types[typeValue]?.long ?? typeValue;
-  const label = String(rawLabel).replace(/\b\w/g, (char) => char.toUpperCase());
-  return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-      <TypeIcon type={typeValue} />
-      <span>{label}</span>
-    </Box>
-  );
-}
-
-const DURATION_OPTIONS = ["Scene", "Instantaneous", "Special"];
-const TARGET_OPTIONS = [
-  "Self",
-  "One creature",
-  "Up to two creatures",
-  "Up to three creatures",
-  "Up to four creatures",
-  "Up to five creatures",
-  "One equipped weapon",
-  "Special",
-];
 
 function createMetaFromBook(bookValue = "homebrew") {
   const book = String(bookValue ?? "").trim() || "homebrew";
@@ -756,26 +727,7 @@ const PILOT_MODULE_BASE_COST = {
   support: 1000,
 };
 
-const NON_STATIC_TYPES = [
-  { value: "default", label: "Standard Spell" },
-  { value: "gift", label: "Gift" },
-  { value: "dance", label: "Dance" },
-  { value: "therioform", label: "Therioform" },
-  { value: "magichant-key", label: "Key (Chanter)" },
-  { value: "magichant", label: "Tone (Chanter)" },
-  { value: "symbol", label: "Symbol" },
-  { value: "invocation", label: "Invocation" },
-  { value: "arcanist", label: "Arcanum" },
-  { value: "arcanist-rework", label: "Arcanum (Rework)" },
-  { value: "tinkerer-alchemy", label: "Alchemy" },
-  { value: "tinkerer-infusion", label: "Infusion" },
-  { value: "cooking", label: "Delicacy" },
-  { value: "magiseed", label: "Magiseed" },
-  { value: "pilot-vehicle", label: "Pilot Vehicle" },
-];
-
-const WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
-const INV_TYPES = ["Blast", "Hex", "Utility"];
+// Pilot-vehicle constants (used by pilot JSX fallback)
 const PILOT_SUBTYPES = [
   { value: "frame", label: "Vehicle Frame" },
   { value: "armor", label: "Armor Module" },
@@ -805,74 +757,196 @@ const PILOT_DAMAGE_TYPES = [
   "Poison",
 ];
 const PILOT_RANGES = ["Melee", "Ranged"];
-const MAGICHANT_KEY_TYPES = Array.from(
-  new Set(availableMagichantKeys.map((k) => k.type).filter(Boolean)),
-);
-const MAGICHANT_KEY_STATUSES = Array.from(
-  new Set(availableMagichantKeys.map((k) => k.status).filter(Boolean)),
-);
-const MAGICHANT_KEY_ATTRIBUTES = Array.from(
-  new Set(availableMagichantKeys.map((k) => k.attribute).filter(Boolean)),
-);
-const MAGICHANT_KEY_RECOVERIES = Array.from(
-  new Set(availableMagichantKeys.map((k) => k.recovery).filter(Boolean)),
-);
+
+function buildPlayerSpellPayload(state) {
+  const { spellType, name, fuid } = state;
+  const metaRaw = {
+    book: state["meta.book"],
+    page: state["meta.page"],
+    bookName: state["meta.bookName"] || undefined,
+    isOfficial: state["meta.isOfficial"],
+  };
+  const meta = state["meta.book"] ? metaRaw : undefined;
+
+  const withMeta = (obj) => (meta ? { ...obj, meta } : obj);
+
+  switch (spellType) {
+    case "default":
+      return withMeta({
+        spellType: "default",
+        class: state.class,
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        description: (state.description ?? "").trim(),
+        isOffensive: state.isOffensive,
+        cost: {
+          resource: "mp",
+          amount: state["cost.amount"] ?? 0,
+          perTarget: state["cost.perTarget"] ?? true,
+        },
+        maxTargets: state.maxTargets ?? 1,
+        targetDescription: (state.targetDescription ?? "").trim() || "One creature",
+        duration: (state.duration ?? "").trim() || "Instantaneous",
+        accuracy: {
+          attr1: state["accuracy.attr1"] ?? "insight",
+          attr2: state["accuracy.attr2"] ?? "will",
+          value: 0,
+          defense: "mdef",
+        },
+        damage: {
+          value: state.isOffensive ? (state["damage.value"] ?? 0) : 0,
+          type: state.isOffensive ? (state["damage.type"] ?? "physical") : "physical",
+          hrZero: state["damage.hrZero"] ?? false,
+        },
+      });
+
+    case "arcanist":
+    case "arcanist-rework":
+      return withMeta({
+        spellType,
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        domain: (state.domain ?? "").trim() || undefined,
+        domainDesc: (state.domainDesc ?? "").trim() || undefined,
+        merge: (state.merge ?? "").trim() || undefined,
+        mergeDesc: (state.mergeDesc ?? "").trim() || undefined,
+        dismiss: (state.dismiss ?? "").trim() || undefined,
+        dismissDesc: (state.dismissDesc ?? "").trim() || undefined,
+        ...(spellType === "arcanist-rework" && {
+          pulse: (state.pulse ?? "").trim() || undefined,
+          pulseDesc: (state.pulseDesc ?? "").trim() || undefined,
+        }),
+      });
+
+    case "tinkerer-alchemy":
+      return withMeta({
+        spellType: "tinkerer-alchemy",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        category: (state.category ?? "").trim() || undefined,
+        effect: (state.effect ?? "").trim(),
+        description: (state.effect ?? "").trim(),
+      });
+
+    case "tinkerer-infusion":
+      return withMeta({
+        spellType: "tinkerer-infusion",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        infusionRank: state.infusionRank != null ? Number(state.infusionRank) : undefined,
+        effect: (state.effect ?? "").trim(),
+        description: (state.effect ?? "").trim(),
+      });
+
+    case "gift":
+      return withMeta({
+        spellType: "gift",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        event: (state.event ?? "").trim(),
+        effect: (state.effect ?? "").trim(),
+        description: (state.effect ?? "").trim(),
+      });
+
+    case "dance":
+      return withMeta({
+        spellType: "dance",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        effect: (state.effect ?? "").trim(),
+        description: (state.effect ?? "").trim(),
+      });
+
+    case "therioform":
+      return withMeta({
+        spellType: "therioform",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        genoclepsis: (state.genoclepsis ?? "").trim(),
+        effect: (state.effect ?? "").trim(),
+        description: (state.effect ?? "").trim(),
+      });
+
+    case "magichant":
+      return withMeta({
+        spellType: "magichant",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        magichantSubtype: "tone",
+        effect: (state.effect ?? "").trim(),
+        description: (state.effect ?? "").trim(),
+      });
+
+    case "magichant-key":
+      return withMeta({
+        spellType: "magichant",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        magichantSubtype: "key",
+        type: (state.keyType ?? "").trim() || undefined,
+        status: (state.keyStatus ?? "").trim() || undefined,
+        attribute: (state.keyAttribute ?? "").trim() || undefined,
+        recovery: (state.keyRecovery ?? "").trim() || undefined,
+      });
+
+    case "symbol":
+      return withMeta({
+        spellType: "symbol",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        effect: (state.effect ?? "").trim(),
+        description: (state.effect ?? "").trim(),
+      });
+
+    case "invocation":
+      return withMeta({
+        spellType: "invocation",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        wellspring: (state.wellspring ?? "").trim() || undefined,
+        type: (state.invType ?? "").trim() || undefined,
+        effect: (state.effect ?? "").trim(),
+        description: (state.effect ?? "").trim(),
+      });
+
+    case "cooking":
+      return withMeta({
+        spellType: "cooking",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        cookbookEffects: (state.cookingEffects ?? []).map((row, i) => ({
+          id: i + 1,
+          effect: (row?.effect ?? "").trim(),
+          taste1: "",
+          taste2: "",
+          customChoices: {},
+        })),
+      });
+
+    case "magiseed":
+      return withMeta({
+        spellType: "magiseed",
+        name: (name ?? "").trim(),
+        fuid: fuid || undefined,
+        description: (state.seedDescription ?? "").trim(),
+        rangeStart: state.seedRangeStart ?? 1,
+        rangeEnd: state.seedRangeEnd ?? 4,
+        effects: {},
+      });
+
+    default:
+      return null;
+  }
+}
 
 function PlayerSpellPanel() {
   const { t } = useTranslate();
   const { openImport } = useQuickCreateImport();
-  const initialSubtype = useQuickCreateSubtype();
-  const [spellType, setSpellType] = useState("default");
-  const [spellClass, setSpellClass] = useState(
-    initialSubtype && spellClasses.includes(initialSubtype) ? initialSubtype : (spellClasses[0] ?? "")
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(playerSpellFieldConfig),
   );
-  const [name, setName] = useState("");
-  const [fuid, setFuid] = useState(undefined);
-  const [description, setDescription] = useState("");
-  const [isOffensive, setIsOffensive] = useState(false);
-  const [mp, setMp] = useState("");
-  const [perTarget, setPerTarget] = useState(true);
-  const [maxTargets, setMaxTargets] = useState("1");
-  const [targetDescription, setTargetDescription] = useState("");
-  const [duration, setDuration] = useState("");
-  const [attr1, setAttr1] = useState("insight");
-  const [attr2, setAttr2] = useState("will");
-  const [damage, setDamage] = useState("");
-  const [damageType, setDamageType] = useState("physical");
-  const [hrZero, setHrZero] = useState(false);
-  // Non-static type fields
-  const [effect, setEffect] = useState("");
-  const [event, setEvent] = useState("");
-  const [genoclepsis, setGenoclepsis] = useState("");
-  const [keyType, setKeyType] = useState("");
-  const [keyStatus, setKeyStatus] = useState("");
-  const [keyAttribute, setKeyAttribute] = useState("");
-  const [keyRecovery, setKeyRecovery] = useState("");
-  const [wellspring, setWellspring] = useState("");
-  const [invType, setInvType] = useState("");
-  // arcanist / arcanist-rework
-  const [domain, setDomain] = useState("");
-  const [domainDesc, setDomainDesc] = useState("");
-  const [merge, setMerge] = useState("");
-  const [mergeDesc, setMergeDesc] = useState("");
-  const [dismiss, setDismiss] = useState("");
-  const [dismissDesc, setDismissDesc] = useState("");
-  const [pulse, setPulse] = useState("");
-  const [pulseDesc, setPulseDesc] = useState("");
-  // tinkerer-alchemy, pilot-vehicle
-  const [itemCategory, setItemCategory] = useState("");
-  // tinkerer-infusion
-  const [infusionRank, setInfusionRank] = useState("");
-  // cooking : 12 roll-result effects (indices 0-11 = results 1-12)
-  const [cookingEffects, setCookingEffects] = useState(
-    Array.from({ length: 12 }, () => ""),
-  );
-  // magiseed
-  const [seedDescription, setSeedDescription] = useState("");
-  const [seedRangeStart, setSeedRangeStart] = useState(1);
-  const [seedRangeEnd, setSeedRangeEnd] = useState(4);
-  const [seedEffects, setSeedEffects] = useState({});
-  // pilot-vehicle
+
+  // Pilot-vehicle local state (kept as-is - schema renderer not used for pilot-vehicle)
   const [pilotSubtype, setPilotSubtype] = useState("frame");
   const [vehicleFrame, setVehicleFrame] = useState(
     availableFrames[0]?.name ?? "",
@@ -886,55 +960,18 @@ function PlayerSpellPanel() {
   const [moduleCumbersome, setModuleCumbersome] = useState(false);
   const [moduleCost, setModuleCost] = useState(PILOT_MODULE_BASE_COST.armor);
   const [moduleDescription, setModuleDescription] = useState("");
-  // weapon-specific
+  const [pilotEffect, setPilotEffect] = useState("");
   const [weaponCategory, setWeaponCategory] = useState("Heavy");
   const [pilotAtt1, setPilotAtt1] = useState("might");
   const [pilotAtt2, setPilotAtt2] = useState("dexterity");
+  const [pilotDamageType, setPilotDamageType] = useState("Physical");
   const [quality, setQuality] = useState("");
   const [qualityCost, setQualityCost] = useState(0);
   const [isShield, setIsShield] = useState(false);
+  const spellType = formState.spellType ?? "default";
 
   const handleClear = () => {
-    setSpellType("default");
-    setSpellClass(spellClasses[0] ?? "");
-    setName("");
-    setFuid(undefined);
-    setDescription("");
-    setIsOffensive(false);
-    setMp("");
-    setPerTarget(true);
-    setMaxTargets("1");
-    setTargetDescription("");
-    setDuration("");
-    setAttr1("insight");
-    setAttr2("will");
-    setDamage("");
-    setDamageType("physical");
-    setHrZero(false);
-    setEffect("");
-    setEvent("");
-    setGenoclepsis("");
-    setKeyType("");
-    setKeyStatus("");
-    setKeyAttribute("");
-    setKeyRecovery("");
-    setWellspring("");
-    setInvType("");
-    setDomain("");
-    setDomainDesc("");
-    setMerge("");
-    setMergeDesc("");
-    setDismiss("");
-    setDismissDesc("");
-    setPulse("");
-    setPulseDesc("");
-    setItemCategory("");
-    setInfusionRank("");
-    setCookingEffects(Array.from({ length: 12 }, () => ""));
-    setSeedDescription("");
-    setSeedRangeStart(1);
-    setSeedRangeEnd(4);
-    setSeedEffects({});
+    setFormState(createDefaultStateFromFields(playerSpellFieldConfig));
     setPilotSubtype("frame");
     setVehicleFrame(availableFrames[0]?.name ?? "");
     setModuleDef("");
@@ -946,8 +983,9 @@ function PlayerSpellPanel() {
     setModuleCumbersome(false);
     setModuleCost(PILOT_MODULE_BASE_COST.armor);
     setModuleDescription("");
+    setPilotEffect("");
     setWeaponCategory("Heavy");
-    setDamageType("Physical");
+    setPilotDamageType("Physical");
     setPilotAtt1("might");
     setPilotAtt2("dexterity");
     setQuality("");
@@ -963,1256 +1001,589 @@ function PlayerSpellPanel() {
         ? "magichant-key"
         : importedType;
 
-    setSpellType(nextSpellType || "default");
-    setName(String(imported.name ?? ""));
-    setFuid(imported.fuid || undefined);
-    setSpellClass(String(imported.class ?? spellClasses[0] ?? ""));
+    // Build flat state for schema form
+    const flatImport = {
+      spellType: nextSpellType || "default",
+      fuid: imported.fuid || undefined,
+      name: String(imported.name ?? ""),
+      class: String(imported.class ?? spellClasses[0] ?? ""),
+      isOffensive: Boolean(imported.isOffensive ?? false),
+      "cost.resource": "mp",
+      "cost.amount": imported.cost?.amount ?? 0,
+      "cost.perTarget": Boolean(imported.cost?.perTarget ?? true),
+      maxTargets: imported.maxTargets ?? 1,
+      targetDescription: String(imported.targetDescription ?? "One creature"),
+      duration: String(imported.duration ?? "Instantaneous"),
+      "accuracy.attr1": String(imported.accuracy?.attr1 ?? "insight"),
+      "accuracy.attr2": String(imported.accuracy?.attr2 ?? "will"),
+      "accuracy.value": 0,
+      "accuracy.defense": "mdef",
+      "damage.value": imported.damage?.value ?? 0,
+      "damage.type": String(imported.damage?.type ?? "physical"),
+      "damage.hrZero": Boolean(imported.damage?.hrZero ?? false),
+      description: String(imported.description ?? ""),
+      effect: String(imported.effect ?? imported.description ?? ""),
+      event: String(imported.event ?? ""),
+      genoclepsis: String(imported.genoclepsis ?? ""),
+      domain: String(imported.domain ?? ""),
+      domainDesc: String(imported.domainDesc ?? ""),
+      merge: String(imported.merge ?? ""),
+      mergeDesc: String(imported.mergeDesc ?? ""),
+      dismiss: String(imported.dismiss ?? ""),
+      dismissDesc: String(imported.dismissDesc ?? ""),
+      pulse: String(imported.pulse ?? ""),
+      pulseDesc: String(imported.pulseDesc ?? ""),
+      wellspring: String(imported.wellspring ?? ""),
+      invType: String(imported.type ?? ""),
+      category: String(imported.category ?? ""),
+      infusionRank:
+        imported.infusionRank == null ? null : Number(imported.infusionRank),
+      keyType:
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? String(imported.type ?? "")
+          : "",
+      keyStatus:
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? String(imported.status ?? "")
+          : "",
+      keyAttribute:
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? String(imported.attribute ?? "")
+          : "",
+      keyRecovery:
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? String(imported.recovery ?? "")
+          : "",
+      cookingEffects: (() => {
+        const src = imported.cookbookEffects;
+        if (Array.isArray(src)) {
+          return src.map((r) => ({ effect: String(r?.effect ?? "") }));
+        }
+        if (src && typeof src === "object") {
+          return Object.values(src).map((r) => ({
+            effect: String(r?.effect ?? r ?? ""),
+          }));
+        }
+        return Array.from({ length: 12 }, () => ({ effect: "" }));
+      })(),
+      seedDescription: String(imported.description ?? ""),
+      seedRangeStart: imported.rangeStart ?? 1,
+      seedRangeEnd: imported.rangeEnd ?? 4,
+      "meta.book": imported.meta?.book ?? "",
+      "meta.page": imported.meta?.page ?? undefined,
+      "meta.bookName": imported.meta?.bookName ?? "",
+      "meta.isOfficial": imported.meta?.isOfficial ?? false,
+    };
 
-    setDescription(String(imported.description ?? ""));
-    setEffect(String(imported.effect ?? imported.description ?? ""));
-    setEvent(String(imported.event ?? ""));
-    setGenoclepsis(String(imported.genoclepsis ?? ""));
+    importIntoSchemaForm(playerSpellFieldConfig, setFormState, flatImport);
 
-    setDuration(String(imported.duration ?? ""));
-    setTargetDescription(String(imported.targetDescription ?? ""));
-    setMaxTargets(String(imported.maxTargets ?? "1"));
-    setPerTarget(Boolean(imported.cost?.perTarget ?? true));
-    setMp(String(imported.cost?.amount ?? ""));
-    setIsOffensive(Boolean(imported.isOffensive ?? false));
-    setDamage(String(imported.damage?.value ?? ""));
-    setDamageType(String(imported.damage?.type ?? "physical"));
-    setHrZero(Boolean(imported.damage?.hrZero ?? false));
-    setAttr1(String(imported.accuracy?.attr1 ?? "insight"));
-    setAttr2(String(imported.accuracy?.attr2 ?? "will"));
-
-    setDomain(String(imported.domain ?? ""));
-    setDomainDesc(String(imported.domainDesc ?? ""));
-    setMerge(String(imported.merge ?? ""));
-    setMergeDesc(String(imported.mergeDesc ?? ""));
-    setDismiss(String(imported.dismiss ?? ""));
-    setDismissDesc(String(imported.dismissDesc ?? ""));
-    setPulse(String(imported.pulse ?? ""));
-    setPulseDesc(String(imported.pulseDesc ?? ""));
-
-    setWellspring(String(imported.wellspring ?? ""));
-    setInvType(String(imported.type ?? ""));
-    setItemCategory(String(imported.category ?? ""));
-    setInfusionRank(
-      imported.infusionRank === undefined ? "" : String(imported.infusionRank),
-    );
+    // Pilot-vehicle - keep separate state
+    if (nextSpellType === "pilot-vehicle") {
+      const sub = imported.pilotSubtype ?? "frame";
+      setPilotSubtype(sub);
+      if (imported.frame) setVehicleFrame(imported.frame);
+      if (imported.def !== undefined) setModuleDef(String(imported.def));
+      if (imported.mdef !== undefined) setModuleMdef(String(imported.mdef));
+      if (imported.martial !== undefined) setModuleMartial(Boolean(imported.martial));
+      if (imported.cost !== undefined) setModuleCost(Number(imported.cost) || PILOT_MODULE_BASE_COST[sub] || 500);
+      if (imported.description) setModuleDescription(String(imported.description));
+      if (imported.description || imported.effect)
+        setPilotEffect(String(imported.effect ?? imported.description ?? ""));
+      if (imported.category) setWeaponCategory(String(imported.category));
+      if (imported.accuracy?.attr1) setPilotAtt1(String(imported.accuracy.attr1));
+      if (imported.accuracy?.attr2) setPilotAtt2(String(imported.accuracy.attr2));
+      if (imported.accuracy?.value !== undefined) setModulePrec(Number(imported.accuracy.value));
+      if (imported.damage?.value !== undefined) setModuleDamage(String(imported.damage.value));
+      if (imported.damage?.type) setPilotDamageType(String(imported.damage.type));
+      if (imported.range) setModuleRange(String(imported.range));
+      if (imported.cumbersome !== undefined) setModuleCumbersome(Boolean(imported.cumbersome));
+      if (imported.quality !== undefined) setQuality(String(imported.quality));
+      if (imported.qualityCost !== undefined) setQualityCost(Number(imported.qualityCost));
+      if (imported.isShield !== undefined) setIsShield(Boolean(imported.isShield));
+    }
   };
 
-  const data = {
-    class: spellClass,
-    name: name.trim(),
-    fuid: fuid || undefined,
-    description: description.trim(),
-    isOffensive,
-    cost: { resource: "mp", amount: mp === "" ? 0 : Number(mp), perTarget },
-    maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
-    targetDescription: targetDescription.trim() || "One creature",
-    duration: duration.trim() || "Instantaneous",
-    accuracy: { attr1, attr2, value: 0, defense: "mdef" },
-    damage: {
-      value: isOffensive && damage !== "" ? Number(damage) : 0,
-      type: isOffensive ? damageType : "physical",
-      hrZero,
-    },
-    spellType: "default",
-  };
+  // Build pilot-vehicle payload from local pilot state (schema renderer not used)
+  const pilotPayload = (() => {
+    const name = (formState.name ?? "").trim();
+    const fuid = formState.fuid || undefined;
+    const frameData = availableFrames.find((f) => f.name === vehicleFrame);
+    const base = {
+      spellType: "pilot-vehicle",
+      name,
+      fuid,
+      pilotSubtype,
+      customName: name,
+      enabled: false,
+      equipped: false,
+      equippedSlot: null,
+    };
+    if (pilotSubtype === "frame")
+      return {
+        ...base,
+        frame: vehicleFrame,
+        passengers: frameData?.passengers ?? 0,
+        distance: frameData?.distance ?? 1,
+        description: pilotEffect.trim(),
+      };
+    if (pilotSubtype === "armor")
+      return {
+        ...base,
+        name: "pilot_custom_armor",
+        type: "pilot_module_armor",
+        category: "Armor",
+        cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.armor,
+        def: Number(moduleDef) || 0,
+        mdef: Number(moduleMdef) || 0,
+        martial: moduleMartial,
+        description: moduleDescription.trim() || undefined,
+      };
+    if (pilotSubtype === "weapon")
+      return {
+        ...base,
+        name: "pilot_custom_weapon",
+        type: "pilot_module_weapon",
+        category: weaponCategory,
+        cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.weapon,
+        accuracy: {
+          attr1: pilotAtt1,
+          attr2: pilotAtt2,
+          value: Number(modulePrec) || 0,
+          defense: "def",
+        },
+        damage: {
+          value: Number(moduleDamage) || 0,
+          type: String(pilotDamageType || "Physical").toLowerCase(),
+          hrZero: false,
+        },
+        range: moduleRange || "Melee",
+        cumbersome: moduleCumbersome,
+        quality: quality.trim(),
+        qualityCost: Number(qualityCost) || 0,
+        isShield,
+        equippedSlot: "main",
+      };
+    // support
+    return {
+      ...base,
+      name: "pilot_custom_support",
+      type: "pilot_module_support",
+      description: pilotEffect.trim(),
+      isComplex: true,
+      cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.support,
+    };
+  })();
 
-  const nonStaticData =
-    spellType === "default"
-      ? null
-      : {
-          name: name.trim(),
-          fuid: fuid || undefined,
-          spellType: spellType === "magichant-key" ? "magichant" : spellType,
-          magichantSubtype:
-            spellType === "magichant-key"
-              ? "key"
-              : spellType === "magichant"
-                ? "tone"
-                : undefined,
-          // generic effect/description (therioform, magichant, symbol, dance, gift, tinkerer-infusion, etc.)
-          effect: effect.trim(),
-          description: effect.trim(),
-          event: event.trim(),
-          genoclepsis: genoclepsis.trim() || undefined,
-          status:
-            spellType === "magichant-key"
-              ? keyStatus.trim() || undefined
-              : undefined,
-          attribute:
-            spellType === "magichant-key"
-              ? keyAttribute.trim() || undefined
-              : undefined,
-          recovery:
-            spellType === "magichant-key"
-              ? keyRecovery.trim() || undefined
-              : undefined,
-          duration: duration || undefined,
-          // invocation
-          wellspring: wellspring.trim() || undefined,
-          type:
-            spellType === "magichant-key"
-              ? keyType.trim() || undefined
-              : invType.trim() || undefined,
-          // arcanist / arcanist-rework
-          domain: domain.trim() || undefined,
-          domainDesc: domainDesc.trim() || undefined,
-          merge: merge.trim() || undefined,
-          mergeDesc: mergeDesc.trim() || undefined,
-          dismiss: dismiss.trim() || undefined,
-          dismissDesc: dismissDesc.trim() || undefined,
-          pulse: pulse.trim() || undefined,
-          pulseDesc: pulseDesc.trim() || undefined,
-          // tinkerer-alchemy / pilot-vehicle category
-          category: itemCategory.trim() || undefined,
-          // tinkerer-infusion
-          infusionRank: infusionRank !== "" ? Number(infusionRank) : undefined,
-          // cooking
-          ...(spellType === "cooking" && {
-            cookbookEffects: cookingEffects.map((fx, i) => ({
-              id: i + 1,
-              effect: fx.trim(),
-              customChoices: {},
-            })),
-          }),
-          // magiseed
-          ...(spellType === "magiseed" && {
-            description: seedDescription.trim(),
-            rangeStart: Number(seedRangeStart),
-            rangeEnd: Number(seedRangeEnd),
-            effects: seedEffects,
-          }),
-          // pilot-vehicle : flat structure per subtype for later import into player-edit
-          ...(spellType === "pilot-vehicle" &&
-            (() => {
-              const frameData = availableFrames.find(
-                (f) => f.name === vehicleFrame,
-              );
-              const base = {
-                pilotSubtype,
-                customName: name.trim(),
-                enabled: false,
-                equipped: false,
-                equippedSlot: null,
-              };
-              if (pilotSubtype === "frame")
-                return {
-                  ...base,
-                  frame: vehicleFrame,
-                  passengers: frameData?.passengers ?? 0,
-                  distance: frameData?.distance ?? 1,
-                  description: effect.trim(),
-                };
-              if (pilotSubtype === "armor")
-                return {
-                  ...base,
-                  name: "pilot_custom_armor",
-                  type: "pilot_module_armor",
-                  category: "Armor",
-                  cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.armor,
-                  def: Number(moduleDef) || 0,
-                  mdef: Number(moduleMdef) || 0,
-                  martial: moduleMartial,
-                  description: moduleDescription.trim() || undefined,
-                };
-              if (pilotSubtype === "weapon")
-                return {
-                  ...base,
-                  name: "pilot_custom_weapon",
-                  type: "pilot_module_weapon",
-                  category: weaponCategory,
-                  cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.weapon,
-                  accuracy: {
-                    attr1: pilotAtt1,
-                    attr2: pilotAtt2,
-                    value: Number(modulePrec) || 0,
-                    defense: "def",
-                  },
-                  damage: {
-                    value: Number(moduleDamage) || 0,
-                    type: String(damageType || "Physical").toLowerCase(),
-                    hrZero: false,
-                  },
-                  range: moduleRange || "Melee",
-                  cumbersome: moduleCumbersome,
-                  quality: quality.trim(),
-                  qualityCost: Number(qualityCost) || 0,
-                  isShield,
-                  equippedSlot: "main",
-                };
-              // support
-              return {
-                ...base,
-                name: "pilot_custom_support",
-                type: "pilot_module_support",
-                description: effect.trim(),
-                isComplex: true,
-                cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.support,
-              };
-            })()),
-        };
-
+  const payload =
+    spellType === "pilot-vehicle"
+      ? pilotPayload
+      : buildPlayerSpellPayload(formState);
   return (
     <PanelLayout
-      data={spellType === "default" ? data : nonStaticData}
-      itemName={name.trim() || ""}
+      data={payload}
+      itemName={(formState.name ?? "").trim() || ""}
       formContent={
         <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 5,
+          {/* Core: spellType, fuid, name */}
+          <SchemaFieldRenderer
+            config={playerSpellFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="quickCreate"
+            group="core"
+            label={t("Player Spell")}
+            cols={1}
+            extraProps={{
+              onBrowse: () =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["player-spell"],
+                  handleImportPlayerSpell,
+                  {
+                    initialSpellClass: SPELL_TYPE_TO_CLASS[spellType] ?? "",
+                    ...(spellType === "pilot-vehicle"
+                      ? { initialModuleTypeFilter: pilotSubtype }
+                      : {}),
+                  },
+                ),
             }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Spell Type")}</InputLabel>
-              <Select
-                value={spellType}
-                label={t("Spell Type")}
-                onChange={(e) => setSpellType(e.target.value)}
-              >
-                {NON_STATIC_TYPES.map((st) => (
-                  <MenuItem key={st.value} value={st.value}>
-                    {t(st.label)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          {spellType === "default" && (
-            <Grid
-              size={{
-                xs: 12,
-                sm: 7,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Class")}</InputLabel>
-                <Select
-                  value={spellClass}
-                  label={t("Class")}
-                  onChange={(e) => setSpellClass(e.target.value)}
-                >
-                  {spellClasses.map((c) => (
-                    <MenuItem key={c} value={c}>
-                      {t(c)}
-                    </MenuItem>
-                  ))}
-                  <MenuItem value="">{t("Custom")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
-          {spellType !== "default" ? (
-            <Grid
-              container
-              spacing={2}
-              sx={{ alignItems: "center", mt: 0, ml: 0 }}
-            >
+          />
+
+          {/* Pilot-vehicle fallback - not handled by schema renderer */}
+          {spellType === "pilot-vehicle" ? (
+            <>
               <Grid size={12}>
-                <FuidField
-                  value={fuid}
-                  name={name}
-                  onChange={setFuid}
-                  onBrowse={() =>
-                    openImport(
-                      QUICK_CREATE_TAB_TO_VIEWER_TYPE["player-spell"],
-                      handleImportPlayerSpell,
-                      {
-                        initialSpellClass: SPELL_TYPE_TO_CLASS[spellType] ?? "",
-                        ...(spellType === "pilot-vehicle"
-                          ? { initialModuleTypeFilter: pilotSubtype }
-                          : {}),
-                      },
-                    )
-                  }
-                  autoSync
-                />
-              </Grid>
-              <Grid size={12}>
-                <TextField
-                  label={t("Name")}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  fullWidth
-                  size="small"
-                  autoFocus
-                />
-              </Grid>
-
-              {/* Gift */}
-              {spellType === "gift" && (
-                <Grid size={12}>
-                  <TextField
-                    label={t("Event / Trigger")}
-                    value={event}
-                    onChange={(e) => setEvent(e.target.value)}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-              )}
-
-              {/* Therioform */}
-              {spellType === "therioform" && (
-                <Grid size={12}>
-                  <TextField
-                    label={t("Genoclepsis (optional)")}
-                    value={genoclepsis}
-                    onChange={(e) => setGenoclepsis(e.target.value)}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-              )}
-
-              {/* Magichant Key */}
-              {spellType === "magichant-key" && (
-                <>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("magichant_type")}</InputLabel>
-                      <Select
-                        value={keyType}
-                        label={t("magichant_type")}
-                        onChange={(e) => setKeyType(e.target.value)}
-                      >
-                        <MenuItem value="">{t("Select")}</MenuItem>
-                        {MAGICHANT_KEY_TYPES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(value)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("magichant_status_effect")}</InputLabel>
-                      <Select
-                        value={keyStatus}
-                        label={t("magichant_status_effect")}
-                        onChange={(e) => setKeyStatus(e.target.value)}
-                      >
-                        <MenuItem value="">{t("Select")}</MenuItem>
-                        {MAGICHANT_KEY_STATUSES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(value)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("magichant_attribute")}</InputLabel>
-                      <Select
-                        value={keyAttribute}
-                        label={t("magichant_attribute")}
-                        onChange={(e) => setKeyAttribute(e.target.value)}
-                      >
-                        <MenuItem value="">{t("Select")}</MenuItem>
-                        {MAGICHANT_KEY_ATTRIBUTES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(value)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("magichant_recovery")}</InputLabel>
-                      <Select
-                        value={keyRecovery}
-                        label={t("magichant_recovery")}
-                        onChange={(e) => setKeyRecovery(e.target.value)}
-                      >
-                        <MenuItem value="">{t("Select")}</MenuItem>
-                        {MAGICHANT_KEY_RECOVERIES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(value)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </>
-              )}
-
-              {/* Dance */}
-              {spellType === "dance" && (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <Autocomplete
-                    freeSolo
-                    options={DURATION_OPTIONS.map(t)}
-                    inputValue={duration}
-                    onInputChange={(_, v) => setDuration(v)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={t("Duration")}
-                        size="small"
-                      />
-                    )}
-                  />
-                </Grid>
-              )}
-
-              {/* Invocation */}
-              {spellType === "invocation" && (
-                <>
-                  <Grid size={6}>
-                    <Autocomplete
-                      options={WELLSPRINGS}
-                      value={wellspring || null}
-                      onChange={(_, v) => setWellspring(v ?? "")}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={t("Wellspring")}
-                          size="small"
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid size={6}>
-                    <Autocomplete
-                      options={INV_TYPES}
-                      value={invType || null}
-                      onChange={(_, v) => setInvType(v ?? "")}
-                      renderInput={(params) => (
-                        <TextField {...params} label={t("Type")} size="small" />
-                      )}
-                    />
-                  </Grid>
-                </>
-              )}
-
-              {/* Arcanum / Arcanum Rework */}
-              {(spellType === "arcanist" ||
-                spellType === "arcanist-rework") && (
-                <>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 4,
-                    }}
-                  >
-                    <TextField
-                      label={t("Domain name")}
-                      value={domain}
-                      onChange={(e) => setDomain(e.target.value)}
-                      fullWidth
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid size={12}>
-                    <CustomTextarea
-                      label={t("Domain effect")}
-                      value={domainDesc}
-                      onChange={(e) => setDomainDesc(e.target.value)}
-                      helperText=""
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 4,
-                    }}
-                  >
-                    <TextField
-                      label={t("Merge name")}
-                      value={merge}
-                      onChange={(e) => setMerge(e.target.value)}
-                      fullWidth
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid size={12}>
-                    <CustomTextarea
-                      label={t("Merge effect")}
-                      value={mergeDesc}
-                      onChange={(e) => setMergeDesc(e.target.value)}
-                      helperText=""
-                    />
-                  </Grid>
-                  {spellType === "arcanist-rework" && (
-                    <>
-                      <Grid
-                        size={{
-                          xs: 12,
-                          sm: 4,
-                        }}
-                      >
-                        <TextField
-                          label={t("Pulse name")}
-                          value={pulse}
-                          onChange={(e) => setPulse(e.target.value)}
-                          fullWidth
-                          size="small"
-                        />
-                      </Grid>
-                      <Grid size={12}>
-                        <CustomTextarea
-                          label={t("Pulse effect")}
-                          value={pulseDesc}
-                          onChange={(e) => setPulseDesc(e.target.value)}
-                          helperText=""
-                        />
-                      </Grid>
-                    </>
-                  )}
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 4,
-                    }}
-                  >
-                    <TextField
-                      label={t("Dismiss name")}
-                      value={dismiss}
-                      onChange={(e) => setDismiss(e.target.value)}
-                      fullWidth
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid size={12}>
-                    <CustomTextarea
-                      label={t("Dismiss effect")}
-                      value={dismissDesc}
-                      onChange={(e) => setDismissDesc(e.target.value)}
-                      helperText=""
-                    />
-                  </Grid>
-                </>
-              )}
-
-              {/* Tinkerer Alchemy */}
-              {spellType === "tinkerer-alchemy" && (
-                <Grid size={12}>
-                  <TextField
-                    label={t("Category")}
-                    value={itemCategory}
-                    onChange={(e) => setItemCategory(e.target.value)}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-              )}
-
-              {/* Tinkerer Infusion */}
-              {spellType === "tinkerer-infusion" && (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 4,
-                  }}
-                >
-                  <TextField
-                    label={t("Rank")}
-                    value={infusionRank}
-                    onChange={(e) => setInfusionRank(e.target.value)}
-                    fullWidth
-                    size="small"
-                    type="number"
-                    slotProps={{
-                      htmlInput: { min: 1, max: 3 },
-                    }}
-                  />
-                </Grid>
-              )}
-
-              {/* Cooking : one text field per roll result 1-12 */}
-              {spellType === "cooking" && (
-                <>
-                  {cookingEffects.map((fx, i) => (
-                    <Grid key={i} size={12}>
-                      <CustomTextarea
-                        label={`${t("Roll")} ${i + 1}`}
-                        value={fx}
-                        onChange={(e) => {
-                          const next = [...cookingEffects];
-                          next[i] = e.target.value;
-                          setCookingEffects(next);
-                        }}
-                        helperText=""
-                      />
-                    </Grid>
-                  ))}
-                </>
-              )}
-
-              {/* Magiseed : description + per-tick effects */}
-              {spellType === "magiseed" && (
-                <>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      sm: 3,
-                    }}
-                  >
-                    <TextField
-                      label={t("Range Start")}
-                      value={seedRangeStart}
-                      type="number"
-                      fullWidth
-                      size="small"
-                      onChange={(e) =>
-                        setSeedRangeStart(Number(e.target.value))
+                <ToggleButtonGroup
+                  value={pilotSubtype}
+                  exclusive
+                  onChange={(_, v) => {
+                    if (v !== null) {
+                      setPilotSubtype(v);
+                      if (v === "armor" || v === "weapon" || v === "support") {
+                        setModuleCost(PILOT_MODULE_BASE_COST[v]);
                       }
-                      slotProps={{
-                        htmlInput: { min: 0, max: 4 },
-                      }}
-                    />
+                    }
+                  }}
+                  size="small"
+                  fullWidth
+                >
+                  {PILOT_SUBTYPES.map((s) => (
+                    <ToggleButton key={s.value} value={s.value}>
+                      {t(s.label)}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Grid>
+
+              {/* Frame */}
+              {pilotSubtype === "frame" && (
+                <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                  <Grid size={12}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                      {t("Frame")}
+                    </Typography>
                   </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      sm: 3,
-                    }}
-                  >
-                    <TextField
-                      label={t("Range End")}
-                      value={seedRangeEnd}
-                      type="number"
-                      fullWidth
-                      size="small"
-                      onChange={(e) => setSeedRangeEnd(Number(e.target.value))}
-                      slotProps={{
-                        htmlInput: { min: 1, max: 6 },
-                      }}
-                    />
+                  <Grid size={12}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("Frame")}</InputLabel>
+                      <Select
+                        value={vehicleFrame}
+                        label={t("Frame")}
+                        onChange={(e) => setVehicleFrame(e.target.value)}
+                      >
+                        {availableFrames.map((f) => (
+                          <MenuItem key={f.name} value={f.name}>
+                            {t(f.name)} - {t("Passengers")}: {f.passengers} |{" "}
+                            {t("Distance")}: {f.distance}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid size={12}>
                     <CustomTextarea
                       label={t("Description")}
-                      value={seedDescription}
-                      onChange={(e) => setSeedDescription(e.target.value)}
+                      value={pilotEffect}
+                      onChange={(e) => setPilotEffect(e.target.value)}
                       helperText=""
                     />
                   </Grid>
-                  {Array.from(
-                    { length: seedRangeEnd - seedRangeStart + 1 },
-                    (_, i) => {
-                      const tick = seedRangeStart + i;
-                      return (
-                        <Grid key={tick} size={12}>
-                          <CustomTextarea
-                            label={`${t("Tick")} ${tick}`}
-                            value={seedEffects[tick] ?? ""}
-                            onChange={(e) =>
-                              setSeedEffects((prev) => ({
-                                ...prev,
-                                [tick]: e.target.value,
-                              }))
-                            }
-                            helperText=""
-                          />
-                        </Grid>
-                      );
-                    },
-                  )}
-                </>
+                </Grid>
               )}
 
-              {/* Pilot Vehicle */}
-              {spellType === "pilot-vehicle" && (
-                <>
+              {/* Support Module */}
+              {pilotSubtype === "support" && (
+                <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
                   <Grid size={12}>
-                    <ToggleButtonGroup
-                      value={pilotSubtype}
-                      exclusive
-                      onChange={(_, v) => {
-                        if (v !== null) {
-                          setPilotSubtype(v);
-                          if (v === "armor" || v === "weapon" || v === "support") {
-                            setModuleCost(PILOT_MODULE_BASE_COST[v]);
-                          }
-                        }
-                      }}
-                      size="small"
-                      fullWidth
-                    >
-                      {PILOT_SUBTYPES.map((s) => (
-                        <ToggleButton key={s.value} value={s.value}>
-                          {t(s.label)}
-                        </ToggleButton>
-                      ))}
-                    </ToggleButtonGroup>
+                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                      {t("Support Module")}
+                    </Typography>
                   </Grid>
-
-                  {/* Frame */}
-                  {pilotSubtype === "frame" && (
-                    <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-                      <Grid size={12}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                          {t("Frame")}
-                        </Typography>
-                      </Grid>
-                      <Grid size={12}>
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Frame")}</InputLabel>
-                          <Select
-                            value={vehicleFrame}
-                            label={t("Frame")}
-                            onChange={(e) => setVehicleFrame(e.target.value)}
-                          >
-                            {availableFrames.map((f) => (
-                              <MenuItem key={f.name} value={f.name}>
-                                {t(f.name)} - {t("Passengers")}: {f.passengers} |{" "}
-                                {t("Distance")}: {f.distance}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                    </Grid>
-                  )}
-
-                  {/* Support Module */}
-                  {pilotSubtype === "support" && (
-                    <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-                      <Grid size={12}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                          {t("Support Module")}
-                        </Typography>
-                      </Grid>
-                      <Grid size={{ xs: 6, sm: 4 }}>
-                        <TextField
-                          label={t("Cost")}
-                          value={moduleCost}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModuleCost(e.target.value)}
-                          slotProps={{ htmlInput: { min: 0 } }}
-                        />
-                      </Grid>
-                    </Grid>
-                  )}
-
-                  {/* Armor Module */}
-                  {pilotSubtype === "armor" && (
-                    <>
-                      <Grid size={12} container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
-                        <Grid size={12}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                            {t("Armor")}
-                          </Typography>
-                        </Grid>
-                        <Grid size="auto" sx={{ display: "flex", alignItems: "center" }}>
-                          <ToggleButton
-                            value="martial"
-                            selected={moduleMartial}
-                            onChange={() => setModuleMartial((v) => !v)}
-                            size="small"
-                          >
-                            <Martial />
-                          </ToggleButton>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <TextField
-                            label={moduleMartial ? "DEF" : t("DEX die") + " + DEF"}
-                            value={moduleDef}
-                            type="number"
-                            fullWidth
-                            size="small"
-                            onChange={(e) => setModuleDef(e.target.value)}
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <TextField
-                            label={moduleMartial ? "MDEF" : t("INS die") + " + MDEF"}
-                            value={moduleMdef}
-                            type="number"
-                            fullWidth
-                            size="small"
-                            onChange={(e) => setModuleMdef(e.target.value)}
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <TextField
-                            label={t("Cost")}
-                            value={moduleCost}
-                            type="number"
-                            fullWidth
-                            size="small"
-                            onChange={(e) => setModuleCost(e.target.value)}
-                            slotProps={{ htmlInput: { min: 0 } }}
-                          />
-                        </Grid>
-                      </Grid>
-                      <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-                        <Grid size={12}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                            {t("Description")}
-                          </Typography>
-                        </Grid>
-                        <Grid size={12}>
-                          <CustomTextarea
-                            label={t("Description (optional)")}
-                            value={moduleDescription}
-                            onChange={(e) => setModuleDescription(e.target.value)}
-                            helperText=""
-                          />
-                        </Grid>
-                      </Grid>
-                    </>
-                  )}
-
-                  {/* Weapon Module */}
-                  {pilotSubtype === "weapon" && (
-                    <>
-                      <Grid size={12} container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
-                        <Grid size={12}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                            {t("Weapon")}
-                          </Typography>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 4 }}>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>{t("Category")}</InputLabel>
-                            <Select
-                              value={weaponCategory}
-                              label={t("Category")}
-                              onChange={(e) => setWeaponCategory(e.target.value)}
-                            >
-                              {PILOT_WEAPON_CATEGORIES.map((c) => (
-                                <MenuItem key={c} value={c}>{c}</MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 4 }}>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>{t("Range")}</InputLabel>
-                            <Select
-                              value={moduleRange || "Melee"}
-                              label={t("Range")}
-                              onChange={(e) => setModuleRange(e.target.value)}
-                            >
-                              {PILOT_RANGES.map((r) => (
-                                <MenuItem key={r} value={r}>{r}</MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 2 }} sx={{ display: "flex", alignItems: "center" }}>
-                          <ToggleButton value="cumbersome" selected={moduleCumbersome} onChange={() => setModuleCumbersome((v) => !v)} size="small" sx={{ width: "100%" }}>
-                            {t("Cumbersome")}
-                          </ToggleButton>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 2 }} sx={{ display: "flex", alignItems: "center" }}>
-                          <ToggleButton value="isShield" selected={isShield} onChange={() => setIsShield((v) => !v)} size="small" sx={{ width: "100%" }}>
-                            {t("Shield")}
-                          </ToggleButton>
-                        </Grid>
-                      </Grid>
-                      <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-                        <Grid size={12}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                            {t("Accuracy")}
-                          </Typography>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>{t("Att 1")}</InputLabel>
-                            <Select value={pilotAtt1} label={t("Att 1")} onChange={(e) => setPilotAtt1(e.target.value)}>
-                              {ATTRS.map((a) => (<MenuItem key={a.value} value={a.value}>{t(a.label)}</MenuItem>))}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>{t("Att 2")}</InputLabel>
-                            <Select value={pilotAtt2} label={t("Att 2")} onChange={(e) => setPilotAtt2(e.target.value)}>
-                              {ATTRS.map((a) => (<MenuItem key={a.value} value={a.value}>{t(a.label)}</MenuItem>))}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <TextField label={t("+Acc")} value={modulePrec} type="number" fullWidth size="small" onChange={(e) => setModulePrec(e.target.value)} />
-                        </Grid>
-                      </Grid>
-                      <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-                        <Grid size={12}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                            {t("Damage")}
-                          </Typography>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 4 }}>
-                          <FormControl fullWidth size="small">
-                            <InputLabel>{t("Damage Type")}</InputLabel>
-                            <Select
-                              value={damageType}
-                              label={t("Damage Type")}
-                              onChange={(e) => setDamageType(e.target.value)}
-                              renderValue={(selected) => renderDamageTypeValue(String(selected).toLowerCase(), t)}
-                            >
-                              {PILOT_DAMAGE_TYPES.map((d) => (
-                                <MenuItem key={d} value={d}>
-                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    <TypeIcon type={String(d).toLowerCase()} />
-                                    <span>{String(d).replace(/\b\w/g, (c) => c.toUpperCase())}</span>
-                                  </Box>
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 2 }}>
-                          <TextField label="HR+" value={moduleDamage} type="number" fullWidth size="small" onChange={(e) => setModuleDamage(e.target.value)} />
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small" onChange={(e) => setModuleCost(e.target.value)} slotProps={{ htmlInput: { min: 0 } }} />
-                        </Grid>
-                      </Grid>
-                      <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
-                        <Grid size={12}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                            {t("Quality")}
-                          </Typography>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <TextField label={t("Quality Cost")} value={qualityCost} type="number" fullWidth size="small" onChange={(e) => setQualityCost(e.target.value)} />
-                        </Grid>
-                        <Grid size={12}>
-                          <TextField label={t("Quality")} value={quality} fullWidth size="small" onChange={(e) => setQuality(e.target.value)} />
-                        </Grid>
-                      </Grid>
-                    </>
-                  )}
-                </>
+                  <Grid size={{ xs: 6, sm: 4 }}>
+                    <TextField
+                      label={t("Cost")}
+                      value={moduleCost}
+                      type="number"
+                      fullWidth
+                      size="small"
+                      onChange={(e) => setModuleCost(e.target.value)}
+                      slotProps={{ htmlInput: { min: 0 } }}
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <CustomTextarea
+                      label={t("Effect")}
+                      value={pilotEffect}
+                      onChange={(e) => setPilotEffect(e.target.value)}
+                      helperText=""
+                    />
+                  </Grid>
+                </Grid>
               )}
 
-              {/* Generic effect/description for types that use it */}
-              {!(
-                spellType === "arcanist" ||
-                spellType === "arcanist-rework" ||
-                spellType === "cooking" ||
-                spellType === "magiseed" ||
-                spellType === "magichant-key"
-              ) &&
-                !(
-                  spellType === "pilot-vehicle" &&
-                  (pilotSubtype === "armor" || pilotSubtype === "weapon")
-                ) && (
-                  <Grid size={12} container spacing={2} sx={{ mb: spellType === "pilot-vehicle" ? 2 : 0 }}>
-                    {spellType === "pilot-vehicle" && (
-                      <Grid size={12}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
-                          {pilotSubtype === "support" ? t("Effect") : t("Description")}
-                        </Typography>
-                      </Grid>
-                    )}
+              {/* Armor Module */}
+              {pilotSubtype === "armor" && (
+                <>
+                  <Grid size={12} container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+                    <Grid size={12}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                        {t("Armor")}
+                      </Typography>
+                    </Grid>
+                    <Grid size="auto" sx={{ display: "flex", alignItems: "center" }}>
+                      <ToggleButton
+                        value="martial"
+                        selected={moduleMartial}
+                        onChange={() => setModuleMartial((v) => !v)}
+                        size="small"
+                      >
+                        <Martial />
+                      </ToggleButton>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField
+                        label={moduleMartial ? "DEF" : t("DEX die") + " + DEF"}
+                        value={moduleDef}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleDef(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField
+                        label={moduleMartial ? "MDEF" : t("INS die") + " + MDEF"}
+                        value={moduleMdef}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleMdef(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField
+                        label={t("Cost")}
+                        value={moduleCost}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleCost(e.target.value)}
+                        slotProps={{ htmlInput: { min: 0 } }}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
                     <Grid size={12}>
                       <CustomTextarea
-                        label={
-                          spellType === "therioform" ||
-                          spellType === "pilot-vehicle"
-                            ? t("Description")
-                            : t("Effect")
-                        }
-                        value={effect}
-                        onChange={(e) => setEffect(e.target.value)}
+                        label={t("Description (optional)")}
+                        value={moduleDescription}
+                        onChange={(e) => setModuleDescription(e.target.value)}
                         helperText=""
                       />
                     </Grid>
                   </Grid>
-                )}
-            </Grid>
+                </>
+              )}
+
+              {/* Weapon Module */}
+              {pilotSubtype === "weapon" && (
+                <>
+                  <Grid size={12} container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+                    <Grid size={12}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                        {t("Weapon")}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Category")}</InputLabel>
+                        <Select
+                          value={weaponCategory}
+                          label={t("Category")}
+                          onChange={(e) => setWeaponCategory(e.target.value)}
+                        >
+                          {PILOT_WEAPON_CATEGORIES.map((c) => (
+                            <MenuItem key={c} value={c}>{c}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Range")}</InputLabel>
+                        <Select
+                          value={moduleRange || "Melee"}
+                          label={t("Range")}
+                          onChange={(e) => setModuleRange(e.target.value)}
+                        >
+                          {PILOT_RANGES.map((r) => (
+                            <MenuItem key={r} value={r}>{r}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 2 }} sx={{ display: "flex", alignItems: "center" }}>
+                      <ToggleButton value="cumbersome" selected={moduleCumbersome} onChange={() => setModuleCumbersome((v) => !v)} size="small" sx={{ width: "100%" }}>
+                        {t("Cumbersome")}
+                      </ToggleButton>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 2 }} sx={{ display: "flex", alignItems: "center" }}>
+                      <ToggleButton value="isShield" selected={isShield} onChange={() => setIsShield((v) => !v)} size="small" sx={{ width: "100%" }}>
+                        {t("Shield")}
+                      </ToggleButton>
+                    </Grid>
+                  </Grid>
+                  <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                    <Grid size={12}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                        {t("Accuracy")}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Att 1")}</InputLabel>
+                        <Select value={pilotAtt1} label={t("Att 1")} onChange={(e) => setPilotAtt1(e.target.value)}>
+                          {[
+                            { value: "dexterity", label: "DEX" },
+                            { value: "insight", label: "INS" },
+                            { value: "might", label: "MIG" },
+                            { value: "will", label: "WLP" },
+                          ].map((a) => (<MenuItem key={a.value} value={a.value}>{t(a.label)}</MenuItem>))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Att 2")}</InputLabel>
+                        <Select value={pilotAtt2} label={t("Att 2")} onChange={(e) => setPilotAtt2(e.target.value)}>
+                          {[
+                            { value: "dexterity", label: "DEX" },
+                            { value: "insight", label: "INS" },
+                            { value: "might", label: "MIG" },
+                            { value: "will", label: "WLP" },
+                          ].map((a) => (<MenuItem key={a.value} value={a.value}>{t(a.label)}</MenuItem>))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField label={t("+Acc")} value={modulePrec} type="number" fullWidth size="small" onChange={(e) => setModulePrec(e.target.value)} />
+                    </Grid>
+                  </Grid>
+                  <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                    <Grid size={12}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                        {t("Damage")}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Damage Type")}</InputLabel>
+                        <Select
+                          value={pilotDamageType}
+                          label={t("Damage Type")}
+                          onChange={(e) => setPilotDamageType(e.target.value)}
+                        >
+                          {PILOT_DAMAGE_TYPES.map((d) => (
+                            <MenuItem key={d} value={d}>
+                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <TypeIcon type={String(d).toLowerCase()} />
+                                <span>{String(d).replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+                              </Box>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 2 }}>
+                      <TextField label="HR+" value={moduleDamage} type="number" fullWidth size="small" onChange={(e) => setModuleDamage(e.target.value)} />
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small" onChange={(e) => setModuleCost(e.target.value)} slotProps={{ htmlInput: { min: 0 } }} />
+                    </Grid>
+                  </Grid>
+                  <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                    <Grid size={12}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                        {t("Quality")}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField label={t("Quality Cost")} value={qualityCost} type="number" fullWidth size="small" onChange={(e) => setQualityCost(e.target.value)} />
+                    </Grid>
+                    <Grid size={12}>
+                      <TextField label={t("Quality")} value={quality} fullWidth size="small" onChange={(e) => setQuality(e.target.value)} />
+                    </Grid>
+                  </Grid>
+                </>
+              )}
+            </>
           ) : (
             <>
-              <Grid size={12}>
-                <FuidField
-                  value={fuid}
-                  name={name}
-                  onChange={setFuid}
-                  onBrowse={() =>
-                    openImport(
-                      QUICK_CREATE_TAB_TO_VIEWER_TYPE["player-spell"],
-                      handleImportPlayerSpell,
-                      { initialSpellClass: spellClass },
-                    )
-                  }
-                  autoSync
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 10,
-                  sm: 6,
-                }}
-              >
-                <TextField
-                  label={t("Name")}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  fullWidth
-                  size="small"
-                  autoFocus
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 2,
-                  sm: 1,
-                }}
-              >
-                <ToggleButton
-                  value="offensive"
-                  selected={isOffensive}
-                  onChange={() => setIsOffensive((v) => !v)}
-                  size="small"
-                  sx={{ width: "100%" }}
-                >
-                  <OffensiveSpellIcon />
-                </ToggleButton>
-              </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 3,
-                }}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-              >
-                <TextField
-                  label={perTarget ? t("MP x Target") : t("MP")}
-                  value={mp}
-                  onChange={(e) => setMp(e.target.value)}
-                  sx={{ flex: 1 }}
-                  size="small"
-                  type="number"
-                  slotProps={{
-                    htmlInput: { min: 0 },
-                  }}
-                />
-                <Switch
-                  size="small"
-                  checked={perTarget}
-                  onChange={(e) => setPerTarget(e.target.checked)}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 3,
-                }}
-              >
-                <TextField
-                  label={t("Max Targets")}
-                  value={maxTargets}
-                  onChange={(e) => setMaxTargets(e.target.value)}
-                  fullWidth
-                  size="small"
-                  type="number"
-                  slotProps={{
-                    htmlInput: { min: 0 },
-                  }}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <Autocomplete
-                  freeSolo
-                  options={TARGET_OPTIONS.map(t)}
-                  inputValue={targetDescription}
-                  onInputChange={(_, v) => {
-                    setTargetDescription(v);
-                    if (
-                      ["Self", "One creature", "One equipped weapon"].includes(
-                        v,
-                      )
-                    )
-                      setPerTarget(false);
-                    else if (v.startsWith("Up to")) setPerTarget(true);
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label={t("Target")} size="small" />
-                  )}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <Autocomplete
-                  freeSolo
-                  options={DURATION_OPTIONS.map(t)}
-                  inputValue={duration}
-                  onInputChange={(_, v) => setDuration(v)}
-                  renderInput={(params) => (
-                    <TextField {...params} label={t("Duration")} size="small" />
-                  )}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 3,
-                }}
-              >
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t("Attr 1")}</InputLabel>
-                  <Select
-                    value={attr1}
-                    label={t("Attr 1")}
-                    onChange={(e) => setAttr1(e.target.value)}
-                  >
-                    {ATTRS.map((a) => (
-                      <MenuItem key={a.value} value={a.value}>
-                        {a.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 3,
-                }}
-              >
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t("Attr 2")}</InputLabel>
-                  <Select
-                    value={attr2}
-                    label={t("Attr 2")}
-                    onChange={(e) => setAttr2(e.target.value)}
-                  >
-                    {ATTRS.map((a) => (
-                      <MenuItem key={a.value} value={a.value}>
-                        {a.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              {isOffensive && (
-                <Grid
-                  size={{
-                    xs: 6,
-                    sm: 3,
-                  }}
-                >
-                  <FormControl fullWidth size="small">
-                    <InputLabel>{t("Damage Type")}</InputLabel>
-                    <Select
-                      value={damageType}
-                      label={t("Damage Type")}
-                      onChange={(e) => setDamageType(e.target.value)}
-                      renderValue={(selected) =>
-                        renderDamageTypeValue(selected, t)
-                      }
-                    >
-                      {Object.keys(types).map((type) => (
-                        <MenuItem key={type} value={type}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            <TypeIcon type={type} />
-                            <span>
-                              {String(types[type].long).replace(
-                                /\b\w/g,
-                                (char) => char.toUpperCase(),
-                              )}
-                            </span>
-                          </Box>
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              )}
-              {isOffensive && (
-                <Grid
-                  size={{
-                    xs: 6,
-                    sm: 3,
-                  }}
-                >
-                  <TextField
-                    label={t("Damage")}
-                    value={damage}
-                    onChange={(e) => setDamage(e.target.value)}
-                    fullWidth
-                    size="small"
-                    type="number"
-                    slotProps={{
-                      htmlInput: { min: 0 },
-                    }}
-                  />
-                </Grid>
-              )}
-              {isOffensive && (
-                <Grid
-                  size={{
-                    xs: 6,
-                    sm: 3,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={hrZero}
-                        onChange={(e) => setHrZero(e.target.checked)}
-                        size="small"
-                      />
-                    }
-                    label="HR0"
-                  />
-                </Grid>
-              )}
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Description")}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
+              {/* cost / target / accuracy / damage / description — default spell only */}
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="cost"
+                label={t("Cost")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="target"
+                label={t("Target")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="accuracy"
+                label={t("Accuracy")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="damage"
+                label={t("Damage")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="description"
+                label={t("Details")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              {/* effect / type-specific fields — non-default spells */}
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="effect"
+                label={t("Details")}
+                hidden={spellType === "default"}
+                cols={1}
+              />
+              {/* arcanist fields */}
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="arcanist"
+                label={t("Arcanum")}
+                hidden={spellType !== "arcanist" && spellType !== "arcanist-rework"}
+                cols={1}
+              />
+              {/* meta */}
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="meta"
+                label={t("Metadata")}
+                cols={2}
+              />
             </>
           )}
+
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -2222,43 +1593,43 @@ function PlayerSpellPanel() {
       }
       previewContent={
         spellType === "default" ? (
-          <SharedPlayerSpellCard item={data} />
+          <SharedPlayerSpellCard item={payload} />
         ) : spellType === "gamble" ? (
-          <SharedGambleSpellCard item={nonStaticData} />
+          <SharedGambleSpellCard item={payload} />
         ) : spellType === "gift" ? (
-          <SharedGiftCard item={nonStaticData} />
+          <SharedGiftCard item={payload} />
         ) : spellType === "dance" ? (
-          <SharedDanceCard item={nonStaticData} />
+          <SharedDanceCard item={payload} />
         ) : spellType === "therioform" ? (
-          <SharedTherioformCard item={nonStaticData} />
+          <SharedTherioformCard item={payload} />
         ) : spellType === "magichant" || spellType === "magichant-key" ? (
-          <SharedMagichantCard item={nonStaticData} />
+          <SharedMagichantCard item={payload} />
         ) : spellType === "symbol" ? (
-          <SharedSymbolCard item={nonStaticData} />
+          <SharedSymbolCard item={payload} />
         ) : spellType === "invocation" ? (
-          <SharedInvocationCard item={nonStaticData} />
+          <SharedInvocationCard item={payload} />
         ) : spellType === "magiseed" ? (
-          <SharedMagiseedCard item={nonStaticData} />
+          <SharedMagiseedCard item={payload} />
         ) : spellType === "tinkerer-alchemy" ? (
-          <SharedAlchemyCard item={nonStaticData} />
+          <SharedAlchemyCard item={payload} />
         ) : spellType === "tinkerer-infusion" ? (
-          <SharedInfusionCard item={nonStaticData} />
+          <SharedInfusionCard item={payload} />
         ) : spellType === "tinkerer-magitech" ? (
-          <SharedMagitechCard item={nonStaticData} />
+          <SharedMagitechCard item={payload} />
         ) : spellType === "cooking" ? (
-          <SharedCookingCard item={nonStaticData} />
+          <SharedCookingCard item={payload} />
         ) : spellType === "pilot-vehicle" ? (
-          <SharedPilotVehicleCard item={nonStaticData} />
+          <SharedPilotVehicleCard item={payload} />
         ) : spellType === "arcanist" || spellType === "arcanist-rework" ? (
-          <SharedArcanumCard item={nonStaticData} />
+          <SharedArcanumCard item={payload} />
         ) : (
-          <SharedPlayerSpellCard item={data} />
+          <SharedPlayerSpellCard item={payload} />
         )
       }
       addButton={
         <AddToCompendiumButton
           itemType={REG["player-spell"].addItemType}
-          data={spellType === "default" ? data : nonStaticData}
+          data={payload}
         />
       }
       exportDataType={REG["player-spell"].exportDataType}

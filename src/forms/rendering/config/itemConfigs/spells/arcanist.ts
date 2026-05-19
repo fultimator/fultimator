@@ -6,7 +6,7 @@ export const arcanistFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "domain",
     kind: "editable",
-    label: "Domain name",
+    label: "spell.arcanist.domain",
     component: "text",
     defaultValue: "",
     group: "arcanist",
@@ -17,7 +17,7 @@ export const arcanistFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "domainDesc",
     kind: "editable",
-    label: "Domain effect",
+    label: "spell.arcanist.domainDesc",
     component: "textarea",
     defaultValue: "",
     group: "arcanist",
@@ -28,7 +28,7 @@ export const arcanistFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "merge",
     kind: "editable",
-    label: "Merge name",
+    label: "spell.arcanist.merge",
     component: "text",
     defaultValue: "",
     group: "arcanist",
@@ -39,7 +39,7 @@ export const arcanistFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "mergeDesc",
     kind: "editable",
-    label: "Merge effect",
+    label: "spell.arcanist.mergeDesc",
     component: "textarea",
     defaultValue: "",
     group: "arcanist",
@@ -50,7 +50,7 @@ export const arcanistFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "pulse",
     kind: "editable",
-    label: "Pulse name",
+    label: "spell.arcanist.pulse",
     component: "text",
     defaultValue: "",
     group: "arcanist",
@@ -61,7 +61,7 @@ export const arcanistFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "pulseDesc",
     kind: "editable",
-    label: "Pulse effect",
+    label: "spell.arcanist.pulseDesc",
     component: "textarea",
     defaultValue: "",
     group: "arcanist",
@@ -72,7 +72,7 @@ export const arcanistFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "dismiss",
     kind: "editable",
-    label: "Dismiss name",
+    label: "spell.arcanist.dismiss",
     component: "text",
     defaultValue: "",
     group: "arcanist",
@@ -83,7 +83,7 @@ export const arcanistFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "dismissDesc",
     kind: "editable",
-    label: "Dismiss effect",
+    label: "spell.arcanist.dismissDesc",
     component: "textarea",
     defaultValue: "",
     group: "arcanist",

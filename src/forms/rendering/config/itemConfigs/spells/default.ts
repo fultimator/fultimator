@@ -14,11 +14,11 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "class",
     kind: "editable",
-    label: "Class",
+    label: "spell.class",
     component: "select",
     defaultValue: STANDARD_SPELL_CLASSES[0],
-    group: "class",
-    order: 10,
+    group: "core",
+    order: 1,
     gridSize: { xs: 12, sm: 7 },
     dependencies: isDefault,
     componentProps: { options: SPELL_CLASS_OPTIONS },
@@ -26,18 +26,18 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "isOffensive",
     kind: "editable",
-    label: "Offensive",
+    label: "spell.offensive",
     component: "offensive-toggle",
     defaultValue: false,
-    group: "class",
-    order: 11,
+    group: "core",
+    order: 5,
     gridSize: "auto",
     dependencies: isDefault,
   },
   {
     key: "cost.resource",
     kind: "computed",
-    label: "Resource",
+    label: "spell.cost.resource",
     defaultValue: "mp" as const,
     group: "cost",
     order: 20,
@@ -45,7 +45,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "cost.amount",
     kind: "editable",
-    label: (s) => (s["cost.perTarget"] ? "MP x Target" : "MP"),
+    label: (s) => (s["cost.perTarget"] ? "spell.cost.amountPerTarget" : "spell.cost.amount"),
     component: "number",
     defaultValue: 0,
     group: "cost",
@@ -57,7 +57,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "cost.perTarget",
     kind: "editable",
-    label: "Per Target",
+    label: "spell.cost.perTarget",
     component: "checkbox",
     defaultValue: true,
     group: "cost",
@@ -68,7 +68,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "maxTargets",
     kind: "editable",
-    label: "Max Targets",
+    label: "spell.maxTargets",
     component: "number",
     defaultValue: 1,
     group: "cost",
@@ -81,7 +81,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "targetDescription",
     kind: "editable",
-    label: "Target",
+    label: "spell.target",
     component: "autocomplete",
     defaultValue: "One creature",
     group: "target",
@@ -93,7 +93,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "duration",
     kind: "editable",
-    label: "Duration",
+    label: "spell.duration",
     component: "autocomplete",
     defaultValue: "Instantaneous",
     group: "target",
@@ -105,7 +105,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "accuracy.attr1",
     kind: "editable",
-    label: "Attr 1",
+    label: "spell.accuracy.attr1",
     component: "select",
     defaultValue: "insight",
     group: "accuracy",
@@ -117,7 +117,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "accuracy.attr2",
     kind: "editable",
-    label: "Attr 2",
+    label: "spell.accuracy.attr2",
     component: "select",
     defaultValue: "will",
     group: "accuracy",
@@ -129,7 +129,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "accuracy.value",
     kind: "computed",
-    label: "Accuracy Bonus",
+    label: "spell.accuracy.bonus",
     defaultValue: 0,
     group: "accuracy",
     order: 42,
@@ -137,7 +137,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "accuracy.defense",
     kind: "computed",
-    label: "Defense",
+    label: "spell.accuracy.defense",
     defaultValue: "mdef" as const,
     group: "accuracy",
     order: 43,
@@ -145,7 +145,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "damage.value",
     kind: "editable",
-    label: "Damage",
+    label: "spell.damage.value",
     component: "number",
     defaultValue: 0,
     group: "damage",
@@ -157,7 +157,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "damage.type",
     kind: "editable",
-    label: "Damage Type",
+    label: "spell.damage.type",
     component: "type-select",
     defaultValue: "physical",
     group: "damage",
@@ -169,7 +169,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "damage.hrZero",
     kind: "editable",
-    label: "HR0",
+    label: "spell.damage.hrZero",
     component: "checkbox",
     defaultValue: false,
     group: "damage",
@@ -180,7 +180,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "description",
     kind: "editable",
-    label: "Description",
+    label: "spell.description",
     component: "textarea",
     defaultValue: "",
     group: "description",
