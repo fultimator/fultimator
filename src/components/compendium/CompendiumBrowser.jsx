@@ -380,7 +380,7 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
 
   return (
     <Box
-      sx={{ display: "flex", height: "100%", overflow: "hidden", ...mainSx }}
+      sx={{ display: "flex", height: "100%", overflow: "hidden", width: "100%", ...mainSx }}
     >
       {/* ---- Desktop sidebar ---- */}
       {isDesktop && (
