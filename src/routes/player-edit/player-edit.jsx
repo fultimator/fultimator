@@ -121,6 +121,11 @@ import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
 import CustomHeader from "../../components/common/CustomHeader";
 import SettingRow from "../../components/common/SettingRow";
 import MigrateFromCompendiumDialog from "../../components/player/settings/MigrateFromCompendiumDialog";
+import useLevelUpFlow from "../../components/player/common/hooks/useLevelUpFlow";
+import {
+  canLevelUpFromExp as canLevelUpFromExpCheck,
+  applyExpLevelUp,
+} from "../../components/player/common/levelUpLogic";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -212,8 +217,18 @@ export default function PlayerEdit() {
 
   const [isSheetEditMode, setIsSheetEditMode] = useState(true);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
-  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
-  const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
+  const {
+    levelUpDialogOpen,
+    levelUpCelebrationOpen,
+    openLevelUpDialog,
+    closeLevelUpDialog,
+    closeCelebration,
+    confirmLevelUp,
+  } = useLevelUpFlow();
+  const [confettiSize, setConfettiSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
+  });
   const [mnemoLevelUpId, setMnemoLevelUpId] = useState(null);
 
   // Local players are always owned by whoever is running the app.
@@ -249,6 +264,14 @@ export default function PlayerEdit() {
       document.removeEventListener("keydown", handleCtrlS);
     };
   }, [handleCtrlS]);
+
+  useEffect(() => {
+    const onResize = () =>
+      setConfettiSize({ width: window.innerWidth, height: window.innerHeight });
+    onResize();
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     if (player) {
@@ -863,7 +886,7 @@ export default function PlayerEdit() {
                   isExpanded={compactViewExpanded}
                   updateMaxStats={updateMaxStats}
                   canLevelUpFromExp={canLevelUpFromExp}
-                  onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+                  onLevelUpRequest={openLevelUpDialog}
                   onToggleEditMode={
                     isOwner ? () => setIsSheetEditMode((v) => !v) : undefined
                   }
@@ -890,7 +913,7 @@ export default function PlayerEdit() {
                 isCharacterSheet={false}
                 updateMaxStats={updateMaxStats}
                 canLevelUpFromExp={canLevelUpFromExp}
-                onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+                onLevelUpRequest={openLevelUpDialog}
               />
               <Divider sx={{ my: 1 }} />
               {/* TODO: Add Zenit somewhere else */}
@@ -1456,7 +1479,7 @@ export default function PlayerEdit() {
         open={levelUpDialogOpen}
         onClose={() => {
           setMnemoLevelUpId(null);
-          setLevelUpDialogOpen(false);
+          closeLevelUpDialog();
         }}
         maxWidth="sm"
         fullWidth
@@ -1516,32 +1539,30 @@ export default function PlayerEdit() {
             color="error"
             onClick={() => {
               setMnemoLevelUpId(null);
-              setLevelUpDialogOpen(false);
+              closeLevelUpDialog();
             }}
           >
             {t("Cancel")}
           </Button>
           <Button
             variant="contained"
-            onClick={() => {
-              const selectedMnemoId = canInvestMnemosphereLevel
-                ? mnemoLevelUpId
-                : null;
-              setPlayerTemp((prev) => {
-                if (!prev) return prev;
-                const currentExp = parseInt(prev.info?.exp, 10) || 0;
-                if (currentExp < 10 || (prev.lvl || 0) >= 50) return prev;
-                const leveled = recalculatePlayerMaxStats({
-                  ...prev,
-                  lvl: Math.min(50, (prev.lvl || 0) + 1),
-                  info: { ...prev.info, exp: Math.max(0, currentExp - 10) },
-                });
-                return applyMnemoLevelUp(leveled, selectedMnemoId);
-              });
-              setMnemoLevelUpId(null);
-              setLevelUpDialogOpen(false);
-              setLevelUpCelebrationOpen(true);
-            }}
+            onClick={() =>
+              confirmLevelUp(() => {
+                if (!canLevelUpFromExpCheck(playerTemp)) return false;
+                const selectedMnemoId = canInvestMnemosphereLevel
+                  ? mnemoLevelUpId
+                  : null;
+                setPlayerTemp((prev) =>
+                  applyExpLevelUp(prev, {
+                    recalculateMaxStats: recalculatePlayerMaxStats,
+                    afterLevelUp: (leveled) =>
+                      applyMnemoLevelUp(leveled, selectedMnemoId),
+                  }),
+                );
+                setMnemoLevelUpId(null);
+                return true;
+              })
+            }
           >
             {t("Level Up")}
           </Button>
@@ -1549,7 +1570,7 @@ export default function PlayerEdit() {
       </Dialog>
       <Dialog
         open={levelUpCelebrationOpen}
-        onClose={() => setLevelUpCelebrationOpen(false)}
+        onClose={closeCelebration}
         maxWidth="sm"
         fullWidth
       >
@@ -1562,7 +1583,7 @@ export default function PlayerEdit() {
         <DialogActions>
           <Button
             variant="contained"
-            onClick={() => setLevelUpCelebrationOpen(false)}
+            onClick={closeCelebration}
           >
             {t("OK")}
           </Button>
@@ -1570,6 +1591,9 @@ export default function PlayerEdit() {
       </Dialog>
       {levelUpCelebrationOpen && (
         <Confetti
+          width={confettiSize.width}
+          height={confettiSize.height}
+          style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none" }}
           recycle={true}
           numberOfPieces={250}
           run={levelUpCelebrationOpen}

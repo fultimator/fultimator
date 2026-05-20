@@ -58,6 +58,8 @@ import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
 } from "../../components/player/playerTransforms";
+import useLevelUpFlow from "../../components/player/common/hooks/useLevelUpFlow";
+import { canLevelUpFromExp as canLevelUpFromExpCheck } from "../../components/player/common/levelUpLogic";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();
@@ -109,14 +111,32 @@ export default function CharacterSheet() {
   const [isUpdated, setIsUpdated] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
-  const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
+  const {
+    levelUpDialogOpen,
+    levelUpCelebrationOpen,
+    openLevelUpDialog,
+    closeLevelUpDialog,
+    closeCelebration,
+    confirmLevelUp,
+  } = useLevelUpFlow();
+  const [confettiSize, setConfettiSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
+  });
 
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 250);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onResize = () =>
+      setConfettiSize({ width: window.innerWidth, height: window.innerHeight });
+    onResize();
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   useEffect(() => {
@@ -341,11 +361,12 @@ export default function CharacterSheet() {
     }
   };
 
-  const canLevelUpFromExp =
-    (parseInt(player?.info?.exp, 10) || 0) >= 10 && (player?.lvl || 0) < 50;
+  const canLevelUpFromExp = canLevelUpFromExpCheck(player);
 
-  const handleConfirmLevelUpFromExp = () => {
-    setPlayer((prevPlayer) => {
+  const handleConfirmLevelUpFromExp = () =>
+    confirmLevelUp(() => {
+      if (!canLevelUpFromExpCheck(player)) return false;
+      setPlayer((prevPlayer) => {
       if (!prevPlayer) return prevPlayer;
 
       const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
@@ -460,10 +481,9 @@ export default function CharacterSheet() {
           },
         },
       };
+      });
+      return true;
     });
-    setLevelUpDialogOpen(false);
-    setLevelUpCelebrationOpen(true);
-  };
 
   if (!player) {
     return null;
@@ -558,7 +578,7 @@ export default function CharacterSheet() {
                   characterImage={player.info.imgurl}
                   updateMaxStats={updateMaxStats}
                   canLevelUpFromExp={canLevelUpFromExp}
-                  onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+                  onLevelUpRequest={openLevelUpDialog}
                 />
                 <PlayerNumbers
                   player={player}
@@ -729,7 +749,7 @@ export default function CharacterSheet() {
               characterImage={player.info.imgurl}
               id="character-sheet-short"
               canLevelUpFromExp={canLevelUpFromExp}
-              onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+              onLevelUpRequest={openLevelUpDialog}
               updateMaxStats={updateMaxStats}
             />
           </Grid>
@@ -782,7 +802,7 @@ export default function CharacterSheet() {
       )}
       <Dialog
         open={levelUpDialogOpen}
-        onClose={() => setLevelUpDialogOpen(false)}
+        onClose={closeLevelUpDialog}
         maxWidth="sm"
         fullWidth
       >
@@ -794,7 +814,7 @@ export default function CharacterSheet() {
           <Button
             variant="contained"
             color="error"
-            onClick={() => setLevelUpDialogOpen(false)}
+            onClick={closeLevelUpDialog}
           >
             {t("Cancel")}
           </Button>
@@ -805,7 +825,7 @@ export default function CharacterSheet() {
       </Dialog>
       <Dialog
         open={levelUpCelebrationOpen}
-        onClose={() => setLevelUpCelebrationOpen(false)}
+        onClose={closeCelebration}
         maxWidth="sm"
         fullWidth
       >
@@ -818,7 +838,7 @@ export default function CharacterSheet() {
         <DialogActions>
           <Button
             variant="contained"
-            onClick={() => setLevelUpCelebrationOpen(false)}
+            onClick={closeCelebration}
           >
             {t("OK")}
           </Button>
@@ -826,6 +846,9 @@ export default function CharacterSheet() {
       </Dialog>
       {levelUpCelebrationOpen && (
         <Confetti
+          width={confettiSize.width}
+          height={confettiSize.height}
+          style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none" }}
           recycle={true}
           numberOfPieces={250}
           run={levelUpCelebrationOpen}

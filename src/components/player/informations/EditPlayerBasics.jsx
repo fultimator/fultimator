@@ -26,6 +26,11 @@ import FabulaIcon from "../../svgs/fabula.svg?react";
 import { Code } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import Confetti from "react-confetti";
+import useLevelUpFlow from "../common/hooks/useLevelUpFlow";
+import {
+  canLevelUpFromExp as canLevelUpFromExpCheck,
+  applyExpLevelUp,
+} from "../common/levelUpLogic";
 
 export default function EditPlayerBasics({
   player,
@@ -45,6 +50,10 @@ export default function EditPlayerBasics({
   const [open, setOpen] = React.useState(false);
 
   const [showConfetti, setShowConfetti] = useState(false);
+  const [confettiSize, setConfettiSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
+  });
 
   const handleClose = () => {
     setOpen(false);
@@ -110,6 +119,14 @@ export default function EditPlayerBasics({
   const handleCloseLevelUp = () => {
     setShowConfetti(false);
   };
+
+  React.useEffect(() => {
+    const onResize = () =>
+      setConfettiSize({ width: window.innerWidth, height: window.innerHeight });
+    onResize();
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   return (
     <Paper
@@ -414,7 +431,13 @@ export default function EditPlayerBasics({
           </>
         ) : null}
       </Grid>
-      {showConfetti && <Confetti />}
+      {showConfetti && (
+        <Confetti
+          width={confettiSize.width}
+          height={confettiSize.height}
+          style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none" }}
+        />
+      )}
     </Paper>
   );
 }
@@ -538,35 +561,33 @@ function ExpAdornment({
   onLevelUp,
   onCloseLevelUp,
 }) {
-  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
-  const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
+  const {
+    levelUpDialogOpen,
+    levelUpCelebrationOpen,
+    openLevelUpDialog,
+    closeLevelUpDialog,
+    closeCelebration,
+    confirmLevelUp,
+  } = useLevelUpFlow();
   const { t } = useTranslate();
 
   const handleExpClick = () => {
-    if (exp >= 10 && isEditMode) {
-      setLevelUpDialogOpen(true);
+    if (canLevelUpFromExpCheck(player) && isEditMode) {
+      openLevelUpDialog();
     }
   };
 
-  const handleLevelUpConfirm = () => {
-    setPlayer((prevPlayer) => ({
-      ...prevPlayer,
-      lvl: prevPlayer.lvl + 1,
-      info: {
-        ...prevPlayer.info,
-        exp: prevPlayer.info.exp - 10,
-      },
-    }));
-    setLevelUpDialogOpen(false);
-    setLevelUpCelebrationOpen(true);
-
-    onLevelUp();
-  };
+  const handleLevelUpConfirm = () =>
+    confirmLevelUp(() => {
+      if (!canLevelUpFromExpCheck(player)) return false;
+      setPlayer((prevPlayer) => applyExpLevelUp(prevPlayer));
+      onLevelUp();
+      return true;
+    });
 
   const handleClose = () => {
-    setLevelUpDialogOpen(false);
-    setLevelUpCelebrationOpen(false);
-
+    closeLevelUpDialog();
+    closeCelebration();
     onCloseLevelUp();
   };
 

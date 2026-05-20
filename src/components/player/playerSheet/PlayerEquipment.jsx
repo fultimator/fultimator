@@ -12,10 +12,11 @@ import {
   Tooltip,
   Divider,
   Box,
+  Card,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import { Casino, SwapHoriz, Edit, Info } from "@mui/icons-material";
+import { Casino, SwapHoriz, Edit, Info, Add, Search } from "@mui/icons-material";
 import {
   SharedWeaponCard,
   SharedArmorCard,
@@ -30,6 +31,12 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import EditPlayerEquipment from "../equipment/EditPlayerEquipment";
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import PlayerWeaponModal from "../equipment/weapons/PlayerWeaponModal";
+import PlayerCustomWeaponModal from "../equipment/customWeapons/PlayerCustomWeaponModal";
+import PlayerShieldModal from "../equipment/shields/PlayerShieldModal";
+import PlayerArmorModal from "../equipment/armor/PlayerArmorModal";
+import PlayerAccessoryModal from "../equipment/accessories/PlayerAccessoryModal";
 
 export default function PlayerEquipment({
   player,
@@ -50,6 +57,9 @@ export default function PlayerEquipment({
   const [openEdit, setOpenEdit] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [createItemType, setCreateItemType] = useState(null);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importType, setImportType] = useState("weapons");
 
   // Guardian - Dual Shieldbearer
   const hasDualShieldBearer = player.classes.some((playerClass) =>
@@ -223,6 +233,12 @@ export default function PlayerEquipment({
   if (hasDualShieldBearer && equippedShields.length >= 2) {
     allEquippedWeapons.push(twinShields);
   }
+  const equippedCustomWeaponsDisplay = allEquippedWeapons.filter(
+    (w) => w.isCustomWeapon,
+  );
+  const equippedBaseWeaponsDisplay = allEquippedWeapons.filter(
+    (w) => !w.isCustomWeapon,
+  );
 
   // Weaponmaster - Melee Weapon Mastery Skill Bonus
   const meleeMasteryModifier = player.classes
@@ -513,11 +529,76 @@ export default function PlayerEquipment({
     setDialogOpen(false);
   };
 
+  const appendEquipmentItem = (sourceKey, item) => {
+    setPlayer((prev) => {
+      const eq0 = prev?.equipment?.[0] ?? {};
+      const next = [...(eq0?.[sourceKey] ?? []), item];
+      const equipment = prev?.equipment
+        ? [{ ...eq0, [sourceKey]: next }, ...prev.equipment.slice(1)]
+        : [{ ...eq0, [sourceKey]: next }];
+      return { ...prev, equipment };
+    });
+  };
+
+  const sectionMeta = {
+    weapons: { label: t("Weapons"), create: "weapon", import: "weapons", source: "weapons" },
+    customWeapons: { label: t("Custom Weapons"), create: "custom-weapon", import: "custom-weapons", source: "customWeapons" },
+    shields: { label: t("Shields"), create: "shield", import: "shields", source: "shields" },
+    armor: { label: t("Armor"), create: "armor", import: "armor", source: "armor" },
+    accessories: { label: t("Accessories"), create: "accessory", import: "accessories", source: "accessories" },
+  };
+
+  const renderSectionHeader = (key) =>
+    isEditMode ? (
+      <Grid size={12}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Divider sx={{ flex: 1 }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: "uppercase" }}>
+              {sectionMeta[key].label}
+            </Typography>
+          </Divider>
+          <IconButton
+            size="small"
+            onClick={() => {
+              setImportType(sectionMeta[key].import);
+              setImportOpen(true);
+            }}
+            sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1 }}
+          >
+            <Search fontSize="small" />
+          </IconButton>
+        </Box>
+      </Grid>
+    ) : null;
+
+  const renderAddPlaceholder = (key) =>
+    isEditMode ? (
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Card
+          onClick={() => setCreateItemType(sectionMeta[key].create)}
+          sx={{
+            minHeight: 40,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            border: "2px dashed",
+            borderColor: "divider",
+            bgcolor: "transparent",
+            boxShadow: "none",
+            "&:hover": { bgcolor: "action.hover" },
+          }}
+        >
+          <Add sx={{ color: "text.secondary" }} />
+        </Card>
+      </Grid>
+    ) : null;
+
   return (
     <>
       {(allEquippedWeapons.length > 0 || equippedArmor.length > 0) && (
         <>
-          <Divider sx={{ my: 1 }} />
+          {isEditMode && <Divider sx={{ my: 1 }} />}
           <Paper
             elevation={3}
             sx={
@@ -598,7 +679,8 @@ export default function PlayerEquipment({
               spacing={1}
               sx={{ padding: "1em", flex: 1, width: "100%" }}
             >
-              {allEquippedWeapons.map((weapon, index) => (
+              {renderSectionHeader("weapons")}
+              {equippedBaseWeaponsDisplay.map((weapon, index) => (
                 <Grid
                   container
                   spacing={0}
@@ -684,6 +766,96 @@ export default function PlayerEquipment({
                   </Grid>
                 </Grid>
               ))}
+              {renderAddPlaceholder("weapons")}
+              {renderSectionHeader("customWeapons")}
+              {equippedCustomWeaponsDisplay.map((weapon, index) => (
+                <Grid
+                  container
+                  spacing={0}
+                  key={`custom-weapon-${index}`}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    maxHeight: "40px",
+                  }}
+                  size={{
+                    xs: 12,
+                    md: 6,
+                  }}
+                >
+                  <Grid sx={{ display: "flex" }} size={10}>
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        backgroundColor: primary,
+                        padding: "5px",
+                        paddingLeft: "10px",
+                        color: "#fff",
+                        borderRadius: "8px 0 0 8px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
+                      {weapon.name}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size={2}
+                  >
+                    <Box
+                      sx={{
+                        padding: "5px",
+                        backgroundColor: theme.palette.ternary?.main || "#999",
+                        borderRadius: "0 8px 8px 0",
+                        marginRight: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                        gap: 0.5,
+                      }}
+                    >
+                      {weapon.isTransforming && isEditMode && (
+                        <Tooltip title={t("weapon_customization_swap_form")}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleSwapForm(weapon)}
+                            sx={{ p: 0.5 }}
+                          >
+                            <SwapHoriz fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title={t("Info")}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setSelectedItem(weapon);
+                            setInfoModalOpen(true);
+                          }}
+                          sx={{ p: 0.5 }}
+                        >
+                          <Info fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t("Roll")}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDiceRoll(weapon)}
+                          sx={{ p: 0.5 }}
+                        >
+                          <Casino fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  </Grid>
+                </Grid>
+              ))}
+              {renderAddPlaceholder("customWeapons")}
+              {renderSectionHeader("armor")}
               {equippedArmor.map((armor, index) => (
                 <Grid
                   container
@@ -749,6 +921,8 @@ export default function PlayerEquipment({
                   </Grid>
                 </Grid>
               ))}
+              {renderAddPlaceholder("armor")}
+              {renderSectionHeader("shields")}
               {equippedShields.map((shield, index) => (
                 <Grid
                   container
@@ -814,6 +988,8 @@ export default function PlayerEquipment({
                   </Grid>
                 </Grid>
               ))}
+              {renderAddPlaceholder("shields")}
+              {renderSectionHeader("accessories")}
               {equippedAccessories.map((accessory, index) => (
                 <Grid
                   container
@@ -879,6 +1055,7 @@ export default function PlayerEquipment({
                   </Grid>
                 </Grid>
               ))}
+              {renderAddPlaceholder("accessories")}
               {(precMeleeModifier !== 0 ||
                 precRangedModifier !== 0 ||
                 damageMeleeModifier !== 0 ||
@@ -982,6 +1159,78 @@ export default function PlayerEquipment({
           </Button>
         </DialogActions>
       </Dialog>
+      <CompendiumViewerModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onAddItem={(type, item) => {
+          if (type === "weapons") appendEquipmentItem("weapons", item);
+          if (type === "custom-weapons") appendEquipmentItem("customWeapons", item);
+          if (type === "shields") appendEquipmentItem("shields", item);
+          if (type === "armor") appendEquipmentItem("armor", item);
+          if (type === "accessories") appendEquipmentItem("accessories", item);
+          setImportOpen(false);
+        }}
+        initialType={importType}
+      />
+      <PlayerWeaponModal
+        open={createItemType === "weapon"}
+        onClose={() => setCreateItemType(null)}
+        editWeaponIndex={null}
+        weapon={null}
+        onAddWeapon={(item) => {
+          appendEquipmentItem("weapons", item);
+          setCreateItemType(null);
+        }}
+        onDeleteWeapon={() => {}}
+      />
+      <PlayerCustomWeaponModal
+        open={createItemType === "custom-weapon"}
+        onClose={() => setCreateItemType(null)}
+        editCustomWeaponIndex={null}
+        customWeapon={null}
+        onAddCustomWeapon={(item) => {
+          appendEquipmentItem("customWeapons", item);
+          setCreateItemType(null);
+        }}
+        onDeleteCustomWeapon={() => {}}
+        player={player}
+        setPlayer={setPlayer}
+      />
+      <PlayerShieldModal
+        open={createItemType === "shield"}
+        onClose={() => setCreateItemType(null)}
+        editShieldIndex={null}
+        shield={null}
+        onAddShield={(item) => {
+          appendEquipmentItem("shields", item);
+          setCreateItemType(null);
+        }}
+        onDeleteShield={() => {}}
+      />
+      <PlayerArmorModal
+        open={createItemType === "armor"}
+        onClose={() => setCreateItemType(null)}
+        editArmorIndex={null}
+        armorPlayer={null}
+        onAddArmor={(item) => {
+          appendEquipmentItem("armor", item);
+          setCreateItemType(null);
+        }}
+        onDeleteArmor={() => {}}
+        player={player}
+        setPlayer={setPlayer}
+      />
+      <PlayerAccessoryModal
+        open={createItemType === "accessory"}
+        onClose={() => setCreateItemType(null)}
+        editAccIndex={null}
+        accessory={null}
+        onAddAccessory={(item) => {
+          appendEquipmentItem("accessories", item);
+          setCreateItemType(null);
+        }}
+        onDeleteAccessory={() => {}}
+      />
       <Dialog
         open={infoModalOpen}
         onClose={() => setInfoModalOpen(false)}

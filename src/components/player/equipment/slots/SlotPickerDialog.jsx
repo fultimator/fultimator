@@ -16,12 +16,16 @@ import {
   Divider,
   Tooltip,
   IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import LockIcon from "@mui/icons-material/Lock";
 import CloseIcon from "@mui/icons-material/Close";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
 import { useTranslate } from "../../../../translation/translate";
 import { resolveEffectiveSlot } from "./equipmentSlots";
 import {
@@ -91,6 +95,8 @@ export default function SlotPickerDialog({
   onDisableModule,
   openModuleOverride = false,
   onClearOtherHandModule,
+  onImportFromCompendium,
+  onCreateNewItem,
 }) {
   const { t } = useTranslate();
   const getModuleLabel = (module) =>
@@ -104,6 +110,7 @@ export default function SlotPickerDialog({
   const [moduleOverrideOpen, setModuleOverrideOpen] = useState(false);
   const [hoveredModule, setHoveredModule] = useState(null);
   const [pendingModule, setPendingModule] = useState(null);
+  const [createMenuAnchorEl, setCreateMenuAnchorEl] = useState(null);
   const wasOpenRef = useRef(false);
 
   const currentlyEquipped = useMemo(() => {
@@ -190,6 +197,14 @@ export default function SlotPickerDialog({
     ) ?? false;
 
   const inv = player?.equipment?.[0] || {};
+
+  const handleCreateForSlot = (kind) => {
+    if (!onCreateNewItem) return;
+    onCreateNewItem(kind, slot);
+  };
+  const defaultCreateKind =
+    slot === "armor" ? "armor" : slot === "accessory" ? "accessory" : "weapon";
+  const showCreateMenu = slot === "mainHand" || slot === "offHand";
 
   const mainHandHasTwoHanded = (() => {
     const res = resolveEffectiveSlot(player, "mainHand");
@@ -412,6 +427,7 @@ export default function SlotPickerDialog({
       if (c.inOtherSlot && !isUnarmedStrike(c)) return false;
       return true;
     });
+  const shouldShowEmptyPrompt = candidates.length === 0;
   const getCandidateSubText = (candidate) => candidate?.sub;
   const isTransformingCustomWeapon = (candidate) =>
     candidate?.source === "customWeapons" &&
@@ -850,12 +866,14 @@ export default function SlotPickerDialog({
                   {t("Equipping item will clear slots")}
                 </Typography>
               )}
-              {candidates.length === 0 ? (
-                <Typography sx={{ p: 2, color: "text.secondary" }}>
-                  {mainHandHasTwoHanded && slot === "offHand"
-                    ? t("Off Hand is locked by a two-handed weapon.")
-                    : t("No items available for this slot.")}
-                </Typography>
+              {shouldShowEmptyPrompt ? (
+                <Box sx={{ p: 2 }}>
+                  <Typography sx={{ color: "text.secondary" }}>
+                    {mainHandHasTwoHanded && slot === "offHand"
+                      ? t("Off Hand is locked by a two-handed weapon.")
+                      : t("No items available for this slot.")}
+                  </Typography>
+                </Box>
               ) : (
                 <List dense disablePadding>
                   {candidates.map((c, i) => {
@@ -995,6 +1013,74 @@ export default function SlotPickerDialog({
                   >
                     {t("Unequip")}
                   </Button>
+                )}
+                {!(mainHandHasTwoHanded && slot === "offHand") && (
+                  <>
+                    <Tooltip title={t("Create New")}>
+                      <span>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="primary"
+                          onClick={(e) => {
+                            if (showCreateMenu) {
+                              setCreateMenuAnchorEl(e.currentTarget);
+                              return;
+                            }
+                            handleCreateForSlot(defaultCreateKind);
+                          }}
+                          disabled={!onCreateNewItem}
+                          sx={{ ml: currentRef ? 1 : 0, minWidth: 32, px: 0.75 }}
+                        >
+                          <AddIcon fontSize="small" />
+                        </Button>
+                      </span>
+                    </Tooltip>
+                    <Menu
+                      anchorEl={createMenuAnchorEl}
+                      open={Boolean(createMenuAnchorEl)}
+                      onClose={() => setCreateMenuAnchorEl(null)}
+                    >
+                      <MenuItem
+                        onClick={() => {
+                          setCreateMenuAnchorEl(null);
+                          handleCreateForSlot("weapon");
+                        }}
+                      >
+                        {t("Create New Weapon")}
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setCreateMenuAnchorEl(null);
+                          handleCreateForSlot("custom-weapon");
+                        }}
+                      >
+                        {t("Create New Custom Weapon")}
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setCreateMenuAnchorEl(null);
+                          handleCreateForSlot("shield");
+                        }}
+                      >
+                        {t("Create New Shield")}
+                      </MenuItem>
+                    </Menu>
+                    <Tooltip title={t("Import from Compendium")}>
+                      <span>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="secondary"
+                          onClick={() => onImportFromCompendium?.(slot)}
+                          disabled={!onImportFromCompendium}
+                          sx={{ minWidth: 32, px: 0.75, ml: 0.75 }}
+                        >
+                          <SearchIcon fontSize="small" />
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  </>
                 )}
                 {vehicleModules.length > 0 && (
                   <Button
