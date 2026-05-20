@@ -274,14 +274,12 @@ const CompendiumViewerModal = ({
   // ---------------------------------------------------------------------------
   const [resolvedSelectedItem, setResolvedSelectedItem] = useState(null);
 
-  // CompendiumBrowser exposes the selected item via renderItemActions callback
+  const handleSelectedItemChange = useCallback((item) => {
+    setResolvedSelectedItem(item ?? null);
+  }, []);
+
   const renderItemActions = useCallback(
     (item, _idx, _selectedItem) => {
-      // Keep track of the currently displayed selected item for footer
-      // (updates each render cycle when the selected item changes)
-      if (item !== resolvedSelectedItem) {
-        setResolvedSelectedItem(item);
-      }
       return (
         <>
           <Export
@@ -327,7 +325,7 @@ const CompendiumViewerModal = ({
         </>
       );
     },
-    [t, selectedType, selectedCompendium, activePack, resolvedSelectedItem],
+    [t, selectedType, selectedCompendium, activePack],
   );
 
   // Reset resolvedSelectedItem when selection is cleared
@@ -436,6 +434,7 @@ const CompendiumViewerModal = ({
           }}
           onToggleLock={toggleLock}
           onOpenQuickCreate={() => setQuickCreateOpen(true)}
+          onSelectedItemChange={handleSelectedItemChange}
           showShareUrl
           showDownloadImage
           isDesktopOverride={isDesktop}

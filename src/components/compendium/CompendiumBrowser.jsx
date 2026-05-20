@@ -89,6 +89,7 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
 
   // Callbacks
   onShareUrl,
+  onSelectedItemChange,
 
   // Render slots
   renderItemActions, // (item, idx, selectedItem) => ReactNode — extra toolbar buttons
@@ -117,6 +118,10 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
     activePack,
     selectedIdx,
   });
+
+  useEffect(() => {
+    onSelectedItemChange?.(selectedItem ?? null);
+  }, [onSelectedItemChange, selectedItem]);
 
   const [downloadSelectedImage] = useDownloadImage(
     selectedItem?.name ?? "",
