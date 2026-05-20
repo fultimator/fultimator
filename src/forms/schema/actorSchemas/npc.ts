@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const AffinityValueSchema = z.enum(["vu", "rs", "im", "ab"]);
+const AffinityValueSchema = z.enum(["vu", "rs", "im", "ab", "no"]);
 
 const NpcAffinitiesSchema = z.object({
   physical: AffinityValueSchema.optional(),

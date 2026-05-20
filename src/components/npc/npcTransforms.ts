@@ -17,11 +17,22 @@ interface VersionedTransform {
   fn: NpcTransform;
 }
 
+function applyVersionedTransforms(
+  npc: TypeNpc,
+  transforms: VersionedTransform[],
+): TypeNpc {
+  return transforms.reduce((n, t) => {
+    if (n.schemaVersion !== undefined && n.schemaVersion >= t.version) return n;
+    return { ...t.fn(n), schemaVersion: t.version };
+  }, npc);
+}
+
 function normalizeElementType(type: unknown): Elements {
   const raw = String(type ?? "physical")
     .toLowerCase()
     .trim();
   if (raw === "wind") return "air" as Elements;
+  if (raw === "lightning") return "bolt" as Elements;
   return (raw || "physical") as Elements;
 }
 
@@ -488,7 +499,9 @@ function renameWindToAir(npc: TypeNpc): TypeNpc {
     ...(npc.affinities as unknown as Record<string, unknown>),
   };
   if ("wind" in affinities) {
-    if (affinities["air"] === undefined) affinities["air"] = affinities["wind"];
+    if (affinities["air"] === undefined || affinities["air"] === "no") {
+      affinities["air"] = affinities["wind"];
+    }
     delete affinities["wind"];
   }
 
@@ -514,6 +527,48 @@ function renameWindToAir(npc: TypeNpc): TypeNpc {
     attacks: attacks as TypeNpc["attacks"],
     weaponattacks: weaponattacks as TypeNpc["weaponattacks"],
     spells: spells as TypeNpc["spells"],
+  };
+}
+
+function normalizeLegacyNumericNpcFields(npc: TypeNpc): TypeNpc {
+  const toNumberIfNumericString = (value: unknown): unknown => {
+    if (typeof value === "string" && value.trim() !== "") {
+      const n = Number(value);
+      if (!Number.isNaN(n)) return n;
+    }
+    return value;
+  };
+  const toNumber = (value: unknown): number =>
+    Number(toNumberIfNumericString(value));
+
+  const normalizeSpCost = <T extends { spCost?: unknown }>(entry: T): T => ({
+    ...entry,
+    spCost: toNumberIfNumericString(entry.spCost),
+  });
+
+  return {
+    ...npc,
+    phases: toNumberIfNumericString(npc.phases) as TypeNpc["phases"],
+    companionlvl: toNumberIfNumericString(
+      npc.companionlvl,
+    ) as TypeNpc["companionlvl"],
+    companionpclvl: toNumberIfNumericString(
+      npc.companionpclvl,
+    ) as TypeNpc["companionpclvl"],
+    actions: (npc.actions ?? []).map((a) => normalizeSpCost(a)),
+    special: (npc.special ?? []).map((s) => normalizeSpCost(s)),
+    resources: npc.resources
+      ? {
+          hp: {
+            current: toNumber(npc.resources.hp.current),
+            bonus: toNumber(npc.resources.hp.bonus),
+          },
+          mp: {
+            current: toNumber(npc.resources.mp.current),
+            bonus: toNumber(npc.resources.mp.bonus),
+          },
+        }
+      : npc.resources,
   };
 }
 
@@ -574,6 +629,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
       "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; NpcExtra numeric/boolean fields migrated",
     fn: actorAlignmentV10,
   },
+  {
+    version: 11,
+    label:
+      "Normalize legacy numeric string fields (phases, spCost, resource pools)",
+    fn: normalizeLegacyNumericNpcFields,
+  },
 ];
 
 export const NPC_CURRENT_SCHEMA_VERSION =
@@ -582,10 +643,7 @@ export const NPC_CURRENT_SCHEMA_VERSION =
     : 0;
 
 export function applyNpcPostLoadTransforms(npc: TypeNpc): TypeNpc {
-  let result = POST_LOAD_TRANSFORMS.reduce((n, t) => {
-    if (n.schemaVersion !== undefined && n.schemaVersion >= t.version) return n;
-    return { ...t.fn(n), schemaVersion: t.version };
-  }, npc);
+  let result = applyVersionedTransforms(npc, POST_LOAD_TRANSFORMS);
   if ((result.schemaVersion ?? 0) < NPC_CURRENT_SCHEMA_VERSION) {
     result = { ...result, schemaVersion: NPC_CURRENT_SCHEMA_VERSION };
   }

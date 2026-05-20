@@ -20,6 +20,16 @@ interface VersionedTransform {
   fn: PlayerTransform;
 }
 
+function applyVersionedTransforms(
+  player: TypePlayer,
+  transforms: VersionedTransform[],
+): TypePlayer {
+  return transforms.reduce((p, t) => {
+    if (p.schemaVersion !== undefined && p.schemaVersion >= t.version) return p;
+    return { ...t.fn(p), schemaVersion: t.version };
+  }, player);
+}
+
 function normalizeElementType(type: unknown): string {
   const raw = String(type ?? "physical")
     .toLowerCase()
@@ -245,7 +255,7 @@ function normalizeNotes(player: TypePlayer): TypePlayer {
   if (!player.notes) return { ...player, notes: [] };
   if (!Array.isArray(player.notes)) return { ...player, notes: [] };
 
-  const normalized = player.notes.map((n: unknown): Record<string, unknown> => {
+  const normalizeNote = (n: unknown): Record<string, unknown> => {
     if (typeof n === "string") return { name: "", description: n };
     if (typeof n === "object" && n !== null) {
       const obj = n as Record<string, unknown>;
@@ -260,7 +270,9 @@ function normalizeNotes(player: TypePlayer): TypePlayer {
       return base;
     }
     return { name: "", description: "" };
-  });
+  };
+
+  const normalized = player.notes.map(normalizeNote);
 
   return { ...player, notes: normalized as unknown as TypePlayer["notes"] };
 }
@@ -1478,10 +1490,7 @@ const ALWAYS_RUN_TRANSFORMS: PlayerTransform[] = [
 
 /** Run all post-load transforms and return the player ready for in-memory use. */
 export function applyPostLoadTransforms(player: TypePlayer): TypePlayer {
-  let result = POST_LOAD_TRANSFORMS.reduce((p, t) => {
-    if (p.schemaVersion !== undefined && p.schemaVersion >= t.version) return p;
-    return { ...t.fn(p), schemaVersion: t.version };
-  }, player);
+  let result = applyVersionedTransforms(player, POST_LOAD_TRANSFORMS);
   // Stamp version even if all migrations were already applied.
   if ((result.schemaVersion ?? 0) < PLAYER_CURRENT_SCHEMA_VERSION) {
     result = { ...result, schemaVersion: PLAYER_CURRENT_SCHEMA_VERSION };
