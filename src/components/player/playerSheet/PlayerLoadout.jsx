@@ -1106,11 +1106,13 @@ export default function PlayerLoadout({
                             </ReactMarkdown>
                           </Box>
                         }
-                        primaryTypographyProps={{
-                          variant: "body2",
-                          fontWeight: m.enabled ? 700 : 400,
+                        slotProps={{
+                          primary: {
+                            variant: "body2",
+                            fontWeight: m.enabled ? 700 : 400,
+                          },
+                          secondary: { component: "div" },
                         }}
-                        secondaryTypographyProps={{ component: "div" }}
                       />
                     </ListItemButton>
                   </ListItem>

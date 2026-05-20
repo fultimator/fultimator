@@ -9,6 +9,32 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
+function normalizeNestedButtons(node: React.ReactNode): React.ReactNode {
+  if (!React.isValidElement(node)) return node;
+
+  const elementType = node.type as { muiName?: string; displayName?: string };
+  const isIconButton =
+    elementType?.muiName === "IconButton" ||
+    elementType?.displayName === "IconButton";
+
+  const children = node.props?.children
+    ? React.Children.map(node.props.children, normalizeNestedButtons)
+    : node.props?.children;
+
+  if (isIconButton) {
+    return React.cloneElement(node, {
+      component: "span",
+      children,
+    });
+  }
+
+  if (children !== node.props?.children) {
+    return React.cloneElement(node, { children });
+  }
+
+  return node;
+}
+
 interface CustomHeaderClassesProps {
   editClassName: () => void;
   headerText: string;
@@ -64,6 +90,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
       {isEditMode && (
         <Tooltip title={t("Edit Class Name")}>
           <IconButton
+            component="span"
             size="small"
             sx={{ px: 1, "&:hover": { color: theme.primary } }}
             onClick={(e) => {
@@ -152,7 +179,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
         />
         {actions && (
           <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
-            {actions}
+            {normalizeNestedButtons(actions)}
           </Box>
         )}
       </Box>

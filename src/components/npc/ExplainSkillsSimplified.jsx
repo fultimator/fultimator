@@ -262,9 +262,11 @@ export default function ExplainSkillsSimplified({ npc }) {
                   >
                     <ListItemText
                       primary={label}
-                      primaryTypographyProps={{
-                        fontSize: "0.9rem",
-                        fontWeight: 500,
+                      slotProps={{
+                        primary: {
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                        },
                       }}
                     />
                   </ListItemButton>

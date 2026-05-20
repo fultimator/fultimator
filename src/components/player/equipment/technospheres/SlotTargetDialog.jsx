@@ -98,7 +98,7 @@ export default function SlotTargetDialog({
                 <ListItemText
                   primary={item.name}
                   secondary={`${tier.label} · ${used}/${tier.slots} ${t("slots used")}`}
-                  primaryTypographyProps={{ fontWeight: 600 }}
+                  slotProps={{ primary: { fontWeight: 600 } }}
                 />
                 <Chip
                   label={`${used}/${tier.slots}`}
@@ -130,7 +130,7 @@ export default function SlotTargetDialog({
                       ? t("Already slotted")
                       : `${t("Full")} · ${used}/${tier.slots} ${t("slots used")}`
                   }
-                  primaryTypographyProps={{ fontWeight: 600 }}
+                  slotProps={{ primary: { fontWeight: 600 } }}
                 />
                 <Chip
                   label={alreadySlotted ? t("Slotted") : t("Full")}

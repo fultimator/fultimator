@@ -87,7 +87,7 @@ function SpecialContextMenu({ special, npcName: _npcName, onDelete }) {
 
   return (
     <>
-      <IconButton onClick={open}>
+      <IconButton component="span" onClick={open}>
         <MenuIcon />
       </IconButton>
 
@@ -261,6 +261,7 @@ export default function EditSpecial({ npc, setNpc }) {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <IconButton
+                      component="span"
                       onClick={() =>
                         addMessage({
                           id: crypto.randomUUID(),

@@ -651,11 +651,13 @@ export default function SlotPickerDialog({
                         <ListItemText
                           primary={getModuleLabel(m)}
                           secondary={moduleStatLine(m, t)}
-                          primaryTypographyProps={{
-                            variant: "body2",
-                            fontWeight: isPending || isActive ? 700 : 400,
+                          slotProps={{
+                            primary: {
+                              variant: "body2",
+                              fontWeight: isPending || isActive ? 700 : 400,
+                            },
+                            secondary: { variant: "caption" },
                           }}
-                          secondaryTypographyProps={{ variant: "caption" }}
                         />
                       </ListItemButton>
                     </ListItem>
@@ -945,12 +947,15 @@ export default function SlotPickerDialog({
                               </Box>
                             }
                             secondary={getCandidateSubText(c)}
-                            primaryTypographyProps={{
-                              variant: "body2",
-                              fontWeight: isPending || isEquipped ? 700 : 400,
-                              component: "div",
+                            slotProps={{
+                              primary: {
+                                variant: "body2",
+                                fontWeight:
+                                  isPending || isEquipped ? 700 : 400,
+                                component: "div",
+                              },
+                              secondary: { variant: "caption" },
                             }}
-                            secondaryTypographyProps={{ variant: "caption" }}
                           />
                           {isChecked && isTransformingCustomWeapon(c) && (
                             <Tooltip

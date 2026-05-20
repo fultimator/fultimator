@@ -773,11 +773,13 @@ export default function CompactLoadout({
                                   : t(m.description || "")
                                 ).slice(0, 50)
                           }
-                          primaryTypographyProps={{
-                            variant: "body2",
-                            fontWeight: m.enabled ? 700 : 400,
+                          slotProps={{
+                            primary: {
+                              variant: "body2",
+                              fontWeight: m.enabled ? 700 : 400,
+                            },
+                            secondary: { variant: "caption" },
                           }}
-                          secondaryTypographyProps={{ variant: "caption" }}
                         />
                       </ListItemButton>
                     </ListItem>

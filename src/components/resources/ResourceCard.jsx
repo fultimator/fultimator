@@ -113,11 +113,13 @@ export default function ResourceCard({
                 <ListItemText
                   primary={option.reseller}
                   secondary={option.url}
-                  secondaryTypographyProps={{
-                    sx: {
-                      fontSize: "0.75rem",
-                      opacity: 0.7,
-                      wordBreak: "break-all",
+                  slotProps={{
+                    secondary: {
+                      sx: {
+                        fontSize: "0.75rem",
+                        opacity: 0.7,
+                        wordBreak: "break-all",
+                      },
                     },
                   }}
                 />
