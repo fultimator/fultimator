@@ -17,12 +17,33 @@ interface VersionedTransform {
   fn: NpcTransform;
 }
 
+function applyVersionedTransforms(
+  npc: TypeNpc,
+  transforms: VersionedTransform[],
+): TypeNpc {
+  return transforms.reduce((n, t) => {
+    if (n.schemaVersion !== undefined && n.schemaVersion >= t.version) return n;
+    return { ...t.fn(n), schemaVersion: t.version };
+  }, npc);
+}
+
 function normalizeElementType(type: unknown): Elements {
   const raw = String(type ?? "physical")
     .toLowerCase()
     .trim();
-  if (raw === "air") return "air" as Elements;
+  if (raw === "wind") return "air" as Elements;
+  if (raw === "lightning") return "bolt" as Elements;
   return (raw || "physical") as Elements;
+}
+
+function firstSpecialText(special: unknown): string {
+  if (Array.isArray(special)) {
+    const first = special.find(
+      (entry) => typeof entry === "string" && entry.trim(),
+    );
+    return typeof first === "string" ? first.trim() : "";
+  }
+  return typeof special === "string" ? special.trim() : "";
 }
 
 // Pre-save transforms
@@ -184,7 +205,11 @@ function unifyNpcSpellSchema(npc: TypeNpc): TypeNpc {
       if (s.itemType === undefined) s.itemType = "spell";
       if (s.spellType === undefined) s.spellType = "npc";
       if (s.description === undefined) s.description = "";
-      if (s.special === undefined) s.special = [];
+      if (s.effect === undefined || String(s.effect).trim() === "") {
+        const specialText = firstSpecialText(s.special);
+        if (specialText) s.effect = specialText;
+      }
+      delete s.special;
 
       // attr1 + attr2 -> accuracy object
       if (s.accuracy === undefined) {
@@ -220,7 +245,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
       a.damage !== undefined &&
       typeof a.damage === "object"
     ) {
-      return {
+      const next: RawAttack = {
         ...a,
         itemType: "attack",
         range: normalizeRange(a.range),
@@ -231,21 +256,21 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
           ),
           hrZero: (a.damage as Record<string, unknown>).hrZero === true,
         },
-        special: Array.isArray(a.special)
-          ? a.special
-          : typeof a.special === "string"
-            ? [a.special]
-            : [],
+        effect:
+          typeof a.effect === "string" && a.effect.trim()
+            ? a.effect
+            : firstSpecialText(a.special),
       };
+      delete next.special;
+      return next;
     }
     const next: RawAttack = { ...a };
     next.itemType = "attack";
     next.range = normalizeRange(a.range);
-    next.special = Array.isArray(a.special)
-      ? a.special
-      : typeof a.special === "string"
-        ? [a.special]
-        : [];
+    next.effect =
+      typeof a.effect === "string" && a.effect.trim()
+        ? a.effect
+        : firstSpecialText(a.special);
     next.accuracy = {
       attr1: (a.attr1 as string) ?? "dexterity",
       attr2: (a.attr2 as string) ?? "might",
@@ -260,6 +285,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
     delete next.attr1;
     delete next.attr2;
     delete next.type;
+    delete next.special;
     return next;
   };
 
@@ -272,16 +298,15 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
       const category = normalizeWeaponCategory(
         wa.category as string | undefined,
       );
-      return {
+      const next: RawAttack = {
         ...wa,
         itemType: "weaponAttack",
         category,
         range: normalizeRange(wa.range),
-        special: Array.isArray(wa.special)
-          ? wa.special
-          : typeof wa.special === "string"
-            ? [wa.special]
-            : [],
+        effect:
+          typeof wa.effect === "string" && wa.effect.trim()
+            ? wa.effect
+            : firstSpecialText(wa.special),
         accuracy: {
           ...(wa.accuracy as Record<string, unknown>),
           defense: (wa.accuracy as Record<string, unknown>).defense
@@ -298,17 +323,18 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
           hrZero: (wa.damage as Record<string, unknown>).hrZero === true,
         },
       };
+      delete next.special;
+      return next;
     }
     const w = (wa.weapon as RawAttack) ?? {};
     const next: RawAttack = { ...wa };
     const category = normalizeWeaponCategory(w.category as string | undefined);
     next.itemType = "weaponAttack";
     next.category = category;
-    next.special = Array.isArray(wa.special)
-      ? wa.special
-      : typeof wa.special === "string"
-        ? [wa.special]
-        : [];
+    next.effect =
+      typeof wa.effect === "string" && wa.effect.trim()
+        ? wa.effect
+        : firstSpecialText(wa.special);
     next.accuracy = {
       attr1: (w.att1 as string) ?? "dexterity",
       attr2: (w.att2 as string) ?? "might",
@@ -323,6 +349,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
     next.range = normalizeRange(w.range ?? wa.range);
     delete next.weapon;
     delete next.type;
+    delete next.special;
     return next;
   };
 
@@ -467,6 +494,84 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
   };
 }
 
+function renameWindToAir(npc: TypeNpc): TypeNpc {
+  const affinities = {
+    ...(npc.affinities as unknown as Record<string, unknown>),
+  };
+  if ("wind" in affinities) {
+    if (affinities["air"] === undefined || affinities["air"] === "no") {
+      affinities["air"] = affinities["wind"];
+    }
+    delete affinities["wind"];
+  }
+
+  const fixDamage = (damage: { type?: unknown } | undefined) =>
+    damage ? { ...damage, type: normalizeElementType(damage.type) } : damage;
+
+  const attacks = (npc.attacks ?? []).map((a) => ({
+    ...a,
+    damage: fixDamage(a.damage),
+  }));
+  const weaponattacks = (npc.weaponattacks ?? []).map((a) => ({
+    ...a,
+    damage: fixDamage(a.damage),
+  }));
+  const spells = (npc.spells ?? []).map((s) => ({
+    ...s,
+    damage: fixDamage(s.damage),
+  }));
+
+  return {
+    ...npc,
+    affinities: affinities as unknown as TypeNpc["affinities"],
+    attacks: attacks as TypeNpc["attacks"],
+    weaponattacks: weaponattacks as TypeNpc["weaponattacks"],
+    spells: spells as TypeNpc["spells"],
+  };
+}
+
+function normalizeLegacyNumericNpcFields(npc: TypeNpc): TypeNpc {
+  const toNumberIfNumericString = (value: unknown): unknown => {
+    if (typeof value === "string" && value.trim() !== "") {
+      const n = Number(value);
+      if (!Number.isNaN(n)) return n;
+    }
+    return value;
+  };
+  const toNumber = (value: unknown): number =>
+    Number(toNumberIfNumericString(value));
+
+  const normalizeSpCost = <T extends { spCost?: unknown }>(entry: T): T => ({
+    ...entry,
+    spCost: toNumberIfNumericString(entry.spCost),
+  });
+
+  return {
+    ...npc,
+    phases: toNumberIfNumericString(npc.phases) as TypeNpc["phases"],
+    companionlvl: toNumberIfNumericString(
+      npc.companionlvl,
+    ) as TypeNpc["companionlvl"],
+    companionpclvl: toNumberIfNumericString(
+      npc.companionpclvl,
+    ) as TypeNpc["companionpclvl"],
+    actions: (npc.actions ?? []).map((a) => normalizeSpCost(a)),
+    special: (npc.special ?? []).map((s) => normalizeSpCost(s)),
+    resources: npc.resources
+      ? {
+          hp: {
+            current: toNumber(npc.resources.hp.current),
+            bonus: toNumber(npc.resources.hp.bonus),
+          },
+          mp: {
+            current: toNumber(npc.resources.mp.current),
+            bonus: toNumber(npc.resources.mp.bonus),
+          },
+        }
+      : npc.resources,
+  };
+}
+
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
   {
     version: 1,
@@ -524,6 +629,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
       "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; NpcExtra numeric/boolean fields migrated",
     fn: actorAlignmentV10,
   },
+  {
+    version: 11,
+    label:
+      "Normalize legacy numeric string fields (phases, spCost, resource pools)",
+    fn: normalizeLegacyNumericNpcFields,
+  },
 ];
 
 export const NPC_CURRENT_SCHEMA_VERSION =
@@ -532,14 +643,11 @@ export const NPC_CURRENT_SCHEMA_VERSION =
     : 0;
 
 export function applyNpcPostLoadTransforms(npc: TypeNpc): TypeNpc {
-  let result = POST_LOAD_TRANSFORMS.reduce((n, t) => {
-    if (n.schemaVersion !== undefined && n.schemaVersion >= t.version) return n;
-    return { ...t.fn(n), schemaVersion: t.version };
-  }, npc);
+  let result = applyVersionedTransforms(npc, POST_LOAD_TRANSFORMS);
   if ((result.schemaVersion ?? 0) < NPC_CURRENT_SCHEMA_VERSION) {
     result = { ...result, schemaVersion: NPC_CURRENT_SCHEMA_VERSION };
   }
-  return result;
+  return renameWindToAir(result);
 }
 
 // Migration detection

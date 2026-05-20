@@ -2,7 +2,10 @@ import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { useDatabase } from "../../../../../hooks/useDatabase";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
-import { resolveEffectiveSlot } from "../../../../player/equipment/slots/equipmentSlots";
+import {
+  resolveEffectiveSlot,
+  getActiveVehicle,
+} from "../../../../player/equipment/slots/equipmentSlots";
 import {
   getAvailableSupportModules,
   getPilotSpellInfo,
@@ -27,6 +30,7 @@ export type AttackOption = {
   category?: string;
   range?: "melee" | "ranged" | string;
   isWeaponModule?: boolean;
+  description?: string;
 };
 
 export type SpellOption = {
@@ -292,23 +296,33 @@ export function resolveAttackOptions(
           ) {
             const vehicleModules = (activeVehicle as Record<string, unknown>)
               .modules as Record<string, unknown>[];
+            const vehicleSlotsObj =
+              ((activeVehicle as Record<string, unknown>).slots as
+                | Record<string, unknown>
+                | undefined) ?? {};
 
             const weaponsBySlot: Record<string, Record<string, unknown>> = {};
-            for (const module of vehicleModules) {
-              if (module.type !== "pilot_module_weapon") continue;
-              const isAvailable =
-                module.equipped === true || module.enabled === true;
-              if (!isAvailable) continue;
-
-              const slot = module.equippedSlot as string | undefined;
-              if (
-                slot &&
-                (slot === "main" || slot === "off" || slot === "both")
-              ) {
-                if (!weaponsBySlot[slot]) {
-                  weaponsBySlot[slot] = module;
-                }
+            for (const slot of ["main", "off"] as const) {
+              const key = vehicleSlotsObj[slot] as string | undefined;
+              if (!key) continue;
+              const mod = vehicleModules.find(
+                (m) =>
+                  ((m.key as string | undefined) ?? m.name) === key &&
+                  m.type === "pilot_module_weapon",
+              );
+              if (mod && !weaponsBySlot[slot]) {
+                weaponsBySlot[slot] = mod;
               }
+            }
+            // Handle "both" (cumbersome): same key in main and off
+            if (
+              vehicleSlotsObj.main &&
+              vehicleSlotsObj.main === vehicleSlotsObj.off &&
+              weaponsBySlot["main"]
+            ) {
+              weaponsBySlot["both"] = weaponsBySlot["main"];
+              delete weaponsBySlot["main"];
+              delete weaponsBySlot["off"];
             }
 
             if (Object.keys(weaponsBySlot).length > 0) {
@@ -363,22 +377,31 @@ export function resolveAttackOptions(
                 if (seen.has(key)) return;
                 seen.add(key);
 
-                const dmg = module.damage;
-                const prec = module.prec;
+                const dmg = module.damage as
+                  | { value?: number; type?: string; hrZero?: boolean }
+                  | undefined;
+                const acc = module.accuracy as
+                  | {
+                      attr1?: string;
+                      attr2?: string;
+                      value?: number;
+                      defense?: string;
+                    }
+                  | undefined;
+                const prec = acc?.value;
                 vehicleWeapons.push({
                   arg: quoteArg(name),
                   name,
                   slot: label,
-                  attr1: toAttr(module.att1),
-                  attr2: toAttr(module.att2),
-                  baseDamage: typeof dmg === "number" ? dmg : undefined,
+                  attr1: toAttr(acc?.attr1),
+                  attr2: toAttr(acc?.attr2),
+                  baseDamage:
+                    typeof dmg?.value === "number" ? dmg.value : undefined,
                   accuracyBonus:
                     typeof prec === "number" && prec !== 0 ? prec : undefined,
-                  accuracyDefense: "def",
+                  accuracyDefense: acc?.defense === "mdef" ? "mdef" : "def",
                   damageType:
-                    typeof module.damageType === "string"
-                      ? module.damageType
-                      : "physical",
+                    typeof dmg?.type === "string" ? dmg.type : "physical",
                   damageHrZero: module.hrZero === true,
                   hands: module.cumbersome ? 2 : 1,
                   category:
@@ -695,11 +718,19 @@ export function resolveEquipmentSlots(
         if (resolved.kind === "vehicleModule") {
           const module = resolved.module;
           const parts: string[] = [];
-          if (typeof module.prec === "number" && module.prec !== 0) {
-            parts.push(`${module.prec > 0 ? "+" : ""}${module.prec} Acc`);
+          if (
+            typeof module.accuracy?.value === "number" &&
+            module.accuracy.value !== 0
+          ) {
+            parts.push(
+              `${module.accuracy.value > 0 ? "+" : ""}${module.accuracy.value} Acc`,
+            );
           }
-          if (typeof module.damage === "number" && module.damage !== 0) {
-            parts.push(`${module.damage} DMG`);
+          if (
+            typeof module.damage?.value === "number" &&
+            module.damage.value !== 0
+          ) {
+            parts.push(`${module.damage.value} DMG`);
           }
           if (
             typeof module.def === "number" ||
@@ -764,8 +795,10 @@ export function resolveEquipmentSlots(
 
   if (vehicleActive) {
     const supportModules = getAvailableSupportModules(player);
-    const activeSupportModules = supportModules.filter(
-      (module) => module.enabled,
+    const activeVehicleObj = getActiveVehicle(player);
+    const supportKeys = new Set<string>(activeVehicleObj?.slots?.support ?? []);
+    const activeSupportModules = supportModules.filter((module) =>
+      supportKeys.has(module.key ?? module.name),
     );
     if (activeSupportModules.length > 0) {
       for (const [idx, module] of activeSupportModules.entries()) {

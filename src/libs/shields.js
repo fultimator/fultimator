@@ -8,6 +8,7 @@ const shield = [
     mdef: 0,
     martial: false,
     init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "bronze-shield",
@@ -18,6 +19,7 @@ const shield = [
     mdef: 0,
     martial: false,
     init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "runic-shield",
@@ -28,6 +30,7 @@ const shield = [
     mdef: 2,
     martial: true,
     init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
 ];
 

@@ -11,7 +11,10 @@ import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
-import { accessoryFieldConfig } from "../../../forms/rendering/config/itemConfigs/accessory";
+import {
+  accessoryFieldConfig,
+  accessoryGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/accessory";
 
 function buildInitialState() {
   return {
@@ -108,6 +111,7 @@ function Accessories() {
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -118,11 +122,11 @@ function Accessories() {
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="quality"
-                label={t("Quality")}
                 cols={2}
                 extraProps={{ onBrowse: () => setQualityBrowserOpen(true) }}
               />
@@ -130,11 +134,11 @@ function Accessories() {
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="modifiers"
-                label={t("Modifiers")}
                 cols={2}
               />
             </Grid>

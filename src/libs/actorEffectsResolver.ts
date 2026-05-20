@@ -89,9 +89,9 @@ function collectEffectiveEffects(
 function* walkItems(actor: Actor): Generator<{ effects?: ItemEffect[] }> {
   if (isPlayer(actor)) {
     for (const klass of actor.classes ?? []) {
-      yield* klass.skills ?? [];
-      yield* klass.heroic ?? [];
-      yield* klass.spells ?? [];
+      if (Array.isArray(klass.skills)) yield* klass.skills;
+      if (Array.isArray(klass.heroic)) yield* klass.heroic;
+      if (Array.isArray(klass.spells)) yield* klass.spells;
     }
 
     for (const eq of actor.equipment ?? []) {
@@ -109,9 +109,9 @@ function* walkItems(actor: Actor): Generator<{ effects?: ItemEffect[] }> {
 
           const mnemo = (eq.mnemospheres ?? []).find((m) => m.id === sphereId);
           if (!mnemo) continue;
-          yield* mnemo.skills ?? [];
-          yield* mnemo.heroic ?? [];
-          yield* mnemo.spells ?? [];
+          if (Array.isArray(mnemo.skills)) yield* mnemo.skills;
+          if (Array.isArray(mnemo.heroic)) yield* mnemo.heroic;
+          if (Array.isArray(mnemo.spells)) yield* mnemo.spells;
         }
       }
     }

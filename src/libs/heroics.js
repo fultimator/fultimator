@@ -10,7 +10,7 @@ const heroics = [
     description: t("adversity_desc", true),
     source: t("adversity_source", true),
     applicableTo: ["Darkblade"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "ambidextrous",
@@ -19,7 +19,7 @@ const heroics = [
     description: t("ambidextrous_desc", true),
     source: t("ambidextrous_source", true),
     applicableTo: [],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "arcane-echoes",
@@ -28,7 +28,7 @@ const heroics = [
     description: t("arcane_echoes_desc", true),
     source: t("arcane_echoes_source", true),
     applicableTo: ["Arcanist"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "chimeric-mastery",
@@ -37,7 +37,7 @@ const heroics = [
     description: t("chimeric_mastery_desc", true),
     source: t("chimeric_mastery_source", true),
     applicableTo: ["Chimerist"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "comet",
@@ -46,7 +46,7 @@ const heroics = [
     description: t("comet_desc", true),
     source: t("comet_source", true),
     applicableTo: ["Entropist"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "deep-pockets",
@@ -55,7 +55,7 @@ const heroics = [
     description: t("deep_pockets_desc", true),
     source: t("deep_pockets_source", true),
     applicableTo: ["Tinkerer"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "disarming-rhetoric",
@@ -64,7 +64,7 @@ const heroics = [
     description: t("disarming_rhetoric_desc", true),
     source: t("disarming_rhetoric_source", true),
     applicableTo: ["Orator"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "extra-hp",
@@ -73,7 +73,7 @@ const heroics = [
     description: t("extra_hp_desc", true),
     source: t("extra_hp_source", true),
     applicableTo: [],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "extra-ip",
@@ -82,7 +82,7 @@ const heroics = [
     description: t("extra_ip_desc", true),
     source: t("extra_ip_source", true),
     applicableTo: [],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "extra-mp",
@@ -91,7 +91,7 @@ const heroics = [
     description: t("extra_mp_desc", true),
     source: t("extra_mp_source", true),
     applicableTo: [],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "extra-spells",
@@ -100,7 +100,7 @@ const heroics = [
     description: t("extra_spells_desc", true),
     source: t("extra_spells_source", true),
     applicableTo: [],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "heartbreaker",
@@ -109,7 +109,7 @@ const heroics = [
     description: t("heartbreaker_desc", true),
     source: t("heartbreaker_source", true),
     applicableTo: ["Darkblade"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "heroic-companion",
@@ -118,7 +118,7 @@ const heroics = [
     description: t("heroic_companion_desc", true),
     source: t("heroic_companion_source", true),
     applicableTo: ["Wayfarer"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "hope",
@@ -127,7 +127,7 @@ const heroics = [
     description: t("hope_desc", true),
     source: t("hope_source", true),
     applicableTo: ["Spiritist"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "mathemagic",
@@ -136,7 +136,7 @@ const heroics = [
     description: t("mathemagic_desc", true),
     source: t("mathemagic_source", true),
     applicableTo: ["Loremaster"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "monkey-grip",
@@ -145,7 +145,7 @@ const heroics = [
     description: t("monkey_grip_desc", true),
     source: t("monkey_grip_source", true),
     applicableTo: ["Fury"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "perfect-aim",
@@ -154,7 +154,7 @@ const heroics = [
     description: t("perfect_aim_desc", true),
     source: t("perfect_aim_source", true),
     applicableTo: ["Sharpshooter"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "pillage",
@@ -163,7 +163,7 @@ const heroics = [
     description: t("pillage_desc", true),
     source: t("pillage_source", true),
     applicableTo: ["Rogue"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "powerful-shot",
@@ -172,7 +172,7 @@ const heroics = [
     description: t("powerful_shot_desc", true),
     source: t("powerful_shot_source", true),
     applicableTo: ["Sharpshooter"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "powerful-spell",
@@ -181,7 +181,7 @@ const heroics = [
     description: t("powerful_spell_desc", true),
     source: t("powerful_spell_source", true),
     applicableTo: ["Chimerist", "Elementalist", "Entropist", "Spiritist"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "powerful-strike",
@@ -190,7 +190,7 @@ const heroics = [
     description: t("powerful_strike_desc", true),
     source: t("powerful_strike_source", true),
     applicableTo: ["Fury", "Weaponmaster"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "predictable",
@@ -199,7 +199,7 @@ const heroics = [
     description: t("predictable_desc", true),
     source: t("predictable_source", true),
     applicableTo: ["Loremaster"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "rampart",
@@ -208,7 +208,7 @@ const heroics = [
     description: t("rampart_desc", true),
     source: t("rampart_source", true),
     applicableTo: ["Guardian"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "repetition",
@@ -217,7 +217,7 @@ const heroics = [
     description: t("repetition_desc", true),
     source: t("repetition_source", true),
     applicableTo: ["Orator"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "revelation",
@@ -226,7 +226,7 @@ const heroics = [
     description: t("revelation_desc", true),
     source: t("revelation_source", true),
     applicableTo: ["Arcanist"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "status-immunity",
@@ -235,7 +235,7 @@ const heroics = [
     description: t("status_immunity_desc", true),
     source: t("status_immunity_source", true),
     applicableTo: ["Wayfarer"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "tempest-strike",
@@ -244,7 +244,7 @@ const heroics = [
     description: t("tempest_strike_desc", true),
     source: t("tempest_strike_source", true),
     applicableTo: ["Weaponmaster"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "unbreakable",
@@ -253,7 +253,7 @@ const heroics = [
     description: t("unbreakable_desc", true),
     source: t("unbreakable_source", true),
     applicableTo: ["Guardian"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "upgrade",
@@ -262,7 +262,7 @@ const heroics = [
     description: t("upgrade_desc", true),
     source: t("upgrade_source", true),
     applicableTo: ["Tinkerer"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "vanish",
@@ -271,7 +271,7 @@ const heroics = [
     description: t("vanish_desc", true),
     source: t("vanish_source", true),
     applicableTo: ["Rogue"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "volcano",
@@ -280,7 +280,7 @@ const heroics = [
     description: t("volcano_desc", true),
     source: t("volcano_source", true),
     applicableTo: ["Elementalist"],
-    book: "core",
+    meta: { book: "core", page: "", isOfficial: true },
   },
 
   // FUHF - high
@@ -291,7 +291,7 @@ const heroics = [
     description: t("arcane_mark_desc", true),
     source: t("arcane_mark_source", true),
     applicableTo: ["Sharpshooter", "Symbolist", "Weaponmaster"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "bimagus",
@@ -300,7 +300,7 @@ const heroics = [
     description: t("bimagus_desc", true),
     source: t("bimagus_source", true),
     applicableTo: ["Elementalist", "Entropist", "Spiritist"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "blade-adept",
@@ -309,7 +309,7 @@ const heroics = [
     description: t("blade_adept_desc", true),
     source: t("blade_adept_source", true),
     applicableTo: ["Rogue", "Weaponmaster"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "bullet-break",
@@ -318,7 +318,7 @@ const heroics = [
     description: t("bullet_break_desc", true),
     source: t("bullet_break_source", true),
     applicableTo: ["Sharpshooter"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "ceaseless-battlefield",
@@ -327,7 +327,7 @@ const heroics = [
     description: t("ceaseless_battlefield_desc", true),
     source: t("ceaseless_battlefield_source", true),
     applicableTo: ["Commander"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "clean-slate",
@@ -336,7 +336,7 @@ const heroics = [
     description: t("clean_slate_desc", true),
     source: t("clean_slate_source", true),
     applicableTo: ["Symbolist"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "double-arrow",
@@ -345,7 +345,7 @@ const heroics = [
     description: t("double_arrow_desc", true),
     source: t("double_arrow_source", true),
     applicableTo: ["Commander", "Sharpshooter"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "fast-rituals",
@@ -354,7 +354,7 @@ const heroics = [
     description: t("fast_rituals_desc", true),
     source: t("fast_rituals_source", true),
     applicableTo: ["Chimerist", "Elementalist", "Entropist", "Spiritist"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "fleeting-moment",
@@ -363,7 +363,7 @@ const heroics = [
     description: t("fleeting_moment_desc", true),
     source: t("fleeting_moment_source", true),
     applicableTo: ["Weaponmaster"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "grand-summoning",
@@ -372,7 +372,7 @@ const heroics = [
     description: t("grand_summoning_desc", true),
     source: t("grand_summoning_source", true),
     applicableTo: ["Arcanist"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "hoplite",
@@ -381,7 +381,7 @@ const heroics = [
     description: t("hoplite_desc", true),
     source: t("hoplite_source", true),
     applicableTo: ["Commander", "Guardian"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "iron-forest",
@@ -390,7 +390,7 @@ const heroics = [
     description: t("iron_forest_desc", true),
     source: t("iron_forest_source", true),
     applicableTo: ["Commander", "Weaponmaster"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "magic-guard",
@@ -399,7 +399,7 @@ const heroics = [
     description: t("magic_guard_desc", true),
     source: t("magic_guard_source", true),
     applicableTo: ["Chimerist", "Elementalist", "Entropist", "Spiritist"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "paso-doble",
@@ -408,7 +408,7 @@ const heroics = [
     description: t("paso_doble_desc", true),
     source: t("paso_doble_source", true),
     applicableTo: ["Dancer"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "power-chord",
@@ -417,7 +417,7 @@ const heroics = [
     description: t("power_chord_desc", true),
     source: t("power_chord_source", true),
     applicableTo: ["Chanter"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "pulverizing-strike",
@@ -426,7 +426,7 @@ const heroics = [
     description: t("pulverizing_strike_desc", true),
     source: t("pulverizing_strike_source", true),
     applicableTo: ["Darkblade", "Fury", "Weaponmaster"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "rising-tide",
@@ -435,7 +435,7 @@ const heroics = [
     description: t("rising_tide_desc", true),
     source: t("rising_tide_source", true),
     applicableTo: ["Fury", "Weaponmaster"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "ritual-seals",
@@ -444,7 +444,7 @@ const heroics = [
     description: t("ritual_seals_desc", true),
     source: t("ritual_seals_source", true),
     applicableTo: ["Symbolist"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "showstopper",
@@ -453,7 +453,7 @@ const heroics = [
     description: t("showstopper_desc", true),
     source: t("showstopper_source", true),
     applicableTo: ["Dancer"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "spiders-web",
@@ -462,7 +462,7 @@ const heroics = [
     description: t("spiders_web_desc", true),
     source: t("spiders_web_source", true),
     applicableTo: ["Fury", "Weaponmaster"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "swirling-swarm",
@@ -471,7 +471,7 @@ const heroics = [
     description: t("swirling_swarm_desc", true),
     source: t("swirling_swarm_source", true),
     applicableTo: ["Dancer", "Fury", "Sharpshooter"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "tabula-rasa",
@@ -480,7 +480,7 @@ const heroics = [
     description: t("tabula_rasa_desc", true),
     source: t("tabula_rasa_source", true),
     applicableTo: ["Commander"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "theme-song",
@@ -489,7 +489,7 @@ const heroics = [
     description: t("theme_song_desc", true),
     source: t("theme_song_source", true),
     applicableTo: ["Chanter"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
   {
     fuid: "triple-slash",
@@ -498,7 +498,7 @@ const heroics = [
     description: t("triple_slash_desc", true),
     source: t("triple_slash_source", true),
     applicableTo: ["Dancer", "Weaponmaster"],
-    book: "high",
+    meta: { book: "high", page: "", isOfficial: true },
   },
 
   // FUTF - techno
@@ -509,7 +509,7 @@ const heroics = [
     description: t("arcane_soldier_desc", true),
     source: t("arcane_soldier_source", true),
     applicableTo: ["Elementalist", "Sharpshooter", "Weaponmaster"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "fast-rituals",
@@ -518,7 +518,7 @@ const heroics = [
     description: t("brainwave_discharge_desc", true),
     source: t("brainwave_discharge_source", true),
     applicableTo: ["Esper"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "fleeting-moment",
@@ -527,7 +527,7 @@ const heroics = [
     description: t("bullet_time_desc", true),
     source: t("bullet_time_source", true),
     applicableTo: ["Entropist", "Rogue"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "decoy-bait",
@@ -536,7 +536,7 @@ const heroics = [
     description: t("decoy_bait_desc", true),
     source: t("decoy_bait_source", true),
     applicableTo: ["Sharpshooter"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "dreamslice",
@@ -545,7 +545,7 @@ const heroics = [
     description: t("dreamslice_desc", true),
     source: t("dreamslice_source", true),
     applicableTo: ["Darkblade", "Esper"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "dynamic-synchronization",
@@ -554,7 +554,7 @@ const heroics = [
     description: t("dynamic_synchronization_desc", true),
     source: t("dynamic_synchronization_source", true),
     applicableTo: ["Pilot"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "greater-akromorphosis",
@@ -563,7 +563,7 @@ const heroics = [
     description: t("greater_akromorphosis_desc", true),
     source: t("greater_akromorphosis_source", true),
     applicableTo: ["Mutant"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "greater-ecdysis",
@@ -572,7 +572,7 @@ const heroics = [
     description: t("greater_ecdysis_desc", true),
     source: t("greater_ecdysis_source", true),
     applicableTo: ["Mutant"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "greater-theriomorphosis",
@@ -581,7 +581,7 @@ const heroics = [
     description: t("greater_theriomorphosis_desc", true),
     source: t("greater_theriomorphosis_source", true),
     applicableTo: [],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "hit-the-nerve",
@@ -590,7 +590,7 @@ const heroics = [
     description: t("hit_the_nerve_desc", true),
     source: t("hit_the_nerve_source", true),
     applicableTo: ["Chanter", "Orator"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "make-it-or-break-it",
@@ -599,7 +599,7 @@ const heroics = [
     description: t("make_it_or_break_it_desc", true),
     source: t("make_it_or_break_it_source", true),
     applicableTo: ["Darkblade", "Fury"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "mimeoclepsis",
@@ -608,7 +608,7 @@ const heroics = [
     description: t("mimeoclepsis_desc", true),
     source: t("mimeoclepsis_source", true),
     applicableTo: ["Chimerist", "Mutant"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "nebulization",
@@ -617,7 +617,7 @@ const heroics = [
     description: t("nebulization_desc", true),
     source: t("nebulization_source", true),
     applicableTo: ["Tinkerer"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "overload-burst",
@@ -626,7 +626,7 @@ const heroics = [
     description: t("overload_burst_desc", true),
     source: t("overload_burst_source", true),
     applicableTo: ["Pilot"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "psychic-field",
@@ -635,7 +635,7 @@ const heroics = [
     description: t("psychic_field_desc", true),
     source: t("psychic_field_source", true),
     applicableTo: ["Esper"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "quantum-magicannon",
@@ -644,7 +644,7 @@ const heroics = [
     description: t("quantum_magicannon_desc", true),
     source: t("quantum_magicannon_source", true),
     applicableTo: ["Tinkerer"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "quick-scan",
@@ -653,7 +653,7 @@ const heroics = [
     description: t("quick_scan_desc", true),
     source: t("quick_scan_source", true),
     applicableTo: ["Loremaster"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
   {
     fuid: "steel-witch",
@@ -662,7 +662,7 @@ const heroics = [
     description: t("steel_witch_desc", true),
     source: t("steel_witch_source", true),
     applicableTo: ["Pilot"],
-    book: "techno",
+    meta: { book: "techno", page: "", isOfficial: true },
   },
 
   // FUNF - natural
@@ -673,7 +673,7 @@ const heroics = [
     description: t("all_you_can_eat_desc", true),
     source: t("all_you_can_eat_source", true),
     applicableTo: ["Gourmet"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "auramancers-refraction",
@@ -682,7 +682,7 @@ const heroics = [
     description: t("auramancers_refraction_desc", true),
     source: t("auramancers_refraction_source", true),
     applicableTo: ["Arcanist", "Spiritist"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "bend-magic",
@@ -691,7 +691,7 @@ const heroics = [
     description: t("bend_magic_desc", true),
     source: t("bend_magic_source", true),
     applicableTo: ["Elementalist", "Entropist", "Invoker", "Symbolist"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "brambleheart",
@@ -700,7 +700,7 @@ const heroics = [
     description: t("brambleheart_desc", true),
     source: t("brambleheart_source", true),
     applicableTo: ["Darkblade", "Floralist"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "brave-bash",
@@ -709,7 +709,7 @@ const heroics = [
     description: t("brave_bash_desc", true),
     source: t("brave_bash_source", true),
     applicableTo: ["Commander", "Guardian", "Weaponmaster"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "cheer-up",
@@ -718,7 +718,7 @@ const heroics = [
     description: t("cheer_up_desc", true),
     source: t("cheer_up_source", true),
     applicableTo: ["Chanter", "Esper", "Orator"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "chimeric-soul",
@@ -727,7 +727,7 @@ const heroics = [
     description: t("chimeric_soul_desc", true),
     source: t("chimeric_soul_source", true),
     applicableTo: ["Chimerist", "Mutant"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "cleansing-moonlight",
@@ -736,7 +736,7 @@ const heroics = [
     description: t("cleansing_moonlight_desc", true),
     source: t("cleansing_moonlight_source", true),
     applicableTo: ["Entropist", "Spiritist"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "ephemeral-tranquility",
@@ -745,7 +745,7 @@ const heroics = [
     description: t("ephemeral_tranquility_desc", true),
     source: t("ephemeral_tranquility_source", true),
     applicableTo: ["Dancer", "Esper", "Rogue", "Spiritist", "Symbolist"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "fitcast",
@@ -754,7 +754,7 @@ const heroics = [
     description: t("fitcast_desc", true),
     source: t("fitcast_source", true),
     applicableTo: ["Chimerist", "Darkblade", "Esper", "Fury", "Wayfarer"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "for-a-better-future",
@@ -763,7 +763,7 @@ const heroics = [
     description: t("for_a_better_future_desc", true),
     source: t("for_a_better_future_source", true),
     applicableTo: ["Merchant"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "greater-chloromancy",
@@ -772,7 +772,7 @@ const heroics = [
     description: t("greater_chloromancy_desc", true),
     source: t("greater_chloromancy_source", true),
     applicableTo: ["Floralist"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "green-thumb",
@@ -781,7 +781,7 @@ const heroics = [
     description: t("green_thumb_desc", true),
     source: t("green_thumb_source", true),
     applicableTo: ["Floralist"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "inner-wellspring",
@@ -790,7 +790,7 @@ const heroics = [
     description: t("inner_wellspring_desc", true),
     source: t("inner_wellspring_source", true),
     applicableTo: ["Invoker"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "power-nap",
@@ -799,7 +799,7 @@ const heroics = [
     description: t("power_nap_desc", true),
     source: t("power_nap_source", true),
     applicableTo: ["Guardian", "Merchant", "Wayfarer"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "side-by-side",
@@ -808,7 +808,7 @@ const heroics = [
     description: t("side_by_side_desc", true),
     source: t("side_by_side_source", true),
     applicableTo: ["Wayfarer"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "silent-hunter",
@@ -817,7 +817,7 @@ const heroics = [
     description: t("silent_hunter_desc", true),
     source: t("silent_hunter_source", true),
     applicableTo: ["Rogue", "Sharpshooter", "Weaponmaster"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "skillful-dosage",
@@ -826,7 +826,7 @@ const heroics = [
     description: t("skillful_dosage_desc", true),
     source: t("skillful_dosage_source", true),
     applicableTo: ["Gourmet", "Loremaster", "Merchant", "Tinkerer"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "specialty-of-the-house",
@@ -835,7 +835,7 @@ const heroics = [
     description: t("specialty_of_the_house_desc", true),
     source: t("specialty_of_the_house_source", true),
     applicableTo: ["Gourmet"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "strength-of-five-wellsprings",
@@ -844,7 +844,7 @@ const heroics = [
     description: t("strength_of_five_wellsprings_desc", true),
     source: t("strength_of_five_wellsprings_source", true),
     applicableTo: ["Invoker"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
   {
     fuid: "wise-counsel",
@@ -853,7 +853,7 @@ const heroics = [
     description: t("wise_counsel_desc", true),
     source: t("wise_counsel_source", true),
     applicableTo: ["Commander", "Loremaster", "Orator"],
-    book: "natural",
+    meta: { book: "natural", page: "", isOfficial: true },
   },
 
   // FUBC - bonus
@@ -864,7 +864,7 @@ const heroics = [
     description: t("anatomist_desc", true),
     source: t("anatomist_source", true),
     applicableTo: ["Fury", "Loremaster", "Sharpshooter"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "arcane-sacrifice",
@@ -873,7 +873,7 @@ const heroics = [
     description: t("arcane_sacrifice_desc", true),
     source: t("arcane_sacrifice_source", true),
     applicableTo: ["Arcanist", "Guardian"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "birth-of-the-cruel",
@@ -882,7 +882,7 @@ const heroics = [
     description: t("birth_of_the_cruel_desc", true),
     source: t("birth_of_the_cruel_source", true),
     applicableTo: ["Necromancer"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "black-white",
@@ -891,7 +891,7 @@ const heroics = [
     description: t("black_white_desc", true),
     source: t("black_white_source", true),
     applicableTo: ["Ace of Cards", "Darkblade", "Entropist", "Spiritist"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "broken-wings-tactic",
@@ -900,7 +900,7 @@ const heroics = [
     description: t("broken_wing_tactic_desc", true),
     source: t("broken_wing_tactic_source", true),
     applicableTo: ["Commander", "Guardian"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "card-vanguard",
@@ -909,7 +909,7 @@ const heroics = [
     description: t("card_vanguard_desc", true),
     source: t("card_vanguard_source", true),
     applicableTo: ["Ace of Cards"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "duel-master",
@@ -924,7 +924,7 @@ const heroics = [
       "Sharpshooter",
       "Weaponmaster",
     ],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "flow-of-yin-and-yang",
@@ -933,7 +933,7 @@ const heroics = [
     description: t("flow_of_yin_and_yang_desc", true),
     source: t("flow_of_yin_and_yang_source", true),
     applicableTo: ["Dancer", "Elementalist", "Esper", "Invoker"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "forbidden-rite",
@@ -942,7 +942,7 @@ const heroics = [
     description: t("forbidden_rite_desc", true),
     source: t("forbidden_rite_source", true),
     applicableTo: ["Ace of Cards", "Arcanist"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "great-cauldrons-secret",
@@ -951,7 +951,7 @@ const heroics = [
     description: t("great_cauldrons_secret_desc", true),
     source: t("great_cauldrons_secret_source", true),
     applicableTo: ["Tinkerer"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "harvester-of-sorrow",
@@ -960,7 +960,7 @@ const heroics = [
     description: t("harvester_of_sorrow_desc", true),
     source: t("harvester_of_sorrow_source", true),
     applicableTo: ["Entropist", "Necromancer"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "hunters-trick",
@@ -969,7 +969,7 @@ const heroics = [
     description: t("hunters_trick_desc", true),
     source: t("hunters_trick_source", true),
     applicableTo: ["Sharpshooter", "Weaponmaster"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "impaler-dragon",
@@ -978,7 +978,7 @@ const heroics = [
     description: t("impaler_dragon_desc", true),
     source: t("impaler_dragon_source", true),
     applicableTo: ["Commander", "Darkblade"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "it-lives",
@@ -987,7 +987,7 @@ const heroics = [
     description: t("it_lives_desc", true),
     source: t("it_lives_source", true),
     applicableTo: ["Tinkerer", "Wayfarer"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "like-an-open-book",
@@ -996,7 +996,7 @@ const heroics = [
     description: t("like_an_open_book_desc", true),
     source: t("like_an_open_book_source", true),
     applicableTo: ["Esper", "Loremaster", "Rogue"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "nether-slash",
@@ -1005,7 +1005,7 @@ const heroics = [
     description: t("nether_slash_desc", true),
     source: t("nether_slash_source", true),
     applicableTo: ["Darkblade", "Elementalist", "Pilot"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "ofuda-mastery",
@@ -1014,7 +1014,7 @@ const heroics = [
     description: t("ofuda_mastery_desc", true),
     source: t("ofuda_mastery_source", true),
     applicableTo: ["Arcanist", "Merchant", "Symbolist", "Spiritist"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "phagomagus",
@@ -1023,7 +1023,7 @@ const heroics = [
     description: t("phagomagus_desc", true),
     source: t("phagomagus_source", true),
     applicableTo: ["Chimerist", "Entropist", "Gourmet", "Mutant"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "pulse-of-the-maggots",
@@ -1032,7 +1032,7 @@ const heroics = [
     description: t("pulse_of_the_maggots_desc", true),
     source: t("pulse_of_the_maggots_source", true),
     applicableTo: ["Necromancer"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "symbiotic-roots",
@@ -1041,7 +1041,7 @@ const heroics = [
     description: t("symbiotic_roots_desc", true),
     source: t("symbiotic_roots_source", true),
     applicableTo: ["Chimerist", "Floralist", "Mutant", "Wayfarer"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
   {
     fuid: "witchvoice",
@@ -1050,11 +1050,9 @@ const heroics = [
     description: t("witchvoice_desc", true),
     source: t("witchvoice_source", true),
     applicableTo: ["Chanter", "Orator"],
-    book: "bonus",
+    meta: { book: "bonus", page: "", isOfficial: true },
   },
 ];
-
-
 
 heroics.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MetaSchema } from "../meta";
 
 export const AccessoryModifiersSchema = z.object({
   def: z.number().int().default(0),
@@ -13,8 +14,11 @@ export const AccessoryModifiersSchema = z.object({
 export const AccessorySchema = z.object({
   itemType: z.literal("accessory"),
   name: z.string().min(1),
+  description: z.string().optional(),
+  book: z.string().default("homebrew"),
   quality: z.string().optional(),
   cost: z.number().int().nonnegative().optional(),
+  meta: MetaSchema.optional(),
 });
 
 export type Accessory = z.infer<typeof AccessorySchema>;

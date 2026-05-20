@@ -13,6 +13,7 @@ import {
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
 import type { ItemEffect, ActorEffect, AppliesEffect } from "./Effects";
+import type { Meta } from "../forms/schema/meta";
 import type {
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
@@ -30,6 +31,8 @@ export type NpcWeaponAttack = EquipmentNpcWeaponAttack;
 export interface NpcSpell {
   fuid?: string;
   name: string;
+  description: string;
+  book?: string;
   accuracy: Accuracy;
   isOffensive: boolean;
   damage: Damage;
@@ -39,8 +42,6 @@ export interface NpcSpell {
   duration: string;
   range: "melee" | "ranged";
   effect: string;
-  description: string;
-  special: string[];
   itemType: "spell";
   spellType: string;
   effects?: ItemEffect[];
@@ -50,8 +51,11 @@ export interface NpcSpell {
 export interface NpcAction {
   fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
   spCost?: number;
+  meta?: Meta;
   effects?: ItemEffect[];
   appliesEffect?: AppliesEffect;
 }
@@ -59,8 +63,11 @@ export interface NpcAction {
 export interface NpcSpecial {
   fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
   spCost?: number;
+  meta?: Meta;
   effects?: ItemEffect[];
   appliesEffect?: AppliesEffect;
 }
@@ -68,6 +75,8 @@ export interface NpcSpecial {
 export interface NpcRareGear {
   fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
   effects?: ItemEffect[];
   appliesEffect?: AppliesEffect;

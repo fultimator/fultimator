@@ -29,7 +29,10 @@ import {
 } from "../../../../libs/weaponNormalization";
 import { validateWeaponPersisted } from "../../../../forms/schema/itemSchemas/weapon";
 import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
-import { weaponFieldConfig } from "../../../../forms/rendering/config/itemConfigs/weapon";
+import {
+  weaponFieldConfig,
+  weaponGroupLabels,
+} from "../../../../forms/rendering/config/itemConfigs/weapon";
 
 function buildInitialState(weapon) {
   const weaponAccuracy = weapon?.accuracy ?? {};
@@ -318,6 +321,7 @@ export default function PlayerWeaponModal({
               <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
                 <SchemaFieldRenderer
                   config={weaponFieldConfig}
+                  groupLabels={weaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
@@ -331,11 +335,11 @@ export default function PlayerWeaponModal({
               <Grid container spacing={2} sx={{ mb: 2 }}>
                 <SchemaFieldRenderer
                   config={weaponFieldConfig}
+                  groupLabels={weaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
                   group="accuracy"
-                  label={t("Accuracy")}
                   cols={2}
                 />
               </Grid>
@@ -344,11 +348,11 @@ export default function PlayerWeaponModal({
               <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
                 <SchemaFieldRenderer
                   config={weaponFieldConfig}
+                  groupLabels={weaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
                   group="damage"
-                  label={t("Damage")}
                   cols={2}
                 />
               </Grid>
@@ -357,11 +361,11 @@ export default function PlayerWeaponModal({
               <Grid container spacing={2} sx={{ mb: 2 }}>
                 <SchemaFieldRenderer
                   config={weaponFieldConfig}
+                  groupLabels={weaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
                   group="quality"
-                  label={t("Quality")}
                   cols={2}
                 />
               </Grid>
@@ -370,11 +374,11 @@ export default function PlayerWeaponModal({
               <Grid container spacing={2} sx={{ mb: 2 }}>
                 <SchemaFieldRenderer
                   config={weaponFieldConfig}
+                  groupLabels={weaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
                   group="rareBonus"
-                  label={t("Rare Weapon Options")}
                   cols={1}
                   extraProps={{
                     rework,
@@ -384,6 +388,7 @@ export default function PlayerWeaponModal({
                 />
                 <SchemaFieldRenderer
                   config={weaponFieldConfig}
+                  groupLabels={weaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
@@ -392,11 +397,11 @@ export default function PlayerWeaponModal({
                 />
                 <SchemaFieldRenderer
                   config={weaponFieldConfig}
+                  groupLabels={weaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
                   group="modifiers"
-                  label={t("Modifiers")}
                   cols={2}
                 />
               </Grid>

@@ -869,7 +869,9 @@ export default function EditPlayerClasses({
             fullWidth
             value={newClassName}
             onChange={(e) => setNewClassName(e.target.value)}
-            onBlur={() => { if (!newClassFuid) setNewClassFuid(slugify(newClassName)); }}
+            onBlur={() => {
+              if (!newClassFuid) setNewClassFuid(slugify(newClassName));
+            }}
             sx={{ mt: 2 }}
           />
         </DialogContent>

@@ -223,11 +223,14 @@ export default function CompactLoadout({
     if (resolved.kind === "vehicleModule") {
       const m = resolved.module;
       if (m.type !== "pilot_module_weapon" || m.isShield) return;
-      att1 = m.att1;
-      att2 = m.att2;
-      prec = m.prec ?? 0;
-      damage = m.damage ?? 0;
-      type = m.damageType ?? "";
+      const acc = m.accuracy;
+      const dmg = m.damage;
+      att1 = acc?.attr1;
+      att2 = acc?.attr2;
+      if (!att1 || !att2) return;
+      prec = acc?.value ?? 0;
+      damage = dmg?.value ?? 0;
+      type = dmg?.type ?? "";
     } else {
       const item = resolved.item;
       const isSecondary = item.activeForm === "secondary";

@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Autocomplete,
   Box,
+  Button,
   Checkbox,
+  Chip,
   FormControl,
   FormControlLabel,
   FormGroup,
@@ -10,6 +13,7 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
+  OutlinedInput,
   ListItemText,
   ListSubheader,
   MenuItem,
@@ -18,10 +22,18 @@ import {
   Select,
   Slider,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import { Add, Delete } from "@mui/icons-material";
+import type { AutocompleteRenderGetTagProps } from "@mui/material";
 import { Clear, Search } from "@mui/icons-material";
-import { Martial, MartialOutline } from "../../components/icons";
+import {
+  Martial,
+  MartialOutline,
+  OffensiveSpellIcon,
+} from "../../components/icons";
+import FuidField from "../../components/common/FuidField";
 import CustomTextarea from "../../components/common/CustomTextarea";
 import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
 import ChangeAccuracyCheck from "../../routes/equip/customWeapons/ChangeAccuracyCheck";
@@ -82,6 +94,43 @@ export interface SelectGroup {
   options: SelectOption[];
 }
 
+function humanizeToken(value: string): string {
+  return value.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function translateOrHumanize(
+  t: (key: string, skipLoad?: boolean) => string,
+  label: string,
+): string {
+  const translated = t(label);
+  if (translated === label) {
+    return humanizeToken(label);
+  }
+  return translated;
+}
+
+export function FuidRenderer({
+  label,
+  value,
+  onCommit,
+  componentProps,
+  disabled,
+}: FieldRendererProps) {
+  const name = (componentProps?.name as string) ?? "";
+  const onBrowse = componentProps?.onBrowse as (() => void) | undefined;
+  return (
+    <FuidField
+      value={value as string | undefined}
+      name={name}
+      label={label}
+      onChange={(v) => onCommit(v)}
+      onBrowse={onBrowse}
+      disabled={disabled}
+      autoSync
+    />
+  );
+}
+
 export function TextRenderer({
   label,
   value,
@@ -97,6 +146,7 @@ export function TextRenderer({
       disabled={disabled}
       fullWidth
       variant="outlined"
+      size="small"
     />
   );
 }
@@ -118,18 +168,37 @@ export function CustomTextareaRenderer({
   );
 }
 
-// Number input with sign-based color.
+// Number input with sign-based color and scroll-wheel stepping.
 export function NumberRenderer({ label, value, onCommit }: FieldRendererProps) {
   const { t } = useTranslate();
   const n = (value as number) ?? 0;
+  const nRef = useRef(n);
+  nRef.current = n;
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      if (document.activeElement !== el) return;
+      e.preventDefault();
+      e.stopPropagation();
+      onCommit(nRef.current + (e.deltaY < 0 ? 1 : -1));
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, [onCommit]);
+
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth size="small">
       <TextField
+        inputRef={inputRef}
         label={t(label)}
         value={n}
         onChange={(e) => onCommit(Number(e.target.value))}
         type="number"
         variant="outlined"
+        size="small"
         color={n > 0 ? "success" : n < 0 ? "error" : "primary"}
         focused={n !== 0}
       />
@@ -166,21 +235,55 @@ export function MartialToggleRenderer({
   const { t } = useTranslate();
   const active = (value as boolean) ?? false;
   return (
-    <IconButton
-      onClick={() => onCommit(!active)}
-      disabled={disabled}
-      title={t("Martial")}
-      color={active ? "secondary" : "default"}
-      sx={{
-        border: "1px solid",
-        borderColor: active ? "secondary.main" : "divider",
-        borderRadius: 1,
-        p: 1,
-        "& svg": { width: 28, height: 28 },
-      }}
-    >
-      {active ? <Martial /> : <MartialOutline />}
-    </IconButton>
+    <Tooltip title={t("Martial")} placement="top">
+      <span>
+        <IconButton
+          onClick={() => onCommit(!active)}
+          disabled={disabled}
+          color={active ? "secondary" : "default"}
+          sx={{
+            border: "1px solid",
+            borderColor: active ? "secondary.main" : "divider",
+            borderRadius: 1,
+            width: 40,
+            height: 40,
+            "& svg": { width: 20, height: 20 },
+          }}
+        >
+          {active ? <Martial /> : <MartialOutline />}
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+}
+
+export function OffensiveToggleRenderer({
+  value,
+  onCommit,
+  disabled,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const active = (value as boolean) ?? false;
+  return (
+    <Tooltip title={t("Offensive")} placement="top">
+      <span>
+        <IconButton
+          onClick={() => onCommit(!active)}
+          disabled={disabled}
+          color={active ? "secondary" : "default"}
+          sx={{
+            border: "1px solid",
+            borderColor: active ? "secondary.main" : "divider",
+            borderRadius: 1,
+            width: 40,
+            height: 40,
+            "& svg": { width: 20, height: 20 },
+          }}
+        >
+          <OffensiveSpellIcon />
+        </IconButton>
+      </span>
+    </Tooltip>
   );
 }
 
@@ -194,17 +297,32 @@ export function SelectRenderer({
   const { t } = useTranslate();
   const options = (componentProps?.options as SelectOption[]) ?? [];
   const disabled = (componentProps?.disabled as boolean) ?? false;
+  const multiple = (componentProps?.multiple as boolean) ?? false;
   const onBrowse = componentProps?.onBrowse as (() => void) | undefined;
   const labelId = `select-${label}`;
+
+  const normalizedValue = multiple
+    ? ((value as string[]) ?? [])
+    : ((value as string | number) ?? "");
+  const labelForValue = (selected: string | number) =>
+    t(options.find((opt) => opt.value === selected)?.label ?? String(selected));
+
   return (
-    <FormControl variant="outlined" fullWidth>
+    <FormControl variant="outlined" fullWidth size="small">
       <InputLabel id={labelId}>{t(label)}</InputLabel>
       <Select
         labelId={labelId}
-        value={(value as string | number) ?? ""}
+        value={normalizedValue}
         label={t(label)}
+        multiple={multiple}
         onChange={(e) => onCommit(e.target.value)}
         disabled={disabled}
+        renderValue={(selected) => {
+          if (Array.isArray(selected)) {
+            return selected.map((entry) => labelForValue(entry)).join(", ");
+          }
+          return labelForValue(selected as string | number);
+        }}
         startAdornment={
           onBrowse ? (
             <InputAdornment position="start">
@@ -224,7 +342,17 @@ export function SelectRenderer({
       >
         {options.map((opt) => (
           <MenuItem key={opt.value} value={opt.value}>
-            {t(opt.label)}
+            {multiple && (
+              <Checkbox
+                checked={
+                  Array.isArray(normalizedValue) &&
+                  normalizedValue.includes(opt.value as string)
+                }
+                size="small"
+                sx={{ p: 0, mr: 1 }}
+              />
+            )}
+            {multiple ? <ListItemText primary={t(opt.label)} /> : t(opt.label)}
           </MenuItem>
         ))}
       </Select>
@@ -260,7 +388,7 @@ export function GroupedSelectRenderer({
   const onBrowse = componentProps?.onBrowse as (() => void) | undefined;
 
   return (
-    <FormControl variant="outlined" fullWidth>
+    <FormControl variant="outlined" fullWidth size="small">
       <InputLabel id={labelId}>{t(label)}</InputLabel>
       <Select
         labelId={labelId}
@@ -309,15 +437,19 @@ export function TypeSelectRenderer({
   const { t } = useTranslate();
   const options = (componentProps?.options as SelectOption[]) ?? [];
   const labelId = `type-select-${label}`;
-  const current = (value as string) ?? "";
+  const DAMAGE_TYPE_ALIASES: Record<string, string> = { wind: "air" };
+  const raw = (value as string) ?? "";
+  const current = DAMAGE_TYPE_ALIASES[raw] ?? raw;
   return (
-    <FormControl variant="outlined" fullWidth>
+    <FormControl variant="outlined" fullWidth size="small">
       <InputLabel id={labelId}>{t(label)}</InputLabel>
       <Select
         labelId={labelId}
         value={current}
         label={t(label)}
-        onChange={(e) => onCommit(e.target.value)}
+        onChange={(e) =>
+          onCommit(DAMAGE_TYPE_ALIASES[e.target.value] ?? e.target.value)
+        }
         renderValue={(v) => {
           const opt = options.find((o) => o.value === v);
           return (
@@ -368,7 +500,7 @@ export function AccuracyAttrPairRenderer({
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <FormControl variant="outlined" fullWidth>
+        <FormControl variant="outlined" fullWidth size="small">
           <InputLabel id="override-acc-attr1">{t("Attribute 1")}</InputLabel>
           <Select
             labelId="override-acc-attr1"
@@ -385,7 +517,7 @@ export function AccuracyAttrPairRenderer({
         </FormControl>
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
-        <FormControl variant="outlined" fullWidth>
+        <FormControl variant="outlined" fullWidth size="small">
           <InputLabel id="override-acc-attr2">{t("Attribute 2")}</InputLabel>
           <Select
             labelId="override-acc-attr2"
@@ -587,7 +719,7 @@ export function SlotEditorRenderer({
 
 // NPC-specific renderers
 
-// Attribute slider (d6–d12, step 2). componentProps: { label: string }
+// Attribute slider (d6-d12, step 2). componentProps: { label: string }
 // The label is shown inline as a short tag (DEX / INS / MIG / WLP).
 export function NpcAttrSliderRenderer({
   label,
@@ -699,7 +831,7 @@ export function NpcArmorSelectRenderer({
     (value as { name?: string } | undefined)?.name ?? items[0]?.name ?? "";
 
   return (
-    <FormControl fullWidth disabled={disabled}>
+    <FormControl fullWidth size="small" disabled={disabled}>
       <InputLabel>{t(label)}</InputLabel>
       <Select
         value={currentName}
@@ -823,5 +955,266 @@ export function NpcDefenseRadioRenderer({
         ))}
       </RadioGroup>
     </FormControl>
+  );
+}
+
+// Autocomplete renderer with optional free-solo entry.
+// componentProps: { options: SelectOption[], freeSolo?: boolean, multiple?: boolean }
+export function AutocompleteRenderer({
+  label,
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const options = (componentProps?.options as SelectOption[]) ?? [];
+  const freeSolo = (componentProps?.freeSolo as boolean) ?? false;
+  const multiple =
+    (componentProps?.multiple as boolean | undefined) ?? Array.isArray(value);
+  const optionLabels = options.map((o) => o.value as string);
+  const selectedMulti = Array.isArray(value) ? value : [];
+  const selectedSingle = typeof value === "string" ? value : "";
+
+  const renderTags = (
+    tags: string[],
+    getTagProps: AutocompleteRenderGetTagProps,
+  ) => (
+    <>
+      {tags.map((tag, index) => {
+        const found = options.find((o) => o.value === tag);
+        return (
+          <Chip
+            key={tag}
+            label={found ? t(found.label) : tag}
+            size="small"
+            {...getTagProps({ index })}
+          />
+        );
+      })}
+    </>
+  );
+
+  // Cast needed: MUI Autocomplete freeSolo generic can't be satisfied with a
+  // runtime boolean; the FreeSolo type param must be a literal true/false.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const AC = Autocomplete as any;
+  return (
+    <AC
+      multiple={multiple}
+      freeSolo={freeSolo}
+      options={optionLabels}
+      value={multiple ? selectedMulti : selectedSingle}
+      onChange={(_: unknown, newValue: string[] | string | null) =>
+        onCommit(
+          multiple
+            ? Array.isArray(newValue)
+              ? newValue
+              : []
+            : (newValue ?? ""),
+        )
+      }
+      getOptionLabel={(opt: string) => {
+        const found = options.find((o) => o.value === opt);
+        return found ? t(found.label) : String(opt);
+      }}
+      {...(multiple ? { renderTags } : {})}
+      renderInput={(params: object) => (
+        <TextField {...(params as object)} label={t(label)} size="small" />
+      )}
+      size="small"
+    />
+  );
+}
+
+// Toggle-group renderer: a row of clickable chips for boolean or multi-boolean values.
+// componentProps:
+//   options: { key: string; label: string }[] - each entry maps to a key in the value object
+//   color?: "primary" | "secondary"             - chip color when active (default "primary")
+// value shape: Record<string, boolean>
+export function ToggleGroupRenderer({
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const options =
+    (componentProps?.options as { key: string; label: string }[]) ?? [];
+  const color = (componentProps?.color as "primary" | "secondary") ?? "primary";
+  const current = (value as Record<string, boolean>) ?? {};
+
+  return (
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+      {options.map(({ key, label }) => (
+        <Chip
+          key={key}
+          label={t(label)}
+          size="small"
+          clickable
+          color={current[key] ? color : "default"}
+          variant={current[key] ? "filled" : "outlined"}
+          onClick={() => onCommit({ ...current, [key]: !current[key] })}
+        />
+      ))}
+    </Box>
+  );
+}
+
+// Chip-multi-select renderer: a wrap row of chips where each toggles membership in a string[].
+// componentProps:
+//   options: { value: string; label: string }[]
+//   color?: "primary" | "secondary"
+// value shape: string[]
+export function ChipMultiSelectRenderer({
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const options =
+    (componentProps?.options as { value: string; label: string }[]) ?? [];
+  const color =
+    (componentProps?.color as "primary" | "secondary") ?? "secondary";
+  const selected = (value as string[]) ?? [];
+
+  const toggle = (val: string) =>
+    onCommit(
+      selected.includes(val)
+        ? selected.filter((s) => s !== val)
+        : [...selected, val],
+    );
+
+  return (
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+      {options.map(({ value: val, label }) => (
+        <Chip
+          key={val}
+          label={translateOrHumanize(t, label)}
+          size="small"
+          clickable
+          color={selected.includes(val) ? color : "default"}
+          variant={selected.includes(val) ? "filled" : "outlined"}
+          onClick={() => toggle(val)}
+        />
+      ))}
+    </Box>
+  );
+}
+
+// Object-list renderer: a dynamic list of structured row objects, each rendered as a
+// nested field group using a sub-config.
+// componentProps:
+//   fields: FieldConfig<TRow>[]              - field config for each row
+//   itemDefaults: TRow                        - blank row template for new entries
+//   fixedCount?: number                       - if set, rows are fixed (no add/remove)
+//   addLabel?: string                         - label for the add button (default "Add")
+//   rowLabel?: (row: TRow, i: number) => string - optional row heading
+// value shape: TRow[]
+export function ObjectListRenderer({
+  value,
+  onCommit,
+  componentProps,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const fields =
+    (componentProps?.fields as import("./config/fieldConfig").ItemFieldConfig<
+      Record<string, unknown>
+    >) ?? [];
+  const itemDefaults =
+    (componentProps?.itemDefaults as Record<string, unknown>) ?? {};
+  const fixedCount = componentProps?.fixedCount as number | undefined;
+  const addLabel = (componentProps?.addLabel as string) ?? "Add";
+  const rowLabel = componentProps?.rowLabel as
+    | ((row: Record<string, unknown>, i: number) => string)
+    | undefined;
+  const renderNestedFields = componentProps?.renderNestedFields as
+    | ((args: {
+        config: import("./config/fieldConfig").ItemFieldConfig<
+          Record<string, unknown>
+        >;
+        state: Record<string, unknown>;
+        onChange: (next: Record<string, unknown>) => void;
+        surface?: "quickCreate" | "create" | "edit";
+        cols?: 1 | 2 | 3 | 4;
+      }) => React.ReactNode)
+    | undefined;
+
+  const rows = (value as Record<string, unknown>[]) ?? [];
+
+  const updateRow = (i: number, next: Record<string, unknown>) => {
+    const updated = rows.map((r, idx) => (idx === i ? next : r));
+    onCommit(updated);
+  };
+
+  const addRow = () => onCommit([...rows, { ...itemDefaults }]);
+
+  const removeRow = (i: number) => onCommit(rows.filter((_, idx) => idx !== i));
+
+  return (
+    <Box
+      sx={{ display: "flex", flexDirection: "column", gap: 1, width: "100%" }}
+    >
+      {rows.map((row, i) => (
+        <Box
+          key={i}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            p: 1.5,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 1,
+            }}
+          >
+            {rowLabel && (
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+              >
+                {rowLabel(row, i)}
+              </Typography>
+            )}
+            {fixedCount === undefined && (
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => removeRow(i)}
+                sx={{ ml: "auto" }}
+              >
+                <Delete fontSize="small" />
+              </IconButton>
+            )}
+          </Box>
+          <Grid container spacing={1}>
+            {renderNestedFields
+              ? renderNestedFields({
+                  config: fields,
+                  state: row,
+                  onChange: (next) => updateRow(i, next),
+                  surface: "edit",
+                  cols: 2,
+                })
+              : null}
+          </Grid>
+        </Box>
+      ))}
+      {fixedCount === undefined && (
+        <Box>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<Add />}
+            onClick={addRow}
+          >
+            {t(addLabel)}
+          </Button>
+        </Box>
+      )}
+    </Box>
   );
 }

@@ -9,7 +9,8 @@ import {
 import { IconButton, Tooltip } from "@mui/material";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useRef } from "react";
-import allBases from "./base";
+import armorBases from "../../../libs/armor";
+import shieldBases from "../../../libs/shields";
 import {
   SharedArmorCard,
   SharedShieldCard,
@@ -20,11 +21,14 @@ import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
-import { armorFieldConfig } from "../../../forms/rendering/config/itemConfigs/armor";
-import { shieldFieldConfig } from "../../../forms/rendering/config/itemConfigs/shield";
-
-const armorBases = allBases.filter((b) => b.category !== "Shield");
-const shieldBases = allBases.filter((b) => b.category === "Shield");
+import {
+  armorFieldConfig,
+  armorGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/armor";
+import {
+  shieldFieldConfig,
+  shieldGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/shield";
 
 function buildState(base) {
   return {
@@ -90,7 +94,14 @@ function applyFileUpload(rawData, bases) {
   return next;
 }
 
-function ItemPanel({ title, bases, fieldConfig, SharedCard, itemTypeFilter }) {
+function ItemPanel({
+  title,
+  bases,
+  fieldConfig,
+  groupLabels,
+  SharedCard,
+  itemTypeFilter,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -158,6 +169,7 @@ function ItemPanel({ title, bases, fieldConfig, SharedCard, itemTypeFilter }) {
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={fieldConfig}
+                groupLabels={groupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -166,6 +178,7 @@ function ItemPanel({ title, bases, fieldConfig, SharedCard, itemTypeFilter }) {
               />
               <SchemaFieldRenderer
                 config={fieldConfig}
+                groupLabels={groupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -176,11 +189,11 @@ function ItemPanel({ title, bases, fieldConfig, SharedCard, itemTypeFilter }) {
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={fieldConfig}
+                groupLabels={groupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="quality"
-                label={t("Quality")}
                 cols={2}
                 extraProps={{ onBrowse: () => setQualityBrowserOpen(true) }}
               />
@@ -188,11 +201,11 @@ function ItemPanel({ title, bases, fieldConfig, SharedCard, itemTypeFilter }) {
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={fieldConfig}
+                groupLabels={groupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="modifiers"
-                label={t("Modifiers")}
                 cols={2}
               />
             </Grid>
@@ -313,6 +326,7 @@ export function ArmorPanel() {
       title="Armor"
       bases={armorBases}
       fieldConfig={armorFieldConfig}
+      groupLabels={armorGroupLabels}
       SharedCard={SharedArmorCard}
       itemTypeFilter="armor"
     />
@@ -325,6 +339,7 @@ export function ShieldPanel() {
       title="Shield"
       bases={shieldBases}
       fieldConfig={shieldFieldConfig}
+      groupLabels={shieldGroupLabels}
       SharedCard={SharedShieldCard}
       itemTypeFilter="shield"
     />

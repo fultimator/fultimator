@@ -1,5 +1,6 @@
 import type { Accuracy, Damage, Attributes, Elements } from "./Misc";
 import type { ItemEffect } from "./Effects";
+import type { Meta } from "../forms/schema/meta";
 
 export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
 
@@ -33,8 +34,10 @@ export interface CustomWeaponRare extends WeaponRare {
 export interface Weapon {
   fuid?: string;
   itemType: "weapon";
-  category: string;
   name: string;
+  description?: string;
+  book?: string;
+  category: string;
   range: "melee" | "ranged";
   hands: 1 | 2;
   martial: boolean;
@@ -45,6 +48,7 @@ export interface Weapon {
   quality?: string;
   cost?: number;
   special?: string[];
+  meta?: Meta;
   effects?: ItemEffect[];
 }
 
@@ -52,6 +56,8 @@ export interface CustomWeapon {
   fuid?: string;
   itemType: "customWeapon";
   name: string;
+  description?: string;
+  book?: string;
   category: string;
   range: "melee" | "ranged";
   hands: 1 | 2;
@@ -62,6 +68,7 @@ export interface CustomWeapon {
   rare?: CustomWeaponRare;
   customizations: CustomWeaponCustomization[];
   quality?: string;
+  qualityName?: string;
   qualityCost?: number;
   cost?: number;
   slots?: SlotTier;
@@ -73,6 +80,7 @@ export interface CustomWeapon {
   secondDamage?: Damage;
   secondModifiers?: WeaponModifiers;
   secondCustomizations?: CustomWeaponCustomization[];
+  meta?: Meta;
   effects?: ItemEffect[];
 }
 
@@ -80,10 +88,11 @@ export interface NpcAttack {
   fuid?: string;
   itemType?: "attack";
   name: string;
+  description?: string;
   range: "melee" | "ranged";
   accuracy: Accuracy;
   damage: Damage;
-  special: string[];
+  effect?: string;
   extraDamage?: boolean;
   effects?: ItemEffect[];
 }
@@ -92,10 +101,11 @@ export interface NpcWeaponAttack {
   fuid?: string;
   itemType?: "weaponAttack";
   name: string;
+  description?: string;
   range: "melee" | "ranged";
   accuracy: Accuracy;
   damage: Damage;
-  special: string[];
+  effect?: string;
   extraDamage?: boolean;
   effects?: ItemEffect[];
 }
@@ -116,8 +126,10 @@ export interface DefensiveModifiers {
 export interface EquipmentArmor {
   fuid?: string;
   itemType?: "armor";
-  category?: "Armor" | string;
   name: string;
+  description?: string;
+  book?: string;
+  category?: "Armor" | string;
   quality?: string;
   selectedQuality?: string;
   qualityCost?: number;
@@ -159,8 +171,10 @@ export interface EquipmentShield extends Omit<EquipmentArmor, "itemType"> {
 export interface EquipmentAccessory {
   fuid?: string;
   itemType?: "accessory";
-  category?: "Accessory" | string;
   name: string;
+  description?: string;
+  book?: string;
+  category?: "Accessory" | string;
   quality?: string;
   selectedQuality?: string;
   qualityCost?: number;

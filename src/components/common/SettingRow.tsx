@@ -46,7 +46,7 @@ const SettingRow: React.FC<SettingRowProps> = ({
           </Typography>
           {hint && (
             <Typography
-              variant="caption"
+              variant="body2"
               sx={{ color: "text.secondary", display: "block", mt: 0.5 }}
             >
               {hint}

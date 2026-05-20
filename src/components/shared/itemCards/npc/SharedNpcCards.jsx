@@ -171,11 +171,12 @@ export const SharedAttackCard = React.memo(function SharedAttackCard({
           </Grid>
         </Grid>
 
-        {item.special?.length > 0 && (
+        {(item.effect || item.special?.length > 0) && (
           <Grid container sx={{ px: 2, py: "4px" }}>
             <Grid size={12}>
               <Typography variant="body2">
-                <strong>{t("Special")}:</strong> {item.special.join("; ")}
+                <strong>{t("Effect")}:</strong>{" "}
+                {item.effect || item.special?.join("; ")}
               </Typography>
             </Grid>
           </Grid>

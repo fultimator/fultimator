@@ -30,7 +30,7 @@ export default function GiftItem({
   const handleNameChange = (value) => {
     const gift = availableGifts.find((g) => g.name === value);
     if (gift) {
-      onItemChange(itemIndex, "name", value);
+      onItemChange(itemIndex, "key", value);
       if (value !== "esper_gift_custom_name") {
         onItemChange(itemIndex, "event", gift.event);
         onItemChange(itemIndex, "effect", gift.effect);
@@ -39,7 +39,7 @@ export default function GiftItem({
     }
   };
 
-  const isCustom = item.name === "esper_gift_custom_name";
+  const isCustom = item.key === "esper_gift_custom_name";
   const [expanded, setExpanded] = useState(false);
   const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } =
     useDeleteConfirmation({
@@ -51,8 +51,8 @@ export default function GiftItem({
 
     const clone = {
       ...item,
-      name: "esper_gift_custom_name",
-      customName: item.customName || (item.name ? t(item.name) : ""),
+      key: "esper_gift_custom_name",
+      customName: item.customName || (item.key ? t(item.key) : ""),
       event: typeof item.event === "string" ? t(item.event) : item.event,
       effect: typeof item.effect === "string" ? t(item.effect) : item.effect,
     };
@@ -71,7 +71,7 @@ export default function GiftItem({
   };
 
   const itemDisplayName =
-    item.customName || t(item.name || "esper_gift_custom_name");
+    item.customName || t(item.key || "esper_gift_custom_name");
 
   return (
     <>
@@ -122,7 +122,7 @@ export default function GiftItem({
               <FormControl fullWidth>
                 <InputLabel>{t("Gift Type")}</InputLabel>
                 <Select
-                  value={item.name || ""}
+                  value={item.key || ""}
                   onChange={(e) => handleNameChange(e.target.value)}
                   label={t("Gift Type")}
                 >

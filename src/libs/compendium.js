@@ -179,12 +179,13 @@ export function getItemSearchText(item) {
   const skillNames = item.skills
     ? item.skills.map((s) => s.skillName).join(" ")
     : "";
+  const book = item.meta?.book ?? item.book;
   return [
     item.name,
     item.category,
     item.type,
     item.range,
-    item.book,
+    book,
     item.class,
     skillNames,
     item.quality,
@@ -289,13 +290,11 @@ const _nonStaticItemsByType = {
       .map((m) => ({
         ...m,
         spellType: "pilot-vehicle",
-        category: "Armor Module",
         pilotSubtype: "armor",
       })),
     ...availableModules.weapon.map((m) => ({
       ...m,
       spellType: "pilot-vehicle",
-      category: "Weapon Module",
       pilotSubtype: "weapon",
     })),
     ...availableModules.support
@@ -303,7 +302,6 @@ const _nonStaticItemsByType = {
       .map((m) => ({
         ...m,
         spellType: "pilot-vehicle",
-        category: "Support Module",
         pilotSubtype: "support",
       })),
   ],

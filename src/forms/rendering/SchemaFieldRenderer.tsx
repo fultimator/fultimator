@@ -1,8 +1,9 @@
 import React from "react";
-import { Box, Divider, Grid, Typography } from "@mui/material";
-import type { ItemFieldConfig } from "./config/fieldConfig";
+import { Box, Grid, Typography } from "@mui/material";
+import type { GroupLabels, ItemFieldConfig } from "./config/fieldConfig";
 import type { FormSurface } from "../schema/fieldParity";
 import { componentMap } from "./componentMap";
+import { useTranslate } from "../../translation/translate";
 
 interface SchemaFieldRendererProps<TFormState extends Record<string, unknown>> {
   config: ItemFieldConfig<TFormState>;
@@ -11,14 +12,18 @@ interface SchemaFieldRendererProps<TFormState extends Record<string, unknown>> {
   surface: FormSurface;
   // Optional group filter.
   group?: string;
-  // Optional section heading.
+  // Optional section heading. Takes precedence over groupLabels lookup.
   label?: string;
+  // Group-key → dot-path label string map from the item config. Used when label is omitted.
+  groupLabels?: GroupLabels;
   // Optional action element rendered beside the section label (e.g. a search icon button).
   labelAction?: React.ReactNode;
   // Fields per row on md+ screens.
   cols?: 1 | 2 | 3 | 4;
   // Extra props merged into each field's component props.
   extraProps?: Record<string, unknown>;
+  // When true, renders nothing (useful for conditionally hiding entire sections).
+  hidden?: boolean;
 }
 
 // Resolve a nested path (for example "damage.value") to [parent, leafKey].
@@ -68,10 +73,14 @@ export function SchemaFieldRenderer<
   surface,
   group,
   label,
+  groupLabels,
   labelAction,
   cols = 2,
   extraProps,
+  hidden,
 }: SchemaFieldRendererProps<TFormState>) {
+  const { t } = useTranslate();
+  if (hidden) return null;
   const mdSize = Math.floor(12 / cols) as 3 | 4 | 6 | 12;
 
   const visible = config
@@ -85,15 +94,27 @@ export function SchemaFieldRenderer<
     })
     .sort((a, b) => a.order - b.order);
 
+  const resolvedLabel =
+    label ?? (group && groupLabels ? groupLabels[group] : undefined);
+
   return (
     <>
-      {label && (
+      {resolvedLabel && (
         <Grid size={12}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Typography variant="h6">{label}</Typography>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                fontSize: "0.75rem",
+                letterSpacing: "0.05em",
+              }}
+            >
+              {typeof resolvedLabel === "string" ? t(resolvedLabel) : ""}
+            </Typography>
             {labelAction}
           </Box>
-          <Divider sx={{ mt: 0.5, mb: 1 }} />
         </Grid>
       )}
       {visible.map((field) => {
@@ -137,9 +158,43 @@ export function SchemaFieldRenderer<
           ? field.format(rawValue as TFormState[keyof TFormState])
           : rawValue;
 
-        const mergedProps = extraProps
-          ? { ...field.componentProps, ...extraProps }
+        const filteredExtra = extraProps
+          ? field.component === "fuid" ||
+            field.component === "grouped-select" ||
+            field.component === "autocomplete"
+            ? extraProps
+            : Object.fromEntries(
+                Object.entries(extraProps).filter(([k]) => k !== "onBrowse"),
+              )
+          : undefined;
+        const mergedProps = filteredExtra
+          ? { ...field.componentProps, ...filteredExtra }
           : field.componentProps;
+        const componentPropsWithNestedRenderer = {
+          ...(mergedProps ?? {}),
+          ...(field.component === "fuid" ? { name: state.name ?? "" } : {}),
+          renderNestedFields: ({
+            config,
+            state,
+            onChange,
+            surface = "edit",
+            cols = 2,
+          }: {
+            config: ItemFieldConfig<Record<string, unknown>>;
+            state: Record<string, unknown>;
+            onChange: (next: Record<string, unknown>) => void;
+            surface?: FormSurface;
+            cols?: 1 | 2 | 3 | 4;
+          }) => (
+            <SchemaFieldRenderer
+              config={config}
+              state={state}
+              onChange={onChange}
+              surface={surface}
+              cols={cols}
+            />
+          ),
+        };
 
         return (
           <Grid
@@ -151,17 +206,22 @@ export function SchemaFieldRenderer<
             }
             sx={
               field.component === "checkbox" ||
-              field.component === "martial-toggle"
+              field.component === "martial-toggle" ||
+              field.component === "offensive-toggle"
                 ? { display: "flex", alignItems: "center" }
                 : undefined
             }
           >
             <Component
               fieldKey={field.key}
-              label={field.label}
+              label={
+                typeof field.label === "function"
+                  ? field.label(state)
+                  : field.label
+              }
               value={displayValue}
               onCommit={handleCommit}
-              componentProps={mergedProps}
+              componentProps={componentPropsWithNestedRenderer}
             />
           </Grid>
         );

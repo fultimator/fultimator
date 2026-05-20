@@ -10,6 +10,7 @@ const weapons = [
     hands: 1,
     range: "melee",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "staff",
@@ -22,6 +23,7 @@ const weapons = [
     hands: 2,
     range: "melee",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "tome",
@@ -34,6 +36,7 @@ const weapons = [
     hands: 2,
     range: "melee",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "crossbow",
@@ -51,6 +54,7 @@ const weapons = [
     hands: 2,
     range: "ranged",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "shortbow",
@@ -68,6 +72,7 @@ const weapons = [
     hands: 2,
     range: "ranged",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "chain-whip",
@@ -85,6 +90,7 @@ const weapons = [
     hands: 2,
     range: "melee",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "pistol",
@@ -102,6 +108,7 @@ const weapons = [
     hands: 1,
     range: "ranged",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "light-spear",
@@ -114,6 +121,7 @@ const weapons = [
     hands: 1,
     range: "melee",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "heavy-spear",
@@ -126,6 +134,7 @@ const weapons = [
     hands: 2,
     range: "melee",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "shuriken",
@@ -143,6 +152,7 @@ const weapons = [
     hands: 1,
     range: "ranged",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "iron-hammer",
@@ -155,6 +165,7 @@ const weapons = [
     hands: 1,
     range: "melee",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "broadaxe",
@@ -167,6 +178,7 @@ const weapons = [
     hands: 1,
     range: "melee",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "waraxe",
@@ -179,6 +191,7 @@ const weapons = [
     hands: 2,
     range: "melee",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "steel-dagger",
@@ -196,6 +209,7 @@ const weapons = [
     hands: 1,
     range: "melee",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "iron-knuckle",
@@ -208,6 +222,7 @@ const weapons = [
     hands: 1,
     range: "melee",
     martial: false,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "katana",
@@ -225,6 +240,7 @@ const weapons = [
     hands: 2,
     range: "melee",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "bronze-sword",
@@ -237,6 +253,7 @@ const weapons = [
     hands: 1,
     range: "melee",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "greatsword",
@@ -249,6 +266,7 @@ const weapons = [
     hands: 2,
     range: "melee",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "rapier",
@@ -266,6 +284,7 @@ const weapons = [
     hands: 1,
     range: "melee",
     martial: true,
+    meta: { book: "core", page: "", isOfficial: true },
   },
 ];
 

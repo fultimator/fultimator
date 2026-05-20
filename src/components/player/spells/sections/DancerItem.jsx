@@ -27,7 +27,7 @@ export default function DancerItem({
   const handleNameChange = (value) => {
     const dance = availableDances.find((d) => d.name === value);
     if (dance) {
-      onItemChange(itemIndex, "name", value);
+      onItemChange(itemIndex, "key", value);
       if (value !== "dance_custom_name") {
         onItemChange(itemIndex, "effect", dance.effect);
         onItemChange(itemIndex, "duration", dance.duration);
@@ -37,8 +37,8 @@ export default function DancerItem({
   };
 
   const isCustom =
-    item.name === "dance_custom_name" ||
-    !availableDances.find((d) => d.name === item.name);
+    item.key === "dance_custom_name" ||
+    !availableDances.find((d) => d.name === item.key);
   const {
     isOpen: deleteDialogOpen,
     closeDialog: setDeleteDialogOpen,
@@ -52,8 +52,8 @@ export default function DancerItem({
 
     const clone = {
       ...item,
-      name: "dance_custom_name",
-      customName: item.customName || (item.name ? t(item.name) : ""),
+      key: "dance_custom_name",
+      customName: item.customName || (item.key ? t(item.key) : ""),
       duration:
         typeof item.duration === "string" ? t(item.duration) : item.duration,
       effect: typeof item.effect === "string" ? t(item.effect) : item.effect,
@@ -63,7 +63,7 @@ export default function DancerItem({
   };
 
   const itemDisplayName =
-    item.customName || t(item.name || "dance_custom_name");
+    item.customName || t(item.key || "dance_custom_name");
 
   return (
     <>
@@ -79,7 +79,7 @@ export default function DancerItem({
               <FormControl fullWidth>
                 <InputLabel>{t("Dance")}</InputLabel>
                 <Select
-                  value={item.name || ""}
+                  value={item.key || ""}
                   onChange={(e) => handleNameChange(e.target.value)}
                   label={t("Dance")}
                 >

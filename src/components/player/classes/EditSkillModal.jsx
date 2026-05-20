@@ -98,7 +98,10 @@ export default function EditSkillModal({
               onChange={(e) =>
                 setSkill({ ...skill, skillName: e.target.value })
               }
-              onBlur={() => { if (!skill.fuid) setSkill({ ...skill, fuid: slugify(skill.skillName) }); }}
+              onBlur={() => {
+                if (!skill.fuid)
+                  setSkill({ ...skill, fuid: slugify(skill.skillName) });
+              }}
               fullWidth
               slotProps={{
                 htmlInput: { maxLength: 100 },
@@ -189,7 +192,7 @@ export default function EditSkillModal({
                     </ListSubheader>,
                     groupedSkills[skillClass].map((groupedSkill) => (
                       <MenuItem
-                        key={groupedSkill.name}
+                        key={`${skillClass}-${groupedSkill.name}`}
                         value={groupedSkill.name}
                       >
                         {t(groupedSkill.name)}

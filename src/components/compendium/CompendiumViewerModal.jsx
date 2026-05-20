@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useMemo,
-  useRef,
-  useCallback,
-  useEffect,
-} from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,7 +6,6 @@ import {
   DialogActions,
   Button,
   Box,
-  Grid,
   IconButton,
   Divider,
   Typography,
@@ -22,7 +15,6 @@ import {
   Tabs,
   Tab,
   Alert,
-  Drawer,
   useMediaQuery,
   InputAdornment,
   Autocomplete,
@@ -33,55 +25,26 @@ import CloseIcon from "@mui/icons-material/Close";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import LinkIcon from "@mui/icons-material/Link";
-import DownloadIcon from "@mui/icons-material/Download";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import MenuIcon from "@mui/icons-material/Menu";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
-import { useTranslate, t as staticT } from "../../translation/translate";
+import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import {
-  CompendiumSidebar,
-  ItemCard,
-} from "../../routes/compendium/compendium";
+import { useCompendiumFilters } from "./hooks/useCompendiumFilters";
+import CompendiumBrowser from "./CompendiumBrowser";
 import {
   ITEM_TYPES,
   VIEWER_TO_PACK_TYPE,
   getItems,
-  getItemSearchText,
   toSlug,
-  makeId,
-  getNonStaticSpellItems,
 } from "../../libs/compendium";
-import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
 import CompendiumItemCreateDialog from "./CompendiumItemCreateDialog";
 import QuickCreateModal from "./QuickCreateModal";
 import { ManageModulesModal } from "../manage-modules";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import classList, { spellList } from "../../libs/classes";
-import { getDelicacyEffects } from "../../libs/gourmetCookingData";
-import useDownloadImage from "../../hooks/useDownloadImage";
-
-const _NPC_TYPES = ["spells", "attacks", "special", "actions"];
-const _PLAYER_TYPES = [
-  "weapons",
-  "armor",
-  "shields",
-  "custom-weapons",
-  "accessories",
-  "player-spells",
-  "qualities",
-  "classes",
-  "heroics",
-];
-
-const SIDEBAR_WIDTH = 300;
-const normalizeWellspring = (value = "") => String(value).trim().toLowerCase();
-const getItemWellspring = (item) =>
-  item?.wellspring ?? item?.Wellspring ?? item?.category ?? "";
 
 const CompendiumViewerModal = ({
   open,
@@ -102,94 +65,34 @@ const CompendiumViewerModal = ({
   const customTheme = useCustomTheme();
   const muiTheme = useTheme();
   const isDesktop = useMediaQuery(muiTheme.breakpoints.up("md"));
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Viewer state (local instead of URL params)
-  const [selectedType, setSelectedType] = useState(initialType);
-  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
-  const [selectedIdx, setSelectedIdx] = useState(null);
-  const [selectedCompendium, setSelectedCompendium] =
-    useState(initialCompendium);
-
-  useEffect(() => {
-    if (open) setSelectedCompendium(initialCompendium);
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const [selectedSpellClass, setSelectedSpellClass] =
-    useState(initialSpellClass);
-  const [selectedModuleType, setSelectedModuleType] = useState(
-    initialModuleTypeFilter,
-  );
-  const [selectedMagichantSubtype, setSelectedMagichantSubtype] = useState("");
-  const [selectedWellspring, setSelectedWellspring] = useState("");
-  const [selectedBook, setSelectedBook] = useState([]);
-  const [selectedQualityFilters, setSelectedQualityFilters] = useState(
+  // ---------------------------------------------------------------------------
+  // Filter state (via hook)
+  // ---------------------------------------------------------------------------
+  const {
+    filters,
+    handlers,
+    selectedIdx,
+    setSelectedIdx,
+    searchQuery,
+    setSearchQuery,
+  } = useCompendiumFilters({
+    restrictToTypes,
+    initialType,
+    initialSearchQuery,
+    initialSpellClass,
+    initialModuleType: initialModuleTypeFilter,
     initialQualityFilters,
-  );
-  const [selectedQualityCategories, setSelectedQualityCategories] = useState(
-    [],
-  );
-  const [selectedHeroicClasses, setSelectedHeroicClasses] = useState([]);
-  const [selectedOptionalSubtypes, setSelectedOptionalSubtypes] = useState(
     initialOptionalSubtypes,
-  );
+    initialCompendium,
+    open,
+  });
 
-  const matchesPilotModuleType = useCallback((item, moduleType) => {
-    const filter = String(moduleType || "").toLowerCase();
-    if (!filter) return true;
+  const { selectedType, selectedCompendium } = filters;
 
-    if (filter === "frame") {
-      return (
-        item?.pilotSubtype === "frame" ||
-        String(item?.category || "").toLowerCase() === "frame" ||
-        item?.passengers != null ||
-        String(item?.name || "")
-          .toLowerCase()
-          .includes("pilot_frame_")
-      );
-    }
-
-    const normalizedValues = [
-      item?.type,
-      item?.category,
-      item?.name,
-      item?.spellType,
-    ]
-      .filter(Boolean)
-      .map((value) => String(value).toLowerCase());
-
-    const matchesFlatField = normalizedValues.some(
-      (value) =>
-        value === `pilot_module_${filter}` ||
-        value.endsWith(`_${filter}`) ||
-        value.includes(`module_${filter}`) ||
-        value.includes(`${filter} module`),
-    );
-    if (matchesFlatField) return true;
-
-    if (!Array.isArray(item?.modules) || item.modules.length === 0)
-      return false;
-    return item.modules.some((module) => {
-      const moduleValues = [module?.type, module?.category, module?.name]
-        .filter(Boolean)
-        .map((value) => String(value).toLowerCase());
-      return moduleValues.some(
-        (value) =>
-          value === `pilot_module_${filter}` ||
-          value.endsWith(`_${filter}`) ||
-          value.includes(`module_${filter}`) ||
-          value.includes(`${filter} module`),
-      );
-    });
-  }, []);
-
-  const matchesInvokerWellspring = useCallback((item, wellspring) => {
-    const filter = normalizeWellspring(wellspring);
-    if (!filter) return true;
-    return normalizeWellspring(getItemWellspring(item)) === filter;
-  }, []);
-
+  // ---------------------------------------------------------------------------
   // Pack state
+  // ---------------------------------------------------------------------------
   const {
     packs,
     createPack,
@@ -207,11 +110,10 @@ const CompendiumViewerModal = ({
   const [newPackName, setNewPackName] = useState("");
   const [newPackFuid, setNewPackFuid] = useState("");
   const [newPackFuidTouched, setNewPackFuidTouched] = useState(false);
-  const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
   const [manageModulesOpen, setManageModulesOpen] = useState(false);
-  const [editPackItem, setEditPackItem] = useState(null); // { item, packItemId, itemType }
-  const [deletePackItem, setDeletePackItem] = useState(null); // { item, packItemId }
+  const [editPackItem, setEditPackItem] = useState(null);
+  const [deletePackItem, setDeletePackItem] = useState(null);
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
   const [editingPackName, setEditingPackName] = useState("");
   const [editingPackFuid, setEditingPackFuid] = useState("");
@@ -234,53 +136,16 @@ const CompendiumViewerModal = ({
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState("");
   const [pendingNavPackId, setPendingNavPackId] = useState(null);
-  const mainRef = useRef(null);
-  const selectedCardRef = useRef(null);
-  const resetDone = useRef(false);
 
   useEffect(() => {
     ensurePersonalPack();
   }, [ensurePersonalPack]);
 
-  // Reset state when modal opens
-  useEffect(() => {
-    if (open && !resetDone.current) {
-      resetDone.current = true;
-      const resolvedType = restrictToTypes?.length
-        ? restrictToTypes.includes(initialType)
-          ? initialType
-          : restrictToTypes[0]
-        : initialType;
-      setSelectedType(resolvedType);
-      setSearchQuery(initialSearchQuery);
-      setSelectedIdx(null);
-      setSelectedSpellClass(initialSpellClass);
-      setSelectedModuleType(initialModuleTypeFilter);
-      setSelectedMagichantSubtype("");
-      setSelectedWellspring("");
-      setSelectedBook([]);
-      setSelectedQualityFilters(initialQualityFilters);
-      setSelectedQualityCategories([]);
-      setSelectedHeroicClasses([]);
-      setSelectedOptionalSubtypes(initialOptionalSubtypes);
-    } else if (!open) {
-      resetDone.current = false;
-    }
-  }, [
-    open,
-    initialType,
-    initialSearchQuery,
-    initialSpellClass,
-    initialModuleTypeFilter,
-    initialOptionalSubtypes,
-    initialQualityFilters,
-    restrictToTypes,
-  ]);
-
   const activePack =
     selectedCompendium !== "official"
       ? (packs.find((p) => p.id === selectedCompendium) ?? null)
       : null;
+
   const normalizedNewPackFuid = toSlug(newPackFuid);
   const normalizedEditingPackFuid = toSlug(editingPackFuid);
   const isNewPackFuidDuplicate =
@@ -310,389 +175,20 @@ const CompendiumViewerModal = ({
     [editingRequires, editingAutoRequires],
   );
 
-  const activeSpellCls = useMemo(() => {
-    if (selectedType !== "player-spells" || !selectedSpellClass) return null;
-    return classList.find((c) => c.name === selectedSpellClass) ?? null;
-  }, [selectedType, selectedSpellClass]);
-  const selectedSpellClassKey = String(selectedSpellClass).trim().toLowerCase();
-  const isPilotClassSelected = selectedSpellClassKey === "pilot";
-  const isChanterClassSelected = selectedSpellClassKey === "chanter";
-  const isInvokerClassSelected = selectedSpellClassKey === "invoker";
-
-  const filteredItems = useMemo(() => {
-    // Pack mode
-    if (activePack) {
-      const packType = VIEWER_TO_PACK_TYPE[selectedType];
-      let items = activePack.items
-        .filter((i) => !packType || i.type === packType)
-        .map((i) => ({ ...i.data, _packItemId: i.id }));
-
-      if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
-        items = items.filter(
-          (item) =>
-            item.filter &&
-            selectedQualityFilters.some((f) => item.filter.includes(f)),
-        );
-      }
-      if (
-        selectedType === "qualities" &&
-        selectedQualityCategories.length > 0
-      ) {
-        items = items.filter(
-          (item) =>
-            item.category && selectedQualityCategories.includes(item.category),
-        );
-      }
-      if (
-        (selectedType === "classes" || selectedType === "heroics") &&
-        selectedBook.length > 0
-      ) {
-        items = items.filter((item) => selectedBook.includes(item.book));
-      }
-      if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
-        items = items.filter(
-          (item) =>
-            item.applicableTo &&
-            selectedHeroicClasses.some((c) => item.applicableTo.includes(c)),
-        );
-      }
-      if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
-        items = items.filter((item) =>
-          selectedOptionalSubtypes.includes(item.subtype),
-        );
-      }
-      if (selectedType === "player-spells" && selectedSpellClass) {
-        const spellClasses = activeSpellCls?.benefits?.spellClasses ?? [];
-        items = items.filter((item) => {
-          if (
-            spellClasses.includes("default") &&
-            item.class === selectedSpellClass
-          ) {
-            return true;
-          }
-          return spellClasses.includes(item.spellType);
-        });
-      }
-      if (
-        selectedType === "player-spells" &&
-        isPilotClassSelected &&
-        selectedModuleType
-      ) {
-        items = items.filter((item) =>
-          matchesPilotModuleType(item, selectedModuleType),
-        );
-      }
-      if (
-        selectedType === "player-spells" &&
-        isChanterClassSelected &&
-        selectedMagichantSubtype
-      ) {
-        items = items.filter((item) => {
-          const isKey =
-            item.magichantSubtype === "key" ||
-            item.type ||
-            item.status ||
-            item.attribute ||
-            item.recovery;
-          return selectedMagichantSubtype === "key" ? isKey : !isKey;
-        });
-      }
-      if (
-        selectedType === "player-spells" &&
-        isInvokerClassSelected &&
-        selectedWellspring
-      ) {
-        items = items.filter((item) =>
-          matchesInvokerWellspring(item, selectedWellspring),
-        );
-      }
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        items = items.filter((item) => getItemSearchText(item).includes(q));
-      }
-      return items;
-    }
-
-    // Official mode : non-player-spells
-    if (selectedType !== "player-spells") {
-      let items = getItems(selectedType);
-      if (selectedType === "classes") {
-        items = items.filter(
-          (c) => c.name !== "Blank Class" && c.book !== "homebrew",
-        );
-        if (selectedBook.length > 0) {
-          items = items.filter((item) => selectedBook.includes(item.book));
-        }
-      }
-      if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
-        items = items.filter(
-          (item) =>
-            item.filter &&
-            selectedQualityFilters.some((f) => item.filter.includes(f)),
-        );
-      }
-      if (
-        selectedType === "qualities" &&
-        selectedQualityCategories.length > 0
-      ) {
-        items = items.filter(
-          (item) =>
-            item.category && selectedQualityCategories.includes(item.category),
-        );
-      }
-      if (selectedType === "heroics" && selectedBook.length > 0) {
-        items = items.filter((item) => selectedBook.includes(item.book));
-      }
-      if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
-        items = items.filter(
-          (item) =>
-            item.applicableTo &&
-            selectedHeroicClasses.some((c) => item.applicableTo.includes(c)),
-        );
-      }
-      if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
-        items = items.filter((item) =>
-          selectedOptionalSubtypes.includes(item.subtype),
-        );
-      }
-      if (!searchQuery.trim()) return items;
-      const q = searchQuery.toLowerCase();
-      return items.filter((item) => getItemSearchText(item).includes(q));
-    }
-
-    // Player spells
-    let items;
-    if (!activeSpellCls) {
-      items = spellList;
-    } else {
-      const scs = activeSpellCls.benefits?.spellClasses ?? [];
-      items = [];
-      for (const sc of scs) {
-        if (sc === "default") {
-          items.push(
-            ...spellList.filter((s) => s.class === activeSpellCls.name),
-          );
-        } else if (sc === "cooking") {
-          const cookingEffects = getDelicacyEffects(staticT);
-          items.push(
-            ...cookingEffects.map((eff) => ({
-              name: `Delicacy #${eff.id}`,
-              spellType: "cooking",
-              ...eff,
-            })),
-          );
-        } else {
-          const nonStatic = getNonStaticSpellItems(sc);
-          if (nonStatic) items.push(...nonStatic);
-        }
-      }
-    }
-    // Filter by module type (for Pilot spells)
-    if (
-      selectedModuleType &&
-      selectedType === "player-spells" &&
-      isPilotClassSelected
-    ) {
-      items = items.filter((item) =>
-        matchesPilotModuleType(item, selectedModuleType),
-      );
-    }
-    if (
-      selectedMagichantSubtype &&
-      selectedType === "player-spells" &&
-      isChanterClassSelected
-    ) {
-      items = items.filter((item) => {
-        const isKey =
-          item.magichantSubtype === "key" ||
-          item.type ||
-          item.status ||
-          item.attribute ||
-          item.recovery;
-        return selectedMagichantSubtype === "key" ? isKey : !isKey;
+  // ---------------------------------------------------------------------------
+  // Pack handlers (wrap filter handleCompendiumChange to also support manage modules)
+  // ---------------------------------------------------------------------------
+  const handleCompendiumChange = useCallback(
+    (compendium) => {
+      handlers.handleCompendiumChange(compendium, {
+        onManageModules: () => setManageModulesOpen(true),
       });
-    }
-    if (
-      selectedWellspring &&
-      selectedType === "player-spells" &&
-      isInvokerClassSelected
-    ) {
-      items = items.filter((item) =>
-        matchesInvokerWellspring(item, selectedWellspring),
-      );
-    }
-    if (!searchQuery.trim()) return items;
-    const q = searchQuery.toLowerCase();
-    return items.filter((item) =>
-      [item.name, item.class, item.spellType, item.wellspring]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(q),
-    );
-  }, [
-    activePack,
-    selectedType,
-    searchQuery,
-    activeSpellCls,
-    selectedQualityFilters,
-    selectedQualityCategories,
-    selectedBook,
-    selectedHeroicClasses,
-    selectedOptionalSubtypes,
-    selectedModuleType,
-    selectedMagichantSubtype,
-    selectedWellspring,
-    selectedSpellClass,
-    isPilotClassSelected,
-    isChanterClassSelected,
-    isInvokerClassSelected,
-    matchesPilotModuleType,
-    matchesInvokerWellspring,
-  ]);
-
-  const itemIds = useMemo(
-    () => filteredItems.map((item, idx) => makeId(item.name, idx)),
-    [filteredItems],
-  );
-
-  // Scroll selected item into view in the main panel
-  useEffect(() => {
-    if (selectedIdx === null || !mainRef.current) return;
-    const id = itemIds[selectedIdx];
-    if (!id) return;
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [selectedIdx, itemIds]);
-
-  const selectedItem = selectedIdx !== null ? filteredItems[selectedIdx] : null;
-  const [downloadSelectedImage] = useDownloadImage(
-    selectedItem?.name ?? "item",
-    selectedCardRef,
-  );
-
-  const handleShareUrl = useCallback(async () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("type", selectedType);
-    if (selectedCompendium !== "official") {
-      url.searchParams.set("compendium", selectedCompendium);
-    } else {
-      url.searchParams.delete("compendium");
-    }
-    if (selectedItem?.name) {
-      url.searchParams.set("item", toSlug(selectedItem.name));
-    }
-    await navigator.clipboard.writeText(url.toString());
-  }, [selectedType, selectedCompendium, selectedItem]);
-
-  // Handlers
-  const handleTypeChange = useCallback(
-    (type) => {
-      if (restrictToTypes?.length && !restrictToTypes.includes(type)) return;
-      setSelectedType(type);
-      setSearchQuery("");
-      setSelectedIdx(null);
-      if (type !== "player-spells") {
-        setSelectedModuleType("");
-        setSelectedMagichantSubtype("");
-        setSelectedWellspring("");
+      if (pendingNavPackId) {
+        setPendingNavPackId(null);
       }
-      if (mainRef.current) mainRef.current.scrollTop = 0;
     },
-    [restrictToTypes],
+    [handlers, pendingNavPackId],
   );
-
-  const handleItemClick = useCallback(
-    (item, idx) => {
-      setSelectedIdx(idx);
-      if (!isDesktop) setDrawerOpen(false);
-    },
-    [isDesktop],
-  );
-
-  const handleSpellClassChange = useCallback((cls) => {
-    setSelectedSpellClass(cls);
-    const classKey = String(cls).trim().toLowerCase();
-    if (classKey !== "pilot") {
-      setSelectedModuleType("");
-    }
-    if (classKey !== "chanter") {
-      setSelectedMagichantSubtype("");
-    }
-    if (classKey !== "invoker") {
-      setSelectedWellspring("");
-    }
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleModuleTypeChange = useCallback((moduleType) => {
-    setSelectedModuleType(moduleType);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleMagichantSubtypeChange = useCallback((magichantSubtype) => {
-    setSelectedMagichantSubtype(magichantSubtype);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleWellspringChange = useCallback((wellspring) => {
-    setSelectedWellspring(wellspring);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleBookChange = useCallback((books) => {
-    setSelectedBook(books);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleQualityFiltersChange = useCallback((filters) => {
-    setSelectedQualityFilters(filters);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleQualityCategoriesChange = useCallback((categories) => {
-    setSelectedQualityCategories(categories);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleHeroicClassesChange = useCallback((classes) => {
-    setSelectedHeroicClasses(classes);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleOptionalSubtypesChange = useCallback((subtypes) => {
-    setSelectedOptionalSubtypes(subtypes);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
-
-  const handleCompendiumChange = useCallback((compendium) => {
-    if (compendium === "__manage_modules__") {
-      setManageModulesOpen(true);
-      return;
-    }
-    setSelectedCompendium(compendium);
-    setSearchQuery("");
-    setSelectedIdx(null);
-    if (mainRef.current) mainRef.current.scrollTop = 0;
-  }, []);
 
   const handleNewPack = useCallback(async () => {
     if (!newPackName.trim()) return;
@@ -711,7 +207,7 @@ const CompendiumViewerModal = ({
       await removeItem(activePack.id, packItemId);
       setSelectedIdx(null);
     },
-    [activePack, removeItem],
+    [activePack, removeItem, setSelectedIdx],
   );
 
   const handleExport = useCallback(async () => {
@@ -760,6 +256,9 @@ const CompendiumViewerModal = ({
     }
   }, [importing, importUrl, importFromManifestUrl]);
 
+  // ---------------------------------------------------------------------------
+  // Context mismatch validation
+  // ---------------------------------------------------------------------------
   const selectedTypeContext = ITEM_TYPES.find(
     (x) => x.key === selectedType,
   )?.context;
@@ -769,84 +268,106 @@ const CompendiumViewerModal = ({
     selectedTypeContext !== "both" &&
     selectedTypeContext !== context;
 
-  const handleAddItem = () => {
-    if (selectedItem && onAddItem) {
-      onAddItem(selectedItem, selectedType);
+  // ---------------------------------------------------------------------------
+  // Item to add (uses selectedIdx resolved in CompendiumBrowser via useCompendiumItems)
+  // We re-derive the selected item here for the footer "Add Item" button
+  // ---------------------------------------------------------------------------
+  const [resolvedSelectedItem, setResolvedSelectedItem] = useState(null);
+
+  // CompendiumBrowser exposes the selected item via renderItemActions callback
+  const renderItemActions = useCallback(
+    (item, _idx, _selectedItem) => {
+      // Keep track of the currently displayed selected item for footer
+      // (updates each render cycle when the selected item changes)
+      if (item !== resolvedSelectedItem) {
+        setResolvedSelectedItem(item);
+      }
+      return (
+        <>
+          <Export
+            name={item.name}
+            dataType={selectedType}
+            data={item}
+            size="small"
+          />
+          {selectedCompendium !== "official" &&
+            item._packItemId &&
+            !activePack?.locked &&
+            VIEWER_TO_PACK_TYPE[selectedType] && (
+              <Tooltip title={t("Edit")}>
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    setEditPackItem({
+                      item,
+                      packItemId: item._packItemId,
+                      itemType: VIEWER_TO_PACK_TYPE[selectedType],
+                    })
+                  }
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          {selectedCompendium !== "official" &&
+            item._packItemId &&
+            !activePack?.locked && (
+              <Tooltip title={t("Remove from pack")}>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() =>
+                    setDeletePackItem({ item, packItemId: item._packItemId })
+                  }
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+        </>
+      );
+    },
+    [t, selectedType, selectedCompendium, activePack, resolvedSelectedItem],
+  );
+
+  // Reset resolvedSelectedItem when selection is cleared
+  useEffect(() => {
+    if (selectedIdx === null) setResolvedSelectedItem(null);
+  }, [selectedIdx]);
+
+  const handleAddItem = useCallback(() => {
+    if (resolvedSelectedItem && onAddItem) {
+      onAddItem(resolvedSelectedItem, selectedType);
     }
     onClose();
+  }, [resolvedSelectedItem, onAddItem, selectedType, onClose]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && resolvedSelectedItem && !contextMismatch) {
+      e.preventDefault();
+      handleAddItem();
+    }
   };
 
-  const sidebarContent = (
-    <CompendiumSidebar
-      selectedType={selectedType}
-      onTypeChange={handleTypeChange}
-      searchQuery={searchQuery}
-      onSearchChange={(q) => {
-        setSearchQuery(q);
-        setSelectedIdx(null);
-      }}
-      filteredItems={filteredItems}
-      onItemClick={handleItemClick}
-      selectedIdx={selectedIdx}
-      selectedSpellClass={selectedSpellClass}
-      onSpellClassChange={handleSpellClassChange}
-      selectedModuleType={selectedModuleType}
-      onModuleTypeChange={handleModuleTypeChange}
-      selectedMagichantSubtype={selectedMagichantSubtype}
-      onMagichantSubtypeChange={handleMagichantSubtypeChange}
-      selectedWellspring={selectedWellspring}
-      onWellspringChange={handleWellspringChange}
-      selectedQualityFilters={selectedQualityFilters}
-      onQualityFiltersChange={handleQualityFiltersChange}
-      selectedQualityCategories={selectedQualityCategories}
-      onQualityCategoriesChange={handleQualityCategoriesChange}
-      selectedBook={selectedBook}
-      onBookChange={handleBookChange}
-      selectedHeroicClasses={selectedHeroicClasses}
-      onHeroicClassesChange={handleHeroicClassesChange}
-      selectedOptionalSubtypes={selectedOptionalSubtypes}
-      onOptionalSubtypesChange={handleOptionalSubtypesChange}
-      packs={packs}
-      selectedCompendium={selectedCompendium}
-      onCompendiumChange={handleCompendiumChange}
-      onNewPack={() => setNewPackDialogOpen(true)}
-      onImportPack={() => {
-        setImportError("");
-        setImportTab(0);
-        setImportUrl("");
-        setImportDialogOpen(true);
-      }}
-      onManagePack={() => {
-        setEditingPackName(activePack?.name ?? "");
-        setEditingPackFuid(activePack?.fuid ?? toSlug(activePack?.name ?? ""));
-        setEditingPackFuidTouched(false);
-        setEditingDescription(activePack?.description ?? "");
-        setEditingAuthor(activePack?.author ?? "");
-        setEditingRequires(
-          activePack?.requiresManual ?? activePack?.requires ?? [],
-        );
-        setEditingAutoRequires(activePack?.requiresAuto ?? []);
-        setEditingOptional(activePack?.optional ?? []);
-        setExportMeta({
-          version: "1.0.0",
-          homepageUrl: "",
-          manifestUrl: "",
-          downloadUrl: "",
+  // Wrap handlers to pass through manage modules callback
+  const wrappedHandlers = useMemo(
+    () => ({
+      ...handlers,
+      handleCompendiumChange: (compendium, opts = {}) => {
+        handlers.handleCompendiumChange(compendium, {
+          ...opts,
+          onManageModules: () => setManageModulesOpen(true),
         });
-        setManageDialogOpen(true);
-      }}
-      activePack={activePack}
-      onToggleLock={toggleLock}
-      onOpenCreateDialog={() => setCreateItemDialogOpen(true)}
-      onOpenQuickCreate={() => setQuickCreateOpen(true)}
-      restrictToTypes={restrictToTypes}
-    />
+      },
+    }),
+    [handlers],
   );
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
+      onKeyDown={handleKeyDown}
       maxWidth="xl"
       fullWidth
       fullScreen={!isDesktop}
@@ -867,207 +388,115 @@ const CompendiumViewerModal = ({
           justifyContent: "space-between",
         }}
       >
-        {!isDesktop && (
-          <IconButton
-            size="small"
-            onClick={() => setDrawerOpen(true)}
-            sx={{ color: "#ffffff", mr: 1 }}
-          >
-            <MenuIcon />
-          </IconButton>
-        )}
         {t("Compendium")}
         <IconButton size="small" onClick={onClose} sx={{ color: "#ffffff" }}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
+
       <DialogContent sx={{ display: "flex", p: 0, overflow: "hidden" }}>
-        {/* Desktop sidebar */}
-        {isDesktop && (
-          <Box
-            sx={{
-              width: SIDEBAR_WIDTH,
-              flexShrink: 0,
-              borderRight: 1,
-              borderColor: "divider",
-              height: "100%",
-              overflow: "hidden",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {sidebarContent}
-          </Box>
-        )}
-
-        {/* Mobile sidebar drawer */}
-        {!isDesktop && (
-          <Drawer
-            anchor="left"
-            open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            slotProps={{ paper: { sx: { width: "85vw", maxWidth: 340 } } }}
-            sx={{ zIndex: 1400 }}
-          >
-            <Box sx={{ display: "flex", justifyContent: "flex-end", p: 1 }}>
-              <IconButton size="small" onClick={() => setDrawerOpen(false)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-            <Divider />
-            <Box sx={{ flex: 1, overflow: "hidden" }}>{sidebarContent}</Box>
-          </Drawer>
-        )}
-
-        {/* Main content */}
-        <Box
-          ref={mainRef}
-          sx={{ flex: 1, overflowY: "auto", p: { xs: 1.5, md: 2 } }}
-        >
-          {/* Mobile type label */}
-          {!isDesktop && (
+        <CompendiumBrowser
+          filters={filters}
+          handlers={wrappedHandlers}
+          selectedIdx={selectedIdx}
+          setSelectedIdx={setSelectedIdx}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          packs={packs}
+          activePack={activePack}
+          context={context}
+          restrictToTypes={restrictToTypes}
+          onNewPack={() => setNewPackDialogOpen(true)}
+          onManagePack={() => {
+            setEditingPackName(activePack?.name ?? "");
+            setEditingPackFuid(
+              activePack?.fuid ?? toSlug(activePack?.name ?? ""),
+            );
+            setEditingPackFuidTouched(false);
+            setEditingDescription(activePack?.description ?? "");
+            setEditingAuthor(activePack?.author ?? "");
+            setEditingRequires(
+              activePack?.requiresManual ?? activePack?.requires ?? [],
+            );
+            setEditingAutoRequires(activePack?.requiresAuto ?? []);
+            setEditingOptional(activePack?.optional ?? []);
+            setExportMeta({
+              version: "1.0.0",
+              homepageUrl: "",
+              manifestUrl: "",
+              downloadUrl: "",
+            });
+            setManageDialogOpen(true);
+          }}
+          onImportPack={() => {
+            setImportError("");
+            setImportTab(0);
+            setImportUrl("");
+            setImportDialogOpen(true);
+          }}
+          onToggleLock={toggleLock}
+          onOpenQuickCreate={() => setQuickCreateOpen(true)}
+          showShareUrl
+          showDownloadImage
+          isDesktopOverride={isDesktop}
+          renderItemActions={renderItemActions}
+          renderEmptyState={() => (
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}
-            >
-              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                {t(ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "")}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                }}
-              >
-                ({filteredItems.length})
-              </Typography>
-            </Box>
-          )}
-          {filteredItems.length === 0 ? (
-            <Typography
               sx={{
-                color: "text.secondary",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                py: 8,
+                px: 4,
+                gap: 2,
               }}
             >
-              {t("No items found.")}
-            </Typography>
-          ) : (
-            <Grid container spacing={2}>
-              {filteredItems.map((item, idx) => {
-                const isSelected = idx === selectedIdx;
-                const itemActionContent = isSelected ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                    }}
-                  >
-                    <Tooltip title={t("Share URL")}>
-                      <IconButton size="small" onClick={handleShareUrl}>
-                        <LinkIcon sx={{ fontSize: "small" }} />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t("Download as Image")}>
-                      <IconButton size="small" onClick={downloadSelectedImage}>
-                        <DownloadIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Export
-                      name={item.name}
-                      dataType={selectedType}
-                      data={item}
-                      size="small"
-                    />
-                    {selectedCompendium !== "official" &&
-                      item._packItemId &&
-                      !activePack?.locked &&
-                      VIEWER_TO_PACK_TYPE[selectedType] && (
-                        <Tooltip title={t("Edit")}>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              setEditPackItem({
-                                item,
-                                packItemId: item._packItemId,
-                                itemType: VIEWER_TO_PACK_TYPE[selectedType],
-                              })
-                            }
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    {VIEWER_TO_PACK_TYPE[selectedType] && (
-                      <AddToCompendiumButton
-                        itemType={VIEWER_TO_PACK_TYPE[selectedType]}
-                        data={item}
-                        excludePackId={
-                          selectedCompendium !== "official"
-                            ? selectedCompendium
-                            : undefined
-                        }
-                        tooltipOverride={
-                          selectedType === "classes" &&
-                          selectedCompendium === "official"
-                            ? t("Clone to Custom")
-                            : undefined
-                        }
-                      />
-                    )}
-                    {selectedCompendium !== "official" &&
-                      item._packItemId &&
-                      !activePack?.locked && (
-                        <Tooltip title={t("Remove from pack")}>
-                          <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() =>
-                              setDeletePackItem({
-                                item,
-                                packItemId: item._packItemId,
-                              })
-                            }
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                  </div>
-                ) : null;
-                return (
-                  <Grid
-                    key={itemIds[idx]}
-                    size={{
-                      xs: 12,
-                      lg: selectedType === "classes" ? 12 : 6,
-                    }}
-                  >
-                    <Box
-                      ref={isSelected ? selectedCardRef : null}
+              <Typography variant="h5" sx={{ color: "text.secondary" }}>
+                {t("No items found.")}
+              </Typography>
+              {selectedCompendium === "official" &&
+                getItems(selectedType).length === 0 && (
+                  <>
+                    <Typography
+                      variant="h6"
                       sx={{
-                        borderRadius: 1,
-                        outline: isSelected
-                          ? `2px solid ${customTheme.primary}`
-                          : "2px solid transparent",
-                        transition: "outline 0.15s ease",
+                        color: "text.secondary",
+                        maxWidth: 480,
+                        fontWeight: 400,
                       }}
                     >
-                      <ItemCard
-                        type={selectedType}
-                        item={item}
-                        id={itemIds[idx]}
-                        onHeaderClick={() => handleItemClick(item, idx)}
-                        actionContent={itemActionContent}
-                        showImageToggle={isSelected}
-                      />
-                    </Box>
-                  </Grid>
-                );
-              })}
-            </Grid>
+                      {t(
+                        "This item type is not covered under the third party license and has no official data.",
+                      )}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: "text.secondary", maxWidth: 480 }}
+                    >
+                      {t(
+                        "You can create custom items by switching to your personal compendium.",
+                      )}
+                    </Typography>
+                    {packs.length > 0 && (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleCompendiumChange(packs[0].id)}
+                        sx={{ mt: 1 }}
+                      >
+                        {t("Go to personal compendium")}
+                      </Button>
+                    )}
+                  </>
+                )}
+            </Box>
           )}
-        </Box>
+          mainSx={{ height: "100%" }}
+        />
       </DialogContent>
+
       {!viewOnly && (
         <>
           <Divider />
@@ -1081,12 +510,7 @@ const CompendiumViewerModal = ({
               gap: { xs: 1, sm: 0 },
             }}
           >
-            <Typography
-              variant="body2"
-              sx={{
-                color: "text.secondary",
-              }}
-            >
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               <strong>{t("Disclaimer")}:</strong>{" "}
               {t(
                 "For personal use only; do not share exported data on official channels.",
@@ -1108,7 +532,7 @@ const CompendiumViewerModal = ({
                 <Button
                   variant="contained"
                   color="primary"
-                  disabled={selectedItem === null || !!contextMismatch}
+                  disabled={resolvedSelectedItem === null || !!contextMismatch}
                   onClick={handleAddItem}
                   sx={{ flexShrink: 0 }}
                 >
@@ -1119,6 +543,7 @@ const CompendiumViewerModal = ({
           </DialogActions>
         </>
       )}
+
       {/* Manage Modules modal */}
       <ManageModulesModal
         open={manageModulesOpen}
@@ -1128,21 +553,22 @@ const CompendiumViewerModal = ({
           handleCompendiumChange(id);
         }}
       />
+
       {/* Quick Create modal */}
       <QuickCreateModal
         open={quickCreateOpen}
         onClose={() => setQuickCreateOpen(false)}
-        lockedToViewerType={restrictToTypes?.length ? selectedType : undefined}
+        lockedToViewerType={selectedType}
+        initialSubtype={
+          selectedType === "player-spells"
+            ? (filters.selectedSpellClass ?? undefined)
+            : selectedType === "optionals" &&
+                filters.selectedOptionalSubtypes?.length === 1
+              ? filters.selectedOptionalSubtypes[0]
+              : undefined
+        }
       />
-      {/* Create item dialog */}
-      {activePack && (
-        <CompendiumItemCreateDialog
-          open={createItemDialogOpen}
-          onClose={() => setCreateItemDialogOpen(false)}
-          itemType={VIEWER_TO_PACK_TYPE[selectedType]}
-          packId={activePack.id}
-        />
-      )}
+
       {/* Edit pack item dialog */}
       {activePack && editPackItem && (
         <CompendiumItemCreateDialog
@@ -1154,6 +580,8 @@ const CompendiumViewerModal = ({
           editItemId={editPackItem.packItemId}
         />
       )}
+
+      {/* Delete confirmation */}
       <DeleteConfirmationDialog
         open={Boolean(deletePackItem)}
         onClose={() => setDeletePackItem(null)}
@@ -1168,18 +596,14 @@ const CompendiumViewerModal = ({
           deletePackItem?.item ? (
             <Box>
               <Typography variant="h4">{deletePackItem.item.name}</Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                }}
-              >
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 {t(selectedType)}
               </Typography>
             </Box>
           ) : null
         }
       />
+
       {/* New Pack dialog */}
       <Dialog
         open={newPackDialogOpen}
@@ -1305,6 +729,7 @@ const CompendiumViewerModal = ({
           </Button>
         </DialogActions>
       </Dialog>
+
       {/* Manage Pack dialog */}
       <Dialog
         open={manageDialogOpen}
@@ -1499,10 +924,9 @@ const CompendiumViewerModal = ({
               const next = Array.from(
                 new Set(values.map((v) => toSlug(String(v))).filter(Boolean)),
               );
-              const manualOnly = next.filter(
-                (dep) => !editingAutoRequires.includes(dep),
+              setEditingRequires(
+                next.filter((dep) => !editingAutoRequires.includes(dep)),
               );
-              setEditingRequires(manualOnly);
             }}
             renderValue={(value, getItemProps) =>
               value.map((option, index) => {
@@ -1624,6 +1048,7 @@ const CompendiumViewerModal = ({
           </Box>
         </DialogActions>
       </Dialog>
+
       {/* Import Pack dialog */}
       <Dialog
         open={importDialogOpen}
@@ -1671,24 +1096,13 @@ const CompendiumViewerModal = ({
             <Tab label={t("Upload .fcp file")} />
             <Tab
               label={t("From URL")}
-              icon={
-                <LinkIcon
-                  sx={{
-                    fontSize: "small",
-                  }}
-                />
-              }
+              icon={<LinkIcon sx={{ fontSize: "small" }} />}
               iconPosition="end"
             />
           </Tabs>
           {importTab === 0 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                }}
-              >
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 {t("Select a .fcp file exported from Fultimator.")}
               </Typography>
               <Button
@@ -1720,12 +1134,7 @@ const CompendiumViewerModal = ({
           )}
           {importTab === 1 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                }}
-              >
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 {t(
                   "Paste a manifest.json URL to download and import the pack.",
                 )}

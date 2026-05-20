@@ -29,8 +29,11 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
                 maxTargets: selectedItem.maxTargets || 0,
                 targetDescription: selectedItem.targetDescription ?? "",
                 duration: selectedItem.duration,
-                effect: selectedItem.effect,
-                special: selectedItem.special || [],
+                effect:
+                  selectedItem.effect ||
+                  selectedItem.special?.[0] ||
+                  selectedItem.description ||
+                  "",
               },
             ],
           };
@@ -62,7 +65,7 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
                   type: selectedItem.damage?.type ?? "physical",
                   hrZero: selectedItem.damage?.hrZero === true,
                 },
-                special: [],
+                effect: selectedItem.effect || selectedItem.special?.[0] || "",
               },
             ],
           };

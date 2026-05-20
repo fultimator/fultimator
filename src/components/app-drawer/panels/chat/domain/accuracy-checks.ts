@@ -29,6 +29,7 @@ export function prepareAccuracyCheck(
     modifiers,
     critThreshold: 6,
     weaponName: weapon.name,
+    description: weapon.description,
     baseDamage: weapon.baseDamage ?? 0,
     damageSituationalBonus: options?.damageSituationalBonus ?? 0,
     damageType: weapon.damageType ?? "physical",

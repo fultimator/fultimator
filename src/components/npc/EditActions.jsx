@@ -1,36 +1,43 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Box,
+  Divider,
   Grid,
-  FormControl,
   IconButton,
-  TextField,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
-  Divider,
+  Menu,
+  MenuItem,
   Snackbar,
-  Alert,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
+import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import {
+  npcActionFieldConfig,
+  npcActionGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAction";
 import {
   Add,
-  Menu as MenuIcon,
   Casino,
   Delete,
+  ExpandMore,
   LibraryAdd,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
-function ActionContextMenu({ action, npcName, onDelete }) {
+function ActionContextMenu({ action, npcName: _npcName, onDelete }) {
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [anchorEl, setAnchorEl] = useState(null);
   const [packMenuAnchor, setPackMenuAnchor] = useState(null);
   const [snackbar, setSnackbar] = useState({
@@ -69,7 +76,6 @@ function ActionContextMenu({ action, npcName, onDelete }) {
   const handleAddToCompendium = async (e) => {
     close();
     if (unlockedNonPersonal.length > 0) {
-      // multiple pack targets — show sub-menu
       setPackMenuAnchor(e.currentTarget);
     } else if (personalPack && !personalPack.locked) {
       await doAdd(personalPack.id);
@@ -81,35 +87,14 @@ function ActionContextMenu({ action, npcName, onDelete }) {
 
   return (
     <>
-      <IconButton size="small" onClick={open}>
-        <MenuIcon fontSize="small" />
+      <IconButton onClick={open}>
+        <MenuIcon />
       </IconButton>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
-        <MenuItem
-          onClick={() => {
-            addMessage({
-              id: crypto.randomUUID(),
-              createdAt: Date.now(),
-              speaker: npcName || "NPC",
-              kind: "display",
-              itemType: "action",
-              name: action.name,
-              tags: [`SP: ${action.spCost ?? 1}`],
-              description: action.effect,
-            });
-            close();
-          }}
-        >
-          <ListItemIcon>
-            <Casino fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t("Roll")}</ListItemText>
-        </MenuItem>
-
         <MenuItem onClick={handleAddToCompendium}>
           <ListItemIcon>
-            <LibraryAdd fontSize="small" />
+            <LibraryAdd />
           </ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
         </MenuItem>
@@ -124,13 +109,12 @@ function ActionContextMenu({ action, npcName, onDelete }) {
           sx={{ color: "error.main" }}
         >
           <ListItemIcon>
-            <Delete fontSize="small" color="error" />
+            <Delete color="error" />
           </ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
       </Menu>
 
-      {/* Pack picker shown when multiple targets exist */}
       <Menu
         anchorEl={packMenuAnchor}
         open={Boolean(packMenuAnchor)}
@@ -179,35 +163,54 @@ function ActionContextMenu({ action, npcName, onDelete }) {
 
 export default function EditActions({ npc, setNpc }) {
   const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [modalOpen, setModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingActionIndex, setPendingActionIndex] = useState(null);
-  const onChangeActions = (i, key, value) => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      newState.actions[i][key] = value;
-      return newState;
+  const [expandedSet, setExpandedSet] = useState(new Set());
+
+  const allExpanded =
+    npc.actions?.length > 0 && expandedSet.size === npc.actions.length;
+
+  const toggleExpanded = (i) => {
+    setExpandedSet((prev) => {
+      const s = new Set(prev);
+      if (s.has(i)) {
+        s.delete(i);
+      } else {
+        s.add(i);
+      }
+      return s;
     });
   };
 
+  const toggleAll = () => {
+    setExpandedSet(
+      allExpanded ? new Set() : new Set(npc.actions?.map((_, i) => i) ?? []),
+    );
+  };
+
   const addActions = () => {
-    setNpc((prevState) => ({
-      ...prevState,
-      actions: [
-        ...(prevState.actions || []),
-        {
-          name: "",
-          effect: "",
-          spCost: 1,
-        },
-      ],
+    const newIndex = npc.actions?.length ?? 0;
+    setExpandedSet((prev) => new Set([...prev, newIndex]));
+    setNpc((prev) => ({
+      ...prev,
+      actions: [...(prev.actions || []), { name: "", effect: "", spCost: 1 }],
     }));
   };
 
   const removeActions = (i) => {
-    setNpc((prevState) => ({
-      ...prevState,
-      actions: (prevState.actions || []).filter((_, index) => index !== i),
+    setExpandedSet((prev) => {
+      const s = new Set();
+      for (const idx of prev) {
+        if (idx < i) s.add(idx);
+        else if (idx > i) s.add(idx - 1);
+      }
+      return s;
+    });
+    setNpc((prev) => ({
+      ...prev,
+      actions: (prev.actions || []).filter((_, index) => index !== i),
     }));
   };
 
@@ -224,75 +227,133 @@ export default function EditActions({ npc, setNpc }) {
         headerText={t("Other Actions")}
         icon={Add}
         openCompendium={() => setModalOpen(true)}
+        onExpandCollapse={toggleAll}
+        allExpanded={allExpanded}
       />
-      {npc.actions?.map((actions, i) => {
-        return (
-          <Grid container key={i} spacing={1}>
-            <Grid
-              sx={{
-                p: 0,
-                m: 0,
-                display: "flex",
-                alignItems: "center",
-                alignSelf: "flex-start",
-                pt: "4px",
-              }}
-            >
-              <ActionContextMenu
-                action={actions}
-                npcName={npc.name}
-                onDelete={() => openDeleteDialog(i)}
-              />
-            </Grid>
-            <Grid size="grow">
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="name"
-                  label={t("Name:")}
-                  value={actions.name}
-                  onChange={(e) => {
-                    return onChangeActions(i, "name", e.target.value);
+      <Grid container spacing={1}>
+        {npc.actions?.map((action, i) => {
+          return (
+            <Grid key={i} size={12}>
+              <Accordion
+                expanded={expandedSet.has(i)}
+                onChange={() => toggleExpanded(i)}
+                disableGutters
+                elevation={0}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  "&:before": { display: "none" },
+                  mb: 0.5,
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  sx={{
+                    "& .MuiAccordionSummary-content": {
+                      alignItems: "center",
+                      overflow: "hidden",
+                    },
                   }}
-                  size="small"
-                ></TextField>
-              </FormControl>
+                >
+                  <Box
+                    sx={{ display: "flex", alignItems: "center" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <IconButton
+                      onClick={() =>
+                        addMessage({
+                          id: crypto.randomUUID(),
+                          createdAt: Date.now(),
+                          speaker: npc.name || "NPC",
+                          kind: "display",
+                          itemType: "action",
+                          name: action.name,
+                          tags: [`SP: ${action.spCost ?? 1}`],
+                          description: action.effect,
+                        })
+                      }
+                    >
+                      <Casino />
+                    </IconButton>
+                    <ActionContextMenu
+                      action={action}
+                      npcName={npc.name}
+                      onDelete={() => openDeleteDialog(i)}
+                    />
+                  </Box>
+                  <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+                    <Typography noWrap>
+                      {action.name || t("(unnamed)")}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                      whiteSpace: "nowrap",
+                      mr: 1,
+                    }}
+                  >
+                    SP: {action.spCost ?? 1}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    <SchemaFieldRenderer
+                      config={npcActionFieldConfig}
+                      groupLabels={npcActionGroupLabels}
+                      state={action}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const actions = [...(prev.actions || [])];
+                          actions[i] = next;
+                          return { ...prev, actions };
+                        });
+                      }}
+                      surface="edit"
+                      group="core"
+                      label={t("Other Action")}
+                      cols={2}
+                      extraProps={{ name: String(action.name ?? "") }}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcActionFieldConfig}
+                      groupLabels={npcActionGroupLabels}
+                      state={action}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const actions = [...(prev.actions || [])];
+                          actions[i] = next;
+                          return { ...prev, actions };
+                        });
+                      }}
+                      surface="edit"
+                      group="body"
+                      cols={1}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcActionFieldConfig}
+                      groupLabels={npcActionGroupLabels}
+                      state={action}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const actions = [...(prev.actions || [])];
+                          actions[i] = next;
+                          return { ...prev, actions };
+                        });
+                      }}
+                      surface="edit"
+                      group="meta"
+                      cols={2}
+                      hidden
+                    />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-            <Grid size={3}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="spCost"
-                  label={t("SP Cost:")}
-                  type="number"
-                  value={actions?.spCost ?? 1}
-                  onChange={(e) =>
-                    onChangeActions(
-                      i,
-                      "spCost",
-                      parseInt(e.target.value, 10) || 1,
-                    )
-                  }
-                  size="small"
-                  slotProps={{
-                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
-                  }}
-                />
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <CustomTextarea
-                  id="effect"
-                  label={t("Effect:")}
-                  value={actions.effect}
-                  onChange={(e) => {
-                    return onChangeActions(i, "effect", e.target.value);
-                  }}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        );
-      })}
+          );
+        })}
+      </Grid>
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

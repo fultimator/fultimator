@@ -1,4 +1,17 @@
-import { memo } from "react";
+import { memo, forwardRef } from "react";
+
+const AccordionSummaryDiv = forwardRef(function AccordionSummaryDiv(
+  {
+    focusRipple: _focusRipple,
+    disableRipple: _disableRipple,
+    internalNativeButton: _internalNativeButton,
+    focusVisibleClassName: _focusVisibleClassName,
+    ...props
+  },
+  ref,
+) {
+  return <div ref={ref} {...props} />;
+});
 import {
   Grid,
   Accordion,
@@ -21,6 +34,7 @@ import { useTranslate } from "../../../translation/translate";
 import ReactMarkdown from "react-markdown";
 import CustomTextarea from "../../common/CustomTextarea";
 import attributes from "../../../libs/attributes";
+import { Martial } from "../../icons";
 import weaponCategories from "../../../libs/weaponCategories";
 import { moduleTypes } from "../../../libs/pilotVehicleData";
 import ModuleDropdown from "./ModuleDropdown";
@@ -44,12 +58,33 @@ const VehicleModule = memo(
       closeDialog: setDeleteDialogOpen,
       handleDelete,
     } = useDeleteConfirmation({
-      onConfirm: () => {},
+      onConfirm: () => onDeleteModule(vehicleIndex, moduleIndex),
     });
+
+    // Derive equipped state from vehicle.slots
+    const moduleKey = module.key ?? module.name;
+    const vehicleSlots = vehicle?.slots ?? {};
+    const isEquipped =
+      vehicleSlots.main === moduleKey ||
+      vehicleSlots.off === moduleKey ||
+      vehicleSlots.armor === moduleKey ||
+      (vehicleSlots.support ?? []).includes(moduleKey);
+    const moduleSlot =
+      vehicleSlots.main === moduleKey && vehicleSlots.off === moduleKey
+        ? "both"
+        : vehicleSlots.main === moduleKey
+          ? "main"
+          : vehicleSlots.off === moduleKey
+            ? "off"
+            : vehicleSlots.armor === moduleKey
+              ? "armor"
+              : (vehicleSlots.support ?? []).includes(moduleKey)
+                ? "support"
+                : null;
 
     const handleEquipToggle = (e) => {
       e.stopPropagation();
-      onModuleChange(vehicleIndex, moduleIndex, "equipped", !module.equipped);
+      onModuleChange(vehicleIndex, moduleIndex, "equipped", !isEquipped);
     };
 
     const handleClone = (e) => {
@@ -75,7 +110,10 @@ const VehicleModule = memo(
     return (
       <>
         <Accordion>
-          <AccordionSummary expandIcon={<ExpandMore />}>
+          <AccordionSummary
+            slots={{ root: AccordionSummaryDiv }}
+            expandIcon={<ExpandMore />}
+          >
             <Grid
               container
               spacing={2}
@@ -88,13 +126,13 @@ const VehicleModule = memo(
                 }}
               >
                 <Button
-                  variant={module.equipped ? "contained" : "outlined"}
-                  color={module.equipped ? "success" : "primary"}
-                  disabled={!module.equipped && !canEquip}
+                  variant={isEquipped ? "contained" : "outlined"}
+                  color={isEquipped ? "success" : "primary"}
+                  disabled={!isEquipped && !canEquip}
                   onClick={handleEquipToggle}
                   sx={{ minWidth: 80 }}
                 >
-                  {module.equipped ? t("Equipped") : t("Equip")}
+                  {isEquipped ? t("Equipped") : t("Equip")}
                 </Button>
               </Grid>
 
@@ -112,13 +150,13 @@ const VehicleModule = memo(
                 </Typography>
                 <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   {t(module.type)}
-                  {module.equipped && module.type === "pilot_module_weapon" && (
+                  {isEquipped && module.type === "pilot_module_weapon" && (
                     <>
                       {" "}
                       |{" "}
                       {module.cumbersome
                         ? t("both_hand")
-                        : module.equippedSlot === "main"
+                        : moduleSlot === "main"
                           ? t("main_hand")
                           : t("off_hand")}
                     </>
@@ -133,11 +171,11 @@ const VehicleModule = memo(
                   sm: 3,
                 }}
               >
-                {module.equipped &&
+                {isEquipped &&
                   module.type === "pilot_module_weapon" &&
                   (module.isShield ? (
                     <ToggleButtonGroup
-                      value={module.equippedSlot || "off"}
+                      value={moduleSlot || "off"}
                       exclusive
                       onChange={(e, newValue) => {
                         e.stopPropagation();
@@ -155,13 +193,14 @@ const VehicleModule = memo(
                       <ToggleButton
                         value="main"
                         disabled={
-                          !vehicle.modules.some(
-                            (m) =>
-                              m.equipped &&
+                          !vehicle.modules.some((m) => {
+                            const mk = m.key ?? m.name;
+                            return (
                               m.isShield &&
-                              (m.equippedSlot === "off" || !m.equippedSlot) &&
-                              m !== module,
-                          )
+                              vehicleSlots.off === mk &&
+                              mk !== moduleKey
+                            );
+                          })
                         }
                         sx={{ minWidth: 35 }}
                       >
@@ -182,7 +221,7 @@ const VehicleModule = memo(
                     </Button>
                   ) : (
                     <ToggleButtonGroup
-                      value={module.equippedSlot || "main"}
+                      value={moduleSlot || "main"}
                       exclusive
                       onChange={(e, newValue) => {
                         e.stopPropagation();
@@ -202,12 +241,14 @@ const VehicleModule = memo(
                       </ToggleButton>
                       <ToggleButton
                         value="off"
-                        disabled={vehicle.modules.some(
-                          (m) =>
-                            m.equipped &&
+                        disabled={vehicle.modules.some((m) => {
+                          const mk = m.key ?? m.name;
+                          return (
                             m.isShield &&
-                            m.equippedSlot === "off",
-                        )}
+                            vehicleSlots.off === mk &&
+                            mk !== moduleKey
+                          );
+                        })}
                         sx={{ minWidth: 35 }}
                       >
                         {t("o_abbr")}
@@ -223,7 +264,10 @@ const VehicleModule = memo(
                   sm: 2,
                 }}
               >
-                <div style={{ display: "flex", gap: 8 }}>
+                <div
+                  style={{ display: "flex", gap: 8 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Button
                     onClick={handleDelete}
                     variant="outlined"
@@ -315,7 +359,7 @@ const VehicleModule = memo(
               )}
 
               {/* Equipment Slot Selection for Weapons */}
-              {module.equipped && module.type === "pilot_module_weapon" && (
+              {isEquipped && module.type === "pilot_module_weapon" && (
                 <Grid
                   size={{
                     xs: 12,
@@ -333,10 +377,7 @@ const VehicleModule = memo(
                       {t("Hand")}
                     </Typography>
                     <ToggleButtonGroup
-                      value={
-                        module.equippedSlot ||
-                        (module.isShield ? "off" : "main")
-                      }
+                      value={moduleSlot || (module.isShield ? "off" : "main")}
                       exclusive
                       onChange={(e, newValue) => {
                         if (newValue !== null) {
@@ -355,12 +396,14 @@ const VehicleModule = memo(
                         value="off"
                         disabled={
                           !module.isShield &&
-                          vehicle.modules.some(
-                            (m) =>
-                              m.equipped &&
+                          vehicle.modules.some((m) => {
+                            const mk = m.key ?? m.name;
+                            return (
                               m.isShield &&
-                              m.equippedSlot === "off",
-                          )
+                              vehicleSlots.off === mk &&
+                              mk !== moduleKey
+                            );
+                          })
                         }
                       >
                         {t("o_abbr")}
@@ -374,9 +417,7 @@ const VehicleModule = memo(
                         color: "text.secondary",
                       }}
                     >
-                      {module.equippedSlot === "off"
-                        ? t("off_hand")
-                        : t("main_hand")}
+                      {moduleSlot === "off" ? t("off_hand") : t("main_hand")}
                     </Typography>
                   </div>
                 </Grid>
@@ -621,12 +662,12 @@ const VehicleModule = memo(
                     <FormControl fullWidth>
                       <InputLabel>{t("First Attribute")}</InputLabel>
                       <Select
-                        value={module.att1 || "might"}
+                        value={module.accuracy?.attr1 || "might"}
                         onChange={(e) =>
                           onModuleChange(
                             vehicleIndex,
                             moduleIndex,
-                            "att1",
+                            "accuracy.attr1",
                             e.target.value,
                           )
                         }
@@ -650,12 +691,12 @@ const VehicleModule = memo(
                     <FormControl fullWidth>
                       <InputLabel>{t("Second Attribute")}</InputLabel>
                       <Select
-                        value={module.att2 || "dexterity"}
+                        value={module.accuracy?.attr2 || "dexterity"}
                         onChange={(e) =>
                           onModuleChange(
                             vehicleIndex,
                             moduleIndex,
-                            "att2",
+                            "accuracy.attr2",
                             e.target.value,
                           )
                         }
@@ -680,12 +721,12 @@ const VehicleModule = memo(
                       fullWidth
                       label={t("Precision Modifier")}
                       type="number"
-                      value={module.prec || 0}
+                      value={module.accuracy?.value || 0}
                       onChange={(e) =>
                         onModuleChange(
                           vehicleIndex,
                           moduleIndex,
-                          "prec",
+                          "accuracy.value",
                           parseInt(e.target.value) || 0,
                         )
                       }
@@ -703,12 +744,12 @@ const VehicleModule = memo(
                       fullWidth
                       label={t("Damage Modifier")}
                       type="number"
-                      value={module.damage || 0}
+                      value={module.damage?.value || 0}
                       onChange={(e) =>
                         onModuleChange(
                           vehicleIndex,
                           moduleIndex,
-                          "damage",
+                          "damage.value",
                           parseInt(e.target.value) || 0,
                         )
                       }
@@ -751,26 +792,26 @@ const VehicleModule = memo(
                     <FormControl fullWidth>
                       <InputLabel>{t("Type")}</InputLabel>
                       <Select
-                        value={module.damageType || "Physical"}
+                        value={module.damage?.type || "physical"}
                         onChange={(e) =>
                           onModuleChange(
                             vehicleIndex,
                             moduleIndex,
-                            "damageType",
+                            "damage.type",
                             e.target.value,
                           )
                         }
                         disabled={!isCustomModule}
                       >
-                        <MenuItem value="Physical">{t("Physical")}</MenuItem>
-                        <MenuItem value="Air">{t("Air")}</MenuItem>
-                        <MenuItem value="Bolt">{t("Bolt")}</MenuItem>
-                        <MenuItem value="Dark">{t("Dark")}</MenuItem>
-                        <MenuItem value="Earth">{t("Earth")}</MenuItem>
-                        <MenuItem value="Fire">{t("Fire")}</MenuItem>
-                        <MenuItem value="Ice">{t("Ice")}</MenuItem>
-                        <MenuItem value="Light">{t("Light")}</MenuItem>
-                        <MenuItem value="Poison">{t("Poison")}</MenuItem>
+                        <MenuItem value="physical">{t("Physical")}</MenuItem>
+                        <MenuItem value="air">{t("Air")}</MenuItem>
+                        <MenuItem value="bolt">{t("Bolt")}</MenuItem>
+                        <MenuItem value="dark">{t("Dark")}</MenuItem>
+                        <MenuItem value="earth">{t("Earth")}</MenuItem>
+                        <MenuItem value="fire">{t("Fire")}</MenuItem>
+                        <MenuItem value="ice">{t("Ice")}</MenuItem>
+                        <MenuItem value="light">{t("Light")}</MenuItem>
+                        <MenuItem value="poison">{t("Poison")}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
@@ -853,23 +894,29 @@ const VehicleModule = memo(
                       sm: 2,
                     }}
                   >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={module.martial || false}
-                          onChange={(e) =>
-                            onModuleChange(
-                              vehicleIndex,
-                              moduleIndex,
-                              "martial",
-                              e.target.checked,
-                            )
-                          }
-                          disabled={!isCustomModule}
-                        />
+                    <ToggleButton
+                      value="martial"
+                      selected={module.martial || false}
+                      onChange={() =>
+                        onModuleChange(
+                          vehicleIndex,
+                          moduleIndex,
+                          "martial",
+                          !(module.martial || false),
+                        )
                       }
-                      label={t("Martial")}
-                    />
+                      size="small"
+                      disabled={!isCustomModule}
+                      sx={{
+                        minWidth: 56,
+                        height: 40,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Martial />
+                    </ToggleButton>
                   </Grid>
                   <Grid
                     size={{

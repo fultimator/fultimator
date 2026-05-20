@@ -294,6 +294,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             </Grid>
             <Grid sx={{ mb: 1 }} size={10}>
               <Typography
+                component="div"
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
                   fontSize: { xs: "0.8rem", sm: "1rem" },
@@ -332,6 +333,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                               </Grid>
                               <Grid size={9}>
                                 <Typography
+                                  component="div"
                                   style={{ flexGrow: 1, marginRight: "5px" }}
                                   sx={{
                                     fontSize: { xs: "0.8rem", sm: "1rem" },
@@ -368,6 +370,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                       </Grid>
                       <Grid size={8}>
                         <Typography
+                          component="div"
                           style={{ flexGrow: 1, marginRight: "5px" }}
                           sx={{
                             fontSize: { xs: "0.8rem", sm: "1rem" },

@@ -1,20 +1,31 @@
 import {
-  Grid,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Divider,
   FormControl,
+  Grid,
   IconButton,
-  TextField,
-  Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
-  Divider,
+  Menu,
+  MenuItem,
+  TextField,
+  Typography,
 } from "@mui/material";
+import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
-import { Add, Menu as MenuIcon, Casino, Delete } from "@mui/icons-material";
+import {
+  Add,
+  Casino,
+  Delete,
+  ExpandMore,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useState } from "react";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
 function RareGearContextMenu({ raregear, npcName, onDelete }) {
@@ -30,8 +41,8 @@ function RareGearContextMenu({ raregear, npcName, onDelete }) {
 
   return (
     <>
-      <IconButton size="small" onClick={open}>
-        <MenuIcon fontSize="small" />
+      <IconButton onClick={open}>
+        <MenuIcon />
       </IconButton>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
@@ -51,7 +62,7 @@ function RareGearContextMenu({ raregear, npcName, onDelete }) {
           }}
         >
           <ListItemIcon>
-            <Casino fontSize="small" />
+            <Casino />
           </ListItemIcon>
           <ListItemText>{t("Roll")}</ListItemText>
         </MenuItem>
@@ -66,7 +77,7 @@ function RareGearContextMenu({ raregear, npcName, onDelete }) {
           sx={{ color: "error.main" }}
         >
           <ListItemIcon>
-            <Delete fontSize="small" color="error" />
+            <Delete color="error" />
           </ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
@@ -77,38 +88,34 @@ function RareGearContextMenu({ raregear, npcName, onDelete }) {
 
 export default function EditRareGear({ npc, setNpc }) {
   const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingGearIndex, setPendingGearIndex] = useState(null);
-  const onChangeRareGear = (i, key, value) => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      newState.raregear[i][key] = value;
-      return newState;
+
+  const onChange = (i, key, value) => {
+    setNpc((prev) => {
+      const raregear = [...(prev.raregear || [])];
+      raregear[i] = { ...raregear[i], [key]: value };
+      return { ...prev, raregear };
     });
   };
 
   const addRareGear = () => {
-    setNpc((prevState) => ({
-      ...prevState,
-      raregear: [
-        ...(prevState.raregear || []),
-        {
-          name: "",
-          effect: "",
-        },
-      ],
+    setNpc((prev) => ({
+      ...prev,
+      raregear: [...(prev.raregear || []), { name: "", effect: "" }],
     }));
   };
 
   const removeRareGear = (i) => {
-    setNpc((prevState) => ({
-      ...prevState,
-      raregear: (prevState.raregear || []).filter((_, index) => index !== i),
+    setNpc((prev) => ({
+      ...prev,
+      raregear: (prev.raregear || []).filter((_, idx) => idx !== i),
     }));
   };
 
-  const openDeleteDialog = (index) => {
-    setPendingGearIndex(index);
+  const openDeleteDialog = (i) => {
+    setPendingGearIndex(i);
     setIsDeleteDialogOpen(true);
   };
 
@@ -120,53 +127,82 @@ export default function EditRareGear({ npc, setNpc }) {
         headerText={t("Rare Equipment")}
         icon={Add}
       />
-      {npc.raregear?.map((raregear, i) => {
-        return (
-          <Grid container key={i} spacing={1}>
-            <Grid
-              sx={{
-                p: 0,
-                m: 0,
-                display: "flex",
+      {npc.raregear?.map((raregear, i) => (
+        <Accordion
+          key={i}
+          disableGutters
+          elevation={0}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            "&:before": { display: "none" },
+            mb: 0.5,
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMore />}
+            sx={{
+              "& .MuiAccordionSummary-content": {
                 alignItems: "center",
-                alignSelf: "flex-start",
-                pt: "4px",
-              }}
+                overflow: "hidden",
+              },
+            }}
+          >
+            <Box
+              sx={{ display: "flex", alignItems: "center" }}
+              onClick={(e) => e.stopPropagation()}
             >
+              <IconButton
+                onClick={() =>
+                  addMessage({
+                    id: crypto.randomUUID(),
+                    createdAt: Date.now(),
+                    speaker: npc.name || "NPC",
+                    kind: "display",
+                    itemType: "item",
+                    name: raregear.name,
+                    tags: ["Rare Equipment"],
+                    description: raregear.effect,
+                  })
+                }
+              >
+                <Casino />
+              </IconButton>
               <RareGearContextMenu
                 raregear={raregear}
                 npcName={npc.name}
                 onDelete={() => openDeleteDialog(i)}
               />
+            </Box>
+            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+              <Typography noWrap>{raregear.name || t("(unnamed)")}</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={1}>
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <TextField
+                    label={t("Name:")}
+                    value={raregear.name}
+                    onChange={(e) => onChange(i, "name", e.target.value)}
+                    size="small"
+                  />
+                </FormControl>
+              </Grid>
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <CustomTextarea
+                    label={t("Effect:")}
+                    value={raregear.effect}
+                    onChange={(e) => onChange(i, "effect", e.target.value)}
+                  />
+                </FormControl>
+              </Grid>
             </Grid>
-            <Grid size="grow">
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="name"
-                  label={t("Name:")}
-                  value={raregear.name}
-                  onChange={(e) => {
-                    return onChangeRareGear(i, "name", e.target.value);
-                  }}
-                  size="small"
-                ></TextField>
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <CustomTextarea
-                  id="effect"
-                  label={t("Effect:")}
-                  value={raregear.effect}
-                  onChange={(e) => {
-                    return onChangeRareGear(i, "effect", e.target.value);
-                  }}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        );
-      })}
+          </AccordionDetails>
+        </Accordion>
+      ))}
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onClose={() => {

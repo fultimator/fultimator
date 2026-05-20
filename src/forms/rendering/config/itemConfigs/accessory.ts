@@ -1,11 +1,14 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { AccessoryPersisted } from "../../../schema/itemSchemas/accessory";
 import allQualities from "../../../../libs/qualities";
 const qualities = allQualities.filter((q) => q.filter?.includes("accessory"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectGroup } from "../../fieldRenderers";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 export type AccessoryFormState = AccessoryPersisted;
+const ACCESSORY_LABEL_PREFIX = "accessory";
 
 const qualityGroups: SelectGroup[] = Object.entries(
   groupBy(qualities, "category") as Record<
@@ -22,13 +25,29 @@ const G = {
   quality: "quality",
   modifiers: "modifiers",
   meta: "meta",
+  source: "source",
 } as const;
+
+export const accessoryGroupLabels: GroupLabels = {
+  quality: "section.quality",
+  modifiers: "section.modifiers",
+};
 
 export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
+    key: "fuid",
+    kind: "editable",
+    label: prefixedLabel(ACCESSORY_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
+    component: "fuid",
+    defaultValue: "",
+    group: G.core,
+    order: -1,
+    gridSize: 12,
+  },
+  {
     key: "name",
     kind: "editable",
-    label: "accessory.name",
+    label: prefixedLabel(ACCESSORY_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -38,7 +57,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "selectedQuality",
     kind: "form-state",
-    label: "accessory.quality.preset",
+    label: "shared.quality.preset",
     component: "grouped-select",
     defaultValue: "",
     group: G.quality,
@@ -62,7 +81,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "qualityCost",
     kind: "form-state",
-    label: "accessory.quality.cost",
+    label: "shared.quality.cost",
     component: "number",
     defaultValue: 0,
     group: G.quality,
@@ -76,7 +95,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "quality",
     kind: "editable",
-    label: "accessory.quality.text",
+    label: "shared.quality.text",
     component: "textarea",
     defaultValue: "",
     group: G.quality,
@@ -86,7 +105,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "defModifier",
     kind: "editable",
-    label: "accessory.modifiers.def",
+    label: "shared.modifiers.def",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -98,7 +117,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "mDefModifier",
     kind: "editable",
-    label: "accessory.modifiers.mdef",
+    label: "shared.modifiers.mdef",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -110,7 +129,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "initModifier",
     kind: "editable",
-    label: "accessory.modifiers.init",
+    label: "shared.modifiers.init",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -122,7 +141,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "magicModifier",
     kind: "editable",
-    label: "accessory.modifiers.magic",
+    label: "shared.modifiers.magic",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -134,7 +153,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "precModifier",
     kind: "editable",
-    label: "accessory.modifiers.accuracy",
+    label: "shared.modifiers.accuracy",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -146,7 +165,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "damageMeleeModifier",
     kind: "editable",
-    label: "accessory.modifiers.damageMelee",
+    label: "shared.modifiers.damageMelee",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -158,7 +177,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "damageRangedModifier",
     kind: "editable",
-    label: "accessory.modifiers.damageRanged",
+    label: "shared.modifiers.damageRanged",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -170,7 +189,7 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "cost",
     kind: "computed",
-    label: "accessory.cost",
+    label: prefixedLabel(ACCESSORY_LABEL_PREFIX, SHARED_LABEL_KEYS.cost),
     component: "readonly-number",
     group: G.meta,
     order: 30,
@@ -178,10 +197,13 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   {
     key: "isEquipped",
     kind: "form-state",
-    label: "accessory.isEquipped",
+    label: "shared.isEquipped",
     component: "checkbox",
     defaultValue: false,
     group: G.meta,
     order: 31,
   },
+  ...(metaFieldConfigWithGroup(
+    G.source,
+  ) as unknown as ItemFieldConfig<AccessoryFormState>),
 ];

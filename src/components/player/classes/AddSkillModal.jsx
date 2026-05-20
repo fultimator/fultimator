@@ -110,7 +110,9 @@ export default function AddSkillModal({
               fullWidth
               value={skillName}
               onChange={(e) => setSkillName(e.target.value)}
-              onBlur={() => { if (!skillFuid) setSkillFuid(slugify(skillName)); }}
+              onBlur={() => {
+                if (!skillFuid) setSkillFuid(slugify(skillName));
+              }}
               slotProps={{
                 htmlInput: { maxLength: 50 },
               }}
@@ -206,7 +208,10 @@ export default function AddSkillModal({
                       {t(skillClass)}
                     </ListSubheader>,
                     groupedSkills[skillClass].map((skill) => (
-                      <MenuItem key={skill.name} value={skill.name}>
+                      <MenuItem
+                        key={`${skillClass}-${skill.name}`}
+                        value={skill.name}
+                      >
                         {t(skill.name)}
                       </MenuItem>
                     )),

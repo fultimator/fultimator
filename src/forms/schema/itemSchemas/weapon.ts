@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Attributes, Elements } from "../../../types/Misc";
+import { MetaSchema } from "../meta";
 
 const AttributeValues = Object.values(Attributes) as [string, ...string[]];
 const ElementValues = Object.values(Elements) as [string, ...string[]];
@@ -34,6 +35,8 @@ export const WeaponRareSchema = z.object({
 export const WeaponSchema = z.object({
   itemType: z.literal("weapon"),
   name: z.string().min(1),
+  description: z.string().optional(),
+  book: z.string().default("homebrew"),
   category: z.string(),
   range: z.enum(["melee", "ranged"]),
   hands: z.union([z.literal(1), z.literal(2)]),
@@ -45,6 +48,7 @@ export const WeaponSchema = z.object({
   quality: z.string().optional(),
   cost: z.number().int().nonnegative().optional(),
   special: z.array(z.string()).optional(),
+  meta: MetaSchema.optional(),
 });
 
 export type Weapon = z.infer<typeof WeaponSchema>;

@@ -1314,9 +1314,12 @@ export default function PlayerEdit() {
                       variant="outlined"
                       size="small"
                       onClick={() => {
-                        setOptionalRulesDraft(
-                          playerTemp?.settings?.optionalRules ?? {},
-                        );
+                        const rules = playerTemp?.settings?.optionalRules ?? {};
+                        setOptionalRulesDraft({
+                          ...rules,
+                          technospheresVariant:
+                            rules.technospheresVariant ?? "standard",
+                        });
                         setIsOptionalRulesModalOpen(true);
                       }}
                     >

@@ -71,7 +71,7 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
       (activity) =>
         !normalizedQuery ||
         activity.name?.toLowerCase().includes(normalizedQuery) ||
-        activity.targetDescription?.toLowerCase().includes(normalizedQuery) ||
+        activity.description?.toLowerCase().includes(normalizedQuery) ||
         activity.effect?.toLowerCase().includes(normalizedQuery),
     );
   if (activities.length === 0) return null;
@@ -100,12 +100,10 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
         <TableBody>
           {activities.map((activity, index) => {
             const activityKey = `activity-${index}`;
-            const hasDetails = activity.targetDescription || activity.effect;
+            const hasDetails = activity.description || activity.effect;
             const forceOpen =
               !!normalizedQuery &&
-              (activity.targetDescription
-                ?.toLowerCase()
-                .includes(normalizedQuery) ||
+              (activity.description?.toLowerCase().includes(normalizedQuery) ||
                 activity.effect?.toLowerCase().includes(normalizedQuery));
             const isOpen = !!openRows.campActivities[activityKey] || forceOpen;
 
@@ -167,14 +165,14 @@ export default function PlayerCampActivities({ player, searchQuery = "" }) {
                             bgcolor: "rgba(0,0,0,0.03)",
                           }}
                         >
-                          {activity.targetDescription && (
+                          {activity.description && (
                             <Typography
                               variant="body2"
                               sx={{ fontSize: "0.85rem", mb: 0.5 }}
                             >
                               <strong>{t("Target")}: </strong>
                               {highlightMatch(
-                                activity.targetDescription,
+                                activity.description,
                                 searchQuery,
                               )}
                             </Typography>

@@ -5,6 +5,7 @@ import { MdExpandMore } from "react-icons/md";
 import type { AccuracyCheckResult } from "../types";
 import { TypeIcon } from "../../../../types";
 import Diamond from "../../../../Diamond";
+import NotesMarkdown from "../../../../common/NotesMarkdown";
 import { BreakdownRow, DiceRow, TagRow } from "./primitives";
 import { ATTR_LABEL, normalizeDamageType } from "./primitives-utils";
 
@@ -78,6 +79,24 @@ export const AccuracyCheckMessageTemplate: React.FC<
         Accuracy Check <Diamond color="inherit" /> {check.intent.weaponName}
       </Typography>
       <TagRow tags={tags} />
+
+      {check.intent.description && (
+        <Box
+          sx={{
+            mt: 0.5,
+            px: 1,
+            py: 0.75,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            backgroundColor: "background.default",
+          }}
+        >
+          <NotesMarkdown sx={{ fontSize: "0.85rem", m: 0 }}>
+            {check.intent.description}
+          </NotesMarkdown>
+        </Box>
+      )}
 
       <DiceRow dice={[check.primary, check.secondary]} />
 

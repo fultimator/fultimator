@@ -30,6 +30,8 @@ import type {
 
 import type { Weapon as ZodWeapon } from "../forms/schema/itemSchemas/weapon";
 import type { CustomWeapon as ZodCustomWeapon } from "../forms/schema/itemSchemas/customWeapon";
+import type { Quality as ZodQuality } from "../forms/schema/itemSchemas/quality";
+import type { Heroic as ZodHeroic } from "../forms/schema/itemSchemas/heroic";
 import type {
   NpcAttack as EquipmentNpcAttack,
   NpcWeaponAttack as EquipmentNpcWeaponAttack,
@@ -37,6 +39,8 @@ import type {
 
 type Weapon = ZodWeapon;
 type CustomWeapon = ZodCustomWeapon;
+type Quality = ZodQuality;
+type Heroic = ZodHeroic;
 
 export type { ActorType, AnyActor };
 
@@ -60,6 +64,8 @@ export type {
   TypeNpc,
   Weapon,
   CustomWeapon,
+  Quality,
+  Heroic,
   Spells,
   MnemosphereSpell,
   NpcSpell,

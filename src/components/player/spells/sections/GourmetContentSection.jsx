@@ -53,37 +53,46 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
     [t],
   );
 
-  // Convert cookbookEffects from object to array if needed
-  const cookbookEffects = Array.isArray(formState.cookbookEffects)
-    ? formState.cookbookEffects
-    : formState.cookbookEffects && typeof formState.cookbookEffects === "object"
-      ? Object.entries(formState.cookbookEffects).map(([key, data]) => ({
-          tasteKey: key,
-          name: data.tasteCombination || key,
-          description: data.effect || "",
-          ...data,
-        }))
-      : [];
-  const ingredientInventory = formState.ingredientInventory || [];
+  const cookbook = formState.cookbook || { effects: [], ingredientInventory: [] };
+  const cookbookEffects = (cookbook.effects || []).map((data, idx) => ({
+    tasteKey: `effect_${idx}`,
+    _index: idx,
+    name:
+      data.taste1 && data.taste2
+        ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
+        : `Effect ${idx + 1}`,
+    description: data.effect || "",
+    customChoices: data.customChoices || {},
+    ...data,
+  }));
+  const ingredientInventory = cookbook.ingredientInventory || [];
 
-  const handleDeleteEffect = (tasteKey) => {
+  const handleDeleteEffect = (_tasteKey, effectIndex) => {
     setFormState((prev) => {
-      const newEffects = { ...prev.cookbookEffects };
-      delete newEffects[tasteKey];
+      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
       return {
         ...prev,
-        cookbookEffects: newEffects,
+        cookbook: {
+          ...prevCookbook,
+          effects: prevCookbook.effects.filter((_, i) => i !== effectIndex),
+        },
       };
     });
   };
 
   const handleDeleteIngredient = (index) => {
-    setFormState((prev) => ({
-      ...prev,
-      ingredientInventory: prev.ingredientInventory.filter(
-        (_, i) => i !== index,
-      ),
-    }));
+    setFormState((prev) => {
+      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      return {
+        ...prev,
+        cookbook: {
+          ...prevCookbook,
+          ingredientInventory: (prevCookbook.ingredientInventory || []).filter(
+            (_, i) => i !== index,
+          ),
+        },
+      };
+    });
   };
 
   const applyCustomChoices = (effectText, customChoices = {}) => {
@@ -158,26 +167,26 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
   };
 
   const handleOpenEditEffect = (effect) => {
-    setEditingTasteKey(effect.tasteKey || "");
+    setEditingTasteKey(String(effect._index ?? ""));
     setEditingText(effect.description || "");
     setEditingCustomChoices(effect.customChoices || {});
     setEditDialogOpen(true);
   };
 
   const handleSaveEditEffect = () => {
-    if (!editingTasteKey) return;
+    if (editingTasteKey === "") return;
+    const idx = Number(editingTasteKey);
     setFormState((prev) => {
-      const current = prev.cookbookEffects || {};
-      const next = { ...current };
-      const existing = next[editingTasteKey] || {};
-      next[editingTasteKey] = {
-        ...existing,
+      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      const effects = [...(prevCookbook.effects || [])];
+      effects[idx] = {
+        ...(effects[idx] || {}),
         effect: editingText,
         customChoices: editingCustomChoices,
       };
       return {
         ...prev,
-        cookbookEffects: next,
+        cookbook: { ...prevCookbook, effects },
       };
     });
     setEditDialogOpen(false);
@@ -246,7 +255,7 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
                         size="small"
                         color="error"
                         startIcon={<Delete />}
-                        onClick={() => handleDeleteEffect(effect.tasteKey)}
+                        onClick={() => handleDeleteEffect(effect.tasteKey, effect._index)}
                       >
                         {t("Delete")}
                       </Button>

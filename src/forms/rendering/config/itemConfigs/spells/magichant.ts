@@ -1,0 +1,71 @@
+import type { ItemFieldConfig } from "../../fieldConfig";
+import type { PlayerSpellFormState } from "./types";
+import { isMagichantKey, isMagichantTone } from "./predicates";
+import {
+  MAGICHANT_KEY_TYPES,
+  MAGICHANT_KEY_STATUSES,
+  MAGICHANT_KEY_ATTRIBUTES,
+  MAGICHANT_KEY_RECOVERIES,
+} from "./options";
+
+export const magichantFields: ItemFieldConfig<PlayerSpellFormState> = [
+  {
+    key: "keyType",
+    kind: "editable",
+    label: "spell.magichant.keyType",
+    component: "autocomplete",
+    defaultValue: "",
+    group: "effect",
+    order: 70,
+    gridSize: { xs: 12, sm: 6 },
+    dependencies: isMagichantKey,
+    componentProps: { options: MAGICHANT_KEY_TYPES, freeSolo: true },
+  },
+  {
+    key: "keyStatus",
+    kind: "editable",
+    label: "spell.magichant.keyStatus",
+    component: "autocomplete",
+    defaultValue: "",
+    group: "effect",
+    order: 71,
+    gridSize: { xs: 12, sm: 6 },
+    dependencies: isMagichantKey,
+    componentProps: { options: MAGICHANT_KEY_STATUSES, freeSolo: true },
+  },
+  {
+    key: "keyAttribute",
+    kind: "editable",
+    label: "spell.magichant.keyAttribute",
+    component: "autocomplete",
+    defaultValue: "",
+    group: "effect",
+    order: 72,
+    gridSize: { xs: 12, sm: 6 },
+    dependencies: isMagichantKey,
+    componentProps: { options: MAGICHANT_KEY_ATTRIBUTES, freeSolo: true },
+  },
+  {
+    key: "keyRecovery",
+    kind: "editable",
+    label: "spell.magichant.keyRecovery",
+    component: "autocomplete",
+    defaultValue: "",
+    group: "effect",
+    order: 73,
+    gridSize: { xs: 12, sm: 6 },
+    dependencies: isMagichantKey,
+    componentProps: { options: MAGICHANT_KEY_RECOVERIES, freeSolo: true },
+  },
+  {
+    key: "effect",
+    kind: "editable",
+    label: "spell.magichant.toneEffect",
+    component: "textarea",
+    defaultValue: "",
+    group: "effect",
+    order: 74,
+    fullWidth: true,
+    dependencies: isMagichantTone,
+  },
+];

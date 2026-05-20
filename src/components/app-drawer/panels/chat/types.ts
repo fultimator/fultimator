@@ -45,6 +45,7 @@ export type AccuracyCheckIntent = {
   modifiers: CheckModifier[]; // accuracy modifiers (prec bonus, etc.)
   critThreshold: number;
   weaponName: string;
+  description?: string;
   baseDamage: number;
   damageSituationalBonus?: number;
   damageType: string;
@@ -86,6 +87,7 @@ export type MagicCheckIntent = {
   critThreshold: number;
   spellName: string;
   spellType?: string;
+  description?: string;
   baseDamage: number;
   damageType: string;
   defense?: "def" | "mdef" | string;

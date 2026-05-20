@@ -10,6 +10,7 @@ import {
   normalizeCustomWeaponLike,
 } from "../../libs/weaponNormalization";
 import { normalizeDefensiveList } from "../../libs/equipmentDefensiveNormalization";
+import { availableModules } from "../../libs/pilotVehicleData";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
@@ -19,11 +20,21 @@ interface VersionedTransform {
   fn: PlayerTransform;
 }
 
+function applyVersionedTransforms(
+  player: TypePlayer,
+  transforms: VersionedTransform[],
+): TypePlayer {
+  return transforms.reduce((p, t) => {
+    if (p.schemaVersion !== undefined && p.schemaVersion >= t.version) return p;
+    return { ...t.fn(p), schemaVersion: t.version };
+  }, player);
+}
+
 function normalizeElementType(type: unknown): string {
   const raw = String(type ?? "physical")
     .toLowerCase()
     .trim();
-  if (raw === "air") return "air";
+  if (raw === "wind") return "air";
   if (raw === "lightning") return "bolt";
   return raw || "physical";
 }
@@ -244,7 +255,7 @@ function normalizeNotes(player: TypePlayer): TypePlayer {
   if (!player.notes) return { ...player, notes: [] };
   if (!Array.isArray(player.notes)) return { ...player, notes: [] };
 
-  const normalized = player.notes.map((n: unknown): Record<string, unknown> => {
+  const normalizeNote = (n: unknown): Record<string, unknown> => {
     if (typeof n === "string") return { name: "", description: n };
     if (typeof n === "object" && n !== null) {
       const obj = n as Record<string, unknown>;
@@ -259,7 +270,9 @@ function normalizeNotes(player: TypePlayer): TypePlayer {
       return base;
     }
     return { name: "", description: "" };
-  });
+  };
+
+  const normalized = player.notes.map(normalizeNote);
 
   return { ...player, notes: normalized as unknown as TypePlayer["notes"] };
 }
@@ -617,6 +630,43 @@ function unifyPlayerSpellSchema(player: TypePlayer): TypePlayer {
     }
     delete s.attr1;
     delete s.attr2;
+
+    // pilot-vehicle weapon modules: legacy flat att1/att2/prec/damageType -> nested objects
+    if (s.spellType === "pilot-vehicle" && s.pilotSubtype === "weapon") {
+      const legacyAtt1 = typeof s.att1 === "string" ? s.att1 : "might";
+      const legacyAtt2 = typeof s.att2 === "string" ? s.att2 : "dexterity";
+      const legacyPrec = typeof s.prec === "number" ? s.prec : 0;
+      const legacyDamage = typeof s.damage === "number" ? s.damage : 0;
+      const legacyDamageType =
+        typeof s.damageType === "string" ? s.damageType : "physical";
+
+      const accuracy =
+        typeof s.accuracy === "object" && s.accuracy !== null
+          ? (s.accuracy as Record<string, unknown>)
+          : null;
+      s.accuracy = {
+        attr1:
+          typeof accuracy?.attr1 === "string" ? accuracy.attr1 : legacyAtt1,
+        attr2:
+          typeof accuracy?.attr2 === "string" ? accuracy.attr2 : legacyAtt2,
+        value:
+          typeof accuracy?.value === "number" ? accuracy.value : legacyPrec,
+        defense: accuracy?.defense === "mdef" ? "mdef" : "def",
+      };
+
+      if (typeof s.damage !== "object" || s.damage === null) {
+        s.damage = {
+          value: legacyDamage,
+          type: normalizeElementType(legacyDamageType),
+          hrZero: false,
+        };
+      }
+
+      delete s.att1;
+      delete s.att2;
+      delete s.prec;
+      delete s.damageType;
+    }
 
     return s as T;
   };
@@ -1033,6 +1083,197 @@ function actorAlignmentV10Player(player: TypePlayer): TypePlayer {
 
 // One-time versioned migrations.
 // Each transform brings the player up to its declared schema version.
+function migrateSpellV11(
+  spell: Record<string, unknown>,
+): Record<string, unknown> {
+  const s = spell;
+  const type = s.spellType as string | undefined;
+
+  // Container sub-item name -> key (gift, dance, symbol, therioform, magiseed)
+  const containerArrayKey: Record<string, string> = {
+    gift: "gifts",
+    dance: "dances",
+    symbol: "symbols",
+    therioform: "therioforms",
+    magiseed: "magiseeds",
+  };
+  const arrayKey = type ? containerArrayKey[type] : undefined;
+  if (arrayKey && Array.isArray(s[arrayKey])) {
+    return {
+      ...s,
+      [arrayKey]: (s[arrayKey] as Record<string, unknown>[]).map((item) =>
+        item.key !== undefined
+          ? item
+          : { ...item, key: item.name, name: undefined },
+      ),
+    };
+  }
+
+  // magichant: name -> key on both keys[] and tones[]
+  if (type === "magichant") {
+    const renameKey = (item: Record<string, unknown>) =>
+      item.key !== undefined
+        ? item
+        : { ...item, key: item.name, name: undefined };
+    return {
+      ...s,
+      keys: Array.isArray(s.keys) ? s.keys.map(renameKey) : s.keys,
+      tones: Array.isArray(s.tones) ? s.tones.map(renameKey) : s.tones,
+    };
+  }
+
+  // invocation: flat tracker fields -> tracker: {}; sub-item name -> key
+  if (type === "invocation") {
+    const tracker = (s.tracker as Record<string, unknown>) ?? {
+      innerWellspring: s.innerWellspring ?? false,
+      chosenWellspring: s.chosenWellspring ?? null,
+      activeWellsprings: s.activeWellsprings ?? [],
+    };
+    return {
+      ...s,
+      tracker,
+      innerWellspring: undefined,
+      chosenWellspring: undefined,
+      activeWellsprings: undefined,
+      invocations: Array.isArray(s.invocations)
+        ? (s.invocations as Record<string, unknown>[]).map((item) =>
+            item.key !== undefined
+              ? item
+              : { ...item, key: item.name, name: undefined },
+          )
+        : s.invocations,
+    };
+  }
+
+  // cooking: flat cookbookEffects + ingredientInventory -> cookbook: {}
+  if (type === "cooking") {
+    if (s.cookbook) return s; // already migrated
+    const rawEffects = s.cookbookEffects ?? {};
+    const effects = Array.isArray(rawEffects)
+      ? rawEffects
+      : Object.values(rawEffects as Record<string, unknown>).map((data) => {
+          const d = data as Record<string, unknown>;
+          return {
+            taste1: d.taste1 ?? "",
+            taste2: d.taste2 ?? "",
+            effect: d.effect ?? "",
+            customChoices: d.customChoices ?? {},
+          };
+        });
+    return {
+      ...s,
+      cookbook: { effects, ingredientInventory: s.ingredientInventory ?? [] },
+      cookbookEffects: undefined,
+      ingredientInventory: undefined,
+    };
+  }
+
+  // pilot-vehicle: reconstruct vehicle.slots from legacy module flags; clean up modules
+  if (type === "pilot-vehicle" && Array.isArray(s.vehicles)) {
+    return {
+      ...s,
+      vehicles: (s.vehicles as Record<string, unknown>[]).map((v) => {
+        const veh = v as Record<string, unknown>;
+        const modules = Array.isArray(veh.modules)
+          ? (veh.modules as Record<string, unknown>[])
+          : [];
+
+        const slots =
+          (veh.slots as Record<string, unknown>) ??
+          (() => {
+            const result: Record<string, unknown> = {
+              main: null,
+              off: null,
+              armor: null,
+              support: [],
+            };
+            for (const m of modules) {
+              if (!m.equipped) continue;
+              const key = (m.key ?? m.name) as string;
+              if (m.type === "pilot_module_armor") {
+                result.armor = key;
+              } else if (m.type === "pilot_module_support") {
+                (result.support as string[]).push(key);
+              } else if (m.type === "pilot_module_weapon") {
+                const slot = (m.equippedSlot as string) ?? "main";
+                if (slot === "both") {
+                  result.main = key;
+                  result.off = key;
+                } else result[slot] = key;
+              }
+            }
+            return result;
+          })();
+
+        return {
+          ...veh,
+          key: veh.key ?? veh.name,
+          name: undefined,
+          enabledModules: undefined,
+          slots,
+          modules: modules.map((m) => {
+            const base: Record<string, unknown> = {
+              ...m,
+              key: m.key ?? m.name,
+              name: undefined,
+              equipped: undefined,
+              equippedSlot: undefined,
+              enabled: undefined,
+            };
+            if (m.type === "pilot_module_weapon" && !m.accuracy) {
+              return {
+                ...base,
+                accuracy: {
+                  attr1: m.att1 ?? "dexterity",
+                  attr2: m.att2 ?? "insight",
+                  value: m.prec ?? 0,
+                  defense: "def",
+                },
+                damage: {
+                  value: m.damage ?? 0,
+                  type:
+                    typeof m.damageType === "string"
+                      ? m.damageType.toLowerCase()
+                      : "physical",
+                  hrZero: false,
+                },
+                att1: undefined,
+                att2: undefined,
+                prec: undefined,
+                damageType: undefined,
+              };
+            }
+            if (m.type === "pilot_module_armor") {
+              return {
+                ...base,
+                att1: undefined,
+                att2: undefined,
+                prec: undefined,
+                damageType: undefined,
+                range: undefined,
+              };
+            }
+            return base;
+          }),
+        };
+      }),
+    };
+  }
+
+  return s;
+}
+
+function migratePlayerSpellsV11(player: TypePlayer): TypePlayer {
+  const migrate = (spell: Record<string, unknown>) => migrateSpellV11(spell);
+  return {
+    ...player,
+    classes: player.classes?.map((cls) => ({
+      ...cls,
+      spells: cls.spells?.map(migrate as never) ?? [],
+    })),
+  };
+}
+
 // Skipped if schemaVersion is already >= the transform's version.
 // Transforms must be ordered by ascending version.
 const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
@@ -1090,10 +1331,151 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
       "Actor alignment v10: shared interfaces; attributes { base } shape; resources/derived layout; modifiers migrated; will renamed to willpower",
     fn: actorAlignmentV10Player,
   },
+  {
+    version: 11,
+    label:
+      "Spell v11: sub-item name->key on container types; invocation tracker grouping; cooking cookbook namespace; pilot-vehicle slots reconstruction",
+    fn: migratePlayerSpellsV11,
+  },
 ];
 
 export const PLAYER_CURRENT_SCHEMA_VERSION =
   POST_LOAD_TRANSFORMS[POST_LOAD_TRANSFORMS.length - 1].version;
+
+const CUSTOM_MODULE_NAMES = new Set([
+  "pilot_custom_weapon",
+  "pilot_custom_armor",
+  "pilot_custom_support",
+]);
+
+// Built once at module load - maps module name -> current static entry.
+const STATIC_MODULE_BY_NAME = new Map<string, Record<string, unknown>>();
+for (const group of Object.values(
+  availableModules as Record<string, Record<string, unknown>[]>,
+)) {
+  for (const entry of group) {
+    if (typeof entry.name === "string")
+      STATIC_MODULE_BY_NAME.set(entry.name, entry);
+  }
+}
+
+const MODULE_INSTANCE_FIELDS = new Set([
+  "enabled",
+  "equipped",
+  "equippedSlot",
+  "customName",
+  "quality",
+  "qualityCost",
+]);
+
+/**
+ * Re-hydrates non-custom vehicle modules from static pilotVehicleData on every
+ * load so stats are always authoritative regardless of when the player was saved.
+ * Custom modules fall back to flat-field migration if still in legacy shape.
+ * Also backfills missing pilotSubtype on the frame spell and collapses
+ * currentVehicles -> vehicles.
+ */
+function rehydrateVehicleModules(player: TypePlayer): TypePlayer {
+  if (!player.classes) return player;
+
+  const migrateModule = (
+    m: Record<string, unknown>,
+  ): Record<string, unknown> => {
+    const name = m.name as string | undefined;
+    const isCustom = !name || CUSTOM_MODULE_NAMES.has(name);
+
+    if (!isCustom) {
+      const staticEntry = STATIC_MODULE_BY_NAME.get(name!);
+      if (staticEntry) {
+        const instanceState: Record<string, unknown> = {};
+        for (const key of MODULE_INSTANCE_FIELDS) {
+          if (m[key] !== undefined) instanceState[key] = m[key];
+        }
+        return { ...staticEntry, ...instanceState };
+      }
+    }
+
+    // Custom module or unknown name: migrate flat fields if not yet nested.
+    if (
+      typeof m.accuracy === "object" &&
+      m.accuracy !== null &&
+      typeof m.damage === "object" &&
+      m.damage !== null
+    )
+      return m;
+
+    const acc = m.accuracyCheck as Record<string, unknown> | undefined;
+    const attr1 =
+      (acc?.att1 as string) ??
+      (m.att1 as string) ??
+      (m.attr1 as string) ??
+      "dexterity";
+    const attr2 =
+      (acc?.att2 as string) ??
+      (m.att2 as string) ??
+      (m.attr2 as string) ??
+      "might";
+    const prec = typeof m.prec === "number" ? m.prec : 0;
+    const dmg =
+      typeof m.damage === "number"
+        ? m.damage
+        : typeof m.dmg === "number"
+          ? m.dmg
+          : 0;
+    const dmgType = normalizeElementType(
+      m.damageType ?? m.weaponType ?? "physical",
+    );
+    const next = { ...m };
+    next.accuracy = { attr1, attr2, value: prec, defense: "def" };
+    next.damage = { value: dmg, type: dmgType, hrZero: false };
+    next.range = m.isRanged ? "ranged" : (m.range ?? "melee");
+    next.cumbersome = m.isTwoHand ?? m.cumbersome ?? false;
+    delete next.att1;
+    delete next.att2;
+    delete next.attr1;
+    delete next.attr2;
+    delete next.prec;
+    delete next.dmg;
+    delete next.isRanged;
+    delete next.isTwoHand;
+    delete next.damageType;
+    delete next.accuracyCheck;
+    return next;
+  };
+
+  const classes = player.classes.map((cls) => ({
+    ...cls,
+    spells: (cls.spells ?? []).map((spell) => {
+      const s = spell as unknown as Record<string, unknown>;
+      if (s.spellType !== "pilot-vehicle") return spell;
+
+      // Backfill missing pilotSubtype on the frame spell.
+      if (s.pilotSubtype === undefined) {
+        s.pilotSubtype = "frame";
+      }
+
+      if (s.pilotSubtype !== "frame") return spell;
+
+      const raw = s.vehicles ?? s.currentVehicles;
+      if (!Array.isArray(raw)) return spell;
+
+      const vehicles = (raw as Record<string, unknown>[]).map((v) => {
+        const modules = v.modules;
+        if (!Array.isArray(modules)) return v;
+        return {
+          ...v,
+          modules: (modules as Record<string, unknown>[]).map(migrateModule),
+        };
+      });
+
+      const next = { ...s, vehicles } as Record<string, unknown>;
+      delete next.currentVehicles;
+      return next as unknown as typeof spell;
+    }),
+  }));
+
+  return { ...player, classes };
+}
 
 // Always-run transforms.
 // Applied on every load regardless of schemaVersion; these guard runtime
@@ -1103,14 +1485,12 @@ const ALWAYS_RUN_TRANSFORMS: PlayerTransform[] = [
   migrateSlotIndexes, // new items may be saved without an index
   restoreRuntimeEquippedFlags, // isEquipped is stripped on save, must be rehydrated
   pruneStaleSlotRefs, // spheres may be deleted between loads
+  rehydrateVehicleModules, // re-hydrate module stats from static data every load
 ];
 
 /** Run all post-load transforms and return the player ready for in-memory use. */
 export function applyPostLoadTransforms(player: TypePlayer): TypePlayer {
-  let result = POST_LOAD_TRANSFORMS.reduce((p, t) => {
-    if (p.schemaVersion !== undefined && p.schemaVersion >= t.version) return p;
-    return { ...t.fn(p), schemaVersion: t.version };
-  }, player);
+  let result = applyVersionedTransforms(player, POST_LOAD_TRANSFORMS);
   // Stamp version even if all migrations were already applied.
   if ((result.schemaVersion ?? 0) < PLAYER_CURRENT_SCHEMA_VERSION) {
     result = { ...result, schemaVersion: PLAYER_CURRENT_SCHEMA_VERSION };

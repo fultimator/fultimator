@@ -7,11 +7,9 @@ function genId() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-
-
 export const mnemosphereClassList = classList.map((classDef) => ({
   name: classDef.name,
-  book: classDef.book,
+  book: classDef.meta?.book,
 }));
 
 export function getMnemosphereCost(lvl = 1) {

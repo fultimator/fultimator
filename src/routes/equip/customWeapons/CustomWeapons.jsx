@@ -22,7 +22,10 @@ import groupBy from "../../../libs/groupby";
 import { calculateCustomWeaponStats } from "../../../components/player/common/playerCalculations";
 import { categories, accuracyChecks } from "./libs.jsx";
 import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
-import { customWeaponFieldConfig } from "../../../forms/rendering/config/itemConfigs/customWeapon";
+import {
+  customWeaponFieldConfig,
+  customWeaponGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/customWeapon";
 
 const qualityGroups = Object.entries(groupBy(qualities, "category")).map(
   ([category, qs]) => ({
@@ -445,11 +448,11 @@ function CustomWeapons() {
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <SchemaFieldRenderer
               config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
               state={formState}
               onChange={setFormState}
               surface="edit"
               group="core"
-              label={t("Primary Weapon")}
               cols={2}
               extraProps={{
                 selectedCategory,
@@ -461,33 +464,33 @@ function CustomWeapons() {
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <SchemaFieldRenderer
               config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
               state={formState}
               onChange={setFormState}
               surface="edit"
               group="accuracy"
-              label={t("Accuracy")}
               cols={2}
             />
           </Grid>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <SchemaFieldRenderer
               config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
               state={formState}
               onChange={setFormState}
               surface="edit"
               group="damage"
-              label={t("Damage")}
               cols={2}
             />
           </Grid>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <SchemaFieldRenderer
               config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
               state={formState}
               onChange={setFormState}
               surface="edit"
               group="quality"
-              label={t("Quality")}
               cols={2}
               extraProps={{
                 groups: qualityGroups,
@@ -499,22 +502,22 @@ function CustomWeapons() {
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <SchemaFieldRenderer
               config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
               state={formState}
               onChange={setFormState}
               surface="edit"
               group="rare"
-              label={t("Rare Weapon Options")}
               cols={2}
             />
           </Grid>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <SchemaFieldRenderer
               config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
               state={formState}
               onChange={setFormState}
               surface="edit"
               group="modifiers"
-              label={t("Modifiers")}
               cols={2}
             />
           </Grid>
@@ -525,11 +528,11 @@ function CustomWeapons() {
               <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
                 <SchemaFieldRenderer
                   config={customWeaponFieldConfig}
+                  groupLabels={customWeaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
                   group="secondary"
-                  label={t("Transforming Form")}
                   cols={2}
                   extraProps={{
                     selectedCategory: secondSelectedCategory,
@@ -541,11 +544,11 @@ function CustomWeapons() {
               <Grid container spacing={2}>
                 <SchemaFieldRenderer
                   config={customWeaponFieldConfig}
+                  groupLabels={customWeaponGroupLabels}
                   state={formState}
                   onChange={setFormState}
                   surface="edit"
                   group="secondaryModifiers"
-                  label={t("Secondary Modifiers")}
                   cols={2}
                 />
               </Grid>

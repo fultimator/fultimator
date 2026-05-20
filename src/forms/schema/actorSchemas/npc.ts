@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const AffinityValueSchema = z.enum(["vu", "rs", "im", "ab"]);
+const AffinityValueSchema = z.enum(["vu", "rs", "im", "ab", "no"]);
 
 const NpcAffinitiesSchema = z.object({
   physical: AffinityValueSchema.optional(),
@@ -102,6 +102,7 @@ const NpcAttackSchema = z
     range: z.enum(["melee", "ranged"]).optional(),
     accuracy: AccuracySchema.optional(),
     damage: DamageSchema.optional(),
+    effect: z.string().optional(),
     special: z.array(z.string()).optional(),
     extraDamage: z.boolean().optional(),
     itemType: z.string().optional(),
