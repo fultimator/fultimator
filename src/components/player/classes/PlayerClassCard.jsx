@@ -21,7 +21,7 @@ import EditClassNameModal from "./EditClassNameModal";
 import AddSkillModal from "./AddSkillModal";
 import EditFreeBenefitsModal from "./EditFreeBenefitsModal";
 import EditSpellClassesModal from "./EditSpellClassesModal";
-import EditHeroicSkillModal from "./EditHeroicSkillModal";
+import ItemEditModal from "../../../forms/ui/ItemEditModal";
 import SelectCompanionModal from "./SelectCompanionModal";
 import spellClasses from "../../../libs/spellClasses";
 import Export from "../../Export";
@@ -92,12 +92,6 @@ export default function PlayerClassCard({
     handleDelete,
   } = useDeleteConfirmation({
     onConfirm: onRemove,
-  });
-
-  const [heroic, setHeroic] = useState({
-    name: classItem.heroic ? classItem.heroic.name : "",
-    description: classItem.heroic ? classItem.heroic.description : "",
-    fuid: classItem.heroic ? classItem.heroic.fuid : undefined,
   });
 
   const [className, setClassName] = useState(classItem.name);
@@ -310,15 +304,7 @@ export default function PlayerClassCard({
   };
 
   const handleEditHeroicSkill = () => {
-    setHeroic(
-      classItem.heroic ?? { name: "", description: "", fuid: undefined },
-    );
     setOpenEditHeroicSkillModal(true);
-  };
-
-  const handleSaveHeroicSkill = () => {
-    editHeroic(heroic);
-    setOpenEditHeroicSkillModal(false);
   };
 
   const handleSaveCompanion = () => {
@@ -472,12 +458,14 @@ export default function PlayerClassCard({
         restrictToTypes={["heroics"]}
         context="player"
       />
-      <EditHeroicSkillModal
+      <ItemEditModal
         open={openEditHeroicSkillModal}
         onClose={() => setOpenEditHeroicSkillModal(false)}
-        onSave={handleSaveHeroicSkill}
-        heroic={heroic}
-        setHeroic={setHeroic}
+        itemType="heroic"
+        item={classItem.heroic ?? null}
+        editIndex={null}
+        onSave={(saved) => { editHeroic(saved); setOpenEditHeroicSkillModal(false); }}
+        onDelete={() => {}}
       />
       <SelectCompanionModal
         open={openSelectCompanionModal}
@@ -742,32 +730,34 @@ export default function PlayerClassCard({
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              alignItems: "center",
+              mt: "30px",
+              px: "17px",
+              py: "3px",
             }}
           >
             <Button
               variant="contained"
               color="secondary"
-              sx={{ marginTop: "30px", fontSize: "0.9em" }}
+              sx={{ fontSize: "0.9em" }}
               onClick={() => setOpenEditSpellClassesModal(true)}
             >
               {t("Edit Class Spell Types")}
             </Button>
-
+            <Box sx={{ flexGrow: 1 }} />
+            <Export name={classItem.name} dataType="class" data={classItem} />
+            <Box sx={{ width: 8 }} />
             <Button
               variant="contained"
               color="error"
               onClick={handleDelete}
-              sx={{ marginTop: "30px", fontSize: "0.9em" }}
+              sx={{ fontSize: "0.9em" }}
             >
               {t("Remove Class")}
             </Button>
           </Box>
         </Grid>
       )}
-      <Grid size={12}>
-        <Export name={classItem.name} dataType="class" data={classItem} />
-      </Grid>
     </Grid>
   );
 
@@ -799,7 +789,7 @@ export default function PlayerClassCard({
           }}
         >
           {showHeader ? header : null}
-          <AccordionDetails sx={{ p: "15px" }}>{cardBody}</AccordionDetails>
+          <AccordionDetails sx={{ p: 0 }}>{cardBody}</AccordionDetails>
         </Accordion>
         {modals}
       </>

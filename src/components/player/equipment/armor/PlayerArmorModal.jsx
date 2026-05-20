@@ -12,47 +12,21 @@ import {
   Typography,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import armor from "../../../../libs/armor";
-import { SLOT_TIERS } from "../technospheres/slotTiers";
 import { SharedArmorCard } from "../../../../components/shared/itemCards";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
 import { armorFieldConfig } from "../../../../forms/rendering/config/itemConfigs/armor";
-import { validateArmorPersisted } from "../../../../forms/schema/itemSchemas/armor";
+import {
+  validateArmorPersisted,
+  buildArmorFormState,
+  buildArmorSavePayload,
+  applyArmorSlotTierChange,
+  applyArmorZenitSideEffect,
+  getArmorSlotCostInfo,
+} from "../../../../forms/schema/itemSchemas/armor";
 import { buildSphereData } from "../../../../libs/technospheres";
 import { normalizeDefensiveItem } from "../../../../libs/equipmentDefensiveNormalization";
-
-function buildInitialState(armorPlayer, isSlotsVariant) {
-  const base = armorPlayer?.base || armor[0];
-  return {
-    itemType: "armor",
-    base,
-    name: armorPlayer?.name || base.name,
-    martial: armorPlayer?.martial ?? base.martial,
-    def: armorPlayer?.def ?? base.def,
-    mdef: armorPlayer?.mdef ?? base.mdef,
-    init: armorPlayer?.init ?? base.init,
-    rework: armorPlayer?.rework || false,
-    quality: armorPlayer?.quality || "",
-    qualityCost: armorPlayer?.qualityCost || 0,
-    selectedQuality: armorPlayer?.selectedQuality || "",
-    isSlotsVariant: isSlotsVariant ?? false,
-    slots: armorPlayer?.slots ?? "alpha",
-    slotted: armorPlayer?.slotted ?? [],
-    cost: armorPlayer?.cost ?? base.cost,
-    defModifier: armorPlayer?.modifiers?.def ?? armorPlayer?.defModifier ?? 0,
-    mDefModifier:
-      armorPlayer?.modifiers?.mdef ?? armorPlayer?.mDefModifier ?? 0,
-    initModifier: armorPlayer?.initModifier ?? 0,
-    magicModifier: armorPlayer?.magicModifier ?? 0,
-    precModifier: armorPlayer?.modifiers?.accuracy ?? 0,
-    damageMeleeModifier: armorPlayer?.damageMeleeModifier ?? 0,
-    damageRangedModifier: armorPlayer?.damageRangedModifier ?? 0,
-    isEquipped: armorPlayer?.isEquipped || false,
-    fuid: armorPlayer?.fuid,
-  };
-}
 
 export default function PlayerArmorModal({
   open,
@@ -73,29 +47,24 @@ export default function PlayerArmorModal({
   const isSlotsVariant =
     isTechnospheres && technospheresVariant !== "mnemospheres";
 
+  const ctx = { player, setPlayer };
+
   const [formState, setFormState] = useState(() =>
-    buildInitialState(armorPlayer, isSlotsVariant),
+    buildArmorFormState(armorPlayer, ctx),
   );
-  const [paidSlots, setPaidSlots] = useState(armorPlayer?.slots ?? "alpha");
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    setFormState(buildInitialState(armorPlayer, isSlotsVariant));
-    setPaidSlots(armorPlayer?.slots ?? "alpha");
+    setFormState(buildArmorFormState(armorPlayer, ctx));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [armorPlayer]);
 
   const { name, base, quality, cost, slots, slotted } = formState;
 
-  const paidSlotTier =
-    SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
-  const selectedSlotTier =
-    SLOT_TIERS.find((t) => t.value === slots) ?? SLOT_TIERS[0];
-  const slotCostDelta = isSlotsVariant
-    ? selectedSlotTier.cost - paidSlotTier.cost
-    : 0;
-  const currentZenit = player?.info?.zenit ?? 0;
-  const cannotAffordSlotTier = slotCostDelta > currentZenit;
+  const slotCostInfo = getArmorSlotCostInfo(formState, armorPlayer, ctx);
+  const slotCostDelta = slotCostInfo?.delta ?? 0;
+  const currentZenit = slotCostInfo?.currentZenit ?? 0;
+  const cannotAffordSlotTier = slotCostInfo?.cannotAfford ?? false;
   const slotCostChangeLabel =
     slotCostDelta > 0
       ? `${t("Deduct on save")}: ${slotCostDelta}z`
@@ -105,19 +74,7 @@ export default function PlayerArmorModal({
   const currentZenitLabel = `${t("Current Zenit")}: ${currentZenit}z`;
 
   const handleSlotTierChange = (tier) => {
-    const newTier = SLOT_TIERS.find((t) => t.value === tier);
-    const hoplospheres = player?.equipment?.[0]?.hoplospheres ?? [];
-    const kept = [];
-    let usedCost = 0;
-    for (const id of slotted) {
-      const hoplo = hoplospheres.find((h) => h.id === id);
-      const slotCost = hoplo?.requiredSlots ?? 1;
-      if (usedCost + slotCost <= (newTier?.slots ?? 1)) {
-        kept.push(id);
-        usedCost += slotCost;
-      }
-    }
-    setFormState((prev) => ({ ...prev, slots: tier, slotted: kept }));
+    setFormState((prev) => applyArmorSlotTierChange(prev, tier, ctx));
   };
 
   const {
@@ -136,101 +93,34 @@ export default function PlayerArmorModal({
   const handleFileUpload = (rawData) => {
     const data = normalizeDefensiveItem(rawData);
     if (data && data.base?.category === "Armor") {
-      const normalized = {
-        ...buildInitialState(data, isSlotsVariant),
-        ...data,
-      };
+      const normalized = { ...buildArmorFormState(data, ctx), ...data };
       const validation = validateArmorPersisted(normalized);
       if (!validation.success) {
-        console.warn(
-          "[PlayerArmorModal] uploaded armor failed validation",
-          validation.error.issues,
-        );
+        console.warn("[PlayerArmorModal] uploaded armor failed validation", validation.error.issues);
         fileInputRef.current.value = null;
         return;
       }
-      const next = buildInitialState(null, isSlotsVariant);
-      if (data.base) next.base = data.base;
-      if (data.name) next.name = data.name;
-      if (data.martial !== undefined) next.martial = data.martial;
-      if (data.init !== undefined) next.init = data.init;
-      if (data.rework) next.rework = data.rework;
-      if (data.quality) next.quality = data.quality;
-      if (data.qualityCost) next.qualityCost = data.qualityCost;
-      if (data.defModifier) next.defModifier = data.defModifier;
-      if (data.mDefModifier) next.mDefModifier = data.mDefModifier;
-      if (data.initModifier) next.initModifier = data.initModifier;
-      if (data.magicModifier) next.magicModifier = data.magicModifier;
-      if (data.modifiers?.accuracy !== undefined) {
-        next.precModifier = data.modifiers.accuracy;
-      }
-      if (data.damageMeleeModifier)
-        next.damageMeleeModifier = data.damageMeleeModifier;
-      if (data.damageRangedModifier)
-        next.damageRangedModifier = data.damageRangedModifier;
-      next.cost = (next.base?.cost ?? 0) + (Number(next.qualityCost) || 0);
-      setFormState(next);
+      setFormState(buildArmorFormState(data, ctx));
     }
     fileInputRef.current.value = null;
   };
 
   const handleSave = () => {
-    const updatedArmor = {
-      ...formState,
-      category: "Armor",
-      modifiers: {
-        ...(formState.modifiers ?? {}),
-        def: parseInt(formState.defModifier),
-        mdef: parseInt(formState.mDefModifier),
-        init: parseInt(formState.initModifier),
-        magic: parseInt(formState.magicModifier),
-        accuracy: parseInt(formState.precModifier),
-        damageMelee: parseInt(formState.damageMeleeModifier),
-        damageRanged: parseInt(formState.damageRangedModifier),
-      },
-      def: formState.base?.def ?? formState.def,
-      mdef: formState.base?.mdef ?? formState.mdef,
-      defModifier: parseInt(formState.defModifier),
-      mDefModifier: parseInt(formState.mDefModifier),
-      initModifier: parseInt(formState.initModifier),
-      magicModifier: parseInt(formState.magicModifier),
-      precModifier: parseInt(formState.precModifier),
-      damageMeleeModifier: parseInt(formState.damageMeleeModifier),
-      damageRangedModifier: parseInt(formState.damageRangedModifier),
-      isEquipped:
-        (armorPlayer?.martial || false) !== formState.martial
-          ? false
-          : formState.isEquipped,
-      ...(isSlotsVariant || armorPlayer?.slots || armorPlayer?.slotted
-        ? { slots, slotted }
-        : {}),
-    };
+    const updatedArmor = buildArmorSavePayload(formState, armorPlayer);
 
     if (import.meta.env.DEV) {
       const result = validateArmorPersisted(updatedArmor);
       if (!result.success) {
-        console.warn(
-          "[PlayerArmorModal] armor schema validation failed",
-          result.error.issues,
-        );
+        console.warn("[PlayerArmorModal] armor schema validation failed", result.error.issues);
       }
     }
 
     onAddArmor(updatedArmor);
-
-    if (slotCostDelta !== 0 && setPlayer) {
-      setPlayer((prev) => ({
-        ...prev,
-        info: {
-          ...prev.info,
-          zenit: Math.max(0, (prev.info?.zenit ?? 0) - slotCostDelta),
-        },
-      }));
-    }
+    applyArmorZenitSideEffect(formState, armorPlayer, ctx);
   };
 
   const handleClearFields = () => {
-    setFormState(buildInitialState(null, isSlotsVariant));
+    setFormState(buildArmorFormState(null, ctx));
   };
 
   return (

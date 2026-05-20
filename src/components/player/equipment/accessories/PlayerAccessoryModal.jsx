@@ -17,28 +17,12 @@ import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
 import { accessoryFieldConfig } from "../../../../forms/rendering/config/itemConfigs/accessory";
-import { validateAccessoryPersisted } from "../../../../forms/schema/itemSchemas/accessory";
+import {
+  validateAccessoryPersisted,
+  buildAccessoryFormState,
+  buildAccessorySavePayload,
+} from "../../../../forms/schema/itemSchemas/accessory";
 import { normalizeDefensiveItem } from "../../../../libs/equipmentDefensiveNormalization";
-
-function buildInitialState(accessory) {
-  return {
-    itemType: "accessory",
-    name: accessory?.name || "",
-    quality: accessory?.quality || "",
-    qualityCost: accessory?.qualityCost || 0,
-    selectedQuality: accessory?.selectedQuality || "",
-    cost: accessory?.cost ?? 0,
-    defModifier: accessory?.modifiers?.def ?? accessory?.defModifier ?? 0,
-    mDefModifier: accessory?.modifiers?.mdef ?? accessory?.mDefModifier ?? 0,
-    initModifier: accessory?.initModifier ?? 0,
-    magicModifier: accessory?.magicModifier ?? 0,
-    precModifier: accessory?.modifiers?.accuracy ?? 0,
-    damageMeleeModifier: accessory?.damageMeleeModifier ?? 0,
-    damageRangedModifier: accessory?.damageRangedModifier ?? 0,
-    isEquipped: accessory?.isEquipped || false,
-    fuid: accessory?.fuid,
-  };
-}
 
 export default function PlayerAccessoryModal({
   open,
@@ -50,12 +34,12 @@ export default function PlayerAccessoryModal({
 }) {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(() =>
-    buildInitialState(accessory),
+    buildAccessoryFormState(accessory),
   );
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    setFormState(buildInitialState(accessory));
+    setFormState(buildAccessoryFormState(accessory));
   }, [accessory]);
 
   const { name, quality, cost } = formState;
@@ -76,7 +60,7 @@ export default function PlayerAccessoryModal({
   const handleFileUpload = (rawData) => {
     const data = normalizeDefensiveItem(rawData);
     if (data) {
-      const normalized = { ...buildInitialState(data), ...data };
+      const normalized = { ...buildAccessoryFormState(data), ...data };
       const validation = validateAccessoryPersisted(normalized);
       if (!validation.success) {
         console.warn(
@@ -86,7 +70,7 @@ export default function PlayerAccessoryModal({
         fileInputRef.current.value = null;
         return;
       }
-      const next = buildInitialState(null);
+      const next = buildAccessoryFormState(null);
       if (data.name) next.name = data.name;
       if (data.quality) {
         next.selectedQuality = "";
@@ -111,26 +95,7 @@ export default function PlayerAccessoryModal({
   };
 
   const handleSave = () => {
-    const updatedAccessory = {
-      ...formState,
-      modifiers: {
-        ...(formState.modifiers ?? {}),
-        def: parseInt(formState.defModifier),
-        mdef: parseInt(formState.mDefModifier),
-        init: parseInt(formState.initModifier),
-        magic: parseInt(formState.magicModifier),
-        accuracy: parseInt(formState.precModifier),
-        damageMelee: parseInt(formState.damageMeleeModifier),
-        damageRanged: parseInt(formState.damageRangedModifier),
-      },
-      defModifier: parseInt(formState.defModifier),
-      mDefModifier: parseInt(formState.mDefModifier),
-      initModifier: parseInt(formState.initModifier),
-      magicModifier: parseInt(formState.magicModifier),
-      precModifier: parseInt(formState.precModifier),
-      damageMeleeModifier: parseInt(formState.damageMeleeModifier),
-      damageRangedModifier: parseInt(formState.damageRangedModifier),
-    };
+    const updatedAccessory = buildAccessorySavePayload(formState);
 
     if (import.meta.env.DEV) {
       const result = validateAccessoryPersisted(updatedAccessory);
@@ -146,7 +111,7 @@ export default function PlayerAccessoryModal({
   };
 
   const handleClearFields = () => {
-    setFormState(buildInitialState(null));
+    setFormState(buildAccessoryFormState(null));
   };
 
   return (

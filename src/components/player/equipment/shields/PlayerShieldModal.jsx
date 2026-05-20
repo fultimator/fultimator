@@ -12,41 +12,17 @@ import {
   Typography,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import shields from "../../../../libs/shields";
 import { SharedShieldCard } from "../../../../components/shared/itemCards";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
 import { shieldFieldConfig } from "../../../../forms/rendering/config/itemConfigs/shield";
-import { validateShieldPersisted } from "../../../../forms/schema/itemSchemas/shield";
+import {
+  validateShieldPersisted,
+  buildShieldFormState,
+  buildShieldSavePayload,
+} from "../../../../forms/schema/itemSchemas/shield";
 import { normalizeDefensiveItem } from "../../../../libs/equipmentDefensiveNormalization";
-
-function buildInitialState(shield) {
-  const base = shield?.base || shields[0];
-  return {
-    itemType: "shield",
-    base,
-    name: shield?.name || base.name,
-    martial: shield?.martial ?? base.martial,
-    def: shield?.def ?? base.def,
-    mdef: shield?.mdef ?? base.mdef,
-    init: shield?.init ?? base.init,
-    rework: shield?.rework || false,
-    quality: shield?.quality || "",
-    qualityCost: shield?.qualityCost || 0,
-    selectedQuality: shield?.selectedQuality || "",
-    cost: shield?.cost ?? base.cost,
-    defModifier: shield?.modifiers?.def ?? shield?.defModifier ?? 0,
-    mDefModifier: shield?.modifiers?.mdef ?? shield?.mDefModifier ?? 0,
-    initModifier: shield?.initModifier ?? 0,
-    magicModifier: shield?.magicModifier ?? 0,
-    precModifier: shield?.modifiers?.accuracy ?? 0,
-    damageMeleeModifier: shield?.damageMeleeModifier ?? 0,
-    damageRangedModifier: shield?.damageRangedModifier ?? 0,
-    isEquipped: shield?.isEquipped || false,
-    fuid: shield?.fuid,
-  };
-}
 
 export default function PlayerShieldModal({
   open,
@@ -57,11 +33,11 @@ export default function PlayerShieldModal({
   onDeleteShield,
 }) {
   const { t } = useTranslate();
-  const [formState, setFormState] = useState(() => buildInitialState(shield));
+  const [formState, setFormState] = useState(() => buildShieldFormState(shield));
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    setFormState(buildInitialState(shield));
+    setFormState(buildShieldFormState(shield));
   }, [shield]);
 
   const { name, base, quality, cost } = formState;
@@ -82,77 +58,25 @@ export default function PlayerShieldModal({
   const handleFileUpload = (rawData) => {
     const data = normalizeDefensiveItem(rawData);
     if (data && data.base?.category === "Shield") {
-      const normalized = { ...buildInitialState(data), ...data };
+      const normalized = { ...buildShieldFormState(data), ...data };
       const validation = validateShieldPersisted(normalized);
       if (!validation.success) {
-        console.warn(
-          "[PlayerShieldModal] uploaded shield failed validation",
-          validation.error.issues,
-        );
+        console.warn("[PlayerShieldModal] uploaded shield failed validation", validation.error.issues);
         fileInputRef.current.value = null;
         return;
       }
-      const next = buildInitialState(null);
-      if (data.base) next.base = data.base;
-      if (data.name) next.name = data.name;
-      if (data.martial !== undefined) next.martial = data.martial;
-      if (data.init !== undefined) next.init = data.init;
-      if (data.rework) next.rework = data.rework;
-      if (data.quality) next.quality = data.quality;
-      if (data.qualityCost) next.qualityCost = data.qualityCost;
-      if (data.defModifier) next.defModifier = data.defModifier;
-      if (data.mDefModifier) next.mDefModifier = data.mDefModifier;
-      if (data.initModifier) next.initModifier = data.initModifier;
-      if (data.magicModifier) next.magicModifier = data.magicModifier;
-      if (data.modifiers?.accuracy !== undefined) {
-        next.precModifier = data.modifiers.accuracy;
-      }
-      if (data.damageMeleeModifier)
-        next.damageMeleeModifier = data.damageMeleeModifier;
-      if (data.damageRangedModifier)
-        next.damageRangedModifier = data.damageRangedModifier;
-      next.cost = (next.base?.cost ?? 0) + (Number(next.qualityCost) || 0);
-      setFormState(next);
+      setFormState(buildShieldFormState(data));
     }
     fileInputRef.current.value = null;
   };
 
   const handleSave = () => {
-    const updatedShield = {
-      ...formState,
-      category: "Shield",
-      modifiers: {
-        ...(formState.modifiers ?? {}),
-        def: parseInt(formState.defModifier),
-        mdef: parseInt(formState.mDefModifier),
-        init: parseInt(formState.initModifier),
-        magic: parseInt(formState.magicModifier),
-        accuracy: parseInt(formState.precModifier),
-        damageMelee: parseInt(formState.damageMeleeModifier),
-        damageRanged: parseInt(formState.damageRangedModifier),
-      },
-      def: formState.base?.def ?? formState.def,
-      mdef: formState.base?.mdef ?? formState.mdef,
-      defModifier: parseInt(formState.defModifier),
-      mDefModifier: parseInt(formState.mDefModifier),
-      initModifier: parseInt(formState.initModifier),
-      magicModifier: parseInt(formState.magicModifier),
-      precModifier: parseInt(formState.precModifier),
-      damageMeleeModifier: parseInt(formState.damageMeleeModifier),
-      damageRangedModifier: parseInt(formState.damageRangedModifier),
-      isEquipped:
-        (shield?.martial || false) !== formState.martial
-          ? false
-          : formState.isEquipped,
-    };
+    const updatedShield = buildShieldSavePayload(formState, shield);
 
     if (import.meta.env.DEV) {
       const result = validateShieldPersisted(updatedShield);
       if (!result.success) {
-        console.warn(
-          "[PlayerShieldModal] shield schema validation failed",
-          result.error.issues,
-        );
+        console.warn("[PlayerShieldModal] shield schema validation failed", result.error.issues);
       }
     }
 
@@ -160,7 +84,7 @@ export default function PlayerShieldModal({
   };
 
   const handleClearFields = () => {
-    setFormState(buildInitialState(null));
+    setFormState(buildShieldFormState(null));
   };
 
   return (

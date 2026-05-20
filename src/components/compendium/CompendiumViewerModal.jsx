@@ -457,13 +457,24 @@ const CompendiumViewerModal = ({
               </Typography>
               {selectedCompendium === "official" &&
                 getItems(selectedType).length === 0 && (
-                  <>
+                  <Box
+                    sx={{
+                      width: "100%",
+                      maxWidth: 640,
+                      p: 2.5,
+                      borderRadius: 2,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      bgcolor: "background.paper",
+                      textAlign: "left",
+                    }}
+                  >
                     <Typography
-                      variant="h6"
+                      variant="body1"
                       sx={{
                         color: "text.secondary",
-                        maxWidth: 480,
-                        fontWeight: 400,
+                        fontWeight: 500,
+                        lineHeight: 1.6,
                       }}
                     >
                       {t(
@@ -472,7 +483,7 @@ const CompendiumViewerModal = ({
                     </Typography>
                     <Typography
                       variant="body1"
-                      sx={{ color: "text.secondary", maxWidth: 480 }}
+                      sx={{ color: "text.secondary", mt: 1, lineHeight: 1.6 }}
                     >
                       {t(
                         "You can create custom items by switching to your personal compendium.",
@@ -483,12 +494,12 @@ const CompendiumViewerModal = ({
                         variant="contained"
                         color="primary"
                         onClick={() => handleCompendiumChange(packs[0].id)}
-                        sx={{ mt: 1 }}
+                        sx={{ mt: 2 }}
                       >
                         {t("Go to personal compendium")}
                       </Button>
                     )}
-                  </>
+                  </Box>
                 )}
             </Box>
           )}

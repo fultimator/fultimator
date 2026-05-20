@@ -568,6 +568,9 @@ export default function EditPlayerClasses({
           px: "10px",
           py: "5px",
           borderRadius: "8px 8px 0 0",
+          border: "2px solid",
+          borderColor: secondary,
+          borderBottom: "none",
           mb: 0,
         }}
       >
@@ -621,23 +624,24 @@ export default function EditPlayerClasses({
           </IconButton>
         </Tooltip>
       </Box>
-      <Divider sx={{ borderColor: secondary, borderBottomWidth: 2, mb: 2 }} />
-
       {isEditMode ? (
-        <>
-          <Paper
-            elevation={3}
-            sx={{
-              p: "15px",
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-            }}
-          >
-            <Grid container spacing={2}>
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: "0 0 8px 8px",
+            border: "2px solid",
+            borderColor: secondary,
+            borderTop: "none",
+            mb: 2,
+            overflow: "hidden",
+          }}
+        >
+          <Box sx={{ p: "15px" }}>
+            <Grid container spacing={1}>
               <Grid size={12}>
                 <CustomHeader
                   type="top"
+                  squareTop
                   headerText={t(
                     usesInnateClassRules ? "Innate Classes" : "Classes",
                   )}
@@ -685,39 +689,26 @@ export default function EditPlayerClasses({
               onChange={handleFileUpload}
               style={{ display: "none" }}
             />
-          </Paper>
-          <Divider sx={{ my: 2 }} />{" "}
-        </>
-      ) : null}
-      {player.classes.length === 0 && (
-        <Paper
-          elevation={3}
-          sx={{
-            p: "15px",
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
-          }}
-        >
-          <Grid size={12}>
-            <Typography variant="h3" align="center">
-              {t(
-                usesInnateClassRules
-                  ? "No innate classes added yet"
-                  : "No classes added yet",
-              )}
-            </Typography>
-          </Grid>
-        </Paper>
-      )}
-      {player.classes &&
-        player.classes.map((cls, index) => {
-          const clsLvl = automaticClassLevel
-            ? getDerivedClassLevel(cls)
-            : cls.lvl;
-          return (
-            <Box key={index} sx={{ mb: 2 }}>
-              <PlayerClassCard
+          </Box>
+          {player.classes.length === 0 && (
+            <Box sx={{ p: "15px", pt: 0 }}>
+              <Typography variant="h3" align="center">
+                {t(
+                  usesInnateClassRules
+                    ? "No innate classes added yet"
+                    : "No classes added yet",
+                )}
+              </Typography>
+            </Box>
+          )}
+          {player.classes &&
+            player.classes.map((cls, index) => {
+              const clsLvl = automaticClassLevel
+                ? getDerivedClassLevel(cls)
+                : cls.lvl;
+              return (
+                <Box key={index} sx={{ px: "15px", pb: "15px" }}>
+                  <PlayerClassCard
                 allClasses={player.classes}
                 classItem={{ ...cls, name: cls.name, lvl: clsLvl }}
                 onRemove={() => handleRemoveClass(index)}
@@ -761,6 +752,8 @@ export default function EditPlayerClasses({
             </Box>
           );
         })}
+        </Paper>
+      ) : null}
       {usesInnateClassRules && (
         <>
           <Divider

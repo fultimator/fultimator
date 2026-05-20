@@ -24,6 +24,7 @@ interface CustomHeaderProps {
   customTooltip?: string;
   onExpandCollapse?: () => void;
   allExpanded?: boolean;
+  squareTop?: boolean;
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
@@ -40,6 +41,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   customTooltip = "",
   onExpandCollapse,
   allExpanded = false,
+  squareTop = false,
 }) => {
   const theme = useCustomTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -104,7 +106,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
               background: theme.primary,
               textTransform: "uppercase",
               padding: "0 5px",
-              borderRadius: type === "top" ? "6px 6px 0 0" : 0,
+              borderRadius: squareTop ? 0 : type === "top" ? "6px 6px 0 0" : 0,
               margin: type === "top" ? "-30px 0 0 -30px" : "0 0 0 -30px",
               fontSize: isMobile ? "1em" : "1.5em",
               display: "flex",

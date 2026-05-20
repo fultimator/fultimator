@@ -28,6 +28,7 @@ const CustomHeader2: React.FC<CustomHeaderProps> = ({
         fontWeight: "normal",
         fontSize: "1em",
         paddingLeft: "17px",
+        paddingRight: "17px",
         paddingTop: "5px",
         paddingBottom: "5px",
         color: isDarkMode ? "white" : "black",

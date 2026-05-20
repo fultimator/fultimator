@@ -1,805 +1,706 @@
-import React, { useRef } from "react";
-import { useTheme } from "@mui/material/styles";
-import { Paper, Grid, Button, Divider } from "@mui/material";
-import { UploadFile } from "@mui/icons-material";
-import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
-import { useTranslate } from "../../../translation/translate";
-import useUploadJSON from "../../../hooks/useUploadJSON";
+import React, { useState } from "react";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Badge,
+  Box,
+  Grid,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
+import {
+  Add,
+  Casino,
+  Delete,
+  Edit,
+  Error as ErrorIcon,
+  Menu as MenuIcon,
+  RadioButtonUnchecked,
+} from "@mui/icons-material";
 import CustomHeader from "../../common/CustomHeader";
-import PlayerWeapons from "./weapons/PlayerWeapons";
-import PlayerCustomWeapons from "./customWeapons/PlayerCustomWeapons";
-import PlayerArmor from "./armor/PlayerArmor";
-import PlayerShields from "./shields/PlayerShields";
-import PlayerAccessories from "./accessories/PlayerAccessories";
-import PlayerWeaponModal from "./weapons/PlayerWeaponModal";
-import PlayerCustomWeaponModal from "./customWeapons/PlayerCustomWeaponModal";
-import PlayerArmorModal from "./armor/PlayerArmorModal";
-import PlayerShieldModal from "./shields/PlayerShieldModal";
-import PlayerAccessoryModal from "./accessories/PlayerAccessoryModal";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 import SphereInventory from "./technospheres/SphereInventory";
-
-import { MeleeIcon, ArmorIcon, ShieldIcon, AccessoryIcon } from "../../icons";
-import { deriveVehicleSlots, validateSlots } from "./slots/equipmentSlots";
-import { clearSlotAction } from "./slots/loadoutActions";
+import {
+  clearSlotAction,
+  equipItemToSlot,
+} from "./slots/loadoutActions";
+import { buildSphereData } from "../../../libs/technospheres";
+import {
+  SharedAccessoryCard,
+  SharedArmorCard,
+  SharedCustomWeaponCard,
+  SharedShieldCard,
+  SharedWeaponCard,
+} from "../../shared/itemCards";
+import {
+  AccessoryIcon,
+  ArmorIcon,
+  DistanceIcon,
+  MeleeIcon,
+  ShieldIcon,
+} from "../../icons";
 import { normalizeWeaponLike } from "../../../libs/weaponNormalization";
+import { buildAccessoryFormState, buildAccessorySavePayload } from "../../../forms/schema/itemSchemas/accessory";
+import { buildArmorFormState, buildArmorSavePayload } from "../../../forms/schema/itemSchemas/armor";
+import { buildShieldFormState, buildShieldSavePayload } from "../../../forms/schema/itemSchemas/shield";
+import { buildCustomWeaponFormState, buildCustomWeaponSavePayload } from "../../../forms/schema/itemSchemas/customWeapon";
+import ItemEditModal from "../../../forms/ui/ItemEditModal";
+import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
+import {
+  buildAccuracyCheckMessage,
+  prepareAccuracyCheck,
+  processAccuracyCheck,
+  rollAccuracyCheck,
+} from "../../app-drawer/panels/chat/domain/accuracy-checks";
+import { OpenBracket, CloseBracket } from "../../Bracket";
 
-export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
-  const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-  const isTechnospheres =
-    player?.settings?.optionalRules?.technospheres ?? false;
-  const technospheresVariant =
-    player?.settings?.optionalRules?.technospheresVariant ?? "standard";
-  const isSlotsVariant =
-    isTechnospheres && technospheresVariant !== "mnemospheres";
+function isTransformingCustomWeapon(item) {
+  return Boolean(
+    item?.customizations?.some(
+      (c) => c?.name === "weapon_customization_transforming",
+    ),
+  );
+}
 
-  const [openNewWeapon, setOpenNewWeapon] = React.useState(false);
-  const [editWeaponIndex, setEditWeaponIndex] = React.useState(null);
-  const [weapon, setWeapon] = React.useState(null);
+function resolveSlotLabel(item, source, index, slots) {
+  const mainRef = slots?.mainHand;
+  const offRef = slots?.offHand;
+  const inMain =
+    mainRef?.source === source &&
+    (mainRef?.index === index || mainRef?.name === item?.name);
+  const inOff =
+    offRef?.source === source &&
+    (offRef?.index === index || offRef?.name === item?.name);
+  if (inMain && inOff) return "M+O";
+  if (inMain) return "M";
+  if (inOff) return "O";
+  return null;
+}
 
-  const [openNewCustomWeapon, setOpenNewCustomWeapon] = React.useState(false);
-  const [editCustomWeaponIndex, setEditCustomWeaponIndex] =
-    React.useState(null);
-  const [customWeapon, setCustomWeapon] = React.useState(null);
+function metaText(item, equipType) {
+  if (equipType === "accessory") return null;
 
-  const [openNewArmor, setOpenNewArmor] = React.useState(false);
-  const [editArmorIndex, setEditArmorIndex] = React.useState(null);
-  const [armor, setArmor] = React.useState(null);
+  if (equipType === "shield" || equipType === "armor") {
+    const def = item?.def ?? 0;
+    const mdef = item?.mdef ?? 0;
+    return (
+      <>
+        <OpenBracket />
+        DEF:{def}
+        <CloseBracket />
+        {" \u2b25 "}
+        <OpenBracket />
+        MDEF:{mdef}
+        <CloseBracket />
+      </>
+    );
+  }
 
-  const [openNewShields, setOpenNewShields] = React.useState(false);
-  const [editShieldIndex, setEditShieldIndex] = React.useState(null);
-  const [shields, setShields] = React.useState(null);
+  const a1 = item?.accuracy?.attr1?.slice(0, 3)?.toUpperCase?.() || "DEX";
+  const a2 = item?.accuracy?.attr2?.slice(0, 3)?.toUpperCase?.() || "MIG";
+  const acc = item?.accuracy?.value ?? 0;
+  const dmg = item?.damage?.value ?? 0;
+  const type = item?.damage?.type ? ` ${item.damage.type}` : "";
+  const hr = item?.damage?.hrZero ? "HR0" : "HR+";
+  return (
+    <>
+      <OpenBracket />
+      {a1}+{a2}
+      <CloseBracket />
+      {acc ? `${acc > 0 ? "+" : ""}${acc}` : ""}
+      {" \u2b25 "}
+      <OpenBracket />
+      {hr}
+      {dmg}
+      <CloseBracket />
+      {type}
+    </>
+  );
+}
 
-  const [openNewAccessory, setOpenNewAccessory] = React.useState(false);
-  const [editAccessoryIndex, setEditAccessoryIndex] = React.useState(null);
-  const [accessory, setAccessory] = React.useState(null);
+function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const { ensurePersonalPack, addItem } = useCompendiumPacks();
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
-  const [openEquipmentCompendium, setOpenEquipmentCompendium] =
-    React.useState(false);
-  const [openWeaponCompendium, setOpenWeaponCompendium] = React.useState(false);
-  const [openArmorCompendium, setOpenArmorCompendium] = React.useState(false);
-  const [openShieldCompendium, setOpenShieldCompendium] = React.useState(false);
-  const [openCustomWeaponCompendium, setOpenCustomWeaponCompendium] =
-    React.useState(false);
-  const [openAccessoryCompendium, setOpenAccessoryCompendium] =
-    React.useState(false);
+  const { item, source, index } = row;
+  const CONTROL_SIZE = 32;
+  const slots = player?.equippedSlots ?? {};
+  const slotLabel = resolveSlotLabel(item, source, index, slots);
+  const isEquipped = Boolean(slotLabel);
+  const isCustom = source === "customWeapons";
+  const isTwoHand = isCustom || item?.hands === 2 || item?.isTwoHand;
+  const isTransforming = isCustom && isTransformingCustomWeapon(item);
 
-  const inv = player.equipment?.[0] || {};
+  const equipType =
+    source === "customWeapons"
+      ? "custom-weapon"
+      : source === "weapons"
+        ? "weapon"
+        : source === "shields"
+          ? "shield"
+          : source === "armor"
+            ? "armor"
+            : "accessory";
 
-  // Helper: update one source array inside equipment[0] and return a new player.
-  const patchInv = (p, source, updater) => {
-    const eq0 = {
-      ...(p.equipment?.[0] ?? {}),
-      [source]: updater(p.equipment?.[0]?.[source] ?? []),
-    };
-    const equipment = p.equipment ? [eq0, ...p.equipment.slice(1)] : [eq0];
-    return { ...p, equipment };
-  };
+  const isMeleeWeapon =
+    equipType === "weapon" || equipType === "custom-weapon"
+      ? Boolean(
+          item?.melee ||
+            item?.range === "weapon_range_melee" ||
+            item?.range === "melee",
+        )
+      : false;
 
-  // For add/edit/delete operations: preserve existing equippedSlots (only clear slots
-  // whose items no longer exist), then refresh vehicleSlots. Do NOT re-derive
-  // equippedSlots from isEquipped flags : that would unequip items when saving edits.
-  const preserveSlots = (p) => {
-    const validated = validateSlots(p);
-    return { ...validated, vehicleSlots: deriveVehicleSlots(validated) };
-  };
+  const EquipIcon =
+    equipType === "weapon" || equipType === "custom-weapon"
+      ? isMeleeWeapon
+        ? MeleeIcon
+        : DistanceIcon
+      : equipType === "armor"
+        ? ArmorIcon
+        : equipType === "shield"
+          ? ShieldIcon
+          : AccessoryIcon;
 
-  // FILE UPLOAD
-  const fileInputRef = useRef(null);
+  const onEquipToggle = (e) => {
+    e.stopPropagation();
+    if (!canEdit) return;
 
-  const { handleFileUpload } = useUploadJSON((data) => {
-    if (data && data.dataType) {
-      switch (data.dataType) {
-        case "weapon":
-          if (data.customizations) {
-            handleAddCustomWeapon(data);
-          } else {
-            handleAddWeapon(data);
-          }
-          break;
-        case "armor":
-          handleAddArmor(data);
-          break;
-        case "shield":
-          handleAddShield(data);
-          break;
-        case "accessory":
-          handleAddAccessory(data);
-          break;
-        default:
-          console.warn("Unknown equipment type:", data.dataType);
-      }
-    }
-  });
-
-  const handleUploadJSON = () => {
-    fileInputRef.current.click();
-  };
-
-  // OPEN MODALS
-  const handleOpenNewWeapon = () => {
-    setWeapon(null);
-    setEditWeaponIndex(null);
-    setOpenNewWeapon(true);
-  };
-
-  const handleOpenNewCustomWeapon = () => {
-    setCustomWeapon(null);
-    setEditCustomWeaponIndex(null);
-    setOpenNewCustomWeapon(true);
-  };
-
-  const handleOpenNewArmor = () => {
-    setArmor(null);
-    setEditArmorIndex(null);
-    setOpenNewArmor(true);
-  };
-
-  const handleOpenNewShield = () => {
-    setShields(null);
-    setEditShieldIndex(null);
-    setOpenNewShields(true);
-  };
-
-  const handleOpenNewAccessory = () => {
-    setAccessory(null);
-    setEditAccessoryIndex(null);
-    setOpenNewAccessory(true);
-  };
-
-  // CLOSE MODALS
-  const handleCloseNewWeapon = () => {
-    setOpenNewWeapon(false);
-    setWeapon(null);
-    setEditWeaponIndex(null);
-  };
-
-  const handleCloseNewCustomWeapon = () => {
-    setOpenNewCustomWeapon(false);
-    setCustomWeapon(null);
-    setEditCustomWeaponIndex(null);
-  };
-
-  const handleCloseNewArmor = () => {
-    setOpenNewArmor(false);
-    setArmor(null);
-    setEditArmorIndex(null);
-  };
-
-  const handleCloseNewShield = () => {
-    setOpenNewShields(false);
-    setShields(null);
-    setEditShieldIndex(null);
-  };
-
-  const handleCloseNewAccessory = () => {
-    setOpenNewAccessory(false);
-    setAccessory(null);
-    setEditAccessoryIndex(null);
-  };
-
-  // ADD NEW
-  const handleAddWeapon = (newWeapon) => {
-    const updated = patchInv(player, "weapons", (arr) => [...arr, newWeapon]);
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleAddCustomWeapon = (newCustomWeapon) => {
-    const updated = patchInv(player, "customWeapons", (arr) => [
-      ...arr,
-      newCustomWeapon,
-    ]);
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleAddArmor = (newArmor) => {
-    const updated = patchInv(player, "armor", (arr) => [...arr, newArmor]);
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleAddShield = (newShields) => {
-    const updated = patchInv(player, "shields", (arr) => [...arr, newShields]);
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleAddAccessory = (newAccessory) => {
-    const updated = patchInv(player, "accessories", (arr) => [
-      ...arr,
-      newAccessory,
-    ]);
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleImportFromCompendium = (equipType, itemData) => {
-    if (equipType === "weapon") {
-      handleAddWeapon(
-        normalizeWeaponLike({
-          ...itemData,
-          base: itemData,
-          name: itemData.name,
-          category: itemData.category || "",
-          martial: itemData.martial || false,
-          damageBonus: false,
-          damageReworkBonus: false,
-          precBonus: false,
-          rework: false,
-          quality: "",
-          qualityCost: 0,
-          totalBonus: 0,
-          selectedQuality: "",
-          cost: itemData.cost || 0,
-          isEquipped: false,
-        }),
-      );
-    } else if (equipType === "armor") {
-      handleAddArmor({
-        base: itemData,
-        name: itemData.name,
-        quality: "",
-        martial: itemData.martial || false,
-        qualityCost: 0,
-        selectedQuality: "",
-        init: itemData.init || 0,
-        rework: false,
-        cost: itemData.cost || 0,
-        def: itemData.def || 0,
-        mdef: itemData.mdef || 0,
-        isEquipped: false,
+    if (isEquipped) {
+      setPlayer((prev) => {
+        let next = prev;
+        if (slotLabel.includes("M")) next = clearSlotAction(next, "mainHand");
+        if (slotLabel.includes("O")) next = clearSlotAction(next, "offHand");
+        return next;
       });
-    } else if (equipType === "shield") {
-      handleAddShield({
-        base: itemData,
-        name: itemData.name,
-        quality: "",
-        martial: itemData.martial || false,
-        qualityCost: 0,
-        selectedQuality: "",
-        init: itemData.init || 0,
-        rework: false,
-        cost: itemData.cost || 0,
-        def: itemData.def || 0,
-        mdef: itemData.mdef || 0,
-        isEquipped: false,
-      });
-    } else if (equipType === "custom-weapon") {
-      handleAddCustomWeapon({ ...itemData, isEquipped: false });
-    } else if (equipType === "accessory") {
-      handleAddAccessory({ ...itemData, isEquipped: false });
-    }
-  };
-
-  // DELETE
-  const handleDeleteWeapon = (index) => {
-    const updated = patchInv(player, "weapons", (arr) =>
-      arr.filter((_, i) => i !== index),
-    );
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleDeleteCustomWeapon = (index) => {
-    const updated = patchInv(player, "customWeapons", (arr) =>
-      arr.filter((_, i) => i !== index),
-    );
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleDeleteArmor = (index) => {
-    const updated = patchInv(player, "armor", (arr) =>
-      arr.filter((_, i) => i !== index),
-    );
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleDeleteShield = (index) => {
-    const updated = patchInv(player, "shields", (arr) =>
-      arr.filter((_, i) => i !== index),
-    );
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleDeleteAccessory = (index) => {
-    const updated = patchInv(player, "accessories", (arr) =>
-      arr.filter((_, i) => i !== index),
-    );
-    setPlayer(preserveSlots(updated));
-  };
-
-  // EDIT
-  const handleEditWeapon = (index) => {
-    setWeapon(inv.weapons[index]);
-    setEditWeaponIndex(index);
-    setOpenNewWeapon(true);
-  };
-
-  const handleEditCustomWeapon = (index) => {
-    setCustomWeapon(inv.customWeapons[index]);
-    setEditCustomWeaponIndex(index);
-    setOpenNewCustomWeapon(true);
-  };
-
-  const handleEditArmor = (index) => {
-    setArmor(inv.armor[index]);
-    setEditArmorIndex(index);
-    setOpenNewArmor(true);
-  };
-
-  const handleEditShield = (index) => {
-    setShields(inv.shields[index]);
-    setEditShieldIndex(index);
-    setOpenNewShields(true);
-  };
-
-  const handleEditAccessory = (index) => {
-    setAccessory(inv.accessories[index]);
-    setEditAccessoryIndex(index);
-    setOpenNewAccessory(true);
-  };
-
-  // SAVE
-  const handleSaveWeapon = (updatedWeapon) => {
-    if (editWeaponIndex !== null) {
-      const updated = patchInv(player, "weapons", (arr) =>
-        arr.map((weapon, i) =>
-          i === editWeaponIndex ? updatedWeapon : weapon,
-        ),
-      );
-      setPlayer(preserveSlots(updated));
-    } else {
-      handleAddWeapon(updatedWeapon);
-    }
-    setOpenNewWeapon(false);
-  };
-
-  const handleSaveCustomWeapon = (updatedCustomWeapon) => {
-    if (editCustomWeaponIndex !== null) {
-      const updated = patchInv(player, "customWeapons", (arr) =>
-        arr.map((customWeapon, i) =>
-          i === editCustomWeaponIndex ? updatedCustomWeapon : customWeapon,
-        ),
-      );
-      setPlayer(preserveSlots(updated));
-    } else {
-      handleAddCustomWeapon(updatedCustomWeapon);
-    }
-    setOpenNewCustomWeapon(false);
-  };
-
-  const handleSaveArmor = (updatedArmor) => {
-    if (editArmorIndex !== null) {
-      const updated = patchInv(player, "armor", (arr) =>
-        arr.map((armor, i) => (i === editArmorIndex ? updatedArmor : armor)),
-      );
-      setPlayer(preserveSlots(updated));
-    } else {
-      handleAddArmor(updatedArmor);
-    }
-    setOpenNewArmor(false);
-  };
-
-  const handleSaveShield = (updatedShield) => {
-    if (editShieldIndex !== null) {
-      const updated = patchInv(player, "shields", (arr) =>
-        arr.map((shield, i) =>
-          i === editShieldIndex ? updatedShield : shield,
-        ),
-      );
-      setPlayer(preserveSlots(updated));
-    } else {
-      handleAddShield(updatedShield);
-    }
-    setOpenNewShields(false);
-  };
-
-  const handleSaveAccessory = (updatedAccessory) => {
-    if (editAccessoryIndex !== null) {
-      const updated = patchInv(player, "accessories", (arr) =>
-        arr.map((accessory, i) =>
-          i === editAccessoryIndex ? updatedAccessory : accessory,
-        ),
-      );
-      setPlayer(preserveSlots(updated));
-    } else {
-      handleAddAccessory(updatedAccessory);
-    }
-    setOpenNewAccessory(false);
-  };
-
-  // TOGGLE EQUIPPED
-
-  // Equip an item to a specific slot, displacing the current occupant.
-  const equipToSlot = (source, itemName, itemIndex, slot, isTwoHand) => {
-    let updated = player;
-
-    // Clear current occupant of the target slot
-    const currentRef = updated.equippedSlots?.[slot];
-    if (currentRef) {
-      updated = patchInv(updated, currentRef.source, (arr) =>
-        arr.map((it, idx) => {
-          const match =
-            currentRef.index !== undefined
-              ? idx === currentRef.index
-              : it.name === currentRef.name;
-          return match ? { ...it, isEquipped: false } : it;
-        }),
-      );
+      return;
     }
 
-    // 2H in mainHand also clears offHand
-    if (isTwoHand && slot === "mainHand") {
-      const offRef = updated.equippedSlots?.offHand;
-      if (offRef) {
-        updated = patchInv(updated, offRef.source, (arr) =>
-          arr.map((it, idx) => {
-            const match =
-              offRef.index !== undefined
-                ? idx === offRef.index
-                : it.name === offRef.name;
-            return match ? { ...it, isEquipped: false } : it;
-          }),
-        );
-      }
-    }
+    const targetSlot =
+      isTwoHand || !slots.mainHand
+        ? "mainHand"
+        : !slots.offHand
+          ? "offHand"
+          : "mainHand";
 
-    // Equip the item
-    updated = patchInv(updated, source, (arr) =>
-      arr.map((it, idx) => {
-        const match =
-          itemIndex !== undefined ? idx === itemIndex : it.name === itemName;
-        return match ? { ...it, isEquipped: true } : it;
+    setPlayer((prev) =>
+      equipItemToSlot(prev, targetSlot, {
+        source,
+        label: item?.name || "",
+        index,
+        item,
       }),
     );
-
-    const prevSlots = updated.equippedSlots ?? {
-      mainHand: null,
-      offHand: null,
-      armor: null,
-      accessory: null,
-    };
-    setPlayer({
-      ...updated,
-      equippedSlots: {
-        ...prevSlots,
-        [slot]: { source, name: itemName, index: itemIndex },
-        ...(isTwoHand && slot === "mainHand" ? { offHand: null } : {}),
-      },
-      vehicleSlots: deriveVehicleSlots(updated),
-    });
   };
 
-  // Unequip an item by clearing whichever slot it currently occupies.
-  const unequipItem = (source, itemName, itemIndex) => {
-    const slots = player.equippedSlots ?? {};
-    const slotKey = Object.keys(slots).find((k) => {
-      const ref = slots[k];
-      if (!ref || ref.source !== source) return false;
-      if (ref.index !== undefined && itemIndex !== undefined)
-        return ref.index === itemIndex;
-      return ref.name === itemName;
-    });
-    if (slotKey) {
-      setPlayer((prev) => clearSlotAction(prev, slotKey));
-    } else {
-      setPlayer(preserveSlots(player));
-    }
-  };
-
-  const handleEquipWeapon = (index, slot) => {
-    const weapon = (inv.weapons ?? [])[index];
-    if (!weapon) return;
-    equipToSlot(
-      "weapons",
-      weapon.name,
-      index,
-      slot,
-      weapon.hands === 2 || weapon.isTwoHand,
-    );
-  };
-
-  const handleUnequipWeapon = (index) => {
-    const weapon = (inv.weapons ?? [])[index];
-    if (!weapon) return;
-    unequipItem("weapons", weapon.name, index);
-  };
-
-  const handleEquipCustomWeapon = (index) => {
-    const cw = (inv.customWeapons ?? [])[index];
-    if (!cw) return;
-    equipToSlot("customWeapons", cw.name, index, "mainHand", true);
-  };
-
-  const handleUnequipCustomWeapon = (index) => {
-    const cw = (inv.customWeapons ?? [])[index];
-    if (!cw) return;
-    unequipItem("customWeapons", cw.name, index);
-  };
-
-  const handleUpdateCustomWeapons = (updatedCustomWeapons) => {
-    const updated = patchInv(
-      player,
-      "customWeapons",
-      () => updatedCustomWeapons,
-    );
-    setPlayer(preserveSlots(updated));
-  };
-
-  const handleEquipArmor = (armorIndex) => {
-    const armor = (inv.armor ?? [])[armorIndex];
-    if (!armor) return;
-    if (armor.isEquipped) {
-      unequipItem("armor", armor.name, armorIndex);
-    } else {
-      equipToSlot("armor", armor.name, armorIndex, "armor", false);
-    }
-  };
-
-  const handleEquipShield = (index, slot) => {
-    const shield = (inv.shields ?? [])[index];
-    if (!shield) return;
-    equipToSlot("shields", shield.name, index, slot, false);
-  };
-
-  const handleUnequipShield = (index) => {
-    const shield = (inv.shields ?? [])[index];
-    if (!shield) return;
-    unequipItem("shields", shield.name, index);
-  };
-
-  const handleEquipAccessory = (accessoryIndex) => {
-    const accessory = (inv.accessories ?? [])[accessoryIndex];
-    if (!accessory) return;
-    if (accessory.isEquipped) {
-      unequipItem("accessories", accessory.name, accessoryIndex);
-    } else {
-      equipToSlot(
-        "accessories",
-        accessory.name,
-        accessoryIndex,
-        "accessory",
-        false,
+  const onSwap = (e) => {
+    e.stopPropagation();
+    if (!canEdit || !isTransforming || !isEquipped || source !== "customWeapons")
+      return;
+    setPlayer((prev) => {
+      const eq0 = prev?.equipment?.[0] ?? {};
+      const updatedCustomWeapons = (eq0.customWeapons ?? []).map((cw, i) =>
+        i !== index
+          ? cw
+          : {
+              ...cw,
+              activeForm: cw.activeForm === "secondary" ? "primary" : "secondary",
+            },
       );
+      const equipment = prev?.equipment
+        ? [{ ...eq0, customWeapons: updatedCustomWeapons }, ...prev.equipment.slice(1)]
+        : [{ ...eq0, customWeapons: updatedCustomWeapons }];
+      return { ...prev, equipment };
+    });
+  };
+
+  const onDeleteItem = (e) => {
+    e.stopPropagation();
+    if (!canEdit) return;
+    setPlayer((prev) => {
+      const eq0 = prev?.equipment?.[0] ?? {};
+      const nextArr = (eq0?.[source] ?? []).filter((_, i) => i !== index);
+      const equipment = prev?.equipment
+        ? [{ ...eq0, [source]: nextArr }, ...prev.equipment.slice(1)]
+        : [{ ...eq0, [source]: nextArr }];
+      return { ...prev, equipment };
+    });
+  };
+
+  const onEdit = (e) => {
+    e.stopPropagation();
+    if (!canEdit || !onEditItem) return;
+    onEditItem(source, index, item);
+  };
+
+  const onAddToCompendium = async (e) => {
+    e.stopPropagation();
+    const typeMap = {
+      weapons: "weapon",
+      customWeapons: "custom-weapon",
+      shields: "shield",
+      armor: "armor",
+      accessories: "accessory",
+    };
+    const dataType = typeMap[source];
+    if (!dataType) return;
+    const pack = await ensurePersonalPack();
+    await addItem(pack.id, dataType, item);
+  };
+
+  const onRoll = (e) => {
+    e.stopPropagation();
+    if (!item?.accuracy) return;
+    const attr1 = item.accuracy?.attr1 || "dexterity";
+    const attr2 = item.accuracy?.attr2 || "might";
+    const dieSizes = {
+      primary: player?.attributes?.[attr1]?.base ?? player?.attributes?.[attr1] ?? 6,
+      secondary: player?.attributes?.[attr2]?.base ?? player?.attributes?.[attr2] ?? 6,
+    };
+    const toRollKey = (attr) => {
+      const key = String(attr || "").toLowerCase();
+      if (key.startsWith("dex")) return "dex";
+      if (key.startsWith("ins")) return "ins";
+      if (key.startsWith("mig")) return "mig";
+      if (key.startsWith("wil") || key.startsWith("wlp")) return "wlp";
+      return "dex";
+    };
+
+    const intent = prepareAccuracyCheck({
+      attr1: toRollKey(attr1),
+      attr2: toRollKey(attr2),
+      accuracyBonus: item?.accuracy?.value ?? 0,
+      name: item?.name || "Attack",
+      description: item?.description || undefined,
+      baseDamage: item?.damage?.value ?? 0,
+      damageType: item?.damage?.type ?? "physical",
+      accuracyDefense: item?.accuracy?.defense ?? "def",
+      range: item?.range ?? "melee",
+      hrZero: item?.damage?.hrZero === true,
+    });
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(intent, rolls, dieSizes, player?.name || "Player");
+    addMessage(buildAccuracyCheckMessage(result));
+  };
+
+  const renderExpandedCard = () => {
+    if (source === "weapons") return <SharedWeaponCard item={item} />;
+    if (source === "customWeapons") {
+      const cardItem = {
+        ...item,
+        secondWeaponName: item?.secondWeaponName ?? item?.secondName,
+        secondSelectedCategory: item?.secondSelectedCategory ?? item?.secondCategory,
+        secondSelectedRange: item?.secondSelectedRange ?? item?.secondRange,
+        secondCurrentCustomizations:
+          item?.secondCurrentCustomizations ?? item?.secondCustomizations,
+      };
+      return (
+        <SharedCustomWeaponCard
+          variant="sheet"
+          item={{
+            ...cardItem,
+            hands: 2,
+            cost: cardItem?.cost || 300,
+            defModifier: cardItem?.defModifier || 0,
+            mDefModifier: cardItem?.mDefModifier || 0,
+            overrideDamageType: cardItem?.overrideDamageType || false,
+          }}
+          sphereData={buildSphereData(
+            { slots: cardItem?.slots, slotted: cardItem?.slotted },
+            player,
+          )}
+        />
+      );
+    }
+    if (source === "shields") return <SharedShieldCard item={item} />;
+    if (source === "armor") {
+      return <SharedArmorCard item={item} sphereData={buildSphereData(item, player)} />;
+    }
+    if (source === "accessories") return <SharedAccessoryCard item={item} />;
+    return null;
+  };
+
+  return (
+    <Accordion disableGutters elevation={0} sx={{ border: "1px solid", borderColor: "divider", mb: 0.75, "&:before": { display: "none" }, bgcolor: "background.paper" }}>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          minHeight: 56,
+          "&.Mui-expanded": { minHeight: 56 },
+          "& .MuiAccordionSummary-expandIconWrapper": {
+            width: CONTROL_SIZE,
+            height: CONTROL_SIZE,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mr: 0.25,
+          },
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+            minWidth: 0,
+            my: 0,
+            "&.Mui-expanded": { my: 0 },
+          },
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", height: "100%" }} onClick={(e) => e.stopPropagation()}>
+          <Box sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Tooltip title="Roll">
+              <IconButton component="span" size="small" onClick={onRoll} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, p: 0.5 }}>
+                <Casino sx={{ fontSize: "1.2rem" }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+          <Box sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <IconButton
+              component="span"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuAnchorEl(e.currentTarget);
+              }}
+              sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, p: 0.5 }}
+            >
+              <MenuIcon sx={{ fontSize: "1.2rem" }} />
+            </IconButton>
+          </Box>
+          <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
+            <MenuItem onClick={async (e) => { await onAddToCompendium(e); setMenuAnchorEl(null); }}>
+              <ListItemText>Add to Compendium</ListItemText>
+            </MenuItem>
+            {isTransforming && (
+              <MenuItem disabled={!isEquipped} onClick={(e) => { onSwap(e); setMenuAnchorEl(null); }}>
+                <ListItemIcon><CompareArrowsIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>Swap Form</ListItemText>
+              </MenuItem>
+            )}
+            <MenuItem onClick={(e) => { onDeleteItem(e); setMenuAnchorEl(null); }} disabled={!canEdit} sx={{ color: "error.main" }}>
+              <ListItemIcon><Delete color="error" fontSize="small" /></ListItemIcon>
+              <ListItemText>Delete</ListItemText>
+            </MenuItem>
+          </Menu>
+        </Box>
+
+        <Box sx={{ flexGrow: 1, overflow: "hidden", display: "flex", alignItems: "center", minHeight: 40 }}>
+          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+            <Typography noWrap>{item?.name || "Unnamed Weapon"}</Typography>
+          </Stack>
+        </Box>
+
+        <Stack direction="row" spacing={0.25} alignItems="center" justifyContent="center" onClick={(e) => e.stopPropagation()} sx={{ ml: 1, alignSelf: "stretch" }}>
+          {metaText(item, equipType) ? (
+            <Typography variant="body2" color="text.secondary" sx={{ mr: 0.5, whiteSpace: "nowrap", display: "flex", alignItems: "center", minHeight: CONTROL_SIZE, lineHeight: 1 }}>
+              {metaText(item, equipType)}
+            </Typography>
+          ) : null}
+
+          <Tooltip title="Edit">
+            <IconButton
+              size="small"
+              onClick={onEdit}
+              disabled={!canEdit || !onEditItem}
+              sx={{
+                width: CONTROL_SIZE,
+                height: CONTROL_SIZE,
+                p: 0.5,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "text.primary",
+                "& .MuiSvgIcon-root": { fontSize: "1.2rem" },
+              }}
+            >
+              <Edit />
+            </IconButton>
+          </Tooltip>
+
+          <Box sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Tooltip title={isEquipped ? "Unequip" : "Equip"}>
+              <Badge badgeContent={slotLabel || null} color="primary" invisible={!slotLabel} sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}>
+                <IconButton
+                  size="small"
+                  onClick={onEquipToggle}
+                  disabled={!canEdit}
+                  sx={{ p: 0.5, width: CONTROL_SIZE, height: CONTROL_SIZE, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "text.primary", opacity: 1, "& .MuiSvgIcon-root": { fontSize: "1.25rem", opacity: 1 } }}
+                >
+                  {isEquipped ? <EquipIcon /> : canEdit ? <RadioButtonUnchecked sx={{ fontSize: "1.2rem" }} /> : <ErrorIcon sx={{ fontSize: "1.2rem", color: "error.main" }} />}
+                </IconButton>
+              </Badge>
+            </Tooltip>
+          </Box>
+
+          {isTransforming && (
+            <Box sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <IconButton
+                size="small"
+                onClick={onSwap}
+                disabled={!canEdit || !isEquipped}
+                sx={{ p: 0.5, width: CONTROL_SIZE, height: CONTROL_SIZE, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "text.primary", opacity: 1, "& .MuiSvgIcon-root": { fontSize: "1.25rem", opacity: 1 } }}
+              >
+                <CompareArrowsIcon />
+              </IconButton>
+            </Box>
+          )}
+        </Stack>
+      </AccordionSummary>
+
+      <AccordionDetails>
+        <Stack spacing={1}>
+          <Box>{renderExpandedCard()}</Box>
+          {item?.description ? (
+            <Typography variant="caption" color="text.secondary">{item.description}</Typography>
+          ) : null}
+        </Stack>
+      </AccordionDetails>
+    </Accordion>
+  );
+}
+
+function EquipmentGroup({
+  title,
+  rows,
+  player,
+  setPlayer,
+  canEdit,
+  headerType,
+  onOpenCompendium,
+  onAddItem,
+  onEditItem,
+}) {
+  return (
+    <Grid container spacing={1}>
+      <Grid size={12}>
+        <CustomHeader
+          type={headerType}
+          headerText={title}
+          showIconButton={canEdit}
+          icon={Add}
+          addItem={onAddItem}
+          openCompendium={onOpenCompendium}
+        />
+      </Grid>
+      <Grid size={12}>
+        {rows.length === 0 ? (
+          <Typography color="text.secondary" variant="body2">No items.</Typography>
+        ) : (
+          <Grid container spacing={1}>
+            {rows.map((row) => (
+              <Grid key={`${row.source}-${row.index}-${row.item?.name}`} size={{ xs: 12, md: 6 }}>
+                <EquipmentRow
+                  row={row}
+                  player={player}
+                  setPlayer={setPlayer}
+                  canEdit={canEdit}
+                  onEditItem={onEditItem}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Grid>
+    </Grid>
+  );
+}
+
+export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
+  const [compendiumOpen, setCompendiumOpen] = useState(false);
+  const [compendiumType, setCompendiumType] = useState("weapons");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editSource, setEditSource] = useState(null);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editItem, setEditItem] = useState(null);
+
+  const isTechnospheres = player?.settings?.optionalRules?.technospheres ?? false;
+
+  const inv = player?.equipment?.[0] || {};
+  const weapons = (inv?.weapons || []).map((item, index) => ({ item, source: "weapons", index }));
+  const customWeapons = (inv?.customWeapons || []).map((item, index) => ({ item, source: "customWeapons", index }));
+  const shields = (inv?.shields || []).map((item, index) => ({ item, source: "shields", index }));
+  const armor = (inv?.armor || []).map((item, index) => ({ item, source: "armor", index }));
+  const accessories = (inv?.accessories || []).map((item, index) => ({ item, source: "accessories", index }));
+
+  const patchInv = (source, updater) => {
+    setPlayer((prev) => {
+      const eq0 = {
+        ...(prev?.equipment?.[0] ?? {}),
+        [source]: updater(prev?.equipment?.[0]?.[source] ?? []),
+      };
+      const equipment = prev?.equipment ? [eq0, ...prev.equipment.slice(1)] : [eq0];
+      return { ...prev, equipment };
+    });
+  };
+
+  const SOURCE_TO_ITEM_TYPE = {
+    weapons: "weapon",
+    customWeapons: "customWeapon",
+    shields: "shield",
+    armor: "armor",
+    accessories: "accessory",
+  };
+
+  const openEditDialog = (source, index, item) => {
+    setEditSource(source);
+    setEditIndex(index);
+    setEditItem(item ?? null);
+    setEditDialogOpen(true);
+  };
+
+  const saveEditDialog = (savedItem) => {
+    if (!editSource || editIndex == null) return;
+    patchInv(editSource, (arr) =>
+      arr.map((it, i) => (i === editIndex ? savedItem : it)),
+    );
+    setEditDialogOpen(false);
+  };
+
+  const deleteEditDialog = (index) => {
+    if (!editSource || index == null) return;
+    patchInv(editSource, (arr) => arr.filter((_, i) => i !== index));
+    setEditDialogOpen(false);
+  };
+
+  const handleAddNew = (source) => {
+    if (!isEditMode) return;
+    if (source === "weapons") {
+      patchInv("weapons", (arr) => [...arr, normalizeWeaponLike({ name: "New Weapon", isEquipped: false })]);
+      return;
+    }
+    if (source === "customWeapons") {
+      patchInv("customWeapons", (arr) => [...arr, buildCustomWeaponSavePayload(buildCustomWeaponFormState(null))]);
+      return;
+    }
+    if (source === "shields") {
+      patchInv("shields", (arr) => [...arr, buildShieldSavePayload(buildShieldFormState(null))]);
+      return;
+    }
+    if (source === "armor") {
+      patchInv("armor", (arr) => [...arr, buildArmorSavePayload(buildArmorFormState(null))]);
+      return;
+    }
+    if (source === "accessories") {
+      patchInv("accessories", (arr) => [...arr, buildAccessorySavePayload(buildAccessoryFormState(null))]);
+    }
+  };
+
+  const handleImportFromCompendium = (type, item) => {
+    if (type === "weapons") {
+      patchInv("weapons", (arr) => [...arr, normalizeWeaponLike({ ...item, base: item, name: item.name, isEquipped: false })]);
+      return;
+    }
+    if (type === "custom-weapons") {
+      patchInv("customWeapons", (arr) => [...arr, { ...item, isEquipped: false }]);
+      return;
+    }
+    if (type === "armor") {
+      patchInv("armor", (arr) => [...arr, { ...item, isEquipped: false }]);
+      return;
+    }
+    if (type === "shields") {
+      patchInv("shields", (arr) => [...arr, { ...item, isEquipped: false }]);
+      return;
+    }
+    if (type === "accessories") {
+      patchInv("accessories", (arr) => [...arr, { ...item, isEquipped: false }]);
     }
   };
 
   return (
     <>
-      {isEditMode ? (
-        <>
-          <Paper
-            elevation={3}
-            sx={{
-              p: "15px",
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-            }}
-          >
-            <Grid container spacing={2}>
-              <Grid size={12}>
-                <CustomHeader
-                  type="top"
-                  headerText={t("Equipment")}
-                  showIconButton={false}
-                />
-              </Grid>
-              <Grid container sx={{ justifyContent: "center" }} spacing={2}>
-                {!isSlotsVariant && (
-                  <Grid
-                    container
-                    sx={{ justifyContent: "center" }}
-                    size={{
-                      xs: 6,
-                      sm: 2.4,
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      onClick={handleOpenNewWeapon}
-                      startIcon={<MeleeIcon />}
-                      size="small"
-                    >
-                      {t("Add Weapon")}
-                    </Button>
-                  </Grid>
-                )}
-                <Grid
-                  container
-                  sx={{ justifyContent: "center" }}
-                  size={{
-                    xs: 6,
-                    sm: 2.4,
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    onClick={handleOpenNewCustomWeapon}
-                    startIcon={<MeleeIcon />}
-                    size="small"
-                  >
-                    {t("Add Custom Weapon")}
-                  </Button>
-                </Grid>
-                <Grid
-                  container
-                  sx={{ justifyContent: "center" }}
-                  size={{
-                    xs: 6,
-                    sm: 2.4,
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    onClick={handleOpenNewArmor}
-                    startIcon={<ArmorIcon />}
-                    disabled={inv.armor && inv.armor.length >= 10}
-                    size="small"
-                  >
-                    {t("Add Armor")}
-                  </Button>
-                </Grid>
-                {!isSlotsVariant && (
-                  <Grid
-                    container
-                    sx={{ justifyContent: "center" }}
-                    size={{
-                      xs: 6,
-                      sm: 2.4,
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      onClick={handleOpenNewShield}
-                      startIcon={<ShieldIcon />}
-                      disabled={inv.shields && inv.shields.length >= 10}
-                      size="small"
-                    >
-                      {t("Add Shield")}
-                    </Button>
-                  </Grid>
-                )}
-                <Grid
-                  container
-                  sx={{ justifyContent: "center" }}
-                  size={{
-                    xs: 6,
-                    sm: 2.4,
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    onClick={handleOpenNewAccessory}
-                    startIcon={<AccessoryIcon />}
-                    disabled={inv.accessories && inv.accessories.length >= 10}
-                    size="small"
-                  >
-                    {t("Add Accessory")}
-                  </Button>
-                </Grid>
-                <Grid
-                  container
-                  sx={{ justifyContent: "center" }}
-                  size={{
-                    xs: 6,
-                    sm: "auto",
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    onClick={handleUploadJSON}
-                    startIcon={<UploadFile />}
-                    size="small"
-                  >
-                    {t("Upload JSON")}
-                  </Button>
-                </Grid>
-                <Grid
-                  container
-                  sx={{ justifyContent: "center" }}
-                  size={{
-                    xs: 6,
-                    sm: "auto",
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    onClick={() => setOpenEquipmentCompendium(true)}
-                    startIcon={<LibraryAddIcon />}
-                    size="small"
-                  >
-                    {t("Import from Pack")}
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Paper>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            style={{ display: "none" }}
-            onChange={handleFileUpload}
-          />
-          <Divider sx={{ my: 2 }} />
-        </>
-      ) : null}
-      {!isSlotsVariant && (
-        <PlayerWeapons
-          player={player}
-          weapons={inv.weapons || []}
-          onEditWeapon={handleEditWeapon}
-          onDeleteWeapon={handleDeleteWeapon}
-          onEquipWeapon={handleEquipWeapon}
-          onUnequipWeapon={handleUnequipWeapon}
-          onAddItem={handleOpenNewWeapon}
-          isEditMode={isEditMode}
-          onOpenCompendium={
-            isEditMode ? () => setOpenWeaponCompendium(true) : undefined
-          }
-        />
-      )}
-      {!isSlotsVariant && <Divider sx={{ my: 2 }} />}
-      <PlayerCustomWeapons
-        player={player}
-        customWeapons={inv.customWeapons || []}
-        onEditCustomWeapon={handleEditCustomWeapon}
-        onDeleteCustomWeapon={handleDeleteCustomWeapon}
-        onEquipCustomWeapon={handleEquipCustomWeapon}
-        onUnequipCustomWeapon={handleUnequipCustomWeapon}
-        onUpdateCustomWeapons={handleUpdateCustomWeapons}
-        onAddItem={handleOpenNewCustomWeapon}
-        onOpenCompendium={
-          isEditMode ? () => setOpenCustomWeaponCompendium(true) : undefined
-        }
-        isEditMode={isEditMode}
-      />
-      <Divider sx={{ my: 2 }} />
-      <PlayerArmor
-        player={player}
-        armor={inv.armor || []}
-        onEditArmor={handleEditArmor}
-        onDeleteArmor={handleDeleteArmor}
-        onEquipArmor={handleEquipArmor}
-        onAddItem={handleOpenNewArmor}
-        isEditMode={isEditMode}
-        onOpenCompendium={
-          isEditMode ? () => setOpenArmorCompendium(true) : undefined
-        }
-      />
-      {!isSlotsVariant && (
-        <>
-          <Divider sx={{ my: 2 }} />
-          <PlayerShields
+      <Paper elevation={3} sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: "secondary.main" }}>
+        <Stack spacing={2}>
+          <EquipmentGroup
+            title="Weapon"
+            rows={weapons}
             player={player}
-            shields={inv.shields || []}
-            onEditShield={handleEditShield}
-            onDeleteShield={handleDeleteShield}
-            onEquipShield={handleEquipShield}
-            onUnequipShield={handleUnequipShield}
-            onAddItem={handleOpenNewShield}
-            isEditMode={isEditMode}
-            onOpenCompendium={
-              isEditMode ? () => setOpenShieldCompendium(true) : undefined
-            }
+            setPlayer={setPlayer}
+            canEdit={isEditMode}
+            headerType="top"
+            onOpenCompendium={() => { setCompendiumType("weapons"); setCompendiumOpen(true); }}
+            onAddItem={() => handleAddNew("weapons")}
+            onEditItem={openEditDialog}
           />
-        </>
-      )}
-      <Divider sx={{ my: 2 }} />
-      <PlayerAccessories
-        player={player}
-        accessories={inv.accessories || []}
-        onEditAccessory={handleEditAccessory}
-        onDeleteAccessory={handleDeleteAccessory}
-        onEquipAccessory={handleEquipAccessory}
-        onAddItem={handleOpenNewAccessory}
-        onOpenCompendium={
-          isEditMode ? () => setOpenAccessoryCompendium(true) : undefined
-        }
-        isEditMode={isEditMode}
+          <EquipmentGroup
+            title="Custom Weapon"
+            rows={customWeapons}
+            player={player}
+            setPlayer={setPlayer}
+            canEdit={isEditMode}
+            headerType="middle"
+            onOpenCompendium={() => { setCompendiumType("custom-weapons"); setCompendiumOpen(true); }}
+            onAddItem={() => handleAddNew("customWeapons")}
+            onEditItem={openEditDialog}
+          />
+          <EquipmentGroup
+            title="Shield"
+            rows={shields}
+            player={player}
+            setPlayer={setPlayer}
+            canEdit={isEditMode}
+            headerType="middle"
+            onOpenCompendium={() => { setCompendiumType("shields"); setCompendiumOpen(true); }}
+            onAddItem={() => handleAddNew("shields")}
+            onEditItem={openEditDialog}
+          />
+          <EquipmentGroup
+            title="Armor"
+            rows={armor}
+            player={player}
+            setPlayer={setPlayer}
+            canEdit={isEditMode}
+            headerType="middle"
+            onOpenCompendium={() => { setCompendiumType("armor"); setCompendiumOpen(true); }}
+            onAddItem={() => handleAddNew("armor")}
+            onEditItem={openEditDialog}
+          />
+          <EquipmentGroup
+            title="Accessory"
+            rows={accessories}
+            player={player}
+            setPlayer={setPlayer}
+            canEdit={isEditMode}
+            headerType="middle"
+            onOpenCompendium={() => { setCompendiumType("accessories"); setCompendiumOpen(true); }}
+            onAddItem={() => handleAddNew("accessories")}
+            onEditItem={openEditDialog}
+          />
+        </Stack>
+      </Paper>
+
+      <CompendiumViewerModal
+        open={compendiumOpen}
+        onClose={() => setCompendiumOpen(false)}
+        onAddItem={(item) => handleImportFromCompendium(compendiumType, item)}
+        initialType={compendiumType}
+        restrictToTypes={[compendiumType]}
+        context="player"
       />
+
+      <ItemEditModal
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        itemType={SOURCE_TO_ITEM_TYPE[editSource]}
+        item={editItem}
+        editIndex={editIndex}
+        onSave={saveEditDialog}
+        onDelete={deleteEditDialog}
+        ctx={{ player, setPlayer }}
+      />
+
       {isTechnospheres && (
         <>
-          <Divider sx={{ my: 2 }} />
+          <Box sx={{ my: 2 }} />
           <SphereInventory
             player={player}
             setPlayer={setPlayer}
@@ -808,132 +709,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
           />
         </>
       )}
-      {/* Modals */}
-      {!isSlotsVariant && (
-        <PlayerWeaponModal
-          open={openNewWeapon}
-          onClose={handleCloseNewWeapon}
-          editWeaponIndex={editWeaponIndex}
-          weapon={weapon}
-          setWeapon={setWeapon}
-          onAddWeapon={handleSaveWeapon}
-          onDeleteWeapon={handleDeleteWeapon}
-        />
-      )}
-      <PlayerCustomWeaponModal
-        open={openNewCustomWeapon}
-        onClose={handleCloseNewCustomWeapon}
-        editCustomWeaponIndex={editCustomWeaponIndex}
-        customWeapon={customWeapon}
-        setCustomWeapon={setCustomWeapon}
-        onAddCustomWeapon={handleSaveCustomWeapon}
-        onDeleteCustomWeapon={handleDeleteCustomWeapon}
-        player={player}
-        setPlayer={setPlayer}
-      />
-      <PlayerArmorModal
-        open={openNewArmor}
-        onClose={handleCloseNewArmor}
-        editArmorIndex={editArmorIndex}
-        armorPlayer={armor}
-        setArmorPlayer={setArmor}
-        onAddArmor={handleSaveArmor}
-        onDeleteArmor={handleDeleteArmor}
-        player={player}
-        setPlayer={setPlayer}
-      />
-      {!isSlotsVariant && (
-        <PlayerShieldModal
-          open={openNewShields}
-          onClose={handleCloseNewShield}
-          editShieldIndex={editShieldIndex}
-          shield={shields}
-          setShield={setShields}
-          onAddShield={handleSaveShield}
-          onDeleteShield={handleDeleteShield}
-        />
-      )}
-      <PlayerAccessoryModal
-        open={openNewAccessory}
-        onClose={handleCloseNewAccessory}
-        editAccIndex={editAccessoryIndex}
-        accessory={accessory}
-        onAddAccessory={handleSaveAccessory}
-        onDeleteAccessory={handleDeleteAccessory}
-      />
-      <CompendiumViewerModal
-        open={openEquipmentCompendium}
-        onClose={() => setOpenEquipmentCompendium(false)}
-        onAddItem={(item, type) => {
-          const typeMap = {
-            weapons: "weapon",
-            "custom-weapons": "custom-weapon",
-            armor: "armor",
-            shields: "shield",
-            accessories: "accessory",
-          };
-          handleImportFromCompendium(typeMap[type], item);
-        }}
-        initialType="weapons"
-        restrictToTypes={[
-          "weapons",
-          "custom-weapons",
-          "armor",
-          "shields",
-          "accessories",
-        ]}
-        context="player"
-      />
-      <CompendiumViewerModal
-        open={openWeaponCompendium}
-        onClose={() => setOpenWeaponCompendium(false)}
-        onAddItem={(item) => {
-          handleImportFromCompendium("weapon", item);
-        }}
-        initialType="weapons"
-        restrictToTypes={["weapons"]}
-        context="player"
-      />
-      <CompendiumViewerModal
-        open={openArmorCompendium}
-        onClose={() => setOpenArmorCompendium(false)}
-        onAddItem={(item) => {
-          handleImportFromCompendium("armor", item);
-        }}
-        initialType="armor"
-        restrictToTypes={["armor"]}
-        context="player"
-      />
-      <CompendiumViewerModal
-        open={openShieldCompendium}
-        onClose={() => setOpenShieldCompendium(false)}
-        onAddItem={(item) => {
-          handleImportFromCompendium("shield", item);
-        }}
-        initialType="shields"
-        restrictToTypes={["shields"]}
-        context="player"
-      />
-      <CompendiumViewerModal
-        open={openCustomWeaponCompendium}
-        onClose={() => setOpenCustomWeaponCompendium(false)}
-        onAddItem={(item) => {
-          handleImportFromCompendium("custom-weapon", item);
-        }}
-        initialType="custom-weapons"
-        restrictToTypes={["custom-weapons"]}
-        context="player"
-      />
-      <CompendiumViewerModal
-        open={openAccessoryCompendium}
-        onClose={() => setOpenAccessoryCompendium(false)}
-        onAddItem={(item) => {
-          handleImportFromCompendium("accessory", item);
-        }}
-        initialType="accessories"
-        restrictToTypes={["accessories"]}
-        context="player"
-      />
     </>
   );
 }

@@ -718,6 +718,7 @@ export default function SlotPickerDialog({
           /* Regular item picker view */
           <>
             <DialogTitle
+              variant="h3"
               sx={{ fontWeight: "bold", textTransform: "uppercase" }}
             >
               {t("Choose item for")}: {slotLabel}
