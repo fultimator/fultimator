@@ -75,6 +75,55 @@ describe("itemFormRegistry", () => {
     expect(subtypes).toContain("pilot-vehicle");
   });
 
+  it("player-spell buildPayload supports every UI subtype", () => {
+    const entry = itemFormRegistry["player-spell"];
+    const base = entry.defaultState?.() as Record<string, unknown>;
+    expect(base).toBeDefined();
+
+    const subtypes = [
+      "gift",
+      "dance",
+      "therioform",
+      "magichant-key",
+      "magichant",
+      "symbol",
+      "invocation",
+      "arcanist",
+      "arcanist-rework",
+      "tinkerer-alchemy",
+      "tinkerer-infusion",
+      "tinkerer-magitech",
+      "cooking",
+      "magiseed",
+      "pilot-vehicle",
+      "gamble",
+      "deck",
+    ];
+
+    for (const subtype of subtypes) {
+      const state = {
+        ...base,
+        name: "Test Spell",
+        spellType: subtype,
+        class: "Arcanist",
+        description: "Test description",
+        targetDescription: "One creature",
+        duration: "Instantaneous",
+        "accuracy.attr1": "insight",
+        "accuracy.attr2": "will",
+      };
+      const payload = entry.buildPayload?.(
+        state,
+        {
+          compendiumClasses: [],
+          compendiumItems: [],
+          affinityOptions: [],
+        },
+      );
+      expect(payload, `payload for subtype ${subtype}`).not.toBeNull();
+    }
+  });
+
   it("optional has subtypeDefinitions for all optional subtypes", () => {
     const entry = itemFormRegistry["optional"];
     expect(entry.subtypeDefinitions).toBeDefined();

@@ -277,7 +277,8 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     buildPayload: (state: unknown): unknown | null => {
       if (!state || typeof state !== "object") return null;
       const s = state as PlayerSpellFormState;
-      const spellType = s.spellType;
+      const spellType =
+        s.spellType === "magichant-key" ? "magichant" : s.spellType;
       if (!spellType) return null;
 
       const metaObj = s["meta.book"]
@@ -387,9 +388,209 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         return parsed.success ? parsed.data : null;
       }
 
-      // All container/bespoke types (gift, dance, symbol, therioform, magichant,
-      // invocation, cooking, magiseed, pilot-vehicle, gamble, deck, tinkerer-magitech)
-      // are edited via their own bespoke UI and save directly - buildPayload is not used.
+      if (spellType === "gift") {
+        return {
+          ...base,
+          spellType: "gift" as const,
+          clock: 0,
+          gifts: [
+            {
+              key: s.name.trim() || "esper_gift_custom_name",
+              customName: "",
+              event: s.event.trim(),
+              effect: s.effect.trim(),
+            },
+          ],
+        };
+      }
+
+      if (spellType === "dance") {
+        return {
+          ...base,
+          spellType: "dance" as const,
+          dances: [
+            {
+              key: s.name.trim() || "dance_custom",
+              customName: "",
+              effect: s.effect.trim(),
+              duration: s.duration.trim(),
+            },
+          ],
+        };
+      }
+
+      if (spellType === "therioform") {
+        return {
+          ...base,
+          spellType: "therioform" as const,
+          therioforms: [
+            {
+              key: s.name.trim() || "mutant_therioform_custom_name",
+              customName: "",
+              genoclepsis: s.genoclepsis.trim(),
+              description: s.effect.trim(),
+            },
+          ],
+        };
+      }
+
+      if (spellType === "magichant") {
+        if (s.spellType === "magichant-key") {
+          return {
+            ...base,
+            spellType: "magichant" as const,
+            keys: [
+              {
+                key: s.name.trim() || "magichant_custom_name",
+                customName: "",
+                type: s.keyType.trim(),
+                status: s.keyStatus.trim(),
+                attribute: s.keyAttribute.trim(),
+                recovery: s.keyRecovery.trim(),
+              },
+            ],
+            tones: [],
+          };
+        }
+        return {
+          ...base,
+          spellType: "magichant" as const,
+          keys: [],
+          tones: [
+            {
+              key: s.name.trim() || "magichant_custom_name",
+              customName: "",
+              effect: s.effect.trim(),
+            },
+          ],
+        };
+      }
+
+      if (spellType === "symbol") {
+        return {
+          ...base,
+          spellType: "symbol" as const,
+          symbols: [
+            {
+              key: s.name.trim() || "symbol_custom_name",
+              customName: "",
+              effect: s.effect.trim(),
+            },
+          ],
+        };
+      }
+
+      if (spellType === "invocation") {
+        return {
+          ...base,
+          spellType: "invocation" as const,
+          spellName: s.name.trim() || "Invocation",
+          tracker: {
+            innerWellspring: false,
+            chosenWellspring: null,
+            activeWellsprings: [],
+          },
+          invocations: [
+            {
+              key: s.name.trim() || "invoker_custom_name",
+              customName: "",
+              type: s.invType.trim(),
+              effect: s.effect.trim(),
+              wellspring: s.wellspring.trim(),
+            },
+          ],
+        };
+      }
+
+      if (spellType === "cooking") {
+        return {
+          ...base,
+          spellType: "cooking" as const,
+          spellName: s.name.trim() || "Cookbook",
+          cookbook: {
+            effects: (s.cookingEffects || []).map((row) => ({
+              taste1: "",
+              taste2: "",
+              effect: (row.effect || "").trim(),
+              customChoices: {},
+            })),
+            ingredientInventory: [],
+          },
+        };
+      }
+
+      if (spellType === "magiseed") {
+        return {
+          ...base,
+          spellType: "magiseed" as const,
+          growthClock: 0,
+          gardenDescription: "",
+          currentMagiseed: null,
+          magiseeds: [
+            {
+              key: s.name.trim() || "magiseed_custom",
+              customName: "",
+              description: s.seedDescription.trim(),
+              rangeStart: s.seedRangeStart,
+              rangeEnd: s.seedRangeEnd,
+              effects: {},
+            },
+          ],
+        };
+      }
+
+      if (spellType === "pilot-vehicle") {
+        return {
+          ...base,
+          spellType: "pilot-vehicle" as const,
+          vehicles: [],
+        };
+      }
+
+      if (spellType === "tinkerer-magitech") {
+        return {
+          ...base,
+          spellType: "tinkerer-magitech" as const,
+          rank: 1,
+          magispheres: [],
+        };
+      }
+
+      if (spellType === "gamble") {
+        return {
+          ...base,
+          spellType: "gamble" as const,
+          spellName: s.name.trim() || "New Gamble",
+          cost: {
+            resource: "mp" as const,
+            amount: s["cost.amount"] ?? 0,
+            perTarget: s["cost.perTarget"] ?? true,
+          },
+          maxTargets: s.maxTargets ?? 2,
+          targetDescription: s.targetDescription.trim() || "Special",
+          duration: s.duration.trim() || "Instantaneous",
+          attr: s["accuracy.attr2"] || "will",
+          targets: [],
+        };
+      }
+
+      if (spellType === "deck") {
+        return {
+          ...base,
+          spellType: "deck" as const,
+          spellName: s.name.trim() || "Ace of Cards Deck",
+          suitConfiguration: {
+            Air: "air",
+            Earth: "earth",
+            Fire: "fire",
+            Ice: "ice",
+          },
+          cardsInDeck: 30,
+          hand: [],
+          discardPile: [],
+        };
+      }
+
       return null;
     },
   },

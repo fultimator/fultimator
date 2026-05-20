@@ -865,189 +865,13 @@ const PILOT_DAMAGE_TYPES = [
 const PILOT_RANGES = ["Melee", "Ranged"];
 
 function buildPlayerSpellPayload(state) {
-  const { spellType, name, fuid } = state;
-  const metaRaw = {
-    book: state["meta.book"],
-    page: state["meta.page"],
-    bookName: state["meta.bookName"] || undefined,
-    isOfficial: state["meta.isOfficial"],
-  };
-  const meta = state["meta.book"] ? metaRaw : undefined;
-
-  const withMeta = (obj) => (meta ? { ...obj, meta } : obj);
-
-  switch (spellType) {
-    case "default":
-      return withMeta({
-        spellType: "default",
-        class: state.class,
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        description: (state.description ?? "").trim(),
-        isOffensive: state.isOffensive,
-        cost: {
-          resource: "mp",
-          amount: state["cost.amount"] ?? 0,
-          perTarget: state["cost.perTarget"] ?? true,
-        },
-        maxTargets: state.maxTargets ?? 1,
-        targetDescription:
-          (state.targetDescription ?? "").trim() || "One creature",
-        duration: (state.duration ?? "").trim() || "Instantaneous",
-        accuracy: {
-          attr1: state["accuracy.attr1"] ?? "insight",
-          attr2: state["accuracy.attr2"] ?? "will",
-          value: 0,
-          defense: "mdef",
-        },
-        damage: {
-          value: state.isOffensive ? (state["damage.value"] ?? 0) : 0,
-          type: state.isOffensive
-            ? (state["damage.type"] ?? "physical")
-            : "physical",
-          hrZero: state["damage.hrZero"] ?? false,
-        },
-      });
-
-    case "arcanist":
-    case "arcanist-rework":
-      return withMeta({
-        spellType,
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        domain: (state.domain ?? "").trim() || undefined,
-        domainDesc: (state.domainDesc ?? "").trim() || undefined,
-        merge: (state.merge ?? "").trim() || undefined,
-        mergeDesc: (state.mergeDesc ?? "").trim() || undefined,
-        dismiss: (state.dismiss ?? "").trim() || undefined,
-        dismissDesc: (state.dismissDesc ?? "").trim() || undefined,
-        ...(spellType === "arcanist-rework" && {
-          pulse: (state.pulse ?? "").trim() || undefined,
-          pulseDesc: (state.pulseDesc ?? "").trim() || undefined,
-        }),
-      });
-
-    case "tinkerer-alchemy":
-      return withMeta({
-        spellType: "tinkerer-alchemy",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        category: (state.category ?? "").trim() || undefined,
-        effect: (state.effect ?? "").trim(),
-        description: (state.effect ?? "").trim(),
-      });
-
-    case "tinkerer-infusion":
-      return withMeta({
-        spellType: "tinkerer-infusion",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        infusionRank:
-          state.infusionRank != null ? Number(state.infusionRank) : undefined,
-        effect: (state.effect ?? "").trim(),
-        description: (state.effect ?? "").trim(),
-      });
-
-    case "gift":
-      return withMeta({
-        spellType: "gift",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        event: (state.event ?? "").trim(),
-        effect: (state.effect ?? "").trim(),
-        description: (state.effect ?? "").trim(),
-      });
-
-    case "dance":
-      return withMeta({
-        spellType: "dance",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        duration: (state.duration ?? "").trim() || "Instantaneous",
-        effect: (state.effect ?? "").trim(),
-        description: (state.effect ?? "").trim(),
-      });
-
-    case "therioform":
-      return withMeta({
-        spellType: "therioform",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        genoclepsis: (state.genoclepsis ?? "").trim(),
-        effect: (state.effect ?? "").trim(),
-        description: (state.effect ?? "").trim(),
-      });
-
-    case "magichant":
-      return withMeta({
-        spellType: "magichant",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        magichantSubtype: "tone",
-        effect: (state.effect ?? "").trim(),
-        description: (state.effect ?? "").trim(),
-      });
-
-    case "magichant-key":
-      return withMeta({
-        spellType: "magichant",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        magichantSubtype: "key",
-        type: (state.keyType ?? "").trim() || undefined,
-        status: (state.keyStatus ?? "").trim() || undefined,
-        attribute: (state.keyAttribute ?? "").trim() || undefined,
-        recovery: (state.keyRecovery ?? "").trim() || undefined,
-      });
-
-    case "symbol":
-      return withMeta({
-        spellType: "symbol",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        effect: (state.effect ?? "").trim(),
-        description: (state.effect ?? "").trim(),
-      });
-
-    case "invocation":
-      return withMeta({
-        spellType: "invocation",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        wellspring: (state.wellspring ?? "").trim() || undefined,
-        type: (state.invType ?? "").trim() || undefined,
-        effect: (state.effect ?? "").trim(),
-        description: (state.effect ?? "").trim(),
-      });
-
-    case "cooking":
-      return withMeta({
-        spellType: "cooking",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        cookbookEffects: (state.cookingEffects ?? []).map((row, i) => ({
-          id: i + 1,
-          effect: (row?.effect ?? "").trim(),
-          taste1: "",
-          taste2: "",
-          customChoices: {},
-        })),
-      });
-
-    case "magiseed":
-      return withMeta({
-        spellType: "magiseed",
-        name: (name ?? "").trim(),
-        fuid: fuid || undefined,
-        description: (state.seedDescription ?? "").trim(),
-        rangeStart: state.seedRangeStart ?? 1,
-        rangeEnd: state.seedRangeEnd ?? 4,
-        effects: {},
-      });
-
-    default:
-      return null;
-  }
+  return (
+    REG["player-spell"].buildPayload?.(state, {
+      compendiumClasses: [],
+      compendiumItems: [],
+      affinityOptions: [],
+    }) ?? null
+  );
 }
 
 function PlayerSpellPanel() {
@@ -1144,7 +968,18 @@ function PlayerSpellPanel() {
       "damage.type": String(imported.damage?.type ?? "physical"),
       "damage.hrZero": Boolean(imported.damage?.hrZero ?? false),
       description: t(String(imported.description ?? "")),
-      effect: t(String(imported.effect ?? imported.description ?? "")),
+      effect: t(
+        String(
+          imported.effect ??
+            imported.invocations?.[0]?.effect ??
+            imported.tones?.[0]?.effect ??
+            imported.symbols?.[0]?.effect ??
+            imported.dances?.[0]?.effect ??
+            imported.gifts?.[0]?.effect ??
+            imported.description ??
+            "",
+        ),
+      ),
       event: t(String(imported.event ?? "")),
       genoclepsis: t(String(imported.genoclepsis ?? "")),
       domain: t(String(imported.domain ?? "")),
@@ -1155,8 +990,10 @@ function PlayerSpellPanel() {
       dismissDesc: t(String(imported.dismissDesc ?? "")),
       pulse: t(String(imported.pulse ?? "")),
       pulseDesc: t(String(imported.pulseDesc ?? "")),
-      wellspring: t(String(imported.wellspring ?? "")),
-      invType: String(imported.type ?? ""),
+      wellspring: t(
+        String(imported.wellspring ?? imported.invocations?.[0]?.wellspring ?? ""),
+      ),
+      invType: String(imported.type ?? imported.invocations?.[0]?.type ?? ""),
       category: String(imported.category ?? ""),
       infusionRank:
         imported.infusionRank == null ? null : Number(imported.infusionRank),
@@ -1177,7 +1014,7 @@ function PlayerSpellPanel() {
           ? String(imported.recovery ?? "")
           : "",
       cookingEffects: (() => {
-        const src = imported.cookbookEffects;
+        const src = imported.cookbook?.effects ?? imported.cookbookEffects;
         if (Array.isArray(src)) {
           return src.map((r) => ({ effect: t(String(r?.effect ?? "")) }));
         }
@@ -1188,9 +1025,13 @@ function PlayerSpellPanel() {
         }
         return Array.from({ length: 12 }, () => ({ effect: "" }));
       })(),
-      seedDescription: t(String(imported.description ?? "")),
-      seedRangeStart: imported.rangeStart ?? 1,
-      seedRangeEnd: imported.rangeEnd ?? 4,
+      seedDescription: t(
+        String(
+          imported.magiseeds?.[0]?.description ?? imported.description ?? "",
+        ),
+      ),
+      seedRangeStart: imported.magiseeds?.[0]?.rangeStart ?? imported.rangeStart ?? 1,
+      seedRangeEnd: imported.magiseeds?.[0]?.rangeEnd ?? imported.rangeEnd ?? 4,
       "meta.book": imported.meta?.book ?? "",
       "meta.page": imported.meta?.page ?? undefined,
       "meta.bookName": imported.meta?.bookName ?? "",
