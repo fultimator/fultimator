@@ -189,9 +189,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     key: "cost.amount",
     kind: "editable",
     label: (s) =>
-      s.cost?.perTarget
-        ? "shared.cost.amountPerTarget"
-        : "shared.cost.amount",
+      s.cost?.perTarget ? "shared.cost.amountPerTarget" : "shared.cost.amount",
     component: "number",
     defaultValue: 1,
     group: G.details,

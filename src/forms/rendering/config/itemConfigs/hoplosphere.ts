@@ -86,7 +86,10 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
   {
     key: "description",
     kind: "editable",
-    label: prefixedLabel(HOPLOSPHERE_LABEL_PREFIX, SHARED_LABEL_KEYS.description),
+    label: prefixedLabel(
+      HOPLOSPHERE_LABEL_PREFIX,
+      SHARED_LABEL_KEYS.description,
+    ),
     component: "textarea",
     defaultValue: "",
     group: G.body,

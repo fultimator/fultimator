@@ -1132,7 +1132,9 @@ function PlayerSpellPanel() {
       "cost.amount": imported.cost?.amount ?? 0,
       "cost.perTarget": Boolean(imported.cost?.perTarget ?? true),
       maxTargets: imported.maxTargets ?? 1,
-      targetDescription: t(String(imported.targetDescription ?? "One creature")),
+      targetDescription: t(
+        String(imported.targetDescription ?? "One creature"),
+      ),
       duration: t(String(imported.duration ?? "Instantaneous")),
       "accuracy.attr1": String(imported.accuracy?.attr1 ?? "insight"),
       "accuracy.attr2": String(imported.accuracy?.attr2 ?? "will"),
@@ -2078,7 +2080,13 @@ function HeroicPanel() {
               name: String(formState.name ?? ""),
               onBrowse: () =>
                 openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.heroic, (item) =>
-                  importIntoSchemaForm(heroicFieldConfig, setFormState, item, null, { translate: true }),
+                  importIntoSchemaForm(
+                    heroicFieldConfig,
+                    setFormState,
+                    item,
+                    null,
+                    { translate: true },
+                  ),
                 ),
             }}
           />

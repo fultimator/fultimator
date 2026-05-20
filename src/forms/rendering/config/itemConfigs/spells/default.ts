@@ -49,7 +49,9 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
     key: "cost.amount",
     kind: "editable",
     label: (s) =>
-      s["cost.perTarget"] ? "shared.cost.amountPerTarget" : "shared.cost.amount",
+      s["cost.perTarget"]
+        ? "shared.cost.amountPerTarget"
+        : "shared.cost.amount",
     component: "number",
     defaultValue: 0,
     group: "cost",

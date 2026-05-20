@@ -714,14 +714,23 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box sx={{ ...nameRowSx(customTheme), display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            ...nameRowSx(customTheme),
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <Box sx={{ flexGrow: 1 }}>
             <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
               {t(item.name)}
             </Typography>
           </Box>
           <Box sx={{ width: "58.33%", textAlign: "center" }}>
-            <Typography component="div" sx={{ fontSize: scale.body, "& p": { margin: 0 } }}>
+            <Typography
+              component="div"
+              sx={{ fontSize: scale.body, "& p": { margin: 0 } }}
+            >
               {item.event ? md(t(item.event)) : "—"}
             </Typography>
           </Box>
@@ -823,7 +832,13 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box sx={{ ...nameRowSx(customTheme), display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            ...nameRowSx(customTheme),
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <Box sx={{ flexGrow: 1 }}>
             <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
               {t(item.name)}
@@ -921,14 +936,28 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box sx={{ ...nameRowSx(customTheme), display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            ...nameRowSx(customTheme),
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <Box sx={{ flexGrow: 1 }}>
             <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
               {t(item.name)}
             </Typography>
           </Box>
           <Box sx={{ width: "58.33%", textAlign: "center" }}>
-            <Typography variant="body2" component="div" sx={{ color: "text.secondary", lineHeight: 1.4, "& p": { margin: 0 } }}>
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{
+                color: "text.secondary",
+                lineHeight: 1.4,
+                "& p": { margin: 0 },
+              }}
+            >
               {item.genoclepsis ? md(t(item.genoclepsis)) : "—"}
             </Typography>
           </Box>
@@ -2650,40 +2679,47 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
     >
       <RowsWithOptionalImage
         header={
-          showHeader && (
-            isKey ? (
-              <Grid
-                container
-                onClick={onHeaderClick}
-                sx={{
-                  ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
-                }}
-              >
-                <Grid size="grow">
-                  <Typography>{typeLabel}</Typography>
-                </Grid>
-                <Grid size={2}>
-                  <Typography sx={{ textAlign: "center" }}>{t("Type")}</Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>{t("Status")}</Typography>
-                </Grid>
-                <Grid size={2}>
-                  <Typography sx={{ textAlign: "center" }}>{t("Attr")}</Typography>
-                </Grid>
-                <Grid size={2}>
-                  <Typography sx={{ textAlign: "center" }}>{t("Recovery")}</Typography>
-                </Grid>
-              </Grid>
-            ) : (
-              <Box
-                onClick={onHeaderClick}
-                sx={headerBoxSx(customTheme, scale, onHeaderClick)}
-              >
+          showHeader &&
+          (isKey ? (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={{
+                ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+              }}
+            >
+              <Grid size="grow">
                 <Typography>{typeLabel}</Typography>
-              </Box>
-            )
-          )
+              </Grid>
+              <Grid size={2}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Type")}
+                </Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Status")}
+                </Typography>
+              </Grid>
+              <Grid size={2}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Attr")}
+                </Typography>
+              </Grid>
+              <Grid size={2}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Recovery")}
+                </Typography>
+              </Grid>
+            </Grid>
+          ) : (
+            <Box
+              onClick={onHeaderClick}
+              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+            >
+              <Typography>{typeLabel}</Typography>
+            </Box>
+          ))
         }
         imageMode={imageMode}
         imageSize={imageSize}
@@ -2705,22 +2741,34 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
               </Typography>
             </Grid>
             <Grid size={2} sx={{ textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: "text.secondary", "& p": { margin: 0 } }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", "& p": { margin: 0 } }}
+              >
                 {item.type ? md(t(item.type)) : "—"}
               </Typography>
             </Grid>
             <Grid size={3} sx={{ textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: "text.secondary", "& p": { margin: 0 } }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", "& p": { margin: 0 } }}
+              >
                 {item.status ? md(t(item.status)) : "—"}
               </Typography>
             </Grid>
             <Grid size={2} sx={{ textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: "text.secondary", "& p": { margin: 0 } }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", "& p": { margin: 0 } }}
+              >
                 {item.attribute ? md(t(item.attribute)) : "—"}
               </Typography>
             </Grid>
             <Grid size={2} sx={{ textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: "text.secondary", "& p": { margin: 0 } }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", "& p": { margin: 0 } }}
+              >
                 {item.recovery ? md(t(item.recovery)) : "—"}
               </Typography>
             </Grid>

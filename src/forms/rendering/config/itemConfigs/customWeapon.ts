@@ -757,10 +757,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "martial",
     kind: "computed",
-    label: prefixedLabel(
-      CUSTOM_WEAPON_LABEL_PREFIX,
-      SHARED_LABEL_KEYS.martial,
-    ),
+    label: prefixedLabel(CUSTOM_WEAPON_LABEL_PREFIX, SHARED_LABEL_KEYS.martial),
     group: G.meta,
     order: 81,
   },
