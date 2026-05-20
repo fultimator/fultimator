@@ -1,11 +1,14 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import type { ClassItem } from "../../../schema/itemSchemas/class";
 import { metaFieldConfig } from "../metaFieldConfig";
 import spellClassesList from "../../../../libs/spellClasses";
 import specialSkillsList from "../../../../libs/skills";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 // Form state mirrors ClassItem directly; no extra UI-only fields needed.
 export type ClassFormState = ClassItem;
+const CLASS_LABEL_PREFIX = "class";
+const CLASS_SKILL_LABEL_PREFIX = "class.skill";
 
 const BLANK_SKILL = {
   skillName: "",
@@ -14,16 +17,6 @@ const BLANK_SKILL = {
   description: "",
   specialSkill: "",
 };
-
-const CLASS_BOOK_SUGGESTIONS = [
-  "core",
-  "rework",
-  "bonus",
-  "high",
-  "techno",
-  "natural",
-  "homebrew",
-];
 
 // Group special skills by class name for the grouped-select.
 const groupedSpecialSkills = specialSkillsList.reduce<
@@ -44,7 +37,10 @@ const specialSkillGroups = Object.keys(groupedSpecialSkills)
     })),
   }));
 
-const spellClassOptions = spellClassesList.map((sc) => ({ value: sc, label: sc }));
+const spellClassOptions = spellClassesList.map((sc) => ({
+  value: sc,
+  label: sc,
+}));
 
 const martialOptions = [
   { key: "melee", label: "Martial Melee" },
@@ -60,7 +56,7 @@ const skillRowFields: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(CLASS_SKILL_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: undefined,
     order: 0,
@@ -69,7 +65,7 @@ const skillRowFields: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "skillName",
     kind: "editable",
-    label: "Skill Name",
+    label: "class.skill.name",
     component: "text",
     defaultValue: "",
     order: 1,
@@ -80,7 +76,7 @@ const skillRowFields: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "maxLvl",
     kind: "editable",
-    label: "Max Lvl",
+    label: "class.skill.maxLevel",
     component: "number",
     defaultValue: 1,
     order: 2,
@@ -91,7 +87,7 @@ const skillRowFields: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "description",
     kind: "editable",
-    label: "Description",
+    label: "class.skill.description",
     component: "textarea",
     defaultValue: "",
     order: 3,
@@ -101,7 +97,7 @@ const skillRowFields: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "specialSkill",
     kind: "editable",
-    label: "Special Skill Effect",
+    label: "class.skill.specialEffect",
     component: "grouped-select",
     defaultValue: "",
     order: 4,
@@ -119,13 +115,23 @@ const G = {
   martials: "martials",
   spellClasses: "spellClasses",
   skills: "skills",
+  meta: "meta",
 } as const;
+
+export const classGroupLabels: GroupLabels = {
+  core: "section.core",
+  benefits: "section.benefits",
+  martials: "section.martials",
+  spellClasses: "section.spellClasses",
+  skills: "section.skills",
+  meta: "section.meta",
+};
 
 export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(CLASS_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: undefined,
     group: G.core,
@@ -135,7 +141,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "Class Name",
+    label: "class.name",
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -145,23 +151,9 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
     validationHints: { required: true },
   },
   {
-    key: "book",
-    kind: "editable",
-    label: "Book",
-    component: "autocomplete",
-    defaultValue: "homebrew",
-    group: G.core,
-    order: 2,
-    gridSize: { xs: 4, sm: 3 },
-    componentProps: {
-      options: CLASS_BOOK_SUGGESTIONS.map((b) => ({ value: b, label: b })),
-      freeSolo: true,
-    },
-  },
-  {
     key: "benefits.hpplus",
     kind: "editable",
-    label: "HP+",
+    label: "class.benefits.hp",
     component: "number",
     defaultValue: 0,
     group: G.benefits,
@@ -173,7 +165,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "benefits.mpplus",
     kind: "editable",
-    label: "MP+",
+    label: "class.benefits.mp",
     component: "number",
     defaultValue: 0,
     group: G.benefits,
@@ -185,7 +177,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "benefits.ipplus",
     kind: "editable",
-    label: "IP+",
+    label: "class.benefits.ip",
     component: "number",
     defaultValue: 0,
     group: G.benefits,
@@ -197,7 +189,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "benefits.martials",
     kind: "editable",
-    label: "Martial Proficiencies",
+    label: "class.benefits.martial",
     component: "toggle-group",
     defaultValue: { armor: false, shields: false, melee: false, ranged: false },
     group: G.martials,
@@ -208,7 +200,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "benefits.rituals",
     kind: "editable",
-    label: "Rituals",
+    label: "class.benefits.rituals",
     component: "toggle-group",
     defaultValue: { ritualism: false },
     group: G.martials,
@@ -219,7 +211,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "benefits.custom",
     kind: "editable",
-    label: "Custom Benefits",
+    label: "class.benefits.custom",
     component: "object-list",
     defaultValue: [],
     group: G.benefits,
@@ -230,7 +222,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
         {
           key: "value",
           kind: "editable",
-          label: "Custom Benefit",
+          label: "class.benefits.customItem",
           component: "text",
           defaultValue: "",
           order: 0,
@@ -245,7 +237,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "benefits.spellClasses",
     kind: "editable",
-    label: "Spell Types",
+    label: "class.benefits.spellClasses",
     component: "chip-multi-select",
     defaultValue: [],
     group: G.spellClasses,
@@ -256,7 +248,7 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
   {
     key: "skills",
     kind: "editable",
-    label: "Skills",
+    label: "class.skills",
     component: "object-list",
     defaultValue: Array.from({ length: 5 }, () => ({ ...BLANK_SKILL })),
     group: G.skills,

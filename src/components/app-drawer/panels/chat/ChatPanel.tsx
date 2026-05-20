@@ -615,7 +615,9 @@ export const ChatPanel: React.FC = () => {
                       <ListItemIcon sx={{ minWidth: 36 }}>
                         <Checkbox
                           edge="start"
-                          checked={activeSupportModuleKeys.has(module.key ?? module.name)}
+                          checked={activeSupportModuleKeys.has(
+                            module.key ?? module.name,
+                          )}
                           disableRipple
                           size="small"
                           color="success"
@@ -653,7 +655,13 @@ export const ChatPanel: React.FC = () => {
                         slotProps={{
                           primary: {
                             variant: "body2",
-                            sx: { fontWeight: activeSupportModuleKeys.has(module.key ?? module.name) ? 700 : 400 },
+                            sx: {
+                              fontWeight: activeSupportModuleKeys.has(
+                                module.key ?? module.name,
+                              )
+                                ? 700
+                                : 400,
+                            },
                           },
                           secondary: {
                             component: "div",

@@ -87,26 +87,25 @@ export default function PilotContentSection({ formState, setFormState, t }) {
     return "custom";
   }, []);
 
-  const getEquippedCount = useCallback(
-    (vehicle, moduleType) => {
-      const s = vehicle.slots ?? {};
-      if (moduleType === "armor") {
-        return s.armor ? 1 : 0;
-      }
-      if (moduleType === "weapon") {
-        const weaponKeys = new Set([s.main, s.off].filter(Boolean));
-        return weaponKeys.size;
-      }
-      if (moduleType === "support") {
-        return (s.support ?? []).reduce((count, key) => {
-          const mod = (vehicle.modules || []).find((m) => (m.key ?? m.name) === key);
-          return count + (mod?.isComplex ? 2 : 1);
-        }, 0);
-      }
-      return 0;
-    },
-    [],
-  );
+  const getEquippedCount = useCallback((vehicle, moduleType) => {
+    const s = vehicle.slots ?? {};
+    if (moduleType === "armor") {
+      return s.armor ? 1 : 0;
+    }
+    if (moduleType === "weapon") {
+      const weaponKeys = new Set([s.main, s.off].filter(Boolean));
+      return weaponKeys.size;
+    }
+    if (moduleType === "support") {
+      return (s.support ?? []).reduce((count, key) => {
+        const mod = (vehicle.modules || []).find(
+          (m) => (m.key ?? m.name) === key,
+        );
+        return count + (mod?.isComplex ? 2 : 1);
+      }, 0);
+    }
+    return 0;
+  }, []);
 
   const getSlotUsageText = useCallback(
     (vehicle, moduleType) => {
@@ -155,13 +154,19 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         if (idx === moduleIndex) return count;
         const mk = m.key ?? m.name;
         const mEquipped =
-          s.main === mk || s.off === mk || s.armor === mk || (s.support ?? []).includes(mk);
+          s.main === mk ||
+          s.off === mk ||
+          s.armor === mk ||
+          (s.support ?? []).includes(mk);
         if (!mEquipped) return count;
         const mType = getModuleTypeForLimits(m);
         return count + (mType === "support" && m.isComplex ? 2 : 1);
       }, 0);
 
-      if (!isCurrentlyEquipped && totalUsedSlots + slotsNeeded > maxEnabledModules) {
+      if (
+        !isCurrentlyEquipped &&
+        totalUsedSlots + slotsNeeded > maxEnabledModules
+      ) {
         return false;
       }
 
@@ -184,7 +189,9 @@ export default function PilotContentSection({ formState, setFormState, t }) {
             if (!offOccupied) return true;
             // Can go to main if another shield is in off
             const offModKey = s.off;
-            const offMod = (vehicle.modules || []).find((m) => (m.key ?? m.name) === offModKey);
+            const offMod = (vehicle.modules || []).find(
+              (m) => (m.key ?? m.name) === offModKey,
+            );
             return !!offMod?.isShield && !mainOccupied;
           }
 
@@ -192,17 +199,19 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         }
 
         // Already equipped - check if current slot is valid
-        const proposedSlot = s.main === moduleKey && s.off === moduleKey
-          ? "both"
-          : s.main === moduleKey
-          ? "main"
-          : s.off === moduleKey
-          ? "off"
-          : null;
+        const proposedSlot =
+          s.main === moduleKey && s.off === moduleKey
+            ? "both"
+            : s.main === moduleKey
+              ? "main"
+              : s.off === moduleKey
+                ? "off"
+                : null;
         if (proposedSlot === "both") {
           // Only valid if no other weapons
           const otherWeapons = (vehicle.modules || []).filter(
-            (m, idx) => idx !== moduleIndex && getModuleTypeForLimits(m) === "weapon",
+            (m, idx) =>
+              idx !== moduleIndex && getModuleTypeForLimits(m) === "weapon",
           );
           const otherEquipped = otherWeapons.some((m) => {
             const mk = m.key ?? m.name;
@@ -221,7 +230,10 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           if (idx === moduleIndex) return false;
           const mk = m.key ?? m.name;
           const mEquipped =
-            s.main === mk || s.off === mk || s.armor === mk || (s.support ?? []).includes(mk);
+            s.main === mk ||
+            s.off === mk ||
+            s.armor === mk ||
+            (s.support ?? []).includes(mk);
           return mEquipped && getModuleTypeForLimits(m) === frameType;
         })
         .reduce((count, m) => {
@@ -381,10 +393,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         const vehicle = { ...updated[vehicleIndex] };
         const baseModule = availableModules[moduleType]?.[0] || {};
 
-        vehicle.modules = [
-          ...(vehicle.modules || []),
-          { ...baseModule },
-        ];
+        vehicle.modules = [...(vehicle.modules || []), { ...baseModule }];
 
         updated[vehicleIndex] = vehicle;
         return updated;
@@ -402,7 +411,9 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         const currentModule = modules[moduleIndex] || {};
 
         const removeFromSlots = (slots, moduleKey) => {
-          const s = { ...(slots ?? { main: null, off: null, armor: null, support: [] }) };
+          const s = {
+            ...(slots ?? { main: null, off: null, armor: null, support: [] }),
+          };
           if (s.main === moduleKey) s.main = null;
           if (s.off === moduleKey) s.off = null;
           if (s.armor === moduleKey) s.armor = null;
@@ -414,9 +425,12 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           let s = removeFromSlots(slots, moduleKey);
           if (newSlot === "main") s.main = moduleKey;
           else if (newSlot === "off") s.off = moduleKey;
-          else if (newSlot === "both") { s.main = moduleKey; s.off = moduleKey; }
-          else if (newSlot === "armor") s.armor = moduleKey;
-          else if (newSlot === "support") s.support = [...(s.support ?? []), moduleKey];
+          else if (newSlot === "both") {
+            s.main = moduleKey;
+            s.off = moduleKey;
+          } else if (newSlot === "armor") s.armor = moduleKey;
+          else if (newSlot === "support")
+            s.support = [...(s.support ?? []), moduleKey];
           return s;
         };
 
@@ -440,7 +454,14 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           // No-op: slot state is on vehicle.slots
         } else if (field === "equipped") {
           const moduleKey = currentModule.key ?? currentModule.name;
-          let vehicleSlots = { ...(vehicle.slots ?? { main: null, off: null, armor: null, support: [] }) };
+          let vehicleSlots = {
+            ...(vehicle.slots ?? {
+              main: null,
+              off: null,
+              armor: null,
+              support: [],
+            }),
+          };
 
           if (value) {
             let newSlot = null;
@@ -466,7 +487,10 @@ export default function PilotContentSection({ formState, setFormState, t }) {
             }
 
             // Keep state unchanged when equip was requested but no valid slot is available.
-            if (currentModule.type === "pilot_module_weapon" && newSlot === null) {
+            if (
+              currentModule.type === "pilot_module_weapon" &&
+              newSlot === null
+            ) {
               return current;
             }
 
@@ -480,7 +504,14 @@ export default function PilotContentSection({ formState, setFormState, t }) {
           vehicle.slots = vehicleSlots;
         } else if (field === "equippedSlot") {
           const moduleKey = currentModule.key ?? currentModule.name;
-          let vehicleSlots = { ...(vehicle.slots ?? { main: null, off: null, armor: null, support: [] }) };
+          let vehicleSlots = {
+            ...(vehicle.slots ?? {
+              main: null,
+              off: null,
+              armor: null,
+              support: [],
+            }),
+          };
           const s = vehicleSlots;
 
           if (currentModule.type === "pilot_module_weapon") {
@@ -490,10 +521,13 @@ export default function PilotContentSection({ formState, setFormState, t }) {
             }
 
             const moduleCurrentSlot =
-              s.main === moduleKey && s.off === moduleKey ? "both"
-              : s.main === moduleKey ? "main"
-              : s.off === moduleKey ? "off"
-              : null;
+              s.main === moduleKey && s.off === moduleKey
+                ? "both"
+                : s.main === moduleKey
+                  ? "main"
+                  : s.off === moduleKey
+                    ? "off"
+                    : null;
 
             // Not equipped - just record the slot intent (no-op, slot state drives display)
             if (!moduleCurrentSlot) {
@@ -509,7 +543,10 @@ export default function PilotContentSection({ formState, setFormState, t }) {
               const otherEquipped = (modules || []).some((m, idx) => {
                 if (idx === moduleIndex) return false;
                 const mk = m.key ?? m.name;
-                return m.type === "pilot_module_weapon" && (s.main === mk || s.off === mk);
+                return (
+                  m.type === "pilot_module_weapon" &&
+                  (s.main === mk || s.off === mk)
+                );
               });
               if (otherEquipped) return current;
             } else {
@@ -519,19 +556,27 @@ export default function PilotContentSection({ formState, setFormState, t }) {
               if (currentInSlot && currentInSlot !== moduleKey) {
                 // Conflict: check if we can swap
                 const oppositeHand = requestedHand === "main" ? "off" : "main";
-                const oppositeSlotKey = oppositeHand === "main" ? s.main : s.off;
-                const conflictMod = modules.find((m) => (m.key ?? m.name) === currentInSlot);
+                const oppositeSlotKey =
+                  oppositeHand === "main" ? s.main : s.off;
+                const conflictMod = modules.find(
+                  (m) => (m.key ?? m.name) === currentInSlot,
+                );
                 const canSwap =
                   !conflictMod?.cumbersome &&
                   moduleCurrentSlot === oppositeHand &&
                   !oppositeSlotKey; // opposite hand must be free after swap
 
-                if (!canSwap && !(!oppositeSlotKey || oppositeSlotKey === moduleKey)) return current;
+                if (
+                  !canSwap &&
+                  !(!oppositeSlotKey || oppositeSlotKey === moduleKey)
+                )
+                  return current;
 
                 if (canSwap) {
                   // Swap: move conflicting module to the opposite hand
                   vehicleSlots = { ...vehicleSlots };
-                  if (oppositeHand === "main") vehicleSlots.main = currentInSlot;
+                  if (oppositeHand === "main")
+                    vehicleSlots.main = currentInSlot;
                   else vehicleSlots.off = currentInSlot;
                 }
               }

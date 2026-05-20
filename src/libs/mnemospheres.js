@@ -9,7 +9,7 @@ function genId() {
 
 export const mnemosphereClassList = classList.map((classDef) => ({
   name: classDef.name,
-  book: classDef.book,
+  book: classDef.meta?.book,
 }));
 
 export function getMnemosphereCost(lvl = 1) {

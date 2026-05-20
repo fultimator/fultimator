@@ -98,7 +98,12 @@ export function deriveVehicleSlots(player: TypePlayer): VehicleSlots {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return {};
 
-  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
+  const s: VehicleSlotMap = vehicle.slots ?? {
+    main: null,
+    off: null,
+    armor: null,
+    support: [],
+  };
   const ref = (key: string): VehicleModuleRef => ({
     vehicleName: vehicle.customName ?? "",
     moduleName: key,

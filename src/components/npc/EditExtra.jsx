@@ -1,9 +1,4 @@
-import {
-  Grid,
-  FormControl,
-  TextField,
-  FormLabel,
-} from "@mui/material";
+import { Grid, FormControl, TextField, FormLabel } from "@mui/material";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
 import { npcFieldConfig } from "../../forms/rendering/config/actorConfigs/npc";
 import { getFreeImmunities } from "../../forms/rendering/config/actorConfigs/npcSpeciesEffects";
@@ -84,7 +79,9 @@ export default function EditExtra({ npc, setNpc }) {
             cols={3}
           />
           <Grid size={12}>
-            <FormLabel sx={{ display: "block", mb: 1 }}>{t("Overrides")}</FormLabel>
+            <FormLabel sx={{ display: "block", mb: 1 }}>
+              {t("Overrides")}
+            </FormLabel>
             <FormControl variant="standard" fullWidth>
               <TextField
                 type="number"

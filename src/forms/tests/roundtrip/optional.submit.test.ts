@@ -156,7 +156,9 @@ describe("optional - union schema (OptionalSchema)", () => {
     ];
     for (const c of cases) {
       const result = OptionalSchema.safeParse(c);
-      expect(result.success, `${c.subtype}: ${JSON.stringify(result)}`).toBe(true);
+      expect(result.success, `${c.subtype}: ${JSON.stringify(result)}`).toBe(
+        true,
+      );
     }
   });
 
@@ -172,10 +174,18 @@ describe("optional - union schema (OptionalSchema)", () => {
 });
 
 describe("optional - subtype payload builder", () => {
-  const buildPayload = createSubtypePayloadBuilder("subtype", OptionalSubtypeSchemas);
+  const buildPayload = createSubtypePayloadBuilder(
+    "subtype",
+    OptionalSubtypeSchemas,
+  );
 
   it("routes quirk state to the quirk schema", () => {
-    const state = { ...SHARED, subtype: "quirk", description: "d", effect: "e" };
+    const state = {
+      ...SHARED,
+      subtype: "quirk",
+      description: "d",
+      effect: "e",
+    };
     const payload = buildPayload(state);
     expect(payload).not.toBeNull();
     expect((payload as { subtype: string } | null)?.subtype).toBe("quirk");

@@ -30,7 +30,12 @@ const WEAPON_MODULE = {
   takesTwoHands: false,
   quality: "",
   qualityCost: 0,
-  accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" as const },
+  accuracy: {
+    attr1: "dexterity",
+    attr2: "insight",
+    value: 0,
+    defense: "def" as const,
+  },
   damage: { value: 10, type: "fire", hrZero: false },
 };
 
@@ -113,7 +118,12 @@ describe("PlayerSpellPilotVehicleSchema roundtrip", () => {
     expect(v.enabled).toBe(false);
     expect(v.maxEnabledModules).toBe(3);
     expect(v.modules).toEqual([]);
-    expect(v.slots).toEqual({ main: null, off: null, armor: null, support: [] });
+    expect(v.slots).toEqual({
+      main: null,
+      off: null,
+      armor: null,
+      support: [],
+    });
   });
 
   it("empty vehicles array is valid", () => {
@@ -158,7 +168,12 @@ describe("VehicleModuleWeaponSchema", () => {
   });
 
   it("defaults cumbersome/isShield/takesTwoHands to false", () => {
-    const { cumbersome: _c, isShield: _s, takesTwoHands: _t, ...minimal } = WEAPON_MODULE;
+    const {
+      cumbersome: _c,
+      isShield: _s,
+      takesTwoHands: _t,
+      ...minimal
+    } = WEAPON_MODULE;
     const result = VehicleModuleWeaponSchema.safeParse(minimal);
     expect(result.success).toBe(true);
     if (!result.success) return;
@@ -199,6 +214,11 @@ describe("VehicleSchema", () => {
     const result = VehicleSchema.safeParse(noSlots);
     expect(result.success).toBe(true);
     if (!result.success) return;
-    expect(result.data.slots).toEqual({ main: null, off: null, armor: null, support: [] });
+    expect(result.data.slots).toEqual({
+      main: null,
+      off: null,
+      armor: null,
+      support: [],
+    });
   });
 });

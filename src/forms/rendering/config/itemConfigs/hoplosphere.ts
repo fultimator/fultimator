@@ -1,18 +1,29 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import type { Hoplosphere } from "../../../schema/itemSchemas/hoplosphere";
+import { metaFieldConfig } from "../metaFieldConfig";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 export type HoplosphereFormState = Hoplosphere;
+const HOPLOSPHERE_LABEL_PREFIX = "hoplosphere";
 
 const G = {
   core: "core",
   body: "body",
+  coag: "coag",
+  meta: "meta",
 } as const;
+
+export const hoplosphereGroupLabels: GroupLabels = {
+  core: "section.core",
+  body: "section.body",
+  meta: "section.meta",
+};
 
 export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(HOPLOSPHERE_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: "",
     group: G.core,
@@ -22,7 +33,7 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "Name",
+    label: prefixedLabel(HOPLOSPHERE_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -33,7 +44,7 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
   {
     key: "requiredSlots",
     kind: "editable",
-    label: "Required Slots",
+    label: "hoplosphere.requiredSlots",
     component: "select",
     defaultValue: 1,
     group: G.core,
@@ -49,7 +60,7 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
   {
     key: "socketable",
     kind: "editable",
-    label: "Socketable",
+    label: "hoplosphere.socketable",
     component: "select",
     defaultValue: "all",
     group: G.core,
@@ -64,7 +75,7 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
   {
     key: "cost",
     kind: "editable",
-    label: "Cost",
+    label: prefixedLabel(HOPLOSPHERE_LABEL_PREFIX, SHARED_LABEL_KEYS.cost),
     component: "number",
     defaultValue: 0,
     group: G.core,
@@ -75,7 +86,7 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
   {
     key: "description",
     kind: "editable",
-    label: "Description",
+    label: prefixedLabel(HOPLOSPHERE_LABEL_PREFIX, SHARED_LABEL_KEYS.description),
     component: "textarea",
     defaultValue: "",
     group: G.body,
@@ -85,14 +96,15 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
   {
     key: "coagEffects",
     kind: "editable",
-    label: "Coagulation Effects",
+    label: "hoplosphere.coagulationEffects",
     component: "textarea",
     defaultValue: {},
-    group: G.body,
+    group: G.coag,
     order: 5,
     fullWidth: true,
     parse: (v) => {
-      if (typeof v === "object" && v !== null) return v as Record<string, string>;
+      if (typeof v === "object" && v !== null)
+        return v as Record<string, string>;
       if (typeof v !== "string" || v.trim() === "") return {};
       try {
         const parsed = JSON.parse(v);
@@ -102,4 +114,5 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
       }
     },
   },
+  ...metaFieldConfig.map((f) => ({ ...f, group: G.meta })),
 ];

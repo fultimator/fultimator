@@ -12,7 +12,10 @@ import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
 import FuidField from "../../common/FuidField";
 import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
-import { heroicFieldConfig } from "../../../forms/rendering/config/itemConfigs/heroic";
+import {
+  heroicFieldConfig,
+  heroicGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/heroic";
 
 export default function EditHeroicSkillModal({
   open,
@@ -62,6 +65,7 @@ export default function EditHeroicSkillModal({
           </Grid>
           <SchemaFieldRenderer
             config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
             state={heroic}
             onChange={setHeroic}
             surface="edit"
@@ -70,6 +74,7 @@ export default function EditHeroicSkillModal({
           />
           <SchemaFieldRenderer
             config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
             state={heroic}
             onChange={setHeroic}
             surface="edit"
@@ -78,11 +83,11 @@ export default function EditHeroicSkillModal({
           />
           <SchemaFieldRenderer
             config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
             state={heroic}
             onChange={setHeroic}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
         </Grid>

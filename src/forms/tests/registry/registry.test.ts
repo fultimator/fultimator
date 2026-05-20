@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { itemFormRegistry, ITEM_FORM_REGISTRY_KEYS } from "../../registry/itemFormRegistry";
+import {
+  itemFormRegistry,
+  ITEM_FORM_REGISTRY_KEYS,
+} from "../../registry/itemFormRegistry";
 import { QUICK_CREATE_TAB_KEYS } from "../../../components/compendium/quickCreateTabKeys";
 
 describe("itemFormRegistry", () => {
@@ -33,7 +36,9 @@ describe("itemFormRegistry", () => {
   it("schema-config entries have schema, defaultState, buildPayload, and fields", () => {
     for (const key of schemaConfigTypes) {
       const entry = itemFormRegistry[key];
-      expect(entry.implementation, `${key}.implementation`).toBe("schema-config");
+      expect(entry.implementation, `${key}.implementation`).toBe(
+        "schema-config",
+      );
       expect(entry.schema, `${key}.schema`).toBeDefined();
       expect(entry.defaultState, `${key}.defaultState`).toBeTypeOf("function");
       expect(entry.buildPayload, `${key}.buildPayload`).toBeTypeOf("function");
@@ -47,12 +52,17 @@ describe("itemFormRegistry", () => {
       const state = entry.defaultState!();
       expect(state, `${key} defaultState`).toBeDefined();
       expect(typeof state, `${key} defaultState type`).toBe("object");
-      expect(Object.keys(state as object).length, `${key} defaultState keys`).toBeGreaterThan(0);
+      expect(
+        Object.keys(state as object).length,
+        `${key} defaultState keys`,
+      ).toBeGreaterThan(0);
     }
   });
 
   it("player-spell uses schema-config implementation", () => {
-    expect(itemFormRegistry["player-spell"].implementation).toBe("schema-config");
+    expect(itemFormRegistry["player-spell"].implementation).toBe(
+      "schema-config",
+    );
   });
 
   it("player-spell has subtypeDefinitions for all spell subtypes", () => {
@@ -69,7 +79,14 @@ describe("itemFormRegistry", () => {
     const entry = itemFormRegistry["optional"];
     expect(entry.subtypeDefinitions).toBeDefined();
     const subtypes = Object.keys(entry.subtypeDefinitions!);
-    for (const s of ["quirk", "camp-activities", "zero-trigger", "zero-effect", "zero-power", "other"]) {
+    for (const s of [
+      "quirk",
+      "camp-activities",
+      "zero-trigger",
+      "zero-effect",
+      "zero-power",
+      "other",
+    ]) {
       expect(subtypes, `optional subtypeDefinitions`).toContain(s);
     }
   });

@@ -8,7 +8,12 @@ const BASE_SPELL = {
   damage: { value: 8, type: "ice", hrZero: false },
   cost: { resource: "mp" as const, amount: 20, perTarget: false },
   range: "ranged" as const,
-  accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" as const },
+  accuracy: {
+    attr1: "insight",
+    attr2: "will",
+    value: 0,
+    defense: "mdef" as const,
+  },
   effect: "",
 };
 
@@ -77,7 +82,10 @@ describe("npc-spell schema roundtrip", () => {
   });
 
   it("wrong itemType fails schema", () => {
-    const result = NpcSpellSchema.safeParse({ ...BASE_SPELL, itemType: "basic" });
+    const result = NpcSpellSchema.safeParse({
+      ...BASE_SPELL,
+      itemType: "basic",
+    });
     expect(result.success).toBe(false);
   });
 

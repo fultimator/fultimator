@@ -1,4 +1,4 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { CustomWeaponPersisted } from "../../../schema/itemSchemas/customWeapon";
 import { calculateCustomWeaponStats } from "../../../../components/player/common/playerCalculations";
@@ -6,6 +6,7 @@ import { Attributes, Elements } from "../../../../types/Misc";
 import { categories } from "../../../../routes/equip/customWeapons/libs";
 import type { SelectOption } from "../../fieldRenderers";
 import { typeOptions } from "../typeOptions";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 export type CustomWeaponFormState = CustomWeaponPersisted & {
   selectedCategory: string;
@@ -36,6 +37,7 @@ export type CustomWeaponFormState = CustomWeaponPersisted & {
   isSlotsVariant: boolean;
   qualityName: string;
 };
+const CUSTOM_WEAPON_LABEL_PREFIX = "customWeapon";
 
 function calcCustomWeaponCost(s: CustomWeaponFormState): number {
   const singleAttributeCost =
@@ -117,12 +119,24 @@ const G = {
   source: "source",
 } as const;
 
+export const customWeaponGroupLabels: GroupLabels = {
+  core: "section.core",
+  accuracy: "section.accuracy",
+  damage: "section.damage",
+  rare: "section.rareBonus",
+  modifiers: "section.modifiers",
+  quality: "section.quality",
+  slots: "section.slots",
+  secondary: "section.secondary",
+  secondaryModifiers: "section.secondaryModifiers",
+};
+
 export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   // Core
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(CUSTOM_WEAPON_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: "",
     group: G.core,
@@ -132,7 +146,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "customWeapon.name",
+    label: prefixedLabel(CUSTOM_WEAPON_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -142,7 +156,10 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "selectedCategory",
     kind: "editable",
-    label: "customWeapon.category",
+    label: prefixedLabel(
+      CUSTOM_WEAPON_LABEL_PREFIX,
+      SHARED_LABEL_KEYS.category,
+    ),
     component: "select",
     defaultValue: categories[0],
     group: G.core,
@@ -164,7 +181,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "selectedRange",
     kind: "editable",
-    label: "customWeapon.range",
+    label: prefixedLabel(CUSTOM_WEAPON_LABEL_PREFIX, SHARED_LABEL_KEYS.range),
     component: "select",
     defaultValue: "melee",
     group: G.core,
@@ -226,7 +243,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "customDamageType",
     kind: "editable",
-    label: "customWeapon.damage.type",
+    label: "shared.damage.type",
     component: "type-select",
     defaultValue: Elements.Physical,
     group: G.damage,
@@ -244,7 +261,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "primaryHrZero",
     kind: "editable",
-    label: "customWeapon.damage.hrZero",
+    label: "shared.damage.hrZero",
     component: "checkbox",
     defaultValue: false,
     group: G.damage,
@@ -257,7 +274,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "precModifier",
     kind: "editable",
-    label: "customWeapon.modifiers.accuracy",
+    label: "shared.modifiers.accuracy",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -281,7 +298,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "damageModifier",
     kind: "editable",
-    label: "customWeapon.modifiers.damage",
+    label: "shared.modifiers.damage",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -305,7 +322,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "defModifier",
     kind: "editable",
-    label: "customWeapon.modifiers.def",
+    label: "shared.modifiers.def",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -317,7 +334,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "mDefModifier",
     kind: "editable",
-    label: "customWeapon.modifiers.mdef",
+    label: "shared.modifiers.mdef",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -539,7 +556,10 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "secondSelectedCategory",
     kind: "editable",
-    label: "customWeapon.second.category",
+    label: prefixedLabel(
+      CUSTOM_WEAPON_LABEL_PREFIX,
+      SHARED_LABEL_KEYS.category,
+    ),
     component: "select",
     defaultValue: categories[0],
     group: G.secondary,
@@ -561,7 +581,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "secondSelectedRange",
     kind: "editable",
-    label: "customWeapon.second.range",
+    label: prefixedLabel(CUSTOM_WEAPON_LABEL_PREFIX, SHARED_LABEL_KEYS.range),
     component: "select",
     defaultValue: "melee",
     group: G.secondary,
@@ -652,7 +672,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "secondPrecModifier",
     kind: "editable",
-    label: "customWeapon.second.modifiers.accuracy",
+    label: "shared.modifiers.accuracy",
     component: "number",
     defaultValue: 0,
     group: G.secondaryModifiers,
@@ -677,7 +697,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "secondDamageModifier",
     kind: "editable",
-    label: "customWeapon.second.modifiers.damage",
+    label: "shared.modifiers.damage",
     component: "number",
     defaultValue: 0,
     group: G.secondaryModifiers,
@@ -702,7 +722,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "secondDefModifier",
     kind: "editable",
-    label: "customWeapon.second.modifiers.def",
+    label: "shared.modifiers.def",
     component: "number",
     defaultValue: 0,
     group: G.secondaryModifiers,
@@ -715,7 +735,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "secondMDefModifier",
     kind: "editable",
-    label: "customWeapon.second.modifiers.mdef",
+    label: "shared.modifiers.mdef",
     component: "number",
     defaultValue: 0,
     group: G.secondaryModifiers,
@@ -729,7 +749,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "cost",
     kind: "computed",
-    label: "customWeapon.cost",
+    label: prefixedLabel(CUSTOM_WEAPON_LABEL_PREFIX, SHARED_LABEL_KEYS.cost),
     component: "readonly-number",
     group: G.meta,
     order: 80,
@@ -737,7 +757,10 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "martial",
     kind: "computed",
-    label: "customWeapon.martial",
+    label: prefixedLabel(
+      CUSTOM_WEAPON_LABEL_PREFIX,
+      SHARED_LABEL_KEYS.martial,
+    ),
     group: G.meta,
     order: 81,
   },

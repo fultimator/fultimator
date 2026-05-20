@@ -27,7 +27,9 @@ function normalizeElementType(type: unknown): Elements {
 
 function firstSpecialText(special: unknown): string {
   if (Array.isArray(special)) {
-    const first = special.find((entry) => typeof entry === "string" && entry.trim());
+    const first = special.find(
+      (entry) => typeof entry === "string" && entry.trim(),
+    );
     return typeof first === "string" ? first.trim() : "";
   }
   return typeof special === "string" ? special.trim() : "";
@@ -482,7 +484,9 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
 }
 
 function renameWindToAir(npc: TypeNpc): TypeNpc {
-  const affinities = { ...(npc.affinities as unknown as Record<string, unknown>) };
+  const affinities = {
+    ...(npc.affinities as unknown as Record<string, unknown>),
+  };
   if ("wind" in affinities) {
     if (affinities["air"] === undefined) affinities["air"] = affinities["wind"];
     delete affinities["wind"];
@@ -491,9 +495,18 @@ function renameWindToAir(npc: TypeNpc): TypeNpc {
   const fixDamage = (damage: { type?: unknown } | undefined) =>
     damage ? { ...damage, type: normalizeElementType(damage.type) } : damage;
 
-  const attacks = (npc.attacks ?? []).map((a) => ({ ...a, damage: fixDamage(a.damage) }));
-  const weaponattacks = (npc.weaponattacks ?? []).map((a) => ({ ...a, damage: fixDamage(a.damage) }));
-  const spells = (npc.spells ?? []).map((s) => ({ ...s, damage: fixDamage(s.damage) }));
+  const attacks = (npc.attacks ?? []).map((a) => ({
+    ...a,
+    damage: fixDamage(a.damage),
+  }));
+  const weaponattacks = (npc.weaponattacks ?? []).map((a) => ({
+    ...a,
+    damage: fixDamage(a.damage),
+  }));
+  const spells = (npc.spells ?? []).map((s) => ({
+    ...s,
+    damage: fixDamage(s.damage),
+  }));
 
   return {
     ...npc,

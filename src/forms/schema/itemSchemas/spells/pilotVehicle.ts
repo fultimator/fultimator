@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { PlayerSpellNonStaticBaseSchema, WeaponModuleAccuracySchema, WeaponModuleDamageSchema } from "./shared";
+import {
+  PlayerSpellNonStaticBaseSchema,
+  WeaponModuleAccuracySchema,
+  WeaponModuleDamageSchema,
+} from "./shared";
 
 const VehicleSlotsSchema = z.object({
   main: z.string().nullable().default(null),
@@ -57,12 +61,18 @@ export const VehicleSchema = z.object({
   description: z.string().default(""),
   enabled: z.boolean().default(false),
   maxEnabledModules: z.number().int().default(3),
-  slots: VehicleSlotsSchema.default({ main: null, off: null, armor: null, support: [] }),
+  slots: VehicleSlotsSchema.default({
+    main: null,
+    off: null,
+    armor: null,
+    support: [],
+  }),
   modules: z.array(VehicleModuleSchema).default([]),
 });
 
-export const PlayerSpellPilotVehicleSchema = PlayerSpellNonStaticBaseSchema.extend({
-  spellType: z.literal("pilot-vehicle"),
-  showInPlayerSheet: z.boolean().default(true),
-  vehicles: z.array(VehicleSchema).default([]),
-});
+export const PlayerSpellPilotVehicleSchema =
+  PlayerSpellNonStaticBaseSchema.extend({
+    spellType: z.literal("pilot-vehicle"),
+    showInPlayerSheet: z.boolean().default(true),
+    vehicles: z.array(VehicleSchema).default([]),
+  });

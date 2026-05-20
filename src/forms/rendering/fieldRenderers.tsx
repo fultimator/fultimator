@@ -28,7 +28,11 @@ import {
 import { Add, Delete } from "@mui/icons-material";
 import type { AutocompleteRenderGetTagProps } from "@mui/material";
 import { Clear, Search } from "@mui/icons-material";
-import { Martial, MartialOutline, OffensiveSpellIcon } from "../../components/icons";
+import {
+  Martial,
+  MartialOutline,
+  OffensiveSpellIcon,
+} from "../../components/icons";
 import FuidField from "../../components/common/FuidField";
 import CustomTextarea from "../../components/common/CustomTextarea";
 import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
@@ -91,12 +95,13 @@ export interface SelectGroup {
 }
 
 function humanizeToken(value: string): string {
-  return value
-    .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return value.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function translateOrHumanize(t: (key: string, skipLoad?: boolean) => string, label: string): string {
+function translateOrHumanize(
+  t: (key: string, skipLoad?: boolean) => string,
+  label: string,
+): string {
   const translated = t(label);
   if (translated === label) {
     return humanizeToken(label);
@@ -105,6 +110,7 @@ function translateOrHumanize(t: (key: string, skipLoad?: boolean) => string, lab
 }
 
 export function FuidRenderer({
+  label,
   value,
   onCommit,
   componentProps,
@@ -114,8 +120,9 @@ export function FuidRenderer({
   const onBrowse = componentProps?.onBrowse as (() => void) | undefined;
   return (
     <FuidField
-      value={(value as string | undefined)}
+      value={value as string | undefined}
       name={name}
+      label={label}
       onChange={(v) => onCommit(v)}
       onBrowse={onBrowse}
       disabled={disabled}
@@ -143,7 +150,6 @@ export function TextRenderer({
     />
   );
 }
-
 
 export function CustomTextareaRenderer({
   label,
@@ -346,11 +352,7 @@ export function SelectRenderer({
                 sx={{ p: 0, mr: 1 }}
               />
             )}
-            {multiple ? (
-              <ListItemText primary={t(opt.label)} />
-            ) : (
-              t(opt.label)
-            )}
+            {multiple ? <ListItemText primary={t(opt.label)} /> : t(opt.label)}
           </MenuItem>
         ))}
       </Select>
@@ -445,7 +447,9 @@ export function TypeSelectRenderer({
         labelId={labelId}
         value={current}
         label={t(label)}
-        onChange={(e) => onCommit(DAMAGE_TYPE_ALIASES[e.target.value] ?? e.target.value)}
+        onChange={(e) =>
+          onCommit(DAMAGE_TYPE_ALIASES[e.target.value] ?? e.target.value)
+        }
         renderValue={(v) => {
           const opt = options.find((o) => o.value === v);
           return (
@@ -1001,7 +1005,13 @@ export function AutocompleteRenderer({
       options={optionLabels}
       value={multiple ? selectedMulti : selectedSingle}
       onChange={(_: unknown, newValue: string[] | string | null) =>
-        onCommit(multiple ? (Array.isArray(newValue) ? newValue : []) : (newValue ?? ""))
+        onCommit(
+          multiple
+            ? Array.isArray(newValue)
+              ? newValue
+              : []
+            : (newValue ?? ""),
+        )
       }
       getOptionLabel={(opt: string) => {
         const found = options.find((o) => o.value === opt);
@@ -1027,7 +1037,8 @@ export function ToggleGroupRenderer({
   componentProps,
 }: FieldRendererProps) {
   const { t } = useTranslate();
-  const options = (componentProps?.options as { key: string; label: string }[]) ?? [];
+  const options =
+    (componentProps?.options as { key: string; label: string }[]) ?? [];
   const color = (componentProps?.color as "primary" | "secondary") ?? "primary";
   const current = (value as Record<string, boolean>) ?? {};
 
@@ -1059,13 +1070,17 @@ export function ChipMultiSelectRenderer({
   componentProps,
 }: FieldRendererProps) {
   const { t } = useTranslate();
-  const options = (componentProps?.options as { value: string; label: string }[]) ?? [];
-  const color = (componentProps?.color as "primary" | "secondary") ?? "secondary";
+  const options =
+    (componentProps?.options as { value: string; label: string }[]) ?? [];
+  const color =
+    (componentProps?.color as "primary" | "secondary") ?? "secondary";
   const selected = (value as string[]) ?? [];
 
   const toggle = (val: string) =>
     onCommit(
-      selected.includes(val) ? selected.filter((s) => s !== val) : [...selected, val],
+      selected.includes(val)
+        ? selected.filter((s) => s !== val)
+        : [...selected, val],
     );
 
   return (
@@ -1100,14 +1115,22 @@ export function ObjectListRenderer({
   componentProps,
 }: FieldRendererProps) {
   const { t } = useTranslate();
-  const fields = (componentProps?.fields as import("./config/fieldConfig").ItemFieldConfig<Record<string, unknown>>) ?? [];
-  const itemDefaults = (componentProps?.itemDefaults as Record<string, unknown>) ?? {};
+  const fields =
+    (componentProps?.fields as import("./config/fieldConfig").ItemFieldConfig<
+      Record<string, unknown>
+    >) ?? [];
+  const itemDefaults =
+    (componentProps?.itemDefaults as Record<string, unknown>) ?? {};
   const fixedCount = componentProps?.fixedCount as number | undefined;
   const addLabel = (componentProps?.addLabel as string) ?? "Add";
-  const rowLabel = componentProps?.rowLabel as ((row: Record<string, unknown>, i: number) => string) | undefined;
+  const rowLabel = componentProps?.rowLabel as
+    | ((row: Record<string, unknown>, i: number) => string)
+    | undefined;
   const renderNestedFields = componentProps?.renderNestedFields as
     | ((args: {
-        config: import("./config/fieldConfig").ItemFieldConfig<Record<string, unknown>>;
+        config: import("./config/fieldConfig").ItemFieldConfig<
+          Record<string, unknown>
+        >;
         state: Record<string, unknown>;
         onChange: (next: Record<string, unknown>) => void;
         surface?: "quickCreate" | "create" | "edit";
@@ -1127,20 +1150,42 @@ export function ObjectListRenderer({
   const removeRow = (i: number) => onCommit(rows.filter((_, idx) => idx !== i));
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1, width: "100%" }}>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", gap: 1, width: "100%" }}
+    >
       {rows.map((row, i) => (
         <Box
           key={i}
-          sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1, p: 1.5 }}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            p: 1.5,
+          }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 1,
+            }}
+          >
             {rowLabel && (
-              <Typography variant="caption" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+              >
                 {rowLabel(row, i)}
               </Typography>
             )}
             {fixedCount === undefined && (
-              <IconButton size="small" color="error" onClick={() => removeRow(i)} sx={{ ml: "auto" }}>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => removeRow(i)}
+                sx={{ ml: "auto" }}
+              >
                 <Delete fontSize="small" />
               </IconButton>
             )}
@@ -1160,7 +1205,12 @@ export function ObjectListRenderer({
       ))}
       {fixedCount === undefined && (
         <Box>
-          <Button size="small" variant="outlined" startIcon={<Add />} onClick={addRow}>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<Add />}
+            onClick={addRow}
+          >
             {t(addLabel)}
           </Button>
         </Box>

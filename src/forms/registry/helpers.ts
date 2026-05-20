@@ -35,11 +35,10 @@ export function createSchemaPayloadBuilder<TState, TPayload>(
 
 export function createSubtypePayloadBuilder<
   TSchemas extends Record<string, ZodTypeAny>,
->(
-  discriminatorKey: string,
-  subtypeSchemas: TSchemas,
-) {
-  return (state: unknown): ReturnType<TSchemas[keyof TSchemas]["parse"]> | null => {
+>(discriminatorKey: string, subtypeSchemas: TSchemas) {
+  return (
+    state: unknown,
+  ): ReturnType<TSchemas[keyof TSchemas]["parse"]> | null => {
     const rawSubtype =
       state && typeof state === "object"
         ? (state as Record<string, unknown>)[discriminatorKey]

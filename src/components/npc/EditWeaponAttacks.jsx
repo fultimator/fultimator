@@ -26,7 +26,10 @@ import { CloseBracket, OpenBracket } from "../Bracket";
 import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../common/CustomHeader";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
-import { npcAttackFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAttack";
+import {
+  npcAttackFieldConfig,
+  npcAttackGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAttack";
 import {
   Add,
   Casino,
@@ -111,12 +114,11 @@ function SelectWeapon({ attack, onChange }) {
       >
         {weapons.map((w) => (
           <MenuItem key={w.name} value={w.name}>
-            {w.name} {w.martial && <Martial />}{" "}
-            <OpenBracket />
-            {attributes[w.accuracy?.attr1]?.shortcaps}+{attributes[w.accuracy?.attr2]?.shortcaps}
+            {w.name} {w.martial && <Martial />} <OpenBracket />
+            {attributes[w.accuracy?.attr1]?.shortcaps}+
+            {attributes[w.accuracy?.attr2]?.shortcaps}
             {w.accuracy?.value > 0 && `+${w.accuracy.value}`}
-            <CloseBracket />{" "}
-            <OpenBracket />
+            <CloseBracket /> <OpenBracket />
             {t("HR +")} {w.damage?.value}
             <CloseBracket />
           </MenuItem>
@@ -131,20 +133,35 @@ function WeaponAttackContextMenu({ attack, onDelete }) {
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [anchorEl, setAnchorEl] = useState(null);
   const [packMenuAnchor, setPackMenuAnchor] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const personalPack = packs.find((p) => p.isPersonal) ?? null;
   const unlockedNonPersonal = packs.filter((p) => !p.isPersonal && !p.locked);
 
-  const open = (e) => { e.stopPropagation(); setAnchorEl(e.currentTarget); };
+  const open = (e) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
   const close = () => setAnchorEl(null);
 
   const doAdd = async (packId) => {
     try {
       await addItem(packId, "npc-attack", attack);
-      setSnackbar({ open: true, message: t("Added to compendium"), severity: "success" });
+      setSnackbar({
+        open: true,
+        message: t("Added to compendium"),
+        severity: "success",
+      });
     } catch (err) {
-      setSnackbar({ open: true, message: err?.message ?? t("Failed to add"), severity: "error" });
+      setSnackbar({
+        open: true,
+        message: err?.message ?? t("Failed to add"),
+        severity: "error",
+      });
     }
   };
 
@@ -152,7 +169,10 @@ function WeaponAttackContextMenu({ attack, onDelete }) {
     close();
     if (unlockedNonPersonal.length > 0) setPackMenuAnchor(e.currentTarget);
     else if (personalPack && !personalPack.locked) await doAdd(personalPack.id);
-    else { const p = await ensurePersonalPack(); await doAdd(p.id); }
+    else {
+      const p = await ensurePersonalPack();
+      await doAdd(p.id);
+    }
   };
 
   return (
@@ -162,23 +182,48 @@ function WeaponAttackContextMenu({ attack, onDelete }) {
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
         <MenuItem onClick={handleAddToCompendium}>
-          <ListItemIcon><LibraryAdd /></ListItemIcon>
+          <ListItemIcon>
+            <LibraryAdd />
+          </ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => { close(); onDelete(); }} sx={{ color: "error.main" }}>
-          <ListItemIcon><Delete color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            close();
+            onDelete();
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <Delete color="error" />
+          </ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
       </Menu>
-      <Menu anchorEl={packMenuAnchor} open={Boolean(packMenuAnchor)} onClose={() => setPackMenuAnchor(null)}>
+      <Menu
+        anchorEl={packMenuAnchor}
+        open={Boolean(packMenuAnchor)}
+        onClose={() => setPackMenuAnchor(null)}
+      >
         {personalPack && !personalPack.locked && (
-          <MenuItem onClick={async () => { setPackMenuAnchor(null); await doAdd(personalPack.id); }}>
+          <MenuItem
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(personalPack.id);
+            }}
+          >
             <ListItemText>{t("Personal")}</ListItemText>
           </MenuItem>
         )}
         {unlockedNonPersonal.map((pack) => (
-          <MenuItem key={pack.id} onClick={async () => { setPackMenuAnchor(null); await doAdd(pack.id); }}>
+          <MenuItem
+            key={pack.id}
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(pack.id);
+            }}
+          >
             <ListItemText>{pack.name}</ListItemText>
           </MenuItem>
         ))}
@@ -189,7 +234,11 @@ function WeaponAttackContextMenu({ attack, onDelete }) {
         onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -216,20 +265,26 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
   const toggleExpanded = (i) => {
     setExpandedSet((prev) => {
       const s = new Set(prev);
-      if (s.has(i)) s.delete(i); else s.add(i);
+      if (s.has(i)) s.delete(i);
+      else s.add(i);
       return s;
     });
   };
 
   const addAttack = () => {
     setNpc((prev) => {
-      const nextIndex = (prev.weaponattacks?.length ?? 0);
+      const nextIndex = prev.weaponattacks?.length ?? 0;
       setExpandedSet((s) => new Set([...s, nextIndex]));
       return {
         ...prev,
         weaponattacks: [
           ...(prev.weaponattacks || []),
-          { ...weaponToAttackFields(weapons[0]), name: "", fuid: "", effect: "" },
+          {
+            ...weaponToAttackFields(weapons[0]),
+            name: "",
+            fuid: "",
+            effect: "",
+          },
         ],
       };
     });
@@ -246,7 +301,9 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
     });
     setNpc((prev) => ({
       ...prev,
-      weaponattacks: (prev.weaponattacks || []).filter((_, index) => index !== i),
+      weaponattacks: (prev.weaponattacks || []).filter(
+        (_, index) => index !== i,
+      ),
     }));
   };
 
@@ -266,151 +323,198 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
         allExpanded={allExpanded}
       />
       <Grid container spacing={1}>
-      {npc.weaponattacks?.map((attack, i) => {
-        const attr1 = ATTR_SHORT[attack.accuracy?.attr1] ?? "DEX";
-        const attr2 = ATTR_SHORT[attack.accuracy?.attr2] ?? "DEX";
-        const accBonus = attack.accuracy?.value ?? 0;
-        const dmgValue = attack.damage?.value ?? 0;
-        const dmgType = attack.damage?.type ?? "physical";
-        const hrZero = attack.damage?.hrZero === true;
+        {npc.weaponattacks?.map((attack, i) => {
+          const attr1 = ATTR_SHORT[attack.accuracy?.attr1] ?? "DEX";
+          const attr2 = ATTR_SHORT[attack.accuracy?.attr2] ?? "DEX";
+          const accBonus = attack.accuracy?.value ?? 0;
+          const dmgValue = attack.damage?.value ?? 0;
+          const dmgType = attack.damage?.type ?? "physical";
+          const hrZero = attack.damage?.hrZero === true;
 
-        const handleRoll = (e) => {
-          e.stopPropagation();
-          const dieSizes = {
-            primary: npc.attributes?.[attack.accuracy?.attr1]?.base ?? npc.attributes?.[attack.accuracy?.attr1] ?? 6,
-            secondary: npc.attributes?.[attack.accuracy?.attr2]?.base ?? npc.attributes?.[attack.accuracy?.attr2] ?? 6,
+          const handleRoll = (e) => {
+            e.stopPropagation();
+            const dieSizes = {
+              primary:
+                npc.attributes?.[attack.accuracy?.attr1]?.base ??
+                npc.attributes?.[attack.accuracy?.attr1] ??
+                6,
+              secondary:
+                npc.attributes?.[attack.accuracy?.attr2]?.base ??
+                npc.attributes?.[attack.accuracy?.attr2] ??
+                6,
+            };
+            const intent = prepareAccuracyCheck({
+              attr1: ATTR_ROLL[attack.accuracy?.attr1] ?? "dex",
+              attr2: ATTR_ROLL[attack.accuracy?.attr2] ?? "dex",
+              accuracyBonus: accBonus,
+              name: attack.name,
+              description: attack.effect ?? attack.special?.[0] ?? undefined,
+              baseDamage: dmgValue,
+              damageType: dmgType,
+              accuracyDefense: attack.accuracy?.defense ?? "def",
+              range: attack.range,
+              hrZero,
+            });
+            const rolls = rollAccuracyCheck(dieSizes);
+            const result = processAccuracyCheck(
+              intent,
+              rolls,
+              dieSizes,
+              npc.name || "NPC",
+            );
+            addMessage(buildAccuracyCheckMessage(result));
           };
-          const intent = prepareAccuracyCheck({
-            attr1: ATTR_ROLL[attack.accuracy?.attr1] ?? "dex",
-            attr2: ATTR_ROLL[attack.accuracy?.attr2] ?? "dex",
-            accuracyBonus: accBonus,
-            name: attack.name,
-            description: attack.effect ?? attack.special?.[0] ?? undefined,
-            baseDamage: dmgValue,
-            damageType: dmgType,
-            accuracyDefense: attack.accuracy?.defense ?? "def",
-            range: attack.range,
-            hrZero,
-          });
-          const rolls = rollAccuracyCheck(dieSizes);
-          const result = processAccuracyCheck(intent, rolls, dieSizes, npc.name || "NPC");
-          addMessage(buildAccuracyCheckMessage(result));
-        };
 
-        const updateAttack = (next) => {
-          setNpc((prev) => {
-            const weaponattacks = [...(prev.weaponattacks || [])];
-            weaponattacks[i] = next;
-            return { ...prev, weaponattacks };
-          });
-        };
+          const updateAttack = (next) => {
+            setNpc((prev) => {
+              const weaponattacks = [...(prev.weaponattacks || [])];
+              weaponattacks[i] = next;
+              return { ...prev, weaponattacks };
+            });
+          };
 
-        return (
-          <Grid key={i} size={{ xs: 12, md: 6 }}>
-          <Accordion
-            expanded={expandedSet.has(i)}
-            onChange={() => toggleExpanded(i)}
-            disableGutters
-            elevation={0}
-            sx={{
-              border: "1px solid",
-              borderColor: "divider",
-              "&:before": { display: "none" },
-              mb: 0.5,
-              containerType: "inline-size",
-            }}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              sx={{ "& .MuiAccordionSummary-content": { alignItems: "center", overflow: "hidden", minWidth: 0 } }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
-                <Tooltip title={t("Roll")}>
-                  <IconButton component="span" onClick={handleRoll}>
-                    <Casino />
-                  </IconButton>
-                </Tooltip>
-                <WeaponAttackContextMenu attack={attack} onDelete={() => openDeleteDialog(i)} />
-              </Box>
-              <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary", mx: 0.5 }}>
-                {attack.range === "ranged" ? <DistanceIcon /> : <MeleeIcon />}
-              </Box>
-              <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
-                <Typography noWrap>{attack.name || t("(unnamed)")}</Typography>
-              </Box>
-              <Typography variant="body2" sx={SUMMARY_META_SX}>
-                <OpenBracket />{attr1}+{attr2}<CloseBracket />
-                {accBonus !== 0 && `${accBonus > 0 ? "+" : ""}${accBonus}`}
-                {" ⬥ "}
-                <OpenBracket />{hrZero ? "HR0" : "HR+"}{dmgValue}<CloseBracket />
-                <TypeName type={dmgType} />
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={1}>
-                {/* Weapon preset picker, not in schema config */}
-                <Grid size={12}>
-                  <SelectWeapon
-                    attack={attack}
-                    onChange={(fields) => updateAttack({ ...attack, ...fields })}
-                  />
-                </Grid>
-                <SchemaFieldRenderer
-                  config={npcAttackFieldConfig}
-                  state={attack}
-                  onChange={updateAttack}
-                  surface="edit"
-                  group="core"
-                  cols={2}
-                  extraProps={{ name: String(attack.name ?? "") }}
-                />
-                <SchemaFieldRenderer
-                  config={npcAttackFieldConfig}
-                  state={attack}
-                  onChange={updateAttack}
-                  surface="edit"
-                  group="accuracy"
-                  label={t("Accuracy")}
-                  cols={2}
-                />
-                <SchemaFieldRenderer
-                  config={npcAttackFieldConfig}
-                  state={attack}
-                  onChange={updateAttack}
-                  surface="edit"
-                  group="damage"
-                  label={t("Damage")}
-                  cols={2}
-                />
-                <SchemaFieldRenderer
-                  config={npcAttackFieldConfig}
-                  state={attack}
-                  onChange={updateAttack}
-                surface="edit"
-                group="effect"
-                label={t("Effect")}
-                cols={1}
-                />
-                <SchemaFieldRenderer
-                  config={npcAttackFieldConfig}
-                  state={attack}
-                  onChange={updateAttack}
-                  surface="edit"
-                  group="meta"
-                  label="Metadata"
-                  cols={2}
-                  hidden
-                />
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          </Grid>
-        );
-      })}
+          return (
+            <Grid key={i} size={{ xs: 12, md: 6 }}>
+              <Accordion
+                expanded={expandedSet.has(i)}
+                onChange={() => toggleExpanded(i)}
+                disableGutters
+                elevation={0}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  "&:before": { display: "none" },
+                  mb: 0.5,
+                  containerType: "inline-size",
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  sx={{
+                    "& .MuiAccordionSummary-content": {
+                      alignItems: "center",
+                      overflow: "hidden",
+                      minWidth: 0,
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", alignItems: "center" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Tooltip title={t("Roll")}>
+                      <IconButton component="span" onClick={handleRoll}>
+                        <Casino />
+                      </IconButton>
+                    </Tooltip>
+                    <WeaponAttackContextMenu
+                      attack={attack}
+                      onDelete={() => openDeleteDialog(i)}
+                    />
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      color: "text.secondary",
+                      mx: 0.5,
+                    }}
+                  >
+                    {attack.range === "ranged" ? (
+                      <DistanceIcon />
+                    ) : (
+                      <MeleeIcon />
+                    )}
+                  </Box>
+                  <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+                    <Typography noWrap>
+                      {attack.name || t("(unnamed)")}
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={SUMMARY_META_SX}>
+                    <OpenBracket />
+                    {attr1}+{attr2}
+                    <CloseBracket />
+                    {accBonus !== 0 && `${accBonus > 0 ? "+" : ""}${accBonus}`}
+                    {" ⬥ "}
+                    <OpenBracket />
+                    {hrZero ? "HR0" : "HR+"}
+                    {dmgValue}
+                    <CloseBracket />
+                    <TypeName type={dmgType} />
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    {/* Weapon preset picker, not in schema config */}
+                    <Grid size={12}>
+                      <SelectWeapon
+                        attack={attack}
+                        onChange={(fields) =>
+                          updateAttack({ ...attack, ...fields })
+                        }
+                      />
+                    </Grid>
+                    <SchemaFieldRenderer
+                      config={npcAttackFieldConfig}
+                      groupLabels={npcAttackGroupLabels}
+                      state={attack}
+                      onChange={updateAttack}
+                      surface="edit"
+                      group="core"
+                      cols={2}
+                      extraProps={{ name: String(attack.name ?? "") }}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcAttackFieldConfig}
+                      groupLabels={npcAttackGroupLabels}
+                      state={attack}
+                      onChange={updateAttack}
+                      surface="edit"
+                      group="accuracy"
+                      cols={2}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcAttackFieldConfig}
+                      groupLabels={npcAttackGroupLabels}
+                      state={attack}
+                      onChange={updateAttack}
+                      surface="edit"
+                      group="damage"
+                      cols={2}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcAttackFieldConfig}
+                      groupLabels={npcAttackGroupLabels}
+                      state={attack}
+                      onChange={updateAttack}
+                      surface="edit"
+                      group="effect"
+                      cols={1}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcAttackFieldConfig}
+                      groupLabels={npcAttackGroupLabels}
+                      state={attack}
+                      onChange={updateAttack}
+                      surface="edit"
+                      group="meta"
+                      cols={2}
+                      hidden
+                    />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+          );
+        })}
       </Grid>
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
-        onClose={() => { setIsDeleteDialogOpen(false); setPendingAttackIndex(null); }}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingAttackIndex(null);
+        }}
         onConfirm={() => {
           if (pendingAttackIndex === null) return;
           removeAttack(pendingAttackIndex);
@@ -419,7 +523,11 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
         }}
         title={t("Delete")}
         message={t("Are you sure you want to delete?")}
-        itemPreview={pendingAttackIndex !== null ? npc.weaponattacks?.[pendingAttackIndex]?.name || "" : ""}
+        itemPreview={
+          pendingAttackIndex !== null
+            ? npc.weaponattacks?.[pendingAttackIndex]?.name || ""
+            : ""
+        }
       />
     </>
   );

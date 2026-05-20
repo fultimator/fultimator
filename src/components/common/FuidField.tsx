@@ -14,6 +14,7 @@ import { useTranslate } from "../../translation/translate";
 interface Props {
   value: string | undefined;
   name: string;
+  label?: string;
   onChange: (fuid: string) => void;
   onBrowse?: () => void;
   disabled?: boolean;
@@ -23,6 +24,7 @@ interface Props {
 export default function FuidField({
   value,
   name,
+  label = "ID",
   onChange,
   onBrowse,
   disabled = false,
@@ -49,7 +51,7 @@ export default function FuidField({
   return (
     <>
       <TextField
-        label="ID"
+        label={t(label)}
         value={value ?? ""}
         fullWidth
         size="small"

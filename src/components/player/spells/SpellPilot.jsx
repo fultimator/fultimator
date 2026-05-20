@@ -70,7 +70,9 @@ function ThemedSpellPilot({
     }
     if (moduleType === "support") {
       return (s.support ?? []).reduce((count, key) => {
-        const mod = (vehicle.modules || []).find((m) => (m.key ?? m.name) === key);
+        const mod = (vehicle.modules || []).find(
+          (m) => (m.key ?? m.name) === key,
+        );
         return count + (mod?.isComplex ? 2 : 1);
       }, 0);
     }
@@ -98,13 +100,19 @@ function ThemedSpellPilot({
       if (idx === moduleIndex) return count;
       const mk = m.key ?? m.name;
       const mEquipped =
-        s.main === mk || s.off === mk || s.armor === mk || (s.support ?? []).includes(mk);
+        s.main === mk ||
+        s.off === mk ||
+        s.armor === mk ||
+        (s.support ?? []).includes(mk);
       if (!mEquipped) return count;
       const mType = getModuleTypeForLimits(m);
       return count + (mType === "support" && m.isComplex ? 2 : 1);
     }, 0);
 
-    if (!isCurrentlyEquipped && totalUsedSlots + slotsNeeded > maxEnabledModules) {
+    if (
+      !isCurrentlyEquipped &&
+      totalUsedSlots + slotsNeeded > maxEnabledModules
+    ) {
       return false;
     }
 
@@ -120,7 +128,9 @@ function ThemedSpellPilot({
 
         if (module.isShield) {
           if (!offOccupied) return true;
-          const offMod = (vehicle.modules || []).find((m) => (m.key ?? m.name) === s.off);
+          const offMod = (vehicle.modules || []).find(
+            (m) => (m.key ?? m.name) === s.off,
+          );
           return !!offMod?.isShield && !mainOccupied;
         }
 
@@ -129,16 +139,22 @@ function ThemedSpellPilot({
 
       // Already equipped - check slot validity
       const proposedSlot =
-        s.main === moduleKey && s.off === moduleKey ? "both"
-        : s.main === moduleKey ? "main"
-        : s.off === moduleKey ? "off"
-        : null;
+        s.main === moduleKey && s.off === moduleKey
+          ? "both"
+          : s.main === moduleKey
+            ? "main"
+            : s.off === moduleKey
+              ? "off"
+              : null;
       if (!proposedSlot) return false;
       if (proposedSlot === "both") {
         const otherWeaponEquipped = (vehicle.modules || []).some((m, idx) => {
           if (idx === moduleIndex) return false;
           const mk = m.key ?? m.name;
-          return getModuleTypeForLimits(m) === "weapon" && (s.main === mk || s.off === mk);
+          return (
+            getModuleTypeForLimits(m) === "weapon" &&
+            (s.main === mk || s.off === mk)
+          );
         });
         return !otherWeaponEquipped;
       }
@@ -150,11 +166,17 @@ function ThemedSpellPilot({
         if (idx === moduleIndex) return false;
         const mk = m.key ?? m.name;
         const mEquipped =
-          s.main === mk || s.off === mk || s.armor === mk || (s.support ?? []).includes(mk);
+          s.main === mk ||
+          s.off === mk ||
+          s.armor === mk ||
+          (s.support ?? []).includes(mk);
         return mEquipped && getModuleTypeForLimits(m) === frameType;
       })
       .reduce((count, m) => {
-        return count + (getModuleTypeForLimits(m) === "support" && m.isComplex ? 2 : 1);
+        return (
+          count +
+          (getModuleTypeForLimits(m) === "support" && m.isComplex ? 2 : 1)
+        );
       }, 0);
 
     return currentlyEquippedSlots + slotsNeeded <= frameLimits[frameType];
@@ -374,15 +396,17 @@ function ThemedSpellPilot({
                   <Typography style={{ flexGrow: 1, marginRight: "5px" }}>
                     {(() => {
                       const vSlots = vehicle.slots ?? {};
-                      const equippedModules = (vehicle.modules || []).filter((m) => {
-                        const mk = m.key ?? m.name;
-                        return (
-                          vSlots.main === mk ||
-                          vSlots.off === mk ||
-                          vSlots.armor === mk ||
-                          (vSlots.support ?? []).includes(mk)
-                        );
-                      });
+                      const equippedModules = (vehicle.modules || []).filter(
+                        (m) => {
+                          const mk = m.key ?? m.name;
+                          return (
+                            vSlots.main === mk ||
+                            vSlots.off === mk ||
+                            vSlots.armor === mk ||
+                            (vSlots.support ?? []).includes(mk)
+                          );
+                        },
+                      );
                       // Deduplicate (cumbersome weapons appear in both main and off)
                       const seen = new Set();
                       const dedupedModules = equippedModules.filter((m) => {
@@ -391,7 +415,8 @@ function ThemedSpellPilot({
                         seen.add(mk);
                         return true;
                       });
-                      if (dedupedModules.length === 0) return t("No modules equipped");
+                      if (dedupedModules.length === 0)
+                        return t("No modules equipped");
                       return dedupedModules
                         .map((m) => {
                           const moduleName =
@@ -407,10 +432,13 @@ function ThemedSpellPilot({
                               vSlots.main === mk && vSlots.off === mk
                                 ? "M+O"
                                 : vSlots.main === mk
-                                ? "M"
-                                : "O";
+                                  ? "M"
+                                  : "O";
                             slotInfo = `[${handText}]`;
-                          } else if (m.type === "pilot_module_support" && m.isComplex) {
+                          } else if (
+                            m.type === "pilot_module_support" &&
+                            m.isComplex
+                          ) {
                             slotInfo = "(2 slots)";
                           } else {
                             slotInfo = "(1 slot)";
@@ -554,337 +582,346 @@ function ThemedSpellPilot({
                               vs.armor === mKey ||
                               (vs.support ?? []).includes(mKey);
                             const moduleSlot =
-                              vs.main === mKey && vs.off === mKey ? "both"
-                              : vs.main === mKey ? "main"
-                              : vs.off === mKey ? "off"
-                              : vs.armor === mKey ? "armor"
-                              : (vs.support ?? []).includes(mKey) ? "support"
-                              : null;
+                              vs.main === mKey && vs.off === mKey
+                                ? "both"
+                                : vs.main === mKey
+                                  ? "main"
+                                  : vs.off === mKey
+                                    ? "off"
+                                    : vs.armor === mKey
+                                      ? "armor"
+                                      : (vs.support ?? []).includes(mKey)
+                                        ? "support"
+                                        : null;
                             return (
-                            <div
-                              key={`${moduleType}-${moduleIndex}`}
-                              style={{
-                                padding: "3px 17px",
-                                borderBottom: `1px solid ${theme.secondary}`,
-                                backgroundColor: isEquipped
-                                  ? theme.ternary + "20"
-                                  : "transparent",
-                                borderLeft: isEquipped
-                                  ? `4px solid ${theme.primary}`
-                                  : "none",
-                              }}
-                            >
-                              <Grid container>
-                                <Grid size={4}>
-                                  <Typography
-                                    sx={{
-                                      fontWeight: isEquipped
-                                        ? "bold"
-                                        : "normal",
-                                      fontSize: "1em",
-                                    }}
-                                  >
-                                    {module.name === "pilot_custom_armor" ||
-                                    module.name === "pilot_custom_weapon" ||
-                                    module.name === "pilot_custom_support"
-                                      ? module.customName
-                                      : t(module.name)}
-                                    {module.martial && <Martial />}
-                                    {module.cumbersome && " ⚠"}
-                                  </Typography>
-                                </Grid>
-                                <Grid size={6}>
-                                  {module.type === "pilot_module_weapon" ? (
-                                    <div>
-                                      <Typography
-                                        sx={{
-                                          fontSize: "0.9em",
-                                          fontWeight: "bold",
-                                        }}
-                                      >
-                                        {t("Accuracy")}: [
-                                        {
-                                          attributes[
-                                            module.accuracy?.attr1 || "might"
-                                          ].shortcaps
-                                        }{" "}
-                                        +{" "}
-                                        {
-                                          attributes[
-                                            module.accuracy?.attr2 ||
-                                              "dexterity"
-                                          ].shortcaps
-                                        }
-                                        ]{" "}
-                                        {(module.accuracy?.value ?? 0) >= 0
-                                          ? `+${module.accuracy?.value ?? 0}`
-                                          : (module.accuracy?.value ?? 0)}
-                                      </Typography>
-                                      <Typography
-                                        sx={{
-                                          fontSize: "0.9em",
-                                          fontWeight: "bold",
-                                        }}
-                                      >
-                                        {t("Damage")}: [HR +{" "}
-                                        {module.damage?.value ?? 0}]
-                                      </Typography>
-                                      <div
-                                        style={{
-                                          fontSize: "0.95em",
-                                          marginTop: "4px",
-                                        }}
-                                      >
-                                        <ReactMarkdown components={components}>
-                                          {module.name === "pilot_custom_weapon"
-                                            ? module.description
-                                            : t(module.description)}
-                                        </ReactMarkdown>
+                              <div
+                                key={`${moduleType}-${moduleIndex}`}
+                                style={{
+                                  padding: "3px 17px",
+                                  borderBottom: `1px solid ${theme.secondary}`,
+                                  backgroundColor: isEquipped
+                                    ? theme.ternary + "20"
+                                    : "transparent",
+                                  borderLeft: isEquipped
+                                    ? `4px solid ${theme.primary}`
+                                    : "none",
+                                }}
+                              >
+                                <Grid container>
+                                  <Grid size={4}>
+                                    <Typography
+                                      sx={{
+                                        fontWeight: isEquipped
+                                          ? "bold"
+                                          : "normal",
+                                        fontSize: "1em",
+                                      }}
+                                    >
+                                      {module.name === "pilot_custom_armor" ||
+                                      module.name === "pilot_custom_weapon" ||
+                                      module.name === "pilot_custom_support"
+                                        ? module.customName
+                                        : t(module.name)}
+                                      {module.martial && <Martial />}
+                                      {module.cumbersome && " ⚠"}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid size={6}>
+                                    {module.type === "pilot_module_weapon" ? (
+                                      <div>
+                                        <Typography
+                                          sx={{
+                                            fontSize: "0.9em",
+                                            fontWeight: "bold",
+                                          }}
+                                        >
+                                          {t("Accuracy")}: [
+                                          {
+                                            attributes[
+                                              module.accuracy?.attr1 || "might"
+                                            ].shortcaps
+                                          }{" "}
+                                          +{" "}
+                                          {
+                                            attributes[
+                                              module.accuracy?.attr2 ||
+                                                "dexterity"
+                                            ].shortcaps
+                                          }
+                                          ]{" "}
+                                          {(module.accuracy?.value ?? 0) >= 0
+                                            ? `+${module.accuracy?.value ?? 0}`
+                                            : (module.accuracy?.value ?? 0)}
+                                        </Typography>
+                                        <Typography
+                                          sx={{
+                                            fontSize: "0.9em",
+                                            fontWeight: "bold",
+                                          }}
+                                        >
+                                          {t("Damage")}: [HR +{" "}
+                                          {module.damage?.value ?? 0}]
+                                        </Typography>
+                                        <div
+                                          style={{
+                                            fontSize: "0.95em",
+                                            marginTop: "4px",
+                                          }}
+                                        >
+                                          <ReactMarkdown
+                                            components={components}
+                                          >
+                                            {module.name ===
+                                            "pilot_custom_weapon"
+                                              ? module.description
+                                              : t(module.description)}
+                                          </ReactMarkdown>
+                                        </div>
                                       </div>
-                                    </div>
-                                  ) : module.type === "pilot_module_armor" ? (
-                                    <div>
-                                      <Typography
-                                        sx={{
-                                          fontSize: "0.9em",
-                                          fontWeight: "bold",
-                                        }}
-                                      >
-                                        Defense:{" "}
-                                        {module.martial
-                                          ? module.def || 0
-                                          : module.def && module.def > 0
-                                            ? `${t("DEX die")} + ${module.def}`
-                                            : t("DEX die")}
-                                      </Typography>
-                                      <Typography
-                                        sx={{
-                                          fontSize: "0.9em",
-                                          fontWeight: "bold",
-                                        }}
-                                      >
-                                        M. Defense:{" "}
-                                        {module.martial
-                                          ? module.mdef || 0
-                                          : module.mdef && module.mdef > 0
-                                            ? `${t("INS die")} + ${module.mdef}`
-                                            : t("INS die")}
-                                      </Typography>
-                                      {/* {module.cost && module.cost > 0 && (
+                                    ) : module.type === "pilot_module_armor" ? (
+                                      <div>
+                                        <Typography
+                                          sx={{
+                                            fontSize: "0.9em",
+                                            fontWeight: "bold",
+                                          }}
+                                        >
+                                          Defense:{" "}
+                                          {module.martial
+                                            ? module.def || 0
+                                            : module.def && module.def > 0
+                                              ? `${t("DEX die")} + ${module.def}`
+                                              : t("DEX die")}
+                                        </Typography>
+                                        <Typography
+                                          sx={{
+                                            fontSize: "0.9em",
+                                            fontWeight: "bold",
+                                          }}
+                                        >
+                                          M. Defense:{" "}
+                                          {module.martial
+                                            ? module.mdef || 0
+                                            : module.mdef && module.mdef > 0
+                                              ? `${t("INS die")} + ${module.mdef}`
+                                              : t("INS die")}
+                                        </Typography>
+                                        {/* {module.cost && module.cost > 0 && (
                                   <Typography sx={{ fontSize: "0.75em", fontWeight: "bold" }}>
                                     Cost: {module.cost}z
                                   </Typography>
                                 )} */}
-                                      {/* No description for armor modules */}
-                                    </div>
-                                  ) : (
-                                    <div style={{ fontSize: "0.95em" }}>
-                                      <ReactMarkdown components={components}>
-                                        {module.name === "pilot_custom_armor" ||
-                                        module.name === "pilot_custom_weapon" ||
-                                        module.name === "pilot_custom_support"
-                                          ? module.description
-                                          : t(module.description)}
-                                      </ReactMarkdown>
-                                    </div>
-                                  )}
-                                </Grid>
-                                <Grid size={2}>
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "flex-end",
-                                      gap: "8px",
-                                    }}
-                                  >
-                                    {isEditMode && (
-                                      <>
-                                        {/* Hand toggle for equipped weapons */}
-                                        {isEquipped &&
-                                          module.type ===
-                                            "pilot_module_weapon" && (
-                                            <div
-                                              style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                              }}
-                                            >
-                                              {module.isShield ? (
-                                                <ToggleButtonGroup
-                                                  value={moduleSlot || "off"}
-                                                  exclusive
-                                                  onChange={(e, newValue) => {
-                                                    if (
-                                                      newValue !== null &&
-                                                      onModuleChange
-                                                    ) {
-                                                      onModuleChange(
-                                                        i,
-                                                        module.originalIndex,
-                                                        "equippedSlot",
-                                                        newValue,
-                                                      );
-                                                    }
-                                                  }}
-                                                  size="small"
-                                                >
-                                                  <ToggleButton
-                                                    value="main"
-                                                    disabled={
-                                                      !vehicle.modules.some(
+                                        {/* No description for armor modules */}
+                                      </div>
+                                    ) : (
+                                      <div style={{ fontSize: "0.95em" }}>
+                                        <ReactMarkdown components={components}>
+                                          {module.name ===
+                                            "pilot_custom_armor" ||
+                                          module.name ===
+                                            "pilot_custom_weapon" ||
+                                          module.name === "pilot_custom_support"
+                                            ? module.description
+                                            : t(module.description)}
+                                        </ReactMarkdown>
+                                      </div>
+                                    )}
+                                  </Grid>
+                                  <Grid size={2}>
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "flex-end",
+                                        gap: "8px",
+                                      }}
+                                    >
+                                      {isEditMode && (
+                                        <>
+                                          {/* Hand toggle for equipped weapons */}
+                                          {isEquipped &&
+                                            module.type ===
+                                              "pilot_module_weapon" && (
+                                              <div
+                                                style={{
+                                                  display: "flex",
+                                                  alignItems: "center",
+                                                }}
+                                              >
+                                                {module.isShield ? (
+                                                  <ToggleButtonGroup
+                                                    value={moduleSlot || "off"}
+                                                    exclusive
+                                                    onChange={(e, newValue) => {
+                                                      if (
+                                                        newValue !== null &&
+                                                        onModuleChange
+                                                      ) {
+                                                        onModuleChange(
+                                                          i,
+                                                          module.originalIndex,
+                                                          "equippedSlot",
+                                                          newValue,
+                                                        );
+                                                      }
+                                                    }}
+                                                    size="small"
+                                                  >
+                                                    <ToggleButton
+                                                      value="main"
+                                                      disabled={
+                                                        !vehicle.modules.some(
+                                                          (m) => {
+                                                            const mk =
+                                                              m.key ?? m.name;
+                                                            return (
+                                                              m.isShield &&
+                                                              vs.off === mk &&
+                                                              mk !== mKey
+                                                            );
+                                                          },
+                                                        )
+                                                      }
+                                                      sx={{
+                                                        minWidth: 30,
+                                                        fontSize: "0.7rem",
+                                                        px: 1,
+                                                      }}
+                                                    >
+                                                      M
+                                                    </ToggleButton>
+                                                    <ToggleButton
+                                                      value="off"
+                                                      sx={{
+                                                        minWidth: 30,
+                                                        fontSize: "0.7rem",
+                                                        px: 1,
+                                                      }}
+                                                    >
+                                                      O
+                                                    </ToggleButton>
+                                                  </ToggleButtonGroup>
+                                                ) : module.cumbersome ? (
+                                                  <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    disabled
+                                                    sx={{
+                                                      minWidth: 60,
+                                                      fontSize: "0.75rem",
+                                                      px: 1,
+                                                    }}
+                                                  >
+                                                    M+O
+                                                  </Button>
+                                                ) : (
+                                                  <ToggleButtonGroup
+                                                    value={moduleSlot || "main"}
+                                                    exclusive
+                                                    onChange={(e, newValue) => {
+                                                      if (
+                                                        newValue !== null &&
+                                                        onModuleChange
+                                                      ) {
+                                                        onModuleChange(
+                                                          i,
+                                                          module.originalIndex,
+                                                          "equippedSlot",
+                                                          newValue,
+                                                        );
+                                                      }
+                                                    }}
+                                                    size="small"
+                                                  >
+                                                    <ToggleButton
+                                                      value="main"
+                                                      sx={{
+                                                        minWidth: 30,
+                                                        fontSize: "0.7rem",
+                                                        px: 1,
+                                                      }}
+                                                    >
+                                                      M
+                                                    </ToggleButton>
+                                                    <ToggleButton
+                                                      value="off"
+                                                      disabled={vehicle.modules.some(
                                                         (m) => {
-                                                          const mk = m.key ?? m.name;
+                                                          const mk2 =
+                                                            m.key ?? m.name;
                                                           return (
                                                             m.isShield &&
-                                                            vs.off === mk &&
-                                                            mk !== mKey
+                                                            vs.off === mk2 &&
+                                                            mk2 !== mKey
                                                           );
                                                         },
-                                                      )
-                                                    }
-                                                    sx={{
-                                                      minWidth: 30,
-                                                      fontSize: "0.7rem",
-                                                      px: 1,
-                                                    }}
-                                                  >
-                                                    M
-                                                  </ToggleButton>
-                                                  <ToggleButton
-                                                    value="off"
-                                                    sx={{
-                                                      minWidth: 30,
-                                                      fontSize: "0.7rem",
-                                                      px: 1,
-                                                    }}
-                                                  >
-                                                    O
-                                                  </ToggleButton>
-                                                </ToggleButtonGroup>
-                                              ) : module.cumbersome ? (
-                                                <Button
-                                                  variant="contained"
-                                                  size="small"
-                                                  disabled
-                                                  sx={{
-                                                    minWidth: 60,
-                                                    fontSize: "0.75rem",
-                                                    px: 1,
-                                                  }}
-                                                >
-                                                  M+O
-                                                </Button>
-                                              ) : (
-                                                <ToggleButtonGroup
-                                                  value={moduleSlot || "main"}
-                                                  exclusive
-                                                  onChange={(e, newValue) => {
-                                                    if (
-                                                      newValue !== null &&
-                                                      onModuleChange
-                                                    ) {
-                                                      onModuleChange(
-                                                        i,
-                                                        module.originalIndex,
-                                                        "equippedSlot",
-                                                        newValue,
-                                                      );
-                                                    }
-                                                  }}
-                                                  size="small"
-                                                >
-                                                  <ToggleButton
-                                                    value="main"
-                                                    sx={{
-                                                      minWidth: 30,
-                                                      fontSize: "0.7rem",
-                                                      px: 1,
-                                                    }}
-                                                  >
-                                                    M
-                                                  </ToggleButton>
-                                                  <ToggleButton
-                                                    value="off"
-                                                    disabled={vehicle.modules.some(
-                                                      (m) => {
-                                                        const mk2 = m.key ?? m.name;
-                                                        return (
-                                                          m.isShield &&
-                                                          vs.off === mk2 &&
-                                                          mk2 !== mKey
-                                                        );
-                                                      },
-                                                    )}
-                                                    sx={{
-                                                      minWidth: 30,
-                                                      fontSize: "0.7rem",
-                                                      px: 1,
-                                                    }}
-                                                  >
-                                                    O
-                                                  </ToggleButton>
-                                                </ToggleButtonGroup>
-                                              )}
-                                            </div>
-                                          )}
-                                        <Button
-                                          variant={
-                                            isEquipped
-                                              ? "contained"
-                                              : "outlined"
-                                          }
-                                          color={
-                                            isEquipped
-                                              ? "success"
-                                              : "primary"
-                                          }
-                                          size="small"
-                                          disabled={
-                                            !isEquipped &&
-                                            !canEquipModule(
-                                              vehicle,
-                                              module.originalIndex,
-                                            )
-                                          }
-                                          onClick={() =>
-                                            onModuleChange &&
-                                            onModuleChange(
-                                              i,
-                                              module.originalIndex,
-                                              "equipped",
-                                              !isEquipped,
-                                            )
-                                          }
-                                          sx={{ minWidth: 60 }}
+                                                      )}
+                                                      sx={{
+                                                        minWidth: 30,
+                                                        fontSize: "0.7rem",
+                                                        px: 1,
+                                                      }}
+                                                    >
+                                                      O
+                                                    </ToggleButton>
+                                                  </ToggleButtonGroup>
+                                                )}
+                                              </div>
+                                            )}
+                                          <Button
+                                            variant={
+                                              isEquipped
+                                                ? "contained"
+                                                : "outlined"
+                                            }
+                                            color={
+                                              isEquipped ? "success" : "primary"
+                                            }
+                                            size="small"
+                                            disabled={
+                                              !isEquipped &&
+                                              !canEquipModule(
+                                                vehicle,
+                                                module.originalIndex,
+                                              )
+                                            }
+                                            onClick={() =>
+                                              onModuleChange &&
+                                              onModuleChange(
+                                                i,
+                                                module.originalIndex,
+                                                "equipped",
+                                                !isEquipped,
+                                              )
+                                            }
+                                            sx={{ minWidth: 60 }}
+                                          >
+                                            {isEquipped ? "Equipped" : "Equip"}
+                                          </Button>
+                                        </>
+                                      )}
+                                      {!isEditMode && (
+                                        <Typography
+                                          sx={{
+                                            color: isEquipped
+                                              ? "success.main"
+                                              : "text.disabled",
+                                            fontWeight: isEquipped
+                                              ? "bold"
+                                              : "normal",
+                                            fontSize: "0.85em",
+                                          }}
                                         >
-                                          {isEquipped
-                                            ? "Equipped"
-                                            : "Equip"}
-                                        </Button>
-                                      </>
-                                    )}
-                                    {!isEditMode && (
-                                      <Typography
-                                        sx={{
-                                          color: isEquipped
-                                            ? "success.main"
-                                            : "text.disabled",
-                                          fontWeight: isEquipped
-                                            ? "bold"
-                                            : "normal",
-                                          fontSize: "0.85em",
-                                        }}
-                                      >
-                                        {isEquipped ? "Active" : "Inactive"}
-                                      </Typography>
-                                    )}
-                                  </div>
+                                          {isEquipped ? "Active" : "Inactive"}
+                                        </Typography>
+                                      )}
+                                    </div>
+                                  </Grid>
                                 </Grid>
-                              </Grid>
-                            </div>
-                          );
-                          }),
+                              </div>
+                            );
+                          },
+                        ),
                       ];
                     })
                     .flat()

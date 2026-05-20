@@ -22,7 +22,9 @@ export const cookingFields: ItemFieldConfig<PlayerSpellFormState> = [
     kind: "editable",
     label: "spell.cooking.effects",
     component: "object-list",
-    defaultValue: Array.from({ length: 12 }, () => ({ ...BLANK_COOKBOOK_EFFECT })),
+    defaultValue: Array.from({ length: 12 }, () => ({
+      ...BLANK_COOKBOOK_EFFECT,
+    })),
     group: "effect",
     order: 70,
     gridSize: 12,

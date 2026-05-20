@@ -122,7 +122,9 @@ describe("class schema roundtrip", () => {
   it("skill maxLvl out of range fails schema", () => {
     const result = ClassSchema.safeParse({
       ...BASE_CLASS,
-      skills: [{ skillName: "Bad", maxLvl: 11, description: "", specialSkill: "" }],
+      skills: [
+        { skillName: "Bad", maxLvl: 11, description: "", specialSkill: "" },
+      ],
     });
     expect(result.success).toBe(false);
   });

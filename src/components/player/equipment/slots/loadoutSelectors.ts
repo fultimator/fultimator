@@ -74,7 +74,12 @@ export function getEquippedModulesForSlot(
 ): IndexedModule[] {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return [];
-  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
+  const s: VehicleSlotMap = vehicle.slots ?? {
+    main: null,
+    off: null,
+    armor: null,
+    support: [],
+  };
   return vehicle.modules
     .map((m, originalIndex) => ({ ...m, originalIndex }))
     .filter((m) => {
@@ -95,8 +100,16 @@ export function getEquippedModuleForSlot(
 ): IndexedModule | null {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return null;
-  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
-  const mods = vehicle.modules.map((m, originalIndex) => ({ ...m, originalIndex }));
+  const s: VehicleSlotMap = vehicle.slots ?? {
+    main: null,
+    off: null,
+    armor: null,
+    support: [],
+  };
+  const mods = vehicle.modules.map((m, originalIndex) => ({
+    ...m,
+    originalIndex,
+  }));
 
   if (slot === "armor") {
     const found = mods.find((m) => (m.key ?? m.name) === s.armor);
@@ -173,7 +186,12 @@ export function getVehicleModuleUsage(
       unknown
     >);
 
-  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
+  const s: VehicleSlotMap = vehicle.slots ?? {
+    main: null,
+    off: null,
+    armor: null,
+    support: [],
+  };
   const counts: Record<string, number> = { weapon: 0, armor: 0, support: 0 };
 
   // Count weapons from slots.main/off (deduplicated for "both" case)
@@ -207,12 +225,18 @@ export function getVehicleModuleUsage(
 export function getEquippedSupportModules(player: TypePlayer): IndexedModule[] {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return [];
-  const s: VehicleSlotMap = vehicle.slots ?? { main: null, off: null, armor: null, support: [] };
+  const s: VehicleSlotMap = vehicle.slots ?? {
+    main: null,
+    off: null,
+    armor: null,
+    support: [],
+  };
   const supportKeys = new Set<string>(s.support);
   return vehicle.modules
     .map((m, i) => ({ ...m, originalIndex: i }))
     .filter(
-      (m) => supportKeys.has(m.key ?? m.name) && m.type === "pilot_module_support",
+      (m) =>
+        supportKeys.has(m.key ?? m.name) && m.type === "pilot_module_support",
     ) as IndexedModule[];
 }
 

@@ -208,7 +208,10 @@ export default function AddSkillModal({
                       {t(skillClass)}
                     </ListSubheader>,
                     groupedSkills[skillClass].map((skill) => (
-                      <MenuItem key={`${skillClass}-${skill.name}`} value={skill.name}>
+                      <MenuItem
+                        key={`${skillClass}-${skill.name}`}
+                        value={skill.name}
+                      >
                         {t(skill.name)}
                       </MenuItem>
                     )),

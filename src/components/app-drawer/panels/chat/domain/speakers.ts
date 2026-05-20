@@ -2,7 +2,10 @@ import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { useDatabase } from "../../../../../hooks/useDatabase";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
-import { resolveEffectiveSlot, getActiveVehicle } from "../../../../player/equipment/slots/equipmentSlots";
+import {
+  resolveEffectiveSlot,
+  getActiveVehicle,
+} from "../../../../player/equipment/slots/equipmentSlots";
 import {
   getAvailableSupportModules,
   getPilotSpellInfo,
@@ -293,16 +296,19 @@ export function resolveAttackOptions(
           ) {
             const vehicleModules = (activeVehicle as Record<string, unknown>)
               .modules as Record<string, unknown>[];
-            const vehicleSlotsObj = (activeVehicle as Record<string, unknown>).slots as
-              | Record<string, unknown>
-              | undefined ?? {};
+            const vehicleSlotsObj =
+              ((activeVehicle as Record<string, unknown>).slots as
+                | Record<string, unknown>
+                | undefined) ?? {};
 
             const weaponsBySlot: Record<string, Record<string, unknown>> = {};
             for (const slot of ["main", "off"] as const) {
               const key = vehicleSlotsObj[slot] as string | undefined;
               if (!key) continue;
               const mod = vehicleModules.find(
-                (m) => ((m.key as string | undefined) ?? m.name) === key && m.type === "pilot_module_weapon",
+                (m) =>
+                  ((m.key as string | undefined) ?? m.name) === key &&
+                  m.type === "pilot_module_weapon",
               );
               if (mod && !weaponsBySlot[slot]) {
                 weaponsBySlot[slot] = mod;
@@ -791,8 +797,8 @@ export function resolveEquipmentSlots(
     const supportModules = getAvailableSupportModules(player);
     const activeVehicleObj = getActiveVehicle(player);
     const supportKeys = new Set<string>(activeVehicleObj?.slots?.support ?? []);
-    const activeSupportModules = supportModules.filter(
-      (module) => supportKeys.has(module.key ?? module.name),
+    const activeSupportModules = supportModules.filter((module) =>
+      supportKeys.has(module.key ?? module.name),
     );
     if (activeSupportModules.length > 0) {
       for (const [idx, module] of activeSupportModules.entries()) {

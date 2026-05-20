@@ -42,12 +42,30 @@ import PlayerAccessoryModal from "../player/equipment/accessories/PlayerAccessor
 import CustomTextarea from "../common/CustomTextarea";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
-import { qualityFieldConfig } from "../../forms/rendering/config/itemConfigs/quality";
-import { heroicFieldConfig } from "../../forms/rendering/config/itemConfigs/heroic";
-import { npcAttackFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAttack";
-import { npcSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpell";
-import { npcActionFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAction";
-import { npcSpecialFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpecial";
+import {
+  qualityFieldConfig,
+  qualityGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/quality";
+import {
+  heroicFieldConfig,
+  heroicGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/heroic";
+import {
+  npcAttackFieldConfig,
+  npcAttackGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAttack";
+import {
+  npcSpellFieldConfig,
+  npcSpellGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpell";
+import {
+  npcActionFieldConfig,
+  npcActionGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAction";
+import {
+  npcSpecialFieldConfig,
+  npcSpecialGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpecial";
 import { createDefaultStateFromFields } from "../../forms/registry/helpers";
 import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
 
@@ -150,10 +168,13 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
-  const buildState = useCallback(() => ({
-    ...createDefaultStateFromFields(npcAttackFieldConfig),
-    ...(editData ?? {}),
-  }), [editData]);
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(npcAttackFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
+  );
   const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
@@ -202,6 +223,7 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -210,6 +232,7 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -218,6 +241,7 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -226,11 +250,11 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
         </Grid>
@@ -255,10 +279,13 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
-  const buildState = useCallback(() => ({
-    ...createDefaultStateFromFields(npcSpellFieldConfig),
-    ...(editData ?? {}),
-  }), [editData]);
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(npcSpellFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
+  );
   const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
@@ -311,6 +338,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -319,6 +347,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -327,6 +356,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -335,11 +365,11 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
         </Grid>
@@ -363,10 +393,13 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const buildState = useCallback(() => ({
-    ...createDefaultStateFromFields(npcSpecialFieldConfig),
-    ...(editData ?? {}),
-  }), [editData]);
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(npcSpecialFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
+  );
 
   const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
@@ -416,6 +449,7 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -424,6 +458,7 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -432,11 +467,11 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
         </Grid>
@@ -460,10 +495,13 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const buildState = useCallback(() => ({
-    ...createDefaultStateFromFields(npcActionFieldConfig),
-    ...(editData ?? {}),
-  }), [editData]);
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(npcActionFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
+  );
 
   const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
@@ -513,6 +551,7 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -521,6 +560,7 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -529,11 +569,11 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
         </Grid>
@@ -1853,10 +1893,13 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const buildState = useCallback(() => ({
-    ...createDefaultStateFromFields(qualityFieldConfig),
-    ...(editData ?? {}),
-  }), [editData]);
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(qualityFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
+  );
 
   const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
@@ -1906,6 +1949,7 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={qualityFieldConfig}
+            groupLabels={qualityGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -1914,6 +1958,7 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={qualityFieldConfig}
+            groupLabels={qualityGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -1922,11 +1967,11 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={qualityFieldConfig}
+            groupLabels={qualityGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
         </Grid>
@@ -1952,10 +1997,13 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const buildState = useCallback(() => ({
-    ...createDefaultStateFromFields(heroicFieldConfig),
-    ...(editData ?? {}),
-  }), [editData]);
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(heroicFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
+  );
 
   const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
@@ -2009,6 +2057,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -2017,6 +2066,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -2025,11 +2075,11 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
           />
           <SchemaFieldRenderer
             config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
         </Grid>

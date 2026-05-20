@@ -1,10 +1,12 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import type { Heroic } from "../../../schema/itemSchemas/heroic";
 import classList from "../../../../libs/classes";
 import type { SelectOption } from "../../fieldRenderers";
 import { metaFieldConfig } from "../metaFieldConfig";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 export type HeroicFormState = Heroic;
+const HEROIC_LABEL_PREFIX = "heroic";
 
 const classOptions: SelectOption[] = (classList as { name: string }[]).map(
   (c) => ({ value: c.name, label: c.name }),
@@ -15,11 +17,16 @@ const G = {
   body: "body",
 } as const;
 
+export const heroicGroupLabels: GroupLabels = {
+  core: "section.core",
+  body: "section.body",
+};
+
 export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(HEROIC_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: "",
     group: G.core,
@@ -29,7 +36,7 @@ export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "Name",
+    label: prefixedLabel(HEROIC_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -40,7 +47,7 @@ export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
   {
     key: "applicableTo",
     kind: "editable",
-    label: "Applicable To",
+    label: "heroic.applicableTo",
     component: "autocomplete",
     defaultValue: [],
     group: G.core,
@@ -51,7 +58,7 @@ export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
   {
     key: "quote",
     kind: "editable",
-    label: "Quote",
+    label: "heroic.quote",
     component: "text",
     defaultValue: "",
     group: G.body,
@@ -61,7 +68,7 @@ export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
   {
     key: "description",
     kind: "editable",
-    label: "Description",
+    label: "heroic.description",
     component: "textarea",
     defaultValue: "",
     group: G.body,

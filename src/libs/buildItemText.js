@@ -86,8 +86,9 @@ function formatAttackDesc(attack, npc, md) {
     desc = md ? `**${core}** damage` : `${core} damage`;
   }
 
-  const specials = attack.effect
-    || (Array.isArray(attack.special)
+  const specials =
+    attack.effect ||
+    (Array.isArray(attack.special)
       ? attack.special.filter(Boolean).join("; ")
       : typeof attack.special === "string"
         ? attack.special
@@ -663,7 +664,8 @@ export function buildItemText(type, item, fmt) {
     }
     case "classes": {
       const parts = [h1(resolve(item.name))];
-      if (item.book) parts.push(field("Book", item.book));
+      const book = item.meta?.book;
+      if (book) parts.push(field("Book", book));
       // Free benefits
       const benefits = item.benefits;
       if (benefits) {

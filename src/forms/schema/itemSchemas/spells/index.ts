@@ -6,8 +6,14 @@ import { PlayerSpellTherioformSchema } from "./therioform";
 import { PlayerSpellMagichantSchema } from "./magichant";
 import { PlayerSpellSymbolSchema } from "./symbol";
 import { PlayerSpellInvocationSchema } from "./invocation";
-import { PlayerSpellArcanistSchema, PlayerSpellArcanistReworkSchema } from "./arcanist";
-import { PlayerSpellTinkererAlchemySchema, PlayerSpellTinkererInfusionSchema } from "./tinkerer";
+import {
+  PlayerSpellArcanistSchema,
+  PlayerSpellArcanistReworkSchema,
+} from "./arcanist";
+import {
+  PlayerSpellTinkererAlchemySchema,
+  PlayerSpellTinkererInfusionSchema,
+} from "./tinkerer";
 import { PlayerSpellMagitechSchema } from "./magitech";
 import { PlayerSpellCookingSchema } from "./cooking";
 import { PlayerSpellMagiseedSchema } from "./magiseed";

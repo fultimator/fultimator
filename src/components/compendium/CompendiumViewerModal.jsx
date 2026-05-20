@@ -344,7 +344,7 @@ const CompendiumViewerModal = ({
         );
       }
       if (selectedType === "classes" && selectedBook.length > 0) {
-        items = items.filter((item) => selectedBook.includes(item.book));
+        items = items.filter((item) => selectedBook.includes(item.meta?.book));
       }
       if (selectedType === "heroics" && selectedBook.length > 0) {
         items = items.filter((item) =>
@@ -420,10 +420,12 @@ const CompendiumViewerModal = ({
       let items = getItems(selectedType);
       if (selectedType === "classes") {
         items = items.filter(
-          (c) => c.name !== "Blank Class" && c.book !== "homebrew",
+          (c) => c.name !== "Blank Class" && c.meta?.book !== "homebrew",
         );
         if (selectedBook.length > 0) {
-          items = items.filter((item) => selectedBook.includes(item.book));
+          items = items.filter((item) =>
+            selectedBook.includes(item.meta?.book),
+          );
         }
       }
       if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
@@ -955,13 +957,53 @@ const CompendiumViewerModal = ({
             </Box>
           )}
           {filteredItems.length === 0 ? (
-            <Typography
+            <Box
               sx={{
-                color: "text.secondary",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                py: 8,
+                px: 4,
+                gap: 2,
               }}
             >
-              {t("No items found.")}
-            </Typography>
+              <Typography variant="h5" sx={{ color: "text.secondary" }}>
+                {t("No items found.")}
+              </Typography>
+              {selectedCompendium === "official" &&
+                getItems(selectedType).length === 0 && (
+                  <>
+                    <Typography
+                      variant="h6"
+                      sx={{ color: "text.secondary", maxWidth: 480, fontWeight: 400 }}
+                    >
+                      {t(
+                        "This item type is not covered under the third party license and has no official data.",
+                      )}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{ color: "text.secondary", maxWidth: 480 }}
+                    >
+                      {t(
+                        "You can create custom items by switching to your personal compendium.",
+                      )}
+                    </Typography>
+                    {packs.length > 0 && (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleCompendiumChange(packs[0].id)}
+                        sx={{ mt: 1 }}
+                      >
+                        {t("Go to personal compendium")}
+                      </Button>
+                    )}
+                  </>
+                )}
+            </Box>
           ) : (
             <Grid container spacing={2}>
               {filteredItems.map((item, idx) => {
@@ -1147,10 +1189,11 @@ const CompendiumViewerModal = ({
         lockedToViewerType={selectedType}
         initialSubtype={
           selectedType === "player-spells"
-            ? selectedSpellClass ?? undefined
-            : selectedType === "optionals" && selectedOptionalSubtypes?.length === 1
-            ? selectedOptionalSubtypes[0]
-            : undefined
+            ? (selectedSpellClass ?? undefined)
+            : selectedType === "optionals" &&
+                selectedOptionalSubtypes?.length === 1
+              ? selectedOptionalSubtypes[0]
+              : undefined
         }
       />
       {/* Create item dialog */}

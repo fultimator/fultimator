@@ -54,6 +54,7 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
 
   const attr1 = attributes[item.accuracy?.attr1];
   const attr2 = attributes[item.accuracy?.attr2];
+  const accuracyBonus = item.accuracy?.value ?? 0;
   const effectText =
     item.effect ??
     item.description ??
@@ -183,7 +184,13 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
                     <strong style={{ whiteSpace: "nowrap" }}>
                       <OpenBracket />
                       {attr1.shortcaps} + {attr2.shortcaps}
-                      <CloseBracket /> <Diamond /> <OpenBracket />
+                      <CloseBracket />
+                      {accuracyBonus > 0
+                        ? `+${accuracyBonus}`
+                        : accuracyBonus < 0
+                          ? `${accuracyBonus}`
+                          : ""}{" "}
+                      <Diamond /> <OpenBracket />
                       {item.damage?.hrZero
                         ? (() => {
                             const val =
@@ -2149,13 +2156,19 @@ export const SharedPilotVehicleCard = React.memo(
                       <Typography>{typeLabel}</Typography>
                     </Grid>
                     <Grid size={2}>
-                      <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {t("Cost")}
+                      </Typography>
                     </Grid>
                     <Grid size={2}>
-                      <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {t("DEF")}
+                      </Typography>
                     </Grid>
                     <Grid size={3}>
-                      <Typography sx={{ textAlign: "center" }}>{t("MDEF")}</Typography>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {t("MDEF")}
+                      </Typography>
                     </Grid>
                   </Grid>
                 ) : pilotSubtype === "support" ? (
@@ -2164,7 +2177,9 @@ export const SharedPilotVehicleCard = React.memo(
                       <Typography>{typeLabel}</Typography>
                     </Grid>
                     <Grid size={3}>
-                      <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {t("Cost")}
+                      </Typography>
                     </Grid>
                   </Grid>
                 ) : pilotSubtype === "frame" ? (
@@ -2173,13 +2188,19 @@ export const SharedPilotVehicleCard = React.memo(
                       <Typography>{typeLabel}</Typography>
                     </Grid>
                     <Grid size={3}>
-                      <Typography sx={{ textAlign: "center" }}>{t("Frame")}</Typography>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {t("Frame")}
+                      </Typography>
                     </Grid>
                     <Grid size={2}>
-                      <Typography sx={{ textAlign: "center" }}>{t("Passengers")}</Typography>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {t("Passengers")}
+                      </Typography>
                     </Grid>
                     <Grid size={3}>
-                      <Typography sx={{ textAlign: "center" }}>{t("Distance")}</Typography>
+                      <Typography sx={{ textAlign: "center" }}>
+                        {t("Distance")}
+                      </Typography>
                     </Grid>
                   </Grid>
                 ) : (
@@ -2260,7 +2281,14 @@ export const SharedPilotVehicleCard = React.memo(
                 </Grid>
               </Grid>
               {item.description && (
-                <Box sx={{ pl: 2, pr: 2, py: 0.75, borderBottom: `1px solid ${customTheme.secondary}` }}>
+                <Box
+                  sx={{
+                    pl: 2,
+                    pr: 2,
+                    py: 0.75,
+                    borderBottom: `1px solid ${customTheme.secondary}`,
+                  }}
+                >
                   <Typography
                     variant="body2"
                     component="div"
@@ -2313,7 +2341,14 @@ export const SharedPilotVehicleCard = React.memo(
                 </Grid>
               </Grid>
               {item.description && (
-                <Box sx={{ pl: 2, pr: 2, py: 0.75, borderBottom: `1px solid ${customTheme.secondary}` }}>
+                <Box
+                  sx={{
+                    pl: 2,
+                    pr: 2,
+                    py: 0.75,
+                    borderBottom: `1px solid ${customTheme.secondary}`,
+                  }}
+                >
                   <Typography
                     variant="body2"
                     component="div"
@@ -2340,7 +2375,10 @@ export const SharedPilotVehicleCard = React.memo(
                   ...(background ? { background } : {}),
                 }}
               >
-                <Grid size={5} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Grid
+                  size={5}
+                  sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                >
                   <Typography
                     sx={{
                       fontWeight: 600,
@@ -2375,7 +2413,9 @@ export const SharedPilotVehicleCard = React.memo(
                       margin: 0,
                     }}
                   >
-                    {item.martial ? (item.def ?? "-") : `${t("DEX die")} + ${item.def ?? 0}`}
+                    {item.martial
+                      ? (item.def ?? "-")
+                      : `${t("DEX die")} + ${item.def ?? 0}`}
                   </Typography>
                 </Grid>
                 <Grid size={3}>
@@ -2388,12 +2428,21 @@ export const SharedPilotVehicleCard = React.memo(
                       margin: 0,
                     }}
                   >
-                    {item.martial ? (item.mdef ?? "-") : `${t("INS die")} + ${item.mdef ?? 0}`}
+                    {item.martial
+                      ? (item.mdef ?? "-")
+                      : `${t("INS die")} + ${item.mdef ?? 0}`}
                   </Typography>
                 </Grid>
               </Grid>
               {item.description && (
-                <Box sx={{ pl: 2, pr: 2, py: 0.75, borderBottom: `1px solid ${customTheme.secondary}` }}>
+                <Box
+                  sx={{
+                    pl: 2,
+                    pr: 2,
+                    py: 0.75,
+                    borderBottom: `1px solid ${customTheme.secondary}`,
+                  }}
+                >
                   <Typography
                     variant="body2"
                     component="div"

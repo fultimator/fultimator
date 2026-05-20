@@ -1,9 +1,11 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import type { Quality } from "../../../schema/itemSchemas/quality";
 import type { SelectOption } from "../../fieldRenderers";
 import { metaFieldConfig } from "../metaFieldConfig";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 export type QualityFormState = Quality;
+const QUALITY_LABEL_PREFIX = "quality";
 
 const QUALITY_CATEGORIES = ["Offensive", "Defensive", "Enhancement"];
 
@@ -26,11 +28,17 @@ const G = {
   meta: "meta",
 } as const;
 
+export const qualityGroupLabels: GroupLabels = {
+  core: "section.core",
+  body: "section.body",
+  meta: "section.meta",
+};
+
 export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(QUALITY_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: "",
     group: G.core,
@@ -40,7 +48,7 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "Name",
+    label: prefixedLabel(QUALITY_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -51,7 +59,7 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
   {
     key: "category",
     kind: "editable",
-    label: "Category",
+    label: prefixedLabel(QUALITY_LABEL_PREFIX, SHARED_LABEL_KEYS.category),
     component: "select",
     defaultValue: QUALITY_CATEGORIES[0],
     group: G.core,
@@ -61,7 +69,7 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
   {
     key: "cost",
     kind: "editable",
-    label: "Cost",
+    label: prefixedLabel(QUALITY_LABEL_PREFIX, SHARED_LABEL_KEYS.cost),
     component: "number",
     defaultValue: 0,
     group: G.core,
@@ -72,7 +80,7 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
   {
     key: "quality",
     kind: "editable",
-    label: "Quality Effect",
+    label: "quality.effect",
     component: "textarea",
     defaultValue: "",
     group: G.body,
@@ -82,7 +90,7 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
   {
     key: "filter",
     kind: "editable",
-    label: "Applicable To",
+    label: "quality.applicableTo",
     component: "select",
     defaultValue: [],
     group: G.meta,

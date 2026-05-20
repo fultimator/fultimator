@@ -1,9 +1,12 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import type { NpcSpell } from "../../../schema/itemSchemas/npcSpell";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { typeOptions } from "../typeOptions";
+import { DURATION_OPTIONS, TARGET_OPTIONS } from "./spells/options";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 export type NpcSpellFormState = NpcSpell;
+const NPC_SPELL_LABEL_PREFIX = "npc.spell";
 
 const G = {
   core: "core",
@@ -13,11 +16,20 @@ const G = {
   effect: "effect",
 } as const;
 
+export const npcSpellGroupLabels: GroupLabels = {
+  core: "section.core",
+  accuracy: "section.accuracy",
+  damage: "section.damage",
+  details: "section.details",
+  effect: "section.effect",
+  meta: "section.meta",
+};
+
 export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "itemType",
     kind: "computed",
-    label: "Item Type",
+    label: "shared.itemType",
     defaultValue: "spell",
     group: G.core,
     order: 0,
@@ -25,7 +37,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: "",
     group: G.core,
@@ -35,7 +47,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "Name",
+    label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -46,7 +58,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "isOffensive",
     kind: "editable",
-    label: "Offensive",
+    label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.offensive),
     component: "offensive-toggle",
     defaultValue: false,
     group: G.core,
@@ -56,7 +68,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "range",
     kind: "editable",
-    label: "Range",
+    label: "shared.range",
     component: "select",
     defaultValue: "ranged",
     group: G.core,
@@ -67,12 +79,13 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
         { value: "melee", label: "Melee" },
         { value: "ranged", label: "Ranged" },
       ],
+      disabled: true,
     },
   },
   {
     key: "accuracy.attr1",
     kind: "editable",
-    label: "Attr 1",
+    label: "shared.accuracy.attr1",
     component: "select",
     defaultValue: "dexterity",
     group: G.accuracy,
@@ -90,7 +103,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "accuracy.attr2",
     kind: "editable",
-    label: "Attr 2",
+    label: "shared.accuracy.attr2",
     component: "select",
     defaultValue: "dexterity",
     group: G.accuracy,
@@ -108,7 +121,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "accuracy.value",
     kind: "editable",
-    label: "Accuracy Bonus",
+    label: "shared.accuracy.bonus",
     component: "number",
     defaultValue: 0,
     group: G.accuracy,
@@ -119,7 +132,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "accuracy.defense",
     kind: "editable",
-    label: "Defense",
+    label: "shared.accuracy.defense",
     component: "select",
     defaultValue: "mdef",
     group: G.accuracy,
@@ -135,7 +148,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "damage.value",
     kind: "editable",
-    label: "Damage Value",
+    label: "shared.damage.value",
     component: "number",
     defaultValue: 0,
     group: G.damage,
@@ -146,7 +159,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "damage.type",
     kind: "editable",
-    label: "Damage Type",
+    label: "shared.damage.type",
     component: "type-select",
     defaultValue: "physical",
     group: G.damage,
@@ -157,7 +170,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "damage.hrZero",
     kind: "editable",
-    label: "HR0",
+    label: "shared.damage.hrZero",
     component: "checkbox",
     defaultValue: false,
     group: G.damage,
@@ -167,7 +180,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "cost.resource",
     kind: "computed",
-    label: "Resource",
+    label: "shared.cost.resource",
     defaultValue: "mp",
     group: G.details,
     order: 30,
@@ -175,7 +188,10 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "cost.amount",
     kind: "editable",
-    label: (s) => (s.cost?.perTarget ? "MP x Target" : "MP"),
+    label: (s) =>
+      s.cost?.perTarget
+        ? "shared.cost.amountPerTarget"
+        : "shared.cost.amount",
     component: "number",
     defaultValue: 1,
     group: G.details,
@@ -186,7 +202,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "cost.perTarget",
     kind: "editable",
-    label: "Per Target",
+    label: "shared.cost.perTarget",
     component: "checkbox",
     defaultValue: true,
     group: G.details,
@@ -196,7 +212,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "maxTargets",
     kind: "editable",
-    label: "Max Targets",
+    label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.maxTargets),
     component: "number",
     defaultValue: 1,
     group: G.details,
@@ -208,27 +224,29 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
   {
     key: "duration",
     kind: "editable",
-    label: "Duration",
-    component: "text",
+    label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.duration),
+    component: "autocomplete",
     defaultValue: "",
     group: G.details,
     order: 34,
     gridSize: 6,
+    componentProps: { options: DURATION_OPTIONS, freeSolo: true },
   },
   {
     key: "targetDescription",
     kind: "editable",
-    label: "Target",
-    component: "text",
+    label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.target),
+    component: "autocomplete",
     defaultValue: "",
     group: G.details,
     order: 35,
     gridSize: 6,
+    componentProps: { options: TARGET_OPTIONS, freeSolo: true },
   },
   {
     key: "effect",
     kind: "editable",
-    label: "Effect",
+    label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.effect),
     component: "textarea",
     defaultValue: "",
     group: G.effect,

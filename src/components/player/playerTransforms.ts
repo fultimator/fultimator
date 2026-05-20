@@ -1071,7 +1071,9 @@ function actorAlignmentV10Player(player: TypePlayer): TypePlayer {
 
 // One-time versioned migrations.
 // Each transform brings the player up to its declared schema version.
-function migrateSpellV11(spell: Record<string, unknown>): Record<string, unknown> {
+function migrateSpellV11(
+  spell: Record<string, unknown>,
+): Record<string, unknown> {
   const s = spell;
   const type = s.spellType as string | undefined;
 
@@ -1088,7 +1090,9 @@ function migrateSpellV11(spell: Record<string, unknown>): Record<string, unknown
     return {
       ...s,
       [arrayKey]: (s[arrayKey] as Record<string, unknown>[]).map((item) =>
-        item.key !== undefined ? item : { ...item, key: item.name, name: undefined },
+        item.key !== undefined
+          ? item
+          : { ...item, key: item.name, name: undefined },
       ),
     };
   }
@@ -1096,7 +1100,9 @@ function migrateSpellV11(spell: Record<string, unknown>): Record<string, unknown
   // magichant: name -> key on both keys[] and tones[]
   if (type === "magichant") {
     const renameKey = (item: Record<string, unknown>) =>
-      item.key !== undefined ? item : { ...item, key: item.name, name: undefined };
+      item.key !== undefined
+        ? item
+        : { ...item, key: item.name, name: undefined };
     return {
       ...s,
       keys: Array.isArray(s.keys) ? s.keys.map(renameKey) : s.keys,
@@ -1119,7 +1125,9 @@ function migrateSpellV11(spell: Record<string, unknown>): Record<string, unknown
       activeWellsprings: undefined,
       invocations: Array.isArray(s.invocations)
         ? (s.invocations as Record<string, unknown>[]).map((item) =>
-            item.key !== undefined ? item : { ...item, key: item.name, name: undefined },
+            item.key !== undefined
+              ? item
+              : { ...item, key: item.name, name: undefined },
           )
         : s.invocations,
     };
@@ -1158,23 +1166,32 @@ function migrateSpellV11(spell: Record<string, unknown>): Record<string, unknown
           ? (veh.modules as Record<string, unknown>[])
           : [];
 
-        const slots = (veh.slots as Record<string, unknown>) ?? (() => {
-          const result: Record<string, unknown> = { main: null, off: null, armor: null, support: [] };
-          for (const m of modules) {
-            if (!m.equipped) continue;
-            const key = (m.key ?? m.name) as string;
-            if (m.type === "pilot_module_armor") {
-              result.armor = key;
-            } else if (m.type === "pilot_module_support") {
-              (result.support as string[]).push(key);
-            } else if (m.type === "pilot_module_weapon") {
-              const slot = (m.equippedSlot as string) ?? "main";
-              if (slot === "both") { result.main = key; result.off = key; }
-              else result[slot] = key;
+        const slots =
+          (veh.slots as Record<string, unknown>) ??
+          (() => {
+            const result: Record<string, unknown> = {
+              main: null,
+              off: null,
+              armor: null,
+              support: [],
+            };
+            for (const m of modules) {
+              if (!m.equipped) continue;
+              const key = (m.key ?? m.name) as string;
+              if (m.type === "pilot_module_armor") {
+                result.armor = key;
+              } else if (m.type === "pilot_module_support") {
+                (result.support as string[]).push(key);
+              } else if (m.type === "pilot_module_weapon") {
+                const slot = (m.equippedSlot as string) ?? "main";
+                if (slot === "both") {
+                  result.main = key;
+                  result.off = key;
+                } else result[slot] = key;
+              }
             }
-          }
-          return result;
-        })();
+            return result;
+          })();
 
         return {
           ...veh,
@@ -1202,16 +1219,27 @@ function migrateSpellV11(spell: Record<string, unknown>): Record<string, unknown
                 },
                 damage: {
                   value: m.damage ?? 0,
-                  type: typeof m.damageType === "string"
-                    ? m.damageType.toLowerCase()
-                    : "physical",
+                  type:
+                    typeof m.damageType === "string"
+                      ? m.damageType.toLowerCase()
+                      : "physical",
                   hrZero: false,
                 },
-                att1: undefined, att2: undefined, prec: undefined, damageType: undefined,
+                att1: undefined,
+                att2: undefined,
+                prec: undefined,
+                damageType: undefined,
               };
             }
             if (m.type === "pilot_module_armor") {
-              return { ...base, att1: undefined, att2: undefined, prec: undefined, damageType: undefined, range: undefined };
+              return {
+                ...base,
+                att1: undefined,
+                att2: undefined,
+                prec: undefined,
+                damageType: undefined,
+                range: undefined,
+              };
             }
             return base;
           }),
@@ -1338,7 +1366,9 @@ const MODULE_INSTANCE_FIELDS = new Set([
 function rehydrateVehicleModules(player: TypePlayer): TypePlayer {
   if (!player.classes) return player;
 
-  const migrateModule = (m: Record<string, unknown>): Record<string, unknown> => {
+  const migrateModule = (
+    m: Record<string, unknown>,
+  ): Record<string, unknown> => {
     const name = m.name as string | undefined;
     const isCustom = !name || CUSTOM_MODULE_NAMES.has(name);
 

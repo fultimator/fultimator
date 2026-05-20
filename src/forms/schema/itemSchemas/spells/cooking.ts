@@ -18,9 +18,11 @@ const IngredientSchema = z.object({
 export const PlayerSpellCookingSchema = PlayerSpellNonStaticBaseSchema.extend({
   spellType: z.literal("cooking"),
   spellName: z.string().default("Cookbook"),
-  cookbookEffects: z.union([
-    z.array(CookbookEffectSchema),
-    z.record(z.string(), CookbookEffectSchema),
-  ]).default([]),
+  cookbookEffects: z
+    .union([
+      z.array(CookbookEffectSchema),
+      z.record(z.string(), CookbookEffectSchema),
+    ])
+    .default([]),
   ingredientInventory: z.array(IngredientSchema).default([]),
 });

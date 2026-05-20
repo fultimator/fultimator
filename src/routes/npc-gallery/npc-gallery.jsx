@@ -1469,15 +1469,20 @@ function Npc({
   };
 
   const copyJsonToClipboard = async () => {
-    await navigator.clipboard.writeText(JSON.stringify({ ...exportData, dataType: "npc" }, null, 2));
+    await navigator.clipboard.writeText(
+      JSON.stringify({ ...exportData, dataType: "npc" }, null, 2),
+    );
     closeMenus();
   };
 
   const downloadJson = () => {
     const safeName = (npc?.name || "npc").replace(/\s+/g, "_").toLowerCase();
-    const blob = new Blob([JSON.stringify({ ...exportData, dataType: "npc" }, null, 2)], {
-      type: "application/json;charset=utf-8",
-    });
+    const blob = new Blob(
+      [JSON.stringify({ ...exportData, dataType: "npc" }, null, 2)],
+      {
+        type: "application/json;charset=utf-8",
+      },
+    );
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -1538,211 +1543,295 @@ function Npc({
           }}
         />
       </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-      <Tooltip title={t("Actions")}>
-        <IconButton onClick={(e) => setActionsAnchor(e.currentTarget)}>
-          <MenuIcon />
-        </IconButton>
-      </Tooltip>
-      <MuiMenu
-        anchorEl={actionsAnchor}
-        open={Boolean(actionsAnchor)}
-        onClose={closeMenus}
-        slotProps={{ transition: { onExited: () => setActionsSubmenu(null) } }}
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
       >
-        {actionsSubmenu === null && [
-          <MenuItem
-            key="edit"
-            onClick={() => {
-              closeMenus();
-              navigate(`/npc-gallery/${npc.id}${filterParams ? (filterParams.startsWith("?") ? filterParams : `?${filterParams}`) : ""}`);
-            }}
-          >
-            <ListItemIcon><Edit fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Edit")} />
-          </MenuItem>,
-          <MenuItem key="export" onClick={() => setActionsSubmenu("export")}>
-            <ListItemIcon><Code fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Export")} />
-            <ChevronRight fontSize="small" />
-          </MenuItem>,
-          <MenuItem key="transfer" onClick={() => setActionsSubmenu("transfer")}>
-            <ListItemIcon><FileCopy fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Copy / Move")} />
-            <ChevronRight fontSize="small" />
-          </MenuItem>,
-          <MenuItem
-            key="delete"
-            onClick={() => { closeMenus(); deleteNpc(npc)(); }}
-          >
-            <ListItemIcon><Delete fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Delete")} />
-          </MenuItem>,
-          <MenuItem
-            key="share"
-            disabled={dbMode !== "cloud"}
-            onClick={() => { closeMenus(); shareNpc(npc.id); }}
-          >
-            <ListItemIcon><Share fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Share URL")} />
-          </MenuItem>,
-          <MenuItem
-            key="download"
-            onClick={() => { closeMenus(); expandAndDownloadImage(); }}
-          >
-            <ListItemIcon><Download fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Download as Image")} />
-          </MenuItem>,
-        ]}
-        {actionsSubmenu === "export" && [
-          <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
-            <ListItemIcon><ChevronLeft fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Export")} />
-          </MenuItem>,
-          <Divider key="div" />,
-          <MenuItem key="copy-json" onClick={copyJsonToClipboard}>{t("copy_json_clipboard")}</MenuItem>,
-          <MenuItem key="dl-json" onClick={downloadJson}>{t("export_json_file")}</MenuItem>,
-          <Divider key="div2" />,
-          <MenuItem key="copy-md" onClick={() => copyText("markdown")}>{t("Copy Markdown to Clipboard")}</MenuItem>,
-          <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>{t("Export as Markdown (.md)")}</MenuItem>,
-          <Divider key="div3" />,
-          <MenuItem key="copy-plain" onClick={() => copyText("plain")}>{t("Copy Plaintext to Clipboard")}</MenuItem>,
-          <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>{t("Export as Plaintext (.txt)")}</MenuItem>,
-          <MenuItem key="copy-obs" onClick={() => copyText("obsidian")}>{t("Copy Obsidian (BlueCorvid) to Clipboard")}</MenuItem>,
-          <MenuItem key="dl-obs" onClick={() => downloadText("obsidian")}>{t("Export as Obsidian (.md)")}</MenuItem>,
-        ]}
-        {actionsSubmenu === "transfer" && [
-          <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
-            <ListItemIcon><ChevronLeft fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Copy / Move")} />
-          </MenuItem>,
-          <Divider key="div" />,
-          <MenuItem key="copy-local" onClick={() => { closeMenus(); copyNpcToLocal(npc)(); }}>
-            <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Copy to Local")} />
-          </MenuItem>,
-          <MenuItem key="copy-cloud" disabled={!cloudUser} onClick={() => { closeMenus(); copyNpcToCloud(npc)(); }}>
-            <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Copy to Cloud")} />
-          </MenuItem>,
-          <Divider key="div2" />,
-          <MenuItem key="move-local" onClick={() => { closeMenus(); moveNpcToLocal(npc)(); }}>
-            <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Move to Local")} />
-          </MenuItem>,
-          <MenuItem key="move-cloud" disabled={!cloudUser} onClick={() => { closeMenus(); moveNpcToCloud(npc)(); }}>
-            <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
-            <ListItemText primary={t("Move to Cloud")} />
-          </MenuItem>,
-        ]}
-      </MuiMenu>
-      <Tooltip title={t("Edit")}>
-        <RouterLink
-          to={`/npc-gallery/${npc.id}${
-            filterParams
-              ? filterParams.startsWith("?")
-                ? filterParams
-                : `?${filterParams}`
-              : ""
-          }`}
-          style={{ display: "inline-flex", alignItems: "center" }}
-        >
-          <IconButton>
-            <Edit />
+        <Tooltip title={t("Actions")}>
+          <IconButton onClick={(e) => setActionsAnchor(e.currentTarget)}>
+            <MenuIcon />
           </IconButton>
-        </RouterLink>
-      </Tooltip>
-      <Export name={`${npc.name}`} dataType="npc" data={npc} />
-      <Tooltip title={t("Copy to...")}>
-        <IconButton onClick={(e) => setTransferAnchor(e.currentTarget)}>
-          <FileCopy />
-        </IconButton>
-      </Tooltip>
-      <MuiMenu
-        anchorEl={transferAnchor}
-        open={Boolean(transferAnchor)}
-        onClose={() => setTransferAnchor(null)}
-      >
-        <MenuItem
-          onClick={() => {
-            setTransferAnchor(null);
-            copyNpcToLocal(npc)();
+        </Tooltip>
+        <MuiMenu
+          anchorEl={actionsAnchor}
+          open={Boolean(actionsAnchor)}
+          onClose={closeMenus}
+          slotProps={{
+            transition: { onExited: () => setActionsSubmenu(null) },
           }}
         >
-          <ListItemIcon>
-            <StorageIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={t("Copy to Local")} />
-        </MenuItem>
-        <MenuItem
-          disabled={!cloudUser}
-          onClick={() => {
-            setTransferAnchor(null);
-            copyNpcToCloud(npc)();
-          }}
+          {actionsSubmenu === null && [
+            <MenuItem
+              key="edit"
+              onClick={() => {
+                closeMenus();
+                navigate(
+                  `/npc-gallery/${npc.id}${filterParams ? (filterParams.startsWith("?") ? filterParams : `?${filterParams}`) : ""}`,
+                );
+              }}
+            >
+              <ListItemIcon>
+                <Edit fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Edit")} />
+            </MenuItem>,
+            <MenuItem key="export" onClick={() => setActionsSubmenu("export")}>
+              <ListItemIcon>
+                <Code fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="transfer"
+              onClick={() => setActionsSubmenu("transfer")}
+            >
+              <ListItemIcon>
+                <FileCopy fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="delete"
+              onClick={() => {
+                closeMenus();
+                deleteNpc(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <Delete fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Delete")} />
+            </MenuItem>,
+            <MenuItem
+              key="share"
+              disabled={dbMode !== "cloud"}
+              onClick={() => {
+                closeMenus();
+                shareNpc(npc.id);
+              }}
+            >
+              <ListItemIcon>
+                <Share fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Share URL")} />
+            </MenuItem>,
+            <MenuItem
+              key="download"
+              onClick={() => {
+                closeMenus();
+                expandAndDownloadImage();
+              }}
+            >
+              <ListItemIcon>
+                <Download fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Download as Image")} />
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "export" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem key="copy-json" onClick={copyJsonToClipboard}>
+              {t("copy_json_clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-json" onClick={downloadJson}>
+              {t("export_json_file")}
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem key="copy-md" onClick={() => copyText("markdown")}>
+              {t("Copy Markdown to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>
+              {t("Export as Markdown (.md)")}
+            </MenuItem>,
+            <Divider key="div3" />,
+            <MenuItem key="copy-plain" onClick={() => copyText("plain")}>
+              {t("Copy Plaintext to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>
+              {t("Export as Plaintext (.txt)")}
+            </MenuItem>,
+            <MenuItem key="copy-obs" onClick={() => copyText("obsidian")}>
+              {t("Copy Obsidian (BlueCorvid) to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-obs" onClick={() => downloadText("obsidian")}>
+              {t("Export as Obsidian (.md)")}
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "transfer" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem
+              key="copy-local"
+              onClick={() => {
+                closeMenus();
+                copyNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="copy-cloud"
+              disabled={!cloudUser}
+              onClick={() => {
+                closeMenus();
+                copyNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Cloud")} />
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem
+              key="move-local"
+              onClick={() => {
+                closeMenus();
+                moveNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="move-cloud"
+              disabled={!cloudUser}
+              onClick={() => {
+                closeMenus();
+                moveNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>,
+          ]}
+        </MuiMenu>
+        <Tooltip title={t("Edit")}>
+          <RouterLink
+            to={`/npc-gallery/${npc.id}${
+              filterParams
+                ? filterParams.startsWith("?")
+                  ? filterParams
+                  : `?${filterParams}`
+                : ""
+            }`}
+            style={{ display: "inline-flex", alignItems: "center" }}
+          >
+            <IconButton>
+              <Edit />
+            </IconButton>
+          </RouterLink>
+        </Tooltip>
+        <Export name={`${npc.name}`} dataType="npc" data={npc} />
+        <Tooltip title={t("Copy to...")}>
+          <IconButton onClick={(e) => setTransferAnchor(e.currentTarget)}>
+            <FileCopy />
+          </IconButton>
+        </Tooltip>
+        <MuiMenu
+          anchorEl={transferAnchor}
+          open={Boolean(transferAnchor)}
+          onClose={() => setTransferAnchor(null)}
         >
-          <ListItemIcon>
-            <CloudIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={t("Copy to Cloud")} />
-        </MenuItem>
-        <Divider />
-        {dbMode !== "local" && (
           <MenuItem
             onClick={() => {
               setTransferAnchor(null);
-              moveNpcToLocal(npc)();
+              copyNpcToLocal(npc)();
             }}
           >
             <ListItemIcon>
               <StorageIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary={t("Move to Local")} />
+            <ListItemText primary={t("Copy to Local")} />
           </MenuItem>
-        )}
-        {dbMode !== "cloud" && (
           <MenuItem
             disabled={!cloudUser}
             onClick={() => {
               setTransferAnchor(null);
-              moveNpcToCloud(npc)();
+              copyNpcToCloud(npc)();
             }}
           >
             <ListItemIcon>
               <CloudIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary={t("Move to Cloud")} />
+            <ListItemText primary={t("Copy to Cloud")} />
           </MenuItem>
-        )}
-      </MuiMenu>
-      <Tooltip title={t("Delete")}>
-        <IconButton onClick={deleteNpc(npc)}>
-          <Delete />
-        </IconButton>
-      </Tooltip>
-      {dbMode === "cloud" && (
-        <Tooltip title={t("Share URL")}>
-          <IconButton onClick={() => shareNpc(npc.id)}>
-            <Share />
+          <Divider />
+          {dbMode !== "local" && (
+            <MenuItem
+              onClick={() => {
+                setTransferAnchor(null);
+                moveNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>
+          )}
+          {dbMode !== "cloud" && (
+            <MenuItem
+              disabled={!cloudUser}
+              onClick={() => {
+                setTransferAnchor(null);
+                moveNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>
+          )}
+        </MuiMenu>
+        <Tooltip title={t("Delete")}>
+          <IconButton onClick={deleteNpc(npc)}>
+            <Delete />
           </IconButton>
         </Tooltip>
-      )}
-      <Tooltip title={t("Download as Image")}>
-        <IconButton onClick={expandAndDownloadImage}>
-          <Download />
-        </IconButton>
-      </Tooltip>
-      <Tooltip
-        title={`Schema version ${npc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION} (${npcNeedsMigration(npc) ? "migration needed" : "up to date"})`}
-      >
-        <Chip
-          label={`v${npc.schemaVersion ?? 0}`}
-          size="small"
-          color={npcNeedsMigration(npc) ? "warning" : "default"}
-          variant="outlined"
-          sx={{ fontSize: "0.85rem" }}
-        />
-      </Tooltip>
+        {dbMode === "cloud" && (
+          <Tooltip title={t("Share URL")}>
+            <IconButton onClick={() => shareNpc(npc.id)}>
+              <Share />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Tooltip title={t("Download as Image")}>
+          <IconButton onClick={expandAndDownloadImage}>
+            <Download />
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          title={`Schema version ${npc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION} (${npcNeedsMigration(npc) ? "migration needed" : "up to date"})`}
+        >
+          <Chip
+            label={`v${npc.schemaVersion ?? 0}`}
+            size="small"
+            color={npcNeedsMigration(npc) ? "warning" : "default"}
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
       </Box>
     </Grid>
   );

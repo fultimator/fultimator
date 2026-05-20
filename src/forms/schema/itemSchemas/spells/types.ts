@@ -19,4 +19,3 @@ export const PlayerSpellTypeSchema = z.enum([
   "gamble",
   "deck",
 ]);
-

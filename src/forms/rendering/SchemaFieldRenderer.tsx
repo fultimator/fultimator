@@ -1,8 +1,9 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import type { ItemFieldConfig } from "./config/fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "./config/fieldConfig";
 import type { FormSurface } from "../schema/fieldParity";
 import { componentMap } from "./componentMap";
+import { useTranslate } from "../../translation/translate";
 
 interface SchemaFieldRendererProps<TFormState extends Record<string, unknown>> {
   config: ItemFieldConfig<TFormState>;
@@ -11,8 +12,10 @@ interface SchemaFieldRendererProps<TFormState extends Record<string, unknown>> {
   surface: FormSurface;
   // Optional group filter.
   group?: string;
-  // Optional section heading.
+  // Optional section heading. Takes precedence over groupLabels lookup.
   label?: string;
+  // Group-key → dot-path label string map from the item config. Used when label is omitted.
+  groupLabels?: GroupLabels;
   // Optional action element rendered beside the section label (e.g. a search icon button).
   labelAction?: React.ReactNode;
   // Fields per row on md+ screens.
@@ -70,11 +73,13 @@ export function SchemaFieldRenderer<
   surface,
   group,
   label,
+  groupLabels,
   labelAction,
   cols = 2,
   extraProps,
   hidden,
 }: SchemaFieldRendererProps<TFormState>) {
+  const { t } = useTranslate();
   if (hidden) return null;
   const mdSize = Math.floor(12 / cols) as 3 | 4 | 6 | 12;
 
@@ -89,9 +94,12 @@ export function SchemaFieldRenderer<
     })
     .sort((a, b) => a.order - b.order);
 
+  const resolvedLabel =
+    label ?? (group && groupLabels ? groupLabels[group] : undefined);
+
   return (
     <>
-      {label && (
+      {resolvedLabel && (
         <Grid size={12}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <Typography
@@ -103,7 +111,7 @@ export function SchemaFieldRenderer<
                 letterSpacing: "0.05em",
               }}
             >
-              {label}
+              {typeof resolvedLabel === "string" ? t(resolvedLabel) : ""}
             </Typography>
             {labelAction}
           </Box>
@@ -151,9 +159,13 @@ export function SchemaFieldRenderer<
           : rawValue;
 
         const filteredExtra = extraProps
-          ? field.component === "fuid" || field.component === "grouped-select" || field.component === "autocomplete"
+          ? field.component === "fuid" ||
+            field.component === "grouped-select" ||
+            field.component === "autocomplete"
             ? extraProps
-            : Object.fromEntries(Object.entries(extraProps).filter(([k]) => k !== "onBrowse"))
+            : Object.fromEntries(
+                Object.entries(extraProps).filter(([k]) => k !== "onBrowse"),
+              )
           : undefined;
         const mergedProps = filteredExtra
           ? { ...field.componentProps, ...filteredExtra }
@@ -201,7 +213,11 @@ export function SchemaFieldRenderer<
           >
             <Component
               fieldKey={field.key}
-              label={typeof field.label === "function" ? field.label(state) : field.label}
+              label={
+                typeof field.label === "function"
+                  ? field.label(state)
+                  : field.label
+              }
               value={displayValue}
               onCommit={handleCommit}
               componentProps={componentPropsWithNestedRenderer}

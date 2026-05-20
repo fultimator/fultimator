@@ -19,7 +19,10 @@ import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../common/CustomHeader";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
-import { npcSpecialFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpecial";
+import {
+  npcSpecialFieldConfig,
+  npcSpecialGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpecial";
 import {
   Add,
   Casino,
@@ -229,121 +232,128 @@ export default function EditSpecial({ npc, setNpc }) {
         allExpanded={allExpanded}
       />
       <Grid container spacing={1}>
-      {npc.special?.map((special, i) => {
-        return (
-        <Grid key={i} size={12}>
-        <Accordion
-          expanded={expandedSet.has(i)}
-          onChange={() => toggleExpanded(i)}
-          disableGutters
-          elevation={0}
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            "&:before": { display: "none" },
-            mb: 0.5,
-          }}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMore />}
-            sx={{
-              "& .MuiAccordionSummary-content": {
-                alignItems: "center",
-                overflow: "hidden",
-              },
-            }}
-          >
-            <Box
-              sx={{ display: "flex", alignItems: "center" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <IconButton
-
-                onClick={() =>
-                  addMessage({
-                    id: crypto.randomUUID(),
-                    createdAt: Date.now(),
-                    speaker: npc.name || "NPC",
-                    kind: "display",
-                    itemType: "special",
-                    name: special.name,
-                    tags: [`SP: ${special.spCost ?? 1}`],
-                    description: special.effect,
-                  })
-                }
+        {npc.special?.map((special, i) => {
+          return (
+            <Grid key={i} size={12}>
+              <Accordion
+                expanded={expandedSet.has(i)}
+                onChange={() => toggleExpanded(i)}
+                disableGutters
+                elevation={0}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  "&:before": { display: "none" },
+                  mb: 0.5,
+                }}
               >
-                <Casino />
-              </IconButton>
-              <SpecialContextMenu
-                special={special}
-                npcName={npc.name}
-                onDelete={() => openDeleteDialog(i)}
-              />
-            </Box>
-            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
-              <Typography noWrap>{special.name || t("(unnamed)")}</Typography>
-            </Box>
-            <Typography
-              variant="body2"
-              sx={{ color: "text.secondary", whiteSpace: "nowrap", mr: 1 }}
-            >
-              SP: {special.spCost ?? 1}
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={1}>
-              <SchemaFieldRenderer
-                config={npcSpecialFieldConfig}
-                state={special}
-                onChange={(next) => {
-                  setNpc((prev) => {
-                    const special = [...(prev.special || [])];
-                    special[i] = next;
-                    return { ...prev, special };
-                  });
-                }}
-                surface="edit"
-                group="core"
-                label={t("Special Rule")}
-                cols={2}
-                extraProps={{ name: String(special.name ?? "") }}
-              />
-              <SchemaFieldRenderer
-                config={npcSpecialFieldConfig}
-                state={special}
-                onChange={(next) => {
-                  setNpc((prev) => {
-                    const special = [...(prev.special || [])];
-                    special[i] = next;
-                    return { ...prev, special };
-                  });
-                }}
-                surface="edit"
-                group="body"
-                cols={1}
-              />
-              <SchemaFieldRenderer
-                config={npcSpecialFieldConfig}
-                state={special}
-                onChange={(next) => {
-                  setNpc((prev) => {
-                    const special = [...(prev.special || [])];
-                    special[i] = next;
-                    return { ...prev, special };
-                  });
-                }}
-                surface="edit"
-                group="meta"
-                label="Metadata"
-                cols={2}
-                hidden
-              />
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  sx={{
+                    "& .MuiAccordionSummary-content": {
+                      alignItems: "center",
+                      overflow: "hidden",
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", alignItems: "center" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <IconButton
+                      onClick={() =>
+                        addMessage({
+                          id: crypto.randomUUID(),
+                          createdAt: Date.now(),
+                          speaker: npc.name || "NPC",
+                          kind: "display",
+                          itemType: "special",
+                          name: special.name,
+                          tags: [`SP: ${special.spCost ?? 1}`],
+                          description: special.effect,
+                        })
+                      }
+                    >
+                      <Casino />
+                    </IconButton>
+                    <SpecialContextMenu
+                      special={special}
+                      npcName={npc.name}
+                      onDelete={() => openDeleteDialog(i)}
+                    />
+                  </Box>
+                  <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+                    <Typography noWrap>
+                      {special.name || t("(unnamed)")}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                      whiteSpace: "nowrap",
+                      mr: 1,
+                    }}
+                  >
+                    SP: {special.spCost ?? 1}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    <SchemaFieldRenderer
+                      config={npcSpecialFieldConfig}
+                      groupLabels={npcSpecialGroupLabels}
+                      state={special}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const special = [...(prev.special || [])];
+                          special[i] = next;
+                          return { ...prev, special };
+                        });
+                      }}
+                      surface="edit"
+                      group="core"
+                      label={t("Special Rule")}
+                      cols={2}
+                      extraProps={{ name: String(special.name ?? "") }}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcSpecialFieldConfig}
+                      groupLabels={npcSpecialGroupLabels}
+                      state={special}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const special = [...(prev.special || [])];
+                          special[i] = next;
+                          return { ...prev, special };
+                        });
+                      }}
+                      surface="edit"
+                      group="body"
+                      cols={1}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcSpecialFieldConfig}
+                      groupLabels={npcSpecialGroupLabels}
+                      state={special}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const special = [...(prev.special || [])];
+                          special[i] = next;
+                          return { ...prev, special };
+                        });
+                      }}
+                      surface="edit"
+                      group="meta"
+                      cols={2}
+                      hidden
+                    />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-          </AccordionDetails>
-        </Accordion>
-        </Grid>
-        );
-      })}
+          );
+        })}
       </Grid>
       <CompendiumViewerModal
         open={modalOpen}

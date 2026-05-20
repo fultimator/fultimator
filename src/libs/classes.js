@@ -5,7 +5,7 @@ const classList = [
   {
     fuid: "arcanist",
     name: "Arcanist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -68,7 +68,7 @@ const classList = [
   {
     fuid: "chimerist",
     name: "Chimerist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -131,7 +131,7 @@ const classList = [
   {
     fuid: "darkblade",
     name: "Darkblade",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -194,7 +194,7 @@ const classList = [
   {
     fuid: "elementalist",
     name: "Elementalist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -257,7 +257,7 @@ const classList = [
   {
     fuid: "entropist",
     name: "Entropist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -320,7 +320,7 @@ const classList = [
   {
     fuid: "fury",
     name: "Fury",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -383,7 +383,7 @@ const classList = [
   {
     fuid: "guardian",
     name: "Guardian",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -446,7 +446,7 @@ const classList = [
   {
     fuid: "loremaster",
     name: "Loremaster",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -509,7 +509,7 @@ const classList = [
   {
     fuid: "orator",
     name: "Orator",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -572,7 +572,7 @@ const classList = [
   {
     fuid: "rogue",
     name: "Rogue",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -635,7 +635,7 @@ const classList = [
   {
     fuid: "sharpshooter",
     name: "Sharpshooter",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -698,7 +698,7 @@ const classList = [
   {
     fuid: "spiritist",
     name: "Spiritist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -761,7 +761,7 @@ const classList = [
   {
     fuid: "tinkerer",
     name: "Tinkerer",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -829,7 +829,7 @@ const classList = [
   {
     fuid: "wayfarer",
     name: "Wayfarer",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -892,7 +892,7 @@ const classList = [
   {
     fuid: "weaponmaster",
     name: "Weaponmaster",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -955,7 +955,7 @@ const classList = [
   {
     fuid: "arcanist-rework",
     name: "Arcanist-Rework",
-    book: "rework",
+    meta: { book: "rework", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -977,7 +977,7 @@ const classList = [
   {
     fuid: "ace-of-cards",
     name: "Ace of Cards",
-    book: "bonus",
+    meta: { book: "bonus", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1043,7 +1043,7 @@ const classList = [
   {
     fuid: "necromancer",
     name: "Necromancer",
-    book: "bonus",
+    meta: { book: "bonus", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1109,7 +1109,7 @@ const classList = [
   {
     fuid: "chanter",
     name: "Chanter",
-    book: "high",
+    meta: { book: "high", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -1172,7 +1172,7 @@ const classList = [
   {
     fuid: "commander",
     name: "Commander",
-    book: "high",
+    meta: { book: "high", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -1235,7 +1235,7 @@ const classList = [
   {
     fuid: "dancer",
     name: "Dancer",
-    book: "high",
+    meta: { book: "high", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1301,7 +1301,7 @@ const classList = [
   {
     fuid: "symbolist",
     name: "Symbolist",
-    book: "high",
+    meta: { book: "high", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1364,7 +1364,7 @@ const classList = [
   {
     fuid: "esper",
     name: "Esper",
-    book: "techno",
+    meta: { book: "techno", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -1428,7 +1428,7 @@ const classList = [
   {
     fuid: "mutant",
     name: "Mutant",
-    book: "techno",
+    meta: { book: "techno", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -1491,7 +1491,7 @@ const classList = [
   {
     fuid: "pilot",
     name: "Pilot",
-    book: "techno",
+    meta: { book: "techno", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -1554,7 +1554,7 @@ const classList = [
   {
     fuid: "floralist",
     name: "Floralist",
-    book: "natural",
+    meta: { book: "natural", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1620,7 +1620,7 @@ const classList = [
   {
     fuid: "gourmet",
     name: "Gourmet",
-    book: "natural",
+    meta: { book: "natural", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1686,7 +1686,7 @@ const classList = [
   {
     fuid: "invoker",
     name: "Invoker",
-    book: "natural",
+    meta: { book: "natural", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1752,7 +1752,7 @@ const classList = [
   {
     fuid: "merchant",
     name: "Merchant",
-    book: "natural",
+    meta: { book: "natural", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1815,7 +1815,7 @@ const classList = [
   {
     fuid: "blank-class",
     name: "Blank Class",
-    book: "homebrew",
+    meta: { book: "homebrew", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -2961,6 +2961,14 @@ export const entropistGamble = {
 
 classList.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+  const book = item.meta?.book ?? "homebrew";
+  item.meta = {
+    book,
+    page: item.meta?.page ?? "",
+    bookName: item.meta?.bookName ?? "",
+    isOfficial: item.meta?.isOfficial ?? (book !== "" && book !== "homebrew"),
+  };
+  delete item.book;
 });
 spellList.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);

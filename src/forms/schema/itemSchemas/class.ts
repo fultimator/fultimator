@@ -12,7 +12,6 @@ const SkillSchema = z.looseObject({
 export const ClassSchema = z.object({
   name: z.string().min(1),
   fuid: z.string().optional(),
-  book: z.string().default("homebrew"),
   meta: MetaSchema.optional(),
   benefits: z.looseObject({
     hpplus: z.number().int().default(0),

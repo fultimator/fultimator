@@ -20,6 +20,7 @@ function SpellRow({ spell, npc, showRoll }) {
   const { t } = useTranslate();
   const addMessage = useChatMessagesStore((s) => s.addMessage);
   const isOffensive = spell.isOffensive === true || spell.type === "offensive";
+  const spellAccuracyBonus = spell.accuracy?.value ?? 0;
 
   const handleAction = (e) => {
     e.stopPropagation();
@@ -53,7 +54,7 @@ function SpellRow({ spell, npc, showRoll }) {
     const intent = prepareMagicCheck({
       attr1: attr1Short,
       attr2: attr2Short,
-      accuracyBonus: spell.accuracy?.value ?? 0,
+      accuracyBonus: spellAccuracyBonus,
       name: spell.name,
       baseDamage: spell.damage?.value ?? 0,
       damageType: spell.damage?.type ?? "physical",
@@ -94,6 +95,8 @@ function SpellRow({ spell, npc, showRoll }) {
                 {" + "}
                 {attributes[spell.accuracy?.attr2]?.shortcaps}
                 <CloseBracket />
+                {spellAccuracyBonus > 0 && `+${spellAccuracyBonus}`}
+                {spellAccuracyBonus < 0 && `${spellAccuracyBonus}`}
                 {calcMagic(npc) > 0 && `+${calcMagic(npc)}`} <Diamond />
                 <OpenBracket />
                 HR +{" "}

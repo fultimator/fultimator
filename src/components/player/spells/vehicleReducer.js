@@ -26,7 +26,12 @@ export const getModuleTypeForLimits = (module) => {
   return "custom";
 };
 
-const defaultSlots = () => ({ main: null, off: null, armor: null, support: [] });
+const defaultSlots = () => ({
+  main: null,
+  off: null,
+  armor: null,
+  support: [],
+});
 
 // Remove a module key from all slots.
 const removeFromSlots = (slots, moduleKey) => {
@@ -44,8 +49,10 @@ const applySlot = (slots, moduleKey, newSlot) => {
   let s = removeFromSlots(slots, moduleKey);
   if (newSlot === "main") s.main = moduleKey;
   else if (newSlot === "off") s.off = moduleKey;
-  else if (newSlot === "both") { s.main = moduleKey; s.off = moduleKey; }
-  else if (newSlot === "armor") s.armor = moduleKey;
+  else if (newSlot === "both") {
+    s.main = moduleKey;
+    s.off = moduleKey;
+  } else if (newSlot === "armor") s.armor = moduleKey;
   else if (newSlot === "support") s.support = [...(s.support ?? []), moduleKey];
   // null = already removed above
   return s;
@@ -225,13 +232,11 @@ export const vehicleReducer = (state, action) => {
 
         // Shield main-hand validation: only allowed if another shield is in off
         if (module.isShield && value === "main") {
-          const hasOffHandShield = vehicle.modules.some(
-            (m, idx) => {
-              if (idx === moduleIndex) return false;
-              const mk = m.key ?? m.name;
-              return m.isShield && s.off === mk;
-            },
-          );
+          const hasOffHandShield = vehicle.modules.some((m, idx) => {
+            if (idx === moduleIndex) return false;
+            const mk = m.key ?? m.name;
+            return m.isShield && s.off === mk;
+          });
           if (!hasOffHandShield) return state;
         }
 
@@ -242,14 +247,25 @@ export const vehicleReducer = (state, action) => {
             const currentInSlot = targetHand === "main" ? s.main : s.off;
             if (currentInSlot && currentInSlot !== moduleKey) {
               // Determine the current slot of the module being moved
-              const currentModuleSlot = s.main === moduleKey ? "main" : s.off === moduleKey ? "off" : null;
+              const currentModuleSlot =
+                s.main === moduleKey
+                  ? "main"
+                  : s.off === moduleKey
+                    ? "off"
+                    : null;
               const otherHand = targetHand === "main" ? "off" : "main";
-              const otherSlotOccupied = (otherHand === "main" ? s.main : s.off) !== null &&
+              const otherSlotOccupied =
+                (otherHand === "main" ? s.main : s.off) !== null &&
                 (otherHand === "main" ? s.main : s.off) !== moduleKey;
 
               // Can swap if: the displaced module is not cumbersome and the other hand is free or holds our module
-              const displacedModule = vehicle.modules.find((m) => (m.key ?? m.name) === currentInSlot);
-              if (!displacedModule?.cumbersome && (!otherSlotOccupied || currentModuleSlot === otherHand)) {
+              const displacedModule = vehicle.modules.find(
+                (m) => (m.key ?? m.name) === currentInSlot,
+              );
+              if (
+                !displacedModule?.cumbersome &&
+                (!otherSlotOccupied || currentModuleSlot === otherHand)
+              ) {
                 // Swap: put displaced module in the other hand
                 vehicle.slots = { ...vehicle.slots };
                 if (otherHand === "main") vehicle.slots.main = currentInSlot;
@@ -261,7 +277,10 @@ export const vehicleReducer = (state, action) => {
 
         vehicle.slots = applySlot(vehicle.slots, moduleKey, value);
       } else if (field === "cumbersome") {
-        vehicle.modules[moduleIndex] = { ...vehicle.modules[moduleIndex], cumbersome: value };
+        vehicle.modules[moduleIndex] = {
+          ...vehicle.modules[moduleIndex],
+          cumbersome: value,
+        };
         const module = vehicle.modules[moduleIndex];
         const moduleKey = module.key ?? module.name;
         const s = vehicle.slots;
@@ -271,12 +290,20 @@ export const vehicleReducer = (state, action) => {
           // Becoming cumbersome while equipped: take both hands, displace others
           vehicle.slots = { ...s, main: null, off: null };
           vehicle.slots = applySlot(vehicle.slots, moduleKey, "both");
-        } else if (!value && isEquipped && s.main === moduleKey && s.off === moduleKey) {
+        } else if (
+          !value &&
+          isEquipped &&
+          s.main === moduleKey &&
+          s.off === moduleKey
+        ) {
           // Was cumbersome (both), now not: move to just main
           vehicle.slots = { ...s, off: null };
         }
       } else if (field === "isShield") {
-        vehicle.modules[moduleIndex] = { ...vehicle.modules[moduleIndex], isShield: value };
+        vehicle.modules[moduleIndex] = {
+          ...vehicle.modules[moduleIndex],
+          isShield: value,
+        };
         const module = vehicle.modules[moduleIndex];
         const moduleKey = module.key ?? module.name;
         const s = vehicle.slots;
@@ -285,7 +312,8 @@ export const vehicleReducer = (state, action) => {
         if (isEquipped && value) {
           // Just became a shield - prefer off hand
           const otherShieldInOff = vehicle.modules.some(
-            (m, idx) => idx !== moduleIndex && m.isShield && s.off === (m.key ?? m.name),
+            (m, idx) =>
+              idx !== moduleIndex && m.isShield && s.off === (m.key ?? m.name),
           );
           const targetSlot = otherShieldInOff ? "main" : "off";
           vehicle.slots = applySlot(s, moduleKey, targetSlot);
@@ -299,7 +327,10 @@ export const vehicleReducer = (state, action) => {
         module[root] = { ...module[root], [child]: value };
         vehicle.modules[moduleIndex] = module;
       } else {
-        vehicle.modules[moduleIndex] = { ...vehicle.modules[moduleIndex], [field]: value };
+        vehicle.modules[moduleIndex] = {
+          ...vehicle.modules[moduleIndex],
+          [field]: value,
+        };
       }
 
       return {

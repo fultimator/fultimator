@@ -1,9 +1,11 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import type { NpcAttack } from "../../../schema/itemSchemas/npcAttack";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { typeOptions } from "../typeOptions";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 export type NpcAttackFormState = NpcAttack;
+const NPC_ATTACK_LABEL_PREFIX = "npc.attack";
 
 const G = {
   core: "core",
@@ -12,11 +14,19 @@ const G = {
   effect: "effect",
 } as const;
 
+export const npcAttackGroupLabels: GroupLabels = {
+  core: "section.core",
+  accuracy: "section.accuracy",
+  damage: "section.damage",
+  effect: "section.effect",
+  meta: "section.meta",
+};
+
 export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "itemType",
     kind: "computed",
-    label: "Item Type",
+    label: "shared.itemType",
     defaultValue: "basic",
     group: G.core,
     order: 0,
@@ -24,7 +34,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(NPC_ATTACK_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: "",
     group: G.core,
@@ -34,7 +44,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "Name",
+    label: prefixedLabel(NPC_ATTACK_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -45,7 +55,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "range",
     kind: "editable",
-    label: "Range",
+    label: "shared.range",
     component: "select",
     defaultValue: "melee",
     group: G.core,
@@ -58,13 +68,14 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
       ],
     },
     onChangeEffects: {
-      category: (s) => (s.range === "ranged" ? "Ranged Attack" : "Melee Attack"),
+      category: (s) =>
+        s.range === "ranged" ? "Ranged Attack" : "Melee Attack",
     },
   },
   {
     key: "category",
     kind: "computed",
-    label: "Category",
+    label: "shared.category",
     defaultValue: "Melee Attack",
     group: G.core,
     order: 4,
@@ -72,7 +83,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "accuracy.attr1",
     kind: "editable",
-    label: "Attr 1",
+    label: "shared.accuracy.attr1",
     component: "select",
     defaultValue: "dexterity",
     group: G.accuracy,
@@ -90,7 +101,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "accuracy.attr2",
     kind: "editable",
-    label: "Attr 2",
+    label: "shared.accuracy.attr2",
     component: "select",
     defaultValue: "dexterity",
     group: G.accuracy,
@@ -108,7 +119,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "accuracy.value",
     kind: "editable",
-    label: "Accuracy Bonus",
+    label: "shared.accuracy.bonus",
     component: "number",
     defaultValue: 0,
     group: G.accuracy,
@@ -119,7 +130,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "accuracy.defense",
     kind: "editable",
-    label: "Defense",
+    label: "shared.accuracy.defense",
     component: "select",
     defaultValue: "def",
     group: G.accuracy,
@@ -135,7 +146,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "damage.value",
     kind: "editable",
-    label: "Damage Value",
+    label: "shared.damage.value",
     component: "number",
     defaultValue: 0,
     group: G.damage,
@@ -146,7 +157,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "damage.type",
     kind: "editable",
-    label: "Damage Type",
+    label: "shared.damage.type",
     component: "type-select",
     defaultValue: "physical",
     group: G.damage,
@@ -157,7 +168,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "damage.hrZero",
     kind: "editable",
-    label: "HR0",
+    label: "shared.damage.hrZero",
     component: "checkbox",
     defaultValue: false,
     group: G.damage,
@@ -167,7 +178,7 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
   {
     key: "effect",
     kind: "editable",
-    label: "Effect",
+    label: prefixedLabel(NPC_ATTACK_LABEL_PREFIX, SHARED_LABEL_KEYS.effect),
     component: "textarea",
     defaultValue: "",
     group: G.effect,

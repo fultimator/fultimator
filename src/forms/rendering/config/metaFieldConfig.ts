@@ -33,7 +33,7 @@ export const metaFieldConfig: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "meta.book",
     kind: "editable",
-    label: "Book",
+    label: "meta.book",
     component: "select",
     defaultValue: "",
     group: META_GROUP,
@@ -56,7 +56,7 @@ export const metaFieldConfig: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "meta.page",
     kind: "editable",
-    label: "Page",
+    label: "meta.page",
     component: "number",
     defaultValue: "",
     group: META_GROUP,
@@ -67,7 +67,7 @@ export const metaFieldConfig: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "meta.bookName",
     kind: "editable",
-    label: "Book Name",
+    label: "meta.bookName",
     component: "text",
     defaultValue: "",
     group: META_GROUP,
@@ -79,7 +79,7 @@ export const metaFieldConfig: ItemFieldConfig<Record<string, unknown>> = [
   {
     key: "meta.isOfficial",
     kind: "computed",
-    label: "Official",
+    label: "meta.isOfficial",
     defaultValue: false,
     group: META_GROUP,
     order: 103,

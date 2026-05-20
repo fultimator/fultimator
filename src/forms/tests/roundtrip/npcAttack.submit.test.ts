@@ -5,7 +5,12 @@ const BASE_ATTACK = {
   itemType: "basic" as const,
   name: "Slash",
   range: "melee" as const,
-  accuracy: { attr1: "dexterity", attr2: "might", value: 0, defense: "def" as const },
+  accuracy: {
+    attr1: "dexterity",
+    attr2: "might",
+    value: 0,
+    defense: "def" as const,
+  },
   damage: { value: 6, type: "physical", hrZero: false },
   martial: false,
   category: "Melee Attack",
@@ -87,7 +92,10 @@ describe("npc-attack schema roundtrip", () => {
   });
 
   it("wrong itemType fails schema", () => {
-    const result = NpcAttackSchema.safeParse({ ...BASE_ATTACK, itemType: "spell" });
+    const result = NpcAttackSchema.safeParse({
+      ...BASE_ATTACK,
+      itemType: "spell",
+    });
     expect(result.success).toBe(false);
   });
 

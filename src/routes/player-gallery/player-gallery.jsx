@@ -423,7 +423,10 @@ function Personal() {
         await db.setDoc(db.doc("player-personal", forcedId), normalizedData);
         return forcedId;
       }
-      const res = await db.addDoc(db.collection("player-personal"), normalizedData);
+      const res = await db.addDoc(
+        db.collection("player-personal"),
+        normalizedData,
+      );
       return res.id;
     } catch (e) {
       console.debug(e);
@@ -1681,7 +1684,10 @@ function PlayerGalleryCardActions({
   const [actionsAnchor, setActionsAnchor] = useState(null);
   const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
   const [downloadImage] = useDownloadImage(player?.name || "player", cardRef);
-  const exportData = canonicalizeForTransfer("pc", applyPreSaveTransforms(player));
+  const exportData = canonicalizeForTransfer(
+    "pc",
+    applyPreSaveTransforms(player),
+  );
 
   const closeMenus = () => {
     setActionsAnchor(null);
@@ -1689,15 +1695,22 @@ function PlayerGalleryCardActions({
   };
 
   const copyJsonToClipboard = async () => {
-    await navigator.clipboard.writeText(JSON.stringify({ ...exportData, dataType: "pc" }, null, 2));
+    await navigator.clipboard.writeText(
+      JSON.stringify({ ...exportData, dataType: "pc" }, null, 2),
+    );
     closeMenus();
   };
 
   const downloadJson = () => {
-    const safeName = (player?.name || "player").replace(/\s+/g, "_").toLowerCase();
-    const blob = new Blob([JSON.stringify({ ...exportData, dataType: "pc" }, null, 2)], {
-      type: "application/json;charset=utf-8",
-    });
+    const safeName = (player?.name || "player")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
+    const blob = new Blob(
+      [JSON.stringify({ ...exportData, dataType: "pc" }, null, 2)],
+      {
+        type: "application/json;charset=utf-8",
+      },
+    );
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -1716,7 +1729,9 @@ function PlayerGalleryCardActions({
   const downloadText = (fmt) => {
     const text = buildItemText("pc", exportData, fmt);
     const ext = fmt === "plain" ? "txt" : "md";
-    const safeName = (player?.name || "player").replace(/\s+/g, "_").toLowerCase();
+    const safeName = (player?.name || "player")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -1756,103 +1771,189 @@ function PlayerGalleryCardActions({
           anchorEl={actionsAnchor}
           open={Boolean(actionsAnchor)}
           onClose={closeMenus}
-          slotProps={{ transition: { onExited: () => setActionsSubmenu(null) } }}
+          slotProps={{
+            transition: { onExited: () => setActionsSubmenu(null) },
+          }}
         >
           {actionsSubmenu === null && [
             <MenuItem
               key="edit"
-              onClick={() => { closeMenus(); handleNavigation(`/player-edit/${player.id}`); }}
+              onClick={() => {
+                closeMenus();
+                handleNavigation(`/player-edit/${player.id}`);
+              }}
             >
-              <ListItemIcon><Edit fontSize="small" /></ListItemIcon>
+              <ListItemIcon>
+                <Edit fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Edit")} />
             </MenuItem>,
             <MenuItem
               key="sheet"
-              onClick={() => { closeMenus(); handleNavigation(`/character-sheet/${player.id}`); }}
+              onClick={() => {
+                closeMenus();
+                handleNavigation(`/character-sheet/${player.id}`);
+              }}
             >
-              <ListItemIcon><Badge fontSize="small" /></ListItemIcon>
+              <ListItemIcon>
+                <Badge fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Player Sheet")} />
             </MenuItem>,
             <MenuItem key="export" onClick={() => setActionsSubmenu("export")}>
-              <ListItemIcon><Code fontSize="small" /></ListItemIcon>
+              <ListItemIcon>
+                <Code fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Export")} />
               <ChevronRight fontSize="small" />
             </MenuItem>,
-            <MenuItem key="transfer" onClick={() => setActionsSubmenu("transfer")}>
-              <ListItemIcon><FileCopy fontSize="small" /></ListItemIcon>
+            <MenuItem
+              key="transfer"
+              onClick={() => setActionsSubmenu("transfer")}
+            >
+              <ListItemIcon>
+                <FileCopy fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Copy / Move")} />
               <ChevronRight fontSize="small" />
             </MenuItem>,
             <MenuItem
               key="delete"
-              onClick={() => { closeMenus(); deletePlayer(player)(); }}
+              onClick={() => {
+                closeMenus();
+                deletePlayer(player)();
+              }}
             >
-              <ListItemIcon><Delete fontSize="small" /></ListItemIcon>
+              <ListItemIcon>
+                <Delete fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Delete")} />
             </MenuItem>,
             <MenuItem
               key="share"
               disabled={dbMode === "local"}
-              onClick={() => { closeMenus(); sharePlayer(player.id); }}
+              onClick={() => {
+                closeMenus();
+                sharePlayer(player.id);
+              }}
             >
-              <ListItemIcon><Share fontSize="small" /></ListItemIcon>
+              <ListItemIcon>
+                <Share fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Share URL")} />
             </MenuItem>,
             <MenuItem
               key="download"
-              onClick={() => { closeMenus(); downloadImage(); }}
+              onClick={() => {
+                closeMenus();
+                downloadImage();
+              }}
             >
-              <ListItemIcon><Download fontSize="small" /></ListItemIcon>
+              <ListItemIcon>
+                <Download fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Download as Image")} />
             </MenuItem>,
           ]}
           {actionsSubmenu === "export" && [
             <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
-              <ListItemIcon><ChevronLeft fontSize="small" /></ListItemIcon>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Export")} />
             </MenuItem>,
             <Divider key="div" />,
-            <MenuItem key="copy-json" onClick={copyJsonToClipboard}>{t("copy_json_clipboard")}</MenuItem>,
-            <MenuItem key="dl-json" onClick={downloadJson}>{t("export_json_file")}</MenuItem>,
+            <MenuItem key="copy-json" onClick={copyJsonToClipboard}>
+              {t("copy_json_clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-json" onClick={downloadJson}>
+              {t("export_json_file")}
+            </MenuItem>,
             <Divider key="div2" />,
-            <MenuItem key="copy-md" onClick={() => copyText("markdown")}>{t("Copy Markdown to Clipboard")}</MenuItem>,
-            <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>{t("Export as Markdown (.md)")}</MenuItem>,
+            <MenuItem key="copy-md" onClick={() => copyText("markdown")}>
+              {t("Copy Markdown to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>
+              {t("Export as Markdown (.md)")}
+            </MenuItem>,
             <Divider key="div3" />,
-            <MenuItem key="copy-plain" onClick={() => copyText("plain")}>{t("Copy Plaintext to Clipboard")}</MenuItem>,
-            <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>{t("Export as Plaintext (.txt)")}</MenuItem>,
+            <MenuItem key="copy-plain" onClick={() => copyText("plain")}>
+              {t("Copy Plaintext to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>
+              {t("Export as Plaintext (.txt)")}
+            </MenuItem>,
           ]}
           {actionsSubmenu === "transfer" && [
             <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
-              <ListItemIcon><ChevronLeft fontSize="small" /></ListItemIcon>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Copy / Move")} />
             </MenuItem>,
             <Divider key="div" />,
-            <MenuItem key="copy-local" onClick={() => { closeMenus(); copyPlayerToLocal(player)(); }}>
-              <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
+            <MenuItem
+              key="copy-local"
+              onClick={() => {
+                closeMenus();
+                copyPlayerToLocal(player)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Copy to Local")} />
             </MenuItem>,
-            <MenuItem key="copy-cloud" onClick={() => { closeMenus(); copyPlayerToCloud(player)(); }}>
-              <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
+            <MenuItem
+              key="copy-cloud"
+              onClick={() => {
+                closeMenus();
+                copyPlayerToCloud(player)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Copy to Cloud")} />
             </MenuItem>,
             <Divider key="div2" />,
-            <MenuItem key="move-local" onClick={() => { closeMenus(); movePlayerToLocal(player)(); }}>
-              <ListItemIcon><StorageIcon fontSize="small" /></ListItemIcon>
+            <MenuItem
+              key="move-local"
+              onClick={() => {
+                closeMenus();
+                movePlayerToLocal(player)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Move to Local")} />
             </MenuItem>,
-            <MenuItem key="move-cloud" onClick={() => { closeMenus(); movePlayerToCloud(player)(); }}>
-              <ListItemIcon><CloudIcon fontSize="small" /></ListItemIcon>
+            <MenuItem
+              key="move-cloud"
+              onClick={() => {
+                closeMenus();
+                movePlayerToCloud(player)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={t("Move to Cloud")} />
             </MenuItem>,
           ]}
         </MuiMenu>
         <Tooltip title={t("Edit")}>
-          <IconButton onClick={() => handleNavigation(`/player-edit/${player.id}`)}>
+          <IconButton
+            onClick={() => handleNavigation(`/player-edit/${player.id}`)}
+          >
             <Edit />
           </IconButton>
         </Tooltip>
         <Tooltip title={t("Player Sheet")}>
-          <IconButton onClick={() => handleNavigation(`/character-sheet/${player.id}`)}>
+          <IconButton
+            onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
+          >
             <Badge />
           </IconButton>
         </Tooltip>

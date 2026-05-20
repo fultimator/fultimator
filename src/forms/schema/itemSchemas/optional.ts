@@ -39,17 +39,16 @@ export const OptionalCampActivitiesSchema = OptionalSharedSchema.extend({
 export const OptionalZeroTriggerSchema = OptionalSharedSchema.extend({
   subtype: z.literal("zero-trigger"),
   description: z.string(),
-  clock: ClockSchema.optional(),
 });
 
 export const OptionalZeroEffectSchema = OptionalSharedSchema.extend({
   subtype: z.literal("zero-effect"),
   description: z.string(),
-  clock: ClockSchema.optional(),
 });
 
 export const OptionalZeroPowerSchema = OptionalSharedSchema.extend({
   subtype: z.literal("zero-power"),
+  description: z.string().optional(),
   zeroTriggerRef: z.string(),
   zeroEffectRef: z.string(),
   zeroTrigger: z.union([ZeroRefSchema, z.literal("")]),

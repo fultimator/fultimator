@@ -73,14 +73,14 @@ const VehicleModule = memo(
       vehicleSlots.main === moduleKey && vehicleSlots.off === moduleKey
         ? "both"
         : vehicleSlots.main === moduleKey
-        ? "main"
-        : vehicleSlots.off === moduleKey
-        ? "off"
-        : vehicleSlots.armor === moduleKey
-        ? "armor"
-        : (vehicleSlots.support ?? []).includes(moduleKey)
-        ? "support"
-        : null;
+          ? "main"
+          : vehicleSlots.off === moduleKey
+            ? "off"
+            : vehicleSlots.armor === moduleKey
+              ? "armor"
+              : (vehicleSlots.support ?? []).includes(moduleKey)
+                ? "support"
+                : null;
 
     const handleEquipToggle = (e) => {
       e.stopPropagation();
@@ -243,7 +243,11 @@ const VehicleModule = memo(
                         value="off"
                         disabled={vehicle.modules.some((m) => {
                           const mk = m.key ?? m.name;
-                          return m.isShield && vehicleSlots.off === mk && mk !== moduleKey;
+                          return (
+                            m.isShield &&
+                            vehicleSlots.off === mk &&
+                            mk !== moduleKey
+                          );
                         })}
                         sx={{ minWidth: 35 }}
                       >
@@ -394,7 +398,11 @@ const VehicleModule = memo(
                           !module.isShield &&
                           vehicle.modules.some((m) => {
                             const mk = m.key ?? m.name;
-                            return m.isShield && vehicleSlots.off === mk && mk !== moduleKey;
+                            return (
+                              m.isShield &&
+                              vehicleSlots.off === mk &&
+                              mk !== moduleKey
+                            );
                           })
                         }
                       >
@@ -409,9 +417,7 @@ const VehicleModule = memo(
                         color: "text.secondary",
                       }}
                     >
-                      {moduleSlot === "off"
-                        ? t("off_hand")
-                        : t("main_hand")}
+                      {moduleSlot === "off" ? t("off_hand") : t("main_hand")}
                     </Typography>
                   </div>
                 </Grid>

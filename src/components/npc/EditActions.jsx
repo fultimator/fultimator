@@ -18,7 +18,10 @@ import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../common/CustomHeader";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
-import { npcActionFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAction";
+import {
+  npcActionFieldConfig,
+  npcActionGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAction";
 import {
   Add,
   Casino,
@@ -228,121 +231,128 @@ export default function EditActions({ npc, setNpc }) {
         allExpanded={allExpanded}
       />
       <Grid container spacing={1}>
-      {npc.actions?.map((action, i) => {
-        return (
-        <Grid key={i} size={12}>
-        <Accordion
-          expanded={expandedSet.has(i)}
-          onChange={() => toggleExpanded(i)}
-          disableGutters
-          elevation={0}
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            "&:before": { display: "none" },
-            mb: 0.5,
-          }}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMore />}
-            sx={{
-              "& .MuiAccordionSummary-content": {
-                alignItems: "center",
-                overflow: "hidden",
-              },
-            }}
-          >
-            <Box
-              sx={{ display: "flex", alignItems: "center" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <IconButton
-
-                onClick={() =>
-                  addMessage({
-                    id: crypto.randomUUID(),
-                    createdAt: Date.now(),
-                    speaker: npc.name || "NPC",
-                    kind: "display",
-                    itemType: "action",
-                    name: action.name,
-                    tags: [`SP: ${action.spCost ?? 1}`],
-                    description: action.effect,
-                  })
-                }
+        {npc.actions?.map((action, i) => {
+          return (
+            <Grid key={i} size={12}>
+              <Accordion
+                expanded={expandedSet.has(i)}
+                onChange={() => toggleExpanded(i)}
+                disableGutters
+                elevation={0}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  "&:before": { display: "none" },
+                  mb: 0.5,
+                }}
               >
-                <Casino />
-              </IconButton>
-              <ActionContextMenu
-                action={action}
-                npcName={npc.name}
-                onDelete={() => openDeleteDialog(i)}
-              />
-            </Box>
-            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
-              <Typography noWrap>{action.name || t("(unnamed)")}</Typography>
-            </Box>
-            <Typography
-              variant="body2"
-              sx={{ color: "text.secondary", whiteSpace: "nowrap", mr: 1 }}
-            >
-              SP: {action.spCost ?? 1}
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={1}>
-              <SchemaFieldRenderer
-                config={npcActionFieldConfig}
-                state={action}
-                onChange={(next) => {
-                  setNpc((prev) => {
-                    const actions = [...(prev.actions || [])];
-                    actions[i] = next;
-                    return { ...prev, actions };
-                  });
-                }}
-                surface="edit"
-                group="core"
-                label={t("Other Action")}
-                cols={2}
-                extraProps={{ name: String(action.name ?? "") }}
-              />
-              <SchemaFieldRenderer
-                config={npcActionFieldConfig}
-                state={action}
-                onChange={(next) => {
-                  setNpc((prev) => {
-                    const actions = [...(prev.actions || [])];
-                    actions[i] = next;
-                    return { ...prev, actions };
-                  });
-                }}
-                surface="edit"
-                group="body"
-                cols={1}
-              />
-              <SchemaFieldRenderer
-                config={npcActionFieldConfig}
-                state={action}
-                onChange={(next) => {
-                  setNpc((prev) => {
-                    const actions = [...(prev.actions || [])];
-                    actions[i] = next;
-                    return { ...prev, actions };
-                  });
-                }}
-                surface="edit"
-                group="meta"
-                label="Metadata"
-                cols={2}
-                hidden
-              />
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  sx={{
+                    "& .MuiAccordionSummary-content": {
+                      alignItems: "center",
+                      overflow: "hidden",
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", alignItems: "center" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <IconButton
+                      onClick={() =>
+                        addMessage({
+                          id: crypto.randomUUID(),
+                          createdAt: Date.now(),
+                          speaker: npc.name || "NPC",
+                          kind: "display",
+                          itemType: "action",
+                          name: action.name,
+                          tags: [`SP: ${action.spCost ?? 1}`],
+                          description: action.effect,
+                        })
+                      }
+                    >
+                      <Casino />
+                    </IconButton>
+                    <ActionContextMenu
+                      action={action}
+                      npcName={npc.name}
+                      onDelete={() => openDeleteDialog(i)}
+                    />
+                  </Box>
+                  <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+                    <Typography noWrap>
+                      {action.name || t("(unnamed)")}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                      whiteSpace: "nowrap",
+                      mr: 1,
+                    }}
+                  >
+                    SP: {action.spCost ?? 1}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    <SchemaFieldRenderer
+                      config={npcActionFieldConfig}
+                      groupLabels={npcActionGroupLabels}
+                      state={action}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const actions = [...(prev.actions || [])];
+                          actions[i] = next;
+                          return { ...prev, actions };
+                        });
+                      }}
+                      surface="edit"
+                      group="core"
+                      label={t("Other Action")}
+                      cols={2}
+                      extraProps={{ name: String(action.name ?? "") }}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcActionFieldConfig}
+                      groupLabels={npcActionGroupLabels}
+                      state={action}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const actions = [...(prev.actions || [])];
+                          actions[i] = next;
+                          return { ...prev, actions };
+                        });
+                      }}
+                      surface="edit"
+                      group="body"
+                      cols={1}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcActionFieldConfig}
+                      groupLabels={npcActionGroupLabels}
+                      state={action}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const actions = [...(prev.actions || [])];
+                          actions[i] = next;
+                          return { ...prev, actions };
+                        });
+                      }}
+                      surface="edit"
+                      group="meta"
+                      cols={2}
+                      hidden
+                    />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-          </AccordionDetails>
-        </Accordion>
-        </Grid>
-        );
-      })}
+          );
+        })}
       </Grid>
       <CompendiumViewerModal
         open={modalOpen}

@@ -1,4 +1,4 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { ShieldPersisted } from "../../../schema/itemSchemas/shield";
 import shields from "../../../../libs/shields";
@@ -6,6 +6,7 @@ import allQualities from "../../../../libs/qualities";
 const qualities = allQualities.filter((q) => q.filter?.includes("shield"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 interface ShieldBase {
   name: string;
@@ -20,6 +21,7 @@ interface ShieldBase {
 export type ShieldFormState = Omit<ShieldPersisted, "base"> & {
   base: ShieldBase | undefined;
 };
+const SHIELD_LABEL_PREFIX = "shield";
 
 const shieldOptions: SelectOption[] = (shields as ShieldBase[]).map((s) => ({
   value: s.name,
@@ -45,11 +47,16 @@ const G = {
   source: "source",
 } as const;
 
+export const shieldGroupLabels: GroupLabels = {
+  quality: "section.quality",
+  modifiers: "section.modifiers",
+};
+
 export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "base",
     kind: "form-state",
-    label: "shield.base",
+    label: prefixedLabel(SHIELD_LABEL_PREFIX, SHARED_LABEL_KEYS.base),
     component: "select",
     defaultValue: undefined,
     group: G.base,
@@ -75,7 +82,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(SHIELD_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: "",
     group: G.core,
@@ -85,7 +92,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "shield.name",
+    label: prefixedLabel(SHIELD_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -96,7 +103,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "martial",
     kind: "editable",
-    label: "shield.martial",
+    label: prefixedLabel(SHIELD_LABEL_PREFIX, SHARED_LABEL_KEYS.martial),
     component: "martial-toggle",
     defaultValue: false,
     group: G.core,
@@ -106,7 +113,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "rework",
     kind: "editable",
-    label: "shield.rework",
+    label: "shared.rework",
     component: "checkbox",
     defaultValue: false,
     group: G.modifiers,
@@ -115,7 +122,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "selectedQuality",
     kind: "form-state",
-    label: "shield.quality.preset",
+    label: "shared.quality.preset",
     component: "grouped-select",
     defaultValue: "",
     group: G.quality,
@@ -146,7 +153,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "qualityCost",
     kind: "form-state",
-    label: "shield.quality.cost",
+    label: "shared.quality.cost",
     component: "number",
     defaultValue: 0,
     group: G.quality,
@@ -160,7 +167,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "quality",
     kind: "editable",
-    label: "shield.quality.text",
+    label: "shared.quality.text",
     component: "textarea",
     defaultValue: "",
     group: G.quality,
@@ -170,7 +177,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "defModifier",
     kind: "editable",
-    label: "shield.modifiers.def",
+    label: "shared.modifiers.def",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -182,7 +189,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "mDefModifier",
     kind: "editable",
-    label: "shield.modifiers.mdef",
+    label: "shared.modifiers.mdef",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -194,7 +201,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "initModifier",
     kind: "editable",
-    label: "shield.modifiers.init",
+    label: "shared.modifiers.init",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -206,7 +213,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "magicModifier",
     kind: "editable",
-    label: "shield.modifiers.magic",
+    label: "shared.modifiers.magic",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -218,7 +225,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "precModifier",
     kind: "editable",
-    label: "shield.modifiers.accuracy",
+    label: "shared.modifiers.accuracy",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -230,7 +237,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "damageMeleeModifier",
     kind: "editable",
-    label: "shield.modifiers.damageMelee",
+    label: "shared.modifiers.damageMelee",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -242,7 +249,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "damageRangedModifier",
     kind: "editable",
-    label: "shield.modifiers.damageRanged",
+    label: "shared.modifiers.damageRanged",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -254,7 +261,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "cost",
     kind: "computed",
-    label: "shield.cost",
+    label: prefixedLabel(SHIELD_LABEL_PREFIX, SHARED_LABEL_KEYS.cost),
     component: "readonly-number",
     group: G.meta,
     order: 30,
@@ -262,7 +269,7 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   {
     key: "isEquipped",
     kind: "form-state",
-    label: "shield.isEquipped",
+    label: "shared.isEquipped",
     component: "checkbox",
     defaultValue: false,
     group: G.meta,

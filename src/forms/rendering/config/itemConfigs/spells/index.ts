@@ -14,14 +14,16 @@ import { symbolFields } from "./symbol";
 import { invocationFields } from "./invocation";
 import { cookingFields } from "./cooking";
 import { magiseedFields } from "./magiseed";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "../sharedLabelKeys";
 
 export type { PlayerSpellFormState, PlayerSpellUiType } from "./types";
+const SPELL_LABEL_PREFIX = "spell";
 
 export const playerSpellFieldConfig: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "spellType",
     kind: "editable",
-    label: "spell.type",
+    label: prefixedLabel(SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.type),
     component: "select",
     defaultValue: "default",
     group: "core",
@@ -32,7 +34,7 @@ export const playerSpellFieldConfig: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "spell.fuid",
+    label: prefixedLabel(SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: undefined,
     group: "core",
@@ -42,7 +44,7 @@ export const playerSpellFieldConfig: ItemFieldConfig<PlayerSpellFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "spell.name",
+    label: prefixedLabel(SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: "core",

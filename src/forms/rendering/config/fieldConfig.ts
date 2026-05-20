@@ -73,3 +73,6 @@ export interface FieldConfig<TFormState extends Record<string, unknown>> {
 
 export type ItemFieldConfig<TFormState extends Record<string, unknown>> =
   FieldConfig<TFormState>[];
+
+// Maps group keys to dot-path label strings, co-located with each item config.
+export type GroupLabels = Record<string, string>;

@@ -34,11 +34,17 @@ export default function EditBasics({ npc, setNpc }) {
   const [errorMessage, setErrorMessage] = React.useState("");
   const [snackOpen, setSnackOpen] = React.useState(false);
   const identityFields = React.useMemo(
-    () => npcFieldConfig.filter((field) => field.group !== "basics" || field.order <= 1),
+    () =>
+      npcFieldConfig.filter(
+        (field) => field.group !== "basics" || field.order <= 1,
+      ),
     [],
   );
   const detailFields = React.useMemo(
-    () => npcFieldConfig.filter((field) => field.group !== "basics" || field.order > 1),
+    () =>
+      npcFieldConfig.filter(
+        (field) => field.group !== "basics" || field.order > 1,
+      ),
     [],
   );
 

@@ -18,7 +18,13 @@ import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
-import { Add, Casino, Delete, ExpandMore, Menu as MenuIcon } from "@mui/icons-material";
+import {
+  Add,
+  Casino,
+  Delete,
+  ExpandMore,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
@@ -55,14 +61,24 @@ function RareGearContextMenu({ raregear, npcName, onDelete }) {
             close();
           }}
         >
-          <ListItemIcon><Casino /></ListItemIcon>
+          <ListItemIcon>
+            <Casino />
+          </ListItemIcon>
           <ListItemText>{t("Roll")}</ListItemText>
         </MenuItem>
 
         <Divider />
 
-        <MenuItem onClick={() => { close(); onDelete(); }} sx={{ color: "error.main" }}>
-          <ListItemIcon><Delete color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            close();
+            onDelete();
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <Delete color="error" />
+          </ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
       </Menu>
@@ -125,9 +141,17 @@ export default function EditRareGear({ npc, setNpc }) {
         >
           <AccordionSummary
             expandIcon={<ExpandMore />}
-            sx={{ "& .MuiAccordionSummary-content": { alignItems: "center", overflow: "hidden" } }}
+            sx={{
+              "& .MuiAccordionSummary-content": {
+                alignItems: "center",
+                overflow: "hidden",
+              },
+            }}
           >
-            <Box sx={{ display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+            <Box
+              sx={{ display: "flex", alignItems: "center" }}
+              onClick={(e) => e.stopPropagation()}
+            >
               <IconButton
                 onClick={() =>
                   addMessage({
@@ -181,7 +205,10 @@ export default function EditRareGear({ npc, setNpc }) {
       ))}
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
-        onClose={() => { setIsDeleteDialogOpen(false); setPendingGearIndex(null); }}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setPendingGearIndex(null);
+        }}
         onConfirm={() => {
           if (pendingGearIndex === null) return;
           removeRareGear(pendingGearIndex);

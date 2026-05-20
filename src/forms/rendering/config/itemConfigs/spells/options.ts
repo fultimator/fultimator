@@ -55,9 +55,13 @@ export const TARGET_OPTIONS = [
   { value: "Special", label: "Special" },
 ];
 
-export const WELLSPRING_OPTIONS = ["Air", "Earth", "Fire", "Lightning", "Water"].map(
-  (w) => ({ value: w, label: w }),
-);
+export const WELLSPRING_OPTIONS = [
+  "Air",
+  "Earth",
+  "Fire",
+  "Lightning",
+  "Water",
+].map((w) => ({ value: w, label: w }));
 
 export const INV_TYPE_OPTIONS = ["Blast", "Hex", "Utility"].map((t) => ({
   value: t,

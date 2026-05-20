@@ -122,21 +122,64 @@ import {
 
 const REG = itemFormRegistry;
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
-import { weaponFieldConfig } from "../../forms/rendering/config/itemConfigs/weapon";
-import { armorFieldConfig } from "../../forms/rendering/config/itemConfigs/armor";
+import {
+  weaponFieldConfig,
+  weaponGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/weapon";
+import {
+  armorFieldConfig,
+  armorGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/armor";
 import FuidField from "../common/FuidField";
-import { shieldFieldConfig } from "../../forms/rendering/config/itemConfigs/shield";
-import { accessoryFieldConfig } from "../../forms/rendering/config/itemConfigs/accessory";
-import { customWeaponFieldConfig } from "../../forms/rendering/config/itemConfigs/customWeapon";
-import { npcActionFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAction";
-import { npcSpecialFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpecial";
-import { npcAttackFieldConfig } from "../../forms/rendering/config/itemConfigs/npcAttack";
-import { npcSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/npcSpell";
-import { qualityFieldConfig } from "../../forms/rendering/config/itemConfigs/quality";
+import {
+  shieldFieldConfig,
+  shieldGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/shield";
+import {
+  accessoryFieldConfig,
+  accessoryGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/accessory";
+import {
+  customWeaponFieldConfig,
+  customWeaponGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/customWeapon";
+import {
+  npcActionFieldConfig,
+  npcActionGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAction";
+import {
+  npcSpecialFieldConfig,
+  npcSpecialGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpecial";
+import {
+  npcAttackFieldConfig,
+  npcAttackGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAttack";
+import {
+  npcSpellFieldConfig,
+  npcSpellGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpell";
+import {
+  qualityFieldConfig,
+  qualityGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/quality";
 import { playerSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/playerSpell";
-import { heroicFieldConfig } from "../../forms/rendering/config/itemConfigs/heroic";
-import { classFieldConfig } from "../../forms/rendering/config/itemConfigs/class";
-import { hoplosphereFieldConfig } from "../../forms/rendering/config/itemConfigs/hoplosphere";
+import {
+  heroicFieldConfig,
+  heroicGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/heroic";
+import {
+  classFieldConfig,
+  classGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/class";
+import {
+  hoplosphereFieldConfig,
+  hoplosphereGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/hoplosphere";
+import {
+  optionalFieldConfig,
+  optionalGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/optional";
 import { createDefaultStateFromFields } from "../../forms/registry/helpers";
 import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
 
@@ -147,7 +190,6 @@ const slugify = (value = "") =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-
 
 function createMetaFromBook(bookValue = "homebrew") {
   const book = String(bookValue ?? "").trim() || "homebrew";
@@ -191,7 +233,12 @@ function stripPrivateFields(value) {
   return next;
 }
 
-function importIntoSchemaForm(fieldConfig, setFormState, item, transform = null) {
+function importIntoSchemaForm(
+  fieldConfig,
+  setFormState,
+  item,
+  transform = null,
+) {
   const defaults = createDefaultStateFromFields(fieldConfig);
   const prepared = stripPrivateFields(transform ? transform(item) : item);
   const merged = mergeImportedIntoDefaults(defaults, prepared);
@@ -227,17 +274,21 @@ function localizeImportedClassItem(item) {
             ...skill,
             description:
               typeof skill.description === "string"
-                ? staticT(skill.description)
+                ? staticT(skill.description, null, true)
                 : skill.description,
           }
         : skill,
     );
   }
-  if (next.benefits && typeof next.benefits === "object" && Array.isArray(next.benefits.custom)) {
+  if (
+    next.benefits &&
+    typeof next.benefits === "object" &&
+    Array.isArray(next.benefits.custom)
+  ) {
     next.benefits = {
       ...next.benefits,
       custom: next.benefits.custom.map((entry) =>
-        typeof entry === "string" ? staticT(entry) : entry,
+        typeof entry === "string" ? staticT(entry, null, true) : entry,
       ),
     };
   }
@@ -274,7 +325,10 @@ const QuickCreateImportContext = React.createContext(null);
 
 function useQuickCreateImport() {
   const ctx = React.useContext(QuickCreateImportContext);
-  if (!ctx) throw new Error("useQuickCreateImport must be used within QuickCreateImportContext");
+  if (!ctx)
+    throw new Error(
+      "useQuickCreateImport must be used within QuickCreateImportContext",
+    );
   return ctx;
 }
 
@@ -385,6 +439,7 @@ function NpcAttackPanel() {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -394,31 +449,38 @@ function NpcAttackPanel() {
             extraProps={{
               name: String(formState.name ?? ""),
               onBrowse: () =>
-                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-attack"], (item) =>
-                  importIntoSchemaForm(npcAttackFieldConfig, setFormState, item),
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-attack"],
+                  (item) =>
+                    importIntoSchemaForm(
+                      npcAttackFieldConfig,
+                      setFormState,
+                      item,
+                    ),
                 ),
             }}
           />
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="accuracy"
-            label={t("Accuracy")}
             cols={2}
           />
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="damage"
-            label={t("Damage")}
             cols={2}
           />
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -427,11 +489,11 @@ function NpcAttackPanel() {
           />
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label={t("Metadata")}
             cols={2}
           />
           <Grid size={12}>
@@ -443,7 +505,10 @@ function NpcAttackPanel() {
       }
       previewContent={<SharedAttackCard item={data} />}
       addButton={
-        <AddToCompendiumButton itemType={REG["npc-attack"].addItemType} data={data} />
+        <AddToCompendiumButton
+          itemType={REG["npc-attack"].addItemType}
+          data={data}
+        />
       }
       exportDataType={REG["npc-attack"].exportDataType}
     />
@@ -473,6 +538,7 @@ function NpcSpellPanel() {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -482,45 +548,48 @@ function NpcSpellPanel() {
             extraProps={{
               name: String(formState.name ?? ""),
               onBrowse: () =>
-                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-spell"], (item) =>
-                  importIntoSchemaForm(
-                    npcSpellFieldConfig,
-                    setFormState,
-                    item,
-                    normalizeImportedNpcSpellItem,
-                  ),
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-spell"],
+                  (item) =>
+                    importIntoSchemaForm(
+                      npcSpellFieldConfig,
+                      setFormState,
+                      item,
+                      normalizeImportedNpcSpellItem,
+                    ),
                 ),
             }}
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="accuracy"
-            label={t("Accuracy")}
             cols={2}
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="damage"
-            label={t("Damage")}
             cols={2}
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="details"
-            label={t("Details")}
             cols={2}
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -529,11 +598,11 @@ function NpcSpellPanel() {
           />
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label={t("Metadata")}
             cols={2}
           />
           <Grid size={12}>
@@ -543,11 +612,12 @@ function NpcSpellPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={
-        <SharedSpellCard item={data} />
-      }
+      previewContent={<SharedSpellCard item={data} />}
       addButton={
-        <AddToCompendiumButton itemType={REG["npc-spell"].addItemType} data={data} />
+        <AddToCompendiumButton
+          itemType={REG["npc-spell"].addItemType}
+          data={data}
+        />
       }
       data={data}
       itemName={data.name}
@@ -577,6 +647,7 @@ function NpcSpecialPanel() {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -586,13 +657,20 @@ function NpcSpecialPanel() {
             extraProps={{
               name: String(formState.name ?? ""),
               onBrowse: () =>
-                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-special"], (item) =>
-                  importIntoSchemaForm(npcSpecialFieldConfig, setFormState, item),
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-special"],
+                  (item) =>
+                    importIntoSchemaForm(
+                      npcSpecialFieldConfig,
+                      setFormState,
+                      item,
+                    ),
                 ),
             }}
           />
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -601,11 +679,11 @@ function NpcSpecialPanel() {
           />
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
           <Grid size={12}>
@@ -650,6 +728,7 @@ function NpcActionPanel() {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -659,13 +738,20 @@ function NpcActionPanel() {
             extraProps={{
               name: String(formState.name ?? ""),
               onBrowse: () =>
-                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-action"], (item) =>
-                  importIntoSchemaForm(npcActionFieldConfig, setFormState, item),
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-action"],
+                  (item) =>
+                    importIntoSchemaForm(
+                      npcActionFieldConfig,
+                      setFormState,
+                      item,
+                    ),
                 ),
             }}
           />
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -674,11 +760,11 @@ function NpcActionPanel() {
           />
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
           <Grid size={12}>
@@ -785,7 +871,8 @@ function buildPlayerSpellPayload(state) {
           perTarget: state["cost.perTarget"] ?? true,
         },
         maxTargets: state.maxTargets ?? 1,
-        targetDescription: (state.targetDescription ?? "").trim() || "One creature",
+        targetDescription:
+          (state.targetDescription ?? "").trim() || "One creature",
         duration: (state.duration ?? "").trim() || "Instantaneous",
         accuracy: {
           attr1: state["accuracy.attr1"] ?? "insight",
@@ -795,7 +882,9 @@ function buildPlayerSpellPayload(state) {
         },
         damage: {
           value: state.isOffensive ? (state["damage.value"] ?? 0) : 0,
-          type: state.isOffensive ? (state["damage.type"] ?? "physical") : "physical",
+          type: state.isOffensive
+            ? (state["damage.type"] ?? "physical")
+            : "physical",
           hrZero: state["damage.hrZero"] ?? false,
         },
       });
@@ -833,7 +922,8 @@ function buildPlayerSpellPayload(state) {
         spellType: "tinkerer-infusion",
         name: (name ?? "").trim(),
         fuid: fuid || undefined,
-        infusionRank: state.infusionRank != null ? Number(state.infusionRank) : undefined,
+        infusionRank:
+          state.infusionRank != null ? Number(state.infusionRank) : undefined,
         effect: (state.effect ?? "").trim(),
         description: (state.effect ?? "").trim(),
       });
@@ -1084,22 +1174,35 @@ function PlayerSpellPanel() {
       if (imported.frame) setVehicleFrame(imported.frame);
       if (imported.def !== undefined) setModuleDef(String(imported.def));
       if (imported.mdef !== undefined) setModuleMdef(String(imported.mdef));
-      if (imported.martial !== undefined) setModuleMartial(Boolean(imported.martial));
-      if (imported.cost !== undefined) setModuleCost(Number(imported.cost) || PILOT_MODULE_BASE_COST[sub] || 500);
-      if (imported.description) setModuleDescription(String(imported.description));
+      if (imported.martial !== undefined)
+        setModuleMartial(Boolean(imported.martial));
+      if (imported.cost !== undefined)
+        setModuleCost(
+          Number(imported.cost) || PILOT_MODULE_BASE_COST[sub] || 500,
+        );
+      if (imported.description)
+        setModuleDescription(String(imported.description));
       if (imported.description || imported.effect)
         setPilotEffect(String(imported.effect ?? imported.description ?? ""));
       if (imported.category) setWeaponCategory(String(imported.category));
-      if (imported.accuracy?.attr1) setPilotAtt1(String(imported.accuracy.attr1));
-      if (imported.accuracy?.attr2) setPilotAtt2(String(imported.accuracy.attr2));
-      if (imported.accuracy?.value !== undefined) setModulePrec(Number(imported.accuracy.value));
-      if (imported.damage?.value !== undefined) setModuleDamage(String(imported.damage.value));
-      if (imported.damage?.type) setPilotDamageType(String(imported.damage.type));
+      if (imported.accuracy?.attr1)
+        setPilotAtt1(String(imported.accuracy.attr1));
+      if (imported.accuracy?.attr2)
+        setPilotAtt2(String(imported.accuracy.attr2));
+      if (imported.accuracy?.value !== undefined)
+        setModulePrec(Number(imported.accuracy.value));
+      if (imported.damage?.value !== undefined)
+        setModuleDamage(String(imported.damage.value));
+      if (imported.damage?.type)
+        setPilotDamageType(String(imported.damage.type));
       if (imported.range) setModuleRange(String(imported.range));
-      if (imported.cumbersome !== undefined) setModuleCumbersome(Boolean(imported.cumbersome));
+      if (imported.cumbersome !== undefined)
+        setModuleCumbersome(Boolean(imported.cumbersome));
       if (imported.quality !== undefined) setQuality(String(imported.quality));
-      if (imported.qualityCost !== undefined) setQualityCost(Number(imported.qualityCost));
-      if (imported.isShield !== undefined) setIsShield(Boolean(imported.isShield));
+      if (imported.qualityCost !== undefined)
+        setQualityCost(Number(imported.qualityCost));
+      if (imported.isShield !== undefined)
+        setIsShield(Boolean(imported.isShield));
     }
   };
 
@@ -1238,7 +1341,15 @@ function PlayerSpellPanel() {
               {pilotSubtype === "frame" && (
                 <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
                   <Grid size={12}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
                       {t("Frame")}
                     </Typography>
                   </Grid>
@@ -1274,7 +1385,15 @@ function PlayerSpellPanel() {
               {pilotSubtype === "support" && (
                 <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
                   <Grid size={12}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
                       {t("Support Module")}
                     </Typography>
                   </Grid>
@@ -1303,13 +1422,29 @@ function PlayerSpellPanel() {
               {/* Armor Module */}
               {pilotSubtype === "armor" && (
                 <>
-                  <Grid size={12} container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+                  <Grid
+                    size={12}
+                    container
+                    spacing={2}
+                    sx={{ mb: 2, alignItems: "center" }}
+                  >
                     <Grid size={12}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
                         {t("Armor")}
                       </Typography>
                     </Grid>
-                    <Grid size="auto" sx={{ display: "flex", alignItems: "center" }}>
+                    <Grid
+                      size="auto"
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
                       <ToggleButton
                         value="martial"
                         selected={moduleMartial}
@@ -1331,7 +1466,9 @@ function PlayerSpellPanel() {
                     </Grid>
                     <Grid size={{ xs: 6, sm: 3 }}>
                       <TextField
-                        label={moduleMartial ? "MDEF" : t("INS die") + " + MDEF"}
+                        label={
+                          moduleMartial ? "MDEF" : t("INS die") + " + MDEF"
+                        }
                         value={moduleMdef}
                         type="number"
                         fullWidth
@@ -1367,9 +1504,22 @@ function PlayerSpellPanel() {
               {/* Weapon Module */}
               {pilotSubtype === "weapon" && (
                 <>
-                  <Grid size={12} container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
+                  <Grid
+                    size={12}
+                    container
+                    spacing={2}
+                    sx={{ mb: 2, alignItems: "center" }}
+                  >
                     <Grid size={12}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
                         {t("Weapon")}
                       </Typography>
                     </Grid>
@@ -1382,7 +1532,9 @@ function PlayerSpellPanel() {
                           onChange={(e) => setWeaponCategory(e.target.value)}
                         >
                           {PILOT_WEAPON_CATEGORIES.map((c) => (
-                            <MenuItem key={c} value={c}>{c}</MenuItem>
+                            <MenuItem key={c} value={c}>
+                              {c}
+                            </MenuItem>
                           ))}
                         </Select>
                       </FormControl>
@@ -1396,61 +1548,120 @@ function PlayerSpellPanel() {
                           onChange={(e) => setModuleRange(e.target.value)}
                         >
                           {PILOT_RANGES.map((r) => (
-                            <MenuItem key={r} value={r}>{r}</MenuItem>
+                            <MenuItem key={r} value={r}>
+                              {r}
+                            </MenuItem>
                           ))}
                         </Select>
                       </FormControl>
                     </Grid>
-                    <Grid size={{ xs: 6, sm: 2 }} sx={{ display: "flex", alignItems: "center" }}>
-                      <ToggleButton value="cumbersome" selected={moduleCumbersome} onChange={() => setModuleCumbersome((v) => !v)} size="small" sx={{ width: "100%" }}>
+                    <Grid
+                      size={{ xs: 6, sm: 2 }}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <ToggleButton
+                        value="cumbersome"
+                        selected={moduleCumbersome}
+                        onChange={() => setModuleCumbersome((v) => !v)}
+                        size="small"
+                        sx={{ width: "100%" }}
+                      >
                         {t("Cumbersome")}
                       </ToggleButton>
                     </Grid>
-                    <Grid size={{ xs: 6, sm: 2 }} sx={{ display: "flex", alignItems: "center" }}>
-                      <ToggleButton value="isShield" selected={isShield} onChange={() => setIsShield((v) => !v)} size="small" sx={{ width: "100%" }}>
+                    <Grid
+                      size={{ xs: 6, sm: 2 }}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <ToggleButton
+                        value="isShield"
+                        selected={isShield}
+                        onChange={() => setIsShield((v) => !v)}
+                        size="small"
+                        sx={{ width: "100%" }}
+                      >
                         {t("Shield")}
                       </ToggleButton>
                     </Grid>
                   </Grid>
                   <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
                     <Grid size={12}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
                         {t("Accuracy")}
                       </Typography>
                     </Grid>
                     <Grid size={{ xs: 6, sm: 3 }}>
                       <FormControl fullWidth size="small">
                         <InputLabel>{t("Att 1")}</InputLabel>
-                        <Select value={pilotAtt1} label={t("Att 1")} onChange={(e) => setPilotAtt1(e.target.value)}>
+                        <Select
+                          value={pilotAtt1}
+                          label={t("Att 1")}
+                          onChange={(e) => setPilotAtt1(e.target.value)}
+                        >
                           {[
                             { value: "dexterity", label: "DEX" },
                             { value: "insight", label: "INS" },
                             { value: "might", label: "MIG" },
                             { value: "will", label: "WLP" },
-                          ].map((a) => (<MenuItem key={a.value} value={a.value}>{t(a.label)}</MenuItem>))}
+                          ].map((a) => (
+                            <MenuItem key={a.value} value={a.value}>
+                              {t(a.label)}
+                            </MenuItem>
+                          ))}
                         </Select>
                       </FormControl>
                     </Grid>
                     <Grid size={{ xs: 6, sm: 3 }}>
                       <FormControl fullWidth size="small">
                         <InputLabel>{t("Att 2")}</InputLabel>
-                        <Select value={pilotAtt2} label={t("Att 2")} onChange={(e) => setPilotAtt2(e.target.value)}>
+                        <Select
+                          value={pilotAtt2}
+                          label={t("Att 2")}
+                          onChange={(e) => setPilotAtt2(e.target.value)}
+                        >
                           {[
                             { value: "dexterity", label: "DEX" },
                             { value: "insight", label: "INS" },
                             { value: "might", label: "MIG" },
                             { value: "will", label: "WLP" },
-                          ].map((a) => (<MenuItem key={a.value} value={a.value}>{t(a.label)}</MenuItem>))}
+                          ].map((a) => (
+                            <MenuItem key={a.value} value={a.value}>
+                              {t(a.label)}
+                            </MenuItem>
+                          ))}
                         </Select>
                       </FormControl>
                     </Grid>
                     <Grid size={{ xs: 6, sm: 3 }}>
-                      <TextField label={t("+Acc")} value={modulePrec} type="number" fullWidth size="small" onChange={(e) => setModulePrec(e.target.value)} />
+                      <TextField
+                        label={t("+Acc")}
+                        value={modulePrec}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModulePrec(e.target.value)}
+                      />
                     </Grid>
                   </Grid>
                   <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
                     <Grid size={12}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
                         {t("Damage")}
                       </Typography>
                     </Grid>
@@ -1464,9 +1675,19 @@ function PlayerSpellPanel() {
                         >
                           {PILOT_DAMAGE_TYPES.map((d) => (
                             <MenuItem key={d} value={d}>
-                              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              >
                                 <TypeIcon type={String(d).toLowerCase()} />
-                                <span>{String(d).replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+                                <span>
+                                  {String(d).replace(/\b\w/g, (c) =>
+                                    c.toUpperCase(),
+                                  )}
+                                </span>
                               </Box>
                             </MenuItem>
                           ))}
@@ -1474,23 +1695,59 @@ function PlayerSpellPanel() {
                       </FormControl>
                     </Grid>
                     <Grid size={{ xs: 6, sm: 2 }}>
-                      <TextField label="HR+" value={moduleDamage} type="number" fullWidth size="small" onChange={(e) => setModuleDamage(e.target.value)} />
+                      <TextField
+                        label="HR+"
+                        value={moduleDamage}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleDamage(e.target.value)}
+                      />
                     </Grid>
                     <Grid size={{ xs: 6, sm: 3 }}>
-                      <TextField label={t("Cost")} value={moduleCost} type="number" fullWidth size="small" onChange={(e) => setModuleCost(e.target.value)} slotProps={{ htmlInput: { min: 0 } }} />
+                      <TextField
+                        label={t("Cost")}
+                        value={moduleCost}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleCost(e.target.value)}
+                        slotProps={{ htmlInput: { min: 0 } }}
+                      />
                     </Grid>
                   </Grid>
                   <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
                     <Grid size={12}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: "bold", textTransform: "uppercase", fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
                         {t("Quality")}
                       </Typography>
                     </Grid>
                     <Grid size={{ xs: 6, sm: 3 }}>
-                      <TextField label={t("Quality Cost")} value={qualityCost} type="number" fullWidth size="small" onChange={(e) => setQualityCost(e.target.value)} />
+                      <TextField
+                        label={t("Quality Cost")}
+                        value={qualityCost}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setQualityCost(e.target.value)}
+                      />
                     </Grid>
                     <Grid size={12}>
-                      <TextField label={t("Quality")} value={quality} fullWidth size="small" onChange={(e) => setQuality(e.target.value)} />
+                      <TextField
+                        label={t("Quality")}
+                        value={quality}
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setQuality(e.target.value)}
+                      />
                     </Grid>
                   </Grid>
                 </>
@@ -1536,7 +1793,7 @@ function PlayerSpellPanel() {
                 surface="quickCreate"
                 group="damage"
                 label={t("Damage")}
-                hidden={spellType !== "default"}
+                hidden={spellType !== "default" || !formState.isOffensive}
                 cols={1}
               />
               <SchemaFieldRenderer
@@ -1568,7 +1825,9 @@ function PlayerSpellPanel() {
                 surface="quickCreate"
                 group="arcanist"
                 label={t("Arcanum")}
-                hidden={spellType !== "arcanist" && spellType !== "arcanist-rework"}
+                hidden={
+                  spellType !== "arcanist" && spellType !== "arcanist-rework"
+                }
                 cols={1}
               />
               {/* meta */}
@@ -1705,8 +1964,14 @@ function QualityPanel() {
                 extraProps={{
                   name: String(formState.name ?? ""),
                   onBrowse: () =>
-                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.quality, (item) =>
-                      importIntoSchemaForm(qualityFieldConfig, setFormState, item),
+                    openImport(
+                      QUICK_CREATE_TAB_TO_VIEWER_TYPE.quality,
+                      (item) =>
+                        importIntoSchemaForm(
+                          qualityFieldConfig,
+                          setFormState,
+                          item,
+                        ),
                     ),
                 }}
               />
@@ -1720,11 +1985,11 @@ function QualityPanel() {
               />
               <SchemaFieldRenderer
                 config={qualityFieldConfig}
+                groupLabels={qualityGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="meta"
-                label="Metadata"
                 cols={2}
               />
             </Grid>
@@ -1795,11 +2060,11 @@ function HeroicPanel() {
           />
           <SchemaFieldRenderer
             config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
             group="meta"
-            label="Metadata"
             cols={2}
           />
           <Grid size={12}>
@@ -1853,8 +2118,7 @@ function ClassPanel() {
     ...formState,
     name: String(formState.name ?? "").trim(),
     fuid: formState.fuid || undefined,
-    book: String(formState.book ?? "").trim() || "homebrew",
-    meta: createMetaFromBook(formState.book),
+    meta: createMetaFromBook(formState.meta?.book),
     benefits: {
       ...(formState.benefits ?? {}),
       custom: normalizedCustomBenefits,
@@ -1927,11 +2191,11 @@ function ClassPanel() {
             />
             <SchemaFieldRenderer
               config={classFieldConfig}
+              groupLabels={classGroupLabels}
               state={formState}
               onChange={setFormState}
               surface="edit"
               group="meta"
-              label="Metadata"
               cols={2}
             />
             <Grid size={12}>
@@ -1950,7 +2214,10 @@ function ClassPanel() {
           />
         }
         addButton={
-          <AddToCompendiumButton itemType={REG.class.addItemType} data={classData} />
+          <AddToCompendiumButton
+            itemType={REG.class.addItemType}
+            data={classData}
+          />
         }
         data={classData}
         itemName={classData.name || ""}
@@ -2168,6 +2435,7 @@ function WeaponPanel() {
             >
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -2179,7 +2447,10 @@ function WeaponPanel() {
                   onBrowse: () =>
                     openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.weapon, (item) =>
                       setFormState((prev) =>
-                        mergeImportedIntoDefaults(buildWeaponPanelState(), stripPrivateFields(item)),
+                        mergeImportedIntoDefaults(
+                          buildWeaponPanelState(),
+                          stripPrivateFields(item),
+                        ),
                       ),
                     ),
                 }}
@@ -2188,11 +2459,11 @@ function WeaponPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="accuracy"
-                label={t("Accuracy")}
                 cols={2}
               />
             </Grid>
@@ -2204,22 +2475,22 @@ function WeaponPanel() {
             >
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="damage"
-                label={t("Damage")}
                 cols={2}
               />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="quality"
-                label={t("Quality")}
                 cols={2}
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
@@ -2227,11 +2498,11 @@ function WeaponPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="rareBonus"
-                label={t("Rare Weapon Options")}
                 cols={1}
                 extraProps={{
                   rework,
@@ -2241,6 +2512,7 @@ function WeaponPanel() {
               />
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -2249,11 +2521,11 @@ function WeaponPanel() {
               />
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="modifiers"
-                label={t("Modifiers")}
                 cols={2}
               />
             </Grid>
@@ -2375,6 +2647,7 @@ function ArmorPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={armorFieldConfig}
+                groupLabels={armorGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -2386,7 +2659,10 @@ function ArmorPanel() {
                   onBrowse: () =>
                     openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.armor, (item) =>
                       setFormState((prev) =>
-                        mergeImportedIntoDefaults(buildArmorPanelState(), stripPrivateFields(item)),
+                        mergeImportedIntoDefaults(
+                          buildArmorPanelState(),
+                          stripPrivateFields(item),
+                        ),
                       ),
                     ),
                 }}
@@ -2395,11 +2671,11 @@ function ArmorPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={armorFieldConfig}
+                groupLabels={armorGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="quality"
-                label={t("Quality")}
                 cols={2}
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
@@ -2407,11 +2683,11 @@ function ArmorPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={armorFieldConfig}
+                groupLabels={armorGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="modifiers"
-                label={t("Modifiers")}
                 cols={2}
               />
             </Grid>
@@ -2530,6 +2806,7 @@ function ShieldPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={shieldFieldConfig}
+                groupLabels={shieldGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -2541,7 +2818,10 @@ function ShieldPanel() {
                   onBrowse: () =>
                     openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.shield, (item) =>
                       setFormState((prev) =>
-                        mergeImportedIntoDefaults(buildShieldPanelState(), stripPrivateFields(item)),
+                        mergeImportedIntoDefaults(
+                          buildShieldPanelState(),
+                          stripPrivateFields(item),
+                        ),
                       ),
                     ),
                 }}
@@ -2550,11 +2830,11 @@ function ShieldPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={shieldFieldConfig}
+                groupLabels={shieldGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="quality"
-                label={t("Quality")}
                 cols={2}
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
@@ -2562,11 +2842,11 @@ function ShieldPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={shieldFieldConfig}
+                groupLabels={shieldGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="modifiers"
-                label={t("Modifiers")}
                 cols={2}
               />
             </Grid>
@@ -2866,6 +3146,7 @@ function CustomWeaponPanel() {
             >
               <SchemaFieldRenderer
                 config={customWeaponFieldConfig}
+                groupLabels={customWeaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -2876,10 +3157,15 @@ function CustomWeaponPanel() {
                   ...coreExtraProps,
                   name: String(formState.name ?? ""),
                   onBrowse: () =>
-                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE["custom-weapon"], (item) =>
-                      setFormState((prev) =>
-                        mergeImportedIntoDefaults(buildCWPanelState(), stripPrivateFields(item)),
-                      ),
+                    openImport(
+                      QUICK_CREATE_TAB_TO_VIEWER_TYPE["custom-weapon"],
+                      (item) =>
+                        setFormState((prev) =>
+                          mergeImportedIntoDefaults(
+                            buildCWPanelState(),
+                            stripPrivateFields(item),
+                          ),
+                        ),
                     ),
                 }}
               />
@@ -2887,11 +3173,11 @@ function CustomWeaponPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={customWeaponFieldConfig}
+                groupLabels={customWeaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="accuracy"
-                label={t("Accuracy")}
                 cols={2}
               />
             </Grid>
@@ -2903,22 +3189,22 @@ function CustomWeaponPanel() {
             >
               <SchemaFieldRenderer
                 config={customWeaponFieldConfig}
+                groupLabels={customWeaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="damage"
-                label={t("Damage")}
                 cols={2}
               />
             </Grid>
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={customWeaponFieldConfig}
+                groupLabels={customWeaponGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="quality"
-                label={t("Quality")}
                 cols={2}
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
@@ -2935,20 +3221,20 @@ function CustomWeaponPanel() {
                 <Grid container spacing={2}>
                   <SchemaFieldRenderer
                     config={customWeaponFieldConfig}
+                    groupLabels={customWeaponGroupLabels}
                     state={formState}
                     onChange={setFormState}
                     surface="edit"
                     group="rare"
-                    label={t("Rare Weapon Options")}
                     cols={2}
                   />
                   <SchemaFieldRenderer
                     config={customWeaponFieldConfig}
+                    groupLabels={customWeaponGroupLabels}
                     state={formState}
                     onChange={setFormState}
                     surface="edit"
                     group="modifiers"
-                    label={t("Modifiers")}
                     cols={2}
                   />
                 </Grid>
@@ -2959,6 +3245,7 @@ function CustomWeaponPanel() {
                 <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
                   <SchemaFieldRenderer
                     config={customWeaponFieldConfig}
+                    groupLabels={customWeaponGroupLabels}
                     state={formState}
                     onChange={setFormState}
                     surface="edit"
@@ -2984,6 +3271,7 @@ function CustomWeaponPanel() {
                     <Grid container spacing={2}>
                       <SchemaFieldRenderer
                         config={customWeaponFieldConfig}
+                        groupLabels={customWeaponGroupLabels}
                         state={formState}
                         onChange={setFormState}
                         surface="edit"
@@ -3099,6 +3387,7 @@ function AccessoryPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -3108,10 +3397,15 @@ function AccessoryPanel() {
                 extraProps={{
                   name: String(name ?? ""),
                   onBrowse: () =>
-                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.accessory, (item) =>
-                      setFormState((prev) =>
-                        mergeImportedIntoDefaults(buildAccessoryPanelState(), stripPrivateFields(item)),
-                      ),
+                    openImport(
+                      QUICK_CREATE_TAB_TO_VIEWER_TYPE.accessory,
+                      (item) =>
+                        setFormState((prev) =>
+                          mergeImportedIntoDefaults(
+                            buildAccessoryPanelState(),
+                            stripPrivateFields(item),
+                          ),
+                        ),
                     ),
                 }}
               />
@@ -3119,11 +3413,11 @@ function AccessoryPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="quality"
-                label={t("Quality")}
                 cols={2}
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
@@ -3131,11 +3425,11 @@ function AccessoryPanel() {
             <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
                 group="modifiers"
-                label={t("Modifiers")}
                 cols={2}
               />
             </Grid>
@@ -3177,35 +3471,31 @@ function AccessoryPanel() {
 
 // Optional panel
 
-const OPTIONAL_SUBTYPES = [
-  { value: "quirk", label: "Quirk" },
-  { value: "camp-activities", label: "Camp Activities" },
-  { value: "zero-trigger", label: "Zero Trigger" },
-  { value: "zero-effect", label: "Zero Effect" },
-  { value: "zero-power", label: "Zero Power" },
-  { value: "other", label: "Other" },
-];
-
 function OptionalPanel() {
   const { t } = useTranslate();
   const { openImport } = useQuickCreateImport();
   const { packs } = useCompendiumPacks();
   const initialSubtype = useQuickCreateSubtype();
-  const validOptionalSubtypes = OPTIONAL_SUBTYPES.map((s) => s.value);
-  const [subtype, setSubtype] = useState(
-    initialSubtype && validOptionalSubtypes.includes(initialSubtype) ? initialSubtype : "quirk"
-  );
-  const [name, setName] = useState("");
-  const [fuid, setFuid] = useState(undefined);
-  const [description, setDescription] = useState("");
-  const [effect, setEffect] = useState("");
-  const [targetDescription, setTargetDescription] = useState("");
-  const [clockSections, setClockSections] = useState(6);
-  const [showClock, setShowClock] = useState(false);
+
+  const [formState, setFormState] = useState(() => {
+    const defaults = createDefaultStateFromFields(optionalFieldConfig);
+    const validSubtypes =
+      optionalFieldConfig
+        .find((f) => f.key === "subtype")
+        ?.componentProps?.options?.map((o) => o.value) ?? [];
+    return {
+      ...defaults,
+      subtype:
+        initialSubtype && validSubtypes.includes(initialSubtype)
+          ? initialSubtype
+          : "quirk",
+    };
+  });
+
+  // zero-power: pack-sourced objects, not schema-driveable
   const [zeroTrigger, setZeroTrigger] = useState(null);
   const [zeroEffect, setZeroEffect] = useState(null);
 
-  // Collect zero-trigger / zero-effect items from all active packs
   const allOptionals = packs.flatMap((p) => {
     if (p.active === false) return [];
     const packFuid = p.fuid || p.name;
@@ -3228,101 +3518,79 @@ function OptionalPanel() {
   const zeroEffectOptions = allOptionals.filter(
     (i) => i.subtype === "zero-effect",
   );
-  const campTargetOptions = [
-    t("Yourself"),
-    t("One ally"),
-    t("Yourself or one ally"),
-  ];
 
-  const data =
-    subtype === "quirk"
+  const subtype = formState.subtype;
+
+  const data = String(formState.name ?? "").trim()
+    ? subtype === "zero-power"
       ? {
           subtype,
-          name: name.trim(),
-          fuid: fuid || undefined,
-          description: description.trim(),
-          effect: effect.trim(),
+          name: String(formState.name).trim(),
+          fuid: formState.fuid || undefined,
+          zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
+          zeroEffectRef: zeroEffect?._sourceRef ?? "",
+          zeroTrigger: zeroTrigger
+            ? {
+                name: zeroTrigger.name ?? "",
+                description: zeroTrigger.description ?? "",
+              }
+            : "",
+          zeroEffect: zeroEffect
+            ? {
+                name: zeroEffect.name ?? "",
+                description: zeroEffect.description ?? "",
+              }
+            : "",
+          ...(formState.description
+            ? { description: String(formState.description).trim() }
+            : {}),
+          clock: { sections: Number(formState.clockSections) || 6 },
           meta: createMetaFromBook("homebrew"),
         }
-      : subtype === "camp-activities"
-        ? {
-            subtype,
-            name: name.trim(),
-            fuid: fuid || undefined,
-            description: targetDescription.trim(),
-            effect: effect.trim(),
-            meta: createMetaFromBook("homebrew"),
-          }
-        : subtype === "zero-trigger" || subtype === "zero-effect"
-          ? {
-              subtype,
-              name: name.trim(),
-              fuid: fuid || undefined,
-              description: description.trim(),
-              meta: createMetaFromBook("homebrew"),
-            }
-          : subtype === "zero-power"
-            ? {
-                subtype,
-                name: name.trim(),
-                fuid: fuid || undefined,
-                zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
-                zeroEffectRef: zeroEffect?._sourceRef ?? "",
-                zeroTrigger: zeroTrigger
-                  ? {
-                      name: zeroTrigger.name ?? "",
-                      description: zeroTrigger.description ?? "",
-                    }
-                  : "",
-                zeroEffect: zeroEffect
-                  ? {
-                      name: zeroEffect.name ?? "",
-                      description: zeroEffect.description ?? "",
-                    }
-                  : "",
-                clock: { sections: Number(clockSections) },
-                meta: createMetaFromBook("homebrew"),
-              }
-            : /* other */ {
-                subtype,
-                name: name.trim(),
-                fuid: fuid || undefined,
-                description: description.trim(),
-                effect: effect.trim(),
-                ...(showClock
-                  ? { clock: { sections: Number(clockSections) } }
-                  : {}),
-                meta: createMetaFromBook("homebrew"),
-              };
+      : {
+          subtype,
+          name: String(formState.name).trim(),
+          fuid: formState.fuid || undefined,
+          ...(formState.description != null
+            ? { description: String(formState.description).trim() }
+            : {}),
+          ...(formState.effect != null
+            ? { effect: String(formState.effect).trim() }
+            : {}),
+          ...(formState.showClock && formState.clockSections
+            ? { clock: { sections: Number(formState.clockSections) } }
+            : {}),
+          meta: createMetaFromBook("homebrew"),
+        }
+    : { subtype, name: "", meta: createMetaFromBook("homebrew") };
 
   const handleClear = () => {
-    setSubtype("quirk");
-    setName("");
-    setFuid(undefined);
-    setDescription("");
-    setEffect("");
-    setTargetDescription("");
-    setClockSections(6);
-    setShowClock(false);
+    setFormState(createDefaultStateFromFields(optionalFieldConfig));
     setZeroTrigger(null);
     setZeroEffect(null);
   };
 
-  const handleImportOptional = (item) => {
+  const handleImport = (item) => {
     const imported = stripPrivateFields(item ?? {});
-    setSubtype(String(imported.subtype ?? "quirk"));
-    setName(String(imported.name ?? ""));
-    setFuid(imported.fuid || undefined);
-    setDescription(String(imported.description ?? ""));
-    setEffect(String(imported.effect ?? ""));
-    setTargetDescription(String(imported.targetDescription ?? ""));
+    const defaults = createDefaultStateFromFields(optionalFieldConfig);
     const sections =
       imported?.clock?.sections ?? imported?.clockSections ?? imported?.clock;
     const parsedSections = Number(sections);
-    if (Number.isFinite(parsedSections) && parsedSections > 0) {
-      setClockSections(parsedSections);
-      setShowClock(true);
-    }
+    setFormState({
+      ...defaults,
+      subtype: String(imported.subtype ?? "quirk"),
+      name: String(imported.name ?? ""),
+      fuid: imported.fuid || "",
+      description: String(imported.description ?? ""),
+      effect: String(imported.effect ?? ""),
+      clockSections:
+        Number.isFinite(parsedSections) && parsedSections > 0
+          ? parsedSections
+          : 6,
+      showClock: Number.isFinite(parsedSections) && parsedSections > 0,
+    });
+    setZeroTrigger(null);
+    setZeroEffect(null);
   };
 
   return (
@@ -3331,159 +3599,45 @@ function OptionalPanel() {
       itemName={data.name || ""}
       formContent={
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "0.75rem",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                {t("Optional Rule")}
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid size={12}>
-            <FuidField
-              value={fuid}
-              name={name}
-              onChange={setFuid}
-              onBrowse={() =>
+          <SchemaFieldRenderer
+            config={optionalFieldConfig}
+            groupLabels={optionalGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            label={t("Optional Rule")}
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
                 openImport(
                   QUICK_CREATE_TAB_TO_VIEWER_TYPE.optional,
-                  handleImportOptional,
-                )
-              }
-              autoSync
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
+                  handleImport,
+                  { initialOptionalSubtypes: [formState.subtype] },
+                ),
             }}
-          >
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Subtype")}</InputLabel>
-              <Select
-                value={subtype}
-                label={t("Subtype")}
-                onChange={(e) => setSubtype(e.target.value)}
-              >
-                {OPTIONAL_SUBTYPES.map((s) => (
-                  <MenuItem key={s.value} value={s.value}>
-                    {t(s.label)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          {subtype === "quirk" && (
-            <>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Description")}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Effect")}
-                  value={effect}
-                  onChange={(e) => setEffect(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-            </>
-          )}
-
-          {subtype === "camp-activities" && (
-            <>
-              <Grid size={12}>
-                <Autocomplete
-                  freeSolo
-                  options={campTargetOptions}
-                  value={targetDescription}
-                  onInputChange={(_, value) => setTargetDescription(value)}
-                  onChange={(_, value) =>
-                    setTargetDescription(typeof value === "string" ? value : "")
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t("Target")}
-                      size="small"
-                      helperText={t(
-                        "Suggested: Yourself, One ally, Yourself or one ally",
-                      )}
-                    />
-                  )}
-                  size="small"
-                />
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Effect")}
-                  value={effect}
-                  onChange={(e) => setEffect(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-            </>
-          )}
-
-          {(subtype === "zero-trigger" || subtype === "zero-effect") && (
-            <Grid size={12}>
-              <CustomTextarea
-                label={t("Description")}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                helperText=""
-              />
-            </Grid>
-          )}
-
+          />
+          <SchemaFieldRenderer
+            config={optionalFieldConfig}
+            groupLabels={optionalGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={optionalFieldConfig}
+            groupLabels={optionalGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="clock"
+            cols={2}
+          />
           {subtype === "zero-power" && (
             <>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <TextField
-                  label={t("Clock Sections")}
-                  value={clockSections}
-                  onChange={(e) => setClockSections(e.target.value)}
-                  fullWidth
-                  size="small"
-                  type="number"
-                  slotProps={{
-                    htmlInput: { min: 2, max: 12 },
-                  }}
-                />
-              </Grid>
               <Grid size={12}>
                 <Autocomplete
                   options={zeroTriggerOptions}
@@ -3544,65 +3698,6 @@ function OptionalPanel() {
                   }
                 />
               </Grid>
-            </>
-          )}
-
-          {subtype === "other" && (
-            <>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Description")}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Effect")}
-                  value={effect}
-                  onChange={(e) => setEffect(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t("Clock")}</InputLabel>
-                  <Select
-                    value={showClock ? "yes" : "no"}
-                    label={t("Clock")}
-                    onChange={(e) => setShowClock(e.target.value === "yes")}
-                  >
-                    <MenuItem value="no">{t("No Clock")}</MenuItem>
-                    <MenuItem value="yes">{t("With Clock")}</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              {showClock && (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <TextField
-                    label={t("Clock Sections")}
-                    value={clockSections}
-                    onChange={(e) => setClockSections(e.target.value)}
-                    fullWidth
-                    size="small"
-                    type="number"
-                    slotProps={{
-                      htmlInput: { min: 2, max: 12 },
-                    }}
-                  />
-                </Grid>
-              )}
             </>
           )}
           <Grid size={12}>
@@ -3747,7 +3842,7 @@ function HoplospherePanel() {
 
           return acc;
         }, {}),
-        meta: createMetaFromBook("homebrew"),
+        meta: deriveIsOfficial(formState) ?? createMetaFromBook("homebrew"),
       }
     : null;
 
@@ -3757,6 +3852,7 @@ function HoplospherePanel() {
         <Grid container spacing={2}>
           <SchemaFieldRenderer
             config={hoplosphereFieldConfig}
+            groupLabels={hoplosphereGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
@@ -3765,40 +3861,54 @@ function HoplospherePanel() {
             extraProps={{
               name: String(formState.name ?? ""),
               onBrowse: () =>
-                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.hoplosphere, (item) => {
-                  const defaults = createDefaultStateFromFields(hoplosphereFieldConfig);
-                  const merged = mergeImportedIntoDefaults(defaults, stripPrivateFields(item));
-                  setFormState(merged);
-                  const importedCoag = merged?.coagEffects;
-                  if (importedCoag && typeof importedCoag === "object") {
-                    const rows = Object.entries(importedCoag)
-                      .map(([threshold, effect]) => ({
-                        threshold: Number(threshold),
-                        effect: String(effect ?? ""),
-                      }))
-                      .filter((row) => row.threshold > 1 && row.effect.trim());
-                    setCoagEffects(rows);
-                  } else {
-                    setCoagEffects([]);
-                  }
-                }),
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE.hoplosphere,
+                  (item) => {
+                    const defaults = createDefaultStateFromFields(
+                      hoplosphereFieldConfig,
+                    );
+                    const merged = mergeImportedIntoDefaults(
+                      defaults,
+                      stripPrivateFields(item),
+                    );
+                    setFormState(merged);
+                    const importedCoag = merged?.coagEffects;
+                    if (importedCoag && typeof importedCoag === "object") {
+                      const rows = Object.entries(importedCoag)
+                        .map(([threshold, effect]) => ({
+                          threshold: Number(threshold),
+                          effect: String(effect ?? ""),
+                        }))
+                        .filter(
+                          (row) => row.threshold > 1 && row.effect.trim(),
+                        );
+                      setCoagEffects(rows);
+                    } else {
+                      setCoagEffects([]);
+                    }
+                  },
+                ),
             }}
           />
+          <SchemaFieldRenderer
+            config={hoplosphereFieldConfig}
+            groupLabels={hoplosphereGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
           <Grid size={12}>
-            <TextField
-              fullWidth
-              multiline
-              minRows={3}
-              size="small"
-              label={t("Description")}
-              value={formState.description ?? ""}
-              onChange={(e) =>
-                setFormState((prev) => ({ ...prev, description: e.target.value }))
-              }
-            />
-          </Grid>
-          <Grid size={12}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                fontSize: "0.75rem",
+                letterSpacing: "0.05em",
+              }}
+            >
               {t("Coagulation")}
             </Typography>
             <Stack spacing={1}>
@@ -3820,14 +3930,16 @@ function HoplospherePanel() {
                     sx={{ width: { xs: 1, sm: 140 } }}
                     slotProps={{ input: { inputProps: { min: 2 } } }}
                   />
-                  <CustomTextarea
-                    label={t("Effect")}
-                    value={row.effect}
-                    onChange={(e) =>
-                      handleCoagChange(index, "effect", e.target.value)
-                    }
-                    helperText=""
-                  />
+                  <Box sx={{ flex: 1 }}>
+                    <CustomTextarea
+                      label={t("hoplosphere.coag.effect")}
+                      value={row.effect}
+                      onChange={(e) =>
+                        handleCoagChange(index, "effect", e.target.value)
+                      }
+                      helperText=""
+                    />
+                  </Box>
                   <IconButton
                     aria-label={t("Remove coagulation effect")}
                     onClick={() => handleRemoveCoag(index)}
@@ -3848,6 +3960,15 @@ function HoplospherePanel() {
               </Button>
             </Stack>
           </Grid>
+          <SchemaFieldRenderer
+            config={hoplosphereFieldConfig}
+            groupLabels={hoplosphereGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -4019,11 +4140,7 @@ export default function QuickCreateModal({
           scrollButtons="auto"
         >
           {TABS.map((item, idx) => (
-            <Tab
-              key={item.key}
-              label={t(item.label)}
-              disabled={false}
-            />
+            <Tab key={item.key} label={t(item.label)} disabled={false} />
           ))}
         </Tabs>
       </Box>

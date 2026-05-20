@@ -60,27 +60,42 @@ describe("hoplosphere schema roundtrip", () => {
   });
 
   it("zero cost passes schema", () => {
-    const result = HoplosphereSchema.safeParse({ ...BASE_HOPLOSPHERE, cost: 0 });
+    const result = HoplosphereSchema.safeParse({
+      ...BASE_HOPLOSPHERE,
+      cost: 0,
+    });
     expect(result.success, JSON.stringify(result)).toBe(true);
   });
 
   it("negative cost fails schema", () => {
-    const result = HoplosphereSchema.safeParse({ ...BASE_HOPLOSPHERE, cost: -1 });
+    const result = HoplosphereSchema.safeParse({
+      ...BASE_HOPLOSPHERE,
+      cost: -1,
+    });
     expect(result.success).toBe(false);
   });
 
   it("missing name fails schema", () => {
-    const result = HoplosphereSchema.safeParse({ ...BASE_HOPLOSPHERE, name: "" });
+    const result = HoplosphereSchema.safeParse({
+      ...BASE_HOPLOSPHERE,
+      name: "",
+    });
     expect(result.success).toBe(false);
   });
 
   it("invalid requiredSlots value fails schema", () => {
-    const result = HoplosphereSchema.safeParse({ ...BASE_HOPLOSPHERE, requiredSlots: 3 });
+    const result = HoplosphereSchema.safeParse({
+      ...BASE_HOPLOSPHERE,
+      requiredSlots: 3,
+    });
     expect(result.success).toBe(false);
   });
 
   it("invalid socketable value fails schema", () => {
-    const result = HoplosphereSchema.safeParse({ ...BASE_HOPLOSPHERE, socketable: "armor" });
+    const result = HoplosphereSchema.safeParse({
+      ...BASE_HOPLOSPHERE,
+      socketable: "armor",
+    });
     expect(result.success).toBe(false);
   });
 

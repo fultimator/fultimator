@@ -1,4 +1,4 @@
-import type { ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { ArmorPersisted } from "../../../schema/itemSchemas/armor";
 import armor from "../../../../libs/armor";
@@ -6,6 +6,7 @@ import allQualities from "../../../../libs/qualities";
 const qualities = allQualities.filter((q) => q.filter?.includes("armor"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
+import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 interface ArmorBase {
   name: string;
@@ -20,6 +21,7 @@ interface ArmorBase {
 export type ArmorFormState = Omit<ArmorPersisted, "base"> & {
   base: ArmorBase | undefined;
 };
+const ARMOR_LABEL_PREFIX = "armor";
 
 const armorOptions: SelectOption[] = (armor as ArmorBase[]).map((a) => ({
   value: a.name,
@@ -46,11 +48,17 @@ const G = {
   source: "source",
 } as const;
 
+export const armorGroupLabels: GroupLabels = {
+  quality: "section.quality",
+  slots: "section.slots",
+  modifiers: "section.modifiers",
+};
+
 export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "base",
     kind: "form-state",
-    label: "armor.base",
+    label: prefixedLabel(ARMOR_LABEL_PREFIX, SHARED_LABEL_KEYS.base),
     component: "select",
     defaultValue: undefined,
     group: G.base,
@@ -76,7 +84,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "fuid",
     kind: "editable",
-    label: "ID",
+    label: prefixedLabel(ARMOR_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
     component: "fuid",
     defaultValue: "",
     group: G.core,
@@ -86,7 +94,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "name",
     kind: "editable",
-    label: "armor.name",
+    label: prefixedLabel(ARMOR_LABEL_PREFIX, SHARED_LABEL_KEYS.name),
     component: "text",
     defaultValue: "",
     group: G.core,
@@ -97,7 +105,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "martial",
     kind: "editable",
-    label: "armor.martial",
+    label: prefixedLabel(ARMOR_LABEL_PREFIX, SHARED_LABEL_KEYS.martial),
     component: "martial-toggle",
     defaultValue: false,
     group: G.core,
@@ -107,7 +115,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "rework",
     kind: "editable",
-    label: "armor.rework",
+    label: "shared.rework",
     component: "checkbox",
     defaultValue: false,
     group: G.modifiers,
@@ -117,7 +125,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "selectedQuality",
     kind: "form-state",
-    label: "armor.quality.preset",
+    label: "shared.quality.preset",
     component: "grouped-select",
     defaultValue: "",
     group: G.quality,
@@ -149,7 +157,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "qualityCost",
     kind: "form-state",
-    label: "armor.quality.cost",
+    label: "shared.quality.cost",
     component: "number",
     defaultValue: 0,
     group: G.quality,
@@ -164,7 +172,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "quality",
     kind: "editable",
-    label: "armor.quality.text",
+    label: "shared.quality.text",
     component: "textarea",
     defaultValue: "",
     group: G.quality,
@@ -198,7 +206,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "defModifier",
     kind: "editable",
-    label: "armor.modifiers.def",
+    label: "shared.modifiers.def",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -210,7 +218,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "mDefModifier",
     kind: "editable",
-    label: "armor.modifiers.mdef",
+    label: "shared.modifiers.mdef",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -222,7 +230,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "initModifier",
     kind: "editable",
-    label: "armor.modifiers.init",
+    label: "shared.modifiers.init",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -234,7 +242,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "magicModifier",
     kind: "editable",
-    label: "armor.modifiers.magic",
+    label: "shared.modifiers.magic",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -246,7 +254,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "precModifier",
     kind: "editable",
-    label: "armor.modifiers.accuracy",
+    label: "shared.modifiers.accuracy",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -258,7 +266,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "damageMeleeModifier",
     kind: "editable",
-    label: "armor.modifiers.damageMelee",
+    label: "shared.modifiers.damageMelee",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -270,7 +278,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "damageRangedModifier",
     kind: "editable",
-    label: "armor.modifiers.damageRanged",
+    label: "shared.modifiers.damageRanged",
     component: "number",
     defaultValue: 0,
     group: G.modifiers,
@@ -282,7 +290,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "cost",
     kind: "computed",
-    label: "armor.cost",
+    label: prefixedLabel(ARMOR_LABEL_PREFIX, SHARED_LABEL_KEYS.cost),
     component: "readonly-number",
     group: G.meta,
     order: 40,
@@ -299,7 +307,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   {
     key: "isEquipped",
     kind: "form-state",
-    label: "armor.isEquipped",
+    label: "shared.isEquipped",
     component: "checkbox",
     defaultValue: false,
     group: G.meta,

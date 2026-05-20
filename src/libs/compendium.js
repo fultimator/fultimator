@@ -179,12 +179,13 @@ export function getItemSearchText(item) {
   const skillNames = item.skills
     ? item.skills.map((s) => s.skillName).join(" ")
     : "";
+  const book = item.meta?.book ?? item.book;
   return [
     item.name,
     item.category,
     item.type,
     item.range,
-    item.book,
+    book,
     item.class,
     skillNames,
     item.quality,
