@@ -1,4 +1,4 @@
-import type { ZodType, ZodTypeAny } from "zod";
+import { z, type ZodType, type ZodTypeAny } from "zod";
 import type { ItemFieldConfig } from "../rendering/config/fieldConfig";
 
 export function createDefaultStateFromFields<
@@ -36,9 +36,7 @@ export function createSchemaPayloadBuilder<TState, TPayload>(
 export function createSubtypePayloadBuilder<
   TSchemas extends Record<string, ZodTypeAny>,
 >(discriminatorKey: string, subtypeSchemas: TSchemas) {
-  return (
-    state: unknown,
-  ): ReturnType<TSchemas[keyof TSchemas]["parse"]> | null => {
+  return (state: unknown): z.output<TSchemas[keyof TSchemas]> | null => {
     const rawSubtype =
       state && typeof state === "object"
         ? (state as Record<string, unknown>)[discriminatorKey]

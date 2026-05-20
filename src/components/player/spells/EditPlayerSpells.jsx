@@ -1125,12 +1125,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             ...cls,
             spells: cls.spells.map((spell, idx) => {
               if (idx === spellIndex && spell.spellType === "invocation") {
-                const currentWellsprings = spell.activeWellsprings || [];
+                const tracker = spell.tracker || {};
+                const currentWellsprings = tracker.activeWellsprings || [];
                 const hasInnerWellspring =
-                  spell.innerWellspring && spell.chosenWellspring;
+                  tracker.innerWellspring && tracker.chosenWellspring;
                 const isInnerWellspring =
                   hasInnerWellspring &&
-                  spell.chosenWellspring === wellspringName;
+                  tracker.chosenWellspring === wellspringName;
 
                 // Don't allow toggling the inner wellspring
                 if (isInnerWellspring) {
@@ -1156,7 +1157,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
                 return {
                   ...spell,
-                  activeWellsprings: newWellsprings,
+                  tracker: {
+                    ...tracker,
+                    activeWellsprings: newWellsprings,
+                  },
                 };
               }
               return spell;
@@ -2079,7 +2083,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                           {spell.spellType === "cooking" && (
                             <SpellGourmet
                               spell={spell}
-                              key={`${cls.name}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbookEffects)}`}
+                              key={`${cls.name}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbook?.effects || [])}`}
                               onEdit={() =>
                                 handleEditGourmet(spell, cls.name, index)
                               }
@@ -2089,7 +2093,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                           {spell.spellType === "invocation" && (
                             <SpellInvoker
                               invoker={spell}
-                              key={`${cls.name}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.activeWellsprings)}`}
+                              key={`${cls.name}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.tracker?.activeWellsprings || [])}`}
                               onEdit={() =>
                                 handleEditInvoker(spell, cls.name, index)
                               }
@@ -2718,7 +2722,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "cooking" && (
                               <SpellGourmet
                                 spell={spell}
-                                key={`${mnemo.id}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbookEffects)}`}
+                                key={`${mnemo.id}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbook?.effects || [])}`}
                                 onEdit={() =>
                                   handleEditGourmet(spell, mnemo.id, index)
                                 }
@@ -2728,19 +2732,20 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "invocation" && (
                               <SpellInvoker
                                 invoker={spell}
-                                key={`${mnemo.id}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.activeWellsprings)}`}
+                                key={`${mnemo.id}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.tracker?.activeWellsprings || [])}`}
                                 onEdit={() =>
                                   handleEditInvoker(spell, mnemo.id, index)
                                 }
                                 onWellspringToggle={(wellspringName) => {
+                                  const tracker = spell.tracker || {};
                                   const currentWellsprings =
-                                    spell.activeWellsprings || [];
+                                    tracker.activeWellsprings || [];
                                   const hasInner =
-                                    spell.innerWellspring &&
-                                    spell.chosenWellspring;
+                                    tracker.innerWellspring &&
+                                    tracker.chosenWellspring;
                                   if (
                                     hasInner &&
-                                    spell.chosenWellspring === wellspringName
+                                    tracker.chosenWellspring === wellspringName
                                   )
                                     return;
                                   let newWellsprings;
@@ -2763,7 +2768,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                   }
                                   updateMnemoSpell(mnemo.id, index, {
                                     ...spell,
-                                    activeWellsprings: newWellsprings,
+                                    tracker: {
+                                      ...tracker,
+                                      activeWellsprings: newWellsprings,
+                                    },
                                   });
                                 }}
                                 player={player}

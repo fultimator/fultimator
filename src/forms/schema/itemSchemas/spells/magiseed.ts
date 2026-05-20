@@ -2,7 +2,7 @@ import { z } from "zod";
 import { PlayerSpellNonStaticBaseSchema } from "./shared";
 
 const MagiseedItemSchema = z.object({
-  name: z.string(),
+  key: z.string(),
   customName: z.string().default(""),
   description: z.string().default(""),
   rangeStart: z.number().int().default(0),

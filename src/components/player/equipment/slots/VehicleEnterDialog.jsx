@@ -52,9 +52,16 @@ export default function VehicleEnterDialog({
             {vehicles.map((vehicle, index) => {
               const vehicleName = vehicle.customName || t("Vehicle");
               const frameName = vehicle.frame ? t(vehicle.frame) : "";
-              const enabledCount = (vehicle.modules || []).filter(
-                (module) => module.enabled,
-              ).length;
+              const slots = vehicle.slots || {};
+              const enabledCount = (vehicle.modules || []).filter((module) => {
+                const key = module?.key ?? module?.name;
+                return (
+                  slots.main === key ||
+                  slots.off === key ||
+                  slots.armor === key ||
+                  (slots.support || []).includes(key)
+                );
+              }).length;
               const moduleCount = (vehicle.modules || []).length;
 
               return (

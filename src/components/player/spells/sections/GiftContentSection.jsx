@@ -10,7 +10,7 @@ export default function GiftContentSection({ formState, setFormState, t }) {
 
   const createBlankGift = useCallback(() => {
     return {
-      name: "esper_gift_custom_name",
+      key: "esper_gift_custom_name",
       event: "",
       effect: "",
       customName: "",
@@ -24,7 +24,7 @@ export default function GiftContentSection({ formState, setFormState, t }) {
         gifts: [
           ...(prev.gifts || []),
           {
-            name: item.name,
+            key: item.key || item.name,
             event: item.event || "",
             effect: item.effect || "",
             customName: "",
@@ -37,13 +37,13 @@ export default function GiftContentSection({ formState, setFormState, t }) {
   );
 
   const getAvailablePresets = useCallback(() => {
-    const addedNames = currentGifts
-      .map((g) => g.name)
-      .filter((name) => name !== "esper_gift_custom_name");
+    const addedKeys = currentGifts
+      .map((g) => g.key)
+      .filter((key) => key !== "esper_gift_custom_name");
     return availableGifts.filter(
       (preset) =>
         preset.name !== "esper_gift_custom_name" &&
-        !addedNames.includes(preset.name),
+        !addedKeys.includes(preset.name),
     );
   }, [currentGifts]);
 
@@ -56,7 +56,7 @@ export default function GiftContentSection({ formState, setFormState, t }) {
         gifts: [
           ...(prev.gifts || []),
           {
-            name: preset.name,
+            key: preset.name,
             event: preset.event,
             effect: preset.effect,
             customName: "",

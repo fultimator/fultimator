@@ -58,7 +58,8 @@ export default function PlayerInvoker({ player, setPlayer }) {
         if (cls.name === invokerSpell.className) {
           const newSpells = cls.spells.map((spell) => {
             if (spell.name === invokerSpell.name) {
-              let activeWellsprings = [...(spell.activeWellsprings || [])];
+              const tracker = spell.tracker || {};
+              let activeWellsprings = [...(tracker.activeWellsprings || [])];
               if (activeWellsprings.includes(wellspring)) {
                 activeWellsprings = activeWellsprings.filter(
                   (w) => w !== wellspring,
@@ -69,7 +70,13 @@ export default function PlayerInvoker({ player, setPlayer }) {
                 }
                 activeWellsprings.push(wellspring);
               }
-              return { ...spell, activeWellsprings };
+              return {
+                ...spell,
+                tracker: {
+                  ...tracker,
+                  activeWellsprings,
+                },
+              };
             }
             return spell;
           });
@@ -177,12 +184,13 @@ export default function PlayerInvoker({ player, setPlayer }) {
                             wellspring.name,
                           );
                           const isActive =
-                            invokerSpell.activeWellsprings?.includes(
+                            invokerSpell.tracker?.activeWellsprings?.includes(
                               wellspring.name,
                             ) || false;
                           const isInnerWellspring =
-                            invokerSpell.innerWellspring &&
-                            invokerSpell.chosenWellspring === wellspring.name;
+                            invokerSpell.tracker?.innerWellspring &&
+                            invokerSpell.tracker?.chosenWellspring ===
+                              wellspring.name;
                           const IconComponent = wellspring.icon;
 
                           return (
@@ -277,14 +285,14 @@ export default function PlayerInvoker({ player, setPlayer }) {
                       availableInvocations
                         .filter((invocation) => {
                           if (
-                            invokerSpell.activeWellsprings?.includes(
+                            invokerSpell.tracker?.activeWellsprings?.includes(
                               invocation.wellspring,
                             )
                           )
                             return true;
                           if (
-                            invokerSpell.innerWellspring &&
-                            invokerSpell.chosenWellspring ===
+                            invokerSpell.tracker?.innerWellspring &&
+                            invokerSpell.tracker?.chosenWellspring ===
                               invocation.wellspring
                           )
                             return true;

@@ -14,20 +14,20 @@ export default function MagichantTonesContentSection({
 
   const createBlankTone = useCallback(() => {
     return {
-      name: "magichant_custom_name",
+      key: "magichant_custom_name",
       effect: "",
       customName: "",
     };
   }, []);
 
   const getAvailablePresets = useCallback(() => {
-    const addedNames = currentTones
-      .map((tone) => tone.name)
-      .filter((name) => name !== "magichant_custom_name");
+    const addedKeys = currentTones
+      .map((tone) => tone.key)
+      .filter((k) => k !== "magichant_custom_name");
     return availableMagichantTones.filter(
       (preset) =>
         preset.name !== "magichant_custom_name" &&
-        !addedNames.includes(preset.name),
+        !addedKeys.includes(preset.name),
     );
   }, [currentTones]);
 
@@ -42,7 +42,7 @@ export default function MagichantTonesContentSection({
         tones: [
           ...(prev.tones || []),
           {
-            name: preset.name,
+            key: preset.name,
             effect: preset.effect,
             customName: "",
           },
@@ -67,7 +67,7 @@ export default function MagichantTonesContentSection({
         tones: [
           ...(prev.tones || []),
           {
-            name: item.name || "magichant_custom_name",
+            key: item.key || item.name || "magichant_custom_name",
             effect: item.effect || "",
             customName: item.customName || "",
           },

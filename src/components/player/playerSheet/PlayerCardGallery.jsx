@@ -443,7 +443,7 @@ export default function PlayerCardGallery({
         return t(spellType || "System");
     }
   };
-  const listNames = (items = [], nameKey = "name", customKey = "customName") =>
+  const listNames = (items = [], nameKey = "key", customKey = "customName") =>
     items
       .map(
         (item) =>
@@ -461,12 +461,22 @@ export default function PlayerCardGallery({
         activeVehicle.customName || t(activeVehicle.name || "pilot_vehicle");
       const frameName = t(activeVehicle.frame || "pilot_frame_exoskeleton");
       const modules = activeVehicle.modules || [];
-      const enabledModules = modules.filter((m) => m.enabled);
+      const slots = activeVehicle.slots || {};
+      const isEquipped = (module) => {
+        const key = module?.key ?? module?.name;
+        return (
+          slots.main === key ||
+          slots.off === key ||
+          slots.armor === key ||
+          (slots.support || []).includes(key)
+        );
+      };
+      const enabledModules = modules.filter(isEquipped);
       const enabledNames = enabledModules
         .map((m) => m.customName || t(m.name || ""))
         .filter(Boolean);
       const otherNames = modules
-        .filter((m) => !m.enabled)
+        .filter((m) => !isEquipped(m))
         .map((m) => m.customName || t(m.name || ""))
         .filter(Boolean);
       const enabledText = enabledNames.length
@@ -481,16 +491,17 @@ export default function PlayerCardGallery({
       const seeds = spell.magiseeds || [];
       const current = spell.currentMagiseed;
       const currentName = current
-        ? current.customName || t(current.name || "")
+        ? current.customName || t(current.key || current.name || "")
         : t("magiseed_no_magiseed");
       const otherSeeds = seeds
         .filter((seed) => {
           if (!current) return true;
-          const seedName = seed?.customName || seed?.name || "";
-          const currentSeedName = current?.customName || current?.name || "";
+          const seedName = seed?.customName || seed?.key || seed?.name || "";
+          const currentSeedName =
+            current?.customName || current?.key || current?.name || "";
           return seedName !== currentSeedName;
         })
-        .map((seed) => seed.customName || t(seed.name || ""))
+        .map((seed) => seed.customName || t(seed.key || seed.name || ""))
         .filter(Boolean);
       const othersText = otherSeeds.length
         ? ` - ${t("Others")}: ${otherSeeds.join(", ")}`
@@ -504,9 +515,10 @@ export default function PlayerCardGallery({
       return `${t("Deck")}: ${cardsInDeck} - ${t("Hand")}: ${hand} - ${t("Discard")}: ${discard}`;
     }
     if (spell.spellType === "invocation") {
-      const wells = spell.activeWellsprings || [];
-      const inner = spell.innerWellspring
-        ? ` + ${spell.chosenWellspring || ""}`
+      const tracker = spell.tracker || {};
+      const wells = tracker.activeWellsprings || [];
+      const inner = tracker.innerWellspring
+        ? ` + ${tracker.chosenWellspring || ""}`
         : "";
       return `${t("Wellsprings")}: ${wells.join(", ") || "-"}${inner}`;
     }
@@ -527,7 +539,7 @@ export default function PlayerCardGallery({
       return symbols.length ? symbols.join(", ") : t("symbol_empty_symbols");
     }
     if (spell.spellType === "cooking") {
-      return `${t("Effects")}: ${spell.cookbookEffects?.length || 0}`;
+      return `${t("Effects")}: ${spell.cookbook?.effects?.length || 0}`;
     }
     if (spell.spellType?.startsWith("tinkerer-")) {
       const counts = [

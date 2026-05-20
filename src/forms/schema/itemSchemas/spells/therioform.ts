@@ -2,7 +2,7 @@ import { z } from "zod";
 import { PlayerSpellNonStaticBaseSchema } from "./shared";
 
 const TherioformItemSchema = z.object({
-  name: z.string(),
+  key: z.string(),
   customName: z.string().default(""),
   genoclepsis: z.string().default(""),
   description: z.string().default(""),

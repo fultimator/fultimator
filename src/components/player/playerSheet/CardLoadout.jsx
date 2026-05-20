@@ -358,19 +358,19 @@ export default function CardLoadout({
                           : "rgba(0,0,0,0.015)",
                     }}
                   >
-                    <Typography
-                      noWrap
-                      sx={{
-                        fontFamily: "Antonio",
-                        fontSize: { xs: "0.74rem", sm: "0.8rem" },
-                        fontWeight: module.enabled ? 700 : 500,
-                        color: module.enabled
+                      <Typography
+                        noWrap
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontSize: { xs: "0.74rem", sm: "0.8rem" },
+                          fontWeight: module.isEquipped ? 700 : 500,
+                          color: module.isEquipped
                           ? theme.palette.text.primary
                           : theme.palette.text.disabled,
-                        fontStyle: module.enabled ? "normal" : "italic",
-                        lineHeight: 1.15,
-                      }}
-                    >
+                          fontStyle: module.isEquipped ? "normal" : "italic",
+                          lineHeight: 1.15,
+                        }}
+                      >
                       {displayName || " - "}
                     </Typography>
                   </Box>

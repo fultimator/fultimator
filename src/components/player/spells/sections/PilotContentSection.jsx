@@ -680,7 +680,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         vehicle.modules = [
           ...(vehicle.modules || []),
           {
-            name: item.name,
+            key: item.key || item.name,
             type: item.type || `pilot_module_${moduleType}`,
             cost: item.cost || 0,
             customName: "",

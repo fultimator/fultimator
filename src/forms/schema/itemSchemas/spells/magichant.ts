@@ -2,7 +2,7 @@ import { z } from "zod";
 import { PlayerSpellNonStaticBaseSchema } from "./shared";
 
 const MagichantKeyItemSchema = z.object({
-  name: z.string(),
+  key: z.string(),
   customName: z.string().default(""),
   type: z.string().default(""),
   status: z.string().default(""),
@@ -11,7 +11,7 @@ const MagichantKeyItemSchema = z.object({
 });
 
 const MagichantToneItemSchema = z.object({
-  name: z.string(),
+  key: z.string(),
   customName: z.string().default(""),
   effect: z.string().default(""),
 });

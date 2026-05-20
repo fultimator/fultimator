@@ -15,14 +15,16 @@ const IngredientSchema = z.object({
   taste: z.string().default(""),
 });
 
+const CookbookSchema = z.object({
+  effects: z.array(CookbookEffectSchema).default([]),
+  ingredientInventory: z.array(IngredientSchema).default([]),
+});
+
 export const PlayerSpellCookingSchema = PlayerSpellNonStaticBaseSchema.extend({
   spellType: z.literal("cooking"),
   spellName: z.string().default("Cookbook"),
-  cookbookEffects: z
-    .union([
-      z.array(CookbookEffectSchema),
-      z.record(z.string(), CookbookEffectSchema),
-    ])
-    .default([]),
-  ingredientInventory: z.array(IngredientSchema).default([]),
+  cookbook: CookbookSchema.default(() => ({
+    effects: [],
+    ingredientInventory: [],
+  })),
 });
