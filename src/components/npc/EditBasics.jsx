@@ -327,7 +327,6 @@ function EditLevel({ npc, setnpc }) {
       const min = prev.rank === "groupvehicle" ? 1 : 5;
       const next = min + Math.floor((prev.lvl - min) / step + 1) * step;
       const lvl = Math.min(60, next);
-      setLevelInput(String(lvl));
       return { ...prev, lvl };
     });
   };
@@ -339,7 +338,6 @@ function EditLevel({ npc, setnpc }) {
       if (prev.lvl <= min) return prev;
       const next = min + Math.ceil((prev.lvl - min) / step - 1) * step;
       const lvl = Math.max(min, next);
-      setLevelInput(String(lvl));
       return { ...prev, lvl };
     });
   };

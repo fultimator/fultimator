@@ -427,10 +427,45 @@ function EditPlayerLevel({
   advancement,
 }) {
   const { t } = useTranslate();
+  const MIN_LEVEL = 5;
+  const MAX_LEVEL = 50;
+  const [levelInput, setLevelInput] = React.useState(String(player.lvl ?? ""));
+
+  React.useEffect(() => {
+    setLevelInput(String(player.lvl ?? ""));
+  }, [player.lvl]);
+
+  const normalizeLevel = React.useCallback(
+    (value) => {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed)) return player.lvl;
+      return Math.min(MAX_LEVEL, Math.max(MIN_LEVEL, Math.round(parsed)));
+    },
+    [player.lvl],
+  );
+
+  const commitLevel = React.useCallback(() => {
+    if (!isEditMode || advancement) {
+      setLevelInput(String(player.lvl ?? ""));
+      return;
+    }
+    const next = normalizeLevel(levelInput);
+    setLevelInput(String(next));
+    setPlayer((prevState) => ({ ...prevState, lvl: next }));
+    updateMaxStats();
+  }, [
+    advancement,
+    isEditMode,
+    levelInput,
+    normalizeLevel,
+    player.lvl,
+    setPlayer,
+    updateMaxStats,
+  ]);
 
   const onRaiseLevel = () => {
     setPlayer((prevState) => {
-      if (prevState.lvl >= 50) return prevState;
+      if (prevState.lvl >= MAX_LEVEL) return prevState;
       return { ...prevState, lvl: prevState.lvl + 1 };
     });
     updateMaxStats();
@@ -438,7 +473,7 @@ function EditPlayerLevel({
 
   const onLowerLevel = () => {
     setPlayer((prevState) => {
-      if (prevState.lvl <= 5) return prevState;
+      if (prevState.lvl <= MIN_LEVEL) return prevState;
       return { ...prevState, lvl: prevState.lvl - 1 };
     });
     updateMaxStats();
@@ -450,10 +485,24 @@ function EditPlayerLevel({
         id="level"
         label={t("Level") + ":"}
         sx={{ width: "100%" }}
-        value={player.lvl}
+        value={levelInput}
+        type="number"
+        onChange={(e) => setLevelInput(e.target.value)}
+        onBlur={commitLevel}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            commitLevel();
+          }
+        }}
         slotProps={{
+          htmlInput: {
+            min: MIN_LEVEL,
+            max: MAX_LEVEL,
+            step: 1,
+          },
           input: {
-            readOnly: true,
+            readOnly: !isEditMode || advancement,
             startAdornment: (
               <IconButton
                 aria-label="decrease level"
