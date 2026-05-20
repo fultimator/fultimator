@@ -690,12 +690,22 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
       <RowsWithOptionalImage
         header={
           showHeader && (
-            <Box
+            <Grid
+              container
               onClick={onHeaderClick}
-              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+              sx={{
+                ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+              }}
             >
-              <Typography>{t("Gift")}</Typography>
-            </Box>
+              <Grid size="grow">
+                <Typography>{t("Gift")}</Typography>
+              </Grid>
+              <Grid size={7}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Event")}
+                </Typography>
+              </Grid>
+            </Grid>
           )
         }
         imageMode={imageMode}
@@ -704,32 +714,37 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box sx={nameRowSx(customTheme)}>
-          <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
-            {t(item.name)}
-          </Typography>
+        <Box sx={{ ...nameRowSx(customTheme), display: "flex", alignItems: "center" }}>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+              {t(item.name)}
+            </Typography>
+          </Box>
+          <Box sx={{ width: "58.33%", textAlign: "center" }}>
+            <Typography component="div" sx={{ fontSize: scale.body, "& p": { margin: 0 } }}>
+              {item.event ? md(t(item.event)) : "—"}
+            </Typography>
+          </Box>
         </Box>
         <Box sx={bodyBoxSx()}>
-          {item.event && (
+          {item.effect && (
             <Typography
               variant="body2"
-              sx={{
-                color: "text.secondary",
-                fontStyle: "italic",
-                mb: 0.5,
-                lineHeight: 1.5,
-              }}
+              component="div"
+              sx={{ color: "text.secondary", lineHeight: 1.5 }}
             >
-              {md(t(item.event))}
+              {md(t(item.effect))}
             </Typography>
           )}
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{ color: "text.secondary", lineHeight: 1.5 }}
-          >
-            {md(t(item.effect))}
-          </Typography>
+          {item.description && item.description !== item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{ color: "text.secondary", lineHeight: 1.5 }}
+            >
+              {md(t(item.description))}
+            </Typography>
+          )}
         </Box>
       </RowsWithOptionalImage>
     </CardContentWrapper>
@@ -784,13 +799,22 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
       <RowsWithOptionalImage
         header={
           showHeader && (
-            <Box
+            <Grid
+              container
               onClick={onHeaderClick}
-              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+              sx={{
+                ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+              }}
             >
-              <Typography>{t("Dance")}</Typography>
-              <Typography>{t("Duration")}</Typography>
-            </Box>
+              <Grid size="grow">
+                <Typography>{t("Dance")}</Typography>
+              </Grid>
+              <Grid size={7}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Duration")}
+                </Typography>
+              </Grid>
+            </Grid>
           )
         }
         imageMode={imageMode}
@@ -799,28 +823,17 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box
-          sx={{
-            ...nameRowSx(customTheme),
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-          }}
-        >
-          <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
-            {t(item.name)}
-          </Typography>
-          <Typography
-            sx={{
-              fontWeight: "bold",
-              fontSize: scale.body,
-              textAlign: "right",
-              flexShrink: 0,
-            }}
-          >
-            {item.duration ? t(item.duration) : "—"}
-          </Typography>
+        <Box sx={{ ...nameRowSx(customTheme), display: "flex", alignItems: "center" }}>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+              {t(item.name)}
+            </Typography>
+          </Box>
+          <Box sx={{ width: "58.33%", textAlign: "center" }}>
+            <Typography sx={{ fontSize: scale.body, "& p": { margin: 0 } }}>
+              {item.duration ? t(item.duration) : "—"}
+            </Typography>
+          </Box>
         </Box>
         <Box sx={bodyBoxSx()}>
           <Typography
@@ -884,13 +897,22 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
       <RowsWithOptionalImage
         header={
           showHeader && (
-            <Box
+            <Grid
+              container
               onClick={onHeaderClick}
-              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+              sx={{
+                ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+              }}
             >
-              <Typography>{t("Therioform")}</Typography>
-              <Typography>{t("GENOCLEPSIS SUGGESTIONS")}</Typography>
-            </Box>
+              <Grid size="grow">
+                <Typography>{t("Therioform")}</Typography>
+              </Grid>
+              <Grid size={7}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Genoclepsis Suggestions")}
+                </Typography>
+              </Grid>
+            </Grid>
           )
         }
         imageMode={imageMode}
@@ -899,50 +921,37 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box
-          sx={{
-            ...nameRowSx(customTheme),
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            flexWrap: "wrap",
-            py: 0,
-          }}
-        >
-          <Typography
-            sx={{
-              fontWeight: "bold",
-              fontSize: scale.body,
-              minWidth: 0,
-              flexShrink: 0,
-            }}
-          >
-            {t(item.name)}
-          </Typography>
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{
-              color: "text.secondary",
-              lineHeight: 1.4,
-              textAlign: "right",
-              minWidth: "12rem",
-              flex: "1 1 12rem",
-              overflowWrap: "anywhere",
-            }}
-          >
-            {item.genoclepsis ? md(t(item.genoclepsis)) : "—"}
-          </Typography>
+        <Box sx={{ ...nameRowSx(customTheme), display: "flex", alignItems: "center" }}>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+              {t(item.name)}
+            </Typography>
+          </Box>
+          <Box sx={{ width: "58.33%", textAlign: "center" }}>
+            <Typography variant="body2" component="div" sx={{ color: "text.secondary", lineHeight: 1.4, "& p": { margin: 0 } }}>
+              {item.genoclepsis ? md(t(item.genoclepsis)) : "—"}
+            </Typography>
+          </Box>
         </Box>
         <Box sx={bodyBoxSx()}>
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{ color: "text.secondary", lineHeight: 1.5 }}
-          >
-            {md(t(item.description))}
-          </Typography>
+          {item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{ color: "text.secondary", lineHeight: 1.5 }}
+            >
+              {md(t(item.effect))}
+            </Typography>
+          )}
+          {item.description && item.description !== item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{ color: "text.secondary", lineHeight: 1.5 }}
+            >
+              {md(t(item.description))}
+            </Typography>
+          )}
         </Box>
       </RowsWithOptionalImage>
     </CardContentWrapper>
@@ -1718,6 +1727,35 @@ export const SharedMagiseedCard = React.memo(function SharedMagiseedCard({
     imageTempInfoTextKey,
   });
 
+  const labelPillSx = {
+    backgroundImage: `linear-gradient(to right, ${customTheme.primary}, ${darken(customTheme.secondary, 0.3)})`,
+    px: 2,
+    py: 0.5,
+    color: "#ffffff",
+    display: "flex",
+    alignItems: "center",
+    minWidth: "fit-content",
+    flexShrink: 0,
+  };
+
+  const nameBandSx = {
+    background: `linear-gradient(90deg, ${customTheme.ternary} 0%, transparent 100%)`,
+    px: 2,
+    py: 0.5,
+    display: "flex",
+    alignItems: "center",
+    flex: 1,
+    minHeight: "28px",
+  };
+
+  const tiers =
+    item.rangeStart != null && item.rangeEnd != null
+      ? Array.from(
+          { length: item.rangeEnd - item.rangeStart + 1 },
+          (_, j) => item.rangeStart + j,
+        ).filter((tier) => item.effects?.[tier])
+      : [];
+
   return (
     <CardContentWrapper
       showCard={showCard}
@@ -1752,52 +1790,56 @@ export const SharedMagiseedCard = React.memo(function SharedMagiseedCard({
             {t(item.name)}
           </Typography>
         </Box>
-        <Box sx={bodyBoxSx()}>
-          {item.description && (
+        {item.description && (
+          <Box sx={bodyBoxSx()}>
             <Typography
               variant="body2"
               component="div"
-              sx={{ color: "text.secondary", mb: 1, lineHeight: 1.5 }}
+              sx={{ color: "text.secondary", lineHeight: 1.5 }}
             >
               {md(t(item.description))}
             </Typography>
-          )}
-          {item.rangeStart != null &&
-            item.rangeEnd != null &&
-            Array.from(
-              { length: item.rangeEnd - item.rangeStart + 1 },
-              (_, j) => {
-                const tier = item.rangeStart + j;
-                const effect = item.effects?.[tier];
-                return effect ? (
-                  <Box key={tier} sx={{ display: "flex", gap: 1, mb: 0.75 }}>
-                    <Typography
-                      variant="caption"
-                      color={customTheme.primary}
-                      sx={{
-                        fontWeight: "bold",
-                        minWidth: 22,
-                        flexShrink: 0,
-                        pt: "2px",
-                        fontSize: "0.8rem",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.3px",
-                      }}
-                    >
-                      T{tier}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      component="div"
-                      sx={{ color: "text.secondary", lineHeight: 1.5 }}
-                    >
-                      {md(t(effect))}
-                    </Typography>
-                  </Box>
-                ) : null;
-              },
-            )}
-        </Box>
+          </Box>
+        )}
+        {tiers.map((tier) => (
+          <Box
+            key={tier}
+            sx={{
+              borderTop: `1px solid ${customTheme.secondary}`,
+              display: "flex",
+              alignItems: "stretch",
+            }}
+          >
+            <Box
+              sx={{
+                ...labelPillSx,
+                alignSelf: "stretch",
+                justifyContent: "center",
+                minWidth: 36,
+                px: 1,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "0.8rem",
+                  color: "inherit",
+                }}
+              >
+                {tier}
+              </Typography>
+            </Box>
+            <Box sx={{ px: 2, py: 0.75, flex: 1, fontSize: "0.875rem" }}>
+              <Typography
+                variant="body2"
+                component="div"
+                sx={{ color: "text.secondary", lineHeight: 1.5 }}
+              >
+                {md(t(item.effects[tier]))}
+              </Typography>
+            </Box>
+          </Box>
+        ))}
       </RowsWithOptionalImage>
     </CardContentWrapper>
   );
@@ -2609,12 +2651,38 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
       <RowsWithOptionalImage
         header={
           showHeader && (
-            <Box
-              onClick={onHeaderClick}
-              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
-            >
-              <Typography>{typeLabel}</Typography>
-            </Box>
+            isKey ? (
+              <Grid
+                container
+                onClick={onHeaderClick}
+                sx={{
+                  ...headerGridSx(customTheme, scale, onHeaderClick, imageMode),
+                }}
+              >
+                <Grid size="grow">
+                  <Typography>{typeLabel}</Typography>
+                </Grid>
+                <Grid size={2}>
+                  <Typography sx={{ textAlign: "center" }}>{t("Type")}</Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography sx={{ textAlign: "center" }}>{t("Status")}</Typography>
+                </Grid>
+                <Grid size={2}>
+                  <Typography sx={{ textAlign: "center" }}>{t("Attr")}</Typography>
+                </Grid>
+                <Grid size={2}>
+                  <Typography sx={{ textAlign: "center" }}>{t("Recovery")}</Typography>
+                </Grid>
+              </Grid>
+            ) : (
+              <Box
+                onClick={onHeaderClick}
+                sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+              >
+                <Typography>{typeLabel}</Typography>
+              </Box>
+            )
           )
         }
         imageMode={imageMode}
@@ -2623,54 +2691,56 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box sx={nameRowSx(customTheme)}>
-          <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
-            {t(item.name)}
-          </Typography>
-        </Box>
-        <Box sx={bodyBoxSx()}>
-          {isKey && keyDetails.length > 0 ? (
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "auto 1fr",
-                columnGap: 1.5,
-                rowGap: 0.75,
-              }}
-            >
-              {keyDetails.map((entry) => (
-                <React.Fragment key={entry.label}>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "text.secondary",
-                      fontWeight: 600,
-                      fontSize: "0.75rem",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.3px",
-                    }}
-                  >
-                    {entry.label}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "text.secondary", lineHeight: 1.5 }}
-                  >
-                    {entry.value}
-                  </Typography>
-                </React.Fragment>
-              ))}
-            </Box>
-          ) : (
-            item.effect && (
-              <Typography
-                variant="body2"
-                component="div"
-                sx={{ color: "text.secondary", lineHeight: 1.5 }}
-              >
-                {md(t(item.effect))}
+        {isKey ? (
+          <Grid
+            container
+            sx={{
+              alignItems: "center",
+              ...nameRowSx(customTheme),
+            }}
+          >
+            <Grid size="grow">
+              <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+                {t(item.name)}
               </Typography>
-            )
+            </Grid>
+            <Grid size={2} sx={{ textAlign: "center" }}>
+              <Typography variant="body2" sx={{ color: "text.secondary", "& p": { margin: 0 } }}>
+                {item.type ? md(t(item.type)) : "—"}
+              </Typography>
+            </Grid>
+            <Grid size={3} sx={{ textAlign: "center" }}>
+              <Typography variant="body2" sx={{ color: "text.secondary", "& p": { margin: 0 } }}>
+                {item.status ? md(t(item.status)) : "—"}
+              </Typography>
+            </Grid>
+            <Grid size={2} sx={{ textAlign: "center" }}>
+              <Typography variant="body2" sx={{ color: "text.secondary", "& p": { margin: 0 } }}>
+                {item.attribute ? md(t(item.attribute)) : "—"}
+              </Typography>
+            </Grid>
+            <Grid size={2} sx={{ textAlign: "center" }}>
+              <Typography variant="body2" sx={{ color: "text.secondary", "& p": { margin: 0 } }}>
+                {item.recovery ? md(t(item.recovery)) : "—"}
+              </Typography>
+            </Grid>
+          </Grid>
+        ) : (
+          <Box sx={nameRowSx(customTheme)}>
+            <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+              {t(item.name)}
+            </Typography>
+          </Box>
+        )}
+        <Box sx={bodyBoxSx()}>
+          {item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{ color: "text.secondary", lineHeight: 1.5 }}
+            >
+              {md(t(item.effect))}
+            </Typography>
           )}
         </Box>
       </RowsWithOptionalImage>

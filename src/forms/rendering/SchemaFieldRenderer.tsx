@@ -172,6 +172,7 @@ export function SchemaFieldRenderer<
           : field.componentProps;
         const componentPropsWithNestedRenderer = {
           ...(mergedProps ?? {}),
+          ...(field.component === "fuid" ? { name: state.name ?? "" } : {}),
           renderNestedFields: ({
             config,
             state,

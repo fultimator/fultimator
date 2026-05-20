@@ -33,6 +33,9 @@ import {
   ThemeProvider,
   Snackbar,
   Autocomplete,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -930,6 +933,7 @@ function CompendiumViewer() {
   const [searchQuery, setSearchQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(null);
+  const [itemMenuAnchor, setItemMenuAnchor] = useState(null); // { el, idx }
   const [shareSnackOpen, setShareSnackOpen] = useState(false);
 
   // Pack state
@@ -948,7 +952,6 @@ function CompendiumViewer() {
   const [newPackName, setNewPackName] = useState("");
   const [newPackFuid, setNewPackFuid] = useState("");
   const [newPackFuidTouched, setNewPackFuidTouched] = useState(false);
-  const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
   const [editClassItem, setEditClassItem] = useState(null); // { item, packItemId }
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
@@ -1165,6 +1168,13 @@ function CompendiumViewer() {
     if (selectedType !== "player-spells" || !selectedSpellClass) return null;
     return classList.find((c) => c.name === selectedSpellClass) ?? null;
   }, [selectedType, selectedSpellClass]);
+
+  const quickCreateInitialSubtype = useMemo(() => {
+    if (selectedType !== "player-spells" || !activeSpellCls) return null;
+    const spellClasses = activeSpellCls.benefits?.spellClasses ?? [];
+    const nonDefault = spellClasses.find((sc) => sc !== "default");
+    return nonDefault ?? (spellClasses.includes("default") ? "default" : null);
+  }, [selectedType, activeSpellCls]);
 
   const filteredItems = useMemo(() => {
     // Pack mode
@@ -1854,7 +1864,6 @@ function CompendiumViewer() {
       }}
       activePack={activePack}
       onToggleLock={toggleLock}
-      onOpenCreateDialog={() => setCreateItemDialogOpen(true)}
       onOpenQuickCreate={() => setQuickCreateOpen(true)}
     />
   );
@@ -2044,88 +2053,216 @@ function CompendiumViewer() {
                         id={itemIds[idx]}
                         onHeaderClick={itemClickHandlers[idx]}
                         showImageToggle={idx === selectedIdx}
+                        actionContent={
+                          idx === selectedIdx ? (
+                            isDesktop ? (
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              >
+                                <Tooltip title={t("Share URL")}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={handleShareUrl}
+                                  >
+                                    <ShareIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title={t("Download as Image")}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={downloadSelectedImage}
+                                  >
+                                    <DownloadIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Export
+                                  name={item.name}
+                                  dataType={selectedType}
+                                  data={item}
+                                />
+                                {VIEWER_TO_PACK_TYPE[selectedType] && (
+                                  <AddToCompendiumButton
+                                    itemType={VIEWER_TO_PACK_TYPE[selectedType]}
+                                    data={item}
+                                    excludePackId={
+                                      selectedCompendium !== "official"
+                                        ? selectedCompendium
+                                        : undefined
+                                    }
+                                    tooltipOverride={
+                                      selectedType === "classes" &&
+                                      selectedCompendium === "official"
+                                        ? t("Clone to Custom")
+                                        : undefined
+                                    }
+                                  />
+                                )}
+                                {selectedCompendium !== "official" &&
+                                  selectedType === "classes" &&
+                                  item._packItemId &&
+                                  !activePack?.locked && (
+                                    <Tooltip title={t("Edit Class")}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() =>
+                                          setEditClassItem({
+                                            item,
+                                            packItemId: item._packItemId,
+                                          })
+                                        }
+                                      >
+                                        <EditIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                                {selectedCompendium !== "official" &&
+                                  item._packItemId &&
+                                  !activePack?.locked && (
+                                    <Tooltip title={t("Remove from pack")}>
+                                      <IconButton
+                                        size="small"
+                                        color="error"
+                                        onClick={() =>
+                                          handleRemoveFromPack(item)
+                                        }
+                                      >
+                                        <DeleteIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                              </Box>
+                            ) : (
+                              <>
+                                <Tooltip title={t("Actions")}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) =>
+                                      setItemMenuAnchor({
+                                        el: e.currentTarget,
+                                        idx,
+                                      })
+                                    }
+                                  >
+                                    <MenuIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Menu
+                                  anchorEl={
+                                    itemMenuAnchor?.idx === idx
+                                      ? itemMenuAnchor.el
+                                      : null
+                                  }
+                                  open={itemMenuAnchor?.idx === idx}
+                                  onClose={() => setItemMenuAnchor(null)}
+                                >
+                                  <MenuItem
+                                    onClick={() => {
+                                      handleShareUrl();
+                                      setItemMenuAnchor(null);
+                                    }}
+                                  >
+                                    <ListItemIcon>
+                                      <ShareIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText>
+                                      {t("Share URL")}
+                                    </ListItemText>
+                                  </MenuItem>
+                                  <MenuItem
+                                    onClick={() => {
+                                      downloadSelectedImage();
+                                      setItemMenuAnchor(null);
+                                    }}
+                                  >
+                                    <ListItemIcon>
+                                      <DownloadIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText>
+                                      {t("Download as Image")}
+                                    </ListItemText>
+                                  </MenuItem>
+                                  <Divider />
+                                  <MenuItem disableRipple sx={{ gap: 1 }}>
+                                    <Export
+                                      name={item.name}
+                                      dataType={selectedType}
+                                      data={item}
+                                    />
+                                    {VIEWER_TO_PACK_TYPE[selectedType] && (
+                                      <AddToCompendiumButton
+                                        itemType={
+                                          VIEWER_TO_PACK_TYPE[selectedType]
+                                        }
+                                        data={item}
+                                        excludePackId={
+                                          selectedCompendium !== "official"
+                                            ? selectedCompendium
+                                            : undefined
+                                        }
+                                        tooltipOverride={
+                                          selectedType === "classes" &&
+                                          selectedCompendium === "official"
+                                            ? t("Clone to Custom")
+                                            : undefined
+                                        }
+                                      />
+                                    )}
+                                  </MenuItem>
+                                  {selectedCompendium !== "official" &&
+                                    selectedType === "classes" &&
+                                    item._packItemId &&
+                                    !activePack?.locked && (
+                                      <MenuItem
+                                        onClick={() => {
+                                          setEditClassItem({
+                                            item,
+                                            packItemId: item._packItemId,
+                                          });
+                                          setItemMenuAnchor(null);
+                                        }}
+                                      >
+                                        <ListItemIcon>
+                                          <EditIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <ListItemText>
+                                          {t("Edit Class")}
+                                        </ListItemText>
+                                      </MenuItem>
+                                    )}
+                                  {selectedCompendium !== "official" &&
+                                    item._packItemId &&
+                                    !activePack?.locked && [
+                                      <Divider key="div" />,
+                                      <MenuItem
+                                        key="remove"
+                                        onClick={() => {
+                                          handleRemoveFromPack(item);
+                                          setItemMenuAnchor(null);
+                                        }}
+                                        sx={{ color: "error.main" }}
+                                      >
+                                        <ListItemIcon>
+                                          <DeleteIcon
+                                            fontSize="small"
+                                            color="error"
+                                          />
+                                        </ListItemIcon>
+                                        <ListItemText>
+                                          {t("Remove from pack")}
+                                        </ListItemText>
+                                      </MenuItem>,
+                                    ]}
+                                </Menu>
+                              </>
+                            )
+                          ) : null
+                        }
                       />
                     </Box>
-                    {idx === selectedIdx && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "flex-end",
-                          gap: 0.5,
-                          mt: 0.5,
-                        }}
-                      >
-                        <Tooltip title={t("Share URL")}>
-                          <IconButton size="small" onClick={handleShareUrl}>
-                            <ShareIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t("Download as Image")}>
-                          <IconButton
-                            size="small"
-                            onClick={downloadSelectedImage}
-                          >
-                            <DownloadIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Export
-                          name={item.name}
-                          dataType={selectedType}
-                          data={item}
-                        />
-                        {/* Add to compendium / Clone to Custom */}
-                        {VIEWER_TO_PACK_TYPE[selectedType] && (
-                          <AddToCompendiumButton
-                            itemType={VIEWER_TO_PACK_TYPE[selectedType]}
-                            data={item}
-                            excludePackId={
-                              selectedCompendium !== "official"
-                                ? selectedCompendium
-                                : undefined
-                            }
-                            tooltipOverride={
-                              selectedType === "classes" &&
-                              selectedCompendium === "official"
-                                ? t("Clone to Custom")
-                                : undefined
-                            }
-                          />
-                        )}
-                        {/* Edit class — pack mode only */}
-                        {selectedCompendium !== "official" &&
-                          selectedType === "classes" &&
-                          item._packItemId &&
-                          !activePack?.locked && (
-                            <Tooltip title={t("Edit Class")}>
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  setEditClassItem({
-                                    item,
-                                    packItemId: item._packItemId,
-                                  })
-                                }
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        {/* Remove from pack — pack mode, only when unlocked */}
-                        {selectedCompendium !== "official" &&
-                          item._packItemId &&
-                          !activePack?.locked && (
-                            <Tooltip title={t("Remove from pack")}>
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => handleRemoveFromPack(item)}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                      </Box>
-                    )}
                   </Grid>
                 ))}
               </Grid>
@@ -2144,16 +2281,8 @@ function CompendiumViewer() {
       <QuickCreateModal
         open={quickCreateOpen}
         onClose={() => setQuickCreateOpen(false)}
+        initialSubtype={quickCreateInitialSubtype ?? undefined}
       />
-      {/* Create item dialog */}
-      {activePack && (
-        <CompendiumItemCreateDialog
-          open={createItemDialogOpen}
-          onClose={() => setCreateItemDialogOpen(false)}
-          itemType={VIEWER_TO_PACK_TYPE[selectedType]}
-          packId={activePack.id}
-        />
-      )}
       {/* Edit class dialog */}
       {activePack && editClassItem && (
         <CompendiumItemCreateDialog

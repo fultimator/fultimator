@@ -233,16 +233,29 @@ function stripPrivateFields(value) {
   return next;
 }
 
+function translateFlatState(state) {
+  const result = {};
+  for (const [key, value] of Object.entries(state)) {
+    if (typeof value === "string" && value) {
+      result[key] = staticT(value);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 function importIntoSchemaForm(
   fieldConfig,
   setFormState,
   item,
   transform = null,
+  { translate = false } = {},
 ) {
   const defaults = createDefaultStateFromFields(fieldConfig);
   const prepared = stripPrivateFields(transform ? transform(item) : item);
   const merged = mergeImportedIntoDefaults(defaults, prepared);
-  setFormState(merged);
+  setFormState(translate ? translateFlatState(merged) : merged);
 }
 
 const QUICK_CREATE_TAB_TO_VIEWER_TYPE = {
@@ -456,6 +469,8 @@ function NpcAttackPanel() {
                       npcAttackFieldConfig,
                       setFormState,
                       item,
+                      null,
+                      { translate: true },
                     ),
                 ),
             }}
@@ -556,6 +571,7 @@ function NpcSpellPanel() {
                       setFormState,
                       item,
                       normalizeImportedNpcSpellItem,
+                      { translate: true },
                     ),
                 ),
             }}
@@ -664,6 +680,8 @@ function NpcSpecialPanel() {
                       npcSpecialFieldConfig,
                       setFormState,
                       item,
+                      null,
+                      { translate: true },
                     ),
                 ),
             }}
@@ -745,6 +763,8 @@ function NpcActionPanel() {
                       npcActionFieldConfig,
                       setFormState,
                       item,
+                      null,
+                      { translate: true },
                     ),
                 ),
             }}
@@ -943,6 +963,7 @@ function buildPlayerSpellPayload(state) {
         spellType: "dance",
         name: (name ?? "").trim(),
         fuid: fuid || undefined,
+        duration: (state.duration ?? "").trim() || "Instantaneous",
         effect: (state.effect ?? "").trim(),
         description: (state.effect ?? "").trim(),
       });
@@ -1032,9 +1053,18 @@ function buildPlayerSpellPayload(state) {
 function PlayerSpellPanel() {
   const { t } = useTranslate();
   const { openImport } = useQuickCreateImport();
-  const [formState, setFormState] = useState(() =>
-    createDefaultStateFromFields(playerSpellFieldConfig),
-  );
+  const initialSubtype = useQuickCreateSubtype();
+  const [formState, setFormState] = useState(() => {
+    const defaults = createDefaultStateFromFields(playerSpellFieldConfig);
+    if (initialSubtype) return { ...defaults, spellType: initialSubtype };
+    return defaults;
+  });
+
+  useEffect(() => {
+    if (initialSubtype) {
+      setFormState((prev) => ({ ...prev, spellType: initialSubtype }));
+    }
+  }, [initialSubtype]);
 
   // Pilot-vehicle local state (kept as-is - schema renderer not used for pilot-vehicle)
   const [pilotSubtype, setPilotSubtype] = useState("frame");
@@ -1095,15 +1125,15 @@ function PlayerSpellPanel() {
     const flatImport = {
       spellType: nextSpellType || "default",
       fuid: imported.fuid || undefined,
-      name: String(imported.name ?? ""),
+      name: t(String(imported.name ?? "")),
       class: String(imported.class ?? spellClasses[0] ?? ""),
       isOffensive: Boolean(imported.isOffensive ?? false),
       "cost.resource": "mp",
       "cost.amount": imported.cost?.amount ?? 0,
       "cost.perTarget": Boolean(imported.cost?.perTarget ?? true),
       maxTargets: imported.maxTargets ?? 1,
-      targetDescription: String(imported.targetDescription ?? "One creature"),
-      duration: String(imported.duration ?? "Instantaneous"),
+      targetDescription: t(String(imported.targetDescription ?? "One creature")),
+      duration: t(String(imported.duration ?? "Instantaneous")),
       "accuracy.attr1": String(imported.accuracy?.attr1 ?? "insight"),
       "accuracy.attr2": String(imported.accuracy?.attr2 ?? "will"),
       "accuracy.value": 0,
@@ -1111,19 +1141,19 @@ function PlayerSpellPanel() {
       "damage.value": imported.damage?.value ?? 0,
       "damage.type": String(imported.damage?.type ?? "physical"),
       "damage.hrZero": Boolean(imported.damage?.hrZero ?? false),
-      description: String(imported.description ?? ""),
-      effect: String(imported.effect ?? imported.description ?? ""),
-      event: String(imported.event ?? ""),
-      genoclepsis: String(imported.genoclepsis ?? ""),
-      domain: String(imported.domain ?? ""),
-      domainDesc: String(imported.domainDesc ?? ""),
-      merge: String(imported.merge ?? ""),
-      mergeDesc: String(imported.mergeDesc ?? ""),
-      dismiss: String(imported.dismiss ?? ""),
-      dismissDesc: String(imported.dismissDesc ?? ""),
-      pulse: String(imported.pulse ?? ""),
-      pulseDesc: String(imported.pulseDesc ?? ""),
-      wellspring: String(imported.wellspring ?? ""),
+      description: t(String(imported.description ?? "")),
+      effect: t(String(imported.effect ?? imported.description ?? "")),
+      event: t(String(imported.event ?? "")),
+      genoclepsis: t(String(imported.genoclepsis ?? "")),
+      domain: t(String(imported.domain ?? "")),
+      domainDesc: t(String(imported.domainDesc ?? "")),
+      merge: t(String(imported.merge ?? "")),
+      mergeDesc: t(String(imported.mergeDesc ?? "")),
+      dismiss: t(String(imported.dismiss ?? "")),
+      dismissDesc: t(String(imported.dismissDesc ?? "")),
+      pulse: t(String(imported.pulse ?? "")),
+      pulseDesc: t(String(imported.pulseDesc ?? "")),
+      wellspring: t(String(imported.wellspring ?? "")),
       invType: String(imported.type ?? ""),
       category: String(imported.category ?? ""),
       infusionRank:
@@ -1147,16 +1177,16 @@ function PlayerSpellPanel() {
       cookingEffects: (() => {
         const src = imported.cookbookEffects;
         if (Array.isArray(src)) {
-          return src.map((r) => ({ effect: String(r?.effect ?? "") }));
+          return src.map((r) => ({ effect: t(String(r?.effect ?? "")) }));
         }
         if (src && typeof src === "object") {
           return Object.values(src).map((r) => ({
-            effect: String(r?.effect ?? r ?? ""),
+            effect: t(String(r?.effect ?? r ?? "")),
           }));
         }
         return Array.from({ length: 12 }, () => ({ effect: "" }));
       })(),
-      seedDescription: String(imported.description ?? ""),
+      seedDescription: t(String(imported.description ?? "")),
       seedRangeStart: imported.rangeStart ?? 1,
       seedRangeEnd: imported.rangeEnd ?? 4,
       "meta.book": imported.meta?.book ?? "",
@@ -1971,6 +2001,8 @@ function QualityPanel() {
                           qualityFieldConfig,
                           setFormState,
                           item,
+                          null,
+                          { translate: true },
                         ),
                     ),
                 }}
@@ -2046,7 +2078,7 @@ function HeroicPanel() {
               name: String(formState.name ?? ""),
               onBrowse: () =>
                 openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.heroic, (item) =>
-                  importIntoSchemaForm(heroicFieldConfig, setFormState, item),
+                  importIntoSchemaForm(heroicFieldConfig, setFormState, item, null, { translate: true }),
                 ),
             }}
           />
@@ -2152,6 +2184,7 @@ function ClassPanel() {
                       setFormState,
                       item,
                       localizeImportedClassItem,
+                      { translate: true },
                     ),
                   ),
               }}

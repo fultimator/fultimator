@@ -14,4 +14,15 @@ export const therioformFields: ItemFieldConfig<PlayerSpellFormState> = [
     fullWidth: true,
     dependencies: isTherioform,
   },
+  {
+    key: "effect",
+    kind: "editable",
+    label: "spell.therioform.effect",
+    component: "textarea",
+    defaultValue: "",
+    group: "effect",
+    order: 75,
+    fullWidth: true,
+    dependencies: isTherioform,
+  },
 ];
