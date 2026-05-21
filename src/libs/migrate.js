@@ -71,6 +71,31 @@ export function diffItem(instance, source, type) {
         changed(instance.spells, source.spells)
       )
         diffs.push("Spell list changed");
+
+      if (source.benefits !== undefined) {
+        const srcB = source.benefits;
+        const instB = instance.benefits ?? {};
+        const srcSpellClasses = srcB.spellClasses ?? [];
+        const instSpellClasses = instB.spellClasses ?? [];
+        const missingSpellClasses = srcSpellClasses.filter(
+          (sc) => !instSpellClasses.includes(sc),
+        );
+        if (missingSpellClasses.length > 0)
+          diffs.push(
+            `Benefits: spell types added (${missingSpellClasses.join(", ")})`,
+          );
+        const srcCustom = srcB.custom ?? [];
+        const instCustom = instB.custom ?? [];
+        const missingCustom = srcCustom.filter(
+          (c) => !instCustom.includes(c),
+        );
+        if (missingCustom.length > 0)
+          diffs.push(`Benefits: ${missingCustom.length} custom benefit(s) added`);
+        if (changed(srcB.martials, instB.martials))
+          diffs.push("Benefits: martial proficiencies changed");
+        if (changed(srcB.rituals, instB.rituals))
+          diffs.push("Benefits: ritual access changed");
+      }
       break;
     }
 
@@ -177,11 +202,37 @@ export function applyMigration(instance, source, type) {
           ...(skillFuid && { fuid: skillFuid }),
         };
       });
+      const mergedBenefits = (() => {
+        const src = source.benefits;
+        const inst = instance.benefits ?? {};
+        if (!src) return inst;
+        const srcCustom = src.custom ?? [];
+        const instCustom = inst.custom ?? [];
+        const appendedCustom = [
+          ...instCustom,
+          ...srcCustom.filter((sc) => !instCustom.includes(sc)),
+        ];
+        const srcSpellClasses = src.spellClasses ?? [];
+        const instSpellClasses = inst.spellClasses ?? [];
+        const appendedSpellClasses = [
+          ...instSpellClasses,
+          ...srcSpellClasses.filter((sc) => !instSpellClasses.includes(sc)),
+        ];
+        return {
+          ...src,
+          hpplus: inst.hpplus ?? src.hpplus,
+          mpplus: inst.mpplus ?? src.mpplus,
+          ipplus: inst.ipplus ?? src.ipplus,
+          custom: appendedCustom,
+          spellClasses: appendedSpellClasses,
+        };
+      })();
       return {
         ...instance,
         name: source.name ?? instance.name,
         fuid: source.fuid ?? instance.fuid,
         skills: mergedSkills,
+        benefits: mergedBenefits,
         ...(source.heroic !== undefined && { heroic: source.heroic }),
         ...(source.spells !== undefined && { spells: source.spells }),
       };

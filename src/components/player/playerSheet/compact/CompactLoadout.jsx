@@ -155,6 +155,8 @@ export default function CompactLoadout({
   const [slotImportOpen, setSlotImportOpen] = useState(false);
   const [slotImportType, setSlotImportType] = useState("weapons");
   const canClickSlot = isEditMode || !!setPlayer;
+  const actionGradient =
+    "linear-gradient(135deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.14) 100%)";
 
   const store = useLoadoutStore();
   useEffect(() => {
@@ -360,7 +362,7 @@ export default function CompactLoadout({
     setSlotImportOpen(true);
   };
 
-  const handleSlotImportAdd = (type, item) => {
+  const handleSlotImportAdd = (item, type) => {
     if (type === "weapons") appendEquipmentItem("weapons", item);
     if (type === "custom-weapons") appendEquipmentItem("customWeapons", item);
     if (type === "shields") appendEquipmentItem("shields", item);
@@ -559,7 +561,20 @@ export default function CompactLoadout({
                             e.stopPropagation();
                             handleSwapSlot(slot);
                           }}
-                          sx={{ p: 0.25 }}
+                          sx={{
+                            p: 0.25,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            color: "text.secondary",
+                            backgroundColor: "action.selected",
+                            backgroundImage: actionGradient,
+                            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.30)",
+                            "&:hover": {
+                              backgroundColor: "action.selected",
+                              backgroundImage: actionGradient,
+                              color: "text.primary",
+                            },
+                          }}
                         >
                           <SwapHoriz sx={{ fontSize: "0.85rem" }} />
                         </IconButton>
@@ -573,7 +588,20 @@ export default function CompactLoadout({
                             e.stopPropagation();
                             handleRollSlot(slot);
                           }}
-                          sx={{ p: 0.25 }}
+                          sx={{
+                            p: 0.25,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            color: "text.secondary",
+                            backgroundColor: "action.selected",
+                            backgroundImage: actionGradient,
+                            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.30)",
+                            "&:hover": {
+                              backgroundColor: "action.selected",
+                              backgroundImage: actionGradient,
+                              color: "text.primary",
+                            },
+                          }}
                         >
                           <CasinoIcon sx={{ fontSize: "0.85rem" }} />
                         </IconButton>

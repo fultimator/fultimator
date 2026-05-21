@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
+  Divider,
   IconButton,
   InputBase,
   List,
@@ -47,12 +48,47 @@ import { DIFFICULTY_PRESETS } from "./types";
 import type { useChatStore } from "./chatStore";
 import { t } from "../../../../translation/translate";
 import NotesMarkdown from "../../../common/NotesMarkdown";
+import {
+  ActionAttackIcon,
+  ActionEquipmentIcon,
+  ActionGuardIcon,
+  ActionHinderIcon,
+  ActionInventoryIcon,
+  ActionObjectiveIcon,
+  ActionSkillIcon,
+  ActionSpellIcon,
+  CheckAttributeIcon,
+  CheckOpenIcon,
+  CheckOpposedIcon,
+} from "../../../icons";
 
 const ATTRIBUTES: { id: Attribute; label: string }[] = [
   { id: "dex", label: "DEX" },
   { id: "ins", label: "INS" },
   { id: "mig", label: "MIG" },
   { id: "wlp", label: "WLP" },
+];
+
+const ACTION_ICON_BY_KEY: Record<string, React.ReactNode> = {
+  attack: <ActionAttackIcon size="1em" />,
+  equipment: <ActionEquipmentIcon size="1em" />,
+  guard: <ActionGuardIcon size="1em" />,
+  hinder: <ActionHinderIcon size="1em" />,
+  inventory: <ActionInventoryIcon size="1em" />,
+  objective: <ActionObjectiveIcon size="1em" />,
+  spell: <ActionSpellIcon size="1em" />,
+  skill: <ActionSkillIcon size="1em" />,
+  check: <CheckOpenIcon size="1em" />,
+};
+
+const ACTION_PICKER_CHECK_OPTIONS: Array<{
+  key: "attribute" | "open" | "opposed";
+  label: string;
+  icon: React.ReactNode;
+}> = [
+  { key: "attribute", label: "Attribute", icon: <CheckAttributeIcon size="1em" /> },
+  { key: "open", label: "Open", icon: <CheckOpenIcon size="1em" /> },
+  { key: "opposed", label: "Opposed", icon: <CheckOpposedIcon size="1em" /> },
 ];
 
 interface ChatComposerProps {
@@ -69,6 +105,8 @@ interface ChatComposerProps {
   onToggleVehicle?: () => void;
   onSwapVehicle?: () => void;
   onOpenSupportModules?: () => void;
+  prefillInput?: string | null;
+  onPrefillConsumed?: () => void;
 }
 
 export const ChatComposer: React.FC<ChatComposerProps> = ({
@@ -83,6 +121,8 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   onToggleVehicle,
   onSwapVehicle,
   onOpenSupportModules,
+  prefillInput,
+  onPrefillConsumed,
 }) => {
   const theme = useTheme();
   const [input, setInput] = useState("");
@@ -107,6 +147,13 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const customModRef = useRef<HTMLInputElement>(null);
   const customDlRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!prefillInput) return;
+    handleInputChange(prefillInput);
+    requestAnimationFrame(() => textareaRef.current?.focus());
+    onPrefillConsumed?.();
+  }, [prefillInput]);
 
   const canSend = Boolean(input.trim()) || store.hasPendingRoll;
   const hasMessages = store.messages.length > 0;
@@ -865,9 +912,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                           width: "100%",
                         }}
                       >
-                        {ACTION_OPTIONS.map((action) => {
+                        {ACTION_OPTIONS.filter((action) => action.toLowerCase() !== "check").map((action) => {
                           const actionKey = action.toLowerCase();
                           const ruleText = getActionRuleDescription(actionKey);
+                          const actionIcon = ACTION_ICON_BY_KEY[actionKey];
                           return (
                             <Box
                               key={action}
@@ -893,12 +941,13 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                               >
                                 {action}
                               </Button>
-                              {ruleText && (
+                              {(ruleText || actionIcon) && (
                                 <IconButton
                                   size="small"
                                   onPointerDown={(e) => e.preventDefault()}
                                   onMouseDown={(e) => e.preventDefault()}
                                   onClick={(e) => {
+                                    if (!ruleText) return;
                                     const anchor = e.currentTarget;
                                     setActionRuleHint({
                                       action: actionKey,
@@ -912,12 +961,66 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     p: 0.25,
                                   }}
                                 >
-                                  <DescriptionIcon sx={{ fontSize: 16 }} />
+                                  {actionIcon ?? (
+                                    <DescriptionIcon sx={{ fontSize: 16 }} />
+                                  )}
                                 </IconButton>
                               )}
                             </Box>
                           );
                         })}
+                      </Box>
+                      <Divider sx={{ my: 0.25 }} />
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr",
+                          gap: 0.5,
+                          width: "100%",
+                        }}
+                      >
+                        {ACTION_PICKER_CHECK_OPTIONS.map((option) => (
+                          <Box
+                            key={option.key}
+                            sx={{
+                              display: "flex",
+                              alignItems: "stretch",
+                              gap: 0.25,
+                            }}
+                          >
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => {
+                                handleInputChange(`/check ${option.key} `);
+                                requestAnimationFrame(() => textareaRef.current?.focus());
+                              }}
+                              sx={{
+                                flex: 1,
+                                minWidth: 0,
+                                fontFamily: "monospace",
+                                fontSize: "0.7rem",
+                                py: 0.25,
+                                textTransform: "none",
+                              }}
+                            >
+                              {option.label}
+                            </Button>
+                            <IconButton
+                              size="small"
+                              onMouseDown={(e) => e.preventDefault()}
+                              sx={{
+                                border: "1px solid",
+                                borderColor: "divider",
+                                borderRadius: 1,
+                                p: 0.25,
+                              }}
+                            >
+                              {option.icon}
+                            </IconButton>
+                          </Box>
+                        ))}
                       </Box>
                     </Box>
                   </ListItem>

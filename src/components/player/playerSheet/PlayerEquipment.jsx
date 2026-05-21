@@ -12,11 +12,18 @@ import {
   Tooltip,
   Divider,
   Box,
-  Card,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import { Casino, SwapHoriz, Edit, Info, Add, Search } from "@mui/icons-material";
+import {
+  Casino,
+  SwapHoriz,
+  Edit,
+  Info,
+  Add,
+  Search,
+  ChatOutlined,
+} from "@mui/icons-material";
 import {
   SharedWeaponCard,
   SharedArmorCard,
@@ -25,13 +32,19 @@ import {
   SharedAccessoryCard,
 } from "../../shared/itemCards";
 // import { OpenBracket, CloseBracket } from "../../Bracket";
-import attributes from "../../../libs/attributes";
 // import types from "../../../libs/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 import EditPlayerEquipment from "../equipment/EditPlayerEquipment";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
+import {
+  buildAccuracyCheckMessage,
+  prepareAccuracyCheck,
+  processAccuracyCheck,
+  rollAccuracyCheck,
+} from "../../app-drawer/panels/chat/domain/accuracy-checks";
 import PlayerWeaponModal from "../equipment/weapons/PlayerWeaponModal";
 import PlayerCustomWeaponModal from "../equipment/customWeapons/PlayerCustomWeaponModal";
 import PlayerShieldModal from "../equipment/shields/PlayerShieldModal";
@@ -49,11 +62,8 @@ export default function PlayerEquipment({
   const custom = useCustomTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
 
-  const [dialogMessage, setDialogMessage] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogSeverity, setDialogSeverity] = useState("info");
-  const [currentWeapon, setCurrentWeapon] = useState(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -144,6 +154,17 @@ export default function PlayerEquipment({
     ? inv.accessories.filter((accessory) => isItemEquipped(player, accessory))
     : [];
 
+  // In edit mode we show full inventory so newly imported items appear immediately.
+  const visibleWeapons = isEditMode ? (inv?.weapons ?? []) : equippedWeapons;
+  const visibleCustomWeapons = isEditMode
+    ? (inv?.customWeapons ?? [])
+    : equippedCustomWeapons;
+  const visibleArmor = isEditMode ? (inv?.armor ?? []) : equippedArmor;
+  const visibleShields = isEditMode ? (inv?.shields ?? []) : equippedShields;
+  const visibleAccessories = isEditMode
+    ? (inv?.accessories ?? [])
+    : equippedAccessories;
+
   // Find all pilot-vehicle spells
   // const pilotSpells = (player.classes || [])
   //   .flatMap((c) => c.spells || [])
@@ -221,22 +242,22 @@ export default function PlayerEquipment({
   };
 
   // Combine regular weapons and custom weapons
-  const allEquippedWeapons = [
-    ...equippedWeapons,
+  const allVisibleWeapons = [
+    ...visibleWeapons,
     // Add custom weapons with proper formatting (showing only active form)
-    ...equippedCustomWeapons.map((customWeapon) =>
+    ...visibleCustomWeapons.map((customWeapon) =>
       formatCustomWeaponForDisplay(customWeapon),
     ),
   ];
 
   // Add Twin Shields to equipped weapons if the player has Dual Shieldbearer and 2 shields equipped
-  if (hasDualShieldBearer && equippedShields.length >= 2) {
-    allEquippedWeapons.push(twinShields);
+  if (!isEditMode && hasDualShieldBearer && equippedShields.length >= 2) {
+    allVisibleWeapons.push(twinShields);
   }
-  const equippedCustomWeaponsDisplay = allEquippedWeapons.filter(
+  const equippedCustomWeaponsDisplay = allVisibleWeapons.filter(
     (w) => w.isCustomWeapon,
   );
-  const equippedBaseWeaponsDisplay = allEquippedWeapons.filter(
+  const equippedBaseWeaponsDisplay = allVisibleWeapons.filter(
     (w) => !w.isCustomWeapon,
   );
 
@@ -378,155 +399,75 @@ export default function PlayerEquipment({
   };
 
   const handleDiceRoll = (weapon) => {
-    setCurrentWeapon(weapon);
+    if (!weapon?.accuracy) return;
+    const attr1 = weapon.accuracy?.attr1 || "dexterity";
+    const attr2 = weapon.accuracy?.attr2 || "might";
+    const dieSizes = {
+      primary: player?.attributes?.[attr1]?.base ?? player?.attributes?.[attr1] ?? 6,
+      secondary: player?.attributes?.[attr2]?.base ?? player?.attributes?.[attr2] ?? 6,
+    };
+    const toRollKey = (attr) => {
+      const key = String(attr || "").toLowerCase();
+      if (key.startsWith("dex")) return "dex";
+      if (key.startsWith("ins")) return "ins";
+      if (key.startsWith("mig")) return "mig";
+      if (key.startsWith("wil") || key.startsWith("wlp")) return "wlp";
+      return "dex";
+    };
 
-    // Handle attribute mapping for custom weapons
-    const att1 = weapon.accuracy?.attr1 || "dexterity";
-    const att2 = weapon.accuracy?.attr2 || "might";
-
-    let att1Value = attributeMap[att1] || 8;
-    let att2Value = attributeMap[att2] || 8;
-
-    // Calculate weapon stats for custom weapons
-    const weaponPrec = weapon.accuracy?.value ?? 0;
-    const weaponDamage = weapon.damage?.value ?? 5;
-
-    const meleeModifier = precMeleeModifier;
-    const rangedModifier = precRangedModifier;
-
-    const meleeDmgModifier = damageMeleeModifier;
-    const rangedDmgModifier = damageRangedModifier;
-
-    const die1 = Math.floor(Math.random() * att1Value) + 1;
-    const die2 = Math.floor(Math.random() * att2Value) + 1;
-
-    // Check for critical failure
-    const isCriticalFailure = die1 === 1 && die2 === 1;
-    // Check for critical success
-    const isCriticalSuccess = die1 >= 6 && die2 >= 6 && die1 === die2;
-
-    const result =
-      die1 +
-      die2 +
-      weaponPrec +
-      (weapon.melee ? meleeModifier : rangedModifier);
-
-    const maxDie = Math.max(die1, die2);
-    const damage = weaponDamage;
-
-    const damageDealt =
-      maxDie + damage + (weapon.melee ? meleeDmgModifier : rangedDmgModifier);
-
-    const dialogContent = (
-      <>
-        <Grid container spacing={2} sx={{ textAlign: "center" }}>
-          <Grid container size={6}>
-            <Grid size={12}>
-              <Typography
-                variant="h3"
-                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-              >
-                {t("Accuracy")}
-              </Typography>
-              <Typography variant="h1" sx={{ textAlign: "center" }}>
-                {result}
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container size={6}>
-            <Grid size={12}>
-              <Typography
-                variant="h3"
-                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-              >
-                {t("Damage")}
-              </Typography>
-              <Typography variant="h1" sx={{ textAlign: "center" }}>
-                {damageDealt}
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-              >
-                {t(weapon.damage?.type ?? "physical")}
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid sx={{ marginTop: "20px" }} size={12}>
-            <Typography component="span">
-              {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${
-                attributes[att2].shortcaps
-              }] ${weaponPrec !== 0 ? "+" + weaponPrec : ""} ${
-                weapon.melee
-                  ? meleeModifier !== 0
-                    ? "+" + meleeModifier
-                    : rangedModifier
-                  : rangedModifier !== 0
-                    ? "+" + rangedModifier
-                    : ""
-              }`}
-            </Typography>
-            <br />
-            <Typography
-              component="span"
-              sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-            >
-              {t("Damage")}:
-            </Typography>
-            <Typography component="span">
-              {` ${maxDie} + ${damage}`}
-              {weapon.melee
-                ? meleeDmgModifier !== 0
-                  ? " + " + meleeDmgModifier
-                  : ""
-                : rangedDmgModifier !== 0
-                  ? " + " + rangedDmgModifier
-                  : ""}
-            </Typography>
-          </Grid>
-        </Grid>
-      </>
+    const intent = prepareAccuracyCheck({
+      attr1: toRollKey(attr1),
+      attr2: toRollKey(attr2),
+      accuracyBonus: weapon?.accuracy?.value ?? 0,
+      name: weapon?.name || "Attack",
+      description: weapon?.quality || undefined,
+      baseDamage: weapon?.damage?.value ?? weapon?.damage ?? 0,
+      damageType: weapon?.damage?.type ?? weapon?.type ?? "physical",
+      accuracyDefense: weapon?.accuracy?.defense ?? "def",
+      range: weapon?.range ?? (weapon?.melee ? "melee" : "ranged"),
+      hrZero: weapon?.damage?.hrZero === true,
+    });
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(
+      intent,
+      rolls,
+      dieSizes,
+      player?.name || "Player",
     );
-
-    // Add critical success/failure visualization
-    if (isCriticalFailure) {
-      setDialogSeverity("error");
-      setDialogMessage(
-        <>
-          <Typography
-            variant="h1"
-            sx={{ textAlign: "center", marginBottom: "10px" }}
-          >
-            {t("Critical Failure")}!
-            <br />
-          </Typography>
-          {dialogContent}
-        </>,
-      );
-    } else if (isCriticalSuccess) {
-      setDialogSeverity("success");
-      setDialogMessage(
-        <>
-          <Typography
-            variant="h1"
-            sx={{ textAlign: "center", marginBottom: "10px" }}
-          >
-            {t("Critical Success")}!
-            <br />
-          </Typography>
-          {dialogContent}
-        </>,
-      );
-    } else {
-      setDialogSeverity("info");
-      setDialogMessage(dialogContent);
-    }
-
-    setDialogOpen(true);
+    addMessage(buildAccuracyCheckMessage(result));
   };
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
+  const sendEquipmentToChat = (item, section) => {
+    const tags = [t("Equipment"), t(section)];
+    const sectionKey = String(section || "").toLowerCase();
+
+    if (sectionKey === "armor" || sectionKey === "shield") {
+      if (item?.def != null) tags.push(`DEF ${item.def >= 0 ? `+${item.def}` : item.def}`);
+      if (item?.mdef != null) tags.push(`M.DEF ${item.mdef >= 0 ? `+${item.mdef}` : item.mdef}`);
+    }
+
+    if (sectionKey === "weapon" || sectionKey === "weapons" || sectionKey === "customweapon" || sectionKey === "customweapons") {
+      const category = item?.category ? t(item.category) : "";
+      if (category) tags.push(category);
+      const hands =
+        item?.hands === 2 || item?.isTwoHand
+          ? "2H"
+          : item?.hands === 1
+            ? "1H"
+            : "";
+      if (hands) tags.push(hands);
+    }
+
+    addMessage({
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      speaker: player?.name || "Player",
+      kind: "display",
+      itemType: "equipment",
+      name: item?.name || t("Equipment"),
+      tags,
+      description: item?.quality || item?.description || "",
+    });
   };
 
   const appendEquipmentItem = (sourceKey, item) => {
@@ -559,6 +500,13 @@ export default function PlayerEquipment({
           </Divider>
           <IconButton
             size="small"
+            onClick={() => setCreateItemType(sectionMeta[key].create)}
+            sx={{ border: "1px dashed", borderColor: "divider", borderRadius: 1 }}
+          >
+            <Add fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
             onClick={() => {
               setImportType(sectionMeta[key].import);
               setImportOpen(true);
@@ -571,34 +519,11 @@ export default function PlayerEquipment({
       </Grid>
     ) : null;
 
-  const renderAddPlaceholder = (key) =>
-    isEditMode ? (
-      <Grid size={{ xs: 12, md: 6 }}>
-        <Card
-          onClick={() => setCreateItemType(sectionMeta[key].create)}
-          sx={{
-            minHeight: 40,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            border: "2px dashed",
-            borderColor: "divider",
-            bgcolor: "transparent",
-            boxShadow: "none",
-            "&:hover": { bgcolor: "action.hover" },
-          }}
-        >
-          <Add sx={{ color: "text.secondary" }} />
-        </Card>
-      </Grid>
-    ) : null;
-
   return (
     <>
-      {(allEquippedWeapons.length > 0 || equippedArmor.length > 0) && (
+      {(allVisibleWeapons.length > 0 || visibleArmor.length > 0 || isEditMode) && (
         <>
-          {isEditMode && <Divider sx={{ my: 1 }} />}
+          <Divider sx={{ my: 1 }} />
           <Paper
             elevation={3}
             sx={
@@ -695,7 +620,7 @@ export default function PlayerEquipment({
                     md: 6,
                   }}
                 >
-                  <Grid sx={{ display: "flex" }} size={10}>
+                  <Grid sx={{ display: "flex" }} size="grow">
                     <Typography
                       variant="h2"
                       sx={{
@@ -714,10 +639,7 @@ export default function PlayerEquipment({
                       {weapon.name}
                     </Typography>
                   </Grid>
-                  <Grid
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                    size={2}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
                     <Box
                       sx={{
                         padding: "5px",
@@ -753,6 +675,15 @@ export default function PlayerEquipment({
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title={t("Send to chat")}>
+                        <IconButton
+                          size="small"
+                          onClick={() => sendEquipmentToChat(weapon, "Weapons")}
+                          sx={{ p: 0.5 }}
+                        >
+                          <ChatOutlined fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title={t("Roll")}>
                         <IconButton
                           size="small"
@@ -766,7 +697,6 @@ export default function PlayerEquipment({
                   </Grid>
                 </Grid>
               ))}
-              {renderAddPlaceholder("weapons")}
               {renderSectionHeader("customWeapons")}
               {equippedCustomWeaponsDisplay.map((weapon, index) => (
                 <Grid
@@ -783,7 +713,7 @@ export default function PlayerEquipment({
                     md: 6,
                   }}
                 >
-                  <Grid sx={{ display: "flex" }} size={10}>
+                  <Grid sx={{ display: "flex" }} size="grow">
                     <Typography
                       variant="h2"
                       sx={{
@@ -802,10 +732,7 @@ export default function PlayerEquipment({
                       {weapon.name}
                     </Typography>
                   </Grid>
-                  <Grid
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                    size={2}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
                     <Box
                       sx={{
                         padding: "5px",
@@ -841,6 +768,17 @@ export default function PlayerEquipment({
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title={t("Send to chat")}>
+                        <IconButton
+                          size="small"
+                          onClick={() =>
+                            sendEquipmentToChat(weapon, "CustomWeapons")
+                          }
+                          sx={{ p: 0.5 }}
+                        >
+                          <ChatOutlined fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title={t("Roll")}>
                         <IconButton
                           size="small"
@@ -854,9 +792,8 @@ export default function PlayerEquipment({
                   </Grid>
                 </Grid>
               ))}
-              {renderAddPlaceholder("customWeapons")}
               {renderSectionHeader("armor")}
-              {equippedArmor.map((armor, index) => (
+              {visibleArmor.map((armor, index) => (
                 <Grid
                   container
                   spacing={0}
@@ -871,7 +808,7 @@ export default function PlayerEquipment({
                     md: 6,
                   }}
                 >
-                  <Grid sx={{ display: "flex" }} size={10}>
+                  <Grid sx={{ display: "flex" }} size="grow">
                     <Typography
                       variant="h2"
                       sx={{
@@ -890,10 +827,7 @@ export default function PlayerEquipment({
                       {armor.name}
                     </Typography>
                   </Grid>
-                  <Grid
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                    size={2}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
                     <Box
                       sx={{
                         padding: "5px",
@@ -917,13 +851,21 @@ export default function PlayerEquipment({
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title={t("Send to chat")}>
+                        <IconButton
+                          size="small"
+                          onClick={() => sendEquipmentToChat(armor, "Armor")}
+                          sx={{ p: 0.5 }}
+                        >
+                          <ChatOutlined fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </Grid>
                 </Grid>
               ))}
-              {renderAddPlaceholder("armor")}
               {renderSectionHeader("shields")}
-              {equippedShields.map((shield, index) => (
+              {visibleShields.map((shield, index) => (
                 <Grid
                   container
                   spacing={0}
@@ -938,7 +880,7 @@ export default function PlayerEquipment({
                     md: 6,
                   }}
                 >
-                  <Grid sx={{ display: "flex" }} size={10}>
+                  <Grid sx={{ display: "flex" }} size="grow">
                     <Typography
                       variant="h2"
                       sx={{
@@ -957,10 +899,7 @@ export default function PlayerEquipment({
                       {shield.name}
                     </Typography>
                   </Grid>
-                  <Grid
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                    size={2}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
                     <Box
                       sx={{
                         padding: "5px",
@@ -984,13 +923,21 @@ export default function PlayerEquipment({
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title={t("Send to chat")}>
+                        <IconButton
+                          size="small"
+                          onClick={() => sendEquipmentToChat(shield, "Shield")}
+                          sx={{ p: 0.5 }}
+                        >
+                          <ChatOutlined fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </Grid>
                 </Grid>
               ))}
-              {renderAddPlaceholder("shields")}
               {renderSectionHeader("accessories")}
-              {equippedAccessories.map((accessory, index) => (
+              {visibleAccessories.map((accessory, index) => (
                 <Grid
                   container
                   spacing={0}
@@ -1005,7 +952,7 @@ export default function PlayerEquipment({
                     md: 6,
                   }}
                 >
-                  <Grid sx={{ display: "flex" }} size={10}>
+                  <Grid sx={{ display: "flex" }} size="grow">
                     <Typography
                       variant="h2"
                       sx={{
@@ -1024,10 +971,7 @@ export default function PlayerEquipment({
                       {accessory.name}
                     </Typography>
                   </Grid>
-                  <Grid
-                    sx={{ display: "flex", alignItems: "stretch" }}
-                    size={2}
-                  >
+                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
                     <Box
                       sx={{
                         padding: "5px",
@@ -1051,11 +995,21 @@ export default function PlayerEquipment({
                           <Info fontSize="small" />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title={t("Send to chat")}>
+                        <IconButton
+                          size="small"
+                          onClick={() =>
+                            sendEquipmentToChat(accessory, "Accessory")
+                          }
+                          sx={{ p: 0.5 }}
+                        >
+                          <ChatOutlined fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </Grid>
                 </Grid>
               ))}
-              {renderAddPlaceholder("accessories")}
               {(precMeleeModifier !== 0 ||
                 precRangedModifier !== 0 ||
                 damageMeleeModifier !== 0 ||
@@ -1087,52 +1041,6 @@ export default function PlayerEquipment({
                 </Grid>
               )}
             </Grid>
-            <Dialog
-              open={dialogOpen}
-              onClose={handleDialogClose}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-              slotProps={{
-                paper: { sx: { width: { xs: "90%", md: "30%" } } },
-              }}
-            >
-              <DialogTitle
-                id="alert-dialog-title"
-                variant="h3"
-                sx={{
-                  backgroundColor:
-                    dialogSeverity === "error"
-                      ? "#bb2124"
-                      : dialogSeverity === "success"
-                        ? "#22bb33"
-                        : "#aaaaaa",
-                }}
-              >
-                {t("Result")}
-              </DialogTitle>
-              <DialogContent sx={{ marginTop: "10px" }}>
-                <DialogContent id="alert-dialog-description">
-                  {dialogMessage}
-                </DialogContent>
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  onClick={handleDialogClose}
-                  color="secondary"
-                  variant="contained"
-                >
-                  {t("Close")}
-                </Button>
-                <Button
-                  onClick={() => handleDiceRoll(currentWeapon)}
-                  color="primary"
-                  autoFocus
-                  variant="contained"
-                >
-                  {t("Re-roll")}
-                </Button>
-              </DialogActions>
-            </Dialog>
           </Paper>
         </>
       )}
@@ -1162,7 +1070,7 @@ export default function PlayerEquipment({
       <CompendiumViewerModal
         open={importOpen}
         onClose={() => setImportOpen(false)}
-        onAddItem={(type, item) => {
+        onAddItem={(item, type) => {
           if (type === "weapons") appendEquipmentItem("weapons", item);
           if (type === "custom-weapons") appendEquipmentItem("customWeapons", item);
           if (type === "shields") appendEquipmentItem("shields", item);
@@ -1242,13 +1150,13 @@ export default function PlayerEquipment({
             <>
               {selectedItem.isCustomWeapon ? (
                 <SharedCustomWeaponCard item={selectedItem} />
-              ) : allEquippedWeapons.includes(selectedItem) ? (
+              ) : allVisibleWeapons.includes(selectedItem) ? (
                 <SharedWeaponCard item={selectedItem} />
-              ) : equippedArmor.includes(selectedItem) ? (
+              ) : visibleArmor.includes(selectedItem) ? (
                 <SharedArmorCard item={selectedItem} />
-              ) : equippedShields.includes(selectedItem) ? (
+              ) : visibleShields.includes(selectedItem) ? (
                 <SharedShieldCard item={selectedItem} />
-              ) : equippedAccessories.includes(selectedItem) ? (
+              ) : visibleAccessories.includes(selectedItem) ? (
                 <SharedAccessoryCard item={selectedItem} />
               ) : null}
             </>

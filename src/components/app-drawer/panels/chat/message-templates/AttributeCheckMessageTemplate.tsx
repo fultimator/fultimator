@@ -5,6 +5,7 @@ import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
 import type { CheckResult } from "../types";
 import Diamond from "../../../../Diamond";
+import { CheckAttributeIcon } from "../../../../icons";
 
 const ATTR_LABEL: Record<string, string> = {
   dex: "DEX",
@@ -74,25 +75,44 @@ export const AttributeCheckMessageTemplate: React.FC<
 
   return (
     <>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
-      >
-        Attribute Check
-        {originLabel && (
-          <>
-            {" "}
-            <Diamond color="inherit" /> {originLabel}
-          </>
-        )}
-        {check.intent.difficulty != null && (
-          <>
-            {" "}
-            <Diamond color="inherit" /> DL {check.intent.difficulty}
-          </>
-        )}
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Box
+          sx={{
+            width: 40,
+            height: 40,
+            minWidth: 40,
+            borderRadius: 0.5,
+            border: "1px solid",
+            borderColor: "divider",
+            backgroundColor: "background.default",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 0.5,
+          }}
+        >
+          <CheckAttributeIcon size="32px" />
+        </Box>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ textTransform: "uppercase", letterSpacing: "0.04em", fontSize: "0.8rem", fontWeight: 700 }}
+        >
+          Attribute Check
+          {originLabel && (
+            <>
+              {" "}
+              <Diamond color="inherit" /> {originLabel}
+            </>
+          )}
+          {check.intent.difficulty != null && (
+            <>
+              {" "}
+              <Diamond color="inherit" /> DL {check.intent.difficulty}
+            </>
+          )}
+        </Typography>
+      </Box>
 
       <Stack
         direction="row"

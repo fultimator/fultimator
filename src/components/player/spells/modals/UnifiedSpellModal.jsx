@@ -153,20 +153,23 @@ export default function UnifiedSpellModal({
   const [formState, setFormState] = useState(spell || {});
 
   const handleDeleteClick = () => {
-    setDeleteConfirmOpen(true);
+    openDeleteConfirm();
   };
 
   const handleDeleteConfirm = () => {
     if (onDelete && spell) {
       onDelete(spell.index);
     }
-    setDeleteConfirmOpen(false);
+    closeDeleteConfirm();
   };
 
-  const { isOpen: deleteConfirmOpen, closeDialog: setDeleteConfirmOpen } =
-    useDeleteConfirmation({
-      onConfirm: handleDeleteConfirm,
-    });
+  const {
+    isOpen: deleteConfirmOpen,
+    openDialog: openDeleteConfirm,
+    closeDialog: closeDeleteConfirm,
+  } = useDeleteConfirmation({
+    onConfirm: handleDeleteConfirm,
+  });
 
   useEffect(() => {
     if (spell) {
@@ -296,7 +299,7 @@ export default function UnifiedSpellModal({
       {onDelete && (
         <DeleteConfirmationDialog
           open={deleteConfirmOpen}
-          onClose={setDeleteConfirmOpen}
+          onClose={closeDeleteConfirm}
           onConfirm={handleDeleteConfirm}
           title={t("Delete")}
           message={

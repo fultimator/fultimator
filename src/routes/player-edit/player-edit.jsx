@@ -2,6 +2,9 @@ import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
+import { useThemeStore } from "../../store/themeStore";
+import { TAB_RAIL_WIDTH, APP_DRAWER_WIDTH } from "../../components/app-drawer/constants";
+import { useDrawerScrollTop, useDrawerSave } from "../../hooks/useDrawerActions";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
@@ -30,6 +33,8 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
@@ -53,7 +58,6 @@ import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
 import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
 import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
-import GenericRolls from "../../components/player/playerSheet/GenericRolls";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
 import PlayerArcana from "../../components/player/playerSheet/PlayerArcana";
@@ -133,6 +137,7 @@ export default function PlayerEdit() {
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
   const isSmallScreen = useMediaQuery("(max-width: 899px)");
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const location = useLocation();
 
   const [isSpecialSkillsModalOpen, setIsSpecialSkillsModalOpen] =
@@ -204,9 +209,15 @@ export default function PlayerEdit() {
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const setDrawerIsOpen = useAppDrawerStore((s) => s.setIsOpen);
+  const setDrawerActiveTab = useAppDrawerStore((s) => s.setActiveTab);
+  const setChatComposerPrefill = useAppDrawerStore(
+    (s) => s.setChatComposerPrefill,
+  );
   const setChatActorDocOverride = useAppDrawerStore(
     (s) => s.setChatActorDocOverride,
   );
+  const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
+  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
   const [compactView, setCompactView] = useState(false);
   const [compactViewExpanded, setCompactViewExpanded] = useState(false);
 
@@ -237,22 +248,28 @@ export default function PlayerEdit() {
     isUsingLocalDb || Boolean(user && player && user.uid === player.uid);
   const isEditMode = isOwner && isSheetEditMode;
 
+  const handleSave = useCallback(() => {
+    setIsUpdated(false);
+    const playerToSave = {
+      ...playerTemp,
+      settings: {
+        ...playerTemp?.settings,
+        defaultView: compactView ? "compact" : "normal",
+      },
+    };
+    activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
+    setSavedSnackbarOpen(true);
+  }, [ref, playerTemp, compactView, activeSetDoc]);
+
   const handleCtrlS = useCallback(
     (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         if (!isOwner) return;
-        const playerToSave = {
-          ...playerTemp,
-          settings: {
-            ...playerTemp?.settings,
-            defaultView: compactView ? "compact" : "normal",
-          },
-        };
-        activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
+        handleSave();
       }
     },
-    [ref, playerTemp, compactView, isOwner, activeSetDoc],
+    [isOwner, handleSave],
   );
 
   useEffect(() => {
@@ -305,6 +322,9 @@ export default function PlayerEdit() {
     setIsUpdated(!deepEqual(current, playerBaseline));
   }, [playerTemp, playerBaseline]);
 
+  useDrawerSave({ canSave: isOwner && isUpdated, onSave: handleSave });
+  useDrawerScrollTop(showScrollTop);
+
   usePrompt(t("unsaved_changes"), isUpdated);
 
   const [download] = useDownload();
@@ -342,6 +362,17 @@ export default function PlayerEdit() {
     setDrawerOpen(open);
     setDrawerIsOpen(open);
   };
+
+  const handleQuickCheck = useCallback(
+    (kind) => {
+      if (kind === "group") return;
+      if (!["attribute", "open", "opposed"].includes(kind)) return;
+      setDrawerActiveTab("chat");
+      setChatComposerPrefill(`/check ${kind} `);
+      setDrawerIsOpen(true);
+    },
+    [setDrawerActiveTab, setChatComposerPrefill, setDrawerIsOpen],
+  );
 
   const recalculatePlayerMaxStats = useCallback((prevPlayer) => {
     const mig = Number(prevPlayer.attributes?.might?.base) || 0;
@@ -915,7 +946,6 @@ export default function PlayerEdit() {
                 canLevelUpFromExp={canLevelUpFromExp}
                 onLevelUpRequest={openLevelUpDialog}
               />
-              <Divider sx={{ my: 1 }} />
               {/* TODO: Add Zenit somewhere else */}
               {/* <PlayerNumbers
                 player={playerTemp}
@@ -924,8 +954,13 @@ export default function PlayerEdit() {
                 isOwner={isOwner}
               />
               <Divider sx={{ my: 1 }} /> */}
-              <GenericRolls player={playerTemp} isEditMode={isEditMode} />
-              <Divider sx={{ my: 1 }} />
+              {isOwner && (
+                <PlayerControls
+                  player={playerTemp}
+                  setPlayer={setPlayerTemp}
+                  onQuickCheck={handleQuickCheck}
+                />
+              )}
               <PlayerBonds
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
@@ -936,9 +971,6 @@ export default function PlayerEdit() {
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
               />
-              {isOwner && (
-                <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
-              )}
               <Divider sx={{ my: 1 }} />
               <PlayerLoadout
                 player={playerTemp}
@@ -946,6 +978,7 @@ export default function PlayerEdit() {
                 isEditMode={isEditMode}
                 isOwner={isOwner}
               />
+              <Divider sx={{ my: 1 }} />
               <PlayerEquipment
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
@@ -1058,6 +1091,7 @@ export default function PlayerEdit() {
             updateMaxStats={updateMaxStats}
             isEditMode={isEditMode}
             advancement={advancement}
+            onLevelUpRequest={openLevelUpDialog}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerTraits
@@ -1121,6 +1155,7 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             updateMaxStats={updateMaxStats}
             isEditMode={isEditMode}
+            onQuickCheck={handleQuickCheck}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerAffinities
@@ -1408,7 +1443,11 @@ export default function PlayerEdit() {
         sx={{
           position: "fixed",
           bottom: 16,
-          right: drawerOpen ? 360 + 16 : 16,
+          right: appDrawerOpen
+            ? APP_DRAWER_WIDTH + 16
+            : isDesktop
+            ? TAB_RAIL_WIDTH + 16
+            : 16,
           transition: "right 0.3s ease",
           zIndex: 1200,
           display: "flex",
@@ -1417,23 +1456,12 @@ export default function PlayerEdit() {
           gap: 1,
         }}
       >
-        {/* Save Button, shown if there are unsaved changes */}
         {isUpdated && isOwner && (
           <Tooltip title={t("Save")} placement="left">
             <Fab
               color="primary"
               aria-label="save"
-              onClick={() => {
-                setIsUpdated(false);
-                const playerToSave = {
-                  ...playerTemp,
-                  settings: {
-                    ...playerTemp?.settings,
-                    defaultView: compactView ? "compact" : "normal",
-                  },
-                };
-                activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
-              }}
+              onClick={handleSave}
               size="medium"
             >
               <Save fontSize="medium" />
@@ -1905,6 +1933,21 @@ export default function PlayerEdit() {
         onSuccess={null}
         webhookUrl={import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL}
       />
+      <Snackbar
+        open={savedSnackbarOpen}
+        autoHideDuration={2500}
+        onClose={() => setSavedSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSavedSnackbarOpen(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {t("Saved")}
+        </Alert>
+      </Snackbar>
     </Layout>
   );
 }

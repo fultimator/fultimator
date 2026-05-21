@@ -223,74 +223,75 @@ export default function PlayerBonds({
                         sx={{
                           height: "100%",
                           minWidth: { xs: "none", sm: "150px" },
-                          px: 1,
-                          py: 0.5,
                           minHeight: 48,
                           display: "flex",
                           flexDirection: "column",
-                          justifyContent: "center",
+                          overflow: "hidden",
                         }}
                       >
+                        {/* Header bar */}
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: 1,
+                            gap: 0.5,
+                            padding: "5px",
+                            paddingLeft: "10px",
+                            backgroundColor: primary,
                           }}
                         >
                           <Typography
-                            variant="h5"
+                            variant="body2"
+                            noWrap
                             sx={{
-                              fontWeight: 700,
+                              color: "#fff",
+                              fontWeight: 800,
                               textTransform: "uppercase",
-                              lineHeight: 1.1,
-                              wordBreak: "break-word",
-                              fontSize: { xs: "1rem", sm: "1.08rem" },
-                              letterSpacing: "0.02em",
+                              letterSpacing: "0.04em",
+                              flex: 1,
                             }}
                           >
                             {bond.name || t("Bond Name")}
                           </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 0.25,
-                              flexShrink: 0,
-                            }}
-                          >
-                            {calculateBondStrength(bond) > 0 && (
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  fontWeight: 800,
-                                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                                }}
-                              >
-                                {"★ " + calculateBondStrength(bond)}
-                              </Typography>
-                            )}
-                            {isEditMode && (
-                              <IconButton
-                                size="small"
-                                onClick={() => {
-                                  setIsCreatingBond(false);
-                                  setEditBondIndex(index);
-                                }}
-                                sx={{ p: 0.5 }}
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            )}
-                          </Box>
+                          {calculateBondStrength(bond) > 0 && (
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: "#fff",
+                                fontWeight: 800,
+                                flexShrink: 0,
+                              }}
+                            >
+                              {"★ " + calculateBondStrength(bond)}
+                            </Typography>
+                          )}
+                          {isEditMode && (
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setIsCreatingBond(false);
+                                setEditBondIndex(index);
+                              }}
+                              sx={{ p: 0.5, color: "#fff" }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          )}
                         </Box>
+                        {/* Body */}
                         <Box
                           sx={{
-                            mt: 0.5,
+                            px: 1,
+                            py: 0.75,
+                            flex: 1,
                             display: "flex",
                             flexWrap: "wrap",
                             gap: 0.45,
+                            alignContent: "flex-start",
+                            alignItems:
+                              getSentiments(bond).length > 0
+                                ? "flex-start"
+                                : "center",
                           }}
                         >
                           {getSentiments(bond).length > 0 ? (
@@ -322,14 +323,26 @@ export default function PlayerBonds({
                               </Typography>
                             ))
                           ) : (
-                            <Typography
-                              variant="caption"
+                            <Box
                               sx={{
-                                color: "text.secondary",
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                               }}
                             >
-                              {"-"}
-                            </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: "text.secondary",
+                                  fontStyle: "italic",
+                                  textAlign: "center",
+                                }}
+                              >
+                                {t("No sentiments")}
+                              </Typography>
+                            </Box>
                           )}
                         </Box>
                       </Card>

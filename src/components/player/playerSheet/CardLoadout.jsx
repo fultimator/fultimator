@@ -133,7 +133,7 @@ export default function CardLoadout({
     setSlotImportOpen(true);
   };
 
-  const handleSlotImportAdd = (type, item) => {
+  const handleSlotImportAdd = (item, type) => {
     if (type === "weapons") appendEquipmentItem("weapons", item);
     if (type === "custom-weapons") appendEquipmentItem("customWeapons", item);
     if (type === "shields") appendEquipmentItem("shields", item);

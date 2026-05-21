@@ -6,6 +6,13 @@ export default function EditPlayerStats({
   setPlayer,
   updateMaxStats: _updateMaxStats,
   isEditMode: _isEditMode,
+  onQuickCheck,
 }) {
-  return <PlayerControls player={player} setPlayer={setPlayer} />;
+  return (
+    <PlayerControls
+      player={player}
+      setPlayer={setPlayer}
+      onQuickCheck={onQuickCheck}
+    />
+  );
 }

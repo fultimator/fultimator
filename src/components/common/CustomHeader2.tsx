@@ -33,7 +33,7 @@ const CustomHeader2: React.FC<CustomHeaderProps> = ({
         paddingBottom: "5px",
         color: isDarkMode ? "white" : "black",
         textAlign: "left",
-        marginBottom: "10px",
+        marginBottom: "4px",
         textTransform: "uppercase",
         backgroundColor: theme.ternary,
         backgroundSize: "100% 100%",

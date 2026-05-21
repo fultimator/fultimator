@@ -2,6 +2,9 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
+import { useDrawerScrollTop, useDrawerSave } from "../../hooks/useDrawerActions";
+import { useThemeStore } from "../../store/themeStore";
+import { TAB_RAIL_WIDTH, APP_DRAWER_WIDTH } from "../../components/app-drawer/constants";
 import {
   Grid,
   Divider,
@@ -9,6 +12,7 @@ import {
   Tooltip,
   IconButton,
   Paper,
+  Box,
   useTheme,
   useMediaQuery,
   Alert,
@@ -148,16 +152,29 @@ export default function NpcEdit() {
     setIsUpdated(!deepEqual(current, baseline));
   }, [npcTemp, npc]);
 
+  const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
+  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 769px)");
+
+  const handleSave = useCallback(() => {
+    setIsUpdated(false);
+    activeSetDoc(ref, applyNpcPreSaveTransforms(npcTemp));
+    setSavedSnackbarOpen(true);
+  }, [ref, npcTemp, activeSetDoc]);
+
+  useDrawerSave({ canSave: isOwner && isUpdated, onSave: handleSave });
+  useDrawerScrollTop(showScrollTop);
+
   // Handler for Ctrl+S to save NPC
   const handleCtrlS = useCallback(
     (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         if (!isOwner) return;
-        activeSetDoc(ref, applyNpcPreSaveTransforms(npcTemp));
+        handleSave();
       }
     },
-    [ref, npcTemp, activeSetDoc, isOwner],
+    [isOwner, handleSave],
   );
 
   // Effect for scroll and keyboard shortcuts
@@ -623,36 +640,48 @@ export default function NpcEdit() {
           </>
         )}
         {/* <NpcUgly npc={npcTemp} /> */}
-        {/* Save Button, shown if there are unsaved changes */}
-        {isUpdated && isOwner && (
-          <Tooltip title={t("Save")} placement="left">
-            <Fab
-              color="primary"
-              aria-label="save"
-              size="medium"
-              sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1200 }}
-              onClick={() => {
-                setIsUpdated(false);
-                activeSetDoc(ref, applyNpcPreSaveTransforms(npcTemp));
-              }}
-            >
-              <Save />
-            </Fab>
-          </Tooltip>
-        )}
-
-        {showScrollTop && (
-          <Tooltip title={t("Scroll to top")} placement="left">
-            <Fab
-              size="medium"
-              color="primary"
-              onClick={handleMoveToTop}
-              sx={{ position: "fixed", bottom: 72, right: 16, zIndex: 1200 }}
-            >
-              <KeyboardArrowUp />
-            </Fab>
-          </Tooltip>
-        )}
+        {/* FAB container */}
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 16,
+            right: appDrawerOpen
+              ? APP_DRAWER_WIDTH + 16
+              : isDesktop
+              ? TAB_RAIL_WIDTH + 16
+              : 16,
+            transition: "right 0.3s ease",
+            zIndex: 1200,
+            display: "flex",
+            flexDirection: "column-reverse",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          {isUpdated && isOwner && (
+            <Tooltip title={t("Save")} placement="left">
+              <Fab
+                color="primary"
+                aria-label="save"
+                size="medium"
+                onClick={handleSave}
+              >
+                <Save />
+              </Fab>
+            </Tooltip>
+          )}
+          {showScrollTop && (
+            <Tooltip title={t("Scroll to top")} placement="left">
+              <Fab
+                size="medium"
+                color="primary"
+                onClick={handleMoveToTop}
+              >
+                <KeyboardArrowUp />
+              </Fab>
+            </Tooltip>
+          )}
+        </Box>
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           open={openShareSnackbar}
@@ -660,6 +689,21 @@ export default function NpcEdit() {
           onClose={handleClose}
           message={t("Copied to Clipboard!")}
         />
+        <Snackbar
+          open={savedSnackbarOpen}
+          autoHideDuration={2500}
+          onClose={() => setSavedSnackbarOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setSavedSnackbarOpen(false)}
+            severity="success"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {t("Saved")}
+          </Alert>
+        </Snackbar>
       </Layout>
     </NpcProvider>
   );

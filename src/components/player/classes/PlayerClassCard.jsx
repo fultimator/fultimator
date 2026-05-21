@@ -59,6 +59,7 @@ export default function PlayerClassCard({
   isExpanded = false,
   onToggleExpand = () => {},
   showHeader = true,
+  noBorder = false,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -493,7 +494,7 @@ export default function PlayerClassCard({
   );
 
   const cardBody = (
-    <Grid container spacing={1}>
+    <Grid container spacing={1} sx={{ pb: noBorder ? 1 : 0 }}>
       {!isAccordion && showHeader && <Grid size={12}>{header}</Grid>}
       {warnings.map((warning, index) => (
         <Grid key={index} size={12}>
@@ -512,7 +513,7 @@ export default function PlayerClassCard({
               isEditMode={isEditMode}
             />
           </Grid>
-          <Grid style={{ margin: "-20px 0 0 0" }} size={12}>
+          <Grid style={{ margin: "-14px 0 0 0" }} size={12}>
             <ul>
               {classItem.benefits.hpplus !== 0 && (
                 <li>
@@ -731,7 +732,7 @@ export default function PlayerClassCard({
             sx={{
               display: "flex",
               alignItems: "center",
-              mt: "30px",
+              mt: "16px",
               px: "17px",
               py: "3px",
             }}
@@ -765,26 +766,39 @@ export default function PlayerClassCard({
     return (
       <>
         <Accordion
-          elevation={3}
+          elevation={noBorder ? 0 : 3}
+          disableGutters={noBorder}
           expanded={isExpanded}
           onChange={onToggleExpand}
           sx={{
-            border: "2px solid",
-            borderColor: secondary,
+            ...(noBorder
+              ? {
+                  border: "none",
+                  boxShadow: "none",
+                  borderBottom: "1px solid",
+                  borderColor: secondary,
+                  "&:last-child": { borderBottom: "none" },
+                }
+              : {
+                  border: "2px solid",
+                  borderColor: secondary,
+                }),
             "&.MuiAccordion-root": {
-              borderRadius: "8px !important",
+              borderRadius: noBorder ? "0 !important" : "8px !important",
               "&:before": { display: "none" },
             },
             "& .MuiAccordion-heading": {
-              borderRadius: "6px !important",
+              borderRadius: noBorder ? "0 !important" : "6px !important",
             },
             "&.Mui-expanded .MuiAccordion-heading": {
-              borderRadius: "6px 6px 0 0 !important",
+              borderRadius: noBorder ? "0 !important" : "6px 6px 0 0 !important",
             },
             "&.MuiAccordion-root .MuiAccordionSummary-root": {
-              borderRadius: isExpanded
-                ? "6px 6px 0 0 !important"
-                : "6px !important",
+              borderRadius: noBorder
+                ? "0 !important"
+                : isExpanded
+                  ? "6px 6px 0 0 !important"
+                  : "6px !important",
             },
           }}
         >

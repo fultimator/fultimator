@@ -19,7 +19,12 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import { Casino, Info, SettingsSuggest } from "@mui/icons-material";
+import {
+  Casino,
+  Info,
+  SettingsSuggest,
+  ChatOutlined,
+} from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../../icons";
 import attributes from "../../../libs/attributes";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
@@ -44,6 +49,7 @@ import {
 } from "../../shared/itemCards";
 import { spellList } from "../../../libs/classes";
 import { getActiveMnemospheres } from "../classes/mnemosphereClassUtils";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
 
 export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -62,8 +68,10 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
   const [targets, setTargets] = useState(1);
   const [useMp, setUseMp] = useState(true);
   const [useIp, setUseIp] = useState(true); // Used for Magispheres
+  const rowHeight = 40;
 
   const [dialogSeverity, setDialogSeverity] = useState("");
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
 
   const inv = player.equipment?.[0];
 
@@ -443,6 +451,26 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
     setDialogMessage("");
   };
 
+  const sendSpellToChat = (spell, isGamble = false) => {
+    const spellName = isGamble
+      ? spell.spellName || spell.name || t("Spell")
+      : spell.name || spell.spellName || t("Spell");
+    addMessage({
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      speaker: player?.name || "Player",
+      kind: "display",
+      itemType: "spell",
+      name: spellName,
+      tags: [
+        t("Spell"),
+        spell.className || t("Unknown"),
+        isGamble ? t("Gamble") : t("Default"),
+      ],
+      description: spell.description || "",
+    });
+  };
+
   return (
     <>
       {(defaultSpells.length > 0 ||
@@ -492,7 +520,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   sx={{
                     display: "flex",
                     alignItems: "stretch",
-                    maxHeight: "40px",
+                    height: `${rowHeight}px`,
                   }}
                   size={{
                     xs: 12,
@@ -507,13 +535,13 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                         fontWeight: "bold",
                         textTransform: "uppercase",
                         backgroundColor: primary,
-                        padding: "5px",
-                        paddingLeft: "10px",
+                        px: "10px",
                         color: "#fff",
                         borderRadius: "8px 0 0 8px",
                         display: "flex",
                         alignItems: "center",
                         width: "100%",
+                        height: `${rowHeight}px`,
                       }}
                     >
                       {spell.isMagisphere && (
@@ -529,20 +557,23 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                     sx={{
                       display: "flex",
                       alignItems: "stretch",
-                      maxHeight: "40px",
+                      height: `${rowHeight}px`,
                     }}
                     size={2}
                   >
                     <div
                       id="spell-right-controls"
                       style={{
-                        padding: "10px",
+                        padding: "0 8px",
                         backgroundColor: ternary,
                         borderRadius: "0 8px 8px 0",
                         marginRight: "15px",
                         display: "flex",
                         alignItems: "center",
+                        justifyContent: "center",
                         flexDirection: "row",
+                        height: `${rowHeight}px`,
+                        width: "100%",
                       }}
                       className="spell-right-controls"
                     >
@@ -554,6 +585,16 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                           <Info />
                         </IconButton>
                       </Tooltip>
+                      {!(spell.isOffensive && isEditMode) && (
+                        <Tooltip title={t("Send to chat")}>
+                          <IconButton
+                            sx={{ padding: "0px", marginLeft: "5px" }}
+                            onClick={() => sendSpellToChat(spell)}
+                          >
+                            <ChatOutlined />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                       {spell.isOffensive && isEditMode && (
                         <Tooltip title={t("Roll")}>
                           <IconButton
@@ -579,7 +620,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                   sx={{
                     display: "flex",
                     alignItems: "stretch",
-                    maxHeight: "40px",
+                    height: `${rowHeight}px`,
                   }}
                   size={{
                     xs: 12,
@@ -594,13 +635,13 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                         fontWeight: "bold",
                         textTransform: "uppercase",
                         backgroundColor: primary,
-                        padding: "5px",
-                        paddingLeft: "10px",
+                        px: "10px",
                         color: "#fff",
                         borderRadius: "8px 0 0 8px",
                         display: "flex",
                         alignItems: "center",
                         width: "100%",
+                        height: `${rowHeight}px`,
                       }}
                     >
                       {gamble.isMagisphere && (
@@ -615,20 +656,23 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                     sx={{
                       display: "flex",
                       alignItems: "stretch",
-                      maxHeight: "40px",
+                      height: `${rowHeight}px`,
                     }}
                     size={2}
                   >
                     <div
                       id="spell-right-controls"
                       style={{
-                        padding: "10px",
+                        padding: "0 8px",
                         backgroundColor: ternary,
                         borderRadius: "0 8px 8px 0",
                         marginRight: "15px",
                         display: "flex",
                         alignItems: "center",
+                        justifyContent: "center",
                         flexDirection: "row",
+                        height: `${rowHeight}px`,
+                        width: "100%",
                       }}
                       className="spell-right-controls"
                     >
@@ -640,6 +684,16 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                           <Info />
                         </IconButton>
                       </Tooltip>
+                      {!isEditMode && (
+                        <Tooltip title={t("Send to chat")}>
+                          <IconButton
+                            sx={{ padding: "0px", marginLeft: "5px" }}
+                            onClick={() => sendSpellToChat(gamble, true)}
+                          >
+                            <ChatOutlined />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                       {isEditMode && (
                         <Tooltip title={t("Roll")}>
                           <IconButton
@@ -691,7 +745,7 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                       sx={{
                         display: "flex",
                         alignItems: "stretch",
-                        maxHeight: "40px",
+                        height: `${rowHeight}px`,
                       }}
                       size={{ xs: 12, md: 6 }}
                     >
@@ -702,13 +756,13 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                             fontWeight: "bold",
                             textTransform: "uppercase",
                             backgroundColor: primary,
-                            padding: "5px",
-                            paddingLeft: "10px",
+                            px: "10px",
                             color: "#fff",
                             borderRadius: "8px 0 0 8px",
                             display: "flex",
                             alignItems: "center",
                             width: "100%",
+                            height: `${rowHeight}px`,
                           }}
                         >
                           {t(spell.name)}
@@ -718,19 +772,22 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                         sx={{
                           display: "flex",
                           alignItems: "stretch",
-                          maxHeight: "40px",
+                          height: `${rowHeight}px`,
                         }}
                         size={2}
                       >
                         <div
                           style={{
-                            padding: "10px",
+                            padding: "0 8px",
                             backgroundColor: ternary,
                             borderRadius: "0 8px 8px 0",
                             marginRight: "15px",
                             display: "flex",
                             alignItems: "center",
+                            justifyContent: "center",
                             flexDirection: "row",
+                            height: `${rowHeight}px`,
+                            width: "100%",
                           }}
                         >
                           <Tooltip title={t("Info")}>
@@ -742,6 +799,14 @@ export default function PlayerSpells({ player, setPlayer, isEditMode }) {
                               }}
                             >
                               <Info />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t("Send to chat")}>
+                            <IconButton
+                              sx={{ padding: "0px", marginLeft: "5px" }}
+                              onClick={() => sendSpellToChat(spell)}
+                            >
+                              <ChatOutlined />
                             </IconButton>
                           </Tooltip>
                         </div>

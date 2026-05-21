@@ -5,6 +5,7 @@ import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
 import type { CheckResult } from "../types";
 import Diamond from "../../../../Diamond";
+import { CheckOpenIcon } from "../../../../icons";
 import {
   ATTR_LABEL,
   STUDY_TIERS,
@@ -44,19 +45,38 @@ export const OpenCheckMessageTemplate: React.FC<
 
   return (
     <>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
-      >
-        Open Check
-        {isStudy && (
-          <>
-            {" "}
-            <Diamond color="inherit" /> Study
-          </>
-        )}
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Box
+          sx={{
+            width: 40,
+            height: 40,
+            minWidth: 40,
+            borderRadius: 0.5,
+            border: "1px solid",
+            borderColor: "divider",
+            backgroundColor: "background.default",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 0.5,
+          }}
+        >
+          <CheckOpenIcon size="32px" />
+        </Box>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ textTransform: "uppercase", letterSpacing: "0.04em", fontSize: "0.8rem", fontWeight: 700 }}
+        >
+          Open Check
+          {isStudy && (
+            <>
+              {" "}
+              <Diamond color="inherit" /> Study
+            </>
+          )}
+        </Typography>
+      </Box>
 
       <Stack
         direction="row"

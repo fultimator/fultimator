@@ -353,7 +353,7 @@ function ThemedSpellChanter({
           </Grid>
         </Grid>
       </div>
-      {magichant.keys.length === 0 ? (
+      {(magichant.keys ?? []).length === 0 ? (
         <Typography
           sx={{
             padding: "3px 17px",
@@ -366,7 +366,7 @@ function ThemedSpellChanter({
           {t("magichant_empty_keys")}
         </Typography>
       ) : (
-        magichant.keys.map((chantKey, i) => (
+        (magichant.keys ?? []).map((chantKey, i) => (
           <Grid
             container
             sx={{
@@ -502,7 +502,7 @@ function ThemedSpellChanter({
           </Grid>
         </Grid>
       </div>
-      {magichant.tones.length === 0 ? (
+      {(magichant.tones ?? []).length === 0 ? (
         <Typography
           sx={{
             padding: "3px 17px",
@@ -515,7 +515,7 @@ function ThemedSpellChanter({
           {t("magichant_empty_tones")}
         </Typography>
       ) : (
-        magichant.tones.map((tone, i) => (
+        (magichant.tones ?? []).map((tone, i) => (
           <React.Fragment key={i}>
             <div
               style={{

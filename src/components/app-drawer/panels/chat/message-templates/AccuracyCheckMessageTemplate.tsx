@@ -6,6 +6,7 @@ import type { AccuracyCheckResult } from "../types";
 import { TypeIcon } from "../../../../types";
 import Diamond from "../../../../Diamond";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
+import { CheckAccuracyIcon } from "../../../../icons";
 import { BreakdownRow, DiceRow, TagRow } from "./primitives";
 import { ATTR_LABEL, normalizeDamageType } from "./primitives-utils";
 
@@ -71,13 +72,32 @@ export const AccuracyCheckMessageTemplate: React.FC<
 
   return (
     <>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
-      >
-        Accuracy Check <Diamond color="inherit" /> {check.intent.weaponName}
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Box
+          sx={{
+            width: 40,
+            height: 40,
+            minWidth: 40,
+            borderRadius: 0.5,
+            border: "1px solid",
+            borderColor: "divider",
+            backgroundColor: "background.default",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 0.5,
+          }}
+        >
+          <CheckAccuracyIcon size="32px" />
+        </Box>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ textTransform: "uppercase", letterSpacing: "0.04em", fontSize: "0.8rem", fontWeight: 700 }}
+        >
+          Accuracy Check <Diamond color="inherit" /> {check.intent.weaponName}
+        </Typography>
+      </Box>
       <TagRow tags={tags} />
 
       {check.intent.description && (

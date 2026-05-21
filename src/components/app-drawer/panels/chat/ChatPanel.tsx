@@ -182,6 +182,10 @@ export const ChatPanel: React.FC = () => {
 
   const { playerDoc, npcDoc } = useRouteActor();
   const chatActorDocOverride = useAppDrawerStore((s) => s.chatActorDocOverride);
+  const chatComposerPrefill = useAppDrawerStore((s) => s.chatComposerPrefill);
+  const setChatComposerPrefill = useAppDrawerStore(
+    (s) => s.setChatComposerPrefill,
+  );
   const contextActorName = useActorName(playerDoc, npcDoc);
   const combatSimActors = useCombatSimActors();
   const activeActorName = useCombatEncounterStore((s) => s.activeActorName);
@@ -524,6 +528,8 @@ export const ChatPanel: React.FC = () => {
           });
         }}
         onOpenSupportModules={() => setSupportPickerOpen(true)}
+        prefillInput={chatComposerPrefill}
+        onPrefillConsumed={() => setChatComposerPrefill(null)}
       />
 
       <DeleteConfirmationDialog

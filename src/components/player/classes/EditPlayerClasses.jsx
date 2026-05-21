@@ -624,48 +624,50 @@ export default function EditPlayerClasses({
           </IconButton>
         </Tooltip>
       </Box>
-      {isEditMode ? (
-        <Paper
-          elevation={3}
-          sx={{
-            borderRadius: "0 0 8px 8px",
-            border: "2px solid",
-            borderColor: secondary,
-            borderTop: "none",
-            mb: 2,
-            overflow: "hidden",
-          }}
-        >
-          <Box sx={{ p: "15px" }}>
-            <Grid container spacing={1}>
-              <Grid size={12}>
-                <CustomHeader
-                  type="top"
-                  squareTop
-                  headerText={t(
-                    usesInnateClassRules ? "Innate Classes" : "Classes",
-                  )}
-                  rightLabel={t("Total Invested Levels")}
-                  rightValue={totalInnateLevel}
-                  rightMax={player.lvl}
-                  showIconButton={canAddMoreClasses}
-                  icon={AddIcon}
-                  customTooltip={t(
-                    usesInnateClassRules
-                      ? "Add Blank Innate Class"
-                      : "Add Blank Class",
-                  )}
-                  addItem={
-                    canAddMoreClasses ? () => setDialogOpen(true) : undefined
-                  }
-                  openCompendium={
-                    canAddMoreClasses
-                      ? () => setCompendiumOpen(true)
-                      : undefined
-                  }
-                />
-              </Grid>
-              {warnings.map((warning, index) => (
+      <Paper
+        elevation={3}
+        sx={{
+          borderRadius: "0 0 8px 8px",
+          border: "2px solid",
+          borderColor: secondary,
+          borderTop: "none",
+          mb: 2,
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{ p: "15px" }}>
+          <Grid container spacing={1}>
+            <Grid size={12}>
+              <CustomHeader
+                type="top"
+                squareTop
+                headerText={t(
+                  usesInnateClassRules ? "Innate Classes" : "Classes",
+                )}
+                rightLabel={t("Total Invested Levels")}
+                rightValue={totalInnateLevel}
+                rightMax={player.lvl}
+                showIconButton={isEditMode && canAddMoreClasses}
+                icon={AddIcon}
+                customTooltip={t(
+                  usesInnateClassRules
+                    ? "Add Blank Innate Class"
+                    : "Add Blank Class",
+                )}
+                addItem={
+                  isEditMode && canAddMoreClasses
+                    ? () => setDialogOpen(true)
+                    : undefined
+                }
+                openCompendium={
+                  isEditMode && canAddMoreClasses
+                    ? () => setCompendiumOpen(true)
+                    : undefined
+                }
+              />
+            </Grid>
+            {isEditMode &&
+              warnings.map((warning, index) => (
                 <Grid key={index} size={12}>
                   <Alert
                     variant="filled"
@@ -681,34 +683,34 @@ export default function EditPlayerClasses({
                   </Alert>
                 </Grid>
               ))}
-            </Grid>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleFileUpload}
-              style={{ display: "none" }}
-            />
+          </Grid>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+          />
+        </Box>
+        {player.classes.length === 0 && (
+          <Box sx={{ p: "15px" }}>
+            <Typography variant="h3" align="center">
+              {t(
+                usesInnateClassRules
+                  ? "No innate classes added yet"
+                  : "No classes added yet",
+              )}
+            </Typography>
           </Box>
-          {player.classes.length === 0 && (
-            <Box sx={{ p: "15px", pt: 0 }}>
-              <Typography variant="h3" align="center">
-                {t(
-                  usesInnateClassRules
-                    ? "No innate classes added yet"
-                    : "No classes added yet",
-                )}
-              </Typography>
-            </Box>
-          )}
-          {player.classes &&
-            player.classes.map((cls, index) => {
-              const clsLvl = automaticClassLevel
-                ? getDerivedClassLevel(cls)
-                : cls.lvl;
-              return (
-                <Box key={index} sx={{ px: "15px", pb: "15px" }}>
-                  <PlayerClassCard
+        )}
+        {player.classes &&
+          player.classes.map((cls, index) => {
+            const clsLvl = automaticClassLevel
+              ? getDerivedClassLevel(cls)
+              : cls.lvl;
+            return (
+              <PlayerClassCard
+                key={index}
                 allClasses={player.classes}
                 classItem={{ ...cls, name: cls.name, lvl: clsLvl }}
                 onRemove={() => handleRemoveClass(index)}
@@ -741,6 +743,7 @@ export default function EditPlayerClasses({
                 isHomebrew={cls.isHomebrew ?? false}
                 isClassLevelReadOnly={automaticClassLevel}
                 isAccordion
+                noBorder
                 isExpanded={!!expandedClasses[index]}
                 onToggleExpand={() =>
                   setExpandedClasses((prev) => ({
@@ -749,11 +752,9 @@ export default function EditPlayerClasses({
                   }))
                 }
               />
-            </Box>
-          );
-        })}
-        </Paper>
-      ) : null}
+            );
+          })}
+      </Paper>
       {usesInnateClassRules && (
         <>
           <Divider

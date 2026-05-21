@@ -5,6 +5,7 @@ import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
 import type { OpposedCheckResult } from "../types";
 import Diamond from "../../../../Diamond";
+import { CheckOpposedIcon } from "../../../../icons";
 import { isOpposedTied } from "../domain/checks";
 
 const ATTR_LABEL: Record<string, string> = {
@@ -88,19 +89,38 @@ export const OpposedCheckMessageTemplate: React.FC<
 
   return (
     <>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
-      >
-        Opposed Check
-        {check.opposedToSpeaker && (
-          <>
-            {" "}
-            <Diamond color="inherit" /> vs {check.opposedToSpeaker}
-          </>
-        )}
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Box
+          sx={{
+            width: 40,
+            height: 40,
+            minWidth: 40,
+            borderRadius: 0.5,
+            border: "1px solid",
+            borderColor: "divider",
+            backgroundColor: "background.default",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 0.5,
+          }}
+        >
+          <CheckOpposedIcon size="32px" />
+        </Box>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ textTransform: "uppercase", letterSpacing: "0.04em", fontSize: "0.8rem", fontWeight: 700 }}
+        >
+          Opposed Check
+          {check.opposedToSpeaker && (
+            <>
+              {" "}
+              <Diamond color="inherit" /> vs {check.opposedToSpeaker}
+            </>
+          )}
+        </Typography>
+      </Box>
 
       <Stack
         direction="row"
