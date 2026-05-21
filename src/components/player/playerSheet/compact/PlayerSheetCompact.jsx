@@ -95,8 +95,8 @@ import CompactLoadout from "./CompactLoadout";
 import CompactSphereInventory from "./CompactSphereInventory";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { calculateAttribute } from "../../common/playerCalculations";
-import ExpIcon from "../../../svgs/exp.svg?react";
-import ExpDisabledIcon from "../../../svgs/exp_disabled.svg?react";
+import ExpIcon from "/src/components/svgs/exp.svg?react";
+import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
 
 // const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 // const StyledTableCell = styled(TableCell)({ padding: 0 });
@@ -1853,7 +1853,12 @@ function Header({
               }
               variant="standard"
               size="small"
+              fullWidth
               sx={{
+                flex: 1,
+                minWidth: 0,
+                width: "100%",
+                "& .MuiInput-root": { width: "100%" },
                 "& .MuiInputBase-input": {
                   color: "#fff",
                   fontFamily: "Antonio",

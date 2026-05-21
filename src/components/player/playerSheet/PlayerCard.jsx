@@ -23,16 +23,21 @@ import {
 import { Add, Remove } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import avatar_image from "../../avatar.jpg";
+import avatar_image from "/images/components/avatar.jpg";
 import Diamond from "../../Diamond";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
-import { DefIcon, MdefIcon, InitIcon } from "../../icons";
-import FabulaIcon from "../../svgs/fabula.svg?react";
-import ExpIcon from "../../svgs/exp.svg?react";
-import ExpDisabledIcon from "../../svgs/exp_disabled.svg?react";
+import ExpIcon from "/src/components/svgs/exp.svg?react";
+import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
+import {
+  DexAttributeIcon,
+  InsAttributeIcon,
+  MigAttributeIcon,
+  WlpAttributeIcon,
+} from "../../icons";
 
 import { TypeAffinity } from "../stats/types";
+import StatTooltip from "../../common/StatTooltip";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { useThemeStore } from "../../../store/themeStore";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
@@ -95,15 +100,9 @@ const AffinityStrip = styled(Box)(({ theme }) => ({
 
 const AffinityCell = styled(Box)(({ theme }) => ({
   display: "flex",
-  flexDirection: "column",
   alignItems: "center",
+  justifyContent: "center",
   padding: "4px 2px",
-  [theme.breakpoints.up("md")]: {
-    padding: "6px 4px",
-  },
-  [theme.breakpoints.up("lg")]: {
-    padding: "8px 4px",
-  },
   borderRight: `1px solid ${theme.palette.divider}`,
   [theme.breakpoints.down("sm")]: {
     borderBottom: `1px solid ${theme.palette.divider}`,
@@ -117,12 +116,12 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
   background: theme.palette.primary.main,
   border: `0.5px solid ${theme.palette.divider}`,
   borderRadius: theme.shape.borderRadius,
-  padding: "4px 6px",
+  padding: "3px 6px",
   [theme.breakpoints.up("md")]: {
-    padding: "6px 8px",
+    padding: "4px 8px",
   },
   [theme.breakpoints.up("lg")]: {
-    padding: "8px 10px",
+    padding: "5px 10px",
   },
   textAlign: "center",
   flex: 1,
@@ -280,55 +279,103 @@ function StatBar({
   );
 }
 
-function CombatStat({ icon, label, value }) {
-  return (
-    <CombatStatCard sx={{ px: { xs: "2px", sm: "6px" }, py: "4px" }}>
-      <Typography
-        sx={{
-          fontFamily: "'Antonio', fantasy, sans-serif",
-          fontWeight: "bold",
-          fontSize: {
-            xs: "0.55rem",
-            sm: "0.62rem",
-            md: "0.68rem",
-            lg: "0.74rem",
-          },
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          color: "#fff",
-          lineHeight: 1.2,
-        }}
-      >
-        {label}
-      </Typography>
+function CombatStat({ icon, label, value, isEditMode = false, onChange, tooltip }) {
+  const card = (
+    <CombatStatCard sx={{ px: { xs: "6px", sm: "8px" }, py: "4px" }}>
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "2px",
+          gap: "8px",
+          minHeight: "36px",
         }}
       >
-        {React.cloneElement(icon, { size: "14px", color: "#fff" })}
+        {icon}
         <Typography
           sx={{
             fontFamily: "'Antonio', fantasy, sans-serif",
+            fontWeight: "bold",
             fontSize: {
               xs: "0.9rem",
               sm: "1.1rem",
               md: "1.2rem",
               lg: "1.3rem",
             },
-            fontWeight: "bold",
-            lineHeight: 1.3,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
             color: "#fff",
+            lineHeight: 1.2,
+            whiteSpace: "nowrap",
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          {value}
+          {label}
         </Typography>
+        {isEditMode ? (
+          <TextField
+            value={value}
+            onChange={onChange}
+            size="small"
+            variant="standard"
+            slotProps={{
+              input: { readOnly: !onChange },
+              htmlInput: {
+                style: {
+                  textAlign: "center",
+                  fontFamily: "Antonio",
+                  fontWeight: "bold",
+                  color: "#fff",
+                  WebkitTextFillColor: "#fff",
+                },
+              },
+            }}
+            sx={{
+              width: { xs: "34px", sm: "40px" },
+              "& .MuiInputBase-input": { color: "#fff" },
+              "& .MuiInput-underline:before": {
+                borderBottomColor: "rgba(255,255,255,0.75)",
+                borderBottomWidth: "2px",
+              },
+              "& .MuiInput-underline:hover:before": {
+                borderBottomColor: "#fff",
+                borderBottomWidth: "2px",
+              },
+              "& .MuiInput-underline:after": {
+                borderBottomColor: "#fff",
+                borderBottomWidth: "2px",
+              },
+            }}
+          />
+        ) : (
+          <Typography
+            sx={{
+              fontFamily: "'Antonio', fantasy, sans-serif",
+              fontSize: {
+                xs: "0.9rem",
+                sm: "1.1rem",
+                md: "1.2rem",
+                lg: "1.3rem",
+              },
+              fontWeight: "bold",
+              lineHeight: 1.2,
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {value}
+          </Typography>
+        )}
       </Box>
     </CombatStatCard>
   );
+
+  if (tooltip) {
+    return <StatTooltip {...tooltip} display="flex" sx={{ flex: 1 }}>{card}</StatTooltip>;
+  }
+  return card;
 }
 
 // Main Component
@@ -599,10 +646,10 @@ export default function PlayerCard({
   ];
 
   const ATTRIBUTES = [
-    { key: "dexterity", label: t("DEX"), curr: currDex },
-    { key: "insight", label: t("INS"), curr: currInsight },
-    { key: "might", label: t("MIG"), curr: currMight },
-    { key: "willpower", label: t("WLP"), curr: currWillpower },
+    { key: "dexterity", label: t("DEX"), fullName: t("Dexterity"), curr: currDex, Icon: DexAttributeIcon, debuffs: ["slow", "enraged"], buffs: ["dexUp"] },
+    { key: "insight", label: t("INS"), fullName: t("Insight"), curr: currInsight, Icon: InsAttributeIcon, debuffs: ["dazed", "enraged"], buffs: ["insUp"] },
+    { key: "might", label: t("MIG"), fullName: t("Might"), curr: currMight, Icon: MigAttributeIcon, debuffs: ["weak", "poisoned"], buffs: ["migUp"] },
+    { key: "willpower", label: t("WLP"), fullName: t("Willpower"), curr: currWillpower, Icon: WlpAttributeIcon, debuffs: ["shaken", "poisoned"], buffs: ["wlpUp"] },
   ];
 
   const avatarSrc = isCharacterSheet
@@ -676,8 +723,15 @@ export default function PlayerCard({
               variant="standard"
               size="small"
               sx={{
+                flex: 1,
+                minWidth: 0,
+                "& .MuiInput-root": { width: "100%" },
+                "& .MuiInputBase-root": {
+                  "&:hover": { backgroundColor: "transparent" },
+                },
                 "& .MuiInputBase-input": {
                   color: "#fff",
+                  "&:-webkit-autofill": { WebkitBoxShadow: "0 0 0 100px transparent inset", WebkitTextFillColor: "#fff" },
                   fontFamily: "Antonio",
                   fontSize: {
                     xs: "1.15rem",
@@ -731,63 +785,74 @@ export default function PlayerCard({
           }}
         >
           {isEditMode ? (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              {player.info.pronouns && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+              <TextField
+                value={player.info.pronouns || ""}
+                onChange={(e) =>
+                  setPlayer((p) => ({
+                    ...p,
+                    info: { ...p.info, pronouns: e.target.value },
+                  }))
+                }
+                variant="standard"
+                size="small"
+                placeholder={t("Pronouns")}
+                sx={{
+                  width: { xs: 110, sm: 130 },
+                  "& .MuiInputBase-root": { minHeight: 32 },
+                  "& .MuiInputBase-input": {
+                    fontFamily: "Antonio",
+                    fontSize: { xs: "0.95rem", sm: "1.08rem" },
+                    lineHeight: 1.1,
+                    textTransform: "uppercase",
+                  },
+                }}
+              />
+              <Diamond color={primary} />
+              <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.45 }}>
                 <Typography
                   sx={{
                     fontFamily: "Antonio",
-                    fontSize: { xs: "0.78rem", sm: "1rem", md: "1.08rem" },
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
                     textTransform: "uppercase",
-                    mr: 0.5,
+                    lineHeight: 1,
                   }}
                 >
-                  {player.info.pronouns} <Diamond color={primary} />
+                  {t("Lvl")}
                 </Typography>
-              )}
-              <IconButton
-                size="small"
-                onClick={() => {
-                  setPlayer((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) }));
-                  updateMaxStats?.();
-                }}
-              >
-                <Remove fontSize="small" />
-              </IconButton>
-              <Typography
-                sx={{
-                  fontFamily: "Antonio",
-                  fontSize: {
-                    xs: "0.96rem",
-                    sm: "1.25rem",
-                    md: "1.35rem",
-                    lg: "1.45rem",
-                  },
-                  fontWeight: "medium",
-                  textTransform: "uppercase",
-                  mx: 0.5,
-                }}
-              >
-                {t("Lvl")} {player.lvl}
-              </Typography>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  setPlayer((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) }));
-                  updateMaxStats?.();
-                }}
-              >
-                <Add fontSize="small" />
-              </IconButton>
+                <TextField
+                  value={player.lvl}
+                  onChange={(e) => {
+                    const next = parseInt(e.target.value, 10);
+                    const lvl = Number.isNaN(next) ? 5 : Math.max(5, Math.min(50, next));
+                    setPlayer((p) => ({ ...p, lvl }));
+                    updateMaxStats?.();
+                  }}
+                  variant="standard"
+                  size="small"
+                  type="number"
+                  sx={{
+                    width: { xs: 48, sm: 54 },
+                    "& .MuiInputBase-root": { minHeight: 32 },
+                    "& .MuiInputBase-input": {
+                      fontFamily: "Antonio",
+                      fontSize: { xs: "1.2rem", sm: "1.3rem" },
+                      fontWeight: "medium",
+                      lineHeight: 1,
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                    },
+                  }}
+                  slotProps={{ htmlInput: { min: 5, max: 50 } }}
+                />
+              </Box>
               <Diamond color={primary} />
               <Typography
                 sx={{
                   fontFamily: "Antonio",
-                  fontSize: {
-                    xs: "0.84rem",
-                    sm: "1rem",
-                    md: "1.08rem",
-                    lg: "1.15rem",
-                  },
+                  fontSize: { xs: "0.9rem", sm: "1rem" },
+                  fontWeight: 400,
+                  lineHeight: 1,
                   textTransform: "uppercase",
                 }}
               >
@@ -807,15 +872,19 @@ export default function PlayerCard({
                 }}
                 size="small"
                 variant="standard"
-                sx={{ width: { xs: "40px", sm: "50px" } }}
-                slotProps={{
-                  htmlInput: {
-                    style: {
-                      textAlign: "center",
-                      fontFamily: "Antonio",
-                      fontWeight: "bold",
-                    },
+                sx={{
+                  width: { xs: "48px", sm: "54px" },
+                  "& .MuiInputBase-root": { minHeight: 32 },
+                  "& .MuiInputBase-input": {
+                    textAlign: "center",
+                    fontFamily: "Antonio",
+                    fontWeight: "medium",
+                    fontSize: { xs: "1.2rem", sm: "1.3rem" },
+                    lineHeight: 1,
                   },
+                }}
+                slotProps={{
+                  htmlInput: { maxLength: 2 },
                 }}
               />
               <IconButton size="small" onClick={() => bumpInfoNumber("exp", 1)}>
@@ -984,69 +1053,74 @@ export default function PlayerCard({
             )}
           </Box>
           <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <StatBar
-              label={t("HP")}
-              value={player.stats.hp.current}
-              max={player.stats.hp.max}
-              color1={
-                isDark
-                  ? newShade(theme.palette.error.main, 10)
-                  : newShade(theme.palette.error.main, 80)
-              }
-              color2={theme.palette.error.main}
-              trackColor="rgba(35,35,35,0.88)"
-              isOwner={isOwner}
-              onClick={() =>
-                setStatChangeDialog({
-                  key: "hp",
-                  label: t("HP"),
-                  value: player.stats.hp.current,
-                  max: player.stats.hp.max,
-                })
-              }
-            />
-            <StatBar
-              label={t("MP")}
-              value={player.stats.mp.current}
-              max={player.stats.mp.max}
-              color1={
-                isDark
-                  ? newShade(theme.palette.info.main, 10)
-                  : newShade(theme.palette.info.main, 80)
-              }
-              color2={theme.palette.info.main}
-              trackColor="rgba(35,35,35,0.88)"
-              isOwner={isOwner}
-              onClick={() =>
-                setStatChangeDialog({
-                  key: "mp",
-                  label: t("MP"),
-                  value: player.stats.mp.current,
-                  max: player.stats.mp.max,
-                })
-              }
-            />
-            <StatBar
-              label={t("IP")}
-              value={player.stats.ip.current}
-              max={player.stats.ip.max}
-              color1={
-                isDark
-                  ? newShade(theme.palette.success.main, 10)
-                  : newShade(theme.palette.success.main, 80)
-              }
-              color2={theme.palette.success.main}
-              trackColor="rgba(35,35,35,0.88)"
-              isOwner={isOwner}
-              onClick={() =>
-                setStatChangeDialog({
-                  key: "ip",
-                  label: t("IP"),
-                  value: player.stats.ip.current,
-                  max: player.stats.ip.max,
-                })
-              }
-            />
+            <StatTooltip
+              title={t("Hit Points")}
+              formula={`${t("MIG")} × 5 + ${t("Level")}`}
+              total={player.stats.hp.max}
+              breakdown={[
+                { label: `${t("MIG")} d${player.attributes.might?.base} × 5`, value: (player.attributes.might?.base ?? 0) * 5 },
+                { label: t("Level"), value: player.lvl },
+                ...(player.stats.hp.max - (player.attributes.might?.base ?? 0) * 5 - player.lvl > 0
+                  ? [{ label: t("Class / item bonuses"), value: player.stats.hp.max - (player.attributes.might?.base ?? 0) * 5 - player.lvl, signed: true }]
+                  : []),
+              ]}
+            >
+              <StatBar
+                label={t("HP")}
+                value={player.stats.hp.current}
+                max={player.stats.hp.max}
+                color1={isDark ? newShade(theme.palette.error.main, 10) : newShade(theme.palette.error.main, 80)}
+                color2={theme.palette.error.main}
+                trackColor="rgba(35,35,35,0.88)"
+                isOwner={isOwner}
+                onClick={() => setStatChangeDialog({ key: "hp", label: t("HP"), value: player.stats.hp.current, max: player.stats.hp.max })}
+              />
+            </StatTooltip>
+            <StatTooltip
+              title={t("Mind Points")}
+              formula={`${t("WLP")} × 5 + ${t("Level")}`}
+              total={player.stats.mp.max}
+              breakdown={[
+                { label: `${t("WLP")} d${player.attributes.willpower?.base} × 5`, value: (player.attributes.willpower?.base ?? 0) * 5 },
+                { label: t("Level"), value: player.lvl },
+                ...(player.stats.mp.max - (player.attributes.willpower?.base ?? 0) * 5 - player.lvl > 0
+                  ? [{ label: t("Class / item bonuses"), value: player.stats.mp.max - (player.attributes.willpower?.base ?? 0) * 5 - player.lvl, signed: true }]
+                  : []),
+              ]}
+            >
+              <StatBar
+                label={t("MP")}
+                value={player.stats.mp.current}
+                max={player.stats.mp.max}
+                color1={isDark ? newShade(theme.palette.info.main, 10) : newShade(theme.palette.info.main, 80)}
+                color2={theme.palette.info.main}
+                trackColor="rgba(35,35,35,0.88)"
+                isOwner={isOwner}
+                onClick={() => setStatChangeDialog({ key: "mp", label: t("MP"), value: player.stats.mp.current, max: player.stats.mp.max })}
+              />
+            </StatTooltip>
+            <StatTooltip
+              title={t("Inventory Points")}
+              formula={t("6 + Class bonuses")}
+              total={player.stats.ip.max}
+              breakdown={[
+                { label: t("Base"), value: 6 },
+                ...(player.stats.ip.max - 6 > 0
+                  ? [{ label: t("Class bonuses"), value: player.stats.ip.max - 6, signed: true }]
+                  : []),
+              ]}
+            >
+              <StatBar
+                label={t("IP")}
+                value={player.stats.ip.current}
+                max={player.stats.ip.max}
+                color1={isDark ? newShade(theme.palette.success.main, 10) : newShade(theme.palette.success.main, 80)}
+                color2={theme.palette.success.main}
+                trackColor="rgba(35,35,35,0.88)"
+                isOwner={isOwner}
+                onClick={() => setStatChangeDialog({ key: "ip", label: t("IP"), value: player.stats.ip.current, max: player.stats.ip.max })}
+              />
+            </StatTooltip>
           </Box>
           {/* Mobile loadout in left column */}
           {/* <Box sx={{
@@ -1312,8 +1386,8 @@ export default function PlayerCard({
                 : { xs: "auto auto auto auto", md: "auto auto auto auto 1fr" },
               gridTemplateRows: "repeat(4, auto)",
               alignItems: "center",
-              rowGap: { xs: "2px", md: "6px", lg: "8px" },
-              columnGap: { xs: "2px", sm: "6px", md: "10px", lg: "12px" },
+              rowGap: { xs: "2px", md: "4px", lg: "5px" },
+              columnGap: { xs: "2px", sm: "6px", md: "8px", lg: "10px" },
             }}
           >
             {/* Right column desktop loadout */}
@@ -1340,7 +1414,7 @@ export default function PlayerCard({
                   flex: 1,
                 }}
               >
-                <Box sx={{ background: primary, px: 1, py: "2px" }}>
+                <Box sx={{ background: primary, px: 1, py: "4px" }}>
                   <Typography
                     sx={{
                       color: custom.white,
@@ -1385,7 +1459,7 @@ export default function PlayerCard({
               </Box>
             </Box>
 
-            {ATTRIBUTES.map(({ key, label, curr }, i) => {
+            {ATTRIBUTES.map(({ key, label, fullName, curr, Icon, debuffs, buffs }, i) => {
               // Which status goes in the left slot for this row
               const leftStatus = STATUSES_LEFT[i]; // slow/dazed/weak/shaken
 
@@ -1412,10 +1486,13 @@ export default function PlayerCard({
                       },
                       lineHeight: 1,
                       whiteSpace: "nowrap",
-                      py: { xs: "5px", sm: "6px", md: "8px" },
+                      py: { xs: "4px", sm: "5px", md: "6px" },
                     }}
                   >
-                    {label}:
+                    <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.35 }}>
+                      <Icon size="1.2em" />
+                      {label}:
+                    </Box>
                   </Typography>
 
                   {/* Col 2 — dice value or Select */}
@@ -1462,25 +1539,37 @@ export default function PlayerCard({
                         ))}
                       </Select>
                     ) : (
-                      <Typography
-                        sx={{
-                          fontFamily: "'Antonio', fantasy, sans-serif",
-                          fontSize: {
-                            xs: "0.8rem",
-                            sm: "1rem",
-                            md: "1.08rem",
-                            lg: "1.14rem",
-                          },
-                          fontWeight: "bold",
-                          color: getAttributeColor(
-                            player.attributes[key]?.base,
-                            curr,
-                          ),
-                          lineHeight: 1,
-                        }}
+                      <StatTooltip
+                        title={fullName}
+                        base={`d${player.attributes[key]?.base}`}
+                        current={`d${curr}`}
+                        breakdown={[
+                          ...debuffs.filter(s => player.statuses?.[s]).map(s => ({ label: s.charAt(0).toUpperCase() + s.slice(1), value: "-2 die" })),
+                          ...buffs.filter(s => player.statuses?.[s]).map(s => ({ label: s, value: "+2 die" })),
+                        ]}
+                        display="inline-flex"
                       >
-                        d{curr}
-                      </Typography>
+                        <Typography
+                          sx={{
+                            fontFamily: "'Antonio', fantasy, sans-serif",
+                            fontSize: {
+                              xs: "0.8rem",
+                              sm: "1rem",
+                              md: "1.08rem",
+                              lg: "1.14rem",
+                            },
+                            fontWeight: "bold",
+                            color: getAttributeColor(
+                              player.attributes[key]?.base,
+                              curr,
+                            ),
+                            lineHeight: 1,
+                            cursor: "help",
+                          }}
+                        >
+                          d{curr}
+                        </Typography>
+                      </StatTooltip>
                     )}
                   </Box>
 
@@ -1524,63 +1613,169 @@ export default function PlayerCard({
             }}
           >
             <CombatStat
-              theme={theme}
               label={t("DEF")}
-              icon={<DefIcon size="18px" color={isDark ? "white" : "black"} />}
+              icon={
+                <Box
+                  component="img"
+                    src="/assets/icons/stats/icon_def.png"
+                    alt={t("DEF")}
+                    sx={{
+                    width: { xs: "30px", sm: "34px" },
+                    height: { xs: "30px", sm: "34px" },
+                    objectFit: "contain",
+                    display: "block",
+                    flexShrink: 0,
+                  }}
+                />
+              }
               value={currDef}
+              isEditMode={isEditMode}
+              tooltip={{
+                title: t("Defense"),
+                formula: isMartialArmor
+                  ? `${equippedArmor?.name ?? t("Armor")} (${t("fixed")})`
+                  : equippedArmor
+                    ? `DEX d${player.attributes.dexterity?.base} + ${equippedArmor.name} +${equippedArmor.def}`
+                    : `DEX d${player.attributes.dexterity?.base}`,
+                total: currDef,
+                breakdown: [
+                  ...(isMartialArmor
+                    ? [{ label: `${equippedArmor?.name ?? t("Armor")} (${t("martial, fixed")})`, value: baseDef }]
+                    : [
+                        { label: `DEX d${player.attributes.dexterity?.base}`, value: currDex },
+                        ...(equippedArmor ? [{ label: `${equippedArmor.name} +${equippedArmor.def}`, value: equippedArmor.def }] : []),
+                      ]
+                  ),
+                  ...equippedShields.filter(s => s.def).map(s => ({ label: `${s.name} (shield)`, value: s.def, signed: true })),
+                  ...(dodgeBonus > 0 ? [{ label: t("Dodge skill"), value: dodgeBonus, signed: true }] : []),
+                  ...equippedShields.filter(s => s?.modifiers?.def ?? s?.defModifier).map(s => ({ label: `${s.name} (bonus)`, value: s?.modifiers?.def ?? s?.defModifier, signed: true })),
+                  ...(equippedAccessory?.modifiers?.def || equippedAccessory?.defModifier ? [{ label: equippedAccessory.name, value: equippedAccessory?.modifiers?.def ?? equippedAccessory?.defModifier, signed: true }] : []),
+                  ...equippedWeapons.filter(w => w?.modifiers?.def ?? w?.defModifier).map(w => ({ label: w.name, value: w?.modifiers?.def ?? w?.defModifier, signed: true })),
+                  ...(player.modifiers?.def ? [{ label: t("Other bonuses"), value: player.modifiers.def, signed: true }] : []),
+                ].filter(e => e.value !== 0),
+              }}
             />
             <CombatStat
-              theme={theme}
               label={t("M.DEF")}
-              icon={<MdefIcon size="18px" color={isDark ? "white" : "black"} />}
-              value={currMDef}
-            />
-            <Tooltip title={isEditMode ? `${t("DEX")} + ${t("INS")}` : ""}>
-              <CombatStat
-                theme={theme}
-                label={t("INIT")}
-                icon={
-                  <InitIcon size="18px" color={isDark ? "white" : "black"} />
-                }
-                value={(currInit > 0 ? "+" : "") + currInit}
-              />
-            </Tooltip>
-            {isEditMode ? (
-              <CombatStatCard sx={{ px: { xs: "2px", sm: "6px" }, py: "4px" }}>
-                <Typography
-                  sx={{
-                    fontFamily: "'Antonio', fantasy, sans-serif",
-                    fontWeight: "bold",
-                    fontSize: {
-                      xs: "0.55rem",
-                      sm: "0.62rem",
-                      md: "0.68rem",
-                      lg: "0.74rem",
-                    },
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
-                    color: combatStatTextColor,
-                    lineHeight: 1.2,
-                    textAlign: "center",
+              icon={
+                <Box
+                  component="img"
+                    src="/assets/icons/stats/icon_mdef.png"
+                    alt={t("M.DEF")}
+                    sx={{
+                    width: { xs: "30px", sm: "34px" },
+                    height: { xs: "30px", sm: "34px" },
+                    objectFit: "contain",
+                    display: "block",
+                    flexShrink: 0,
                   }}
-                >
-                  FP
-                </Typography>
+                />
+              }
+              value={currMDef}
+              isEditMode={isEditMode}
+              tooltip={{
+                title: t("Magic Defense"),
+                formula: isMartialArmor
+                  ? `${equippedArmor?.name ?? t("Armor")} (${t("fixed")})`
+                  : equippedArmor
+                    ? `INS d${player.attributes.insight?.base} + ${equippedArmor.name} +${equippedArmor.mdef}`
+                    : `INS d${player.attributes.insight?.base}`,
+                total: currMDef,
+                breakdown: [
+                  ...(isMartialArmor
+                    ? [{ label: `${equippedArmor?.name ?? t("Armor")} (${t("martial, fixed")})`, value: baseMDef }]
+                    : [
+                        { label: `INS d${player.attributes.insight?.base}`, value: currInsight },
+                        ...(equippedArmor ? [{ label: `${equippedArmor.name} +${equippedArmor.mdef}`, value: equippedArmor.mdef }] : []),
+                      ]
+                  ),
+                  ...equippedShields.filter(s => s.mdef).map(s => ({ label: `${s.name} (shield)`, value: s.mdef, signed: true })),
+                  ...equippedShields.filter(s => s?.modifiers?.mdef ?? s?.mDefModifier).map(s => ({ label: `${s.name} (bonus)`, value: s?.modifiers?.mdef ?? s?.mDefModifier, signed: true })),
+                  ...(equippedAccessory?.modifiers?.mdef || equippedAccessory?.mDefModifier ? [{ label: equippedAccessory.name, value: equippedAccessory?.modifiers?.mdef ?? equippedAccessory?.mDefModifier, signed: true }] : []),
+                  ...equippedWeapons.filter(w => w?.modifiers?.mdef ?? w?.mDefModifier).map(w => ({ label: w.name, value: w?.modifiers?.mdef ?? w?.mDefModifier, signed: true })),
+                  ...(player.modifiers?.mdef ? [{ label: t("Other bonuses"), value: player.modifiers.mdef, signed: true }] : []),
+                ].filter(e => e.value !== 0),
+              }}
+            />
+            <CombatStat
+              label={t("INIT")}
+              icon={
+                <Box
+                  component="img"
+                  src="/assets/icons/stats/icon_clock.png"
+                  alt={t("INIT")}
+                  sx={{
+                    width: { xs: "30px", sm: "34px" },
+                    height: { xs: "30px", sm: "34px" },
+                    objectFit: "contain",
+                    display: "block",
+                    flexShrink: 0,
+                  }}
+                />
+              }
+              value={(currInit > 0 ? "+" : "") + currInit}
+              isEditMode={isEditMode}
+              tooltip={{
+                title: t("Initiative"),
+                formula: t("Sum of all initiative modifiers"),
+                total: currInit,
+                breakdown: [
+                  ...(equippedArmor ? [{ label: equippedArmor.name, value: baseInit, signed: true }] : []),
+                  ...(equippedArmor?.initModifier ? [{ label: `${equippedArmor.name} (bonus)`, value: equippedArmor.initModifier, signed: true }] : []),
+                  ...equippedShields.filter(s => s.initModifier).map(s => ({ label: s.name, value: s.initModifier, signed: true })),
+                  ...(equippedAccessory?.initModifier ? [{ label: equippedAccessory.name, value: equippedAccessory.initModifier, signed: true }] : []),
+                  ...(player.modifiers?.init ? [{ label: t("Other bonuses"), value: player.modifiers.init, signed: true }] : []),
+                ].filter(e => e.value !== 0),
+              }}
+            />
+            {isEditMode ? (
+              <CombatStatCard sx={{ px: { xs: "6px", sm: "8px" }, py: "6px" }}>
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "2px",
+                    gap: "10px",
+                    minHeight: "42px",
                   }}
                 >
-                  <FabulaIcon style={{ width: "14px", height: "14px" }} />
+                  <Box
+                    component="img"
+                    src="/assets/icons/resources/fp.png"
+                    alt="FP"
+                    sx={{
+                      width: { xs: "36px", sm: "40px" },
+                      height: { xs: "36px", sm: "40px" },
+                      objectFit: "contain",
+                      display: "block",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontFamily: "'Antonio', fantasy, sans-serif",
+                      fontWeight: "bold",
+                      fontSize: {
+                        xs: "0.9rem",
+                        sm: "1.1rem",
+                        md: "1.2rem",
+                        lg: "1.3rem",
+                      },
+                      letterSpacing: "0.06em",
+                      textTransform: "uppercase",
+                      color: "#fff",
+                      lineHeight: 1.2,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    FP
+                  </Typography>
                   <IconButton
                     size="small"
-                    sx={{ p: 0.25, color: combatStatTextColor }}
+                    sx={{ p: 0.25, color: "#fff" }}
                     onClick={() => bumpInfoNumber("fabulapoints", -1)}
                   >
-                    <Remove sx={{ fontSize: "0.95rem" }} />
+                    <Remove sx={{ fontSize: "1.05rem" }} />
                   </IconButton>
                   <TextField
                     value={player.info.fabulapoints || 0}
@@ -1593,47 +1788,49 @@ export default function PlayerCard({
                     }}
                     size="small"
                     variant="standard"
-                    sx={{
-                      width: { xs: "30px", sm: "36px" },
-                      "& .MuiInputBase-input": {
-                        color: combatStatTextColor,
-                      },
-                      "& .MuiInput-underline:before": {
-                        borderBottomColor: theme.palette.divider,
-                      },
-                      "& .MuiInput-underline:hover:before": {
-                        borderBottomColor: combatStatTextColor,
-                      },
-                      "& .MuiInput-underline:after": {
-                        borderBottomColor: combatStatTextColor,
-                      },
-                    }}
                     slotProps={{
+                      input: { disableUnderline: true },
                       htmlInput: {
                         style: {
                           textAlign: "center",
                           fontFamily: "Antonio",
                           fontWeight: "bold",
-                          color: combatStatTextColor,
-                          WebkitTextFillColor: combatStatTextColor,
+                          color: "#fff",
+                          WebkitTextFillColor: "#fff",
                         },
                       },
+                    }}
+                    sx={{
+                      width: { xs: "36px", sm: "44px" },
+                      "& .MuiInputBase-input": { color: "#fff" },
                     }}
                   />
                   <IconButton
                     size="small"
-                    sx={{ p: 0.25, color: combatStatTextColor }}
+                    sx={{ p: 0.25, color: "#fff" }}
                     onClick={() => bumpInfoNumber("fabulapoints", 1)}
                   >
-                    <Add sx={{ fontSize: "0.95rem" }} />
+                    <Add sx={{ fontSize: "1.05rem" }} />
                   </IconButton>
                 </Box>
               </CombatStatCard>
             ) : (
               <CombatStat
-                theme={theme}
                 label="FP"
-                icon={<FabulaIcon style={{ width: "14px", height: "14px" }} />}
+                icon={
+                  <Box
+                    component="img"
+                    src="/assets/icons/resources/fp.png"
+                    alt="FP"
+                    sx={{
+                      width: { xs: "36px", sm: "40px" },
+                      height: { xs: "36px", sm: "40px" },
+                      objectFit: "contain",
+                      display: "block",
+                      flexShrink: 0,
+                    }}
+                  />
+                }
                 value={player.info.fabulapoints || 0}
               />
             )}
@@ -1654,10 +1851,17 @@ export default function PlayerCard({
           "poison",
         ].map((type) => (
           <AffinityCell key={type}>
-            <TypeAffinity
-              type={type}
-              affinity={player.affinities?.[type] || ""}
-            />
+            <StatTooltip
+              title={type.charAt(0).toUpperCase() + type.slice(1)}
+              base={player.affinities?.[type] || ""}
+              display="flex"
+            >
+              <TypeAffinity
+                type={type}
+                affinity={player.affinities?.[type] || ""}
+                iconSize="2.2em"
+              />
+            </StatTooltip>
           </AffinityCell>
         ))}
       </AffinityStrip>

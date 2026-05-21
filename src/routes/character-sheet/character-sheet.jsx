@@ -37,7 +37,7 @@ import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFu
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import MnemoReceptaclePanel from "../../components/player/equipment/technospheres/MnemoReceptaclePanel";
-import powered_by_fu from "../powered_by_fu.png";
+import powered_by_fu from "/images/routes/powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
   Download,

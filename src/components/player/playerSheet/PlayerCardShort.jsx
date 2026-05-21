@@ -3,9 +3,9 @@ import { Paper, Grid, Typography, Divider, Card } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
-import avatar_image from "../../avatar.jpg";
+import avatar_image from "/images/components/avatar.jpg";
 import Diamond from "../../Diamond";
-import powered_by_fu from "../../../routes/powered_by_fu.png";
+import powered_by_fu from "/images/routes/powered_by_fu.png";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 

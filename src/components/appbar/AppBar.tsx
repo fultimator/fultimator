@@ -6,6 +6,7 @@ import {
   IconButton,
   Typography,
   useScrollTrigger,
+  useMediaQuery,
   Slide,
   Tooltip,
 } from "@mui/material";
@@ -19,8 +20,8 @@ import MenuOption from "./MenuOption";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import type { ThemeValue, StyleProfileValue } from "../../store/themeStore";
 
-import logo929 from "./../logo_929.webp";
-import logo1400 from "./../logo_1400.webp";
+import logo929 from "/assets/branding/logo_929.webp";
+import logo1400 from "/assets/branding/logo_1400.webp";
 
 interface AppBarProps {
   isNpcEdit: boolean;
@@ -38,7 +39,10 @@ interface AppBarProps {
 const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
   children,
 }) => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const trigger = useScrollTrigger();
+  // Only hide on mobile — on desktop the persistent drawer rail depends on AppBar height
+  if (!isMobile) return children;
   return (
     <Slide appear={false} direction="down" in={!trigger}>
       {children}

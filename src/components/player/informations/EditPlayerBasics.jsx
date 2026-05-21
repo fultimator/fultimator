@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   FormControl,
@@ -10,27 +10,15 @@ import {
   Button,
   InputAdornment,
   Snackbar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
-import ZenitIcon from "../../svgs/zenit.svg?react";
-import ExpIcon from "../../svgs/exp.svg?react";
-import ExpDisabledIcon from "../../svgs/exp_disabled.svg?react";
-import FabulaIcon from "../../svgs/fabula.svg?react";
+import zenitIcon from "/assets/icons/resources/zenit.png";
+import ExpIcon from "/src/components/svgs/exp.svg?react";
+import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
+import fpBorderlessIcon from "/assets/icons/resources/fp_borderless.png";
 import { Code } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
-import Confetti from "react-confetti";
-import useLevelUpFlow from "../common/hooks/useLevelUpFlow";
-import {
-  canLevelUpFromExp as canLevelUpFromExpCheck,
-  applyExpLevelUp,
-} from "../common/levelUpLogic";
 
 export default function EditPlayerBasics({
   player,
@@ -38,6 +26,7 @@ export default function EditPlayerBasics({
   updateMaxStats,
   isEditMode,
   advancement,
+  onLevelUpRequest,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -48,12 +37,6 @@ export default function EditPlayerBasics({
   const [isImageError, setIsImageError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
-
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [confettiSize, setConfettiSize] = useState({
-    width: typeof window !== "undefined" ? window.innerWidth : 0,
-    height: typeof window !== "undefined" ? window.innerHeight : 0,
-  });
 
   const handleClose = () => {
     setOpen(false);
@@ -110,22 +93,6 @@ export default function EditPlayerBasics({
       setIsImageError(true);
       setErrorMessage(`Error: ${error.message}`);
     }
-  }, []);
-
-  const handleLevelUp = () => {
-    setShowConfetti(true);
-  };
-
-  const handleCloseLevelUp = () => {
-    setShowConfetti(false);
-  };
-
-  React.useEffect(() => {
-    const onResize = () =>
-      setConfettiSize({ width: window.innerWidth, height: window.innerHeight });
-    onResize();
-    window.addEventListener("resize", onResize, { passive: true });
-    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   return (
@@ -257,7 +224,7 @@ export default function EditPlayerBasics({
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton>
-                        <FabulaIcon style={{ width: "28px", height: "28px" }} />
+                        <img src={fpBorderlessIcon} alt="FP" style={{ width: "36px", height: "26px", objectFit: "contain" }} />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -300,11 +267,7 @@ export default function EditPlayerBasics({
                   endAdornment: (
                     <ExpAdornment
                       exp={player.info.exp}
-                      isEditMode={isEditMode}
-                      player={player}
-                      setPlayer={setPlayer}
-                      onLevelUp={handleLevelUp}
-                      onCloseLevelUp={handleCloseLevelUp}
+                      onLevelUpRequest={onLevelUpRequest}
                     />
                   ),
                 },
@@ -339,7 +302,7 @@ export default function EditPlayerBasics({
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton>
-                        <ZenitIcon style={{ width: "28px", height: "28px" }} />
+                        <img src={zenitIcon} alt="Zenit" style={{ width: "28px", height: "28px" }} />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -431,13 +394,6 @@ export default function EditPlayerBasics({
           </>
         ) : null}
       </Grid>
-      {showConfetti && (
-        <Confetti
-          width={confettiSize.width}
-          height={confettiSize.height}
-          style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none" }}
-        />
-      )}
     </Paper>
   );
 }
@@ -553,197 +509,25 @@ function EditPlayerLevel({
   );
 }
 
-function ExpAdornment({
-  exp,
-  isEditMode,
-  player,
-  setPlayer,
-  onLevelUp,
-  onCloseLevelUp,
-}) {
-  const {
-    levelUpDialogOpen,
-    levelUpCelebrationOpen,
-    openLevelUpDialog,
-    closeLevelUpDialog,
-    closeCelebration,
-    confirmLevelUp,
-  } = useLevelUpFlow();
-  const { t } = useTranslate();
-
-  const handleExpClick = () => {
-    if (canLevelUpFromExpCheck(player) && isEditMode) {
-      openLevelUpDialog();
-    }
-  };
-
-  const handleLevelUpConfirm = () =>
-    confirmLevelUp(() => {
-      if (!canLevelUpFromExpCheck(player)) return false;
-      setPlayer((prevPlayer) => applyExpLevelUp(prevPlayer));
-      onLevelUp();
-      return true;
-    });
-
-  const handleClose = () => {
-    closeLevelUpDialog();
-    closeCelebration();
-    onCloseLevelUp();
-  };
+function ExpAdornment({ exp, onLevelUpRequest }) {
+  const canLevelUp = exp >= 10;
 
   return (
-    <>
-      <InputAdornment position="end">
-        <IconButton
-          onClick={handleExpClick}
-          sx={{
-            animation: exp >= 10 ? "flash 1s infinite" : "none",
-            cursor: exp >= 10 && isEditMode ? "pointer" : "default",
-          }}
-          disabled={!isEditMode}
-        >
-          {exp >= 10 ? (
-            <ExpIcon
-              style={{
-                width: "28px",
-                height: "28px",
-                color: "gold",
-              }}
-            />
-          ) : (
-            <ExpDisabledIcon
-              style={{
-                width: "28px",
-                height: "28px",
-                color: "gray",
-              }}
-            />
-          )}
-        </IconButton>
-      </InputAdornment>
-      <Dialog
-        open={levelUpDialogOpen}
-        onClose={handleClose}
-        slotProps={{
-          paper: {
-            sx: {
-              width: "80%",
-              maxWidth: "md",
-            },
-          },
+    <InputAdornment position="end">
+      <IconButton
+        onClick={onLevelUpRequest}
+        disabled={!canLevelUp}
+        sx={{
+          animation: canLevelUp ? "flash 1s infinite" : "none",
         }}
       >
-        <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
-          {t("Level Up Confirmation")}
-        </DialogTitle>
-        <DialogContent>
-          <p>{t("Do you want to use 10 EXP to level up?")}</p>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained" onClick={handleClose} color="error">
-            {t("Cancel")}
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleLevelUpConfirm}
-            color="primary"
-          >
-            {t("Level Up")}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={levelUpCelebrationOpen}
-        onClose={handleClose}
-        slotProps={{
-          paper: {
-            sx: {
-              width: "80%",
-              maxWidth: "lg",
-            },
-          },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-          {t("New Level Reached!")}
-        </DialogTitle>
-        <DialogContent>
-          <ul>
-            <li>
-              <ReactMarkdown>
-                {t(
-                  "You may change your character's **Identity** and/or **Theme**.",
-                )}
-              </ReactMarkdown>
-            </li>
-            <li>
-              <ReactMarkdown>
-                {t(
-                  "Your maximum **Hit Points** and **Mind Points** has increased by **one** point each. Note that this does **not** affect your current Hit Points and Mind Points.",
-                )}
-              </ReactMarkdown>
-            </li>
-            {(player.lvl === 20 || player.lvl === 40) && (
-              <li>
-                <ReactMarkdown>
-                  {t("You reached LVL") +
-                    " **" +
-                    player.lvl +
-                    "**. " +
-                    t(
-                      "You may choose one of your **Attributes** and increase its base die size by one step, up to a maximum of **d12**.",
-                    )}
-                </ReactMarkdown>
-              </li>
-            )}
-            <li>
-              <ReactMarkdown>
-                {t(
-                  "You may increase the level of one of your character's Classes by one, or you gain your first level in a Class you didn't already have.",
-                )}
-              </ReactMarkdown>
-            </li>
-          </ul>
-
-          <Typography>
-            {t(
-              "There are, however, two important limitations when leveling up:",
-            )}
-          </Typography>
-          <ul>
-            <li>
-              <ReactMarkdown>
-                {t(
-                  "You can never have more than ten levels in a Class. Once you put the tenth level in a Class, that Class has been **mastered** (which grants you a **Heroic Skill**) and you can no longer invest levels into it.",
-                )}
-              </ReactMarkdown>
-            </li>
-            <li>
-              <ReactMarkdown>
-                {t(
-                  player?.settings?.optionalRules?.technospheres
-                    ? "You can never have more than **three non-mastered innate Classes**. To diversify further, master an innate Class first, or invest levels into a Mnemosphere Class instead."
-                    : "You can never have more than **three non-mastered Classes**. If you want to further diversify your character, you must first master some of the Classes you acquired.",
-                )}
-              </ReactMarkdown>
-            </li>
-          </ul>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained" onClick={handleClose} color="primary">
-            {t("OK")}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <style>
-        {`
-          @keyframes flash {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-          }
-        `}
-      </style>
-    </>
+        {canLevelUp ? (
+          <ExpIcon style={{ width: "28px", height: "28px" }} />
+        ) : (
+          <ExpDisabledIcon style={{ width: "28px", height: "28px" }} />
+        )}
+      </IconButton>
+    </InputAdornment>
   );
 }
+

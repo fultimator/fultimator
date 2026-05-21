@@ -53,15 +53,15 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
-import allToken from "../icons/All-token.webp";
-import beastToken from "../icons/Beast-token.webp";
-import constructToken from "../icons/Construct-token.webp";
-import demonToken from "../icons/Demon-token.webp";
-import elementalToken from "../icons/Elemental-token.webp";
-import humanToken from "../icons/Human-token.webp";
-import monsterToken from "../icons/Monster-token.webp";
-import plantToken from "../icons/Plant-token.webp";
-import undeadToken from "../icons/Undead-token.webp";
+import allToken from "/images/routes/icons/species/All-token.webp";
+import beastToken from "/images/routes/icons/species/Beast-token.webp";
+import constructToken from "/images/routes/icons/species/Construct-token.webp";
+import demonToken from "/images/routes/icons/species/Demon-token.webp";
+import elementalToken from "/images/routes/icons/species/Elemental-token.webp";
+import humanToken from "/images/routes/icons/species/Human-token.webp";
+import monsterToken from "/images/routes/icons/species/Monster-token.webp";
+import plantToken from "/images/routes/icons/species/Plant-token.webp";
+import undeadToken from "/images/routes/icons/species/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import {

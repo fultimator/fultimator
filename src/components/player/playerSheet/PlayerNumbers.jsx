@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import ZenitIcon from "../../svgs/zenit.svg?react";
+import zenitIcon from "/assets/icons/resources/zenit.png";
 
 function ZenitDialog({ open, handleClose, currentValue, onApply, t }) {
   const [amount, setAmount] = useState("");
@@ -171,7 +171,7 @@ export default function PlayerNumbers({
               >
                 {t("Zenit")}
               </Typography>
-              <ZenitIcon style={{ width: "18px", height: "18px" }} />
+              <img src={zenitIcon} alt="Zenit" style={{ width: "18px", height: "18px" }} />
             </Box>
             <Typography variant="h4" sx={{ fontWeight: "bold" }}>
               {player.info.zenit}

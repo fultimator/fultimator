@@ -2,10 +2,15 @@ import React from "react";
 import { Typography, LinearProgress, Card, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import avatar_image from "../../avatar.jpg";
+import avatar_image from "/images/components/avatar.jpg";
 import Diamond from "../../Diamond";
 import { styled } from "@mui/system";
-import { DefIcon, MdefIcon, InitIcon } from "../../icons";
+import {
+  DexAttributeIcon,
+  InsAttributeIcon,
+  MigAttributeIcon,
+  WlpAttributeIcon,
+} from "../../icons";
 import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
@@ -92,12 +97,12 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
   background: theme.palette.background.default,
   border: `0.5px solid ${theme.palette.divider}`,
   borderRadius: theme.shape.borderRadius,
-  padding: "4px 6px",
+  padding: "3px 6px",
   [theme.breakpoints.up("md")]: {
-    padding: "6px 8px",
+    padding: "4px 8px",
   },
   [theme.breakpoints.up("lg")]: {
-    padding: "8px 10px",
+    padding: "5px 10px",
   },
   textAlign: "center",
   flex: 1,
@@ -129,15 +134,15 @@ function CombatStat({ icon, label, value, theme }) {
           fontFamily: "'Antonio', fantasy, sans-serif",
           fontWeight: "bold",
           fontSize: {
-            xs: "0.55rem",
-            sm: "0.62rem",
-            md: "0.68rem",
-            lg: "0.74rem",
+            xs: "0.62rem",
+            sm: "0.7rem",
+            md: "0.76rem",
+            lg: "0.82rem",
           },
           letterSpacing: "0.06em",
           textTransform: "uppercase",
           color: theme.palette.text.secondary,
-          lineHeight: 1.2,
+          lineHeight: 1.1,
         }}
       >
         {label}
@@ -147,16 +152,16 @@ function CombatStat({ icon, label, value, theme }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "2px",
+          gap: "1px",
         }}
       >
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            "& svg": {
-              width: { xs: 14, sm: 18, md: 20 },
-              height: { xs: 14, sm: 18, md: 20 },
+            "& svg, & img": {
+              width: { xs: 22, sm: 26, md: 28 },
+              height: { xs: 22, sm: 26, md: 28 },
             },
           }}
         >
@@ -350,10 +355,10 @@ export default function PlayerCardGallery({
   const inCrisis = player.stats.hp.current <= player.stats.hp.max / 2;
 
   const ATTRIBUTES = [
-    { key: "dexterity", label: t("DEX"), curr: currDex },
-    { key: "insight", label: t("INS"), curr: currInsight },
-    { key: "might", label: t("MIG"), curr: currMight },
-    { key: "willpower", label: t("WLP"), curr: currWillpower },
+    { key: "dexterity", label: t("DEX"), curr: currDex, Icon: DexAttributeIcon },
+    { key: "insight", label: t("INS"), curr: currInsight, Icon: InsAttributeIcon },
+    { key: "might", label: t("MIG"), curr: currMight, Icon: MigAttributeIcon },
+    { key: "willpower", label: t("WLP"), curr: currWillpower, Icon: WlpAttributeIcon },
   ];
   const visibleClasses = (player.classes || []).filter((c) => c && c.name);
   const hasDescription = Boolean(player.info?.description?.trim());
@@ -644,8 +649,6 @@ export default function PlayerCardGallery({
             flexDirection: "column",
             minWidth: 0,
             overflow: "hidden",
-            height: "100%",
-            justifyContent: "space-between",
           }}
         >
           {/* Top section: avatar + bars */}
@@ -723,18 +726,17 @@ export default function PlayerCardGallery({
           <Box
             sx={{
               display: "grid",
-              mt: "auto",
               pt: 0.75,
               borderTop: `0.5px solid ${theme.palette.divider}`,
               width: "100%",
               minWidth: 0,
               gridTemplateColumns: "1fr 1fr",
               gap: "6px",
-              px: 0.25,
+              px: 0.5,
               pb: 0.75,
             }}
           >
-            {ATTRIBUTES.map(({ key, label, curr }) => (
+            {ATTRIBUTES.map(({ key, label, curr, Icon }) => (
               <Box
                 key={`grid-${key}`}
                 sx={{
@@ -745,20 +747,24 @@ export default function PlayerCardGallery({
                   background: theme.palette.background.default,
                   border: `0.5px solid ${theme.palette.divider}`,
                   borderRadius: "6px",
-                  px: { xs: 0.75, md: 1 },
+                  px: { xs: 0.5, md: 0.75 },
                   py: { xs: 0.5, md: 0.65 },
                 }}
               >
                 <Typography
                   sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.3,
                     fontFamily: "'Antonio'",
                     fontWeight: "bold",
-                    fontSize: { xs: "0.68rem", md: "0.76rem", lg: "0.84rem" },
+                    fontSize: { xs: "0.74rem", md: "0.84rem", lg: "0.92rem" },
                     lineHeight: 1,
                     whiteSpace: "nowrap",
                     letterSpacing: "0.04em",
                   }}
                 >
+                  <Icon size="1.2em" />
                   {label}
                 </Typography>
                 <Typography
@@ -786,8 +792,8 @@ export default function PlayerCardGallery({
           sx={{
             display: "flex",
             flexDirection: "column",
-            p: { xs: 0.5, sm: 1, md: 1.25, lg: 1.5 },
-            gap: { xs: 0.75, sm: 1, md: 1.2, lg: 1.4 },
+            p: { xs: 0.5, sm: 0.75, md: 1, lg: 1.25 },
+            gap: { xs: 0.75, sm: 0.75, md: 0.875, lg: 1 },
             minWidth: 0,
           }}
         >
@@ -799,7 +805,7 @@ export default function PlayerCardGallery({
               overflow: "hidden",
             }}
           >
-            <Box sx={{ background: primary, px: 1, py: "2px" }}>
+            <Box sx={{ background: primary, px: 1, py: "4px" }}>
               <Typography
                 sx={{
                   color: custom.white,
@@ -903,7 +909,6 @@ export default function PlayerCardGallery({
               display: "flex",
               flex: { xs: 1, [loadoutBreakpoint]: "0 0 auto" },
               minHeight: 0,
-              pt: 0.25,
               width: "100%",
               minWidth: 0,
               overflow: "hidden",
@@ -919,7 +924,7 @@ export default function PlayerCardGallery({
                 flexDirection: "column",
               }}
             >
-              <Box sx={{ background: primary, px: 1, py: "2px" }}>
+              <Box sx={{ background: primary, px: 1, py: "4px" }}>
                 <Typography
                   sx={{
                     color: custom.white,
@@ -974,19 +979,40 @@ export default function PlayerCardGallery({
             <CombatStat
               theme={theme}
               label={t("DEF")}
-              icon={<DefIcon size="18px" color={isDark ? "white" : "black"} />}
+              icon={
+                <Box
+                  component="img"
+                  src="/assets/icons/stats/icon_def.png"
+                  alt={t("DEF")}
+                  sx={{ objectFit: "contain", display: "block" }}
+                />
+              }
               value={currDef}
             />
             <CombatStat
               theme={theme}
               label={t("M.DEF")}
-              icon={<MdefIcon size="18px" color={isDark ? "white" : "black"} />}
+              icon={
+                <Box
+                  component="img"
+                  src="/assets/icons/stats/icon_mdef.png"
+                  alt={t("M.DEF")}
+                  sx={{ objectFit: "contain", display: "block" }}
+                />
+              }
               value={currMDef}
             />
             <CombatStat
               theme={theme}
               label={t("INIT")}
-              icon={<InitIcon size="18px" color={isDark ? "white" : "black"} />}
+              icon={
+                <Box
+                  component="img"
+                  src="/assets/icons/stats/icon_clock.png"
+                  alt={t("INIT")}
+                  sx={{ objectFit: "contain", display: "block" }}
+                />
+              }
               value={(currInit > 0 ? "+" : "") + currInit}
             />
           </Box>
