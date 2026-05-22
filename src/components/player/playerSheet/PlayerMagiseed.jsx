@@ -27,6 +27,82 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ReactMarkdown from "react-markdown";
+import { useNumericClock } from "../../../hooks/useClock";
+
+function MagiseedClockRow({ magiseedSpell, setPlayer, isEditMode, t, theme, primary }) {
+  const clockValue = magiseedSpell.growthClock || 0;
+
+  const persistClock = (newValue) => {
+    if (!setPlayer) return;
+    setPlayer((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls) =>
+        cls.name === magiseedSpell.className
+          ? {
+            ...cls,
+            spells: cls.spells.map((spell) =>
+              spell.spellType === "magiseed"
+                ? { ...spell, growthClock: newValue }
+                : spell,
+            ),
+          }
+          : cls,
+      ),
+    }));
+  };
+
+  const { state, set, increment, decrement, reset } = useNumericClock(4, clockValue, persistClock);
+  const canEdit = isEditMode || !!setPlayer;
+
+  return (
+    <Grid container sx={{ alignItems: "flex-start" }} spacing={2}>
+      <Grid>
+        <Clock
+          numSections={4}
+          size={60}
+          state={state}
+          setState={canEdit ? set : undefined}
+          isCharacterSheet={!canEdit}
+          onReset={canEdit ? reset : undefined}
+        />
+        {canEdit && (
+          <Stack direction="row" spacing={0.5} sx={{ mt: 1, justifyContent: "center" }}>
+            <Tooltip title={t("Decrement")} arrow>
+              <IconButton color="primary" onClick={decrement} size="small" sx={{ p: 0.25 }}>
+                <RemoveIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Reset")} arrow>
+              <IconButton color="primary" onClick={reset} size="small" sx={{ p: 0.25 }}>
+                <RestartAltIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Increment")} arrow>
+              <IconButton color="primary" onClick={increment} size="small" sx={{ p: 0.25 }}>
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        )}
+      </Grid>
+      <Grid size="grow">
+        <LinearProgress
+          variant="determinate"
+          value={(clockValue / 4) * 100}
+          sx={{
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: theme.palette.grey[300],
+            "& .MuiLinearProgress-bar": { backgroundColor: primary },
+          }}
+        />
+        <Typography variant="caption" sx={{ mt: 0.5, display: "block" }}>
+          {clockValue} / 4
+        </Typography>
+      </Grid>
+    </Grid>
+  );
+}
 
 export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -66,39 +142,6 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
     });
   };
 
-  const handleClockChange = (magiseedSpell, newClock) => {
-    if (!setPlayer) return;
-    setPlayer((prevPlayer) => {
-      const newClasses = prevPlayer.classes.map((cls) => {
-        if (cls.name === magiseedSpell.className) {
-          const newSpells = cls.spells.map((spell) => {
-            if (spell.spellType === "magiseed") {
-              return { ...spell, growthClock: newClock };
-            }
-            return spell;
-          });
-          return { ...cls, spells: newSpells };
-        }
-        return cls;
-      });
-      return { ...prevPlayer, classes: newClasses };
-    });
-  };
-
-  const incrementMagiseedClock = (magiseedSpell) => {
-    const currentClock = magiseedSpell.growthClock || 0;
-    if (currentClock < 4) {
-      handleClockChange(magiseedSpell, currentClock + 1);
-    }
-  };
-
-  const decrementMagiseedClock = (magiseedSpell) => {
-    const currentClock = magiseedSpell.growthClock || 0;
-    if (currentClock > 0) {
-      handleClockChange(magiseedSpell, currentClock - 1);
-    }
-  };
-
   /* All magiseed spells from all classes */
   const magiseedSpells = player.classes
     .flatMap((c) => c.spells.map((spell) => ({ ...spell, className: c.name })))
@@ -109,18 +152,6 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
         (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     )
     .sort((a, b) => a.className.localeCompare(b.className));
-
-  const getClockState = (clock) => {
-    const state = [false, false, false, false];
-    for (let i = 0; i < clock && i < 4; i++) {
-      state[i] = true;
-    }
-    return state;
-  };
-
-  const getClockProgress = (clock) => {
-    return (clock / 4) * 100;
-  };
 
   const getCurrentEffect = (magiseedSpell) => {
     const currentMagiseed = magiseedSpell.currentMagiseed;
@@ -194,112 +225,20 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                       {t("magiseed_growth_clock")} -{" "}
                       {t(magiseedSpell.className)}
                     </Typography>
-                    <Grid
-                      container
-                      sx={{ alignItems: "flex-start" }}
-                      spacing={2}
-                    >
-                      <Grid>
-                        <Clock
-                          numSections={4}
-                          size={60}
-                          state={getClockState(magiseedSpell.growthClock || 0)}
-                          setState={
-                            isEditMode || setPlayer
-                              ? (newState) => {
-                                  const filledSections = newState.reduce(
-                                    (count, section) =>
-                                      count + (section ? 1 : 0),
-                                    0,
-                                  );
-                                  handleClockChange(
-                                    magiseedSpell,
-                                    filledSections,
-                                  );
-                                }
-                              : undefined
-                          }
-                          isCharacterSheet={!isEditMode && !setPlayer}
-                          onReset={
-                            isEditMode || setPlayer
-                              ? () => handleClockChange(magiseedSpell, 0)
-                              : undefined
-                          }
-                        />
-                        {(isEditMode || setPlayer) && (
-                          <Stack
-                            direction="row"
-                            spacing={0.5}
-                            sx={{ mt: 1, justifyContent: "center" }}
-                          >
-                            <Tooltip title={t("Decrement")} arrow>
-                              <IconButton
-                                color="primary"
-                                onClick={() =>
-                                  decrementMagiseedClock(magiseedSpell)
-                                }
-                                size="small"
-                                sx={{ p: 0.25 }}
-                              >
-                                <RemoveIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t("Reset")} arrow>
-                              <IconButton
-                                color="primary"
-                                onClick={() =>
-                                  handleClockChange(magiseedSpell, 0)
-                                }
-                                size="small"
-                                sx={{ p: 0.25 }}
-                              >
-                                <RestartAltIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t("Increment")} arrow>
-                              <IconButton
-                                color="primary"
-                                onClick={() =>
-                                  incrementMagiseedClock(magiseedSpell)
-                                }
-                                size="small"
-                                sx={{ p: 0.25 }}
-                              >
-                                <AddIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Stack>
-                        )}
-                      </Grid>
-                      <Grid size="grow">
-                        <Typography sx={{ fontWeight: "bold", mb: 0.5 }}>
-                          {magiseedSpell.currentMagiseed
-                            ? magiseedSpell.currentMagiseed.customName ||
-                              t(magiseedSpell.currentMagiseed.name)
-                            : t("magiseed_no_magiseed")}
-                        </Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={getClockProgress(
-                            magiseedSpell.growthClock || 0,
-                          )}
-                          sx={{
-                            height: 10,
-                            borderRadius: 5,
-                            backgroundColor: theme.palette.grey[300],
-                            "& .MuiLinearProgress-bar": {
-                              backgroundColor: primary,
-                            },
-                          }}
-                        />
-                        <Typography
-                          variant="caption"
-                          sx={{ mt: 0.5, display: "block" }}
-                        >
-                          {magiseedSpell.growthClock || 0} / 4
-                        </Typography>
-                      </Grid>
-                    </Grid>
+                    <Typography sx={{ fontWeight: "bold", mb: 0.5 }}>
+                      {magiseedSpell.currentMagiseed
+                        ? magiseedSpell.currentMagiseed.customName ||
+                        t(magiseedSpell.currentMagiseed.name)
+                        : t("magiseed_no_magiseed")}
+                    </Typography>
+                    <MagiseedClockRow
+                      magiseedSpell={magiseedSpell}
+                      setPlayer={setPlayer}
+                      isEditMode={isEditMode}
+                      t={t}
+                      theme={theme}
+                      primary={primary}
+                    />
                   </Grid>
 
                   {/* Current Effect */}

@@ -3,7 +3,6 @@ import { useTheme } from "@mui/material";
 
 function calculateCoordinates(centerX, centerY, radius, angleInDegrees) {
   const angleInRadians = (angleInDegrees - 90) * (Math.PI / 180);
-
   return {
     x: centerX + radius * Math.cos(angleInRadians),
     y: centerY + radius * Math.sin(angleInRadians),
@@ -16,81 +15,40 @@ const Clock = ({
   state = [],
   setState,
   isCharacterSheet,
-  onReset = () => {},
+  onReset = () => { },
 }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const hoveredActiveColor = theme.palette.info.main; // Define a new color in the theme
+  const hoveredActiveColor = theme.palette.info.main;
 
-  // const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  // const [_isMouseDown, setIsMouseDown] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const handleClick = (index) => {
     const updatedSections = new Array(numSections).fill(false);
-    // Fill from 0 to index (inclusive)
     for (let i = 0; i <= index; i++) {
       updatedSections[i] = true;
     }
     setState(updatedSections);
   };
 
-  // const handleIncrement = () => {
-  //   const currentFilled = state.filter(Boolean).length;
-  //   if (currentFilled < numSections) {
-  //     handleClick(currentFilled);
-  //   }
-  // };
-
-  // const handleDecrement = () => {
-  //   const currentFilled = state.filter(Boolean).length;
-  //   if (currentFilled > 0) {
-  //     const updatedSections = [...state];
-  //     updatedSections[currentFilled - 1] = false;
-  //     setState(updatedSections);
-  //   }
-  // };
-
   const handleRightClick = (e) => {
-    e.preventDefault(); // Prevent context menu
+    e.preventDefault();
     if (!isCharacterSheet) {
       onReset();
     }
   };
 
-  // const handleMouseDown = (index) => {
-  //   if (!isCharacterSheet && !isMobile) {
-  //     setIsMouseDown(true);
-  //     handleClick(index);
-  //   }
-  // };
-
-  const handleMouseEnter = (index) => {
-    setHoveredIndex(index);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredIndex(null);
-  };
+  const handleMouseEnter = (index) => setHoveredIndex(index);
+  const handleMouseLeave = () => setHoveredIndex(null);
 
   const sections = [];
   for (let i = 0; i < numSections; i++) {
     const startAngle = (360 / numSections) * i;
     const endAngle = (360 / numSections) * (i + 1);
 
-    const startPoint = calculateCoordinates(
-      size / 2,
-      size / 2,
-      size / 2,
-      startAngle,
-    );
-    const endPoint = calculateCoordinates(
-      size / 2,
-      size / 2,
-      size / 2,
-      endAngle,
-    );
+    const startPoint = calculateCoordinates(size / 2, size / 2, size / 2, startAngle);
+    const endPoint = calculateCoordinates(size / 2, size / 2, size / 2, endAngle);
 
     const pathData = `
       M ${size / 2},${size / 2}
@@ -99,10 +57,10 @@ const Clock = ({
       Z
     `;
 
-    const isHovered = hoveredIndex === i;
+    const isHovered = hoveredIndex !== null && i <= hoveredIndex;
     const isActive = state[i];
-    let fill = "transparent";
 
+    let fill = "transparent";
     if (isHovered && isActive) {
       fill = hoveredActiveColor;
     } else if (isHovered) {

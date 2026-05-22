@@ -158,13 +158,11 @@ export default function CharacterSheet() {
   }, [playerData]);
 
   useEffect(() => {
-    if (player && playerDataBaseline) {
-      if (!deepEqual(applyPreSaveTransforms(player), playerDataBaseline)) {
-        setIsUpdated(true);
-      } else {
-        setIsUpdated(false);
-      }
-    }
+    if (!player || !playerDataBaseline) return;
+    const timer = setTimeout(() => {
+      setIsUpdated(!deepEqual(applyPreSaveTransforms(player), playerDataBaseline));
+    }, 300);
+    return () => clearTimeout(timer);
   }, [player, playerDataBaseline]);
 
   usePrompt(
@@ -367,120 +365,120 @@ export default function CharacterSheet() {
     confirmLevelUp(() => {
       if (!canLevelUpFromExpCheck(player)) return false;
       setPlayer((prevPlayer) => {
-      if (!prevPlayer) return prevPlayer;
+        if (!prevPlayer) return prevPlayer;
 
-      const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
-      if (currentExp < 10 || (prevPlayer.lvl || 0) >= 50) return prevPlayer;
+        const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
+        if (currentExp < 10 || (prevPlayer.lvl || 0) >= 50) return prevPlayer;
 
-      const leveledPlayer = {
-        ...prevPlayer,
-        lvl: Math.min(50, (prevPlayer.lvl || 0) + 1),
-        info: {
-          ...prevPlayer.info,
-          exp: Math.max(0, currentExp - 10),
-        },
-      };
-
-      // Recalculate max stats for the new level
-      const mig = Number(leveledPlayer.attributes?.might?.base) || 0;
-      const wil = Number(leveledPlayer.attributes?.willpower?.base) || 0;
-      const lvl = Number(leveledPlayer.lvl) || 0;
-
-      const baseMaxHP = mig * 5 + lvl;
-      const baseMaxMP = wil * 5 + lvl;
-
-      let hpBonus = 0;
-      let mpBonus = 0;
-      let ipBonus = 0;
-
-      const innateClassesCS2 =
-        leveledPlayer.settings?.optionalRules?.innateClasses ?? [];
-      const isTechnospheresCS2 =
-        leveledPlayer.settings?.optionalRules?.technospheres ?? false;
-      const technospheresVariantCS2 =
-        leveledPlayer.settings?.optionalRules?.technospheresVariant ??
-        "standard";
-      const usesInnateClassRulesCS2 =
-        isTechnospheresCS2 && technospheresVariantCS2 !== "hoplospheres";
-      (leveledPlayer.classes || []).forEach((cls) => {
-        if (!cls.benefits) return;
-        if (usesInnateClassRulesCS2 && !innateClassesCS2.includes(cls.name))
-          return;
-        hpBonus += Number(cls.benefits.hpplus) || 0;
-        mpBonus += Number(cls.benefits.mpplus) || 0;
-        ipBonus += Number(cls.benefits.ipplus) || 0;
-      });
-
-      if (
-        isTechnospheresCS2 &&
-        (technospheresVariantCS2 === "standard" ||
-          technospheresVariantCS2 === "mnemospheres")
-      ) {
-        hpBonus += 5;
-        mpBonus += 5;
-      }
-
-      if (leveledPlayer.modifiers) {
-        hpBonus +=
-          Number(
-            leveledPlayer.resources?.hp.bonus ?? leveledPlayer.modifiers.hp,
-          ) || 0;
-        mpBonus +=
-          Number(
-            leveledPlayer.resources?.mp.bonus ?? leveledPlayer.modifiers.mp,
-          ) || 0;
-        ipBonus += Number(leveledPlayer.modifiers.ip) || 0;
-      }
-
-      const fortressBonus = (leveledPlayer.classes || [])
-        .map((cls) => cls.skills || [])
-        .flat()
-        .filter((skill) => skill.specialSkill === "Fortress")
-        .map((skill) => (Number(skill.currentLvl) || 0) * 3)
-        .reduce((a, b) => a + b, 0);
-      hpBonus += fortressBonus;
-
-      const focusedBonus = (leveledPlayer.classes || [])
-        .map((cls) => cls.skills || [])
-        .flat()
-        .filter((skill) => skill.specialSkill === "Focused")
-        .map((skill) => (Number(skill.currentLvl) || 0) * 3)
-        .reduce((a, b) => a + b, 0);
-      mpBonus += focusedBonus;
-
-      const maxHP = baseMaxHP + hpBonus;
-      const maxMP = baseMaxMP + mpBonus;
-      const maxIP = 6 + ipBonus;
-
-      return {
-        ...leveledPlayer,
-        stats: {
-          hp: {
-            ...leveledPlayer.stats.hp,
-            max: maxHP,
-            current: Math.min(
-              Number(leveledPlayer.stats.hp.current) || 0,
-              maxHP,
-            ),
+        const leveledPlayer = {
+          ...prevPlayer,
+          lvl: Math.min(50, (prevPlayer.lvl || 0) + 1),
+          info: {
+            ...prevPlayer.info,
+            exp: Math.max(0, currentExp - 10),
           },
-          mp: {
-            ...leveledPlayer.stats.mp,
-            max: maxMP,
-            current: Math.min(
-              Number(leveledPlayer.stats.mp.current) || 0,
-              maxMP,
-            ),
+        };
+
+        // Recalculate max stats for the new level
+        const mig = Number(leveledPlayer.attributes?.might?.base) || 0;
+        const wil = Number(leveledPlayer.attributes?.willpower?.base) || 0;
+        const lvl = Number(leveledPlayer.lvl) || 0;
+
+        const baseMaxHP = mig * 5 + lvl;
+        const baseMaxMP = wil * 5 + lvl;
+
+        let hpBonus = 0;
+        let mpBonus = 0;
+        let ipBonus = 0;
+
+        const innateClassesCS2 =
+          leveledPlayer.settings?.optionalRules?.innateClasses ?? [];
+        const isTechnospheresCS2 =
+          leveledPlayer.settings?.optionalRules?.technospheres ?? false;
+        const technospheresVariantCS2 =
+          leveledPlayer.settings?.optionalRules?.technospheresVariant ??
+          "standard";
+        const usesInnateClassRulesCS2 =
+          isTechnospheresCS2 && technospheresVariantCS2 !== "hoplospheres";
+        (leveledPlayer.classes || []).forEach((cls) => {
+          if (!cls.benefits) return;
+          if (usesInnateClassRulesCS2 && !innateClassesCS2.includes(cls.name))
+            return;
+          hpBonus += Number(cls.benefits.hpplus) || 0;
+          mpBonus += Number(cls.benefits.mpplus) || 0;
+          ipBonus += Number(cls.benefits.ipplus) || 0;
+        });
+
+        if (
+          isTechnospheresCS2 &&
+          (technospheresVariantCS2 === "standard" ||
+            technospheresVariantCS2 === "mnemospheres")
+        ) {
+          hpBonus += 5;
+          mpBonus += 5;
+        }
+
+        if (leveledPlayer.modifiers) {
+          hpBonus +=
+            Number(
+              leveledPlayer.resources?.hp.bonus ?? leveledPlayer.modifiers.hp,
+            ) || 0;
+          mpBonus +=
+            Number(
+              leveledPlayer.resources?.mp.bonus ?? leveledPlayer.modifiers.mp,
+            ) || 0;
+          ipBonus += Number(leveledPlayer.modifiers.ip) || 0;
+        }
+
+        const fortressBonus = (leveledPlayer.classes || [])
+          .map((cls) => cls.skills || [])
+          .flat()
+          .filter((skill) => skill.specialSkill === "Fortress")
+          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
+          .reduce((a, b) => a + b, 0);
+        hpBonus += fortressBonus;
+
+        const focusedBonus = (leveledPlayer.classes || [])
+          .map((cls) => cls.skills || [])
+          .flat()
+          .filter((skill) => skill.specialSkill === "Focused")
+          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
+          .reduce((a, b) => a + b, 0);
+        mpBonus += focusedBonus;
+
+        const maxHP = baseMaxHP + hpBonus;
+        const maxMP = baseMaxMP + mpBonus;
+        const maxIP = 6 + ipBonus;
+
+        return {
+          ...leveledPlayer,
+          stats: {
+            hp: {
+              ...leveledPlayer.stats.hp,
+              max: maxHP,
+              current: Math.min(
+                Number(leveledPlayer.stats.hp.current) || 0,
+                maxHP,
+              ),
+            },
+            mp: {
+              ...leveledPlayer.stats.mp,
+              max: maxMP,
+              current: Math.min(
+                Number(leveledPlayer.stats.mp.current) || 0,
+                maxMP,
+              ),
+            },
+            ip: {
+              ...leveledPlayer.stats.ip,
+              max: maxIP,
+              current: Math.min(
+                Number(leveledPlayer.stats.ip.current) || 0,
+                maxIP,
+              ),
+            },
           },
-          ip: {
-            ...leveledPlayer.stats.ip,
-            max: maxIP,
-            current: Math.min(
-              Number(leveledPlayer.stats.ip.current) || 0,
-              maxIP,
-            ),
-          },
-        },
-      };
+        };
       });
       return true;
     });
@@ -678,7 +676,7 @@ export default function CharacterSheet() {
                 {optionalRules.technospheres &&
                   ["integrated", "mnemospheres"].includes(
                     player?.settings?.optionalRules?.technospheresVariant ??
-                      "standard",
+                    "standard",
                   ) && (
                     <MnemoReceptaclePanel
                       player={player}

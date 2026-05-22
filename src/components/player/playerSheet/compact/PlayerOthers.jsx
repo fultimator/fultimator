@@ -27,6 +27,7 @@ import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import Clock from "../Clock";
+import { useClock } from "../../../../hooks/useClock";
 
 const StyledTableCellHeader = styled(TableCell)({
   padding: "4px 8px",
@@ -68,10 +69,216 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
+function OtherItemRow({ other, index, setPlayer, searchQuery, normalizedQuery }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
+
+  const sections = other.clock?.sections ?? 0;
+  const hasClock = sections > 0;
+  const clockState = hasClock
+    ? (other.clockState ?? new Array(sections).fill(false))
+    : [];
+
+  const persistState = (newState) => {
+    if (!setPlayer) return;
+    setPlayer((prev) => {
+      const updated = [...(prev.others ?? [])];
+      updated[index] = { ...updated[index], clockState: newState };
+      return { ...prev, others: updated };
+    });
+  };
+
+  const { filledCount: filled, increment, decrement, reset } = useClock(sections, clockState, persistState);
+
+  const otherKey = `other-${index}`;
+  const hasDetails = other.description || other.effect;
+  const forceOpen =
+    !!normalizedQuery &&
+    (other.description?.toLowerCase().includes(normalizedQuery) ||
+      other.effect?.toLowerCase().includes(normalizedQuery));
+  const isOpen = !!openRows.others[otherKey] || forceOpen;
+
+  return (
+    <React.Fragment>
+      {/* Name row */}
+      <TableRow>
+        <StyledTableCell sx={{ width: 36 }}>
+          {hasDetails ? (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleRow("others", otherKey);
+              }}
+            >
+              {isOpen ? (
+                <KeyboardArrowUp fontSize="small" />
+              ) : (
+                <KeyboardArrowDown fontSize="small" />
+              )}
+            </IconButton>
+          ) : (
+            <Tooltip title={t("Optional")}>
+              <StickyNote2Outlined
+                fontSize="small"
+                sx={{ ml: "4px", color: theme.secondary }}
+              />
+            </Tooltip>
+          )}
+        </StyledTableCell>
+        <StyledTableCell
+          onClick={(e) => {
+            e.stopPropagation();
+            if (hasDetails) toggleRow("others", otherKey);
+          }}
+          sx={{
+            cursor: hasDetails ? "pointer" : "default",
+            minWidth: { xs: 60, sm: 100 },
+            wordBreak: "break-word",
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: "bold",
+              textTransform: "uppercase",
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            {highlightMatch(other.name, searchQuery)}
+          </Typography>
+        </StyledTableCell>
+        <StyledTableCell
+          sx={{
+            width: { xs: 55, sm: 80 },
+            display: { xs: "none", sm: "table-cell" },
+          }}
+        />
+        <StyledTableCell
+          sx={{
+            width: { xs: 65, sm: 90 },
+            display: { xs: "none", sm: "table-cell" },
+          }}
+        />
+        <StyledTableCell sx={{ width: { xs: 110, sm: 110 } }} />
+      </TableRow>
+      {/* Clock row */}
+      {hasClock && (
+        <TableRow sx={{ bgcolor: "action.hover" }}>
+          <StyledTableCell sx={{ width: 36 }}>
+            <Clock
+              numSections={sections}
+              size={28}
+              state={clockState}
+              setState={() => { }}
+              isCharacterSheet={true}
+            />
+          </StyledTableCell>
+          <StyledTableCell>
+            <Typography variant="body2" sx={{ fontSize: "0.75rem" }}>
+              {t("Clock")}
+            </Typography>
+          </StyledTableCell>
+          <StyledTableCell
+            sx={{
+              width: { xs: 55, sm: 80 },
+              display: { xs: "none", sm: "table-cell" },
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: "0.85rem",
+                fontWeight: "bold",
+              }}
+            >
+              {filled}/{sections}
+            </Typography>
+          </StyledTableCell>
+          <StyledTableCell
+            sx={{
+              width: { xs: 65, sm: 90 },
+              display: { xs: "none", sm: "table-cell" },
+            }}
+          />
+          <StyledTableCell
+            sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}
+            >
+              <IconButton
+                size="small"
+                disabled={filled === 0}
+                onClick={decrement}
+                sx={{ p: "2px" }}
+              >
+                <Remove fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                disabled={filled >= sections}
+                onClick={increment}
+                sx={{ p: "2px" }}
+              >
+                <Add fontSize="small" />
+              </IconButton>
+              <Tooltip title={t("Reset")} arrow>
+                <IconButton
+                  size="small"
+                  onClick={reset}
+                  sx={{ p: "2px" }}
+                >
+                  <RestartAlt fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </StyledTableCell>
+        </TableRow>
+      )}
+      {/* Collapsible description + effect */}
+      {hasDetails && (
+        <TableRow>
+          <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
+            <Collapse in={isOpen} timeout="auto" unmountOnExit>
+              <Box
+                sx={{
+                  p: 1,
+                  ml: { xs: 1, sm: 4 },
+                  bgcolor: "rgba(0,0,0,0.03)",
+                }}
+              >
+                {other.description && (
+                  <NotesMarkdown
+                    sx={{ fontSize: "0.85rem", fontStyle: "italic" }}
+                  >
+                    {highlightMarkdownText(other.description, searchQuery)}
+                  </NotesMarkdown>
+                )}
+                {other.effect && (
+                  <NotesMarkdown sx={{ fontSize: "0.85rem", mt: 0.5 }}>
+                    {highlightMarkdownText(other.effect, searchQuery)}
+                  </NotesMarkdown>
+                )}
+              </Box>
+            </Collapse>
+          </StyledTableCell>
+        </TableRow>
+      )}
+    </React.Fragment>
+  );
+}
+
+export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
+  const { t } = useTranslate();
+  const theme = useCustomTheme();
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const others = (player.others ?? [])
@@ -84,39 +291,6 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
         other.effect?.toLowerCase().includes(normalizedQuery),
     );
   if (others.length === 0) return null;
-
-  const updateClock = (index, newState) => {
-    if (!setPlayer) return;
-    setPlayer((prev) => {
-      const updated = [...(prev.others ?? [])];
-      updated[index] = { ...updated[index], clockState: newState };
-      return { ...prev, others: updated };
-    });
-  };
-
-  const increment = (index, clockState) => {
-    const currentFilled = clockState.filter(Boolean).length;
-    const sections = clockState.length;
-    if (currentFilled < sections) {
-      const next = new Array(sections).fill(false);
-      for (let i = 0; i <= currentFilled; i++) {
-        next[i] = true;
-      }
-      updateClock(index, next);
-    }
-  };
-
-  const decrement = (index, clockState) => {
-    const currentFilled = clockState.filter(Boolean).length;
-    if (currentFilled > 0) {
-      const next = [...clockState];
-      next[currentFilled - 1] = false;
-      updateClock(index, next);
-    }
-  };
-
-  const reset = (index, sections) =>
-    updateClock(index, new Array(sections).fill(false));
 
   return (
     <TableContainer component={Paper} sx={{ mb: 1 }}>
@@ -138,202 +312,16 @@ export default function PlayerOthers({ player, setPlayer, searchQuery = "" }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {others.map((other, index) => {
-            const sections = other.clock?.sections ?? 0;
-            const hasClock = sections > 0;
-            const clockState = hasClock
-              ? (other.clockState ?? new Array(sections).fill(false))
-              : [];
-            const filled = hasClock ? clockState.filter(Boolean).length : 0;
-            const otherKey = `other-${index}`;
-            const hasDetails = other.description || other.effect;
-            const forceOpen =
-              !!normalizedQuery &&
-              (other.description?.toLowerCase().includes(normalizedQuery) ||
-                other.effect?.toLowerCase().includes(normalizedQuery));
-            const isOpen = !!openRows.others[otherKey] || forceOpen;
-
-            return (
-              <React.Fragment key={index}>
-                {/* Name row */}
-                <TableRow>
-                  <StyledTableCell sx={{ width: 36 }}>
-                    {hasDetails ? (
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleRow("others", otherKey);
-                        }}
-                      >
-                        {isOpen ? (
-                          <KeyboardArrowUp fontSize="small" />
-                        ) : (
-                          <KeyboardArrowDown fontSize="small" />
-                        )}
-                      </IconButton>
-                    ) : (
-                      <Tooltip title={t("Optional")}>
-                        <StickyNote2Outlined
-                          fontSize="small"
-                          sx={{ ml: "4px", color: theme.secondary }}
-                        />
-                      </Tooltip>
-                    )}
-                  </StyledTableCell>
-                  <StyledTableCell
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (hasDetails) toggleRow("others", otherKey);
-                    }}
-                    sx={{
-                      cursor: hasDetails ? "pointer" : "default",
-                      minWidth: { xs: 60, sm: 100 },
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        wordBreak: "break-word",
-                        overflowWrap: "break-word",
-                      }}
-                    >
-                      {highlightMatch(other.name, searchQuery)}
-                    </Typography>
-                  </StyledTableCell>
-                  <StyledTableCell
-                    sx={{
-                      width: { xs: 55, sm: 80 },
-                      display: { xs: "none", sm: "table-cell" },
-                    }}
-                  />
-                  <StyledTableCell
-                    sx={{
-                      width: { xs: 65, sm: 90 },
-                      display: { xs: "none", sm: "table-cell" },
-                    }}
-                  />
-                  <StyledTableCell sx={{ width: { xs: 110, sm: 110 } }} />
-                </TableRow>
-                {/* Clock row */}
-                {hasClock && (
-                  <TableRow sx={{ bgcolor: "action.hover" }}>
-                    <StyledTableCell sx={{ width: 36 }}>
-                      <Clock
-                        numSections={sections}
-                        size={28}
-                        state={clockState}
-                        setState={() => {}}
-                        isCharacterSheet={true}
-                      />
-                    </StyledTableCell>
-                    <StyledTableCell>
-                      <Typography variant="body2" sx={{ fontSize: "0.75rem" }}>
-                        {t("Clock")}
-                      </Typography>
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{
-                        width: { xs: 55, sm: 80 },
-                        display: { xs: "none", sm: "table-cell" },
-                        textAlign: "center",
-                      }}
-                    >
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontSize: "0.85rem",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {filled}/{sections}
-                      </Typography>
-                    </StyledTableCell>
-                    <StyledTableCell
-                      sx={{
-                        width: { xs: 65, sm: 90 },
-                        display: { xs: "none", sm: "table-cell" },
-                      }}
-                    />
-                    <StyledTableCell
-                      sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <IconButton
-                          size="small"
-                          disabled={filled === 0}
-                          onClick={() => decrement(index, clockState)}
-                          sx={{ p: "2px" }}
-                        >
-                          <Remove fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          disabled={filled >= sections}
-                          onClick={() => increment(index, clockState)}
-                          sx={{ p: "2px" }}
-                        >
-                          <Add fontSize="small" />
-                        </IconButton>
-                        <Tooltip title={t("Reset")} arrow>
-                          <IconButton
-                            size="small"
-                            onClick={() => reset(index, sections)}
-                            sx={{ p: "2px" }}
-                          >
-                            <RestartAlt fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </StyledTableCell>
-                  </TableRow>
-                )}
-                {/* Collapsible description + effect */}
-                {hasDetails && (
-                  <TableRow>
-                    <StyledTableCell colSpan={5} sx={{ p: 0, border: 0 }}>
-                      <Collapse in={isOpen} timeout="auto" unmountOnExit>
-                        <Box
-                          sx={{
-                            p: 1,
-                            ml: { xs: 1, sm: 4 },
-                            bgcolor: "rgba(0,0,0,0.03)",
-                          }}
-                        >
-                          {other.description && (
-                            <NotesMarkdown
-                              sx={{ fontSize: "0.85rem", fontStyle: "italic" }}
-                            >
-                              {highlightMarkdownText(
-                                other.description,
-                                searchQuery,
-                              )}
-                            </NotesMarkdown>
-                          )}
-                          {other.effect && (
-                            <NotesMarkdown
-                              sx={{ fontSize: "0.85rem", mt: 0.5 }}
-                            >
-                              {highlightMarkdownText(other.effect, searchQuery)}
-                            </NotesMarkdown>
-                          )}
-                        </Box>
-                      </Collapse>
-                    </StyledTableCell>
-                  </TableRow>
-                )}
-              </React.Fragment>
-            );
-          })}
+          {others.map((other, index) => (
+            <OtherItemRow
+              key={index}
+              other={other}
+              index={index}
+              setPlayer={setPlayer}
+              searchQuery={searchQuery}
+              normalizedQuery={normalizedQuery}
+            />
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
