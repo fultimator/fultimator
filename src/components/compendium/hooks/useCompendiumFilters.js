@@ -6,7 +6,7 @@ import { toSlug } from "../../../libs/compendium";
  *
  * Designed for modal / importer contexts (local useState).
  * The full-page route keeps its own URL-param state and passes values as props
- * to CompendiumBrowser — no hook needed there.
+ * to CompendiumBrowser - no hook needed there.
  *
  * Returns { filters, handlers, selectedIdx, setSelectedIdx, searchQuery, setSearchQuery }
  */
@@ -109,7 +109,7 @@ export function useCompendiumFilters({
   const isInvokerClassSelected = selectedSpellClassKey === "invoker";
 
   // ---------------------------------------------------------------------------
-  // Handlers — each resets search + selection and optionally scrolls
+  // Handlers - each resets search + selection and optionally scrolls
   // ---------------------------------------------------------------------------
 
   const handleTypeChange = useCallback(

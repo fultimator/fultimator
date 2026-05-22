@@ -4,8 +4,14 @@ import { useDatabase } from "../../hooks/useDatabase";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 import { useThemeStore } from "../../store/themeStore";
-import { TAB_RAIL_WIDTH, APP_DRAWER_WIDTH } from "../../components/app-drawer/constants";
-import { useDrawerScrollTop, useDrawerSave } from "../../hooks/useDrawerActions";
+import {
+  TAB_RAIL_WIDTH,
+  APP_DRAWER_WIDTH,
+} from "../../components/app-drawer/constants";
+import {
+  useDrawerScrollTop,
+  useDrawerSave,
+} from "../../hooks/useDrawerActions";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
@@ -376,7 +382,8 @@ export default function PlayerEdit() {
         setDrawerIsOpen(true);
         return;
       }
-      const normalizedKind = payload?.kind === "attribute" ? "attribute" : "open";
+      const normalizedKind =
+        payload?.kind === "attribute" ? "attribute" : "open";
       const primary = payload?.primary || "dex";
       const secondary = payload?.secondary || "ins";
       const modifier = Number(payload?.modifier) || 0;
@@ -1476,8 +1483,8 @@ export default function PlayerEdit() {
           right: appDrawerOpen
             ? APP_DRAWER_WIDTH + 16
             : isDesktop
-            ? TAB_RAIL_WIDTH + 16
-            : 16,
+              ? TAB_RAIL_WIDTH + 16
+              : 16,
           transition: "right 0.3s ease",
           zIndex: 1200,
           display: "flex",
@@ -1639,10 +1646,7 @@ export default function PlayerEdit() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            onClick={closeCelebration}
-          >
+          <Button variant="contained" onClick={closeCelebration}>
             {t("OK")}
           </Button>
         </DialogActions>

@@ -112,14 +112,11 @@ describe("itemFormRegistry", () => {
         "accuracy.attr1": "insight",
         "accuracy.attr2": "will",
       };
-      const payload = entry.buildPayload?.(
-        state,
-        {
-          compendiumClasses: [],
-          compendiumItems: [],
-          affinityOptions: [],
-        },
-      );
+      const payload = entry.buildPayload?.(state, {
+        compendiumClasses: [],
+        compendiumItems: [],
+        affinityOptions: [],
+      });
       expect(payload, `payload for subtype ${subtype}`).not.toBeNull();
     }
   });

@@ -51,7 +51,8 @@ export default function PlayerMagichant({ player }) {
       speaker: player?.name || "Player",
       kind: "display",
       itemType: "spell",
-      name: tone.name === "magichant_custom_name" ? tone.customName : t(tone.name),
+      name:
+        tone.name === "magichant_custom_name" ? tone.customName : t(tone.name),
       tags: [t("Magichant"), magichantSpell.className || t("Unknown")],
       description: tone.description || "",
     });
@@ -540,12 +541,18 @@ export default function PlayerMagichant({ player }) {
                       magichantSpell.tones.map((tone, tIndex) => (
                         <ItemNameRow
                           key={`${msIndex}-${tIndex}`}
-                          name={tone.name === "magichant_custom_name" ? tone.customName : t(tone.name)}
+                          name={
+                            tone.name === "magichant_custom_name"
+                              ? tone.customName
+                              : t(tone.name)
+                          }
                         >
                           <Tooltip title={t("Info")}>
                             <IconButton
                               sx={{ padding: "0px" }}
-                              onClick={() => handleOpenModal(magichantSpell, tone)}
+                              onClick={() =>
+                                handleOpenModal(magichantSpell, tone)
+                              }
                             >
                               <Info />
                             </IconButton>

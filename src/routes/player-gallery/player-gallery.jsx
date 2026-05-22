@@ -1956,7 +1956,9 @@ function PlayerGalleryCardActions({
           <>
             <Tooltip title={t("Player Sheet")}>
               <IconButton
-                onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
+                onClick={() =>
+                  handleNavigation(`/character-sheet/${player.id}`)
+                }
               >
                 <Badge />
               </IconButton>

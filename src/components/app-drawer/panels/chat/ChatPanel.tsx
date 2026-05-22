@@ -440,34 +440,34 @@ export const ChatPanel: React.FC = () => {
               direction: "rtl",
             }}
           >
-          <Box
-            sx={{
-              px: 2,
-              pt: 2,
-              pb: 2,
-              direction: "ltr",
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
-          >
-            {store.messages.length === 0 && (
-              <Typography variant="body2" color="text.secondary">
-                Start chatting or roll from the dice tray below.
-              </Typography>
-            )}
-            {store.messages.map((message) => (
-              <BaseMessageTemplate
-                key={message.id}
-                speaker={message.speaker || AUTHOR_NAME}
-                timeAgo={formatTimeAgo(message.createdAt)}
-                onDelete={() => store.deleteMessage(message.id)}
-              >
-                <MessageContent message={message} />
-              </BaseMessageTemplate>
-            ))}
-            <Box ref={endOfMessagesRef} />
-          </Box>
+            <Box
+              sx={{
+                px: 2,
+                pt: 2,
+                pb: 2,
+                direction: "ltr",
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+              }}
+            >
+              {store.messages.length === 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  Start chatting or roll from the dice tray below.
+                </Typography>
+              )}
+              {store.messages.map((message) => (
+                <BaseMessageTemplate
+                  key={message.id}
+                  speaker={message.speaker || AUTHOR_NAME}
+                  timeAgo={formatTimeAgo(message.createdAt)}
+                  onDelete={() => store.deleteMessage(message.id)}
+                >
+                  <MessageContent message={message} />
+                </BaseMessageTemplate>
+              ))}
+              <Box ref={endOfMessagesRef} />
+            </Box>
           </Box>
         </MessageListErrorBoundary>
       </ChatActionsProvider>

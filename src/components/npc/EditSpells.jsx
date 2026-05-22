@@ -307,7 +307,10 @@ export default function EditSpells({ npc, setNpc }) {
       ) {
         return prev;
       }
-      [spells[fromIndex], spells[toIndex]] = [spells[toIndex], spells[fromIndex]];
+      [spells[fromIndex], spells[toIndex]] = [
+        spells[toIndex],
+        spells[fromIndex],
+      ];
       return { ...prev, spells };
     });
     setExpandedSet((prev) => {

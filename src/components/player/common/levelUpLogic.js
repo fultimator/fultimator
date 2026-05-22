@@ -21,4 +21,3 @@ export function applyExpLevelUp(player, options = {}) {
 
   return afterLevelUp ? afterLevelUp(withStats) : withStats;
 }
-

@@ -28,7 +28,9 @@ export function useSpellModals() {
     // Ensure the active list index is always available, even when the spell
     // object itself does not carry an `index` field.
     setSpellBeingEdited(
-      spell && typeof spell === "object" ? { ...spell, index: spellIndex } : spell,
+      spell && typeof spell === "object"
+        ? { ...spell, index: spellIndex }
+        : spell,
     );
     setEditingSpellClass(spellClass);
     setEditingSpellIndex(spellIndex);

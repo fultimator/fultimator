@@ -41,7 +41,7 @@ const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
 }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const trigger = useScrollTrigger();
-  // Only hide on mobile — on desktop the persistent drawer rail depends on AppBar height
+  // Only hide on mobile - on desktop the persistent drawer rail depends on AppBar height
   if (!isMobile) return children;
   return (
     <Slide appear={false} direction="down" in={!trigger}>

@@ -50,7 +50,10 @@ export default function PlayerTherioforms({ player }) {
       speaker: player?.name || "Player",
       kind: "display",
       itemType: "spell",
-      name: therioform.name === "mutant_therioform_custom_name" ? therioform.customName : t(therioform.name),
+      name:
+        therioform.name === "mutant_therioform_custom_name"
+          ? therioform.customName
+          : t(therioform.name),
       tags: [t("Therioform"), mutantSpell.className || t("Unknown")],
       description: therioform.description || "",
     });
@@ -112,12 +115,18 @@ export default function PlayerTherioforms({ player }) {
                     mutantSpell.therioforms.map((therioform, tIndex) => (
                       <ItemNameRow
                         key={`${msIndex}-${tIndex}`}
-                        name={therioform.name === "mutant_therioform_custom_name" ? therioform.customName : t(therioform.name)}
+                        name={
+                          therioform.name === "mutant_therioform_custom_name"
+                            ? therioform.customName
+                            : t(therioform.name)
+                        }
                       >
                         <Tooltip title={t("Info")}>
                           <IconButton
                             sx={{ padding: "0px" }}
-                            onClick={() => handleOpenModal(mutantSpell, therioform)}
+                            onClick={() =>
+                              handleOpenModal(mutantSpell, therioform)
+                            }
                           >
                             <Info />
                           </IconButton>

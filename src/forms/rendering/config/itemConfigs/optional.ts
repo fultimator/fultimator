@@ -113,7 +113,7 @@ export const optionalFieldConfig: ItemFieldConfig<OptionalFormState> = [
     fullWidth: true,
     dependencies: hasDescription,
   },
-  // body: target (camp-activities — maps to description in output)
+  // body: target (camp-activities - maps to description in output)
   {
     key: "description",
     kind: "editable",

@@ -29,7 +29,8 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
   const tags = message.tags.map((t) =>
     t === "default" ? formatSpellType(t) : t,
   );
-  const iconSrc = DISPLAY_ICON_SRC[String(message.itemType || "").toLowerCase()];
+  const iconSrc =
+    DISPLAY_ICON_SRC[String(message.itemType || "").toLowerCase()];
   const clockSections = Number(message.clock?.sections) || 0;
   const clockState =
     clockSections > 0
@@ -75,7 +76,12 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
               component="img"
               src={iconSrc}
               alt={message.itemType}
-              sx={{ width: 32, height: 32, objectFit: "contain", display: "block" }}
+              sx={{
+                width: 32,
+                height: 32,
+                objectFit: "contain",
+                display: "block",
+              }}
             />
           </Box>
         )}
@@ -120,7 +126,12 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
             >
               <Typography
                 variant="caption"
-                sx={{ display: "block", mb: 0.4, fontWeight: 700, color: "text.secondary" }}
+                sx={{
+                  display: "block",
+                  mb: 0.4,
+                  fontWeight: 700,
+                  color: "text.secondary",
+                }}
               >
                 Description
               </Typography>
@@ -144,7 +155,12 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
             >
               <Typography
                 variant="caption"
-                sx={{ display: "block", mb: 0.4, fontWeight: 700, color: "text.secondary" }}
+                sx={{
+                  display: "block",
+                  mb: 0.4,
+                  fontWeight: 700,
+                  color: "text.secondary",
+                }}
               >
                 Effect
               </Typography>
@@ -179,10 +195,19 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                 isCharacterSheet
               />
               <Box>
-                <Typography variant="caption" sx={{ display: "block", color: "text.secondary", fontWeight: 700 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    color: "text.secondary",
+                    fontWeight: 700,
+                  }}
+                >
                   {message.clock?.name || "Clock"}
                 </Typography>
-                <Typography sx={{ fontSize: "1.25rem", lineHeight: 1.1, fontWeight: 800 }}>
+                <Typography
+                  sx={{ fontSize: "1.25rem", lineHeight: 1.1, fontWeight: 800 }}
+                >
                   {filledClockSections}/{clockSections}
                 </Typography>
               </Box>

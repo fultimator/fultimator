@@ -79,7 +79,11 @@ function CombatClock({ clock, index, onUpdate, onRemove, onReset, addLog }) {
           </IconButton>
         </Tooltip>
         <Tooltip title={t("clocks_reset_tooltip")}>
-          <IconButton size="small" onClick={() => onReset(index)} sx={{ mr: 0.5 }}>
+          <IconButton
+            size="small"
+            onClick={() => onReset(index)}
+            sx={{ mr: 0.5 }}
+          >
             <RestartAlt fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -89,7 +93,11 @@ function CombatClock({ clock, index, onUpdate, onRemove, onReset, addLog }) {
           </IconButton>
         </Tooltip>
         <Tooltip title={t("clocks_remove_tooltip")}>
-          <IconButton size="small" onClick={() => onRemove(index)} color="error">
+          <IconButton
+            size="small"
+            onClick={() => onRemove(index)}
+            color="error"
+          >
             <RemoveCircleOutlined fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -376,7 +384,7 @@ export default function CombatSimClocks({
                     numSections={4}
                     size={60}
                     state={[false, false, false, false]}
-                    setState={() => { }}
+                    setState={() => {}}
                     isCharacterSheet={false}
                   />
                 </Box>

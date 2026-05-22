@@ -1,6 +1,17 @@
 import React, { useState } from "react";
-import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Typography } from "@mui/material";
-import { DeleteOutlined as DeleteOutlineIcon, Menu as MenuIcon } from "@mui/icons-material";
+import {
+  Box,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import {
+  DeleteOutlined as DeleteOutlineIcon,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
 
 interface BaseMessageTemplateProps {
   speaker: string;

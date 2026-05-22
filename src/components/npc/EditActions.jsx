@@ -259,7 +259,10 @@ export default function EditActions({ npc, setNpc }) {
       ) {
         return prev;
       }
-      [actions[fromIndex], actions[toIndex]] = [actions[toIndex], actions[fromIndex]];
+      [actions[fromIndex], actions[toIndex]] = [
+        actions[toIndex],
+        actions[fromIndex],
+      ];
       return { ...prev, actions };
     });
     setExpandedSet((prev) => {

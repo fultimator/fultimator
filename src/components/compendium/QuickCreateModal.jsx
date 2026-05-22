@@ -991,7 +991,9 @@ function PlayerSpellPanel() {
       pulse: t(String(imported.pulse ?? "")),
       pulseDesc: t(String(imported.pulseDesc ?? "")),
       wellspring: t(
-        String(imported.wellspring ?? imported.invocations?.[0]?.wellspring ?? ""),
+        String(
+          imported.wellspring ?? imported.invocations?.[0]?.wellspring ?? "",
+        ),
       ),
       invType: String(imported.type ?? imported.invocations?.[0]?.type ?? ""),
       category: String(imported.category ?? ""),
@@ -1030,7 +1032,8 @@ function PlayerSpellPanel() {
           imported.magiseeds?.[0]?.description ?? imported.description ?? "",
         ),
       ),
-      seedRangeStart: imported.magiseeds?.[0]?.rangeStart ?? imported.rangeStart ?? 1,
+      seedRangeStart:
+        imported.magiseeds?.[0]?.rangeStart ?? imported.rangeStart ?? 1,
       seedRangeEnd: imported.magiseeds?.[0]?.rangeEnd ?? imported.rangeEnd ?? 4,
       "meta.book": imported.meta?.book ?? "",
       "meta.page": imported.meta?.page ?? undefined,
@@ -1628,7 +1631,7 @@ function PlayerSpellPanel() {
             </>
           ) : (
             <>
-              {/* cost / target / accuracy / damage / description — default spell only */}
+              {/* cost / target / accuracy / damage / description - default spell only */}
               <SchemaFieldRenderer
                 config={playerSpellFieldConfig}
                 state={formState}
@@ -1679,7 +1682,7 @@ function PlayerSpellPanel() {
                 hidden={spellType !== "default"}
                 cols={1}
               />
-              {/* effect / type-specific fields — non-default spells */}
+              {/* effect / type-specific fields - non-default spells */}
               <SchemaFieldRenderer
                 config={playerSpellFieldConfig}
                 state={formState}

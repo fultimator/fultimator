@@ -23,7 +23,11 @@ interface AppDrawerStore {
   setIsOpen: (open: boolean) => void;
   setChatActorDocOverride: (doc: Record<string, unknown> | null) => void;
   setChatComposerPrefill: (value: string | null) => void;
-  setDrawerBottomActions: (actions: DrawerBottomAction[] | ((prev: DrawerBottomAction[]) => DrawerBottomAction[])) => void;
+  setDrawerBottomActions: (
+    actions:
+      | DrawerBottomAction[]
+      | ((prev: DrawerBottomAction[]) => DrawerBottomAction[]),
+  ) => void;
 }
 
 export const useAppDrawerStore = create<AppDrawerStore>()(
@@ -40,7 +44,10 @@ export const useAppDrawerStore = create<AppDrawerStore>()(
       setChatComposerPrefill: (value) => set({ chatComposerPrefill: value }),
       setDrawerBottomActions: (actions) =>
         set((s) => ({
-          drawerBottomActions: typeof actions === "function" ? actions(s.drawerBottomActions) : actions,
+          drawerBottomActions:
+            typeof actions === "function"
+              ? actions(s.drawerBottomActions)
+              : actions,
         })),
     }),
     {

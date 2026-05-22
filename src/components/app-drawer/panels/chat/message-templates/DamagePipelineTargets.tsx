@@ -60,9 +60,7 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
   const [appliedMap, setAppliedMap] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    setHitMap(
-      Object.fromEntries(targets.map((t) => [t.combatId, defaultHit])),
-    );
+    setHitMap(Object.fromEntries(targets.map((t) => [t.combatId, defaultHit])));
     setAppliedMap({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targets.map((t) => t.combatId).join(","), fumble]);
@@ -170,7 +168,9 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
                     sx={{
                       p: 0.25,
                       color: isHit ? "success.main" : "error.main",
-                      "&:disabled": { color: isHit ? "success.dark" : "error.dark" },
+                      "&:disabled": {
+                        color: isHit ? "success.dark" : "error.dark",
+                      },
                     }}
                   >
                     {isHit ? (
@@ -210,7 +210,15 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
                 </Typography>
               )}
 
-              <Tooltip title={isApplied ? "Applied" : isHit ? "Apply damage" : "No damage (miss)"}>
+              <Tooltip
+                title={
+                  isApplied
+                    ? "Applied"
+                    : isHit
+                      ? "Apply damage"
+                      : "No damage (miss)"
+                }
+              >
                 <span>
                   <IconButton
                     size="small"

@@ -86,11 +86,11 @@ export function diffItem(instance, source, type) {
           );
         const srcCustom = srcB.custom ?? [];
         const instCustom = instB.custom ?? [];
-        const missingCustom = srcCustom.filter(
-          (c) => !instCustom.includes(c),
-        );
+        const missingCustom = srcCustom.filter((c) => !instCustom.includes(c));
         if (missingCustom.length > 0)
-          diffs.push(`Benefits: ${missingCustom.length} custom benefit(s) added`);
+          diffs.push(
+            `Benefits: ${missingCustom.length} custom benefit(s) added`,
+          );
         if (changed(srcB.martials, instB.martials))
           diffs.push("Benefits: martial proficiencies changed");
         if (changed(srcB.rituals, instB.rituals))

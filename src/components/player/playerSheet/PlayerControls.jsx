@@ -390,7 +390,8 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
   };
 
   const submitQuickCheck = () => {
-    const normalizedKind = quickCheckKind === "attribute" ? "attribute" : "open";
+    const normalizedKind =
+      quickCheckKind === "attribute" ? "attribute" : "open";
     const parsedCustomDl = Number.parseInt(quickCheckCustomDifficulty, 10);
     const difficulty =
       quickCheckKind === "attribute"
@@ -512,7 +513,9 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
             variant="h2"
             sx={{ lineHeight: 1.05, width: "fit-content", fontWeight: 700 }}
           >
-            <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.75 }}>
+            <Box
+              sx={{ display: "inline-flex", alignItems: "center", gap: 0.75 }}
+            >
               {stat === "hp" && <HpResourceIcon size="1.2em" />}
               {stat === "mp" && <MpResourceIcon size="1.2em" />}
               {stat === "ip" && <IpResourceIcon size="1.2em" />}
@@ -664,14 +667,30 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                   gridRow: { md: 1 },
                 }}
               >
-                <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.75 }}>
+                <Box
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.75,
+                  }}
+                >
                   <FpResourceIcon size="1.2em" />
                   {`${t("Fabula Points")}【${player.info.fabulapoints}】`}
                 </Box>
               </Typography>
               <Box sx={{ gridColumn: { md: 1 }, gridRow: { md: 2 } }}>
-                <Stack direction="row" spacing={0.6} sx={{ alignItems: "center" }}>
-                  <Button variant="outlined" size="small" color="primary" onClick={changeFabulaPoints(-fabulaChange)} sx={compactControlSx}>
+                <Stack
+                  direction="row"
+                  spacing={0.6}
+                  sx={{ alignItems: "center" }}
+                >
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    onClick={changeFabulaPoints(-fabulaChange)}
+                    sx={compactControlSx}
+                  >
                     -{fabulaChange}
                   </Button>
                   <TextField
@@ -687,7 +706,13 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                       htmlInput: { min: 0 },
                     }}
                   />
-                  <Button variant="outlined" size="small" color="primary" onClick={changeFabulaPoints(fabulaChange)} sx={compactControlSx}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    color="primary"
+                    onClick={changeFabulaPoints(fabulaChange)}
+                    sx={compactControlSx}
+                  >
                     +{fabulaChange}
                   </Button>
                 </Stack>
@@ -696,7 +721,11 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
               <Divider
                 orientation="vertical"
                 flexItem
-                sx={{ display: { xs: "none", md: "block" }, gridColumn: { md: 2 }, gridRow: { md: "1 / span 2" } }}
+                sx={{
+                  display: { xs: "none", md: "block" },
+                  gridColumn: { md: 2 },
+                  gridRow: { md: "1 / span 2" },
+                }}
               />
 
               <Typography
@@ -709,7 +738,13 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                   justifySelf: { md: "center" },
                 }}
               >
-                <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.75 }}>
+                <Box
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.75,
+                  }}
+                >
                   <ZenitResourceIcon size="1.2em" />
                   {`${t("Zenit")}【${player.info.zenit}】`}
                 </Box>
@@ -757,12 +792,8 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                     },
                   }}
                 >
-                  <ToggleButton value="+">
-                    {t("+")}
-                  </ToggleButton>
-                  <ToggleButton value="-">
-                    {t("-")}
-                  </ToggleButton>
+                  <ToggleButton value="+">{t("+")}</ToggleButton>
+                  <ToggleButton value="-">{t("-")}</ToggleButton>
                 </ToggleButtonGroup>
 
                 <TextField
@@ -808,108 +839,144 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                   gridRow: { md: "1 / span 2" },
                 }}
               >
-              <Tooltip title="Group Check">
-                <IconButton
-                  size="small"
-                  onClick={(e) => openQuickCheckPopover(e, "group")}
-                  sx={{
-                    gridColumn: { md: 5 },
-                    gridRow: { md: "1 / span 2" },
-                    pl: { md: 1.2 },
-                    ...quickCheckSx,
-                  }}
-                >
-                  <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.6 }}>
-                    <Box className="quick-check-icon" sx={{ display: "inline-flex" }}>
-                      <CheckGroupIcon size="2.4em" />
-                    </Box>
-                    <Typography
-                      variant="body1"
-                      sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                <Tooltip title="Group Check">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => openQuickCheckPopover(e, "group")}
+                    sx={{
+                      gridColumn: { md: 5 },
+                      gridRow: { md: "1 / span 2" },
+                      pl: { md: 1.2 },
+                      ...quickCheckSx,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 0.6,
+                      }}
                     >
-                      {t("Group")}
-                      <br />
-                      {t("Check")}
-                    </Typography>
-                  </Box>
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Attribute Check">
-                <IconButton
-                  size="small"
-                  onClick={(e) => openQuickCheckPopover(e, "attribute")}
-                  sx={{
-                    gridColumn: { md: 6 },
-                    gridRow: { md: "1 / span 2" },
-                    ...quickCheckSx,
-                  }}
-                >
-                  <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.6 }}>
-                    <Box className="quick-check-icon" sx={{ display: "inline-flex" }}>
-                      <CheckAttributeIcon size="2.4em" />
+                      <Box
+                        className="quick-check-icon"
+                        sx={{ display: "inline-flex" }}
+                      >
+                        <CheckGroupIcon size="2.4em" />
+                      </Box>
+                      <Typography
+                        variant="body1"
+                        sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                      >
+                        {t("Group")}
+                        <br />
+                        {t("Check")}
+                      </Typography>
                     </Box>
-                    <Typography
-                      variant="body1"
-                      sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Attribute Check">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => openQuickCheckPopover(e, "attribute")}
+                    sx={{
+                      gridColumn: { md: 6 },
+                      gridRow: { md: "1 / span 2" },
+                      ...quickCheckSx,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 0.6,
+                      }}
                     >
-                      {t("Attribute")}
-                      <br />
-                      {t("Check")}
-                    </Typography>
-                  </Box>
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Open Check">
-                <IconButton
-                  size="small"
-                  onClick={(e) => openQuickCheckPopover(e, "open")}
-                  sx={{
-                    gridColumn: { md: 7 },
-                    gridRow: { md: "1 / span 2" },
-                    ...quickCheckSx,
-                  }}
-                >
-                  <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.6 }}>
-                    <Box className="quick-check-icon" sx={{ display: "inline-flex" }}>
-                      <CheckOpenIcon size="2.4em" />
+                      <Box
+                        className="quick-check-icon"
+                        sx={{ display: "inline-flex" }}
+                      >
+                        <CheckAttributeIcon size="2.4em" />
+                      </Box>
+                      <Typography
+                        variant="body1"
+                        sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                      >
+                        {t("Attribute")}
+                        <br />
+                        {t("Check")}
+                      </Typography>
                     </Box>
-                    <Typography
-                      variant="body1"
-                      sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Open Check">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => openQuickCheckPopover(e, "open")}
+                    sx={{
+                      gridColumn: { md: 7 },
+                      gridRow: { md: "1 / span 2" },
+                      ...quickCheckSx,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 0.6,
+                      }}
                     >
-                      {t("Open")}
-                      <br />
-                      {t("Check")}
-                    </Typography>
-                  </Box>
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Opposed Check">
-                <IconButton
-                  size="small"
-                  onClick={(e) => openQuickCheckPopover(e, "opposed")}
-                  sx={{
-                    gridColumn: { md: 8 },
-                    gridRow: { md: "1 / span 2" },
-                    pr: { md: 2.5 },
-                    ...quickCheckSx,
-                  }}
-                >
-                  <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.6 }}>
-                    <Box className="quick-check-icon" sx={{ display: "inline-flex" }}>
-                      <CheckOpposedIcon size="2.4em" />
+                      <Box
+                        className="quick-check-icon"
+                        sx={{ display: "inline-flex" }}
+                      >
+                        <CheckOpenIcon size="2.4em" />
+                      </Box>
+                      <Typography
+                        variant="body1"
+                        sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                      >
+                        {t("Open")}
+                        <br />
+                        {t("Check")}
+                      </Typography>
                     </Box>
-                    <Typography
-                      variant="body1"
-                      sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Opposed Check">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => openQuickCheckPopover(e, "opposed")}
+                    sx={{
+                      gridColumn: { md: 8 },
+                      gridRow: { md: "1 / span 2" },
+                      pr: { md: 2.5 },
+                      ...quickCheckSx,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 0.6,
+                      }}
                     >
-                      {t("Opposed")}
-                      <br />
-                      {t("Check")}
-                    </Typography>
-                  </Box>
-                </IconButton>
-              </Tooltip>
+                      <Box
+                        className="quick-check-icon"
+                        sx={{ display: "inline-flex" }}
+                      >
+                        <CheckOpposedIcon size="2.4em" />
+                      </Box>
+                      <Typography
+                        variant="body1"
+                        sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                      >
+                        {t("Opposed")}
+                        <br />
+                        {t("Check")}
+                      </Typography>
+                    </Box>
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Box>
           </Grid>
@@ -1014,7 +1081,9 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                     labelId="quick-check-difficulty-mode-label"
                     label={t("Difficulty")}
                     value={quickCheckDifficultyMode}
-                    onChange={(e) => setQuickCheckDifficultyMode(e.target.value)}
+                    onChange={(e) =>
+                      setQuickCheckDifficultyMode(e.target.value)
+                    }
                   >
                     <MenuItem value="preset">{t("Preset")}</MenuItem>
                     <MenuItem value="custom">{t("Custom DL")}</MenuItem>
@@ -1044,7 +1113,9 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                     type="number"
                     label={t("Custom DL")}
                     value={quickCheckCustomDifficulty}
-                    onChange={(e) => setQuickCheckCustomDifficulty(e.target.value)}
+                    onChange={(e) =>
+                      setQuickCheckCustomDifficulty(e.target.value)
+                    }
                   />
                 )}
               </>

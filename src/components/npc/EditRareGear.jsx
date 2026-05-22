@@ -160,7 +160,10 @@ export default function EditRareGear({ npc, setNpc }) {
       ) {
         return prev;
       }
-      [raregear[fromIndex], raregear[toIndex]] = [raregear[toIndex], raregear[fromIndex]];
+      [raregear[fromIndex], raregear[toIndex]] = [
+        raregear[toIndex],
+        raregear[fromIndex],
+      ];
       return { ...prev, raregear };
     });
   };

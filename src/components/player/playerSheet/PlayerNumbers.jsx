@@ -171,7 +171,11 @@ export default function PlayerNumbers({
               >
                 {t("Zenit")}
               </Typography>
-              <img src={zenitIcon} alt="Zenit" style={{ width: "18px", height: "18px" }} />
+              <img
+                src={zenitIcon}
+                alt="Zenit"
+                style={{ width: "18px", height: "18px" }}
+              />
             </Box>
             <Typography variant="h4" sx={{ fontWeight: "bold" }}>
               {player.info.zenit}

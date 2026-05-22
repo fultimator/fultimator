@@ -223,7 +223,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     componentProps: { ...ATTR_SLIDER, showMarks: true },
   },
 
-  // affinities — last entry (poison) shows the full vu/rs/im/ab legend
+  // affinities - last entry (poison) shows the full vu/rs/im/ab legend
   {
     key: "affinities.physical",
     kind: "editable",
@@ -315,7 +315,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     componentProps: { showLabels: true },
   },
 
-  // defenses — hidden when defOverride or mDefOverride is active
+  // defenses - hidden when defOverride or mDefOverride is active
   {
     key: "extra",
     kind: "editable",
@@ -413,7 +413,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
   },
   // extra.statusImmunity rendered manually in EditExtra to show SP-cost helper text
 
-  // immunities — freeImmunities injected via extraProps at render time
+  // immunities - freeImmunities injected via extraProps at render time
   {
     key: "immunities",
     kind: "editable",

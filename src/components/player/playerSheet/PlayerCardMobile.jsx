@@ -216,7 +216,16 @@ function StatChangeDialog({ open, handleClose, stat, value, max, onApply, t }) {
   );
 }
 
-function StatBar({ label, value, max, color1, color2, trackColor, onClick, isOwner }) {
+function StatBar({
+  label,
+  value,
+  max,
+  color1,
+  color2,
+  trackColor,
+  onClick,
+  isOwner,
+}) {
   return (
     <StatBarWrapper
       sx={{ background: trackColor, cursor: isOwner ? "pointer" : "default" }}
@@ -236,7 +245,14 @@ function StatBar({ label, value, max, color1, color2, trackColor, onClick, isOwn
   );
 }
 
-function CombatStat({ icon, label, value, isEditMode = false, onChange, tooltip }) {
+function CombatStat({
+  icon,
+  label,
+  value,
+  isEditMode = false,
+  onChange,
+  tooltip,
+}) {
   const card = (
     <CombatStatCard>
       <Box
@@ -608,10 +624,42 @@ export default function PlayerCardMobile({
   ];
 
   const ATTRIBUTES = [
-    { key: "dexterity", label: t("DEX"), fullName: t("Dexterity"), curr: currDex, Icon: DexAttributeIcon, debuffs: ["slow", "enraged"], buffs: ["dexUp"] },
-    { key: "insight", label: t("INS"), fullName: t("Insight"), curr: currInsight, Icon: InsAttributeIcon, debuffs: ["dazed", "enraged"], buffs: ["insUp"] },
-    { key: "might", label: t("MIG"), fullName: t("Might"), curr: currMight, Icon: MigAttributeIcon, debuffs: ["weak", "poisoned"], buffs: ["migUp"] },
-    { key: "willpower", label: t("WLP"), fullName: t("Willpower"), curr: currWillpower, Icon: WlpAttributeIcon, debuffs: ["shaken", "poisoned"], buffs: ["wlpUp"] },
+    {
+      key: "dexterity",
+      label: t("DEX"),
+      fullName: t("Dexterity"),
+      curr: currDex,
+      Icon: DexAttributeIcon,
+      debuffs: ["slow", "enraged"],
+      buffs: ["dexUp"],
+    },
+    {
+      key: "insight",
+      label: t("INS"),
+      fullName: t("Insight"),
+      curr: currInsight,
+      Icon: InsAttributeIcon,
+      debuffs: ["dazed", "enraged"],
+      buffs: ["insUp"],
+    },
+    {
+      key: "might",
+      label: t("MIG"),
+      fullName: t("Might"),
+      curr: currMight,
+      Icon: MigAttributeIcon,
+      debuffs: ["weak", "poisoned"],
+      buffs: ["migUp"],
+    },
+    {
+      key: "willpower",
+      label: t("WLP"),
+      fullName: t("Willpower"),
+      curr: currWillpower,
+      Icon: WlpAttributeIcon,
+      debuffs: ["shaken", "poisoned"],
+      buffs: ["wlpUp"],
+    },
   ];
 
   const avatarSrc = isCharacterSheet
@@ -693,9 +741,7 @@ export default function PlayerCardMobile({
         {isEditMode ? (
           <TextField
             value={player.name}
-            onChange={(e) =>
-              setPlayer((p) => ({ ...p, name: e.target.value }))
-            }
+            onChange={(e) => setPlayer((p) => ({ ...p, name: e.target.value }))}
             variant="standard"
             size="small"
             fullWidth
@@ -771,7 +817,9 @@ export default function PlayerCardMobile({
               }}
             />
             <Diamond color={primary} />
-            <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.4 }}>
+            <Box
+              sx={{ display: "inline-flex", alignItems: "center", gap: 0.4 }}
+            >
               <Typography
                 sx={{
                   fontFamily: "Antonio",
@@ -786,7 +834,9 @@ export default function PlayerCardMobile({
                 value={player.lvl}
                 onChange={(e) => {
                   const next = parseInt(e.target.value, 10);
-                  const lvl = Number.isNaN(next) ? 5 : Math.max(5, Math.min(50, next));
+                  const lvl = Number.isNaN(next)
+                    ? 5
+                    : Math.max(5, Math.min(50, next));
                   setPlayer((p) => ({ ...p, lvl }));
                   updateMaxStats?.();
                 }}
@@ -806,7 +856,9 @@ export default function PlayerCardMobile({
               />
             </Box>
             <Diamond color={primary} />
-            <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.25 }}>
+            <Box
+              sx={{ display: "inline-flex", alignItems: "center", gap: 0.25 }}
+            >
               <Typography
                 sx={{
                   fontFamily: "Antonio",
@@ -817,7 +869,10 @@ export default function PlayerCardMobile({
               >
                 {t("Exp")}
               </Typography>
-              <IconButton size="small" onClick={() => bumpInfoNumber("exp", -1)}>
+              <IconButton
+                size="small"
+                onClick={() => bumpInfoNumber("exp", -1)}
+              >
                 <Remove fontSize="small" />
               </IconButton>
               <TextField
@@ -843,7 +898,9 @@ export default function PlayerCardMobile({
                 <Add fontSize="small" />
               </IconButton>
             </Box>
-            <Tooltip title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}>
+            <Tooltip
+              title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
+            >
               <span>
                 <IconButton
                   size="small"
@@ -857,7 +914,9 @@ export default function PlayerCardMobile({
                   {canLevelUpFromExp ? (
                     <ExpIcon style={{ width: "18px", height: "18px" }} />
                   ) : (
-                    <ExpDisabledIcon style={{ width: "18px", height: "18px" }} />
+                    <ExpDisabledIcon
+                      style={{ width: "18px", height: "18px" }}
+                    />
                   )}
                 </IconButton>
               </span>
@@ -874,19 +933,15 @@ export default function PlayerCardMobile({
             >
               {player.info.pronouns && (
                 <>
-                  {player.info.pronouns}
-                  {" "}
-                  <Diamond color={primary} />
-                  {" "}
+                  {player.info.pronouns} <Diamond color={primary} />{" "}
                 </>
               )}
-              {t("Lvl")} {player.lvl}
-              {" "}
-              <Diamond color={primary} />
-              {" "}
-              {t("Exp")} {player.info.exp || 0}
+              {t("Lvl")} {player.lvl} <Diamond color={primary} /> {t("Exp")}{" "}
+              {player.info.exp || 0}
             </Typography>
-            <Tooltip title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}>
+            <Tooltip
+              title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
+            >
               <span>
                 <IconButton
                   size="small"
@@ -900,7 +955,9 @@ export default function PlayerCardMobile({
                   {canLevelUpFromExp ? (
                     <ExpIcon style={{ width: "16px", height: "16px" }} />
                   ) : (
-                    <ExpDisabledIcon style={{ width: "16px", height: "16px" }} />
+                    <ExpDisabledIcon
+                      style={{ width: "16px", height: "16px" }}
+                    />
                   )}
                 </IconButton>
               </span>
@@ -961,10 +1018,25 @@ export default function PlayerCardMobile({
             formula={`${t("MIG")} × 5 + ${t("Level")}`}
             total={player.stats.hp.max}
             breakdown={[
-              { label: `${t("MIG")} d${player.attributes.might?.base} × 5`, value: (player.attributes.might?.base ?? 0) * 5 },
+              {
+                label: `${t("MIG")} d${player.attributes.might?.base} × 5`,
+                value: (player.attributes.might?.base ?? 0) * 5,
+              },
               { label: t("Level"), value: player.lvl },
-              ...(player.stats.hp.max - (player.attributes.might?.base ?? 0) * 5 - player.lvl > 0
-                ? [{ label: t("Class / item bonuses"), value: player.stats.hp.max - (player.attributes.might?.base ?? 0) * 5 - player.lvl, signed: true }]
+              ...(player.stats.hp.max -
+                (player.attributes.might?.base ?? 0) * 5 -
+                player.lvl >
+              0
+                ? [
+                    {
+                      label: t("Class / item bonuses"),
+                      value:
+                        player.stats.hp.max -
+                        (player.attributes.might?.base ?? 0) * 5 -
+                        player.lvl,
+                      signed: true,
+                    },
+                  ]
                 : []),
             ]}
           >
@@ -972,7 +1044,11 @@ export default function PlayerCardMobile({
               label={t("HP")}
               value={player.stats.hp.current}
               max={player.stats.hp.max}
-              color1={isDark ? newShade(theme.palette.error.main, 10) : newShade(theme.palette.error.main, 80)}
+              color1={
+                isDark
+                  ? newShade(theme.palette.error.main, 10)
+                  : newShade(theme.palette.error.main, 80)
+              }
               color2={theme.palette.error.main}
               trackColor="rgba(35,35,35,0.88)"
               isOwner={isOwner}
@@ -991,10 +1067,25 @@ export default function PlayerCardMobile({
             formula={`${t("WLP")} × 5 + ${t("Level")}`}
             total={player.stats.mp.max}
             breakdown={[
-              { label: `${t("WLP")} d${player.attributes.willpower?.base} × 5`, value: (player.attributes.willpower?.base ?? 0) * 5 },
+              {
+                label: `${t("WLP")} d${player.attributes.willpower?.base} × 5`,
+                value: (player.attributes.willpower?.base ?? 0) * 5,
+              },
               { label: t("Level"), value: player.lvl },
-              ...(player.stats.mp.max - (player.attributes.willpower?.base ?? 0) * 5 - player.lvl > 0
-                ? [{ label: t("Class / item bonuses"), value: player.stats.mp.max - (player.attributes.willpower?.base ?? 0) * 5 - player.lvl, signed: true }]
+              ...(player.stats.mp.max -
+                (player.attributes.willpower?.base ?? 0) * 5 -
+                player.lvl >
+              0
+                ? [
+                    {
+                      label: t("Class / item bonuses"),
+                      value:
+                        player.stats.mp.max -
+                        (player.attributes.willpower?.base ?? 0) * 5 -
+                        player.lvl,
+                      signed: true,
+                    },
+                  ]
                 : []),
             ]}
           >
@@ -1002,7 +1093,11 @@ export default function PlayerCardMobile({
               label={t("MP")}
               value={player.stats.mp.current}
               max={player.stats.mp.max}
-              color1={isDark ? newShade(theme.palette.info.main, 10) : newShade(theme.palette.info.main, 80)}
+              color1={
+                isDark
+                  ? newShade(theme.palette.info.main, 10)
+                  : newShade(theme.palette.info.main, 80)
+              }
               color2={theme.palette.info.main}
               trackColor="rgba(35,35,35,0.88)"
               isOwner={isOwner}
@@ -1023,7 +1118,13 @@ export default function PlayerCardMobile({
             breakdown={[
               { label: t("Base"), value: 6 },
               ...(player.stats.ip.max - 6 > 0
-                ? [{ label: t("Class bonuses"), value: player.stats.ip.max - 6, signed: true }]
+                ? [
+                    {
+                      label: t("Class bonuses"),
+                      value: player.stats.ip.max - 6,
+                      signed: true,
+                    },
+                  ]
                 : []),
             ]}
           >
@@ -1031,7 +1132,11 @@ export default function PlayerCardMobile({
               label={t("IP")}
               value={player.stats.ip.current}
               max={player.stats.ip.max}
-              color1={isDark ? newShade(theme.palette.success.main, 10) : newShade(theme.palette.success.main, 80)}
+              color1={
+                isDark
+                  ? newShade(theme.palette.success.main, 10)
+                  : newShade(theme.palette.success.main, 80)
+              }
               color2={theme.palette.success.main}
               trackColor="rgba(35,35,35,0.88)"
               isOwner={isOwner}
@@ -1088,7 +1193,15 @@ export default function PlayerCardMobile({
         }}
       >
         <SectionHeader title={t("Traits")} />
-        <Box sx={{ px: 1.5, py: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+        <Box
+          sx={{
+            px: 1.5,
+            py: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+          }}
+        >
           {/* Identity */}
           {isEditMode ? (
             <TextField
@@ -1211,139 +1324,163 @@ export default function PlayerCardMobile({
         }}
       >
         <SectionHeader title={t("Attributes")} />
-        <Box sx={{ px: 1, py: 0.75, display: "flex", flexDirection: "column", gap: "4px" }}>
-          {ATTRIBUTES.map(({ key, label, fullName, curr, Icon, debuffs, buffs }, i) => {
-            const leftStatus = STATUSES_LEFT[i];
-            const rightStatus =
-              i === 0
-                ? { key: "enraged", label: t("Enraged") }
-                : i === 2
-                  ? { key: "poisoned", label: t("Poisoned") }
-                  : null;
+        <Box
+          sx={{
+            px: 1,
+            py: 0.75,
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px",
+          }}
+        >
+          {ATTRIBUTES.map(
+            ({ key, label, fullName, curr, Icon, debuffs, buffs }, i) => {
+              const leftStatus = STATUSES_LEFT[i];
+              const rightStatus =
+                i === 0
+                  ? { key: "enraged", label: t("Enraged") }
+                  : i === 2
+                    ? { key: "poisoned", label: t("Poisoned") }
+                    : null;
 
-            return (
-              <Box
-                key={key}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  py: "3px",
-                  borderBottom: i < ATTRIBUTES.length - 1 ? `1px solid ${theme.palette.divider}` : "none",
-                }}
-              >
-                {/* Icon + label */}
+              return (
                 <Box
+                  key={key}
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 0.4,
-                    minWidth: 60,
+                    gap: 1,
+                    py: "3px",
+                    borderBottom:
+                      i < ATTRIBUTES.length - 1
+                        ? `1px solid ${theme.palette.divider}`
+                        : "none",
                   }}
                 >
-                  <Icon size="1.15em" />
-                  <Typography
+                  {/* Icon + label */}
+                  <Box
                     sx={{
-                      fontFamily: "'Antonio'",
-                      fontWeight: "bold",
-                      fontSize: "0.9rem",
-                      lineHeight: 1,
-                      whiteSpace: "nowrap",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.4,
+                      minWidth: 60,
                     }}
                   >
-                    {label}:
-                  </Typography>
-                </Box>
-
-                {/* Dice value or Select */}
-                <Box sx={{ minWidth: 52, display: "flex", alignItems: "center" }}>
-                  {isEditMode ? (
-                    <Select
-                      value={player.attributes[key]?.base}
-                      onChange={(e) => {
-                        setPlayer((p) => ({
-                          ...p,
-                          attributes: {
-                            ...p.attributes,
-                            [key]: {
-                              ...p.attributes[key],
-                              base: e.target.value,
-                            },
-                          },
-                        }));
-                        updateMaxStats?.();
-                      }}
-                      variant="standard"
-                      size="small"
+                    <Icon size="1.15em" />
+                    <Typography
                       sx={{
-                        fontFamily: "'Antonio', fantasy, sans-serif",
+                        fontFamily: "'Antonio'",
+                        fontWeight: "bold",
                         fontSize: "0.9rem",
-                        minWidth: 48,
+                        lineHeight: 1,
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      {[6, 8, 10, 12].map((v) => (
-                        <MenuItem
-                          key={v}
-                          value={v}
-                          sx={{ fontFamily: "'Antonio', fantasy, sans-serif" }}
-                        >
-                          d{v}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  ) : (
-                    <StatTooltip
-                      title={fullName}
-                      base={`d${player.attributes[key]?.base}`}
-                      current={`d${curr}`}
-                      breakdown={[
-                        ...debuffs.filter((s) => player.statuses?.[s]).map((s) => ({
-                          label: s.charAt(0).toUpperCase() + s.slice(1),
-                          value: "-2 die",
-                        })),
-                        ...buffs.filter((s) => player.statuses?.[s]).map((s) => ({
-                          label: s,
-                          value: "+2 die",
-                        })),
-                      ]}
-                      display="inline-flex"
-                    >
-                      <Typography
+                      {label}:
+                    </Typography>
+                  </Box>
+
+                  {/* Dice value or Select */}
+                  <Box
+                    sx={{ minWidth: 52, display: "flex", alignItems: "center" }}
+                  >
+                    {isEditMode ? (
+                      <Select
+                        value={player.attributes[key]?.base}
+                        onChange={(e) => {
+                          setPlayer((p) => ({
+                            ...p,
+                            attributes: {
+                              ...p.attributes,
+                              [key]: {
+                                ...p.attributes[key],
+                                base: e.target.value,
+                              },
+                            },
+                          }));
+                          updateMaxStats?.();
+                        }}
+                        variant="standard"
+                        size="small"
                         sx={{
                           fontFamily: "'Antonio', fantasy, sans-serif",
                           fontSize: "0.9rem",
-                          fontWeight: "bold",
-                          color: getAttributeColor(player.attributes[key]?.base, curr),
-                          lineHeight: 1,
-                          cursor: "help",
+                          minWidth: 48,
                         }}
                       >
-                        d{curr}
-                      </Typography>
-                    </StatTooltip>
-                  )}
-                </Box>
+                        {[6, 8, 10, 12].map((v) => (
+                          <MenuItem
+                            key={v}
+                            value={v}
+                            sx={{
+                              fontFamily: "'Antonio', fantasy, sans-serif",
+                            }}
+                          >
+                            d{v}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    ) : (
+                      <StatTooltip
+                        title={fullName}
+                        base={`d${player.attributes[key]?.base}`}
+                        current={`d${curr}`}
+                        breakdown={[
+                          ...debuffs
+                            .filter((s) => player.statuses?.[s])
+                            .map((s) => ({
+                              label: s.charAt(0).toUpperCase() + s.slice(1),
+                              value: "-2 die",
+                            })),
+                          ...buffs
+                            .filter((s) => player.statuses?.[s])
+                            .map((s) => ({
+                              label: s,
+                              value: "+2 die",
+                            })),
+                        ]}
+                        display="inline-flex"
+                      >
+                        <Typography
+                          sx={{
+                            fontFamily: "'Antonio', fantasy, sans-serif",
+                            fontSize: "0.9rem",
+                            fontWeight: "bold",
+                            color: getAttributeColor(
+                              player.attributes[key]?.base,
+                              curr,
+                            ),
+                            lineHeight: 1,
+                            cursor: "help",
+                          }}
+                        >
+                          d{curr}
+                        </Typography>
+                      </StatTooltip>
+                    )}
+                  </Box>
 
-                {/* Left status */}
-                <FormControlLabel
-                  control={statusCheckbox(leftStatus.key)}
-                  label={statusLabel(leftStatus.label)}
-                  sx={{ margin: 0, flex: 1 }}
-                />
-
-                {/* Right status (enraged / poisoned) */}
-                {rightStatus ? (
+                  {/* Left status */}
                   <FormControlLabel
-                    control={statusCheckbox(rightStatus.key)}
-                    label={statusLabel(rightStatus.label)}
+                    control={statusCheckbox(leftStatus.key)}
+                    label={statusLabel(leftStatus.label)}
                     sx={{ margin: 0, flex: 1 }}
                   />
-                ) : (
-                  <Box sx={{ flex: 1 }} />
-                )}
-              </Box>
-            );
-          })}
+
+                  {/* Right status (enraged / poisoned) */}
+                  {rightStatus ? (
+                    <FormControlLabel
+                      control={statusCheckbox(rightStatus.key)}
+                      label={statusLabel(rightStatus.label)}
+                      sx={{ margin: 0, flex: 1 }}
+                    />
+                  ) : (
+                    <Box sx={{ flex: 1 }} />
+                  )}
+                </Box>
+              );
+            },
+          )}
         </Box>
       </Box>
 
@@ -1366,7 +1503,13 @@ export default function PlayerCardMobile({
               component="img"
               src="/assets/icons/stats/icon_def.png"
               alt={t("DEF")}
-              sx={{ width: "28px", height: "28px", objectFit: "contain", display: "block", flexShrink: 0 }}
+              sx={{
+                width: "28px",
+                height: "28px",
+                objectFit: "contain",
+                display: "block",
+                flexShrink: 0,
+              }}
             />
           }
           value={currDef}
@@ -1381,18 +1524,71 @@ export default function PlayerCardMobile({
             total: currDef,
             breakdown: [
               ...(isMartialArmor
-                ? [{ label: `${equippedArmor?.name ?? t("Armor")} (${t("martial, fixed")})`, value: baseDef }]
-                : [
-                    { label: `DEX d${player.attributes.dexterity?.base}`, value: currDex },
-                    ...(equippedArmor ? [{ label: `${equippedArmor.name} +${equippedArmor.def}`, value: equippedArmor.def }] : []),
+                ? [
+                    {
+                      label: `${equippedArmor?.name ?? t("Armor")} (${t("martial, fixed")})`,
+                      value: baseDef,
+                    },
                   ]
-              ),
-              ...equippedShields.filter((s) => s.def).map((s) => ({ label: `${s.name} (shield)`, value: s.def, signed: true })),
-              ...(dodgeBonus > 0 ? [{ label: t("Dodge skill"), value: dodgeBonus, signed: true }] : []),
-              ...equippedShields.filter((s) => s?.modifiers?.def ?? s?.defModifier).map((s) => ({ label: `${s.name} (bonus)`, value: s?.modifiers?.def ?? s?.defModifier, signed: true })),
-              ...(equippedAccessory?.modifiers?.def || equippedAccessory?.defModifier ? [{ label: equippedAccessory.name, value: equippedAccessory?.modifiers?.def ?? equippedAccessory?.defModifier, signed: true }] : []),
-              ...equippedWeapons.filter((w) => w?.modifiers?.def ?? w?.defModifier).map((w) => ({ label: w.name, value: w?.modifiers?.def ?? w?.defModifier, signed: true })),
-              ...(player.modifiers?.def ? [{ label: t("Other bonuses"), value: player.modifiers.def, signed: true }] : []),
+                : [
+                    {
+                      label: `DEX d${player.attributes.dexterity?.base}`,
+                      value: currDex,
+                    },
+                    ...(equippedArmor
+                      ? [
+                          {
+                            label: `${equippedArmor.name} +${equippedArmor.def}`,
+                            value: equippedArmor.def,
+                          },
+                        ]
+                      : []),
+                  ]),
+              ...equippedShields
+                .filter((s) => s.def)
+                .map((s) => ({
+                  label: `${s.name} (shield)`,
+                  value: s.def,
+                  signed: true,
+                })),
+              ...(dodgeBonus > 0
+                ? [{ label: t("Dodge skill"), value: dodgeBonus, signed: true }]
+                : []),
+              ...equippedShields
+                .filter((s) => s?.modifiers?.def ?? s?.defModifier)
+                .map((s) => ({
+                  label: `${s.name} (bonus)`,
+                  value: s?.modifiers?.def ?? s?.defModifier,
+                  signed: true,
+                })),
+              ...(equippedAccessory?.modifiers?.def ||
+              equippedAccessory?.defModifier
+                ? [
+                    {
+                      label: equippedAccessory.name,
+                      value:
+                        equippedAccessory?.modifiers?.def ??
+                        equippedAccessory?.defModifier,
+                      signed: true,
+                    },
+                  ]
+                : []),
+              ...equippedWeapons
+                .filter((w) => w?.modifiers?.def ?? w?.defModifier)
+                .map((w) => ({
+                  label: w.name,
+                  value: w?.modifiers?.def ?? w?.defModifier,
+                  signed: true,
+                })),
+              ...(player.modifiers?.def
+                ? [
+                    {
+                      label: t("Other bonuses"),
+                      value: player.modifiers.def,
+                      signed: true,
+                    },
+                  ]
+                : []),
             ].filter((e) => e.value !== 0),
           }}
         />
@@ -1403,7 +1599,13 @@ export default function PlayerCardMobile({
               component="img"
               src="/assets/icons/stats/icon_mdef.png"
               alt={t("M.DEF")}
-              sx={{ width: "28px", height: "28px", objectFit: "contain", display: "block", flexShrink: 0 }}
+              sx={{
+                width: "28px",
+                height: "28px",
+                objectFit: "contain",
+                display: "block",
+                flexShrink: 0,
+              }}
             />
           }
           value={currMDef}
@@ -1418,17 +1620,68 @@ export default function PlayerCardMobile({
             total: currMDef,
             breakdown: [
               ...(isMartialArmor
-                ? [{ label: `${equippedArmor?.name ?? t("Armor")} (${t("martial, fixed")})`, value: baseMDef }]
-                : [
-                    { label: `INS d${player.attributes.insight?.base}`, value: currInsight },
-                    ...(equippedArmor ? [{ label: `${equippedArmor.name} +${equippedArmor.mdef}`, value: equippedArmor.mdef }] : []),
+                ? [
+                    {
+                      label: `${equippedArmor?.name ?? t("Armor")} (${t("martial, fixed")})`,
+                      value: baseMDef,
+                    },
                   ]
-              ),
-              ...equippedShields.filter((s) => s.mdef).map((s) => ({ label: `${s.name} (shield)`, value: s.mdef, signed: true })),
-              ...equippedShields.filter((s) => s?.modifiers?.mdef ?? s?.mDefModifier).map((s) => ({ label: `${s.name} (bonus)`, value: s?.modifiers?.mdef ?? s?.mDefModifier, signed: true })),
-              ...(equippedAccessory?.modifiers?.mdef || equippedAccessory?.mDefModifier ? [{ label: equippedAccessory.name, value: equippedAccessory?.modifiers?.mdef ?? equippedAccessory?.mDefModifier, signed: true }] : []),
-              ...equippedWeapons.filter((w) => w?.modifiers?.mdef ?? w?.mDefModifier).map((w) => ({ label: w.name, value: w?.modifiers?.mdef ?? w?.mDefModifier, signed: true })),
-              ...(player.modifiers?.mdef ? [{ label: t("Other bonuses"), value: player.modifiers.mdef, signed: true }] : []),
+                : [
+                    {
+                      label: `INS d${player.attributes.insight?.base}`,
+                      value: currInsight,
+                    },
+                    ...(equippedArmor
+                      ? [
+                          {
+                            label: `${equippedArmor.name} +${equippedArmor.mdef}`,
+                            value: equippedArmor.mdef,
+                          },
+                        ]
+                      : []),
+                  ]),
+              ...equippedShields
+                .filter((s) => s.mdef)
+                .map((s) => ({
+                  label: `${s.name} (shield)`,
+                  value: s.mdef,
+                  signed: true,
+                })),
+              ...equippedShields
+                .filter((s) => s?.modifiers?.mdef ?? s?.mDefModifier)
+                .map((s) => ({
+                  label: `${s.name} (bonus)`,
+                  value: s?.modifiers?.mdef ?? s?.mDefModifier,
+                  signed: true,
+                })),
+              ...(equippedAccessory?.modifiers?.mdef ||
+              equippedAccessory?.mDefModifier
+                ? [
+                    {
+                      label: equippedAccessory.name,
+                      value:
+                        equippedAccessory?.modifiers?.mdef ??
+                        equippedAccessory?.mDefModifier,
+                      signed: true,
+                    },
+                  ]
+                : []),
+              ...equippedWeapons
+                .filter((w) => w?.modifiers?.mdef ?? w?.mDefModifier)
+                .map((w) => ({
+                  label: w.name,
+                  value: w?.modifiers?.mdef ?? w?.mDefModifier,
+                  signed: true,
+                })),
+              ...(player.modifiers?.mdef
+                ? [
+                    {
+                      label: t("Other bonuses"),
+                      value: player.modifiers.mdef,
+                      signed: true,
+                    },
+                  ]
+                : []),
             ].filter((e) => e.value !== 0),
           }}
         />
@@ -1439,7 +1692,13 @@ export default function PlayerCardMobile({
               component="img"
               src="/assets/icons/stats/icon_clock.png"
               alt={t("INIT")}
-              sx={{ width: "28px", height: "28px", objectFit: "contain", display: "block", flexShrink: 0 }}
+              sx={{
+                width: "28px",
+                height: "28px",
+                objectFit: "contain",
+                display: "block",
+                flexShrink: 0,
+              }}
             />
           }
           value={(currInit > 0 ? "+" : "") + currInit}
@@ -1449,11 +1708,43 @@ export default function PlayerCardMobile({
             formula: t("Sum of all initiative modifiers"),
             total: currInit,
             breakdown: [
-              ...(equippedArmor ? [{ label: equippedArmor.name, value: baseInit, signed: true }] : []),
-              ...(equippedArmor?.initModifier ? [{ label: `${equippedArmor.name} (bonus)`, value: equippedArmor.initModifier, signed: true }] : []),
-              ...equippedShields.filter((s) => s.initModifier).map((s) => ({ label: s.name, value: s.initModifier, signed: true })),
-              ...(equippedAccessory?.initModifier ? [{ label: equippedAccessory.name, value: equippedAccessory.initModifier, signed: true }] : []),
-              ...(player.modifiers?.init ? [{ label: t("Other bonuses"), value: player.modifiers.init, signed: true }] : []),
+              ...(equippedArmor
+                ? [{ label: equippedArmor.name, value: baseInit, signed: true }]
+                : []),
+              ...(equippedArmor?.initModifier
+                ? [
+                    {
+                      label: `${equippedArmor.name} (bonus)`,
+                      value: equippedArmor.initModifier,
+                      signed: true,
+                    },
+                  ]
+                : []),
+              ...equippedShields
+                .filter((s) => s.initModifier)
+                .map((s) => ({
+                  label: s.name,
+                  value: s.initModifier,
+                  signed: true,
+                })),
+              ...(equippedAccessory?.initModifier
+                ? [
+                    {
+                      label: equippedAccessory.name,
+                      value: equippedAccessory.initModifier,
+                      signed: true,
+                    },
+                  ]
+                : []),
+              ...(player.modifiers?.init
+                ? [
+                    {
+                      label: t("Other bonuses"),
+                      value: player.modifiers.init,
+                      signed: true,
+                    },
+                  ]
+                : []),
             ].filter((e) => e.value !== 0),
           }}
         />
@@ -1473,7 +1764,13 @@ export default function PlayerCardMobile({
                 component="img"
                 src="/assets/icons/resources/fp.png"
                 alt="FP"
-                sx={{ width: "28px", height: "28px", objectFit: "contain", display: "block", flexShrink: 0 }}
+                sx={{
+                  width: "28px",
+                  height: "28px",
+                  objectFit: "contain",
+                  display: "block",
+                  flexShrink: 0,
+                }}
               />
               <Typography
                 sx={{
@@ -1500,7 +1797,10 @@ export default function PlayerCardMobile({
                 value={player.info.fabulapoints || 0}
                 onChange={(e) => {
                   const nextValue = parseInt(e.target.value, 10);
-                  setInfoNumber("fabulapoints", Number.isNaN(nextValue) ? 0 : nextValue);
+                  setInfoNumber(
+                    "fabulapoints",
+                    Number.isNaN(nextValue) ? 0 : nextValue,
+                  );
                 }}
                 size="small"
                 variant="standard"
@@ -1518,8 +1818,12 @@ export default function PlayerCardMobile({
                 sx={{
                   width: "34px",
                   "& .MuiInputBase-input": { color: "#fff" },
-                  "& .MuiInput-underline:before": { borderBottomColor: "rgba(255,255,255,0.6)" },
-                  "& .MuiInput-underline:hover:before": { borderBottomColor: "#fff" },
+                  "& .MuiInput-underline:before": {
+                    borderBottomColor: "rgba(255,255,255,0.6)",
+                  },
+                  "& .MuiInput-underline:hover:before": {
+                    borderBottomColor: "#fff",
+                  },
                   "& .MuiInput-underline:after": { borderBottomColor: "#fff" },
                 }}
               />
@@ -1540,7 +1844,13 @@ export default function PlayerCardMobile({
                 component="img"
                 src="/assets/icons/resources/fp.png"
                 alt="FP"
-                sx={{ width: "28px", height: "28px", objectFit: "contain", display: "block", flexShrink: 0 }}
+                sx={{
+                  width: "28px",
+                  height: "28px",
+                  objectFit: "contain",
+                  display: "block",
+                  flexShrink: 0,
+                }}
               />
             }
             value={player.info.fabulapoints || 0}

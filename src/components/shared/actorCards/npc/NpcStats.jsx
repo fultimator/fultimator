@@ -140,7 +140,8 @@ export function NpcStats({ npc }) {
             whiteSpace: "nowrap",
           }}
         >
-          {calcHP(npc)} <Diamond color="white.main" /> {Math.floor(calcHP(npc) / 2)}
+          {calcHP(npc)} <Diamond color="white.main" />{" "}
+          {Math.floor(calcHP(npc) / 2)}
         </Box>
         <Box
           sx={{
@@ -193,11 +194,16 @@ export function NpcStats({ npc }) {
         }}
       >
         <Box sx={{ px: 1, py: 0.4 }}>{t("HP")}</Box>
-        <Box sx={{ py: 0.4, px: 1.5, color: "white.main", bgcolor: "red.main" }}>
-          {calcHP(npc)} <Diamond color="white.main" /> {Math.floor(calcHP(npc) / 2)}
+        <Box
+          sx={{ py: 0.4, px: 1.5, color: "white.main", bgcolor: "red.main" }}
+        >
+          {calcHP(npc)} <Diamond color="white.main" />{" "}
+          {Math.floor(calcHP(npc) / 2)}
         </Box>
         <Box sx={{ px: 1, py: 0.4 }}>{t("MP")}</Box>
-        <Box sx={{ px: 1.5, py: 0.4, color: "white.main", bgcolor: "cyan.main" }}>
+        <Box
+          sx={{ px: 1.5, py: 0.4, color: "white.main", bgcolor: "cyan.main" }}
+        >
           {calcMP(npc)}
         </Box>
         <Box sx={{ py: 0.4, gridColumn: "1 / -1", bgcolor: panelBg }}>
@@ -255,28 +261,55 @@ export function NpcStats({ npc }) {
         </Grid>
         {npc.affinities && (
           <>
-            <Grid sx={{ py: 0.4, borderRight: "1px solid #42484B" }} size="grow">
-              <TypeAffinity type="physical" affinity={npc.affinities.physical} />
+            <Grid
+              sx={{ py: 0.4, borderRight: "1px solid #42484B" }}
+              size="grow"
+            >
+              <TypeAffinity
+                type="physical"
+                affinity={npc.affinities.physical}
+              />
             </Grid>
-            <Grid sx={{ py: 0.4, borderRight: "1px solid #604365" }} size="grow">
+            <Grid
+              sx={{ py: 0.4, borderRight: "1px solid #604365" }}
+              size="grow"
+            >
               <TypeAffinity type="air" affinity={npc.affinities.air} />
             </Grid>
-            <Grid sx={{ py: 0.4, borderRight: "1px solid #6f5375" }} size="grow">
+            <Grid
+              sx={{ py: 0.4, borderRight: "1px solid #6f5375" }}
+              size="grow"
+            >
               <TypeAffinity type="bolt" affinity={npc.affinities.bolt} />
             </Grid>
-            <Grid sx={{ py: 0.4, borderRight: "1px solid #816687" }} size="grow">
+            <Grid
+              sx={{ py: 0.4, borderRight: "1px solid #816687" }}
+              size="grow"
+            >
               <TypeAffinity type="dark" affinity={npc.affinities.dark} />
             </Grid>
-            <Grid sx={{ py: 0.4, borderRight: "1px solid #957d9b" }} size="grow">
+            <Grid
+              sx={{ py: 0.4, borderRight: "1px solid #957d9b" }}
+              size="grow"
+            >
               <TypeAffinity type="earth" affinity={npc.affinities.earth} />
             </Grid>
-            <Grid sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }} size="grow">
+            <Grid
+              sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }}
+              size="grow"
+            >
               <TypeAffinity type="fire" affinity={npc.affinities.fire} />
             </Grid>
-            <Grid sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }} size="grow">
+            <Grid
+              sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }}
+              size="grow"
+            >
               <TypeAffinity type="ice" affinity={npc.affinities.ice} />
             </Grid>
-            <Grid sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }} size="grow">
+            <Grid
+              sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }}
+              size="grow"
+            >
               <TypeAffinity type="light" affinity={npc.affinities.light} />
             </Grid>
             <Grid sx={{ py: 0.4 }} size="grow">

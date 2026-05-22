@@ -74,21 +74,34 @@ export function normalizeArmor(data: unknown): Armor {
 
 export interface ArmorCtx {
   player?: {
-    settings?: { optionalRules?: { technospheres?: boolean; technospheresVariant?: string } };
+    settings?: {
+      optionalRules?: {
+        technospheres?: boolean;
+        technospheresVariant?: string;
+      };
+    };
     info?: { zenit?: number };
-    equipment?: Array<{ hoplospheres?: Array<{ id: string; requiredSlots?: number }> }>;
+    equipment?: Array<{
+      hoplospheres?: Array<{ id: string; requiredSlots?: number }>;
+    }>;
   };
   setPlayer?: (updater: (prev: unknown) => unknown) => void;
 }
 
 export function resolveArmorSlotsVariant(ctx?: ArmorCtx): boolean {
   const rules = ctx?.player?.settings?.optionalRules;
-  return (rules?.technospheres ?? false) && (rules?.technospheresVariant ?? "standard") !== "mnemospheres";
+  return (
+    (rules?.technospheres ?? false) &&
+    (rules?.technospheresVariant ?? "standard") !== "mnemospheres"
+  );
 }
 
-export function buildArmorFormState(item?: Partial<ArmorPersisted> | null, ctx?: ArmorCtx): ArmorPersisted {
+export function buildArmorFormState(
+  item?: Partial<ArmorPersisted> | null,
+  ctx?: ArmorCtx,
+): ArmorPersisted {
   const isSlotsVariant = resolveArmorSlotsVariant(ctx);
-  const base = (item?.base as typeof allArmor[0] | undefined) ?? allArmor[0];
+  const base = (item?.base as (typeof allArmor)[0] | undefined) ?? allArmor[0];
   return {
     itemType: "armor",
     base,
@@ -132,7 +145,16 @@ export function buildArmorSavePayload(
   const base = formState.base as { def?: number; mdef?: number } | undefined;
   return {
     ...formState,
-    modifiers: { ...(formState.modifiers ?? {}), def, mdef, init, magic, accuracy, damageMelee, damageRanged },
+    modifiers: {
+      ...(formState.modifiers ?? {}),
+      def,
+      mdef,
+      init,
+      magic,
+      accuracy,
+      damageMelee,
+      damageRanged,
+    },
     def: base?.def ?? formState.def,
     mdef: base?.mdef ?? formState.mdef,
     defModifier: def,
@@ -143,7 +165,9 @@ export function buildArmorSavePayload(
     damageMeleeModifier: damageMelee,
     damageRangedModifier: damageRanged,
     isEquipped:
-      (originalItem?.martial ?? false) !== formState.martial ? false : formState.isEquipped,
+      (originalItem?.martial ?? false) !== formState.martial
+        ? false
+        : formState.isEquipped,
     ...(formState.isSlotsVariant || originalItem?.slots || originalItem?.slotted
       ? { slots: formState.slots, slotted: formState.slotted }
       : {}),
@@ -162,9 +186,16 @@ export function applyArmorSlotTierChange(
   for (const id of formState.slotted ?? []) {
     const hoplo = hoplospheres.find((h) => h.id === id);
     const slotCost = hoplo?.requiredSlots ?? 1;
-    if (used + slotCost <= (tier?.slots ?? 1)) { kept.push(id); used += slotCost; }
+    if (used + slotCost <= (tier?.slots ?? 1)) {
+      kept.push(id);
+      used += slotCost;
+    }
   }
-  return { ...formState, slots: newTier as ArmorPersisted["slots"], slotted: kept };
+  return {
+    ...formState,
+    slots: newTier as ArmorPersisted["slots"],
+    slotted: kept,
+  };
 }
 
 export function getArmorSlotCostInfo(
@@ -174,8 +205,10 @@ export function getArmorSlotCostInfo(
 ): { delta: number; currentZenit: number; cannotAfford: boolean } | null {
   if (!formState.isSlotsVariant) return null;
   const paidSlots = originalItem?.slots ?? "alpha";
-  const paidTier = SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
-  const selectedTier = SLOT_TIERS.find((t) => t.value === formState.slots) ?? SLOT_TIERS[0];
+  const paidTier =
+    SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
+  const selectedTier =
+    SLOT_TIERS.find((t) => t.value === formState.slots) ?? SLOT_TIERS[0];
   const delta = selectedTier.cost - paidTier.cost;
   const currentZenit = ctx?.player?.info?.zenit ?? 0;
   return { delta, currentZenit, cannotAfford: delta > currentZenit };
@@ -190,6 +223,12 @@ export function applyArmorZenitSideEffect(
   if (!info || info.delta === 0 || !ctx?.setPlayer) return;
   ctx.setPlayer((prev: unknown) => {
     const p = prev as { info?: { zenit?: number } };
-    return { ...p, info: { ...p.info, zenit: Math.max(0, (p.info?.zenit ?? 0) - info.delta) } };
+    return {
+      ...p,
+      info: {
+        ...p.info,
+        zenit: Math.max(0, (p.info?.zenit ?? 0) - info.delta),
+      },
+    };
   });
 }

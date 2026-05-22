@@ -51,8 +51,12 @@ export function useNumericClock(maxSections, value, onChange) {
   const state = toState(value);
 
   const set = (newState) => onChange(fromState(newState));
-  const increment = () => { if (value < maxSections) onChange(value + 1); };
-  const decrement = () => { if (value > 0) onChange(value - 1); };
+  const increment = () => {
+    if (value < maxSections) onChange(value + 1);
+  };
+  const decrement = () => {
+    if (value > 0) onChange(value - 1);
+  };
   const reset = () => onChange(0);
 
   return { filledCount: value, state, set, increment, decrement, reset };

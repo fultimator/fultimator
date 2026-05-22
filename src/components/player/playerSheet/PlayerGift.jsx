@@ -36,19 +36,23 @@ function GiftClockRow({ giftSpell, setPlayer, isEditMode, t, theme, primary }) {
       classes: prev.classes.map((cls) =>
         cls.name === giftSpell.className
           ? {
-            ...cls,
-            spells: cls.spells.map((spell) =>
-              spell.name === giftSpell.name
-                ? { ...spell, clock: newValue }
-                : spell,
-            ),
-          }
+              ...cls,
+              spells: cls.spells.map((spell) =>
+                spell.name === giftSpell.name
+                  ? { ...spell, clock: newValue }
+                  : spell,
+              ),
+            }
           : cls,
       ),
     }));
   };
 
-  const { state, set, increment, decrement, reset } = useNumericClock(4, clockValue, persistClock);
+  const { state, set, increment, decrement, reset } = useNumericClock(
+    4,
+    clockValue,
+    persistClock,
+  );
   const canEdit = isEditMode || !!setPlayer;
 
   return (
@@ -63,19 +67,38 @@ function GiftClockRow({ giftSpell, setPlayer, isEditMode, t, theme, primary }) {
           onReset={canEdit ? reset : undefined}
         />
         {canEdit && (
-          <Stack direction="row" spacing={0.5} sx={{ mt: 1, justifyContent: "center" }}>
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{ mt: 1, justifyContent: "center" }}
+          >
             <Tooltip title={t("Decrement")} arrow>
-              <IconButton color="primary" onClick={decrement} size="small" sx={{ p: 0.25 }}>
+              <IconButton
+                color="primary"
+                onClick={decrement}
+                size="small"
+                sx={{ p: 0.25 }}
+              >
                 <RemoveIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Reset")} arrow>
-              <IconButton color="primary" onClick={reset} size="small" sx={{ p: 0.25 }}>
+              <IconButton
+                color="primary"
+                onClick={reset}
+                size="small"
+                sx={{ p: 0.25 }}
+              >
                 <RestartAltIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Increment")} arrow>
-              <IconButton color="primary" onClick={increment} size="small" sx={{ p: 0.25 }}>
+              <IconButton
+                color="primary"
+                onClick={increment}
+                size="small"
+                sx={{ p: 0.25 }}
+              >
                 <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -132,7 +155,8 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
       speaker: player?.name || "Player",
       kind: "display",
       itemType: "spell",
-      name: gift.name === "esper_gift_custom_name" ? gift.customName : t(gift.name),
+      name:
+        gift.name === "esper_gift_custom_name" ? gift.customName : t(gift.name),
       tags: [t("Gift"), giftSpell.className || t("Unknown")],
       description: gift.description || "",
     });
@@ -217,7 +241,11 @@ export default function PlayerGift({ player, setPlayer, isEditMode }) {
                     giftSpell.gifts.map((gift, gIndex) => (
                       <ItemNameRow
                         key={`${gsIndex}-${gIndex}`}
-                        name={gift.name === "esper_gift_custom_name" ? gift.customName : t(gift.name)}
+                        name={
+                          gift.name === "esper_gift_custom_name"
+                            ? gift.customName
+                            : t(gift.name)
+                        }
                       >
                         <Tooltip title={t("Info")}>
                           <IconButton

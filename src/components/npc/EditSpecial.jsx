@@ -260,7 +260,10 @@ export default function EditSpecial({ npc, setNpc }) {
       ) {
         return prev;
       }
-      [special[fromIndex], special[toIndex]] = [special[toIndex], special[fromIndex]];
+      [special[fromIndex], special[toIndex]] = [
+        special[toIndex],
+        special[fromIndex],
+      ];
       return { ...prev, special };
     });
     setExpandedSet((prev) => {

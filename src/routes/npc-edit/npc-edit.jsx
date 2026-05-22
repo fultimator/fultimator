@@ -2,9 +2,15 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
-import { useDrawerScrollTop, useDrawerSave } from "../../hooks/useDrawerActions";
+import {
+  useDrawerScrollTop,
+  useDrawerSave,
+} from "../../hooks/useDrawerActions";
 import { useThemeStore } from "../../store/themeStore";
-import { TAB_RAIL_WIDTH, APP_DRAWER_WIDTH } from "../../components/app-drawer/constants";
+import {
+  TAB_RAIL_WIDTH,
+  APP_DRAWER_WIDTH,
+} from "../../components/app-drawer/constants";
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -496,35 +502,35 @@ export default function NpcEdit() {
                     borderColor: secondary,
                   }}
                 >
-                <Grid container spacing={2}>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      md: 6,
-                    }}
-                  >
-                    <CustomHeader
-                      type="top"
-                      headerText={t("Affinity")}
-                      showIconButton={false}
-                    />
-                    <ExplainAffinities npc={npcTemp} />
-                    <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
+                  <Grid container spacing={2}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <CustomHeader
+                        type="top"
+                        headerText={t("Affinity")}
+                        showIconButton={false}
+                      />
+                      <ExplainAffinities npc={npcTemp} />
+                      <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <CustomHeader
+                        type={isSmallScreen ? "middle" : "top"}
+                        headerText={t("Bonuses")}
+                        showIconButton={false}
+                      />
+                      <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
+                    </Grid>
                   </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      md: 6,
-                    }}
-                  >
-                    <CustomHeader
-                      type={isSmallScreen ? "middle" : "top"}
-                      headerText={t("Bonuses")}
-                      showIconButton={false}
-                    />
-                    <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
-                  </Grid>
-                </Grid>
                 </Paper>
                 <Divider sx={{ my: 1 }} />
               </>
@@ -542,14 +548,14 @@ export default function NpcEdit() {
                     borderColor: secondary,
                   }}
                 >
-                <Grid container>
-                  <Grid size={12}>
-                    <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
+                  <Grid container>
+                    <Grid size={12}>
+                      <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
+                    </Grid>
+                    <Grid size={12}>
+                      <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
+                    </Grid>
                   </Grid>
-                  <Grid size={12}>
-                    <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
-                  </Grid>
-                </Grid>
                 </Paper>
                 <Divider sx={{ my: 1 }} />
               </>
@@ -585,48 +591,48 @@ export default function NpcEdit() {
                     borderColor: secondary,
                   }}
                 >
-                <Grid container spacing={2}>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      md: 6,
-                    }}
-                  >
-                    <div id="edit-section-actions">
-                      <EditActions npc={npcTemp} setNpc={setNpcTemp} />
-                    </div>
+                  <Grid container spacing={2}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <div id="edit-section-actions">
+                        <EditActions npc={npcTemp} setNpc={setNpcTemp} />
+                      </div>
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <div id="edit-section-special">
+                        <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
+                      </div>
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <div id="edit-section-raregear">
+                        <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
+                      </div>
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <div id="edit-section-notes">
+                        <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
+                      </div>
+                    </Grid>
                   </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      md: 6,
-                    }}
-                  >
-                    <div id="edit-section-special">
-                      <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
-                    </div>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      md: 6,
-                    }}
-                  >
-                    <div id="edit-section-raregear">
-                      <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
-                    </div>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      md: 6,
-                    }}
-                  >
-                    <div id="edit-section-notes">
-                      <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
-                    </div>
-                  </Grid>
-                </Grid>
                 </Paper>
                 <Divider sx={{ my: 1 }} />
               </>
@@ -661,8 +667,8 @@ export default function NpcEdit() {
             right: appDrawerOpen
               ? APP_DRAWER_WIDTH + 16
               : isDesktop
-              ? TAB_RAIL_WIDTH + 16
-              : 16,
+                ? TAB_RAIL_WIDTH + 16
+                : 16,
             transition: "right 0.3s ease",
             zIndex: 1200,
             display: "flex",
@@ -742,10 +748,7 @@ export default function NpcEdit() {
                   },
                 }}
               >
-                <BottomNavigationAction
-                  label={t("Overview")}
-                  icon={<Home />}
-                />
+                <BottomNavigationAction label={t("Overview")} icon={<Home />} />
                 {isOwner && (
                   <BottomNavigationAction
                     label={t("Basics")}

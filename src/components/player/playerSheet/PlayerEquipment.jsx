@@ -403,8 +403,10 @@ export default function PlayerEquipment({
     const attr1 = weapon.accuracy?.attr1 || "dexterity";
     const attr2 = weapon.accuracy?.attr2 || "might";
     const dieSizes = {
-      primary: player?.attributes?.[attr1]?.base ?? player?.attributes?.[attr1] ?? 6,
-      secondary: player?.attributes?.[attr2]?.base ?? player?.attributes?.[attr2] ?? 6,
+      primary:
+        player?.attributes?.[attr1]?.base ?? player?.attributes?.[attr1] ?? 6,
+      secondary:
+        player?.attributes?.[attr2]?.base ?? player?.attributes?.[attr2] ?? 6,
     };
     const toRollKey = (attr) => {
       const key = String(attr || "").toLowerCase();
@@ -442,11 +444,18 @@ export default function PlayerEquipment({
     const sectionKey = String(section || "").toLowerCase();
 
     if (sectionKey === "armor" || sectionKey === "shield") {
-      if (item?.def != null) tags.push(`DEF ${item.def >= 0 ? `+${item.def}` : item.def}`);
-      if (item?.mdef != null) tags.push(`M.DEF ${item.mdef >= 0 ? `+${item.mdef}` : item.mdef}`);
+      if (item?.def != null)
+        tags.push(`DEF ${item.def >= 0 ? `+${item.def}` : item.def}`);
+      if (item?.mdef != null)
+        tags.push(`M.DEF ${item.mdef >= 0 ? `+${item.mdef}` : item.mdef}`);
     }
 
-    if (sectionKey === "weapon" || sectionKey === "weapons" || sectionKey === "customweapon" || sectionKey === "customweapons") {
+    if (
+      sectionKey === "weapon" ||
+      sectionKey === "weapons" ||
+      sectionKey === "customweapon" ||
+      sectionKey === "customweapons"
+    ) {
       const category = item?.category ? t(item.category) : "";
       if (category) tags.push(category);
       const hands =
@@ -482,11 +491,36 @@ export default function PlayerEquipment({
   };
 
   const sectionMeta = {
-    weapons: { label: t("Weapons"), create: "weapon", import: "weapons", source: "weapons" },
-    customWeapons: { label: t("Custom Weapons"), create: "custom-weapon", import: "custom-weapons", source: "customWeapons" },
-    shields: { label: t("Shields"), create: "shield", import: "shields", source: "shields" },
-    armor: { label: t("Armor"), create: "armor", import: "armor", source: "armor" },
-    accessories: { label: t("Accessories"), create: "accessory", import: "accessories", source: "accessories" },
+    weapons: {
+      label: t("Weapons"),
+      create: "weapon",
+      import: "weapons",
+      source: "weapons",
+    },
+    customWeapons: {
+      label: t("Custom Weapons"),
+      create: "custom-weapon",
+      import: "custom-weapons",
+      source: "customWeapons",
+    },
+    shields: {
+      label: t("Shields"),
+      create: "shield",
+      import: "shields",
+      source: "shields",
+    },
+    armor: {
+      label: t("Armor"),
+      create: "armor",
+      import: "armor",
+      source: "armor",
+    },
+    accessories: {
+      label: t("Accessories"),
+      create: "accessory",
+      import: "accessories",
+      source: "accessories",
+    },
   };
 
   const renderSectionHeader = (key) =>
@@ -494,14 +528,21 @@ export default function PlayerEquipment({
       <Grid size={12}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Divider sx={{ flex: 1 }}>
-            <Typography variant="caption" sx={{ fontWeight: 800, textTransform: "uppercase" }}>
+            <Typography
+              variant="caption"
+              sx={{ fontWeight: 800, textTransform: "uppercase" }}
+            >
               {sectionMeta[key].label}
             </Typography>
           </Divider>
           <IconButton
             size="small"
             onClick={() => setCreateItemType(sectionMeta[key].create)}
-            sx={{ border: "1px dashed", borderColor: "divider", borderRadius: 1 }}
+            sx={{
+              border: "1px dashed",
+              borderColor: "divider",
+              borderRadius: 1,
+            }}
           >
             <Add fontSize="small" />
           </IconButton>
@@ -511,7 +552,11 @@ export default function PlayerEquipment({
               setImportType(sectionMeta[key].import);
               setImportOpen(true);
             }}
-            sx={{ border: "1px solid", borderColor: "divider", borderRadius: 1 }}
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+            }}
           >
             <Search fontSize="small" />
           </IconButton>
@@ -521,7 +566,9 @@ export default function PlayerEquipment({
 
   return (
     <>
-      {(allVisibleWeapons.length > 0 || visibleArmor.length > 0 || isEditMode) && (
+      {(allVisibleWeapons.length > 0 ||
+        visibleArmor.length > 0 ||
+        isEditMode) && (
         <>
           <Divider sx={{ my: 1 }} />
           <Paper
@@ -639,7 +686,10 @@ export default function PlayerEquipment({
                       {weapon.name}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size="auto"
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -732,7 +782,10 @@ export default function PlayerEquipment({
                       {weapon.name}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size="auto"
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -827,7 +880,10 @@ export default function PlayerEquipment({
                       {armor.name}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size="auto"
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -899,7 +955,10 @@ export default function PlayerEquipment({
                       {shield.name}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size="auto"
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -971,7 +1030,10 @@ export default function PlayerEquipment({
                       {accessory.name}
                     </Typography>
                   </Grid>
-                  <Grid sx={{ display: "flex", alignItems: "stretch" }} size="auto">
+                  <Grid
+                    sx={{ display: "flex", alignItems: "stretch" }}
+                    size="auto"
+                  >
                     <Box
                       sx={{
                         padding: "5px",
@@ -1072,7 +1134,8 @@ export default function PlayerEquipment({
         onClose={() => setImportOpen(false)}
         onAddItem={(item, type) => {
           if (type === "weapons") appendEquipmentItem("weapons", item);
-          if (type === "custom-weapons") appendEquipmentItem("customWeapons", item);
+          if (type === "custom-weapons")
+            appendEquipmentItem("customWeapons", item);
           if (type === "shields") appendEquipmentItem("shields", item);
           if (type === "armor") appendEquipmentItem("armor", item);
           if (type === "accessories") appendEquipmentItem("accessories", item);

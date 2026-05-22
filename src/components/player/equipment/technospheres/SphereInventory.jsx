@@ -206,7 +206,7 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
   const [compendiumType, setCompendiumType] = useState(null);
   const [compendiumImport, setCompendiumImport] = useState(null);
   const [snackbar, setSnackbar] = useState(null);
-  const [slotTarget, setSlotTarget] = useState(null); // { sphere } — open SlotTargetDialog
+  const [slotTarget, setSlotTarget] = useState(null); // { sphere } - open SlotTargetDialog
 
   const {
     mnemospheres,

@@ -66,7 +66,10 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           ? [...current, wellspring]
           : [current[1], wellspring];
 
-      return { ...prev, tracker: { ...prevTracker, activeWellsprings: newWellsprings } };
+      return {
+        ...prev,
+        tracker: { ...prevTracker, activeWellsprings: newWellsprings },
+      };
     });
   };
 

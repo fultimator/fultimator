@@ -300,7 +300,10 @@ export default function EditAttacks({ npc, setNpc }) {
       ) {
         return prev;
       }
-      [attacks[fromIndex], attacks[toIndex]] = [attacks[toIndex], attacks[fromIndex]];
+      [attacks[fromIndex], attacks[toIndex]] = [
+        attacks[toIndex],
+        attacks[fromIndex],
+      ];
       return { ...prev, attacks };
     });
     setExpandedSet((prev) => {

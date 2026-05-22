@@ -33,7 +33,9 @@ export default function PlayerShieldModal({
   onDeleteShield,
 }) {
   const { t } = useTranslate();
-  const [formState, setFormState] = useState(() => buildShieldFormState(shield));
+  const [formState, setFormState] = useState(() =>
+    buildShieldFormState(shield),
+  );
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -61,7 +63,10 @@ export default function PlayerShieldModal({
       const normalized = { ...buildShieldFormState(data), ...data };
       const validation = validateShieldPersisted(normalized);
       if (!validation.success) {
-        console.warn("[PlayerShieldModal] uploaded shield failed validation", validation.error.issues);
+        console.warn(
+          "[PlayerShieldModal] uploaded shield failed validation",
+          validation.error.issues,
+        );
         fileInputRef.current.value = null;
         return;
       }
@@ -76,7 +81,10 @@ export default function PlayerShieldModal({
     if (import.meta.env.DEV) {
       const result = validateShieldPersisted(updatedShield);
       if (!result.success) {
-        console.warn("[PlayerShieldModal] shield schema validation failed", result.error.issues);
+        console.warn(
+          "[PlayerShieldModal] shield schema validation failed",
+          result.error.issues,
+        );
       }
     }
 

@@ -33,8 +33,12 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
     }));
   };
 
-  const { set: setClockState, increment: incrementClock, decrement: decrementClock, reset: resetClock } =
-    useClock(sections, clockState, persistState);
+  const {
+    set: setClockState,
+    increment: incrementClock,
+    decrement: decrementClock,
+    reset: resetClock,
+  } = useClock(sections, clockState, persistState);
 
   if (!zeroPower?.name) return null;
 

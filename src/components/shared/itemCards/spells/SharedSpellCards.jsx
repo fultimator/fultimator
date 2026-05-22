@@ -561,7 +561,7 @@ export const SharedGambleSpellCard = React.memo(function SharedGambleSpellCard({
           </Grid>
           <Grid size={2}>
             <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {attr ? attr.shortcaps : "—"}
+              {attr ? attr.shortcaps : "-"}
             </Typography>
           </Grid>
         </Grid>
@@ -735,7 +735,7 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
               component="div"
               sx={{ fontSize: scale.body, "& p": { margin: 0 } }}
             >
-              {item.event ? md(t(item.event)) : "—"}
+              {item.event ? md(t(item.event)) : "-"}
             </Typography>
           </Box>
         </Box>
@@ -851,7 +851,7 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
           </Box>
           <Box sx={{ width: "58.33%", textAlign: "center" }}>
             <Typography sx={{ fontSize: scale.body, "& p": { margin: 0 } }}>
-              {item.duration ? t(item.duration) : "—"}
+              {item.duration ? t(item.duration) : "-"}
             </Typography>
           </Box>
         </Box>
@@ -964,7 +964,7 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
                 "& p": { margin: 0 },
               }}
             >
-              {item.genoclepsis ? md(t(item.genoclepsis)) : "—"}
+              {item.genoclepsis ? md(t(item.genoclepsis)) : "-"}
             </Typography>
           </Box>
         </Box>
@@ -2049,7 +2049,7 @@ export const SharedPilotVehicleCard = React.memo(
                     margin: 0,
                   }}
                 >
-                  {item.cost ? `${item.cost}z` : "—"}
+                  {item.cost ? `${item.cost}z` : "-"}
                 </Typography>
               </Grid>
               <Grid size={cols.accuracy}>
@@ -2113,7 +2113,7 @@ export const SharedPilotVehicleCard = React.memo(
                     margin: 0,
                   }}
                 >
-                  {item.category ? t(item.category) : "—"}
+                  {item.category ? t(item.category) : "-"}
                 </Typography>
               </Grid>
               <Grid
@@ -2142,7 +2142,7 @@ export const SharedPilotVehicleCard = React.memo(
                     margin: 0,
                   }}
                 >
-                  {item.range ? t(item.range) : "—"}
+                  {item.range ? t(item.range) : "-"}
                 </Typography>
               </Grid>
               <Grid
@@ -2171,7 +2171,7 @@ export const SharedPilotVehicleCard = React.memo(
                     margin: 0,
                   }}
                 >
-                  {item.cumbersome ? t("Cumbersome") : "—"}
+                  {item.cumbersome ? t("Cumbersome") : "-"}
                 </Typography>
               </Grid>
             </Grid>
@@ -2337,7 +2337,7 @@ export const SharedPilotVehicleCard = React.memo(
                       margin: 0,
                     }}
                   >
-                    {item.frame ? t(item.frame) : "—"}
+                    {item.frame ? t(item.frame) : "-"}
                   </Typography>
                 </Grid>
                 <Grid size={2}>
@@ -2349,7 +2349,7 @@ export const SharedPilotVehicleCard = React.memo(
                       margin: 0,
                     }}
                   >
-                    {item.passengers ?? "—"}
+                    {item.passengers ?? "-"}
                   </Typography>
                 </Grid>
                 <Grid size={3}>
@@ -2361,7 +2361,7 @@ export const SharedPilotVehicleCard = React.memo(
                       margin: 0,
                     }}
                   >
-                    {item.distance ?? "—"}
+                    {item.distance ?? "-"}
                   </Typography>
                 </Grid>
               </Grid>
@@ -2761,7 +2761,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
                 variant="body2"
                 sx={{ color: "text.secondary", "& p": { margin: 0 } }}
               >
-                {item.type ? md(t(item.type)) : "—"}
+                {item.type ? md(t(item.type)) : "-"}
               </Typography>
             </Grid>
             <Grid size={3} sx={{ textAlign: "center" }}>
@@ -2769,7 +2769,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
                 variant="body2"
                 sx={{ color: "text.secondary", "& p": { margin: 0 } }}
               >
-                {item.status ? md(t(item.status)) : "—"}
+                {item.status ? md(t(item.status)) : "-"}
               </Typography>
             </Grid>
             <Grid size={2} sx={{ textAlign: "center" }}>
@@ -2777,7 +2777,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
                 variant="body2"
                 sx={{ color: "text.secondary", "& p": { margin: 0 } }}
               >
-                {item.attribute ? md(t(item.attribute)) : "—"}
+                {item.attribute ? md(t(item.attribute)) : "-"}
               </Typography>
             </Grid>
             <Grid size={2} sx={{ textAlign: "center" }}>
@@ -2785,7 +2785,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
                 variant="body2"
                 sx={{ color: "text.secondary", "& p": { margin: 0 } }}
               >
-                {item.recovery ? md(t(item.recovery)) : "—"}
+                {item.recovery ? md(t(item.recovery)) : "-"}
               </Typography>
             </Grid>
           </Grid>

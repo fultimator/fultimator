@@ -196,7 +196,7 @@ export default function EditExtra({ npc, setNpc }) {
                   label={t("Status Effect Immunity")}
                   value={npc.extra?.statusImmunity || 0}
                   onChange={handleStatusImmunityChange}
-                  helperText={`${t("Gain 2 Immunities per 1 SP")} — ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
+                  helperText={`${t("Gain 2 Immunities per 1 SP")} - ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
                 />
               </FormControl>
             )}
@@ -267,7 +267,7 @@ export default function EditExtra({ npc, setNpc }) {
                 label={t("Status Effect Immunity")}
                 value={npc.extra?.statusImmunity || 0}
                 onChange={handleStatusImmunityChange}
-                helperText={`${t("Gain 2 Immunities per 1 SP")} — ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
+                helperText={`${t("Gain 2 Immunities per 1 SP")} - ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
               />
             </FormControl>
           </Grid>

@@ -92,13 +92,18 @@ export default function PlayerBonds({
     if (isCreatingBond) {
       setPlayer((prev) => ({
         ...prev,
-        info: { ...prev.info, bonds: [...(prev.info?.bonds ?? []), { ...draftBond }] },
+        info: {
+          ...prev.info,
+          bonds: [...(prev.info?.bonds ?? []), { ...draftBond }],
+        },
       }));
       closeModal();
       return;
     }
 
-    const updated = bonds.map((b, i) => (i === editBondIndex ? { ...draftBond } : b));
+    const updated = bonds.map((b, i) =>
+      i === editBondIndex ? { ...draftBond } : b,
+    );
     setPlayer((prev) => ({ ...prev, info: { ...prev.info, bonds: updated } }));
     closeModal();
   };
@@ -396,12 +401,18 @@ export default function PlayerBonds({
           onClose={closeModal}
           onConfirm={saveBond}
           title={isCreatingBond ? t("Add Bond") : t("Edit Bond")}
-          subtitle={t("Set the bond name and sentiments. Opposed sentiments auto-exclude each other.")}
+          subtitle={t(
+            "Set the bond name and sentiments. Opposed sentiments auto-exclude each other.",
+          )}
           maxWidth="sm"
           actions={
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {!isCreatingBond ? (
-                <Button variant="contained" color="error" onClick={handleDelete}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDelete}
+                >
                   {t("Delete")}
                 </Button>
               ) : null}

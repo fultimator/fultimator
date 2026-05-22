@@ -140,7 +140,7 @@ export default function MnemoReceptaclePanel({
             color="error"
             sx={{ display: "block", mb: 1 }}
           >
-            {t("Over capacity — unload mnemospheres to match current limit")}
+            {t("Over capacity - unload mnemospheres to match current limit")}
           </Typography>
         )}
 

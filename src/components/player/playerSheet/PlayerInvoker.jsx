@@ -322,7 +322,9 @@ export default function PlayerInvoker({ player, setPlayer }) {
                             <Tooltip title={t("Info")}>
                               <IconButton
                                 sx={{ padding: "0px" }}
-                                onClick={() => handleOpenModal(invokerSpell, invocation)}
+                                onClick={() =>
+                                  handleOpenModal(invokerSpell, invocation)
+                                }
                               >
                                 <Info />
                               </IconButton>
@@ -330,7 +332,9 @@ export default function PlayerInvoker({ player, setPlayer }) {
                             <Tooltip title={t("Send to chat")}>
                               <IconButton
                                 sx={{ padding: "0px", marginLeft: "5px" }}
-                                onClick={() => sendToChat(invokerSpell, invocation)}
+                                onClick={() =>
+                                  sendToChat(invokerSpell, invocation)
+                                }
                               >
                                 <ChatOutlined />
                               </IconButton>

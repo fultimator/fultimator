@@ -61,7 +61,9 @@ export function normalizeAccessory(data: unknown): Accessory {
 
 export type AccessoryCtx = Record<string, never>;
 
-export function buildAccessoryFormState(item?: Partial<AccessoryPersisted> | null): AccessoryPersisted {
+export function buildAccessoryFormState(
+  item?: Partial<AccessoryPersisted> | null,
+): AccessoryPersisted {
   return {
     itemType: "accessory",
     fuid: item?.fuid,
@@ -82,7 +84,9 @@ export function buildAccessoryFormState(item?: Partial<AccessoryPersisted> | nul
   };
 }
 
-export function buildAccessorySavePayload(formState: AccessoryPersisted): AccessoryPersisted {
+export function buildAccessorySavePayload(
+  formState: AccessoryPersisted,
+): AccessoryPersisted {
   const def = parseInt(String(formState.defModifier));
   const mdef = parseInt(String(formState.mDefModifier));
   const init = parseInt(String(formState.initModifier));
@@ -92,7 +96,16 @@ export function buildAccessorySavePayload(formState: AccessoryPersisted): Access
   const damageRanged = parseInt(String(formState.damageRangedModifier));
   return {
     ...formState,
-    modifiers: { ...(formState.modifiers ?? {}), def, mdef, init, magic, accuracy, damageMelee, damageRanged },
+    modifiers: {
+      ...(formState.modifiers ?? {}),
+      def,
+      mdef,
+      init,
+      magic,
+      accuracy,
+      damageMelee,
+      damageRanged,
+    },
     defModifier: def,
     mDefModifier: mdef,
     initModifier: init,

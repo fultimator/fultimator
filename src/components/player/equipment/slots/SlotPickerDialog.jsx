@@ -969,8 +969,7 @@ export default function SlotPickerDialog({
                             slotProps={{
                               primary: {
                                 variant: "body2",
-                                fontWeight:
-                                  isPending || isEquipped ? 700 : 400,
+                                fontWeight: isPending || isEquipped ? 700 : 400,
                                 component: "div",
                               },
                               secondary: { variant: "caption" },
@@ -1030,7 +1029,11 @@ export default function SlotPickerDialog({
                             handleCreateForSlot(defaultCreateKind);
                           }}
                           disabled={!onCreateNewItem}
-                          sx={{ ml: currentRef ? 1 : 0, minWidth: 32, px: 0.75 }}
+                          sx={{
+                            ml: currentRef ? 1 : 0,
+                            minWidth: 32,
+                            px: 0.75,
+                          }}
                         >
                           <AddIcon fontSize="small" />
                         </Button>

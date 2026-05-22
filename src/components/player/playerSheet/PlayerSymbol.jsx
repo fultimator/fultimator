@@ -113,7 +113,11 @@ export default function PlayerSymbol({ player }) {
                     symbolSpell.symbols.map((sym, sIndex) => (
                       <ItemNameRow
                         key={`${ssIndex}-${sIndex}`}
-                        name={sym.name === "symbol_custom_name" ? sym.customName : t(sym.name)}
+                        name={
+                          sym.name === "symbol_custom_name"
+                            ? sym.customName
+                            : t(sym.name)
+                        }
                       >
                         <Tooltip title={t("Info")}>
                           <IconButton

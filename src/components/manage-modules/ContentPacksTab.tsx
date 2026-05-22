@@ -118,7 +118,7 @@ function PackRow({
               color: "text.secondary",
             }}
           >
-            {pack.author ?? "—"}
+            {pack.author ?? "-"}
           </Typography>
         </TableCell>
 
@@ -130,7 +130,7 @@ function PackRow({
               color: "text.secondary",
             }}
           >
-            {pack.version ?? "—"}
+            {pack.version ?? "-"}
           </Typography>
         </TableCell>
 

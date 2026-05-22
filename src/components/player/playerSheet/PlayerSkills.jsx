@@ -112,7 +112,11 @@ export default function PlayerSkills({ player, isEditMode = false }) {
   const sendSkillToChat = (skill, isMnemo = false) => {
     const baseName = isMnemo ? skill.name : skill.skillName;
     const level = skill.currentLvl ?? 0;
-    const localizedName = isMnemo ? t(baseName) : skill.isHomebrew ? baseName : t(baseName);
+    const localizedName = isMnemo
+      ? t(baseName)
+      : skill.isHomebrew
+        ? baseName
+        : t(baseName);
     const localizedDescription = isMnemo
       ? skill.description || ""
       : skill.isHomebrew
@@ -200,7 +204,7 @@ export default function PlayerSkills({ player, isEditMode = false }) {
               spacing={1}
               sx={{ padding: "1em", flex: 1, width: "100%" }}
             >
-              {(isEditMode
+              {isEditMode
                 ? classGroupKeys.flatMap((className, groupIndex) => [
                     <Grid key={`class-divider-${className}`} size={12}>
                       <Box
@@ -216,7 +220,10 @@ export default function PlayerSkills({ player, isEditMode = false }) {
                           <Typography
                             variant="caption"
                             color="text.secondary"
-                            sx={{ textTransform: "uppercase", letterSpacing: 1 }}
+                            sx={{
+                              textTransform: "uppercase",
+                              letterSpacing: 1,
+                            }}
                           >
                             {t(className)}
                           </Typography>
@@ -237,7 +244,7 @@ export default function PlayerSkills({ player, isEditMode = false }) {
                             color="text.secondary"
                             sx={{ letterSpacing: 0.5 }}
                           >
-                            {(classLevelByName[className] ?? 0)}/10
+                            {classLevelByName[className] ?? 0}/10
                           </Typography>
                         </Box>
                       </Box>
@@ -334,7 +341,7 @@ export default function PlayerSkills({ player, isEditMode = false }) {
                         </div>
                       </Grid>
                     </Grid>
-                  )))}
+                  ))}
 
               {allMnemoSkills.length > 0 && (
                 <>

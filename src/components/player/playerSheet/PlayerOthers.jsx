@@ -36,7 +36,11 @@ function OtherItem({ other, index, setPlayer, isEditMode }) {
     });
   };
 
-  const { set, increment, decrement, reset } = useClock(sections, clockState, persistState);
+  const { set, increment, decrement, reset } = useClock(
+    sections,
+    clockState,
+    persistState,
+  );
 
   return (
     <React.Fragment>

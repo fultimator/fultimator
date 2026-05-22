@@ -44,7 +44,11 @@ interface AppDrawerProps {
   onOpen: () => void;
 }
 
-export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose, onOpen }) => {
+export const AppDrawer: React.FC<AppDrawerProps> = ({
+  open,
+  onClose,
+  onOpen,
+}) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const activeTab = useAppDrawerStore((s) => s.activeTab);
   const setActiveTab = useAppDrawerStore((s) => s.setActiveTab);
@@ -74,12 +78,22 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose, onOpen }) =
           : { width: open ? APP_DRAWER_WIDTH : TAB_RAIL_WIDTH, flexShrink: 0 }),
         "& .MuiBackdrop-root": { position: "fixed !important", zIndex: 1200 },
         "& .MuiDrawer-paper": {
-          width: isMobile ? APP_DRAWER_WIDTH : (open ? APP_DRAWER_WIDTH : TAB_RAIL_WIDTH),
+          width: isMobile
+            ? APP_DRAWER_WIDTH
+            : open
+              ? APP_DRAWER_WIDTH
+              : TAB_RAIL_WIDTH,
           transition: "width 0.25s ease !important",
           boxSizing: "border-box",
           position: "fixed !important",
           ...(isMobile
-            ? { top: 0, height: "100%", right: 0, bottom: 0, zIndex: theme.zIndex.modal }
+            ? {
+                top: 0,
+                height: "100%",
+                right: 0,
+                bottom: 0,
+                zIndex: theme.zIndex.modal,
+              }
             : {
                 zIndex: theme.zIndex.appBar - 1,
                 top: 0,
@@ -136,7 +150,11 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose, onOpen }) =
                 "&:hover": { backgroundColor: "action.hover" },
               }}
             >
-              {open ? <ChevronRightIcon fontSize="small" /> : <ChevronLeftIcon fontSize="small" />}
+              {open ? (
+                <ChevronRightIcon fontSize="small" />
+              ) : (
+                <ChevronLeftIcon fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
 
@@ -170,29 +188,37 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose, onOpen }) =
             <>
               <Box sx={{ flex: 1 }} />
               <Divider flexItem />
-              {drawerBottomActions.map(({ id, label, icon, onClick, disabled, color }) => (
-                <Tooltip key={id} title={label} placement="left">
-                  <span>
-                    <IconButton
-                      aria-label={label}
-                      onClick={disabled ? undefined : onClick}
-                      size="small"
-                      disabled={disabled}
-                      sx={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 1,
-                        color: disabled ? "text.disabled" : (color ?? "primary.main"),
-                        opacity: disabled ? 0.35 : 1,
-                        "&:hover": { backgroundColor: disabled ? "transparent" : "action.hover" },
-                        "&.Mui-disabled": { color: "text.disabled" },
-                      }}
-                    >
-                      {icon}
-                    </IconButton>
-                  </span>
-                </Tooltip>
-              ))}
+              {drawerBottomActions.map(
+                ({ id, label, icon, onClick, disabled, color }) => (
+                  <Tooltip key={id} title={label} placement="left">
+                    <span>
+                      <IconButton
+                        aria-label={label}
+                        onClick={disabled ? undefined : onClick}
+                        size="small"
+                        disabled={disabled}
+                        sx={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 1,
+                          color: disabled
+                            ? "text.disabled"
+                            : (color ?? "primary.main"),
+                          opacity: disabled ? 0.35 : 1,
+                          "&:hover": {
+                            backgroundColor: disabled
+                              ? "transparent"
+                              : "action.hover",
+                          },
+                          "&.Mui-disabled": { color: "text.disabled" },
+                        }}
+                      >
+                        {icon}
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                ),
+              )}
             </>
           )}
         </Box>
@@ -202,7 +228,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose, onOpen }) =
           sx={{
             flex: 1,
             minWidth: 0,
-            display: isMobile ? "flex" : (open ? "flex" : "none"),
+            display: isMobile ? "flex" : open ? "flex" : "none",
             flexDirection: "column",
             overflow: "hidden",
           }}

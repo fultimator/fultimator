@@ -88,7 +88,11 @@ const ACTION_PICKER_CHECK_OPTIONS: Array<{
   label: string;
   icon: React.ReactNode;
 }> = [
-  { key: "attribute", label: "Attribute", icon: <CheckAttributeIcon size="1em" /> },
+  {
+    key: "attribute",
+    label: "Attribute",
+    icon: <CheckAttributeIcon size="1em" />,
+  },
   { key: "open", label: "Open", icon: <CheckOpenIcon size="1em" /> },
   { key: "opposed", label: "Opposed", icon: <CheckOpposedIcon size="1em" /> },
 ];
@@ -914,7 +918,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                           width: "100%",
                         }}
                       >
-                        {ACTION_OPTIONS.filter((action) => action.toLowerCase() !== "check").map((action) => {
+                        {ACTION_OPTIONS.filter(
+                          (action) => action.toLowerCase() !== "check",
+                        ).map((action) => {
                           const actionKey = action.toLowerCase();
                           const ruleText = getActionRuleDescription(actionKey);
                           const actionIcon = ACTION_ICON_BY_KEY[actionKey];
@@ -996,7 +1002,9 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                               onMouseDown={(e) => e.preventDefault()}
                               onClick={() => {
                                 handleInputChange(`/check ${option.key} `);
-                                requestAnimationFrame(() => textareaRef.current?.focus());
+                                requestAnimationFrame(() =>
+                                  textareaRef.current?.focus(),
+                                );
                               }}
                               sx={{
                                 flex: 1,

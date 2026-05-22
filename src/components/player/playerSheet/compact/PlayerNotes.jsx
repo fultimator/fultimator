@@ -70,7 +70,14 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-function NoteClockRow({ clock, clockIndex, noteOriginalIndex, setPlayer, searchQuery, t }) {
+function NoteClockRow({
+  clock,
+  clockIndex,
+  noteOriginalIndex,
+  setPlayer,
+  searchQuery,
+  t,
+}) {
   const persistState = (newState) => {
     setPlayer((prev) => ({
       ...prev,
@@ -78,20 +85,21 @@ function NoteClockRow({ clock, clockIndex, noteOriginalIndex, setPlayer, searchQ
         ni !== noteOriginalIndex
           ? note
           : {
-            ...note,
-            clocks: note.clocks.map((c, ci) =>
-              ci !== clockIndex ? c : { ...c, state: newState },
-            ),
-          },
+              ...note,
+              clocks: note.clocks.map((c, ci) =>
+                ci !== clockIndex ? c : { ...c, state: newState },
+              ),
+            },
       ),
     }));
   };
 
-  const { filledCount: filled, increment, decrement, reset } = useClock(
-    clock.sections,
-    clock.state,
-    persistState,
-  );
+  const {
+    filledCount: filled,
+    increment,
+    decrement,
+    reset,
+  } = useClock(clock.sections, clock.state, persistState);
 
   const total = clock.sections;
 
@@ -152,7 +160,7 @@ function NoteClockRow({ clock, clockIndex, noteOriginalIndex, setPlayer, searchQ
             numSections={total}
             size={28}
             state={clock.state}
-            setState={() => { }}
+            setState={() => {}}
             isCharacterSheet={true}
           />
           <IconButton
@@ -208,7 +216,6 @@ export default function PlayerNotes({
     );
 
   if (visibleNotes.length === 0 && !(isEditMode && onAddNote)) return null;
-
 
   return (
     <TableContainer component={Paper} sx={{ width: "100%", mb: 1 }}>

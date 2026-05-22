@@ -62,8 +62,7 @@ export default function DancerItem({
     onCloneItem(itemIndex, clone);
   };
 
-  const itemDisplayName =
-    item.customName || t(item.key || "dance_custom_name");
+  const itemDisplayName = item.customName || t(item.key || "dance_custom_name");
 
   return (
     <>

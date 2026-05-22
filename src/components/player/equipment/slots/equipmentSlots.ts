@@ -213,7 +213,7 @@ export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
 }
 
 /**
- * Compatibility shim — use this instead of reading item.isEquipped directly
+ * Compatibility shim - use this instead of reading item.isEquipped directly
  * in stat calculations and display code.
  *
  * If `player.equippedSlots` exists → returns true if the item's name appears
@@ -386,7 +386,7 @@ export function resolveEffectiveSlot(
  * the player is in memory, items must have correct `isEquipped` flags so that
  * `syncSlots` / `deriveEquippedSlots` can work correctly on every equip change.
  *
- * Do NOT call this inside `syncSlots` — doing so would overwrite explicit
+ * Do NOT call this inside `syncSlots` - doing so would overwrite explicit
  * equip/unequip changes with the stale pre-change slot state.
  */
 export function rehydrateIsEquipped(player: TypePlayer): TypePlayer {
@@ -443,7 +443,7 @@ export function rehydrateIsEquipped(player: TypePlayer): TypePlayer {
  * After any equip change, call this to re-derive both slot caches and
  * return a new player object ready to pass to setPlayer.
  *
- * This keeps equippedSlots as the authoritative source going forward —
+ * This keeps equippedSlots as the authoritative source going forward -
  * all stat reads should use isItemEquipped(player, item) rather than
  * item.isEquipped directly.
  */

@@ -1,11 +1,5 @@
 import React, { useState, useRef } from "react";
-import {
-  Box,
-  Divider,
-  Popover,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Box, Divider, Popover, Tooltip, Typography } from "@mui/material";
 
 function BreakdownRow({ label, value, signed, bold, dim }) {
   const display =
@@ -40,7 +34,14 @@ function BreakdownRow({ label, value, signed, bold, dim }) {
 }
 
 function affinityLabel(value) {
-  const labels = { rs: "Resistance", im: "Immunity", ab: "Absorption", vu: "Vulnerability", no: "None", "": "None" };
+  const labels = {
+    rs: "Resistance",
+    im: "Immunity",
+    ab: "Absorption",
+    vu: "Vulnerability",
+    no: "None",
+    "": "None",
+  };
   return labels[value] ?? value ?? "None";
 }
 
@@ -79,13 +80,19 @@ function TooltipContent({ title, formula, breakdown, total, base, current }) {
           <Divider sx={{ mb: 0.75 }} />
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.35 }}>
             <BreakdownRow label="Base" value={affinityLabel(base)} />
-            <BreakdownRow label="Current" value={affinityLabel(current ?? base)} bold />
-            {breakdown?.filter(e => e.value !== undefined).length > 0 && (
+            <BreakdownRow
+              label="Current"
+              value={affinityLabel(current ?? base)}
+              bold
+            />
+            {breakdown?.filter((e) => e.value !== undefined).length > 0 && (
               <>
                 <Divider sx={{ my: 0.5 }} />
-                {breakdown.filter(e => e.value !== undefined).map((entry, i) => (
-                  <BreakdownRow key={i} {...entry} />
-                ))}
+                {breakdown
+                  .filter((e) => e.value !== undefined)
+                  .map((entry, i) => (
+                    <BreakdownRow key={i} {...entry} />
+                  ))}
               </>
             )}
           </Box>
@@ -111,7 +118,17 @@ function TooltipContent({ title, formula, breakdown, total, base, current }) {
   );
 }
 
-export default function StatTooltip({ title, formula, breakdown, total, base, current, children, display = "block", sx }) {
+export default function StatTooltip({
+  title,
+  formula,
+  breakdown,
+  total,
+  base,
+  current,
+  children,
+  display = "block",
+  sx,
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
   const touchRef = useRef(false);
 
@@ -138,10 +155,7 @@ export default function StatTooltip({ title, formula, breakdown, total, base, cu
   if (isTouch) {
     return (
       <>
-        <Box
-          onClick={handleClick}
-          sx={{ cursor: "pointer", display, ...sx }}
-        >
+        <Box onClick={handleClick} sx={{ cursor: "pointer", display, ...sx }}>
           {children}
         </Box>
         <Popover
@@ -193,9 +207,7 @@ export default function StatTooltip({ title, formula, breakdown, total, base, cu
         },
       }}
     >
-      <Box sx={{ display, cursor: "help", ...sx }}>
-        {children}
-      </Box>
+      <Box sx={{ display, cursor: "help", ...sx }}>{children}</Box>
     </Tooltip>
   );
 }

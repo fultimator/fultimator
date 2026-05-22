@@ -221,25 +221,42 @@ function SlotCard({
       </Typography>
       {isAux && (
         <Tooltip title={t("Auto-generated")}>
-          <AutoFixHighIcon sx={{ fontSize: 12, color: "#fff", opacity: 0.85 }} />
+          <AutoFixHighIcon
+            sx={{ fontSize: 12, color: "#fff", opacity: 0.85 }}
+          />
         </Tooltip>
       )}
       {isVehicle && !isAux && (
         <Tooltip title={resolved.vehicle.customName}>
-          <PrecisionManufacturingIcon sx={{ fontSize: 12, color: "#fff", opacity: 0.85 }} />
+          <PrecisionManufacturingIcon
+            sx={{ fontSize: 12, color: "#fff", opacity: 0.85 }}
+          />
         </Tooltip>
       )}
       {hasModule && !isVehicle && !isEmpty && !isAux && (
         <Tooltip title={t("Vehicle module available")}>
-          <PrecisionManufacturingIcon sx={{ fontSize: 12, color: "#fff", opacity: 0.7 }} />
+          <PrecisionManufacturingIcon
+            sx={{ fontSize: 12, color: "#fff", opacity: 0.7 }}
+          />
         </Tooltip>
       )}
-      {locked && <LockIcon sx={{ fontSize: 12, color: "#fff", opacity: 0.7 }} />}
+      {locked && (
+        <LockIcon sx={{ fontSize: 12, color: "#fff", opacity: 0.7 }} />
+      )}
     </Box>
   );
 
   const bodyInner = (
-    <Box sx={{ px: 1, py: 0.75, display: "flex", flexDirection: "column", justifyContent: "center", height: "100%" }}>
+    <Box
+      sx={{
+        px: 1,
+        py: 0.75,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        height: "100%",
+      }}
+    >
       {isEmpty ? (
         <Typography
           variant="body2"
@@ -306,7 +323,14 @@ function SlotCard({
       {labelRow}
       <Box sx={{ display: "flex", alignItems: "stretch", flex: 1 }}>
         {clickable ? (
-          <CardActionArea onClick={onClick} sx={{ flex: 1, alignItems: "stretch", "& .MuiCardActionArea-focusHighlight": {} }}>
+          <CardActionArea
+            onClick={onClick}
+            sx={{
+              flex: 1,
+              alignItems: "stretch",
+              "& .MuiCardActionArea-focusHighlight": {},
+            }}
+          >
             {bodyInner}
           </CardActionArea>
         ) : (
@@ -328,7 +352,10 @@ function SlotCard({
               <Tooltip title={t("weapon_customization_swap_form")}>
                 <IconButton
                   size="small"
-                  onClick={(e) => { e.stopPropagation(); onSwap(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSwap();
+                  }}
                 >
                   <SwapHoriz fontSize="small" />
                 </IconButton>
@@ -338,7 +365,10 @@ function SlotCard({
               <Tooltip title={t("Roll")}>
                 <IconButton
                   size="small"
-                  onClick={(e) => { e.stopPropagation(); onRoll(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRoll();
+                  }}
                 >
                   <CasinoIcon fontSize="small" />
                 </IconButton>
@@ -562,9 +592,10 @@ export default function PlayerLoadout({
       attr1: toRollKey(att1),
       attr2: toRollKey(att2),
       accuracyBonus: prec ?? 0,
-      name: resolved.kind === "vehicleModule"
-        ? (resolved.module.customName || t(resolved.module.name))
-        : resolved.item?.name || "Attack",
+      name:
+        resolved.kind === "vehicleModule"
+          ? resolved.module.customName || t(resolved.module.name)
+          : resolved.item?.name || "Attack",
       description:
         resolved.kind === "vehicleModule"
           ? resolved.module.description || undefined

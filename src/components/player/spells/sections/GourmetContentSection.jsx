@@ -53,7 +53,10 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
     [t],
   );
 
-  const cookbook = formState.cookbook || { effects: [], ingredientInventory: [] };
+  const cookbook = formState.cookbook || {
+    effects: [],
+    ingredientInventory: [],
+  };
   const cookbookEffects = (cookbook.effects || []).map((data, idx) => ({
     tasteKey: `effect_${idx}`,
     _index: idx,
@@ -69,7 +72,10 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
 
   const handleDeleteEffect = (_tasteKey, effectIndex) => {
     setFormState((prev) => {
-      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
       return {
         ...prev,
         cookbook: {
@@ -82,7 +88,10 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
 
   const handleDeleteIngredient = (index) => {
     setFormState((prev) => {
-      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
       return {
         ...prev,
         cookbook: {
@@ -177,7 +186,10 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
     if (editingTasteKey === "") return;
     const idx = Number(editingTasteKey);
     setFormState((prev) => {
-      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
       const effects = [...(prevCookbook.effects || [])];
       effects[idx] = {
         ...(effects[idx] || {}),
@@ -255,7 +267,9 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
                         size="small"
                         color="error"
                         startIcon={<Delete />}
-                        onClick={() => handleDeleteEffect(effect.tasteKey, effect._index)}
+                        onClick={() =>
+                          handleDeleteEffect(effect.tasteKey, effect._index)
+                        }
                       >
                         {t("Delete")}
                       </Button>

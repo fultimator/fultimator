@@ -48,7 +48,7 @@ const SIDEBAR_WIDTH = 300;
 /**
  * Layout-agnostic compendium browser.
  *
- * Renders sidebar + item grid. Does NOT include any Dialog or page wrapper —
+ * Renders sidebar + item grid. Does NOT include any Dialog or page wrapper -
  * those stay in callers (compendium.jsx route and CompendiumViewerModal).
  *
  * Filter state is passed in as `filters` (from useCompendiumFilters or
@@ -70,7 +70,7 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
   packs,
   activePack,
 
-  // Sidebar callbacks (pack management — provided by caller)
+  // Sidebar callbacks (pack management - provided by caller)
   onNewPack,
   onManagePack,
   onToggleLock,
@@ -92,8 +92,8 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
   onSelectedItemChange,
 
   // Render slots
-  renderItemActions, // (item, idx, selectedItem) => ReactNode — extra toolbar buttons
-  renderEmptyState, // () => ReactNode — overrides default "no items" message
+  renderItemActions, // (item, idx, selectedItem) => ReactNode - extra toolbar buttons
+  renderEmptyState, // () => ReactNode - overrides default "no items" message
 
   // Layout
   sidebarSx,
@@ -380,7 +380,13 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
 
   return (
     <Box
-      sx={{ display: "flex", height: "100%", overflow: "hidden", width: "100%", ...mainSx }}
+      sx={{
+        display: "flex",
+        height: "100%",
+        overflow: "hidden",
+        width: "100%",
+        ...mainSx,
+      }}
     >
       {/* ---- Desktop sidebar ---- */}
       {isDesktop && (

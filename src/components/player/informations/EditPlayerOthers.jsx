@@ -50,27 +50,56 @@ function fromFormState(form) {
     name: form.name ?? "",
     description: form.description ?? "",
     effect: form.effect ?? "",
-    clock: form.clockEnabled ? { sections: Number(form.clockSections) || 6 } : undefined,
+    clock: form.clockEnabled
+      ? { sections: Number(form.clockSections) || 6 }
+      : undefined,
   };
 }
 
-function OtherRow({ other, index, onEdit, onDelete, onRoll, onAddToCompendium }) {
+function OtherRow({
+  other,
+  index,
+  onEdit,
+  onDelete,
+  onRoll,
+  onAddToCompendium,
+}) {
   const { t } = useTranslate();
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   return (
-    <Accordion disableGutters elevation={0} sx={{ border: "1px solid", borderColor: "divider", mb: 0.75, "&:before": { display: "none" } }}>
+    <Accordion
+      disableGutters
+      elevation={0}
+      sx={{
+        border: "1px solid",
+        borderColor: "divider",
+        mb: 0.75,
+        "&:before": { display: "none" },
+      }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         sx={{
           minHeight: 56,
           "&.Mui-expanded": { minHeight: 56 },
-          "& .MuiAccordionSummary-content": { alignItems: "center", my: 0, "&.Mui-expanded": { my: 0 } },
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+            my: 0,
+            "&.Mui-expanded": { my: 0 },
+          },
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
-          <Tooltip title={t("Roll")}> 
-            <IconButton size="small" onClick={() => onRoll(other)} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Tooltip title={t("Roll")}>
+            <IconButton
+              size="small"
+              onClick={() => onRoll(other)}
+              sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}
+            >
               <Casino sx={{ fontSize: "1.2rem" }} />
             </IconButton>
           </Tooltip>
@@ -84,7 +113,11 @@ function OtherRow({ other, index, onEdit, onDelete, onRoll, onAddToCompendium })
           >
             <MenuIcon sx={{ fontSize: "1.2rem" }} />
           </IconButton>
-          <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
+          <Menu
+            anchorEl={menuAnchorEl}
+            open={Boolean(menuAnchorEl)}
+            onClose={() => setMenuAnchorEl(null)}
+          >
             <MenuItem
               onClick={async (e) => {
                 e.stopPropagation();
@@ -117,8 +150,12 @@ function OtherRow({ other, index, onEdit, onDelete, onRoll, onAddToCompendium })
         </Box>
 
         <Box onClick={(e) => e.stopPropagation()}>
-          <Tooltip title={t("Edit")}> 
-            <IconButton size="small" onClick={() => onEdit(index)} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}>
+          <Tooltip title={t("Edit")}>
+            <IconButton
+              size="small"
+              onClick={() => onEdit(index)}
+              sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}
+            >
               <EditIcon sx={{ fontSize: "1.2rem" }} />
             </IconButton>
           </Tooltip>
@@ -152,7 +189,15 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
       : null;
 
   return (
-    <Paper elevation={3} sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: secondary }}>
+    <Paper
+      elevation={3}
+      sx={{
+        p: "15px",
+        borderRadius: "8px",
+        border: "2px solid",
+        borderColor: secondary,
+      }}
+    >
       <Grid container spacing={1}>
         <Grid size={12}>
           <CustomHeader
@@ -160,7 +205,9 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
             headerText={t("Other Optionals")}
             showIconButton={isEditMode}
             addItem={() => setCreateOpen(true)}
-            openCompendium={isEditMode ? () => setCompendiumOpen(true) : undefined}
+            openCompendium={
+              isEditMode ? () => setCompendiumOpen(true) : undefined
+            }
             icon={AddIcon}
             customTooltip={t("Add Optional")}
           />
@@ -219,7 +266,9 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
                     name: entry.name || "",
                     description: entry.description || "",
                     effect: entry.effect || "",
-                    ...(entry.clock?.sections ? { clock: { sections: entry.clock.sections } } : {}),
+                    ...(entry.clock?.sections
+                      ? { clock: { sections: entry.clock.sections } }
+                      : {}),
                   });
                 }}
               />
@@ -243,7 +292,8 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
             setPlayer((prev) => {
               const next = [...(prev.others ?? [])];
               if (createOpen) next.push(nextEntry);
-              else if (editIndex !== null && next[editIndex]) next[editIndex] = nextEntry;
+              else if (editIndex !== null && next[editIndex])
+                next[editIndex] = nextEntry;
               return { ...prev, others: next };
             });
             setCreateOpen(false);
@@ -271,7 +321,9 @@ export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
               name: item.name ?? "",
               description: item.description ?? "",
               effect: item.effect ?? "",
-              ...(item.clock?.sections ? { clock: { sections: item.clock.sections } } : {}),
+              ...(item.clock?.sections
+                ? { clock: { sections: item.clock.sections } }
+                : {}),
             };
             setPlayer((prev) => ({
               ...prev,

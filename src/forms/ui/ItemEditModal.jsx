@@ -46,10 +46,13 @@ export default function ItemEditModal({
     const initial = {};
     if (!reg) return initial;
     const initFs = reg.buildState(item, ctx);
-    const gs = typeof reg.groups === "function" ? reg.groups(initFs) : reg.groups;
+    const gs =
+      typeof reg.groups === "function" ? reg.groups(initFs) : reg.groups;
     (gs ?? []).forEach(({ accordionGroup, accordionDefaultExpanded }) => {
       if (accordionGroup && !(accordionGroup in initial)) {
-        initial[accordionGroup] = accordionDefaultExpanded ? accordionDefaultExpanded(initFs) : false;
+        initial[accordionGroup] = accordionDefaultExpanded
+          ? accordionDefaultExpanded(initFs)
+          : false;
       }
     });
     return initial;
@@ -63,24 +66,30 @@ export default function ItemEditModal({
 
   useEffect(() => {
     if (!reg) return;
-    const gs = typeof reg.groups === "function" ? reg.groups(formState) : reg.groups;
+    const gs =
+      typeof reg.groups === "function" ? reg.groups(formState) : reg.groups;
     const next = {};
     (gs ?? []).forEach(({ key, accordionGroup, accordionDefaultExpanded }) => {
       if (accordionGroup && !(accordionGroup in next)) {
-        next[accordionGroup] = accordionDefaultExpanded ? accordionDefaultExpanded(formState) : false;
+        next[accordionGroup] = accordionDefaultExpanded
+          ? accordionDefaultExpanded(formState)
+          : false;
       }
     });
     setAccordionStates(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item, itemType]);
 
-  const { isOpen: deleteOpen, closeDialog: closeDelete, handleDelete } =
-    useDeleteConfirmation({
-      onConfirm: () => {
-        if (editIndex !== null && editIndex !== undefined) onDelete(editIndex);
-        onClose();
-      },
-    });
+  const {
+    isOpen: deleteOpen,
+    closeDialog: closeDelete,
+    handleDelete,
+  } = useDeleteConfirmation({
+    onConfirm: () => {
+      if (editIndex !== null && editIndex !== undefined) onDelete(editIndex);
+      onClose();
+    },
+  });
 
   if (!reg) return null;
 
@@ -90,7 +99,10 @@ export default function ItemEditModal({
     if (import.meta.env.DEV) {
       const result = reg.validate(payload);
       if (!result.success) {
-        console.warn(`[ItemEditModal:${itemType}] validation failed`, result.error.issues);
+        console.warn(
+          `[ItemEditModal:${itemType}] validation failed`,
+          result.error.issues,
+        );
       }
     }
 
@@ -104,9 +116,15 @@ export default function ItemEditModal({
       fileInputRef.current.value = null;
       return;
     }
-    const validation = reg.validate({ ...reg.buildState(normalized, ctx), ...normalized });
+    const validation = reg.validate({
+      ...reg.buildState(normalized, ctx),
+      ...normalized,
+    });
     if (!validation.success) {
-      console.warn(`[ItemEditModal:${itemType}] upload failed validation`, validation.error.issues);
+      console.warn(
+        `[ItemEditModal:${itemType}] upload failed validation`,
+        validation.error.issues,
+      );
       fileInputRef.current.value = null;
       return;
     }
@@ -117,15 +135,13 @@ export default function ItemEditModal({
   const resolvedGroups =
     typeof reg.groups === "function" ? reg.groups(formState) : reg.groups;
 
-  const armorSlotOnChange =
-    reg.getSlotOnChange
-      ? reg.getSlotOnChange(formState, setFormState, ctx)
-      : null;
+  const armorSlotOnChange = reg.getSlotOnChange
+    ? reg.getSlotOnChange(formState, setFormState, ctx)
+    : null;
 
-  const slotCostInfo =
-    reg.getSlotCostInfo
-      ? reg.getSlotCostInfo(formState, item, ctx)
-      : null;
+  const slotCostInfo = reg.getSlotCostInfo
+    ? reg.getSlotCostInfo(formState, item, ctx)
+    : null;
 
   const customWeaponQualityOnChange = reg.getQualityOnChange
     ? reg.getQualityOnChange(formState, setFormState)
@@ -138,7 +154,10 @@ export default function ItemEditModal({
   for (const g of resolvedGroups) {
     if (g.accordionGroup) {
       const last = segments[segments.length - 1];
-      if (last?.type === "accordion" && last.accordionGroup === g.accordionGroup) {
+      if (
+        last?.type === "accordion" &&
+        last.accordionGroup === g.accordionGroup
+      ) {
         last.groups.push(g);
       } else {
         segments.push({
@@ -259,10 +278,18 @@ export default function ItemEditModal({
 
       <Grid size={12}>
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Button variant="outlined" size="small" onClick={() => fileInputRef.current.click()}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => fileInputRef.current.click()}
+          >
             {t("Upload JSON")}
           </Button>
-          <Button variant="outlined" size="small" onClick={() => setFormState(reg.buildState(null, ctx))}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setFormState(reg.buildState(null, ctx))}
+          >
             {t("Clear All Fields")}
           </Button>
           <input
@@ -278,7 +305,9 @@ export default function ItemEditModal({
                 try {
                   handleFileUpload(JSON.parse(String(reader.result)));
                 } catch {
-                  console.warn(`[ItemEditModal:${itemType}] invalid JSON upload`);
+                  console.warn(
+                    `[ItemEditModal:${itemType}] invalid JSON upload`,
+                  );
                   fileInputRef.current.value = null;
                 }
               };
@@ -312,7 +341,10 @@ export default function ItemEditModal({
         </IconButton>
 
         <DialogContent sx={{ p: 0 }}>
-          <PanelLayout formContent={formContent} previewContent={previewContent} />
+          <PanelLayout
+            formContent={formContent}
+            previewContent={previewContent}
+          />
         </DialogContent>
 
         <Divider />
@@ -330,8 +362,8 @@ export default function ItemEditModal({
             >
               {slotCostInfo.delta > 0
                 ? `${t("Deduct on save")}: ${slotCostInfo.delta}z`
-                : `${t("Refund on save")}: ${Math.abs(slotCostInfo.delta)}z`}
-              {" "}({t("Current Zenit")}: {slotCostInfo.currentZenit}z)
+                : `${t("Refund on save")}: ${Math.abs(slotCostInfo.delta)}z`}{" "}
+              ({t("Current Zenit")}: {slotCostInfo.currentZenit}z)
               {slotCostInfo.cannotAfford ? ` - ${t("Not enough Zenit")}` : ""}
             </Typography>
           )}
@@ -362,7 +394,9 @@ export default function ItemEditModal({
           <Box>
             <Typography variant="h4">{formState.name}</Typography>
             {formState.cost != null && (
-              <Typography variant="body2">{formState.cost} {t("zenit")}</Typography>
+              <Typography variant="body2">
+                {formState.cost} {t("zenit")}
+              </Typography>
             )}
           </Box>
         }

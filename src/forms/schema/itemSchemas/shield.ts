@@ -68,8 +68,11 @@ export function normalizeShield(data: unknown): Shield {
 
 export type ShieldCtx = Record<string, never>;
 
-export function buildShieldFormState(item?: Partial<ShieldPersisted> | null): ShieldPersisted {
-  const base = (item?.base as typeof allShields[0] | undefined) ?? allShields[0];
+export function buildShieldFormState(
+  item?: Partial<ShieldPersisted> | null,
+): ShieldPersisted {
+  const base =
+    (item?.base as (typeof allShields)[0] | undefined) ?? allShields[0];
   return {
     itemType: "shield",
     base,
@@ -110,7 +113,16 @@ export function buildShieldSavePayload(
   const base = formState.base as { def?: number; mdef?: number } | undefined;
   return {
     ...formState,
-    modifiers: { ...(formState.modifiers ?? {}), def, mdef, init, magic, accuracy, damageMelee, damageRanged },
+    modifiers: {
+      ...(formState.modifiers ?? {}),
+      def,
+      mdef,
+      init,
+      magic,
+      accuracy,
+      damageMelee,
+      damageRanged,
+    },
     def: base?.def ?? formState.def,
     mdef: base?.mdef ?? formState.mdef,
     defModifier: def,
@@ -121,6 +133,8 @@ export function buildShieldSavePayload(
     damageMeleeModifier: damageMelee,
     damageRangedModifier: damageRanged,
     isEquipped:
-      (originalItem?.martial ?? false) !== formState.martial ? false : formState.isEquipped,
+      (originalItem?.martial ?? false) !== formState.martial
+        ? false
+        : formState.isEquipped,
   };
 }

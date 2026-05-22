@@ -224,7 +224,15 @@ export default function EditPlayerBasics({
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton>
-                        <img src={fpBorderlessIcon} alt="FP" style={{ width: "36px", height: "26px", objectFit: "contain" }} />
+                        <img
+                          src={fpBorderlessIcon}
+                          alt="FP"
+                          style={{
+                            width: "36px",
+                            height: "26px",
+                            objectFit: "contain",
+                          }}
+                        />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -302,7 +310,11 @@ export default function EditPlayerBasics({
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton>
-                        <img src={zenitIcon} alt="Zenit" style={{ width: "28px", height: "28px" }} />
+                        <img
+                          src={zenitIcon}
+                          alt="Zenit"
+                          style={{ width: "28px", height: "28px" }}
+                        />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -530,4 +542,3 @@ function ExpAdornment({ exp, onLevelUpRequest }) {
     </InputAdornment>
   );
 }
-

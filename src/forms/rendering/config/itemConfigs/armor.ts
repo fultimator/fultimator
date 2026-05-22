@@ -121,7 +121,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     group: G.modifiers,
     order: 3,
   },
-  // Quality — hidden when technospheres slots variant is active
+  // Quality - hidden when technospheres slots variant is active
   {
     key: "selectedQuality",
     kind: "form-state",
@@ -180,7 +180,7 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     dependencies: (s) => !s.isSlotsVariant,
     fullWidth: true,
   },
-  // Slots — shown only when technospheres slots variant is active
+  // Slots - shown only when technospheres slots variant is active
   {
     key: "slots",
     kind: "editable",

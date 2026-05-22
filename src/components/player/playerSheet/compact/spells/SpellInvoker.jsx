@@ -56,7 +56,9 @@ export default function SpellInvoker({ spell, setPlayer }) {
           const newSpells = cls.spells.map((s) => {
             if (s.spellType === "invocation") {
               const prevTracker = s.tracker || {};
-              let activeWellsprings = [...(prevTracker.activeWellsprings || [])];
+              let activeWellsprings = [
+                ...(prevTracker.activeWellsprings || []),
+              ];
               if (activeWellsprings.includes(wellspring)) {
                 activeWellsprings = activeWellsprings.filter(
                   (w) => w !== wellspring,
@@ -97,7 +99,8 @@ export default function SpellInvoker({ spell, setPlayer }) {
                 const spellTracker = spell.tracker || {};
                 const isActive = spellTracker.activeWellsprings?.includes(ws);
                 const isInner =
-                  spellTracker.innerWellspring && spellTracker.chosenWellspring === ws;
+                  spellTracker.innerWellspring &&
+                  spellTracker.chosenWellspring === ws;
                 const isSelected = isActive || isInner;
                 const backgroundColor = getWellspringColor(ws, isSelected);
                 const selectedTextColor = getSelectedTextColor(ws);

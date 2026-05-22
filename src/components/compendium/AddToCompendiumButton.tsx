@@ -85,14 +85,14 @@ export default function AddToCompendiumButton({
     if (allTargets.length > 1) {
       setAnchorEl(e.currentTarget);
     } else if (unlockedTargets.length === 1) {
-      // Only one unlocked target — add directly
+      // Only one unlocked target - add directly
       await doAdd(unlockedTargets[0].id);
     } else if (allTargets.length === 0) {
-      // No packs yet — create personal
+      // No packs yet - create personal
       const personal = await ensurePersonalPack();
       await doAdd(personal.id);
     } else {
-      // All targets are locked — open menu so user can see why
+      // All targets are locked - open menu so user can see why
       setAnchorEl(e.currentTarget);
     }
   };

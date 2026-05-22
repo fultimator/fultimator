@@ -68,7 +68,7 @@ export default function SlotEditor({
               ? hoplo.name
               : id;
           const tooltipTitle = mnemo
-            ? `${mnemo.class} Lv.${mnemo.lvl} — ${500 + mnemo.lvl * 300}z`
+            ? `${mnemo.class} Lv.${mnemo.lvl} - ${500 + mnemo.lvl * 300}z`
             : hoplo
               ? hoplo.description
               : "";

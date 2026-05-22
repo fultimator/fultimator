@@ -30,10 +30,7 @@ import {
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 import SphereInventory from "./technospheres/SphereInventory";
-import {
-  clearSlotAction,
-  equipItemToSlot,
-} from "./slots/loadoutActions";
+import { clearSlotAction, equipItemToSlot } from "./slots/loadoutActions";
 import { buildSphereData } from "../../../libs/technospheres";
 import {
   SharedAccessoryCard,
@@ -50,10 +47,22 @@ import {
   ShieldIcon,
 } from "../../icons";
 import { normalizeWeaponLike } from "../../../libs/weaponNormalization";
-import { buildAccessoryFormState, buildAccessorySavePayload } from "../../../forms/schema/itemSchemas/accessory";
-import { buildArmorFormState, buildArmorSavePayload } from "../../../forms/schema/itemSchemas/armor";
-import { buildShieldFormState, buildShieldSavePayload } from "../../../forms/schema/itemSchemas/shield";
-import { buildCustomWeaponFormState, buildCustomWeaponSavePayload } from "../../../forms/schema/itemSchemas/customWeapon";
+import {
+  buildAccessoryFormState,
+  buildAccessorySavePayload,
+} from "../../../forms/schema/itemSchemas/accessory";
+import {
+  buildArmorFormState,
+  buildArmorSavePayload,
+} from "../../../forms/schema/itemSchemas/armor";
+import {
+  buildShieldFormState,
+  buildShieldSavePayload,
+} from "../../../forms/schema/itemSchemas/shield";
+import {
+  buildCustomWeaponFormState,
+  buildCustomWeaponSavePayload,
+} from "../../../forms/schema/itemSchemas/customWeapon";
 import ItemEditModal from "../../../forms/ui/ItemEditModal";
 import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
 import { useChatMessagesStore } from "../../../store/chatMessagesStore";
@@ -158,8 +167,8 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
     equipType === "weapon" || equipType === "custom-weapon"
       ? Boolean(
           item?.melee ||
-            item?.range === "weapon_range_melee" ||
-            item?.range === "melee",
+          item?.range === "weapon_range_melee" ||
+          item?.range === "melee",
         )
       : false;
 
@@ -207,7 +216,12 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
 
   const onSwap = (e) => {
     e.stopPropagation();
-    if (!canEdit || !isTransforming || !isEquipped || source !== "customWeapons")
+    if (
+      !canEdit ||
+      !isTransforming ||
+      !isEquipped ||
+      source !== "customWeapons"
+    )
       return;
     setPlayer((prev) => {
       const eq0 = prev?.equipment?.[0] ?? {};
@@ -216,11 +230,15 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
           ? cw
           : {
               ...cw,
-              activeForm: cw.activeForm === "secondary" ? "primary" : "secondary",
+              activeForm:
+                cw.activeForm === "secondary" ? "primary" : "secondary",
             },
       );
       const equipment = prev?.equipment
-        ? [{ ...eq0, customWeapons: updatedCustomWeapons }, ...prev.equipment.slice(1)]
+        ? [
+            { ...eq0, customWeapons: updatedCustomWeapons },
+            ...prev.equipment.slice(1),
+          ]
         : [{ ...eq0, customWeapons: updatedCustomWeapons }];
       return { ...prev, equipment };
     });
@@ -266,8 +284,10 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
     const attr1 = item.accuracy?.attr1 || "dexterity";
     const attr2 = item.accuracy?.attr2 || "might";
     const dieSizes = {
-      primary: player?.attributes?.[attr1]?.base ?? player?.attributes?.[attr1] ?? 6,
-      secondary: player?.attributes?.[attr2]?.base ?? player?.attributes?.[attr2] ?? 6,
+      primary:
+        player?.attributes?.[attr1]?.base ?? player?.attributes?.[attr1] ?? 6,
+      secondary:
+        player?.attributes?.[attr2]?.base ?? player?.attributes?.[attr2] ?? 6,
     };
     const toRollKey = (attr) => {
       const key = String(attr || "").toLowerCase();
@@ -291,7 +311,12 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
       hrZero: item?.damage?.hrZero === true,
     });
     const rolls = rollAccuracyCheck(dieSizes);
-    const result = processAccuracyCheck(intent, rolls, dieSizes, player?.name || "Player");
+    const result = processAccuracyCheck(
+      intent,
+      rolls,
+      dieSizes,
+      player?.name || "Player",
+    );
     addMessage(buildAccuracyCheckMessage(result));
   };
 
@@ -301,7 +326,8 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
       const cardItem = {
         ...item,
         secondWeaponName: item?.secondWeaponName ?? item?.secondName,
-        secondSelectedCategory: item?.secondSelectedCategory ?? item?.secondCategory,
+        secondSelectedCategory:
+          item?.secondSelectedCategory ?? item?.secondCategory,
         secondSelectedRange: item?.secondSelectedRange ?? item?.secondRange,
         secondCurrentCustomizations:
           item?.secondCurrentCustomizations ?? item?.secondCustomizations,
@@ -326,14 +352,29 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
     }
     if (source === "shields") return <SharedShieldCard item={item} />;
     if (source === "armor") {
-      return <SharedArmorCard item={item} sphereData={buildSphereData(item, player)} />;
+      return (
+        <SharedArmorCard
+          item={item}
+          sphereData={buildSphereData(item, player)}
+        />
+      );
     }
     if (source === "accessories") return <SharedAccessoryCard item={item} />;
     return null;
   };
 
   return (
-    <Accordion disableGutters elevation={0} sx={{ border: "1px solid", borderColor: "divider", mb: 0.75, "&:before": { display: "none" }, bgcolor: "background.paper" }}>
+    <Accordion
+      disableGutters
+      elevation={0}
+      sx={{
+        border: "1px solid",
+        borderColor: "divider",
+        mb: 0.75,
+        "&:before": { display: "none" },
+        bgcolor: "background.paper",
+      }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         sx={{
@@ -355,15 +396,39 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
           },
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", height: "100%" }} onClick={(e) => e.stopPropagation()}>
-          <Box sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", height: "100%" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Box
+            sx={{
+              width: CONTROL_SIZE,
+              height: CONTROL_SIZE,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Tooltip title="Roll">
-              <IconButton component="span" size="small" onClick={onRoll} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, p: 0.5 }}>
+              <IconButton
+                component="span"
+                size="small"
+                onClick={onRoll}
+                sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, p: 0.5 }}
+              >
                 <Casino sx={{ fontSize: "1.2rem" }} />
               </IconButton>
             </Tooltip>
           </Box>
-          <Box sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Box
+            sx={{
+              width: CONTROL_SIZE,
+              height: CONTROL_SIZE,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <IconButton
               component="span"
               size="small"
@@ -376,25 +441,64 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
               <MenuIcon sx={{ fontSize: "1.2rem" }} />
             </IconButton>
           </Box>
-          <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
-            <MenuItem onClick={async (e) => { await onAddToCompendium(e); setMenuAnchorEl(null); }}>
+          <Menu
+            anchorEl={menuAnchorEl}
+            open={Boolean(menuAnchorEl)}
+            onClose={() => setMenuAnchorEl(null)}
+          >
+            <MenuItem
+              onClick={async (e) => {
+                await onAddToCompendium(e);
+                setMenuAnchorEl(null);
+              }}
+            >
               <ListItemText>Add to Compendium</ListItemText>
             </MenuItem>
             {isTransforming && (
-              <MenuItem disabled={!isEquipped} onClick={(e) => { onSwap(e); setMenuAnchorEl(null); }}>
-                <ListItemIcon><CompareArrowsIcon fontSize="small" /></ListItemIcon>
+              <MenuItem
+                disabled={!isEquipped}
+                onClick={(e) => {
+                  onSwap(e);
+                  setMenuAnchorEl(null);
+                }}
+              >
+                <ListItemIcon>
+                  <CompareArrowsIcon fontSize="small" />
+                </ListItemIcon>
                 <ListItemText>Swap Form</ListItemText>
               </MenuItem>
             )}
-            <MenuItem onClick={(e) => { onDeleteItem(e); setMenuAnchorEl(null); }} disabled={!canEdit} sx={{ color: "error.main" }}>
-              <ListItemIcon><Delete color="error" fontSize="small" /></ListItemIcon>
+            <MenuItem
+              onClick={(e) => {
+                onDeleteItem(e);
+                setMenuAnchorEl(null);
+              }}
+              disabled={!canEdit}
+              sx={{ color: "error.main" }}
+            >
+              <ListItemIcon>
+                <Delete color="error" fontSize="small" />
+              </ListItemIcon>
               <ListItemText>Delete</ListItemText>
             </MenuItem>
           </Menu>
         </Box>
 
-        <Box sx={{ flexGrow: 1, overflow: "hidden", display: "flex", alignItems: "center", minHeight: 40 }}>
-          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+        <Box
+          sx={{
+            flexGrow: 1,
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            minHeight: 40,
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            flexWrap="wrap"
+          >
             <Typography noWrap>{item?.name || "Unnamed Weapon"}</Typography>
           </Stack>
         </Box>
@@ -445,28 +549,83 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
             </IconButton>
           </Tooltip>
 
-          <Box sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Box
+            sx={{
+              width: CONTROL_SIZE,
+              height: CONTROL_SIZE,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Tooltip title={isEquipped ? "Unequip" : "Equip"}>
-              <Badge badgeContent={slotLabel || null} color="primary" invisible={!slotLabel} sx={{ "& .MuiBadge-badge": { fontSize: "0.6rem", height: 14, minWidth: 14 } }}>
+              <Badge
+                badgeContent={slotLabel || null}
+                color="primary"
+                invisible={!slotLabel}
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: "0.6rem",
+                    height: 14,
+                    minWidth: 14,
+                  },
+                }}
+              >
                 <IconButton
                   size="small"
                   onClick={onEquipToggle}
                   disabled={!canEdit}
-                  sx={{ p: 0.5, width: CONTROL_SIZE, height: CONTROL_SIZE, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "text.primary", opacity: 1, "& .MuiSvgIcon-root": { fontSize: "1.25rem", opacity: 1 } }}
+                  sx={{
+                    p: 0.5,
+                    width: CONTROL_SIZE,
+                    height: CONTROL_SIZE,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "text.primary",
+                    opacity: 1,
+                    "& .MuiSvgIcon-root": { fontSize: "1.25rem", opacity: 1 },
+                  }}
                 >
-                  {isEquipped ? <EquipIcon /> : canEdit ? <RadioButtonUnchecked sx={{ fontSize: "1.2rem" }} /> : <ErrorIcon sx={{ fontSize: "1.2rem", color: "error.main" }} />}
+                  {isEquipped ? (
+                    <EquipIcon />
+                  ) : canEdit ? (
+                    <RadioButtonUnchecked sx={{ fontSize: "1.2rem" }} />
+                  ) : (
+                    <ErrorIcon
+                      sx={{ fontSize: "1.2rem", color: "error.main" }}
+                    />
+                  )}
                 </IconButton>
               </Badge>
             </Tooltip>
           </Box>
 
           {isTransforming && (
-            <Box sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Box
+              sx={{
+                width: CONTROL_SIZE,
+                height: CONTROL_SIZE,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <IconButton
                 size="small"
                 onClick={onSwap}
                 disabled={!canEdit || !isEquipped}
-                sx={{ p: 0.5, width: CONTROL_SIZE, height: CONTROL_SIZE, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "text.primary", opacity: 1, "& .MuiSvgIcon-root": { fontSize: "1.25rem", opacity: 1 } }}
+                sx={{
+                  p: 0.5,
+                  width: CONTROL_SIZE,
+                  height: CONTROL_SIZE,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "text.primary",
+                  opacity: 1,
+                  "& .MuiSvgIcon-root": { fontSize: "1.25rem", opacity: 1 },
+                }}
               >
                 <CompareArrowsIcon />
               </IconButton>
@@ -479,7 +638,9 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
         <Stack spacing={1}>
           <Box>{renderExpandedCard()}</Box>
           {item?.description ? (
-            <Typography variant="caption" color="text.secondary">{item.description}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {item.description}
+            </Typography>
           ) : null}
         </Stack>
       </AccordionDetails>
@@ -512,11 +673,16 @@ function EquipmentGroup({
       </Grid>
       <Grid size={12}>
         {rows.length === 0 ? (
-          <Typography color="text.secondary" variant="body2">No items.</Typography>
+          <Typography color="text.secondary" variant="body2">
+            No items.
+          </Typography>
         ) : (
           <Grid container spacing={1}>
             {rows.map((row) => (
-              <Grid key={`${row.source}-${row.index}-${row.item?.name}`} size={{ xs: 12, md: 6 }}>
+              <Grid
+                key={`${row.source}-${row.index}-${row.item?.name}`}
+                size={{ xs: 12, md: 6 }}
+              >
                 <EquipmentRow
                   row={row}
                   player={player}
@@ -541,14 +707,35 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const [editIndex, setEditIndex] = useState(null);
   const [editItem, setEditItem] = useState(null);
 
-  const isTechnospheres = player?.settings?.optionalRules?.technospheres ?? false;
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
 
   const inv = player?.equipment?.[0] || {};
-  const weapons = (inv?.weapons || []).map((item, index) => ({ item, source: "weapons", index }));
-  const customWeapons = (inv?.customWeapons || []).map((item, index) => ({ item, source: "customWeapons", index }));
-  const shields = (inv?.shields || []).map((item, index) => ({ item, source: "shields", index }));
-  const armor = (inv?.armor || []).map((item, index) => ({ item, source: "armor", index }));
-  const accessories = (inv?.accessories || []).map((item, index) => ({ item, source: "accessories", index }));
+  const weapons = (inv?.weapons || []).map((item, index) => ({
+    item,
+    source: "weapons",
+    index,
+  }));
+  const customWeapons = (inv?.customWeapons || []).map((item, index) => ({
+    item,
+    source: "customWeapons",
+    index,
+  }));
+  const shields = (inv?.shields || []).map((item, index) => ({
+    item,
+    source: "shields",
+    index,
+  }));
+  const armor = (inv?.armor || []).map((item, index) => ({
+    item,
+    source: "armor",
+    index,
+  }));
+  const accessories = (inv?.accessories || []).map((item, index) => ({
+    item,
+    source: "accessories",
+    index,
+  }));
 
   const patchInv = (source, updater) => {
     setPlayer((prev) => {
@@ -556,7 +743,9 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         ...(prev?.equipment?.[0] ?? {}),
         [source]: updater(prev?.equipment?.[0]?.[source] ?? []),
       };
-      const equipment = prev?.equipment ? [eq0, ...prev.equipment.slice(1)] : [eq0];
+      const equipment = prev?.equipment
+        ? [eq0, ...prev.equipment.slice(1)]
+        : [eq0];
       return { ...prev, equipment };
     });
   };
@@ -593,33 +782,59 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
   const handleAddNew = (source) => {
     if (!isEditMode) return;
     if (source === "weapons") {
-      patchInv("weapons", (arr) => [...arr, normalizeWeaponLike({ name: "New Weapon", isEquipped: false })]);
+      patchInv("weapons", (arr) => [
+        ...arr,
+        normalizeWeaponLike({ name: "New Weapon", isEquipped: false }),
+      ]);
       return;
     }
     if (source === "customWeapons") {
-      patchInv("customWeapons", (arr) => [...arr, buildCustomWeaponSavePayload(buildCustomWeaponFormState(null))]);
+      patchInv("customWeapons", (arr) => [
+        ...arr,
+        buildCustomWeaponSavePayload(buildCustomWeaponFormState(null)),
+      ]);
       return;
     }
     if (source === "shields") {
-      patchInv("shields", (arr) => [...arr, buildShieldSavePayload(buildShieldFormState(null))]);
+      patchInv("shields", (arr) => [
+        ...arr,
+        buildShieldSavePayload(buildShieldFormState(null)),
+      ]);
       return;
     }
     if (source === "armor") {
-      patchInv("armor", (arr) => [...arr, buildArmorSavePayload(buildArmorFormState(null))]);
+      patchInv("armor", (arr) => [
+        ...arr,
+        buildArmorSavePayload(buildArmorFormState(null)),
+      ]);
       return;
     }
     if (source === "accessories") {
-      patchInv("accessories", (arr) => [...arr, buildAccessorySavePayload(buildAccessoryFormState(null))]);
+      patchInv("accessories", (arr) => [
+        ...arr,
+        buildAccessorySavePayload(buildAccessoryFormState(null)),
+      ]);
     }
   };
 
   const handleImportFromCompendium = (type, item) => {
     if (type === "weapons") {
-      patchInv("weapons", (arr) => [...arr, normalizeWeaponLike({ ...item, base: item, name: item.name, isEquipped: false })]);
+      patchInv("weapons", (arr) => [
+        ...arr,
+        normalizeWeaponLike({
+          ...item,
+          base: item,
+          name: item.name,
+          isEquipped: false,
+        }),
+      ]);
       return;
     }
     if (type === "custom-weapons") {
-      patchInv("customWeapons", (arr) => [...arr, { ...item, isEquipped: false }]);
+      patchInv("customWeapons", (arr) => [
+        ...arr,
+        { ...item, isEquipped: false },
+      ]);
       return;
     }
     if (type === "armor") {
@@ -631,13 +846,24 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
       return;
     }
     if (type === "accessories") {
-      patchInv("accessories", (arr) => [...arr, { ...item, isEquipped: false }]);
+      patchInv("accessories", (arr) => [
+        ...arr,
+        { ...item, isEquipped: false },
+      ]);
     }
   };
 
   return (
     <>
-      <Paper elevation={3} sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: "secondary.main" }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: "15px",
+          borderRadius: "8px",
+          border: "2px solid",
+          borderColor: "secondary.main",
+        }}
+      >
         <Stack spacing={2}>
           <EquipmentGroup
             title="Weapon"
@@ -646,7 +872,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             setPlayer={setPlayer}
             canEdit={isEditMode}
             headerType="top"
-            onOpenCompendium={() => { setCompendiumType("weapons"); setCompendiumOpen(true); }}
+            onOpenCompendium={() => {
+              setCompendiumType("weapons");
+              setCompendiumOpen(true);
+            }}
             onAddItem={() => handleAddNew("weapons")}
             onEditItem={openEditDialog}
           />
@@ -657,7 +886,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             setPlayer={setPlayer}
             canEdit={isEditMode}
             headerType="middle"
-            onOpenCompendium={() => { setCompendiumType("custom-weapons"); setCompendiumOpen(true); }}
+            onOpenCompendium={() => {
+              setCompendiumType("custom-weapons");
+              setCompendiumOpen(true);
+            }}
             onAddItem={() => handleAddNew("customWeapons")}
             onEditItem={openEditDialog}
           />
@@ -668,7 +900,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             setPlayer={setPlayer}
             canEdit={isEditMode}
             headerType="middle"
-            onOpenCompendium={() => { setCompendiumType("shields"); setCompendiumOpen(true); }}
+            onOpenCompendium={() => {
+              setCompendiumType("shields");
+              setCompendiumOpen(true);
+            }}
             onAddItem={() => handleAddNew("shields")}
             onEditItem={openEditDialog}
           />
@@ -679,7 +914,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             setPlayer={setPlayer}
             canEdit={isEditMode}
             headerType="middle"
-            onOpenCompendium={() => { setCompendiumType("armor"); setCompendiumOpen(true); }}
+            onOpenCompendium={() => {
+              setCompendiumType("armor");
+              setCompendiumOpen(true);
+            }}
             onAddItem={() => handleAddNew("armor")}
             onEditItem={openEditDialog}
           />
@@ -690,7 +928,10 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
             setPlayer={setPlayer}
             canEdit={isEditMode}
             headerType="middle"
-            onOpenCompendium={() => { setCompendiumType("accessories"); setCompendiumOpen(true); }}
+            onOpenCompendium={() => {
+              setCompendiumType("accessories");
+              setCompendiumOpen(true);
+            }}
             onAddItem={() => handleAddNew("accessories")}
             onEditItem={openEditDialog}
           />

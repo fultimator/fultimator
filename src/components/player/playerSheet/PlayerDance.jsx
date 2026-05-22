@@ -50,7 +50,8 @@ export default function PlayerDance({ player }) {
       speaker: player?.name || "Player",
       kind: "display",
       itemType: "spell",
-      name: dance.name === "dance_custom_name" ? dance.customName : t(dance.name),
+      name:
+        dance.name === "dance_custom_name" ? dance.customName : t(dance.name),
       tags: [t("Dance"), danceSpell.className || t("Unknown")],
       description: dance.description || "",
     });
@@ -112,7 +113,11 @@ export default function PlayerDance({ player }) {
                     danceSpell.dances.map((dance, dIndex) => (
                       <ItemNameRow
                         key={`${dsIndex}-${dIndex}`}
-                        name={dance.name === "dance_custom_name" ? dance.customName : t(dance.name)}
+                        name={
+                          dance.name === "dance_custom_name"
+                            ? dance.customName
+                            : t(dance.name)
+                        }
                       >
                         <Tooltip title={t("Info")}>
                           <IconButton

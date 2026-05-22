@@ -197,7 +197,14 @@ function AffinityImg({ name, disabled, alt, size = "1.5em" }) {
 }
 
 export function PhysicalIcon({ disabled, size }) {
-  return <AffinityImg name="physical" disabled={disabled} alt="Physical" size={size} />;
+  return (
+    <AffinityImg
+      name="physical"
+      disabled={disabled}
+      alt="Physical"
+      size={size}
+    />
+  );
 }
 
 export function AirIcon({ disabled, size }) {
@@ -216,7 +223,9 @@ export function DarkIcon({ disabled, size }) {
 }
 
 export function EarthIcon({ disabled, size }) {
-  return <AffinityImg name="earth" disabled={disabled} alt="Earth" size={size} />;
+  return (
+    <AffinityImg name="earth" disabled={disabled} alt="Earth" size={size} />
+  );
 }
 
 export function FireIcon({ disabled, size }) {
@@ -228,11 +237,15 @@ export function IceIcon({ disabled, size }) {
 }
 
 export function LightIcon({ disabled, size }) {
-  return <AffinityImg name="light" disabled={disabled} alt="Light" size={size} />;
+  return (
+    <AffinityImg name="light" disabled={disabled} alt="Light" size={size} />
+  );
 }
 
 export function PoisonIcon({ disabled, size }) {
-  return <AffinityImg name="poison" disabled={disabled} alt="Poison" size={size} />;
+  return (
+    <AffinityImg name="poison" disabled={disabled} alt="Poison" size={size} />
+  );
 }
 
 export function UntypedIcon({ disabled }) {

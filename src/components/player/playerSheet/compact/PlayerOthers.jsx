@@ -69,7 +69,13 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
-function OtherItemRow({ other, index, setPlayer, searchQuery, normalizedQuery }) {
+function OtherItemRow({
+  other,
+  index,
+  setPlayer,
+  searchQuery,
+  normalizedQuery,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
@@ -89,7 +95,12 @@ function OtherItemRow({ other, index, setPlayer, searchQuery, normalizedQuery })
     });
   };
 
-  const { filledCount: filled, increment, decrement, reset } = useClock(sections, clockState, persistState);
+  const {
+    filledCount: filled,
+    increment,
+    decrement,
+    reset,
+  } = useClock(sections, clockState, persistState);
 
   const otherKey = `other-${index}`;
   const hasDetails = other.description || other.effect;
@@ -172,7 +183,7 @@ function OtherItemRow({ other, index, setPlayer, searchQuery, normalizedQuery })
               numSections={sections}
               size={28}
               state={clockState}
-              setState={() => { }}
+              setState={() => {}}
               isCharacterSheet={true}
             />
           </StyledTableCell>
@@ -231,11 +242,7 @@ function OtherItemRow({ other, index, setPlayer, searchQuery, normalizedQuery })
                 <Add fontSize="small" />
               </IconButton>
               <Tooltip title={t("Reset")} arrow>
-                <IconButton
-                  size="small"
-                  onClick={reset}
-                  sx={{ p: "2px" }}
-                >
+                <IconButton size="small" onClick={reset} sx={{ p: "2px" }}>
                   <RestartAlt fontSize="small" />
                 </IconButton>
               </Tooltip>

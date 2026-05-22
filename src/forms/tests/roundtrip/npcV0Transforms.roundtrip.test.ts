@@ -100,7 +100,9 @@ describe("NPC v0 transform compatibility", () => {
     expect(migrated.attacks?.[0]?.damage?.type).toBe("air");
     expect(migrated.weaponattacks?.[0]?.damage?.type).toBe("air");
     expect(migrated.spells?.[0]?.damage?.type).toBe("air");
-    expect((migrated as unknown as Record<string, unknown>).sheild).toBeUndefined();
+    expect(
+      (migrated as unknown as Record<string, unknown>).sheild,
+    ).toBeUndefined();
   });
 
   it("migrates a fully-populated legacy npc with all option buckets filled", () => {
@@ -143,8 +145,20 @@ describe("NPC v0 transform compatibility", () => {
         magic: true,
         statusImmunity: 2,
       },
-      armor: { name: "Abyss Plate", martial: true, cost: 5000, def: 4, mdef: 3 },
-      shield: { name: "Void Guard", martial: true, cost: 2800, def: 2, mdef: 2 },
+      armor: {
+        name: "Abyss Plate",
+        martial: true,
+        cost: 5000,
+        def: 4,
+        mdef: 3,
+      },
+      shield: {
+        name: "Void Guard",
+        martial: true,
+        cost: 2800,
+        def: 2,
+        mdef: 2,
+      },
       attacks: [
         {
           name: "Rend",

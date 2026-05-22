@@ -143,19 +143,25 @@ describe("Player v0 transform compatibility", () => {
               name: "Old Gift",
               class: "Esper",
               spellType: "gift",
-              gifts: [{ name: "esper_gift_custom_name", event: "x", effect: "y" }],
+              gifts: [
+                { name: "esper_gift_custom_name", event: "x", effect: "y" },
+              ],
             },
             {
               name: "Old Dance",
               class: "Dancer",
               spellType: "dance",
-              dances: [{ name: "dance_custom", duration: "Scene", effect: "z" }],
+              dances: [
+                { name: "dance_custom", duration: "Scene", effect: "z" },
+              ],
             },
             {
               name: "Old Therioform",
               class: "Mutant",
               spellType: "therioform",
-              therioforms: [{ name: "mutant_therioform_custom_name", description: "shape" }],
+              therioforms: [
+                { name: "mutant_therioform_custom_name", description: "shape" },
+              ],
             },
             {
               name: "Old Magichant",
@@ -177,7 +183,9 @@ describe("Player v0 transform compatibility", () => {
               innerWellspring: true,
               chosenWellspring: "Air",
               activeWellsprings: ["Fire", "Water"],
-              invocations: [{ name: "invoker_custom_name", type: "Blast", effect: "boom" }],
+              invocations: [
+                { name: "invoker_custom_name", type: "Blast", effect: "boom" },
+              ],
             },
             {
               name: "Old Gamble",
@@ -200,15 +208,24 @@ describe("Player v0 transform compatibility", () => {
               class: "Gourmet",
               spellType: "cooking",
               cookbookEffects: {
-                "earth_fire": { taste1: "earth", taste2: "fire", effect: "burn" },
+                earth_fire: { taste1: "earth", taste2: "fire", effect: "burn" },
               },
-              ingredientInventory: [{ id: "i1", name: "Salt", quantity: 2, taste: "earth" }],
+              ingredientInventory: [
+                { id: "i1", name: "Salt", quantity: 2, taste: "earth" },
+              ],
             },
             {
               name: "Old Magiseed",
               class: "Floralist",
               spellType: "magiseed",
-              magiseeds: [{ name: "magiseed_custom", description: "seed", rangeStart: 1, rangeEnd: 4 }],
+              magiseeds: [
+                {
+                  name: "magiseed_custom",
+                  description: "seed",
+                  rangeStart: 1,
+                  rangeEnd: 4,
+                },
+              ],
             },
             {
               name: "Old Pilot",
@@ -272,8 +289,12 @@ describe("Player v0 transform compatibility", () => {
           isEquipped: true,
         },
       ],
-      armor: [{ name: "Old Armor", martial: true, cost: 1200, isEquipped: true }],
-      shields: [{ name: "Old Shield", martial: false, cost: 500, isEquipped: true }],
+      armor: [
+        { name: "Old Armor", martial: true, cost: 1200, isEquipped: true },
+      ],
+      shields: [
+        { name: "Old Shield", martial: false, cost: 500, isEquipped: true },
+      ],
       accessories: [{ name: "Old Ring", cost: 300, isEquipped: true }],
       equipment: [
         {
@@ -313,7 +334,9 @@ describe("Player v0 transform compatibility", () => {
     expect(Array.isArray(migrated.equipment)).toBe(true);
     expect(migrated.equipment[0]).toBeDefined();
     expect(Array.isArray(migrated.classes)).toBe(true);
-    expect(migrated.classes.length).toBeGreaterThanOrEqual(ALL_CLASS_NAMES.length);
+    expect(migrated.classes.length).toBeGreaterThanOrEqual(
+      ALL_CLASS_NAMES.length,
+    );
     expect(Array.isArray(migrated.notes)).toBe(true);
     expect(typeof migrated.attributes.willpower.base).toBe("number");
     expect(migrated.resources?.hp).toBeDefined();
@@ -342,16 +365,31 @@ describe("Player v0 transform compatibility", () => {
     const spells = migrated.classes[0].spells as unknown as Array<
       Record<string, unknown>
     >;
-    const findSpell = (type: string) => spells.find((s) => s.spellType === type);
-    expect((findSpell("gift")?.gifts as Array<Record<string, unknown>>)?.[0]?.key).toBeDefined();
-    expect((findSpell("dance")?.dances as Array<Record<string, unknown>>)?.[0]?.key).toBeDefined();
+    const findSpell = (type: string) =>
+      spells.find((s) => s.spellType === type);
     expect(
-      (findSpell("therioform")?.therioforms as Array<Record<string, unknown>>)?.[0]
+      (findSpell("gift")?.gifts as Array<Record<string, unknown>>)?.[0]?.key,
+    ).toBeDefined();
+    expect(
+      (findSpell("dance")?.dances as Array<Record<string, unknown>>)?.[0]?.key,
+    ).toBeDefined();
+    expect(
+      (
+        findSpell("therioform")?.therioforms as Array<Record<string, unknown>>
+      )?.[0]?.key,
+    ).toBeDefined();
+    expect(
+      (findSpell("symbol")?.symbols as Array<Record<string, unknown>>)?.[0]
         ?.key,
     ).toBeDefined();
-    expect((findSpell("symbol")?.symbols as Array<Record<string, unknown>>)?.[0]?.key).toBeDefined();
-    expect((findSpell("magichant")?.keys as Array<Record<string, unknown>>)?.[0]?.key).toBeDefined();
-    expect((findSpell("magichant")?.tones as Array<Record<string, unknown>>)?.[0]?.key).toBeDefined();
+    expect(
+      (findSpell("magichant")?.keys as Array<Record<string, unknown>>)?.[0]
+        ?.key,
+    ).toBeDefined();
+    expect(
+      (findSpell("magichant")?.tones as Array<Record<string, unknown>>)?.[0]
+        ?.key,
+    ).toBeDefined();
     expect(findSpell("invocation")?.tracker).toBeDefined();
     expect(findSpell("invocation")?.activeWellsprings).toBeUndefined();
     expect(findSpell("cooking")?.cookbook).toBeDefined();

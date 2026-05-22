@@ -160,7 +160,9 @@ export default function CharacterSheet() {
   useEffect(() => {
     if (!player || !playerDataBaseline) return;
     const timer = setTimeout(() => {
-      setIsUpdated(!deepEqual(applyPreSaveTransforms(player), playerDataBaseline));
+      setIsUpdated(
+        !deepEqual(applyPreSaveTransforms(player), playerDataBaseline),
+      );
     }, 300);
     return () => clearTimeout(timer);
   }, [player, playerDataBaseline]);
@@ -676,7 +678,7 @@ export default function CharacterSheet() {
                 {optionalRules.technospheres &&
                   ["integrated", "mnemospheres"].includes(
                     player?.settings?.optionalRules?.technospheresVariant ??
-                    "standard",
+                      "standard",
                   ) && (
                     <MnemoReceptaclePanel
                       player={player}
@@ -834,10 +836,7 @@ export default function CharacterSheet() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            onClick={closeCelebration}
-          >
+          <Button variant="contained" onClick={closeCelebration}>
             {t("OK")}
           </Button>
         </DialogActions>

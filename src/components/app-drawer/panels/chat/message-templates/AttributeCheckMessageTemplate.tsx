@@ -96,7 +96,12 @@ export const AttributeCheckMessageTemplate: React.FC<
         <Typography
           variant="caption"
           color="text.secondary"
-          sx={{ textTransform: "uppercase", letterSpacing: "0.04em", fontSize: "0.8rem", fontWeight: 700 }}
+          sx={{
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            fontSize: "0.8rem",
+            fontWeight: 700,
+          }}
         >
           Attribute Check
           {originLabel && (

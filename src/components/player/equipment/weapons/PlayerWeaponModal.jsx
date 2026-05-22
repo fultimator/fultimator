@@ -44,7 +44,9 @@ export default function PlayerWeaponModal({
   onDeleteWeapon,
 }) {
   const { t } = useTranslate();
-  const [formState, setFormState] = useState(() => buildWeaponFormState(weapon));
+  const [formState, setFormState] = useState(() =>
+    buildWeaponFormState(weapon),
+  );
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -110,7 +112,10 @@ export default function PlayerWeaponModal({
     if (import.meta.env.DEV) {
       const result = validateWeaponPersisted(updatedWeapon);
       if (!result.success) {
-        console.warn("[PlayerWeaponModal] weapon schema validation failed", result.error.issues);
+        console.warn(
+          "[PlayerWeaponModal] weapon schema validation failed",
+          result.error.issues,
+        );
       }
     }
     onAddWeapon(updatedWeapon);

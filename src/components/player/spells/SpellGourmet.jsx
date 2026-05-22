@@ -280,7 +280,7 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
                     fontWeight: "bold",
                   }}
                 >
-                  {effect.tasteCombination || "—"}
+                  {effect.tasteCombination || "-"}
                 </Typography>
               </Box>
               <Box sx={{ flex: 1 }}>

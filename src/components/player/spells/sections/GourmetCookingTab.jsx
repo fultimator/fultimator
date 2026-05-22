@@ -73,7 +73,10 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
   const [choiceDialogOpen, setChoiceDialogOpen] = useState(false);
   const [choiceDialogRolls, setChoiceDialogRolls] = useState([]);
 
-  const cookbook = formState.cookbook || { effects: [], ingredientInventory: [] };
+  const cookbook = formState.cookbook || {
+    effects: [],
+    ingredientInventory: [],
+  };
   const ingredientInventory = useMemo(
     () => cookbook.ingredientInventory || [],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -236,7 +239,10 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
     if (!rollResult || rollResult.type !== "effect") return;
 
     setFormState((prev) => {
-      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
       const combo = getTasteCombinations(t).find(
         (c) => c.key === targetCombination,
       );
@@ -311,7 +317,10 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
     }
 
     setFormState((prev) => {
-      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
       const inventory = [...(prevCookbook.ingredientInventory || [])];
 
       rolls.forEach((roll) => {
@@ -354,7 +363,10 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
     if (invalidChoice) return;
 
     setFormState((prev) => {
-      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
       const inventory = [...(prevCookbook.ingredientInventory || [])];
 
       choiceDialogRolls.forEach((roll) => {
@@ -414,7 +426,10 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
     if (!name || !shopIngredientTaste) return;
 
     setFormState((prev) => {
-      const prevCookbook = prev.cookbook || { effects: [], ingredientInventory: [] };
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
       const inventory = [...(prevCookbook.ingredientInventory || [])];
       const existingIndex = inventory.findIndex(
         (item) =>

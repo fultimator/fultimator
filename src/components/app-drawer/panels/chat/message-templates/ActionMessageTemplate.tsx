@@ -70,7 +70,9 @@ export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
   const actionKey = String(message.action || "").toLowerCase();
   const labelCandidates = ACTION_LABEL_KEY[actionKey] ?? [actionKey];
   const ruleCandidates = ACTION_RULE_KEY[actionKey] ?? [`${actionKey}_rule`];
-  const label = toTitleCase(resolveLocalizedKey(labelCandidates, message.action));
+  const label = toTitleCase(
+    resolveLocalizedKey(labelCandidates, message.action),
+  );
   const description = resolveLocalizedKey(ruleCandidates, "");
   const actionIconSrc = ACTION_ICON_SRC[actionKey];
 
@@ -103,11 +105,18 @@ export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
               component="img"
               src={actionIconSrc}
               alt={label}
-              sx={{ width: 32, height: 32, objectFit: "contain", display: "block" }}
+              sx={{
+                width: 32,
+                height: 32,
+                objectFit: "contain",
+                display: "block",
+              }}
             />
           </Box>
         )}
-        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, minWidth: 0 }}>
+        <Box
+          sx={{ display: "flex", alignItems: "baseline", gap: 1, minWidth: 0 }}
+        >
           <Typography variant="body1" sx={{ fontWeight: 700 }}>
             {label}
           </Typography>

@@ -103,7 +103,8 @@ function ThemedSpellInvoker({
                   color: "#4CAF50",
                 }}
               >
-                + {t("invoker_invocation_inner")}: {invokerTracker.chosenWellspring}
+                + {t("invoker_invocation_inner")}:{" "}
+                {invokerTracker.chosenWellspring}
               </Typography>
             )}
             <Typography
@@ -131,7 +132,8 @@ function ThemedSpellInvoker({
             ].map((wellspring) => {
               const wellspringColor = getWellspringColor(wellspring.name);
               const isActive =
-                invokerTracker.activeWellsprings?.includes(wellspring.name) || false;
+                invokerTracker.activeWellsprings?.includes(wellspring.name) ||
+                false;
               const isInnerWellspring =
                 invokerTracker.innerWellspring &&
                 invokerTracker.chosenWellspring === wellspring.name;

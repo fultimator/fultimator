@@ -99,7 +99,10 @@ export function normalizeCustomWeapon(data: unknown): CustomWeapon {
 
 function normalizeAccuracyCheck(
   value: unknown,
-  fallback = { attr1: accuracyChecks[0].att1 as Attributes, attr2: accuracyChecks[0].att2 as Attributes },
+  fallback = {
+    attr1: accuracyChecks[0].att1 as Attributes,
+    attr2: accuracyChecks[0].att2 as Attributes,
+  },
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const v = value as any;
@@ -110,12 +113,15 @@ function normalizeAccuracyCheck(
     ? v[1]
     : (v?.accuracy?.attr2 ?? v?.attr2 ?? v?.att2 ?? v?.accuracy?.att2);
   const validAttrs = ["dexterity", "insight", "might", "will"];
-  if (validAttrs.includes(attr1) && validAttrs.includes(attr2)) return { attr1, attr2 };
+  if (validAttrs.includes(attr1) && validAttrs.includes(attr2))
+    return { attr1, attr2 };
   return fallback;
 }
 
 export interface PlayerShape {
-  settings?: { optionalRules?: { technospheres?: boolean; technospheresVariant?: string } };
+  settings?: {
+    optionalRules?: { technospheres?: boolean; technospheresVariant?: string };
+  };
   info?: { zenit?: number };
   equipment?: Array<{
     hoplospheres?: Array<{ id: string; requiredSlots?: number }>;
@@ -136,10 +142,16 @@ export function buildCustomWeaponFormState(
   item?: Partial<CustomWeaponPersisted> | null,
   ctx?: CustomWeaponCtx,
 ): CustomWeaponFormStateLoose {
-  const isTechnospheres = ctx?.player?.settings?.optionalRules?.technospheres ?? false;
-  const technospheresVariant = ctx?.player?.settings?.optionalRules?.technospheresVariant ?? "standard";
-  const isSlotsVariant = isTechnospheres && technospheresVariant !== "mnemospheres";
-  const isIntegrated = isTechnospheres && (technospheresVariant === "integrated" || technospheresVariant === "hoplospheres");
+  const isTechnospheres =
+    ctx?.player?.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    ctx?.player?.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const isSlotsVariant =
+    isTechnospheres && technospheresVariant !== "mnemospheres";
+  const isIntegrated =
+    isTechnospheres &&
+    (technospheresVariant === "integrated" ||
+      technospheresVariant === "hoplospheres");
 
   if (!item) {
     return {
@@ -149,10 +161,20 @@ export function buildCustomWeaponFormState(
       range: "melee",
       hands: 2,
       martial: false,
-      accuracy: { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 0, type: "physical", hrZero: false },
       modifiers: { damage: 0, accuracy: 0, def: 0, mdef: 0 },
-      rare: { accuracyBonus: false, damageBonus: false, overrideDamageType: false, overrideAccuracyAttributes: false },
+      rare: {
+        accuracyBonus: false,
+        damageBonus: false,
+        overrideDamageType: false,
+        overrideAccuracyAttributes: false,
+      },
       customizations: [],
       quality: "",
       qualityCost: 0,
@@ -172,7 +194,10 @@ export function buildCustomWeaponFormState(
       isEquipped: false,
       selectedCategory: categories[0],
       selectedRange: "melee",
-      selectedAccuracyCheck: { attr1: accuracyChecks[0].att1, attr2: accuracyChecks[0].att2 },
+      selectedAccuracyCheck: {
+        attr1: accuracyChecks[0].att1,
+        attr2: accuracyChecks[0].att2,
+      },
       customDamageType: "physical",
       primaryHrZero: false,
       rareAccuracyBonus: false,
@@ -187,7 +212,10 @@ export function buildCustomWeaponFormState(
       secondWeaponName: "",
       secondSelectedCategory: categories[0],
       secondSelectedRange: "melee",
-      secondSelectedAccuracyCheck: { attr1: accuracyChecks[0].att1, attr2: accuracyChecks[0].att2 },
+      secondSelectedAccuracyCheck: {
+        attr1: accuracyChecks[0].att1,
+        attr2: accuracyChecks[0].att2,
+      },
       secondaryHrZero: false,
       secondOverrideDamageType: false,
       secondCustomDamageType: "physical",
@@ -206,24 +234,29 @@ export function buildCustomWeaponFormState(
   const selectedAccuracyCheck = overrideAccuracyAttributes
     ? normalizeAccuracyCheck(ac)
     : (() => {
-        const found = accuracyChecks.find(
-          (c) => c.att1 === ac?.attr1 && c.att2 === ac?.attr2,
-        ) ?? accuracyChecks[0];
+        const found =
+          accuracyChecks.find(
+            (c) => c.att1 === ac?.attr1 && c.att2 === ac?.attr2,
+          ) ?? accuracyChecks[0];
         return { attr1: found.att1, attr2: found.att2 };
       })();
 
   const secondAc = item.secondAccuracy;
   const secondSelectedAccuracyCheck = (() => {
-    const found = accuracyChecks.find(
-      (c) => c.att1 === secondAc?.attr1 && c.att2 === secondAc?.attr2,
-    ) ?? accuracyChecks[0];
+    const found =
+      accuracyChecks.find(
+        (c) => c.att1 === secondAc?.attr1 && c.att2 === secondAc?.attr2,
+      ) ?? accuracyChecks[0];
     return { attr1: found.att1, attr2: found.att2 };
   })();
 
   const overrideDamageType = rare?.overrideDamageType ?? false;
-  const customDamageType = rare?.overrideDamageTypeValue ?? item.damage?.type ?? "physical";
+  const customDamageType =
+    rare?.overrideDamageTypeValue ?? item.damage?.type ?? "physical";
   const currentCustomizations = item.customizations ?? [];
-  const hasTransforming = currentCustomizations.some((c) => c.name === "weapon_customization_transforming");
+  const hasTransforming = currentCustomizations.some(
+    (c) => c.name === "weapon_customization_transforming",
+  );
 
   return {
     itemType: "customWeapon",
@@ -232,7 +265,12 @@ export function buildCustomWeaponFormState(
     range: item.range ?? "melee",
     hands: item.hands ?? 2,
     martial: item.martial ?? false,
-    accuracy: item.accuracy ?? { attr1: "dexterity", attr2: "insight", value: 0, defense: "def" },
+    accuracy: item.accuracy ?? {
+      attr1: "dexterity",
+      attr2: "insight",
+      value: 0,
+      defense: "def",
+    },
     damage: item.damage ?? { value: 0, type: "physical", hrZero: false },
     modifiers: item.modifiers ?? { damage: 0, accuracy: 0, def: 0, mdef: 0 },
     rare: {
@@ -255,7 +293,12 @@ export function buildCustomWeaponFormState(
     secondRange: item.secondRange ?? "melee",
     secondAccuracy: item.secondAccuracy,
     secondDamage: item.secondDamage,
-    secondModifiers: item.secondModifiers ?? { damage: 0, accuracy: 0, def: 0, mdef: 0 },
+    secondModifiers: item.secondModifiers ?? {
+      damage: 0,
+      accuracy: 0,
+      def: 0,
+      mdef: 0,
+    },
     secondCustomizations: item.secondCustomizations ?? [],
     dataType: "weapon",
     selectedQuality: item.selectedQuality ?? "",
@@ -280,7 +323,9 @@ export function buildCustomWeaponFormState(
     secondSelectedRange: item.secondRange ?? "melee",
     secondSelectedAccuracyCheck,
     secondaryHrZero: item.secondDamage?.hrZero === true,
-    secondOverrideDamageType: !!(item.secondDamage?.type && item.secondDamage.type !== "physical"),
+    secondOverrideDamageType: !!(
+      item.secondDamage?.type && item.secondDamage.type !== "physical"
+    ),
     secondCustomDamageType: item.secondDamage?.type ?? "physical",
     secondPrecModifier: item.secondModifiers?.accuracy ?? 0,
     secondDamageModifier: item.secondModifiers?.damage ?? 0,
@@ -291,7 +336,10 @@ export function buildCustomWeaponFormState(
   };
 }
 
-export function buildCustomWeaponSavePayload(formState: CustomWeaponFormStateLoose, originalItem?: CustomWeaponFormStateLoose | null): CustomWeaponFormStateLoose {
+export function buildCustomWeaponSavePayload(
+  formState: CustomWeaponFormStateLoose,
+  originalItem?: CustomWeaponFormStateLoose | null,
+): CustomWeaponFormStateLoose {
   const { precision, damage: dmgVal } = calculateCustomWeaponStats(
     {
       category: formState.selectedCategory,
@@ -313,8 +361,12 @@ export function buildCustomWeaponSavePayload(formState: CustomWeaponFormStateLoo
       ? formState.customDamageType
       : "physical";
 
-  let secondAccuracy: { attr1: string; attr2: string; value: number; defense: string } | undefined;
-  let secondDamage: { value: number; type: string; hrZero: boolean } | undefined;
+  let secondAccuracy:
+    | { attr1: string; attr2: string; value: number; defense: string }
+    | undefined;
+  let secondDamage:
+    | { value: number; type: string; hrZero: boolean }
+    | undefined;
   if (formState.hasTransforming) {
     const { precision: s2prec, damage: s2dmg } = calculateCustomWeaponStats(
       {
@@ -341,7 +393,11 @@ export function buildCustomWeaponSavePayload(formState: CustomWeaponFormStateLoo
       value: s2prec,
       defense: "def",
     };
-    secondDamage = { value: s2dmg, type: s2DamageType, hrZero: formState.secondaryHrZero };
+    secondDamage = {
+      value: s2dmg,
+      type: s2DamageType,
+      hrZero: formState.secondaryHrZero,
+    };
   }
 
   return {
@@ -355,7 +411,11 @@ export function buildCustomWeaponSavePayload(formState: CustomWeaponFormStateLoo
       value: precision,
       defense: "def",
     },
-    damage: { value: dmgVal, type: resolvedDamageType, hrZero: formState.primaryHrZero },
+    damage: {
+      value: dmgVal,
+      type: resolvedDamageType,
+      hrZero: formState.primaryHrZero,
+    },
     modifiers: {
       damage: parseInt(formState.damageModifier) || 0,
       accuracy: parseInt(formState.precModifier) || 0,
@@ -405,8 +465,10 @@ export function getCustomWeaponSlotCostInfo(
 ): { delta: number; currentZenit: number; cannotAfford: boolean } | null {
   if (!formState.isSlotsVariant) return null;
   const paidSlots = originalItem?.slots ?? "alpha";
-  const paidTier = SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
-  const selectedTier = SLOT_TIERS.find((t) => t.value === formState.slots) ?? SLOT_TIERS[0];
+  const paidTier =
+    SLOT_TIERS.find((t) => t.value === paidSlots) ?? SLOT_TIERS[0];
+  const selectedTier =
+    SLOT_TIERS.find((t) => t.value === formState.slots) ?? SLOT_TIERS[0];
   const delta = selectedTier.cost - paidTier.cost;
   const currentZenit = ctx?.player?.info?.zenit ?? 0;
   return { delta, currentZenit, cannotAfford: delta > currentZenit };
@@ -424,7 +486,10 @@ export function applyCustomWeaponSlotTierChange(
   for (const id of (formState.slotted as string[]) ?? []) {
     const hoplo = hoplospheres.find((h) => h.id === id);
     const slotCost = hoplo?.requiredSlots ?? 1;
-    if (used + slotCost <= (tier?.slots ?? 1)) { kept.push(id); used += slotCost; }
+    if (used + slotCost <= (tier?.slots ?? 1)) {
+      kept.push(id);
+      used += slotCost;
+    }
   }
   return { ...formState, slots: newTier, slotted: kept };
 }
@@ -438,6 +503,9 @@ export function applyCustomWeaponZenitSideEffect(
   if (!info || info.delta === 0 || !ctx?.setPlayer) return;
   ctx.setPlayer((prev) => ({
     ...prev,
-    info: { ...(prev.info ?? {}), zenit: Math.max(0, (prev.info?.zenit ?? 0) - info.delta) },
+    info: {
+      ...(prev.info ?? {}),
+      zenit: Math.max(0, (prev.info?.zenit ?? 0) - info.delta),
+    },
   }));
 }

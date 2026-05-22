@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  ButtonBase,
-  Menu,
-  MenuItem,
-  Typography,
-} from "@mui/material";
+import { Box, ButtonBase, Menu, MenuItem, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import StatTooltip from "../../common/StatTooltip";
 import {
@@ -85,7 +79,13 @@ export function TypeAffinity({
       current={value}
       display="flex"
     >
-      <Box sx={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+      <Box
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <TypeIcon type={type} disabled={disabled} size={iconSize} />
       </Box>
     </StatTooltip>
@@ -93,7 +93,14 @@ export function TypeAffinity({
 
   if (!editable) {
     return (
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 0.5,
+        }}
+      >
         {iconNode}
         {normalizedAffinity && (
           <Typography

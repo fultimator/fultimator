@@ -72,11 +72,13 @@ export const WeaponFormStateSchema = z.object({
   att2: z.string().optional(),
   type: z.string().optional(),
   damageHrZero: z.boolean().default(false),
-  rareBonuses: z.object({
-    precBonus: z.boolean().default(false),
-    damageBonus: z.boolean().default(false),
-    damageReworkBonus: z.boolean().default(false),
-  }).optional(),
+  rareBonuses: z
+    .object({
+      precBonus: z.boolean().default(false),
+      damageBonus: z.boolean().default(false),
+      damageReworkBonus: z.boolean().default(false),
+    })
+    .optional(),
   precModifier: z.number().int().default(0),
   damageModifier: z.number().int().default(0),
   defModifier: z.number().int().default(0),
@@ -115,10 +117,15 @@ export function normalizeWeapon(data: unknown): Weapon {
 
 export type WeaponCtx = Record<string, never>;
 
-export function buildWeaponFormState(item?: Partial<WeaponPersisted> | null): WeaponPersisted {
-  const acc: Partial<z.infer<typeof WeaponAccuracySchema>> = item?.accuracy ?? {};
-  const dmg: Partial<z.infer<typeof WeaponDamageSchema>> = item?.damage && typeof item.damage === "object" ? item.damage : {};
-  const base = (item?.base as typeof allWeapons[0] | undefined) ?? allWeapons[0];
+export function buildWeaponFormState(
+  item?: Partial<WeaponPersisted> | null,
+): WeaponPersisted {
+  const acc: Partial<z.infer<typeof WeaponAccuracySchema>> =
+    item?.accuracy ?? {};
+  const dmg: Partial<z.infer<typeof WeaponDamageSchema>> =
+    item?.damage && typeof item.damage === "object" ? item.damage : {};
+  const base =
+    (item?.base as (typeof allWeapons)[0] | undefined) ?? allWeapons[0];
   const att1 = acc.attr1 ?? item?.att1 ?? getWeaponAttr1(allWeapons[0]);
   const att2 = acc.attr2 ?? item?.att2 ?? getWeaponAttr2(allWeapons[0]);
   const type = dmg.type ?? item?.type ?? getWeaponType(allWeapons[0]);
@@ -154,7 +161,12 @@ export function buildWeaponFormState(item?: Partial<WeaponPersisted> | null): We
     mDefModifier: item?.modifiers?.mdef ?? item?.mDefModifier ?? 0,
     isEquipped: item?.isEquipped ?? false,
     // Populate nested objects so WeaponPersistedSchema validation passes.
-    accuracy: { attr1: att1, attr2: att2, value: acc.value ?? 0, defense: acc.defense ?? "def" },
+    accuracy: {
+      attr1: att1,
+      attr2: att2,
+      value: acc.value ?? 0,
+      defense: acc.defense ?? "def",
+    },
     damage: { value: dmg.value ?? 0, type, hrZero: damageHrZero },
     itemType: "weapon",
     book: item?.book ?? "homebrew",
@@ -165,21 +177,74 @@ export function buildWeaponSavePayload(
   formState: WeaponPersisted,
   originalItem?: Partial<WeaponPersisted> | null,
 ): WeaponPersisted {
-  const { base, name, category, type, hands, att1, att2, martial,
-    damageHrZero, damageBonus, damageReworkBonus, precBonus, rework,
-    quality, qualityName, qualityCost, totalBonus, selectedQuality,
-    precModifier, damageModifier, defModifier, mDefModifier, isEquipped, fuid } = formState;
+  const {
+    base,
+    name,
+    category,
+    type,
+    hands,
+    att1,
+    att2,
+    martial,
+    damageHrZero,
+    damageBonus,
+    damageReworkBonus,
+    precBonus,
+    rework,
+    quality,
+    qualityName,
+    qualityCost,
+    totalBonus,
+    selectedQuality,
+    precModifier,
+    damageModifier,
+    defModifier,
+    mDefModifier,
+    isEquipped,
+    fuid,
+  } = formState;
 
-  const savedCost = calcWeaponCost({ base, type, att1, att2, rework, damageBonus, precBonus, qualityCost });
-  const savedDamage = calcWeaponDamage({ base, hands, rework, damageBonus, damageReworkBonus, damageModifier, cost: savedCost });
+  const savedCost = calcWeaponCost({
+    base,
+    type,
+    att1,
+    att2,
+    rework,
+    damageBonus,
+    precBonus,
+    qualityCost,
+  });
+  const savedDamage = calcWeaponDamage({
+    base,
+    hands,
+    rework,
+    damageBonus,
+    damageReworkBonus,
+    damageModifier,
+    cost: savedCost,
+  });
   const savedPrec = calcWeaponPrec({ base, rework, precBonus, precModifier });
 
   return normalizeWeaponLike({
-    base, name, category, fuid,
+    base,
+    name,
+    category,
+    fuid,
     range: getWeaponRange(base),
-    type, hands, att1, att2, martial,
-    damageBonus, damageReworkBonus, precBonus, rework,
-    quality, qualityName, qualityCost, totalBonus, selectedQuality,
+    type,
+    hands,
+    att1,
+    att2,
+    martial,
+    damageBonus,
+    damageReworkBonus,
+    precBonus,
+    rework,
+    quality,
+    qualityName,
+    qualityCost,
+    totalBonus,
+    selectedQuality,
     cost: savedCost,
     damage: { value: savedDamage, type, hrZero: damageHrZero },
     prec: savedPrec,
@@ -196,10 +261,39 @@ export function buildWeaponSavePayload(
 }
 
 export function calcWeaponPreview(formState: WeaponPersisted) {
-  const { base, type, att1, att2, rework, damageBonus, precBonus, qualityCost,
-    hands, damageReworkBonus, damageModifier, precModifier } = formState;
-  const cost = calcWeaponCost({ base, type, att1, att2, rework, damageBonus, precBonus, qualityCost });
-  const damage = calcWeaponDamage({ base, hands, rework, damageBonus, damageReworkBonus, damageModifier, cost });
+  const {
+    base,
+    type,
+    att1,
+    att2,
+    rework,
+    damageBonus,
+    precBonus,
+    qualityCost,
+    hands,
+    damageReworkBonus,
+    damageModifier,
+    precModifier,
+  } = formState;
+  const cost = calcWeaponCost({
+    base,
+    type,
+    att1,
+    att2,
+    rework,
+    damageBonus,
+    precBonus,
+    qualityCost,
+  });
+  const damage = calcWeaponDamage({
+    base,
+    hands,
+    rework,
+    damageBonus,
+    damageReworkBonus,
+    damageModifier,
+    cost,
+  });
   const prec = calcWeaponPrec({ base, rework, precBonus, precModifier });
   return { cost, damage, prec };
 }

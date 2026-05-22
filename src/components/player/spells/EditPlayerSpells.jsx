@@ -175,7 +175,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
   const spellTypeOptions = player.classes
     .filter(
-      (cls) => cls.benefits.spellClasses && cls.benefits.spellClasses.length > 0,
+      (cls) =>
+        cls.benefits.spellClasses && cls.benefits.spellClasses.length > 0,
     )
     .flatMap((cls) =>
       cls.benefits.spellClasses.map((spellType) => ({
@@ -193,16 +194,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
   const selectedSpellTypeOption =
     selectedClass && selectedSpell
-      ? spellTypeOptions.find(
+      ? (spellTypeOptions.find(
           (o) => o.className === selectedClass && o.spellType === selectedSpell,
-        ) ?? null
+        ) ?? null)
       : null;
 
   const handleSpellTypeOptionChange = (event, newValue) => {
     setSelectedClass(newValue ? newValue.className : null);
     setSelectedSpell(newValue ? newValue.spellType : null);
   };
-
 
   const buildBlankSpell = (spellType) => {
     if (spellType === "default")
@@ -969,7 +969,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     }
     if (singletonSpellTypes.has(spellType)) {
       const already = (
-        (player.classes.find((c) => c.name === className)?.spells) ?? []
+        player.classes.find((c) => c.name === className)?.spells ?? []
       ).some((sp) => sp.spellType === spellType);
       if (already) {
         const msg = `You already have a ${label} spell`;

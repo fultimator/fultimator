@@ -96,7 +96,10 @@ export default function PlayerArmorModal({
       const normalized = { ...buildArmorFormState(data, ctx), ...data };
       const validation = validateArmorPersisted(normalized);
       if (!validation.success) {
-        console.warn("[PlayerArmorModal] uploaded armor failed validation", validation.error.issues);
+        console.warn(
+          "[PlayerArmorModal] uploaded armor failed validation",
+          validation.error.issues,
+        );
         fileInputRef.current.value = null;
         return;
       }
@@ -111,7 +114,10 @@ export default function PlayerArmorModal({
     if (import.meta.env.DEV) {
       const result = validateArmorPersisted(updatedArmor);
       if (!result.success) {
-        console.warn("[PlayerArmorModal] armor schema validation failed", result.error.issues);
+        console.warn(
+          "[PlayerArmorModal] armor schema validation failed",
+          result.error.issues,
+        );
       }
     }
 

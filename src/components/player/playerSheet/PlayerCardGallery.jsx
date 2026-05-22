@@ -355,10 +355,25 @@ export default function PlayerCardGallery({
   const inCrisis = player.stats.hp.current <= player.stats.hp.max / 2;
 
   const ATTRIBUTES = [
-    { key: "dexterity", label: t("DEX"), curr: currDex, Icon: DexAttributeIcon },
-    { key: "insight", label: t("INS"), curr: currInsight, Icon: InsAttributeIcon },
+    {
+      key: "dexterity",
+      label: t("DEX"),
+      curr: currDex,
+      Icon: DexAttributeIcon,
+    },
+    {
+      key: "insight",
+      label: t("INS"),
+      curr: currInsight,
+      Icon: InsAttributeIcon,
+    },
     { key: "might", label: t("MIG"), curr: currMight, Icon: MigAttributeIcon },
-    { key: "willpower", label: t("WLP"), curr: currWillpower, Icon: WlpAttributeIcon },
+    {
+      key: "willpower",
+      label: t("WLP"),
+      curr: currWillpower,
+      Icon: WlpAttributeIcon,
+    },
   ];
   const visibleClasses = (player.classes || []).filter((c) => c && c.name);
   const hasDescription = Boolean(player.info?.description?.trim());

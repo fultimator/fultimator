@@ -4,7 +4,9 @@ import { useAppDrawerStore } from "../store/appDrawerStore";
 import { useTranslate } from "../translation/translate";
 
 export function useDrawerScrollTop(showScrollTop: boolean) {
-  const setDrawerBottomActions = useAppDrawerStore((s) => s.setDrawerBottomActions);
+  const setDrawerBottomActions = useAppDrawerStore(
+    (s) => s.setDrawerBottomActions,
+  );
   const { t } = useTranslate();
 
   useEffect(() => {
@@ -25,7 +27,9 @@ export function useDrawerScrollTop(showScrollTop: boolean) {
 
   useEffect(() => {
     return () => {
-      setDrawerBottomActions((prev) => prev.filter((a) => a.id !== "scroll-top"));
+      setDrawerBottomActions((prev) =>
+        prev.filter((a) => a.id !== "scroll-top"),
+      );
     };
   }, [setDrawerBottomActions]);
 }
@@ -35,7 +39,9 @@ export function useDrawerSave(options: {
   onSave: () => void;
 }) {
   const { canSave, onSave } = options;
-  const setDrawerBottomActions = useAppDrawerStore((s) => s.setDrawerBottomActions);
+  const setDrawerBottomActions = useAppDrawerStore(
+    (s) => s.setDrawerBottomActions,
+  );
   const { t } = useTranslate();
 
   useEffect(() => {

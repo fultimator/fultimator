@@ -316,13 +316,136 @@ export default function PlayerNotes({
               )}
             </Box>
             {/* Body */}
-            <Box sx={{ p: 1, flex: 1, display: "flex", flexDirection: "column" }}>
-
-            {note.clocks && note.clocks.length === 1 ? (
-              <Grid container spacing={1} sx={{ alignItems: "flex-start" }}>
-                <Grid size={{ xs: 12, sm: 8 }}>
+            <Box
+              sx={{ p: 1, flex: 1, display: "flex", flexDirection: "column" }}
+            >
+              {note.clocks && note.clocks.length === 1 ? (
+                <Grid container spacing={1} sx={{ alignItems: "flex-start" }}>
+                  <Grid size={{ xs: 12, sm: 8 }}>
+                    <Box
+                      sx={{
+                        bgcolor:
+                          theme.palette.mode === "dark"
+                            ? "rgba(255,255,255,0.03)"
+                            : "rgba(0,0,0,0.02)",
+                        p: 1,
+                        borderRadius: 1,
+                        border: "1px solid",
+                        borderColor:
+                          theme.palette.mode === "dark"
+                            ? "rgba(255,255,255,0.08)"
+                            : "rgba(0,0,0,0.05)",
+                      }}
+                    >
+                      <NotesMarkdown
+                        sx={{
+                          fontFamily: "PT Sans Narrow",
+                          fontSize: "0.95rem",
+                          lineHeight: 1.4,
+                          "& p": { margin: 0, mb: 0.5 },
+                        }}
+                      >
+                        {note.description}
+                      </NotesMarkdown>
+                    </Box>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <Stack
+                      sx={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "100%",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Clock
+                          isCharacterSheet={isCharacterSheet}
+                          numSections={note.clocks[0].sections}
+                          size={80}
+                          state={note.clocks[0].state}
+                          setState={(newState) =>
+                            handleClockStateChange(originalIndex, 0, newState)
+                          }
+                        />
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            mt: 0.5,
+                            textAlign: "center",
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                            fontSize: "0.7rem",
+                            color: "text.secondary",
+                          }}
+                        >
+                          {note.clocks[0].name}
+                        </Typography>
+                      </Box>
+                      {!isCharacterSheet && (
+                        <Stack
+                          direction="row"
+                          spacing={0.25}
+                          sx={{ mt: 0.25, justifyContent: "center" }}
+                        >
+                          <Tooltip
+                            title={`${t("Decrement")} ${note.clocks[0].name}`}
+                            arrow
+                          >
+                            <IconButton
+                              color="primary"
+                              onClick={() =>
+                                decrementClockState(originalIndex, 0)
+                              }
+                              size="small"
+                              sx={{ p: 0.25 }}
+                            >
+                              <RemoveIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip
+                            title={`${t("Reset")} ${note.clocks[0].name}`}
+                            arrow
+                          >
+                            <IconButton
+                              color="primary"
+                              onClick={() => resetClockState(originalIndex, 0)}
+                              size="small"
+                              sx={{ p: 0.25 }}
+                            >
+                              <RestartAltIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip
+                            title={`${t("Increment")} ${note.clocks[0].name}`}
+                            arrow
+                          >
+                            <IconButton
+                              color="primary"
+                              onClick={() =>
+                                incrementClockState(originalIndex, 0)
+                              }
+                              size="small"
+                              sx={{ p: 0.25 }}
+                            >
+                              <AddIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      )}
+                    </Stack>
+                  </Grid>
+                </Grid>
+              ) : (
+                <>
                   <Box
                     sx={{
+                      flex: 1,
                       bgcolor:
                         theme.palette.mode === "dark"
                           ? "rgba(255,255,255,0.03)"
@@ -347,252 +470,136 @@ export default function PlayerNotes({
                       {note.description}
                     </NotesMarkdown>
                   </Box>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 4 }}>
-                  <Stack
-                    sx={{
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: "100%",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Clock
-                        isCharacterSheet={isCharacterSheet}
-                        numSections={note.clocks[0].sections}
-                        size={80}
-                        state={note.clocks[0].state}
-                        setState={(newState) =>
-                          handleClockStateChange(originalIndex, 0, newState)
-                        }
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          mt: 0.5,
-                          textAlign: "center",
-                          fontWeight: "bold",
-                          textTransform: "uppercase",
-                          fontSize: "0.7rem",
-                          color: "text.secondary",
-                        }}
-                      >
-                        {note.clocks[0].name}
-                      </Typography>
-                    </Box>
-                    {!isCharacterSheet && (
-                      <Stack
-                        direction="row"
-                        spacing={0.25}
-                        sx={{ mt: 0.25, justifyContent: "center" }}
-                      >
-                        <Tooltip
-                          title={`${t("Decrement")} ${note.clocks[0].name}`}
-                          arrow
-                        >
-                          <IconButton
-                            color="primary"
-                            onClick={() =>
-                              decrementClockState(originalIndex, 0)
-                            }
-                            size="small"
-                            sx={{ p: 0.25 }}
-                          >
-                            <RemoveIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          title={`${t("Reset")} ${note.clocks[0].name}`}
-                          arrow
-                        >
-                          <IconButton
-                            color="primary"
-                            onClick={() => resetClockState(originalIndex, 0)}
-                            size="small"
-                            sx={{ p: 0.25 }}
-                          >
-                            <RestartAltIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          title={`${t("Increment")} ${note.clocks[0].name}`}
-                          arrow
-                        >
-                          <IconButton
-                            color="primary"
-                            onClick={() =>
-                              incrementClockState(originalIndex, 0)
-                            }
-                            size="small"
-                            sx={{ p: 0.25 }}
-                          >
-                            <AddIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-                    )}
-                  </Stack>
-                </Grid>
-              </Grid>
-            ) : (
-              <>
-                <Box
-                  sx={{
-                    flex: 1,
-                    bgcolor:
-                      theme.palette.mode === "dark"
-                        ? "rgba(255,255,255,0.03)"
-                        : "rgba(0,0,0,0.02)",
-                    p: 1,
-                    borderRadius: 1,
-                    border: "1px solid",
-                    borderColor:
-                      theme.palette.mode === "dark"
-                        ? "rgba(255,255,255,0.08)"
-                        : "rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <NotesMarkdown
-                    sx={{
-                      fontFamily: "PT Sans Narrow",
-                      fontSize: "0.95rem",
-                      lineHeight: 1.4,
-                      "& p": { margin: 0, mb: 0.5 },
-                    }}
-                  >
-                    {note.description}
-                  </NotesMarkdown>
-                </Box>
 
-                {note.clocks && note.clocks.length > 0 && (
-                  <Box sx={{ mt: 2 }}>
-                    <Grid
-                      container
-                      spacing={2}
-                      sx={{ justifyContent: "center" }}
-                    >
-                      {note.clocks.map((clock, clockIndex) => (
-                        <Grid
-                          key={clockIndex}
-                          size={{
-                            xs: 12,
-                            sm: note.clocks.length > 1 ? 6 : 12,
-                            md:
-                              note.clocks.length > 2
-                                ? 4
-                                : note.clocks.length > 1
-                                  ? 6
-                                  : 12,
-                          }}
-                        >
-                          <Stack
-                            sx={{ alignItems: "center", position: "relative" }}
-                          >
-                            <Clock
-                              isCharacterSheet={isCharacterSheet}
-                              numSections={clock.sections}
-                              size={
+                  {note.clocks && note.clocks.length > 0 && (
+                    <Box sx={{ mt: 2 }}>
+                      <Grid
+                        container
+                        spacing={2}
+                        sx={{ justifyContent: "center" }}
+                      >
+                        {note.clocks.map((clock, clockIndex) => (
+                          <Grid
+                            key={clockIndex}
+                            size={{
+                              xs: 12,
+                              sm: note.clocks.length > 1 ? 6 : 12,
+                              md:
                                 note.clocks.length > 2
-                                  ? 80
+                                  ? 4
                                   : note.clocks.length > 1
-                                    ? 100
-                                    : 120
-                              }
-                              state={clock.state}
-                              setState={(newState) =>
-                                handleClockStateChange(
-                                  originalIndex,
-                                  clockIndex,
-                                  newState,
-                                )
-                              }
-                            />
-                            <Typography
-                              variant="caption"
+                                    ? 6
+                                    : 12,
+                            }}
+                          >
+                            <Stack
                               sx={{
-                                mt: 0.75,
-                                textAlign: "center",
-                                fontWeight: "bold",
-                                textTransform: "uppercase",
-                                fontSize: "0.75rem",
-                                color: "text.secondary",
+                                alignItems: "center",
+                                position: "relative",
                               }}
                             >
-                              {clock.name}
-                            </Typography>
-                            {!isCharacterSheet && (
-                              <Stack
-                                direction="row"
-                                spacing={0.5}
-                                sx={{ justifyContent: "center" }}
+                              <Clock
+                                isCharacterSheet={isCharacterSheet}
+                                numSections={clock.sections}
+                                size={
+                                  note.clocks.length > 2
+                                    ? 80
+                                    : note.clocks.length > 1
+                                      ? 100
+                                      : 120
+                                }
+                                state={clock.state}
+                                setState={(newState) =>
+                                  handleClockStateChange(
+                                    originalIndex,
+                                    clockIndex,
+                                    newState,
+                                  )
+                                }
+                              />
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  mt: 0.75,
+                                  textAlign: "center",
+                                  fontWeight: "bold",
+                                  textTransform: "uppercase",
+                                  fontSize: "0.75rem",
+                                  color: "text.secondary",
+                                }}
                               >
-                                <Tooltip
-                                  title={`${t("Decrement")} ${clock.name}`}
-                                  arrow
+                                {clock.name}
+                              </Typography>
+                              {!isCharacterSheet && (
+                                <Stack
+                                  direction="row"
+                                  spacing={0.5}
+                                  sx={{ justifyContent: "center" }}
                                 >
-                                  <IconButton
-                                    color="primary"
-                                    onClick={() =>
-                                      decrementClockState(
-                                        originalIndex,
-                                        clockIndex,
-                                      )
-                                    }
-                                    size="small"
-                                    sx={{ p: 0.25 }}
+                                  <Tooltip
+                                    title={`${t("Decrement")} ${clock.name}`}
+                                    arrow
                                   >
-                                    <RemoveIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip
-                                  title={`${t("Reset")} ${clock.name}`}
-                                  arrow
-                                >
-                                  <IconButton
-                                    color="primary"
-                                    onClick={() =>
-                                      resetClockState(originalIndex, clockIndex)
-                                    }
-                                    size="small"
-                                    sx={{ p: 0.25 }}
+                                    <IconButton
+                                      color="primary"
+                                      onClick={() =>
+                                        decrementClockState(
+                                          originalIndex,
+                                          clockIndex,
+                                        )
+                                      }
+                                      size="small"
+                                      sx={{ p: 0.25 }}
+                                    >
+                                      <RemoveIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip
+                                    title={`${t("Reset")} ${clock.name}`}
+                                    arrow
                                   >
-                                    <RestartAltIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip
-                                  title={`${t("Increment")} ${clock.name}`}
-                                  arrow
-                                >
-                                  <IconButton
-                                    color="primary"
-                                    onClick={() =>
-                                      incrementClockState(
-                                        originalIndex,
-                                        clockIndex,
-                                      )
-                                    }
-                                    size="small"
-                                    sx={{ p: 0.25 }}
+                                    <IconButton
+                                      color="primary"
+                                      onClick={() =>
+                                        resetClockState(
+                                          originalIndex,
+                                          clockIndex,
+                                        )
+                                      }
+                                      size="small"
+                                      sx={{ p: 0.25 }}
+                                    >
+                                      <RestartAltIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip
+                                    title={`${t("Increment")} ${clock.name}`}
+                                    arrow
                                   >
-                                    <AddIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Stack>
-                            )}
-                          </Stack>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
-                )}
-              </>
-            )}
+                                    <IconButton
+                                      color="primary"
+                                      onClick={() =>
+                                        incrementClockState(
+                                          originalIndex,
+                                          clockIndex,
+                                        )
+                                      }
+                                      size="small"
+                                      sx={{ p: 0.25 }}
+                                    >
+                                      <AddIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Stack>
+                              )}
+                            </Stack>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Box>
+                  )}
+                </>
+              )}
             </Box>
           </Card>
         </Grid>
@@ -622,7 +629,14 @@ export default function PlayerNotes({
               },
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "text.secondary" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                color: "text.secondary",
+              }}
+            >
               <AddIcon fontSize="small" />
               <Typography variant="body2">{t("Add Note")}</Typography>
             </Box>
@@ -698,7 +712,9 @@ export default function PlayerNotes({
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle variant="h4">{isCreating ? t("Add Note") : t("Edit Note")}</DialogTitle>
+        <DialogTitle variant="h4">
+          {isCreating ? t("Add Note") : t("Edit Note")}
+        </DialogTitle>
         <DialogContent sx={{ display: "grid", gap: 1.5, pt: "8px !important" }}>
           <TextField
             label={t("Name")}
@@ -747,7 +763,11 @@ export default function PlayerNotes({
                       borderRadius: 1,
                     }}
                   >
-                    <Grid container spacing={1.25} sx={{ alignItems: "center" }}>
+                    <Grid
+                      container
+                      spacing={1.25}
+                      sx={{ alignItems: "center" }}
+                    >
                       <Grid size={{ xs: 12, sm: 7 }}>
                         <TextField
                           label={t("Clock Name")}
@@ -803,8 +823,17 @@ export default function PlayerNotes({
             </Grid>
           )}
         </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2, borderTop: 1, borderColor: "divider" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}>
+        <DialogActions
+          sx={{ px: 3, py: 2, borderTop: 1, borderColor: "divider" }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              width: "100%",
+            }}
+          >
             {!isCreating ? (
               <Button
                 variant="contained"

@@ -29,7 +29,14 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ReactMarkdown from "react-markdown";
 import { useNumericClock } from "../../../hooks/useClock";
 
-function MagiseedClockRow({ magiseedSpell, setPlayer, isEditMode, t, theme, primary }) {
+function MagiseedClockRow({
+  magiseedSpell,
+  setPlayer,
+  isEditMode,
+  t,
+  theme,
+  primary,
+}) {
   const clockValue = magiseedSpell.growthClock || 0;
 
   const persistClock = (newValue) => {
@@ -39,19 +46,23 @@ function MagiseedClockRow({ magiseedSpell, setPlayer, isEditMode, t, theme, prim
       classes: prev.classes.map((cls) =>
         cls.name === magiseedSpell.className
           ? {
-            ...cls,
-            spells: cls.spells.map((spell) =>
-              spell.spellType === "magiseed"
-                ? { ...spell, growthClock: newValue }
-                : spell,
-            ),
-          }
+              ...cls,
+              spells: cls.spells.map((spell) =>
+                spell.spellType === "magiseed"
+                  ? { ...spell, growthClock: newValue }
+                  : spell,
+              ),
+            }
           : cls,
       ),
     }));
   };
 
-  const { state, set, increment, decrement, reset } = useNumericClock(4, clockValue, persistClock);
+  const { state, set, increment, decrement, reset } = useNumericClock(
+    4,
+    clockValue,
+    persistClock,
+  );
   const canEdit = isEditMode || !!setPlayer;
 
   return (
@@ -66,19 +77,38 @@ function MagiseedClockRow({ magiseedSpell, setPlayer, isEditMode, t, theme, prim
           onReset={canEdit ? reset : undefined}
         />
         {canEdit && (
-          <Stack direction="row" spacing={0.5} sx={{ mt: 1, justifyContent: "center" }}>
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{ mt: 1, justifyContent: "center" }}
+          >
             <Tooltip title={t("Decrement")} arrow>
-              <IconButton color="primary" onClick={decrement} size="small" sx={{ p: 0.25 }}>
+              <IconButton
+                color="primary"
+                onClick={decrement}
+                size="small"
+                sx={{ p: 0.25 }}
+              >
                 <RemoveIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Reset")} arrow>
-              <IconButton color="primary" onClick={reset} size="small" sx={{ p: 0.25 }}>
+              <IconButton
+                color="primary"
+                onClick={reset}
+                size="small"
+                sx={{ p: 0.25 }}
+              >
                 <RestartAltIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Increment")} arrow>
-              <IconButton color="primary" onClick={increment} size="small" sx={{ p: 0.25 }}>
+              <IconButton
+                color="primary"
+                onClick={increment}
+                size="small"
+                sx={{ p: 0.25 }}
+              >
                 <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -228,7 +258,7 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                     <Typography sx={{ fontWeight: "bold", mb: 0.5 }}>
                       {magiseedSpell.currentMagiseed
                         ? magiseedSpell.currentMagiseed.customName ||
-                        t(magiseedSpell.currentMagiseed.name)
+                          t(magiseedSpell.currentMagiseed.name)
                         : t("magiseed_no_magiseed")}
                     </Typography>
                     <MagiseedClockRow
@@ -276,7 +306,8 @@ export default function PlayerMagiseed({ player, setPlayer, isEditMode }) {
                           <>
                             {seed.customName || t(seed.name)}
                             {magiseedSpell.currentMagiseed &&
-                              seed.name === magiseedSpell.currentMagiseed.name && (
+                              seed.name ===
+                                magiseedSpell.currentMagiseed.name && (
                                 <Typography
                                   component="span"
                                   variant="h3"

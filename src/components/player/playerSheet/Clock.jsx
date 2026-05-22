@@ -15,7 +15,7 @@ const Clock = ({
   state = [],
   setState,
   isCharacterSheet,
-  onReset = () => { },
+  onReset = () => {},
 }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -47,8 +47,18 @@ const Clock = ({
     const startAngle = (360 / numSections) * i;
     const endAngle = (360 / numSections) * (i + 1);
 
-    const startPoint = calculateCoordinates(size / 2, size / 2, size / 2, startAngle);
-    const endPoint = calculateCoordinates(size / 2, size / 2, size / 2, endAngle);
+    const startPoint = calculateCoordinates(
+      size / 2,
+      size / 2,
+      size / 2,
+      startAngle,
+    );
+    const endPoint = calculateCoordinates(
+      size / 2,
+      size / 2,
+      size / 2,
+      endAngle,
+    );
 
     const pathData = `
       M ${size / 2},${size / 2}

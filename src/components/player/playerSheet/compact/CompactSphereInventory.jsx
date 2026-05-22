@@ -269,7 +269,7 @@ function MnemoRow({
               color: slotted || isLoaded ? "success.main" : "text.secondary",
             }}
           >
-            {slotted ? t("Slotted") : isLoaded ? t("Loaded") : "—"}
+            {slotted ? t("Slotted") : isLoaded ? t("Loaded") : "-"}
           </Typography>
         </StyledTableCell>
         <StyledTableCell sx={{ width: { xs: 80, sm: 92 }, textAlign: "right" }}>
@@ -680,7 +680,7 @@ function HoploRow({
               color: slotted ? "success.main" : "text.secondary",
             }}
           >
-            {slotted ? t("Slotted") : "—"}
+            {slotted ? t("Slotted") : "-"}
           </Typography>
         </StyledTableCell>
         <StyledTableCell sx={{ width: { xs: 80, sm: 92 }, textAlign: "right" }}>

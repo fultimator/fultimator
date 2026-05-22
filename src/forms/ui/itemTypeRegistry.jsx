@@ -87,11 +87,16 @@ import {
   QuirkOptionalPreviewCard,
 } from "./itemPreviewCards";
 
-const weaponQualities = allQualities.filter((q) => q.filter?.includes("weapon"));
+const weaponQualities = allQualities.filter((q) =>
+  q.filter?.includes("weapon"),
+);
 const qualityGroups = Object.entries(groupBy(weaponQualities, "category")).map(
   ([category, qs]) => ({
     header: category,
-    options: qs.map((q) => ({ value: q.name, label: `${q.name} (${q.cost}z)` })),
+    options: qs.map((q) => ({
+      value: q.name,
+      label: `${q.name} (${q.cost}z)`,
+    })),
   }),
 );
 
@@ -126,8 +131,10 @@ export const ITEM_TYPE_REGISTRY = {
 
   armor: {
     buildState: (item, ctx) => buildArmorFormState(item, ctx),
-    buildSavePayload: (formState, originalItem) => buildArmorSavePayload(formState, originalItem),
-    onAfterSave: (formState, originalItem, ctx) => applyArmorZenitSideEffect(formState, originalItem, ctx),
+    buildSavePayload: (formState, originalItem) =>
+      buildArmorSavePayload(formState, originalItem),
+    onAfterSave: (formState, originalItem, ctx) =>
+      applyArmorZenitSideEffect(formState, originalItem, ctx),
     normalizeUpload: (raw) => {
       const data = normalizeDefensiveItem(raw);
       return data?.base?.category === "Armor" ? data : null;
@@ -152,7 +159,8 @@ export const ITEM_TYPE_REGISTRY = {
 
   shield: {
     buildState: (item) => buildShieldFormState(item),
-    buildSavePayload: (formState, originalItem) => buildShieldSavePayload(formState, originalItem),
+    buildSavePayload: (formState, originalItem) =>
+      buildShieldSavePayload(formState, originalItem),
     normalizeUpload: (raw) => {
       const data = normalizeDefensiveItem(raw);
       return data?.base?.category === "Shield" ? data : null;
@@ -169,7 +177,8 @@ export const ITEM_TYPE_REGISTRY = {
 
   weapon: {
     buildState: (item) => buildWeaponFormState(item),
-    buildSavePayload: (formState, originalItem) => buildWeaponSavePayload(formState, originalItem),
+    buildSavePayload: (formState, originalItem) =>
+      buildWeaponSavePayload(formState, originalItem),
     normalizeUpload: (raw) => normalizeWeaponLike(raw),
     validate: validateWeaponPersisted,
     fieldConfig: weaponFieldConfig,
@@ -187,21 +196,38 @@ export const ITEM_TYPE_REGISTRY = {
 
   customWeapon: {
     buildState: (item, ctx) => buildCustomWeaponFormState(item, ctx),
-    buildSavePayload: (formState, originalItem) => buildCustomWeaponSavePayload(formState, originalItem),
-    onAfterSave: (formState, originalItem, ctx) => applyCustomWeaponZenitSideEffect(formState, originalItem, ctx),
+    buildSavePayload: (formState, originalItem) =>
+      buildCustomWeaponSavePayload(formState, originalItem),
+    onAfterSave: (formState, originalItem, ctx) =>
+      applyCustomWeaponZenitSideEffect(formState, originalItem, ctx),
     normalizeUpload: (raw) => {
       if (raw?.dataType !== "weapon") return null;
-      try { return normalizeCustomWeapon(raw); } catch { return null; }
+      try {
+        return normalizeCustomWeapon(raw);
+      } catch {
+        return null;
+      }
     },
     validate: validateCustomWeaponPersisted,
     fieldConfig: customWeaponFieldConfig,
     groups: (formState) => [
-      { key: "core", label: "Custom Weapon", cols: 2,
-        extraProps: { selectedCategory: formState.selectedCategory, rareAccuracyBonus: formState.rareAccuracyBonus, isSecondForm: false } },
+      {
+        key: "core",
+        label: "Custom Weapon",
+        cols: 2,
+        extraProps: {
+          selectedCategory: formState.selectedCategory,
+          rareAccuracyBonus: formState.rareAccuracyBonus,
+          isSecondForm: false,
+        },
+      },
       { key: "accuracy", label: "Accuracy", cols: 2 },
       { key: "damage", label: "Damage", cols: 2 },
       formState.isSlotsVariant
-        ? { key: "slots", label: "Slots", cols: 1,
+        ? {
+            key: "slots",
+            label: "Slots",
+            cols: 1,
             extraProps: (fs, ctx) => ({
               isWeapon: true,
               isIntegrated: fs.isIntegrated,
@@ -209,32 +235,80 @@ export const ITEM_TYPE_REGISTRY = {
               player: ctx?.player,
               onAddToBank: ctx?.setPlayer
                 ? (item, type) => {
-                    const bankKey = type === "mnemospheres" ? "mnemospheres" : "hoplospheres";
-                    const genId = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+                    const bankKey =
+                      type === "mnemospheres" ? "mnemospheres" : "hoplospheres";
+                    const genId = () =>
+                      Math.random().toString(36).slice(2) +
+                      Date.now().toString(36);
                     ctx.setPlayer((prev) => {
                       const prevEq0 = prev?.equipment?.[0] ?? {};
-                      const eq0New = { ...prevEq0, [bankKey]: [...(prevEq0[bankKey] ?? []), { ...item, id: item.id ?? genId() }] };
-                      const equipment = prev?.equipment ? [eq0New, ...prev.equipment.slice(1)] : [eq0New];
+                      const eq0New = {
+                        ...prevEq0,
+                        [bankKey]: [
+                          ...(prevEq0[bankKey] ?? []),
+                          { ...item, id: item.id ?? genId() },
+                        ],
+                      };
+                      const equipment = prev?.equipment
+                        ? [eq0New, ...prev.equipment.slice(1)]
+                        : [eq0New];
                       return { ...prev, equipment };
                     });
                   }
                 : undefined,
-            }) }
-        : { key: "quality", label: "Quality", cols: 2, extraProps: { groups: qualityGroups } },
-      { key: "rare", label: "Modifiers", cols: 2, accordionGroup: "modifiers_accordion",
+            }),
+          }
+        : {
+            key: "quality",
+            label: "Quality",
+            cols: 2,
+            extraProps: { groups: qualityGroups },
+          },
+      {
+        key: "rare",
+        label: "Modifiers",
+        cols: 2,
+        accordionGroup: "modifiers_accordion",
         accordionDefaultExpanded: (s) =>
-          (s.precModifier ?? 0) !== 0 || (s.damageModifier ?? 0) !== 0 ||
-          (s.defModifier ?? 0) !== 0 || (s.mDefModifier ?? 0) !== 0 ||
-          s.overrideDamageType || s.rareAccuracyBonus || s.rareDamageBonus },
-      { key: "modifiers", label: "Modifiers", cols: 2, accordionGroup: "modifiers_accordion" },
-      ...(formState.hasTransforming ? [
-        { key: "secondary", label: "weapon_customization_transforming_form", cols: 2,
-          extraProps: { selectedCategory: formState.secondSelectedCategory, rareAccuracyBonus: formState.rareAccuracyBonus, isSecondForm: true } },
-        { key: "secondaryModifiers", label: "weapon_customization_transforming_form_modifiers", cols: 2, accordionGroup: "secondary_modifiers_accordion",
-          accordionDefaultExpanded: (s) =>
-            (s.secondPrecModifier ?? 0) !== 0 || (s.secondDamageModifier ?? 0) !== 0 ||
-            (s.secondDefModifier ?? 0) !== 0 || (s.secondMDefModifier ?? 0) !== 0 },
-      ] : []),
+          (s.precModifier ?? 0) !== 0 ||
+          (s.damageModifier ?? 0) !== 0 ||
+          (s.defModifier ?? 0) !== 0 ||
+          (s.mDefModifier ?? 0) !== 0 ||
+          s.overrideDamageType ||
+          s.rareAccuracyBonus ||
+          s.rareDamageBonus,
+      },
+      {
+        key: "modifiers",
+        label: "Modifiers",
+        cols: 2,
+        accordionGroup: "modifiers_accordion",
+      },
+      ...(formState.hasTransforming
+        ? [
+            {
+              key: "secondary",
+              label: "weapon_customization_transforming_form",
+              cols: 2,
+              extraProps: {
+                selectedCategory: formState.secondSelectedCategory,
+                rareAccuracyBonus: formState.rareAccuracyBonus,
+                isSecondForm: true,
+              },
+            },
+            {
+              key: "secondaryModifiers",
+              label: "weapon_customization_transforming_form_modifiers",
+              cols: 2,
+              accordionGroup: "secondary_modifiers_accordion",
+              accordionDefaultExpanded: (s) =>
+                (s.secondPrecModifier ?? 0) !== 0 ||
+                (s.secondDamageModifier ?? 0) !== 0 ||
+                (s.secondDefModifier ?? 0) !== 0 ||
+                (s.secondMDefModifier ?? 0) !== 0,
+            },
+          ]
+        : []),
     ],
     getSlotCostInfo: (formState, originalItem, ctx) =>
       getCustomWeaponSlotCostInfo(formState, originalItem, ctx),
@@ -243,10 +317,20 @@ export const ITEM_TYPE_REGISTRY = {
       setFormState(applyCustomWeaponSlotTierChange(next, next.slots, ctx));
     },
     getQualityOnChange: (formState, setFormState) => (next) => {
-      if (next.selectedQuality !== formState.selectedQuality && next.selectedQuality) {
-        const q = weaponQualities.find((qu) => qu.name === next.selectedQuality);
+      if (
+        next.selectedQuality !== formState.selectedQuality &&
+        next.selectedQuality
+      ) {
+        const q = weaponQualities.find(
+          (qu) => qu.name === next.selectedQuality,
+        );
         if (q) {
-          setFormState({ ...next, qualityName: q.name, quality: q.quality, qualityCost: q.cost });
+          setFormState({
+            ...next,
+            qualityName: q.name,
+            quality: q.quality,
+            qualityCost: q.cost,
+          });
           return;
         }
       }
@@ -280,7 +364,8 @@ export const ITEM_TYPE_REGISTRY = {
 
   zeroPowerOptional: {
     buildState: (item) => buildZeroPowerOptionalFormState(item),
-    buildSavePayload: (formState) => buildZeroPowerOptionalSavePayload(formState),
+    buildSavePayload: (formState) =>
+      buildZeroPowerOptionalSavePayload(formState),
     normalizeUpload: (raw) => normalizeZeroPowerOptional(raw),
     validate: validateZeroPowerOptional,
     fieldConfig: zeroPowerOptionalFieldConfig,

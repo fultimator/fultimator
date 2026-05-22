@@ -465,7 +465,10 @@ export default function PlayerClassCard({
         itemType="heroic"
         item={classItem.heroic ?? null}
         editIndex={null}
-        onSave={(saved) => { editHeroic(saved); setOpenEditHeroicSkillModal(false); }}
+        onSave={(saved) => {
+          editHeroic(saved);
+          setOpenEditHeroicSkillModal(false);
+        }}
         onDelete={() => {}}
       />
       <SelectCompanionModal
@@ -791,7 +794,9 @@ export default function PlayerClassCard({
               borderRadius: noBorder ? "0 !important" : "6px !important",
             },
             "&.Mui-expanded .MuiAccordion-heading": {
-              borderRadius: noBorder ? "0 !important" : "6px 6px 0 0 !important",
+              borderRadius: noBorder
+                ? "0 !important"
+                : "6px 6px 0 0 !important",
             },
             "&.MuiAccordion-root .MuiAccordionSummary-root": {
               borderRadius: noBorder

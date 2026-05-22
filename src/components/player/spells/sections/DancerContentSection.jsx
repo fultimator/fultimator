@@ -24,9 +24,7 @@ export default function DancerContentSection({ formState, setFormState, t }) {
     const addedKeys = currentDances
       .map((d) => d.key)
       .filter((key) => key !== "dance_custom");
-    return availableDances.filter(
-      (preset) => !addedKeys.includes(preset.name),
-    );
+    return availableDances.filter((preset) => !addedKeys.includes(preset.name));
   }, [currentDances]);
 
   const handleAddPreset = useCallback((presetName) => {

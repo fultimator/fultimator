@@ -17,7 +17,11 @@ import { calculateCustomWeaponStats } from "../../components/player/common/playe
 export function AccessoryPreviewCard({ formState }) {
   return (
     <SharedAccessoryCard
-      item={{ name: formState.name, cost: formState.cost, quality: formState.quality }}
+      item={{
+        name: formState.name,
+        cost: formState.cost,
+        quality: formState.quality,
+      }}
     />
   );
 }
@@ -109,7 +113,11 @@ export function CustomWeaponPreviewCard({ formState, ctx }) {
   const pHasElemental = (formState.customizations ?? []).some(
     (c) => c.name === "weapon_customization_elemental",
   );
-  const pType = pHasElemental ? customDamageType : overrideDamageType ? customDamageType : "physical";
+  const pType = pHasElemental
+    ? customDamageType
+    : overrideDamageType
+      ? customDamageType
+      : "physical";
 
   const { precision: s2Prec, damage: s2Dmg } = hasTransforming
     ? calculateCustomWeaponStats(
@@ -127,7 +135,11 @@ export function CustomWeaponPreviewCard({ formState, ctx }) {
   const s2HasElemental = (secondCustomizations ?? []).some(
     (c) => c.name === "weapon_customization_elemental",
   );
-  const s2Type = s2HasElemental ? secondCustomDamageType : secondOverrideDamageType ? secondCustomDamageType : "physical";
+  const s2Type = s2HasElemental
+    ? secondCustomDamageType
+    : secondOverrideDamageType
+      ? secondCustomDamageType
+      : "physical";
 
   return (
     <SharedCustomWeaponCard
@@ -159,12 +171,19 @@ export function CustomWeaponPreviewCard({ formState, ctx }) {
         secondSelectedCategory: formState.secondSelectedCategory,
         secondSelectedRange: formState.secondSelectedRange,
         secondAccuracy: hasTransforming
-          ? { attr1: secondSelectedAccuracyCheck.attr1, attr2: secondSelectedAccuracyCheck.attr2, value: s2Prec, defense: "def" }
+          ? {
+              attr1: secondSelectedAccuracyCheck.attr1,
+              attr2: secondSelectedAccuracyCheck.attr2,
+              value: s2Prec,
+              defense: "def",
+            }
           : undefined,
         secondDamage: hasTransforming
           ? { value: s2Dmg, type: s2Type, hrZero: secondaryHrZero }
           : undefined,
-        secondCurrentCustomizations: hasTransforming ? secondCustomizations : undefined,
+        secondCurrentCustomizations: hasTransforming
+          ? secondCustomizations
+          : undefined,
       }}
       sphereData={buildSphereData({ slots, slotted }, ctx?.player)}
     />
@@ -189,7 +208,11 @@ export function WeaponPreviewCard({ formState }) {
         rework: formState.rework,
         quality: formState.quality,
         cost,
-        damage: { value: damage, type: formState.type, hrZero: formState.damageHrZero },
+        damage: {
+          value: damage,
+          type: formState.type,
+          hrZero: formState.damageHrZero,
+        },
         prec,
         defModifier: parseInt(String(formState.defModifier)),
         mDefModifier: parseInt(String(formState.mDefModifier)),

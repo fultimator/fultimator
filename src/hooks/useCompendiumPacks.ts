@@ -641,7 +641,7 @@ export function useCompendiumPacks() {
     try {
       zip = await JSZip.loadAsync(file);
     } catch {
-      throw new Error("Could not read file — is it a valid .fcp ZIP archive?");
+      throw new Error("Could not read file - is it a valid .fcp ZIP archive?");
     }
 
     const manifestFile = zip.file("manifest.json");
@@ -653,7 +653,7 @@ export function useCompendiumPacks() {
       const manifestText = await manifestFile.async("text");
       manifest = JSON.parse(manifestText);
     } catch {
-      throw new Error("Could not parse manifest.json — file may be corrupt");
+      throw new Error("Could not parse manifest.json - file may be corrupt");
     }
 
     const validation = validateManifest(manifest);

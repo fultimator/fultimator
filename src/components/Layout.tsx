@@ -190,13 +190,21 @@ const Layout: React.FC<LayoutProps> = ({
         />
       )}
 
-      <AppDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onOpen={toggleDrawer} />
+      <AppDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onOpen={toggleDrawer}
+      />
 
       <ChatToastOverlay />
 
       <Box
         sx={{
-          marginRight: isMobile ? 0 : (drawerOpen ? `${DRAWER_WIDTH}px` : `${TAB_RAIL_WIDTH}px`),
+          marginRight: isMobile
+            ? 0
+            : drawerOpen
+              ? `${DRAWER_WIDTH}px`
+              : `${TAB_RAIL_WIDTH}px`,
           transition: (theme) =>
             theme.transitions.create("marginRight", {
               easing: drawerOpen

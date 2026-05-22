@@ -91,8 +91,12 @@ export default function PlayerZeroPower({
     }));
   };
 
-  const { filledCount: filled, increment, decrement, reset } =
-    useClock(sections, clockState, persistState);
+  const {
+    filledCount: filled,
+    increment,
+    decrement,
+    reset,
+  } = useClock(sections, clockState, persistState);
 
   if (!zeroPower?.name) return null;
 
@@ -205,7 +209,7 @@ export default function PlayerZeroPower({
                 numSections={sections}
                 size={28}
                 state={clockState}
-                setState={() => { }}
+                setState={() => {}}
                 isCharacterSheet={true}
               />
             </StyledTableCell>
