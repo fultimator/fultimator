@@ -471,6 +471,17 @@ export default function PlayerCard({
     });
   };
 
+  const handleAffinityChange = (type) => (nextAffinity) => {
+    if (!setPlayer) return;
+    setPlayer((prev) => ({
+      ...prev,
+      affinities: {
+        ...(prev.affinities ?? {}),
+        [type]: nextAffinity || "",
+      },
+    }));
+  };
+
   const currDex = calculateAttribute(
     player,
     player.attributes.dexterity?.base,
@@ -1851,17 +1862,27 @@ export default function PlayerCard({
           "poison",
         ].map((type) => (
           <AffinityCell key={type}>
-            <StatTooltip
-              title={type.charAt(0).toUpperCase() + type.slice(1)}
-              base={player.affinities?.[type] || ""}
-              display="flex"
-            >
+            {isEditMode ? (
               <TypeAffinity
                 type={type}
                 affinity={player.affinities?.[type] || ""}
                 iconSize="2.2em"
+                editable={Boolean(setPlayer)}
+                onChangeAffinity={handleAffinityChange(type)}
               />
-            </StatTooltip>
+            ) : (
+              <StatTooltip
+                title={type.charAt(0).toUpperCase() + type.slice(1)}
+                base={player.affinities?.[type] || ""}
+                display="flex"
+              >
+                <TypeAffinity
+                  type={type}
+                  affinity={player.affinities?.[type] || ""}
+                  iconSize="2.2em"
+                />
+              </StatTooltip>
+            )}
           </AffinityCell>
         ))}
       </AffinityStrip>

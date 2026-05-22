@@ -2408,6 +2408,17 @@ function Stats({
     if (updateMaxStats) updateMaxStats();
   };
 
+  const handleAffinityChange = (type) => (nextAffinity) => {
+    if (!setPlayer) return;
+    setPlayer((p) => ({
+      ...p,
+      affinities: {
+        ...(p.affinities ?? {}),
+        [type]: nextAffinity || "",
+      },
+    }));
+  };
+
   return (
     <Typography
       component="div"
@@ -2677,6 +2688,8 @@ function Stats({
                 <TypeAffinity
                   type={type}
                   affinity={player.affinities?.[type] || ""}
+                  editable={Boolean(isEditMode && setPlayer)}
+                  onChangeAffinity={handleAffinityChange(type)}
                 />
               </Grid>
             ))}
