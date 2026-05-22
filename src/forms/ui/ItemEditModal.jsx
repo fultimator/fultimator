@@ -22,6 +22,7 @@ import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import PanelLayout from "./PanelLayout";
 import { ITEM_TYPE_REGISTRY } from "./itemTypeRegistry";
+import CompendiumViewerModal from "../../components/compendium/CompendiumViewerModal";
 
 export default function ItemEditModal({
   open,
@@ -53,6 +54,7 @@ export default function ItemEditModal({
     });
     return initial;
   });
+  const [qualityBrowserOpen, setQualityBrowserOpen] = useState(false);
 
   useEffect(() => {
     if (reg) setFormState(reg.buildState(item, ctx));
@@ -155,10 +157,49 @@ export default function ItemEditModal({
   const resolveExtraProps = (extraProps) =>
     typeof extraProps === "function" ? extraProps(formState, ctx) : extraProps;
 
+  const qualityFiltersByItemType = {
+    weapon: ["weapon"],
+    customWeapon: ["weapon", "customWeapon"],
+    armor: ["armor"],
+    shield: ["shield"],
+    accessory: ["accessory"],
+  };
+
+  const qualityFilters = qualityFiltersByItemType[itemType] ?? [];
+
+  const handleQualityImported = (qualityItem) => {
+    setFormState((prev) => {
+      const next = {
+        ...prev,
+        selectedQuality: qualityItem?.name ?? prev.selectedQuality,
+        qualityName: qualityItem?.name ?? prev.qualityName,
+        quality: qualityItem?.quality ?? prev.quality,
+        qualityCost:
+          qualityItem?.cost != null ? qualityItem.cost : prev.qualityCost,
+      };
+
+      if ("cost" in prev) {
+        const prevQualityCost = Number(prev?.qualityCost) || 0;
+        const importedCost = Number(qualityItem?.cost) || 0;
+        next.cost = (Number(prev?.cost) || 0) - prevQualityCost + importedCost;
+      }
+
+      return next;
+    });
+    setQualityBrowserOpen(false);
+  };
+
   const renderGroupContent = (g) => {
     const extraProps = resolveExtraProps(g.extraProps);
+    const withBrowse =
+      g.key === "quality"
+        ? {
+            ...(extraProps ?? {}),
+            onBrowse: () => setQualityBrowserOpen(true),
+          }
+        : extraProps;
     return (
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         <SchemaFieldRenderer
           config={reg.fieldConfig}
           state={formState}
@@ -173,18 +214,18 @@ export default function ItemEditModal({
           group={g.key}
           label={t(g.label)}
           cols={g.cols ?? 2}
-          extraProps={extraProps}
+          extraProps={withBrowse}
         />
       </Grid>
     );
   };
 
   const formContent = (
-    <Grid container spacing={2}>
+    <Grid container spacing={1}>
       {segments.map((seg, i) => {
         if (seg.type === "accordion") {
           return (
-            <Grid key={seg.accordionGroup + i} size={12} sx={{ mb: 1 }}>
+            <Grid key={seg.accordionGroup + i} size={12} sx={{ mb: 0.5 }}>
               <Accordion
                 expanded={!!accordionStates[seg.accordionGroup]}
                 onChange={() =>
@@ -210,7 +251,7 @@ export default function ItemEditModal({
         }
         const g = seg.group;
         return (
-          <Grid key={g.key} size={12} sx={{ mb: 1 }}>
+          <Grid key={g.key} size={12} sx={{ mb: 0.5 }}>
             {renderGroupContent(g)}
           </Grid>
         );
@@ -325,6 +366,14 @@ export default function ItemEditModal({
             )}
           </Box>
         }
+      />
+      <CompendiumViewerModal
+        open={qualityBrowserOpen}
+        onClose={() => setQualityBrowserOpen(false)}
+        onAddItem={handleQualityImported}
+        initialType="qualities"
+        restrictToTypes={["qualities"]}
+        initialQualityFilters={qualityFilters}
       />
     </>
   );

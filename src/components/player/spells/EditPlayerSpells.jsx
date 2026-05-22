@@ -1434,7 +1434,19 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 >
                   <Button
                     variant="contained"
-                    sx={{ width: "100%", height: "100%" }}
+                    sx={{
+                      width: "100%",
+                      height: 56,
+                      minHeight: 56,
+                      boxSizing: "border-box",
+                      border: "1px solid transparent",
+                      "&.Mui-disabled": {
+                        color: "rgba(255,255,255,0.7)",
+                        backgroundColor: "rgba(120,120,120,0.45)",
+                        border: "1px solid rgba(140,140,140,0.55)",
+                        filter: "grayscale(100%)",
+                      },
+                    }}
                     disabled={!selectedSpell}
                     onClick={() => addNewSpell(selectedSpell)}
                   >

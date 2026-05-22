@@ -501,6 +501,39 @@ const CompendiumViewerModal = ({
                     )}
                   </Box>
                 )}
+              {selectedCompendium !== "official" && (
+                <Box
+                  sx={{
+                    width: "100%",
+                    maxWidth: 640,
+                    p: 2.5,
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                    textAlign: "left",
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "text.secondary",
+                      fontWeight: 500,
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {t("Create a new one.")}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setQuickCreateOpen(true)}
+                    sx={{ mt: 2 }}
+                  >
+                    {t("Create a new one.")}
+                  </Button>
+                </Box>
+              )}
             </Box>
           )}
           mainSx={{ height: "100%" }}

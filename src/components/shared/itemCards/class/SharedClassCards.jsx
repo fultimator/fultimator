@@ -5,7 +5,6 @@ import {
   AccordionSummary,
   Box,
   Chip,
-  Divider,
   Stack,
   Typography,
 } from "@mui/material";
@@ -640,6 +639,7 @@ export const SharedClassCard = React.memo(function SharedClassCard({
             onChange={(_, v) => setExpandedSpells(v)}
             sx={{
               borderTop: `1px solid ${customTheme.secondary}`,
+              borderRadius: "0 !important",
               "&:before": { display: "none" },
             }}
           >
@@ -767,8 +767,6 @@ export const SharedClassCard = React.memo(function SharedClassCard({
             </AccordionDetails>
           </Accordion>
         )}
-
-        <Divider />
 
         {item.skills?.map((skill, i) => (
           <Box

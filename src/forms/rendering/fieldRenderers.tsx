@@ -94,16 +94,31 @@ export interface SelectGroup {
   options: SelectOption[];
 }
 
-function humanizeToken(value: string): string {
-  return value.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+const UNIFORM_SELECT_SX = {
+  "& .MuiSelect-select": {
+    minHeight: "unset !important",
+    paddingTop: "8.5px",
+    paddingBottom: "8.5px",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+  },
+};
+
+function humanizeToken(value: unknown): string {
+  const text = String(value ?? "").trim();
+  if (!text) return "";
+  return text.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function translateOrHumanize(
   t: (key: string, skipLoad?: boolean) => string,
-  label: string,
+  label: unknown,
 ): string {
-  const translated = t(label);
-  if (translated === label) {
+  const key = String(label ?? "");
+  if (!key) return "";
+  const translated = t(key);
+  if (!translated || translated === key) {
     return humanizeToken(label);
   }
   return translated;
@@ -305,7 +320,10 @@ export function SelectRenderer({
     ? ((value as string[]) ?? [])
     : ((value as string | number) ?? "");
   const labelForValue = (selected: string | number) =>
-    t(options.find((opt) => opt.value === selected)?.label ?? String(selected));
+    translateOrHumanize(
+      t,
+      String(options.find((opt) => opt.value === selected)?.label ?? selected),
+    );
 
   return (
     <FormControl variant="outlined" fullWidth size="small">
@@ -314,6 +332,7 @@ export function SelectRenderer({
         labelId={labelId}
         value={normalizedValue}
         label={t(label)}
+        sx={UNIFORM_SELECT_SX}
         multiple={multiple}
         onChange={(e) => onCommit(e.target.value)}
         disabled={disabled}
@@ -394,6 +413,7 @@ export function GroupedSelectRenderer({
         labelId={labelId}
         value={current}
         label={t(label)}
+        sx={UNIFORM_SELECT_SX}
         onChange={(e) => onCommit(e.target.value)}
         startAdornment={
           onBrowse ? (
@@ -447,6 +467,7 @@ export function TypeSelectRenderer({
         labelId={labelId}
         value={current}
         label={t(label)}
+        sx={UNIFORM_SELECT_SX}
         onChange={(e) =>
           onCommit(DAMAGE_TYPE_ALIASES[e.target.value] ?? e.target.value)
         }
@@ -661,7 +682,7 @@ export function RareBonusBlockRenderer({
                 }
               />
             }
-            label={`+1 ${t("weapon.rare.accuracyBonus.label")} (+100z)`}
+            label={`+1 ${t("shared.modifiers.accuracy")} (+100z)`}
           />
         </Grid>
         {!rework && (
@@ -673,7 +694,7 @@ export function RareBonusBlockRenderer({
                   onChange={(e) => emit({ damageBonus: e.target.checked })}
                 />
               }
-              label={`+4 ${t("weapon.rare.damageBonus.label")} (+200z)`}
+              label={`+4 ${t("shared.modifiers.damage")} (+200z)`}
             />
           </Grid>
         )}
@@ -967,13 +988,26 @@ export function AutocompleteRenderer({
   componentProps,
 }: FieldRendererProps) {
   const { t } = useTranslate();
-  const options = (componentProps?.options as SelectOption[]) ?? [];
+  const rawOptions = (componentProps?.options as unknown[]) ?? [];
+  const options: SelectOption[] = rawOptions.map((entry) => {
+    if (
+      entry &&
+      typeof entry === "object" &&
+      "value" in (entry as Record<string, unknown>)
+    ) {
+      const opt = entry as SelectOption;
+      return { value: opt.value, label: opt.label ?? String(opt.value) };
+    }
+    const val = String(entry ?? "");
+    return { value: val, label: val };
+  });
   const freeSolo = (componentProps?.freeSolo as boolean) ?? false;
   const multiple =
     (componentProps?.multiple as boolean | undefined) ?? Array.isArray(value);
   const optionLabels = options.map((o) => o.value as string);
   const selectedMulti = Array.isArray(value) ? value : [];
-  const selectedSingle = typeof value === "string" ? value : "";
+  const selectedSingle =
+    typeof value === "string" && value.trim().length > 0 ? value : null;
 
   const renderTags = (
     tags: string[],
@@ -1015,7 +1049,7 @@ export function AutocompleteRenderer({
       }
       getOptionLabel={(opt: string) => {
         const found = options.find((o) => o.value === opt);
-        return found ? t(found.label) : String(opt);
+        return found ? translateOrHumanize(t, found.label) : String(opt);
       }}
       {...(multiple ? { renderTags } : {})}
       renderInput={(params: object) => (

@@ -134,6 +134,8 @@ export function HeaderSpacer({ imageMode, imageSize, imageVisible }) {
 
 function withRowMinHeight(row) {
   if (!isValidElement(row)) return row;
+  const muiName = row.type?.muiName;
+  if (muiName === "Divider" || muiName === "MuiDivider") return row;
 
   return cloneElement(row, {
     sx: [
@@ -153,18 +155,20 @@ export function RowsWithOptionalImage({
   imageRowCount = 1,
   children,
 }) {
+  const rows = Children.toArray(children);
+  const normalizedRows = rows.map(withRowMinHeight);
+
   if (!isImageMode(imageMode) || !imageVisible) {
     return (
       <>
         {header}
-        {children}
+        {normalizedRows}
       </>
     );
   }
 
-  const rows = Children.toArray(children);
-  const imageRows = rows.slice(0, imageRowCount).map(withRowMinHeight);
-  const remainingRows = rows.slice(imageRowCount);
+  const imageRows = normalizedRows.slice(0, imageRowCount);
+  const remainingRows = normalizedRows.slice(imageRowCount);
   const imageContentSize = Math.min(imageSize, 72);
 
   return (
@@ -220,7 +224,13 @@ export function CardContentWrapper({
   children,
 }) {
   return (
-    <Stack>
+    <Stack
+      sx={{
+        "& .MuiChip-label": {
+          fontWeight: 700,
+        },
+      }}
+    >
       <CardWrapper showCard={showCard} id={id} cardRef={cardRef}>
         <Stack>{children}</Stack>
       </CardWrapper>

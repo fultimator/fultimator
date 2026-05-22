@@ -2148,59 +2148,18 @@ function buildWeaponPanelState() {
 }
 
 function QualityPickerDialog({ open, onClose, onSelect, filterType }) {
-  const { t } = useTranslate();
-  const filtered = qualities.filter((q) => q.filter?.includes(filterType));
-  const [search, setSearch] = useState("");
-  const visible = search
-    ? filtered.filter((q) =>
-        q.name.toLowerCase().includes(search.toLowerCase()),
-      )
-    : filtered;
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{t("Browse Qualities")}</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          fullWidth
-          size="small"
-          placeholder={t("Search...")}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{ mb: 2, mt: 1 }}
-        />
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          {visible.map((q) => (
-            <Box
-              key={q.fuid}
-              onClick={() => {
-                onSelect(q);
-                onClose();
-              }}
-              sx={{
-                p: 1.5,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 1,
-                cursor: "pointer",
-                "&:hover": { bgcolor: "action.hover" },
-              }}
-            >
-              <Typography variant="subtitle2">
-                {q.name} ({q.cost}z)
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {q.quality}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t("Cancel")}</Button>
-      </DialogActions>
-    </Dialog>
+    <CompendiumViewerModal
+      open={open}
+      onClose={onClose}
+      onAddItem={(item) => {
+        onSelect(item);
+        onClose();
+      }}
+      initialType="qualities"
+      restrictToTypes={["qualities"]}
+      initialQualityFilters={[filterType]}
+    />
   );
 }
 
@@ -3436,6 +3395,9 @@ function OptionalPanel() {
           ...(formState.description != null
             ? { description: String(formState.description).trim() }
             : {}),
+          ...(formState.targetDescription != null
+            ? { targetDescription: String(formState.targetDescription).trim() }
+            : {}),
           ...(formState.effect != null
             ? { effect: String(formState.effect).trim() }
             : {}),
@@ -3464,6 +3426,7 @@ function OptionalPanel() {
       name: String(imported.name ?? ""),
       fuid: imported.fuid || "",
       description: String(imported.description ?? ""),
+      targetDescription: String(imported.targetDescription ?? ""),
       effect: String(imported.effect ?? ""),
       clockSections:
         Number.isFinite(parsedSections) && parsedSections > 0

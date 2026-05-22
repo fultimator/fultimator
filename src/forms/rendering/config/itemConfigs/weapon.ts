@@ -166,7 +166,7 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     group: G.core,
     order: 1,
     validationHints: { required: true },
-    gridSize: "grow",
+    gridSize: { xs: 12, md: 10 },
   },
   {
     key: "martial",
@@ -176,7 +176,7 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     defaultValue: false,
     group: G.core,
     order: 2,
-    gridSize: "auto",
+    gridSize: { xs: 12, md: 2 },
   },
   {
     key: "category",

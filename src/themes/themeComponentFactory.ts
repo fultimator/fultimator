@@ -943,6 +943,9 @@ export function createThemeComponents({
     },
     MuiButton: {
       styleOverrides: {
+        root: {
+          fontWeight: 700,
+        },
         outlined: {
           borderColor: isEffectProfile(profile)
             ? alpha(quaternary, isDark ? 0.95 : 0.7)

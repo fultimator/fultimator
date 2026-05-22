@@ -347,7 +347,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "rareAccuracyBonus",
     kind: "editable",
-    label: "customWeapon.rare.accuracyBonus",
+    label: "+1 Accuracy Bonus (+100z)",
     component: "checkbox",
     defaultValue: false,
     group: G.rare,
@@ -372,7 +372,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "rareDamageBonus",
     kind: "editable",
-    label: "customWeapon.rare.damageBonus",
+    label: "+4 Damage Bonus (+200z)",
     component: "checkbox",
     defaultValue: false,
     group: G.rare,

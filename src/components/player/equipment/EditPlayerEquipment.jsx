@@ -399,9 +399,28 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
           </Stack>
         </Box>
 
-        <Stack direction="row" spacing={0.25} alignItems="center" justifyContent="center" onClick={(e) => e.stopPropagation()} sx={{ ml: 1, alignSelf: "stretch" }}>
+        <Stack
+          direction="row"
+          spacing={0.25}
+          alignItems="center"
+          justifyContent="center"
+          onClick={(e) => e.stopPropagation()}
+          sx={{ ml: 1, alignSelf: "center", minHeight: CONTROL_SIZE }}
+        >
           {metaText(item, equipType) ? (
-            <Typography variant="body2" color="text.secondary" sx={{ mr: 0.5, whiteSpace: "nowrap", display: "flex", alignItems: "center", minHeight: CONTROL_SIZE, lineHeight: 1 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mr: 0.5,
+                whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                minHeight: CONTROL_SIZE,
+                lineHeight: 1.2,
+                fontWeight: 700,
+              }}
+            >
               {metaText(item, equipType)}
             </Typography>
           ) : null}
