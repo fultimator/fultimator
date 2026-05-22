@@ -131,7 +131,6 @@ export default function NpcSelector({
             {filteredNpcList.map((npc) => (
               <Box key={npc.id}>
                 <ListItem
-                  button
                   onClick={() => handleSelectNPC(npc.id)}
                   sx={{ padding: "5px 10px" }}
                 >
@@ -465,7 +464,6 @@ export default function NpcSelector({
               {filteredNpcList.map((npc) => (
                 <Box key={npc.id}>
                   <ListItem
-                    button
                     onClick={() => handleSelectNPC(npc.id)}
                     sx={{ padding: "5px 10px" }}
                   >

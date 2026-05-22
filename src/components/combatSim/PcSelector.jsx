@@ -57,7 +57,6 @@ export default function PcSelector({
           {filteredList.map((player) => (
             <Box key={player.id}>
               <ListItem
-                button
                 onClick={() => handleSelectPC(player)}
                 sx={{ padding: "5px 10px" }}
               >

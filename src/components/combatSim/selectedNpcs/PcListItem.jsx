@@ -36,7 +36,6 @@ export default function PcListItem({
 
   return (
     <ListItem
-      button
       onClick={(e) =>
         e.target.type !== "checkbox" && handleListItemClick(pc.combatId)
       }

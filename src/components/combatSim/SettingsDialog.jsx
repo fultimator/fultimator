@@ -474,7 +474,6 @@ const SettingsDialog = ({
                   {category.items.map((item, itemIndex) => (
                     <ListItem
                       key={itemIndex}
-                      button
                       onClick={() => {
                         if (item.type === "switch")
                           handleSwitchChange(item.name)({
@@ -681,7 +680,6 @@ const SettingsDialog = ({
                     {logSettings.map((item, index) => (
                       <ListItem
                         key={item.key}
-                        button
                         onClick={() => handleLogTypeToggle(item.key)}
                         sx={{
                           borderBottom:

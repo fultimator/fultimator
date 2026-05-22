@@ -86,7 +86,6 @@ export default function NpcListItem({
       ref={setNodeRef}
       style={style}
       key={npc.combatId}
-      button
       onClick={(e) => npc.id && handleListItemClick(e, npc.combatId)}
       sx={{
         border:
