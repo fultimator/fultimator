@@ -25,6 +25,8 @@ import {
 } from "../../forms/rendering/config/itemConfigs/npcSpecial";
 import {
   Add,
+  ArrowDownward,
+  ArrowUpward,
   Casino,
   Delete,
   ExpandMore,
@@ -36,7 +38,15 @@ import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
-function SpecialContextMenu({ special, npcName: _npcName, onDelete }) {
+function SpecialContextMenu({
+  special,
+  npcName: _npcName,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  showMoveUp,
+  showMoveDown,
+}) {
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -97,6 +107,30 @@ function SpecialContextMenu({ special, npcName: _npcName, onDelete }) {
             <LibraryAdd />
           </ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveUp}
+          onClick={() => {
+            close();
+            onMoveUp();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowUpward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Up")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveDown}
+          onClick={() => {
+            close();
+            onMoveDown();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowDownward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Down")}</ListItemText>
         </MenuItem>
 
         <Divider />
@@ -215,6 +249,32 @@ export default function EditSpecial({ npc, setNpc }) {
     }));
   };
 
+  const moveSpecial = (fromIndex, toIndex) => {
+    setNpc((prev) => {
+      const special = [...(prev.special || [])];
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= special.length ||
+        toIndex >= special.length
+      ) {
+        return prev;
+      }
+      [special[fromIndex], special[toIndex]] = [special[toIndex], special[fromIndex]];
+      return { ...prev, special };
+    });
+    setExpandedSet((prev) => {
+      const next = new Set(prev);
+      const hadFrom = next.has(fromIndex);
+      const hadTo = next.has(toIndex);
+      if (hadFrom) next.add(toIndex);
+      else next.delete(toIndex);
+      if (hadTo) next.add(fromIndex);
+      else next.delete(fromIndex);
+      return next;
+    });
+  };
+
   const openDeleteDialog = (index) => {
     setPendingSpecialIndex(index);
     setIsDeleteDialogOpen(true);
@@ -281,6 +341,10 @@ export default function EditSpecial({ npc, setNpc }) {
                       special={special}
                       npcName={npc.name}
                       onDelete={() => openDeleteDialog(i)}
+                      onMoveUp={() => moveSpecial(i, i - 1)}
+                      onMoveDown={() => moveSpecial(i, i + 1)}
+                      showMoveUp={i > 0}
+                      showMoveDown={i < (npc.special?.length ?? 0) - 1}
                     />
                   </Box>
                   <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>

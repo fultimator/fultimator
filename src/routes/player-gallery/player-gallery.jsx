@@ -17,6 +17,7 @@ import {
   Chip,
   Divider,
   IconButton,
+  useMediaQuery,
   ListItemIcon,
   ListItemText,
   Menu as MuiMenu,
@@ -1683,6 +1684,7 @@ function PlayerGalleryCardActions({
   const [expanded, setExpanded] = useState(false);
   const [actionsAnchor, setActionsAnchor] = useState(null);
   const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
+  const isMobile = useMediaQuery("(max-width: 600px)");
   const [downloadImage] = useDownloadImage(player?.name || "player", cardRef);
   const exportData = canonicalizeForTransfer(
     "pc",
@@ -1950,46 +1952,50 @@ function PlayerGalleryCardActions({
             <Edit />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t("Player Sheet")}>
-          <IconButton
-            onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
-          >
-            <Badge />
-          </IconButton>
-        </Tooltip>
-        <PlayerTransferButton
-          player={player}
-          copyPlayerToLocal={copyPlayerToLocal}
-          copyPlayerToCloud={copyPlayerToCloud}
-          movePlayerToLocal={movePlayerToLocal}
-          movePlayerToCloud={movePlayerToCloud}
-          t={t}
-        />
-        <Tooltip title={t("Delete")}>
-          <IconButton onClick={deletePlayer(player)}>
-            <Delete />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t("Share URL")}>
-          <span>
-            <IconButton
-              onClick={() => sharePlayer(player.id)}
-              disabled={dbMode === "local"}
-            >
-              <Share />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={t("Download as Image")}>
-          <IconButton onClick={downloadImage}>
-            <Download />
-          </IconButton>
-        </Tooltip>
-        <Export
-          name={`${player.name}`}
-          dataType="pc"
-          data={applyPreSaveTransforms(player)}
-        />
+        {!isMobile && (
+          <>
+            <Tooltip title={t("Player Sheet")}>
+              <IconButton
+                onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
+              >
+                <Badge />
+              </IconButton>
+            </Tooltip>
+            <PlayerTransferButton
+              player={player}
+              copyPlayerToLocal={copyPlayerToLocal}
+              copyPlayerToCloud={copyPlayerToCloud}
+              movePlayerToLocal={movePlayerToLocal}
+              movePlayerToCloud={movePlayerToCloud}
+              t={t}
+            />
+            <Tooltip title={t("Delete")}>
+              <IconButton onClick={deletePlayer(player)}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Share URL")}>
+              <span>
+                <IconButton
+                  onClick={() => sharePlayer(player.id)}
+                  disabled={dbMode === "local"}
+                >
+                  <Share />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t("Download as Image")}>
+              <IconButton onClick={downloadImage}>
+                <Download />
+              </IconButton>
+            </Tooltip>
+            <Export
+              name={`${player.name}`}
+              dataType="pc"
+              data={applyPreSaveTransforms(player)}
+            />
+          </>
+        )}
         <Box sx={{ ml: "auto" }} />
         <Tooltip
           title={`Schema version ${player.schemaVersion ?? 0} of ${PLAYER_CURRENT_SCHEMA_VERSION} (${playerNeedsMigration(player) ? "migration needed" : "up to date"})`}

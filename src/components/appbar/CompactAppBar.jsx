@@ -54,6 +54,11 @@ const NpcEditAppBar = ({
                 <ArrowBack />
               </IconButton>
             )}
+            <Tooltip title="Open Compendium">
+              <IconButton color="inherit" onClick={openCompendiumModal}>
+                <Search />
+              </IconButton>
+            </Tooltip>
           </Grid>
           <Grid size={6} sx={{ textAlign: "center" }}>
             <Grid container sx={{ justifyContent: "center" }}>
@@ -65,11 +70,6 @@ const NpcEditAppBar = ({
               container
               sx={{ alignItems: "center", justifyContent: "flex-end" }}
             >
-              <Tooltip title="Open Compendium">
-                <IconButton color="inherit" onClick={openCompendiumModal}>
-                  <Search />
-                </IconButton>
-              </Tooltip>
               {onOpenDrawer && (
                 <Tooltip title="Open Chat">
                   <IconButton color="inherit" onClick={onOpenDrawer}>
@@ -132,6 +132,11 @@ const PcEditAppBar = ({
                 <ArrowBack />
               </IconButton>
             )}
+            <Tooltip title="Open Compendium">
+              <IconButton color="inherit" onClick={openCompendiumModal}>
+                <Search />
+              </IconButton>
+            </Tooltip>
           </Grid>
           <Grid size={6} sx={{ textAlign: "center" }}>
             <Grid container sx={{ justifyContent: "center" }}>
@@ -143,11 +148,6 @@ const PcEditAppBar = ({
               container
               sx={{ alignItems: "center", justifyContent: "flex-end" }}
             >
-              <Tooltip title="Open Compendium">
-                <IconButton color="inherit" onClick={openCompendiumModal}>
-                  <Search />
-                </IconButton>
-              </Tooltip>
               {onOpenDrawer && (
                 <Tooltip title="Open Chat">
                   <IconButton color="inherit" onClick={onOpenDrawer}>

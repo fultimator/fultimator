@@ -20,6 +20,8 @@ import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
 import {
   Add,
+  ArrowDownward,
+  ArrowUpward,
   Casino,
   Delete,
   ExpandMore,
@@ -28,7 +30,15 @@ import {
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
-function NoteContextMenu({ note, npcName, onDelete }) {
+function NoteContextMenu({
+  note,
+  npcName,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  showMoveUp,
+  showMoveDown,
+}) {
   const { t } = useTranslate();
   const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -67,6 +77,31 @@ function NoteContextMenu({ note, npcName, onDelete }) {
           <ListItemText>{t("Roll")}</ListItemText>
         </MenuItem>
 
+        <Divider />
+        <MenuItem
+          disabled={!showMoveUp}
+          onClick={() => {
+            close();
+            onMoveUp();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowUpward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Up")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveDown}
+          onClick={() => {
+            close();
+            onMoveDown();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowDownward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Down")}</ListItemText>
+        </MenuItem>
         <Divider />
 
         <MenuItem
@@ -112,6 +147,22 @@ export default function EditNotes({ npc, setNpc }) {
       ...prev,
       notes: (prev.notes || []).filter((_, idx) => idx !== i),
     }));
+  };
+
+  const moveNote = (fromIndex, toIndex) => {
+    setNpc((prev) => {
+      const notes = [...(prev.notes || [])];
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= notes.length ||
+        toIndex >= notes.length
+      ) {
+        return prev;
+      }
+      [notes[fromIndex], notes[toIndex]] = [notes[toIndex], notes[fromIndex]];
+      return { ...prev, notes };
+    });
   };
 
   const openDeleteDialog = (i) => {
@@ -173,6 +224,10 @@ export default function EditNotes({ npc, setNpc }) {
                 note={note}
                 npcName={npc.name}
                 onDelete={() => openDeleteDialog(i)}
+                onMoveUp={() => moveNote(i, i - 1)}
+                onMoveDown={() => moveNote(i, i + 1)}
+                showMoveUp={i > 0}
+                showMoveDown={i < (npc.notes?.length ?? 0) - 1}
               />
             </Box>
             <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>

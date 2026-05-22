@@ -19,9 +19,11 @@ import {
   Button,
   ToggleButtonGroup,
   ToggleButton,
+  useMediaQuery,
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+import PlayerCardMobile from "./PlayerCardMobile";
 import { useTranslate } from "../../../translation/translate";
 import avatar_image from "/images/components/avatar.jpg";
 import Diamond from "../../Diamond";
@@ -393,6 +395,7 @@ export default function PlayerCard({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const custom = useCustomTheme();
   const actorSheetEffectsEnabled = useThemeStore(
     (s) => s.customization.actorSheetEffectsEnabled,
@@ -692,6 +695,22 @@ export default function PlayerCard({
       disabled={!(isEditMode || isOwner) || isImmune(key)}
     />
   );
+
+  if (isMobile) {
+    return (
+      <PlayerCardMobile
+        player={player}
+        setPlayer={setPlayer}
+        isEditMode={isEditMode}
+        isOwner={isOwner}
+        isCharacterSheet={isCharacterSheet}
+        characterImage={characterImage}
+        updateMaxStats={updateMaxStats}
+        canLevelUpFromExp={canLevelUpFromExp}
+        onLevelUpRequest={onLevelUpRequest}
+      />
+    );
+  }
 
   return (
     <Card

@@ -25,6 +25,8 @@ import {
 } from "../../forms/rendering/config/itemConfigs/npcSpell";
 import {
   Add,
+  ArrowDownward,
+  ArrowUpward,
   Casino,
   Delete,
   ExpandMore,
@@ -63,7 +65,14 @@ const SUMMARY_META_SX = {
   },
 };
 
-function SpellContextMenu({ spell, onDelete }) {
+function SpellContextMenu({
+  spell,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  showMoveUp,
+  showMoveDown,
+}) {
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -124,6 +133,30 @@ function SpellContextMenu({ spell, onDelete }) {
             <LibraryAdd />
           </ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveUp}
+          onClick={() => {
+            close();
+            onMoveUp();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowUpward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Up")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveDown}
+          onClick={() => {
+            close();
+            onMoveDown();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowDownward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Down")}</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem
@@ -263,6 +296,32 @@ export default function EditSpells({ npc, setNpc }) {
     }));
   };
 
+  const moveSpell = (fromIndex, toIndex) => {
+    setNpc((prev) => {
+      const spells = [...(prev.spells || [])];
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= spells.length ||
+        toIndex >= spells.length
+      ) {
+        return prev;
+      }
+      [spells[fromIndex], spells[toIndex]] = [spells[toIndex], spells[fromIndex]];
+      return { ...prev, spells };
+    });
+    setExpandedSet((prev) => {
+      const next = new Set(prev);
+      const hadFrom = next.has(fromIndex);
+      const hadTo = next.has(toIndex);
+      if (hadFrom) next.add(toIndex);
+      else next.delete(toIndex);
+      if (hadTo) next.add(fromIndex);
+      else next.delete(fromIndex);
+      return next;
+    });
+  };
+
   const openDeleteDialog = (index) => {
     setPendingSpellIndex(index);
     setIsDeleteDialogOpen(true);
@@ -378,6 +437,10 @@ export default function EditSpells({ npc, setNpc }) {
                     <SpellContextMenu
                       spell={spell}
                       onDelete={() => openDeleteDialog(i)}
+                      onMoveUp={() => moveSpell(i, i - 1)}
+                      onMoveDown={() => moveSpell(i, i + 1)}
+                      showMoveUp={i > 0}
+                      showMoveDown={i < (npc.spells?.length ?? 0) - 1}
                     />
                   </Box>
                   <Box

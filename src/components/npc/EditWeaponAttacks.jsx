@@ -32,6 +32,8 @@ import {
 } from "../../forms/rendering/config/itemConfigs/npcAttack";
 import {
   Add,
+  ArrowDownward,
+  ArrowUpward,
   Casino,
   Delete,
   ExpandMore,
@@ -128,7 +130,14 @@ function SelectWeapon({ attack, onChange }) {
   );
 }
 
-function WeaponAttackContextMenu({ attack, onDelete }) {
+function WeaponAttackContextMenu({
+  attack,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  showMoveUp,
+  showMoveDown,
+}) {
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -186,6 +195,30 @@ function WeaponAttackContextMenu({ attack, onDelete }) {
             <LibraryAdd />
           </ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveUp}
+          onClick={() => {
+            close();
+            onMoveUp();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowUpward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Up")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveDown}
+          onClick={() => {
+            close();
+            onMoveDown();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowDownward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Down")}</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem
@@ -307,6 +340,35 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
     }));
   };
 
+  const moveAttack = (fromIndex, toIndex) => {
+    setNpc((prev) => {
+      const weaponattacks = [...(prev.weaponattacks || [])];
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= weaponattacks.length ||
+        toIndex >= weaponattacks.length
+      ) {
+        return prev;
+      }
+      [weaponattacks[fromIndex], weaponattacks[toIndex]] = [
+        weaponattacks[toIndex],
+        weaponattacks[fromIndex],
+      ];
+      return { ...prev, weaponattacks };
+    });
+    setExpandedSet((prev) => {
+      const next = new Set(prev);
+      const hadFrom = next.has(fromIndex);
+      const hadTo = next.has(toIndex);
+      if (hadFrom) next.add(toIndex);
+      else next.delete(toIndex);
+      if (hadTo) next.add(fromIndex);
+      else next.delete(fromIndex);
+      return next;
+    });
+  };
+
   const openDeleteDialog = (index) => {
     setPendingAttackIndex(index);
     setIsDeleteDialogOpen(true);
@@ -410,6 +472,10 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
                     <WeaponAttackContextMenu
                       attack={attack}
                       onDelete={() => openDeleteDialog(i)}
+                      onMoveUp={() => moveAttack(i, i - 1)}
+                      onMoveDown={() => moveAttack(i, i + 1)}
+                      showMoveUp={i > 0}
+                      showMoveDown={i < (npc.weaponattacks?.length ?? 0) - 1}
                     />
                   </Box>
                   <Box

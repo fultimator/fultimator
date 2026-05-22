@@ -722,7 +722,7 @@ export default function PlayerCardGallery({
             />
           </Box>
 
-          {/* Attributes (always 2x2) */}
+          {/* Attributes (always 2x2, 1 column on mobile) */}
           <Box
             sx={{
               display: "grid",
@@ -730,7 +730,7 @@ export default function PlayerCardGallery({
               borderTop: `0.5px solid ${theme.palette.divider}`,
               width: "100%",
               minWidth: 0,
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
               gap: "6px",
               px: 0.5,
               pb: 0.75,
@@ -1018,6 +1018,27 @@ export default function PlayerCardGallery({
           </Box>
         </Box>
       </Box>
+      {/* Affinity Strip */}
+      <AffinityStrip>
+        {[
+          "physical",
+          "air",
+          "bolt",
+          "dark",
+          "earth",
+          "fire",
+          "ice",
+          "light",
+          "poison",
+        ].map((type) => (
+          <AffinityCell key={type}>
+            <TypeAffinity
+              type={type}
+              affinity={player.affinities?.[type] || ""}
+            />
+          </AffinityCell>
+        ))}
+      </AffinityStrip>
       {isExpanded && (
         <Box
           sx={{
@@ -1224,27 +1245,6 @@ export default function PlayerCardGallery({
           </Box>
         </Box>
       )}
-      {/* Affinity Strip */}
-      <AffinityStrip>
-        {[
-          "physical",
-          "air",
-          "bolt",
-          "dark",
-          "earth",
-          "fire",
-          "ice",
-          "light",
-          "poison",
-        ].map((type) => (
-          <AffinityCell key={type}>
-            <TypeAffinity
-              type={type}
-              affinity={player.affinities?.[type] || ""}
-            />
-          </AffinityCell>
-        ))}
-      </AffinityStrip>
     </Card>
   );
 }

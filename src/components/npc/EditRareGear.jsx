@@ -20,6 +20,8 @@ import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
 import {
   Add,
+  ArrowDownward,
+  ArrowUpward,
   Casino,
   Delete,
   ExpandMore,
@@ -28,7 +30,15 @@ import {
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
-function RareGearContextMenu({ raregear, npcName, onDelete }) {
+function RareGearContextMenu({
+  raregear,
+  npcName,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  showMoveUp,
+  showMoveDown,
+}) {
   const { t } = useTranslate();
   const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -67,6 +77,31 @@ function RareGearContextMenu({ raregear, npcName, onDelete }) {
           <ListItemText>{t("Roll")}</ListItemText>
         </MenuItem>
 
+        <Divider />
+        <MenuItem
+          disabled={!showMoveUp}
+          onClick={() => {
+            close();
+            onMoveUp();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowUpward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Up")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveDown}
+          onClick={() => {
+            close();
+            onMoveDown();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowDownward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Down")}</ListItemText>
+        </MenuItem>
         <Divider />
 
         <MenuItem
@@ -112,6 +147,22 @@ export default function EditRareGear({ npc, setNpc }) {
       ...prev,
       raregear: (prev.raregear || []).filter((_, idx) => idx !== i),
     }));
+  };
+
+  const moveRareGear = (fromIndex, toIndex) => {
+    setNpc((prev) => {
+      const raregear = [...(prev.raregear || [])];
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= raregear.length ||
+        toIndex >= raregear.length
+      ) {
+        return prev;
+      }
+      [raregear[fromIndex], raregear[toIndex]] = [raregear[toIndex], raregear[fromIndex]];
+      return { ...prev, raregear };
+    });
   };
 
   const openDeleteDialog = (i) => {
@@ -173,6 +224,10 @@ export default function EditRareGear({ npc, setNpc }) {
                 raregear={raregear}
                 npcName={npc.name}
                 onDelete={() => openDeleteDialog(i)}
+                onMoveUp={() => moveRareGear(i, i - 1)}
+                onMoveDown={() => moveRareGear(i, i + 1)}
+                showMoveUp={i > 0}
+                showMoveDown={i < (npc.raregear?.length ?? 0) - 1}
               />
             </Box>
             <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>

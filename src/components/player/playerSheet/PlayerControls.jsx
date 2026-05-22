@@ -800,6 +800,14 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                   mx: 0.75,
                 }}
               />
+              <Box
+                sx={{
+                  display: { xs: "grid", md: "contents" },
+                  gridTemplateColumns: "1fr 1fr",
+                  gridColumn: { md: "5 / span 4" },
+                  gridRow: { md: "1 / span 2" },
+                }}
+              >
               <Tooltip title="Group Check">
                 <IconButton
                   size="small"
@@ -902,6 +910,7 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
                   </Box>
                 </IconButton>
               </Tooltip>
+              </Box>
             </Box>
           </Grid>
         </Grid>
