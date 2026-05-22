@@ -20,6 +20,7 @@ interface ShieldBase {
 
 export type ShieldFormState = Omit<ShieldPersisted, "base"> & {
   base: ShieldBase | undefined;
+  qualityApplicableTo: string[];
 };
 const SHIELD_LABEL_PREFIX = "shield";
 
@@ -37,6 +38,14 @@ const qualityGroups: SelectGroup[] = Object.entries(
   header: category,
   options: qs.map((q) => ({ value: q.name, label: `${q.name} (${q.cost}z)` })),
 }));
+
+const qualityApplicableToOptions: SelectOption[] = [
+  { value: "weapon", label: "Weapons" },
+  { value: "customWeapon", label: "Custom Weapons" },
+  { value: "armor", label: "Armor" },
+  { value: "shield", label: "Shields" },
+  { value: "accessory", label: "Accessories" },
+];
 
 const G = {
   base: "base",
@@ -141,6 +150,13 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
         );
         return q?.cost ?? s.qualityCost;
       },
+      qualityApplicableTo: (s) => {
+        const q = qualities.find(
+          (el: { name: string; filter?: string[] }) =>
+            el.name === s.selectedQuality,
+        );
+        return Array.isArray(q?.filter) ? q.filter : s.qualityApplicableTo;
+      },
       cost: (s) => {
         const q = qualities.find(
           (el: { name: string }) => el.name === s.selectedQuality,
@@ -173,6 +189,21 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     group: G.quality,
     order: 12,
     fullWidth: true,
+  },
+  {
+    key: "qualityApplicableTo",
+    kind: "form-state",
+    label: "quality.applicableTo",
+    component: "autocomplete",
+    defaultValue: ["shield"],
+    group: G.quality,
+    order: 13,
+    fullWidth: true,
+    componentProps: {
+      options: qualityApplicableToOptions,
+      multiple: true,
+      freeSolo: false,
+    },
   },
   {
     key: "defModifier",

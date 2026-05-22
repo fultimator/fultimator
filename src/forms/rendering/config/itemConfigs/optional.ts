@@ -15,6 +15,7 @@ type OptionalFormStateShape = {
   fuid?: string;
   meta?: OptionalItem extends { meta?: infer M } ? M : never;
   description?: string | CampActivityTargetKey;
+  target?: CampActivityTargetKey | "";
   targetDescription?: string;
   effect?: string;
   showClock?: boolean;
@@ -115,11 +116,11 @@ export const optionalFieldConfig: ItemFieldConfig<OptionalFormState> = [
   },
   // body: target (camp-activities - maps to description in output)
   {
-    key: "description",
+    key: "target",
     kind: "editable",
     label: prefixedLabel(OPTIONAL_LABEL_PREFIX, SHARED_LABEL_KEYS.target),
     component: "select",
-    defaultValue: "choice",
+    defaultValue: "",
     group: G.body,
     order: 2,
     fullWidth: true,
@@ -141,7 +142,7 @@ export const optionalFieldConfig: ItemFieldConfig<OptionalFormState> = [
     group: G.body,
     order: 2.5,
     fullWidth: true,
-    dependencies: (s) => hasCampTarget(s) && s.description === "choice",
+    dependencies: (s) => hasCampTarget(s) && s.target === "choice",
   },
   // body: effect (quirk, camp-activities, other)
   {

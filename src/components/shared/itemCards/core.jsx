@@ -134,6 +134,7 @@ export function HeaderSpacer({ imageMode, imageSize, imageVisible }) {
 
 function withRowMinHeight(row) {
   if (!isValidElement(row)) return row;
+  if (row.type === Symbol.for("react.fragment")) return row;
   const muiName = row.type?.muiName;
   if (muiName === "Divider" || muiName === "MuiDivider") return row;
 

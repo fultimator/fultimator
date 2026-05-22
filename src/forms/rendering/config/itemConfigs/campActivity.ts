@@ -25,7 +25,7 @@ export const campActivityFieldConfig: ItemFieldConfig<CampActivityFormState> = [
     kind: "editable",
     label: "Target",
     component: "select",
-    defaultValue: "choice",
+    defaultValue: "",
     group: G.core,
     order: 2,
     fullWidth: true,

@@ -17,7 +17,6 @@ import Export from "../../../components/Export";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import allQualities from "../../../libs/qualities";
-const qualities = allQualities.filter((q) => q.filter?.includes("weapon"));
 import groupBy from "../../../libs/groupby";
 import { calculateCustomWeaponStats } from "../../../components/player/common/playerCalculations";
 import { categories, accuracyChecks } from "./libs.jsx";
@@ -27,6 +26,14 @@ import {
   customWeaponGroupLabels,
 } from "../../../forms/rendering/config/itemConfigs/customWeapon";
 
+const qualities = allQualities
+  .filter(
+    (q) =>
+      q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+  )
+  .filter(
+    (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
+  );
 const qualityGroups = Object.entries(groupBy(qualities, "category")).map(
   ([category, qs]) => ({
     header: category,
@@ -99,6 +106,7 @@ function buildInitialState(data) {
         attr2: accuracyChecks[0].att2,
       },
       customDamageType: "physical",
+      rareOverrideDamageTypeValue: "physical",
       primaryHrZero: false,
       rareAccuracyBonus: false,
       rareDamageBonus: false,
@@ -156,8 +164,10 @@ function buildInitialState(data) {
 
   const overrideDamageType =
     rare.overrideDamageType ?? data.overrideDamageType ?? false;
-  const customDamageType =
+  const customDamageType = data.damage?.type ?? "physical";
+  const rareOverrideDamageTypeValue =
     rare.overrideDamageTypeValue ??
+    data.rareOverrideDamageTypeValue ??
     data.customDamageType ??
     data.damage?.type ??
     "physical";
@@ -187,7 +197,7 @@ function buildInitialState(data) {
       damageBonus: rare.damageBonus ?? false,
       overrideDamageType,
       overrideAccuracyAttributes,
-      overrideDamageTypeValue: customDamageType,
+      overrideDamageTypeValue: rareOverrideDamageTypeValue,
       overrideAccuracyAttr1: selectedAccuracyCheck.attr1,
       overrideAccuracyAttr2: selectedAccuracyCheck.attr2,
     },
@@ -215,6 +225,7 @@ function buildInitialState(data) {
     selectedRange: data.range ?? "melee",
     selectedAccuracyCheck,
     customDamageType,
+    rareOverrideDamageTypeValue,
     primaryHrZero: data.damage?.hrZero === true,
     rareAccuracyBonus: rare.accuracyBonus ?? false,
     rareDamageBonus: rare.damageBonus ?? false,
@@ -266,6 +277,7 @@ function CustomWeapons() {
       qualityName: item.name,
       quality: item.quality ?? "",
       qualityCost: item.cost ?? 0,
+      qualityApplicableTo: Array.isArray(item.filter) ? item.filter : [],
       cost: (prev.cost ?? 0) - (prev.qualityCost ?? 0) + (item.cost ?? 0),
     }));
     setQualityBrowserOpen(false);
@@ -335,10 +347,10 @@ function CustomWeapons() {
     (c) => c.name === "weapon_customization_elemental",
   );
   const pType = pHasElemental
-    ? customDamageType
+    ? (formState.damage?.type ?? customDamageType ?? "physical")
     : overrideDamageType
-      ? customDamageType
-      : selectedCategory;
+      ? (formState.rareOverrideDamageTypeValue ?? "physical")
+      : "physical";
 
   const exportData = {
     name,
@@ -368,7 +380,7 @@ function CustomWeapons() {
       damageBonus: rareDamageBonus,
       overrideAccuracyAttributes,
       overrideDamageType,
-      overrideDamageTypeValue: customDamageType,
+      overrideDamageTypeValue: formState.rareOverrideDamageTypeValue,
       overrideAccuracyAttr1: selectedAccuracyCheck?.attr1 ?? "dexterity",
       overrideAccuracyAttr2: selectedAccuracyCheck?.attr2 ?? "insight",
     },
@@ -396,9 +408,9 @@ function CustomWeapons() {
           (c) => c.name === "weapon_customization_elemental",
         );
         const s2Type = s2HasElemental
-          ? secondCustomDamageType
-          : secondOverrideDamageType
-            ? secondCustomDamageType
+          ? (formState.secondDamage?.type ?? secondCustomDamageType ?? "physical")
+          : overrideDamageType
+            ? (formState.rareOverrideDamageTypeValue ?? "physical")
             : "physical";
         return {
           secondName: secondWeaponName,

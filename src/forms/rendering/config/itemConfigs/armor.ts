@@ -20,6 +20,7 @@ interface ArmorBase {
 
 export type ArmorFormState = Omit<ArmorPersisted, "base"> & {
   base: ArmorBase | undefined;
+  qualityApplicableTo: string[];
 };
 const ARMOR_LABEL_PREFIX = "armor";
 
@@ -37,6 +38,14 @@ const qualityGroups: SelectGroup[] = Object.entries(
   header: category,
   options: qs.map((q) => ({ value: q.name, label: `${q.name} (${q.cost}z)` })),
 }));
+
+const qualityApplicableToOptions: SelectOption[] = [
+  { value: "weapon", label: "Weapons" },
+  { value: "customWeapon", label: "Custom Weapons" },
+  { value: "armor", label: "Armor" },
+  { value: "shield", label: "Shields" },
+  { value: "accessory", label: "Accessories" },
+];
 
 const G = {
   base: "base",
@@ -145,6 +154,13 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
         );
         return q?.cost ?? s.qualityCost;
       },
+      qualityApplicableTo: (s) => {
+        const q = qualities.find(
+          (el: { name: string; filter?: string[] }) =>
+            el.name === s.selectedQuality,
+        );
+        return Array.isArray(q?.filter) ? q.filter : s.qualityApplicableTo;
+      },
       cost: (s) => {
         const q = qualities.find(
           (el: { name: string }) => el.name === s.selectedQuality,
@@ -179,6 +195,22 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
     order: 12,
     dependencies: (s) => !s.isSlotsVariant,
     fullWidth: true,
+  },
+  {
+    key: "qualityApplicableTo",
+    kind: "form-state",
+    label: "quality.applicableTo",
+    component: "autocomplete",
+    defaultValue: ["armor"],
+    group: G.quality,
+    order: 13,
+    dependencies: (s) => !s.isSlotsVariant,
+    fullWidth: true,
+    componentProps: {
+      options: qualityApplicableToOptions,
+      multiple: true,
+      freeSolo: false,
+    },
   },
   // Slots - shown only when technospheres slots variant is active
   {

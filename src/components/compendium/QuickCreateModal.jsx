@@ -277,6 +277,28 @@ const QUICK_CREATE_TAB_TO_VIEWER_TYPE = {
   optional: "optionals",
 };
 
+const customWeaponQualityGroups = Object.entries(
+  qualities
+    .filter(
+      (q) => q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+    )
+    .filter(
+      (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
+    )
+    .reduce((acc, q) => {
+      const key = q.category || "Uncategorized";
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(q);
+      return acc;
+    }, {}),
+).map(([category, qs]) => ({
+  header: category,
+  options: qs.map((q) => ({
+    value: q.name,
+    label: `${q.name} (${q.cost}z)`,
+  })),
+}));
+
 function localizeImportedClassItem(item) {
   if (!item || typeof item !== "object") return item;
   const next = { ...item };
@@ -386,7 +408,7 @@ function PanelLayout({
             md: 6,
           }}
         >
-          <Stack spacing={2}>
+          <Stack spacing={1}>
             <Box ref={previewRef}>{previewContent}</Box>
             <Box
               sx={{
@@ -449,7 +471,7 @@ function NpcAttackPanel() {
       data={data}
       itemName={data.name || ""}
       formContent={
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <SchemaFieldRenderer
             config={npcAttackFieldConfig}
             groupLabels={npcAttackGroupLabels}
@@ -550,7 +572,7 @@ function NpcSpellPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <SchemaFieldRenderer
             config={npcSpellFieldConfig}
             groupLabels={npcSpellGroupLabels}
@@ -660,7 +682,7 @@ function NpcSpecialPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <SchemaFieldRenderer
             config={npcSpecialFieldConfig}
             groupLabels={npcSpecialGroupLabels}
@@ -743,7 +765,7 @@ function NpcActionPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <SchemaFieldRenderer
             config={npcActionFieldConfig}
             groupLabels={npcActionGroupLabels}
@@ -1162,7 +1184,7 @@ function PlayerSpellPanel() {
       data={payload}
       itemName={(formState.name ?? "").trim() || ""}
       formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
+        <Grid container spacing={1} sx={{ alignItems: "center" }}>
           {/* Core: spellType, fuid, name */}
           <SchemaFieldRenderer
             config={playerSpellFieldConfig}
@@ -1215,7 +1237,7 @@ function PlayerSpellPanel() {
 
               {/* Frame */}
               {pilotSubtype === "frame" && (
-                <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                   <Grid size={12}>
                     <Typography
                       variant="subtitle2"
@@ -1259,7 +1281,7 @@ function PlayerSpellPanel() {
 
               {/* Support Module */}
               {pilotSubtype === "support" && (
-                <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                   <Grid size={12}>
                     <Typography
                       variant="subtitle2"
@@ -1301,8 +1323,8 @@ function PlayerSpellPanel() {
                   <Grid
                     size={12}
                     container
-                    spacing={2}
-                    sx={{ mb: 2, alignItems: "center" }}
+                    spacing={1}
+                    sx={{ mb: 0.75, alignItems: "center" }}
                   >
                     <Grid size={12}>
                       <Typography
@@ -1364,7 +1386,7 @@ function PlayerSpellPanel() {
                       />
                     </Grid>
                   </Grid>
-                  <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                  <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                     <Grid size={12}>
                       <CustomTextarea
                         label={t("Description (optional)")}
@@ -1383,8 +1405,8 @@ function PlayerSpellPanel() {
                   <Grid
                     size={12}
                     container
-                    spacing={2}
-                    sx={{ mb: 2, alignItems: "center" }}
+                    spacing={1}
+                    sx={{ mb: 0.75, alignItems: "center" }}
                   >
                     <Grid size={12}>
                       <Typography
@@ -1460,7 +1482,7 @@ function PlayerSpellPanel() {
                       </ToggleButton>
                     </Grid>
                   </Grid>
-                  <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                  <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                     <Grid size={12}>
                       <Typography
                         variant="subtitle2"
@@ -1527,7 +1549,7 @@ function PlayerSpellPanel() {
                       />
                     </Grid>
                   </Grid>
-                  <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                  <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                     <Grid size={12}>
                       <Typography
                         variant="subtitle2"
@@ -1592,7 +1614,7 @@ function PlayerSpellPanel() {
                       />
                     </Grid>
                   </Grid>
-                  <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                  <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                     <Grid size={12}>
                       <Typography
                         variant="subtitle2"
@@ -1803,7 +1825,7 @@ function QualityPanel() {
             <Tab label={t("Generator")} />
           </Tabs>
           {qualityTab === 0 ? (
-            <Grid container spacing={2}>
+            <Grid container spacing={1}>
               <Grid size={12}>
                 <Autocomplete
                   options={qualities}
@@ -1912,7 +1934,7 @@ function HeroicPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <SchemaFieldRenderer
             config={heroicFieldConfig}
             state={formState}
@@ -2019,7 +2041,7 @@ function ClassPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             <SchemaFieldRenderer
               config={classFieldConfig}
               state={formState}
@@ -2141,6 +2163,7 @@ function buildWeaponPanelState() {
     totalBonus: 0,
     selectedQuality: "",
     qualityName: "",
+    qualityApplicableTo: ["weapon"],
     range: getWeaponRange(base),
     precModifier: 0,
     damageModifier: 0,
@@ -2270,12 +2293,12 @@ function WeaponPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
               size={12}
               container
-              spacing={2}
-              sx={{ mb: 2, alignItems: "center" }}
+              spacing={1}
+              sx={{ mb: 0.75, alignItems: "center" }}
             >
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
@@ -2300,7 +2323,7 @@ function WeaponPanel() {
                 }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
                 groupLabels={weaponGroupLabels}
@@ -2314,8 +2337,8 @@ function WeaponPanel() {
             <Grid
               size={12}
               container
-              spacing={2}
-              sx={{ mb: 2, alignItems: "center" }}
+              spacing={1}
+              sx={{ mb: 0.75, alignItems: "center" }}
             >
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
@@ -2327,7 +2350,7 @@ function WeaponPanel() {
                 cols={2}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
                 groupLabels={weaponGroupLabels}
@@ -2339,7 +2362,7 @@ function WeaponPanel() {
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={weaponFieldConfig}
                 groupLabels={weaponGroupLabels}
@@ -2402,6 +2425,7 @@ function WeaponPanel() {
             qualityName: q.name,
             quality: q.quality ?? "",
             qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
           }))
         }
       />
@@ -2426,6 +2450,7 @@ function buildArmorPanelState() {
     quality: "",
     qualityCost: 0,
     selectedQuality: "",
+    qualityApplicableTo: ["armor"],
     isSlotsVariant: false,
     slots: "alpha",
     slotted: [],
@@ -2453,6 +2478,7 @@ function ArmorPanel() {
     base,
     ...base,
     name,
+    martial: Boolean(formState.martial),
     fuid: formState.fuid || undefined,
     cost,
     quality,
@@ -2487,8 +2513,8 @@ function ArmorPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={armorFieldConfig}
                 groupLabels={armorGroupLabels}
@@ -2512,7 +2538,7 @@ function ArmorPanel() {
                 }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={armorFieldConfig}
                 groupLabels={armorGroupLabels}
@@ -2524,7 +2550,7 @@ function ArmorPanel() {
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={armorFieldConfig}
                 groupLabels={armorGroupLabels}
@@ -2564,6 +2590,7 @@ function ArmorPanel() {
             qualityName: q.name,
             quality: q.quality ?? "",
             qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
           }))
         }
       />
@@ -2588,6 +2615,7 @@ function buildShieldPanelState() {
     quality: "",
     qualityCost: 0,
     selectedQuality: "",
+    qualityApplicableTo: ["shield"],
     cost: base.cost,
     defModifier: 0,
     mDefModifier: 0,
@@ -2612,6 +2640,7 @@ function ShieldPanel() {
     base,
     ...base,
     name,
+    martial: Boolean(formState.martial),
     fuid: formState.fuid || undefined,
     cost,
     quality,
@@ -2646,8 +2675,8 @@ function ShieldPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={shieldFieldConfig}
                 groupLabels={shieldGroupLabels}
@@ -2671,7 +2700,7 @@ function ShieldPanel() {
                 }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={shieldFieldConfig}
                 groupLabels={shieldGroupLabels}
@@ -2683,7 +2712,7 @@ function ShieldPanel() {
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={shieldFieldConfig}
                 groupLabels={shieldGroupLabels}
@@ -2723,6 +2752,7 @@ function ShieldPanel() {
             qualityName: q.name,
             quality: q.quality ?? "",
             qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
           }))
         }
       />
@@ -2771,6 +2801,7 @@ function buildCWPanelState() {
     dataType: "weapon",
     selectedQuality: "",
     qualityName: "",
+    qualityApplicableTo: ["customWeapon"],
     isEquipped: false,
     selectedCategory: cwCategories[0],
     selectedRange: "melee",
@@ -2779,6 +2810,7 @@ function buildCWPanelState() {
       attr2: cwAccuracyChecks[0].att2,
     },
     customDamageType: "physical",
+    rareOverrideDamageTypeValue: "physical",
     primaryHrZero: false,
     rareAccuracyBonus: false,
     rareDamageBonus: false,
@@ -2824,6 +2856,7 @@ function CustomWeaponPanel() {
     secondSelectedCategory,
     primaryHrZero,
     customDamageType,
+    rareOverrideDamageTypeValue,
     overrideDamageType,
     damageModifier,
     precModifier,
@@ -2857,9 +2890,9 @@ function CustomWeaponPanel() {
     (c) => c.name === "weapon_customization_elemental",
   );
   const primaryType = pHasElemental
-    ? customDamageType
+    ? (formState.damage?.type ?? customDamageType ?? "physical")
     : overrideDamageType
-      ? customDamageType
+      ? (rareOverrideDamageTypeValue ?? "physical")
       : "physical";
 
   const { precision: secondPrecision, damage: secondDamage } = hasTransforming
@@ -2880,9 +2913,9 @@ function CustomWeaponPanel() {
     (c) => c.name === "weapon_customization_elemental",
   );
   const secondType = s2HasElemental
-    ? secondCustomDamageType
-    : secondOverrideDamageType
-      ? secondCustomDamageType
+    ? (formState.secondDamage?.type ?? secondCustomDamageType ?? "physical")
+    : overrideDamageType
+      ? (rareOverrideDamageTypeValue ?? "physical")
       : "physical";
 
   const singleAttributeAccuracyCost =
@@ -2981,12 +3014,12 @@ function CustomWeaponPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
               size={12}
               container
-              spacing={2}
-              sx={{ mb: 2, alignItems: "center" }}
+              spacing={1}
+              sx={{ mb: 0.75, alignItems: "center" }}
             >
               <SchemaFieldRenderer
                 config={customWeaponFieldConfig}
@@ -3014,7 +3047,7 @@ function CustomWeaponPanel() {
                 }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={customWeaponFieldConfig}
                 groupLabels={customWeaponGroupLabels}
@@ -3028,8 +3061,8 @@ function CustomWeaponPanel() {
             <Grid
               size={12}
               container
-              spacing={2}
-              sx={{ mb: 2, alignItems: "center" }}
+              spacing={1}
+              sx={{ mb: 0.75, alignItems: "center" }}
             >
               <SchemaFieldRenderer
                 config={customWeaponFieldConfig}
@@ -3041,7 +3074,7 @@ function CustomWeaponPanel() {
                 cols={2}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={customWeaponFieldConfig}
                 groupLabels={customWeaponGroupLabels}
@@ -3050,7 +3083,10 @@ function CustomWeaponPanel() {
                 surface="edit"
                 group="quality"
                 cols={2}
-                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+                extraProps={{
+                  groups: customWeaponQualityGroups,
+                  onBrowse: () => setQualityPickerOpen(true),
+                }}
               />
             </Grid>
             <Accordion
@@ -3062,7 +3098,7 @@ function CustomWeaponPanel() {
                 <Typography>{t("Modifiers")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Grid container spacing={2}>
+                <Grid container spacing={1}>
                   <SchemaFieldRenderer
                     config={customWeaponFieldConfig}
                     groupLabels={customWeaponGroupLabels}
@@ -3086,7 +3122,7 @@ function CustomWeaponPanel() {
             </Accordion>
             {hasTransforming && (
               <>
-                <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+                <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                   <SchemaFieldRenderer
                     config={customWeaponFieldConfig}
                     groupLabels={customWeaponGroupLabels}
@@ -3112,7 +3148,7 @@ function CustomWeaponPanel() {
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={1}>
                       <SchemaFieldRenderer
                         config={customWeaponFieldConfig}
                         groupLabels={customWeaponGroupLabels}
@@ -3157,6 +3193,7 @@ function CustomWeaponPanel() {
             qualityName: q.name,
             quality: q.quality ?? "",
             qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
           }))
         }
       />
@@ -3174,6 +3211,7 @@ function buildAccessoryPanelState() {
     quality: "",
     qualityCost: 0,
     selectedQuality: "",
+    qualityApplicableTo: ["accessory"],
     cost: 0,
     defModifier: 0,
     mDefModifier: 0,
@@ -3227,8 +3265,8 @@ function AccessoryPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
                 groupLabels={accessoryGroupLabels}
@@ -3254,7 +3292,7 @@ function AccessoryPanel() {
                 }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
                 groupLabels={accessoryGroupLabels}
@@ -3266,7 +3304,7 @@ function AccessoryPanel() {
                 extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
               />
             </Grid>
-            <Grid size={12} container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
               <SchemaFieldRenderer
                 config={accessoryFieldConfig}
                 groupLabels={accessoryGroupLabels}
@@ -3306,6 +3344,7 @@ function AccessoryPanel() {
             qualityName: q.name,
             quality: q.quality ?? "",
             qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
           }))
         }
       />
@@ -3395,9 +3434,13 @@ function OptionalPanel() {
           subtype,
           name: String(formState.name).trim(),
           fuid: formState.fuid || undefined,
-          ...(formState.description != null
-            ? { description: String(formState.description).trim() }
-            : {}),
+          ...(subtype === "camp-activities"
+            ? {
+                description: String(formState.target || "").trim(),
+              }
+            : formState.description != null
+              ? { description: String(formState.description).trim() }
+              : {}),
           ...(formState.targetDescription != null
             ? { targetDescription: String(formState.targetDescription).trim() }
             : {}),
@@ -3428,7 +3471,14 @@ function OptionalPanel() {
       subtype: String(imported.subtype ?? "quirk"),
       name: String(imported.name ?? ""),
       fuid: imported.fuid || "",
-      description: String(imported.description ?? ""),
+      description:
+        imported.subtype === "camp-activities"
+          ? ""
+          : String(imported.description ?? ""),
+      target:
+        imported.subtype === "camp-activities"
+          ? String(imported.description ?? "")
+          : "",
       targetDescription: String(imported.targetDescription ?? ""),
       effect: String(imported.effect ?? ""),
       clockSections:
@@ -3446,7 +3496,7 @@ function OptionalPanel() {
       data={data}
       itemName={data.name || ""}
       formContent={
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <SchemaFieldRenderer
             config={optionalFieldConfig}
             groupLabels={optionalGroupLabels}
@@ -3585,7 +3635,7 @@ function MnemospherePanel() {
   return (
     <PanelLayout
       formContent={
-        <Stack spacing={2}>
+        <Stack spacing={1}>
           <FormControl fullWidth size="small">
             <InputLabel>{t("Class")}</InputLabel>
             <Select
@@ -3697,7 +3747,7 @@ function HoplospherePanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <SchemaFieldRenderer
             config={hoplosphereFieldConfig}
             groupLabels={hoplosphereGroupLabels}

@@ -4,6 +4,7 @@ import type { CustomWeaponPersisted } from "../../../schema/itemSchemas/customWe
 import { calculateCustomWeaponStats } from "../../../../components/player/common/playerCalculations";
 import { Attributes, Elements } from "../../../../types/Misc";
 import { categories } from "../../../../routes/equip/customWeapons/libs";
+import allQualities from "../../../../libs/qualities";
 import type { SelectOption } from "../../fieldRenderers";
 import { typeOptions } from "../typeOptions";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
@@ -13,6 +14,7 @@ export type CustomWeaponFormState = CustomWeaponPersisted & {
   selectedRange: "melee" | "ranged";
   selectedAccuracyCheck: { attr1: Attributes; attr2: Attributes };
   customDamageType: Elements;
+  rareOverrideDamageTypeValue: Elements;
   primaryHrZero: boolean;
   rareAccuracyBonus: boolean;
   rareDamageBonus: boolean;
@@ -36,13 +38,14 @@ export type CustomWeaponFormState = CustomWeaponPersisted & {
   secondMDefModifier: number;
   isSlotsVariant: boolean;
   qualityName: string;
+  qualityApplicableTo: string[];
 };
 const CUSTOM_WEAPON_LABEL_PREFIX = "customWeapon";
 
 function calcCustomWeaponCost(s: CustomWeaponFormState): number {
   const singleAttributeCost =
     s.overrideAccuracyAttributes &&
-    s.selectedAccuracyCheck.attr1 === s.selectedAccuracyCheck.attr2
+      s.selectedAccuracyCheck.attr1 === s.selectedAccuracyCheck.attr2
       ? 50
       : 0;
   return (
@@ -104,6 +107,22 @@ const rangeOptions: SelectOption[] = [
   { value: "melee", label: "weapon_range_melee" },
   { value: "ranged", label: "weapon_range_ranged" },
 ];
+
+const qualityApplicableToOptions: SelectOption[] = [
+  { value: "weapon", label: "Weapons" },
+  { value: "customWeapon", label: "Custom Weapons" },
+  { value: "armor", label: "Armor" },
+  { value: "shield", label: "Shields" },
+  { value: "accessory", label: "Accessories" },
+];
+
+const qualities = allQualities
+  .filter(
+    (q) => q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+  )
+  .filter(
+    (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
+  );
 
 const G = {
   core: "core",
@@ -173,8 +192,8 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
           s.selectedCategory.toLowerCase().includes(r),
         )
           ? (s.customizations ?? []).filter(
-              (c) => c.name !== "weapon_customization_powerful",
-            )
+            (c) => c.name !== "weapon_customization_powerful",
+          )
           : s.customizations,
     },
   },
@@ -250,7 +269,6 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     order: 20,
     componentProps: { options: typeOptions },
     dependencies: (s) =>
-      s.overrideDamageType === true ||
       (s.customizations ?? []).some(
         (c) => c.name === "weapon_customization_elemental",
       ),
@@ -404,12 +422,14 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     order: 42,
     onChangeEffects: {
       "rare.overrideDamageType": (s) => s.overrideDamageType,
+      rareOverrideDamageTypeValue: (s) =>
+        s.overrideDamageType ? s.rareOverrideDamageTypeValue : s.customDamageType,
       cost: calcCustomWeaponCost,
     },
   },
   {
     // Only rendered when overrideDamageType is true; elemental customization takes precedence.
-    key: "customDamageType",
+    key: "rareOverrideDamageTypeValue",
     kind: "editable",
     label: "customWeapon.rare.overrideDamageTypeValue",
     component: "type-select",
@@ -423,7 +443,9 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
         (c) => c.name === "weapon_customization_elemental",
       ),
     onChangeEffects: {
-      "rare.overrideDamageTypeValue": (s) => s.customDamageType,
+      customDamageType: (s) => s.rareOverrideDamageTypeValue,
+      "damage.type": (s) => s.rareOverrideDamageTypeValue,
+      "rare.overrideDamageTypeValue": (s) => s.rareOverrideDamageTypeValue,
     },
   },
   {
@@ -461,7 +483,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "selectedQuality",
     kind: "form-state",
-    label: "customWeapon.quality.preset",
+    label: "shared.quality.preset",
     component: "grouped-select",
     defaultValue: "",
     group: G.quality,
@@ -471,15 +493,37 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     // qualityGroups come in via extraProps at render time.
     onChangeEffects: {
       quality: (s) => {
-        // Quality text/cost are resolved in the modal onChange wrapper.
-        return s.selectedQuality ?? s.quality;
+        const q = qualities.find(
+          (el: { name: string }) => el.name === s.selectedQuality,
+        );
+        return q?.quality ?? s.quality;
       },
+      qualityName: (s) => {
+        const q = qualities.find(
+          (el: { name: string }) => el.name === s.selectedQuality,
+        );
+        return q?.name ?? s.qualityName;
+      },
+      qualityCost: (s) => {
+        const q = qualities.find(
+          (el: { name: string }) => el.name === s.selectedQuality,
+        );
+        return q?.cost ?? s.qualityCost;
+      },
+      qualityApplicableTo: (s) => {
+        const q = qualities.find(
+          (el: { name: string; filter?: string[] }) =>
+            el.name === s.selectedQuality,
+        );
+        return Array.isArray(q?.filter) ? q.filter : s.qualityApplicableTo;
+      },
+      cost: calcCustomWeaponCost,
     },
   },
   {
     key: "qualityName",
     kind: "editable",
-    label: "customWeapon.quality.name",
+    label: "shared.name",
     component: "text",
     defaultValue: "",
     group: G.quality,
@@ -489,7 +533,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "qualityCost",
     kind: "editable",
-    label: "customWeapon.quality.cost",
+    label: "shared.quality.cost",
     component: "number",
     defaultValue: 0,
     group: G.quality,
@@ -505,13 +549,29 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "quality",
     kind: "editable",
-    label: "customWeapon.quality.text",
+    label: "shared.quality.text",
     component: "textarea",
     defaultValue: "",
     group: G.quality,
     order: 53,
     dependencies: (s) => !s.isSlotsVariant,
     fullWidth: true,
+  },
+  {
+    key: "qualityApplicableTo",
+    kind: "form-state",
+    label: "quality.applicableTo",
+    component: "autocomplete",
+    defaultValue: ["customWeapon"],
+    group: G.quality,
+    order: 54,
+    dependencies: (s) => !s.isSlotsVariant,
+    fullWidth: true,
+    componentProps: {
+      options: qualityApplicableToOptions,
+      multiple: true,
+      freeSolo: false,
+    },
   },
   // Slots (technospheres variant)
   {
@@ -573,8 +633,8 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
           s.secondSelectedCategory.toLowerCase().includes(r),
         )
           ? (s.secondCustomizations ?? []).filter(
-              (c) => c.name !== "weapon_customization_powerful",
-            )
+            (c) => c.name !== "weapon_customization_powerful",
+          )
           : s.secondCustomizations,
     },
   },
@@ -610,7 +670,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "secondaryHrZero",
     kind: "editable",
-    label: "customWeapon.second.damage.hrZero",
+    label: "shared.damage.hrZero",
     component: "checkbox",
     defaultValue: false,
     group: G.secondary,
@@ -628,7 +688,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     defaultValue: false,
     group: G.secondary,
     order: 65,
-    dependencies: (s) => s.hasTransforming === true,
+    dependencies: () => false,
     onChangeEffects: {
       "secondDamage.type": (s) =>
         s.secondOverrideDamageType
@@ -639,7 +699,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   {
     key: "secondCustomDamageType",
     kind: "editable",
-    label: "customWeapon.second.rare.overrideDamageTypeValue",
+    label: "shared.damage.type",
     component: "type-select",
     defaultValue: Elements.Physical,
     group: G.secondary,
@@ -647,8 +707,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     componentProps: { options: typeOptions },
     dependencies: (s) =>
       s.hasTransforming === true &&
-      s.secondOverrideDamageType === true &&
-      !(s.secondCustomizations ?? []).some(
+      (s.secondCustomizations ?? []).some(
         (c) => c.name === "weapon_customization_elemental",
       ),
     onChangeEffects: {
@@ -664,6 +723,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     group: G.secondary,
     order: 67,
     dependencies: (s) => s.hasTransforming === true,
+    fullWidth: true,
     // secondSelectedCategory and rareAccuracyBonus flow via extraProps, isSecondForm=true.
     onChangeEffects: {
       martial: calcIsMartial,

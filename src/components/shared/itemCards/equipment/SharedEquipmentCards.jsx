@@ -18,11 +18,7 @@ import {
   headerBoxSx,
   nameRowSx,
 } from "../core-utils";
-import {
-  CardContentWrapper,
-  HeaderSpacer,
-  RowsWithOptionalImage,
-} from "../core";
+import { CardContentWrapper, HeaderSpacer, RowsWithOptionalImage } from "../core";
 
 const ROW_MIN_HEIGHT = "38px";
 const ROW_MIN_HEIGHT_NO_IMAGE = "40px";
@@ -48,8 +44,39 @@ const StyledMarkdownBase = styled(ReactMarkdown)({
   display: "inline",
 });
 
+const defaultMarkdownComponents = {
+  p: ({ _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", margin: "0.5em 0", lineHeight: 1.5 }}
+    />
+  ),
+  ul: ({ _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", paddingLeft: "1.5em", margin: "0.5em 0" }}
+    />
+  ),
+  ol: ({ _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", paddingLeft: "1.5em", margin: "0.5em 0" }}
+    />
+  ),
+  li: ({ _node, ...props }) => (
+    <span {...props} style={{ display: "list-item", lineHeight: 1.6 }} />
+  ),
+};
+
 const StyledMarkdown = ({ children, ...props }) => (
-  <StyledMarkdownBase remarkPlugins={[remarkBreaks]} {...props}>
+  <StyledMarkdownBase
+    remarkPlugins={[remarkBreaks]}
+    components={{
+      ...defaultMarkdownComponents,
+      ...(props.components || {}),
+    }}
+    {...props}
+  >
     {typeof children === "string" ? children.replace(/\\n/g, "\n") : children}
   </StyledMarkdownBase>
 );
@@ -233,39 +260,37 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-            <Grid size={cols.name}>
-              <Typography>{t("Weapon")}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-            <Grid size={cols.accuracy}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Accuracy")}
-              </Typography>
-            </Grid>
-            <Grid size={cols.damage}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Damage")}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
-
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+                <Grid size={cols.name}>
+                  <Typography>{t("Weapon")}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
+                <Grid size={cols.accuracy}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Accuracy")}
+                  </Typography>
+                </Grid>
+                <Grid size={cols.damage}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Damage")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -458,10 +483,10 @@ function SharedArmorLikeCard({
   });
 
   const category = forceCategory || getArmorCategory(item);
-  const withImage = isImageMode(imageMode);
-  const cols = withImage
-    ? { name: 3, cost: 1, def: 2, mdef: 2, init: 2 }
-    : { name: 3, cost: 2, def: 2, mdef: 2, init: 3 };
+  const hasInitColumn = !item.rework;
+  const cols = hasInitColumn
+    ? { name: 3, cost: 2, def: 2, mdef: 2, init: 3 } // sums to 12
+    : { name: 6, cost: 2, def: 2, mdef: 2 }; // sums to 12
 
   return (
     <CardContentWrapper
@@ -475,42 +500,42 @@ function SharedArmorLikeCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-            <Grid size={cols.name}>
-              <Typography>{t(category)}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-            <Grid size={cols.def}>
-              <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
-            </Grid>
-            <Grid size={cols.mdef}>
-              <Typography sx={{ textAlign: "center" }}>{t("MDEF")}</Typography>
-            </Grid>
-            {!item.rework && (
-              <Grid size={cols.init}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("INIT")}
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        </Grid>
-      )}
-
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+                <Grid size={cols.name}>
+                  <Typography>{t(category)}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
+                <Grid size={cols.def}>
+                  <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
+                </Grid>
+                <Grid size={cols.mdef}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("MDEF")}
+                  </Typography>
+                </Grid>
+                {hasInitColumn && (
+                  <Grid size={cols.init}>
+                    <Typography sx={{ textAlign: "center" }}>
+                      {t("INIT")}
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -574,7 +599,7 @@ function SharedArmorLikeCard({
               {getArmorMDef(item, category, t)}
             </Typography>
           </Grid>
-          {!item.rework && (
+          {hasInitColumn && (
             <Grid size={cols.init}>
               <Typography
                 sx={{
@@ -891,6 +916,8 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
 }
 
 function buildSecondWeaponItem(item) {
+  const secondaryCustomizations =
+    item.secondCurrentCustomizations ?? item.secondCustomizations ?? [];
   return {
     name: item.secondWeaponName || item.name,
     category: item.secondSelectedCategory || item.category,
@@ -899,7 +926,7 @@ function buildSecondWeaponItem(item) {
       ? item.accuracy
       : item.secondAccuracy || item.accuracy,
     damage: item.secondDamage || item.damage,
-    customizations: item.secondCurrentCustomizations || [],
+    customizations: secondaryCustomizations,
     quality: item.quality,
     qualityCost: item.qualityCost,
     cost: item.cost,
@@ -956,7 +983,8 @@ export const SharedCustomWeaponCard = React.memo(
 
     const hasStoredSecondForm =
       (item.secondWeaponName != null ||
-        item.secondCurrentCustomizations != null) &&
+        item.secondCurrentCustomizations != null ||
+        item.secondCustomizations != null) &&
       Array.isArray(item.customizations) &&
       item.customizations.some(
         (c) => c.name === "weapon_customization_transforming",
@@ -1004,9 +1032,7 @@ export const SharedCustomWeaponCard = React.memo(
                 <Typography>{t("Custom Weapon")}</Typography>
               </Grid>
               <Grid size={cols.cost}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Cost")}
-                </Typography>
+                <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
               </Grid>
               <Grid size={cols.accuracy}>
                 <Typography sx={{ textAlign: "center" }}>
@@ -1014,9 +1040,7 @@ export const SharedCustomWeaponCard = React.memo(
                 </Typography>
               </Grid>
               <Grid size={cols.damage}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Damage")}
-                </Typography>
+                <Typography sx={{ textAlign: "center" }}>{t("Damage")}</Typography>
               </Grid>
             </Grid>
           </Grid>
@@ -1044,59 +1068,69 @@ export const SharedCustomWeaponCard = React.memo(
             </Typography>
           </Box>
         )}
-        <Box sx={{ opacity: activeForm === "secondary" ? 0.5 : 1 }}>
-          <CustomWeaponRows item={item} {...rowProps} />
-          {sphereData ? (
-            <SphereDataRow
-              sphereData={sphereData}
-              customTheme={customTheme}
-              imageMode={imageMode}
-              t={t}
-            />
-          ) : (
-            <CustomizationsAndQualityRow
-              item={item}
-              customTheme={customTheme}
-              imageMode={imageMode}
-              t={t}
-            />
-          )}
-        </Box>
-
-        {secondItem && (
-          <>
-            <Box
-              sx={{
-                px: 1,
-                pt: 0.5,
-                pb: 0.25,
-                background: customTheme.secondary + "33",
-                borderTop: `1px solid ${customTheme.secondary}`,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                  opacity: 0.7,
-                }}
-              >
-                {t("Transforming Form")}
-              </Typography>
-            </Box>
-            <Box sx={{ opacity: activeForm === "primary" ? 0.5 : 1 }}>
-              <CustomWeaponRows item={secondItem} {...rowProps} />
-              <CustomizationsAndQualityRow
-                item={secondItem}
+        <RowsWithOptionalImage
+          // Custom Weapon keeps its own header image slot layout.
+          // Prevent RowsWithOptionalImage from rendering a second image column.
+          imageMode="none"
+          imageSize={imageSize}
+          imageVisible={imageVisible}
+          imageSlot={imageSlot}
+          customTheme={customTheme}
+        >
+          <Box sx={{ opacity: activeForm === "secondary" ? 0.5 : 1 }}>
+            <CustomWeaponRows item={item} {...rowProps} />
+            {sphereData ? (
+              <SphereDataRow
+                sphereData={sphereData}
                 customTheme={customTheme}
                 imageMode={imageMode}
                 t={t}
               />
-            </Box>
-          </>
-        )}
+            ) : (
+              <CustomizationsAndQualityRow
+                item={item}
+                customTheme={customTheme}
+                imageMode={imageMode}
+                t={t}
+              />
+            )}
+          </Box>
+
+          {secondItem && (
+            <>
+              <Box
+                sx={{
+                  px: 1,
+                  pt: 0.5,
+                  pb: 0.25,
+                  background: customTheme.secondary + "33",
+                  borderTop: `1px solid ${customTheme.secondary}`,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    opacity: 0.7,
+                  }}
+                >
+                  {t("Transforming Form")}
+                </Typography>
+              </Box>
+              <Box sx={{ opacity: activeForm === "primary" ? 0.5 : 1 }}>
+                <CustomWeaponRows item={secondItem} {...rowProps} />
+                <CustomizationsAndQualityRow
+                  item={secondItem}
+                  customTheme={customTheme}
+                  imageMode={imageMode}
+                  t={t}
+                />
+              </Box>
+            </>
+          )}
+        </RowsWithOptionalImage>
       </CardContentWrapper>
     );
   },
@@ -1137,7 +1171,7 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
   });
 
   const withImage = isImageMode(imageMode);
-  const cols = withImage ? { name: 6, cost: 4 } : { name: 9, cost: 3 };
+  const cols = withImage ? { name: 8, cost: 4 } : { name: 9, cost: 3 };
 
   return (
     <CardContentWrapper
@@ -1151,29 +1185,27 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-            <Grid size={cols.name}>
-              <Typography>{t("Accessory")}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
-
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+                <Grid size={cols.name}>
+                  <Typography>{t("Accessory")}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}

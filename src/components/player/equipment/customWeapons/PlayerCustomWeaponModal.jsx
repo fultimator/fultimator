@@ -20,7 +20,6 @@ import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { SharedCustomWeaponCard } from "../../../../components/shared/itemCards";
 import { SLOT_TIERS } from "../technospheres/slotTiers";
 import allQualities from "../../../../libs/qualities";
-const qualities = allQualities.filter((q) => q.filter?.includes("weapon"));
 import groupBy from "../../../../libs/groupby";
 import {
   categories,
@@ -33,6 +32,14 @@ import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRend
 import { customWeaponFieldConfig } from "../../../../forms/rendering/config/itemConfigs/customWeapon";
 
 // Quality grouped options built once at module load.
+const qualities = allQualities
+  .filter(
+    (q) =>
+      q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+  )
+  .filter(
+    (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
+  );
 const qualityGroups = Object.entries(groupBy(qualities, "category")).map(
   ([category, qs]) => ({
     header: category,
@@ -132,6 +139,7 @@ function buildInitialFormState(customWeapon, isSlotsVariant) {
         attr2: accuracyChecks[0].att2,
       },
       customDamageType: "physical",
+      rareOverrideDamageTypeValue: "physical",
       primaryHrZero: false,
       rareAccuracyBonus: false,
       rareDamageBonus: false,
@@ -191,8 +199,10 @@ function buildInitialFormState(customWeapon, isSlotsVariant) {
 
   const overrideDamageType =
     rare.overrideDamageType ?? customWeapon.overrideDamageType ?? false;
-  const customDamageType =
+  const customDamageType = customWeapon.damage?.type ?? "physical";
+  const rareOverrideDamageTypeValue =
     rare.overrideDamageTypeValue ??
+    customWeapon.rareOverrideDamageTypeValue ??
     customWeapon.customDamageType ??
     customWeapon.damage?.type ??
     "physical";
@@ -231,7 +241,7 @@ function buildInitialFormState(customWeapon, isSlotsVariant) {
       damageBonus: rare.damageBonus ?? false,
       overrideDamageType,
       overrideAccuracyAttributes,
-      overrideDamageTypeValue: customDamageType,
+      overrideDamageTypeValue: rareOverrideDamageTypeValue,
       overrideAccuracyAttr1: selectedAccuracyCheck.attr1,
       overrideAccuracyAttr2: selectedAccuracyCheck.attr2,
     },
@@ -261,6 +271,7 @@ function buildInitialFormState(customWeapon, isSlotsVariant) {
     selectedRange: customWeapon.range ?? "melee",
     selectedAccuracyCheck,
     customDamageType,
+    rareOverrideDamageTypeValue,
     primaryHrZero: customWeapon.damage?.hrZero === true,
     rareAccuracyBonus: rare.accuracyBonus ?? false,
     rareDamageBonus: rare.damageBonus ?? false,
@@ -401,9 +412,9 @@ export default function PlayerCustomWeaponModal({
       (c) => c.name === "weapon_customization_elemental",
     );
     const resolvedDamageType = hasElemental
-      ? customDamageType
+      ? (formState.damage?.type ?? customDamageType ?? "physical")
       : overrideDamageType
-        ? customDamageType
+        ? (formState.rareOverrideDamageTypeValue ?? "physical")
         : "physical";
 
     const primaryAccuracy = {
@@ -435,9 +446,9 @@ export default function PlayerCustomWeaponModal({
         (c) => c.name === "weapon_customization_elemental",
       );
       const s2DamageType = s2HasElemental
-        ? secondCustomDamageType
-        : secondOverrideDamageType
-          ? secondCustomDamageType
+        ? (formState.secondDamage?.type ?? secondCustomDamageType ?? "physical")
+        : overrideDamageType
+          ? (formState.rareOverrideDamageTypeValue ?? "physical")
           : "physical";
       secondAccuracy = {
         attr1: secondSelectedAccuracyCheck.attr1,
@@ -470,7 +481,7 @@ export default function PlayerCustomWeaponModal({
         damageBonus: formState.rareDamageBonus,
         overrideDamageType,
         overrideAccuracyAttributes,
-        overrideDamageTypeValue: customDamageType,
+        overrideDamageTypeValue: formState.rareOverrideDamageTypeValue,
         overrideAccuracyAttr1: selectedAccuracyCheck.attr1,
         overrideAccuracyAttr2: selectedAccuracyCheck.attr2,
       },
@@ -606,9 +617,9 @@ export default function PlayerCustomWeaponModal({
     (c) => c.name === "weapon_customization_elemental",
   );
   const pType = pHasElemental
-    ? customDamageType
+    ? (formState.damage?.type ?? customDamageType ?? "physical")
     : overrideDamageType
-      ? customDamageType
+      ? (formState.rareOverrideDamageTypeValue ?? "physical")
       : "physical";
 
   const { precision: s2Prec, damage: s2Dmg } = hasTransforming
@@ -628,9 +639,9 @@ export default function PlayerCustomWeaponModal({
     (c) => c.name === "weapon_customization_elemental",
   );
   const s2Type = s2HasElemental
-    ? secondCustomDamageType
-    : secondOverrideDamageType
-      ? secondCustomDamageType
+    ? (formState.secondDamage?.type ?? secondCustomDamageType ?? "physical")
+    : overrideDamageType
+      ? (formState.rareOverrideDamageTypeValue ?? "physical")
       : "physical";
 
   return (
@@ -751,6 +762,9 @@ export default function PlayerCustomWeaponModal({
                           qualityName: q.name,
                           quality: q.quality,
                           qualityCost: q.cost,
+                          qualityApplicableTo: Array.isArray(q.filter)
+                            ? q.filter
+                            : [],
                         });
                         return;
                       }

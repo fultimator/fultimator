@@ -100,7 +100,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
         <>
           <Typography
             variant="h2"
-            component="legend"
+            component="div"
             sx={{
               color: theme.white,
               background: theme.primary,
@@ -113,6 +113,8 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
               alignItems: "center",
               justifyContent: "space-between",
               minHeight: "56px",
+              width: "100%",
+              boxSizing: "border-box",
             }}
           >
             <div style={{ marginLeft: "15px" }}>{headerText}</div>
@@ -216,7 +218,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
           />
           <Typography
             variant="h2"
-            component="legend"
+            component="div"
             sx={{
               color: theme.white,
               background: theme.primary,
@@ -229,6 +231,8 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
               alignItems: "center",
               justifyContent: "space-between",
               minHeight: "56px",
+              width: "100%",
+              boxSizing: "border-box",
             }}
           >
             <div style={{ marginLeft: "15px" }}>{headerText}</div>

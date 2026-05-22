@@ -224,7 +224,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
     <Grid sx={{ width: "100%", margin: "15px" }} size={12}>
       <Typography
         variant="h2"
-        component="legend"
+        component="div"
         sx={{
           color: theme.white,
           backgroundColor: theme.primary,
@@ -238,6 +238,8 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           justifyContent: "space-between",
           lineHeight: "normal",
           textAlign: "center",
+          width: "100%",
+          boxSizing: "border-box",
         }}
       >
         {content}

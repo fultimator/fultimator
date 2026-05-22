@@ -45,10 +45,7 @@ const NpcEditAppBar = ({
           container
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
-          <Grid
-            size={3}
-            sx={{ textAlign: "left", display: "flex", alignItems: "center" }}
-          >
+          <Grid sx={{ textAlign: "left", display: "flex", alignItems: "center" }}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
@@ -60,12 +57,12 @@ const NpcEditAppBar = ({
               </IconButton>
             </Tooltip>
           </Grid>
-          <Grid size={6} sx={{ textAlign: "center" }}>
-            <Grid container sx={{ justifyContent: "center" }}>
+          <Grid sx={{ flex: 1, minWidth: 0, px: 0.5 }}>
+            <Grid container sx={{ justifyContent: "center", minWidth: 0 }}>
               <ExplainSkillsSimplified npc={npcTemp} />
             </Grid>
           </Grid>
-          <Grid size={3} sx={{ textAlign: "right" }}>
+          <Grid sx={{ textAlign: "right" }}>
             <Grid
               container
               sx={{ alignItems: "center", justifyContent: "flex-end" }}
@@ -123,10 +120,7 @@ const PcEditAppBar = ({
           container
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
-          <Grid
-            size={3}
-            sx={{ textAlign: "left", display: "flex", alignItems: "center" }}
-          >
+          <Grid sx={{ textAlign: "left", display: "flex", alignItems: "center" }}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
@@ -138,12 +132,12 @@ const PcEditAppBar = ({
               </IconButton>
             </Tooltip>
           </Grid>
-          <Grid size={6} sx={{ textAlign: "center" }}>
-            <Grid container sx={{ justifyContent: "center" }}>
+          <Grid sx={{ flex: 1, minWidth: 0, px: 0.5 }}>
+            <Grid container sx={{ justifyContent: "center", minWidth: 0 }}>
               <span>{t("Character Designer")}</span>
             </Grid>
           </Grid>
-          <Grid size={3} sx={{ textAlign: "right" }}>
+          <Grid sx={{ textAlign: "right" }}>
             <Grid
               container
               sx={{ alignItems: "center", justifyContent: "flex-end" }}

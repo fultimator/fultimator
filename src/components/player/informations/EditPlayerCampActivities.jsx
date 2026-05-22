@@ -36,7 +36,7 @@ function toFormState(activity) {
   return {
     itemType: "campActivity",
     name: activity?.name ?? "",
-    description: activity?.description ?? "choice",
+    description: activity?.description,
     targetDescription: activity?.targetDescription ?? "",
     effect: activity?.effect ?? "",
   };
@@ -45,7 +45,7 @@ function toFormState(activity) {
 function fromFormState(form) {
   return {
     name: form.name ?? "",
-    description: form.description ?? "choice",
+    description: form.description,
     targetDescription: form.targetDescription ?? "",
     effect: form.effect ?? "",
   };
@@ -242,7 +242,7 @@ export default function EditPlayerCampActivities({
                     itemType: "optional",
                     name: entry.name || t("Camp Activity"),
                     tags: [t("Camp Activities")],
-                    description: entry.description || "choice",
+                    description: entry.description,
                     ...(entry.targetDescription
                       ? { targetDescription: entry.targetDescription }
                       : {}),
@@ -254,7 +254,7 @@ export default function EditPlayerCampActivities({
                   await addItem(pack.id, "optional", {
                     subtype: "camp-activities",
                     name: entry.name || "",
-                    description: entry.description || "choice",
+                    description: entry.description,
                     ...(entry.targetDescription
                       ? { targetDescription: entry.targetDescription }
                       : {}),
@@ -309,7 +309,7 @@ export default function EditPlayerCampActivities({
           onAddItem={(item) => {
             const nextEntry = {
               name: item.name ?? "",
-              description: item.description ?? "choice",
+              description: item.description,
               targetDescription: item.targetDescription ?? "",
               effect: item.effect ?? "",
             };

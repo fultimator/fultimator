@@ -26,7 +26,6 @@ import {
   Typography,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
-import type { AutocompleteRenderGetTagProps } from "@mui/material";
 import { Clear, Search } from "@mui/icons-material";
 import {
   Martial,
@@ -1009,24 +1008,6 @@ export function AutocompleteRenderer({
   const selectedSingle =
     typeof value === "string" && value.trim().length > 0 ? value : null;
 
-  const renderTags = (
-    tags: string[],
-    getTagProps: AutocompleteRenderGetTagProps,
-  ) => (
-    <>
-      {tags.map((tag, index) => {
-        const found = options.find((o) => o.value === tag);
-        return (
-          <Chip
-            key={tag}
-            label={found ? t(found.label) : tag}
-            size="small"
-            {...getTagProps({ index })}
-          />
-        );
-      })}
-    </>
-  );
 
   // Cast needed: MUI Autocomplete freeSolo generic can't be satisfied with a
   // runtime boolean; the FreeSolo type param must be a literal true/false.
@@ -1051,7 +1032,6 @@ export function AutocompleteRenderer({
         const found = options.find((o) => o.value === opt);
         return found ? translateOrHumanize(t, found.label) : String(opt);
       }}
-      {...(multiple ? { renderTags } : {})}
       renderInput={(params: object) => (
         <TextField {...(params as object)} label={t(label)} size="small" />
       )}

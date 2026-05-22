@@ -287,6 +287,17 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
       minWidth: 0,
     },
   };
+  const selectMenuProps = {
+    disableScrollLock: true,
+    keepMounted: true,
+    slotProps: {
+      paper: {
+        sx: {
+          zIndex: (theme) => theme.zIndex.modal + 2,
+        },
+      },
+    },
+  };
 
   return (
     <Box
@@ -331,6 +342,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               value={selectedCompendium}
               onChange={(e) => onCompendiumChange(e.target.value)}
               label={t("Compendium")}
+              MenuProps={selectMenuProps}
             >
               <MenuItem value="official">{t("Official Data")}</MenuItem>
               {[...packs]
@@ -412,6 +424,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 }
                 onChange={(e) => onTypeChange(e.target.value)}
                 label={t("Item Type")}
+                MenuProps={selectMenuProps}
               >
                 {activeTypes.map((type) => (
                   <MenuItem key={type.key} value={type.key}>
@@ -464,6 +477,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               value={selectedSpellClass}
               onChange={(e) => onSpellClassChange(e.target.value)}
               label={t("Class")}
+              MenuProps={selectMenuProps}
             >
               <MenuItem value="">{t("All")}</MenuItem>
               {classList
@@ -486,6 +500,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 value={selectedModuleType}
                 onChange={(e) => onModuleTypeChange?.(e.target.value)}
                 label={t("Module Type")}
+                MenuProps={selectMenuProps}
               >
                 <MenuItem value="">{t("All")}</MenuItem>
                 <MenuItem value="frame">{t("Vehicle Frame")}</MenuItem>
@@ -505,6 +520,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 value={selectedMagichantSubtype}
                 onChange={(e) => onMagichantSubtypeChange?.(e.target.value)}
                 label={t("Chant Type")}
+                MenuProps={selectMenuProps}
               >
                 <MenuItem value="">{t("All")}</MenuItem>
                 <MenuItem value="key">{t("Key")}</MenuItem>
@@ -520,6 +536,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               value={selectedWellspring}
               onChange={(e) => onWellspringChange?.(e.target.value)}
               label={t("Wellspring")}
+              MenuProps={selectMenuProps}
             >
               <MenuItem value="">{t("All")}</MenuItem>
               {INVOKER_WELLSPRINGS.map((wellspring) => (

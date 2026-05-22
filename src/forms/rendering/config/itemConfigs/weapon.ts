@@ -56,6 +56,7 @@ export type WeaponFormState = Omit<WeaponPersisted, "base"> & {
   defModifier: number;
   mDefModifier: number;
   qualityName: string;
+  qualityApplicableTo: string[];
   rareBonuses: WeaponRareBonuses;
 };
 const WEAPON_LABEL_PREFIX = "weapon";
@@ -80,6 +81,14 @@ const attributeOptions: SelectOption[] = Object.entries(
 const handsOptions: SelectOption[] = [
   { value: 1, label: "One Hand" },
   { value: 2, label: "Two Hand" },
+];
+
+const qualityApplicableToOptions: SelectOption[] = [
+  { value: "weapon", label: "Weapons" },
+  { value: "customWeapon", label: "Custom Weapons" },
+  { value: "armor", label: "Armor" },
+  { value: "shield", label: "Shields" },
+  { value: "accessory", label: "Accessories" },
 ];
 
 const qualityGroups: SelectGroup[] = Object.entries(
@@ -531,6 +540,13 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
         );
         return q?.cost ?? s.qualityCost;
       },
+      qualityApplicableTo: (s) => {
+        const q = qualities.find(
+          (el: { name: string; filter?: string[] }) =>
+            el.name === s.selectedQuality,
+        );
+        return Array.isArray(q?.filter) ? q.filter : s.qualityApplicableTo;
+      },
     },
   },
   {
@@ -576,6 +592,21 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
     group: G.quality,
     order: 53,
     fullWidth: true,
+  },
+  {
+    key: "qualityApplicableTo",
+    kind: "form-state",
+    label: "quality.applicableTo",
+    component: "autocomplete",
+    defaultValue: ["weapon"],
+    group: G.quality,
+    order: 58,
+    fullWidth: true,
+    componentProps: {
+      options: qualityApplicableToOptions,
+      multiple: true,
+      freeSolo: false,
+    },
   },
   // Computed / meta
   {

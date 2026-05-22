@@ -133,6 +133,7 @@ function ItemPanel({
       qualityName: item.name,
       quality: item.quality ?? "",
       qualityCost: item.cost ?? 0,
+      qualityApplicableTo: Array.isArray(item.filter) ? item.filter : [],
       cost: (prev.cost ?? 0) - (prev.qualityCost ?? 0) + (item.cost ?? 0),
     }));
     setQualityBrowserOpen(false);

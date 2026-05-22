@@ -7,7 +7,9 @@ import groupBy from "../../../../libs/groupby";
 import type { SelectGroup } from "../../fieldRenderers";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
-export type AccessoryFormState = AccessoryPersisted;
+export type AccessoryFormState = AccessoryPersisted & {
+  qualityApplicableTo: string[];
+};
 const ACCESSORY_LABEL_PREFIX = "accessory";
 
 const qualityGroups: SelectGroup[] = Object.entries(
@@ -19,6 +21,14 @@ const qualityGroups: SelectGroup[] = Object.entries(
   header: category,
   options: qs.map((q) => ({ value: q.name, label: `${q.name} (${q.cost}z)` })),
 }));
+
+const qualityApplicableToOptions = [
+  { value: "weapon", label: "Weapons" },
+  { value: "customWeapon", label: "Custom Weapons" },
+  { value: "armor", label: "Armor" },
+  { value: "shield", label: "Shields" },
+  { value: "accessory", label: "Accessories" },
+];
 
 const G = {
   core: "core",
@@ -76,6 +86,13 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
         );
         return q?.cost ?? s.qualityCost;
       },
+      qualityApplicableTo: (s) => {
+        const q = qualities.find(
+          (el: { name: string; filter?: string[] }) =>
+            el.name === s.selectedQuality,
+        );
+        return Array.isArray(q?.filter) ? q.filter : s.qualityApplicableTo;
+      },
     },
   },
   {
@@ -101,6 +118,21 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
     group: G.quality,
     order: 12,
     fullWidth: true,
+  },
+  {
+    key: "qualityApplicableTo",
+    kind: "form-state",
+    label: "quality.applicableTo",
+    component: "autocomplete",
+    defaultValue: ["accessory"],
+    group: G.quality,
+    order: 13,
+    fullWidth: true,
+    componentProps: {
+      options: qualityApplicableToOptions,
+      multiple: true,
+      freeSolo: false,
+    },
   },
   {
     key: "defModifier",

@@ -83,11 +83,13 @@ const CustomHeaderAccordion = ({
         )}
         <Typography
           variant="h2"
-          component="legend"
+          component="div"
           sx={{
             color: "#ffffff",
             textTransform: "uppercase",
             fontSize: "1.5em",
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
           {headerText}

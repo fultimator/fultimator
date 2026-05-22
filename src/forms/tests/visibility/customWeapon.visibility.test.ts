@@ -147,7 +147,7 @@ describe("transforming secondary form fields", () => {
 describe("rare override damage type value field", () => {
   it("hidden when overrideDamageType is off", () => {
     const rareTypeEntry = customWeaponFieldConfig.find(
-      (f) => f.key === "customDamageType" && f.group === "rare",
+      (f) => f.key === "rareOverrideDamageTypeValue" && f.group === "rare",
     );
     expect(rareTypeEntry).toBeDefined();
     expect(
@@ -159,7 +159,7 @@ describe("rare override damage type value field", () => {
 
   it("shown when overrideDamageType is on and no elemental customization", () => {
     const rareTypeEntry = customWeaponFieldConfig.find(
-      (f) => f.key === "customDamageType" && f.group === "rare",
+      (f) => f.key === "rareOverrideDamageTypeValue" && f.group === "rare",
     );
     expect(
       rareTypeEntry!.dependencies!({
@@ -170,7 +170,7 @@ describe("rare override damage type value field", () => {
 
   it("hidden when elemental customization is present (takes precedence)", () => {
     const rareTypeEntry = customWeaponFieldConfig.find(
-      (f) => f.key === "customDamageType" && f.group === "rare",
+      (f) => f.key === "rareOverrideDamageTypeValue" && f.group === "rare",
     );
     expect(
       rareTypeEntry!.dependencies!({

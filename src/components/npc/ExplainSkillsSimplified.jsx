@@ -12,6 +12,7 @@ import {
   ListItemButton,
   ListItemText,
   useTheme,
+  useMediaQuery,
   ThemeProvider,
   Button,
   Box,
@@ -64,6 +65,7 @@ function scrollToSection(sectionId) {
 export default function ExplainSkillsSimplified({ npc }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const primary = theme.palette.primary.main;
   const darkerPrimary = darken(primary, 0.2);
   const hoverPrimary = darken(primary, 0.1);
@@ -97,7 +99,7 @@ export default function ExplainSkillsSimplified({ npc }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: "200px" }}>
+      <Box sx={{ width: "100%", maxWidth: isSmallScreen ? 300 : 360, minWidth: 0 }}>
         <Button
           aria-describedby={id}
           onClick={handleClick}
@@ -105,13 +107,17 @@ export default function ExplainSkillsSimplified({ npc }) {
             backgroundColor: darkerPrimary,
             color: "#ffffff",
             borderRadius: "16px",
-            padding: "6px",
+            px: isSmallScreen ? 1 : 1.5,
+            py: 0.75,
             textTransform: "none",
             fontWeight: "bold",
             display: "flex",
             alignItems: "center",
+            justifyContent: "center",
+            gap: isSmallScreen ? 0.5 : 1,
             zIndex: theme.zIndex.appBar + 1,
             width: "100%",
+            minWidth: 0,
             borderBottomLeftRadius: open ? 0 : "16px",
             borderBottomRightRadius: open ? 0 : "16px",
             borderBottom: open ? `1px solid ${primary}` : "none",
@@ -122,22 +128,32 @@ export default function ExplainSkillsSimplified({ npc }) {
         >
           <Typography
             variant="h3"
-            sx={{ display: "flex", alignItems: "center" }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: isSmallScreen ? "1.05rem" : undefined,
+              whiteSpace: "nowrap",
+            }}
           >
             {t("Available:")} {totalAvailableSkills}
           </Typography>
           <Divider
             orientation="vertical"
             flexItem
-            sx={{ mx: 1, background: "white" }}
+            sx={{ mx: isSmallScreen ? 0.5 : 1, background: "white" }}
           />
           <Typography
             variant="h3"
-            sx={{ display: "flex", alignItems: "center" }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: isSmallScreen ? "1.05rem" : undefined,
+              whiteSpace: "nowrap",
+            }}
           >
             {t("Used:")} {totalUsedSkills}
           </Typography>
-          <ExpandMoreIcon sx={{ color: "white" }} />
+          <ExpandMoreIcon sx={{ color: "white", flexShrink: 0 }} />
         </Button>
       </Box>
       <Popover

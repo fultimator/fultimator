@@ -30,7 +30,7 @@ const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({
       <Grid sx={{ width: "100%", margin: "15px" }} size={12}>
         <Typography
           variant="h1"
-          component="legend"
+          component="div"
           sx={{
             color: "#ffffff",
             background: `linear-gradient(to right, ${primary}, ${primary}, ${secondary})`,
@@ -40,6 +40,8 @@ const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({
             margin: "-29px 0 0 -29px",
             display: "flex",
             alignItems: "center",
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
           <IconButton sx={{ px: 1, color: white }}>{icon}</IconButton>
