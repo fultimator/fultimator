@@ -16,7 +16,7 @@ const Clock = ({
   state = [],
   setState,
   isCharacterSheet,
-  onReset,
+  onReset = () => {},
 }) => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
@@ -54,7 +54,7 @@ const Clock = ({
 
   const handleRightClick = (e) => {
     e.preventDefault(); // Prevent context menu
-    if (onReset && !isCharacterSheet) {
+    if (!isCharacterSheet) {
       onReset();
     }
   };

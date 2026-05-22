@@ -144,6 +144,10 @@ export function ActionSpellIcon({ size }) {
   return <ActionImg name="action_spell" alt="Spell" size={size} />;
 }
 
+export function ActionStudyIcon({ size }) {
+  return <ActionImg name="action_study" alt="Study" size={size} />;
+}
+
 export function CheckAccuracyIcon({ size }) {
   return <CheckImg name="check_accuracy" alt="Accuracy Check" size={size} />;
 }

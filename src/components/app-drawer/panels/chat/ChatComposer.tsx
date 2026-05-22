@@ -57,6 +57,7 @@ import {
   ActionObjectiveIcon,
   ActionSkillIcon,
   ActionSpellIcon,
+  ActionStudyIcon,
   CheckAttributeIcon,
   CheckOpenIcon,
   CheckOpposedIcon,
@@ -78,6 +79,7 @@ const ACTION_ICON_BY_KEY: Record<string, React.ReactNode> = {
   objective: <ActionObjectiveIcon size="1em" />,
   spell: <ActionSpellIcon size="1em" />,
   skill: <ActionSkillIcon size="1em" />,
+  study: <ActionStudyIcon size="1em" />,
   check: <CheckOpenIcon size="1em" />,
 };
 

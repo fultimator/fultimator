@@ -435,11 +435,17 @@ export const ChatPanel: React.FC = () => {
         <MessageListErrorBoundary>
           <Box
             sx={{
+              flex: 1,
+              overflowY: "auto",
+              direction: "rtl",
+            }}
+          >
+          <Box
+            sx={{
               px: 2,
               pt: 2,
               pb: 2,
-              flex: 1,
-              overflowY: "auto",
+              direction: "ltr",
               display: "flex",
               flexDirection: "column",
               gap: 1,
@@ -461,6 +467,7 @@ export const ChatPanel: React.FC = () => {
               </BaseMessageTemplate>
             ))}
             <Box ref={endOfMessagesRef} />
+          </Box>
           </Box>
         </MessageListErrorBoundary>
       </ChatActionsProvider>

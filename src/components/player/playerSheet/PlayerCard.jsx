@@ -1800,7 +1800,6 @@ export default function PlayerCard({
                     size="small"
                     variant="standard"
                     slotProps={{
-                      input: { disableUnderline: true },
                       htmlInput: {
                         style: {
                           textAlign: "center",
@@ -1814,6 +1813,15 @@ export default function PlayerCard({
                     sx={{
                       width: { xs: "36px", sm: "44px" },
                       "& .MuiInputBase-input": { color: "#fff" },
+                      "& .MuiInput-underline:before": {
+                        borderBottomColor: "rgba(255, 255, 255, 0.6)",
+                      },
+                      "& .MuiInput-underline:hover:before": {
+                        borderBottomColor: "#fff",
+                      },
+                      "& .MuiInput-underline:after": {
+                        borderBottomColor: "#fff",
+                      },
                     }}
                   />
                   <IconButton

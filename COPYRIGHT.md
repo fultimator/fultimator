@@ -24,6 +24,7 @@ Use this file to track copyright, creators, and licenses for all visual assets b
 | `action_objective.png` | `assets/icons/actions/action_objective.png` | `Mildew` | `https://linktr.ee/not_mildew` | `Explicit permission to use for Fultimator` |
 | `action_skill.png` | `assets/icons/actions/action_skill.png` | `Mildew` | `https://linktr.ee/not_mildew` | `Explicit permission to use for Fultimator` |
 | `action_spell.png` | `assets/icons/actions/action_spell.png` | `Mildew` | `https://linktr.ee/not_mildew` | `Explicit permission to use for Fultimator` |
+| `action_study.png` | `assets/icons/actions/action_study.png` | `Mildew` | `https://linktr.ee/not_mildew` | `Explicit permission to use for Fultimator` |
 | `air-disabled.svg` | `assets/icons/affinities/air-disabled.svg` | `Need Games` | `https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf` | `Public Domain` |
 | `air.svg` | `assets/icons/affinities/air.svg` | `Need Games` | `https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf` | `Public Domain` |
 | `bolt-disabled.svg` | `assets/icons/affinities/bolt-disabled.svg` | `Need Games` | `https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf` | `Public Domain` |

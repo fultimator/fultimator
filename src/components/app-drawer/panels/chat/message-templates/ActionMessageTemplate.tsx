@@ -42,6 +42,7 @@ const ACTION_ICON_SRC: Record<string, string | undefined> = {
   objective: "/assets/icons/actions/action_objective.png",
   spell: "/assets/icons/actions/action_spell.png",
   skill: "/assets/icons/actions/action_skill.png",
+  study: "/assets/icons/actions/action_study.png",
 };
 
 function resolveLocalizedKey(candidates: string[], fallback: string): string {

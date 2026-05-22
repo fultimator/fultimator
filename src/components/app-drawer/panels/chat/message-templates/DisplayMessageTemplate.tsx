@@ -20,6 +20,7 @@ const DISPLAY_ICON_SRC: Record<string, string | undefined> = {
   guard: "/assets/icons/actions/action_guard.png",
   hinder: "/assets/icons/actions/action_hinder.png",
   attack: "/assets/icons/actions/action_attack.png",
+  study: "/assets/icons/actions/action_study.png",
 };
 
 export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({

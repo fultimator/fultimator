@@ -153,13 +153,14 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
               </Grid>
             </Grid>
 
-            <Grid container>
+            <Grid container direction="column">
               {/* Merge Benefit */}
               <Grid
                 container
                 sx={{
                   justifyContent: "space-between",
                   borderTop: `1px solid ${theme.primary}`,
+                  width: "100%",
                 }}
               >
                 {/* Merge Label */}
@@ -245,6 +246,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                     sx={{
                       justifyContent: "space-between",
                       borderTop: `1px solid ${theme.primary}`,
+                      width: "100%",
                     }}
                   >
                     {/* Pulse Grid Item */}
@@ -330,6 +332,7 @@ export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
                 sx={{
                   justifyContent: "space-between",
                   borderTop: `1px solid ${theme.primary}`,
+                  width: "100%",
                 }}
               >
                 {/* Dismiss Label */}
