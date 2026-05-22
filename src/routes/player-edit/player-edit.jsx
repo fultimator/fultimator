@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
 import { useThemeStore } from "../../store/themeStore";
 import { TAB_RAIL_WIDTH, APP_DRAWER_WIDTH } from "../../components/app-drawer/constants";
 import { useDrawerScrollTop, useDrawerSave } from "../../hooks/useDrawerActions";
@@ -129,6 +130,7 @@ import {
   canLevelUpFromExp as canLevelUpFromExpCheck,
   applyExpLevelUp,
 } from "../../components/player/common/levelUpLogic";
+import { executeCommand } from "../../components/app-drawer/panels/chat/domain/commands";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -212,6 +214,7 @@ export default function PlayerEdit() {
   const setChatComposerPrefill = useAppDrawerStore(
     (s) => s.setChatComposerPrefill,
   );
+  const addChatMessage = useChatMessagesStore((s) => s.addMessage);
   const setChatActorDocOverride = useAppDrawerStore(
     (s) => s.setChatActorDocOverride,
   );
@@ -363,14 +366,50 @@ export default function PlayerEdit() {
   };
 
   const handleQuickCheck = useCallback(
-    (kind) => {
-      if (kind === "group") return;
-      if (!["attribute", "open", "opposed"].includes(kind)) return;
+    (payload) => {
+      if (typeof payload === "string") {
+        const kind = payload;
+        if (kind === "group") return;
+        if (!["attribute", "open", "opposed"].includes(kind)) return;
+        setDrawerActiveTab("chat");
+        setChatComposerPrefill(`/check ${kind} `);
+        setDrawerIsOpen(true);
+        return;
+      }
+      const normalizedKind = payload?.kind === "attribute" ? "attribute" : "open";
+      const primary = payload?.primary || "dex";
+      const secondary = payload?.secondary || "ins";
+      const modifier = Number(payload?.modifier) || 0;
+      const hasDifficulty =
+        Number.isFinite(payload?.difficulty) && Number(payload?.difficulty) > 0;
+      const difficulty = hasDifficulty ? Number(payload.difficulty) : null;
+      const command = [
+        "/check",
+        normalizedKind,
+        primary,
+        secondary,
+        String(modifier),
+        ...(difficulty != null ? [String(difficulty)] : []),
+      ].join(" ");
+      const result = executeCommand(command, {
+        speaker: playerTemp?.name || "Player",
+        playerDoc: playerTemp || null,
+      });
+      if (result && result.ok) {
+        result.messages.forEach(addChatMessage);
+      } else {
+        setChatComposerPrefill(command);
+      }
       setDrawerActiveTab("chat");
-      setChatComposerPrefill(`/check ${kind} `);
       setDrawerIsOpen(true);
     },
-    [setDrawerActiveTab, setChatComposerPrefill, setDrawerIsOpen],
+    [
+      addChatMessage,
+      playerTemp,
+      setDrawerActiveTab,
+      setChatComposerPrefill,
+      setDrawerIsOpen,
+    ],
   );
 
   const recalculatePlayerMaxStats = useCallback((prevPlayer) => {

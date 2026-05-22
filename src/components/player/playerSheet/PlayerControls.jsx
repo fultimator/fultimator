@@ -25,6 +25,7 @@ import {
   Checkbox,
   Box,
   ListItemText,
+  Popover,
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
@@ -352,6 +353,61 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
       "50%": { transform: "translateY(-2px)" },
       "100%": { transform: "translateY(0px)" },
     },
+  };
+  const QUICK_CHECK_ATTRIBUTES = ["dex", "ins", "mig", "wlp"];
+  const QUICK_CHECK_ATTRIBUTE_LABELS = {
+    dex: "DEX",
+    ins: "INS",
+    mig: "MIG",
+    wlp: "WLP",
+  };
+  const QUICK_CHECK_DIFFICULTIES = [7, 10, 13, 16];
+  const QUICK_CHECK_DIFFICULTY_LABELS = {
+    7: "Easy",
+    10: "Normal",
+    13: "Hard",
+    16: "Very Hard",
+  };
+  const [quickCheckAnchorEl, setQuickCheckAnchorEl] = useState(null);
+  const [quickCheckKind, setQuickCheckKind] = useState("attribute");
+  const [quickCheckPrimary, setQuickCheckPrimary] = useState("dex");
+  const [quickCheckSecondary, setQuickCheckSecondary] = useState("ins");
+  const [quickCheckModifier, setQuickCheckModifier] = useState(0);
+  const [quickCheckDifficultyMode, setQuickCheckDifficultyMode] =
+    useState("preset");
+  const [quickCheckDifficulty, setQuickCheckDifficulty] = useState(10);
+  const [quickCheckCustomDifficulty, setQuickCheckCustomDifficulty] =
+    useState("");
+  const isQuickCheckPopoverOpen = Boolean(quickCheckAnchorEl);
+
+  const openQuickCheckPopover = (event, kind) => {
+    setQuickCheckAnchorEl(event.currentTarget);
+    setQuickCheckKind(kind);
+  };
+
+  const closeQuickCheckPopover = () => {
+    setQuickCheckAnchorEl(null);
+  };
+
+  const submitQuickCheck = () => {
+    const normalizedKind = quickCheckKind === "attribute" ? "attribute" : "open";
+    const parsedCustomDl = Number.parseInt(quickCheckCustomDifficulty, 10);
+    const difficulty =
+      quickCheckKind === "attribute"
+        ? quickCheckDifficultyMode === "custom"
+          ? Number.isFinite(parsedCustomDl) && parsedCustomDl > 0
+            ? parsedCustomDl
+            : undefined
+          : quickCheckDifficulty
+        : undefined;
+    onQuickCheck?.({
+      kind: normalizedKind,
+      primary: quickCheckPrimary,
+      secondary: quickCheckSecondary,
+      modifier: Number(quickCheckModifier) || 0,
+      difficulty,
+    });
+    closeQuickCheckPopover();
   };
 
   const [zenitChange, setZenitChange] = useState(0);
@@ -747,7 +803,7 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
               <Tooltip title="Group Check">
                 <IconButton
                   size="small"
-                  onClick={() => onQuickCheck?.("group")}
+                  onClick={(e) => openQuickCheckPopover(e, "group")}
                   sx={{
                     gridColumn: { md: 5 },
                     gridRow: { md: "1 / span 2" },
@@ -773,7 +829,7 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
               <Tooltip title="Attribute Check">
                 <IconButton
                   size="small"
-                  onClick={() => onQuickCheck?.("attribute")}
+                  onClick={(e) => openQuickCheckPopover(e, "attribute")}
                   sx={{
                     gridColumn: { md: 6 },
                     gridRow: { md: "1 / span 2" },
@@ -798,7 +854,7 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
               <Tooltip title="Open Check">
                 <IconButton
                   size="small"
-                  onClick={() => onQuickCheck?.("open")}
+                  onClick={(e) => openQuickCheckPopover(e, "open")}
                   sx={{
                     gridColumn: { md: 7 },
                     gridRow: { md: "1 / span 2" },
@@ -823,7 +879,7 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
               <Tooltip title="Opposed Check">
                 <IconButton
                   size="small"
-                  onClick={() => onQuickCheck?.("opposed")}
+                  onClick={(e) => openQuickCheckPopover(e, "opposed")}
                   sx={{
                     gridColumn: { md: 8 },
                     gridRow: { md: "1 / span 2" },
@@ -861,6 +917,135 @@ export default function PlayerControls({ player, setPlayer, onQuickCheck }) {
         t={t}
         player={player}
       />
+      <Popover
+        open={isQuickCheckPopoverOpen}
+        anchorEl={quickCheckAnchorEl}
+        onClose={closeQuickCheckPopover}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        slotProps={{
+          paper: {
+            sx: {
+              overflow: "visible",
+              mt: 1,
+              "&::before": {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                top: 0,
+                left: "50%",
+                width: 12,
+                height: 12,
+                backgroundColor: "background.paper",
+                transform: "translate(-50%, -50%) rotate(45deg)",
+                borderTop: "1px solid",
+                borderLeft: "1px solid",
+                borderColor: "divider",
+                zIndex: 0,
+              },
+            },
+          },
+        }}
+      >
+        <Box sx={{ p: 1.5, minWidth: 280, maxWidth: 340 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+            {t("Roll Check")}
+          </Typography>
+          <Stack spacing={1}>
+            <Stack direction="row" spacing={1}>
+              <FormControl fullWidth size="small">
+                <InputLabel id="quick-check-primary-label">
+                  {t("Attr 1")}
+                </InputLabel>
+                <Select
+                  labelId="quick-check-primary-label"
+                  label={t("Attr 1")}
+                  value={quickCheckPrimary}
+                  onChange={(e) => setQuickCheckPrimary(e.target.value)}
+                >
+                  {QUICK_CHECK_ATTRIBUTES.map((attr) => (
+                    <MenuItem key={`qc-primary-${attr}`} value={attr}>
+                      {t(QUICK_CHECK_ATTRIBUTE_LABELS[attr] || attr)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small">
+                <InputLabel id="quick-check-secondary-label">
+                  {t("Attr 2")}
+                </InputLabel>
+                <Select
+                  labelId="quick-check-secondary-label"
+                  label={t("Attr 2")}
+                  value={quickCheckSecondary}
+                  onChange={(e) => setQuickCheckSecondary(e.target.value)}
+                >
+                  {QUICK_CHECK_ATTRIBUTES.map((attr) => (
+                    <MenuItem key={`qc-secondary-${attr}`} value={attr}>
+                      {t(QUICK_CHECK_ATTRIBUTE_LABELS[attr] || attr)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
+            <TextField
+              size="small"
+              type="number"
+              label={t("Modifier")}
+              value={quickCheckModifier}
+              onChange={(e) => setQuickCheckModifier(e.target.value)}
+            />
+            {quickCheckKind === "attribute" && (
+              <>
+                <FormControl fullWidth size="small">
+                  <InputLabel id="quick-check-difficulty-mode-label">
+                    {t("Difficulty")}
+                  </InputLabel>
+                  <Select
+                    labelId="quick-check-difficulty-mode-label"
+                    label={t("Difficulty")}
+                    value={quickCheckDifficultyMode}
+                    onChange={(e) => setQuickCheckDifficultyMode(e.target.value)}
+                  >
+                    <MenuItem value="preset">{t("Preset")}</MenuItem>
+                    <MenuItem value="custom">{t("Custom DL")}</MenuItem>
+                  </Select>
+                </FormControl>
+                {quickCheckDifficultyMode === "preset" ? (
+                  <FormControl fullWidth size="small">
+                    <InputLabel id="quick-check-difficulty-value-label">
+                      {t("DL")}
+                    </InputLabel>
+                    <Select
+                      labelId="quick-check-difficulty-value-label"
+                      label={t("DL")}
+                      value={quickCheckDifficulty}
+                      onChange={(e) => setQuickCheckDifficulty(e.target.value)}
+                    >
+                      {QUICK_CHECK_DIFFICULTIES.map((dl) => (
+                        <MenuItem key={`qc-dl-${dl}`} value={dl}>
+                          {`${dl} ${t(QUICK_CHECK_DIFFICULTY_LABELS[dl] || "")}`.trim()}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                ) : (
+                  <TextField
+                    size="small"
+                    type="number"
+                    label={t("Custom DL")}
+                    value={quickCheckCustomDifficulty}
+                    onChange={(e) => setQuickCheckCustomDifficulty(e.target.value)}
+                  />
+                )}
+              </>
+            )}
+            <Button variant="contained" onClick={submitQuickCheck}>
+              {t("Roll Check")}
+            </Button>
+          </Stack>
+        </Box>
+      </Popover>
     </>
   );
 }
