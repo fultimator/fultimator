@@ -1,196 +1,100 @@
-import React, { useCallback, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
-  Grid,
-  TextField,
-  useTheme,
-  Paper,
-  IconButton,
-  Tooltip,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
+  Grid,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Paper,
+  Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import Casino from "@mui/icons-material/Casino";
+import Delete from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useTranslate } from "../../../translation/translate";
-import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
+import ItemEditModal from "../../../forms/ui/ItemEditModal";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
-import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
-import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
+import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
+import { SharedOptionalCard } from "../../shared/itemCards";
 
 const QUIRK_SUBTYPES = ["quirk"];
+const CONTROL_SIZE = 32;
+
+function toFormState(quirk) {
+  return {
+    itemType: "quirkOptional",
+    name: quirk?.name ?? "",
+    description: quirk?.description ?? "",
+    effect: quirk?.effect ?? "",
+  };
+}
+
+function fromFormState(form) {
+  return { name: form.name ?? "", description: form.description ?? "", effect: form.effect ?? "" };
+}
 
 export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const { ensurePersonalPack, addItem } = useCompendiumPacks();
+
+  const [editorOpen, setEditorOpen] = useState(false);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
-  const {
-    isOpen: deleteDialogOpen,
-    closeDialog: setDeleteDialogOpen,
-    handleDelete,
-  } = useDeleteConfirmation({
-    onConfirm: () => {
-      setPlayer((prev) => ({
-        ...prev,
-        quirk: { name: "", description: "", effect: "" },
-      }));
-    },
-  });
+  const [creating, setCreating] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
-  const onChangeQuirk = useCallback(
-    (key) => (value) => {
-      setPlayer((prevState) => ({
-        ...prevState,
-        quirk: {
-          ...prevState.quirk,
-          [key]: value,
-        },
-      }));
-    },
-    [setPlayer],
-  );
-
-  const handleAddFromCompendium = useCallback(
-    (item) => {
-      setPlayer((prev) => ({
-        ...prev,
-        quirk: {
-          name: item.name ?? "",
-          description: item.description ?? "",
-          effect: item.effect ?? "",
-        },
-      }));
-    },
-    [setPlayer],
-  );
+  const quirk = useMemo(() => player.quirk, [player.quirk]);
+  const hasQuirk = Boolean(quirk && (quirk.name?.trim() || quirk.description?.trim() || quirk.effect?.trim()));
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
-      <Grid container>
+    <Paper elevation={3} sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: secondary }}>
+      <Grid container spacing={1}>
         <Grid size={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Quirk")}
-            showIconButton={false}
-          />
+          <CustomHeader type="top" headerText={t("Quirk")} showIconButton={isEditMode} addItem={() => { setCreating(true); setEditorOpen(true); }} openCompendium={isEditMode ? () => setCompendiumOpen(true) : undefined} icon={AddIcon} customTooltip={t("Add Quirk")} />
         </Grid>
-        <Grid container spacing={1} sx={{ py: 1, alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 10,
-              sm: 11,
-            }}
-          >
-            <TextField
-              id="name"
-              label={t("Quirk Name") + ":"}
-              value={player.quirk?.name || ""}
-              onChange={(e) => onChangeQuirk("name")(e.target.value)}
-              fullWidth
-              slotProps={{
-                input: {
-                  readOnly: !isEditMode,
-                },
 
-                htmlInput: { maxLength: 50 },
-              }}
-            />
+        {!hasQuirk ? (
+          <Grid size={12} sx={{ py: 2 }}><Typography sx={{ textAlign: "center", color: "text.secondary" }}>{t("No quirk yet.")}</Typography></Grid>
+        ) : (
+          <Grid size={12}>
+            <Accordion disableGutters elevation={0} sx={{ border: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ minHeight: 56, "&.Mui-expanded": { minHeight: 56 }, "& .MuiAccordionSummary-content": { alignItems: "center", my: 0, "&.Mui-expanded": { my: 0 } } }}>
+                <Box sx={{ display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+                  <Tooltip title={t("Roll")}><IconButton size="small" onClick={() => addMessage({ id: crypto.randomUUID(), createdAt: Date.now(), speaker: player?.name || "Player", kind: "display", itemType: "optional", name: quirk.name || t("Quirk"), tags: [t("Quirk")], description: quirk.description || "", effect: quirk.effect || "" })} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}><Casino sx={{ fontSize: "1.2rem" }} /></IconButton></Tooltip>
+                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchorEl(e.currentTarget); }} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}><MenuIcon sx={{ fontSize: "1.2rem" }} /></IconButton>
+                  <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
+                    <MenuItem onClick={async () => { const pack = await ensurePersonalPack(); await addItem(pack.id, "optional", { subtype: "quirk", ...quirk }); setMenuAnchorEl(null); }}><ListItemText>{t("Add to Compendium")}</ListItemText></MenuItem>
+                    <MenuItem onClick={() => { setPlayer((prev) => { const next = { ...prev }; delete next.quirk; return next; }); setMenuAnchorEl(null); }} sx={{ color: "error.main" }}><ListItemIcon><Delete color="error" fontSize="small" /></ListItemIcon><ListItemText>{t("Delete")}</ListItemText></MenuItem>
+                  </Menu>
+                </Box>
+                <Box sx={{ flexGrow: 1, minWidth: 0 }}><Typography noWrap sx={{ fontWeight: 700 }}>{quirk.name || t("Unnamed Quirk")}</Typography></Box>
+                <Box onClick={(e) => e.stopPropagation()}><Tooltip title={t("Edit")}><IconButton size="small" onClick={() => { setCreating(false); setEditorOpen(true); }} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}><EditIcon sx={{ fontSize: "1.2rem" }} /></IconButton></Tooltip></Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <SharedOptionalCard item={{ ...quirk, subtype: "quirk" }} />
+              </AccordionDetails>
+            </Accordion>
           </Grid>
-          {isEditMode && (
-            <Grid
-              sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
-              size={{
-                xs: 2,
-                sm: 1,
-              }}
-            >
-              <Tooltip title={t("Replace from Compendium")}>
-                <IconButton
-                  size="small"
-                  onClick={() => setCompendiumOpen(true)}
-                >
-                  <SearchIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t("Remove")}>
-                <IconButton size="small" color="error" onClick={handleDelete}>
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-          )}
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <CustomTextarea
-              id="description"
-              label={t("Description") + ":"}
-              value={player.quirk?.description || ""}
-              onChange={(e) => onChangeQuirk("description")(e.target.value)}
-              maxLength={5000}
-              maxRows={10}
-              readOnly={!isEditMode}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <CustomTextarea
-              id="effect"
-              label={t("Effect") + ":"}
-              value={player.quirk?.effect || ""}
-              onChange={(e) => onChangeQuirk("effect")(e.target.value)}
-              maxLength={5000}
-              maxRows={10}
-              readOnly={!isEditMode}
-            />
-          </Grid>
-        </Grid>
+        )}
       </Grid>
-      {isEditMode && (
-        <CompendiumViewerModal
-          open={compendiumOpen}
-          onClose={() => setCompendiumOpen(false)}
-          onAddItem={handleAddFromCompendium}
-          initialType="optionals"
-          restrictToTypes={["optionals"]}
-          initialOptionalSubtypes={QUIRK_SUBTYPES}
-        />
-      )}
-      <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={setDeleteDialogOpen}
-        onConfirm={() => {
-          setPlayer((prev) => ({
-            ...prev,
-            quirk: { name: "", description: "", effect: "" },
-          }));
-        }}
-        title={t("Confirm Deletion")}
-        message={t("Are you sure you want to delete this quirk?")}
-        itemPreview={
-          <Box>
-            <Typography variant="h4">
-              {player.quirk?.name || t("Quirk")}
-            </Typography>
-          </Box>
-        }
-      />
+
+      {editorOpen ? <ItemEditModal open onClose={() => { setEditorOpen(false); setCreating(false); }} itemType="quirkOptional" item={toFormState(creating ? null : quirk)} editIndex={creating || !hasQuirk ? null : 0} onSave={(payload) => { setPlayer((prev) => ({ ...prev, quirk: fromFormState(payload) })); setEditorOpen(false); setCreating(false); }} onDelete={() => { setPlayer((prev) => { const next = { ...prev }; delete next.quirk; return next; }); setEditorOpen(false); setCreating(false); }} ctx={{ player, setPlayer }} /> : null}
+
+      {isEditMode ? <CompendiumViewerModal open={compendiumOpen} onClose={() => setCompendiumOpen(false)} onAddItem={(item) => { setPlayer((prev) => ({ ...prev, quirk: { name: item.name ?? "", description: item.description ?? "", effect: item.effect ?? "" } })); setCompendiumOpen(false); }} initialType="optionals" restrictToTypes={["optionals"]} initialOptionalSubtypes={QUIRK_SUBTYPES} /> : null}
     </Paper>
   );
 }

@@ -36,6 +36,7 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -244,6 +245,7 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -439,6 +441,7 @@ export const SharedGambleSpellCard = React.memo(function SharedGambleSpellCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -660,6 +663,7 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -778,6 +782,7 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -882,6 +887,7 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -1005,6 +1011,7 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -1255,6 +1262,7 @@ export const SharedAlchemyCard = React.memo(function SharedAlchemyCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -1352,6 +1360,7 @@ export const SharedInfusionCard = React.memo(function SharedInfusionCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -1449,6 +1458,7 @@ export const SharedMagitechCard = React.memo(function SharedMagitechCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -1530,6 +1540,7 @@ export const SharedInvocationCard = React.memo(function SharedInvocationCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -1629,6 +1640,7 @@ export const SharedCookingCard = React.memo(function SharedCookingCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -1741,6 +1753,7 @@ export const SharedMagiseedCard = React.memo(function SharedMagiseedCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -1893,6 +1906,7 @@ export const SharedPilotVehicleCard = React.memo(
     actionContent = CARD_DEFAULTS.actionContent,
     defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
   }) {
+    item = item ?? {};
     const {
       t,
       customTheme,
@@ -2549,6 +2563,7 @@ export const SharedSymbolCard = React.memo(function SharedSymbolCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,
@@ -2630,6 +2645,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
+  item = item ?? {};
   const {
     t,
     customTheme,

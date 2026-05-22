@@ -9,6 +9,7 @@ import NotesMarkdown from "../../../../common/NotesMarkdown";
 import { CheckAccuracyIcon } from "../../../../icons";
 import { BreakdownRow, DiceRow, TagRow } from "./primitives";
 import { ATTR_LABEL, normalizeDamageType } from "./primitives-utils";
+import { DamagePipelineTargets } from "./DamagePipelineTargets";
 
 const gridSx = {
   px: 0.75,
@@ -303,6 +304,13 @@ export const AccuracyCheckMessageTemplate: React.FC<
           </Box>
         </Collapse>
       </Box>
+
+      <DamagePipelineTargets
+        damage={check.damage}
+        damageType={check.intent.damageType}
+        critical={check.critical}
+        fumble={check.fumble}
+      />
     </>
   );
 };

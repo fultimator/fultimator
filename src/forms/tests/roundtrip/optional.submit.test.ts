@@ -55,7 +55,8 @@ describe("optional - camp-activities subtype", () => {
     const result = OptionalCampActivitiesSchema.safeParse({
       ...SHARED,
       subtype: "camp-activities",
-      description: "Rest by the fire.",
+      description: "choice",
+      targetDescription: "Rest by the fire.",
       effect: "Recover 10 HP.",
     });
     expect(result.success, JSON.stringify(result)).toBe(true);
@@ -140,7 +141,13 @@ describe("optional - union schema (OptionalSchema)", () => {
   it("each subtype passes the union schema", () => {
     const cases = [
       { ...SHARED, subtype: "quirk", description: "d", effect: "e" },
-      { ...SHARED, subtype: "camp-activities", description: "d", effect: "e" },
+      {
+        ...SHARED,
+        subtype: "camp-activities",
+        description: "choice",
+        targetDescription: "d",
+        effect: "e",
+      },
       { ...SHARED, subtype: "zero-trigger", description: "d" },
       { ...SHARED, subtype: "zero-effect", description: "d" },
       {

@@ -269,6 +269,24 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   const isPilotSelected = selectedSpellClassKey === "pilot";
   const isChanterSelected = selectedSpellClassKey === "chanter";
   const isInvokerSelected = selectedSpellClassKey === "invoker";
+  const compactMultiAutocompleteSx = {
+    "& .MuiOutlinedInput-root": {
+      minHeight: 40,
+      alignItems: "center",
+    },
+    "& .MuiAutocomplete-inputRoot": {
+      flexWrap: "nowrap",
+      pr: 4,
+    },
+    "& .MuiAutocomplete-tag": {
+      maxWidth: 112,
+      m: 0,
+      mr: 0.5,
+    },
+    "& .MuiAutocomplete-input": {
+      minWidth: 0,
+    },
+  };
 
   return (
     <Box
@@ -516,8 +534,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         {(selectedType === "classes" || selectedType === "heroics") && (
           <Autocomplete
             multiple
+            limitTags={1}
             size="small"
             fullWidth
+            sx={compactMultiAutocompleteSx}
             options={CLASS_BOOK_OPTIONS}
             getOptionLabel={(option) => t(option.label)}
             value={CLASS_BOOK_OPTIONS.filter((o) =>
@@ -572,8 +592,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         {selectedType === "heroics" && (
           <Autocomplete
             multiple
+            limitTags={1}
             size="small"
             fullWidth
+            sx={compactMultiAutocompleteSx}
             options={classList.map((c) => c.name)}
             value={selectedHeroicClasses}
             onChange={(e, newValue) => onHeroicClassesChange(newValue)}
@@ -603,8 +625,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         {selectedType === "optionals" && (
           <Autocomplete
             multiple
+            limitTags={1}
             size="small"
             fullWidth
+            sx={compactMultiAutocompleteSx}
             options={[
               "quirk",
               "camp-activities",
@@ -659,8 +683,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
               <Autocomplete
                 multiple
+                limitTags={1}
                 size="small"
                 fullWidth
+                sx={compactMultiAutocompleteSx}
                 options={QUALITY_CATEGORY_OPTIONS}
                 getOptionLabel={(option) => t(option.label)}
                 value={QUALITY_CATEGORY_OPTIONS.filter((o) =>
@@ -695,8 +721,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
               <Autocomplete
                 multiple
+                limitTags={1}
                 size="small"
                 fullWidth
+                sx={compactMultiAutocompleteSx}
                 options={QUALITY_FILTER_OPTIONS}
                 getOptionLabel={(option) => t(option.label)}
                 value={QUALITY_FILTER_OPTIONS.filter((o) =>

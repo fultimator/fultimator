@@ -1,323 +1,289 @@
-import React, { useCallback, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Card,
   Grid,
-  TextField,
-  useTheme,
-  Paper,
   IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Paper,
+  Stack,
   Tooltip,
-  Divider,
   Typography,
-  Switch,
-  FormControlLabel,
+  useTheme,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import SearchIcon from "@mui/icons-material/Search";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useTranslate } from "../../../translation/translate";
-import CustomTextarea from "../../common/CustomTextarea";
+import Casino from "@mui/icons-material/Casino";
+import Delete from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MenuIcon from "@mui/icons-material/Menu";
 import CustomHeader from "../../common/CustomHeader";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
-import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
-import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
+import ItemEditModal from "../../../forms/ui/ItemEditModal";
+import { useTranslate } from "../../../translation/translate";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
+import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
+import { SharedOptionalCard } from "../../shared/itemCards";
 
 const OTHER_SUBTYPES = ["other"];
+const CONTROL_SIZE = 32;
 
-function emptyOther() {
-  return { name: "", description: "", effect: "" };
+function toFormState(other) {
+  return {
+    itemType: "otherOptional",
+    name: other?.name ?? "",
+    description: other?.description ?? "",
+    effect: other?.effect ?? "",
+    clockEnabled: Boolean(other?.clock?.sections),
+    clockSections: Number(other?.clock?.sections) || 6,
+  };
+}
+
+function fromFormState(form) {
+  return {
+    name: form.name ?? "",
+    description: form.description ?? "",
+    effect: form.effect ?? "",
+    clock: form.clockEnabled ? { sections: Number(form.clockSections) || 6 } : undefined,
+  };
+}
+
+function OtherRow({ other, index, onEdit, onDelete, onRoll, onAddToCompendium }) {
+  const { t } = useTranslate();
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
+  return (
+    <Accordion disableGutters elevation={0} sx={{ border: "1px solid", borderColor: "divider", mb: 0.75, "&:before": { display: "none" } }}>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          minHeight: 56,
+          "&.Mui-expanded": { minHeight: 56 },
+          "& .MuiAccordionSummary-content": { alignItems: "center", my: 0, "&.Mui-expanded": { my: 0 } },
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }} onClick={(e) => e.stopPropagation()}>
+          <Tooltip title={t("Roll")}> 
+            <IconButton size="small" onClick={() => onRoll(other)} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}>
+              <Casino sx={{ fontSize: "1.2rem" }} />
+            </IconButton>
+          </Tooltip>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuAnchorEl(e.currentTarget);
+            }}
+            sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}
+          >
+            <MenuIcon sx={{ fontSize: "1.2rem" }} />
+          </IconButton>
+          <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
+            <MenuItem
+              onClick={async (e) => {
+                e.stopPropagation();
+                await onAddToCompendium(other);
+                setMenuAnchorEl(null);
+              }}
+            >
+              <ListItemText>{t("Add to Compendium")}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(index);
+                setMenuAnchorEl(null);
+              }}
+              sx={{ color: "error.main" }}
+            >
+              <ListItemIcon>
+                <Delete color="error" fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t("Delete")}</ListItemText>
+            </MenuItem>
+          </Menu>
+        </Box>
+
+        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Typography noWrap sx={{ fontWeight: 700 }}>
+            {other.name || t("Unnamed Optional")}
+          </Typography>
+        </Box>
+
+        <Box onClick={(e) => e.stopPropagation()}>
+          <Tooltip title={t("Edit")}> 
+            <IconButton size="small" onClick={() => onEdit(index)} sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}>
+              <EditIcon sx={{ fontSize: "1.2rem" }} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </AccordionSummary>
+
+      <AccordionDetails>
+        <SharedOptionalCard item={{ ...other, subtype: "other" }} />
+      </AccordionDetails>
+    </Accordion>
+  );
 }
 
 export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
-  const [replaceCompendiumOpen, setReplaceCompendiumOpen] = useState(false);
-  const [replaceIndex, setReplaceIndex] = useState(null);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } =
-    useDeleteConfirmation({
-      onConfirm: () => {
-        if (deleteIndex !== null) handleRemove(deleteIndex);
-      },
-    });
-  const [deleteIndex, setDeleteIndex] = useState(null);
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const { ensurePersonalPack, addItem } = useCompendiumPacks();
 
-  const others = player.others ?? [];
+  const [editIndex, setEditIndex] = useState(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [compendiumOpen, setCompendiumOpen] = useState(false);
 
-  const onChangeOther = useCallback(
-    (index, key) => (value) => {
-      setPlayer((prev) => {
-        const updated = [...(prev.others ?? [])];
-        updated[index] = { ...updated[index], [key]: value };
-        return { ...prev, others: updated };
-      });
-    },
-    [setPlayer],
-  );
+  const others = useMemo(() => player.others ?? [], [player.others]);
 
-  const handleAdd = useCallback(() => {
-    setPlayer((prev) => ({
-      ...prev,
-      others: [...(prev.others ?? []), emptyOther()],
-    }));
-  }, [setPlayer]);
-
-  const handleRemove = useCallback(
-    (index) => {
-      setPlayer((prev) => {
-        const updated = [...(prev.others ?? [])];
-        updated.splice(index, 1);
-        return { ...prev, others: updated };
-      });
-    },
-    [setPlayer],
-  );
-
-  const handleReplaceFromCompendium = useCallback(
-    (item) => {
-      if (replaceIndex === null) return;
-      setPlayer((prev) => ({
-        ...prev,
-        others: (prev.others ?? []).map((other, idx) =>
-          idx === replaceIndex
-            ? {
-                ...other,
-                name: item.name ?? "",
-                description: item.description ?? "",
-                effect: item.effect ?? "",
-                ...(item.clock?.sections
-                  ? { clock: { sections: item.clock.sections } }
-                  : { clock: undefined }),
-              }
-            : other,
-        ),
-      }));
-      setReplaceCompendiumOpen(false);
-      setReplaceIndex(null);
-    },
-    [replaceIndex, setPlayer],
-  );
+  const editingItem = createOpen
+    ? toFormState(null)
+    : editIndex !== null
+      ? toFormState(others[editIndex])
+      : null;
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
-      <Grid container>
+    <Paper elevation={3} sx={{ p: "15px", borderRadius: "8px", border: "2px solid", borderColor: secondary }}>
+      <Grid container spacing={1}>
         <Grid size={12}>
           <CustomHeader
             type="top"
             headerText={t("Other Optionals")}
             showIconButton={isEditMode}
-            addItem={handleAdd}
+            addItem={() => setCreateOpen(true)}
+            openCompendium={isEditMode ? () => setCompendiumOpen(true) : undefined}
             icon={AddIcon}
             customTooltip={t("Add Optional")}
           />
         </Grid>
 
-        {others.length === 0 && (
-          <Grid sx={{ py: 2 }} size={12}>
-            <Typography sx={{ textAlign: "center" }}>
+        {others.length === 0 ? (
+          <Grid size={12} sx={{ py: 2 }}>
+            <Typography sx={{ textAlign: "center", color: "text.secondary" }}>
               {t("No optional entries yet.")}
             </Typography>
           </Grid>
+        ) : (
+          <Grid size={12}>
+            {others.map((other, index) => (
+              <OtherRow
+                key={`${other.name || "other"}-${index}`}
+                other={other}
+                index={index}
+                onEdit={setEditIndex}
+                onDelete={(i) => {
+                  setPlayer((prev) => ({
+                    ...prev,
+                    others: (prev.others ?? []).filter((_, idx) => idx !== i),
+                  }));
+                }}
+                onRoll={(entry) => {
+                  addMessage({
+                    id: crypto.randomUUID(),
+                    createdAt: Date.now(),
+                    speaker: player?.name || "Player",
+                    kind: "display",
+                    itemType: "optional",
+                    name: entry.name || t("Optional"),
+                    tags: [t("Optional")],
+                    description: entry.description || "",
+                    effect: entry.effect || "",
+                    ...(entry.clock?.sections
+                      ? {
+                          clock: {
+                            sections: entry.clock.sections,
+                            state:
+                              Array.isArray(entry.clockState) &&
+                              entry.clockState.length === entry.clock.sections
+                                ? entry.clockState
+                                : new Array(entry.clock.sections).fill(false),
+                            name: entry.name || t("Optional"),
+                          },
+                        }
+                      : {}),
+                  });
+                }}
+                onAddToCompendium={async (entry) => {
+                  const pack = await ensurePersonalPack();
+                  await addItem(pack.id, "optional", {
+                    subtype: "other",
+                    name: entry.name || "",
+                    description: entry.description || "",
+                    effect: entry.effect || "",
+                    ...(entry.clock?.sections ? { clock: { sections: entry.clock.sections } } : {}),
+                  });
+                }}
+              />
+            ))}
+          </Grid>
         )}
-
-        {others.map((other, index) => (
-          <React.Fragment key={index}>
-            {index > 0 && (
-              <Grid size={12}>
-                <Divider sx={{ my: 1 }} />
-              </Grid>
-            )}
-            <Grid
-              container
-              spacing={1}
-              sx={{ py: 1, alignItems: "flex-start" }}
-            >
-              <Grid
-                size={{
-                  xs: 9,
-                  sm: 10,
-                }}
-              >
-                <TextField
-                  label={t("Name") + ":"}
-                  value={other.name ?? ""}
-                  onChange={(e) => onChangeOther(index, "name")(e.target.value)}
-                  fullWidth
-                  size="small"
-                  slotProps={{
-                    input: { readOnly: !isEditMode },
-                    htmlInput: { maxLength: 100 },
-                  }}
-                />
-              </Grid>
-              {isEditMode && (
-                <Grid
-                  sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}
-                  size={{
-                    xs: 3,
-                    sm: 2,
-                  }}
-                >
-                  <Tooltip title={t("Replace from Compendium")}>
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        setReplaceIndex(index);
-                        setReplaceCompendiumOpen(true);
-                      }}
-                    >
-                      <SearchIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t("Remove")}>
-                    <IconButton
-                      size="small"
-                      color="error"
-                      onClick={() => {
-                        setDeleteIndex(index);
-                        setDeleteDialogOpen(true);
-                      }}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              )}
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Description") + ":"}
-                  value={other.description ?? ""}
-                  onChange={(e) =>
-                    onChangeOther(index, "description")(e.target.value)
-                  }
-                  maxLength={5000}
-                  maxRows={8}
-                  readOnly={!isEditMode}
-                />
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Effect") + ":"}
-                  value={other.effect ?? ""}
-                  onChange={(e) =>
-                    onChangeOther(index, "effect")(e.target.value)
-                  }
-                  maxLength={5000}
-                  maxRows={8}
-                  readOnly={!isEditMode}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                {isEditMode ? (
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        size="small"
-                        checked={!!other.clock?.sections}
-                        onChange={(e) => {
-                          setPlayer((prev) => {
-                            const updated = [...(prev.others ?? [])];
-                            updated[index] = e.target.checked
-                              ? { ...updated[index], clock: { sections: 6 } }
-                              : { ...updated[index], clock: undefined };
-                            return { ...prev, others: updated };
-                          });
-                        }}
-                      />
-                    }
-                    label={t("Clock")}
-                  />
-                ) : (
-                  other.clock?.sections && (
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: "text.secondary",
-                      }}
-                    >
-                      {t("Clock")}: {other.clock.sections}
-                    </Typography>
-                  )
-                )}
-              </Grid>
-              {other.clock?.sections && (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <TextField
-                    label={t("Clock Sections") + ":"}
-                    value={other.clock.sections}
-                    onChange={(e) => {
-                      setPlayer((prev) => {
-                        const updated = [...(prev.others ?? [])];
-                        updated[index] = {
-                          ...updated[index],
-                          clock: { sections: Number(e.target.value) || 6 },
-                        };
-                        return { ...prev, others: updated };
-                      });
-                    }}
-                    type="number"
-                    fullWidth
-                    size="small"
-                    slotProps={{
-                      input: { readOnly: !isEditMode },
-                      htmlInput: { min: 2, max: 12, readOnly: !isEditMode },
-                    }}
-                  />
-                </Grid>
-              )}
-            </Grid>
-          </React.Fragment>
-        ))}
       </Grid>
-      {isEditMode && replaceIndex !== null && (
-        <CompendiumViewerModal
-          open={replaceCompendiumOpen}
+
+      {(createOpen || editIndex !== null) && editingItem ? (
+        <ItemEditModal
+          open
           onClose={() => {
-            setReplaceCompendiumOpen(false);
-            setReplaceIndex(null);
+            setCreateOpen(false);
+            setEditIndex(null);
           }}
-          onAddItem={handleReplaceFromCompendium}
+          itemType="otherOptional"
+          item={editingItem}
+          editIndex={createOpen ? null : editIndex}
+          onSave={(payload) => {
+            const nextEntry = fromFormState(payload);
+            setPlayer((prev) => {
+              const next = [...(prev.others ?? [])];
+              if (createOpen) next.push(nextEntry);
+              else if (editIndex !== null && next[editIndex]) next[editIndex] = nextEntry;
+              return { ...prev, others: next };
+            });
+            setCreateOpen(false);
+            setEditIndex(null);
+          }}
+          onDelete={(index) => {
+            setPlayer((prev) => {
+              const next = [...(prev.others ?? [])];
+              if (index >= 0) next.splice(index, 1);
+              return { ...prev, others: next };
+            });
+            setCreateOpen(false);
+            setEditIndex(null);
+          }}
+          ctx={{ player, setPlayer }}
+        />
+      ) : null}
+
+      {isEditMode ? (
+        <CompendiumViewerModal
+          open={compendiumOpen}
+          onClose={() => setCompendiumOpen(false)}
+          onAddItem={(item) => {
+            const nextEntry = {
+              name: item.name ?? "",
+              description: item.description ?? "",
+              effect: item.effect ?? "",
+              ...(item.clock?.sections ? { clock: { sections: item.clock.sections } } : {}),
+            };
+            setPlayer((prev) => ({
+              ...prev,
+              others: [...(prev.others ?? []), nextEntry],
+            }));
+            setCompendiumOpen(false);
+          }}
           initialType="optionals"
           restrictToTypes={["optionals"]}
           initialOptionalSubtypes={OTHER_SUBTYPES}
         />
-      )}
-      <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={() => {
-          setDeleteDialogOpen(false);
-          setDeleteIndex(null);
-        }}
-        onConfirm={() => {
-          if (deleteIndex !== null) handleRemove(deleteIndex);
-        }}
-        title={t("Confirm Deletion")}
-        message={t("Are you sure you want to delete this optional entry?")}
-        itemPreview={
-          deleteIndex !== null && (
-            <Typography variant="h4">
-              {others[deleteIndex]?.name || t("Optional")}
-            </Typography>
-          )
-        }
-      />
+      ) : null}
     </Paper>
   );
 }

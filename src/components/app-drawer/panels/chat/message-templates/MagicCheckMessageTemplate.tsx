@@ -13,6 +13,7 @@ import {
   formatSpellType,
   normalizeDamageType,
 } from "./primitives-utils";
+import { DamagePipelineTargets } from "./DamagePipelineTargets";
 
 const gridSx = {
   px: 0.75,
@@ -289,6 +290,13 @@ export const MagicCheckMessageTemplate: React.FC<
           </Box>
         </Collapse>
       </Box>
+
+      <DamagePipelineTargets
+        damage={check.damage}
+        damageType={check.intent.damageType}
+        critical={check.critical}
+        fumble={check.fumble}
+      />
     </>
   );
 };

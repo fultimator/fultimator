@@ -4,8 +4,10 @@ import {
   SharedArmorCard,
   SharedCustomWeaponCard,
   SharedHeroicCard,
+  SharedOptionalCard,
   SharedShieldCard,
   SharedWeaponCard,
+  SharedZeroPowerCard,
 } from "../../components/shared/itemCards";
 import { calcWeaponPreview } from "../schema/itemSchemas/weapon";
 import { normalizeWeaponLike } from "../../libs/weaponNormalization";
@@ -192,6 +194,67 @@ export function WeaponPreviewCard({ formState }) {
         defModifier: parseInt(String(formState.defModifier)),
         mDefModifier: parseInt(String(formState.mDefModifier)),
       })}
+    />
+  );
+}
+
+export function OtherOptionalPreviewCard({ formState }) {
+  return (
+    <SharedOptionalCard
+      item={{
+        subtype: "other",
+        name: formState.name || "Unnamed Optional",
+        description: formState.description || "",
+        effect: formState.effect || "",
+        ...(formState.clockEnabled
+          ? { clock: { sections: Number(formState.clockSections) || 6 } }
+          : {}),
+      }}
+    />
+  );
+}
+
+export function CampActivityPreviewCard({ formState }) {
+  return (
+    <SharedOptionalCard
+      item={{
+        subtype: "camp-activities",
+        name: formState.name || "Unnamed Camp Activity",
+        description: formState.description || "",
+        effect: formState.effect || "",
+      }}
+    />
+  );
+}
+
+export function ZeroPowerOptionalPreviewCard({ formState }) {
+  return (
+    <SharedZeroPowerCard
+      item={{
+        name: formState.name || "Unnamed Zero Power",
+        clock: Number(formState.clockSections) || 6,
+        zeroTrigger: {
+          name: formState.triggerName || "",
+          description: formState.triggerDescription || "",
+        },
+        zeroEffect: {
+          name: formState.effectName || "",
+          description: formState.effectDescription || "",
+        },
+      }}
+    />
+  );
+}
+
+export function QuirkOptionalPreviewCard({ formState }) {
+  return (
+    <SharedOptionalCard
+      item={{
+        subtype: "quirk",
+        name: formState.name || "Unnamed Quirk",
+        description: formState.description || "",
+        effect: formState.effect || "",
+      }}
     />
   );
 }

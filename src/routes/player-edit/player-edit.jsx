@@ -48,7 +48,6 @@ import EditPlayerZeroPower from "../../components/player/informations/EditPlayer
 import EditPlayerOther from "../../components/player/informations/EditPlayerOthers";
 import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffinities";
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
-import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
 import EditPlayerImmunities from "../../components/player/stats/EditPlayerImmunities";
 import EditManualStats from "../../components/player/stats/EditManualStats";
@@ -1148,14 +1147,6 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isEditMode}
             updateMaxStats={updateMaxStats}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerStats
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            updateMaxStats={updateMaxStats}
-            isEditMode={isEditMode}
-            onQuickCheck={handleQuickCheck}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerAffinities

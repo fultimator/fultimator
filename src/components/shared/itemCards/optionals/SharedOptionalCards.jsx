@@ -688,6 +688,12 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
     typeof item.zeroEffect === "object"
       ? (item.zeroEffect?.description ?? "")
       : "";
+  const campTargetLabel =
+    {
+      yourself: t("Yourself"),
+      ally: t("One ally"),
+      choice: t("Special"),
+    }[String(item.description ?? "").toLowerCase()] ?? item.description;
 
   return (
     <CardContentWrapper
@@ -766,7 +772,11 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
                 }}
               >
                 <Typography variant="body2">
-                  <strong>{t("Target")}:</strong> {item.description}
+                  <strong>{t("Target")}:</strong>{" "}
+                  {String(item.description ?? "").toLowerCase() === "choice" &&
+                  item.targetDescription
+                    ? item.targetDescription
+                    : campTargetLabel}
                 </Typography>
               </Box>
             )}

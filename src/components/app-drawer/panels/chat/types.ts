@@ -125,6 +125,12 @@ export type DisplayMessage = {
   name: string;
   tags: string[];
   description?: string;
+  effect?: string;
+  clock?: {
+    sections: number;
+    state?: boolean[];
+    name?: string;
+  };
 };
 
 export type Attribute = "dex" | "ins" | "mig" | "wlp";

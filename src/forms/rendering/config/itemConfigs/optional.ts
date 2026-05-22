@@ -1,5 +1,6 @@
 import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
 import type { OptionalItem } from "../../../schema/itemSchemas/optional";
+import type { CampActivityTargetKey } from "../../../schema/itemSchemas/optional";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
 type OptionalFormStateShape = {
@@ -13,7 +14,8 @@ type OptionalFormStateShape = {
   name: string;
   fuid?: string;
   meta?: OptionalItem extends { meta?: infer M } ? M : never;
-  description?: string;
+  description?: string | CampActivityTargetKey;
+  targetDescription?: string;
   effect?: string;
   showClock?: boolean;
   clockSections?: number;
@@ -116,16 +118,30 @@ export const optionalFieldConfig: ItemFieldConfig<OptionalFormState> = [
     key: "description",
     kind: "editable",
     label: prefixedLabel(OPTIONAL_LABEL_PREFIX, SHARED_LABEL_KEYS.target),
-    component: "autocomplete",
-    defaultValue: "",
+    component: "select",
+    defaultValue: "choice",
     group: G.body,
     order: 2,
     fullWidth: true,
     dependencies: hasCampTarget,
     componentProps: {
-      freeSolo: true,
-      options: ["Yourself", "One ally", "Yourself or one ally"],
+      options: [
+        { value: "yourself", label: "Yourself" },
+        { value: "ally", label: "One ally" },
+        { value: "choice", label: "Special" },
+      ],
     },
+  },
+  {
+    key: "targetDescription",
+    kind: "editable",
+    label: "Target Description",
+    component: "text",
+    defaultValue: "",
+    group: G.body,
+    order: 2.5,
+    fullWidth: true,
+    dependencies: (s) => hasCampTarget(s) && s.description === "choice",
   },
   // body: effect (quirk, camp-activities, other)
   {
