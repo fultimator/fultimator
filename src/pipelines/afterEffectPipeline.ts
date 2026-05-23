@@ -1,4 +1,5 @@
 import type { AfterEffect, AfterEffectAmount } from "../types/Effects";
+import { resolveExpr, isExprValue, type ExprBindings } from "./exprResolver";
 import type { ResourceDelta, ResourceMultiplier } from "../types/Bonuses";
 import { resolveDamage, buildDamageContext, type DamageElement } from "./damagePipeline";
 import {
@@ -51,6 +52,7 @@ export interface AfterEffectContext {
   targetIds: string[];
   coverTargetId?: string;
   actors: Record<string, RuntimeActorSnapshot>;
+  exprBindings?: ExprBindings;
 }
 
 export interface AfterEffectPipelineResult {
@@ -60,8 +62,10 @@ export interface AfterEffectPipelineResult {
 function resolveAmount(
   amount: AfterEffectAmount,
   primary: PrimaryOutcomeResult,
+  bindings: ExprBindings,
 ): number {
   if (typeof amount === "number") return amount;
+  if (isExprValue(amount)) return Math.max(0, Math.floor(resolveExpr(amount, bindings)));
   if (amount === "half-damage") {
     if (primary.kind !== "damage") return 0;
     return Math.max(0, Math.floor(primary.resolvedAmount * 0.5));
@@ -95,7 +99,7 @@ export function resolveAfterEffects(
   let lastPrimary: PrimaryOutcomeResult = ctx.primaryOutcome;
 
   for (const ae of ctx.afterEffects) {
-    const baseAmount = resolveAmount(ae.amount, lastPrimary);
+    const baseAmount = resolveAmount(ae.amount, lastPrimary, ctx.exprBindings ?? { sl: 0 });
     const targetIds = resolveTargetIds(ae.target, ctx);
     const resource = ae.resource as ResourceKind;
 

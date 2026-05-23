@@ -1,4 +1,5 @@
 import type { ActionBehavior, AfterEffect, AppliedEffect } from "../types/Effects";
+import type { ExprBindings } from "./exprResolver";
 import type { RuntimeActor } from "../types/RuntimeActor";
 import type { ResourceDelta, ResourceMultiplier, DamageBonuses } from "../types/Bonuses";
 import type { Elements } from "../types/Misc";
@@ -242,6 +243,7 @@ export function executeAfterEffects(
   targetIds: string[],
   actors: Record<string, ActorPipelineData>,
   coverTargetId?: string,
+  exprBindings?: ExprBindings,
 ) {
   if (!afterEffects.length) return;
 
@@ -257,6 +259,7 @@ export function executeAfterEffects(
     targetIds,
     coverTargetId,
     actors: snapshots,
+    exprBindings,
   };
 
   return resolveAfterEffects(aeCtx);
@@ -321,6 +324,7 @@ export interface ExecuteActionOpts {
   coverTargetId?: string;
   actors: Record<string, ActorPipelineData>;
   preRollValues?: Record<string, number>;
+  exprBindings?: ExprBindings;
 }
 
 export interface ExecuteActionResult {
@@ -366,6 +370,7 @@ export function executeAction(opts: ExecuteActionOpts): ExecuteActionResult {
       opts.targetIds ?? [],
       opts.actors,
       opts.coverTargetId,
+      opts.exprBindings,
     );
   }
 

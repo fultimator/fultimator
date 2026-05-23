@@ -86,9 +86,17 @@ export interface AppliedEffect {
   predicate?: EffectPredicate;
 }
 
-// AfterEffect 
+// AfterEffect
 
-export type AfterEffectAmount = number | "half-damage" | "half-loss";
+// ExprValue - a runtime expression referencing pipeline bindings.
+// Supported bindings: $sl, @source.<dot.path>, @target.<dot.path>, @item.<dot.path>
+// Supported operators: + and - only.
+// Unknown bindings resolve to 0. Used wherever a numeric amount can vary at runtime.
+export interface ExprValue {
+  expr: string;
+}
+
+export type AfterEffectAmount = number | "half-damage" | "half-loss" | ExprValue;
 
 export type AfterEffectTarget = "self" | "targets" | "cover-target";
 
