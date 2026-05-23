@@ -113,7 +113,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
               alignItems: "center",
               justifyContent: "space-between",
               minHeight: "56px",
-              width: "100%",
+              width: "calc(100% + 30px)",
               boxSizing: "border-box",
             }}
           >
@@ -231,7 +231,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
               alignItems: "center",
               justifyContent: "space-between",
               minHeight: "56px",
-              width: "100%",
+              width: "calc(100% + 30px)",
               boxSizing: "border-box",
             }}
           >

@@ -238,7 +238,7 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           justifyContent: "space-between",
           lineHeight: "normal",
           textAlign: "center",
-          width: "100%",
+          width: "calc(100% + 30px)",
           boxSizing: "border-box",
         }}
       >

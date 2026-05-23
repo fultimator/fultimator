@@ -40,7 +40,7 @@ const CustomHeaderAlt: React.FC<CustomHeaderAltProps> = ({
             margin: "-29px 0 0 -29px",
             display: "flex",
             alignItems: "center",
-            width: "100%",
+            width: "calc(100% + 29px)",
             boxSizing: "border-box",
           }}
         >
