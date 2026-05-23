@@ -1,4 +1,5 @@
 import type { Affinities, ActorStatuses, Elements } from "./Misc";
+import type { AppliedEffect } from "./Effects";
 
 export type RuntimeActorSource = "npc" | "pc";
 
@@ -17,6 +18,9 @@ export interface RuntimeActor {
   statusEffects: ActorStatuses;
   temporaryAffinities: Partial<Record<Elements, Affinities>>;
   affinityLocks: Elements[];
+
+  // combat-temporary effects applied to this actor
+  appliedEffects: AppliedEffect[];
 
   // per-turn / per-encounter cooldowns keyed by skill fuid
   cooldowns: Record<string, CooldownDuration>;
@@ -47,6 +51,7 @@ export function createRuntimeActor(
     },
     temporaryAffinities: {},
     affinityLocks: [],
+    appliedEffects: [],
     cooldowns: {},
     flags: {},
   };

@@ -12,7 +12,7 @@ import {
   ActorDerived,
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
-import type { ItemEffect, ActorEffect, AppliesEffect } from "./Effects";
+import type { ActorEffect, ActionBehavior } from "./Effects";
 import type { Meta } from "../forms/schema/meta";
 import type {
   NpcAttack as EquipmentNpcAttack,
@@ -44,8 +44,7 @@ export interface NpcSpell {
   effect: string;
   itemType: "spell";
   spellType: string;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface NpcAction {
@@ -56,8 +55,7 @@ export interface NpcAction {
   effect: string;
   spCost?: number;
   meta?: Meta;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface NpcSpecial {
@@ -68,8 +66,7 @@ export interface NpcSpecial {
   effect: string;
   spCost?: number;
   meta?: Meta;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface NpcRareGear {
@@ -78,8 +75,7 @@ export interface NpcRareGear {
   description?: string;
   book?: string;
   effect: string;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface NpcExtra {

@@ -10,7 +10,7 @@ import {
   ActorDerived,
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
-import type { ItemEffect, ActorEffect, AppliesEffect } from "./Effects";
+import type { ItemEffect, ActorEffect, ActionBehavior } from "./Effects";
 import type {
   Weapon as EquipmentWeapon,
   CustomWeapon as EquipmentCustomWeapon,
@@ -42,16 +42,14 @@ export interface MnemosphereSkill {
   specialSkill?: string;
   maxLvl: number;
   currentLvl: number;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface MnemosphereHeroic {
   fuid?: string;
   name: string;
   specialSkill?: string;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface MnemosphereSpell {
@@ -76,8 +74,7 @@ export interface MnemosphereSpell {
   itemType: "spell";
   damage?: Damage;
   spellType?: string;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface Mnemosphere {
@@ -155,8 +152,7 @@ export interface Skills {
   currentLvl: number;
   maxLvl: number;
   specialSkill?: string;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface PlayerModifiers {
@@ -177,8 +173,7 @@ export interface HeroicSkills {
   quote: string;
   description: string;
   book?: string;
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface PlayerSettings {
@@ -248,8 +243,7 @@ export interface Spells {
   spellType?: string;
   vehicles?: Vehicle[];
   currentVehicles?: Vehicle[];
-  effects?: ItemEffect[];
-  appliesEffect?: AppliesEffect;
+  behavior?: ActionBehavior;
 }
 
 export interface PlayerClass {

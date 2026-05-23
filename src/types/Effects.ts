@@ -61,11 +61,76 @@ export interface ActorEffect {
   predicate?: EffectPredicate;
 }
 
+// AppliesEffect 
+
+export type AppliesEffectTarget = "single" | "all" | "self" | "cover-target";
+
 export interface AppliesEffect {
   label: string;
-  target: "single" | "all";
+  target: AppliesEffectTarget;
   duration: EffectDuration;
   changes?: EffectChange[];
   grants?: GrantData[];
   predicate?: EffectPredicate;
+}
+
+// AppliedEffect (runtime - lives on RuntimeActor) 
+
+export interface AppliedEffect {
+  id: string;
+  origin?: string;            // source item fuid; same-origin recasts replace
+  changesFingerprint: string; // stable JSON of sorted changes[]; identical effects do not stack
+  changes?: EffectChange[];
+  grants?: GrantData[];
+  duration: EffectDuration;
+  predicate?: EffectPredicate;
+}
+
+// AfterEffect 
+
+export type AfterEffectAmount = number | "half-damage" | "half-loss";
+
+export type AfterEffectTarget = "self" | "targets" | "cover-target";
+
+export interface AfterEffect {
+  resource: "hp" | "mp" | "ip";
+  direction: "loss" | "recovery";
+  amount: AfterEffectAmount;
+  target: AfterEffectTarget;
+  predicate?: EffectPredicate;
+}
+
+// ActionTrigger 
+
+export type TriggerAction = "guard" | "attack" | "spell" | "equipment";
+
+export type GuardVariant = "cover" | "no-cover";
+
+export interface TriggerCondition {
+  guardVariant?: GuardVariant;
+}
+
+export interface OnHitCondition {
+  singleTarget?: boolean;
+  targetHasStatusEffects?: boolean;
+}
+
+export type CooldownDuration = "until-next-turn" | "until-next-round";
+
+export type ActionTrigger =
+  | { kind: "active" }
+  | { kind: "chat-action"; action: TriggerAction; condition?: TriggerCondition }
+  | { kind: "reactive"; event: "ally-targeted"; cooldown?: CooldownDuration }
+  | { kind: "combat-start" }
+  | { kind: "on-hit"; condition?: OnHitCondition }
+  | { kind: "on-damage-taken" };
+
+// ActionBehavior - groups all execution-time behavior on an item.
+// Execution order: trigger -> effects -> appliesEffect -> afterEffects
+
+export interface ActionBehavior {
+  trigger?: ActionTrigger;
+  effects?: ItemEffect[];
+  appliesEffect?: AppliesEffect;
+  afterEffects?: AfterEffect[];
 }

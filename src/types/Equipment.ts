@@ -1,5 +1,5 @@
 import type { Accuracy, Damage, Attributes, Elements } from "./Misc";
-import type { ItemEffect } from "./Effects";
+import type { ItemEffect, ActionBehavior } from "./Effects";
 import type { Meta } from "../forms/schema/meta";
 
 export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
@@ -94,7 +94,7 @@ export interface NpcAttack {
   damage: Damage;
   effect?: string;
   extraDamage?: boolean;
-  effects?: ItemEffect[];
+  behavior?: ActionBehavior;
 }
 
 export interface NpcWeaponAttack {
@@ -107,7 +107,7 @@ export interface NpcWeaponAttack {
   damage: Damage;
   effect?: string;
   extraDamage?: boolean;
-  effects?: ItemEffect[];
+  behavior?: ActionBehavior;
 }
 
 export interface DefensiveModifiers {
