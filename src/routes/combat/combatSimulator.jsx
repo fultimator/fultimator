@@ -36,6 +36,7 @@ import { useDatabase } from "../../hooks/useDatabase";
 import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
 import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../components/player/playerTransforms";
 import { totalIncomingDamageBonus } from "../../libs/actorBonuses";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
 export default function CombatSimulator() {
   const { authLoading, dbMode, cloudUser, activeUid } = useDatabaseContext();
@@ -419,6 +420,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     const interval = setInterval(updateRelativeTime, 60000);
     return () => clearInterval(interval);
   }, [lastSaved, lastAutoSaved]);
+
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
 
   // Handle Log state
   const addLog = (message, name, value, status) => {
@@ -1546,6 +1549,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             npcRef={null}
             isMobile={isMobile}
             addLog={addLog}
+            addMessage={addMessage}
             openLogs={() => setLogOpen(true)}
             npcDetailWidth={`${npcDetailWidth}%`}
             checkNewTurn={checkNewTurn}

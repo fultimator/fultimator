@@ -41,6 +41,25 @@ import { useTheme } from "@mui/material/styles";
 import RollsTab from "./npcDetail/RollsTab";
 import StandardRollsSection from "./npcDetail/StandardRollsSection";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
+import {
+  prepareAccuracyCheck,
+  rollAccuracyCheck,
+  processAccuracyCheck,
+  buildAccuracyCheckMessage,
+} from "../app-drawer/panels/chat/domain/accuracy-checks";
+import {
+  prepareMagicCheck,
+  rollMagicCheck,
+  processMagicCheck,
+  buildMagicCheckMessage,
+} from "../app-drawer/panels/chat/domain/magic-checks";
+import {
+  prepareCheck,
+  rollCheck,
+  processCheck,
+  buildAttributeCheckMessage,
+  buildOpenCheckMessage,
+} from "../app-drawer/panels/chat/domain/checks";
 
 const NPCDetail = ({
   selectedNPC,
@@ -62,6 +81,7 @@ const NPCDetail = ({
   npcRef,
   isMobile,
   addLog,
+  addMessage,
   openLogs,
   npcDetailWidth,
   checkNewTurn,
@@ -69,8 +89,6 @@ const NPCDetail = ({
 }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
 
   const [open, setOpen] = useState(false);
   const [numTargets, setNumTargets] = useState(1);
@@ -85,12 +103,7 @@ const NPCDetail = ({
     showSpellEffect,
     autoCheckTurnAfterRoll,
     hideLogs,
-    logAttack,
-    logCritFailure,
-    logCritSuccess,
-    logSpellOffensiveRoll,
     logSpellUse,
-    logStandardRoll,
     studyValues,
   } = useCombatSimSettingsStore.getState().settings;
 
@@ -103,6 +116,22 @@ const NPCDetail = ({
     insight: calcAttr("Dazed", "Enraged", "insight", selectedNPC),
     might: calcAttr("Weak", "Poisoned", "might", selectedNPC),
     will: calcAttr("Shaken", "Poisoned", "will", selectedNPC),
+  };
+
+  const npcSpeaker =
+    selectedNPC?.name +
+    (selectedNPC?.combatStats?.combatNotes
+      ? "【" + selectedNPC.combatStats.combatNotes + "】"
+      : "");
+
+  // Maps long-form NPC attr keys ("dexterity") to pipeline short-form ("dex")
+  const toAttr = (raw) => {
+    const key = String(raw || "").toLowerCase();
+    if (key === "dex" || key === "dexterity") return "dex";
+    if (key === "ins" || key === "insight") return "ins";
+    if (key === "mig" || key === "might") return "mig";
+    if (key === "wlp" || key === "will" || key === "willpower") return "wlp";
+    return "dex";
   };
 
   const normalizeAttrKey = (raw) => {
@@ -159,61 +188,32 @@ const NPCDetail = ({
     if (autoUseMP) {
       handleUseMP(finalMpCost);
     }
+
     if (spellData.type === "offensive") {
-      // Roll the attack
-      const rolled = rollAttack(spellData, "spell");
-      if (!rolled) return;
-      const {
-        diceResults,
-        totalHitScore,
-        damage,
-        isCriticalFailure,
-        isCriticalSuccess,
-      } = rolled;
-
-      if (logSpellOffensiveRoll) {
-        // log the spell
-        addLog("combat_sim_log_spell_offensive_roll", "--isSpell--", {
-          npcName:
-            selectedNPC.name +
-            (selectedNPC?.combatStats?.combatNotes
-              ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : ""),
-          spellName: spellData.name,
-          targets: numTargets,
-          dice1: diceResults.attribute1,
-          dice2: diceResults.attribute2,
-          extraMagic:
-            calcMagic(selectedNPC) !== 0 ? " + " + calcMagic(selectedNPC) : "",
-          totalHitScore: totalHitScore,
-          hr: damage,
-          effect: showSpellEffect && spellData.effect ? spellData.effect : "",
-        });
-      }
-
-      if (isCriticalFailure && logCritFailure) {
-        setTimeout(() => {
-          addLog(
-            "combat_sim_log_crit_failure",
-            selectedNPC.name +
-              (selectedNPC?.combatStats?.combatNotes
-                ? "【" + selectedNPC.combatStats.combatNotes + "】"
-                : ""),
-          );
-        }, 100);
-      }
-
-      if (isCriticalSuccess && logCritSuccess) {
-        setTimeout(() => {
-          addLog(
-            "combat_sim_log_crit_success",
-            selectedNPC.name +
-              (selectedNPC?.combatStats?.combatNotes
-                ? "【" + selectedNPC.combatStats.combatNotes + "】"
-                : ""),
-          );
-        }, 100);
-      }
+      const attr1Raw = spellData.accuracy?.attr1 ?? spellData.attr1;
+      const attr2Raw = spellData.accuracy?.attr2 ?? spellData.attr2;
+      const dieSizes = {
+        primary: resolveNpcAttributeDie(normalizeAttrKey(attr1Raw)),
+        secondary: resolveNpcAttributeDie(normalizeAttrKey(attr2Raw)),
+      };
+      const magicBonus = calcMagic(selectedNPC);
+      const intent = prepareMagicCheck(
+        {
+          arg: spellData.name,
+          name: spellData.name,
+          attr1: toAttr(attr1Raw),
+          attr2: toAttr(attr2Raw),
+          accuracyBonus: magicBonus !== 0 ? magicBonus : undefined,
+          baseDamage: 0,
+          damageType: spellData.damage?.type ?? "physical",
+          damageHrZero: spellData.damageHrZero ?? false,
+          description:
+            showSpellEffect && spellData.effect ? spellData.effect : undefined,
+        },
+      );
+      const rolls = rollMagicCheck(dieSizes);
+      const result = processMagicCheck(intent, rolls, dieSizes, npcSpeaker);
+      if (addMessage) addMessage(buildMagicCheckMessage(result));
     } else {
       if (logSpellUse) {
         addLog(
@@ -231,11 +231,11 @@ const NPCDetail = ({
         );
       }
     }
+
     if (autoOpenLogs) {
       openLogs();
     }
     if (isMobile) {
-      /* close dialog */
       setSelectedNPC(null);
     }
     if (autoCheckTurnAfterRoll) {
@@ -244,92 +244,56 @@ const NPCDetail = ({
       }, 100);
     }
 
-    // reset numTargets
     setNumTargets(1);
   };
 
   const handleAttack = (attack, attackType) => {
-    // Roll the attack
-    const rolled = rollAttack(attack, attackType);
-    if (!rolled) return;
-    const {
-      diceResults,
-      totalHitScore,
-      damage,
-      hr,
-      isCriticalFailure,
-      isCriticalSuccess,
-    } = rolled;
+    const attr1Raw =
+      attackType === "weapon"
+        ? (attack.accuracy?.attr1 ?? attack.weapon?.att1)
+        : attack.accuracy?.attr1;
+    const attr2Raw =
+      attackType === "weapon"
+        ? (attack.accuracy?.attr2 ?? attack.weapon?.att2)
+        : attack.accuracy?.attr2;
 
-    if (logAttack) {
-      // Add the attack to the log
-      addLog("combat_sim_log_attack", "--isAttack--", {
-        npcName:
-          selectedNPC.name +
-          (selectedNPC?.combatStats?.combatNotes
-            ? "【" + selectedNPC.combatStats.combatNotes + "】"
-            : ""),
-        attackName: attack.name,
-        range:
-          attackType === "attack"
-            ? attack.range
-            : (attack.range ?? attack.weapon?.range),
-        damageType: attack.damage?.type,
-        dice1: diceResults.attribute1,
-        dice2: diceResults.attribute2,
-        prec:
-          calcPrecision(attack, selectedNPC) !== 0
-            ? " + " + calcPrecision(attack, selectedNPC)
-            : "",
-        totalHitScore,
-        hr,
-        extraDamage: calcDamage(attack, selectedNPC),
-        damage,
-        attackType,
-        effect:
-          attackType === "attack"
-            ? showBaseAttackEffect && (attack.effect || attack.special?.[0])
-              ? attack.effect || attack.special[0]
-              : ""
-            : showWeaponAttackEffect && (attack.effect || attack.special?.[0])
-              ? attack.effect || attack.special[0]
-              : "",
-      });
-    }
+    const dieSizes = {
+      primary: resolveNpcAttributeDie(normalizeAttrKey(attr1Raw)),
+      secondary: resolveNpcAttributeDie(normalizeAttrKey(attr2Raw)),
+    };
 
-    if (isCriticalFailure && logCritFailure) {
-      setTimeout(() => {
-        addLog(
-          "combat_sim_log_crit_failure",
-          selectedNPC.name +
-            (selectedNPC?.combatStats?.combatNotes
-              ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : ""),
-        );
-      }, 100);
-    }
+    const isNoDmg = attack.damage?.type === "nodmg" || attack.type === "nodmg";
+    const effectText =
+      attackType === "attack"
+        ? showBaseAttackEffect && (attack.effect || attack.special?.[0])
+          ? attack.effect || attack.special[0]
+          : undefined
+        : showWeaponAttackEffect && (attack.effect || attack.special?.[0])
+          ? attack.effect || attack.special[0]
+          : undefined;
 
-    if (isCriticalSuccess && logCritSuccess) {
-      setTimeout(() => {
-        addLog(
-          "combat_sim_log_crit_success",
-          selectedNPC.name +
-            (selectedNPC?.combatStats?.combatNotes
-              ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : ""),
-        );
-      }, 100);
-    }
+    const intent = prepareAccuracyCheck({
+      arg: attack.name,
+      name: attack.name,
+      attr1: toAttr(attr1Raw),
+      attr2: toAttr(attr2Raw),
+      accuracyBonus: calcPrecision(attack, selectedNPC) || undefined,
+      baseDamage: isNoDmg ? 0 : calcDamage(attack, selectedNPC),
+      damageType: attack.damage?.type ?? "physical",
+      range: attack.range ?? attack.weapon?.range,
+      description: effectText,
+    });
+
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(intent, rolls, dieSizes, npcSpeaker);
+    if (addMessage) addMessage(buildAccuracyCheckMessage(result));
 
     if (autoOpenLogs) {
       openLogs();
     }
-
     if (isMobile) {
-      /* close dialog */
       setSelectedNPC(null);
     }
-
     if (autoCheckTurnAfterRoll) {
       setTimeout(() => {
         checkNewTurn(selectedNPC.combatId);
@@ -361,136 +325,50 @@ const NPCDetail = ({
     );
   }
 
-  const rollAttack = (attack, attackType) => {
-    const message = `Rolling ${attack.name}.`;
-    console.log(message);
-
-    let attribute1, attribute2, extraDamage, extraPrecision, type;
-
-    if (attackType === "weapon") {
-      const attr1 = normalizeAttrKey(
-        attack.accuracy?.attr1 ?? attack.weapon?.att1,
-      );
-      const attr2 = normalizeAttrKey(
-        attack.accuracy?.attr2 ?? attack.weapon?.att2,
-      );
-      attribute1 = resolveNpcAttributeDie(attr1);
-      attribute2 = resolveNpcAttributeDie(attr2);
-      extraDamage = calcDamage(attack, selectedNPC);
-      extraPrecision = calcPrecision(attack, selectedNPC);
-      type = attack.damage?.type;
-    } else if (attackType === "spell") {
-      // For spells
-      const attr1 = normalizeAttrKey(attack.accuracy?.attr1 ?? attack.attr1);
-      const attr2 = normalizeAttrKey(attack.accuracy?.attr2 ?? attack.attr2);
-      attribute1 = resolveNpcAttributeDie(attr1);
-      attribute2 = resolveNpcAttributeDie(attr2);
-      extraDamage = 0;
-      extraPrecision = calcMagic(selectedNPC);
-      type = "spell";
-    } else {
-      // For base attacks
-      const attr1 = normalizeAttrKey(attack.accuracy?.attr1);
-      const attr2 = normalizeAttrKey(attack.accuracy?.attr2);
-      attribute1 = resolveNpcAttributeDie(attr1);
-      attribute2 = resolveNpcAttributeDie(attr2);
-      extraDamage = calcDamage(attack, selectedNPC);
-      extraPrecision = calcPrecision(attack, selectedNPC);
-      type = attack.damage?.type;
-    }
-
-    // Simulate rolling the dice for each attribute
-    const rollDice = (attribute) => Math.floor(Math.random() * attribute) + 1;
-    const roll1 = rollDice(attribute1);
-    const roll2 = rollDice(attribute2);
-
-    // Check for critical success / failure
-    const isCriticalSuccess = roll1 === roll2 && roll1 >= 6 && roll2 >= 6;
-    const isCriticalFailure = roll1 === 1 && roll2 === 1;
-
-    // Update dice results state
-    const diceResults = { attribute1: roll1, attribute2: roll2 };
-
-    // Calculate results
-    const totalHitScore = roll1 + roll2 + extraPrecision;
-    let baseDamage = Math.max(roll1, roll2);
-
-    let damage = 0;
-    if (type !== "nodmg") {
-      damage = baseDamage + extraDamage;
-    }
-
-    return {
-      diceResults,
-      totalHitScore,
-      damage,
-      hr: baseDamage,
-      isCriticalSuccess,
-      isCriticalFailure,
+  const handleRoll = (
+    attribute1,
+    attribute2,
+    attr1label,
+    attr2label,
+    modifier = 0,
+    kind = "open",
+    difficulty,
+  ) => {
+    const labelToAttr = (label) => {
+      switch (label.toUpperCase()) {
+        case "DEX": return "dex";
+        case "INS": return "ins";
+        case "MIG": return "mig";
+        case "WLP": return "wlp";
+        default: return "dex";
+      }
     };
-  };
 
-  const handleRoll = (attribute1, attribute2, attr1label, attr2label) => {
-    // Simulate rolling the dice for each attribute
-    const rollDice = (attribute) => Math.floor(Math.random() * attribute) + 1;
-    const roll1 = rollDice(attribute1);
-    const roll2 = rollDice(attribute2);
-
-    // Check for critical success / failure
-    const isCriticalSuccess = roll1 === roll2 && roll1 >= 6 && roll2 >= 6;
-    const isCriticalFailure = roll1 === 1 && roll2 === 1;
-
-    // Calculate results
-    const totalHitScore = roll1 + roll2;
-
-    console.log(
-      `Rolling ${attr1label} (${roll1}) + ${attr2label} (${roll2}) = ${totalHitScore}`,
-    );
-
-    if (logStandardRoll) {
-      // log the roll
-      addLog("combat_sim_log_standard_roll", "--isStandardRoll--", {
-        npcName:
-          selectedNPC.name +
-          (selectedNPC?.combatStats?.combatNotes
-            ? "【" + selectedNPC.combatStats.combatNotes + "】"
-            : ""),
-        dice1: roll1,
-        dice2: roll2,
-        dice1Label: attr1label,
-        dice2Label: attr2label,
-        totalHitScore,
-      });
-    }
-
-    if (isCriticalFailure && logCritFailure) {
-      setTimeout(() => {
-        addLog(
-          "combat_sim_log_crit_failure",
-          selectedNPC.name +
-            (selectedNPC?.combatStats?.combatNotes
-              ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : ""),
-        );
-      }, 100);
-    }
-
-    if (isCriticalSuccess && logCritSuccess) {
-      setTimeout(() => {
-        addLog(
-          "combat_sim_log_crit_success",
-          selectedNPC.name +
-            (selectedNPC?.combatStats?.combatNotes
-              ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : ""),
-        );
-      }, 100);
+    const dieSizes = { primary: attribute1, secondary: attribute2 };
+    const intent = prepareCheck({
+      primary: labelToAttr(attr1label),
+      secondary: labelToAttr(attr2label),
+      modifiers:
+        Number(modifier) !== 0
+          ? [{ label: "Situational Bonus", value: Number(modifier) }]
+          : [],
+      ...(kind === "attribute" && Number.isFinite(Number(difficulty))
+        ? { difficulty: Number(difficulty) }
+        : {}),
+    });
+    const rolls = rollCheck(dieSizes);
+    const result = processCheck(intent, rolls, dieSizes, npcSpeaker);
+    if (addMessage) {
+      if (kind === "attribute") {
+        addMessage(buildAttributeCheckMessage(result));
+      } else {
+        addMessage(buildOpenCheckMessage(result));
+      }
     }
 
     if (autoOpenLogs) {
       openLogs();
     }
-
     if (autoCheckTurnAfterRoll) {
       setTimeout(() => {
         checkNewTurn(selectedNPC.combatId);
