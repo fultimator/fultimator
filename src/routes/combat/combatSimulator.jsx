@@ -217,6 +217,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     (s) => s.setActiveActorName,
   );
   const clearEncounterActors = useCombatEncounterStore((s) => s.clearActors);
+  const clearTargets = useCombatEncounterStore((s) => s.clearTargets);
   useEffect(() => {
     setEncounterActors(id, selectedNPCs, selectedPCs);
   }, [id, selectedNPCs, selectedPCs]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -1470,6 +1471,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             onSortEnd={handleSortEnd}
             onClockClick={() => setClockDialogOpen(true)}
             onNotesClick={() => setNotesDialogOpen(true)}
+            onClearAll={() => {
+              clearTargets();
+              setSelectedNPC(null);
+              setSelectedPC(null);
+            }}
             selectedPCs={selectedPCs}
             handleRemovePC={handleRemovePC}
             handlePcClick={handlePcClick}
