@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -19,6 +19,7 @@ import {
   Delete,
   MoreVert,
   DragIndicator,
+  TouchApp,
 } from "@mui/icons-material";
 import { calcHP, calcMP } from "../../../libs/npcs";
 import { GiDeathSkull } from "react-icons/gi";
@@ -27,6 +28,7 @@ import { t } from "../../../translation/translate";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTheme } from "@mui/material/styles";
+import { useCombatEncounterStore } from "../../../stores/combatEncounterStore";
 
 export default function NpcListItem({
   npc,
@@ -58,6 +60,27 @@ export default function NpcListItem({
   const error = theme.palette.error;
   const text = theme.palette.text;
 
+  const { targets, setTarget, toggleTarget } = useCombatEncounterStore();
+  const [hovered, setHovered] = useState(false);
+  const isTargeted = targets.some((t) => t.combatId === npc.combatId);
+
+  useEffect(() => {
+    if (!hovered) return;
+    const handleKeyDown = (e) => {
+      if (e.key !== "t" && e.key !== "T") return;
+      const tag = document.activeElement?.tagName;
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(tag)) return;
+      const ref = { combatId: npc.combatId, name: npc.name, source: "npc" };
+      if (e.shiftKey) {
+        toggleTarget(ref);
+      } else {
+        setTarget(ref);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [hovered, npc.combatId, npc.name, setTarget, toggleTarget]);
+
   const {
     attributes,
     listeners,
@@ -87,13 +110,17 @@ export default function NpcListItem({
       style={style}
       key={npc.combatId}
       onClick={(e) => npc.id && handleListItemClick(e, npc.combatId)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       sx={{
-        border:
-          selectedNpcID && selectedNpcID === npc.combatId
+        border: isTargeted
+          ? `2px solid ${theme.palette.warning.main}`
+          : selectedNpcID && selectedNpcID === npc.combatId
             ? `1px solid ${primary}`
             : `1px solid ${theme.palette.divider}`,
         marginY: 1,
         borderRadius: 1,
+        position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -102,7 +129,11 @@ export default function NpcListItem({
             ? isDarkMode
               ? error.dark
               : error.light
-            : "inherit",
+            : isTargeted
+              ? isDarkMode
+                ? "rgba(237,177,80,0.08)"
+                : "rgba(237,177,80,0.06)"
+              : "inherit",
         "&:hover": {
           backgroundColor:
             npc.combatStats?.currentHp === 0
@@ -115,7 +146,7 @@ export default function NpcListItem({
         },
         paddingY: 1,
         flexDirection: "row",
-        overflow: "hidden",
+        overflow: "visible",
         cursor: npc.id ? "pointer" : "default",
       }}
     >
@@ -143,16 +174,72 @@ export default function NpcListItem({
         </Box>
       )}
 
+      {/* Selected indicator badge */}
+      {selectedNpcID === npc.combatId && (
+        <Tooltip title="Selected" enterDelay={300}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: -10,
+              left: isTargeted ? 32 : 8,
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              backgroundColor: primary,
+              border: `2px solid ${theme.palette.background.paper}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+              boxShadow: `0 0 0 1px ${primary}`,
+            }}
+          >
+            <TouchApp sx={{ fontSize: 11, color: "primary.contrastText" }} />
+          </Box>
+        </Tooltip>
+      )}
+
+      {/* Target indicator badge */}
+      {isTargeted && (
+        <Tooltip title="Targeted (T / Shift+T)" enterDelay={300}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: -10,
+              left: 8,
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              backgroundColor: theme.palette.warning.main,
+              border: `2px solid ${theme.palette.background.paper}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+              boxShadow: `0 0 0 1px ${theme.palette.warning.main}`,
+            }}
+          >
+            <img
+              src="/assets/icons/checks/roll_target.png"
+              alt="targeted"
+              style={{ width: 12, height: 12 }}
+            />
+          </Box>
+        </Tooltip>
+      )}
+
       {/* Left: Index */}
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           width: isMobile ? "5px" : "10px",
           height: "100%",
           borderRight: "1px solid #ccc",
           padding: "0 10px",
+          gap: "2px",
         }}
       >
         <Typography

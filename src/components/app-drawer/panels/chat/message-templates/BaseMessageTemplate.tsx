@@ -11,12 +11,15 @@ import {
 import {
   DeleteOutlined as DeleteOutlineIcon,
   Menu as MenuIcon,
+  RestartAlt as RestartAltIcon,
 } from "@mui/icons-material";
 
 interface BaseMessageTemplateProps {
   speaker: string;
   timeAgo: string;
   onDelete: () => void;
+  onRetarget?: () => void;
+  dimmed?: boolean;
   children: React.ReactNode;
 }
 
@@ -24,6 +27,8 @@ export const BaseMessageTemplate: React.FC<BaseMessageTemplateProps> = ({
   speaker,
   timeAgo,
   onDelete,
+  onRetarget,
+  dimmed = false,
   children,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -42,6 +47,11 @@ export const BaseMessageTemplate: React.FC<BaseMessageTemplateProps> = ({
     onDelete();
   };
 
+  const handleRetarget = () => {
+    handleMenuClose();
+    onRetarget?.();
+  };
+
   return (
     <Box
       sx={{
@@ -55,6 +65,9 @@ export const BaseMessageTemplate: React.FC<BaseMessageTemplateProps> = ({
         borderColor: "divider",
         backgroundColor: "background.paper",
         boxShadow: 1,
+        opacity: dimmed ? 0.55 : 1,
+        filter: dimmed ? "saturate(0.75)" : "none",
+        transition: "opacity 0.2s, filter 0.2s",
       }}
     >
       <Box
@@ -85,6 +98,14 @@ export const BaseMessageTemplate: React.FC<BaseMessageTemplateProps> = ({
             onClose={handleMenuClose}
             slotProps={{ paper: { sx: { minWidth: 160 } } }}
           >
+            {onRetarget && (
+              <MenuItem onClick={handleRetarget}>
+                <ListItemIcon>
+                  <RestartAltIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Retarget Actors</ListItemText>
+              </MenuItem>
+            )}
             <MenuItem onClick={handleDelete}>
               <ListItemIcon>
                 <DeleteOutlineIcon fontSize="small" />

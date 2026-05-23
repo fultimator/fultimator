@@ -27,18 +27,21 @@ import {
   accuracyModifiersFromEffects,
   isActorInCrisis,
 } from "./effect-modifiers";
+import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
 import type { TypePlayer } from "../../../../../types/Players";
 import type { TypeNpc } from "../../../../../types/Npcs";
 import type {
   Attribute,
   AttackOverrides,
   ChatMessage,
+  DamagePipelineTarget,
   DieSides,
 } from "../types";
 
 export type CommandContext = {
   speaker: string;
   playerDoc: Record<string, unknown> | null;
+  targetsSnapshot?: DamagePipelineTarget[];
 };
 
 export type CommandParam = {
@@ -442,7 +445,14 @@ const actionCommand: Command = {
         dieSizes,
         context.speaker,
       );
-      return [buildAccuracyCheckMessage(result)];
+      const targetsSnapshot =
+        context.targetsSnapshot ?? useCombatEncounterStore.getState().targets;
+      return [
+        buildAccuracyCheckMessage({
+          ...result,
+          targetsSnapshot: [...targetsSnapshot],
+        }),
+      ];
     }
 
     if (subAction.toLowerCase() === "spell" && weaponArg) {
@@ -485,7 +495,14 @@ const actionCommand: Command = {
         dieSizes,
         context.speaker,
       );
-      return [buildMagicCheckMessage(result)];
+      const targetsSnapshot =
+        context.targetsSnapshot ?? useCombatEncounterStore.getState().targets;
+      return [
+        buildMagicCheckMessage({
+          ...result,
+          targetsSnapshot: [...targetsSnapshot],
+        }),
+      ];
     }
 
     if (subAction.toLowerCase() === "hinder") {

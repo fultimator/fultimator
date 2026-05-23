@@ -29,8 +29,8 @@ interface CombatEncounterState {
   clearTargets: () => void;
   setInteractionMode: (mode: "select" | "target") => void;
   // runtime actor mutations
-  applyHpDamage: (combatId: string, amount: number) => void;
-  revertHpDamage: (combatId: string, amount: number) => void;
+  applyHpDamage: (combatId: string, amount: number) => boolean;
+  revertHpDamage: (combatId: string, amount: number) => boolean;
   updateRuntimeActor: (
     combatId: string,
     updater: (actor: RuntimeActor) => RuntimeActor,
@@ -80,11 +80,18 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
     interactionMode: "select",
 
     setActors: (encounterId, npcs, pcs) =>
-      set({
-        encounterId,
-        selectedNPCs: npcs,
-        selectedPCs: pcs,
-        runtimeActors: buildRuntimeActors(npcs, pcs),
+      set((state) => {
+        const fresh = buildRuntimeActors(npcs, pcs);
+        const merged: Record<string, RuntimeActor> = {};
+        for (const [id, actor] of Object.entries(fresh)) {
+          merged[id] = state.runtimeActors[id] ?? actor;
+        }
+        return {
+          encounterId,
+          selectedNPCs: npcs,
+          selectedPCs: pcs,
+          runtimeActors: merged,
+        };
       }),
 
     setActiveActorName: (name) => set({ activeActorName: name }),
@@ -116,35 +123,105 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
 
     setInteractionMode: (mode) => set({ interactionMode: mode }),
 
-    applyHpDamage: (combatId, amount) =>
+    applyHpDamage: (combatId, amount) => {
+      let applied = false;
       set((state) => {
-        const actor = state.runtimeActors[combatId];
-        if (!actor) return state;
-        return {
-          runtimeActors: {
-            ...state.runtimeActors,
-            [combatId]: {
-              ...actor,
-              currentHp: Math.max(0, actor.currentHp - amount),
-            },
-          },
-        };
-      }),
+        const key = String(combatId);
+        const actor = state.runtimeActors[key];
+        let foundInDocs = false;
 
-    revertHpDamage: (combatId, amount) =>
-      set((state) => {
-        const actor = state.runtimeActors[combatId];
-        if (!actor) return state;
+        const patchDocHp = (doc: ActorDoc): ActorDoc => {
+          const stats =
+            (doc.combatStats as Record<string, unknown> | undefined) ?? {};
+          const currentHp = Number(stats.currentHp ?? 0);
+          foundInDocs = true;
+          return {
+            ...doc,
+            combatStats: {
+              ...stats,
+              currentHp: Math.max(0, currentHp - amount),
+            },
+          };
+        };
+
+        const nextSelectedNPCs = state.selectedNPCs.map((npc) =>
+          String(npc.combatId ?? "") === key ? patchDocHp(npc) : npc,
+        );
+        const nextSelectedPCs = state.selectedPCs.map((pc) =>
+          String(pc.combatId ?? "") === key ? patchDocHp(pc) : pc,
+        );
+
+        if (!actor && !foundInDocs) return state;
+        applied = true;
+
         return {
           runtimeActors: {
             ...state.runtimeActors,
-            [combatId]: {
-              ...actor,
-              currentHp: actor.currentHp + amount,
-            },
+            ...(actor
+              ? {
+                  [key]: {
+                    ...actor,
+                    currentHp: Math.max(0, actor.currentHp - amount),
+                  },
+                }
+              : {}),
           },
+          selectedNPCs: nextSelectedNPCs,
+          selectedPCs: nextSelectedPCs,
         };
-      }),
+      });
+      return applied;
+    },
+
+    revertHpDamage: (combatId, amount) => {
+      let reverted = false;
+      set((state) => {
+        const key = String(combatId);
+        const actor = state.runtimeActors[key];
+        let foundInDocs = false;
+
+        const patchDocHp = (doc: ActorDoc): ActorDoc => {
+          const stats =
+            (doc.combatStats as Record<string, unknown> | undefined) ?? {};
+          const currentHp = Number(stats.currentHp ?? 0);
+          foundInDocs = true;
+          return {
+            ...doc,
+            combatStats: {
+              ...stats,
+              currentHp: currentHp + amount,
+            },
+          };
+        };
+
+        const nextSelectedNPCs = state.selectedNPCs.map((npc) =>
+          String(npc.combatId ?? "") === key ? patchDocHp(npc) : npc,
+        );
+        const nextSelectedPCs = state.selectedPCs.map((pc) =>
+          String(pc.combatId ?? "") === key ? patchDocHp(pc) : pc,
+        );
+
+        if (!actor && !foundInDocs) return state;
+        reverted = true;
+
+        return {
+          runtimeActors: {
+            ...state.runtimeActors,
+            ...(actor
+              ? {
+                  [key]: {
+                    ...actor,
+                    currentHp: actor.currentHp + amount,
+                  },
+                }
+              : {}),
+          },
+          selectedNPCs: nextSelectedNPCs,
+          selectedPCs: nextSelectedPCs,
+        };
+      });
+      return reverted;
+    },
 
     updateRuntimeActor: (combatId, updater) =>
       set((state) => {

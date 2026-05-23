@@ -311,9 +311,9 @@ export const AccuracyCheckMessageTemplate: React.FC<
       </Box>
 
       <DamagePipelineTargets
+        targets={check.targetsSnapshot ?? []}
         damage={check.damage}
         damageType={check.intent.damageType}
-        critical={check.critical}
         fumble={check.fumble}
       />
     </>

@@ -3,15 +3,44 @@ import { DICE_OPTIONS } from "./constants";
 import { buildRollMessage, buildTextMessage } from "./domain/rolls";
 import { executeCommand } from "./domain/commands";
 import { useChatMessagesStore } from "../../../../store/chatMessagesStore";
-import type { DieSides } from "./types";
+import { useCombatEncounterStore } from "../../../../stores/combatEncounterStore";
+import type { ChatMessage, DieSides } from "./types";
 
 export type PendingDice = Partial<Record<DieSides, number>>;
+
+function hydrateTargetsSnapshot(message: ChatMessage): ChatMessage {
+  if (message.kind !== "accuracy" && message.kind !== "magic") return message;
+
+  const existing = message.check.targetsSnapshot;
+  if (Array.isArray(existing) && existing.length > 0) return message;
+
+  const latestTargets = useCombatEncounterStore.getState().targets;
+  if (latestTargets.length === 0) return message;
+
+  if (message.kind === "accuracy") {
+    return {
+      ...message,
+      check: {
+        ...message.check,
+        targetsSnapshot: [...latestTargets],
+      },
+    };
+  }
+
+  return {
+    ...message,
+    check: {
+      ...message.check,
+      targetsSnapshot: [...latestTargets],
+    },
+  };
+}
 
 export function useChatStore(
   selectedSpeaker: string,
   playerDoc: Record<string, unknown> | null = null,
 ) {
-  const { messages, addMessage, deleteMessage, clearAll } =
+  const { messages, addMessage, deleteMessage, clearAll, setMessages } =
     useChatMessagesStore();
   const [pendingDice, setPendingDice] = useState<PendingDice>({});
   const [pendingD100, setPendingD100] = useState(0);
@@ -38,6 +67,7 @@ export function useChatStore(
       const result = executeCommand(trimmed, {
         speaker: selectedSpeaker,
         playerDoc,
+        targetsSnapshot: useCombatEncounterStore.getState().targets,
       });
       if (result === null) {
         addMessage(buildTextMessage(trimmed, selectedSpeaker));
@@ -46,7 +76,7 @@ export function useChatStore(
         setCommandError(result.error);
         return;
       } else if (result.ok === true) {
-        result.messages.forEach(addMessage);
+        result.messages.map(hydrateTargetsSnapshot).forEach(addMessage);
         setCommandError(null);
       }
     }
@@ -76,6 +106,7 @@ export function useChatStore(
     addMessage,
     deleteMessage,
     clearAll,
+    setMessages,
     addDie: (sides: DieSides) =>
       setPendingDice((prev) => ({ ...prev, [sides]: (prev[sides] ?? 0) + 1 })),
     addD100: () => setPendingD100((prev) => prev + 1),

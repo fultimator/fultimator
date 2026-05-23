@@ -69,6 +69,8 @@ export type AccuracyCheckResult = {
   damage: number; // damageHR + baseDamage
   critical: boolean;
   fumble: boolean;
+  targetsSnapshot?: DamagePipelineTarget[];
+  retargetSuperseded?: boolean;
 };
 
 export type AccuracyCheckMessage = {
@@ -106,6 +108,14 @@ export type MagicCheckResult = {
   damage: number;
   critical: boolean;
   fumble: boolean;
+  targetsSnapshot?: DamagePipelineTarget[];
+  retargetSuperseded?: boolean;
+};
+
+export type DamagePipelineTarget = {
+  combatId: string;
+  name: string;
+  source: "npc" | "pc";
 };
 
 export type MagicCheckMessage = {

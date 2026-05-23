@@ -75,6 +75,11 @@ import {
 import { getActiveVehicle } from "../../../player/equipment/slots/equipmentSlots";
 import { useTranslate } from "../../../../translation/translate";
 
+const isRetargetableMessage = (
+  message: ChatMessage,
+): message is Extract<ChatMessage, { kind: "accuracy" | "magic" }> =>
+  message.kind === "accuracy" || message.kind === "magic";
+
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -250,6 +255,100 @@ export const ChatPanel: React.FC = () => {
 
   const store = useChatStore(selectedSpeaker, activeActorDoc);
   const { addMessage } = store;
+  const liveTargets = useCombatEncounterStore((s) => s.targets);
+
+  useEffect(() => {
+    if (liveTargets.length === 0) return;
+
+    let changed = false;
+    const hydrated: ChatMessage[] = store.messages.map((m) => {
+      if (m.kind === "accuracy") {
+        const existing = m.check.targetsSnapshot;
+        if (Array.isArray(existing) && existing.length > 0) return m;
+        changed = true;
+        return {
+          ...m,
+          check: {
+            ...m.check,
+            targetsSnapshot: [...liveTargets],
+          },
+        };
+      }
+      if (m.kind === "magic") {
+        const existing = m.check.targetsSnapshot;
+        if (Array.isArray(existing) && existing.length > 0) return m;
+        changed = true;
+        return {
+          ...m,
+          check: {
+            ...m.check,
+            targetsSnapshot: [...liveTargets],
+          },
+        };
+      }
+      return m;
+    });
+
+    if (changed) {
+      store.setMessages(hydrated);
+    }
+  }, [liveTargets, store]);
+
+  const handleRetargetMessage = useCallback(
+    (messageId: string) => {
+      const source = store.messages.find((m) => m.id === messageId);
+      if (!source || !isRetargetableMessage(source)) return;
+
+      const markedMessages: ChatMessage[] = store.messages.map((m) => {
+        if (m.id !== messageId) return m;
+        if (m.kind === "accuracy") {
+          return {
+            ...m,
+            check: {
+              ...m.check,
+              retargetSuperseded: true,
+            },
+          };
+        }
+        if (m.kind === "magic") {
+          return {
+            ...m,
+            check: {
+              ...m.check,
+              retargetSuperseded: true,
+            },
+          };
+        }
+        return m;
+      });
+
+      const regenerated: ChatMessage =
+        source.kind === "accuracy"
+          ? {
+              ...source,
+              id: crypto.randomUUID(),
+              createdAt: Date.now(),
+              check: {
+                ...source.check,
+                targetsSnapshot: [...liveTargets],
+                retargetSuperseded: false,
+              },
+            }
+          : {
+              ...source,
+              id: crypto.randomUUID(),
+              createdAt: Date.now(),
+              check: {
+                ...source.check,
+                targetsSnapshot: [...liveTargets],
+                retargetSuperseded: false,
+              },
+            };
+
+      store.setMessages([...markedMessages, regenerated]);
+    },
+    [liveTargets, store],
+  );
 
   const handleOppose = useCallback(
     (target: OpposeTarget) => {
@@ -462,6 +561,16 @@ export const ChatPanel: React.FC = () => {
                   speaker={message.speaker || AUTHOR_NAME}
                   timeAgo={formatTimeAgo(message.createdAt)}
                   onDelete={() => store.deleteMessage(message.id)}
+                  onRetarget={
+                    isRetargetableMessage(message)
+                      ? () => handleRetargetMessage(message.id)
+                      : undefined
+                  }
+                  dimmed={
+                    isRetargetableMessage(message)
+                      ? message.check.retargetSuperseded === true
+                      : false
+                  }
                 >
                   <MessageContent message={message} />
                 </BaseMessageTemplate>
