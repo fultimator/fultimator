@@ -37,7 +37,9 @@ describe("resolveActorEffects", () => {
               name: "Training",
               maxLvl: 1,
               currentLvl: 1,
-              effects: [transferredAccuracy(4, "bonuses.accuracy.melee")],
+              behavior: {
+                effects: [transferredAccuracy(4, "bonuses.accuracy.melee")],
+              },
             },
           ],
           heroic: [],
@@ -58,7 +60,9 @@ describe("resolveActorEffects", () => {
         {
           name: "Tactical Orders",
           effect: "",
-          effects: [transferredAccuracy(5, "bonuses.accuracy.ranged")],
+          behavior: {
+            effects: [transferredAccuracy(5, "bonuses.accuracy.ranged")],
+          },
         },
       ],
     } as TypeNpc;
@@ -189,7 +193,7 @@ describe("resolveActorEffects", () => {
                 name: "Aim",
                 maxLvl: 1,
                 currentLvl: 1,
-                effects: [transferredAccuracy(3)],
+                behavior: { effects: [transferredAccuracy(3)] },
               },
             ],
             heroic: [],

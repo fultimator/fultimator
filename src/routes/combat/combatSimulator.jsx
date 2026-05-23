@@ -35,7 +35,8 @@ import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
 import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../components/player/playerTransforms";
-import { totalIncomingDamageBonus } from "../../libs/actorBonuses";
+import { buildDamageContext, resolveDamage } from "../../pipelines/damagePipeline";
+import { getActorBonuses } from "../../libs/actorBonuses";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
 export default function CombatSimulator() {
@@ -849,9 +850,15 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     // NPC path
     if (!isHealing && statType === "HP") {
-      adjustedValue = -Number(
-        calculateDamage(npcClicked, value, damageType, isGuarding),
-      );
+      const dmgCtx = buildDamageContext({
+        baseDamage: Number(value) || 0,
+        damageType: damageType || "untyped",
+        npcAffinities: npcClicked.affinities || {},
+        temporaryAffinities: npcClicked.runtimeActor?.temporaryAffinities,
+        isGuarding,
+        incomingDamageBonuses: getActorBonuses(npcClicked).incomingDamage,
+      });
+      adjustedValue = -resolveDamage(dmgCtx).finalDamage;
     } else {
       adjustedValue = isHealing ? Number(value) : -Number(value);
     }
@@ -993,54 +1000,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       }
     }
   };
-
-  // Calculate damage with affinities
-  function calculateDamage(
-    npc,
-    damageValue,
-    damageType = "",
-    isGuarding = false,
-  ) {
-    const affinities = npc.affinities || {};
-    // Add incoming-damage-bonus effects on this target before affinity scaling
-    // so resistance/vulnerability applies to the full boosted total.
-    // Passes element and species context so category-specific bonuses resolve.
-    const incomingBonus = totalIncomingDamageBonus(npc.effects ?? [], {
-      element: damageType || undefined,
-      species: npc.species || undefined,
-    });
-    const damage = (parseInt(damageValue, 10) || 0) + incomingBonus;
-
-    // Default damage value
-    let finalDamage = damage;
-
-    if (affinities[damageType]) {
-      switch (affinities[damageType]) {
-        case "vu": // Vulnerable (x2)
-          finalDamage = isGuarding ? damage : damage * 2;
-          break;
-        case "rs": // Resistant (x0.5, rounded down)
-          finalDamage = Math.floor(damage * 0.5);
-          break;
-        case "ab": // Absorb (turn damage into healing)
-          finalDamage = -damage;
-          break;
-        case "im": // Immune (no damage)
-          finalDamage = 0;
-          break;
-        default:
-          break;
-      }
-    } else if (isGuarding) {
-      finalDamage = Math.floor(damage * 0.5);
-    }
-
-    if (isGuarding && damageType === "") {
-      finalDamage = Math.floor(damage * 0.5);
-    }
-
-    return finalDamage;
-  }
 
   // Handle Input Change in HP/MP Dialog
   const handleChange = (e) => {

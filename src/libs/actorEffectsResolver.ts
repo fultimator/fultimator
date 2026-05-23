@@ -6,6 +6,7 @@ import {
 } from "../types/Bonuses";
 import type {
   ActorEffect,
+  ActionBehavior,
   EffectChange,
   EffectMode,
   GrantData,
@@ -86,12 +87,21 @@ function collectEffectiveEffects(
   return out;
 }
 
+function behaviorEffects(
+  item: { behavior?: ActionBehavior },
+): { effects?: ItemEffect[] } {
+  return { effects: item.behavior?.effects };
+}
+
 function* walkItems(actor: Actor): Generator<{ effects?: ItemEffect[] }> {
   if (isPlayer(actor)) {
     for (const klass of actor.classes ?? []) {
-      if (Array.isArray(klass.skills)) yield* klass.skills;
-      if (Array.isArray(klass.heroic)) yield* klass.heroic;
-      if (Array.isArray(klass.spells)) yield* klass.spells;
+      if (Array.isArray(klass.skills))
+        for (const s of klass.skills) yield behaviorEffects(s);
+      if (Array.isArray(klass.heroic))
+        for (const h of klass.heroic) yield behaviorEffects(h);
+      if (Array.isArray(klass.spells))
+        for (const sp of klass.spells) yield behaviorEffects(sp);
     }
 
     for (const eq of actor.equipment ?? []) {
@@ -109,19 +119,22 @@ function* walkItems(actor: Actor): Generator<{ effects?: ItemEffect[] }> {
 
           const mnemo = (eq.mnemospheres ?? []).find((m) => m.id === sphereId);
           if (!mnemo) continue;
-          if (Array.isArray(mnemo.skills)) yield* mnemo.skills;
-          if (Array.isArray(mnemo.heroic)) yield* mnemo.heroic;
-          if (Array.isArray(mnemo.spells)) yield* mnemo.spells;
+          if (Array.isArray(mnemo.skills))
+            for (const s of mnemo.skills) yield behaviorEffects(s);
+          if (Array.isArray(mnemo.heroic))
+            for (const h of mnemo.heroic) yield behaviorEffects(h);
+          if (Array.isArray(mnemo.spells))
+            for (const sp of mnemo.spells) yield behaviorEffects(sp);
         }
       }
     }
   } else {
-    yield* actor.attacks ?? [];
-    yield* actor.weaponattacks ?? [];
-    yield* actor.spells ?? [];
-    yield* actor.special ?? [];
-    yield* actor.actions ?? [];
-    yield* actor.raregear ?? [];
+    for (const a of actor.attacks ?? []) yield behaviorEffects(a);
+    for (const a of actor.weaponattacks ?? []) yield behaviorEffects(a);
+    for (const s of actor.spells ?? []) yield behaviorEffects(s);
+    for (const s of actor.special ?? []) yield behaviorEffects(s);
+    for (const a of actor.actions ?? []) yield behaviorEffects(a);
+    for (const r of actor.raregear ?? []) yield behaviorEffects(r);
   }
 }
 
