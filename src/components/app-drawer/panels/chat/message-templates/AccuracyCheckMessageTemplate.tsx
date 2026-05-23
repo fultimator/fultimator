@@ -10,6 +10,8 @@ import { CheckAccuracyIcon } from "../../../../icons";
 import { BreakdownRow, DiceRow, TagRow } from "./primitives";
 import { ATTR_LABEL, normalizeDamageType } from "./primitives-utils";
 import { DamagePipelineTargets } from "./DamagePipelineTargets";
+import { ReactiveInterruptZone, OnHitZone } from "./ChatActionZone";
+import type { DamagePipelineTarget } from "../types";
 
 const gridSx = {
   px: 0.75,
@@ -44,6 +46,12 @@ export const AccuracyCheckMessageTemplate: React.FC<
 > = ({ check }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [activeTargets, setActiveTargets] = useState<DamagePipelineTarget[]>(
+    check.targetsSnapshot ?? [],
+  );
+
+  const speakerCombatId = (check as unknown as Record<string, unknown>).speakerCombatId as string | undefined;
+  const isSingleTarget = activeTargets.length === 1;
 
   const accentColor = check.critical
     ? "success.main"
@@ -310,11 +318,26 @@ export const AccuracyCheckMessageTemplate: React.FC<
         </Collapse>
       </Box>
 
+      <ReactiveInterruptZone
+        attackerCombatId={speakerCombatId}
+        onSubstituteTarget={(combatId) =>
+          setActiveTargets((prev) => {
+            if (prev.some((t) => t.combatId === combatId)) return prev;
+            const name = combatId;
+            return [...prev, { combatId, name, source: "pc" }];
+          })
+        }
+      />
       <DamagePipelineTargets
-        targets={check.targetsSnapshot ?? []}
+        targets={activeTargets}
         damage={check.damage}
         damageType={check.intent.damageType}
         fumble={check.fumble}
+      />
+      <OnHitZone
+        attackerCombatId={speakerCombatId}
+        isSingleTarget={isSingleTarget}
+        isFumble={check.fumble}
       />
     </>
   );

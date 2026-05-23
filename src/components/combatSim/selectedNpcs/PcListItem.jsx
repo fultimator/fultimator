@@ -31,10 +31,11 @@ export default function PcListItem({
   const secondary = theme.palette.secondary.main;
   const isDarkMode = theme.palette.mode === "dark";
 
-  const { targets, setTarget, toggleTarget } = useCombatEncounterStore();
+  const { targets, setTarget, toggleTarget, runtimeActors } = useCombatEncounterStore();
   const [hovered, setHovered] = useState(false);
   const pcName = pc.name || pc.characterName || "Unknown";
   const isTargeted = targets.some((t) => t.combatId === pc.combatId);
+  const runtime = runtimeActors[pc.combatId];
 
   useEffect(() => {
     if (!hovered) return;
@@ -55,7 +56,8 @@ export default function PcListItem({
 
   const maxHp = pc.stats?.hp?.max ?? 0;
   const maxMp = pc.stats?.mp?.max ?? 0;
-  const currentHp = pc.combatStats?.currentHp ?? maxHp;
+  const currentHp = runtime?.currentHp ?? pc.combatStats?.currentHp ?? maxHp;
+  const currentMp = runtime?.currentMp ?? pc.combatStats?.currentMp ?? maxMp;
 
   return (
     <ListItem
@@ -276,7 +278,7 @@ export default function PcListItem({
                   handleHpMpClick("MP", pc);
                 }}
               >
-                {pc.combatStats?.currentMp ?? maxMp}/{maxMp} {t("MP")}
+                {currentMp}/{maxMp} {t("MP")}
               </Typography>
             </Tooltip>
           </>

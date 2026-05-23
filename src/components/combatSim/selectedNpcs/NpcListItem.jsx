@@ -60,7 +60,10 @@ export default function NpcListItem({
   const error = theme.palette.error;
   const text = theme.palette.text;
 
-  const { targets, setTarget, toggleTarget } = useCombatEncounterStore();
+  const { targets, setTarget, toggleTarget, runtimeActors } = useCombatEncounterStore();
+  const runtime = runtimeActors[npc.combatId];
+  const currentHp = runtime?.currentHp ?? npc.combatStats?.currentHp ?? 0;
+  const currentMp = runtime?.currentMp ?? npc.combatStats?.currentMp ?? 0;
   const [hovered, setHovered] = useState(false);
   const isTargeted = targets.some((t) => t.combatId === npc.combatId);
 
@@ -125,7 +128,7 @@ export default function NpcListItem({
         alignItems: "center",
         justifyContent: "space-between",
         backgroundColor:
-          npc.combatStats?.currentHp === 0
+          currentHp === 0
             ? isDarkMode
               ? error.dark
               : error.light
@@ -136,7 +139,7 @@ export default function NpcListItem({
               : "inherit",
         "&:hover": {
           backgroundColor:
-            npc.combatStats?.currentHp === 0
+            currentHp === 0
               ? isDarkMode
                 ? error.main
                 : error.lighter
@@ -273,7 +276,7 @@ export default function NpcListItem({
             }}
           >
             {npc.id ? (
-              npc.combatStats?.currentHp === 0 ? (
+              currentHp === 0 ? (
                 <>
                   <GiDeathSkull style={{ marginRight: 5 }} />
                   {npc.name}
@@ -311,15 +314,14 @@ export default function NpcListItem({
                   variant="h5"
                   sx={{
                     color:
-                      npc.combatStats?.currentHp <= Math.floor(calcHP(npc) / 2)
+                      currentHp <= Math.floor(calcHP(npc) / 2)
                         ? error.main
                         : theme.palette.success.main,
                     fontWeight: "bold",
                     transition: "color 0.2s ease-in-out",
                     "&:hover": {
                       color:
-                        npc.combatStats?.currentHp <=
-                        Math.floor(calcHP(npc) / 2)
+                        currentHp <= Math.floor(calcHP(npc) / 2)
                           ? error.dark
                           : theme.palette.success.dark,
                       textDecoration: "underline",
@@ -330,9 +332,8 @@ export default function NpcListItem({
                     handleHpMpClick("HP", npc);
                   }}
                 >
-                  {npc.combatStats?.currentHp}/{calcHP(npc)} {t("HP")}{" "}
-                  {npc.combatStats?.currentHp <=
-                    Math.floor(calcHP(npc) / 2) && (
+                  {currentHp}/{calcHP(npc)} {t("HP")}{" "}
+                  {currentHp <= Math.floor(calcHP(npc) / 2) && (
                     <IoIosWarning
                       style={{
                         fontSize: "1.2em",
@@ -366,7 +367,7 @@ export default function NpcListItem({
                     handleHpMpClick("MP", npc);
                   }}
                 >
-                  {npc.combatStats?.currentMp}/{calcMP(npc)} {t("MP")}
+                  {currentMp}/{calcMP(npc)} {t("MP")}
                 </Typography>
               </Tooltip>
             </>

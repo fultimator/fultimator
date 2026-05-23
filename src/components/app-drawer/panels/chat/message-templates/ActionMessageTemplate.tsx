@@ -4,6 +4,7 @@ import type { ActionMessage } from "../types";
 import { t } from "../../../../../translation/translate";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
 import { TagRow } from "./primitives";
+import { ChatActionZone } from "./ChatActionZone";
 
 const ACTION_LABEL_KEY: Record<string, string[]> = {
   attack: ["attack", "attacks"],
@@ -62,10 +63,12 @@ function toTitleCase(value: string): string {
 
 interface ActionMessageTemplateProps {
   message: ActionMessage;
+  speakerCombatId?: string;
 }
 
 export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
   message,
+  speakerCombatId,
 }) => {
   const actionKey = String(message.action || "").toLowerCase();
   const labelCandidates = ACTION_LABEL_KEY[actionKey] ?? [actionKey];
@@ -144,6 +147,12 @@ export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
             {description}
           </NotesMarkdown>
         </Box>
+      )}
+      {actionKey === "guard" && (
+        <>
+          <ChatActionZone guardVariant="no-cover" speakerCombatId={speakerCombatId} />
+          <ChatActionZone guardVariant="cover" speakerCombatId={speakerCombatId} />
+        </>
       )}
     </>
   );
