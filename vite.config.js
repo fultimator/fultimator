@@ -1,6 +1,7 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
+import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 import { readFileSync } from "fs";
 const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
@@ -11,6 +12,20 @@ export default defineConfig({
     svgr({
       svgrOptions: {
         icon: true,
+      },
+    }),
+    VitePWA({
+      registerType: "autoUpdate",
+      manifest: false,
+      workbox: {
+        navigateFallback: "/index.html",
+        maximumFileSizeToCacheInBytes: 7 * 1024 * 1024,
+        globPatterns: [
+          "**/*.{js,css,html,ico,png,svg,webp,avif,jpg,jpeg,woff2,ttf}",
+        ],
+      },
+      devOptions: {
+        enabled: false,
       },
     }),
   ],
