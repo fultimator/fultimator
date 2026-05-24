@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
 
 const AffinityValueSchema = z.enum(["vu", "rs", "im", "ab", "no"]);
 
@@ -81,7 +82,7 @@ const NpcArmorSchema = z
     fuid: z.string().optional(),
     armor: z.boolean().optional(),
   })
-  .passthrough();
+  .loose();
 
 const AccuracySchema = z.object({
   attr1: z.string(),
@@ -106,8 +107,10 @@ const NpcAttackSchema = z
     special: z.array(z.string()).optional(),
     extraDamage: z.boolean().optional(),
     itemType: z.string().optional(),
+    passives: z.array(PassiveSchema).optional(),
+    behaviors: z.array(BehaviorSchema).optional(),
   })
-  .passthrough();
+  .loose();
 
 const NpcWeaponAttackSchema = NpcAttackSchema;
 
@@ -133,13 +136,17 @@ const NpcSpellSchema = z
     special: z.array(z.string()).optional(),
     itemType: z.string().optional(),
     spellType: z.string().optional(),
+    passives: z.array(PassiveSchema).optional(),
+    behaviors: z.array(BehaviorSchema).optional(),
   })
-  .passthrough();
+  .loose();
 
 const NpcActionSchema = z.object({
   name: z.string(),
   effect: z.string().optional(),
   spCost: z.number().optional(),
+  passives: z.array(PassiveSchema).optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 const NpcSpecialSchema = NpcActionSchema;
@@ -147,6 +154,8 @@ const NpcSpecialSchema = NpcActionSchema;
 const NpcRareGearSchema = z.object({
   name: z.string(),
   effect: z.string().optional(),
+  passives: z.array(PassiveSchema).optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 const NpcNotesSchema = z.object({

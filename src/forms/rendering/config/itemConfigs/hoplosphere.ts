@@ -1,10 +1,19 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import type { Hoplosphere } from "../../../schema/itemSchemas/hoplosphere";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  PASSIVE_ITEM_TABS,
+  BEHAVIOR_GROUPS,
+} from "../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
-export type HoplosphereFormState = Hoplosphere;
+export type HoplosphereFormState = Hoplosphere & Record<string, unknown>;
 const HOPLOSPHERE_LABEL_PREFIX = "hoplosphere";
+
+export { PASSIVE_ITEM_TABS as hoplosphereTabs };
 
 const G = {
   core: "core",
@@ -17,6 +26,7 @@ export const hoplosphereGroupLabels: GroupLabels = {
   core: "section.core",
   body: "section.body",
   meta: "section.meta",
+  [BEHAVIOR_GROUPS.selfEffects]: "behavior.effects",
 };
 
 export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
@@ -118,4 +128,8 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
     },
   },
   ...metaFieldConfig.map((f) => ({ ...f, group: G.meta })),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.hoplosphere,
+  ) as unknown as FieldConfig<HoplosphereFormState>,
+  behaviorsTabField as unknown as FieldConfig<HoplosphereFormState>,
 ];

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
+import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
 
 const AccuracySchema = z.object({
   attr1: z.string(),
@@ -34,6 +35,8 @@ export const NpcSpellSchema = z.object({
   accuracy: AccuracySchema,
   effect: z.string().default(""),
   meta: MetaSchema.optional(),
+  passives: z.array(PassiveSchema).optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 export type NpcSpell = z.infer<typeof NpcSpellSchema>;

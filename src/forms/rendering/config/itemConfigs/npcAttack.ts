@@ -1,11 +1,20 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import type { NpcAttack } from "../../../schema/itemSchemas/npcAttack";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { typeOptions } from "../typeOptions";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  behaviorGroupLabels,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
-export type NpcAttackFormState = NpcAttack;
+export type NpcAttackFormState = NpcAttack & Record<string, unknown>;
 const NPC_ATTACK_LABEL_PREFIX = "npc.attack";
+
+export { DEFAULT_ITEM_TABS as npcAttackTabs };
 
 const G = {
   core: "core",
@@ -20,6 +29,7 @@ export const npcAttackGroupLabels: GroupLabels = {
   damage: "section.damage",
   effect: "section.effect",
   meta: "section.meta",
+  ...behaviorGroupLabels,
 };
 
 export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
@@ -186,4 +196,8 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcAttackFormState>),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.npcAttack,
+  ) as unknown as FieldConfig<NpcAttackFormState>,
+  behaviorsTabField as unknown as FieldConfig<NpcAttackFormState>,
 ];

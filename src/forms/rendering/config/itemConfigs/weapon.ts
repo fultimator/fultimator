@@ -1,6 +1,13 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { WeaponPersisted } from "../../../schema/itemSchemas/weapon";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  PASSIVE_ITEM_TABS,
+  BEHAVIOR_GROUPS,
+} from "../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 import {
   calcWeaponCost,
   calcWeaponDamage,
@@ -60,6 +67,8 @@ export type WeaponFormState = Omit<WeaponPersisted, "base"> & {
   rareBonuses: WeaponRareBonuses;
 };
 const WEAPON_LABEL_PREFIX = "weapon";
+
+export { PASSIVE_ITEM_TABS as weaponTabs };
 
 // Option lists built once at module load.
 const weaponGroups: SelectGroup[] = Object.entries(
@@ -122,6 +131,7 @@ export const weaponGroupLabels: GroupLabels = {
   quality: "section.quality",
   rareBonus: "section.rareBonus",
   modifiers: "section.modifiers",
+  [BEHAVIOR_GROUPS.selfEffects]: "behavior.effects",
 };
 
 export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
@@ -636,4 +646,8 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<WeaponFormState>),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.weapon,
+  ) as unknown as FieldConfig<WeaponFormState>,
+  behaviorsTabField as unknown as FieldConfig<WeaponFormState>,
 ];

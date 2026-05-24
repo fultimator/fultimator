@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../../meta";
+import { PassiveSchema, BehaviorSchema } from "../../shared/behaviorSchemas";
 
 export const AccuracySchema = z.object({
   attr1: z.string(),
@@ -38,6 +39,8 @@ export const PlayerSpellNonStaticBaseSchema = z.object({
   fuid: z.string().optional(),
   meta: MetaSchema.optional(),
   showInPlayerSheet: z.boolean().default(true),
+  passives: z.array(PassiveSchema).optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
   spellType: z.enum([
     "default",
     "gift",

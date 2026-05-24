@@ -1,4 +1,4 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { AccessoryPersisted } from "../../../schema/itemSchemas/accessory";
 import allQualities from "../../../../libs/qualities";
@@ -6,11 +6,20 @@ const qualities = allQualities.filter((q) => q.filter?.includes("accessory"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectGroup } from "../../fieldRenderers";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  PASSIVE_ITEM_TABS,
+  BEHAVIOR_GROUPS,
+} from "../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export type AccessoryFormState = AccessoryPersisted & {
   qualityApplicableTo: string[];
 };
 const ACCESSORY_LABEL_PREFIX = "accessory";
+
+export { PASSIVE_ITEM_TABS as accessoryTabs };
 
 const qualityGroups: SelectGroup[] = Object.entries(
   groupBy(qualities, "category") as Record<
@@ -41,6 +50,7 @@ const G = {
 export const accessoryGroupLabels: GroupLabels = {
   quality: "section.quality",
   modifiers: "section.modifiers",
+  [BEHAVIOR_GROUPS.selfEffects]: "behavior.effects",
 };
 
 export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
@@ -238,4 +248,8 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<AccessoryFormState>),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.accessory,
+  ) as unknown as FieldConfig<AccessoryFormState>,
+  behaviorsTabField as unknown as FieldConfig<AccessoryFormState>,
 ];

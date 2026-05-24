@@ -1,4 +1,4 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { ShieldPersisted } from "../../../schema/itemSchemas/shield";
 import shields from "../../../../libs/shields";
@@ -7,6 +7,13 @@ const qualities = allQualities.filter((q) => q.filter?.includes("shield"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  PASSIVE_ITEM_TABS,
+  BEHAVIOR_GROUPS,
+} from "../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 interface ShieldBase {
   name: string;
@@ -23,6 +30,8 @@ export type ShieldFormState = Omit<ShieldPersisted, "base"> & {
   qualityApplicableTo: string[];
 };
 const SHIELD_LABEL_PREFIX = "shield";
+
+export { PASSIVE_ITEM_TABS as shieldTabs };
 
 const shieldOptions: SelectOption[] = (shields as ShieldBase[]).map((s) => ({
   value: s.name,
@@ -59,6 +68,7 @@ const G = {
 export const shieldGroupLabels: GroupLabels = {
   quality: "section.quality",
   modifiers: "section.modifiers",
+  [BEHAVIOR_GROUPS.selfEffects]: "behavior.effects",
 };
 
 export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
@@ -309,4 +319,8 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<ShieldFormState>),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.shield,
+  ) as unknown as FieldConfig<ShieldFormState>,
+  behaviorsTabField as unknown as FieldConfig<ShieldFormState>,
 ];

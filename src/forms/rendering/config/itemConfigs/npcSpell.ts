@@ -1,12 +1,21 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import type { NpcSpell } from "../../../schema/itemSchemas/npcSpell";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { typeOptions } from "../typeOptions";
 import { DURATION_OPTIONS, TARGET_OPTIONS } from "./spells/options";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  behaviorGroupLabels,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
-export type NpcSpellFormState = NpcSpell;
+export type NpcSpellFormState = NpcSpell & Record<string, unknown>;
 const NPC_SPELL_LABEL_PREFIX = "npc.spell";
+
+export { DEFAULT_ITEM_TABS as npcSpellTabs };
 
 const G = {
   core: "core",
@@ -23,6 +32,7 @@ export const npcSpellGroupLabels: GroupLabels = {
   details: "section.details",
   effect: "section.effect",
   meta: "section.meta",
+  ...behaviorGroupLabels,
 };
 
 export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
@@ -91,6 +101,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     group: G.accuracy,
     order: 10,
     gridSize: { xs: 6, md: 6 },
+    dependencies: (s) => !!s.isOffensive,
     componentProps: {
       options: [
         { value: "dexterity", label: "DEX" },
@@ -109,6 +120,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     group: G.accuracy,
     order: 11,
     gridSize: { xs: 6, md: 6 },
+    dependencies: (s) => !!s.isOffensive,
     componentProps: {
       options: [
         { value: "dexterity", label: "DEX" },
@@ -127,6 +139,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     group: G.accuracy,
     order: 12,
     gridSize: { xs: 6, md: 6 },
+    dependencies: (s) => !!s.isOffensive,
     parse: (v) => Number(v) || 0,
   },
   {
@@ -138,6 +151,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     group: G.accuracy,
     order: 13,
     gridSize: { xs: 6, md: 6 },
+    dependencies: (s) => !!s.isOffensive,
     componentProps: {
       options: [
         { value: "def", label: "DEF" },
@@ -154,6 +168,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     group: G.damage,
     order: 20,
     gridSize: { xs: 6, md: 4 },
+    dependencies: (s) => !!s.isOffensive,
     parse: (v) => Number(v) || 0,
   },
   {
@@ -165,6 +180,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     group: G.damage,
     order: 21,
     gridSize: { xs: 6, md: 4 },
+    dependencies: (s) => !!s.isOffensive,
     componentProps: { options: typeOptions },
   },
   {
@@ -176,6 +192,7 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     group: G.damage,
     order: 22,
     gridSize: { xs: 12, md: 4 },
+    dependencies: (s) => !!s.isOffensive,
   },
   {
     key: "cost.resource",
@@ -252,4 +269,8 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcSpellFormState>),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.npcSpell,
+  ) as unknown as FieldConfig<NpcSpellFormState>,
+  behaviorsTabField as unknown as FieldConfig<NpcSpellFormState>,
 ];

@@ -1,10 +1,19 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import type { NpcSpecial } from "../../../schema/itemSchemas/npcSpecial";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  behaviorGroupLabels,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
-export type NpcSpecialFormState = NpcSpecial;
+export type NpcSpecialFormState = NpcSpecial & Record<string, unknown>;
 const NPC_SPECIAL_LABEL_PREFIX = "npc.special";
+
+export { DEFAULT_ITEM_TABS as npcSpecialTabs };
 
 const G = {
   core: "core",
@@ -14,6 +23,7 @@ const G = {
 export const npcSpecialGroupLabels: GroupLabels = {
   core: "section.core",
   meta: "section.meta",
+  ...behaviorGroupLabels,
 };
 
 export const npcSpecialFieldConfig: ItemFieldConfig<NpcSpecialFormState> = [
@@ -61,4 +71,8 @@ export const npcSpecialFieldConfig: ItemFieldConfig<NpcSpecialFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcSpecialFormState>),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.npcSpecial,
+  ) as unknown as FieldConfig<NpcSpecialFormState>,
+  behaviorsTabField as unknown as FieldConfig<NpcSpecialFormState>,
 ];

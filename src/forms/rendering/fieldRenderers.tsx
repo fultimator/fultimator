@@ -107,7 +107,10 @@ const UNIFORM_SELECT_SX = {
 function humanizeToken(value: unknown): string {
   const text = String(value ?? "").trim();
   if (!text) return "";
-  return text.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return text
+    .replace(/[.\-_]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function translateOrHumanize(
@@ -1008,7 +1011,6 @@ export function AutocompleteRenderer({
   const selectedSingle =
     typeof value === "string" && value.trim().length > 0 ? value : null;
 
-
   // Cast needed: MUI Autocomplete freeSolo generic can't be satisfied with a
   // runtime boolean; the FreeSolo type param must be a literal true/false.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1030,7 +1032,35 @@ export function AutocompleteRenderer({
       }
       getOptionLabel={(opt: string) => {
         const found = options.find((o) => o.value === opt);
-        return found ? translateOrHumanize(t, found.label) : String(opt);
+        if (!found) return String(opt);
+        // Raw-key options (label === value): show the key as-is in the input
+        if (found.label === found.value) return found.value as string;
+        return translateOrHumanize(t, found.label);
+      }}
+      renderOption={(props: object, opt: string) => {
+        const found = options.find((o) => o.value === opt);
+        const human = found ? translateOrHumanize(t, found.label) : String(opt);
+        const isRaw = found && found.label === found.value;
+        const { key, ...liProps } =
+          props as React.HTMLAttributes<HTMLLIElement> & { key?: React.Key };
+        return (
+          <li key={key} {...liProps}>
+            {isRaw ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  lineHeight: 1.2,
+                }}
+              >
+                <span>{human}</span>
+                <span style={{ fontSize: "0.7rem", opacity: 0.55 }}>{opt}</span>
+              </Box>
+            ) : (
+              human
+            )}
+          </li>
+        );
       }}
       renderInput={(params: object) => (
         <TextField {...(params as object)} label={t(label)} size="small" />
@@ -1211,7 +1241,15 @@ export function ObjectListRenderer({
                   state: row,
                   onChange: (next) => updateRow(i, next),
                   surface: "edit",
-                  cols: 2,
+                  cols:
+                    fields.filter(
+                      (f) =>
+                        f.kind !== "form-state" &&
+                        f.kind !== "computed" &&
+                        f.component,
+                    ).length > 3
+                      ? 2
+                      : 1,
                 })
               : null}
           </Grid>

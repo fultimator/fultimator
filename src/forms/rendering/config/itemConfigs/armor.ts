@@ -1,4 +1,4 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { ArmorPersisted } from "../../../schema/itemSchemas/armor";
 import armor from "../../../../libs/armor";
@@ -7,6 +7,13 @@ const qualities = allQualities.filter((q) => q.filter?.includes("armor"));
 import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  PASSIVE_ITEM_TABS,
+  BEHAVIOR_GROUPS,
+} from "../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 interface ArmorBase {
   name: string;
@@ -23,6 +30,8 @@ export type ArmorFormState = Omit<ArmorPersisted, "base"> & {
   qualityApplicableTo: string[];
 };
 const ARMOR_LABEL_PREFIX = "armor";
+
+export { PASSIVE_ITEM_TABS as armorTabs };
 
 const armorOptions: SelectOption[] = (armor as ArmorBase[]).map((a) => ({
   value: a.name,
@@ -61,6 +70,7 @@ export const armorGroupLabels: GroupLabels = {
   quality: "section.quality",
   slots: "section.slots",
   modifiers: "section.modifiers",
+  [BEHAVIOR_GROUPS.selfEffects]: "behavior.effects",
 };
 
 export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
@@ -348,4 +358,8 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<ArmorFormState>),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.armor,
+  ) as unknown as FieldConfig<ArmorFormState>,
+  behaviorsTabField as unknown as FieldConfig<ArmorFormState>,
 ];

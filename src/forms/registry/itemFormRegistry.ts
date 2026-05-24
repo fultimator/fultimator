@@ -28,23 +28,57 @@ import {
   PlayerSpellTinkererAlchemySchema,
   PlayerSpellTinkererInfusionSchema,
 } from "../schema/itemSchemas/playerSpell";
-import { weaponFieldConfig } from "../rendering/config/itemConfigs/weapon";
-import { customWeaponFieldConfig } from "../rendering/config/itemConfigs/customWeapon";
-import { armorFieldConfig } from "../rendering/config/itemConfigs/armor";
-import { shieldFieldConfig } from "../rendering/config/itemConfigs/shield";
-import { accessoryFieldConfig } from "../rendering/config/itemConfigs/accessory";
-import { npcSpecialFieldConfig } from "../rendering/config/itemConfigs/npcSpecial";
-import { npcActionFieldConfig } from "../rendering/config/itemConfigs/npcAction";
+import {
+  weaponFieldConfig,
+  weaponTabs,
+} from "../rendering/config/itemConfigs/weapon";
+import {
+  customWeaponFieldConfig,
+  customWeaponTabs,
+} from "../rendering/config/itemConfigs/customWeapon";
+import {
+  armorFieldConfig,
+  armorTabs,
+} from "../rendering/config/itemConfigs/armor";
+import {
+  shieldFieldConfig,
+  shieldTabs,
+} from "../rendering/config/itemConfigs/shield";
+import {
+  accessoryFieldConfig,
+  accessoryTabs,
+} from "../rendering/config/itemConfigs/accessory";
+import {
+  npcSpecialFieldConfig,
+  npcSpecialTabs,
+} from "../rendering/config/itemConfigs/npcSpecial";
+import {
+  npcActionFieldConfig,
+  npcActionTabs,
+} from "../rendering/config/itemConfigs/npcAction";
 import { qualityFieldConfig } from "../rendering/config/itemConfigs/quality";
-import { heroicFieldConfig } from "../rendering/config/itemConfigs/heroic";
-import { npcAttackFieldConfig } from "../rendering/config/itemConfigs/npcAttack";
-import { npcSpellFieldConfig } from "../rendering/config/itemConfigs/npcSpell";
+import {
+  heroicFieldConfig,
+  heroicTabs,
+} from "../rendering/config/itemConfigs/heroic";
+import {
+  npcAttackFieldConfig,
+  npcAttackTabs,
+} from "../rendering/config/itemConfigs/npcAttack";
+import {
+  npcSpellFieldConfig,
+  npcSpellTabs,
+} from "../rendering/config/itemConfigs/npcSpell";
 import { classFieldConfig } from "../rendering/config/itemConfigs/class";
 import { optionalFieldConfig } from "../rendering/config/itemConfigs/optional";
 import { mnemosphereFieldConfig } from "../rendering/config/itemConfigs/mnemosphere";
-import { hoplosphereFieldConfig } from "../rendering/config/itemConfigs/hoplosphere";
+import {
+  hoplosphereFieldConfig,
+  hoplosphereTabs,
+} from "../rendering/config/itemConfigs/hoplosphere";
 import {
   playerSpellFieldConfig,
+  playerSpellTabs,
   type PlayerSpellFormState,
 } from "../rendering/config/itemConfigs/playerSpell";
 import {
@@ -81,6 +115,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "weapons",
     schema: WeaponPersistedSchema,
     fields: weaponFieldConfig,
+    tabs: weaponTabs,
     defaultState: () => createDefaultStateFromFields(weaponFieldConfig),
     buildPayload: createSchemaPayloadBuilder(WeaponPersistedSchema),
   },
@@ -92,6 +127,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "custom-weapons",
     schema: CustomWeaponPersistedSchema,
     fields: customWeaponFieldConfig,
+    tabs: customWeaponTabs,
     defaultState: () => createDefaultStateFromFields(customWeaponFieldConfig),
     buildPayload: createSchemaPayloadBuilder(CustomWeaponPersistedSchema),
   },
@@ -103,6 +139,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "armor",
     schema: ArmorPersistedSchema,
     fields: armorFieldConfig,
+    tabs: armorTabs,
     defaultState: () => createDefaultStateFromFields(armorFieldConfig),
     buildPayload: createSchemaPayloadBuilder(ArmorPersistedSchema),
   },
@@ -114,6 +151,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "shields",
     schema: ShieldPersistedSchema,
     fields: shieldFieldConfig,
+    tabs: shieldTabs,
     defaultState: () => createDefaultStateFromFields(shieldFieldConfig),
     buildPayload: createSchemaPayloadBuilder(ShieldPersistedSchema),
   },
@@ -125,6 +163,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "accessories",
     schema: AccessoryPersistedSchema,
     fields: accessoryFieldConfig,
+    tabs: accessoryTabs,
     defaultState: () => createDefaultStateFromFields(accessoryFieldConfig),
     buildPayload: createSchemaPayloadBuilder(AccessoryPersistedSchema),
   },
@@ -136,6 +175,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "special",
     schema: NpcSpecialSchema,
     fields: npcSpecialFieldConfig,
+    tabs: npcSpecialTabs,
     defaultState: () => createDefaultStateFromFields(npcSpecialFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcSpecialSchema),
   },
@@ -147,6 +187,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "actions",
     schema: NpcActionSchema,
     fields: npcActionFieldConfig,
+    tabs: npcActionTabs,
     defaultState: () => createDefaultStateFromFields(npcActionFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcActionSchema),
   },
@@ -169,6 +210,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "heroics",
     schema: HeroicSchema,
     fields: heroicFieldConfig,
+    tabs: heroicTabs,
     defaultState: () => createDefaultStateFromFields(heroicFieldConfig),
     buildPayload: createSchemaPayloadBuilder(HeroicSchema),
   },
@@ -180,6 +222,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "attacks",
     schema: NpcAttackSchema,
     fields: npcAttackFieldConfig,
+    tabs: npcAttackTabs,
     defaultState: () => createDefaultStateFromFields(npcAttackFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcAttackSchema),
   },
@@ -191,6 +234,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "spells",
     schema: NpcSpellSchema,
     fields: npcSpellFieldConfig,
+    tabs: npcSpellTabs,
     defaultState: () => createDefaultStateFromFields(npcSpellFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcSpellSchema),
   },
@@ -250,6 +294,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "hoplospheres",
     schema: HoplosphereSchema,
     fields: hoplosphereFieldConfig,
+    tabs: hoplosphereTabs,
     defaultState: () => createDefaultStateFromFields(hoplosphereFieldConfig),
     buildPayload: createSchemaPayloadBuilder(HoplosphereSchema),
   },
@@ -261,6 +306,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "player-spells",
     schema: PlayerSpellSchema,
     fields: playerSpellFieldConfig,
+    tabs: playerSpellTabs,
     defaultState: () => createDefaultStateFromFields(playerSpellFieldConfig),
     discriminatorKey: "spellType",
     subtypeDefinitions: Object.fromEntries(

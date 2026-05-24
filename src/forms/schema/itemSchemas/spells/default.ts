@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { MetaSchema } from "../../meta";
 import { AccuracySchema, CostSchema, DamageSchema } from "./shared";
+import { PassiveSchema, BehaviorSchema } from "../../shared/behaviorSchemas";
 
 export const PlayerSpellDefaultSchema = z.object({
   class: z.string(),
@@ -16,4 +17,6 @@ export const PlayerSpellDefaultSchema = z.object({
   accuracy: AccuracySchema,
   damage: DamageSchema,
   spellType: z.literal("default"),
+  passives: z.array(PassiveSchema).optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });

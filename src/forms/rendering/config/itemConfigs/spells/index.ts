@@ -1,4 +1,4 @@
-import type { ItemFieldConfig } from "../../fieldConfig";
+import type { ItemFieldConfig, FieldConfig } from "../../fieldConfig";
 import { metaFieldConfig } from "../../metaFieldConfig";
 import type { PlayerSpellFormState } from "./types";
 import { SPELL_TYPE_OPTIONS } from "./options";
@@ -15,8 +15,15 @@ import { invocationFields } from "./invocation";
 import { cookingFields } from "./cooking";
 import { magiseedFields } from "./magiseed";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "../sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  DEFAULT_ITEM_TABS,
+} from "../../shared/behaviorFields";
+import { ITEM_SCOPED_KEYS } from "../../shared/itemScopedKeys";
 
 export type { PlayerSpellFormState, PlayerSpellUiType } from "./types";
+export { DEFAULT_ITEM_TABS as playerSpellTabs };
 const SPELL_LABEL_PREFIX = "spell";
 
 export const playerSpellFieldConfig: ItemFieldConfig<PlayerSpellFormState> = [
@@ -66,4 +73,8 @@ export const playerSpellFieldConfig: ItemFieldConfig<PlayerSpellFormState> = [
   ...cookingFields,
   ...magiseedFields,
   ...(metaFieldConfig as unknown as ItemFieldConfig<PlayerSpellFormState>),
+  makePassivesTabField(
+    ITEM_SCOPED_KEYS.playerSpell,
+  ) as unknown as FieldConfig<PlayerSpellFormState>,
+  behaviorsTabField as unknown as FieldConfig<PlayerSpellFormState>,
 ];
