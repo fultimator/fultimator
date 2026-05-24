@@ -15,14 +15,12 @@ export default defineConfig({
       },
     }),
     VitePWA({
-      registerType: "autoUpdate",
       manifest: false,
+      includeAssets: ["**/*"],
       workbox: {
         navigateFallback: "/index.html",
         maximumFileSizeToCacheInBytes: 7 * 1024 * 1024,
-        globPatterns: [
-          "**/*.{js,css,html,ico,png,svg,webp,avif,jpg,jpeg,woff2,ttf}",
-        ],
+        globPatterns: ["**/*"],
       },
       devOptions: {
         enabled: false,
