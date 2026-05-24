@@ -219,6 +219,11 @@ export const ChatPanel: React.FC = () => {
     string,
     unknown
   > | null>(null);
+  const [pendingExternalCommand, setPendingExternalCommand] = useState<{
+    command: string;
+    speaker?: string;
+    actorDoc?: Record<string, unknown> | null;
+  } | null>(null);
   const activeActorDoc = activeActorDocOverride ?? baseActiveActorDoc;
   const activeActorDocRef = useRef(activeActorDoc);
   activeActorDocRef.current = activeActorDoc;
@@ -258,41 +263,49 @@ export const ChatPanel: React.FC = () => {
   const liveTargets = useCombatEncounterStore((s) => s.targets);
 
   useEffect(() => {
-    if (liveTargets.length === 0) return;
+    const handler = (event: Event) => {
+      const detail =
+        typeof (event as { detail?: unknown }).detail === "object" &&
+        (event as { detail?: unknown }).detail !== null
+          ? ((event as { detail?: unknown }).detail as {
+              command?: string;
+              speaker?: string;
+              actorDoc?: Record<string, unknown> | null;
+            })
+          : undefined;
+      const cmd = detail?.command;
+      if (!cmd) return;
+      const speaker = detail?.speaker;
+      const actorDoc = detail?.actorDoc;
+      setPendingExternalCommand({ command: cmd, speaker, actorDoc });
+    };
+    window.addEventListener("chat:run-command", handler);
+    return () => {
+      window.removeEventListener("chat:run-command", handler);
+    };
+  }, []);
 
-    let changed = false;
-    const hydrated: ChatMessage[] = store.messages.map((m) => {
-      if (m.kind === "accuracy") {
-        const existing = m.check.targetsSnapshot;
-        if (Array.isArray(existing) && existing.length > 0) return m;
-        changed = true;
-        return {
-          ...m,
-          check: {
-            ...m.check,
-            targetsSnapshot: [...liveTargets],
-          },
-        };
-      }
-      if (m.kind === "magic") {
-        const existing = m.check.targetsSnapshot;
-        if (Array.isArray(existing) && existing.length > 0) return m;
-        changed = true;
-        return {
-          ...m,
-          check: {
-            ...m.check,
-            targetsSnapshot: [...liveTargets],
-          },
-        };
-      }
-      return m;
-    });
+  useEffect(() => {
+    if (!pendingExternalCommand) return;
+    const { command, speaker, actorDoc } = pendingExternalCommand;
 
-    if (changed) {
-      store.setMessages(hydrated);
+    if (speaker && selectedSpeaker !== speaker) {
+      setSelectedSpeaker(speaker);
+      localStorage.setItem(LOCAL_SPEAKER_KEY, speaker);
+      return;
     }
-  }, [liveTargets, store]);
+
+    if (actorDoc) {
+      setActiveActorDocOverride(actorDoc);
+    }
+
+    store.send(command);
+    setPendingExternalCommand(null);
+  }, [pendingExternalCommand, selectedSpeaker, setSelectedSpeaker, store]);
+
+  // Intentionally do not auto-hydrate historical messages with live targets.
+  // Target snapshots should only change through explicit actions (e.g. Retarget Actors)
+  // to avoid mutating older chat entries when selection changes later.
 
   const handleRetargetMessage = useCallback(
     (messageId: string) => {
@@ -687,6 +700,8 @@ export const ChatPanel: React.FC = () => {
               return disableModuleForSlot(prev, pilotInfo, activeSlotForDialog);
             });
           }}
+          onImportFromCompendium={() => {}}
+          onCreateNewItem={() => {}}
           onClearOtherHandModule={() => {}}
         />
       )}

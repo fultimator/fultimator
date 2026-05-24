@@ -31,6 +31,7 @@ import {
   ThemeProvider,
   Snackbar,
   Autocomplete,
+  useMediaQuery,
 } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CloseIcon from "@mui/icons-material/Close";
