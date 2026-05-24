@@ -20,7 +20,9 @@ export default defineConfig({
       workbox: {
         navigateFallback: "/index.html",
         maximumFileSizeToCacheInBytes: 7 * 1024 * 1024,
-        globPatterns: ["**/*"],
+        globPatterns: [
+          "**/*.{js,css,html,ico,png,svg,webp,avif,jpg,jpeg,woff2,ttf}",
+        ],
       },
       devOptions: {
         enabled: false,
