@@ -7,23 +7,19 @@ import {
   Box,
   Card,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
   TextField,
-  Checkbox,
-  FormControlLabel,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
+import ActorEditModal from "../../common/ActorEditModal";
 
 const POSITIVE_SENTIMENTS = ["admiration", "loyality", "affection"];
 const NEGATIVE_SENTIMENTS = ["inferiority", "mistrust", "hatred"];
@@ -43,6 +39,7 @@ export default function PlayerBonds({
   const negativeColor = "red";
 
   const [editBondIndex, setEditBondIndex] = useState(null);
+  const [isCreatingBond, setIsCreatingBond] = useState(false);
   const [draftBond, setDraftBond] = useState(null);
   const {
     isOpen: deleteDialogOpen,
@@ -55,18 +52,19 @@ export default function PlayerBonds({
   const bonds = useMemo(() => player.info?.bonds ?? [], [player.info?.bonds]);
 
   useEffect(() => {
-    if (editBondIndex !== null && bonds[editBondIndex]) {
+    if (!isCreatingBond && editBondIndex !== null && bonds[editBondIndex]) {
       setDraftBond({ ...bonds[editBondIndex] });
     }
-  }, [editBondIndex, bonds]);
+  }, [isCreatingBond, editBondIndex, bonds]);
 
   const closeModal = () => {
     setEditBondIndex(null);
+    setIsCreatingBond(false);
     setDraftBond(null);
     setDeleteDialogOpen(false);
   };
 
-  const addNewBond = () => {
+  const addNewBondAndEdit = () => {
     if (bonds.length >= 6) return;
     const newBond = {
       name: "",
@@ -77,28 +75,32 @@ export default function PlayerBonds({
       mistrust: false,
       hatred: false,
     };
-    setPlayer((prev) => ({
+    setIsCreatingBond(true);
+    setEditBondIndex(null);
+    setDraftBond(newBond);
+  };
+
+  const handlePairToggle = (positiveKey, negativeKey) => (_event, value) => {
+    setDraftBond((prev) => ({
       ...prev,
-      info: { ...prev.info, bonds: [...(prev.info?.bonds ?? []), newBond] },
+      [positiveKey]: value === positiveKey,
+      [negativeKey]: value === negativeKey,
     }));
   };
 
-  const handleDraftCheck = (key) => (event) => {
-    setDraftBond((prev) => {
-      const next = { ...prev, [key]: event.target.checked };
-      if (key === "admiration" && event.target.checked)
-        next.inferiority = false;
-      if (key === "inferiority" && event.target.checked)
-        next.admiration = false;
-      if (key === "loyality" && event.target.checked) next.mistrust = false;
-      if (key === "mistrust" && event.target.checked) next.loyality = false;
-      if (key === "affection" && event.target.checked) next.hatred = false;
-      if (key === "hatred" && event.target.checked) next.affection = false;
-      return next;
-    });
-  };
-
   const saveBond = () => {
+    if (isCreatingBond) {
+      setPlayer((prev) => ({
+        ...prev,
+        info: {
+          ...prev.info,
+          bonds: [...(prev.info?.bonds ?? []), { ...draftBond }],
+        },
+      }));
+      closeModal();
+      return;
+    }
+
     const updated = bonds.map((b, i) =>
       i === editBondIndex ? { ...draftBond } : b,
     );
@@ -176,7 +178,7 @@ export default function PlayerBonds({
                 {isEditMode && (
                   <IconButton
                     size="small"
-                    onClick={addNewBond}
+                    onClick={addNewBondAndEdit}
                     disabled={bonds.length >= 6}
                     sx={{ position: "absolute", right: 8, color: custom.white }}
                   >
@@ -226,71 +228,75 @@ export default function PlayerBonds({
                         sx={{
                           height: "100%",
                           minWidth: { xs: "none", sm: "150px" },
-                          px: 1,
-                          py: 0.5,
                           minHeight: 48,
                           display: "flex",
                           flexDirection: "column",
-                          justifyContent: "center",
+                          overflow: "hidden",
                         }}
                       >
+                        {/* Header bar */}
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "space-between",
-                            gap: 1,
+                            gap: 0.5,
+                            padding: "5px",
+                            paddingLeft: "10px",
+                            backgroundColor: primary,
                           }}
                         >
                           <Typography
-                            variant="h5"
+                            variant="body2"
+                            noWrap
                             sx={{
-                              fontWeight: 700,
+                              color: "#fff",
+                              fontWeight: 800,
                               textTransform: "uppercase",
-                              lineHeight: 1.1,
-                              wordBreak: "break-word",
-                              fontSize: { xs: "1rem", sm: "1.08rem" },
-                              letterSpacing: "0.02em",
+                              letterSpacing: "0.04em",
+                              flex: 1,
                             }}
                           >
                             {bond.name || t("Bond Name")}
                           </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 0.25,
-                              flexShrink: 0,
-                            }}
-                          >
-                            {calculateBondStrength(bond) > 0 && (
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  fontWeight: 800,
-                                  fontSize: { xs: "0.9rem", sm: "1rem" },
-                                }}
-                              >
-                                {"★ " + calculateBondStrength(bond)}
-                              </Typography>
-                            )}
-                            {isEditMode && (
-                              <IconButton
-                                size="small"
-                                onClick={() => setEditBondIndex(index)}
-                                sx={{ p: 0.5 }}
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            )}
-                          </Box>
+                          {calculateBondStrength(bond) > 0 && (
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: "#fff",
+                                fontWeight: 800,
+                                flexShrink: 0,
+                              }}
+                            >
+                              {"★ " + calculateBondStrength(bond)}
+                            </Typography>
+                          )}
+                          {isEditMode && (
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setIsCreatingBond(false);
+                                setEditBondIndex(index);
+                              }}
+                              sx={{ p: 0.5, color: "#fff" }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          )}
                         </Box>
+                        {/* Body */}
                         <Box
                           sx={{
-                            mt: 0.5,
+                            px: 1,
+                            py: 0.75,
+                            flex: 1,
                             display: "flex",
                             flexWrap: "wrap",
                             gap: 0.45,
+                            alignContent: "flex-start",
+                            alignItems:
+                              getSentiments(bond).length > 0
+                                ? "flex-start"
+                                : "center",
                           }}
                         >
                           {getSentiments(bond).length > 0 ? (
@@ -322,42 +328,103 @@ export default function PlayerBonds({
                               </Typography>
                             ))
                           ) : (
-                            <Typography
-                              variant="caption"
+                            <Box
                               sx={{
-                                color: "text.secondary",
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                               }}
                             >
-                              {"-"}
-                            </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: "text.secondary",
+                                  fontStyle: "italic",
+                                  textAlign: "center",
+                                }}
+                              >
+                                {t("No sentiments")}
+                              </Typography>
+                            </Box>
                           )}
                         </Box>
                       </Card>
                     </Grid>
                   ))
                 : null}
+              {isEditMode && bonds.length < 6 && (
+                <Grid
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                    md: 4,
+                  }}
+                >
+                  <Card
+                    onClick={addNewBondAndEdit}
+                    sx={{
+                      height: "100%",
+                      minHeight: 48,
+                      px: 1,
+                      py: 0.5,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      border: "2px dashed",
+                      borderColor: "divider",
+                      bgcolor: "transparent",
+                      boxShadow: "none",
+                      "&:hover": {
+                        bgcolor: "action.hover",
+                      },
+                    }}
+                  >
+                    <AddIcon
+                      sx={{
+                        color: "text.secondary",
+                        fontSize: "2rem",
+                      }}
+                    />
+                  </Card>
+                </Grid>
+              )}
             </Grid>
           </Paper>
         </>
       )}
-      {editBondIndex !== null && draftBond && (
-        <Dialog open onClose={closeModal} fullWidth maxWidth="sm">
-          <DialogTitle sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
-            {t("Edit Bond")}
-            <IconButton
-              aria-label="close"
-              onClick={closeModal}
-              sx={{
-                position: "absolute",
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent dividers>
+      {(isCreatingBond || editBondIndex !== null) && draftBond && (
+        <ActorEditModal
+          open
+          onClose={closeModal}
+          onConfirm={saveBond}
+          title={isCreatingBond ? t("Add Bond") : t("Edit Bond")}
+          subtitle={t(
+            "Set the bond name and sentiments. Opposed sentiments auto-exclude each other.",
+          )}
+          maxWidth="sm"
+          actions={
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {!isCreatingBond ? (
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDelete}
+                >
+                  {t("Delete")}
+                </Button>
+              ) : null}
+              <Box sx={{ flexGrow: 1 }} />
+              <Button onClick={closeModal}>{t("Cancel")}</Button>
+              <Button variant="contained" color="primary" onClick={saveBond}>
+                {t("Save")}
+              </Button>
+            </Box>
+          }
+        >
+          <Box sx={{ mt: 0.5 }}>
             <Grid container spacing={2}>
               <Grid size={12}>
                 <TextField
@@ -373,57 +440,124 @@ export default function PlayerBonds({
                 />
               </Grid>
               {[
-                {
-                  key: "admiration",
-                  label: t("Admiration"),
-                  color: positiveColor,
-                },
-                { key: "loyality", label: t("Loyality"), color: positiveColor },
-                {
-                  key: "affection",
-                  label: t("Affection"),
-                  color: positiveColor,
-                },
-                {
-                  key: "inferiority",
-                  label: t("Inferiority"),
-                  color: negativeColor,
-                },
-                { key: "mistrust", label: t("Mistrust"), color: negativeColor },
-                { key: "hatred", label: t("Hatred"), color: negativeColor },
-              ].map(({ key, label, color }) => (
-                <Grid key={key} size={4}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={!!draftBond[key]}
-                        onChange={handleDraftCheck(key)}
-                      />
-                    }
-                    label={
-                      <Typography sx={{ fontSize: "14px", color }}>
-                        {label}
-                      </Typography>
-                    }
-                  />
+                [
+                  {
+                    key: "admiration",
+                    label: t("Admiration"),
+                    color: positiveColor,
+                  },
+                  {
+                    key: "inferiority",
+                    label: t("Inferiority"),
+                    color: negativeColor,
+                  },
+                ],
+                [
+                  {
+                    key: "loyality",
+                    label: t("Loyality"),
+                    color: positiveColor,
+                  },
+                  {
+                    key: "mistrust",
+                    label: t("Mistrust"),
+                    color: negativeColor,
+                  },
+                ],
+                [
+                  {
+                    key: "affection",
+                    label: t("Affection"),
+                    color: positiveColor,
+                  },
+                  {
+                    key: "hatred",
+                    label: t("Hatred"),
+                    color: negativeColor,
+                  },
+                ],
+              ].map((pair) => (
+                <Grid key={pair[0].key} size={12}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      gap: 1,
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      p: 0.75,
+                      borderRadius: 1,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      bgcolor: "background.paper",
+                    }}
+                  >
+                    <ToggleButtonGroup
+                      exclusive
+                      value={
+                        draftBond[pair[0].key]
+                          ? pair[0].key
+                          : draftBond[pair[1].key]
+                            ? pair[1].key
+                            : null
+                      }
+                      onChange={handlePairToggle(pair[0].key, pair[1].key)}
+                      sx={{
+                        width: "100%",
+                        "& .MuiToggleButtonGroup-grouped": {
+                          flex: 1,
+                          minHeight: 34,
+                          borderColor: "divider",
+                          textTransform: "uppercase",
+                          fontWeight: 600,
+                          letterSpacing: "0.02em",
+                          fontSize: "0.78rem",
+                          px: 1,
+                        },
+                      }}
+                    >
+                      <ToggleButton
+                        value={pair[0].key}
+                        sx={{
+                          color: pair[0].color,
+                          "&.Mui-selected": {
+                            color: pair[0].color,
+                            bgcolor: "rgba(76, 175, 80, 0.11)",
+                          },
+                        }}
+                      >
+                        {pair[0].label}
+                      </ToggleButton>
+                      <ToggleButton
+                        value={pair[1].key}
+                        sx={{
+                          color: pair[1].color,
+                          "&.Mui-selected": {
+                            color: pair[1].color,
+                            bgcolor: "rgba(244, 67, 54, 0.1)",
+                          },
+                        }}
+                      >
+                        {pair[1].label}
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        fontWeight: 600,
+                        px: 0.75,
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {t("OR")}
+                    </Typography>
+                  </Box>
                 </Grid>
               ))}
             </Grid>
-          </DialogContent>
-          <DialogActions sx={{ justifyContent: "space-between", px: 3, py: 2 }}>
-            <Button variant="contained" color="error" onClick={handleDelete}>
-              {t("Delete")}
-            </Button>
-            <Box>
-              <Button onClick={closeModal} sx={{ mr: 1 }}>
-                {t("Cancel")}
-              </Button>
-              <Button variant="contained" color="primary" onClick={saveBond}>
-                {t("Save")}
-              </Button>
-            </Box>
-          </DialogActions>
-        </Dialog>
+          </Box>
+        </ActorEditModal>
       )}
       <DeleteConfirmationDialog
         open={deleteDialogOpen}

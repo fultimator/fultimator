@@ -42,20 +42,24 @@ import {
   getEquippedModulesForSlot,
   getEquippedModuleForSlot,
   getVehicleModuleUsage,
-  getEquippedSupportModules,
+  getAvailableSupportModules,
   getSupportSlots,
   getAuxHandItem,
   getPilotSpellInfo,
 } from "../../equipment/slots/loadoutSelectors";
 import { useLoadoutStore } from "../../../../store/playerLoadoutStore";
-import {
-  calculateAttribute,
-  calculateCustomWeaponStats,
-} from "../../common/playerCalculations";
+import { calculateAttribute } from "../../common/playerCalculations";
 import attributes from "../../../../libs/attributes";
 import SlotPickerDialog from "../../equipment/slots/SlotPickerDialog";
+import VehicleEnterDialog from "../../equipment/slots/VehicleEnterDialog";
 import SpellPilotVehiclesModal from "../../spells/SpellPilotVehiclesModal";
 import PlayerEquipment from "./PlayerEquipment";
+import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
+import PlayerWeaponModal from "../../equipment/weapons/PlayerWeaponModal";
+import PlayerCustomWeaponModal from "../../equipment/customWeapons/PlayerCustomWeaponModal";
+import PlayerShieldModal from "../../equipment/shields/PlayerShieldModal";
+import PlayerArmorModal from "../../equipment/armor/PlayerArmorModal";
+import PlayerAccessoryModal from "../../equipment/accessories/PlayerAccessoryModal";
 
 // const SLOTS = ['mainHand', 'offHand', 'armor', 'accessory'];
 
@@ -102,10 +106,7 @@ function isWeaponResolved(resolved) {
     );
   }
   const item = resolved.item;
-  return (
-    !!(item?.att1 && item?.att2) ||
-    !!(item?.accuracyCheck?.att1 && item?.accuracyCheck?.att2)
-  );
+  return !!(item?.accuracy?.attr1 && item?.accuracy?.attr2);
 }
 
 function hasTransforming(resolved) {
@@ -149,7 +150,13 @@ export default function CompactLoadout({
   const [equipOpen, setEquipOpen] = useState(false);
   const [rollDialog, setRollDialog] = useState(null);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
+  const [vehicleEnterOpen, setVehicleEnterOpen] = useState(false);
+  const [createItemType, setCreateItemType] = useState(null);
+  const [slotImportOpen, setSlotImportOpen] = useState(false);
+  const [slotImportType, setSlotImportType] = useState("weapons");
   const canClickSlot = isEditMode || !!setPlayer;
+  const actionGradient =
+    "linear-gradient(135deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.14) 100%)";
 
   const store = useLoadoutStore();
   useEffect(() => {
@@ -159,7 +166,7 @@ export default function CompactLoadout({
   // Attributes
   const getAttrDie = (key) => {
     const normKey = key === "will" ? "willpower" : key;
-    const base = player?.attributes?.[normKey] ?? 8;
+    const base = player?.attributes?.[normKey]?.base ?? 8;
     const cfg = {
       dexterity: [["slow", "enraged"], ["dexUp"]],
       insight: [["dazed", "enraged"], ["insUp"]],
@@ -175,7 +182,14 @@ export default function CompactLoadout({
 
   const vehicleModuleUsage = getVehicleModuleUsage(player);
   const pilotSpellInfo = getPilotSpellInfo(player);
-  const equippedSupportModules = getEquippedSupportModules(player);
+  const pilotVehicles = pilotSpellInfo
+    ? Array.isArray(pilotSpellInfo.spell.vehicles)
+      ? pilotSpellInfo.spell.vehicles
+      : Array.isArray(pilotSpellInfo.spell.currentVehicles)
+        ? pilotSpellInfo.spell.currentVehicles
+        : []
+    : [];
+  const equippedSupportModules = getAvailableSupportModules(player);
   const supportSlots = getSupportSlots(player);
   const auxHandItem = getAuxHandItem(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);
@@ -192,7 +206,14 @@ export default function CompactLoadout({
 
   // Vehicle handlers
   const handleToggleVehicle = () => {
-    store.toggleVehicle();
+    if (activeVehicle) {
+      store.toggleVehicle();
+      return;
+    }
+    setVehicleEnterOpen(true);
+  };
+  const handleEnterVehicle = (vehicleIndex) => {
+    store.enterVehicle(vehicleIndex);
   };
   const handleSaveVehicles = (_, updatedPilot) => {
     store.saveVehicles(updatedPilot);
@@ -213,27 +234,29 @@ export default function CompactLoadout({
     if (resolved.kind === "vehicleModule") {
       const m = resolved.module;
       if (m.type !== "pilot_module_weapon" || m.isShield) return;
-      att1 = m.att1;
-      att2 = m.att2;
-      prec = m.prec ?? 0;
-      damage = m.damage ?? 0;
-      type = m.damageType ?? "";
+      const acc = m.accuracy;
+      const dmg = m.damage;
+      att1 = acc?.attr1;
+      att2 = acc?.attr2;
+      if (!att1 || !att2) return;
+      prec = acc?.value ?? 0;
+      damage = dmg?.value ?? 0;
+      type = dmg?.type ?? "";
     } else {
       const item = resolved.item;
-      att1 = item.att1 ?? item.accuracyCheck?.att1;
-      att2 = item.att2 ?? item.accuracyCheck?.att2;
+      const isSecondary = item.activeForm === "secondary";
+      const acc = isSecondary
+        ? (item.secondAccuracy ?? item.accuracy)
+        : item.accuracy;
+      const dmg = isSecondary
+        ? (item.secondDamage ?? item.damage)
+        : item.damage;
+      att1 = acc?.attr1;
+      att2 = acc?.attr2;
       if (!att1 || !att2) return;
-      if ("accuracyCheck" in item) {
-        const isSecondary = item.activeForm === "secondary";
-        const stats = calculateCustomWeaponStats(item, isSecondary);
-        prec = stats.precision;
-        damage = stats.damage;
-        type = (isSecondary ? item.secondSelectedType : item.type) ?? "";
-      } else {
-        prec = item.prec ?? 0;
-        damage = item.damage ?? item.dmg ?? 0;
-        type = item.type ?? "";
-      }
+      prec = acc?.value ?? 0;
+      damage = dmg?.value ?? 0;
+      type = dmg?.type ?? "";
     }
 
     const die1 = getAttrDie(att1);
@@ -308,6 +331,45 @@ export default function CompactLoadout({
   const visibleSupportSlots = isMainTab
     ? supportSlots.filter((entry) => Boolean(entry.module))
     : supportSlots;
+
+  const appendEquipmentItem = (sourceKey, item) => {
+    setPlayer((prev) => {
+      const eq0 = prev?.equipment?.[0] ?? {};
+      const next = [...(eq0?.[sourceKey] ?? []), item];
+      const equipment = prev?.equipment
+        ? [{ ...eq0, [sourceKey]: next }, ...prev.equipment.slice(1)]
+        : [{ ...eq0, [sourceKey]: next }];
+      return { ...prev, equipment };
+    });
+  };
+
+  const handleCreateNewItem = (kind) => {
+    setPickerSlot(null);
+    setPickerOpenModuleOverride(false);
+    setCreateItemType(kind);
+  };
+
+  const handleImportFromCompendium = (slot) => {
+    const typeMap = {
+      mainHand: "weapons",
+      offHand: "shields",
+      armor: "armor",
+      accessory: "accessories",
+    };
+    setSlotImportType(typeMap[slot] ?? "weapons");
+    setPickerSlot(null);
+    setPickerOpenModuleOverride(false);
+    setSlotImportOpen(true);
+  };
+
+  const handleSlotImportAdd = (item, type) => {
+    if (type === "weapons") appendEquipmentItem("weapons", item);
+    if (type === "custom-weapons") appendEquipmentItem("customWeapons", item);
+    if (type === "shields") appendEquipmentItem("shields", item);
+    if (type === "armor") appendEquipmentItem("armor", item);
+    if (type === "accessories") appendEquipmentItem("accessories", item);
+    setSlotImportOpen(false);
+  };
 
   return (
     <TableContainer component={Paper} sx={{ mb: 1 }}>
@@ -401,7 +463,7 @@ export default function CompactLoadout({
                   : (() => {
                       const item = resolved.item;
                       if (
-                        "accuracyCheck" in item &&
+                        "secondAccuracy" in item &&
                         item.activeForm === "secondary"
                       )
                         return item.secondWeaponName || `${item.name} (Alt)`;
@@ -499,7 +561,20 @@ export default function CompactLoadout({
                             e.stopPropagation();
                             handleSwapSlot(slot);
                           }}
-                          sx={{ p: 0.25 }}
+                          sx={{
+                            p: 0.25,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            color: "text.secondary",
+                            backgroundColor: "action.selected",
+                            backgroundImage: actionGradient,
+                            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.30)",
+                            "&:hover": {
+                              backgroundColor: "action.selected",
+                              backgroundImage: actionGradient,
+                              color: "text.primary",
+                            },
+                          }}
                         >
                           <SwapHoriz sx={{ fontSize: "0.85rem" }} />
                         </IconButton>
@@ -513,7 +588,20 @@ export default function CompactLoadout({
                             e.stopPropagation();
                             handleRollSlot(slot);
                           }}
-                          sx={{ p: 0.25 }}
+                          sx={{
+                            p: 0.25,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            color: "text.secondary",
+                            backgroundColor: "action.selected",
+                            backgroundImage: actionGradient,
+                            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.30)",
+                            "&:hover": {
+                              backgroundColor: "action.selected",
+                              backgroundImage: actionGradient,
+                              color: "text.primary",
+                            },
+                          }}
                         >
                           <CasinoIcon sx={{ fontSize: "0.85rem" }} />
                         </IconButton>
@@ -699,8 +787,75 @@ export default function CompactLoadout({
                     )
                 : undefined
             }
+            onCreateNewItem={handleCreateNewItem}
+            onImportFromCompendium={handleImportFromCompendium}
           />
         )}
+        <CompendiumViewerModal
+          open={slotImportOpen}
+          onClose={() => setSlotImportOpen(false)}
+          onAddItem={handleSlotImportAdd}
+          initialType={slotImportType}
+        />
+        <PlayerWeaponModal
+          open={createItemType === "weapon"}
+          onClose={() => setCreateItemType(null)}
+          editWeaponIndex={null}
+          weapon={null}
+          onAddWeapon={(item) => {
+            appendEquipmentItem("weapons", item);
+            setCreateItemType(null);
+          }}
+          onDeleteWeapon={() => {}}
+        />
+        <PlayerCustomWeaponModal
+          open={createItemType === "custom-weapon"}
+          onClose={() => setCreateItemType(null)}
+          editCustomWeaponIndex={null}
+          customWeapon={null}
+          onAddCustomWeapon={(item) => {
+            appendEquipmentItem("customWeapons", item);
+            setCreateItemType(null);
+          }}
+          onDeleteCustomWeapon={() => {}}
+          player={player}
+          setPlayer={setPlayer}
+        />
+        <PlayerShieldModal
+          open={createItemType === "shield"}
+          onClose={() => setCreateItemType(null)}
+          editShieldIndex={null}
+          shield={null}
+          onAddShield={(item) => {
+            appendEquipmentItem("shields", item);
+            setCreateItemType(null);
+          }}
+          onDeleteShield={() => {}}
+        />
+        <PlayerArmorModal
+          open={createItemType === "armor"}
+          onClose={() => setCreateItemType(null)}
+          editArmorIndex={null}
+          armorPlayer={null}
+          onAddArmor={(item) => {
+            appendEquipmentItem("armor", item);
+            setCreateItemType(null);
+          }}
+          onDeleteArmor={() => {}}
+          player={player}
+          setPlayer={setPlayer}
+        />
+        <PlayerAccessoryModal
+          open={createItemType === "accessory"}
+          onClose={() => setCreateItemType(null)}
+          editAccIndex={null}
+          accessory={null}
+          onAddAccessory={(item) => {
+            appendEquipmentItem("accessories", item);
+            setCreateItemType(null);
+          }}
+          onDeleteAccessory={() => {}}
+        />
         {/* Support module picker */}
         <Dialog
           open={supportPickerOpen}
@@ -761,11 +916,13 @@ export default function CompactLoadout({
                                   : t(m.description || "")
                                 ).slice(0, 50)
                           }
-                          primaryTypographyProps={{
-                            variant: "body2",
-                            fontWeight: m.enabled ? 700 : 400,
+                          slotProps={{
+                            primary: {
+                              variant: "body2",
+                              fontWeight: m.enabled ? 700 : 400,
+                            },
+                            secondary: { variant: "caption" },
                           }}
-                          secondaryTypographyProps={{ variant: "caption" }}
                         />
                       </ListItemButton>
                     </ListItem>
@@ -887,6 +1044,14 @@ export default function CompactLoadout({
             onClose={() => setVehicleModalOpen(false)}
             pilot={pilotSpellInfo.spell}
             onSave={handleSaveVehicles}
+          />
+        )}
+        {pilotSpellInfo && (
+          <VehicleEnterDialog
+            open={vehicleEnterOpen}
+            onClose={() => setVehicleEnterOpen(false)}
+            vehicles={pilotVehicles}
+            onEnter={handleEnterVehicle}
           />
         )}
       </Box>

@@ -18,13 +18,13 @@ import { useNavigate } from "react-router";
 import Layout from "../components/Layout";
 import React, { useState } from "react";
 import { useTranslate } from "../translation/translate";
-import adversary_compedium from "./adversary_compedium.webp";
-import adversary_designer from "./adversary_designer.webp";
-import combat_simulator from "./combat_simulator.webp";
-import dice_roller from "./dice_roller.webp";
-import items_rituals_projects from "./items_rituals_projects.webp";
-import compendium_viewer from "./compendia_viewer.webp"; // placeholder, replace with dedicated asset
-import character_designer from "./character_designer.webp";
+import adversary_compedium from "/images/routes/navigation/adversary_compedium.webp";
+import adversary_designer from "/images/routes/navigation/adversary_designer.webp";
+import combat_simulator from "/images/routes/navigation/combat_simulator.webp";
+import dice_roller from "/images/routes/navigation/dice_roller.webp";
+import items_rituals_projects from "/images/routes/items_rituals_projects.webp";
+import compendium_viewer from "/images/routes/navigation/compendia_viewer.webp"; // placeholder, replace with dedicated asset
+import character_designer from "/images/routes/navigation/character_designer.webp";
 import PublicIcon from "@mui/icons-material/Public";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import DesktopMacIcon from "@mui/icons-material/DesktopMac";
@@ -35,7 +35,7 @@ import { useTheme } from "@mui/material/styles";
 import DownloadIcon from "@mui/icons-material/Download";
 import { FaWindows, FaApple, FaLinux } from "react-icons/fa";
 import EmailIcon from "@mui/icons-material/Email";
-import powered_by_fu from "./powered_by_fu.png";
+import powered_by_fu from "/images/routes/powered_by_fu.png";
 import LanguageIcon from "@mui/icons-material/Language";
 
 function Home() {

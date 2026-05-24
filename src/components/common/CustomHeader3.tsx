@@ -102,7 +102,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
         color: "white",
         textAlign: "left",
         marginBottom: "4px",
-        marginTop: "10px",
+        marginTop: "4px",
         textTransform: "uppercase",
         display: "flex",
         alignItems: "center",

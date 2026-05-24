@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Typography, Paper, Divider } from "@mui/material";
+import { Typography, Paper, Divider, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import SpellArcanist from "../spells/SpellArcanist";
@@ -56,24 +56,25 @@ export default function PlayerArcana({ player }) {
             >
               {t("Arcana")}
             </Typography>
-            <Grid container spacing={1} sx={{ padding: "1em" }}>
+            <Box
+              sx={{
+                padding: "1em",
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gap: 1,
+                alignItems: "start",
+              }}
+            >
               {arcana.map((spell, index) => (
-                <Grid
-                  container
-                  key={index}
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
-                >
+                <Box key={index}>
                   <SpellArcanist
                     arcana={spell}
                     isEditMode={false}
                     rework={spell.spellType === "arcanist-rework"}
                   />
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
           </Paper>
         </>
       )}

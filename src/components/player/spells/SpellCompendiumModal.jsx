@@ -273,7 +273,7 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                   {selectedItem.isOffensive && <OffensiveSpellIcon />}
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                  {selectedItem.mp}{" "}
+                  {selectedItem.cost?.amount}{" "}
                   {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""}{" "}
                   {t("MP")}
                   <Box
@@ -288,7 +288,7 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                     allowedElements={["strong"]}
                     unwrapDisallowed={true}
                   >
-                    {t(selectedItem.targetDesc)}
+                    {t(selectedItem.targetDescription)}
                   </StyledMarkdown>
                   <Box
                     component="span"
@@ -317,7 +317,8 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
               <div>
                 <Typography variant="h3">{t(selectedItem.name)}</Typography>
                 <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                  {t("Up to")} {selectedItem.mp * selectedItem.maxTargets}{" "}
+                  {t("Up to")}{" "}
+                  {(selectedItem.cost?.amount ?? 0) * selectedItem.maxTargets}{" "}
                   {t("MP")}
                   <Box
                     component="span"
@@ -331,7 +332,7 @@ const SpellCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                     allowedElements={["strong"]}
                     unwrapDisallowed={true}
                   >
-                    {t(selectedItem.targetDesc)}
+                    {t(selectedItem.targetDescription)}
                   </StyledMarkdown>
                   <Box
                     component="span"

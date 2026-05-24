@@ -27,6 +27,7 @@ import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompact
 import Clock from "../Clock";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import { useClock } from "../../../../hooks/useClock";
 
 const StyledTableCellHeader = styled(TableCell)({
   padding: "4px 8px",
@@ -79,13 +80,10 @@ export default function PlayerZeroPower({
   const zeroPowerKey = "zeroPower-0";
 
   const zeroPower = player.zeroPower;
-  if (!zeroPower?.name) return null;
+  const sections = zeroPower?.clock?.sections ?? 6;
+  const clockState = zeroPower?.clockState ?? new Array(sections).fill(false);
 
-  const sections = zeroPower.clock?.sections ?? 6;
-  const clockState = zeroPower.clockState ?? new Array(sections).fill(false);
-  const filled = clockState.filter(Boolean).length;
-
-  const updateClock = (newState) => {
+  const persistState = (newState) => {
     if (!setPlayer) return;
     setPlayer((prev) => ({
       ...prev,
@@ -93,27 +91,14 @@ export default function PlayerZeroPower({
     }));
   };
 
-  const increment = () => {
-    const currentFilled = clockState.filter(Boolean).length;
-    if (currentFilled < sections) {
-      const next = new Array(sections).fill(false);
-      for (let i = 0; i <= currentFilled; i++) {
-        next[i] = true;
-      }
-      updateClock(next);
-    }
-  };
+  const {
+    filledCount: filled,
+    increment,
+    decrement,
+    reset,
+  } = useClock(sections, clockState, persistState);
 
-  const decrement = () => {
-    const currentFilled = clockState.filter(Boolean).length;
-    if (currentFilled > 0) {
-      const next = [...clockState];
-      next[currentFilled - 1] = false;
-      updateClock(next);
-    }
-  };
-
-  const reset = () => updateClock(new Array(sections).fill(false));
+  if (!zeroPower?.name) return null;
 
   const triggerName =
     typeof zeroPower.zeroTrigger === "string"

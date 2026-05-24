@@ -16,6 +16,12 @@ import {
 } from "../equipment/slots/loadoutSelectors";
 import { useLoadoutStore } from "../../../store/playerLoadoutStore";
 import SlotPickerDialog from "../equipment/slots/SlotPickerDialog";
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import PlayerWeaponModal from "../equipment/weapons/PlayerWeaponModal";
+import PlayerCustomWeaponModal from "../equipment/customWeapons/PlayerCustomWeaponModal";
+import PlayerShieldModal from "../equipment/shields/PlayerShieldModal";
+import PlayerArmorModal from "../equipment/armor/PlayerArmorModal";
+import PlayerAccessoryModal from "../equipment/accessories/PlayerAccessoryModal";
 
 const SLOT_LABEL_KEY = {
   mainHand: "MAIN",
@@ -31,7 +37,7 @@ function resolvedName(resolved, locked, t) {
     return resolved.module.customName || t(resolved.module.name);
   }
   const item = resolved.item;
-  if ("accuracyCheck" in item && item.activeForm === "secondary") {
+  if ("secondAccuracy" in item && item.activeForm === "secondary") {
     return item.secondWeaponName || `${item.name} (Alt)`;
   }
   return item?.name ?? " - ";
@@ -51,6 +57,9 @@ export default function CardLoadout({
   const [pickerSlot, setPickerSlot] = useState(null);
   const [pickerOpenModuleOverride, setPickerOpenModuleOverride] =
     useState(false);
+  const [createItemType, setCreateItemType] = useState(null);
+  const [slotImportOpen, setSlotImportOpen] = useState(false);
+  const [slotImportType, setSlotImportType] = useState("weapons");
 
   const store = useLoadoutStore();
   useEffect(() => {
@@ -93,6 +102,45 @@ export default function CardLoadout({
   const primary = theme.palette.primary.main;
   const divider = theme.palette.divider;
   const supportLabel = t("pilot_module_support");
+
+  const appendEquipmentItem = (sourceKey, item) => {
+    setPlayer((prev) => {
+      const eq0 = prev?.equipment?.[0] ?? {};
+      const next = [...(eq0?.[sourceKey] ?? []), item];
+      const equipment = prev?.equipment
+        ? [{ ...eq0, [sourceKey]: next }, ...prev.equipment.slice(1)]
+        : [{ ...eq0, [sourceKey]: next }];
+      return { ...prev, equipment };
+    });
+  };
+
+  const handleCreateNewItem = (kind) => {
+    setPickerSlot(null);
+    setPickerOpenModuleOverride(false);
+    setCreateItemType(kind);
+  };
+
+  const handleImportFromCompendium = (slot) => {
+    const typeMap = {
+      mainHand: "weapons",
+      offHand: "shields",
+      armor: "armor",
+      accessory: "accessories",
+    };
+    setSlotImportType(typeMap[slot] ?? "weapons");
+    setPickerSlot(null);
+    setPickerOpenModuleOverride(false);
+    setSlotImportOpen(true);
+  };
+
+  const handleSlotImportAdd = (item, type) => {
+    if (type === "weapons") appendEquipmentItem("weapons", item);
+    if (type === "custom-weapons") appendEquipmentItem("customWeapons", item);
+    if (type === "shields") appendEquipmentItem("shields", item);
+    if (type === "armor") appendEquipmentItem("armor", item);
+    if (type === "accessories") appendEquipmentItem("accessories", item);
+    setSlotImportOpen(false);
+  };
 
   const renderSlotRow = ({ key, resolved, locked }) => {
     const isEmpty = !locked && !resolved;
@@ -363,11 +411,11 @@ export default function CardLoadout({
                       sx={{
                         fontFamily: "Antonio",
                         fontSize: { xs: "0.74rem", sm: "0.8rem" },
-                        fontWeight: module.enabled ? 700 : 500,
-                        color: module.enabled
+                        fontWeight: module.isEquipped ? 700 : 500,
+                        color: module.isEquipped
                           ? theme.palette.text.primary
                           : theme.palette.text.disabled,
-                        fontStyle: module.enabled ? "normal" : "italic",
+                        fontStyle: module.isEquipped ? "normal" : "italic",
                         lineHeight: 1.15,
                       }}
                     >
@@ -421,8 +469,75 @@ export default function CardLoadout({
                   )
               : undefined
           }
+          onCreateNewItem={handleCreateNewItem}
+          onImportFromCompendium={handleImportFromCompendium}
         />
       )}
+      <CompendiumViewerModal
+        open={slotImportOpen}
+        onClose={() => setSlotImportOpen(false)}
+        onAddItem={handleSlotImportAdd}
+        initialType={slotImportType}
+      />
+      <PlayerWeaponModal
+        open={createItemType === "weapon"}
+        onClose={() => setCreateItemType(null)}
+        editWeaponIndex={null}
+        weapon={null}
+        onAddWeapon={(item) => {
+          appendEquipmentItem("weapons", item);
+          setCreateItemType(null);
+        }}
+        onDeleteWeapon={() => {}}
+      />
+      <PlayerCustomWeaponModal
+        open={createItemType === "custom-weapon"}
+        onClose={() => setCreateItemType(null)}
+        editCustomWeaponIndex={null}
+        customWeapon={null}
+        onAddCustomWeapon={(item) => {
+          appendEquipmentItem("customWeapons", item);
+          setCreateItemType(null);
+        }}
+        onDeleteCustomWeapon={() => {}}
+        player={player}
+        setPlayer={setPlayer}
+      />
+      <PlayerShieldModal
+        open={createItemType === "shield"}
+        onClose={() => setCreateItemType(null)}
+        editShieldIndex={null}
+        shield={null}
+        onAddShield={(item) => {
+          appendEquipmentItem("shields", item);
+          setCreateItemType(null);
+        }}
+        onDeleteShield={() => {}}
+      />
+      <PlayerArmorModal
+        open={createItemType === "armor"}
+        onClose={() => setCreateItemType(null)}
+        editArmorIndex={null}
+        armorPlayer={null}
+        onAddArmor={(item) => {
+          appendEquipmentItem("armor", item);
+          setCreateItemType(null);
+        }}
+        onDeleteArmor={() => {}}
+        player={player}
+        setPlayer={setPlayer}
+      />
+      <PlayerAccessoryModal
+        open={createItemType === "accessory"}
+        onClose={() => setCreateItemType(null)}
+        editAccIndex={null}
+        accessory={null}
+        onAddAccessory={(item) => {
+          appendEquipmentItem("accessories", item);
+          setCreateItemType(null);
+        }}
+        onDeleteAccessory={() => {}}
+      />
     </Box>
   );
 }

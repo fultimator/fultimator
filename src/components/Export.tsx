@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../translation/translate";
 import { buildItemText } from "../libs/buildItemText";
+import { canonicalizeForTransfer } from "../libs/exportTransforms";
 
 type Props = {
   name?: string;
@@ -26,8 +27,16 @@ enum ExportAction {
 
 function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
   const { t } = useTranslate();
+  const canonicalData = React.useMemo(
+    () => canonicalizeForTransfer(dataType, data),
+    [dataType, data],
+  );
+  const canonicalDataObject =
+    canonicalData && typeof canonicalData === "object"
+      ? (canonicalData as Record<string, unknown>)
+      : {};
   const [downloadJSON, copyToClipboard] = useDownloadJSON(name, {
-    ...data,
+    ...canonicalDataObject,
     dataType,
   });
 
@@ -67,14 +76,14 @@ function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
   }
 
   async function handleCopyText(fmt: string) {
-    const text = buildItemText(dataType, data, fmt);
+    const text = buildItemText(dataType, canonicalData, fmt);
     await navigator.clipboard.writeText(text);
     handleCloseExportMenu();
     handleSnackbarOpen();
   }
 
   function handleDownloadText(fmt: string) {
-    const text = buildItemText(dataType, data, fmt);
+    const text = buildItemText(dataType, canonicalData, fmt);
     const ext = fmt === "plain" ? "txt" : "md";
     const safeName = (name || "export").replace(/\s+/g, "_").toLowerCase();
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });

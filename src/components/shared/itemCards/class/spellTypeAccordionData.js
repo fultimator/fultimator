@@ -77,14 +77,18 @@ const pilotModuleDetailBuilders = {
   ],
   weapon: (module) => [
     ...(module.category ? [{ label: "Category", value: module.category }] : []),
-    { label: "Accuracy", value: `+${module.prec ?? 0}`, rawValue: true },
     {
-      label: "Damage",
-      value: module.isShield ? "0" : `HR + ${module.damage ?? 0}`,
+      label: "Accuracy",
+      value: `+${module.accuracy?.value ?? 0}`,
       rawValue: true,
     },
-    ...(module.damageType
-      ? [{ label: "Damage Type", value: module.damageType }]
+    {
+      label: "Damage",
+      value: module.isShield ? "0" : `HR + ${module.damage?.value ?? 0}`,
+      rawValue: true,
+    },
+    ...(module.damage?.type
+      ? [{ label: "Damage Type", value: module.damage.type }]
       : []),
     ...(module.range ? [{ label: "Range", value: module.range }] : []),
     ...(module.description

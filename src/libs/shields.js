@@ -1,4 +1,15 @@
-const shields = [
+const shield = [
+  {
+    fuid: "no-shield",
+    category: "Shield",
+    name: "No Shield",
+    cost: 0,
+    def: 0,
+    mdef: 0,
+    martial: false,
+    init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
+  },
   {
     fuid: "bronze-shield",
     category: "Shield",
@@ -8,6 +19,7 @@ const shields = [
     mdef: 0,
     martial: false,
     init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
     fuid: "runic-shield",
@@ -18,7 +30,8 @@ const shields = [
     mdef: 2,
     martial: true,
     init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
 ];
 
-export default shields;
+export default shield;

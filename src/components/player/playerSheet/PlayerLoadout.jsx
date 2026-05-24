@@ -33,46 +33,51 @@ import CasinoIcon from "@mui/icons-material/Casino";
 import { SwapHoriz } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { useTheme } from "@mui/material/styles";
 import attributes from "../../../libs/attributes";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
 } from "../equipment/slots/equipmentSlots";
 import {
-  calculateAttribute,
-  calculateCustomWeaponStats,
-} from "../common/playerCalculations";
-import {
   getSlotLocks,
   getEquippedModulesForSlot,
   getEquippedModuleForSlot,
   getVehicleModuleUsage,
-  getEquippedSupportModules,
+  getAvailableSupportModules,
   getSupportSlots,
   getAuxHandItem,
 } from "../equipment/slots/loadoutSelectors";
 import { useLoadoutStore } from "../../../store/playerLoadoutStore";
 import SlotPickerDialog from "../equipment/slots/SlotPickerDialog";
+import VehicleEnterDialog from "../equipment/slots/VehicleEnterDialog";
 import SpellPilotVehiclesModal from "../spells/SpellPilotVehiclesModal";
+import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
+import PlayerWeaponModal from "../equipment/weapons/PlayerWeaponModal";
+import PlayerCustomWeaponModal from "../equipment/customWeapons/PlayerCustomWeaponModal";
+import PlayerShieldModal from "../equipment/shields/PlayerShieldModal";
+import PlayerArmorModal from "../equipment/armor/PlayerArmorModal";
+import PlayerAccessoryModal from "../equipment/accessories/PlayerAccessoryModal";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
+import {
+  buildAccuracyCheckMessage,
+  prepareAccuracyCheck,
+  processAccuracyCheck,
+  rollAccuracyCheck,
+} from "../../app-drawer/panels/chat/domain/accuracy-checks";
 
 // Stat line helpers
 
 function weaponStatLine(item) {
   if (!item) return "-";
-  if (
-    (item.att1 && item.att2) ||
-    (item.accuracyCheck?.att1 && item.accuracyCheck?.att2)
-  ) {
-    const a1 =
-      attributes[item.att1 ?? item.accuracyCheck?.att1]?.shortcaps ??
-      item.att1 ??
-      item.accuracyCheck?.att1;
-    const a2 =
-      attributes[item.att2 ?? item.accuracyCheck?.att2]?.shortcaps ??
-      item.att2 ??
-      item.accuracyCheck?.att2;
+  const acc = item.accuracy;
+  if (acc?.attr1 && acc?.attr2) {
+    const a1 = attributes[acc.attr1]?.shortcaps ?? acc.attr1;
+    const a2 = attributes[acc.attr2]?.shortcaps ?? acc.attr2;
+    const dmg = item.damage?.value ?? item.damage ?? "?";
+    const type = item.damage?.type ?? item.type ?? "";
     const hands = item.hands === 2 || item.isTwoHand ? "2H" : "1H";
-    return `${a1}+${a2} / ${item.dmg ?? item.damage ?? "?"} ${item.type ?? ""} / ${hands}`.trim();
+    return `${a1}+${a2} / ${dmg} ${type} / ${hands}`.trim();
   }
   return item.quality || "-";
 }
@@ -93,10 +98,12 @@ function moduleStatLine(module) {
   if (module.type === "pilot_module_weapon") {
     if (module.isShield)
       return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-    const a1 = attributes[module.att1]?.shortcaps ?? module.att1;
-    const a2 = attributes[module.att2]?.shortcaps ?? module.att2;
+    const acc = module.accuracy ?? {};
+    const dmg = module.damage ?? {};
+    const a1 = attributes[acc.attr1]?.shortcaps ?? acc.attr1 ?? "might";
+    const a2 = attributes[acc.attr2]?.shortcaps ?? acc.attr2 ?? "dexterity";
     const hands = module.cumbersome ? "2H" : "1H";
-    return `${a1}+${a2} / ${module.damage ?? "?"} ${module.damageType ?? ""} / ${hands}`.trim();
+    return `${a1}+${a2} / ${dmg.value ?? "?"} ${dmg.type ?? ""} / ${hands}`.trim();
   }
   if (module.type === "pilot_module_armor") {
     return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
@@ -116,6 +123,9 @@ function SlotCard({
   onRoll,
   onSwap,
   isAux,
+  primary,
+  ternary,
+  ternaryContrast,
 }) {
   const { t } = useTranslate();
   const isVehicle = resolved?.kind === "vehicleModule";
@@ -125,7 +135,7 @@ function SlotCard({
     if (isVehicle) return resolved.module.customName || t(resolved.module.name);
     const item = resolved?.item;
     if (!item) return null;
-    if ("accuracyCheck" in item && item.activeForm === "secondary") {
+    if ("secondAccuracy" in item && item.activeForm === "secondary") {
       return item.secondWeaponName || `${item.name} (Alt)`;
     }
     return item.name ?? null;
@@ -136,20 +146,21 @@ function SlotCard({
     if (isVehicle) return moduleStatLine(resolved.module);
     const item = resolved.item;
     // Custom weapon: respect active form
-    if ("accuracyCheck" in item) {
+    if ("secondAccuracy" in item || "accuracy" in item) {
       const isSecondary = item.activeForm === "secondary";
       const acc = isSecondary
-        ? item.secondSelectedAccuracyCheck
-        : item.accuracyCheck;
-      if (acc?.att1 && acc?.att2) {
-        const a1 = attributes[acc.att1]?.shortcaps ?? acc.att1;
-        const a2 = attributes[acc.att2]?.shortcaps ?? acc.att2;
-        const stats = calculateCustomWeaponStats(item, isSecondary);
-        const type = isSecondary ? item.secondSelectedType : item.type;
-        return `${a1}+${a2} / ${stats.damage} ${type ?? ""} / 2H`.trim();
+        ? (item.secondAccuracy ?? item.accuracy)
+        : item.accuracy;
+      const dmg = isSecondary
+        ? (item.secondDamage ?? item.damage)
+        : item.damage;
+      if (acc?.attr1 && acc?.attr2) {
+        const a1 = attributes[acc.attr1]?.shortcaps ?? acc.attr1;
+        const a2 = attributes[acc.attr2]?.shortcaps ?? acc.attr2;
+        return `${a1}+${a2} / ${dmg?.value ?? "?"} ${dmg?.type ?? ""} / 2H`.trim();
       }
     }
-    if ("att1" in item && "att2" in item) return weaponStatLine(item);
+    if ("accuracy" in item) return weaponStatLine(item);
     if ("def" in item && "mdef" in item && !("init" in item))
       return shieldStatLine(item);
     if ("def" in item && "mdef" in item && "init" in item)
@@ -157,15 +168,13 @@ function SlotCard({
     return item.quality || "-";
   })();
 
-  // A slot is weapon-type if it has rollable att1+att2+damage stats
+  // A slot is weapon-type if it has rollable accuracy+damage stats
   const isWeaponType =
     !isEmpty &&
     (isVehicle
       ? resolved.module.type === "pilot_module_weapon" &&
         !resolved.module.isShield
-      : ("att1" in resolved.item && "att2" in resolved.item) ||
-        (resolved.item?.accuracyCheck?.att1 &&
-          resolved.item?.accuracyCheck?.att2));
+      : !!resolved.item?.accuracy?.attr1 && !!resolved.item?.accuracy?.attr2);
 
   const clickable = !locked && !!onClick && !isAux;
   const showRoll = !!onRoll && isWeaponType && !isEmpty;
@@ -177,54 +186,81 @@ function SlotCard({
       (c) => c.name === "weapon_customization_transforming",
     );
 
-  const cardInner = (
-    <CardContent sx={{ px: 1, py: 0.8, "&:last-child": { pb: 0.8 } }}>
-      <Box
+  const headerBg = isAux
+    ? "warning.main"
+    : isVehicle
+      ? "success.main"
+      : primary;
+
+  const labelRow = (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 0.5,
+        px: 1,
+        py: 0.4,
+        backgroundColor: headerBg,
+        borderRadius: "6px 6px 0 0",
+        opacity: locked ? 0.55 : 1,
+      }}
+    >
+      <Typography
+        variant="caption"
         sx={{
-          display: "flex",
-          gap: 0.5,
-          mb: 0.5,
-          alignItems: "center",
+          color: "#fff",
+          fontWeight: 800,
+          letterSpacing: 0.6,
+          fontSize: { xs: "0.65rem", sm: "0.68rem" },
+          textTransform: "uppercase",
+          lineHeight: 1.2,
+          flex: 1,
         }}
       >
-        <Typography
-          variant="caption"
-          sx={{
-            color: "text.secondary",
-            fontWeight: 800,
-            letterSpacing: 0.4,
-            fontSize: { xs: "0.68rem", sm: "0.72rem" },
-          }}
-        >
-          {label}
-        </Typography>
-        {isAux && (
-          <Tooltip title={t("Auto-generated")}>
-            <AutoFixHighIcon sx={{ fontSize: 12, color: "warning.main" }} />
-          </Tooltip>
-        )}
-        {isVehicle && !isAux && (
-          <Tooltip title={resolved.vehicle.customName}>
-            <PrecisionManufacturingIcon
-              sx={{ fontSize: 12, color: "success.main" }}
-            />
-          </Tooltip>
-        )}
-        {hasModule && !isVehicle && !isEmpty && !isAux && (
-          <Tooltip title={t("Vehicle module available")}>
-            <PrecisionManufacturingIcon
-              sx={{ fontSize: 12, color: "success.light", opacity: 0.6 }}
-            />
-          </Tooltip>
-        )}
-      </Box>
+        {label}
+      </Typography>
+      {isAux && (
+        <Tooltip title={t("Auto-generated")}>
+          <AutoFixHighIcon
+            sx={{ fontSize: 12, color: "#fff", opacity: 0.85 }}
+          />
+        </Tooltip>
+      )}
+      {isVehicle && !isAux && (
+        <Tooltip title={resolved.vehicle.customName}>
+          <PrecisionManufacturingIcon
+            sx={{ fontSize: 12, color: "#fff", opacity: 0.85 }}
+          />
+        </Tooltip>
+      )}
+      {hasModule && !isVehicle && !isEmpty && !isAux && (
+        <Tooltip title={t("Vehicle module available")}>
+          <PrecisionManufacturingIcon
+            sx={{ fontSize: 12, color: "#fff", opacity: 0.7 }}
+          />
+        </Tooltip>
+      )}
+      {locked && (
+        <LockIcon sx={{ fontSize: 12, color: "#fff", opacity: 0.7 }} />
+      )}
+    </Box>
+  );
+
+  const bodyInner = (
+    <Box
+      sx={{
+        px: 1,
+        py: 0.75,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        height: "100%",
+      }}
+    >
       {isEmpty ? (
         <Typography
           variant="body2"
-          sx={{
-            color: "text.disabled",
-            fontStyle: "italic",
-          }}
+          sx={{ color: "text.disabled", fontStyle: "italic" }}
         >
           {t("- Empty -")}
         </Typography>
@@ -233,10 +269,7 @@ function SlotCard({
           <Typography
             variant="body2"
             noWrap
-            sx={{
-              fontWeight: 700,
-              fontSize: { xs: "0.84rem", sm: "0.9rem" },
-            }}
+            sx={{ fontWeight: 700, fontSize: { xs: "0.84rem", sm: "0.9rem" } }}
           >
             {itemName}
           </Typography>
@@ -250,7 +283,8 @@ function SlotCard({
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                lineHeight: 1.2,
+                lineHeight: 1.3,
+                mt: 0.25,
               }}
             >
               {statLine}
@@ -258,17 +292,18 @@ function SlotCard({
           )}
         </>
       )}
-    </CardContent>
+    </Box>
   );
 
   return (
     <Card
       elevation={1}
       sx={{
-        opacity: locked ? 0.45 : 1,
-        position: "relative",
         height: "100%",
         minWidth: "100%",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
         border: isAux
           ? "1px dashed"
           : isVehicle
@@ -285,13 +320,21 @@ function SlotCard({
               : undefined,
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "stretch", height: "100%" }}>
+      {labelRow}
+      <Box sx={{ display: "flex", alignItems: "stretch", flex: 1 }}>
         {clickable ? (
-          <CardActionArea onClick={onClick} sx={{ flex: 1 }}>
-            {cardInner}
+          <CardActionArea
+            onClick={onClick}
+            sx={{
+              flex: 1,
+              alignItems: "stretch",
+              "& .MuiCardActionArea-focusHighlight": {},
+            }}
+          >
+            {bodyInner}
           </CardActionArea>
         ) : (
-          <Box sx={{ flex: 1 }}>{cardInner}</Box>
+          <Box sx={{ flex: 1 }}>{bodyInner}</Box>
         )}
         {(showRoll || showSwap) && (
           <Box
@@ -299,10 +342,10 @@ function SlotCard({
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              borderLeft: "1px solid",
-              borderColor: "divider",
-              px: 0.5,
               justifyContent: "center",
+              px: 0.75,
+              gap: 0.5,
+              backgroundColor: ternary,
             }}
           >
             {showSwap && (
@@ -334,17 +377,6 @@ function SlotCard({
           </Box>
         )}
       </Box>
-      {locked && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 4,
-            right: 4,
-          }}
-        >
-          <LockIcon sx={{ fontSize: 14, color: "text.disabled" }} />
-        </Box>
-      )}
     </Card>
   );
 }
@@ -472,17 +504,24 @@ export default function PlayerLoadout({
   isOwner,
 }) {
   const { t } = useTranslate();
+  const muiTheme = useTheme();
   const theme = useCustomTheme();
   const primary = theme.primary;
   const secondary = theme.secondary;
+  const ternary = theme.ternary || "#999";
+  const ternaryContrast = muiTheme.palette.getContrastText(ternary);
   const canClickSlot = isEditMode || !!isOwner || !!setPlayer;
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
 
   const [pickerSlot, setPickerSlot] = useState(null);
   const [pickerOpenModuleOverride, setPickerOpenModuleOverride] =
     useState(false);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
+  const [vehicleEnterOpen, setVehicleEnterOpen] = useState(false);
   const [supportPickerOpen, setSupportPickerOpen] = useState(false);
-  const [rollDialog, setRollDialog] = useState(null);
+  const [createItemType, setCreateItemType] = useState(null);
+  const [slotImportOpen, setSlotImportOpen] = useState(false);
+  const [slotImportType, setSlotImportType] = useState("weapons");
 
   const store = useLoadoutStore();
   useEffect(() => {
@@ -491,19 +530,6 @@ export default function PlayerLoadout({
 
   // Shared selectors
   const auxHandItem = getAuxHandItem(player);
-
-  // Roll
-  const getAttrDie = (key) => {
-    const normKey = key === "will" ? "willpower" : key;
-    const base = player?.attributes?.[normKey] ?? 8;
-    const cfg = {
-      dexterity: [["slow", "enraged"], ["dexUp"]],
-      insight: [["dazed", "enraged"], ["insUp"]],
-      might: [["weak", "poisoned"], ["migUp"]],
-      willpower: [["shaken", "poisoned"], ["wlpUp"]],
-    }[normKey] ?? [[], []];
-    return calculateAttribute(player, base, cfg[0], cfg[1], 6, 12);
-  };
 
   const handleRollSlot = (slot) => {
     const resolved =
@@ -514,54 +540,80 @@ export default function PlayerLoadout({
         : resolveEffectiveSlot(player, slot);
     if (!resolved) return;
 
-    let att1, att2, prec, damage, type;
+    let att1, att2, prec, damage, type, defense, range, hrZero;
     if (resolved.kind === "vehicleModule") {
       const m = resolved.module;
       if (m.type !== "pilot_module_weapon" || m.isShield) return;
-      att1 = m.att1;
-      att2 = m.att2;
-      prec = m.prec ?? 0;
-      damage = m.damage ?? 0;
-      type = m.damageType ?? "";
+      const acc = m.accuracy;
+      const dmg = m.damage;
+      att1 = acc?.attr1;
+      att2 = acc?.attr2;
+      if (!att1 || !att2) return;
+      prec = acc?.value ?? 0;
+      damage = dmg?.value ?? 0;
+      type = dmg?.type ?? "";
+      defense = acc?.defense ?? "def";
+      range = m?.range ?? "melee";
+      hrZero = dmg?.hrZero === true;
     } else {
       const item = resolved.item;
-      att1 = item.att1 ?? item.accuracyCheck?.att1;
-      att2 = item.att2 ?? item.accuracyCheck?.att2;
+      const isSecondary = item.activeForm === "secondary";
+      const acc = isSecondary
+        ? (item.secondAccuracy ?? item.accuracy)
+        : item.accuracy;
+      const dmg = isSecondary
+        ? (item.secondDamage ?? item.damage)
+        : item.damage;
+      att1 = acc?.attr1;
+      att2 = acc?.attr2;
       if (!att1 || !att2) return;
-      if ("accuracyCheck" in item) {
-        // Custom weapon: derive stats from customizations
-        const isSecondary = item.activeForm === "secondary";
-        const stats = calculateCustomWeaponStats(item, isSecondary);
-        prec = stats.precision;
-        damage = stats.damage;
-        type = (isSecondary ? item.secondSelectedType : item.type) ?? "";
-      } else {
-        prec = item.prec ?? 0;
-        damage = item.damage ?? item.dmg ?? 0;
-        type = item.type ?? "";
-      }
+      prec = acc?.value ?? 0;
+      damage = dmg?.value ?? 0;
+      type = dmg?.type ?? "";
+      defense = acc?.defense ?? "def";
+      range = item?.range ?? (item?.melee ? "melee" : "ranged");
+      hrZero = dmg?.hrZero === true;
     }
-
-    const die1 = getAttrDie(att1);
-    const die2 = getAttrDie(att2);
-    const r1 = Math.floor(Math.random() * die1) + 1;
-    const r2 = Math.floor(Math.random() * die2) + 1;
-    setRollDialog({
-      slot,
-      att1,
-      att2,
-      die1,
-      die2,
-      r1,
-      r2,
-      prec,
-      damage,
-      type,
-      accuracy: r1 + r2 + prec,
-      damageRoll: Math.max(r1, r2) + damage,
-      isCritSuccess: r1 >= 6 && r2 >= 6 && r1 === r2,
-      isCritFail: r1 === 1 && r2 === 1,
+    const toRollKey = (attr) => {
+      const key = String(attr || "").toLowerCase();
+      if (key.startsWith("dex")) return "dex";
+      if (key.startsWith("ins")) return "ins";
+      if (key.startsWith("mig")) return "mig";
+      if (key.startsWith("wil") || key.startsWith("wlp")) return "wlp";
+      return "dex";
+    };
+    const dieSizes = {
+      primary:
+        player?.attributes?.[att1]?.base ?? player?.attributes?.[att1] ?? 6,
+      secondary:
+        player?.attributes?.[att2]?.base ?? player?.attributes?.[att2] ?? 6,
+    };
+    const intent = prepareAccuracyCheck({
+      attr1: toRollKey(att1),
+      attr2: toRollKey(att2),
+      accuracyBonus: prec ?? 0,
+      name:
+        resolved.kind === "vehicleModule"
+          ? resolved.module.customName || t(resolved.module.name)
+          : resolved.item?.name || "Attack",
+      description:
+        resolved.kind === "vehicleModule"
+          ? resolved.module.description || undefined
+          : resolved.item?.quality || undefined,
+      baseDamage: damage ?? 0,
+      damageType: type || "physical",
+      accuracyDefense: defense,
+      range,
+      hrZero,
     });
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(
+      intent,
+      rolls,
+      dieSizes,
+      player?.name || "Player",
+    );
+    addMessage(buildAccuracyCheckMessage(result));
   };
 
   const handleSwapSlot = (slot) => {
@@ -577,7 +629,7 @@ export default function PlayerLoadout({
   const vs = player?.vehicleSlots;
 
   const vehicleModuleUsage = getVehicleModuleUsage(player);
-  const equippedSupportModules = getEquippedSupportModules(player);
+  const equippedSupportModules = getAvailableSupportModules(player);
   const supportSlots = getSupportSlots(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);
   const pilotSpellInfo = (() => {
@@ -589,9 +641,23 @@ export default function PlayerLoadout({
     }
     return null;
   })();
+  const pilotVehicles = pilotSpellInfo
+    ? Array.isArray(pilotSpellInfo.spell.vehicles)
+      ? pilotSpellInfo.spell.vehicles
+      : Array.isArray(pilotSpellInfo.spell.currentVehicles)
+        ? pilotSpellInfo.spell.currentVehicles
+        : []
+    : [];
 
   const handleToggleVehicle = () => {
-    store.toggleVehicle();
+    if (activeVehicle) {
+      store.toggleVehicle();
+      return;
+    }
+    setVehicleEnterOpen(true);
+  };
+  const handleEnterVehicle = (vehicleIndex) => {
+    store.enterVehicle(vehicleIndex);
   };
   const handleSaveVehicles = (_, updatedPilot) => {
     store.saveVehicles(updatedPilot);
@@ -639,6 +705,45 @@ export default function PlayerLoadout({
       locked: false,
     },
   ];
+
+  const appendEquipmentItem = (sourceKey, item) => {
+    setPlayer((prev) => {
+      const eq0 = prev?.equipment?.[0] ?? {};
+      const next = [...(eq0?.[sourceKey] ?? []), item];
+      const equipment = prev?.equipment
+        ? [{ ...eq0, [sourceKey]: next }, ...prev.equipment.slice(1)]
+        : [{ ...eq0, [sourceKey]: next }];
+      return { ...prev, equipment };
+    });
+  };
+
+  const handleCreateNewItem = (kind) => {
+    setPickerSlot(null);
+    setPickerOpenModuleOverride(false);
+    setCreateItemType(kind);
+  };
+
+  const handleImportFromCompendium = (slot) => {
+    const typeMap = {
+      mainHand: "weapons",
+      offHand: "shields",
+      armor: "armor",
+      accessory: "accessories",
+    };
+    setSlotImportType(typeMap[slot] ?? "weapons");
+    setPickerSlot(null);
+    setPickerOpenModuleOverride(false);
+    setSlotImportOpen(true);
+  };
+
+  const handleSlotImportAdd = (item, type) => {
+    if (type === "weapons") appendEquipmentItem("weapons", item);
+    if (type === "custom-weapons") appendEquipmentItem("customWeapons", item);
+    if (type === "shields") appendEquipmentItem("shields", item);
+    if (type === "armor") appendEquipmentItem("armor", item);
+    if (type === "accessories") appendEquipmentItem("accessories", item);
+    setSlotImportOpen(false);
+  };
 
   return (
     <Paper
@@ -742,7 +847,7 @@ export default function PlayerLoadout({
         )}
 
         {/* 4-slot grid + aux hand */}
-        <Grid container spacing={1}>
+        <Grid container spacing={1} sx={{ alignItems: "stretch" }}>
           {slotCards.map(({ slot, label, resolved, locked }) => (
             <Grid
               key={slot}
@@ -770,6 +875,9 @@ export default function PlayerLoadout({
                     ? () => handleSwapSlot(slot)
                     : undefined
                 }
+                primary={primary}
+                ternary={ternary}
+                ternaryContrast={ternaryContrast}
               />
             </Grid>
           ))}
@@ -789,6 +897,9 @@ export default function PlayerLoadout({
                 isEditMode={canClickSlot}
                 isAux
                 onRoll={() => handleRollSlot("aux")}
+                primary={primary}
+                ternary={ternary}
+                ternaryContrast={ternaryContrast}
               />
             </Grid>
           )}
@@ -892,106 +1003,6 @@ export default function PlayerLoadout({
           </>
         )}
       </Box>
-      {/* Roll result dialog */}
-      {rollDialog && (
-        <Dialog
-          open
-          onClose={() => setRollDialog(null)}
-          maxWidth="xs"
-          fullWidth
-          slotProps={{
-            paper: { sx: { width: { xs: "90%", md: "30%" } } },
-          }}
-        >
-          <DialogTitle
-            variant="h3"
-            sx={{
-              backgroundColor: rollDialog.isCritFail
-                ? "#bb2124"
-                : rollDialog.isCritSuccess
-                  ? "#22bb33"
-                  : "#aaaaaa",
-            }}
-          >
-            {rollDialog.isCritFail
-              ? t("Critical Failure!")
-              : rollDialog.isCritSuccess
-                ? t("Critical Success!")
-                : t("Result")}
-          </DialogTitle>
-          <DialogContent sx={{ mt: 1 }}>
-            <Grid container spacing={2} sx={{ textAlign: "center", pt: 1 }}>
-              <Grid size={6}>
-                <Typography
-                  variant="h3"
-                  sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                >
-                  {t("Accuracy")}
-                </Typography>
-                <Typography variant="h1">{rollDialog.accuracy}</Typography>
-              </Grid>
-              <Grid size={6}>
-                <Typography
-                  variant="h3"
-                  sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                >
-                  {t("Damage")}
-                </Typography>
-                <Typography variant="h1">{rollDialog.damageRoll}</Typography>
-                {rollDialog.type && (
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                  >
-                    {t(rollDialog.type)}
-                  </Typography>
-                )}
-              </Grid>
-              <Grid sx={{ mt: 1 }} size={12}>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                  }}
-                >
-                  {rollDialog.r1} [
-                  {attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
-                  {" + "}
-                  {rollDialog.r2} [
-                  {attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
-                  {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ""}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                  }}
-                >
-                  {t("Damage")}: {Math.max(rollDialog.r1, rollDialog.r2)} +{" "}
-                  {rollDialog.damage}
-                </Typography>
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => setRollDialog(null)}
-              color="secondary"
-              variant="contained"
-            >
-              {t("Close")}
-            </Button>
-            <Button
-              onClick={() => handleRollSlot(rollDialog.slot)}
-              color="primary"
-              variant="contained"
-              autoFocus
-            >
-              {t("Re-roll")}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
       {/* Slot picker dialog (includes module override view) */}
       {pickerSlot && (
         <SlotPickerDialog
@@ -1020,8 +1031,75 @@ export default function PlayerLoadout({
                   )
               : undefined
           }
+          onCreateNewItem={handleCreateNewItem}
+          onImportFromCompendium={handleImportFromCompendium}
         />
       )}
+      <CompendiumViewerModal
+        open={slotImportOpen}
+        onClose={() => setSlotImportOpen(false)}
+        onAddItem={handleSlotImportAdd}
+        initialType={slotImportType}
+      />
+      <PlayerWeaponModal
+        open={createItemType === "weapon"}
+        onClose={() => setCreateItemType(null)}
+        editWeaponIndex={null}
+        weapon={null}
+        onAddWeapon={(item) => {
+          appendEquipmentItem("weapons", item);
+          setCreateItemType(null);
+        }}
+        onDeleteWeapon={() => {}}
+      />
+      <PlayerCustomWeaponModal
+        open={createItemType === "custom-weapon"}
+        onClose={() => setCreateItemType(null)}
+        editCustomWeaponIndex={null}
+        customWeapon={null}
+        onAddCustomWeapon={(item) => {
+          appendEquipmentItem("customWeapons", item);
+          setCreateItemType(null);
+        }}
+        onDeleteCustomWeapon={() => {}}
+        player={player}
+        setPlayer={setPlayer}
+      />
+      <PlayerShieldModal
+        open={createItemType === "shield"}
+        onClose={() => setCreateItemType(null)}
+        editShieldIndex={null}
+        shield={null}
+        onAddShield={(item) => {
+          appendEquipmentItem("shields", item);
+          setCreateItemType(null);
+        }}
+        onDeleteShield={() => {}}
+      />
+      <PlayerArmorModal
+        open={createItemType === "armor"}
+        onClose={() => setCreateItemType(null)}
+        editArmorIndex={null}
+        armorPlayer={null}
+        onAddArmor={(item) => {
+          appendEquipmentItem("armor", item);
+          setCreateItemType(null);
+        }}
+        onDeleteArmor={() => {}}
+        player={player}
+        setPlayer={setPlayer}
+      />
+      <PlayerAccessoryModal
+        open={createItemType === "accessory"}
+        onClose={() => setCreateItemType(null)}
+        editAccIndex={null}
+        accessory={null}
+        onAddAccessory={(item) => {
+          appendEquipmentItem("accessories", item);
+          setCreateItemType(null);
+        }}
+        onDeleteAccessory={() => {}}
+      />
       {/* Support module picker dialog */}
       <Dialog
         open={supportPickerOpen}
@@ -1097,11 +1175,13 @@ export default function PlayerLoadout({
                             </ReactMarkdown>
                           </Box>
                         }
-                        primaryTypographyProps={{
-                          variant: "body2",
-                          fontWeight: m.enabled ? 700 : 400,
+                        slotProps={{
+                          primary: {
+                            variant: "body2",
+                            fontWeight: m.enabled ? 700 : 400,
+                          },
+                          secondary: { component: "div" },
                         }}
-                        secondaryTypographyProps={{ component: "div" }}
                       />
                     </ListItemButton>
                   </ListItem>
@@ -1123,6 +1203,14 @@ export default function PlayerLoadout({
           onClose={() => setVehicleModalOpen(false)}
           onSave={handleSaveVehicles}
           pilot={pilotSpellInfo.spell}
+        />
+      )}
+      {pilotSpellInfo && (
+        <VehicleEnterDialog
+          open={vehicleEnterOpen}
+          onClose={() => setVehicleEnterOpen(false)}
+          vehicles={pilotVehicles}
+          onEnter={handleEnterVehicle}
         />
       )}
     </Paper>

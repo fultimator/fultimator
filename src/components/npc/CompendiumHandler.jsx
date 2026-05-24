@@ -13,16 +13,27 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
               {
                 itemType: "spell",
                 name: selectedItem.name,
-                attr1: selectedItem.attr1 || "dexterity",
-                attr2: selectedItem.attr2 || "dexterity",
-                type: selectedItem.type || "",
-                damagetype: selectedItem.damagetype || "physical",
-                mp: selectedItem.mp,
+                accuracy: selectedItem.accuracy ?? {
+                  attr1: selectedItem.attr1 || "insight",
+                  attr2: selectedItem.attr2 || "will",
+                  value: 0,
+                  defense: "mdef",
+                },
+                isOffensive: !!selectedItem.isOffensive,
+                damage: selectedItem.damage ?? { value: 0, type: "physical" },
+                cost: selectedItem.cost ?? {
+                  resource: "mp",
+                  amount: 0,
+                  perTarget: true,
+                },
                 maxTargets: selectedItem.maxTargets || 0,
-                target: selectedItem.target,
+                targetDescription: selectedItem.targetDescription ?? "",
                 duration: selectedItem.duration,
-                effect: selectedItem.effect,
-                special: selectedItem.special || [],
+                effect:
+                  selectedItem.effect ||
+                  selectedItem.special?.[0] ||
+                  selectedItem.description ||
+                  "",
               },
             ],
           };
@@ -30,7 +41,7 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
         case "basic": {
           let range = "melee";
           if (selectedItem.ranged === true) {
-            range = "distance";
+            range = "ranged";
           } else if (selectedItem.melee === true) {
             range = "melee";
           }
@@ -43,12 +54,18 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
                 itemType: "basic",
                 name: selectedItem.name,
                 range: range,
-                attr1: selectedItem.attr1 || "dexterity",
-                attr2: selectedItem.attr2 || "dexterity",
-                type: selectedItem.type,
-                flathit: selectedItem.flathit,
-                flatdmg: selectedItem.flatdmg,
-                special: [],
+                accuracy: {
+                  attr1: selectedItem.accuracy?.attr1 ?? "dexterity",
+                  attr2: selectedItem.accuracy?.attr2 ?? "dexterity",
+                  value: selectedItem.accuracy?.value ?? 0,
+                  defense: selectedItem.accuracy?.defense ?? "def",
+                },
+                damage: {
+                  value: selectedItem.damage?.value ?? 0,
+                  type: selectedItem.damage?.type ?? "physical",
+                  hrZero: selectedItem.damage?.hrZero === true,
+                },
+                effect: selectedItem.effect || selectedItem.special?.[0] || "",
               },
             ],
           };

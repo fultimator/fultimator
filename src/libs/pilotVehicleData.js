@@ -1,3 +1,5 @@
+import { slugify } from "./slugify";
+
 // Available module types (slot is determined by type)
 export const moduleTypes = [
   "pilot_module_armor",
@@ -115,13 +117,10 @@ export const availableModules = {
       quality: "",
       category: "Arcane",
       cost: 500,
-      prec: 0,
-      damage: 8,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "will",
+      accuracy: { attr1: "dexterity", attr2: "will", value: 0, defense: "def" },
+      damage: { value: 8, type: "physical", hrZero: false },
     },
     {
       fuid: "axe",
@@ -131,13 +130,15 @@ export const availableModules = {
       category: "Heavy",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 0,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 0, type: "physical", hrZero: false },
     },
     {
       fuid: "blade",
@@ -147,29 +148,33 @@ export const availableModules = {
       category: "Dagger",
       quality: "",
       cost: 500,
-      prec: 1,
-      damage: 6,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
+      damage: { value: 6, type: "physical", hrZero: false },
     },
     {
       fuid: "bow",
       name: "pilot_module_bow",
       type: "pilot_module_weapon",
       cumbersome: true,
-      quality: "",
       category: "Bow",
+      quality: "",
       cost: 500,
-      prec: 1,
-      damage: 12,
       range: "Ranged",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
+      damage: { value: 12, type: "physical", hrZero: false },
     },
     {
       fuid: "cannon",
@@ -179,13 +184,15 @@ export const availableModules = {
       category: "Firearm",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 14,
       range: "Ranged",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 14, type: "physical", hrZero: false },
     },
     {
       fuid: "claw",
@@ -196,13 +203,15 @@ export const availableModules = {
       category: "Brawling",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 8,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 8, type: "physical", hrZero: false },
     },
     {
       fuid: "claymore",
@@ -212,13 +221,15 @@ export const availableModules = {
       category: "Sword",
       quality: "",
       cost: 500,
-      prec: 1,
-      damage: 14,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
+      damage: { value: 14, type: "physical", hrZero: false },
     },
     {
       fuid: "esoteric",
@@ -228,13 +239,10 @@ export const availableModules = {
       category: "Sword",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 12,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "will",
+      accuracy: { attr1: "dexterity", attr2: "will", value: 0, defense: "def" },
+      damage: { value: 12, type: "physical", hrZero: false },
     },
     {
       fuid: "flail",
@@ -244,13 +252,15 @@ export const availableModules = {
       category: "Flail",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 10,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 10, type: "physical", hrZero: false },
     },
     {
       fuid: "flamer",
@@ -260,13 +270,15 @@ export const availableModules = {
       category: "Firearm",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 10,
       range: "Melee",
-      damageType: "Fire",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 10, type: "fire", hrZero: false },
     },
     {
       fuid: "machine-gun",
@@ -277,13 +289,15 @@ export const availableModules = {
       category: "Firearm",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 10,
       range: "Ranged",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 10, type: "physical", hrZero: false },
     },
     {
       fuid: "rifle",
@@ -293,13 +307,15 @@ export const availableModules = {
       category: "Firearm",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 10,
       range: "Ranged",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 10, type: "physical", hrZero: false },
     },
     {
       fuid: "scythe",
@@ -309,13 +325,15 @@ export const availableModules = {
       category: "Heavy",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 16,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 16, type: "physical", hrZero: false },
     },
     // Shield Module (now a weapon with shield flag)
     {
@@ -327,13 +345,10 @@ export const availableModules = {
       isShield: true,
       quality: "",
       cost: 0,
-      prec: 0,
-      damage: 0,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "might",
-      att2: "might",
+      accuracy: { attr1: "might", attr2: "might", value: 0, defense: "def" },
+      damage: { value: 0, type: "physical", hrZero: false },
     },
     {
       fuid: "spear",
@@ -343,13 +358,15 @@ export const availableModules = {
       category: "Spear",
       quality: "",
       cost: 500,
-      prec: 0,
-      damage: 10,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 10, type: "physical", hrZero: false },
     },
     {
       fuid: "sword",
@@ -359,13 +376,15 @@ export const availableModules = {
       category: "Sword",
       quality: "",
       cost: 500,
-      prec: 1,
-      damage: 8,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
+      damage: { value: 8, type: "physical", hrZero: false },
     },
     {
       fuid: "trident",
@@ -375,13 +394,15 @@ export const availableModules = {
       category: "Spear",
       quality: "",
       cost: 500,
-      prec: 1,
-      damage: 14,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
-      att1: "dexterity",
-      att2: "insight",
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 1,
+        defense: "def",
+      },
+      damage: { value: 14, type: "physical", hrZero: false },
     },
     // Custom Weapon Module
     {
@@ -390,16 +411,18 @@ export const availableModules = {
       type: "pilot_module_weapon",
       quality: "",
       category: "Heavy",
-      cost: 0,
-      prec: 0,
-      damage: 0,
+      cost: 500,
       range: "Melee",
-      damageType: "Physical",
       qualityCost: 0,
       equipped: false,
       equippedSlot: "main",
-      att1: "might",
-      att2: "dexterity",
+      accuracy: {
+        attr1: "might",
+        attr2: "dexterity",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 0, type: "physical", hrZero: false },
     },
   ],
 
@@ -412,6 +435,7 @@ export const availableModules = {
       description: "",
       customName: "",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "aerial",
@@ -419,6 +443,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_aerial_desc",
       isComplex: true,
+      cost: 1000,
     },
     {
       fuid: "anti-element",
@@ -426,6 +451,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_anti-element_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "advanced-targeting",
@@ -433,6 +459,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_advanced_targeting_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "counterstrike",
@@ -440,6 +467,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_counterstrike_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "excavation",
@@ -447,6 +475,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_excavation_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "expanded-plating",
@@ -454,6 +483,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_expanded_plating_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "magistatic",
@@ -461,6 +491,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_magistatic_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "power",
@@ -468,6 +499,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_power_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "rapid-interface",
@@ -475,6 +507,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_rapid_interface_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "seafarer",
@@ -482,6 +515,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_seafarer_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "seat",
@@ -489,6 +523,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_seat_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "secondary-offensive",
@@ -496,6 +531,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_secondary_offensive_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "sensor",
@@ -503,6 +539,7 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_sensor_desc",
       isComplex: false,
+      cost: 1000,
     },
     {
       fuid: "turbo",
@@ -510,16 +547,10 @@ export const availableModules = {
       type: "pilot_module_support",
       description: "pilot_module_turbo_desc",
       isComplex: false,
+      cost: 1000,
     },
   ],
 };
-
-const slugify = (value = "") =>
-  String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 
 availableFrames.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
@@ -529,3 +560,8 @@ Object.values(availableModules).forEach((list) => {
     if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
   });
 });
+
+availableModules.support = availableModules.support.map((module) => ({
+  ...module,
+  cost: module.cost ?? 1000,
+}));

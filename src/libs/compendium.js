@@ -1,7 +1,8 @@
 import weapons from "./weapons";
+import armor from "./armor";
+import shield from "./shields";
 import heroics from "./heroics";
 import qualities from "./qualities";
-import { baseArmors, baseShields } from "./equip";
 import { npcSpells } from "./npcSpells";
 import { npcAttacks } from "./npcAttacks";
 import classList, {
@@ -48,13 +49,8 @@ export const QUALITY_CATEGORY_OPTIONS = [
   { label: staticT("Enhancement", true), value: "Enhancement" },
 ];
 
-const armors = baseArmors
-  .filter((a) => a.name !== "No Armor")
-  .map((a) => ({ ...a, category: "Armor" }));
-
-const shields = baseShields
-  .filter((s) => s.name !== "No Shield")
-  .map((s) => ({ ...s, category: "Shield" }));
+const armors = armor.map((a) => ({ ...a, category: "Armor" }));
+const shields = shield.map((s) => ({ ...s, category: "Shield" }));
 
 export const ITEM_TYPES = [
   { key: "weapons", label: staticT("Weapons", true), context: "player" },
@@ -183,12 +179,13 @@ export function getItemSearchText(item) {
   const skillNames = item.skills
     ? item.skills.map((s) => s.skillName).join(" ")
     : "";
+  const book = item.meta?.book ?? item.book;
   return [
     item.name,
     item.category,
     item.type,
     item.range,
-    item.book,
+    book,
     item.class,
     skillNames,
     item.quality,
@@ -293,13 +290,11 @@ const _nonStaticItemsByType = {
       .map((m) => ({
         ...m,
         spellType: "pilot-vehicle",
-        category: "Armor Module",
         pilotSubtype: "armor",
       })),
     ...availableModules.weapon.map((m) => ({
       ...m,
       spellType: "pilot-vehicle",
-      category: "Weapon Module",
       pilotSubtype: "weapon",
     })),
     ...availableModules.support
@@ -307,7 +302,6 @@ const _nonStaticItemsByType = {
       .map((m) => ({
         ...m,
         spellType: "pilot-vehicle",
-        category: "Support Module",
         pilotSubtype: "support",
       })),
   ],

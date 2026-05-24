@@ -14,6 +14,7 @@ import Clock from "./Clock";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { useClock } from "../../../hooks/useClock";
 
 export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -21,12 +22,10 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
   const isDarkMode = theme.mode === "dark";
 
   const zeroPower = player.zeroPower;
-  if (!zeroPower?.name) return null;
+  const sections = zeroPower?.clock?.sections ?? 6;
+  const clockState = zeroPower?.clockState ?? new Array(sections).fill(false);
 
-  const sections = zeroPower.clock?.sections ?? 6;
-  const clockState = zeroPower.clockState ?? new Array(sections).fill(false);
-
-  const setClockState = (newState) => {
+  const persistState = (newState) => {
     if (!setPlayer) return;
     setPlayer((prev) => ({
       ...prev,
@@ -34,27 +33,14 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode }) {
     }));
   };
 
-  const resetClock = () => setClockState(new Array(sections).fill(false));
+  const {
+    set: setClockState,
+    increment: incrementClock,
+    decrement: decrementClock,
+    reset: resetClock,
+  } = useClock(sections, clockState, persistState);
 
-  const incrementClock = () => {
-    const currentFilled = clockState.filter(Boolean).length;
-    if (currentFilled < sections) {
-      const newState = new Array(sections).fill(false);
-      for (let i = 0; i <= currentFilled; i++) {
-        newState[i] = true;
-      }
-      setClockState(newState);
-    }
-  };
-
-  const decrementClock = () => {
-    const currentFilled = clockState.filter(Boolean).length;
-    if (currentFilled > 0) {
-      const newState = [...clockState];
-      newState[currentFilled - 1] = false;
-      setClockState(newState);
-    }
-  };
+  if (!zeroPower?.name) return null;
 
   const triggerName =
     typeof zeroPower.zeroTrigger === "string"

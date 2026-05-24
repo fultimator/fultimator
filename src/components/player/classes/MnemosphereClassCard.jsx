@@ -301,7 +301,7 @@ export default function MnemosphereClassCard({
         }}
       >
         {showHeader ? mnemoHeader : null}
-        <AccordionDetails sx={{ p: "15px" }}>{cardBody}</AccordionDetails>
+        <AccordionDetails sx={{ p: 0 }}>{cardBody}</AccordionDetails>
       </Accordion>
     );
   }

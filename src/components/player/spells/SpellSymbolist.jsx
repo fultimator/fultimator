@@ -104,7 +104,7 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
           </Grid>
         </Grid>
       </div>
-      {symbol.symbols.length === 0 ? (
+      {(symbol.symbols ?? []).length === 0 ? (
         <Typography
           sx={{
             padding: "3px 17px",
@@ -117,7 +117,7 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
           {t("symbol_empty_symbols")}
         </Typography>
       ) : (
-        symbol.symbols.map((sym, i) => (
+        (symbol.symbols ?? []).map((sym, i) => (
           <React.Fragment key={i}>
             <div
               style={{

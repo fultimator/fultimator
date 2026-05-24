@@ -829,6 +829,8 @@ export function createThemeComponents({
     styleCustomization?.textEffectColor !== undefined;
   const shouldApplyTextEffectColor =
     enableTextEffects && hasCustomTextEffectColor;
+  const defaultDialogTitleTextColor =
+    isDark || profile !== "noir" ? "#f4faff" : "#0f1e3d";
 
   const buttonUppercase =
     styleCustomization?.buttonUppercase ??
@@ -941,6 +943,9 @@ export function createThemeComponents({
     },
     MuiButton: {
       styleOverrides: {
+        root: {
+          fontWeight: 700,
+        },
         outlined: {
           borderColor: isEffectProfile(profile)
             ? alpha(quaternary, isDark ? 0.95 : 0.7)
@@ -1058,9 +1063,23 @@ export function createThemeComponents({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
+          backgroundColor: isDark ? alpha(ternary, 0.65) : alpha(ternary, 0.7),
+          borderRadius: controlRadius,
           color: isDark ? "#edf2f8" : "#243446",
           "&:hover": { color: isDark ? "#edf2f8" : "#243446" },
           "&.Mui-focused": { color: isDark ? "#edf2f8" : "#243446" },
+          "&.MuiInputBase-multiline": {
+            borderRadius: multilineRadius,
+          },
+          "& fieldset": {
+            borderColor: alpha(quaternary, 0.6),
+          },
+          "&:hover fieldset": {
+            borderColor: alpha(secondary, isDark ? 0.92 : 0.85),
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: alpha(secondary, isDark ? 1 : 0.95),
+          },
         },
         input: {
           color: isDark ? "#edf2f8" : "#243446",
@@ -1071,35 +1090,7 @@ export function createThemeComponents({
     },
     MuiTextField: {
       styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            backgroundColor: isDark
-              ? alpha(ternary, 0.65)
-              : alpha(ternary, 0.7),
-            borderRadius: controlRadius,
-            "&.MuiInputBase-multiline": {
-              borderRadius: multilineRadius,
-            },
-            "& fieldset": {
-              borderColor: alpha(quaternary, 0.6),
-            },
-            "&:hover fieldset": {
-              borderColor: alpha(secondary, isDark ? 0.92 : 0.85),
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: alpha(secondary, isDark ? 1 : 0.95),
-            },
-            "& .MuiInputBase-input": {
-              color: isDark ? "#edf2f8" : "#243446",
-            },
-            "&:hover .MuiInputBase-input": {
-              color: isDark ? "#edf2f8" : "#243446",
-            },
-            "&.Mui-focused .MuiInputBase-input": {
-              color: isDark ? "#edf2f8" : "#243446",
-            },
-          },
-        },
+        root: {},
       },
     },
     MuiInput: {
@@ -1132,11 +1123,6 @@ export function createThemeComponents({
         select: {
           color: isDark ? "#edf2f8" : "#243446",
         },
-        root: () => ({
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: alpha(secondary, 0.95),
-          },
-        }),
       },
     },
     MuiMenu: {
@@ -1385,11 +1371,13 @@ export function createThemeComponents({
                 : profile === "regalia" && allowProfileSurfaceColorStyling
                   ? `linear-gradient(${getGradientDirection(styleCustomization)}deg, ${alpha(secondary, 0.9)} 0%, ${alpha(primary, 0.95)} 100%)`
                   : `linear-gradient(${getGradientDirection(styleCustomization)}deg, ${alpha(secondary, 0.9)} 0%, ${alpha(primary, 0.92)} 100%)`,
-          color: shouldApplyTextEffectColor
-            ? profile === "dystopian" && !isDark
-              ? "#0f1e3d"
-              : "#f4faff"
-            : "#f4faff",
+          "&&": {
+            color: shouldApplyTextEffectColor
+              ? !isDark
+                ? defaultDialogTitleTextColor
+                : "#f4faff"
+              : defaultDialogTitleTextColor,
+          },
           borderBottom: `1px solid ${alpha(quaternary, isDark ? 0.8 : 0.5)}`,
         },
       },

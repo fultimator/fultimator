@@ -17,20 +17,20 @@ export default function SymbolistContentSection({
 
   const createBlankSymbol = useCallback(() => {
     return {
-      name: "symbol_custom_name",
+      key: "symbol_custom_name",
       effect: "",
       customName: "",
     };
   }, []);
 
   const getAvailablePresets = useCallback(() => {
-    const addedNames = currentSymbols
-      .map((s) => s.name)
-      .filter((name) => name !== "symbol_custom_name");
+    const addedKeys = currentSymbols
+      .map((s) => s.key)
+      .filter((key) => key !== "symbol_custom_name");
     return availableSymbols.filter(
       (preset) =>
         preset.name !== "symbol_custom_name" &&
-        !addedNames.includes(preset.name),
+        !addedKeys.includes(preset.name),
     );
   }, [currentSymbols]);
 
@@ -43,7 +43,7 @@ export default function SymbolistContentSection({
         symbols: [
           ...(prev.symbols || []),
           {
-            name: preset.name,
+            key: preset.name,
             effect: preset.effect,
             customName: "",
           },
@@ -64,7 +64,7 @@ export default function SymbolistContentSection({
         symbols: [
           ...(prev.symbols || []),
           {
-            name: item.name,
+            key: item.key || item.name,
             effect: item.effect || "",
             customName: "",
           },

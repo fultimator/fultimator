@@ -166,10 +166,20 @@ function applyModuleUpdater(
                     : Array.isArray(s.currentVehicles)
                       ? s.currentVehicles
                       : [];
-                  const updatedVehicles = vehicles.map((v: Vehicle) =>
-                    !v.enabled
-                      ? v
-                      : { ...v, modules: updaterFn(v.modules ?? []) },
+                  const activeIndex = vehicles.findIndex(
+                    (v: Vehicle) => v.enabled,
+                  );
+                  const targetIndex =
+                    activeIndex >= 0
+                      ? activeIndex
+                      : vehicles.length > 0
+                        ? 0
+                        : -1;
+                  const updatedVehicles = vehicles.map(
+                    (v: Vehicle, vi: number) =>
+                      vi !== targetIndex
+                        ? v
+                        : { ...v, modules: updaterFn(v.modules ?? []) },
                   );
                   return {
                     ...s,
@@ -558,6 +568,41 @@ export function toggleActiveVehicle(
                 isActive
                   ? { ...v, enabled: false }
                   : { ...v, enabled: vi === 0 },
+            );
+            return {
+              ...s,
+              vehicles: updatedVehicles,
+              currentVehicles: updatedVehicles,
+            };
+          }),
+        },
+  );
+  return syncSlots({ ...player, classes });
+}
+
+export function enterVehicleAction(
+  player: TypePlayer,
+  pilotInfo: PilotSpellInfo,
+  vehicleIndex: number,
+): TypePlayer {
+  const { classIndex, spellIndex } = pilotInfo;
+  const classes = (player.classes ?? []).map((cls: PlayerClass, ci: number) =>
+    ci !== classIndex
+      ? cls
+      : {
+          ...cls,
+          spells: (cls.spells ?? []).map((s: Spells, si: number) => {
+            if (si !== spellIndex) return s;
+            const baseVehicles = Array.isArray(s.vehicles)
+              ? s.vehicles
+              : Array.isArray(s.currentVehicles)
+                ? s.currentVehicles
+                : [];
+            const updatedVehicles = baseVehicles.map(
+              (v: Vehicle, vi: number) => ({
+                ...v,
+                enabled: vi === vehicleIndex,
+              }),
             );
             return {
               ...s,

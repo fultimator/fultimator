@@ -8,6 +8,7 @@ import {
 import {
   Box,
   Button,
+  Chip,
   Divider,
   IconButton,
   ListItemIcon,
@@ -33,9 +34,12 @@ import {
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 import {
   Delete,
+  ChevronLeft,
+  ChevronRight,
+  Code,
   Download,
   DriveFileMove,
   Edit,
@@ -49,6 +53,7 @@ import {
   ExpandLess,
   ExpandMore,
   KeyboardArrowUp,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import JSZip from "jszip";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
@@ -69,10 +74,16 @@ import DeleteConfirmationDialog from "../../components/common/DeleteConfirmation
 import MigrationDialog from "../../components/common/MigrationDialog";
 import {
   npcNeedsMigration,
+  getPendingNpcMigrations,
+  NPC_CURRENT_SCHEMA_VERSION,
   applyNpcPreSaveTransforms,
   applyNpcPostLoadTransforms,
 } from "../../components/npc/npcTransforms";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
+import {
+  canonicalizeForTransfer,
+  normalizeOwnershipForTarget,
+} from "../../libs/exportTransforms";
 
 export default function NpcGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -245,8 +256,8 @@ function Personal() {
       affinities: {},
     };
     try {
-      const res = await db.addDoc(db.collection("npc-personal"), data);
-      console.debug(res);
+      const docRef = await db.addDoc(db.collection("npc-personal"), data);
+      navigate(`/npc-gallery/${docRef.id}`);
     } catch (e) {
       console.debug(e);
     }
@@ -254,16 +265,21 @@ function Personal() {
 
   const handleFileUpload = async (jsonData) => {
     try {
-      if (!validateNpc(jsonData)) {
+      const data = applyNpcPostLoadTransforms(jsonData);
+
+      if (!validateNpc(data)) {
         console.error("Invalid NPC data.");
         alert(t("Invalid NPC JSON data."));
         return;
       }
 
-      delete jsonData.id;
-      jsonData.published = false;
+      delete data.id;
+      data.published = false;
 
-      const res = await db.addDoc(db.collection("npc-personal"), jsonData);
+      const res = await db.addDoc(
+        db.collection("npc-personal"),
+        applyNpcPreSaveTransforms(data),
+      );
       console.debug("Document added with ID: ", res.id);
     } catch (error) {
       console.error("Error uploading NPC from JSON:", error);
@@ -276,9 +292,7 @@ function Personal() {
     try {
       const docRef = await db.addDoc(db.collection("npc-personal"), data);
       notify(t("NPC copied"));
-      setTimeout(() => {
-        window.location.href = `/npc-gallery/${docRef.id}`;
-      }, 800);
+      navigate(`/npc-gallery/${docRef.id}`);
     } catch {
       notify(t("Failed to copy NPC"));
     }
@@ -322,10 +336,14 @@ function Personal() {
   const [exportAnchor, setExportAnchor] = useState(null);
 
   // Bulk cross-DB copy / move
-  const bulkCopyToDb = async (npcs, targetDb) => {
+  const bulkCopyToDb = async (npcs, targetDb, target) => {
     for (const npc of npcs) {
-      const data = { ...npc, published: false };
-      delete data.id;
+      const canonical = canonicalizeForTransfer("npc", npc);
+      const data = normalizeOwnershipForTarget(
+        { ...canonical, published: false },
+        target,
+        cloudUser?.uid,
+      );
       await targetDb.addDoc(targetDb.collection("npc-personal"), data);
     }
   };
@@ -339,7 +357,7 @@ function Personal() {
   const copySelectedToLocal = async () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     try {
-      await bulkCopyToDb(selected, localDb);
+      await bulkCopyToDb(selected, localDb, "local");
       notify(t("Copied to Local"));
       setSelectedIds(new Set());
     } catch {
@@ -354,7 +372,7 @@ function Personal() {
     }
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     try {
-      await bulkCopyToDb(selected, cloudDb);
+      await bulkCopyToDb(selected, cloudDb, "cloud");
       notify(t("Copied to Cloud"));
       setSelectedIds(new Set());
     } catch {
@@ -365,7 +383,7 @@ function Personal() {
   const moveSelectedToLocal = async () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     try {
-      await bulkCopyToDb(selected, localDb);
+      await bulkCopyToDb(selected, localDb, "local");
       await bulkDeleteFromDb(selected, db);
       notify(t("Moved to Local"));
       setSelectedIds(new Set());
@@ -381,7 +399,7 @@ function Personal() {
     }
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     try {
-      await bulkCopyToDb(selected, cloudDb);
+      await bulkCopyToDb(selected, cloudDb, "cloud");
       await bulkDeleteFromDb(selected, db);
       notify(t("Moved to Cloud"));
       setSelectedIds(new Set());
@@ -394,7 +412,7 @@ function Personal() {
     if (!window.confirm(`Copy all ${filteredList.length} NPC(s) to Local?`))
       return;
     try {
-      await bulkCopyToDb(filteredList, localDb);
+      await bulkCopyToDb(filteredList, localDb, "local");
       notify(t("Copied to Local"));
     } catch {
       notify(t("Failed to copy to Local"));
@@ -409,7 +427,7 @@ function Personal() {
     if (!window.confirm(`Copy all ${filteredList.length} NPC(s) to Cloud?`))
       return;
     try {
-      await bulkCopyToDb(filteredList, cloudDb);
+      await bulkCopyToDb(filteredList, cloudDb, "cloud");
       notify(t("Copied to Cloud"));
     } catch {
       notify(t("Failed to copy to Cloud"));
@@ -420,7 +438,7 @@ function Personal() {
     if (!window.confirm(`Move all ${filteredList.length} NPC(s) to Local?`))
       return;
     try {
-      await bulkCopyToDb(filteredList, localDb);
+      await bulkCopyToDb(filteredList, localDb, "local");
       await bulkDeleteFromDb(filteredList, db);
       notify(t("Moved to Local"));
     } catch {
@@ -436,7 +454,7 @@ function Personal() {
     if (!window.confirm(`Move all ${filteredList.length} NPC(s) to Cloud?`))
       return;
     try {
-      await bulkCopyToDb(filteredList, cloudDb);
+      await bulkCopyToDb(filteredList, cloudDb, "cloud");
       await bulkDeleteFromDb(filteredList, db);
       notify(t("Moved to Cloud"));
     } catch {
@@ -448,9 +466,10 @@ function Personal() {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     const zip = new JSZip();
     selected.forEach((npc) => {
+      const canonical = canonicalizeForTransfer("npc", npc);
       zip.file(
         `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`,
-        JSON.stringify(npc, null, 2),
+        JSON.stringify(canonical, null, 2),
       );
     });
     const blob = await zip.generateAsync({ type: "blob" });
@@ -467,7 +486,9 @@ function Personal() {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     const separator = fmt === "obsidian" ? "\n\n" : "\n\n---\n\n";
     const text = selected
-      .map((npc) => buildItemText("npc", npc, fmt))
+      .map((npc) =>
+        buildItemText("npc", canonicalizeForTransfer("npc", npc), fmt),
+      )
       .join(separator);
     await navigator.clipboard.writeText(text);
     setExportAnchor(null);
@@ -479,7 +500,11 @@ function Personal() {
     const ext = fmt === "plain" ? "txt" : "md";
     const zip = new JSZip();
     selected.forEach((npc) => {
-      const text = buildItemText("npc", npc, fmt);
+      const text = buildItemText(
+        "npc",
+        canonicalizeForTransfer("npc", npc),
+        fmt,
+      );
       zip.file(`${npc.name.replace(/\s+/g, "_").toLowerCase()}.${ext}`, text);
     });
     const blob = await zip.generateAsync({ type: "blob" });
@@ -587,7 +612,7 @@ function Personal() {
 
   const copyNpcToLocal = (npc) => async () => {
     try {
-      await bulkCopyToDb([npc], localDb);
+      await bulkCopyToDb([npc], localDb, "local");
       notify(t("NPC copied to Local"));
     } catch {
       notify(t("Failed to copy NPC to Local"));
@@ -600,7 +625,7 @@ function Personal() {
       return;
     }
     try {
-      await bulkCopyToDb([npc], cloudDb);
+      await bulkCopyToDb([npc], cloudDb, "cloud");
       notify(t("NPC copied to Cloud"));
     } catch {
       notify(t("Failed to copy NPC to Cloud"));
@@ -609,7 +634,7 @@ function Personal() {
 
   const moveNpcToLocal = (npc) => async () => {
     try {
-      await bulkCopyToDb([npc], localDb);
+      await bulkCopyToDb([npc], localDb, "local");
       await db.deleteDoc(db.doc("npc-personal", npc.id));
       notify(t("NPC moved to Local"));
     } catch {
@@ -623,7 +648,7 @@ function Personal() {
       return;
     }
     try {
-      await bulkCopyToDb([npc], cloudDb);
+      await bulkCopyToDb([npc], cloudDb, "cloud");
       await db.deleteDoc(db.doc("npc-personal", npc.id));
       notify(t("NPC moved to Cloud"));
     } catch {
@@ -1335,6 +1360,7 @@ function Personal() {
         actors={staleNpcs}
         actorType="npc"
         onMigrateAll={handleMigrateAllNpcs}
+        getMigrations={getPendingNpcMigrations}
       />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
@@ -1410,9 +1436,14 @@ function Npc({
 }) {
   const { t } = useTranslate();
   const { cloudUser } = useDatabaseContext();
+  const navigate = useNavigate();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
   const [transferAnchor, setTransferAnchor] = useState(null);
+  const [actionsAnchor, setActionsAnchor] = useState(null);
+  const [exportAnchor, setExportAnchor] = useState(null);
+  const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
+  const exportData = canonicalizeForTransfer("npc", npc);
 
   const [collapse, setCollapse] = useState(false);
 
@@ -1429,6 +1460,57 @@ function Npc({
     onRegisterDownload(npc.id, expandAndDownloadImage);
     return () => onRegisterDownload(npc.id, null);
   }, [npc.id, onRegisterDownload, expandAndDownloadImage]);
+
+  const closeMenus = () => {
+    setTransferAnchor(null);
+    setExportAnchor(null);
+    setActionsAnchor(null);
+    setActionsSubmenu(null);
+  };
+
+  const copyJsonToClipboard = async () => {
+    await navigator.clipboard.writeText(
+      JSON.stringify({ ...exportData, dataType: "npc" }, null, 2),
+    );
+    closeMenus();
+  };
+
+  const downloadJson = () => {
+    const safeName = (npc?.name || "npc").replace(/\s+/g, "_").toLowerCase();
+    const blob = new Blob(
+      [JSON.stringify({ ...exportData, dataType: "npc" }, null, 2)],
+      {
+        type: "application/json;charset=utf-8",
+      },
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
+
+  const copyText = async (fmt) => {
+    const text = buildItemText("npc", exportData, fmt);
+    await navigator.clipboard.writeText(text);
+    closeMenus();
+  };
+
+  const downloadText = (fmt) => {
+    const text = buildItemText("npc", exportData, fmt);
+    const ext = fmt === "plain" ? "txt" : "md";
+    const safeName = (npc?.name || "npc").replace(/\s+/g, "_").toLowerCase();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
 
   return (
     <Grid
@@ -1449,116 +1531,308 @@ function Npc({
             : {}
         }
       >
-        <NpcPretty
+        <NpcActorCard
           npc={npc}
-          ref={ref}
+          cardRef={ref}
           npcImage={npc.imgurl}
           collapse={collapse}
+          variant="interactive"
           onClick={() => {
             if (selectMode) onToggleSelect(npc.id);
             else setCollapse(!collapse);
           }}
         />
       </Box>
-      <Tooltip title={t("Copy to...")}>
-        <IconButton onClick={(e) => setTransferAnchor(e.currentTarget)}>
-          <FileCopy />
-        </IconButton>
-      </Tooltip>
-      <MuiMenu
-        anchorEl={transferAnchor}
-        open={Boolean(transferAnchor)}
-        onClose={() => setTransferAnchor(null)}
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
       >
-        <MenuItem
-          onClick={() => {
-            setTransferAnchor(null);
-            copyNpcToLocal(npc)();
+        <Tooltip title={t("Actions")}>
+          <IconButton onClick={(e) => setActionsAnchor(e.currentTarget)}>
+            <MenuIcon />
+          </IconButton>
+        </Tooltip>
+        <MuiMenu
+          anchorEl={actionsAnchor}
+          open={Boolean(actionsAnchor)}
+          onClose={closeMenus}
+          slotProps={{
+            transition: { onExited: () => setActionsSubmenu(null) },
           }}
         >
-          <ListItemIcon>
-            <StorageIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={t("Copy to Local")} />
-        </MenuItem>
-        <MenuItem
-          disabled={!cloudUser}
-          onClick={() => {
-            setTransferAnchor(null);
-            copyNpcToCloud(npc)();
-          }}
+          {actionsSubmenu === null && [
+            <MenuItem
+              key="edit"
+              onClick={() => {
+                closeMenus();
+                navigate(
+                  `/npc-gallery/${npc.id}${filterParams ? (filterParams.startsWith("?") ? filterParams : `?${filterParams}`) : ""}`,
+                );
+              }}
+            >
+              <ListItemIcon>
+                <Edit fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Edit")} />
+            </MenuItem>,
+            <MenuItem key="export" onClick={() => setActionsSubmenu("export")}>
+              <ListItemIcon>
+                <Code fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="transfer"
+              onClick={() => setActionsSubmenu("transfer")}
+            >
+              <ListItemIcon>
+                <FileCopy fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="delete"
+              onClick={() => {
+                closeMenus();
+                deleteNpc(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <Delete fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Delete")} />
+            </MenuItem>,
+            <MenuItem
+              key="share"
+              disabled={dbMode !== "cloud"}
+              onClick={() => {
+                closeMenus();
+                shareNpc(npc.id);
+              }}
+            >
+              <ListItemIcon>
+                <Share fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Share URL")} />
+            </MenuItem>,
+            <MenuItem
+              key="download"
+              onClick={() => {
+                closeMenus();
+                expandAndDownloadImage();
+              }}
+            >
+              <ListItemIcon>
+                <Download fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Download as Image")} />
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "export" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem key="copy-json" onClick={copyJsonToClipboard}>
+              {t("copy_json_clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-json" onClick={downloadJson}>
+              {t("export_json_file")}
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem key="copy-md" onClick={() => copyText("markdown")}>
+              {t("Copy Markdown to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>
+              {t("Export as Markdown (.md)")}
+            </MenuItem>,
+            <Divider key="div3" />,
+            <MenuItem key="copy-plain" onClick={() => copyText("plain")}>
+              {t("Copy Plaintext to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>
+              {t("Export as Plaintext (.txt)")}
+            </MenuItem>,
+            <MenuItem key="copy-obs" onClick={() => copyText("obsidian")}>
+              {t("Copy Obsidian (BlueCorvid) to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-obs" onClick={() => downloadText("obsidian")}>
+              {t("Export as Obsidian (.md)")}
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "transfer" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem
+              key="copy-local"
+              onClick={() => {
+                closeMenus();
+                copyNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="copy-cloud"
+              disabled={!cloudUser}
+              onClick={() => {
+                closeMenus();
+                copyNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Cloud")} />
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem
+              key="move-local"
+              onClick={() => {
+                closeMenus();
+                moveNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="move-cloud"
+              disabled={!cloudUser}
+              onClick={() => {
+                closeMenus();
+                moveNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>,
+          ]}
+        </MuiMenu>
+        <Tooltip title={t("Edit")}>
+          <RouterLink
+            to={`/npc-gallery/${npc.id}${
+              filterParams
+                ? filterParams.startsWith("?")
+                  ? filterParams
+                  : `?${filterParams}`
+                : ""
+            }`}
+            style={{ display: "inline-flex", alignItems: "center" }}
+          >
+            <IconButton>
+              <Edit />
+            </IconButton>
+          </RouterLink>
+        </Tooltip>
+        <Export name={`${npc.name}`} dataType="npc" data={npc} />
+        <Tooltip title={t("Copy to...")}>
+          <IconButton onClick={(e) => setTransferAnchor(e.currentTarget)}>
+            <FileCopy />
+          </IconButton>
+        </Tooltip>
+        <MuiMenu
+          anchorEl={transferAnchor}
+          open={Boolean(transferAnchor)}
+          onClose={() => setTransferAnchor(null)}
         >
-          <ListItemIcon>
-            <CloudIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary={t("Copy to Cloud")} />
-        </MenuItem>
-        <Divider />
-        {dbMode !== "local" && (
           <MenuItem
             onClick={() => {
               setTransferAnchor(null);
-              moveNpcToLocal(npc)();
+              copyNpcToLocal(npc)();
             }}
           >
             <ListItemIcon>
               <StorageIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary={t("Move to Local")} />
+            <ListItemText primary={t("Copy to Local")} />
           </MenuItem>
-        )}
-        {dbMode !== "cloud" && (
           <MenuItem
             disabled={!cloudUser}
             onClick={() => {
               setTransferAnchor(null);
-              moveNpcToCloud(npc)();
+              copyNpcToCloud(npc)();
             }}
           >
             <ListItemIcon>
               <CloudIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary={t("Move to Cloud")} />
+            <ListItemText primary={t("Copy to Cloud")} />
           </MenuItem>
-        )}
-      </MuiMenu>
-      <Tooltip title={t("Edit")}>
-        <RouterLink
-          to={`/npc-gallery/${npc.id}${
-            filterParams
-              ? filterParams.startsWith("?")
-                ? filterParams
-                : `?${filterParams}`
-              : ""
-          }`}
-        >
-          <IconButton>
-            <Edit />
-          </IconButton>
-        </RouterLink>
-      </Tooltip>
-      <Tooltip title={t("Delete")}>
-        <IconButton onClick={deleteNpc(npc)}>
-          <Delete />
-        </IconButton>
-      </Tooltip>
-      {dbMode === "cloud" && (
-        <Tooltip title={t("Share URL")}>
-          <IconButton onClick={() => shareNpc(npc.id)}>
-            <Share />
+          <Divider />
+          {dbMode !== "local" && (
+            <MenuItem
+              onClick={() => {
+                setTransferAnchor(null);
+                moveNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>
+          )}
+          {dbMode !== "cloud" && (
+            <MenuItem
+              disabled={!cloudUser}
+              onClick={() => {
+                setTransferAnchor(null);
+                moveNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>
+          )}
+        </MuiMenu>
+        <Tooltip title={t("Delete")}>
+          <IconButton onClick={deleteNpc(npc)}>
+            <Delete />
           </IconButton>
         </Tooltip>
-      )}
-      <Tooltip title={t("Download as Image")}>
-        <IconButton
-          onClick={() => {
-            expandAndDownloadImage();
-          }}
+        {dbMode === "cloud" && (
+          <Tooltip title={t("Share URL")}>
+            <IconButton onClick={() => shareNpc(npc.id)}>
+              <Share />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Tooltip title={t("Download as Image")}>
+          <IconButton onClick={expandAndDownloadImage}>
+            <Download />
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          title={`Schema version ${npc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION} (${npcNeedsMigration(npc) ? "migration needed" : "up to date"})`}
         >
-          <Download />
-        </IconButton>
-      </Tooltip>
-      <Export name={`${npc.name}`} dataType="npc" data={npc} />
+          <Chip
+            label={`v${npc.schemaVersion ?? 0}`}
+            size="small"
+            color={npcNeedsMigration(npc) ? "warning" : "default"}
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
+      </Box>
     </Grid>
   );
 }

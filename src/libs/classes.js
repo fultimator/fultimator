@@ -1,10 +1,11 @@
 import { t } from "../translation/translate";
+import { slugify } from "./slugify";
 
 const classList = [
   {
     fuid: "arcanist",
     name: "Arcanist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -23,6 +24,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "arcane-circle",
         skillName: "Arcane Circle",
         currentLvl: 0,
         maxLvl: 4,
@@ -30,6 +32,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "arcane-regeneration",
         skillName: "Arcane Regeneration",
         currentLvl: 0,
         maxLvl: 2,
@@ -37,6 +40,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "bind-and-summon",
         skillName: "Bind and Summon",
         currentLvl: 0,
         maxLvl: 1,
@@ -44,6 +48,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "emergency-arcanum",
         skillName: "Emergency Arcanum",
         currentLvl: 0,
         maxLvl: 6,
@@ -51,6 +56,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ritual-arcanism",
         skillName: "Ritual Arcanism",
         currentLvl: 0,
         maxLvl: 1,
@@ -62,7 +68,7 @@ const classList = [
   {
     fuid: "chimerist",
     name: "Chimerist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -81,6 +87,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "consume",
         skillName: "Consume",
         currentLvl: 0,
         maxLvl: 5,
@@ -88,6 +95,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "feral-speech",
         skillName: "Feral Speech",
         currentLvl: 0,
         maxLvl: 1,
@@ -95,6 +103,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "pathogenesis",
         skillName: "Pathogenesis",
         currentLvl: 0,
         maxLvl: 1,
@@ -102,6 +111,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ritual-chimerism",
         skillName: "Ritual Chimerism",
         currentLvl: 0,
         maxLvl: 1,
@@ -109,6 +119,7 @@ const classList = [
         specialSkill: "Ritual Chimerism",
       },
       {
+        fuid: "spell-mimic",
         skillName: "Spell Mimic",
         currentLvl: 0,
         maxLvl: 10,
@@ -120,7 +131,7 @@ const classList = [
   {
     fuid: "darkblade",
     name: "Darkblade",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -139,6 +150,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "agony",
         skillName: "Agony",
         currentLvl: 0,
         maxLvl: 5,
@@ -146,6 +158,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "dark-blood",
         skillName: "Dark Blood",
         currentLvl: 0,
         maxLvl: 1,
@@ -153,6 +166,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "heart-of-darkness",
         skillName: "Heart of Darkness",
         currentLvl: 0,
         maxLvl: 1,
@@ -160,6 +174,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "painful-lessons",
         skillName: "Painful Lessons",
         currentLvl: 0,
         maxLvl: 3,
@@ -167,6 +182,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "shadow-strike",
         skillName: "Shadow Strike",
         currentLvl: 0,
         maxLvl: 5,
@@ -178,7 +194,7 @@ const classList = [
   {
     fuid: "elementalist",
     name: "Elementalist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -197,6 +213,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "cataclysm",
         skillName: "Cataclysm",
         currentLvl: 0,
         maxLvl: 3,
@@ -204,6 +221,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "elemental-magic",
         skillName: "Elemental Magic",
         currentLvl: 0,
         maxLvl: 10,
@@ -211,6 +229,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "magic-artillery",
         skillName: "Magic Artillery",
         currentLvl: 0,
         maxLvl: 3,
@@ -218,6 +237,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ritual-elementalism",
         skillName: "Ritual Elementalism",
         currentLvl: 0,
         maxLvl: 1,
@@ -225,6 +245,7 @@ const classList = [
         specialSkill: "Ritual Elementalism",
       },
       {
+        fuid: "spellblade",
         skillName: "Spellblade",
         currentLvl: 0,
         maxLvl: 4,
@@ -236,7 +257,7 @@ const classList = [
   {
     fuid: "entropist",
     name: "Entropist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -255,6 +276,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "absorb-mp",
         skillName: "Absorb MP",
         currentLvl: 0,
         maxLvl: 5,
@@ -262,6 +284,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "entropic-magic",
         skillName: "Entropic Magic",
         currentLvl: 0,
         maxLvl: 10,
@@ -269,6 +292,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "lucky-seven",
         skillName: "Lucky Seven",
         currentLvl: 0,
         maxLvl: 1,
@@ -276,6 +300,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ritual-entropism",
         skillName: "Ritual Entropism",
         currentLvl: 0,
         maxLvl: 1,
@@ -283,6 +308,7 @@ const classList = [
         specialSkill: "Ritual Entropism",
       },
       {
+        fuid: "stolen-time",
         skillName: "Stolen Time",
         currentLvl: 0,
         maxLvl: 4,
@@ -294,7 +320,7 @@ const classList = [
   {
     fuid: "fury",
     name: "Fury",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -313,6 +339,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "adrenaline",
         skillName: "Adrenaline",
         currentLvl: 0,
         maxLvl: 5,
@@ -320,6 +347,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "frenzy",
         skillName: "Frenzy",
         currentLvl: 0,
         maxLvl: 1,
@@ -327,6 +355,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "indomitable-spirit",
         skillName: "Indomitable Spirit",
         currentLvl: 0,
         maxLvl: 4,
@@ -334,6 +363,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "provoke",
         skillName: "Provoke",
         currentLvl: 0,
         maxLvl: 5,
@@ -341,6 +371,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "withstand",
         skillName: "Withstand",
         currentLvl: 0,
         maxLvl: 5,
@@ -352,7 +383,7 @@ const classList = [
   {
     fuid: "guardian",
     name: "Guardian",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -371,6 +402,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "bodyguard",
         skillName: "Bodyguard",
         currentLvl: 0,
         maxLvl: 1,
@@ -378,6 +410,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "defensive-mastery",
         skillName: "Defensive Mastery",
         currentLvl: 0,
         maxLvl: 5,
@@ -385,6 +418,7 @@ const classList = [
         specialSkill: "Defensive Mastery",
       },
       {
+        fuid: "dual-shieldbearer",
         skillName: "Dual Shieldbearer",
         currentLvl: 0,
         maxLvl: 1,
@@ -392,6 +426,7 @@ const classList = [
         specialSkill: "Dual Shieldbearer",
       },
       {
+        fuid: "fortress",
         skillName: "Fortress",
         currentLvl: 0,
         maxLvl: 5,
@@ -399,6 +434,7 @@ const classList = [
         specialSkill: "Fortress",
       },
       {
+        fuid: "protect",
         skillName: "Protect",
         currentLvl: 0,
         maxLvl: 1,
@@ -410,7 +446,7 @@ const classList = [
   {
     fuid: "loremaster",
     name: "Loremaster",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -429,6 +465,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "flash-of-insight",
         skillName: "Flash of Insight",
         currentLvl: 0,
         maxLvl: 3,
@@ -436,6 +473,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "focused",
         skillName: "Focused",
         currentLvl: 0,
         maxLvl: 5,
@@ -443,6 +481,7 @@ const classList = [
         specialSkill: "Focused",
       },
       {
+        fuid: "knowledge-is-power",
         skillName: "Knowledge Is Power",
         currentLvl: 0,
         maxLvl: 1,
@@ -450,6 +489,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "quick-assessment",
         skillName: "Quick Assessment",
         currentLvl: 0,
         maxLvl: 6,
@@ -457,6 +497,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "trained-memory",
         skillName: "Trained Memory",
         currentLvl: 0,
         maxLvl: 1,
@@ -468,7 +509,7 @@ const classList = [
   {
     fuid: "orator",
     name: "Orator",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -487,6 +528,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "condemn",
         skillName: "Condemn",
         currentLvl: 0,
         maxLvl: 6,
@@ -494,6 +536,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "encourage",
         skillName: "Encourage",
         currentLvl: 0,
         maxLvl: 6,
@@ -501,6 +544,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "my-trust-in-you",
         skillName: "My Trust In You",
         currentLvl: 0,
         maxLvl: 2,
@@ -508,6 +552,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "persuasive",
         skillName: "Persuasive",
         currentLvl: 0,
         maxLvl: 2,
@@ -515,6 +560,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "unexpected-ally",
         skillName: "Unexpected Ally",
         currentLvl: 0,
         maxLvl: 1,
@@ -526,7 +572,7 @@ const classList = [
   {
     fuid: "rogue",
     name: "Rogue",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -545,6 +591,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "cheap-shot",
         skillName: "Cheap Shot",
         currentLvl: 0,
         maxLvl: 5,
@@ -552,6 +599,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "dodge",
         skillName: "Dodge",
         currentLvl: 0,
         maxLvl: 3,
@@ -559,6 +607,7 @@ const classList = [
         specialSkill: "Dodge",
       },
       {
+        fuid: "high-speed",
         skillName: "High Speed",
         currentLvl: 0,
         maxLvl: 3,
@@ -566,6 +615,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "see-you-later",
         skillName: "See You Later",
         currentLvl: 0,
         maxLvl: 1,
@@ -573,6 +623,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "soul-steal",
         skillName: "Soul Steal",
         currentLvl: 0,
         maxLvl: 5,
@@ -584,7 +635,7 @@ const classList = [
   {
     fuid: "sharpshooter",
     name: "Sharpshooter",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -603,6 +654,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "barrage",
         skillName: "Barrage",
         currentLvl: 0,
         maxLvl: 1,
@@ -610,6 +662,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "crossfire",
         skillName: "Crossfire",
         currentLvl: 0,
         maxLvl: 1,
@@ -617,6 +670,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "hawkeye",
         skillName: "Hawkeye",
         currentLvl: 0,
         maxLvl: 5,
@@ -624,6 +678,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ranged-weapon-mastery",
         skillName: "Ranged Weapon Mastery",
         currentLvl: 0,
         maxLvl: 4,
@@ -631,6 +686,7 @@ const classList = [
         specialSkill: "Ranged Weapon Mastery",
       },
       {
+        fuid: "warning-shot",
         skillName: "Warning Shot",
         currentLvl: 0,
         maxLvl: 4,
@@ -642,7 +698,7 @@ const classList = [
   {
     fuid: "spiritist",
     name: "Spiritist",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -661,6 +717,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "healing-power",
         skillName: "Healing Power",
         currentLvl: 0,
         maxLvl: 2,
@@ -668,6 +725,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ritual-spiritism",
         skillName: "Ritual Spiritism",
         currentLvl: 0,
         maxLvl: 1,
@@ -675,6 +733,7 @@ const classList = [
         specialSkill: "Ritual Spiritism",
       },
       {
+        fuid: "spiritual-magic",
         skillName: "Spiritual Magic",
         currentLvl: 0,
         maxLvl: 10,
@@ -682,6 +741,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "support-magic",
         skillName: "Support Magic",
         currentLvl: 0,
         maxLvl: 1,
@@ -689,6 +749,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "vismagus",
         skillName: "Vismagus",
         currentLvl: 0,
         maxLvl: 1,
@@ -700,7 +761,7 @@ const classList = [
   {
     fuid: "tinkerer",
     name: "Tinkerer",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -724,6 +785,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "emergency-item",
         skillName: "Emergency Item",
         currentLvl: 0,
         maxLvl: 1,
@@ -731,6 +793,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "gadgets",
         skillName: "Gadgets",
         currentLvl: 0,
         maxLvl: 5,
@@ -738,6 +801,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "potion-rain",
         skillName: "Potion Rain",
         currentLvl: 0,
         maxLvl: 2,
@@ -745,6 +809,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "secret-formula",
         skillName: "Secret Formula",
         currentLvl: 0,
         maxLvl: 5,
@@ -752,6 +817,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "visionary",
         skillName: "Visionary",
         currentLvl: 0,
         maxLvl: 5,
@@ -763,7 +829,7 @@ const classList = [
   {
     fuid: "wayfarer",
     name: "Wayfarer",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -782,6 +848,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "faithful-companion",
         skillName: "Faithful Companion",
         currentLvl: 0,
         maxLvl: 5,
@@ -789,6 +856,7 @@ const classList = [
         specialSkill: "Faithful Companion",
       },
       {
+        fuid: "resourceful",
         skillName: "Resourceful",
         currentLvl: 0,
         maxLvl: 4,
@@ -796,6 +864,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "tavern-talk",
         skillName: "Tavern Talk",
         currentLvl: 0,
         maxLvl: 3,
@@ -803,6 +872,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "treasure-hunter",
         skillName: "Treasure Hunter",
         currentLvl: 0,
         maxLvl: 2,
@@ -810,6 +880,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "well-traveled",
         skillName: "Well-Traveled",
         currentLvl: 0,
         maxLvl: 1,
@@ -821,7 +892,7 @@ const classList = [
   {
     fuid: "weaponmaster",
     name: "Weaponmaster",
-    book: "core",
+    meta: { book: "core", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -840,6 +911,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "bladestorm",
         skillName: "Bladestorm",
         currentLvl: 0,
         maxLvl: 1,
@@ -847,6 +919,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "bone-crusher",
         skillName: "Bone Crusher",
         currentLvl: 0,
         maxLvl: 4,
@@ -854,6 +927,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "breach",
         skillName: "Breach",
         currentLvl: 0,
         maxLvl: 3,
@@ -861,6 +935,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "counterattack",
         skillName: "Counterattack",
         currentLvl: 0,
         maxLvl: 1,
@@ -868,6 +943,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "melee-weapon-mastery",
         skillName: "Melee Weapon Mastery",
         currentLvl: 0,
         maxLvl: 4,
@@ -879,7 +955,7 @@ const classList = [
   {
     fuid: "arcanist-rework",
     name: "Arcanist-Rework",
-    book: "rework",
+    meta: { book: "rework", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -901,7 +977,7 @@ const classList = [
   {
     fuid: "ace-of-cards",
     name: "Ace of Cards",
-    book: "bonus",
+    meta: { book: "bonus", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -923,6 +999,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "double-or-nothing",
         skillName: "Double or Nothing",
         currentLvl: 0,
         maxLvl: 1,
@@ -930,6 +1007,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "high-or-low",
         skillName: "High or Low",
         currentLvl: 0,
         maxLvl: 1,
@@ -937,6 +1015,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "magic-cards",
         skillName: "Magic Cards",
         currentLvl: 0,
         maxLvl: 3,
@@ -944,6 +1023,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "mulligan",
         skillName: "Mulligan",
         currentLvl: 0,
         maxLvl: 5,
@@ -951,6 +1031,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "trap-card",
         skillName: "Trap Card",
         currentLvl: 0,
         maxLvl: 4,
@@ -962,7 +1043,7 @@ const classList = [
   {
     fuid: "necromancer",
     name: "Necromancer",
-    book: "bonus",
+    meta: { book: "bonus", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -984,6 +1065,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "beyond-the-realms-of-death",
         skillName: "Beyond The Realms Of Death",
         currentLvl: 0,
         maxLvl: 5,
@@ -991,6 +1073,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "children-of-the-grave",
         skillName: "Children Of The Grave",
         currentLvl: 0,
         maxLvl: 1,
@@ -998,6 +1081,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "fear-is-the-key",
         skillName: "Fear Is The Key",
         currentLvl: 0,
         maxLvl: 3,
@@ -1005,6 +1089,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "for-whom-the-bell-tolls",
         skillName: "For Whom The Bell Tolls",
         currentLvl: 0,
         maxLvl: 3,
@@ -1012,6 +1097,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "rondo-of-nightmare",
         skillName: "Rondo Of Nightmare",
         currentLvl: 0,
         maxLvl: 1,
@@ -1023,7 +1109,7 @@ const classList = [
   {
     fuid: "chanter",
     name: "Chanter",
-    book: "high",
+    meta: { book: "high", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -1042,6 +1128,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "magichant",
         skillName: "Magichant",
         currentLvl: 0,
         maxLvl: 10,
@@ -1049,6 +1136,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "resonance",
         skillName: "Resonance",
         currentLvl: 0,
         maxLvl: 3,
@@ -1056,6 +1144,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "siren-s-song",
         skillName: "Siren's Song",
         currentLvl: 0,
         maxLvl: 1,
@@ -1063,6 +1152,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "sound-barrier",
         skillName: "Sound Barrier",
         currentLvl: 0,
         maxLvl: 5,
@@ -1070,6 +1160,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "vibrato",
         skillName: "Vibrato",
         currentLvl: 0,
         maxLvl: 1,
@@ -1081,7 +1172,7 @@ const classList = [
   {
     fuid: "commander",
     name: "Commander",
-    book: "high",
+    meta: { book: "high", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -1100,6 +1191,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "bishop-s-edict",
         skillName: "Bishop's Edict",
         currentLvl: 0,
         maxLvl: 5,
@@ -1107,6 +1199,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "charging-cavalry",
         skillName: "Charging Cavalry",
         currentLvl: 0,
         maxLvl: 5,
@@ -1114,6 +1207,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "crushing-chariot",
         skillName: "Crushing Chariot",
         currentLvl: 0,
         maxLvl: 1,
@@ -1121,6 +1215,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "king-s-castle",
         skillName: "King's Castle",
         currentLvl: 0,
         maxLvl: 4,
@@ -1128,6 +1223,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "queen-s-gambit",
         skillName: "Queen's Gambit",
         currentLvl: 0,
         maxLvl: 6,
@@ -1139,7 +1235,7 @@ const classList = [
   {
     fuid: "dancer",
     name: "Dancer",
-    book: "high",
+    meta: { book: "high", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1161,6 +1257,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "dance",
         skillName: "Dance",
         currentLvl: 0,
         maxLvl: 10,
@@ -1168,6 +1265,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "follow-my-lead",
         skillName: "Follow My Lead",
         currentLvl: 0,
         maxLvl: 1,
@@ -1175,6 +1273,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "frenetic-footwork",
         skillName: "Frenetic Footwork",
         currentLvl: 0,
         maxLvl: 2,
@@ -1182,6 +1281,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "quick-change",
         skillName: "Quick-Change",
         currentLvl: 0,
         maxLvl: 1,
@@ -1189,6 +1289,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "wardancer",
         skillName: "Wardancer",
         currentLvl: 0,
         maxLvl: 5,
@@ -1200,7 +1301,7 @@ const classList = [
   {
     fuid: "symbolist",
     name: "Symbolist",
-    book: "high",
+    meta: { book: "high", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1219,6 +1320,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "magic-symbols",
         skillName: "Magic Symbols",
         currentLvl: 0,
         maxLvl: 3,
@@ -1226,6 +1328,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "mirage",
         skillName: "Mirage",
         currentLvl: 0,
         maxLvl: 1,
@@ -1233,6 +1336,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "personal-touch",
         skillName: "Personal Touch",
         currentLvl: 0,
         maxLvl: 5,
@@ -1240,6 +1344,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "symbolic-connection",
         skillName: "Symbolic Connection",
         currentLvl: 0,
         maxLvl: 1,
@@ -1247,6 +1352,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "symbolism",
         skillName: "Symbolism",
         currentLvl: 0,
         maxLvl: 5,
@@ -1258,7 +1364,7 @@ const classList = [
   {
     fuid: "esper",
     name: "Esper",
-    book: "techno",
+    meta: { book: "techno", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 5,
@@ -1278,6 +1384,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "cognitive-focus",
         skillName: "Cognitive Focus",
         currentLvl: 0,
         maxLvl: 5,
@@ -1285,6 +1392,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "hypercognition",
         skillName: "Hypercognition",
         currentLvl: 0,
         maxLvl: 5,
@@ -1292,6 +1400,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "navigator",
         skillName: "Navigator",
         currentLvl: 0,
         maxLvl: 1,
@@ -1299,6 +1408,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "psychic-gifts",
         skillName: "Psychic Gifts",
         currentLvl: 0,
         maxLvl: 5,
@@ -1306,6 +1416,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "psychokinesis",
         skillName: "Psychokinesis",
         currentLvl: 0,
         maxLvl: 1,
@@ -1317,7 +1428,7 @@ const classList = [
   {
     fuid: "mutant",
     name: "Mutant",
-    book: "techno",
+    meta: { book: "techno", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -1336,6 +1447,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "akromorphosis",
         skillName: "Akromorphosis",
         currentLvl: 0,
         maxLvl: 3,
@@ -1343,6 +1455,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "biophagy",
         skillName: "Biophagy",
         currentLvl: 0,
         maxLvl: 4,
@@ -1350,6 +1463,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ecdysis",
         skillName: "Ecdysis",
         currentLvl: 0,
         maxLvl: 1,
@@ -1357,6 +1471,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "genoclepsis",
         skillName: "Genoclepsis",
         currentLvl: 0,
         maxLvl: 2,
@@ -1364,6 +1479,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "theriomorphosis",
         skillName: "Theriomorphosis",
         currentLvl: 0,
         maxLvl: 6,
@@ -1375,7 +1491,7 @@ const classList = [
   {
     fuid: "pilot",
     name: "Pilot",
-    book: "techno",
+    meta: { book: "techno", page: "" },
     benefits: {
       hpplus: 5,
       mpplus: 0,
@@ -1394,6 +1510,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "compression-tech",
         skillName: "Compression Tech",
         currentLvl: 0,
         maxLvl: 1,
@@ -1401,6 +1518,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "flexible-configuration",
         skillName: "Flexible Configuration",
         currentLvl: 0,
         maxLvl: 4,
@@ -1408,6 +1526,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "heart-in-the-engine",
         skillName: "Heart in the Engine",
         currentLvl: 0,
         maxLvl: 3,
@@ -1415,6 +1534,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "personal-vehicle",
         skillName: "Personal Vehicle",
         currentLvl: 0,
         maxLvl: 5,
@@ -1422,6 +1542,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "strong-grip",
         skillName: "Strong Grip",
         currentLvl: 0,
         maxLvl: 1,
@@ -1433,7 +1554,7 @@ const classList = [
   {
     fuid: "floralist",
     name: "Floralist",
-    book: "natural",
+    meta: { book: "natural", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1455,6 +1576,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "battle-gardening",
         skillName: "BattleGardening",
         currentLvl: 0,
         maxLvl: 3,
@@ -1462,6 +1584,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "chloromancy",
         skillName: "Chloromancy",
         currentLvl: 0,
         maxLvl: 10,
@@ -1469,6 +1592,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "graft",
         skillName: "Graft",
         currentLvl: 0,
         maxLvl: 1,
@@ -1476,6 +1600,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "tree-of-life",
         skillName: "TreeOfLife",
         currentLvl: 0,
         maxLvl: 5,
@@ -1483,6 +1608,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "verdant-sway",
         skillName: "VerdantSway",
         currentLvl: 0,
         maxLvl: 1,
@@ -1494,7 +1620,7 @@ const classList = [
   {
     fuid: "gourmet",
     name: "Gourmet",
-    book: "natural",
+    meta: { book: "natural", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1516,6 +1642,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "cooking",
         skillName: "Cooking",
         currentLvl: 0,
         maxLvl: 5,
@@ -1523,6 +1650,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "knife-and-fork",
         skillName: "KnifeAndFork",
         currentLvl: 0,
         maxLvl: 1,
@@ -1530,6 +1658,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "made-with-love",
         skillName: "MadeWithLove",
         currentLvl: 0,
         maxLvl: 3,
@@ -1537,6 +1666,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "salt-and-pepper",
         skillName: "SaltAndPepper",
         currentLvl: 0,
         maxLvl: 1,
@@ -1544,6 +1674,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "traveling-cook",
         skillName: "TravelingCook",
         currentLvl: 0,
         maxLvl: 3,
@@ -1555,7 +1686,7 @@ const classList = [
   {
     fuid: "invoker",
     name: "Invoker",
-    book: "natural",
+    meta: { book: "natural", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1577,6 +1708,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "elemental-harmony",
         skillName: "ElementalHarmony",
         currentLvl: 0,
         maxLvl: 2,
@@ -1584,6 +1716,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "invocation",
         skillName: "Invocation",
         currentLvl: 0,
         maxLvl: 3,
@@ -1591,6 +1724,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "linked-invocation",
         skillName: "LinkedInvocation",
         currentLvl: 0,
         maxLvl: 3,
@@ -1598,6 +1732,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ripples",
         skillName: "Ripples",
         currentLvl: 0,
         maxLvl: 5,
@@ -1605,6 +1740,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "wellspring-expansion",
         skillName: "WellspringExpansion",
         currentLvl: 0,
         maxLvl: 5,
@@ -1616,7 +1752,7 @@ const classList = [
   {
     fuid: "merchant",
     name: "Merchant",
-    book: "natural",
+    meta: { book: "natural", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1635,6 +1771,7 @@ const classList = [
     },
     skills: [
       {
+        fuid: "expiration-date",
         skillName: "ExpirationDate",
         currentLvl: 0,
         maxLvl: 3,
@@ -1642,6 +1779,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "ive-heard-of-it",
         skillName: "IveHeardOfIt",
         currentLvl: 0,
         maxLvl: 3,
@@ -1649,6 +1787,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "private-stock",
         skillName: "PrivateStock",
         currentLvl: 0,
         maxLvl: 3,
@@ -1656,6 +1795,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "real-treasure",
         skillName: "RealTreasure",
         currentLvl: 0,
         maxLvl: 3,
@@ -1663,6 +1803,7 @@ const classList = [
         specialSkill: "",
       },
       {
+        fuid: "winds-of-trade",
         skillName: "WindsOfTrade",
         currentLvl: 0,
         maxLvl: 3,
@@ -1674,7 +1815,7 @@ const classList = [
   {
     fuid: "blank-class",
     name: "Blank Class",
-    book: "homebrew",
+    meta: { book: "homebrew", page: "" },
     benefits: {
       hpplus: 0,
       mpplus: 0,
@@ -1911,13 +2052,16 @@ export const spellList = [
     name: "Boulder",
     description: "Boulder_desc",
     isOffensive: true,
-    mp: 20,
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 20, type: "earth", hrZero: false },
   },
   {
     fuid: "elemental-shroud",
@@ -1925,13 +2069,16 @@ export const spellList = [
     name: "Elemental Shroud",
     description: "ElementalShroud_desc",
     isOffensive: false,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "elemental-weapon",
@@ -1939,13 +2086,16 @@ export const spellList = [
     name: "Elemental Weapon",
     description: "ElementalWeapon_desc",
     isOffensive: false,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One weapon",
+    targetDescription: "One equipped weapon",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "flares",
@@ -1953,13 +2103,16 @@ export const spellList = [
     name: "Flare",
     description: "Flare_desc",
     isOffensive: true,
-    mp: 20,
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 25, type: "fire", hrZero: false },
   },
   {
     fuid: "fulgur",
@@ -1967,13 +2120,16 @@ export const spellList = [
     name: "Fulgur",
     description: "Fulgur_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 15, type: "bolt", hrZero: false },
   },
   {
     fuid: "glacies",
@@ -1981,13 +2137,16 @@ export const spellList = [
     name: "Glacies",
     description: "Glacies_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 15, type: "ice", hrZero: false },
   },
   {
     fuid: "iceberg",
@@ -1995,13 +2154,16 @@ export const spellList = [
     name: "Iceberg",
     description: "Iceberg_desc",
     isOffensive: true,
-    mp: 20,
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 25, type: "ice", hrZero: false },
   },
   {
     fuid: "ignis",
@@ -2009,13 +2171,16 @@ export const spellList = [
     name: "Ignis",
     description: "Ignis_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 15, type: "fire", hrZero: false },
   },
   {
     fuid: "soaring-strike",
@@ -2023,13 +2188,16 @@ export const spellList = [
     name: "Soaring Strike",
     description: "SoaringStrike_desc",
     isOffensive: false,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 1,
-    targetDesc: "Self",
+    targetDescription: "Self",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "terra",
@@ -2037,13 +2205,16 @@ export const spellList = [
     name: "Terra",
     description: "Terra_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 15, type: "earth", hrZero: false },
   },
   {
     fuid: "thunderbolt",
@@ -2051,13 +2222,16 @@ export const spellList = [
     name: "Thunderbolt",
     description: "Thunderbolt_desc",
     isOffensive: true,
-    mp: 20,
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 25, type: "bolt", hrZero: false },
   },
   {
     fuid: "ventus",
@@ -2065,13 +2239,16 @@ export const spellList = [
     name: "Ventus",
     description: "Ventus_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 15, type: "air", hrZero: false },
   },
   {
     fuid: "vortex",
@@ -2079,13 +2256,16 @@ export const spellList = [
     name: "Vortex",
     description: "Vortex_desc",
     isOffensive: false,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: false },
     maxTargets: 1,
-    targetDesc: "Self",
+    targetDescription: "Self",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 25, type: "air", hrZero: false },
   },
   {
     fuid: "acceleration",
@@ -2093,13 +2273,16 @@ export const spellList = [
     name: "Acceleration",
     description: "Acceleration_desc",
     isOffensive: false,
-    mp: 20,
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "anomaly",
@@ -2107,13 +2290,16 @@ export const spellList = [
     name: "Anomaly",
     description: "Anomaly_desc",
     isOffensive: true,
-    mp: 20,
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "dark-weapon",
@@ -2121,13 +2307,16 @@ export const spellList = [
     name: "Dark Weapon",
     description: "DarkWeapon_desc",
     isOffensive: false,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 1,
-    targetDesc: "One equipped weapon",
+    targetDescription: "One equipped weapon",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "dispel",
@@ -2135,13 +2324,16 @@ export const spellList = [
     name: "Dispel",
     description: "Dispel_desc",
     isOffensive: false,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "divination",
@@ -2149,13 +2341,16 @@ export const spellList = [
     name: "Divination",
     description: "Divination_desc",
     isOffensive: false,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 1,
-    targetDesc: "Self",
+    targetDescription: "Self",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "drain-spirit",
@@ -2163,13 +2358,16 @@ export const spellList = [
     name: "Drain Spirit",
     description: "DrainSpirit_desc",
     isOffensive: true,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 20, type: "untyped", hrZero: false },
   },
   {
     fuid: "drain-vigor",
@@ -2177,13 +2375,16 @@ export const spellList = [
     name: "Drain Vigor",
     description: "DrainVigor_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 15, type: "dark", hrZero: false },
   },
   {
     fuid: "mirror",
@@ -2191,13 +2392,16 @@ export const spellList = [
     name: "Mirror",
     description: "Mirror_desc",
     isOffensive: false,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "omega",
@@ -2205,13 +2409,16 @@ export const spellList = [
     name: "Omega",
     description: "Omega_desc",
     isOffensive: true,
-    mp: 15,
+    cost: { resource: "mp", amount: 15, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 20, type: "untyped", hrZero: false },
   },
   {
     fuid: "stop",
@@ -2219,13 +2426,16 @@ export const spellList = [
     name: "Stop",
     description: "Stop_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "umbra",
@@ -2233,22 +2443,25 @@ export const spellList = [
     name: "Umbra",
     description: "Umbra_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 15, type: "dark", hrZero: false },
   },
   {
     fuid: "gamble",
     class: "Entropist",
     spellType: "gamble",
     name: "Gamble",
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 2,
-    targetDesc: "Special",
+    targetDescription: "Special",
     duration: "Instantaneous",
     attr: "will",
     targets: [
@@ -2288,7 +2501,7 @@ export const spellList = [
         secondEffects: [
           {
             dieValue: 1,
-            effect: t("wind"),
+            effect: t("air"),
           },
           {
             dieValue: 2,
@@ -2320,13 +2533,16 @@ export const spellList = [
     name: "Aura",
     description: "Aura_desc",
     isOffensive: false,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "awaken",
@@ -2334,13 +2550,16 @@ export const spellList = [
     name: "Awaken",
     description: "Awaken_desc",
     isOffensive: false,
-    mp: 20,
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "barrier",
@@ -2348,13 +2567,16 @@ export const spellList = [
     name: "Barrier",
     description: "Barrier_desc",
     isOffensive: false,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "cleanse",
@@ -2362,13 +2584,16 @@ export const spellList = [
     name: "Cleanse",
     description: "Cleanse_desc",
     isOffensive: false,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "enrage",
@@ -2376,13 +2601,16 @@ export const spellList = [
     name: "Enrage",
     description: "Enrage_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "hallucination",
@@ -2390,13 +2618,16 @@ export const spellList = [
     name: "Hallucination",
     description: "Hallucination_desc",
     isOffensive: true,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "heal",
@@ -2404,13 +2635,16 @@ export const spellList = [
     name: "Heal",
     description: "Heal_desc",
     isOffensive: false,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "lux",
@@ -2418,13 +2652,16 @@ export const spellList = [
     name: "Lux",
     description: "Lux_desc",
     isOffensive: true,
-    mp: 10,
+    cost: { resource: "mp", amount: 10, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 15, type: "light", hrZero: false },
   },
   {
     fuid: "mercy",
@@ -2432,13 +2669,16 @@ export const spellList = [
     name: "Mercy",
     description: "Mercy_desc",
     isOffensive: false,
-    mp: 20,
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDesc: "One creature",
+    targetDescription: "One creature",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "reinforce",
@@ -2446,13 +2686,16 @@ export const spellList = [
     name: "Reinforce",
     description: "Reinforce_desc",
     isOffensive: false,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "soul-shroud",
@@ -2460,13 +2703,16 @@ export const spellList = [
     name: "Soul Shroud",
     description: "SoulShroud_desc",
     isOffensive: false,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "soul-weapon",
@@ -2474,13 +2720,16 @@ export const spellList = [
     name: "Soul Weapon",
     description: "SoulWeapon_desc",
     isOffensive: false,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 1,
-    targetDesc: "One equipped weapon",
+    targetDescription: "One equipped weapon",
     duration: "Scene",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
   {
     fuid: "torpor",
@@ -2488,13 +2737,16 @@ export const spellList = [
     name: "Torpor",
     description: "Torpor_desc",
     isOffensive: true,
-    mp: 5,
+    cost: { resource: "mp", amount: 5, perTarget: true },
     maxTargets: 3,
-    targetDesc: "Up to three creatures",
+    targetDescription: "Up to three creatures",
     duration: "Instantaneous",
-    attr1: "insight",
-    attr2: "will",
+    accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
     spellType: "default",
+    range: "ranged",
+    itemType: "spell",
+    special: [],
+    damage: { value: 0, type: "physical", hrZero: false },
   },
 ];
 
@@ -2638,9 +2890,9 @@ export const entropistGamble = {
   fuid: "gamble",
   spellType: "gamble",
   spellName: t("Gamble"),
-  mp: 10,
+  cost: { resource: "mp", amount: 10, perTarget: true },
   maxTargets: 2,
-  targetDesc: "Special",
+  targetDescription: "Special",
   duration: "Instantaneous",
   attr: "will",
   targets: [
@@ -2680,7 +2932,7 @@ export const entropistGamble = {
       secondEffects: [
         {
           dieValue: 1,
-          effect: t("wind"),
+          effect: t("air"),
         },
         {
           dieValue: 2,
@@ -2707,15 +2959,16 @@ export const entropistGamble = {
   ],
 };
 
-const slugify = (value = "") =>
-  String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
 classList.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);
+  const book = item.meta?.book ?? "homebrew";
+  item.meta = {
+    book,
+    page: item.meta?.page ?? "",
+    bookName: item.meta?.bookName ?? "",
+    isOfficial: item.meta?.isOfficial ?? (book !== "" && book !== "homebrew"),
+  };
+  delete item.book;
 });
 spellList.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);

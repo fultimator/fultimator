@@ -46,7 +46,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
 
   const damageTypeLabels = {
     physical: "physical_damage",
-    wind: "air_damage",
+    air: "air_damage",
     bolt: "bolt_damage",
     dark: "dark_damage",
     earth: "earth_damage",
@@ -265,7 +265,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       primary={
                         <>
                           {item.name}
-                          {item.type === "offensive" && <OffensiveSpellIcon />}
+                          {item.isOffensive && <OffensiveSpellIcon />}
                           {item.martial === true && <Martial />}
                         </>
                       }
@@ -310,11 +310,11 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                       <strong>
                         <OpenBracket />
-                        {selectedItem.attr1 &&
-                          attributes[selectedItem.attr1]?.shortcaps}
+                        {selectedItem.accuracy?.attr1 &&
+                          attributes[selectedItem.accuracy?.attr1]?.shortcaps}
                         {" + "}
-                        {selectedItem.attr2 &&
-                          attributes[selectedItem.attr2]?.shortcaps}
+                        {selectedItem.accuracy?.attr2 &&
+                          attributes[selectedItem.accuracy?.attr2]?.shortcaps}
                         <CloseBracket />
                       </strong>
                       <Box
@@ -327,7 +327,8 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                       </Box>
                       <strong>
                         <OpenBracket />
-                        {t("HR")} + {5 + (selectedItem.flatdmg || 0)}
+                        {selectedItem.damage?.hrZero ? "HR0" : t("HR")} +{" "}
+                        {selectedItem.damage?.value ?? 0}
                         <CloseBracket />
                       </strong>{" "}
                       <span>
@@ -335,7 +336,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                           allowedElements={["strong"]}
                           unwrapDisallowed={true}
                         >
-                          {t(damageTypeLabels[selectedItem.type])}
+                          {t(damageTypeLabels[selectedItem.damage?.type])}
                         </ReactMarkdown>
                       </span>
                     </Typography>
@@ -347,7 +348,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                 {selectedType === "spell" && (
                   <>
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                      {selectedItem.mp}{" "}
+                      {selectedItem.cost?.amount}{" "}
                       {selectedItem.maxTargets !== 1 ? " × " + t("T") : ""}{" "}
                       {t("MP")}
                       <Box
@@ -362,7 +363,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
                         allowedElements={["strong"]}
                         unwrapDisallowed={true}
                       >
-                        {selectedItem.target}
+                        {selectedItem.targetDescription}
                       </StyledMarkdown>
                       <Box
                         component="span"

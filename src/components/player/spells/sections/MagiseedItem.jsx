@@ -39,8 +39,7 @@ export default function MagiseedItem({
   const handleNameChange = (value) => {
     const preset = magiseeds.find((m) => m.name === value);
     if (preset) {
-      onItemChange(itemIndex, "name", value);
-      // Update other fields from preset if not custom
+      onItemChange(itemIndex, "key", value);
       if (value !== "magiseed_custom") {
         onItemChange(itemIndex, "description", preset.description);
         onItemChange(itemIndex, "rangeStart", preset.rangeStart || 0);
@@ -51,18 +50,18 @@ export default function MagiseedItem({
     }
   };
 
-  const isCustom = item.name === "magiseed_custom";
+  const isCustom = item.key === "magiseed_custom";
   const magiseedName = isCustom
     ? item.customName || t("Custom Magiseed")
-    : t(item.name);
+    : t(item.key);
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
 
     const clone = {
       ...item,
-      name: "magiseed_custom",
-      customName: item.customName || (item.name ? t(item.name) : ""),
+      key: "magiseed_custom",
+      customName: item.customName || (item.key ? t(item.key) : ""),
       description:
         typeof item.description === "string"
           ? t(item.description)
@@ -153,7 +152,7 @@ export default function MagiseedItem({
                   <FormControl fullWidth>
                     <InputLabel>{t("Magiseed")}</InputLabel>
                     <Select
-                      value={item.name || ""}
+                      value={item.key || ""}
                       onChange={(e) => handleNameChange(e.target.value)}
                       label={t("Magiseed")}
                     >

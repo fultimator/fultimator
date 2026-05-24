@@ -25,7 +25,7 @@ const ATTR_SHORT = {
 
 const DAMAGE_TYPE_LABEL = {
   physical: "Physical",
-  wind: "Air",
+  air: "Air",
   bolt: "Bolt",
   dark: "Dark",
   earth: "Earth",
@@ -33,16 +33,14 @@ const DAMAGE_TYPE_LABEL = {
   ice: "Ice",
   light: "Light",
   poison: "Poison",
+  untyped: "Untyped",
 };
 
 const AFFINITY_LABEL = { vu: "VU", rs: "RS", im: "IM", ab: "AB" };
 
-// "wind" in NPC data → "air" in Obsidian fu-vault format
-const OBSIDIAN_AFFINITY_KEY = { wind: "air" };
-
 const NPC_AFFINITY_ORDER = [
   "physical",
-  "wind",
+  "air",
   "bolt",
   "dark",
   "earth",
@@ -69,27 +67,32 @@ function npcRankLabel(rank) {
 }
 
 function formatAttackDesc(attack, npc, md) {
-  const a1 = ATTR_SHORT[attack.attr1] ?? attack.attr1;
-  const a2 = ATTR_SHORT[attack.attr2] ?? attack.attr2;
+  const attr1 = attack.accuracy?.attr1;
+  const attr2 = attack.accuracy?.attr2;
+  const a1 = ATTR_SHORT[attr1] ?? attr1;
+  const a2 = ATTR_SHORT[attr2] ?? attr2;
   const prec = calcPrecision(attack, npc);
   const precStr = prec > 0 ? ` +${prec}` : prec < 0 ? ` ${prec}` : "";
   const checkPart = `[${a1} + ${a2}]${precStr}`;
 
+  const attackType = attack.damage?.type;
   let desc;
-  if (attack.type === "nodmg") {
+  if (attackType === "nodmg") {
     desc = md ? `**${checkPart}**` : checkPart;
   } else {
     const dmg = calcDamage(attack, npc);
-    const dmgType = DAMAGE_TYPE_LABEL[attack.type] ?? attack.type;
+    const dmgType = DAMAGE_TYPE_LABEL[attackType] ?? attackType;
     const core = `${checkPart} ~ [HR+${dmg}] ${dmgType}`;
     desc = md ? `**${core}** damage` : `${core} damage`;
   }
 
-  const specials = Array.isArray(attack.special)
-    ? attack.special.filter(Boolean).join("; ")
-    : typeof attack.special === "string"
-      ? attack.special
-      : "";
+  const specials =
+    attack.effect ||
+    (Array.isArray(attack.special)
+      ? attack.special.filter(Boolean).join("; ")
+      : typeof attack.special === "string"
+        ? attack.special
+        : "");
   if (specials) desc += `, ${specials}`;
   return desc;
 }
@@ -144,7 +147,7 @@ function buildNpcText(npc, md) {
   const allAttacks = [...(npc.attacks ?? [])];
   if (allAttacks.length) {
     const lines = allAttacks.map((atk) => {
-      const rangeIcon = atk.range === "distance" ? "[Ranged]" : "[Melee]";
+      const rangeIcon = atk.range === "ranged" ? "[Ranged]" : "[Melee]";
       const desc = formatAttackDesc(atk, npc, md);
       return `${rangeIcon} ${b(atk.name)}  -  ${desc}`;
     });
@@ -154,16 +157,16 @@ function buildNpcText(npc, md) {
   // Spells
   if (npc.spells?.length) {
     const lines = npc.spells.map((spell) => {
-      const offensive = spell.type === "offensive";
+      const offensive = spell.isOffensive;
       const magic = calcMagic(npc);
       let header = b(spell.name);
       if (offensive) {
-        const a1 = ATTR_SHORT[spell.attr1] ?? spell.attr1;
-        const a2 = ATTR_SHORT[spell.attr2] ?? spell.attr2;
+        const a1 = ATTR_SHORT[spell.accuracy?.attr1] ?? spell.accuracy?.attr1;
+        const a2 = ATTR_SHORT[spell.accuracy?.attr2] ?? spell.accuracy?.attr2;
         const magicStr = magic > 0 ? ` +${magic}` : "";
-        header += ` (Offensive)  -  ${b(`[${a1} + ${a2}]${magicStr}`)}  -  ${spell.mp} MP  -  ${spell.target}  -  ${spell.duration}`;
+        header += ` (Offensive)  -  ${b(`[${a1} + ${a2}]${magicStr}`)}  -  ${spell.cost?.amount} MP  -  ${spell.targetDescription}  -  ${spell.duration}`;
       } else {
-        header += `  -  ${spell.mp} MP  -  ${spell.target}  -  ${spell.duration}`;
+        header += `  -  ${spell.cost?.amount} MP  -  ${spell.targetDescription}  -  ${spell.duration}`;
       }
       return `${header}\n${spell.effect ?? ""}`;
     });
@@ -232,12 +235,8 @@ function buildNpcObsidian(npc) {
   }
 
   // Attacks : split melee/ranged
-  const meleeAttacks = (npc.attacks ?? []).filter(
-    (a) => a.range !== "distance",
-  );
-  const rangedAttacks = (npc.attacks ?? []).filter(
-    (a) => a.range === "distance",
-  );
+  const meleeAttacks = (npc.attacks ?? []).filter((a) => a.range !== "ranged");
+  const rangedAttacks = (npc.attacks ?? []).filter((a) => a.range === "ranged");
 
   if (meleeAttacks.length) {
     lines.push("\nattacks-m:");
@@ -261,15 +260,15 @@ function buildNpcObsidian(npc) {
     const magic = calcMagic(npc);
     lines.push("\nspells:");
     for (const spell of npc.spells) {
-      const offensive = spell.type === "offensive";
+      const offensive = spell.isOffensive;
       let name = spell.name ?? "";
       if (offensive) {
-        const a1 = ATTR_SHORT[spell.attr1] ?? spell.attr1;
-        const a2 = ATTR_SHORT[spell.attr2] ?? spell.attr2;
+        const a1 = ATTR_SHORT[spell.accuracy?.attr1] ?? spell.accuracy?.attr1;
+        const a2 = ATTR_SHORT[spell.accuracy?.attr2] ?? spell.accuracy?.attr2;
         const magicStr = magic > 0 ? ` +${magic}` : "";
         name += ` ($) ~ [${a1} + ${a2}]${magicStr}`;
       }
-      name += ` ~ ${spell.mp} MP ~ ${spell.target} ~ ${spell.duration}`;
+      name += ` ~ ${spell.cost?.amount} MP ~ ${spell.targetDescription} ~ ${spell.duration}`;
       lines.push(`  - name: "${name.replace(/"/g, '\\"')}"`);
       lines.push(
         `    desc: "${(spell.effect ?? "").replace(/"/g, '\\"').replace(/\n/g, " ")}"`,
@@ -545,16 +544,16 @@ export function buildItemText(type, item, fmt) {
 
       // Gamble spell
       if (st === "gamble") {
-        const target = item.targetDesc ?? item.target;
+        const target = item.targetDescription;
         const stats = [
-          item.mp != null && field("MP", item.mp),
+          item.cost?.amount != null && field("MP", item.cost.amount),
           target && field("Target", resolve(target)),
           item.duration && field("Duration", resolve(item.duration)),
-          item.attr1 &&
-            item.attr2 &&
+          item.accuracy?.attr1 &&
+            item.accuracy?.attr2 &&
             field(
               "Roll",
-              `${attributes[item.attr1]?.shortcaps} + ${attributes[item.attr2]?.shortcaps}`,
+              `${attributes[item.accuracy.attr1]?.shortcaps} + ${attributes[item.accuracy.attr2]?.shortcaps}`,
             ),
         ].filter(Boolean);
         if (stats.length) parts.push(stats.join("\n"));
@@ -572,16 +571,16 @@ export function buildItemText(type, item, fmt) {
       }
 
       // Default static spell
-      const target = item.targetDesc ?? item.target;
+      const target = item.targetDescription;
       const stats = [
-        item.mp != null && field("MP", item.mp),
+        item.cost?.amount != null && field("MP", item.cost.amount),
         target && field("Target", resolve(target)),
         item.duration && field("Duration", resolve(item.duration)),
-        item.attr1 &&
-          item.attr2 &&
+        item.accuracy?.attr1 &&
+          item.accuracy?.attr2 &&
           field(
             "Roll",
-            `${attributes[item.attr1]?.shortcaps} + ${attributes[item.attr2]?.shortcaps}`,
+            `${attributes[item.accuracy.attr1]?.shortcaps} + ${attributes[item.accuracy.attr2]?.shortcaps}`,
           ),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));
@@ -591,11 +590,12 @@ export function buildItemText(type, item, fmt) {
       return parts.join("\n\n");
     }
     case "weapons": {
-      const attr1 = attributes[item.att1];
-      const attr2 = attributes[item.att2];
-      const dmgType = types[item.type];
+      const attr1 = attributes[item.accuracy?.attr1];
+      const attr2 = attributes[item.accuracy?.attr2];
+      const dmgType = types[item.damage?.type];
+      const precVal = item.accuracy?.value ?? 0;
       const precStr =
-        item.prec > 0 ? ` +${item.prec}` : item.prec < 0 ? ` ${item.prec}` : "";
+        precVal > 0 ? ` +${precVal}` : precVal < 0 ? ` ${precVal}` : "";
       const parts = [h1(resolve(item.name))];
       const stats = [
         item.category && field("Category", resolve(item.category)),
@@ -609,8 +609,11 @@ export function buildItemText(type, item, fmt) {
             "Accuracy",
             `[${attr1.shortcaps} + ${attr2.shortcaps}]${precStr}`,
           ),
-        item.damage != null &&
-          field("Damage", `[HR + ${item.damage}] ${dmgType?.long ?? ""}`),
+        (item.damage?.value ?? item.damage) != null &&
+          field(
+            "Damage",
+            `[HR + ${item.damage?.value ?? item.damage}] ${dmgType?.long ?? ""}`,
+          ),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));
       if (item.quality) parts.push(resolve(item.quality));
@@ -621,18 +624,18 @@ export function buildItemText(type, item, fmt) {
       const parts = [h1(resolve(item.name))];
       const defDisplay =
         item.category === "Shield"
-          ? `+${item.defbonus ?? item.def}`
+          ? `+${item.def}`
           : item.martial
             ? String(item.def)
-            : item.defbonus
-              ? `DEX die +${item.defbonus}`
+            : item.def
+              ? `DEX die +${item.def}`
               : "DEX die";
       const mdefDisplay = item.martial
-        ? item.mdefbonus
-          ? `INS die +${item.mdefbonus}`
+        ? item.mdef
+          ? `INS die +${item.mdef}`
           : "INS die"
-        : item.mdefbonus
-          ? `INS die +${item.mdefbonus}`
+        : item.mdef
+          ? `INS die +${item.mdef}`
           : "INS die";
       const stats = [
         item.category && field("Category", resolve(item.category)),
@@ -661,7 +664,8 @@ export function buildItemText(type, item, fmt) {
     }
     case "classes": {
       const parts = [h1(resolve(item.name))];
-      if (item.book) parts.push(field("Book", item.book));
+      const book = item.meta?.book;
+      if (book) parts.push(field("Book", book));
       // Free benefits
       const benefits = item.benefits;
       if (benefits) {
@@ -693,10 +697,11 @@ export function buildItemText(type, item, fmt) {
       return parts.join("\n\n");
     }
     case "attacks": {
-      const attr1 = attributes[item.attr1];
-      const attr2 = attributes[item.attr2];
-      const dmgType = types[item.type];
-      const hitBonus = item.flathit > 0 ? ` +${item.flathit}` : "";
+      const attr1 = attributes[item.accuracy?.attr1];
+      const attr2 = attributes[item.accuracy?.attr2];
+      const dmgType = types[item.damage?.type];
+      const hitBonus =
+        (item.accuracy?.value ?? 0) > 0 ? ` +${item.accuracy?.value}` : "";
       const parts = [h1(resolve(item.name))];
       const stats = [
         item.category && field("Category", resolve(item.category)),
@@ -708,7 +713,10 @@ export function buildItemText(type, item, fmt) {
               `[${attr1.shortcaps} + ${attr2.shortcaps}]${hitBonus}`,
             )
           : field("Accuracy", " - "),
-        field("Damage", `[HR + ${item.flatdmg ?? 0}] ${dmgType?.long ?? ""}`),
+        field(
+          "Damage",
+          `[${item.damage?.hrZero ? "HR0" : "HR"} + ${item.damage?.value ?? 0}] ${dmgType?.long ?? ""}`,
+        ),
       ].filter(Boolean);
       if (stats.length) parts.push(stats.join("\n"));
       return parts.join("\n\n");

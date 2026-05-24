@@ -1,52 +1,281 @@
-import { RemoveCircleOutlined } from "@mui/icons-material";
-
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Box,
+  Divider,
   Grid,
-  FormControl,
   IconButton,
-  TextField,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Snackbar,
+  Typography,
   useMediaQuery,
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
-import { Add } from "@mui/icons-material";
+import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import {
+  npcSpecialFieldConfig,
+  npcSpecialGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpecial";
+import {
+  Add,
+  ArrowDownward,
+  ArrowUpward,
+  Casino,
+  Delete,
+  ExpandMore,
+  LibraryAdd,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
+import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
+
+function SpecialContextMenu({
+  special,
+  npcName: _npcName,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  showMoveUp,
+  showMoveDown,
+}) {
+  const { t } = useTranslate();
+  const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [packMenuAnchor, setPackMenuAnchor] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const personalPack = packs.find((p) => p.isPersonal) ?? null;
+  const unlockedNonPersonal = packs.filter((p) => !p.isPersonal && !p.locked);
+
+  const open = (e) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
+  const close = () => setAnchorEl(null);
+
+  const doAdd = async (packId) => {
+    try {
+      await addItem(packId, "npc-special", special);
+      setSnackbar({
+        open: true,
+        message: t("Added to compendium"),
+        severity: "success",
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: err?.message ?? t("Failed to add"),
+        severity: "error",
+      });
+    }
+  };
+
+  const handleAddToCompendium = async (e) => {
+    close();
+    if (unlockedNonPersonal.length > 0) {
+      setPackMenuAnchor(e.currentTarget);
+    } else if (personalPack && !personalPack.locked) {
+      await doAdd(personalPack.id);
+    } else {
+      const personal = await ensurePersonalPack();
+      await doAdd(personal.id);
+    }
+  };
+
+  return (
+    <>
+      <IconButton component="span" onClick={open}>
+        <MenuIcon />
+      </IconButton>
+
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
+        <MenuItem onClick={handleAddToCompendium}>
+          <ListItemIcon>
+            <LibraryAdd />
+          </ListItemIcon>
+          <ListItemText>{t("Add to Compendium")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveUp}
+          onClick={() => {
+            close();
+            onMoveUp();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowUpward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Up")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveDown}
+          onClick={() => {
+            close();
+            onMoveDown();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowDownward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Down")}</ListItemText>
+        </MenuItem>
+
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            close();
+            onDelete();
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <Delete color="error" />
+          </ListItemIcon>
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      <Menu
+        anchorEl={packMenuAnchor}
+        open={Boolean(packMenuAnchor)}
+        onClose={() => setPackMenuAnchor(null)}
+      >
+        {personalPack && !personalPack.locked && (
+          <MenuItem
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(personalPack.id);
+            }}
+          >
+            <ListItemText>{t("Personal")}</ListItemText>
+          </MenuItem>
+        )}
+        {unlockedNonPersonal.map((pack) => (
+          <MenuItem
+            key={pack.id}
+            onClick={async () => {
+              setPackMenuAnchor(null);
+              await doAdd(pack.id);
+            }}
+          >
+            <ListItemText>{pack.name}</ListItemText>
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2500}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
+  );
+}
 
 export default function EditSpecial({ npc, setNpc }) {
   const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const isSmallScreen = useMediaQuery("(max-width: 899px)");
   const [modalOpen, setModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingSpecialIndex, setPendingSpecialIndex] = useState(null);
-  const onChangeSpecial = (i, key, value) => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      newState.special[i][key] = value;
-      return newState;
+  const [expandedSet, setExpandedSet] = useState(new Set());
+
+  const allExpanded =
+    npc.special?.length > 0 && expandedSet.size === npc.special.length;
+
+  const toggleExpanded = (i) => {
+    setExpandedSet((prev) => {
+      const s = new Set(prev);
+      if (s.has(i)) {
+        s.delete(i);
+      } else {
+        s.add(i);
+      }
+      return s;
     });
   };
 
+  const toggleAll = () => {
+    setExpandedSet(
+      allExpanded ? new Set() : new Set(npc.special?.map((_, i) => i) ?? []),
+    );
+  };
+
   const addSpecial = () => {
-    setNpc((prevState) => ({
-      ...prevState,
-      special: [
-        ...(prevState.special || []),
-        {
-          name: "",
-          effect: "",
-        },
-      ],
+    const newIndex = npc.special?.length ?? 0;
+    setExpandedSet((prev) => new Set([...prev, newIndex]));
+    setNpc((prev) => ({
+      ...prev,
+      special: [...(prev.special || []), { name: "", effect: "", spCost: 1 }],
     }));
   };
 
   const removeSpecial = (i) => {
-    setNpc((prevState) => ({
-      ...prevState,
-      special: (prevState.special || []).filter((_, index) => index !== i),
+    setExpandedSet((prev) => {
+      const s = new Set();
+      for (const idx of prev) {
+        if (idx < i) s.add(idx);
+        else if (idx > i) s.add(idx - 1);
+      }
+      return s;
+    });
+    setNpc((prev) => ({
+      ...prev,
+      special: (prev.special || []).filter((_, index) => index !== i),
     }));
+  };
+
+  const moveSpecial = (fromIndex, toIndex) => {
+    setNpc((prev) => {
+      const special = [...(prev.special || [])];
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= special.length ||
+        toIndex >= special.length
+      ) {
+        return prev;
+      }
+      [special[fromIndex], special[toIndex]] = [
+        special[toIndex],
+        special[fromIndex],
+      ];
+      return { ...prev, special };
+    });
+    setExpandedSet((prev) => {
+      const next = new Set(prev);
+      const hadFrom = next.has(fromIndex);
+      const hadTo = next.has(toIndex);
+      if (hadFrom) next.add(toIndex);
+      else next.delete(toIndex);
+      if (hadTo) next.add(fromIndex);
+      else next.delete(fromIndex);
+      return next;
+    });
   };
 
   const openDeleteDialog = (index) => {
@@ -62,71 +291,144 @@ export default function EditSpecial({ npc, setNpc }) {
         headerText={t("Special Rules")}
         icon={Add}
         openCompendium={() => setModalOpen(true)}
+        onExpandCollapse={toggleAll}
+        allExpanded={allExpanded}
       />
-      {npc.special?.map((special, i) => {
-        return (
-          <Grid container key={i} spacing={1}>
-            <Grid sx={{ p: 0, m: 0 }}>
-              <IconButton onClick={() => openDeleteDialog(i)}>
-                <RemoveCircleOutlined />
-              </IconButton>
-            </Grid>
-            <Grid size="grow">
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="name"
-                  label={t("Name:")}
-                  value={special.name}
-                  onChange={(e) => {
-                    return onChangeSpecial(i, "name", e.target.value);
+      <Grid container spacing={1}>
+        {npc.special?.map((special, i) => {
+          return (
+            <Grid key={i} size={12}>
+              <Accordion
+                expanded={expandedSet.has(i)}
+                onChange={() => toggleExpanded(i)}
+                disableGutters
+                elevation={0}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "divider",
+                  "&:before": { display: "none" },
+                  mb: 0.5,
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  sx={{
+                    "& .MuiAccordionSummary-content": {
+                      alignItems: "center",
+                      overflow: "hidden",
+                    },
                   }}
-                  size="small"
-                ></TextField>
-              </FormControl>
+                >
+                  <Box
+                    sx={{ display: "flex", alignItems: "center" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <IconButton
+                      component="span"
+                      onClick={() =>
+                        addMessage({
+                          id: crypto.randomUUID(),
+                          createdAt: Date.now(),
+                          speaker: npc.name || "NPC",
+                          kind: "display",
+                          itemType: "special",
+                          name: special.name,
+                          tags: [`SP: ${special.spCost ?? 1}`],
+                          description: special.effect,
+                        })
+                      }
+                    >
+                      <Casino />
+                    </IconButton>
+                    <SpecialContextMenu
+                      special={special}
+                      npcName={npc.name}
+                      onDelete={() => openDeleteDialog(i)}
+                      onMoveUp={() => moveSpecial(i, i - 1)}
+                      onMoveDown={() => moveSpecial(i, i + 1)}
+                      showMoveUp={i > 0}
+                      showMoveDown={i < (npc.special?.length ?? 0) - 1}
+                    />
+                  </Box>
+                  <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+                    <Typography noWrap>
+                      {special.name || t("(unnamed)")}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                      whiteSpace: "nowrap",
+                      mr: 1,
+                    }}
+                  >
+                    SP: {special.spCost ?? 1}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    <SchemaFieldRenderer
+                      config={npcSpecialFieldConfig}
+                      groupLabels={npcSpecialGroupLabels}
+                      state={special}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const special = [...(prev.special || [])];
+                          special[i] = next;
+                          return { ...prev, special };
+                        });
+                      }}
+                      surface="edit"
+                      group="core"
+                      label={t("Special Rule")}
+                      cols={2}
+                      extraProps={{ name: String(special.name ?? "") }}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcSpecialFieldConfig}
+                      groupLabels={npcSpecialGroupLabels}
+                      state={special}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const special = [...(prev.special || [])];
+                          special[i] = next;
+                          return { ...prev, special };
+                        });
+                      }}
+                      surface="edit"
+                      group="body"
+                      cols={1}
+                    />
+                    <SchemaFieldRenderer
+                      config={npcSpecialFieldConfig}
+                      groupLabels={npcSpecialGroupLabels}
+                      state={special}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const special = [...(prev.special || [])];
+                          special[i] = next;
+                          return { ...prev, special };
+                        });
+                      }}
+                      surface="edit"
+                      group="meta"
+                      cols={2}
+                      hidden
+                    />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
             </Grid>
-            <Grid size={3}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="spCost"
-                  label={t("SP Cost:")}
-                  type="number"
-                  value={special?.spCost ?? 1}
-                  onChange={(e) => onChangeSpecial(i, "spCost", e.target.value)}
-                  size="small"
-                  slotProps={{
-                    htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
-                  }}
-                />
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                {/* <TextField id="effect" label={t("Effect:")} value={special.effect}
-                  onChange={(e) => {
-                    return onChangeSpecial(i, "effect", e.target.value);
-                  }}
-                  size="small"
-                  sx={{ mb: 2 }}
-                ></TextField> */}
-
-                <CustomTextarea
-                  id="effect"
-                  label={t("Effect:")}
-                  value={special.effect}
-                  onChange={(e) => {
-                    return onChangeSpecial(i, "effect", e.target.value);
-                  }}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        );
-      })}
+          );
+        })}
+      </Grid>
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         context="npc"
         initialType="special"
+        initialCompendium="personal"
         onAddItem={(item) => {
           setNpc((prev) => ({
             ...prev,
@@ -136,6 +438,7 @@ export default function EditSpecial({ npc, setNpc }) {
                 name: item.name,
                 effect: item.effect || "",
                 spCost: item.spCost ?? 1,
+                fuid: item.fuid,
               },
             ],
           }));

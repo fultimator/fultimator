@@ -35,8 +35,17 @@ function isPilotConfigurationIllegal(formState) {
 
   const getEquippedCount = (vehicle, moduleType) => {
     if (!vehicle?.modules) return 0;
+    const slots = vehicle.slots ?? {};
     return vehicle.modules
-      .filter((m) => m.equipped && getModuleTypeForLimits(m) === moduleType)
+      .filter((m) => {
+        const key = m?.key ?? m?.name;
+        const equipped =
+          slots.main === key ||
+          slots.off === key ||
+          slots.armor === key ||
+          (slots.support ?? []).includes(key);
+        return equipped && getModuleTypeForLimits(m) === moduleType;
+      })
       .reduce(
         (count, module) =>
           count + (moduleType === "support" && module.isComplex ? 2 : 1),
@@ -48,8 +57,15 @@ function isPilotConfigurationIllegal(formState) {
     const frameLimits = getFrameLimits(
       vehicle.frame || "pilot_frame_exoskeleton",
     );
+    const slots = vehicle.slots ?? {};
     const totalSlots = (vehicle.modules || []).reduce((count, module) => {
-      if (!module.equipped) return count;
+      const key = module?.key ?? module?.name;
+      const equipped =
+        slots.main === key ||
+        slots.off === key ||
+        slots.armor === key ||
+        (slots.support ?? []).includes(key);
+      if (!equipped) return count;
       const moduleType = getModuleTypeForLimits(module);
       return count + (moduleType === "support" && module.isComplex ? 2 : 1);
     }, 0);
@@ -137,20 +153,23 @@ export default function UnifiedSpellModal({
   const [formState, setFormState] = useState(spell || {});
 
   const handleDeleteClick = () => {
-    setDeleteConfirmOpen(true);
+    openDeleteConfirm();
   };
 
   const handleDeleteConfirm = () => {
     if (onDelete && spell) {
       onDelete(spell.index);
     }
-    setDeleteConfirmOpen(false);
+    closeDeleteConfirm();
   };
 
-  const { isOpen: deleteConfirmOpen, closeDialog: setDeleteConfirmOpen } =
-    useDeleteConfirmation({
-      onConfirm: handleDeleteConfirm,
-    });
+  const {
+    isOpen: deleteConfirmOpen,
+    openDialog: openDeleteConfirm,
+    closeDialog: closeDeleteConfirm,
+  } = useDeleteConfirmation({
+    onConfirm: handleDeleteConfirm,
+  });
 
   useEffect(() => {
     if (spell) {
@@ -280,7 +299,7 @@ export default function UnifiedSpellModal({
       {onDelete && (
         <DeleteConfirmationDialog
           open={deleteConfirmOpen}
-          onClose={setDeleteConfirmOpen}
+          onClose={closeDeleteConfirm}
           onConfirm={handleDeleteConfirm}
           title={t("Delete")}
           message={

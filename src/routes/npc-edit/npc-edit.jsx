@@ -3,26 +3,43 @@ import { useParams, useLocation } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import {
+  useDrawerScrollTop,
+  useDrawerSave,
+} from "../../hooks/useDrawerActions";
+import { useThemeStore } from "../../store/themeStore";
+import {
+  TAB_RAIL_WIDTH,
+  APP_DRAWER_WIDTH,
+} from "../../components/app-drawer/constants";
+import {
+  BottomNavigation,
+  BottomNavigationAction,
   Grid,
   Divider,
   Fab,
   Tooltip,
   IconButton,
   Paper,
+  Box,
   useTheme,
   useMediaQuery,
   Alert,
   Snackbar,
 } from "@mui/material";
 import {
+  AutoFixHigh,
+  FlashOn,
+  Home,
+  Psychology,
+  Shield,
   Download,
   Save,
   Share,
-  KeyboardArrowUp,
   ContentCopy,
+  QueryStats,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 // import NpcUgly from "../../components/npc/Ugly";
 import EditBasics from "../../components/npc/EditBasics";
 import ExplainSkills from "../../components/npc/ExplainSkills";
@@ -46,6 +63,10 @@ import TagList from "../../components/TagList";
 import { moderators } from "../../libs/userGroups";
 import blacklist from "../../translation/blacklist.json";
 import deepEqual from "deep-equal";
+import {
+  applyNpcPostLoadTransforms,
+  applyNpcPreSaveTransforms,
+} from "../../components/npc/npcTransforms";
 import { NpcProvider } from "../../components/npc/NpcContext";
 
 // Combine all blacklisted names into a single array
@@ -86,6 +107,7 @@ export default function NpcEdit() {
 
   const { cloudUser: user } = useDatabaseContext();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [mobileTab, setMobileTab] = useState(0);
 
   const [checkedRules, setCheckedRules] = useState(false);
   const [rulesDialogOpen, setRulesDialogOpen] = useState(false);
@@ -110,11 +132,6 @@ export default function NpcEdit() {
     isModerator = true;
   }
 
-  // Scroll-to-top handler
-  const handleMoveToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   // Single hook call - both adapters are always instantiated so this is unconditionally stable.
   const [npc] = db.useDocumentData(ref);
 
@@ -123,35 +140,50 @@ export default function NpcEdit() {
   const isOwner = isLocalNpc || Boolean(user && npc && user.uid === npc.uid);
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
-  const [npcTemp, setNpcTemp] = useState(npc); // Temporary NPC state
+  const [npcTemp, setNpcTemp] = useState(() =>
+    npc ? applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))) : npc,
+  ); // Temporary NPC state
 
-  // Effect to update temporary NPC state when NPC data changes
+  // Effect to update temporary NPC state when NPC data changes.
+  // Apply post-load transforms so migrations are reflected in the editor.
   useEffect(() => {
     if (npc) {
-      // Perform a deep copy of the npc object
-      const updatedPlayerTemp = JSON.parse(JSON.stringify(npc));
-      setNpcTemp(updatedPlayerTemp);
+      setNpcTemp(applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))));
       setIsUpdated(false);
     }
   }, [npc]);
 
   useEffect(() => {
-    if (!deepEqual(npcTemp, npc)) {
-      setIsUpdated(true);
-    } else {
-      setIsUpdated(false);
-    }
+    const baseline = npc
+      ? applyNpcPreSaveTransforms(JSON.parse(JSON.stringify(npc)))
+      : npc;
+    const current = npcTemp ? applyNpcPreSaveTransforms(npcTemp) : npcTemp;
+    setIsUpdated(!deepEqual(current, baseline));
   }, [npcTemp, npc]);
+
+  const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
+  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 769px)");
+
+  const handleSave = useCallback(() => {
+    setIsUpdated(false);
+    activeSetDoc(ref, applyNpcPreSaveTransforms(npcTemp));
+    setSavedSnackbarOpen(true);
+  }, [ref, npcTemp, activeSetDoc]);
+
+  useDrawerSave({ canSave: isOwner && isUpdated, onSave: handleSave });
+  useDrawerScrollTop(showScrollTop);
 
   // Handler for Ctrl+S to save NPC
   const handleCtrlS = useCallback(
     (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
-        activeSetDoc(ref, npcTemp);
+        if (!isOwner) return;
+        handleSave();
       }
     },
-    [ref, npcTemp, activeSetDoc],
+    [isOwner, handleSave],
   );
 
   // Effect for scroll and keyboard shortcuts
@@ -231,15 +263,18 @@ export default function NpcEdit() {
   // Function to publish NPC
   const publish = () => {
     setIsUpdated(false);
-    activeSetDoc(ref, {
-      ...npcTemp,
-      published: true,
-      searchString: npcTemp.name
-        .replace(/[\W_]+/g, " ")
-        .toLowerCase()
-        .split(" "),
-      publishedAt: Date.now(),
-    });
+    activeSetDoc(
+      ref,
+      applyNpcPreSaveTransforms({
+        ...npcTemp,
+        published: true,
+        searchString: npcTemp.name
+          .replace(/[\W_]+/g, " ")
+          .toLowerCase()
+          .split(" "),
+        publishedAt: Date.now(),
+      }),
+    );
     if (isBlacklisted(npcTemp.name)) {
       sendDiscordWebhook(
         "⚠️ BLACKLISTED NPC NAME PUBLISHED! ⚠️",
@@ -256,7 +291,10 @@ export default function NpcEdit() {
   // Function to update publish language as moderator
   const updatePublishLanguage = async (newLang) => {
     setIsUpdated(false);
-    activeSetDoc(ref, { ...npcTemp, language: newLang });
+    activeSetDoc(
+      ref,
+      applyNpcPreSaveTransforms({ ...npcTemp, language: newLang }),
+    );
 
     // Send message to webhook when updating publish language as moderator
     if (user && isModerator && user.uid !== npc.uid) {
@@ -274,10 +312,10 @@ export default function NpcEdit() {
   // Function to unpublish NPC
   const unPublish = async () => {
     setIsUpdated(false);
-    activeSetDoc(ref, {
-      ...npcTemp,
-      published: false,
-    });
+    activeSetDoc(
+      ref,
+      applyNpcPreSaveTransforms({ ...npcTemp, published: false }),
+    );
 
     // Send message to webhook when unpublishing as moderator
     if (user && isModerator && user.uid !== npc.uid) {
@@ -341,291 +379,317 @@ export default function NpcEdit() {
             Moderator view
           </Alert>
         )}
-        <Grid container spacing={2}>
-          {/* NPC Pretty Display (Left-side Grid Item) */}
-          <Grid
-            size={{
-              xs: 12,
-              md: 8,
-            }}
-          >
-            <NpcPretty
-              npc={npcTemp}
-              ref={prettyRef}
-              npcImage={npcTemp.imgurl}
-              collapse={true}
-            />
-          </Grid>
+        {isSmallScreen && <Divider sx={{ my: 1 }} />}
 
-          {/* Skills, Controls and Publish (Right-side Grid Item) */}
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            {/* Skill Points */}
-            <ExplainSkills npc={npcTemp} />
-            <Divider sx={{ my: 1 }} />
+        {(!isSmallScreen || mobileTab === 0) && (
+          <>
+            <Grid container spacing={2}>
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 8,
+                }}
+              >
+                <NpcActorCard
+                  npc={npcTemp}
+                  cardRef={prettyRef}
+                  npcImage={npcTemp.imgurl}
+                  collapse={true}
+                  variant="interactive"
+                />
+              </Grid>
 
-            {/* Download NPC Sheet Button */}
-            <Tooltip title={t("Download as Image")}>
-              <IconButton onClick={DownloadImage}>
-                <Download />
-              </IconButton>
-            </Tooltip>
-
-            {/* Share URL Button - local NPCs have no public URL */}
-            <Tooltip title={t("Share URL")}>
-              <span>
-                <IconButton
-                  onClick={() => shareNpc(npc.id)}
-                  disabled={isLocalNpc}
-                >
-                  <Share />
-                </IconButton>
-              </span>
-            </Tooltip>
-
-            {/* Export NPC Data */}
-            <Export name={`${npc.name}`} dataType="npc" data={npc} />
-
-            {/* Copy and Edit Button, shown only if user is not the creator */}
-            {!isOwner && (
-              <Tooltip title={t("Copy and Edit Sheet")} placement="bottom">
-                <IconButton
-                  aria-label="duplicate"
-                  onClick={() => copyNpc(npcTemp)}
-                >
-                  <ContentCopy />
-                </IconButton>
-              </Tooltip>
-            )}
-
-            <Divider sx={{ my: 1 }} />
-
-            {/* NPC sharing options - Firestore only, not available for local NPCs */}
-            {!isLocalNpc && (
-              <EditPublish
-                npc={npcTemp}
-                setNpc={setNpcTemp}
-                user={user}
-                isModerator={isModerator}
-                checkedRules={checkedRules}
-                rulesDialogOpen={rulesDialogOpen}
-                handleDialogOpen={handleDialogOpen}
-                handleDialogClose={handleDialogClose}
-                handleCheckboxChange={handleCheckboxChange}
-                publish={publish}
-                unPublish={unPublish}
-                updatePublishLanguage={updatePublishLanguage}
-                isUpdated={isUpdated}
-              />
-            )}
-            {/* Tags Section */}
-            {isOwner && (
-              <>
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 4,
+                }}
+              >
+                <ExplainSkills npc={npcTemp} />
                 <Divider sx={{ my: 1 }} />
-                <TagList npc={npcTemp} setNpc={setNpcTemp} />
-                {/*TEST BUTTON <Button onClick={() => console.log(npcTemp)} variant="contained">Log Temp NPC Object</Button>*/}
-              </>
-            )}
-          </Grid>
-        </Grid>
 
-        <Divider sx={{ my: 1 }} />
+                <Tooltip title={t("Download as Image")}>
+                  <IconButton onClick={DownloadImage}>
+                    <Download />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title={t("Share URL")}>
+                  <span>
+                    <IconButton
+                      onClick={() => shareNpc(npc.id)}
+                      disabled={isLocalNpc}
+                    >
+                      <Share />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+
+                <Export name={`${npc.name}`} dataType="npc" data={npc} />
+
+                {!isOwner && (
+                  <Tooltip title={t("Copy and Edit Sheet")} placement="bottom">
+                    <IconButton
+                      aria-label="duplicate"
+                      onClick={() => copyNpc(npcTemp)}
+                    >
+                      <ContentCopy />
+                    </IconButton>
+                  </Tooltip>
+                )}
+
+                <Divider sx={{ my: 1 }} />
+
+                {!isLocalNpc && (
+                  <EditPublish
+                    npc={npcTemp}
+                    setNpc={setNpcTemp}
+                    user={user}
+                    isModerator={isModerator}
+                    checkedRules={checkedRules}
+                    rulesDialogOpen={rulesDialogOpen}
+                    handleDialogOpen={handleDialogOpen}
+                    handleDialogClose={handleDialogClose}
+                    handleCheckboxChange={handleCheckboxChange}
+                    publish={publish}
+                    unPublish={unPublish}
+                    updatePublishLanguage={updatePublishLanguage}
+                    isUpdated={isUpdated}
+                  />
+                )}
+                {isOwner && (
+                  <>
+                    <Divider sx={{ my: 1 }} />
+                    <TagList npc={npcTemp} setNpc={setNpcTemp} />
+                  </>
+                )}
+              </Grid>
+            </Grid>
+            <Divider sx={{ my: 1 }} />
+          </>
+        )}
 
         {/* NPC Edit Options for Creator */}
         {isOwner && (
           <>
-            {/* Edit Basic Information */}
-            <Paper
-              elevation={3}
-              sx={{
-                p: "15px",
-                borderRadius: "8px",
-                border: "2px solid",
-                borderColor: secondary,
-              }}
-            >
-              <EditBasics npc={npcTemp} setNpc={setNpcTemp} />
-            </Paper>
-            <Divider sx={{ my: 1 }} />
+            {(!isSmallScreen || mobileTab === 1) && (
+              <>
+                <Paper
+                  id="edit-section-basics"
+                  elevation={3}
+                  sx={{
+                    p: "15px",
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                  }}
+                >
+                  <EditBasics npc={npcTemp} setNpc={setNpcTemp} />
+                </Paper>
+                <Divider sx={{ my: 1 }} />
+              </>
+            )}
 
-            {/* Edit Affinities and Bonuses */}
-            <Paper
-              elevation={3}
-              sx={{
-                p: "15px",
-                borderRadius: "8px",
-                border: "2px solid",
-                borderColor: secondary,
-              }}
-            >
-              <Grid container spacing={2}>
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 6,
+            {(!isSmallScreen || mobileTab === 2) && (
+              <>
+                <Paper
+                  id="edit-section-affinities"
+                  elevation={3}
+                  sx={{
+                    p: "15px",
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
                   }}
                 >
-                  <CustomHeader
-                    type="top"
-                    headerText={t("Affinity")}
-                    showIconButton={false}
-                  />
-                  <ExplainAffinities npc={npcTemp} />
-                  <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
-                >
-                  <CustomHeader
-                    type={isSmallScreen ? "middle" : "top"}
-                    headerText={t("Bonuses")}
-                    showIconButton={false}
-                  />
-                  <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
-                </Grid>
-              </Grid>
-            </Paper>
-            <Divider sx={{ my: 1 }} />
+                  <Grid container spacing={2}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <CustomHeader
+                        type="top"
+                        headerText={t("Affinity")}
+                        showIconButton={false}
+                      />
+                      <ExplainAffinities npc={npcTemp} />
+                      <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <CustomHeader
+                        type={isSmallScreen ? "middle" : "top"}
+                        headerText={t("Bonuses")}
+                        showIconButton={false}
+                      />
+                      <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
+                    </Grid>
+                  </Grid>
+                </Paper>
+                <Divider sx={{ my: 1 }} />
+              </>
+            )}
 
-            {/* Edit Base Attacks and Weapon Attacks */}
-            <Paper
-              elevation={3}
-              sx={{
-                p: "15px",
-                borderRadius: "8px",
-                border: "2px solid",
-                borderColor: secondary,
-              }}
-            >
-              <Grid container>
-                <Grid size={12}>
-                  <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
-                </Grid>
-                <Grid size={12}>
-                  <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
-                </Grid>
-              </Grid>
-            </Paper>
-            <Divider sx={{ my: 1 }} />
+            {(!isSmallScreen || mobileTab === 3) && (
+              <>
+                <Paper
+                  id="edit-section-attacks"
+                  elevation={3}
+                  sx={{
+                    p: "15px",
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                  }}
+                >
+                  <Grid container>
+                    <Grid size={12}>
+                      <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
+                    </Grid>
+                    <Grid size={12}>
+                      <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
+                    </Grid>
+                  </Grid>
+                </Paper>
+                <Divider sx={{ my: 1 }} />
+              </>
+            )}
 
-            {/* Edit Spells */}
-            <Paper
-              elevation={3}
-              sx={{
-                p: "15px",
-                borderRadius: "8px",
-                border: "2px solid",
-                borderColor: secondary,
-              }}
-            >
-              <EditSpells npc={npcTemp} setNpc={setNpcTemp} />
-            </Paper>
-            <Divider sx={{ my: 1 }} />
+            {(!isSmallScreen || mobileTab === 4) && (
+              <>
+                <Paper
+                  id="edit-section-spells"
+                  elevation={3}
+                  sx={{
+                    p: "15px",
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                  }}
+                >
+                  <EditSpells npc={npcTemp} setNpc={setNpcTemp} />
+                </Paper>
+                <Divider sx={{ my: 1 }} />
+              </>
+            )}
 
-            {/* Edit Extra Features */}
-            <Paper
-              elevation={3}
-              sx={{
-                p: "15px",
-                borderRadius: "8px",
-                border: "2px solid",
-                borderColor: secondary,
-              }}
-            >
-              <Grid container spacing={2}>
-                {/* Edit Other Actions */}
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 6,
+            {(!isSmallScreen || mobileTab === 5) && (
+              <>
+                <Paper
+                  id="edit-section-extras"
+                  elevation={3}
+                  sx={{
+                    p: "15px",
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
                   }}
                 >
-                  <EditActions npc={npcTemp} setNpc={setNpcTemp} />
-                </Grid>
-                {/* Edit Special Rules */}
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
-                >
-                  <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
-                </Grid>
-                {/* Edit Rare Gear */}
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
-                >
-                  <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
-                </Grid>
-                {/* Edit Notes */}
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
-                >
-                  <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
-                </Grid>
-              </Grid>
-            </Paper>
-            <Divider sx={{ my: 1 }} />
+                  <Grid container spacing={2}>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <div id="edit-section-actions">
+                        <EditActions npc={npcTemp} setNpc={setNpcTemp} />
+                      </div>
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <div id="edit-section-special">
+                        <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
+                      </div>
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <div id="edit-section-raregear">
+                        <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
+                      </div>
+                    </Grid>
+                    <Grid
+                      size={{
+                        xs: 12,
+                        md: 6,
+                      }}
+                    >
+                      <div id="edit-section-notes">
+                        <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
+                      </div>
+                    </Grid>
+                  </Grid>
+                </Paper>
+                <Divider sx={{ my: 1 }} />
+              </>
+            )}
 
-            {/* Attack Chance Generator Section */}
-            <Paper
-              elevation={3}
-              sx={{
-                p: "15px",
-                borderRadius: "8px",
-                border: "2px solid",
-                borderColor: secondary,
-              }}
-            >
-              <Probs />
-            </Paper>
-            <Divider sx={{ my: 2, mb: 20 }} />
+            {(!isSmallScreen || mobileTab === 5) && (
+              <>
+                <Paper
+                  id="edit-section-attackchance"
+                  elevation={3}
+                  sx={{
+                    p: "15px",
+                    borderRadius: "8px",
+                    border: "2px solid",
+                    borderColor: secondary,
+                  }}
+                >
+                  <Probs />
+                </Paper>
+                <Divider sx={{ my: 1 }} />
+              </>
+            )}
+            <Divider sx={{ my: 2, mb: isSmallScreen ? 24 : 20 }} />
           </>
         )}
         {/* <NpcUgly npc={npcTemp} /> */}
-        {/* Save Button, shown if there are unsaved changes */}
-        {isUpdated && (
-          <Tooltip title={t("Save")} placement="left">
-            <Fab
-              color="primary"
-              aria-label="save"
-              size="medium"
-              sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1200 }}
-              onClick={() => {
-                setIsUpdated(false);
-                activeSetDoc(ref, npcTemp);
-              }}
-            >
-              <Save />
-            </Fab>
-          </Tooltip>
-        )}
-
-        {showScrollTop && (
-          <Tooltip title={t("Scroll to top")} placement="left">
-            <Fab
-              size="medium"
-              color="primary"
-              onClick={handleMoveToTop}
-              sx={{ position: "fixed", bottom: 72, right: 16, zIndex: 1200 }}
-            >
-              <KeyboardArrowUp />
-            </Fab>
-          </Tooltip>
-        )}
+        {/* FAB container */}
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 16,
+            right: appDrawerOpen
+              ? APP_DRAWER_WIDTH + 16
+              : isDesktop
+                ? TAB_RAIL_WIDTH + 16
+                : 16,
+            transition: "right 0.3s ease",
+            zIndex: 1200,
+            display: "flex",
+            flexDirection: "column-reverse",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          {!isSmallScreen && isUpdated && isOwner && (
+            <Tooltip title={t("Save")} placement="left">
+              <Fab
+                color="primary"
+                aria-label="save"
+                size="medium"
+                onClick={handleSave}
+              >
+                <Save />
+              </Fab>
+            </Tooltip>
+          )}
+        </Box>
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           open={openShareSnackbar}
@@ -633,6 +697,115 @@ export default function NpcEdit() {
           onClose={handleClose}
           message={t("Copied to Clipboard!")}
         />
+        <Snackbar
+          open={savedSnackbarOpen}
+          autoHideDuration={2500}
+          onClose={() => setSavedSnackbarOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setSavedSnackbarOpen(false)}
+            severity="success"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {t("Saved")}
+          </Alert>
+        </Snackbar>
+        {isSmallScreen && (
+          <Paper
+            elevation={6}
+            sx={{
+              position: "fixed",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1300,
+              borderTop: "1px solid",
+              borderColor: "divider",
+              display: "flex",
+              alignItems: "stretch",
+            }}
+          >
+            <Box
+              sx={{
+                flex: 1,
+                overflowX: "auto",
+                overflowY: "hidden",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
+              <BottomNavigation
+                showLabels
+                value={mobileTab}
+                onChange={(_, newValue) => setMobileTab(newValue)}
+                sx={{
+                  width: "max-content",
+                  minWidth: "100%",
+                  "& .MuiBottomNavigationAction-root": {
+                    flex: "0 0 auto",
+                    minWidth: 96,
+                  },
+                }}
+              >
+                <BottomNavigationAction label={t("Overview")} icon={<Home />} />
+                {isOwner && (
+                  <BottomNavigationAction
+                    label={t("Basics")}
+                    icon={<Psychology />}
+                  />
+                )}
+                {isOwner && (
+                  <BottomNavigationAction
+                    label={t("Stats")}
+                    icon={<Shield />}
+                  />
+                )}
+                {isOwner && (
+                  <BottomNavigationAction
+                    label={t("Attacks")}
+                    icon={<FlashOn />}
+                  />
+                )}
+                {isOwner && (
+                  <BottomNavigationAction
+                    label={t("Spells")}
+                    icon={<AutoFixHigh />}
+                  />
+                )}
+                {isOwner && (
+                  <BottomNavigationAction
+                    label={t("Extras")}
+                    icon={<QueryStats />}
+                  />
+                )}
+              </BottomNavigation>
+            </Box>
+            <Box
+              sx={{
+                flexShrink: 0,
+                borderLeft: "1px solid",
+                borderColor: "divider",
+                display: "flex",
+                alignItems: "center",
+                px: 1,
+              }}
+            >
+              <Tooltip title={t("Save")} placement="top">
+                <span>
+                  <IconButton
+                    color={isUpdated && isOwner ? "primary" : "default"}
+                    onClick={handleSave}
+                    disabled={!isOwner || !isUpdated}
+                    aria-label="save"
+                  >
+                    <Save />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+          </Paper>
+        )}
       </Layout>
     </NpcProvider>
   );

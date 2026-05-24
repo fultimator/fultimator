@@ -206,16 +206,17 @@ export default function PlayerSpellsFull({
                           <SpellDefault
                             key={spellIndex}
                             spellName={spell.name}
-                            mp={spell.mp}
+                            mp={spell.cost?.amount}
+                            perTarget={spell.cost?.perTarget ?? true}
                             maxTargets={spell.maxTargets}
-                            targetDesc={spell.targetDesc}
+                            targetDescription={spell.targetDescription}
                             duration={spell.duration}
                             description={spell.description}
                             isEditMode={isEditMode}
                             isOffensive={spell.isOffensive}
                             isMagisphere={spell.isMagisphere || false}
-                            attr1={spell.attr1}
-                            attr2={spell.attr2}
+                            attr1={spell.accuracy?.attr1}
+                            attr2={spell.accuracy?.attr2}
                             showInPlayerSheet={spell.showInPlayerSheet}
                             index={spellIndex}
                             onEdit={() =>

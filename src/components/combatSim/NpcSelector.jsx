@@ -131,7 +131,6 @@ export default function NpcSelector({
             {filteredNpcList.map((npc) => (
               <Box key={npc.id}>
                 <ListItem
-                  button
                   onClick={() => handleSelectNPC(npc.id)}
                   sx={{ padding: "5px 10px" }}
                 >
@@ -198,7 +197,7 @@ export default function NpcSelector({
         size="small"
         onClick={() => setNpcDrawerOpen(true)}
       >
-        {t("combat_sim_select_npcs")}
+        {t("combat_sim_select_actors")}
       </Button>
       <Drawer
         anchor="left"
@@ -465,7 +464,6 @@ export default function NpcSelector({
               {filteredNpcList.map((npc) => (
                 <Box key={npc.id}>
                   <ListItem
-                    button
                     onClick={() => handleSelectNPC(npc.id)}
                     sx={{ padding: "5px 10px" }}
                   >

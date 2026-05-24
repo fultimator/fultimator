@@ -70,26 +70,16 @@ export default function SpellGourmet({ spell }) {
   };
 
   // Convert cookbook effects to array
-  let cookbookEffectsArray = [];
-  if (spell.cookbookEffects) {
-    if (Array.isArray(spell.cookbookEffects)) {
-      cookbookEffectsArray = spell.cookbookEffects;
-    } else {
-      cookbookEffectsArray = Object.entries(spell.cookbookEffects).map(
-        ([key, data]) => ({
-          ...data,
-          key: key,
-          tasteCombination:
-            data.taste1 && data.taste2
-              ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
-              : key
-                  .split("_")
-                  .map((t) => t.charAt(0).toUpperCase() + t.slice(1))
-                  .join(" + "),
-        }),
-      );
-    }
-  }
+  const cookbookEffectsArray = (spell.cookbook?.effects || []).map(
+    (data, index) => ({
+      ...data,
+      key: `${data.taste1 || ""}_${data.taste2 || ""}_${index}`,
+      tasteCombination:
+        data.taste1 && data.taste2
+          ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
+          : `Effect ${index + 1}`,
+    }),
+  );
 
   return (
     <Table size="small" sx={{ border: `1px solid ${theme.primary}40` }}>
@@ -126,8 +116,8 @@ export default function SpellGourmet({ spell }) {
         )}
 
         {/* Ingredient Inventory Summary */}
-        {spell.ingredientInventory &&
-          spell.ingredientInventory.some((i) => i.quantity > 0) && (
+        {spell.cookbook?.ingredientInventory &&
+          spell.cookbook.ingredientInventory.some((i) => i.quantity > 0) && (
             <TableRow>
               <StyledTableCell colSpan={2} sx={{ pt: 1 }}>
                 <Typography
@@ -141,7 +131,7 @@ export default function SpellGourmet({ spell }) {
                   {t("gourmet_ingredient_inventory")}:
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {spell.ingredientInventory
+                  {spell.cookbook.ingredientInventory
                     .filter((i) => i.quantity > 0)
                     .map((item, i) => (
                       <Box

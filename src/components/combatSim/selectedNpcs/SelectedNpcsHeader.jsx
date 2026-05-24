@@ -1,9 +1,17 @@
 import React from "react";
-import { Box, Button, IconButton, Typography } from "@mui/material";
-import { AccessTime, Notes, Replay } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+} from "@mui/material";
+import { AccessTime, Close, Notes, Replay, TouchApp } from "@mui/icons-material";
 import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
-import { calcInit } from "../../../libs/npcs";
+import { useCombatEncounterStore } from "../../../stores/combatEncounterStore";
 
 export default function SelectedNpcsHeader({
   selectedNPCs,
@@ -11,21 +19,17 @@ export default function SelectedNpcsHeader({
   onNotesClick,
   onClockClick,
   handleResetTurns,
+  onClearAll,
 }) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
-  const isDarkMode = theme.palette.mode === "dark";
+  const interactionMode = useCombatEncounterStore((s) => s.interactionMode);
+  const setInteractionMode = useCombatEncounterStore(
+    (s) => s.setInteractionMode,
+  );
 
   const isAllTurnsChecked = selectedNPCs?.every((npc) =>
     npc.combatStats.turns?.every(Boolean),
-  );
-
-  // Calculate the highest initiative for the selected NPCs
-  const highestInit = Math.max(
-    ...selectedNPCs
-      .filter((npc) => npc.id !== undefined && npc.attributes !== undefined)
-      .map((npc) => calcInit(npc))
-      .concat([0]), // Add a default value in case the array is empty
   );
   return (
     <Box
@@ -39,35 +43,46 @@ export default function SelectedNpcsHeader({
         gap: 1,
       }}
     >
-      {/* Left side */}
-      {!isMobile && (
-        <Typography
-          variant={"h5"}
-          sx={{
-            userSelect: "none",
-            WebkitUserSelect: "none",
-            MozUserSelect: "none",
-            msUserSelect: "none",
+      {/* Left side - interaction mode toggle + clear button */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <ToggleButtonGroup
+          exclusive
+          size="small"
+          value={interactionMode}
+          onChange={(_, val) => {
+            if (val !== null) setInteractionMode(val);
           }}
+          sx={{ "& .MuiToggleButton-root": { px: 0.75, py: 0.5 } }}
         >
-          {t("combat_sim_selected_npcs")}
-        </Typography>
-      )}
-
-      {/* Center - Initiative */}
-      <Box
-        sx={{
-          display: "flex",
-          flex: 1,
-          justifyContent: isMobile ? "left" : "center",
-        }}
-      >
-        {selectedNPCs.length > 0 && (
-          <Typography variant={isMobile ? "h6" : "h5"} color={primary}>
-            {t("combat_sim_npc_initiative")}: <strong>{highestInit}</strong>
-          </Typography>
-        )}
+          <ToggleButton value="select">
+            <Tooltip title="Select mode: click to open actor sheet">
+              <TouchApp fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
+          <ToggleButton value="target">
+            <Tooltip title="Target mode: T to target, Shift+T to multi-target">
+              <img
+                src="/assets/icons/checks/roll_target.png"
+                style={{ width: 16, height: 16 }}
+                alt="target"
+              />
+            </Tooltip>
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+        <Tooltip title="Clear targets & selection">
+          <IconButton
+            size="small"
+            onClick={onClearAll}
+            sx={{ color: "text.secondary" }}
+          >
+            <Close fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </Box>
+
+      {/* Spacer */}
+      <Box sx={{ flex: 1 }} />
 
       {/* Right side - Buttons */}
       <Box

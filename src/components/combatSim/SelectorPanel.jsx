@@ -39,7 +39,7 @@ export default function SelectorPanel({
           size="small"
           onClick={() => setNpcDrawerOpen(true)}
         >
-          {selectorTab === 0 ? t("combat_sim_select_npcs") : t("Select PCs")}
+          {selectorTab === 0 ? t("combat_sim_select_actors") : t("Select PCs")}
         </Button>
         <Drawer
           anchor="left"

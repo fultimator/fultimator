@@ -27,7 +27,7 @@ export default function SymbolistItem({
   const handleNameChange = (value) => {
     const symbol = availableSymbols.find((s) => s.name === value);
     if (symbol) {
-      onItemChange(itemIndex, "name", value);
+      onItemChange(itemIndex, "key", value);
       if (value !== "symbol_custom_name") {
         onItemChange(itemIndex, "effect", symbol.effect);
         onItemChange(itemIndex, "customName", "");
@@ -35,7 +35,7 @@ export default function SymbolistItem({
     }
   };
 
-  const isCustom = item.name === "symbol_custom_name";
+  const isCustom = item.key === "symbol_custom_name";
   const {
     isOpen: deleteDialogOpen,
     closeDialog: setDeleteDialogOpen,
@@ -49,8 +49,8 @@ export default function SymbolistItem({
 
     const clone = {
       ...item,
-      name: "symbol_custom_name",
-      customName: item.customName || (item.name ? t(item.name) : ""),
+      key: "symbol_custom_name",
+      customName: item.customName || (item.key ? t(item.key) : ""),
       effect: typeof item.effect === "string" ? t(item.effect) : item.effect,
     };
 
@@ -58,7 +58,7 @@ export default function SymbolistItem({
   };
 
   const itemDisplayName =
-    item.customName || t(item.name || "symbol_custom_name");
+    item.customName || t(item.key || "symbol_custom_name");
 
   return (
     <>
@@ -74,7 +74,7 @@ export default function SymbolistItem({
               <FormControl fullWidth>
                 <InputLabel>{t("Symbol")}</InputLabel>
                 <Select
-                  value={item.name || ""}
+                  value={item.key || ""}
                   onChange={(e) => handleNameChange(e.target.value)}
                   label={t("Symbol")}
                 >

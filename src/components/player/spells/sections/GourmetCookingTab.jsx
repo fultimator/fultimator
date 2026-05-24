@@ -73,11 +73,20 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
   const [choiceDialogOpen, setChoiceDialogOpen] = useState(false);
   const [choiceDialogRolls, setChoiceDialogRolls] = useState([]);
 
+  const cookbook = formState.cookbook || {
+    effects: [],
+    ingredientInventory: [],
+  };
   const ingredientInventory = useMemo(
-    () => formState.ingredientInventory || [],
-    [formState.ingredientInventory],
+    () => cookbook.ingredientInventory || [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [formState.cookbook],
   );
-  const cookbookEffects = formState.cookbookEffects || {};
+  const cookbookEffectsArr = cookbook.effects || [];
+  // Build a lookup map by taste key for the cooking preview
+  const cookbookEffects = Object.fromEntries(
+    cookbookEffectsArr.map((e) => [`${e.taste1}_${e.taste2}`, e]),
+  );
   const allYouCanEat = formState.allYouCanEat || false;
   const usedAllYouCanEat = formState.usedAllYouCanEat || false;
 
@@ -230,24 +239,34 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
     if (!rollResult || rollResult.type !== "effect") return;
 
     setFormState((prev) => {
-      const newEffects = { ...prev.cookbookEffects };
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
       const combo = getTasteCombinations(t).find(
         (c) => c.key === targetCombination,
       );
+      if (!combo) return prev;
 
-      if (combo) {
-        newEffects[combo.key] = {
-          effect: rollResult.data.effect,
-          taste1: combo.taste1,
-          taste2: combo.taste2,
-          customChoices: customChoices,
-          tasteCombination: combo.combination,
-        };
+      const existingIdx = (prevCookbook.effects || []).findIndex(
+        (e) => e.taste1 === combo.taste1 && e.taste2 === combo.taste2,
+      );
+      const newEntry = {
+        taste1: combo.taste1,
+        taste2: combo.taste2,
+        effect: rollResult.data.effect,
+        customChoices: customChoices,
+      };
+      const effects = [...(prevCookbook.effects || [])];
+      if (existingIdx >= 0) {
+        effects[existingIdx] = newEntry;
+      } else {
+        effects.push(newEntry);
       }
 
       return {
         ...prev,
-        cookbookEffects: newEffects,
+        cookbook: { ...prevCookbook, effects },
       };
     });
 
@@ -298,7 +317,11 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
     }
 
     setFormState((prev) => {
-      const inventory = [...(prev.ingredientInventory || [])];
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
+      const inventory = [...(prevCookbook.ingredientInventory || [])];
 
       rolls.forEach((roll) => {
         if (!roll) return;
@@ -326,7 +349,7 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
 
       return {
         ...prev,
-        ingredientInventory: inventory,
+        cookbook: { ...prevCookbook, ingredientInventory: inventory },
       };
     });
 
@@ -340,7 +363,11 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
     if (invalidChoice) return;
 
     setFormState((prev) => {
-      const inventory = [...(prev.ingredientInventory || [])];
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
+      const inventory = [...(prevCookbook.ingredientInventory || [])];
 
       choiceDialogRolls.forEach((roll) => {
         const ingredientName = (roll.name || "").trim() || t("Ingredient");
@@ -369,7 +396,7 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
 
       return {
         ...prev,
-        ingredientInventory: inventory,
+        cookbook: { ...prevCookbook, ingredientInventory: inventory },
       };
     });
 
@@ -399,7 +426,11 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
     if (!name || !shopIngredientTaste) return;
 
     setFormState((prev) => {
-      const inventory = [...(prev.ingredientInventory || [])];
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
+      const inventory = [...(prevCookbook.ingredientInventory || [])];
       const existingIndex = inventory.findIndex(
         (item) =>
           (item.name || "").trim().toLowerCase() === name.toLowerCase() &&
@@ -424,7 +455,7 @@ export default function GourmetCookingTab({ formState, setFormState, t }) {
 
       return {
         ...prev,
-        ingredientInventory: inventory,
+        cookbook: { ...prevCookbook, ingredientInventory: inventory },
       };
     });
 

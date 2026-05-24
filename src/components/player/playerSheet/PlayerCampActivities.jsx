@@ -44,7 +44,7 @@ export default function PlayerCampActivities({ player }) {
             </Typography>
 
             <Grid container>
-              {activity.targetDescription && (
+              {activity.description && (
                 <Grid
                   sx={{
                     background: `linear-gradient(to right, ${theme.ternary}, ${isDarkMode ? "#252525" : "white"})`,
@@ -58,7 +58,7 @@ export default function PlayerCampActivities({ player }) {
                     sx={{ fontFamily: "PT Sans Narrow", fontSize: "1rem" }}
                   >
                     <strong>{t("Target")}: </strong>
-                    {activity.targetDescription}
+                    {activity.description}
                   </Typography>
                 </Grid>
               )}

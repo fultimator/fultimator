@@ -27,6 +27,7 @@ import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import Clock from "../Clock";
+import { useClock } from "../../../../hooks/useClock";
 
 const StyledTableCellHeader = styled(TableCell)({
   padding: "4px 8px",
@@ -69,6 +70,126 @@ function highlightMarkdownText(markdown, query) {
   return source.replace(regex, "<mark>$1</mark>");
 }
 
+function NoteClockRow({
+  clock,
+  clockIndex,
+  noteOriginalIndex,
+  setPlayer,
+  searchQuery,
+  t,
+}) {
+  const persistState = (newState) => {
+    setPlayer((prev) => ({
+      ...prev,
+      notes: prev.notes.map((note, ni) =>
+        ni !== noteOriginalIndex
+          ? note
+          : {
+              ...note,
+              clocks: note.clocks.map((c, ci) =>
+                ci !== clockIndex ? c : { ...c, state: newState },
+              ),
+            },
+      ),
+    }));
+  };
+
+  const {
+    filledCount: filled,
+    increment,
+    decrement,
+    reset,
+  } = useClock(clock.sections, clock.state, persistState);
+
+  const total = clock.sections;
+
+  return (
+    <TableRow sx={{ bgcolor: "action.hover" }}>
+      <StyledTableCell sx={{ width: 36, pl: 1 }} />
+      <StyledTableCell
+        sx={{
+          minWidth: { xs: 60, sm: 100 },
+          wordBreak: "break-word",
+          pl: 1,
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+        >
+          {highlightMatch(clock.name, searchQuery)}
+        </Typography>
+      </StyledTableCell>
+      <StyledTableCell
+        sx={{
+          width: { xs: 55, sm: 80 },
+          display: { xs: "none", sm: "table-cell" },
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{ fontSize: "0.8rem", fontWeight: "bold" }}
+        >
+          {filled}/{total}
+        </Typography>
+      </StyledTableCell>
+      <StyledTableCell
+        sx={{
+          width: { xs: 65, sm: 90 },
+          display: { xs: "none", sm: "table-cell" },
+        }}
+      />
+      <StyledTableCell
+        sx={{
+          width: { xs: 156, sm: 176 },
+          textAlign: "right",
+          overflow: "visible",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 0,
+            flexWrap: "nowrap",
+          }}
+        >
+          <Clock
+            numSections={total}
+            size={28}
+            state={clock.state}
+            setState={() => {}}
+            isCharacterSheet={true}
+          />
+          <IconButton
+            size="small"
+            disabled={filled === 0}
+            onClick={decrement}
+            sx={{ p: "2px" }}
+          >
+            <Remove fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            disabled={filled >= total}
+            onClick={increment}
+            sx={{ p: "2px" }}
+          >
+            <Add fontSize="small" />
+          </IconButton>
+          <Tooltip title={t("Reset")} arrow>
+            <IconButton size="small" onClick={reset} sx={{ p: "2px" }}>
+              <RestartAlt fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </StyledTableCell>
+    </TableRow>
+  );
+}
+
 export default function PlayerNotes({
   player,
   setPlayer,
@@ -95,46 +216,6 @@ export default function PlayerNotes({
     );
 
   if (visibleNotes.length === 0 && !(isEditMode && onAddNote)) return null;
-
-  const updateClock = (noteIndex, clockIndex, newState) => {
-    setPlayer((prev) => ({
-      ...prev,
-      notes: prev.notes.map((note, ni) =>
-        ni !== noteIndex
-          ? note
-          : {
-              ...note,
-              clocks: note.clocks.map((clock, ci) =>
-                ci !== clockIndex ? clock : { ...clock, state: newState },
-              ),
-            },
-      ),
-    }));
-  };
-
-  const increment = (noteIndex, clockIndex, clock) => {
-    const currentFilled = clock.state.filter(Boolean).length;
-    if (currentFilled < clock.sections) {
-      const next = new Array(clock.sections).fill(false);
-      for (let i = 0; i <= currentFilled; i++) {
-        next[i] = true;
-      }
-      updateClock(noteIndex, clockIndex, next);
-    }
-  };
-
-  const decrement = (noteIndex, clockIndex, clock) => {
-    const currentFilled = clock.state.filter(Boolean).length;
-    if (currentFilled > 0) {
-      const next = [...clock.state];
-      next[currentFilled - 1] = false;
-      updateClock(noteIndex, clockIndex, next);
-    }
-  };
-
-  const reset = (noteIndex, clockIndex, clock) => {
-    updateClock(noteIndex, clockIndex, new Array(clock.sections).fill(false));
-  };
 
   return (
     <TableContainer component={Paper} sx={{ width: "100%", mb: 1 }}>
@@ -309,114 +390,17 @@ export default function PlayerNotes({
                   </TableRow>
                 )}
                 {/* Clock rows */}
-                {note.clocks?.map((clock, clockIndex) => {
-                  const filled = clock.state.filter(Boolean).length;
-                  const total = clock.sections;
-                  const canIncrement = filled < total;
-                  const canDecrement = filled > 0;
-
-                  return (
-                    <TableRow
-                      key={`clock-${noteIndex}-${clockIndex}`}
-                      sx={{ bgcolor: "action.hover" }}
-                    >
-                      <StyledTableCell sx={{ width: 36, pl: 1 }} />
-                      <StyledTableCell
-                        sx={{
-                          minWidth: { xs: 60, sm: 100 },
-                          wordBreak: "break-word",
-                          pl: 1,
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
-                        >
-                          {highlightMatch(clock.name, searchQuery)}
-                        </Typography>
-                      </StyledTableCell>
-                      <StyledTableCell
-                        sx={{
-                          width: { xs: 55, sm: 80 },
-                          display: { xs: "none", sm: "table-cell" },
-                          textAlign: "center",
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontSize: "0.8rem",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {filled}/{total}
-                        </Typography>
-                      </StyledTableCell>
-                      <StyledTableCell
-                        sx={{
-                          width: { xs: 65, sm: 90 },
-                          display: { xs: "none", sm: "table-cell" },
-                        }}
-                      />
-                      <StyledTableCell
-                        sx={{
-                          width: { xs: 156, sm: 176 },
-                          textAlign: "right",
-                          overflow: "visible",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "flex-end",
-                            gap: 0,
-                            flexWrap: "nowrap",
-                          }}
-                        >
-                          <Clock
-                            numSections={total}
-                            size={28}
-                            state={clock.state}
-                            setState={() => {}}
-                            isCharacterSheet={true}
-                          />
-                          <IconButton
-                            size="small"
-                            disabled={!canDecrement}
-                            onClick={() =>
-                              decrement(note.originalIndex, clockIndex, clock)
-                            }
-                            sx={{ p: "2px" }}
-                          >
-                            <Remove fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            disabled={!canIncrement}
-                            onClick={() =>
-                              increment(note.originalIndex, clockIndex, clock)
-                            }
-                            sx={{ p: "2px" }}
-                          >
-                            <Add fontSize="small" />
-                          </IconButton>
-                          <Tooltip title={t("Reset")} arrow>
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                reset(note.originalIndex, clockIndex, clock)
-                              }
-                              sx={{ p: "2px" }}
-                            >
-                              <RestartAlt fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </StyledTableCell>
-                    </TableRow>
-                  );
-                })}
+                {note.clocks?.map((clock, clockIndex) => (
+                  <NoteClockRow
+                    key={`clock-${noteIndex}-${clockIndex}`}
+                    clock={clock}
+                    clockIndex={clockIndex}
+                    noteOriginalIndex={note.originalIndex}
+                    setPlayer={setPlayer}
+                    searchQuery={searchQuery}
+                    t={t}
+                  />
+                ))}
               </React.Fragment>
             );
           })}

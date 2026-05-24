@@ -48,9 +48,9 @@ export const SharedAttackCard = React.memo(function SharedAttackCard({
     imageTempInfoTextKey,
   });
 
-  const attr1 = attributes[item.attr1];
-  const attr2 = attributes[item.attr2];
-  const dmgType = types[item.type];
+  const attr1 = attributes[item.accuracy?.attr1];
+  const attr2 = attributes[item.accuracy?.attr2];
+  const dmgType = types[item.damage?.type];
 
   return (
     <CardContentWrapper
@@ -130,7 +130,9 @@ export const SharedAttackCard = React.memo(function SharedAttackCard({
                   <OpenBracket />
                   {attr1.shortcaps} + {attr2.shortcaps}
                   <CloseBracket />
-                  {item.flathit > 0 ? `+${item.flathit}` : ""}
+                  {(item.accuracy?.value ?? 0) > 0
+                    ? `+${item.accuracy?.value ?? 0}`
+                    : ""}
                 </>
               ) : (
                 " - "
@@ -146,7 +148,14 @@ export const SharedAttackCard = React.memo(function SharedAttackCard({
               }}
             >
               <OpenBracket />
-              HR + {item.flatdmg}
+              {item.damage?.hrZero
+                ? (() => {
+                    const val = item.damage?.value ?? 0;
+                    return val === 0
+                      ? "HR0"
+                      : `HR0 ${val > 0 ? "+" : ""} ${val}`;
+                  })()
+                : `HR + ${item.damage?.value ?? 0}`}
               <CloseBracket />
               {dmgType?.long}
             </Typography>
@@ -155,18 +164,19 @@ export const SharedAttackCard = React.memo(function SharedAttackCard({
             <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
               {item.range === "melee"
                 ? t("Melee")
-                : item.range === "distance"
+                : item.range === "ranged"
                   ? t("Ranged")
                   : t(item.range)}
             </Typography>
           </Grid>
         </Grid>
 
-        {item.special?.length > 0 && (
+        {(item.effect || item.special?.length > 0) && (
           <Grid container sx={{ px: 2, py: "4px" }}>
             <Grid size={12}>
               <Typography variant="body2">
-                <strong>{t("Special")}:</strong> {item.special.join("; ")}
+                <strong>{t("Effect")}:</strong>{" "}
+                {item.effect || item.special?.join("; ")}
               </Typography>
             </Grid>
           </Grid>

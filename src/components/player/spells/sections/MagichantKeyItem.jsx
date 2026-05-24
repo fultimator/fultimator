@@ -9,8 +9,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Stack,
 } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
+import { TypeIcon } from "../../../types";
 import { availableMagichantKeys } from "../spellOptionData";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
@@ -26,7 +28,7 @@ export default function MagichantKeyItem({
   const handleNameChange = (value) => {
     const key = availableMagichantKeys.find((k) => k.name === value);
     if (!key) return;
-    onItemChange(itemIndex, "name", value);
+    onItemChange(itemIndex, "key", value);
     onItemChange(itemIndex, "type", key.type || "");
     onItemChange(itemIndex, "status", key.status || "");
     onItemChange(itemIndex, "attribute", key.attribute || "");
@@ -37,8 +39,8 @@ export default function MagichantKeyItem({
   };
 
   const isCustom =
-    item.name === "magichant_custom_name" ||
-    !availableMagichantKeys.find((k) => k.name === item.name);
+    item.key === "magichant_custom_name" ||
+    !availableMagichantKeys.find((k) => k.name === item.key);
   const {
     isOpen: deleteDialogOpen,
     closeDialog: setDeleteDialogOpen,
@@ -51,8 +53,8 @@ export default function MagichantKeyItem({
     if (!onCloneItem) return;
     onCloneItem(itemIndex, {
       ...item,
-      name: "magichant_custom_name",
-      customName: item.customName || (item.name ? t(item.name) : ""),
+      key: "magichant_custom_name",
+      customName: item.customName || (item.key ? t(item.key) : ""),
       type: typeof item.type === "string" ? t(item.type) : item.type,
       status: typeof item.status === "string" ? t(item.status) : item.status,
       attribute:
@@ -63,7 +65,7 @@ export default function MagichantKeyItem({
   };
 
   const itemDisplayName =
-    item.customName || t(item.name || "magichant_custom_name");
+    item.customName || t(item.key || "magichant_custom_name");
 
   return (
     <>
@@ -79,7 +81,7 @@ export default function MagichantKeyItem({
               <FormControl fullWidth>
                 <InputLabel>{t("magichant_key")}</InputLabel>
                 <Select
-                  value={item.name || "magichant_custom_name"}
+                  value={item.key || "magichant_custom_name"}
                   onChange={(e) => handleNameChange(e.target.value)}
                   label={t("magichant_key")}
                 >
@@ -101,7 +103,7 @@ export default function MagichantKeyItem({
               <TextField
                 fullWidth
                 label={t("magichant_name")}
-                value={isCustom ? item.customName || "" : t(item.name || "")}
+                value={isCustom ? item.customName || "" : t(item.key || "")}
                 onChange={(e) =>
                   isCustom &&
                   onItemChange(itemIndex, "customName", e.target.value)
@@ -119,17 +121,28 @@ export default function MagichantKeyItem({
                 md: 3,
               }}
             >
-              <TextField
-                fullWidth
-                label={t("magichant_type")}
-                value={isCustom ? item.type || "" : t(item.type || "")}
-                onChange={(e) =>
-                  isCustom && onItemChange(itemIndex, "type", e.target.value)
-                }
-                slotProps={{
-                  input: { readOnly: !isCustom },
-                }}
-              />
+              {isCustom ? (
+                <TextField
+                  fullWidth
+                  label={t("magichant_type")}
+                  value={item.type || ""}
+                  onChange={(e) =>
+                    onItemChange(itemIndex, "type", e.target.value)
+                  }
+                />
+              ) : (
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  sx={{ height: "100%", minHeight: 40 }}
+                >
+                  <TypeIcon type={item.type} />
+                  <span style={{ textTransform: "capitalize" }}>
+                    {item.type || ""}
+                  </span>
+                </Stack>
+              )}
             </Grid>
             <Grid
               size={{

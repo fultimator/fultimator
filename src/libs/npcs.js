@@ -1,10 +1,12 @@
 export function calcHP(npc) {
   if (!npc || !npc.attributes) return 0;
-  let hp = 2 * npc.lvl + 5 * npc.attributes.might;
+  const might = npc.attributes.might?.base ?? 8;
+  let hp = 2 * npc.lvl + 5 * might;
 
   // Skill Extra HP
-  if (npc.extra?.hp) {
-    hp += parseInt(npc.extra.hp);
+  const hpBonus = npc.resources?.hp.bonus ?? npc.extra?.hp ?? 0;
+  if (hpBonus) {
+    hp += parseInt(hpBonus);
   }
 
   // Rank
@@ -35,8 +37,9 @@ export function calcHP(npc) {
   if (npc.rank === "companion") {
     const sl = npc.companionlvl || 1;
     const lvl = npc.companionpclvl || 5;
-    const extraHP = npc.extra && npc.extra.hp ? parseInt(npc.extra.hp) : 0;
-    hp = sl * npc.attributes.might + Math.floor(lvl / 2) + extraHP;
+    const extraHP =
+      npc.resources?.hp.bonus ?? (npc.extra?.hp ? parseInt(npc.extra.hp) : 0);
+    hp = sl * might + Math.floor(lvl / 2) + extraHP;
   }
 
   if (npc.rank === "groupvehicle") {
@@ -48,10 +51,12 @@ export function calcHP(npc) {
 
 export function calcMP(npc) {
   if (!npc || !npc.attributes) return 0;
-  let mp = npc.lvl + 5 * npc.attributes.will;
+  const will = npc.attributes.will?.base ?? 8;
+  let mp = npc.lvl + 5 * will;
   // Skill Extra MP
-  if (npc.extra?.mp) {
-    mp += parseInt(npc.extra.mp);
+  const mpBonus = npc.resources?.mp.bonus ?? npc.extra?.mp ?? 0;
+  if (mpBonus) {
+    mp += parseInt(mpBonus);
   }
   // Rank
   if (
@@ -70,15 +75,18 @@ export function calcMP(npc) {
 
 export function calcInit(npc) {
   if (!npc || !npc.attributes) return 0;
-  let init = (npc.attributes.dexterity + npc.attributes.insight) / 2;
+  const dexterity = npc.attributes.dexterity?.base ?? 8;
+  const insight = npc.attributes.insight?.base ?? 8;
+  let init = (dexterity + insight) / 2;
 
   // Skill Extra Init
-  let flatinit = Number(npc.extra?.extrainit);
+  const initBonus = npc.derived?.init.bonus ?? npc.extra?.extrainit ?? 0;
+  let flatinit = Number(initBonus);
   if (!isNaN(flatinit)) {
     init += flatinit;
   }
 
-  if (npc.extra?.init) {
+  if (npc.features?.init?.enabled ?? npc.extra?.init) {
     init += 4;
   }
 
@@ -117,10 +125,9 @@ export function calcDef(npc) {
   let def = 0;
 
   // Check if DEF is overridden
-  if (npc.extra?.defOverride) {
-    // When overridden, only use the override value
-    return npc.extra?.def || 0;
-  }
+  const d = npc.derived?.def;
+  if (d?.override !== undefined) return d.override;
+  if (!d && npc.extra?.defOverride) return npc.extra?.def || 0; // pre-v10 fallback
 
   // Normal calculation when not overridden
   // Armor
@@ -128,23 +135,13 @@ export function calcDef(npc) {
     def += npc.armor?.def;
   }
 
-  if (npc.armor?.defbonus) {
-    def += npc.armor?.defbonus;
-  }
-
   // Shield
   if (npc.shield?.def) {
     def += npc.shield?.def;
   }
 
-  if (npc.shield?.defbonus) {
-    def += npc.shield?.defbonus;
-  }
-
   // Skill Extra def (bonus)
-  if (npc.extra?.def) {
-    def += npc.extra?.def;
-  }
+  def += d?.bonus ?? npc.extra?.def ?? 0;
 
   return def;
 }
@@ -153,26 +150,23 @@ export function calcMDef(npc) {
   let mdef = 0;
 
   // Check if M.DEF is overridden
-  if (npc.extra?.mDefOverride) {
-    // When overridden, only use the override value
-    return npc.extra?.mDef || 0;
-  }
+  const d = npc.derived?.mdef;
+  if (d?.override !== undefined) return d.override;
+  if (!d && npc.extra?.mDefOverride) return npc.extra?.mDef || 0; // pre-v10 fallback
 
   // Normal calculation when not overridden
   // Armor
-  if (npc.armor?.mdefbonus) {
-    mdef += npc.armor?.mdefbonus;
+  if (npc.armor?.mdef) {
+    mdef += npc.armor?.mdef;
   }
 
   // Shield
-  if (npc.shield?.mdefbonus) {
-    mdef += npc.shield?.mdefbonus;
+  if (npc.shield?.mdef) {
+    mdef += npc.shield?.mdef;
   }
 
   // Skill Extra M def (bonus)
-  if (npc.extra?.mDef) {
-    mdef += npc.extra?.mDef;
-  }
+  mdef += d?.bonus ?? npc.extra?.mDef ?? 0;
 
   return mdef;
 }
@@ -190,12 +184,10 @@ export function calcDamage(attack, npc) {
 
   // Equip
   if (attack.weapon) {
-    number = number - 5 + attack.weapon.damage;
-  }
-
-  // Flat Damage Input
-  if (attack.flatdmg) {
-    number += Number(attack.flatdmg);
+    number =
+      number - 5 + (attack.weapon.damage?.value ?? attack.weapon.damage ?? 0);
+  } else if (attack.damage?.value !== undefined) {
+    number = number - 5 + attack.damage.value;
   }
 
   // Group Vehicle Rules
@@ -214,13 +206,16 @@ export function calcPrecision(attack, npc) {
   number = number + Math.floor(npc.lvl / 10);
 
   // Extra Precision
-  if (npc.extra?.precision) {
+  if (npc.features?.precision?.enabled ?? npc.extra?.precision) {
     number = number + 3;
   }
 
-  // Equip
+  // Equip (unified schema: accuracy.value flat on attack)
   if (attack.weapon) {
-    number = number + attack.weapon.prec;
+    number =
+      number + (attack.weapon.prec ?? attack.weapon.accuracy?.value ?? 0);
+  } else if (attack.accuracy?.value !== undefined) {
+    number = number + attack.accuracy.value;
   }
 
   // Companion
@@ -228,11 +223,6 @@ export function calcPrecision(attack, npc) {
     const sl = npc.companionlvl || 1;
     number = number + sl;
   }
-  //Flat Hit Input
-  if (attack.flathit) {
-    number += Number(attack.flathit);
-  }
-
   return number;
 }
 
@@ -242,8 +232,8 @@ export function calcMagic(npc) {
   // Level
   number = number + Math.floor(npc.lvl / 10);
 
-  // Extra Precision
-  if (npc.extra?.magic) {
+  // Extra Magic
+  if (npc.features?.magic?.enabled ?? npc.extra?.magic) {
     number = number + 3;
   }
 
@@ -316,7 +306,7 @@ export function calcAvailableSkillsFromVulnerabilities(npc) {
   if (
     npc.species === "Plant" &&
     (npc.affinities.fire ||
-      npc.affinities.wind ||
+      npc.affinities.air ||
       npc.affinities.ice ||
       npc.affinities.bolt)
   ) {
@@ -403,17 +393,13 @@ export function calcUsedSkillsFromOtherActions(npc) {
 export function calcUsedSkillsFromSpecialAttacks(npc) {
   let sum = 0;
   npc.attacks?.forEach((attack) => {
-    sum += attack.special.length;
-    if (attack.extraDamage) {
-      sum++;
-    }
+    if (attack.effect || attack.special?.length) sum++;
+    if (attack.extraDamage) sum++;
   });
 
   npc.weaponattacks?.forEach((attack) => {
-    sum += attack.special.length;
-    if (attack.extraDamage) {
-      sum++;
-    }
+    if (attack.effect || attack.special?.length) sum++;
+    if (attack.extraDamage) sum++;
   });
 
   return sum;
@@ -455,24 +441,15 @@ export function calcUsedSkillsFromExtraMP(npc) {
 }
 
 export function calcUsedSkillsFromExtraInit(npc) {
-  if (!npc.extra?.init) {
-    return 0;
-  }
-  return 1;
+  return (npc.features?.init?.enabled ?? npc.extra?.init) ? 1 : 0;
 }
 
 export function calcUsedSkillsFromExtraPrecision(npc) {
-  if (!npc.extra?.precision) {
-    return 0;
-  }
-  return 1;
+  return (npc.features?.precision?.enabled ?? npc.extra?.precision) ? 1 : 0;
 }
 
 export function calcUsedSkillsFromExtraMagic(npc) {
-  if (!npc.extra?.magic) {
-    return 0;
-  }
-  return 1;
+  return (npc.features?.magic?.enabled ?? npc.extra?.magic) ? 1 : 0;
 }
 
 export function calcUsedSkillsFromResistances(npc) {
@@ -572,11 +549,11 @@ export function calcUsedSkillsFromEquip(npc) {
     equip = true;
   }
 
-  if (npc.armor && npc.armor.cost !== 0) {
+  if (npc.armor && (npc.armor.cost ?? 0) !== 0) {
     equip = true;
   }
 
-  if (npc.shield && npc.shield.cost !== 0) {
+  if (npc.shield && (npc.shield.cost ?? 0) !== 0) {
     equip = true;
   }
 

@@ -6,17 +6,22 @@ import {
   IconButton,
   Typography,
   useScrollTrigger,
+  useMediaQuery,
   Slide,
   Tooltip,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router";
-import { ArrowBack, Search, Tune as TuneIcon } from "@mui/icons-material";
+import {
+  ArrowBack,
+  Search,
+  ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
+} from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import type { ThemeValue, StyleProfileValue } from "../../store/themeStore";
 
-import logo929 from "./../logo_929.webp";
-import logo1400 from "./../logo_1400.webp";
+import logo929 from "/assets/branding/logo_929.webp";
+import logo1400 from "/assets/branding/logo_1400.webp";
 
 interface AppBarProps {
   isNpcEdit: boolean;
@@ -34,7 +39,10 @@ interface AppBarProps {
 const HideOnScroll: React.FC<{ children: React.ReactElement }> = ({
   children,
 }) => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const trigger = useScrollTrigger();
+  // Only hide on mobile - on desktop the persistent drawer rail depends on AppBar height
+  if (!isMobile) return children;
   return (
     <Slide appear={false} direction="down" in={!trigger}>
       {children}
@@ -77,10 +85,11 @@ const AppBar: React.FC<AppBarProps> = ({
               sx={{ alignItems: "center", justifyContent: "space-between" }}
             >
               <Grid
-                size={2}
+                size={{ xs: showGoBackButton ? 2 : 2, sm: 2 }}
                 sx={{
                   textAlign: "left",
                   display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
                   alignItems: "center",
                   justifyContent: "flex-start",
                 }}
@@ -90,6 +99,11 @@ const AppBar: React.FC<AppBarProps> = ({
                     <ArrowBack />
                   </IconButton>
                 )}
+                <Tooltip title="Open Compendium">
+                  <IconButton color="inherit" onClick={openCompendiumModal}>
+                    <Search />
+                  </IconButton>
+                </Tooltip>
               </Grid>
 
               {!isNpcEdit && (
@@ -144,15 +158,10 @@ const AppBar: React.FC<AppBarProps> = ({
                     justifyContent: "flex-end",
                   }}
                 >
-                  <Tooltip title="Open Compendium">
-                    <IconButton color="inherit" onClick={openCompendiumModal}>
-                      <Search />
-                    </IconButton>
-                  </Tooltip>
                   {onOpenDrawer && (
-                    <Tooltip title="Open Drawer">
+                    <Tooltip title="Open Chat">
                       <IconButton color="inherit" onClick={onOpenDrawer}>
-                        <TuneIcon />
+                        <ChatBubbleOutlineIcon />
                       </IconButton>
                     </Tooltip>
                   )}

@@ -80,7 +80,7 @@ function ChangeCustomizations({
     <Grid container spacing={1} size={12}>
       {/* Customization Selection */}
       <Grid size={10}>
-        <FormControl fullWidth>
+        <FormControl fullWidth size="small">
           <InputLabel>{t("weapons_customization_select")}</InputLabel>
           <Select
             label={t("weapons_customization_select")}
@@ -91,6 +91,9 @@ function ChangeCustomizations({
               "& .MuiSelect-select": {
                 display: "flex",
                 alignItems: "center",
+                minHeight: "unset !important",
+                paddingTop: "8.5px",
+                paddingBottom: "8.5px",
               },
             }}
           >
@@ -125,7 +128,20 @@ function ChangeCustomizations({
             }
           }}
           disabled={isButtonDisabled || !selectedCustomization}
-          sx={{ height: "100%", width: "100%" }}
+          sx={{
+            height: 40,
+            minHeight: 40,
+            width: "100%",
+            boxSizing: "border-box",
+            border: "1px solid transparent",
+            "&.Mui-disabled": {
+              color: "rgba(255,255,255,0.7)",
+              backgroundColor: "rgba(120,120,120,0.45)",
+              border: "1px solid rgba(140,140,140,0.55)",
+              filter: "grayscale(100%)",
+              opacity: 0.9,
+            },
+          }}
         >
           {"+"}
         </Button>

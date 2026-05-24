@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Box, List, Typography, Divider } from "@mui/material";
+import { TouchApp } from "@mui/icons-material";
+import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
+import { calcInit } from "../../libs/npcs";
 import PcListItem from "./selectedNpcs/PcListItem";
 import {
   DndContext,
@@ -40,6 +43,7 @@ export default function SelectedNpcs({
   onSortEnd = null, // Function to handle sorting end (function)
   onClockClick, // Function to handle clock button click (function)
   onNotesClick, // Function to handle notes button click (function)
+  onClearAll, // Function to clear targets and selected actor (function)
   // PC props
   selectedPCs = [],
   handleRemovePC,
@@ -50,6 +54,15 @@ export default function SelectedNpcs({
 }) {
   const [anchorMenu, setAnchorMenu] = useState(null); // Anchor element for the menu
   const [selectedNpcMenu, setSelectedNpcMenu] = useState(null); // ID of the selected NPC for the menu
+
+  const { interactionMode, toggleTarget, targets } = useCombatEncounterStore();
+
+  const highestInit = Math.max(
+    ...selectedNPCs
+      .filter((npc) => npc.id !== undefined && npc.attributes !== undefined)
+      .map((npc) => calcInit(npc))
+      .concat([0]),
+  );
 
   const handleMenuOpen = (event, npcId) => {
     setAnchorMenu(event.currentTarget);
@@ -101,10 +114,23 @@ export default function SelectedNpcs({
     }
   };
 
-  // Handle list item click
+  // Handle list item click - in target mode, left-click toggles target instead of selecting
   const handleListItemClick = (e, combatId) => {
-    if (e.target.type !== "checkbox") {
+    if (e.target.type === "checkbox") return;
+    if (interactionMode === "target") {
+      const npc = selectedNPCs.find((n) => n.combatId === combatId);
+      if (npc) toggleTarget({ combatId: npc.combatId, name: npc.name, source: "npc" });
+    } else {
       handleNpcClick(combatId);
+    }
+  };
+
+  const handlePcListItemClick = (combatId) => {
+    if (interactionMode === "target") {
+      const pc = selectedPCs.find((p) => p.combatId === combatId);
+      if (pc) toggleTarget({ combatId: pc.combatId, name: pc.name || pc.characterName || "Unknown", source: "pc" });
+    } else {
+      handlePcClick(combatId);
     }
   };
 
@@ -117,6 +143,7 @@ export default function SelectedNpcs({
         onNotesClick={onNotesClick}
         onClockClick={onClockClick}
         handleResetTurns={handleResetTurns}
+        onClearAll={onClearAll}
       />
       {/* Body */}
       <Box
@@ -147,6 +174,15 @@ export default function SelectedNpcs({
                 items={selectedNPCs.map((npc) => npc.combatId)}
                 strategy={verticalListSortingStrategy}
               >
+                {selectedNPCs.length > 0 && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+                    <Divider sx={{ flex: 1 }} />
+                    <Typography variant="caption" sx={{ color: "text.secondary", whiteSpace: "nowrap" }}>
+                      NPCs{highestInit > 0 ? ` · Initiative: ${highestInit}` : ""}
+                    </Typography>
+                    <Divider sx={{ flex: 1 }} />
+                  </Box>
+                )}
                 <List>
                   {selectedNPCs.map((npc, index) => (
                     <NpcListItem
@@ -209,7 +245,7 @@ export default function SelectedNpcs({
                       pc={pc}
                       index={index}
                       selectedPcID={selectedPcID}
-                      handleListItemClick={handlePcClick}
+                      handleListItemClick={handlePcListItemClick}
                       handleRemovePC={handleRemovePC}
                       handleHpMpClick={handleHpMpClickPC}
                       handleUpdatePcTurns={handleUpdatePcTurns}
@@ -220,6 +256,54 @@ export default function SelectedNpcs({
               </>
             )}
           </>
+        )}
+
+        {/* Legend */}
+        {(selectedNpcID || selectedPcID || targets.length > 0) && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              pt: 0.75,
+              mt: 0.5,
+              borderTop: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            {(selectedNpcID || selectedPcID) && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <TouchApp sx={{ fontSize: 14, color: "primary.main" }} />
+                <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+                  Selected
+                </Typography>
+              </Box>
+            )}
+            {targets.length > 0 && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Box
+                  sx={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: "50%",
+                    backgroundColor: "warning.main",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src="/assets/icons/checks/roll_target.png"
+                    alt="targeted"
+                    style={{ width: 9, height: 9 }}
+                  />
+                </Box>
+                <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+                  Targeted ({targets.length})
+                </Typography>
+              </Box>
+            )}
+          </Box>
         )}
       </Box>
     </>

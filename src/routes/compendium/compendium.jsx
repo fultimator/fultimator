@@ -21,7 +21,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Grid,
   Chip,
   Drawer,
   Fab,
@@ -29,18 +28,14 @@ import {
   Tooltip,
   Divider,
   InputAdornment,
-  useMediaQuery,
   ThemeProvider,
   Snackbar,
   Autocomplete,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import MenuIcon from "@mui/icons-material/Menu";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
-import DownloadIcon from "@mui/icons-material/Download";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -65,11 +60,10 @@ import Layout from "../../components/Layout";
 import { ManageModulesModal } from "../../components/manage-modules";
 import Export from "../../components/Export";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import AddToCompendiumButton from "../../components/compendium/AddToCompendiumButton";
 import CompendiumItemCreateDialog from "../../components/compendium/CompendiumItemCreateDialog";
 import QuickCreateModal from "../../components/compendium/QuickCreateModal";
-import useDownloadImage from "../../hooks/useDownloadImage";
-import { useTranslate, t as staticT } from "../../translation/translate";
+import CompendiumBrowser from "../../components/compendium/CompendiumBrowser";
+import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
 import {
@@ -105,13 +99,7 @@ import {
   SharedHoplosphereCard,
 } from "../../components/shared/itemCards";
 
-import classList, { spellList, spellsByClass } from "../../libs/classes";
-import _attributes from "../../libs/attributes";
-import _types from "../../libs/types";
-import { getDelicacyEffects } from "../../libs/gourmetCookingData";
-
-// Pre-compute delicacy effects once at module load
-const staticDelicacyEffects = getDelicacyEffects(staticT);
+import classList from "../../libs/classes";
 import {
   CLASS_BOOK_OPTIONS,
   QUALITY_FILTER_OPTIONS,
@@ -120,10 +108,7 @@ import {
   PACK_ITEM_TYPES,
   VIEWER_TO_PACK_TYPE,
   getItems,
-  getItemSearchText,
   toSlug,
-  makeId,
-  getNonStaticSpellItems,
 } from "../../libs/compendium";
 
 const INVOKER_WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
@@ -138,12 +123,14 @@ function SidebarSecondaryValue(type, item, t) {
   if (type === "shields") return `${item.cost}z`;
   if (type === "accessories") return `${item.cost}z`;
   if (type === "qualities") return `${item.cost}z`;
-  if (type === "spells") return `${item.mp} MP`;
+  if (type === "spells") return `${item.cost?.amount} MP`;
   if (type === "player-spells")
-    return item.mp != null ? `${item.mp} MP` : (item.wellspring ?? "");
+    return item.cost?.amount != null
+      ? `${item.cost.amount} MP`
+      : (item.wellspring ?? "");
   if (type === "attacks") return t(item.range);
   if (type === "classes") return item.book ?? "";
-  if (type === "heroics") return item.book ?? "";
+  if (type === "heroics") return item.meta?.book ?? item.book ?? "";
   if (type === "mnemospheres") return `${item.class ?? ""} Lv.${item.lvl ?? 1}`;
   if (type === "hoplospheres") return `${item.cost ?? 0}z`;
   if (type === "optionals") return item.subtype ?? "";
@@ -265,9 +252,9 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onCompendiumChange,
   onNewPack,
   onManagePack,
+  onImportPack,
   activePack,
   onToggleLock,
-  onOpenCreateDialog,
   onOpenQuickCreate,
   restrictToTypes,
 }) {
@@ -282,6 +269,35 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   const isPilotSelected = selectedSpellClassKey === "pilot";
   const isChanterSelected = selectedSpellClassKey === "chanter";
   const isInvokerSelected = selectedSpellClassKey === "invoker";
+  const compactMultiAutocompleteSx = {
+    "& .MuiOutlinedInput-root": {
+      minHeight: 40,
+      alignItems: "center",
+    },
+    "& .MuiAutocomplete-inputRoot": {
+      flexWrap: "nowrap",
+      pr: 4,
+    },
+    "& .MuiAutocomplete-tag": {
+      maxWidth: 112,
+      m: 0,
+      mr: 0.5,
+    },
+    "& .MuiAutocomplete-input": {
+      minWidth: 0,
+    },
+  };
+  const selectMenuProps = {
+    disableScrollLock: true,
+    keepMounted: true,
+    slotProps: {
+      paper: {
+        sx: {
+          zIndex: (theme) => theme.zIndex.modal + 2,
+        },
+      },
+    },
+  };
 
   return (
     <Box
@@ -326,6 +342,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               value={selectedCompendium}
               onChange={(e) => onCompendiumChange(e.target.value)}
               label={t("Compendium")}
+              MenuProps={selectMenuProps}
             >
               <MenuItem value="official">{t("Official Data")}</MenuItem>
               {[...packs]
@@ -407,6 +424,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 }
                 onChange={(e) => onTypeChange(e.target.value)}
                 label={t("Item Type")}
+                MenuProps={selectMenuProps}
               >
                 {activeTypes.map((type) => (
                   <MenuItem key={type.key} value={type.key}>
@@ -449,25 +467,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 ))}
               </Select>
             </FormControl>
-            {isPackMode && (
-              <Tooltip
-                title={
-                  activePack?.locked
-                    ? t("Unlock pack to create items")
-                    : t("Create New Item")
-                }
-              >
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={onOpenCreateDialog}
-                    disabled={!!activePack?.locked}
-                  >
-                    <AddIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            )}
           </Box>
         )}
 
@@ -478,6 +477,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               value={selectedSpellClass}
               onChange={(e) => onSpellClassChange(e.target.value)}
               label={t("Class")}
+              MenuProps={selectMenuProps}
             >
               <MenuItem value="">{t("All")}</MenuItem>
               {classList
@@ -500,6 +500,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 value={selectedModuleType}
                 onChange={(e) => onModuleTypeChange?.(e.target.value)}
                 label={t("Module Type")}
+                MenuProps={selectMenuProps}
               >
                 <MenuItem value="">{t("All")}</MenuItem>
                 <MenuItem value="frame">{t("Vehicle Frame")}</MenuItem>
@@ -519,6 +520,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 value={selectedMagichantSubtype}
                 onChange={(e) => onMagichantSubtypeChange?.(e.target.value)}
                 label={t("Chant Type")}
+                MenuProps={selectMenuProps}
               >
                 <MenuItem value="">{t("All")}</MenuItem>
                 <MenuItem value="key">{t("Key")}</MenuItem>
@@ -534,6 +536,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               value={selectedWellspring}
               onChange={(e) => onWellspringChange?.(e.target.value)}
               label={t("Wellspring")}
+              MenuProps={selectMenuProps}
             >
               <MenuItem value="">{t("All")}</MenuItem>
               {INVOKER_WELLSPRINGS.map((wellspring) => (
@@ -548,8 +551,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         {(selectedType === "classes" || selectedType === "heroics") && (
           <Autocomplete
             multiple
+            limitTags={1}
             size="small"
             fullWidth
+            sx={compactMultiAutocompleteSx}
             options={CLASS_BOOK_OPTIONS}
             getOptionLabel={(option) => t(option.label)}
             value={CLASS_BOOK_OPTIONS.filter((o) =>
@@ -604,8 +609,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         {selectedType === "heroics" && (
           <Autocomplete
             multiple
+            limitTags={1}
             size="small"
             fullWidth
+            sx={compactMultiAutocompleteSx}
             options={classList.map((c) => c.name)}
             value={selectedHeroicClasses}
             onChange={(e, newValue) => onHeroicClassesChange(newValue)}
@@ -635,8 +642,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         {selectedType === "optionals" && (
           <Autocomplete
             multiple
+            limitTags={1}
             size="small"
             fullWidth
+            sx={compactMultiAutocompleteSx}
             options={[
               "quirk",
               "camp-activities",
@@ -691,8 +700,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
               <Autocomplete
                 multiple
+                limitTags={1}
                 size="small"
                 fullWidth
+                sx={compactMultiAutocompleteSx}
                 options={QUALITY_CATEGORY_OPTIONS}
                 getOptionLabel={(option) => t(option.label)}
                 value={QUALITY_CATEGORY_OPTIONS.filter((o) =>
@@ -722,18 +733,15 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                   })
                 }
               />
-              {/* <Tooltip title={t("Clear Filters")}>
-                <IconButton size="small" onClick={() => onQualityCategoriesChange([])}>
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Tooltip> */}
             </Box>
 
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
               <Autocomplete
                 multiple
+                limitTags={1}
                 size="small"
                 fullWidth
+                sx={compactMultiAutocompleteSx}
                 options={QUALITY_FILTER_OPTIONS}
                 getOptionLabel={(option) => t(option.label)}
                 value={QUALITY_FILTER_OPTIONS.filter((o) =>
@@ -763,18 +771,9 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                   })
                 }
               />
-              {/* <Tooltip title={t("Clear Filters")}>
-                <IconButton size="small" onClick={() => onQualityFiltersChange([])}>
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Tooltip> */}
             </Box>
           </>
         )}
-
-        {/* <Typography variant="caption" color="text.secondary" sx={{ mt: -0.5 }}>
-          {filteredItems.length} {t("items")}
-        </Typography> */}
       </Paper>
       <TableContainer
         component={Paper}
@@ -828,215 +827,92 @@ export const ItemCard = React.memo(function ItemCard({
   item,
   id,
   onHeaderClick,
+  actionContent,
+  imageMode = "slot",
+  showImageToggle = false,
 }) {
+  const sharedProps = {
+    item,
+    id,
+    onHeaderClick,
+    actionContent,
+    imageMode,
+    showImageToggle,
+  };
   switch (type) {
     case "weapons":
-      return (
-        <SharedWeaponCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedWeaponCard {...sharedProps} />;
     case "armor":
-      return (
-        <SharedArmorCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedArmorCard {...sharedProps} />;
     case "shields":
-      return (
-        <SharedShieldCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedShieldCard {...sharedProps} />;
     case "spells":
-      return (
-        <SharedSpellCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedSpellCard {...sharedProps} />;
     case "player-spells":
       if (!item.spellType || item.spellType === "default") {
-        return (
-          <SharedPlayerSpellCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedPlayerSpellCard {...sharedProps} />;
       } else if (item.spellType === "gamble") {
-        return (
-          <SharedGambleSpellCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedGambleSpellCard {...sharedProps} />;
       } else if (item.spellType === "gift") {
-        return (
-          <SharedGiftCard item={item} id={id} onHeaderClick={onHeaderClick} />
-        );
+        return <SharedGiftCard {...sharedProps} />;
       } else if (item.spellType === "dance") {
-        return (
-          <SharedDanceCard item={item} id={id} onHeaderClick={onHeaderClick} />
-        );
+        return <SharedDanceCard {...sharedProps} />;
       } else if (item.spellType === "therioform") {
-        return (
-          <SharedTherioformCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedTherioformCard {...sharedProps} />;
       } else if (item.spellType === "magichant") {
-        return (
-          <SharedMagichantCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedMagichantCard {...sharedProps} />;
       } else if (item.spellType === "symbol") {
-        return (
-          <SharedSymbolCard item={item} id={id} onHeaderClick={onHeaderClick} />
-        );
+        return <SharedSymbolCard {...sharedProps} />;
       } else if (item.spellType === "invocation") {
-        return (
-          <SharedInvocationCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedInvocationCard {...sharedProps} />;
       } else if (item.spellType === "magiseed") {
-        return (
-          <SharedMagiseedCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedMagiseedCard {...sharedProps} />;
       } else if (item.spellType === "tinkerer-alchemy") {
-        return (
-          <SharedAlchemyCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedAlchemyCard {...sharedProps} />;
       } else if (item.spellType === "tinkerer-infusion") {
-        return (
-          <SharedInfusionCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedInfusionCard {...sharedProps} />;
       } else if (item.spellType === "tinkerer-magitech") {
-        return (
-          <SharedMagitechCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedMagitechCard {...sharedProps} />;
       } else if (item.spellType === "cooking") {
-        return (
-          <SharedCookingCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedCookingCard {...sharedProps} />;
       } else if (item.spellType === "pilot-vehicle") {
-        return (
-          <SharedPilotVehicleCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedPilotVehicleCard {...sharedProps} />;
       } else if (
         item.spellType === "arcanist" ||
         item.spellType === "arcanist-rework"
       ) {
-        return (
-          <SharedArcanumCard
-            item={item}
-            id={id}
-            onHeaderClick={onHeaderClick}
-          />
-        );
+        return <SharedArcanumCard {...sharedProps} />;
       }
-      return (
-        <SharedPlayerSpellCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedPlayerSpellCard {...sharedProps} />;
     case "attacks":
-      return (
-        <SharedAttackCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedAttackCard {...sharedProps} />;
     case "qualities":
-      return (
-        <SharedQualityCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedQualityCard {...sharedProps} />;
     case "classes":
-      return (
-        <SharedClassCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedClassCard {...sharedProps} />;
     case "heroics":
-      return (
-        <SharedHeroicCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedHeroicCard {...sharedProps} />;
     case "mnemospheres":
-      return (
-        <SharedMnemosphereCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedMnemosphereCard {...sharedProps} />;
     case "hoplospheres":
-      return (
-        <SharedHoplosphereCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedHoplosphereCard {...sharedProps} />;
     case "custom-weapons":
-      return (
-        <SharedCustomWeaponCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedCustomWeaponCard {...sharedProps} />;
     case "accessories":
-      return (
-        <SharedAccessoryCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedAccessoryCard {...sharedProps} />;
     case "special":
-      return (
-        <SharedSpecialRuleCard
-          item={item}
-          id={id}
-          onHeaderClick={onHeaderClick}
-        />
-      );
+      return <SharedSpecialRuleCard {...sharedProps} />;
     case "actions":
-      return (
-        <SharedActionCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedActionCard {...sharedProps} />;
     case "optionals":
-      return (
-        <SharedOptionalCard item={item} id={id} onHeaderClick={onHeaderClick} />
-      );
+      return <SharedOptionalCard {...sharedProps} />;
     default:
       return null;
   }
 });
 
 // ---------------------------------------------------------------------------
-// Main CompendiumViewer
+// Main CompendiumViewer (full-page route)
 // ---------------------------------------------------------------------------
 
 const SIDEBAR_WIDTH = 300;
@@ -1044,14 +920,13 @@ const SIDEBAR_WIDTH = 300;
 function CompendiumViewer() {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
-  const muiTheme = useTheme();
-  const isDesktop = useMediaQuery(muiTheme.breakpoints.up("md"));
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(null);
   const [shareSnackOpen, setShareSnackOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const mainRef = useRef(null);
 
   // Pack state
   const {
@@ -1069,9 +944,8 @@ function CompendiumViewer() {
   const [newPackName, setNewPackName] = useState("");
   const [newPackFuid, setNewPackFuid] = useState("");
   const [newPackFuidTouched, setNewPackFuidTouched] = useState(false);
-  const [createItemDialogOpen, setCreateItemDialogOpen] = useState(false);
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
-  const [editClassItem, setEditClassItem] = useState(null); // { item, packItemId }
+  const [editClassItem, setEditClassItem] = useState(null);
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
   const [editingPackName, setEditingPackName] = useState("");
   const [editingPackFuid, setEditingPackFuid] = useState("");
@@ -1081,8 +955,6 @@ function CompendiumViewer() {
   const [editingRequires, setEditingRequires] = useState([]);
   const [editingAutoRequires, setEditingAutoRequires] = useState([]);
   const [editingOptional, setEditingOptional] = useState([]);
-
-  // Export meta lives inside the Manage Pack dialog (not a separate dialog)
   const [exportMeta, setExportMeta] = useState({
     version: "1.0.0",
     homepageUrl: "",
@@ -1090,11 +962,9 @@ function CompendiumViewer() {
     downloadUrl: "",
   });
   const [exporting, setExporting] = useState(false);
-
   const [manageModulesOpen, setManageModulesOpen] = useState(false);
-  const [_pendingNavPackId, setPendingNavPackId] = useState(null);
+  const [, setPendingNavPackId] = useState(null);
 
-  // Always ensure the personal pack exists so it shows in the dropdown
   useEffect(() => {
     ensurePersonalPack();
   }, [ensurePersonalPack]);
@@ -1104,7 +974,6 @@ function CompendiumViewer() {
     [packs],
   );
   const rawSelectedCompendium = searchParams.get("compendium") ?? "official";
-  // If the selected pack was deactivated, fall back to official
   const selectedCompendium =
     rawSelectedCompendium === "official" ||
     activePacks.some((p) => p.id === rawSelectedCompendium)
@@ -1150,6 +1019,7 @@ function CompendiumViewer() {
     [editingRequires, editingAutoRequires],
   );
 
+  // URL-backed filter values
   const selectedType = searchParams.get("type") ?? "weapons";
   const selectedSpellClass = searchParams.get("class") ?? "";
   const selectedModuleType = searchParams.get("moduleType") ?? "";
@@ -1186,15 +1056,16 @@ function CompendiumViewer() {
     return subtypes ? subtypes.split(",") : [];
   }, [searchParams]);
 
+  // Cleanup stale magichantSubtype URL param
   useEffect(() => {
     const hasSubtypeParam = searchParams.has("magichantSubtype");
     if (!hasSubtypeParam) return;
-    const shouldKeepSubtype =
+    const shouldKeep =
       selectedType === "player-spells" &&
       isChanterClassSelected &&
       (selectedMagichantSubtype === "key" ||
         selectedMagichantSubtype === "tone");
-    if (shouldKeepSubtype) return;
+    if (shouldKeep) return;
     const next = new URLSearchParams(searchParams);
     next.delete("magichantSubtype");
     setSearchParams(next, { replace: true });
@@ -1206,67 +1077,8 @@ function CompendiumViewer() {
     setSearchParams,
   ]);
 
-  const mainRef = useRef(null);
-  const selectedCardRef = useRef(null);
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
-  const matchesPilotModuleType = useCallback((item, moduleType) => {
-    const filter = String(moduleType || "").toLowerCase();
-    if (!filter) return true;
-
-    if (filter === "frame") {
-      return (
-        item?.pilotSubtype === "frame" ||
-        String(item?.category || "").toLowerCase() === "frame" ||
-        item?.passengers != null ||
-        String(item?.name || "")
-          .toLowerCase()
-          .includes("pilot_frame_")
-      );
-    }
-
-    const normalizedValues = [
-      item?.type,
-      item?.category,
-      item?.name,
-      item?.spellType,
-    ]
-      .filter(Boolean)
-      .map((value) => String(value).toLowerCase());
-
-    const matchesFlatField = normalizedValues.some(
-      (value) =>
-        value === `pilot_module_${filter}` ||
-        value.endsWith(`_${filter}`) ||
-        value.includes(`module_${filter}`) ||
-        value.includes(`${filter} module`),
-    );
-    if (matchesFlatField) return true;
-
-    if (!Array.isArray(item?.modules) || item.modules.length === 0)
-      return false;
-    return item.modules.some((module) => {
-      const moduleValues = [module?.type, module?.category, module?.name]
-        .filter(Boolean)
-        .map((value) => String(value).toLowerCase());
-      return moduleValues.some(
-        (value) =>
-          value === `pilot_module_${filter}` ||
-          value.endsWith(`_${filter}`) ||
-          value.includes(`module_${filter}`) ||
-          value.includes(`${filter} module`),
-      );
-    });
-  }, []);
-
-  const matchesInvokerWellspring = useCallback((item, wellspring) => {
-    const filter = normalizeWellspring(wellspring);
-    if (!filter) return true;
-    return normalizeWellspring(getItemWellspring(item)) === filter;
-  }, []);
-
   // Lock page scroll while this route is mounted
-  React.useEffect(() => {
+  useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "";
@@ -1281,257 +1093,209 @@ function CompendiumViewer() {
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Compute filtered items
-  const activeSpellCls = useMemo(() => {
-    if (selectedType !== "player-spells" || !selectedSpellClass) return null;
-    return classList.find((c) => c.name === selectedSpellClass) ?? null;
-  }, [selectedType, selectedSpellClass]);
-
-  const filteredItems = useMemo(() => {
-    // Pack mode
-    if (activePack) {
-      const packType = VIEWER_TO_PACK_TYPE[selectedType];
-      let items = activePack.items
-        .filter((i) => !packType || i.type === packType)
-        // Embed the pack item id so Remove can find it later
-        .map((i) => ({ ...i.data, _packItemId: i.id }));
-
-      if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
-        items = items.filter(
-          (item) =>
-            item.filter &&
-            selectedQualityFilters.some((f) => item.filter.includes(f)),
-        );
-      }
-
-      if (
-        selectedType === "qualities" &&
-        selectedQualityCategories.length > 0
-      ) {
-        items = items.filter(
-          (item) =>
-            item.category && selectedQualityCategories.includes(item.category),
-        );
-      }
-
-      if (selectedType === "classes" && selectedBook.length > 0) {
-        items = items.filter((item) => selectedBook.includes(item.book));
-      }
-
-      if (selectedType === "heroics" && selectedBook.length > 0) {
-        items = items.filter((item) => selectedBook.includes(item.book));
-      }
-
-      if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
-        items = items.filter(
-          (item) =>
-            item.applicableTo &&
-            selectedHeroicClasses.some((c) => item.applicableTo.includes(c)),
-        );
-      }
-
-      if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
-        items = items.filter((item) =>
-          selectedOptionalSubtypes.includes(item.subtype),
-        );
-      }
-
-      if (selectedType === "player-spells" && selectedSpellClass) {
-        const spellClasses = activeSpellCls?.benefits?.spellClasses ?? [];
-        items = items.filter((item) => {
-          if (
-            spellClasses.includes("default") &&
-            item.class === selectedSpellClass
-          ) {
-            return true;
-          }
-          return spellClasses.includes(item.spellType);
-        });
-      }
-      if (
-        selectedType === "player-spells" &&
-        isPilotClassSelected &&
-        selectedModuleType
-      ) {
-        items = items.filter((item) =>
-          matchesPilotModuleType(item, selectedModuleType),
-        );
-      }
-      if (
-        selectedType === "player-spells" &&
-        isChanterClassSelected &&
-        selectedMagichantSubtype
-      ) {
-        items = items.filter((item) => {
-          const isKey =
-            item.magichantSubtype === "key" ||
-            item.type ||
-            item.status ||
-            item.attribute ||
-            item.recovery;
-          return selectedMagichantSubtype === "key" ? isKey : !isKey;
-        });
-      }
-      if (
-        selectedType === "player-spells" &&
-        isInvokerClassSelected &&
-        selectedWellspring
-      ) {
-        items = items.filter((item) =>
-          matchesInvokerWellspring(item, selectedWellspring),
-        );
-      }
-
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        items = items.filter((item) => getItemSearchText(item).includes(q));
-      }
-      return items;
-    }
-
-    // Official mode
-    if (selectedType !== "player-spells") {
-      let items = getItems(selectedType);
-
-      if (selectedType === "classes") {
-        // Filter out blank classes and homebrew from official data
-        items = items.filter(
-          (c) => c.name !== "Blank Class" && c.book !== "homebrew",
-        );
-        if (selectedBook.length > 0) {
-          items = items.filter((item) => selectedBook.includes(item.book));
-        }
-      }
-
-      if (selectedType === "qualities" && selectedQualityFilters.length > 0) {
-        items = items.filter(
-          (item) =>
-            item.filter &&
-            selectedQualityFilters.some((f) => item.filter.includes(f)),
-        );
-      }
-
-      if (
-        selectedType === "qualities" &&
-        selectedQualityCategories.length > 0
-      ) {
-        items = items.filter(
-          (item) =>
-            item.category && selectedQualityCategories.includes(item.category),
-        );
-      }
-
-      if (selectedType === "heroics" && selectedBook.length > 0) {
-        items = items.filter((item) => selectedBook.includes(item.book));
-      }
-
-      if (selectedType === "heroics" && selectedHeroicClasses.length > 0) {
-        items = items.filter(
-          (item) =>
-            item.applicableTo &&
-            selectedHeroicClasses.some((c) => item.applicableTo.includes(c)),
-        );
-      }
-
-      if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
-        items = items.filter((item) =>
-          selectedOptionalSubtypes.includes(item.subtype),
-        );
-      }
-
-      if (!searchQuery.trim()) return items;
-      const q = searchQuery.toLowerCase();
-      return items.filter((item) => getItemSearchText(item).includes(q));
-    }
-
-    // Build player-spells list
-    let items;
-    if (!activeSpellCls) {
-      // No class selected — show all static spells
-      items = spellList;
-    } else {
-      const scs = activeSpellCls.benefits?.spellClasses ?? [];
-      items = [];
-      for (const sc of scs) {
-        if (sc === "default") {
-          items.push(...(spellsByClass[activeSpellCls.name] || []));
-        } else if (sc === "cooking") {
-          items.push(
-            ...staticDelicacyEffects.map((eff) => ({
-              name: `Delicacy #${eff.id}`,
-              spellType: "cooking",
-              ...eff,
-            })),
-          );
-        } else {
-          const nonStatic = getNonStaticSpellItems(sc);
-          if (nonStatic) items.push(...nonStatic);
-        }
-      }
-    }
-
-    if (isPilotClassSelected && selectedModuleType) {
-      items = items.filter((item) =>
-        matchesPilotModuleType(item, selectedModuleType),
-      );
-    }
-    if (isChanterClassSelected && selectedMagichantSubtype) {
-      items = items.filter((item) => {
-        const isKey =
-          item.magichantSubtype === "key" ||
-          item.type ||
-          item.status ||
-          item.attribute ||
-          item.recovery;
-        return selectedMagichantSubtype === "key" ? isKey : !isKey;
-      });
-    }
-    if (isInvokerClassSelected && selectedWellspring) {
-      items = items.filter((item) =>
-        matchesInvokerWellspring(item, selectedWellspring),
-      );
-    }
-
-    if (!searchQuery.trim()) return items;
-    const q = searchQuery.toLowerCase();
-    return items.filter((item) =>
-      [item.name, item.class, item.spellType, item.wellspring]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(q),
-    );
-  }, [
-    activePack,
+  // Build filters + handlers objects that CompendiumBrowser expects
+  const filters = {
     selectedType,
-    searchQuery,
-    activeSpellCls,
     selectedSpellClass,
-    selectedQualityFilters,
-    selectedQualityCategories,
-    selectedBook,
-    selectedHeroicClasses,
-    selectedOptionalSubtypes,
-    isPilotClassSelected,
-    isChanterClassSelected,
-    isInvokerClassSelected,
     selectedModuleType,
     selectedMagichantSubtype,
     selectedWellspring,
-    matchesInvokerWellspring,
-    matchesPilotModuleType,
-  ]);
+    selectedBook,
+    selectedQualityFilters,
+    selectedQualityCategories,
+    selectedHeroicClasses,
+    selectedOptionalSubtypes,
+    selectedCompendium,
+    searchQuery,
+    isPilotClassSelected,
+    isChanterClassSelected,
+    isInvokerClassSelected,
+  };
 
-  // Stable IDs per item (index in the filtered list)
-  const itemIds = useMemo(
-    () => filteredItems.map((item, idx) => makeId(item.name, idx)),
-    [filteredItems],
+  const urlBase = useCallback(
+    () =>
+      selectedCompendium !== "official"
+        ? { compendium: selectedCompendium }
+        : {},
+    [selectedCompendium],
   );
 
-  const selectedItem = selectedIdx !== null ? filteredItems[selectedIdx] : null;
-  const [downloadSelectedImage] = useDownloadImage(
-    selectedItem?.name ?? "",
-    selectedCardRef,
+  const handlers = useMemo(
+    () => ({
+      handleTypeChange: (type, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        setSearchParams({ ...urlBase(), type });
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleSpellClassChange: (cls, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const newParams = {
+          ...urlBase(),
+          type: selectedType,
+          ...(cls ? { class: cls } : {}),
+        };
+        if (String(cls).toLowerCase() === "pilot" && selectedModuleType)
+          newParams.moduleType = selectedModuleType;
+        if (String(cls).toLowerCase() === "chanter" && selectedMagichantSubtype)
+          newParams.magichantSubtype = selectedMagichantSubtype;
+        if (String(cls).toLowerCase() === "invoker" && selectedWellspring)
+          newParams.wellspring = selectedWellspring;
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleModuleTypeChange: (moduleType, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        setSearchParams({
+          ...urlBase(),
+          type: selectedType,
+          ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+          ...(moduleType ? { moduleType } : {}),
+        });
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleMagichantSubtypeChange: (magichantSubtype, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const safe =
+          magichantSubtype === "key" || magichantSubtype === "tone"
+            ? magichantSubtype
+            : "";
+        setSearchParams({
+          ...urlBase(),
+          type: selectedType,
+          ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+          ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
+          ...(safe ? { magichantSubtype: safe } : {}),
+        });
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleWellspringChange: (wellspring, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        setSearchParams({
+          ...urlBase(),
+          type: selectedType,
+          ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+          ...(wellspring ? { wellspring } : {}),
+        });
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleBookChange: (books, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const heroicClasses = searchParams.get("heroicClasses");
+        const newParams = { ...urlBase(), type: selectedType };
+        if (books.length > 0) newParams.book = books.join(",");
+        if (heroicClasses) newParams.heroicClasses = heroicClasses;
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleQualityFiltersChange: (filters, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const categories = searchParams.get("qualityCategories");
+        const newParams = { ...urlBase(), type: selectedType };
+        if (filters.length > 0) newParams.qualityFilters = filters.join(",");
+        if (categories) newParams.qualityCategories = categories;
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleQualityCategoriesChange: (categories, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const qFilters = searchParams.get("qualityFilters");
+        const newParams = { ...urlBase(), type: selectedType };
+        if (categories.length > 0)
+          newParams.qualityCategories = categories.join(",");
+        if (qFilters) newParams.qualityFilters = qFilters;
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleHeroicClassesChange: (classes, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const book = searchParams.get("book");
+        const newParams = { ...urlBase(), type: selectedType };
+        if (classes.length > 0) newParams.heroicClasses = classes.join(",");
+        if (book) newParams.book = book;
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleOptionalSubtypesChange: (subtypes, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const book = searchParams.get("book");
+        const newParams = { ...urlBase(), type: selectedType };
+        if (subtypes.length > 0)
+          newParams.optionalSubtypes = subtypes.join(",");
+        if (book) newParams.book = book;
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleCompendiumChange: (
+        compendium,
+        { onManageModules, scrollRef } = {},
+      ) => {
+        if (compendium === "__manage_modules__") {
+          setManageModulesOpen(true);
+          return;
+        }
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const base = compendium !== "official" ? { compendium } : {};
+        setSearchParams({ ...base, type: selectedType });
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleItemClick: (
+        item,
+        idx,
+        { isDesktop: _isDesktop, setDrawerOpen: _sd } = {},
+      ) => {
+        setSelectedIdx(idx);
+        setSearchParams({
+          ...urlBase(),
+          type: selectedType,
+          ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
+          ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
+          ...(selectedMagichantSubtype
+            ? { magichantSubtype: selectedMagichantSubtype }
+            : {}),
+          ...(selectedWellspring ? { wellspring: selectedWellspring } : {}),
+          ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
+          ...(selectedQualityFilters.length > 0
+            ? { qualityFilters: selectedQualityFilters.join(",") }
+            : {}),
+          ...(selectedQualityCategories.length > 0
+            ? { qualityCategories: selectedQualityCategories.join(",") }
+            : {}),
+          ...(selectedHeroicClasses.length > 0
+            ? { heroicClasses: selectedHeroicClasses.join(",") }
+            : {}),
+          ...(selectedOptionalSubtypes.length > 0
+            ? { optionalSubtypes: selectedOptionalSubtypes.join(",") }
+            : {}),
+          item: toSlug(item.name),
+        });
+      },
+    }),
+    [
+      searchParams,
+      setSearchParams,
+      urlBase,
+      selectedType,
+      selectedSpellClass,
+      selectedModuleType,
+      selectedMagichantSubtype,
+      selectedWellspring,
+      selectedBook,
+      selectedQualityFilters,
+      selectedQualityCategories,
+      selectedHeroicClasses,
+      selectedOptionalSubtypes,
+    ],
   );
 
   const handleShareUrl = useCallback(async () => {
@@ -1545,251 +1309,6 @@ function CompendiumViewer() {
     setShareSnackOpen(true);
   }, [searchParams]);
 
-  // Restore selection from URL params on mount / when filteredItems change
-  useEffect(() => {
-    const itemSlug = searchParams.get("item");
-    if (!itemSlug) return;
-    const idx = filteredItems.findIndex(
-      (item) => toSlug(item.name) === itemSlug,
-    );
-    if (idx === -1) return;
-    setSelectedIdx(idx);
-    const id = itemIds[idx];
-    requestAnimationFrame(() => {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: "instant", block: "center" });
-    });
-    // Only run when filteredItems/itemIds change (covers initial load + type change from URL)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredItems, itemIds]);
-
-  const handleTypeChange = useCallback(
-    (type) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      setSearchParams({ ...base, type });
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [selectedCompendium, setSearchParams],
-  );
-
-  const handleSpellClassChange = useCallback(
-    (cls) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const newParams = {
-        ...base,
-        type: selectedType,
-        ...(cls ? { class: cls } : {}),
-      };
-      if (String(cls).toLowerCase() === "pilot" && selectedModuleType) {
-        newParams.moduleType = selectedModuleType;
-      }
-      if (String(cls).toLowerCase() === "chanter" && selectedMagichantSubtype) {
-        newParams.magichantSubtype = selectedMagichantSubtype;
-      }
-      if (String(cls).toLowerCase() === "invoker" && selectedWellspring) {
-        newParams.wellspring = selectedWellspring;
-      }
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [
-      selectedCompendium,
-      selectedType,
-      setSearchParams,
-      selectedModuleType,
-      selectedMagichantSubtype,
-      selectedWellspring,
-    ],
-  );
-
-  const handleModuleTypeChange = useCallback(
-    (moduleType) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const newParams = {
-        ...base,
-        type: selectedType,
-        ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
-        ...(moduleType ? { moduleType } : {}),
-      };
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [selectedCompendium, selectedType, selectedSpellClass, setSearchParams],
-  );
-
-  const handleMagichantSubtypeChange = useCallback(
-    (magichantSubtype) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const safeSubtype =
-        magichantSubtype === "key" || magichantSubtype === "tone"
-          ? magichantSubtype
-          : "";
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const newParams = {
-        ...base,
-        type: selectedType,
-        ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
-        ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
-        ...(safeSubtype ? { magichantSubtype: safeSubtype } : {}),
-      };
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [
-      selectedCompendium,
-      selectedSpellClass,
-      selectedType,
-      selectedModuleType,
-      setSearchParams,
-    ],
-  );
-
-  const handleWellspringChange = useCallback(
-    (wellspring) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const newParams = {
-        ...base,
-        type: selectedType,
-        ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
-        ...(wellspring ? { wellspring } : {}),
-      };
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [selectedCompendium, selectedSpellClass, selectedType, setSearchParams],
-  );
-
-  const handleBookChange = useCallback(
-    (books) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const heroicClasses = searchParams.get("heroicClasses");
-      const newParams = { ...base, type: selectedType };
-      if (books.length > 0) newParams.book = books.join(",");
-      if (heroicClasses) newParams.heroicClasses = heroicClasses;
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [selectedCompendium, selectedType, setSearchParams, searchParams],
-  );
-
-  const handleQualityFiltersChange = useCallback(
-    (filters) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const categories = searchParams.get("qualityCategories");
-      const newParams = { ...base, type: selectedType };
-      if (filters.length > 0) newParams.qualityFilters = filters.join(",");
-      if (categories) newParams.qualityCategories = categories;
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [selectedCompendium, selectedType, setSearchParams, searchParams],
-  );
-
-  const handleQualityCategoriesChange = useCallback(
-    (categories) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const filters = searchParams.get("qualityFilters");
-      const newParams = { ...base, type: selectedType };
-      if (categories.length > 0)
-        newParams.qualityCategories = categories.join(",");
-      if (filters) newParams.qualityFilters = filters;
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [selectedCompendium, selectedType, setSearchParams, searchParams],
-  );
-
-  const handleHeroicClassesChange = useCallback(
-    (classes) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const book = searchParams.get("book");
-      const newParams = { ...base, type: selectedType };
-      if (classes.length > 0) newParams.heroicClasses = classes.join(",");
-      if (book) newParams.book = book;
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [selectedCompendium, selectedType, setSearchParams, searchParams],
-  );
-
-  const handleOptionalSubtypesChange = useCallback(
-    (subtypes) => {
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      const book = searchParams.get("book");
-      const newParams = { ...base, type: selectedType };
-      if (subtypes.length > 0) newParams.optionalSubtypes = subtypes.join(",");
-      if (book) newParams.book = book;
-      setSearchParams(newParams);
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [selectedCompendium, selectedType, setSearchParams, searchParams],
-  );
-
-  const handleCompendiumChange = useCallback(
-    (compendium) => {
-      if (compendium === "__manage_modules__") {
-        setManageModulesOpen(true);
-        return;
-      }
-      setSearchQuery("");
-      setSelectedIdx(null);
-      const defaultType = compendium !== "official" ? "weapons" : "weapons";
-      const base = compendium !== "official" ? { compendium } : {};
-      setSearchParams({ ...base, type: defaultType });
-      if (mainRef.current) mainRef.current.scrollTop = 0;
-    },
-    [setSearchParams],
-  );
-
   const handleNewPack = useCallback(async () => {
     if (!newPackName.trim()) return;
     const fuid = toSlug(newPackFuid) || toSlug(newPackName) || undefined;
@@ -1797,7 +1316,7 @@ function CompendiumViewer() {
     setNewPackName("");
     setNewPackFuid("");
     setNewPackFuidTouched(false);
-    setPendingNavPackId(id); // navigate in onExited
+    setPendingNavPackId(id);
     setNewPackDialogOpen(false);
   }, [newPackName, newPackFuid, createPack]);
 
@@ -1821,159 +1340,70 @@ function CompendiumViewer() {
     }
   }, [activePack, exportAsModule, exportMeta]);
 
-  const handleItemClick = useCallback(
-    (item, idx) => {
-      setSelectedIdx(idx);
-      const base =
-        selectedCompendium !== "official"
-          ? { compendium: selectedCompendium }
-          : {};
-      setSearchParams({
-        ...base,
-        type: selectedType,
-        ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
-        ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
-        ...(selectedMagichantSubtype
-          ? { magichantSubtype: selectedMagichantSubtype }
-          : {}),
-        ...(selectedWellspring ? { wellspring: selectedWellspring } : {}),
-        ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
-        ...(selectedQualityFilters.length > 0
-          ? { qualityFilters: selectedQualityFilters.join(",") }
-          : {}),
-        ...(selectedQualityCategories.length > 0
-          ? { qualityCategories: selectedQualityCategories.join(",") }
-          : {}),
-        ...(selectedHeroicClasses.length > 0
-          ? { heroicClasses: selectedHeroicClasses.join(",") }
-          : {}),
-        ...(selectedOptionalSubtypes.length > 0
-          ? { optionalSubtypes: selectedOptionalSubtypes.join(",") }
-          : {}),
-        item: toSlug(item.name),
-      });
-      const id = itemIds[idx];
-      const scrollToItem = () => {
-        const el = document.getElementById(id);
-        if (el) {
-          requestAnimationFrame(() => {
-            el.scrollIntoView({ behavior: "auto", block: "center" });
-          });
-        }
-      };
-      if (!isDesktop) {
-        setDrawerOpen(false);
-        setTimeout(scrollToItem, 300); // wait for drawer close animation
-      } else {
-        requestAnimationFrame(scrollToItem);
-      }
-    },
+  // Quickcreate subtype hint computed from active spell class
+  const activeSpellCls = useMemo(() => {
+    if (selectedType !== "player-spells" || !selectedSpellClass) return null;
+    return classList.find((c) => c.name === selectedSpellClass) ?? null;
+  }, [selectedType, selectedSpellClass]);
+  const quickCreateInitialSubtype = useMemo(() => {
+    if (selectedType !== "player-spells" || !activeSpellCls) return null;
+    const spellClasses = activeSpellCls.benefits?.spellClasses ?? [];
+    const nonDefault = spellClasses.find((sc) => sc !== "default");
+    return nonDefault ?? (spellClasses.includes("default") ? "default" : null);
+  }, [selectedType, activeSpellCls]);
+
+  // Route-specific item actions (share, download, export, pack management)
+  const renderItemActions = useCallback(
+    (item, _idx, _selectedItem) => (
+      <>
+        <Tooltip title={t("Share URL")}>
+          <IconButton size="small" onClick={handleShareUrl}>
+            <ShareIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("Download as Image")}>
+          {/* download is handled by CompendiumBrowser via showDownloadImage */}
+          <span style={{ display: "none" }} />
+        </Tooltip>
+        <Export name={item.name} dataType={selectedType} data={item} />
+        {selectedCompendium !== "official" &&
+          selectedType === "classes" &&
+          item._packItemId &&
+          !activePack?.locked && (
+            <Tooltip title={t("Edit Class")}>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  setEditClassItem({ item, packItemId: item._packItemId })
+                }
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+        {selectedCompendium !== "official" &&
+          item._packItemId &&
+          !activePack?.locked && (
+            <Tooltip title={t("Remove from pack")}>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => handleRemoveFromPack(item)}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+      </>
+    ),
     [
-      itemIds,
-      isDesktop,
+      t,
+      handleShareUrl,
       selectedType,
-      selectedSpellClass,
       selectedCompendium,
-      selectedModuleType,
-      selectedMagichantSubtype,
-      selectedWellspring,
-      selectedBook,
-      selectedQualityFilters,
-      selectedQualityCategories,
-      selectedHeroicClasses,
-      selectedOptionalSubtypes,
-      setSearchParams,
+      activePack,
+      handleRemoveFromPack,
     ],
-  );
-
-  // Memoize click handlers per item to prevent ItemCard re-renders from stale closures
-  const itemClickHandlers = useMemo(
-    () => filteredItems.map((item, idx) => () => handleItemClick(item, idx)),
-    [filteredItems, handleItemClick],
-  );
-
-  const sidebarContent = (
-    <CompendiumSidebar
-      selectedType={selectedType}
-      onTypeChange={handleTypeChange}
-      searchQuery={searchQuery}
-      onSearchChange={(q) => {
-        setSearchQuery(q);
-        setSelectedIdx(null);
-        const base =
-          selectedCompendium !== "official"
-            ? { compendium: selectedCompendium }
-            : {};
-        setSearchParams({
-          ...base,
-          type: selectedType,
-          ...(selectedSpellClass ? { class: selectedSpellClass } : {}),
-          ...(selectedModuleType ? { moduleType: selectedModuleType } : {}),
-          ...(selectedMagichantSubtype
-            ? { magichantSubtype: selectedMagichantSubtype }
-            : {}),
-          ...(selectedWellspring ? { wellspring: selectedWellspring } : {}),
-          ...(selectedBook.length > 0 ? { book: selectedBook.join(",") } : {}),
-          ...(selectedQualityFilters.length > 0
-            ? { qualityFilters: selectedQualityFilters.join(",") }
-            : {}),
-          ...(selectedQualityCategories.length > 0
-            ? { qualityCategories: selectedQualityCategories.join(",") }
-            : {}),
-          ...(selectedOptionalSubtypes.length > 0
-            ? { optionalSubtypes: selectedOptionalSubtypes.join(",") }
-            : {}),
-        });
-      }}
-      filteredItems={filteredItems}
-      onItemClick={handleItemClick}
-      selectedIdx={selectedIdx}
-      selectedSpellClass={selectedSpellClass}
-      onSpellClassChange={handleSpellClassChange}
-      selectedModuleType={selectedModuleType}
-      onModuleTypeChange={handleModuleTypeChange}
-      selectedMagichantSubtype={selectedMagichantSubtype}
-      onMagichantSubtypeChange={handleMagichantSubtypeChange}
-      selectedWellspring={selectedWellspring}
-      onWellspringChange={handleWellspringChange}
-      selectedQualityFilters={selectedQualityFilters}
-      onQualityFiltersChange={handleQualityFiltersChange}
-      selectedQualityCategories={selectedQualityCategories}
-      onQualityCategoriesChange={handleQualityCategoriesChange}
-      selectedBook={selectedBook}
-      onBookChange={handleBookChange}
-      selectedHeroicClasses={selectedHeroicClasses}
-      onHeroicClassesChange={handleHeroicClassesChange}
-      selectedOptionalSubtypes={selectedOptionalSubtypes}
-      onOptionalSubtypesChange={handleOptionalSubtypesChange}
-      packs={activePacks}
-      selectedCompendium={selectedCompendium}
-      onCompendiumChange={handleCompendiumChange}
-      onNewPack={() => setNewPackDialogOpen(true)}
-      onManagePack={() => {
-        setEditingPackName(activePack?.name ?? "");
-        setEditingPackFuid(activePack?.fuid ?? toSlug(activePack?.name ?? ""));
-        setEditingPackFuidTouched(false);
-        setEditingDescription(activePack?.description ?? "");
-        setEditingAuthor(activePack?.author ?? "");
-        setEditingRequires(
-          activePack?.requiresManual ?? activePack?.requires ?? [],
-        );
-        setEditingAutoRequires(activePack?.requiresAuto ?? []);
-        setEditingOptional(activePack?.optional ?? []);
-        setExportMeta({
-          version: "1.0.0",
-          homepageUrl: "",
-          manifestUrl: "",
-          downloadUrl: "",
-        });
-        setManageDialogOpen(true);
-      }}
-      activePack={activePack}
-      onToggleLock={toggleLock}
-      onOpenCreateDialog={() => setCreateItemDialogOpen(true)}
-      onOpenQuickCreate={() => setQuickCreateOpen(true)}
-    />
   );
 
   return (
@@ -1982,273 +1412,68 @@ function CompendiumViewer() {
         <Box
           sx={{
             display: "flex",
+            flexDirection: "column",
             height: "calc(100vh - 6em)",
             overflow: "hidden",
           }}
         >
-          {/* ---- Desktop sidebar ---- */}
-          {isDesktop && (
-            <Box
-              sx={{
-                width: SIDEBAR_WIDTH,
-                flexShrink: 0,
-                borderRight: `1px solid ${muiTheme.palette.divider}`,
-                height: "100%",
-                overflow: "hidden",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {sidebarContent}
-            </Box>
-          )}
-
-          {/* ---- Mobile drawer ---- */}
-          {!isDesktop && (
-            <Drawer
-              anchor="left"
-              open={drawerOpen}
-              onClose={() => setDrawerOpen(false)}
-              PaperProps={{ sx: { width: "85vw", maxWidth: 340 } }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  p: 1,
-                }}
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => setDrawerOpen(false)}
-                  aria-label="close sidebar"
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-              <Divider />
-              <Box sx={{ flex: 1, overflow: "hidden" }}>{sidebarContent}</Box>
-            </Drawer>
-          )}
-
-          {/* ---- Main content area ---- */}
-          <Box
-            ref={mainRef}
-            sx={{
-              flex: 1,
-              overflowY: "auto",
-              p: { xs: 1.5, md: 2 },
+          <CompendiumBrowser
+            filters={filters}
+            handlers={handlers}
+            selectedIdx={selectedIdx}
+            setSelectedIdx={setSelectedIdx}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            packs={activePacks}
+            activePack={activePack}
+            onNewPack={() => setNewPackDialogOpen(true)}
+            onManagePack={() => {
+              setEditingPackName(activePack?.name ?? "");
+              setEditingPackFuid(
+                activePack?.fuid ?? toSlug(activePack?.name ?? ""),
+              );
+              setEditingPackFuidTouched(false);
+              setEditingDescription(activePack?.description ?? "");
+              setEditingAuthor(activePack?.author ?? "");
+              setEditingRequires(
+                activePack?.requiresManual ?? activePack?.requires ?? [],
+              );
+              setEditingAutoRequires(activePack?.requiresAuto ?? []);
+              setEditingOptional(activePack?.optional ?? []);
+              setExportMeta({
+                version: "1.0.0",
+                homepageUrl: "",
+                manifestUrl: "",
+                downloadUrl: "",
+              });
+              setManageDialogOpen(true);
             }}
-          >
-            {/* Mobile header */}
-            {!isDesktop && (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mb: 2,
+            onToggleLock={toggleLock}
+            onOpenQuickCreate={() => setQuickCreateOpen(true)}
+            showDownloadImage
+            showShareUrl
+            renderItemActions={renderItemActions}
+            mainSx={{ flex: 1 }}
+          />
+
+          {/* Scroll-to-top FAB */}
+          {showScrollTop && (
+            <Tooltip title={t("Scroll to top")}>
+              <Fab
+                size="small"
+                color="primary"
+                onClick={() => {
+                  if (mainRef.current) mainRef.current.scrollTop = 0;
                 }}
+                sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  {t(
-                    ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "",
-                  )}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                  }}
-                >
-                  ({filteredItems.length})
-                </Typography>
-              </Box>
-            )}
-
-            {/* Mobile FAB — fixed bottom-left */}
-            {!isDesktop && (
-              <Tooltip title={t("Open filters & navigation")}>
-                <Fab
-                  color="primary"
-                  size="medium"
-                  onClick={() => setDrawerOpen(true)}
-                  aria-label="open sidebar"
-                  sx={{
-                    position: "fixed",
-                    bottom: 24,
-                    left: 24,
-                    zIndex: (theme) => theme.zIndex.speedDial,
-                  }}
-                >
-                  <MenuIcon />
-                </Fab>
-              </Tooltip>
-            )}
-
-            {/* Scroll-to-top FAB */}
-            {showScrollTop && (
-              <Tooltip title={t("Scroll to top")}>
-                <Fab
-                  size="small"
-                  color="primary"
-                  onClick={() => {
-                    if (mainRef.current) mainRef.current.scrollTop = 0;
-                  }}
-                  sx={{
-                    position: "fixed",
-                    bottom: 24,
-                    right: 24,
-                    zIndex: 1200,
-                  }}
-                >
-                  <KeyboardArrowUpIcon />
-                </Fab>
-              </Tooltip>
-            )}
-
-            {/* Desktop section title */}
-            {isDesktop && (
-              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-                {t(ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "")}
-                <Typography
-                  component="span"
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                    ml: 1,
-                  }}
-                >
-                  ({filteredItems.length} {t("items")})
-                </Typography>
-              </Typography>
-            )}
-
-            {filteredItems.length === 0 ? (
-              <Typography
-                sx={{
-                  color: "text.secondary",
-                }}
-              >
-                {t("No items found.")}
-              </Typography>
-            ) : (
-              <Grid container spacing={2}>
-                {filteredItems.map((item, idx) => (
-                  <Grid
-                    key={itemIds[idx]}
-                    size={{
-                      xs: 12,
-                      lg: selectedType === "classes" ? 12 : 6,
-                    }}
-                    sx={{ contain: "layout paint" }}
-                  >
-                    <Box
-                      ref={idx === selectedIdx ? selectedCardRef : null}
-                      sx={{
-                        borderRadius: 2,
-                        border:
-                          idx === selectedIdx
-                            ? `2px solid ${customTheme.primary}`
-                            : "2px solid transparent",
-                        transition: "border-color 0.15s ease",
-                        contain: "content",
-                      }}
-                    >
-                      <ItemCard
-                        type={selectedType}
-                        item={item}
-                        id={itemIds[idx]}
-                        onHeaderClick={itemClickHandlers[idx]}
-                      />
-                    </Box>
-                    {idx === selectedIdx && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "flex-end",
-                          gap: 0.5,
-                          mt: 0.5,
-                        }}
-                      >
-                        <Tooltip title={t("Share URL")}>
-                          <IconButton size="small" onClick={handleShareUrl}>
-                            <ShareIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t("Download as Image")}>
-                          <IconButton
-                            size="small"
-                            onClick={downloadSelectedImage}
-                          >
-                            <DownloadIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Export
-                          name={item.name}
-                          dataType={selectedType}
-                          data={item}
-                        />
-                        {/* Add to compendium / Clone to Custom */}
-                        {VIEWER_TO_PACK_TYPE[selectedType] && (
-                          <AddToCompendiumButton
-                            itemType={VIEWER_TO_PACK_TYPE[selectedType]}
-                            data={item}
-                            excludePackId={
-                              selectedCompendium !== "official"
-                                ? selectedCompendium
-                                : undefined
-                            }
-                            tooltipOverride={
-                              selectedType === "classes" &&
-                              selectedCompendium === "official"
-                                ? t("Clone to Custom")
-                                : undefined
-                            }
-                          />
-                        )}
-                        {/* Edit class — pack mode only */}
-                        {selectedCompendium !== "official" &&
-                          selectedType === "classes" &&
-                          item._packItemId &&
-                          !activePack?.locked && (
-                            <Tooltip title={t("Edit Class")}>
-                              <IconButton
-                                size="small"
-                                onClick={() =>
-                                  setEditClassItem({
-                                    item,
-                                    packItemId: item._packItemId,
-                                  })
-                                }
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        {/* Remove from pack — pack mode, only when unlocked */}
-                        {selectedCompendium !== "official" &&
-                          item._packItemId &&
-                          !activePack?.locked && (
-                            <Tooltip title={t("Remove from pack")}>
-                              <IconButton
-                                size="small"
-                                color="error"
-                                onClick={() => handleRemoveFromPack(item)}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                      </Box>
-                    )}
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </Box>
+                <KeyboardArrowUpIcon />
+              </Fab>
+            </Tooltip>
+          )}
         </Box>
       </Layout>
+
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={shareSnackOpen}
@@ -2256,20 +1481,15 @@ function CompendiumViewer() {
         onClose={() => setShareSnackOpen(false)}
         message={t("Copied to Clipboard!")}
       />
+
       {/* Quick Create modal */}
       <QuickCreateModal
         open={quickCreateOpen}
         onClose={() => setQuickCreateOpen(false)}
+        lockedToViewerType={selectedType}
+        initialSubtype={quickCreateInitialSubtype ?? undefined}
       />
-      {/* Create item dialog */}
-      {activePack && (
-        <CompendiumItemCreateDialog
-          open={createItemDialogOpen}
-          onClose={() => setCreateItemDialogOpen(false)}
-          itemType={VIEWER_TO_PACK_TYPE[selectedType]}
-          packId={activePack.id}
-        />
-      )}
+
       {/* Edit class dialog */}
       {activePack && editClassItem && (
         <CompendiumItemCreateDialog
@@ -2281,6 +1501,7 @@ function CompendiumViewer() {
           editItemId={editClassItem.packItemId}
         />
       )}
+
       {/* New Pack dialog */}
       <Dialog
         open={newPackDialogOpen}
@@ -2397,7 +1618,8 @@ function CompendiumViewer() {
           </Button>
         </DialogActions>
       </Dialog>
-      {/* Manage Pack dialog — rename, description, author, module meta, export */}
+
+      {/* Manage Pack dialog */}
       <Dialog
         open={manageDialogOpen}
         onClose={() => !exporting && setManageDialogOpen(false)}
@@ -2507,7 +1729,6 @@ function CompendiumViewer() {
             fullWidth
             size="small"
           />
-
           <Divider>
             <Typography
               variant="caption"
@@ -2583,10 +1804,9 @@ function CompendiumViewer() {
               const next = Array.from(
                 new Set(values.map((v) => toSlug(String(v))).filter(Boolean)),
               );
-              const manualOnly = next.filter(
-                (dep) => !editingAutoRequires.includes(dep),
+              setEditingRequires(
+                next.filter((dep) => !editingAutoRequires.includes(dep)),
               );
-              setEditingRequires(manualOnly);
             }}
             renderValue={(value, getItemProps) =>
               value.map((option, index) => {
@@ -2649,7 +1869,7 @@ function CompendiumViewer() {
               disabled={exporting}
               onClick={async () => {
                 await deletePack(activePack.id);
-                setPendingNavPackId("official"); // navigate in onExited
+                setPendingNavPackId("official");
                 setManageDialogOpen(false);
               }}
             >
@@ -2708,12 +1928,13 @@ function CompendiumViewer() {
           </Box>
         </DialogActions>
       </Dialog>
+
       <ManageModulesModal
         open={manageModulesOpen}
         onClose={() => setManageModulesOpen(false)}
         onImportSuccess={(id) => {
           setManageModulesOpen(false);
-          handleCompendiumChange(id);
+          handlers.handleCompendiumChange(id);
         }}
       />
     </ThemeProvider>

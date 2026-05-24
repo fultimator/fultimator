@@ -156,14 +156,10 @@ export default function PlayerCustomWeapons({
                       ...customWeapon,
                       hands: 2,
                       cost: customWeapon.cost || 300,
-                      damageModifier: customWeapon.damageModifier || 0,
-                      precModifier: customWeapon.precModifier || 0,
                       defModifier: customWeapon.defModifier || 0,
                       mDefModifier: customWeapon.mDefModifier || 0,
                       overrideDamageType:
                         customWeapon.overrideDamageType || false,
-                      customDamageType:
-                        customWeapon.customDamageType || "physical",
                     }}
                     activeForm={customWeapon.activeForm}
                     sphereData={buildSphereData(customWeapon, player)}

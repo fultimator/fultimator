@@ -305,7 +305,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedWeaponCard
                 item={s.weapon}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -313,7 +313,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedCustomWeaponCard
                 item={s.customWeapon}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -321,7 +321,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedArmorCard
                 item={s.armor}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -329,7 +329,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedShieldCard
                 item={s.shield}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -337,7 +337,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedAccessoryCard
                 item={s.accessory}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -349,7 +349,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedSpellCard
                   item={s.npcSpell}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -359,7 +359,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedPlayerSpellCard
                   item={s.playerSpell}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -369,7 +369,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedGambleSpellCard
                   item={s.gambleSpell}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -379,7 +379,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedGiftCard
                   item={s.gift}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -389,7 +389,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedDanceCard
                   item={s.dance}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -399,7 +399,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedTherioformCard
                   item={s.therioform}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -409,7 +409,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedArcanumCard
                   item={s.arcanum}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -419,7 +419,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedArcanumReworkCard
                   item={s.arcanumRework}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -428,7 +428,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedPilotVehicleCard
                 item={s.pilotFrame}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -436,7 +436,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedPilotVehicleCard
                 item={s.pilotWeapon}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -444,7 +444,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedPilotVehicleCard
                 item={s.vehicleModule}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -452,7 +452,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedMagichantCard
                 item={s.magichantKey}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -460,7 +460,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedMagichantCard
                 item={s.magichantTone}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -469,7 +469,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedSymbolCard
                   item={s.symbol}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -479,7 +479,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedInvocationCard
                   item={s.invocation}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -489,7 +489,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedMagiseedCard
                   item={s.magiseed}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -498,7 +498,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedAlchemyCard
                 item={s.alchemy}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -506,7 +506,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedInfusionCard
                 item={s.infusion}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -514,7 +514,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedMagitechCard
                 item={s.magitech}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -522,7 +522,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedCookingCard
                 item={s.cooking}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -534,7 +534,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedAttackCard
                   item={s.npcAttack}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -543,7 +543,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedSpecialRuleCard
                 item={s.npcSpecialRule}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -551,7 +551,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedActionCard
                 item={s.npcAction}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -563,7 +563,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedClassCard
                   item={s.cls}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -573,7 +573,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedSkillCard
                   item={s.skill}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -583,7 +583,7 @@ export default function DebugMenu() {
               <CardSlot>
                 <SharedHeroicCard
                   item={s.heroic}
-                  variant="compendium"
+                  variant="interactive"
                   imageMode="slot"
                   showImageToggle
                 />
@@ -595,7 +595,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedOptionalCard
                 item={s.optional}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -603,7 +603,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedZeroPowerCard
                 item={s.zeroPower}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -611,7 +611,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedQualityCard
                 item={s.quality}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -619,7 +619,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedRitualCard
                 item={s.ritual}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />
@@ -627,7 +627,7 @@ export default function DebugMenu() {
             <CardSlot>
               <SharedProjectCard
                 item={s.project}
-                variant="compendium"
+                variant="interactive"
                 imageMode="slot"
                 showImageToggle
               />

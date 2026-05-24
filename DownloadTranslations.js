@@ -8,6 +8,7 @@ const sheetNames = [
   "Home",
   "Resources",
   "General",
+  "Forms",
   "Classes",
   "Skills",
   "HeroicSkills",

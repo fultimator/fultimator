@@ -6,7 +6,11 @@ import {
   Tooltip,
   Container,
 } from "@mui/material";
-import { ArrowBack, Search, Tune as TuneIcon } from "@mui/icons-material";
+import {
+  ArrowBack,
+  Search,
+  ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
+} from "@mui/icons-material";
 import MenuOption from "./MenuOption";
 import { useNpc } from "../npc/useNpcContext";
 import ExplainSkillsSimplified from "../npc/ExplainSkillsSimplified";
@@ -41,34 +45,32 @@ const NpcEditAppBar = ({
           container
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
-          <Grid size={3} sx={{ textAlign: "left" }}>
+          <Grid sx={{ textAlign: "left", display: "flex", alignItems: "center" }}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
               </IconButton>
             )}
+            <Tooltip title="Open Compendium">
+              <IconButton color="inherit" onClick={openCompendiumModal}>
+                <Search />
+              </IconButton>
+            </Tooltip>
           </Grid>
-          <Grid size={6} sx={{ textAlign: "center" }}>
-            <Grid container sx={{ justifyContent: "center" }}>
+          <Grid sx={{ flex: 1, minWidth: 0, px: 0.5 }}>
+            <Grid container sx={{ justifyContent: "center", minWidth: 0 }}>
               <ExplainSkillsSimplified npc={npcTemp} />
             </Grid>
           </Grid>
-          <Grid size={3} sx={{ textAlign: "right" }}>
+          <Grid sx={{ textAlign: "right" }}>
             <Grid
               container
               sx={{ alignItems: "center", justifyContent: "flex-end" }}
             >
-              {showGoBackButton && !isPcEdit && (
-                <Tooltip title="Open Compendium">
-                  <IconButton color="inherit" onClick={openCompendiumModal}>
-                    <Search />
-                  </IconButton>
-                </Tooltip>
-              )}
               {onOpenDrawer && (
-                <Tooltip title="Open Drawer">
+                <Tooltip title="Open Chat">
                   <IconButton color="inherit" onClick={onOpenDrawer}>
-                    <TuneIcon />
+                    <ChatBubbleOutlineIcon />
                   </IconButton>
                 </Tooltip>
               )}
@@ -118,34 +120,32 @@ const PcEditAppBar = ({
           container
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
-          <Grid size={3} sx={{ textAlign: "left" }}>
+          <Grid sx={{ textAlign: "left", display: "flex", alignItems: "center" }}>
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
               </IconButton>
             )}
+            <Tooltip title="Open Compendium">
+              <IconButton color="inherit" onClick={openCompendiumModal}>
+                <Search />
+              </IconButton>
+            </Tooltip>
           </Grid>
-          <Grid size={6} sx={{ textAlign: "center" }}>
-            <Grid container sx={{ justifyContent: "center" }}>
+          <Grid sx={{ flex: 1, minWidth: 0, px: 0.5 }}>
+            <Grid container sx={{ justifyContent: "center", minWidth: 0 }}>
               <span>{t("Character Designer")}</span>
             </Grid>
           </Grid>
-          <Grid size={3} sx={{ textAlign: "right" }}>
+          <Grid sx={{ textAlign: "right" }}>
             <Grid
               container
               sx={{ alignItems: "center", justifyContent: "flex-end" }}
             >
-              {showGoBackButton && (
-                <Tooltip title="Open Compendium">
-                  <IconButton color="inherit" onClick={openCompendiumModal}>
-                    <Search />
-                  </IconButton>
-                </Tooltip>
-              )}
               {onOpenDrawer && (
-                <Tooltip title="Open Drawer">
+                <Tooltip title="Open Chat">
                   <IconButton color="inherit" onClick={onOpenDrawer}>
-                    <TuneIcon />
+                    <ChatBubbleOutlineIcon />
                   </IconButton>
                 </Tooltip>
               )}

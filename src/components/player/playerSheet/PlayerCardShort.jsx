@@ -3,9 +3,9 @@ import { Paper, Grid, Typography, Divider, Card } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
-import avatar_image from "../../avatar.jpg";
+import avatar_image from "/images/components/avatar.jpg";
 import Diamond from "../../Diamond";
-import powered_by_fu from "../../../routes/powered_by_fu.png";
+import powered_by_fu from "/images/routes/powered_by_fu.png";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
 
@@ -76,30 +76,46 @@ export default function PlayerCardShort({
     (equippedArmor !== null
       ? equippedArmor.martial
         ? equippedArmor.def
-        : player.attributes.dexterity + equippedArmor.def
-      : player.attributes.dexterity) +
+        : player.attributes.dexterity?.base + equippedArmor.def
+      : player.attributes.dexterity?.base) +
     (equippedShield !== null ? equippedShield.def : 0) +
     (player.modifiers?.def || 0) +
-    (equippedArmor !== null ? equippedArmor.defModifier || 0 : 0) +
-    (equippedShield !== null ? equippedShield.defModifier || 0 : 0) +
-    (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
+    (equippedArmor !== null
+      ? (equippedArmor.modifiers?.def ?? equippedArmor.defModifier ?? 0)
+      : 0) +
+    (equippedShield !== null
+      ? (equippedShield.modifiers?.def ?? equippedShield.defModifier ?? 0)
+      : 0) +
+    (equippedAccessory !== null
+      ? (equippedAccessory.modifiers?.def ?? equippedAccessory.defModifier ?? 0)
+      : 0) +
     equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.defModifier || 0),
+      (total, weapon) =>
+        total + (weapon.modifiers?.def ?? weapon.defModifier ?? 0),
       0,
     ) +
     dodgeBonus;
 
   const currMDef =
     (equippedArmor !== null
-      ? player.attributes.insight + equippedArmor.mdef
-      : player.attributes.insight) +
+      ? player.attributes.insight?.base + equippedArmor.mdef
+      : player.attributes.insight?.base) +
     (equippedShield !== null ? equippedShield.mdef : 0) +
     (player.modifiers?.mdef || 0) +
-    (equippedArmor !== null ? equippedArmor.mDefModifier || 0 : 0) +
-    (equippedShield !== null ? equippedShield.mDefModifier || 0 : 0) +
-    (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
+    (equippedArmor !== null
+      ? (equippedArmor.modifiers?.mdef ?? equippedArmor.mDefModifier ?? 0)
+      : 0) +
+    (equippedShield !== null
+      ? (equippedShield.modifiers?.mdef ?? equippedShield.mDefModifier ?? 0)
+      : 0) +
+    (equippedAccessory !== null
+      ? (equippedAccessory.modifiers?.mdef ??
+        equippedAccessory.mDefModifier ??
+        0)
+      : 0) +
     equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.mDefModifier || 0),
+      (total, weapon) =>
+        total + (weapon.modifiers?.mdef ?? weapon.mDefModifier ?? 0),
       0,
     );
 
@@ -400,22 +416,22 @@ export default function PlayerCardShort({
               </Grid>
               <Grid container sx={{ justifyContent: "center" }} size={3}>
                 <Typography variant="h2" align="center">
-                  {t("DEX") + ": d" + player.attributes.dexterity}
+                  {t("DEX") + ": d" + player.attributes.dexterity?.base}
                 </Typography>
               </Grid>
               <Grid container sx={{ justifyContent: "center" }} size={3}>
                 <Typography variant="h2" align="center">
-                  {t("INS") + ": d" + player.attributes.insight}
+                  {t("INS") + ": d" + player.attributes.insight?.base}
                 </Typography>
               </Grid>
               <Grid container sx={{ justifyContent: "center" }} size={3}>
                 <Typography variant="h2" align="center">
-                  {t("MIG") + ": d" + player.attributes.might}
+                  {t("MIG") + ": d" + player.attributes.might?.base}
                 </Typography>
               </Grid>
               <Grid container sx={{ justifyContent: "center" }} size={3}>
                 <Typography variant="h2" align="center">
-                  {t("WLP") + ": d" + player.attributes.willpower}
+                  {t("WLP") + ": d" + player.attributes.willpower?.base}
                 </Typography>
               </Grid>
             </Grid>

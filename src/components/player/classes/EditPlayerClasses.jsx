@@ -33,6 +33,8 @@ import {
   isAutomaticClassLevelEnabled,
   syncAutomaticClassLevels,
 } from "./classLevelUtils";
+import FuidField from "../../common/FuidField";
+import { slugify } from "../../../libs/slugify";
 
 export default function EditPlayerClasses({
   player,
@@ -55,6 +57,7 @@ export default function EditPlayerClasses({
   const [warnings, setWarnings] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClassName, setNewClassName] = useState("");
+  const [newClassFuid, setNewClassFuid] = useState(undefined);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
   const [expandedClasses, setExpandedClasses] = useState({});
   const [expandedMnemos, setExpandedMnemos] = useState({});
@@ -243,7 +246,7 @@ export default function EditPlayerClasses({
     fileInputRef.current.value = null;
   });
 
-  const addClassToPlayer = (name, isHomebrew) => {
+  const addClassToPlayer = (name, isHomebrew, fuid) => {
     // Check if the selected class type already exists in player's classes
     const classExists = player.classes.some(
       (cls) => cls.name.toLowerCase() === name.toLowerCase(),
@@ -261,6 +264,7 @@ export default function EditPlayerClasses({
 
     updatedPlayer.classes.push({
       name: name,
+      fuid: fuid,
       lvl: 1,
       benefits: {},
       skills: [],
@@ -276,6 +280,7 @@ export default function EditPlayerClasses({
     updateMaxStats();
     setDialogOpen(false);
     setNewClassName("");
+    setNewClassFuid(undefined);
   };
 
   const handleRemoveClass = (index) => {
@@ -288,12 +293,12 @@ export default function EditPlayerClasses({
     updateMaxStats();
   };
 
-  const editClassName = (index, newClassName) => {
+  const editClassName = (index, newClassName, newFuid) => {
     const updatedPlayer = {
       ...player,
       classes: player.classes.map((cls, i) => {
         if (i === index) {
-          return { ...cls, name: newClassName };
+          return { ...cls, name: newClassName, fuid: newFuid };
         }
         return cls;
       }),
@@ -350,6 +355,7 @@ export default function EditPlayerClasses({
     maxLevel,
     description,
     specialSkill,
+    fuid,
   ) => {
     const updatedPlayer = {
       ...player,
@@ -362,9 +368,10 @@ export default function EditPlayerClasses({
               {
                 skillName: skillName,
                 currentLvl: 1,
-                maxLvl: maxLevel, // Ensure maxLevel is parsed as a number
+                maxLvl: maxLevel,
                 description: description,
                 specialSkill: specialSkill,
+                fuid: fuid,
               },
             ],
           };
@@ -383,6 +390,7 @@ export default function EditPlayerClasses({
     maxLevel,
     description,
     specialSkill,
+    fuid,
   ) => {
     const updatedPlayer = {
       ...player,
@@ -392,8 +400,8 @@ export default function EditPlayerClasses({
             ...cls,
             skills: cls.skills.map((skill, index) => {
               if (index === skillIndex) {
-                const newMaxLevel = parseInt(maxLevel); // Ensure maxLevel is parsed as a number
-                const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel); // Adjust current level if necessary
+                const newMaxLevel = parseInt(maxLevel);
+                const newCurrentLevel = Math.min(skill.currentLvl, newMaxLevel);
                 return {
                   ...skill,
                   skillName,
@@ -401,6 +409,7 @@ export default function EditPlayerClasses({
                   currentLvl: newCurrentLevel,
                   description,
                   specialSkill,
+                  fuid,
                 };
               }
               return skill;
@@ -526,6 +535,7 @@ export default function EditPlayerClasses({
 
     updatedPlayer.classes.push({
       name: item.name,
+      fuid: item.fuid,
       lvl: 1,
       _packItemId: item._packItemId,
       benefits: item.benefits,
@@ -558,6 +568,9 @@ export default function EditPlayerClasses({
           px: "10px",
           py: "5px",
           borderRadius: "8px 8px 0 0",
+          border: "2px solid",
+          borderColor: secondary,
+          borderBottom: "none",
           mb: 0,
         }}
       >
@@ -611,47 +624,50 @@ export default function EditPlayerClasses({
           </IconButton>
         </Tooltip>
       </Box>
-      <Divider sx={{ borderColor: secondary, borderBottomWidth: 2, mb: 2 }} />
-
-      {isEditMode ? (
-        <>
-          <Paper
-            elevation={3}
-            sx={{
-              p: "15px",
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-            }}
-          >
-            <Grid container spacing={2}>
-              <Grid size={12}>
-                <CustomHeader
-                  type="top"
-                  headerText={t(
-                    usesInnateClassRules ? "Innate Classes" : "Classes",
-                  )}
-                  rightLabel={t("Total Invested Levels")}
-                  rightValue={totalInnateLevel}
-                  rightMax={player.lvl}
-                  showIconButton={canAddMoreClasses}
-                  icon={AddIcon}
-                  customTooltip={t(
-                    usesInnateClassRules
-                      ? "Add Blank Innate Class"
-                      : "Add Blank Class",
-                  )}
-                  addItem={
-                    canAddMoreClasses ? () => setDialogOpen(true) : undefined
-                  }
-                  openCompendium={
-                    canAddMoreClasses
-                      ? () => setCompendiumOpen(true)
-                      : undefined
-                  }
-                />
-              </Grid>
-              {warnings.map((warning, index) => (
+      <Paper
+        elevation={3}
+        sx={{
+          borderRadius: "0 0 8px 8px",
+          border: "2px solid",
+          borderColor: secondary,
+          borderTop: "none",
+          mb: 2,
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{ p: "15px" }}>
+          <Grid container spacing={1}>
+            <Grid size={12}>
+              <CustomHeader
+                type="top"
+                squareTop
+                headerText={t(
+                  usesInnateClassRules ? "Innate Classes" : "Classes",
+                )}
+                rightLabel={t("Total Invested Levels")}
+                rightValue={totalInnateLevel}
+                rightMax={player.lvl}
+                showIconButton={isEditMode && canAddMoreClasses}
+                icon={AddIcon}
+                customTooltip={t(
+                  usesInnateClassRules
+                    ? "Add Blank Innate Class"
+                    : "Add Blank Class",
+                )}
+                addItem={
+                  isEditMode && canAddMoreClasses
+                    ? () => setDialogOpen(true)
+                    : undefined
+                }
+                openCompendium={
+                  isEditMode && canAddMoreClasses
+                    ? () => setCompendiumOpen(true)
+                    : undefined
+                }
+              />
+            </Grid>
+            {isEditMode &&
+              warnings.map((warning, index) => (
                 <Grid key={index} size={12}>
                   <Alert
                     variant="filled"
@@ -667,29 +683,17 @@ export default function EditPlayerClasses({
                   </Alert>
                 </Grid>
               ))}
-            </Grid>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleFileUpload}
-              style={{ display: "none" }}
-            />
-          </Paper>
-          <Divider sx={{ my: 2 }} />{" "}
-        </>
-      ) : null}
-      {player.classes.length === 0 && (
-        <Paper
-          elevation={3}
-          sx={{
-            p: "15px",
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
-          }}
-        >
-          <Grid size={12}>
+          </Grid>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+          />
+        </Box>
+        {player.classes.length === 0 && (
+          <Box sx={{ p: "15px" }}>
             <Typography variant="h3" align="center">
               {t(
                 usesInnateClassRules
@@ -697,17 +701,16 @@ export default function EditPlayerClasses({
                   : "No classes added yet",
               )}
             </Typography>
-          </Grid>
-        </Paper>
-      )}
-      {player.classes &&
-        player.classes.map((cls, index) => {
-          const clsLvl = automaticClassLevel
-            ? getDerivedClassLevel(cls)
-            : cls.lvl;
-          return (
-            <Box key={index} sx={{ mb: 2 }}>
+          </Box>
+        )}
+        {player.classes &&
+          player.classes.map((cls, index) => {
+            const clsLvl = automaticClassLevel
+              ? getDerivedClassLevel(cls)
+              : cls.lvl;
+            return (
               <PlayerClassCard
+                key={index}
                 allClasses={player.classes}
                 classItem={{ ...cls, name: cls.name, lvl: clsLvl }}
                 onRemove={() => handleRemoveClass(index)}
@@ -732,16 +735,15 @@ export default function EditPlayerClasses({
                 }
                 isEditMode={isEditMode}
                 editCompanion={(companion) => editCompanion(index, companion)}
-                editClassName={(newClassName) =>
-                  editClassName(index, newClassName)
+                editClassName={(newClassName, newFuid) =>
+                  editClassName(index, newClassName, newFuid)
                 }
                 editHeroic={(heroic) => editHeroic(index, heroic)}
                 userId={player.uid}
-                isHomebrew={
-                  cls.isHomebrew === undefined ? true : cls.isHomebrew
-                }
+                isHomebrew={cls.isHomebrew ?? false}
                 isClassLevelReadOnly={automaticClassLevel}
                 isAccordion
+                noBorder
                 isExpanded={!!expandedClasses[index]}
                 onToggleExpand={() =>
                   setExpandedClasses((prev) => ({
@@ -750,9 +752,9 @@ export default function EditPlayerClasses({
                   }))
                 }
               />
-            </Box>
-          );
-        })}
+            );
+          })}
+      </Paper>
       {usesInnateClassRules && (
         <>
           <Divider
@@ -849,6 +851,11 @@ export default function EditPlayerClasses({
           <DialogContentText>
             {t("Please enter the name for the new class")}.
           </DialogContentText>
+          <FuidField
+            value={newClassFuid}
+            name={newClassName}
+            onChange={setNewClassFuid}
+          />
           <TextField
             autoFocus
             margin="dense"
@@ -856,6 +863,9 @@ export default function EditPlayerClasses({
             fullWidth
             value={newClassName}
             onChange={(e) => setNewClassName(e.target.value)}
+            onBlur={() => {
+              if (!newClassFuid) setNewClassFuid(slugify(newClassName));
+            }}
             sx={{ mt: 2 }}
           />
         </DialogContent>
@@ -868,7 +878,7 @@ export default function EditPlayerClasses({
             {t("Cancel")}
           </Button>
           <Button
-            onClick={() => addClassToPlayer(newClassName, true)}
+            onClick={() => addClassToPlayer(newClassName, true, newClassFuid)}
             color="primary"
             variant="contained"
             disabled={!newClassName}

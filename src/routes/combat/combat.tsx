@@ -22,9 +22,10 @@ import { useDatabase } from "../../hooks/useDatabase";
 
 import { SignIn } from "../../components/auth";
 import Layout from "../../components/Layout";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 import PointBar from "../../components/PointBar";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
 import { useEffect } from "react";
 import React from "react";
 import { TypeNpc } from "../../types/Npcs";
@@ -85,7 +86,11 @@ function AuthCombat() {
       db.orderBy("name", "asc"),
     );
     db.getDocs(q)
-      .then((docs) => setPersonalList((docs as TypeNpc[]) ?? []))
+      .then((docs) =>
+        setPersonalList(
+          ((docs as TypeNpc[]) ?? []).map(applyNpcPostLoadTransforms),
+        ),
+      )
       .catch((e) => console.error("Error loading NPCs:", e))
       .finally(() => setLoading(false));
   }, [db]);
@@ -217,8 +222,13 @@ function NpcCombatant({ npc }: NpcProps) {
     };
   };
 
-  const adjustAttribute = (attribute = 0, amount = 0, min = 6) => {
-    return attribute + amount <= min ? min : attribute + amount;
+  const adjustAttribute = (
+    attr: { base: number },
+    amount: number,
+    min = 6,
+  ): { base: number } => {
+    const next = attr.base + amount;
+    return { base: next <= min ? min : next };
   };
 
   useEffect(() => {
@@ -332,35 +342,39 @@ function NpcCombatant({ npc }: NpcProps) {
 
     if (attackType === "weapon") {
       // For weapon attacks
-      const { att1, att2 } = attack.weapon;
-      attribute1 = attributes[att1];
-      attribute2 = attributes[att2];
-      extraDamage =
-        attack.weapon.damage +
-        (attack.flatdmg ? parseInt(attack.flatdmg) : 0) +
-        (attack.extraDamage ? 5 : 0);
+      attribute1 =
+        attributes[attack.accuracy?.attr1]?.base ??
+        attributes[attack.accuracy?.attr1];
+      attribute2 =
+        attributes[attack.accuracy?.attr2]?.base ??
+        attributes[attack.accuracy?.attr2];
+      extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
       extraPrecision =
-        (npc.extra?.precision ? 3 : 0) +
-        attack.weapon.prec +
-        (attack.flathit ? parseInt(attack.flathit) : 0) +
+        (npc.features?.precision?.enabled ? 3 : 0) +
+        (attack.accuracy?.value ?? 0) +
         accuracyLevelBonus;
-      type = attack.weapon.type;
+      type = attack.damage?.type;
     } else if (attackType === "spell") {
       // For spells
       const { attr1, attr2 } = attack;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
+      attribute1 = attributes[attr1]?.base ?? attributes[attr1];
+      attribute2 = attributes[attr2]?.base ?? attributes[attr2];
       extraDamage = 0;
-      extraPrecision = (npc.extra?.magic ? 3 : 0) + accuracyLevelBonus;
+      extraPrecision =
+        (npc.features?.magic?.enabled ? 3 : 0) + accuracyLevelBonus;
       type = "spell";
     } else {
       // For base attacks
-      const { attr1, attr2 } = attack;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
-      extraDamage = attack.extraDamage ? 10 : 5;
-      extraPrecision = (npc.extra?.precision ? 3 : 0) + accuracyLevelBonus;
-      type = attack.type;
+      const attr1 = attack.accuracy?.attr1;
+      const attr2 = attack.accuracy?.attr2;
+      attribute1 = attributes[attr1]?.base ?? attributes[attr1];
+      attribute2 = attributes[attr2]?.base ?? attributes[attr2];
+      extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
+      extraPrecision =
+        (npc.features?.precision?.enabled ? 3 : 0) +
+        (attack.accuracy?.value ?? 0) +
+        accuracyLevelBonus;
+      type = attack.damage?.type;
     }
 
     // Get +5 damage after lvl 20 and another +5 after lvl 40 and another +5 after lvl 60
@@ -416,25 +430,26 @@ function NpcCombatant({ npc }: NpcProps) {
   const generateButtonLabel = (attack) => {
     let translatedAttribute1, translatedAttribute2;
 
-    if (attack.weapon) {
+    if (attack.weapon || attack.accuracy) {
       // For weapon attacks
-      const { name, weapon } = attack;
-      const { att1, att2 } = weapon;
-      const attributeMap = {
+      const name = attack.name ?? attack.weapon?.name;
+      const attr1 = attack.accuracy?.attr1;
+      const attr2 = attack.accuracy?.attr2;
+      const attributeMap: Record<string, string> = {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[att1])} d${attributes[att1]}`;
-      translatedAttribute2 = `${t(attributeMap[att2])} d${attributes[att2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     } else if (attack.spell) {
       // For spells
       const { name, spell } = attack;
-      const { attr1, attr2 } = spell;
+      const { attr1, attr2 } = spell.accuracy ?? {};
       const attributeMap = {
         dexterity: "DEX",
         insight: "INS",
@@ -442,8 +457,8 @@ function NpcCombatant({ npc }: NpcProps) {
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
-      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     }
@@ -457,8 +472,8 @@ function NpcCombatant({ npc }: NpcProps) {
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
-      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     }
@@ -467,12 +482,13 @@ function NpcCombatant({ npc }: NpcProps) {
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
       <Grid size={6}>
-        <NpcPretty
+        <NpcActorCard
           npc={npc}
           study={selectedStudy}
           npcImage={npc.imgurl}
-          ref={ref}
+          cardRef={ref}
           collapse={true}
+          variant="interactive"
         />
         <Grid container size={12} sx={{ mt: 5 }}>
           <Grid size={2}>
@@ -487,9 +503,9 @@ function NpcCombatant({ npc }: NpcProps) {
               fullWidth
             >
               <MenuItem value={0}>-</MenuItem>
-              <MenuItem value={1}>7+</MenuItem>
-              <MenuItem value={2}>10+</MenuItem>
-              <MenuItem value={3}>13+</MenuItem>
+              <MenuItem value={1}>10+</MenuItem>
+              <MenuItem value={2}>13+</MenuItem>
+              <MenuItem value={3}>16+</MenuItem>
             </Select>
           </Grid>
           {/* Download Button */}
@@ -577,22 +593,22 @@ function NpcCombatant({ npc }: NpcProps) {
           <Grid container size={12}>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("DEX:")} d{attributes.dexterity}
+                {t("DEX:")} d{attributes.dexterity?.base}
               </Typography>
             </Grid>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("INS:")} d{attributes.insight}
+                {t("INS:")} d{attributes.insight?.base}
               </Typography>
             </Grid>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("MIG:")} d{attributes.might}
+                {t("MIG:")} d{attributes.might?.base}
               </Typography>
             </Grid>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("WIL:")} d{attributes.will}
+                {t("WIL:")} d{attributes.will?.base}
               </Typography>
             </Grid>
           </Grid>
@@ -738,7 +754,7 @@ function NpcCombatant({ npc }: NpcProps) {
               </Grid>
             ))}
             {npc.spells
-              ?.filter((spell) => spell.type === "offensive")
+              ?.filter((spell) => spell.isOffensive)
               .map((spell, index) => (
                 <Grid key={index}>
                   <Button

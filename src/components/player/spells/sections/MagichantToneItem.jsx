@@ -27,7 +27,7 @@ export default function MagichantToneItem({
   const handleNameChange = (value) => {
     const tone = availableMagichantTones.find((entry) => entry.name === value);
     if (!tone) return;
-    onItemChange(itemIndex, "name", value);
+    onItemChange(itemIndex, "key", value);
     onItemChange(itemIndex, "effect", tone.effect || "");
     if (value !== "magichant_custom_name") {
       onItemChange(itemIndex, "customName", "");
@@ -35,8 +35,8 @@ export default function MagichantToneItem({
   };
 
   const isCustom =
-    item.name === "magichant_custom_name" ||
-    !availableMagichantTones.find((entry) => entry.name === item.name);
+    item.key === "magichant_custom_name" ||
+    !availableMagichantTones.find((entry) => entry.name === item.key);
   const {
     isOpen: deleteDialogOpen,
     closeDialog: setDeleteDialogOpen,
@@ -49,14 +49,14 @@ export default function MagichantToneItem({
     if (!onCloneItem) return;
     onCloneItem(itemIndex, {
       ...item,
-      name: "magichant_custom_name",
-      customName: item.customName || (item.name ? t(item.name) : ""),
+      key: "magichant_custom_name",
+      customName: item.customName || (item.key ? t(item.key) : ""),
       effect: typeof item.effect === "string" ? t(item.effect) : item.effect,
     });
   };
 
   const itemDisplayName =
-    item.customName || t(item.name || "magichant_custom_name");
+    item.customName || t(item.key || "magichant_custom_name");
 
   return (
     <>
@@ -72,7 +72,7 @@ export default function MagichantToneItem({
               <FormControl fullWidth>
                 <InputLabel>{t("magichant_tone")}</InputLabel>
                 <Select
-                  value={item.name || "magichant_custom_name"}
+                  value={item.key || "magichant_custom_name"}
                   onChange={(e) => handleNameChange(e.target.value)}
                   label={t("magichant_tone")}
                 >
@@ -94,7 +94,7 @@ export default function MagichantToneItem({
               <TextField
                 fullWidth
                 label={t("magichant_name")}
-                value={isCustom ? item.customName || "" : t(item.name || "")}
+                value={isCustom ? item.customName || "" : t(item.key || "")}
                 onChange={(e) =>
                   isCustom &&
                   onItemChange(itemIndex, "customName", e.target.value)

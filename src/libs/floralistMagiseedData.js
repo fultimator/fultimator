@@ -1,3 +1,5 @@
+import { slugify } from "./slugify";
+
 const magiseeds = [
   {
     fuid: "arctic-narcissus",
@@ -262,13 +264,6 @@ const magiseeds = [
     },
   },
 ];
-
-const slugify = (value = "") =>
-  String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 
 magiseeds.forEach((item) => {
   if (item.fuid === undefined && item.name) item.fuid = slugify(item.name);

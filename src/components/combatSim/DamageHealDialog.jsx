@@ -26,6 +26,7 @@ import { TypeIcon } from "../../components/types";
 import ReactMarkdown from "react-markdown";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
+import { buildDamageContext, resolveDamage } from "../../pipelines/damagePipeline";
 
 const DamageHealDialog = ({
   open,
@@ -60,46 +61,16 @@ const DamageHealDialog = ({
     isIgnoreResistance = false,
     isIgnoreImmunity = false,
   ) {
-    const affinities = npc.affinities || {};
-    const damage = parseInt(damageValue, 10) || 0;
-
-    // Default damage value
-    let finalDamage = damage;
-
-    if (affinities[damageType]) {
-      switch (affinities[damageType]) {
-        case "vu": // Vulnerable (x2)
-          finalDamage = isGuarding ? damage : damage * 2;
-          break;
-        case "rs": // Resistant (x0.5, rounded down)
-          if (isIgnoreResistance) {
-            finalDamage = damage;
-          } else {
-            finalDamage = Math.floor(damage * 0.5);
-          }
-          break;
-        case "ab": // Absorb (turn damage into healing)
-          finalDamage = -damage;
-          break;
-        case "im": // Immune (no damage)
-          if (isIgnoreImmunity) {
-            finalDamage = damage;
-          } else {
-            finalDamage = 0;
-          }
-          break;
-        default:
-          break;
-      }
-    } else if (isGuarding) {
-      if (isIgnoreResistance) {
-        finalDamage = damage;
-      } else {
-        finalDamage = Math.floor(damage * 0.5);
-      }
-    }
-
-    return finalDamage;
+    const ctx = buildDamageContext({
+      baseDamage: parseInt(damageValue, 10) || 0,
+      damageType: damageType || "untyped",
+      npcAffinities: npc.affinities || {},
+      temporaryAffinities: npc.runtimeActor?.temporaryAffinities,
+      isGuarding,
+      ignoreResistance: isIgnoreResistance,
+      ignoreImmunity: isIgnoreImmunity,
+    });
+    return resolveDamage(ctx).finalDamage;
   }
 
   return (

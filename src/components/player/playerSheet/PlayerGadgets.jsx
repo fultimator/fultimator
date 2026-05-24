@@ -20,20 +20,22 @@ import {
 import { useTheme } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "../../../translation/translate";
-import { Info, Casino, CheckCircle } from "@mui/icons-material";
+import { Info, Casino, CheckCircle, ChatOutlined } from "@mui/icons-material";
+import ItemNameRow from "./ItemNameRow";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
 import SpellTinkererAlchemy from "../spells/SpellTinkererAlchemy";
 import SpellTinkererInfusion from "../spells/SpellTinkererInfusion";
 import SpellTinkererMagitech from "../spells/SpellTinkererMagitech";
 import { syncSlots } from "../equipment/slots/equipmentSlots";
 
 const ranks = ["Basic", "Advanced", "Superior"]; // Define ranks
-const elements = ["physical", "wind", "bolt", "earth", "fire", "ice"];
+const elements = ["physical", "air", "bolt", "earth", "fire", "ice"];
 export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const [selectedAlchemy, setSelectedAlchemy] = useState(null);
   const [selectedInfusion, setSelectedInfusion] = useState(null);
@@ -50,6 +52,19 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
   const [selectedElement, setSelectedElement] = useState("physical");
   const [useMagicannonIP, setUseMagicannonIP] = useState(true);
   const [equipMagicannon, setEquipMagicannon] = useState(true);
+
+  const sendToChat = (gadget) => {
+    addMessage({
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      speaker: player?.name || "Player",
+      kind: "display",
+      itemType: "spell",
+      name: gadget.name || t(gadget.spellType || "Gadget"),
+      tags: [t("Gadget"), gadget.className || t("Unknown")],
+      description: gadget.description || "",
+    });
+  };
 
   const handleOpenModal = (gadget) => {
     if (gadget.spellType === "tinkerer-alchemy") {
@@ -358,299 +373,116 @@ export default function PlayerGadgets({ player, setPlayer, isEditMode }) {
               sx={{ padding: "1em", flex: 1, width: "100%" }}
             >
               {alchemySpells.map((alchemy, index) => (
-                <Grid
-                  container
-                  spacing={0}
+                <ItemNameRow
                   key={index}
-                  sx={{
-                    display: "flex",
-                    alignItems: "stretch",
-                    maxHeight: "40px",
-                  }}
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
+                  name={
+                    t("Alchemy") +
+                    " (" +
+                    (alchemy.rank ? t(ranks[alchemy.rank - 1]) : "") +
+                    ") " +
+                    " - " +
+                    t(alchemy.className)
+                  }
                 >
-                  <Grid sx={{ display: "flex" }} size={10}>
-                    <Typography
-                      id="spell-left-name"
-                      variant="h2"
-                      sx={{
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        backgroundColor: primary,
-                        padding: "5px",
-                        paddingLeft: "10px",
-                        color: "#fff",
-                        borderRadius: "8px 0 0 8px",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                      }}
+                  <Tooltip title={t("Info")}>
+                    <IconButton
+                      sx={{ padding: "0px" }}
+                      onClick={() => handleOpenModal(alchemy)}
                     >
-                      {t("Alchemy") +
-                        " (" +
-                        (alchemy.rank ? t(ranks[alchemy.rank - 1]) : "") +
-                        ") " +
-                        " - " +
-                        t(alchemy.className)}
-                    </Typography>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      display: "flex",
-                      alignItems: "stretch",
-                      maxHeight: "40px",
-                    }}
-                    size={2}
-                  >
-                    <div
-                      id="spell-right-controls"
-                      style={{
-                        padding: "10px",
-                        backgroundColor: ternary,
-                        borderRadius: "0 8px 8px 0",
-                        marginRight: "15px",
-                        display: "flex",
-                        alignItems: "center",
-                        flexDirection: "row",
-                      }}
-                      className="spell-right-controls"
+                      <Info />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t("Send to chat")}>
+                    <IconButton
+                      sx={{ padding: "0px", marginLeft: "5px" }}
+                      onClick={() => sendToChat(alchemy)}
                     >
-                      <Tooltip title={t("Info")}>
-                        <IconButton
-                          sx={{ padding: "0px" }}
-                          onClick={() => handleOpenModal(alchemy)}
-                        >
-                          <Info />
-                        </IconButton>
-                      </Tooltip>
-                      {isEditMode && (
-                        <Tooltip title={t("Roll")}>
-                          <IconButton
-                            sx={{ padding: "0px", marginLeft: "5px" }}
-                            onClick={() => handleRollSetup(alchemy)}
-                          >
-                            <Casino />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </div>
-                  </Grid>
-                </Grid>
+                      <ChatOutlined />
+                    </IconButton>
+                  </Tooltip>
+                  {isEditMode && (
+                    <Tooltip title={t("Roll")}>
+                      <IconButton
+                        sx={{ padding: "0px", marginLeft: "5px" }}
+                        onClick={() => handleRollSetup(alchemy)}
+                      >
+                        <Casino />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </ItemNameRow>
               ))}
               {infusionSpells.map((infusion, index) => (
-                <Grid
-                  container
-                  spacing={0}
+                <ItemNameRow
                   key={index}
-                  sx={{
-                    display: "flex",
-                    alignItems: "stretch",
-                    maxHeight: "40px",
-                  }}
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
+                  name={
+                    t("Infusion") +
+                    " (" +
+                    (infusion.rank ? t(ranks[infusion.rank - 1]) : "") +
+                    ") " +
+                    " - " +
+                    t(infusion.className)
+                  }
                 >
-                  <Grid sx={{ display: "flex" }} size={10}>
-                    <Typography
-                      id="spell-left-name"
-                      variant="h2"
-                      sx={{
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        backgroundColor: primary,
-                        padding: "5px",
-                        paddingLeft: "10px",
-                        color: "#fff",
-                        borderRadius: "8px 0 0 8px",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                      }}
+                  <Tooltip title={t("Info")}>
+                    <IconButton
+                      sx={{ padding: "0px" }}
+                      onClick={() => handleOpenModal(infusion)}
                     >
-                      {t("Infusion") +
-                        " (" +
-                        (infusion.rank ? t(ranks[infusion.rank - 1]) : "") +
-                        ") " +
-                        " - " +
-                        t(infusion.className)}
-                    </Typography>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      display: "flex",
-                      alignItems: "stretch",
-                      maxHeight: "40px",
-                    }}
-                    size={2}
-                  >
-                    <div
-                      id="spell-right-controls"
-                      style={{
-                        padding: "10px",
-                        backgroundColor: ternary,
-                        borderRadius: "0 8px 8px 0",
-                        marginRight: "15px",
-                        display: "flex",
-                        alignItems: "center",
-                        flexDirection: "row",
-                      }}
-                      className="spell-right-controls"
+                      <Info />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t("Send to chat")}>
+                    <IconButton
+                      sx={{ padding: "0px", marginLeft: "5px" }}
+                      onClick={() => sendToChat(infusion)}
                     >
-                      <Tooltip title={t("Info")}>
-                        <IconButton
-                          sx={{ padding: "0px" }}
-                          onClick={() => handleOpenModal(infusion)}
-                        >
-                          <Info />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </Grid>
-                </Grid>
+                      <ChatOutlined />
+                    </IconButton>
+                  </Tooltip>
+                </ItemNameRow>
               ))}
               {magitechSpells.map((magitech, index) => (
-                <Grid
-                  container
-                  spacing={0}
+                <ItemNameRow
                   key={index}
-                  sx={{
-                    display: "flex",
-                    alignItems: "stretch",
-                    maxHeight: "40px",
-                  }}
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
+                  name={
+                    t("Magitech") +
+                    " (" +
+                    (magitech.rank ? t(ranks[magitech.rank - 1]) : "") +
+                    ") " +
+                    " - " +
+                    t(magitech.className)
+                  }
                 >
-                  <Grid sx={{ display: "flex" }} size={10}>
-                    <Typography
-                      id="spell-left-name"
-                      variant="h2"
-                      sx={{
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        backgroundColor: primary,
-                        padding: "5px",
-                        paddingLeft: "10px",
-                        color: "#fff",
-                        borderRadius: "8px 0 0 8px",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                      }}
+                  <Tooltip title={t("Info")}>
+                    <IconButton
+                      sx={{ padding: "0px" }}
+                      onClick={() => handleOpenModal(magitech)}
                     >
-                      {t("Magitech") +
-                        " (" +
-                        (magitech.rank ? t(ranks[magitech.rank - 1]) : "") +
-                        ") " +
-                        " - " +
-                        t(magitech.className)}
-                    </Typography>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      display: "flex",
-                      alignItems: "stretch",
-                      maxHeight: "40px",
-                    }}
-                    size={2}
-                  >
-                    <div
-                      id="spell-right-controls"
-                      style={{
-                        padding: "10px",
-                        backgroundColor: ternary,
-                        borderRadius: "0 8px 8px 0",
-                        marginRight: "15px",
-                        display: "flex",
-                        alignItems: "center",
-                        flexDirection: "row",
-                      }}
-                      className="spell-right-controls"
+                      <Info />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t("Send to chat")}>
+                    <IconButton
+                      sx={{ padding: "0px", marginLeft: "5px" }}
+                      onClick={() => sendToChat(magitech)}
                     >
-                      <Tooltip title={t("Info")}>
-                        <IconButton
-                          sx={{ padding: "0px" }}
-                          onClick={() => handleOpenModal(magitech)}
-                        >
-                          <Info />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </Grid>
-                </Grid>
+                      <ChatOutlined />
+                    </IconButton>
+                  </Tooltip>
+                </ItemNameRow>
               ))}
               {magitechSpells.some((magitech) => magitech.rank >= 2) && (
-                <Grid
-                  container
-                  sx={{
-                    display: "flex",
-                    alignItems: "stretch",
-                    maxHeight: "40px",
-                  }}
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
-                >
-                  <Grid sx={{ display: "flex" }} size={10}>
-                    <Typography
-                      id="spell-left-name"
-                      variant="h2"
-                      sx={{
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        backgroundColor: primary,
-                        padding: "5px",
-                        paddingLeft: "10px",
-                        color: "#fff",
-                        borderRadius: "8px 0 0 8px",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                      }}
+                <ItemNameRow name={t("Magicannon")}>
+                  <Tooltip title={t("Activate")}>
+                    <IconButton
+                      sx={{ padding: "0px" }}
+                      onClick={() => setOpenMagicannonModal(true)}
                     >
-                      {t("Magicannon")}
-                    </Typography>
-                  </Grid>
-                  <Grid
-                    sx={{
-                      display: "flex",
-                      alignItems: "stretch",
-                      maxHeight: "40px",
-                    }}
-                    size={2}
-                  >
-                    <div
-                      id="spell-right-controls"
-                      style={{
-                        padding: "10px",
-                        backgroundColor: ternary,
-                        borderRadius: "0 8px 8px 0",
-                        marginRight: "15px",
-                        display: "flex",
-                        alignItems: "center",
-                        flexDirection: "row",
-                      }}
-                      className="spell-right-controls"
-                    >
-                      <Tooltip title={t("Activate")}>
-                        <IconButton
-                          sx={{ padding: "0px" }}
-                          onClick={() => setOpenMagicannonModal(true)}
-                        >
-                          <CheckCircle />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  </Grid>
-                </Grid>
+                      <CheckCircle />
+                    </IconButton>
+                  </Tooltip>
+                </ItemNameRow>
               )}
             </Grid>
             <Dialog

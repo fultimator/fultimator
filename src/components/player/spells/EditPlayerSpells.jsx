@@ -28,7 +28,6 @@ import SpellTinkererAlchemyEffectsModal from "./SpellTinkererAlchemyEffectsModal
 import { tinkererAlchemy, tinkererInfusion } from "../../../libs/classes";
 import SpellTinkererInfusion from "./SpellTinkererInfusion";
 import SpellTinkererInfusionModal from "./SpellTinkererInfusionModal";
-import SpellCompendiumModal from "./SpellCompendiumModal";
 import SpellTinkererMagitech from "./SpellTinkererMagitech";
 import SpellTinkererMagitechRankModal from "./SpellTinkererMagitechRankModal";
 import SpellEntropistGambleModal from "./SpellEntropistGambleModal";
@@ -127,30 +126,36 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       addMnemoSpell(mnemoId, {
         spellType: spell.spellType,
         name: t(spell.name),
-        mp: spell.mp,
+        cost: spell.cost ?? { resource: "mp", amount: 0, perTarget: true },
         maxTargets: spell.maxTargets,
-        targetDesc: t(spell.targetDesc),
+        targetDescription: t(spell.targetDescription),
         duration: t(spell.duration),
         description: t(spell.description),
         isOffensive: spell.isOffensive,
-        attr1: spell.attr1,
-        attr2: spell.attr2,
+        accuracy: spell.accuracy ?? {
+          attr1: spell.attr1 || "insight",
+          attr2: spell.attr2 || "will",
+          value: 0,
+          defense: "mdef",
+        },
         isMagisphere: spell.isMagisphere || false,
         showInPlayerSheet: true,
+        fuid: spell.fuid,
         _packItemId: spell._packItemId,
       });
     } else if (spell.spellType === "gamble") {
       addMnemoSpell(mnemoId, {
         spellType: spell.spellType,
         spellName: t(spell.name),
-        mp: spell.mp,
+        cost: spell.cost ?? { resource: "mp", amount: 0, perTarget: true },
         maxTargets: spell.maxTargets,
-        targetDesc: t(spell.targetDesc),
+        targetDescription: t(spell.targetDescription),
         duration: t(spell.duration),
         attr: spell.attr,
         targets: spell.targets,
         isMagisphere: spell.isMagisphere || false,
         showInPlayerSheet: true,
+        fuid: spell.fuid,
         _packItemId: spell._packItemId,
       });
     } else {
@@ -168,37 +173,54 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setSelectedMnemoSpellType(null);
   };
 
-  const handleClassChange = (event, newValue) => {
-    setSelectedClass(
-      newValue
-        ? player.classes.find((cls) => t(cls.name) === newValue)?.name
-        : null,
+  const spellTypeOptions = player.classes
+    .filter(
+      (cls) =>
+        cls.benefits.spellClasses && cls.benefits.spellClasses.length > 0,
+    )
+    .flatMap((cls) =>
+      cls.benefits.spellClasses.map((spellType) => ({
+        label: `${spellType.charAt(0).toUpperCase() + spellType.slice(1)} (${t(cls.name)})`,
+        spellType,
+        className: cls.name,
+      })),
     );
-    setSelectedSpell(null); // Reset selected spell when class changes
+
+  const optionAlreadyExists = (option) => {
+    const cls = player.classes.find((c) => c.name === option.className);
+    if (!cls) return false;
+    return (cls.spells ?? []).some((s) => s.spellType === option.spellType);
   };
 
-  const handleSpellChange = (event, newValue) => {
-    setSelectedSpell(newValue);
-  };
+  const selectedSpellTypeOption =
+    selectedClass && selectedSpell
+      ? (spellTypeOptions.find(
+          (o) => o.className === selectedClass && o.spellType === selectedSpell,
+        ) ?? null)
+      : null;
 
-  const filteredSpells = selectedClass
-    ? player.classes.find((cls) => cls.name === selectedClass)?.benefits
-        .spellClasses || []
-    : [];
+  const handleSpellTypeOptionChange = (event, newValue) => {
+    setSelectedClass(newValue ? newValue.className : null);
+    setSelectedSpell(newValue ? newValue.spellType : null);
+  };
 
   const buildBlankSpell = (spellType) => {
     if (spellType === "default")
       return {
         spellType,
         name: "New Spell",
-        mp: 0,
+        cost: { resource: "mp", amount: 0, perTarget: true },
         maxTargets: 0,
-        targetDesc: "",
+        targetDescription: "",
         duration: "",
         description: "",
         isOffensive: false,
-        attr1: "dexterity",
-        attr2: "dexterity",
+        accuracy: {
+          attr1: "dexterity",
+          attr2: "dexterity",
+          value: 0,
+          defense: "mdef",
+        },
         showInPlayerSheet: true,
       };
     if (spellType === "arcanist")
@@ -240,9 +262,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         spellType,
         showInPlayerSheet: true,
         spellName: "New Gamble",
-        mp: 10,
+        cost: { resource: "mp", amount: 10, perTarget: true },
         maxTargets: 2,
-        targetDesc: "Special",
+        targetDescription: "Special",
         duration: "Instantaneous",
         attr: "will",
         targets: [
@@ -329,14 +351,18 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 {
                   spellType: spell,
                   name: "New Spell",
-                  mp: 0,
+                  cost: { resource: "mp", amount: 0, perTarget: true },
                   maxTargets: 0,
-                  targetDesc: "",
+                  targetDescription: "",
                   duration: "",
                   description: "",
                   isOffensive: false,
-                  attr1: "dexterity",
-                  attr2: "dexterity",
+                  accuracy: {
+                    attr1: "insight",
+                    attr2: "will",
+                    value: 0,
+                    defense: "mdef",
+                  },
                   showInPlayerSheet: true,
                 },
               ],
@@ -483,9 +509,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   showInPlayerSheet: true,
 
                   spellName: "New Gamble",
-                  mp: 10,
+                  cost: { resource: "mp", amount: 10, perTarget: true },
                   maxTargets: 2,
-                  targetDesc: "Special",
+                  targetDescription: "Special",
                   duration: "Instantaneous",
                   attr: "will",
                   targets: [
@@ -793,60 +819,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setSelectedSpell(null);
   };
 
-  const addSpellFromCompendium = (spell) => {
-    setPlayer((prev) => ({
-      ...prev,
-      classes: prev.classes.map((cls) => {
-        if (cls.name === selectedClass) {
-          if (spell.spellType === "default") {
-            return {
-              ...cls,
-              spells: [
-                ...cls.spells,
-                {
-                  spellType: spell.spellType,
-                  name: t(spell.name),
-                  mp: spell.mp,
-                  maxTargets: spell.maxTargets,
-                  targetDesc: t(spell.targetDesc),
-                  duration: t(spell.duration),
-                  description: t(spell.description),
-                  isOffensive: spell.isOffensive,
-                  attr1: spell.attr1,
-                  attr2: spell.attr2,
-                  isMagisphere: spell.isMagisphere || false,
-                  showInPlayerSheet: true,
-                },
-              ],
-            };
-          } else if (spell.spellType === "gamble") {
-            return {
-              ...cls,
-              spells: [
-                ...cls.spells,
-                {
-                  spellType: spell.spellType,
-                  spellName: t(spell.name),
-                  mp: spell.mp,
-                  maxTargets: spell.maxTargets,
-                  targetDesc: t(spell.targetDesc),
-                  duration: t(spell.duration),
-                  attr: spell.attr,
-                  targets: spell.targets,
-                  isMagisphere: spell.isMagisphere || false,
-                  showInPlayerSheet: true,
-                },
-              ],
-            };
-          }
-        }
-        return cls;
-      }),
-    }));
-    setSelectedClass(null);
-    setSelectedSpell(null);
-  };
-
   const addDefaultSpellFromCompendium = (spell, className) => {
     if (!className) return;
     if (spell?.spellType !== "default") {
@@ -866,16 +838,25 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             {
               spellType: spell.spellType,
               name: t(spell.name),
-              mp: spell.mp,
+              cost: spell.cost ?? {
+                resource: "mp",
+                amount: 0,
+                perTarget: true,
+              },
               maxTargets: spell.maxTargets,
-              targetDesc: t(spell.targetDesc),
+              targetDescription: t(spell.targetDescription),
               duration: t(spell.duration),
               description: t(spell.description),
               isOffensive: spell.isOffensive,
-              attr1: spell.attr1,
-              attr2: spell.attr2,
+              accuracy: spell.accuracy ?? {
+                attr1: "insight",
+                attr2: "will",
+                value: 0,
+                defense: "mdef",
+              },
               isMagisphere: spell.isMagisphere || false,
               showInPlayerSheet: true,
+              fuid: spell.fuid,
               _packItemId: spell._packItemId,
             },
           ],
@@ -912,6 +893,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
               showInPlayerSheet: true,
+              fuid: spell.fuid,
               _packItemId: spell._packItemId,
             },
           ],
@@ -950,6 +932,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
               showInPlayerSheet: true,
+              fuid: spell.fuid,
               _packItemId: spell._packItemId,
             },
           ],
@@ -959,6 +942,23 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     return true;
   };
 
+  const singletonSpellTypes = new Set([
+    "magichant",
+    "symbol",
+    "dance",
+    "gift",
+    "therioform",
+    "pilot-vehicle",
+    "magiseed",
+    "gourmet",
+    "invoker",
+    "deck",
+    "alchemy",
+    "infusion",
+    "magitech",
+    "mutant",
+  ]);
+
   const addSystemSpellFromCompendium = (spell, className, spellType, label) => {
     if (!className) return false;
     if (spell?.spellType !== spellType) {
@@ -966,6 +966,28 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         window.electron.alert(`Please select a ${label} spell.`);
       else alert(`Please select a ${label} spell.`);
       return false;
+    }
+    if (singletonSpellTypes.has(spellType)) {
+      const already = (
+        player.classes.find((c) => c.name === className)?.spells ?? []
+      ).some((sp) => sp.spellType === spellType);
+      if (already) {
+        const msg = `You already have a ${label} spell`;
+        if (window.electron) window.electron.alert(msg);
+        else alert(msg);
+        return false;
+      }
+      setPlayer((prev) => ({
+        ...prev,
+        classes: prev.classes.map((cls) => {
+          if (cls.name !== className) return cls;
+          return {
+            ...cls,
+            spells: [...cls.spells, buildBlankSpell(spellType)],
+          };
+        }),
+      }));
+      return true;
     }
     const clonedSpell = JSON.parse(JSON.stringify(spell));
     setPlayer((prev) => ({
@@ -1088,12 +1110,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             ...cls,
             spells: cls.spells.map((spell, idx) => {
               if (idx === spellIndex && spell.spellType === "invocation") {
-                const currentWellsprings = spell.activeWellsprings || [];
+                const tracker = spell.tracker || {};
+                const currentWellsprings = tracker.activeWellsprings || [];
                 const hasInnerWellspring =
-                  spell.innerWellspring && spell.chosenWellspring;
+                  tracker.innerWellspring && tracker.chosenWellspring;
                 const isInnerWellspring =
                   hasInnerWellspring &&
-                  spell.chosenWellspring === wellspringName;
+                  tracker.chosenWellspring === wellspringName;
 
                 // Don't allow toggling the inner wellspring
                 if (isInnerWellspring) {
@@ -1119,7 +1142,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
                 return {
                   ...spell,
-                  activeWellsprings: newWellsprings,
+                  tracker: {
+                    ...tracker,
+                    activeWellsprings: newWellsprings,
+                  },
                 };
               }
               return spell;
@@ -1374,35 +1400,26 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   showIconButton={false}
                 />
               </Grid>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} size={12}>
                 <Grid
                   size={{
                     xs: 12,
-                    sm: 4,
+                    sm: 8,
                   }}
                 >
                   <Autocomplete
-                    options={player.classes
-                      .filter(
-                        (cls) =>
-                          cls.benefits.spellClasses &&
-                          cls.benefits.spellClasses.length > 0,
-                      )
-                      .map((cls) => t(cls.name))}
-                    value={
-                      selectedClass
-                        ? t(
-                            player.classes.find(
-                              (cls) => cls.name === selectedClass,
-                            )?.name,
-                          )
-                        : null
+                    options={spellTypeOptions}
+                    value={selectedSpellTypeOption}
+                    onChange={handleSpellTypeOptionChange}
+                    getOptionDisabled={optionAlreadyExists}
+                    getOptionLabel={(o) => o.label}
+                    isOptionEqualToValue={(a, b) =>
+                      a.className === b.className && a.spellType === b.spellType
                     }
-                    onChange={handleClassChange}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label={t("Class")}
+                        label={t("Select Spell Type")}
                         variant="outlined"
                         fullWidth
                       />
@@ -1413,51 +1430,27 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   size={{
                     xs: 12,
                     sm: 4,
-                  }}
-                >
-                  <Autocomplete
-                    options={filteredSpells}
-                    value={selectedSpell}
-                    onChange={handleSpellChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={t("Select Spell")}
-                        variant="outlined"
-                        fullWidth
-                      />
-                    )}
-                    disabled={!selectedClass}
-                  />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 6,
-                    sm: 2,
                   }}
                 >
                   <Button
                     variant="contained"
-                    sx={{ width: "100%", height: "100%" }}
+                    sx={{
+                      width: "100%",
+                      height: 56,
+                      minHeight: 56,
+                      boxSizing: "border-box",
+                      border: "1px solid transparent",
+                      "&.Mui-disabled": {
+                        color: "rgba(255,255,255,0.7)",
+                        backgroundColor: "rgba(120,120,120,0.45)",
+                        border: "1px solid rgba(140,140,140,0.55)",
+                        filter: "grayscale(100%)",
+                      },
+                    }}
                     disabled={!selectedSpell}
                     onClick={() => addNewSpell(selectedSpell)}
                   >
-                    {t("Add Blank Spell")}
-                  </Button>
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 6,
-                    sm: 2,
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    sx={{ width: "100%", height: "100%" }}
-                    disabled={!selectedClass}
-                    onClick={() => openModal("compendium")}
-                  >
-                    {t("Add from Compendium")}
+                    {t("Add Spell Type")}
                   </Button>
                 </Grid>
               </Grid>
@@ -1770,9 +1763,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "pilot-vehicle" &&
                               !spellTypeHeaders.pilot && (
                                 <>
-                                  <CustomHeader2
-                                    headerText={t("pilot_vehicles")}
-                                  />
+                                  {renderCompendiumHeader(
+                                    t("pilot_vehicles"),
+                                    () =>
+                                      setSystemCompendiumTarget({
+                                        className: cls.name,
+                                        spellType: "pilot-vehicle",
+                                        label: t("pilot_vehicles"),
+                                      }),
+                                  )}
                                   {(spellTypeHeaders.pilot = true)}
                                 </>
                               )}
@@ -1822,9 +1821,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                           {spell.spellType === "default" && (
                             <SpellDefault
                               spellName={spell.name}
-                              mp={spell.mp}
+                              mp={spell.cost?.amount}
+                              perTarget={spell.cost?.perTarget ?? true}
                               maxTargets={spell.maxTargets}
-                              targetDesc={spell.targetDesc}
+                              targetDescription={spell.targetDescription}
                               duration={spell.duration}
                               description={spell.description}
                               onEdit={() =>
@@ -1832,8 +1832,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               }
                               isEditMode={isEditMode}
                               isOffensive={spell.isOffensive}
-                              attr1={spell.attr1}
-                              attr2={spell.attr2}
+                              attr1={spell.accuracy?.attr1}
+                              attr2={spell.accuracy?.attr2}
                               isMagisphere={spell.isMagisphere || false}
                               showInPlayerSheet={
                                 spell.showInPlayerSheet ||
@@ -2035,7 +2035,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                           {spell.spellType === "cooking" && (
                             <SpellGourmet
                               spell={spell}
-                              key={`${cls.name}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbookEffects)}`}
+                              key={`${cls.name}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbook?.effects || [])}`}
                               onEdit={() =>
                                 handleEditGourmet(spell, cls.name, index)
                               }
@@ -2045,7 +2045,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                           {spell.spellType === "invocation" && (
                             <SpellInvoker
                               invoker={spell}
-                              key={`${cls.name}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.activeWellsprings)}`}
+                              key={`${cls.name}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.tracker?.activeWellsprings || [])}`}
                               onEdit={() =>
                                 handleEditInvoker(spell, cls.name, index)
                               }
@@ -2139,7 +2139,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                       />
                     </Grid>
                     {isEditMode && (
-                      <Grid container spacing={2}>
+                      <Grid container spacing={2} size={12}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                           <Autocomplete
                             options={mnemoSpellClasses}
@@ -2174,25 +2174,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             }
                           >
                             {t("Add Blank Spell")}
-                          </Button>
-                        </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <Button
-                            variant="outlined"
-                            sx={{ width: "100%", height: "100%" }}
-                            onClick={() =>
-                              setMnemoCompendiumTarget({
-                                mnemoId: mnemo.id,
-                                spellType:
-                                  selectedMnemoTarget === mnemo.id
-                                    ? selectedMnemoSpellType
-                                    : mnemoSpellClasses[0],
-                                label: t("Spell"),
-                                className: mnemo.class,
-                              })
-                            }
-                          >
-                            {t("Add from Compendium")}
                           </Button>
                         </Grid>
                       </Grid>
@@ -2435,9 +2416,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "default" && (
                               <SpellDefault
                                 spellName={spell.name}
-                                mp={spell.mp}
+                                mp={spell.cost?.amount}
+                                perTarget={spell.cost?.perTarget ?? true}
                                 maxTargets={spell.maxTargets}
-                                targetDesc={spell.targetDesc}
+                                targetDescription={spell.targetDescription}
                                 duration={spell.duration}
                                 description={spell.description}
                                 onEdit={() =>
@@ -2445,8 +2427,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                 }
                                 isEditMode={isEditMode}
                                 isOffensive={spell.isOffensive}
-                                attr1={spell.attr1}
-                                attr2={spell.attr2}
+                                attr1={spell.accuracy?.attr1}
+                                attr2={spell.accuracy?.attr2}
                                 isMagisphere={spell.isMagisphere || false}
                                 showInPlayerSheet={
                                   spell.showInPlayerSheet ||
@@ -2673,7 +2655,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "cooking" && (
                               <SpellGourmet
                                 spell={spell}
-                                key={`${mnemo.id}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbookEffects)}`}
+                                key={`${mnemo.id}-cooking-${index}-${spell.spellName}-${JSON.stringify(spell.cookbook?.effects || [])}`}
                                 onEdit={() =>
                                   handleEditGourmet(spell, mnemo.id, index)
                                 }
@@ -2683,19 +2665,20 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             {spell.spellType === "invocation" && (
                               <SpellInvoker
                                 invoker={spell}
-                                key={`${mnemo.id}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.activeWellsprings)}`}
+                                key={`${mnemo.id}-invocation-${index}-${spell.spellName}-${JSON.stringify(spell.invocations)}-${JSON.stringify(spell.tracker?.activeWellsprings || [])}`}
                                 onEdit={() =>
                                   handleEditInvoker(spell, mnemo.id, index)
                                 }
                                 onWellspringToggle={(wellspringName) => {
+                                  const tracker = spell.tracker || {};
                                   const currentWellsprings =
-                                    spell.activeWellsprings || [];
+                                    tracker.activeWellsprings || [];
                                   const hasInner =
-                                    spell.innerWellspring &&
-                                    spell.chosenWellspring;
+                                    tracker.innerWellspring &&
+                                    tracker.chosenWellspring;
                                   if (
                                     hasInner &&
-                                    spell.chosenWellspring === wellspringName
+                                    tracker.chosenWellspring === wellspringName
                                   )
                                     return;
                                   let newWellsprings;
@@ -2718,7 +2701,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                   }
                                   updateMnemoSpell(mnemo.id, index, {
                                     ...spell,
-                                    activeWellsprings: newWellsprings,
+                                    tracker: {
+                                      ...tracker,
+                                      activeWellsprings: newWellsprings,
+                                    },
                                   });
                                 }}
                                 player={player}
@@ -3142,12 +3128,6 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
           handleDeleteSpell(spellIndex, editingSpellClass)
         }
         deck={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellCompendiumModal
-        open={isOpen("compendium")}
-        onClose={closeModal}
-        typeName={selectedClass}
-        onSave={(spell) => addSpellFromCompendium(spell)}
       />
       <CompendiumViewerModal
         open={defaultCompendiumClass !== null}

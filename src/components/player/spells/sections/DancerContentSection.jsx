@@ -13,7 +13,7 @@ export default function DancerContentSection({ formState, setFormState, t }) {
 
   const createBlankDance = useCallback(() => {
     return {
-      name: "dance_custom",
+      key: "dance_custom",
       effect: "",
       duration: "",
       customName: "",
@@ -21,12 +21,10 @@ export default function DancerContentSection({ formState, setFormState, t }) {
   }, []);
 
   const getAvailablePresets = useCallback(() => {
-    const addedNames = currentDances
-      .map((d) => d.name)
-      .filter((name) => name !== "dance_custom");
-    return availableDances.filter(
-      (preset) => !addedNames.includes(preset.name),
-    );
+    const addedKeys = currentDances
+      .map((d) => d.key)
+      .filter((key) => key !== "dance_custom");
+    return availableDances.filter((preset) => !addedKeys.includes(preset.name));
   }, [currentDances]);
 
   const handleAddPreset = useCallback((presetName) => {
@@ -38,7 +36,7 @@ export default function DancerContentSection({ formState, setFormState, t }) {
         dances: [
           ...(prev.dances || []),
           {
-            name: preset.name,
+            key: preset.name,
             effect: preset.effect,
             duration: preset.duration,
             customName: "",
@@ -60,7 +58,7 @@ export default function DancerContentSection({ formState, setFormState, t }) {
         dances: [
           ...(prev.dances || []),
           {
-            name: item.name,
+            key: item.key || item.name,
             effect: item.effect || "",
             duration: item.duration || "",
             customName: "",

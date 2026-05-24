@@ -59,6 +59,7 @@ function ThemedSpellInvoker({
   const getSelectedTextColor = (wellspring) =>
     wellspring === "Air" || wellspring === "Lightning" ? "black" : "white";
 
+  const invokerTracker = invoker.tracker || {};
   const availableInvocations =
     invoker.availableInvocations && invoker.availableInvocations.length > 0
       ? invoker.availableInvocations
@@ -91,8 +92,8 @@ function ThemedSpellInvoker({
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="h6" sx={{ marginBottom: 1 }}>
             {t("invoker_invocation_active_wellspring")} (
-            {invoker.activeWellsprings?.length || 0}/2)
-            {invoker.innerWellspring && (
+            {invokerTracker.activeWellsprings?.length || 0}/2)
+            {invokerTracker.innerWellspring && (
               <Typography
                 component="span"
                 sx={{
@@ -102,7 +103,8 @@ function ThemedSpellInvoker({
                   color: "#4CAF50",
                 }}
               >
-                + {t("invoker_invocation_inner")}: {invoker.chosenWellspring}
+                + {t("invoker_invocation_inner")}:{" "}
+                {invokerTracker.chosenWellspring}
               </Typography>
             )}
             <Typography
@@ -130,10 +132,11 @@ function ThemedSpellInvoker({
             ].map((wellspring) => {
               const wellspringColor = getWellspringColor(wellspring.name);
               const isActive =
-                invoker.activeWellsprings?.includes(wellspring.name) || false;
+                invokerTracker.activeWellsprings?.includes(wellspring.name) ||
+                false;
               const isInnerWellspring =
-                invoker.innerWellspring &&
-                invoker.chosenWellspring === wellspring.name;
+                invokerTracker.innerWellspring &&
+                invokerTracker.chosenWellspring === wellspring.name;
               const IconComponent = wellspring.icon;
               const selectedTextColor = getSelectedTextColor(wellspring.name);
 
@@ -197,7 +200,7 @@ function ThemedSpellInvoker({
               );
             })}
           </Box>
-          {isEditMode && invoker.activeWellsprings?.length !== 2 && (
+          {isEditMode && invokerTracker.activeWellsprings?.length !== 2 && (
             <Typography
               variant="body2"
               sx={{ color: theme.primary, fontStyle: "italic", marginTop: 1 }}
@@ -205,14 +208,14 @@ function ThemedSpellInvoker({
               {t(
                 "Select exactly 2 wellsprings to determine available invocations",
               )}
-              {invoker.innerWellspring && (
+              {invokerTracker.innerWellspring && (
                 <Typography
                   component="span"
                   sx={{ display: "block", color: "#4CAF50" }}
                 >
                   {t("invoker_inner_wellspring_always_available").replace(
                     "{wellspring}",
-                    invoker.chosenWellspring,
+                    invokerTracker.chosenWellspring,
                   )}
                 </Typography>
               )}
@@ -348,16 +351,16 @@ function ThemedSpellInvoker({
           .filter((invocation) => {
             // Show if invocation matches active wellsprings
             if (
-              invoker.activeWellsprings &&
-              invoker.activeWellsprings.includes(invocation.wellspring)
+              invokerTracker.activeWellsprings &&
+              invokerTracker.activeWellsprings.includes(invocation.wellspring)
             ) {
               return true;
             }
 
             // Show if invocation matches inner wellspring
             if (
-              invoker.innerWellspring &&
-              invoker.chosenWellspring === invocation.wellspring
+              invokerTracker.innerWellspring &&
+              invokerTracker.chosenWellspring === invocation.wellspring
             ) {
               return true;
             }

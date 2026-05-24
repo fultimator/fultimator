@@ -13,8 +13,10 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import { Info } from "@mui/icons-material";
+import { Info, ChatOutlined } from "@mui/icons-material";
 import { SharedMagichantCard } from "../../shared/itemCards";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
+import ItemNameRow from "./ItemNameRow";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 
@@ -22,9 +24,9 @@ export default function PlayerMagichant({ player }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const [selectedTone, setSelectedTone] = useState(null);
   const [_selectedMagichantSpell, setSelectedMagichantSpell] = useState(null);
@@ -40,6 +42,20 @@ export default function PlayerMagichant({ player }) {
     setOpenModal(false);
     setSelectedTone(null);
     setSelectedMagichantSpell(null);
+  };
+
+  const sendToChat = (magichantSpell, tone) => {
+    addMessage({
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      speaker: player?.name || "Player",
+      kind: "display",
+      itemType: "spell",
+      name:
+        tone.name === "magichant_custom_name" ? tone.customName : t(tone.name),
+      tags: [t("Magichant"), magichantSpell.className || t("Unknown")],
+      description: tone.description || "",
+    });
   };
 
   /* All magichant spells from all classes */
@@ -523,76 +539,33 @@ export default function PlayerMagichant({ player }) {
                   <Grid container spacing={1} size={12}>
                     {magichantSpell.tones &&
                       magichantSpell.tones.map((tone, tIndex) => (
-                        <Grid
-                          container
-                          spacing={0}
+                        <ItemNameRow
                           key={`${msIndex}-${tIndex}`}
-                          sx={{
-                            display: "flex",
-                            alignItems: "stretch",
-                            maxHeight: "40px",
-                          }}
-                          size={{
-                            xs: 12,
-                            md: 6,
-                          }}
+                          name={
+                            tone.name === "magichant_custom_name"
+                              ? tone.customName
+                              : t(tone.name)
+                          }
                         >
-                          <Grid sx={{ display: "flex" }} size={10}>
-                            <Typography
-                              id="spell-left-name"
-                              variant="h2"
-                              sx={{
-                                fontWeight: "bold",
-                                textTransform: "uppercase",
-                                backgroundColor: primary,
-                                padding: "5px",
-                                paddingLeft: "10px",
-                                color: "#fff",
-                                borderRadius: "8px 0 0 8px",
-                                display: "flex",
-                                alignItems: "center",
-                                width: "100%",
-                              }}
+                          <Tooltip title={t("Info")}>
+                            <IconButton
+                              sx={{ padding: "0px" }}
+                              onClick={() =>
+                                handleOpenModal(magichantSpell, tone)
+                              }
                             >
-                              {tone.name === "magichant_custom_name"
-                                ? tone.customName
-                                : t(tone.name)}
-                            </Typography>
-                          </Grid>
-                          <Grid
-                            sx={{
-                              display: "flex",
-                              alignItems: "stretch",
-                              maxHeight: "40px",
-                            }}
-                            size={2}
-                          >
-                            <div
-                              id="spell-right-controls"
-                              sx={{
-                                padding: "10px",
-                                backgroundColor: ternary,
-                                borderRadius: "0 8px 8px 0",
-                                marginRight: "15px",
-                                display: "flex",
-                                alignItems: "center",
-                                flexDirection: "row",
-                              }}
-                              className="spell-right-controls"
+                              <Info />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t("Send to chat")}>
+                            <IconButton
+                              sx={{ padding: "0px", marginLeft: "5px" }}
+                              onClick={() => sendToChat(magichantSpell, tone)}
                             >
-                              <Tooltip title={t("Info")}>
-                                <IconButton
-                                  sx={{ padding: "0px" }}
-                                  onClick={() =>
-                                    handleOpenModal(magichantSpell, tone)
-                                  }
-                                >
-                                  <Info />
-                                </IconButton>
-                              </Tooltip>
-                            </div>
-                          </Grid>
-                        </Grid>
+                              <ChatOutlined />
+                            </IconButton>
+                          </Tooltip>
+                        </ItemNameRow>
                       ))}
                   </Grid>
                 </React.Fragment>

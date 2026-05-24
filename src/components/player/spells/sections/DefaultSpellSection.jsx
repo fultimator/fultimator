@@ -3,9 +3,11 @@ import {
   Grid,
   TextField,
   FormControl,
+  InputLabel,
   ToggleButton,
   FormControlLabel,
   Switch,
+  Tooltip,
   Select,
   MenuItem,
   Autocomplete,
@@ -28,12 +30,14 @@ import attributes from "../../../../libs/attributes";
 
 export default function DefaultSpellSection({ formState, setFormState, t }) {
   const [inputDuration, setInputDuration] = useState(formState.duration || "");
-  const [inputTarget, setInputTarget] = useState(formState.targetDesc || "");
+  const [inputTarget, setInputTarget] = useState(
+    formState.targetDescription || "",
+  );
 
   useEffect(() => {
     setInputDuration(formState.duration || "");
-    setInputTarget(formState.targetDesc || "");
-  }, [formState.duration, formState.targetDesc]);
+    setInputTarget(formState.targetDescription || "");
+  }, [formState.duration, formState.targetDescription]);
 
   const handleChange = (field, value) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
@@ -46,7 +50,7 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
 
   const handleTargetChange = (event, newValue) => {
     setInputTarget(newValue);
-    handleChange("targetDesc", newValue);
+    handleChange("targetDescription", newValue);
   };
 
   const duration = [t("Scene"), t("Instantaneous"), t("Special")];
@@ -65,8 +69,8 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
     <Grid container spacing={2}>
       <Grid
         size={{
-          xs: 12,
-          sm: 7,
+          xs: 10,
+          sm: 9,
         }}
       >
         <TextField
@@ -82,7 +86,7 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
       </Grid>
       <Grid
         size={{
-          xs: 12,
+          xs: 2,
           sm: 1,
         }}
       >
@@ -103,18 +107,20 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
       <Grid
         size={{
           xs: 6,
-          sm: 2,
+          sm: 3,
         }}
+        sx={{ display: "flex", alignItems: "center", gap: 1 }}
       >
         <TextField
           type="number"
-          label={t("MP x Target")}
+          label={formState.cost?.perTarget ? t("MP x Target") : t("MP")}
           variant="outlined"
-          fullWidth
+          sx={{ flex: 1 }}
           value={
-            formState.mp === null || formState.mp === undefined
+            formState.cost?.amount === null ||
+            formState.cost?.amount === undefined
               ? ""
-              : formState.mp.toString()
+              : formState.cost.amount.toString()
           }
           onChange={(e) => {
             const value = e.target.value;
@@ -122,7 +128,10 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
               value === "" ||
               (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
             ) {
-              handleChange("mp", value === "" ? 0 : parseInt(value, 10));
+              handleChange("cost", {
+                ...(formState.cost ?? { resource: "mp", perTarget: true }),
+                amount: value === "" ? 0 : parseInt(value, 10),
+              });
             }
           }}
           onBlur={(e) => {
@@ -132,9 +141,24 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
             } else if (value > 999) {
               value = 999;
             }
-            handleChange("mp", value);
+            handleChange("cost", {
+              ...(formState.cost ?? { resource: "mp", perTarget: true }),
+              amount: value,
+            });
           }}
         />
+        <Tooltip title={t("Cost is per target hit")}>
+          <Switch
+            size="small"
+            checked={formState.cost?.perTarget ?? true}
+            onChange={(e) =>
+              handleChange("cost", {
+                ...(formState.cost ?? { resource: "mp", amount: 0 }),
+                perTarget: e.target.checked,
+              })
+            }
+          />
+        </Tooltip>
       </Grid>
       <Grid
         size={{
@@ -178,7 +202,7 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
       <Grid
         size={{
           xs: 12,
-          sm: 6,
+          sm: 7,
         }}
       >
         <Autocomplete
@@ -188,7 +212,7 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
           onChange={handleTargetChange}
           onInputChange={(event, newValue) => {
             setInputTarget(newValue);
-            handleChange("targetDesc", newValue);
+            handleChange("targetDescription", newValue);
           }}
           freeSolo
           renderInput={(params) => (
@@ -206,7 +230,7 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
       <Grid
         size={{
           xs: 12,
-          sm: 6,
+          sm: 5,
         }}
       >
         <Autocomplete
@@ -239,22 +263,37 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
               sm: 6,
             }}
           >
-            <Select
-              fullWidth
-              value={formState.attr1 || "dexterity"}
-              onChange={(e) => handleChange("attr1", e.target.value)}
-            >
-              <MenuItem value={"dexterity"}>
-                {attributes["dexterity"].shortcaps}
-              </MenuItem>
-              <MenuItem value={"insight"}>
-                {attributes["insight"].shortcaps}
-              </MenuItem>
-              <MenuItem value={"might"}>
-                {attributes["might"].shortcaps}
-              </MenuItem>
-              <MenuItem value={"will"}>{attributes["will"].shortcaps}</MenuItem>
-            </Select>
+            <FormControl fullWidth>
+              <InputLabel>{t("Attr 1")}</InputLabel>
+              <Select
+                fullWidth
+                label={t("Attr 1")}
+                value={formState.accuracy?.attr1 || "dexterity"}
+                onChange={(e) =>
+                  handleChange("accuracy", {
+                    ...(formState.accuracy ?? {
+                      attr2: "dexterity",
+                      value: 0,
+                      defense: "mdef",
+                    }),
+                    attr1: e.target.value,
+                  })
+                }
+              >
+                <MenuItem value={"dexterity"}>
+                  {attributes["dexterity"].shortcaps}
+                </MenuItem>
+                <MenuItem value={"insight"}>
+                  {attributes["insight"].shortcaps}
+                </MenuItem>
+                <MenuItem value={"might"}>
+                  {attributes["might"].shortcaps}
+                </MenuItem>
+                <MenuItem value={"will"}>
+                  {attributes["will"].shortcaps}
+                </MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
           <Grid
             size={{
@@ -262,22 +301,37 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
               sm: 6,
             }}
           >
-            <Select
-              fullWidth
-              value={formState.attr2 || "dexterity"}
-              onChange={(e) => handleChange("attr2", e.target.value)}
-            >
-              <MenuItem value={"dexterity"}>
-                {attributes["dexterity"].shortcaps}
-              </MenuItem>
-              <MenuItem value={"insight"}>
-                {attributes["insight"].shortcaps}
-              </MenuItem>
-              <MenuItem value={"might"}>
-                {attributes["might"].shortcaps}
-              </MenuItem>
-              <MenuItem value={"will"}>{attributes["will"].shortcaps}</MenuItem>
-            </Select>
+            <FormControl fullWidth>
+              <InputLabel>{t("Attr 2")}</InputLabel>
+              <Select
+                fullWidth
+                label={t("Attr 2")}
+                value={formState.accuracy?.attr2 || "dexterity"}
+                onChange={(e) =>
+                  handleChange("accuracy", {
+                    ...(formState.accuracy ?? {
+                      attr1: "dexterity",
+                      value: 0,
+                      defense: "mdef",
+                    }),
+                    attr2: e.target.value,
+                  })
+                }
+              >
+                <MenuItem value={"dexterity"}>
+                  {attributes["dexterity"].shortcaps}
+                </MenuItem>
+                <MenuItem value={"insight"}>
+                  {attributes["insight"].shortcaps}
+                </MenuItem>
+                <MenuItem value={"might"}>
+                  {attributes["might"].shortcaps}
+                </MenuItem>
+                <MenuItem value={"will"}>
+                  {attributes["will"].shortcaps}
+                </MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
         </>
       ) : null}

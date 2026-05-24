@@ -17,6 +17,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
 import {
   Info,
+  ChatOutlined,
   Air,
   Terrain,
   LocalFireDepartment,
@@ -25,15 +26,17 @@ import {
 } from "@mui/icons-material";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { SharedInvocationCard } from "../../shared/itemCards";
+import ItemNameRow from "./ItemNameRow";
+import { useChatMessagesStore } from "../../../store/chatMessagesStore";
 import { buildInvokerAvailableInvocations } from "../spells/invokerUtils";
 
 export default function PlayerInvoker({ player, setPlayer }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const custom = useCustomTheme();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const ternary = theme.palette.ternary.main;
 
   const [selectedInvocation, setSelectedInvocation] = useState(null);
   const [_selectedInvokerSpell, setSelectedInvokerSpell] = useState(null);
@@ -51,6 +54,19 @@ export default function PlayerInvoker({ player, setPlayer }) {
     setSelectedInvokerSpell(null);
   };
 
+  const sendToChat = (invokerSpell, invocation) => {
+    addMessage({
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      speaker: player?.name || "Player",
+      kind: "display",
+      itemType: "spell",
+      name: t(invocation.name),
+      tags: [t("Invocation"), invokerSpell.className || t("Unknown")],
+      description: invocation.description || "",
+    });
+  };
+
   const handleWellspringToggle = (invokerSpell, wellspring) => {
     if (!setPlayer) return;
     setPlayer((prevPlayer) => {
@@ -58,7 +74,8 @@ export default function PlayerInvoker({ player, setPlayer }) {
         if (cls.name === invokerSpell.className) {
           const newSpells = cls.spells.map((spell) => {
             if (spell.name === invokerSpell.name) {
-              let activeWellsprings = [...(spell.activeWellsprings || [])];
+              const tracker = spell.tracker || {};
+              let activeWellsprings = [...(tracker.activeWellsprings || [])];
               if (activeWellsprings.includes(wellspring)) {
                 activeWellsprings = activeWellsprings.filter(
                   (w) => w !== wellspring,
@@ -69,7 +86,13 @@ export default function PlayerInvoker({ player, setPlayer }) {
                 }
                 activeWellsprings.push(wellspring);
               }
-              return { ...spell, activeWellsprings };
+              return {
+                ...spell,
+                tracker: {
+                  ...tracker,
+                  activeWellsprings,
+                },
+              };
             }
             return spell;
           });
@@ -177,12 +200,13 @@ export default function PlayerInvoker({ player, setPlayer }) {
                             wellspring.name,
                           );
                           const isActive =
-                            invokerSpell.activeWellsprings?.includes(
+                            invokerSpell.tracker?.activeWellsprings?.includes(
                               wellspring.name,
                             ) || false;
                           const isInnerWellspring =
-                            invokerSpell.innerWellspring &&
-                            invokerSpell.chosenWellspring === wellspring.name;
+                            invokerSpell.tracker?.innerWellspring &&
+                            invokerSpell.tracker?.chosenWellspring ===
+                              wellspring.name;
                           const IconComponent = wellspring.icon;
 
                           return (
@@ -277,89 +301,45 @@ export default function PlayerInvoker({ player, setPlayer }) {
                       availableInvocations
                         .filter((invocation) => {
                           if (
-                            invokerSpell.activeWellsprings?.includes(
+                            invokerSpell.tracker?.activeWellsprings?.includes(
                               invocation.wellspring,
                             )
                           )
                             return true;
                           if (
-                            invokerSpell.innerWellspring &&
-                            invokerSpell.chosenWellspring ===
+                            invokerSpell.tracker?.innerWellspring &&
+                            invokerSpell.tracker?.chosenWellspring ===
                               invocation.wellspring
                           )
                             return true;
                           return false;
                         })
                         .map((invocation, iIndex) => (
-                          <Grid
-                            container
-                            spacing={0}
+                          <ItemNameRow
                             key={`${isIndex}-${iIndex}`}
-                            sx={{
-                              display: "flex",
-                              alignItems: "stretch",
-                              maxHeight: "40px",
-                            }}
-                            size={{
-                              xs: 12,
-                              md: 6,
-                            }}
+                            name={t(invocation.name)}
                           >
-                            <Grid sx={{ display: "flex" }} size={10}>
-                              <Typography
-                                id="spell-left-name"
-                                variant="h2"
-                                sx={{
-                                  fontWeight: "bold",
-                                  textTransform: "uppercase",
-                                  backgroundColor: primary,
-                                  padding: "5px",
-                                  paddingLeft: "10px",
-                                  color: "#fff",
-                                  borderRadius: "8px 0 0 8px",
-                                  borderLeft: `6px solid ${getWellspringColor(invocation.wellspring)}`,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  width: "100%",
-                                }}
+                            <Tooltip title={t("Info")}>
+                              <IconButton
+                                sx={{ padding: "0px" }}
+                                onClick={() =>
+                                  handleOpenModal(invokerSpell, invocation)
+                                }
                               >
-                                {t(invocation.name)}
-                              </Typography>
-                            </Grid>
-                            <Grid
-                              sx={{
-                                display: "flex",
-                                alignItems: "stretch",
-                                maxHeight: "40px",
-                              }}
-                              size={2}
-                            >
-                              <div
-                                id="spell-right-controls"
-                                style={{
-                                  padding: "10px",
-                                  backgroundColor: ternary,
-                                  borderRadius: "0 8px 8px 0",
-                                  marginRight: "15px",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  flexDirection: "row",
-                                }}
-                                className="spell-right-controls"
+                                <Info />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t("Send to chat")}>
+                              <IconButton
+                                sx={{ padding: "0px", marginLeft: "5px" }}
+                                onClick={() =>
+                                  sendToChat(invokerSpell, invocation)
+                                }
                               >
-                                <Tooltip title={t("Info")}>
-                                  <IconButton
-                                    sx={{ padding: "0px" }}
-                                    onClick={() =>
-                                      handleOpenModal(invokerSpell, invocation)
-                                    }
-                                  >
-                                    <Info />
-                                  </IconButton>
-                                </Tooltip>
-                              </div>
-                            </Grid>
-                          </Grid>
+                                <ChatOutlined />
+                              </IconButton>
+                            </Tooltip>
+                          </ItemNameRow>
                         ))
                     )}
                   </React.Fragment>

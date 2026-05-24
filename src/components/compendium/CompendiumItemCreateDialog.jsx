@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -17,14 +17,13 @@ import {
   Box,
   Typography,
   ListSubheader,
+  Switch,
 } from "@mui/material";
 import { Add, Close, Delete as DeleteIcon } from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../icons";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
-import types from "../../libs/types";
-import classList from "../../libs/classes";
 import {
   buildMnemosphere,
   MNEMOSPHERE_LEVELS,
@@ -33,7 +32,7 @@ import {
 import spellClassesList from "../../libs/spellClasses";
 import specialSkillsList from "../../libs/skills";
 import { availableFrames } from "../../libs/pilotVehicleData";
-import { Chip, Box as MuiBox, OutlinedInput } from "@mui/material";
+import { Chip } from "@mui/material";
 
 import PlayerWeaponModal from "../player/equipment/weapons/PlayerWeaponModal";
 import PlayerArmorModal from "../player/equipment/armor/PlayerArmorModal";
@@ -42,6 +41,33 @@ import PlayerCustomWeaponModal from "../player/equipment/customWeapons/PlayerCus
 import PlayerAccessoryModal from "../player/equipment/accessories/PlayerAccessoryModal";
 import CustomTextarea from "../common/CustomTextarea";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
+import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import {
+  qualityFieldConfig,
+  qualityGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/quality";
+import {
+  heroicFieldConfig,
+  heroicGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/heroic";
+import {
+  npcAttackFieldConfig,
+  npcAttackGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAttack";
+import {
+  npcSpellFieldConfig,
+  npcSpellGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpell";
+import {
+  npcActionFieldConfig,
+  npcActionGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAction";
+import {
+  npcSpecialFieldConfig,
+  npcSpecialGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpecial";
+import { createDefaultStateFromFields } from "../../forms/registry/helpers";
+import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
 
 // Shared attribute options
 const ATTRS = [
@@ -126,56 +152,43 @@ function slugify(str) {
     .replace(/(^-|-$)/g, "");
 }
 
+function createMetaFromBook(bookValue = "homebrew") {
+  const book = String(bookValue ?? "").trim() || "homebrew";
+  return {
+    book,
+    page: undefined,
+    bookName: "",
+    isOfficial: deriveIsOfficial(book),
+  };
+}
+
 // NPC Attack form
 
 function NpcAttackForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
-
-  const [name, setName] = useState(editData?.name ?? "");
-  const [range, setRange] = useState(editData?.range ?? "melee");
-  const [attr1, setAttr1] = useState(editData?.attr1 ?? "dexterity");
-  const [attr2, setAttr2] = useState(editData?.attr2 ?? "dexterity");
-  const [dmgType, setDmgType] = useState(editData?.type ?? "physical");
-  const [special, setSpecial] = useState(
-    Array.isArray(editData?.special)
-      ? (editData.special[0] ?? "")
-      : (editData?.special ?? ""),
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(npcAttackFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
   );
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setName(editData?.name ?? "");
-    setRange(editData?.range ?? "melee");
-    setAttr1(editData?.attr1 ?? "dexterity");
-    setAttr2(editData?.attr2 ?? "dexterity");
-    setDmgType(editData?.type ?? "physical");
-    setSpecial(
-      Array.isArray(editData?.special)
-        ? (editData.special[0] ?? "")
-        : (editData?.special ?? ""),
-    );
-  }, [editData]);
+    setFormState(buildState());
+  }, [buildState]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!String(formState.name ?? "").trim()) return;
     setSaving(true);
-    const payload = {
-      itemType: "basic",
-      name: name.trim(),
-      range,
-      attr1,
-      attr2,
-      type: dmgType,
-      special: special.trim() ? [special.trim()] : [],
-    };
-    if (isEditing) {
-      await updateItem(packId, editItemId, payload);
-    } else {
-      await addItem(packId, "npc-attack", payload);
-    }
+    const payload = { ...formState, name: String(formState.name ?? "").trim() };
+    if (isEditing) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "npc-attack", payload);
     setSaving(false);
     onClose();
   };
@@ -208,107 +221,42 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Range")}</InputLabel>
-              <Select
-                value={range}
-                label={t("Range")}
-                onChange={(e) => setRange(e.target.value)}
-              >
-                <MenuItem value="melee">{t("Melee")}</MenuItem>
-                <MenuItem value="distance">{t("Distance")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 1")}</InputLabel>
-              <Select
-                value={attr1}
-                label={t("Attr 1")}
-                onChange={(e) => setAttr1(e.target.value)}
-              >
-                {ATTRS.map((a) => (
-                  <MenuItem key={a.value} value={a.value}>
-                    {a.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 2")}</InputLabel>
-              <Select
-                value={attr2}
-                label={t("Attr 2")}
-                onChange={(e) => setAttr2(e.target.value)}
-              >
-                {ATTRS.map((a) => (
-                  <MenuItem key={a.value} value={a.value}>
-                    {a.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Damage Type")}</InputLabel>
-              <Select
-                value={dmgType}
-                label={t("Damage Type")}
-                onChange={(e) => setDmgType(e.target.value)}
-              >
-                {Object.keys(types).map((type) => (
-                  <MenuItem key={type} value={type}>
-                    {types[type].long}
-                  </MenuItem>
-                ))}
-                <MenuItem value="nodmg">{t("No Damage")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Special")}
-              value={special}
-              onChange={(e) => setSpecial(e.target.value)}
-              helperText=""
-              placeholder={t("Optional special effect description")}
-            />
-          </Grid>
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="stats"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="details"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -316,7 +264,7 @@ function NpcAttackForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!String(formState.name ?? "").trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -331,72 +279,31 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
-
-  const [name, setName] = useState(editData?.name ?? "");
-  const [isOffensive, setIsOffensive] = useState(
-    editData?.type === "offensive",
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(npcSpellFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
   );
-  const [mp, setMp] = useState(editData?.mp != null ? String(editData.mp) : "");
-  const [maxTargets, setMaxTargets] = useState(
-    editData?.maxTargets != null ? String(editData.maxTargets) : "",
-  );
-  const [duration, setDuration] = useState(editData?.duration ?? "");
-  const [target, setTarget] = useState(editData?.target ?? "");
-  const [range, setRange] = useState(editData?.range ?? "melee");
-  const [attr1, setAttr1] = useState(editData?.attr1 ?? "dexterity");
-  const [attr2, setAttr2] = useState(editData?.attr2 ?? "dexterity");
-  const [dmgType, setDmgType] = useState(editData?.damagetype ?? "physical");
-  const [special, setSpecial] = useState(
-    Array.isArray(editData?.special)
-      ? (editData.special[0] ?? "")
-      : (editData?.special ?? ""),
-  );
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setName(editData?.name ?? "");
-    setIsOffensive(editData?.type === "offensive");
-    setMp(editData?.mp != null ? String(editData.mp) : "");
-    setMaxTargets(
-      editData?.maxTargets != null ? String(editData.maxTargets) : "",
-    );
-    setDuration(editData?.duration ?? "");
-    setTarget(editData?.target ?? "");
-    setRange(editData?.range ?? "melee");
-    setAttr1(editData?.attr1 ?? "dexterity");
-    setAttr2(editData?.attr2 ?? "dexterity");
-    setDmgType(editData?.damagetype ?? "physical");
-    setSpecial(
-      Array.isArray(editData?.special)
-        ? (editData.special[0] ?? "")
-        : (editData?.special ?? ""),
-    );
-  }, [editData]);
+    setFormState(buildState());
+  }, [buildState]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!String(formState.name ?? "").trim()) return;
     setSaving(true);
     const payload = {
-      itemType: "spell",
-      name: name.trim(),
-      fuid: slugify(name.trim()),
-      type: isOffensive ? "offensive" : "",
-      damagetype: dmgType,
-      mp: mp === "" ? undefined : Number(mp),
-      maxTargets: maxTargets === "" ? undefined : Number(maxTargets),
-      duration: duration || undefined,
-      target: target || undefined,
-      range,
-      attr1,
-      attr2,
-      special: special.trim() ? [special.trim()] : [],
+      ...formState,
+      name: String(formState.name ?? "").trim(),
+      fuid: formState.fuid || slugify(String(formState.name ?? "").trim()),
     };
-    if (isEditing) {
-      await updateItem(packId, editItemId, payload);
-    } else {
-      await addItem(packId, "npc-spell", payload);
-    }
+    if (isEditing) await updateItem(packId, editItemId, payload);
+    else await addItem(packId, "npc-spell", payload);
     setSaving(false);
     onClose();
   };
@@ -428,201 +335,43 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 10,
-              sm: 11,
-            }}
-          >
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 2,
-              sm: 1,
-            }}
-          >
-            <ToggleButton
-              value="offensive"
-              selected={isOffensive}
-              onChange={() => setIsOffensive((v) => !v)}
-              size="small"
-              sx={{ width: "100%" }}
-            >
-              <OffensiveSpellIcon />
-            </ToggleButton>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <TextField
-              label={t("MP x Target")}
-              value={mp}
-              onChange={(e) => setMp(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <TextField
-              label={t("Max Targets")}
-              value={maxTargets}
-              onChange={(e) => setMaxTargets(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <Autocomplete
-              freeSolo
-              options={DURATION_OPTIONS.map(t)}
-              value={duration}
-              onInputChange={(_, v) => setDuration(v)}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Duration")} size="small" />
-              )}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <Autocomplete
-              freeSolo
-              options={TARGET_OPTIONS.map(t)}
-              value={target}
-              onInputChange={(_, v) => setTarget(v)}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Target")} size="small" />
-              )}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Range")}</InputLabel>
-              <Select
-                value={range}
-                label={t("Range")}
-                onChange={(e) => setRange(e.target.value)}
-              >
-                <MenuItem value="melee">{t("Melee")}</MenuItem>
-                <MenuItem value="distance">{t("Distance")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          {isOffensive && (
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Damage Type")}</InputLabel>
-                <Select
-                  value={dmgType}
-                  label={t("Damage Type")}
-                  onChange={(e) => setDmgType(e.target.value)}
-                >
-                  {Object.keys(types).map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {types[type].long}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 1")}</InputLabel>
-              <Select
-                value={attr1}
-                label={t("Attr 1")}
-                onChange={(e) => setAttr1(e.target.value)}
-              >
-                {ATTRS.map((a) => (
-                  <MenuItem key={a.value} value={a.value}>
-                    {a.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 2")}</InputLabel>
-              <Select
-                value={attr2}
-                label={t("Attr 2")}
-                onChange={(e) => setAttr2(e.target.value)}
-              >
-                {ATTRS.map((a) => (
-                  <MenuItem key={a.value} value={a.value}>
-                    {a.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Special")}
-              value={special}
-              onChange={(e) => setSpecial(e.target.value)}
-              helperText=""
-              placeholder={t("Spell effect description")}
-            />
-          </Grid>
+        <Grid container spacing={2}>
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="stats"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="details"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -630,7 +379,7 @@ function NpcSpellForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!String(formState.name ?? "").trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -644,28 +393,26 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState(editData?.name ?? "");
-  const [effect, setEffect] = useState(editData?.effect ?? "");
-  const [spCost, setSpCost] = useState(
-    editData?.spCost != null ? String(editData.spCost) : "",
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(npcSpecialFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
   );
+
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setName(editData?.name ?? "");
-    setEffect(editData?.effect ?? "");
-    setSpCost(editData?.spCost != null ? String(editData.spCost) : "");
-  }, [editData]);
+    setFormState(buildState());
+  }, [buildState]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!formState.name?.trim()) return;
     setSaving(true);
-    const payload = {
-      name: name.trim(),
-      effect: effect.trim(),
-      spCost: spCost === "" ? undefined : Number(spCost),
-    };
+    const payload = { ...formState, name: formState.name.trim() };
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "npc-special", payload);
     setSaving(false);
@@ -684,7 +431,7 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
           py: 1.25,
         }}
       >
-        {t("New Special Rule")}
+        {t(isEditing ? "Edit Special Rule" : "New Special Rule")}
         <IconButton
           size="small"
           onClick={onClose}
@@ -700,42 +447,33 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 4,
-            }}
-          >
-            <TextField
-              label={t("SP Cost")}
-              value={spCost}
-              onChange={(e) => setSpCost(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Effect")}
-              value={effect}
-              onChange={(e) => setEffect(e.target.value)}
-              helperText=""
-            />
-          </Grid>
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -743,7 +481,7 @@ function NpcSpecialForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!formState.name?.trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -757,28 +495,26 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState(editData?.name ?? "");
-  const [effect, setEffect] = useState(editData?.effect ?? "");
-  const [spCost, setSpCost] = useState(
-    editData?.spCost != null ? String(editData.spCost) : "",
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(npcActionFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
   );
+
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setName(editData?.name ?? "");
-    setEffect(editData?.effect ?? "");
-    setSpCost(editData?.spCost != null ? String(editData.spCost) : "");
-  }, [editData]);
+    setFormState(buildState());
+  }, [buildState]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!formState.name?.trim()) return;
     setSaving(true);
-    const payload = {
-      name: name.trim(),
-      effect: effect.trim(),
-      spCost: spCost === "" ? undefined : Number(spCost),
-    };
+    const payload = { ...formState, name: formState.name.trim() };
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "npc-action", payload);
     setSaving(false);
@@ -797,7 +533,7 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
           py: 1.25,
         }}
       >
-        {t("New Other Action")}
+        {t(isEditing ? "Edit Other Action" : "New Other Action")}
         <IconButton
           size="small"
           onClick={onClose}
@@ -813,42 +549,33 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 4,
-            }}
-          >
-            <TextField
-              label={t("SP Cost")}
-              value={spCost}
-              onChange={(e) => setSpCost(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Effect")}
-              value={effect}
-              onChange={(e) => setEffect(e.target.value)}
-              helperText=""
-            />
-          </Grid>
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -856,7 +583,7 @@ function NpcActionForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!formState.name?.trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -887,14 +614,23 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
   const [isOffensive, setIsOffensive] = useState(
     Boolean(editData?.isOffensive),
   );
-  const [mp, setMp] = useState(editData?.mp != null ? String(editData.mp) : "");
+  const [mp, setMp] = useState(
+    editData?.cost?.amount != null ? String(editData.cost.amount) : "",
+  );
+  const [perTarget, setPerTarget] = useState(editData?.cost?.perTarget ?? true);
   const [maxTargets, setMaxTargets] = useState(
     editData?.maxTargets != null ? String(editData.maxTargets) : "1",
   );
-  const [targetDesc, setTargetDesc] = useState(editData?.targetDesc ?? "");
+  const [targetDesc, setTargetDesc] = useState(
+    editData?.targetDescription ?? "",
+  );
   const [duration, setDuration] = useState(editData?.duration ?? "");
-  const [attr1, setAttr1] = useState(editData?.attr1 ?? "insight");
-  const [attr2, setAttr2] = useState(editData?.attr2 ?? "will");
+  const [attr1, setAttr1] = useState(
+    editData?.accuracy?.attr1 ?? editData?.attr1 ?? "insight",
+  );
+  const [attr2, setAttr2] = useState(
+    editData?.accuracy?.attr2 ?? editData?.attr2 ?? "will",
+  );
   const [effect, setEffect] = useState(editData?.effect ?? "");
   const [event, setEvent] = useState(editData?.event ?? "");
   const [genoclepsis, setGenoclepsis] = useState(editData?.genoclepsis ?? "");
@@ -946,11 +682,15 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     Boolean(editData?.martial),
   );
   const [moduleDamage, setModuleDamage] = useState(
-    editData?.damage != null ? String(editData.damage) : "",
+    editData?.damage?.value != null ? String(editData.damage.value) : "",
   );
   const [moduleRange, setModuleRange] = useState(editData?.range ?? "Melee");
   const [modulePrec, setModulePrec] = useState(
-    editData?.prec != null ? String(editData.prec) : "0",
+    editData?.accuracy?.value != null
+      ? String(editData.accuracy.value)
+      : editData?.prec != null
+        ? String(editData.prec)
+        : "0",
   );
   const [moduleCost, setModuleCost] = useState(
     editData?.cost != null ? String(editData.cost) : "0",
@@ -962,10 +702,19 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     editData?.category ?? "Heavy",
   );
   const [damageType, setDamageType] = useState(
-    editData?.damageType ?? "Physical",
+    editData?.damage?.type
+      ? String(editData.damage.type).replace(
+          /^./,
+          String(editData.damage.type).charAt(0).toUpperCase(),
+        )
+      : (editData?.damageType ?? "Physical"),
   );
-  const [pilotAtt1, setPilotAtt1] = useState(editData?.att1 ?? "might");
-  const [pilotAtt2, setPilotAtt2] = useState(editData?.att2 ?? "dexterity");
+  const [pilotAtt1, setPilotAtt1] = useState(
+    editData?.accuracy?.attr1 ?? editData?.att1 ?? "might",
+  );
+  const [pilotAtt2, setPilotAtt2] = useState(
+    editData?.accuracy?.attr2 ?? editData?.att2 ?? "dexterity",
+  );
   const [pilotQuality, setPilotQuality] = useState(editData?.quality ?? "");
   const [pilotQualityCost, setPilotQualityCost] = useState(
     editData?.qualityCost != null ? String(editData.qualityCost) : "0",
@@ -988,14 +737,15 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     setName(editData?.name ?? "");
     setDescription(editData?.description ?? "");
     setIsOffensive(Boolean(editData?.isOffensive));
-    setMp(editData?.mp != null ? String(editData.mp) : "");
+    setMp(editData?.cost?.amount != null ? String(editData.cost.amount) : "");
+    setPerTarget(editData?.cost?.perTarget ?? true);
     setMaxTargets(
       editData?.maxTargets != null ? String(editData.maxTargets) : "1",
     );
-    setTargetDesc(editData?.targetDesc ?? "");
+    setTargetDesc(editData?.targetDescription ?? "");
     setDuration(editData?.duration ?? "");
-    setAttr1(editData?.attr1 ?? "insight");
-    setAttr2(editData?.attr2 ?? "will");
+    setAttr1(editData?.accuracy?.attr1 ?? editData?.attr1 ?? "insight");
+    setAttr2(editData?.accuracy?.attr2 ?? editData?.attr2 ?? "will");
     setEffect(editData?.effect ?? "");
     setEvent(editData?.event ?? "");
     setGenoclepsis(editData?.genoclepsis ?? "");
@@ -1032,15 +782,30 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     setModuleDef(editData?.def != null ? String(editData.def) : "");
     setModuleMdef(editData?.mdef != null ? String(editData.mdef) : "");
     setModuleMartial(Boolean(editData?.martial));
-    setModuleDamage(editData?.damage != null ? String(editData.damage) : "");
+    setModuleDamage(
+      editData?.damage?.value != null ? String(editData.damage.value) : "",
+    );
     setModuleRange(editData?.range ?? "Melee");
-    setModulePrec(editData?.prec != null ? String(editData.prec) : "0");
+    setModulePrec(
+      editData?.accuracy?.value != null
+        ? String(editData.accuracy.value)
+        : editData?.prec != null
+          ? String(editData.prec)
+          : "0",
+    );
     setModuleCost(editData?.cost != null ? String(editData.cost) : "0");
     setModuleDescription(editData?.description ?? "");
     setWeaponCategory(editData?.category ?? "Heavy");
-    setDamageType(editData?.damageType ?? "Physical");
-    setPilotAtt1(editData?.att1 ?? "might");
-    setPilotAtt2(editData?.att2 ?? "dexterity");
+    setDamageType(
+      editData?.damage?.type
+        ? String(editData.damage.type).replace(
+            /^./,
+            String(editData.damage.type).charAt(0).toUpperCase(),
+          )
+        : (editData?.damageType ?? "Physical"),
+    );
+    setPilotAtt1(editData?.accuracy?.attr1 ?? editData?.att1 ?? "might");
+    setPilotAtt2(editData?.accuracy?.attr2 ?? editData?.att2 ?? "dexterity");
     setPilotQuality(editData?.quality ?? "");
     setPilotQualityCost(
       editData?.qualityCost != null ? String(editData.qualityCost) : "0",
@@ -1059,12 +824,11 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
         name: name.trim(),
         description: description.trim(),
         isOffensive,
-        mp: mp === "" ? 0 : Number(mp),
+        cost: { resource: "mp", amount: mp === "" ? 0 : Number(mp), perTarget },
         maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
-        targetDesc: targetDesc.trim() || "One creature",
+        targetDescription: targetDesc.trim() || "One creature",
         duration: duration.trim() || "Instantaneous",
-        attr1,
-        attr2,
+        accuracy: { attr1, attr2, value: 0, defense: "mdef" },
         spellType: "default",
       };
     } else {
@@ -1163,13 +927,19 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                 type: "pilot_module_weapon",
                 category: weaponCategory,
                 cost: Number(moduleCost) || 0,
-                damage: Number(moduleDamage) || 0,
+                accuracy: {
+                  attr1: pilotAtt1,
+                  attr2: pilotAtt2,
+                  value: Number(modulePrec) || 0,
+                  defense: "def",
+                },
+                damage: {
+                  value: Number(moduleDamage) || 0,
+                  type: String(damageType || "Physical").toLowerCase(),
+                  hrZero: false,
+                },
                 range: moduleRange || "Melee",
-                damageType,
-                prec: Number(modulePrec) || 0,
                 cumbersome: moduleCumbersome,
-                att1: pilotAtt1,
-                att2: pilotAtt2,
                 quality: pilotQuality.trim(),
                 qualityCost: Number(pilotQualityCost) || 0,
                 isShield,
@@ -1300,17 +1070,23 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   xs: 6,
                   sm: 3,
                 }}
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
               >
                 <TextField
-                  label={t("MP")}
+                  label={perTarget ? t("MP x Target") : t("MP")}
                   value={mp}
                   onChange={(e) => setMp(e.target.value)}
-                  fullWidth
+                  sx={{ flex: 1 }}
                   size="small"
                   type="number"
                   slotProps={{
                     htmlInput: { min: 0 },
                   }}
+                />
+                <Switch
+                  size="small"
+                  checked={perTarget}
+                  onChange={(e) => setPerTarget(e.target.checked)}
                 />
               </Grid>
               <Grid
@@ -1341,7 +1117,16 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   freeSolo
                   options={TARGET_OPTIONS.map(t)}
                   value={targetDesc}
-                  onInputChange={(_, v) => setTargetDesc(v)}
+                  onInputChange={(_, v) => {
+                    setTargetDesc(v);
+                    if (
+                      ["Self", "One creature", "One equipped weapon"].includes(
+                        v,
+                      )
+                    )
+                      setPerTarget(false);
+                    else if (v.startsWith("Up to")) setPerTarget(true);
+                  }}
                   renderInput={(params) => (
                     <TextField {...params} label={t("Target")} size="small" />
                   )}
@@ -2103,59 +1888,35 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
 
 // Quality form
 
-const QUALITY_CATEGORIES = ["Offensive", "Defensive", "Enhancement"];
-const FILTER_OPTIONS = [
-  { label: "Weapons", value: "weapon" },
-  { label: "Custom Weapons", value: "customWeapon" },
-  { label: "Armor", value: "armor" },
-  { label: "Shields", value: "shield" },
-  { label: "Accessories", value: "accessory" },
-];
-
 function QualityForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState(editData?.name ?? "");
-  const [category, setCategory] = useState(
-    editData?.category ?? QUALITY_CATEGORIES[0],
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(qualityFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
   );
-  const [quality, setQuality] = useState(editData?.quality ?? "");
-  const [cost, setCost] = useState(editData?.cost ?? 0);
-  const [filter, setFilter] = useState(editData?.filter ?? []);
+
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setName(editData?.name ?? "");
-    setCategory(editData?.category ?? QUALITY_CATEGORIES[0]);
-    setQuality(editData?.quality ?? "");
-    setCost(editData?.cost ?? 0);
-    setFilter(editData?.filter ?? []);
-  }, [editData]);
+    setFormState(buildState());
+  }, [buildState]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!formState.name?.trim()) return;
     setSaving(true);
-    const payload = {
-      name: name.trim(),
-      category,
-      quality: quality.trim(),
-      cost: Number(cost),
-      filter,
-    };
+    const payload = { ...formState, name: formState.name.trim() };
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "quality", payload);
     setSaving(false);
     onClose();
-  };
-
-  const handleFilterChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setFilter(typeof value === "string" ? value.split(",") : value);
   };
 
   return (
@@ -2170,7 +1931,7 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
           py: 1.25,
         }}
       >
-        {t("New Quality")}
+        {t(isEditing ? "Edit Quality" : "New Quality")}
         <IconButton
           size="small"
           onClick={onClose}
@@ -2186,103 +1947,33 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Category")}</InputLabel>
-              <Select
-                value={category}
-                label={t("Category")}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                {QUALITY_CATEGORIES.map((cat) => (
-                  <MenuItem key={cat} value={cat}>
-                    {t(cat)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Quality Effect")}
-              value={quality}
-              onChange={(e) => setQuality(e.target.value)}
-              helperText=""
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <TextField
-              label={t("Cost")}
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel id="filter-label">{t("Applicable to")}</InputLabel>
-              <Select
-                labelId="filter-label"
-                id="filter-select"
-                multiple
-                value={filter}
-                onChange={handleFilterChange}
-                input={<OutlinedInput label={t("Applicable to")} />}
-                renderValue={(selected) => (
-                  <MuiBox sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((value) => (
-                      <Chip
-                        key={value}
-                        label={t(
-                          FILTER_OPTIONS.find((o) => o.value === value)
-                            ?.label || value,
-                        )}
-                        size="small"
-                      />
-                    ))}
-                  </MuiBox>
-                )}
-              >
-                {FILTER_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {t(option.label)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
+          <SchemaFieldRenderer
+            config={qualityFieldConfig}
+            groupLabels={qualityGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={qualityFieldConfig}
+            groupLabels={qualityGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={qualityFieldConfig}
+            groupLabels={qualityGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -2290,7 +1981,7 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!formState.name?.trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -2301,49 +1992,34 @@ function QualityForm({ packId, onClose, editData, editItemId }) {
 
 // Heroic form
 
-const CLASS_NAME_OPTIONS = classList.map((c) => c.name);
-const HEROIC_BOOK_OPTIONS = [
-  "core",
-  "rework",
-  "bonus",
-  "high",
-  "techno",
-  "natural",
-];
-
 function HeroicForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
   const { addItem, updateItem } = useCompendiumPacks();
   const customTheme = useCustomTheme();
 
-  const [name, setName] = useState(editData?.name ?? "");
-  const [book, setBook] = useState(editData?.book ?? "");
-  const [quote, setQuote] = useState(editData?.quote ?? "");
-  const [description, setDescription] = useState(editData?.description ?? "");
-  const [applicableTo, setApplicableTo] = useState(
-    editData?.applicableTo ?? [],
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(heroicFieldConfig),
+      ...(editData ?? {}),
+    }),
+    [editData],
   );
+
+  const [formState, setFormState] = useState(buildState);
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
   useEffect(() => {
-    setName(editData?.name ?? "");
-    setBook(editData?.book ?? "");
-    setQuote(editData?.quote ?? "");
-    setDescription(editData?.description ?? "");
-    setApplicableTo(editData?.applicableTo ?? []);
-  }, [editData]);
+    setFormState(buildState());
+  }, [buildState]);
 
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!formState.name?.trim()) return;
     setSaving(true);
     const payload = {
-      name: name.trim(),
-      fuid: slugify(name.trim()),
-      book,
-      quote: quote.trim(),
-      description: description.trim(),
-      applicableTo,
+      ...formState,
+      name: formState.name.trim(),
+      fuid: slugify(formState.name.trim()),
     };
     if (isEditing) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "heroic", payload);
@@ -2363,7 +2039,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
           py: 1.25,
         }}
       >
-        {t("New Heroic Skill")}
+        {t(isEditing ? "Edit Heroic Skill" : "New Heroic Skill")}
         <IconButton
           size="small"
           onClick={onClose}
@@ -2379,93 +2055,33 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
       </DialogTitle>
       <DialogContent sx={{ pt: "16px !important" }}>
         <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Book")}</InputLabel>
-              <Select
-                value={book}
-                label={t("Book")}
-                onChange={(e) => setBook(e.target.value)}
-              >
-                <MenuItem value="">{t("None")}</MenuItem>
-                {HEROIC_BOOK_OPTIONS.map((b) => (
-                  <MenuItem
-                    key={b}
-                    value={b}
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {b}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <Autocomplete
-              multiple
-              options={CLASS_NAME_OPTIONS}
-              value={applicableTo}
-              onChange={(_, newValue) => setApplicableTo(newValue)}
-              freeSolo
-              renderValue={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    key={option}
-                    label={option}
-                    size="small"
-                    {...getTagProps({ index })}
-                  />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t("Applicable To")}
-                  size="small"
-                  placeholder={t("Select classes...")}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              label={t("Quote")}
-              value={quote}
-              onChange={(e) => setQuote(e.target.value)}
-              fullWidth
-              size="small"
-              slotProps={{
-                htmlInput: { maxLength: 200 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Description")}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              helperText=""
-              maxLength={1500}
-            />
-          </Grid>
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
@@ -2473,7 +2089,7 @@ function HeroicForm({ packId, onClose, editData, editItemId }) {
         <Button
           variant="contained"
           onClick={handleSave}
-          disabled={!name.trim() || saving}
+          disabled={!formState.name?.trim() || saving}
         >
           {t(isEditing ? "Save" : "Add")}
         </Button>
@@ -2563,6 +2179,7 @@ export function ClassForm({
       name: name.trim(),
       fuid: slugify(name.trim()),
       book: book.trim() || "homebrew",
+      meta: createMetaFromBook(book),
       benefits: {
         hpplus: Number(hpplus) || 0,
         mpplus: Number(mpplus) || 0,
@@ -2992,7 +2609,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
   const [description, setDescription] = useState(editData?.description ?? "");
   const [effect, setEffect] = useState(editData?.effect ?? "");
   const [targetDescription, setTargetDescription] = useState(
-    editData?.targetDescription ?? "",
+    editData?.description ?? "",
   );
   const [clockSections, setClockSections] = useState(
     editData?.clock?.sections ?? 6,
@@ -3042,7 +2659,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
     setName(editData?.name ?? "");
     setDescription(editData?.description ?? "");
     setEffect(editData?.effect ?? "");
-    setTargetDescription(editData?.targetDescription ?? "");
+    setTargetDescription(editData?.description ?? "");
     setClockSections(editData?.clock?.sections ?? 6);
     setShowClock(Boolean(editData?.clock));
 
@@ -3072,16 +2689,23 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
         name: name.trim(),
         description: description.trim(),
         effect: effect.trim(),
+        meta: editData?.meta ?? createMetaFromBook("homebrew"),
       };
     if (subtype === "camp-activities")
       return {
         subtype,
         name: name.trim(),
-        targetDescription: targetDescription.trim(),
+        description: targetDescription.trim(),
         effect: effect.trim(),
+        meta: editData?.meta ?? createMetaFromBook("homebrew"),
       };
     if (subtype === "zero-trigger" || subtype === "zero-effect")
-      return { subtype, name: name.trim(), description: description.trim() };
+      return {
+        subtype,
+        name: name.trim(),
+        description: description.trim(),
+        meta: editData?.meta ?? createMetaFromBook("homebrew"),
+      };
     if (subtype === "zero-power")
       return {
         subtype,
@@ -3101,6 +2725,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
             }
           : "",
         clock: { sections: Number(clockSections) },
+        meta: editData?.meta ?? createMetaFromBook("homebrew"),
       };
     return {
       subtype,
@@ -3108,6 +2733,7 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
       description: description.trim(),
       effect: effect.trim(),
       ...(showClock ? { clock: { sections: Number(clockSections) } } : {}),
+      meta: editData?.meta ?? createMetaFromBook("homebrew"),
     };
   };
 
@@ -3411,6 +3037,7 @@ function MnemosphereForm({ packId, onClose, editData, editItemId }) {
       ...buildMnemosphere(selectedClass, Number(selectedLvl)),
       fuid: slugify(selectedClass),
       id: editData?.id,
+      meta: editData?.meta ?? createMetaFromBook("homebrew"),
     };
     if (editItemId) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "mnemosphere", payload);
@@ -3518,6 +3145,7 @@ function HoplosphereForm({ packId, onClose, editData, editItemId }) {
         if (threshold > 1 && effect) acc[threshold] = effect;
         return acc;
       }, {}),
+      meta: editData?.meta ?? createMetaFromBook("homebrew"),
     };
     if (editItemId) await updateItem(packId, editItemId, payload);
     else await addItem(packId, "hoplosphere", payload);

@@ -14,7 +14,7 @@ export default function MagichantKeysContentSection({
 
   const createBlankKey = useCallback(() => {
     return {
-      name: "magichant_custom_name",
+      key: "magichant_custom_name",
       type: "",
       status: "",
       attribute: "",
@@ -24,13 +24,13 @@ export default function MagichantKeysContentSection({
   }, []);
 
   const getAvailablePresets = useCallback(() => {
-    const addedNames = currentKeys
-      .map((key) => key.name)
-      .filter((name) => name !== "magichant_custom_name");
+    const addedKeys = currentKeys
+      .map((k) => k.key)
+      .filter((k) => k !== "magichant_custom_name");
     return availableMagichantKeys.filter(
       (preset) =>
         preset.name !== "magichant_custom_name" &&
-        !addedNames.includes(preset.name),
+        !addedKeys.includes(preset.name),
     );
   }, [currentKeys]);
 
@@ -45,7 +45,7 @@ export default function MagichantKeysContentSection({
         keys: [
           ...(prev.keys || []),
           {
-            name: preset.name,
+            key: preset.name,
             type: preset.type,
             status: preset.status,
             attribute: preset.attribute,
@@ -76,7 +76,7 @@ export default function MagichantKeysContentSection({
         keys: [
           ...(prev.keys || []),
           {
-            name: item.name || "magichant_custom_name",
+            key: item.key || item.name || "magichant_custom_name",
             type: item.type || "",
             status: item.status || "",
             attribute: item.attribute || "",

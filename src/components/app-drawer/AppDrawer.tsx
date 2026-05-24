@@ -1,37 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Divider,
   Drawer,
   IconButton,
   Tooltip,
-  Typography,
   useMediaQuery,
 } from "@mui/material";
 import {
   Bookmark as BookmarkIcon,
   ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
+  ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   Palette as PaletteIcon,
 } from "@mui/icons-material";
-import { APP_DRAWER_WIDTH } from "./constants";
-import { NotesPanel } from "./panels/NotesPanel";
+import { APP_DRAWER_WIDTH, TAB_RAIL_WIDTH } from "./constants";
+import { ChatPanel } from "./panels/chat";
 import { CustomizerPanel } from "./panels/CustomizerPanel";
 import { SavedThemesPanel } from "./panels/SavedThemesPanel";
-
-const TAB_RAIL_WIDTH = 44;
-
-type DrawerTab = "notes" | "customizer" | "themes";
-
-const TAB_TITLE: Record<DrawerTab, string> = {
-  notes: "Chat",
-  customizer: "Customizer",
-  themes: "Saved Themes",
-};
+import { useAppDrawerStore, type DrawerTab } from "../../store/appDrawerStore";
 
 const TABS: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
   {
-    id: "notes",
+    id: "chat",
     label: "Chat",
     icon: <ChatBubbleOutlineIcon fontSize="small" />,
   },
@@ -50,17 +41,24 @@ const TABS: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
 interface AppDrawerProps {
   open: boolean;
   onClose: () => void;
+  onOpen: () => void;
 }
 
-export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
+export const AppDrawer: React.FC<AppDrawerProps> = ({
+  open,
+  onClose,
+  onOpen,
+}) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const [activeTab, setActiveTab] = useState<DrawerTab>("customizer");
+  const activeTab = useAppDrawerStore((s) => s.activeTab);
+  const setActiveTab = useAppDrawerStore((s) => s.setActiveTab);
+  const drawerBottomActions = useAppDrawerStore((s) => s.drawerBottomActions);
 
   return (
     <Drawer
       variant={isMobile ? "temporary" : "persistent"}
       anchor="right"
-      open={open}
+      open={isMobile ? open : true}
       onClose={onClose}
       ModalProps={
         isMobile
@@ -74,18 +72,37 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
             }
           : undefined
       }
-      sx={{
+      sx={(theme) => ({
         ...(isMobile
           ? { width: 0, overflow: "visible", position: "static" }
-          : { width: APP_DRAWER_WIDTH, flexShrink: 0 }),
+          : { width: open ? APP_DRAWER_WIDTH : TAB_RAIL_WIDTH, flexShrink: 0 }),
         "& .MuiBackdrop-root": { position: "fixed !important", zIndex: 1200 },
         "& .MuiDrawer-paper": {
-          width: APP_DRAWER_WIDTH,
+          width: isMobile
+            ? APP_DRAWER_WIDTH
+            : open
+              ? APP_DRAWER_WIDTH
+              : TAB_RAIL_WIDTH,
+          transition: "width 0.25s ease !important",
           boxSizing: "border-box",
           position: "fixed !important",
           ...(isMobile
-            ? { marginTop: 0, height: "100%", right: 0, top: 0, bottom: 0 }
-            : { marginTop: "64px", height: "calc(100% - 64px)" }),
+            ? {
+                top: 0,
+                height: "100%",
+                right: 0,
+                bottom: 0,
+                zIndex: theme.zIndex.modal,
+              }
+            : {
+                zIndex: theme.zIndex.appBar - 1,
+                top: 0,
+                height: "100%",
+                paddingTop: `${theme.mixins.toolbar.minHeight ?? 56}px`,
+                "@media (min-width:600px)": {
+                  paddingTop: "64px",
+                },
+              }),
           overflow: "hidden",
           backgroundColor: "background.paper",
           color: "text.primary",
@@ -102,13 +119,14 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
             backgroundColor: "background.paper",
           },
         },
-      }}
+      })}
     >
       <Box sx={{ display: "flex", height: "100%" }}>
         {/* Tab rail */}
         <Box
           sx={{
             width: TAB_RAIL_WIDTH,
+            flexShrink: 0,
             borderRight: 1,
             borderColor: "divider",
             backgroundColor: "action.hover",
@@ -119,11 +137,37 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
             gap: 1,
           }}
         >
+          <Tooltip title={open ? "Collapse" : "Expand"} placement="left">
+            <IconButton
+              aria-label={open ? "Collapse drawer" : "Expand drawer"}
+              onClick={open ? onClose : onOpen}
+              size="small"
+              sx={{
+                width: 30,
+                height: 30,
+                borderRadius: 1,
+                color: "text.secondary",
+                "&:hover": { backgroundColor: "action.hover" },
+              }}
+            >
+              {open ? (
+                <ChevronRightIcon fontSize="small" />
+              ) : (
+                <ChevronLeftIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Tooltip>
+
+          <Divider flexItem />
+
           {TABS.map(({ id, label, icon }) => (
-            <Tooltip key={id} title={label} placement="right">
+            <Tooltip key={id} title={label} placement="left">
               <IconButton
                 aria-label={label}
-                onClick={() => setActiveTab(id)}
+                onClick={() => {
+                  setActiveTab(id);
+                  if (!open) onOpen();
+                }}
                 size="small"
                 sx={{
                   width: 30,
@@ -139,6 +183,44 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
               </IconButton>
             </Tooltip>
           ))}
+
+          {drawerBottomActions.length > 0 && (
+            <>
+              <Box sx={{ flex: 1 }} />
+              <Divider flexItem />
+              {drawerBottomActions.map(
+                ({ id, label, icon, onClick, disabled, color }) => (
+                  <Tooltip key={id} title={label} placement="left">
+                    <span>
+                      <IconButton
+                        aria-label={label}
+                        onClick={disabled ? undefined : onClick}
+                        size="small"
+                        disabled={disabled}
+                        sx={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 1,
+                          color: disabled
+                            ? "text.disabled"
+                            : (color ?? "primary.main"),
+                          opacity: disabled ? 0.35 : 1,
+                          "&:hover": {
+                            backgroundColor: disabled
+                              ? "transparent"
+                              : "action.hover",
+                          },
+                          "&.Mui-disabled": { color: "text.disabled" },
+                        }}
+                      >
+                        {icon}
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                ),
+              )}
+            </>
+          )}
         </Box>
 
         {/* Content area */}
@@ -146,31 +228,13 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ open, onClose }) => {
           sx={{
             flex: 1,
             minWidth: 0,
-            display: "flex",
+            display: isMobile ? "flex" : open ? "flex" : "none",
             flexDirection: "column",
             overflow: "hidden",
           }}
         >
-          <Box
-            sx={{
-              p: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {TAB_TITLE[activeTab]}
-            </Typography>
-            <IconButton onClick={onClose} size="small" sx={{ ml: 1 }}>
-              <ChevronRightIcon />
-            </IconButton>
-          </Box>
-
-          <Divider />
-
           <Box sx={{ flex: 1, overflowY: "auto" }}>
-            {activeTab === "notes" && <NotesPanel />}
+            {activeTab === "chat" && <ChatPanel />}
             {activeTab === "customizer" && <CustomizerPanel />}
             {activeTab === "themes" && <SavedThemesPanel />}
           </Box>

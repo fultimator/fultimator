@@ -23,8 +23,39 @@ const StyledMarkdownBase = styled(ReactMarkdown)({
   display: "inline",
 });
 
+const defaultMarkdownComponents = {
+  p: ({ node: _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", margin: "0.5em 0", lineHeight: 1.5 }}
+    />
+  ),
+  ul: ({ node: _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", paddingLeft: "1.5em", margin: "0.5em 0" }}
+    />
+  ),
+  ol: ({ node: _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", paddingLeft: "1.5em", margin: "0.5em 0" }}
+    />
+  ),
+  li: ({ node: _node, ...props }) => (
+    <span {...props} style={{ display: "list-item", lineHeight: 1.6 }} />
+  ),
+};
+
 export const StyledMarkdown = ({ children, ...props }) => (
-  <StyledMarkdownBase remarkPlugins={[remarkBreaks]} {...props}>
+  <StyledMarkdownBase
+    remarkPlugins={[remarkBreaks]}
+    components={{
+      ...defaultMarkdownComponents,
+      ...(props.components || {}),
+    }}
+    {...props}
+  >
     {typeof children === "string" ? children.replace(/\\n/g, "\n") : children}
   </StyledMarkdownBase>
 );

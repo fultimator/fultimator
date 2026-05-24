@@ -11,7 +11,6 @@ import { OpenBracket, CloseBracket } from "../../../Bracket";
 import Diamond from "../../../Diamond";
 import attributes from "../../../../libs/attributes";
 import types from "../../../../libs/types";
-import { calculateCustomWeaponStats } from "../../../player/common/playerCalculations";
 import {
   CARD_DEFAULTS,
   useCardSetup,
@@ -19,11 +18,7 @@ import {
   headerBoxSx,
   nameRowSx,
 } from "../core-utils";
-import {
-  CardContentWrapper,
-  HeaderSpacer,
-  RowsWithOptionalImage,
-} from "../core";
+import { CardContentWrapper, HeaderSpacer, RowsWithOptionalImage } from "../core";
 
 const ROW_MIN_HEIGHT = "38px";
 const ROW_MIN_HEIGHT_NO_IMAGE = "40px";
@@ -49,8 +44,39 @@ const StyledMarkdownBase = styled(ReactMarkdown)({
   display: "inline",
 });
 
+const defaultMarkdownComponents = {
+  p: ({ _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", margin: "0.5em 0", lineHeight: 1.5 }}
+    />
+  ),
+  ul: ({ _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", paddingLeft: "1.5em", margin: "0.5em 0" }}
+    />
+  ),
+  ol: ({ _node, ...props }) => (
+    <span
+      {...props}
+      style={{ display: "block", paddingLeft: "1.5em", margin: "0.5em 0" }}
+    />
+  ),
+  li: ({ _node, ...props }) => (
+    <span {...props} style={{ display: "list-item", lineHeight: 1.6 }} />
+  ),
+};
+
 const StyledMarkdown = ({ children, ...props }) => (
-  <StyledMarkdownBase remarkPlugins={[remarkBreaks]} {...props}>
+  <StyledMarkdownBase
+    remarkPlugins={[remarkBreaks]}
+    components={{
+      ...defaultMarkdownComponents,
+      ...(props.components || {}),
+    }}
+    {...props}
+  >
     {typeof children === "string" ? children.replace(/\\n/g, "\n") : children}
   </StyledMarkdownBase>
 );
@@ -141,19 +167,6 @@ function getArmorInit(item) {
   return `${value > 0 ? "+" : ""}${value}`;
 }
 
-function getCustomWeaponDamageType(item) {
-  const hasElemental = (item.customizations || []).some(
-    (c) => c.name === "weapon_customization_elemental",
-  );
-  if (
-    !hasElemental &&
-    (item.overrideDamageType || item.overrideType) &&
-    item.customDamageType
-  )
-    return item.customDamageType;
-  return item.type || "physical";
-}
-
 function isCustomWeaponMartial(item) {
   if (item.martial) return true;
   if (
@@ -167,25 +180,13 @@ function isCustomWeaponMartial(item) {
   ) {
     return true;
   }
-  const { damage } = calculateCustomWeaponStats(item, false);
-  return damage >= 10;
+  return (item.damage?.value ?? 0) >= 10;
 }
 
 function getCustomWeaponRangeLabel(item, t) {
-  return item.range === "weapon_range_ranged" ? t("Ranged") : t("Melee");
-}
-
-function resolveAccuracyAttributes(item) {
-  const att1Raw = Array.isArray(item.accuracyCheck)
-    ? item.accuracyCheck[0]
-    : item.accuracyCheck?.att1 || item.att1;
-  const att2Raw = Array.isArray(item.accuracyCheck)
-    ? item.accuracyCheck[1]
-    : item.accuracyCheck?.att2 || item.att2;
-  return {
-    attr1: attributes[att1Raw || "dexterity"],
-    attr2: attributes[att2Raw || "might"],
-  };
+  return item.range === "weapon_range_ranged" || item.range === "ranged"
+    ? t("Ranged")
+    : t("Melee");
 }
 
 function QualityRow({ item, customTheme, imageMode }) {
@@ -239,9 +240,9 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
     imageTempInfoTextKey,
   });
 
-  const attr1 = attributes[item.att1];
-  const attr2 = attributes[item.att2];
-  const dmgType = types[item.type];
+  const attr1 = attributes[item.accuracy?.attr1 ?? item.att1];
+  const attr2 = attributes[item.accuracy?.attr2 ?? item.att2];
+  const dmgType = types[item.damage?.type ?? item.type];
   const withImage = isImageMode(imageMode);
   const cols = withImage
     ? { name: 3, cost: 1, accuracy: 4, damage: 4, hands: 4, range: 3 }
@@ -259,39 +260,37 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-            <Grid size={cols.name}>
-              <Typography>{t("Weapon")}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-            <Grid size={cols.accuracy}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Accuracy")}
-              </Typography>
-            </Grid>
-            <Grid size={cols.damage}>
-              <Typography sx={{ textAlign: "center" }}>
-                {t("Damage")}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
-
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+                <Grid size={cols.name}>
+                  <Typography>{t("Weapon")}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
+                <Grid size={cols.accuracy}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Accuracy")}
+                  </Typography>
+                </Grid>
+                <Grid size={cols.damage}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Damage")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -342,10 +341,10 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
               <OpenBracket />
               {attr1?.shortcaps} + {attr2?.shortcaps}
               <CloseBracket />
-              {item.prec > 0
-                ? `+${item.prec}`
-                : item.prec < 0
-                  ? `${item.prec}`
+              {(item.accuracy?.value ?? item.prec ?? 0) > 0
+                ? `+${item.accuracy?.value ?? item.prec}`
+                : (item.accuracy?.value ?? item.prec ?? 0) < 0
+                  ? `${item.accuracy?.value ?? item.prec}`
                   : ""}
             </Typography>
           </Grid>
@@ -360,7 +359,17 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
               }}
             >
               <OpenBracket />
-              {t("HR")} {item.damage >= 0 ? "+" : ""} {item.damage}
+              {item.damage?.hrZero
+                ? (() => {
+                    const val = item.damage?.value ?? item.damage;
+                    return val === 0
+                      ? "HR0"
+                      : `HR0 ${val > 0 ? "+" : ""} ${val}`;
+                  })()
+                : (() => {
+                    const val = item.damage?.value ?? item.damage;
+                    return `${t("HR")} + ${val}`;
+                  })()}
               <CloseBracket />
               {dmgType?.long}
             </Typography>
@@ -474,10 +483,10 @@ function SharedArmorLikeCard({
   });
 
   const category = forceCategory || getArmorCategory(item);
-  const withImage = isImageMode(imageMode);
-  const cols = withImage
-    ? { name: 3, cost: 1, def: 2, mdef: 2, init: 2 }
-    : { name: 3, cost: 2, def: 2, mdef: 2, init: 3 };
+  const hasInitColumn = !item.rework;
+  const cols = hasInitColumn
+    ? { name: 3, cost: 2, def: 2, mdef: 2, init: 3 } // sums to 12
+    : { name: 6, cost: 2, def: 2, mdef: 2 }; // sums to 12
 
   return (
     <CardContentWrapper
@@ -491,42 +500,42 @@ function SharedArmorLikeCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-            <Grid size={cols.name}>
-              <Typography>{t(category)}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-            <Grid size={cols.def}>
-              <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
-            </Grid>
-            <Grid size={cols.mdef}>
-              <Typography sx={{ textAlign: "center" }}>{t("MDEF")}</Typography>
-            </Grid>
-            {!item.rework && (
-              <Grid size={cols.init}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("INIT")}
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        </Grid>
-      )}
-
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+                <Grid size={cols.name}>
+                  <Typography>{t(category)}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
+                <Grid size={cols.def}>
+                  <Typography sx={{ textAlign: "center" }}>{t("DEF")}</Typography>
+                </Grid>
+                <Grid size={cols.mdef}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("MDEF")}
+                  </Typography>
+                </Grid>
+                {hasInitColumn && (
+                  <Grid size={cols.init}>
+                    <Typography sx={{ textAlign: "center" }}>
+                      {t("INIT")}
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -590,7 +599,7 @@ function SharedArmorLikeCard({
               {getArmorMDef(item, category, t)}
             </Typography>
           </Grid>
-          {!item.rework && (
+          {hasInitColumn && (
             <Grid size={cols.init}>
               <Typography
                 sx={{
@@ -646,9 +655,11 @@ function CustomWeaponRows({
   cols,
   t,
 }) {
-  const { precision, damage } = calculateCustomWeaponStats(item, false);
-  const { attr1, attr2 } = resolveAccuracyAttributes(item);
-  const damageType = types[getCustomWeaponDamageType(item)];
+  const precision = item.accuracy?.value ?? 0;
+  const damage = item.damage?.value ?? 0;
+  const attr1 = attributes[item.accuracy?.attr1 ?? "dexterity"];
+  const attr2 = attributes[item.accuracy?.attr2 ?? "might"];
+  const damageType = types[item.damage?.type ?? "physical"];
   const martial = isCustomWeaponMartial(item);
 
   return (
@@ -721,7 +732,11 @@ function CustomWeaponRows({
             }}
           >
             <OpenBracket />
-            {t("HR +")} {damage}
+            {item.damage?.hrZero
+              ? damage === 0
+                ? "HR0"
+                : `HR0 ${damage > 0 ? "+" : ""} ${damage}`
+              : `${t("HR")} + ${damage}`}
             <CloseBracket />
             {damageType?.long}
           </Typography>
@@ -854,7 +869,7 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
       >
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
           <Chip
-            label={`${t("Slot Tier")}: ${SLOT_TIERS.find((t) => t.value === (sphereData.slotTier ?? "alpha"))?.label ?? "slot α"}`}
+            label={`${t("Slot Tier")}: ${SLOT_TIERS.find((t) => t.value === (sphereData.slotTier ?? "alpha"))?.label ?? "slot alpha"}`}
             size="small"
             variant="outlined"
           />
@@ -863,7 +878,7 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
               key={`${sphere.type}-${sphere.id}`}
               label={
                 sphere.type === "hoplosphere" && sphere.coagCount > 1
-                  ? `${sphere.name} (Coag ×${sphere.coagCount})`
+                  ? `${sphere.name} (Coag x${sphere.coagCount})`
                   : sphere.name
               }
               size="small"
@@ -890,7 +905,7 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
                     component="div"
                     sx={{ pl: 1.5, color: "text.secondary" }}
                   >
-                    Coag ×{threshold}: {effect}
+                    Coag x{threshold}: {effect}
                   </Typography>
                 ))}
           </Box>
@@ -901,31 +916,25 @@ function SphereDataRow({ sphereData, customTheme, imageMode, t }) {
 }
 
 function buildSecondWeaponItem(item) {
-  const secondHasElemental = (item.secondCurrentCustomizations || []).some(
-    (c) => c.name === "weapon_customization_elemental",
-  );
+  const secondaryCustomizations =
+    item.secondCurrentCustomizations ?? item.secondCustomizations ?? [];
   return {
     name: item.secondWeaponName || item.name,
     category: item.secondSelectedCategory || item.category,
     range: item.secondSelectedRange || item.range,
-    accuracyCheck: item.overrideAccuracyAttributes
-      ? item.accuracyCheck
-      : item.secondSelectedAccuracyCheck || item.accuracyCheck,
-    type: item.secondSelectedType || item.type,
-    customizations: item.secondCurrentCustomizations || [],
+    accuracy: item.overrideAccuracyAttributes
+      ? item.accuracy
+      : item.secondAccuracy || item.accuracy,
+    damage: item.secondDamage || item.damage,
+    customizations: secondaryCustomizations,
     quality: item.quality,
     qualityCost: item.qualityCost,
     cost: item.cost,
     rareAccuracyBonus: item.rareAccuracyBonus || false,
     rareDamageBonus: item.rareDamageBonus || false,
-    damageModifier: item.secondDamageModifier || 0,
-    precModifier: item.secondPrecModifier || 0,
     defModifier: item.secondDefModifier || 0,
     mDefModifier: item.secondMDefModifier || 0,
-    overrideDamageType: secondHasElemental
-      ? false
-      : item.overrideDamageType || false,
-    customDamageType: item.customDamageType || item.type || "physical",
+    overrideDamageType: item.secondOverrideDamageType || false,
   };
 }
 
@@ -974,7 +983,8 @@ export const SharedCustomWeaponCard = React.memo(
 
     const hasStoredSecondForm =
       (item.secondWeaponName != null ||
-        item.secondCurrentCustomizations != null) &&
+        item.secondCurrentCustomizations != null ||
+        item.secondCustomizations != null) &&
       Array.isArray(item.customizations) &&
       item.customizations.some(
         (c) => c.name === "weapon_customization_transforming",
@@ -1022,9 +1032,7 @@ export const SharedCustomWeaponCard = React.memo(
                 <Typography>{t("Custom Weapon")}</Typography>
               </Grid>
               <Grid size={cols.cost}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Cost")}
-                </Typography>
+                <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
               </Grid>
               <Grid size={cols.accuracy}>
                 <Typography sx={{ textAlign: "center" }}>
@@ -1032,9 +1040,7 @@ export const SharedCustomWeaponCard = React.memo(
                 </Typography>
               </Grid>
               <Grid size={cols.damage}>
-                <Typography sx={{ textAlign: "center" }}>
-                  {t("Damage")}
-                </Typography>
+                <Typography sx={{ textAlign: "center" }}>{t("Damage")}</Typography>
               </Grid>
             </Grid>
           </Grid>
@@ -1062,59 +1068,69 @@ export const SharedCustomWeaponCard = React.memo(
             </Typography>
           </Box>
         )}
-        <Box sx={{ opacity: activeForm === "secondary" ? 0.5 : 1 }}>
-          <CustomWeaponRows item={item} {...rowProps} />
-          {sphereData ? (
-            <SphereDataRow
-              sphereData={sphereData}
-              customTheme={customTheme}
-              imageMode={imageMode}
-              t={t}
-            />
-          ) : (
-            <CustomizationsAndQualityRow
-              item={item}
-              customTheme={customTheme}
-              imageMode={imageMode}
-              t={t}
-            />
-          )}
-        </Box>
-
-        {secondItem && (
-          <>
-            <Box
-              sx={{
-                px: 1,
-                pt: 0.5,
-                pb: 0.25,
-                background: customTheme.secondary + "33",
-                borderTop: `1px solid ${customTheme.secondary}`,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                  opacity: 0.7,
-                }}
-              >
-                {t("Transforming Form")}
-              </Typography>
-            </Box>
-            <Box sx={{ opacity: activeForm === "primary" ? 0.5 : 1 }}>
-              <CustomWeaponRows item={secondItem} {...rowProps} />
-              <CustomizationsAndQualityRow
-                item={secondItem}
+        <RowsWithOptionalImage
+          // Custom Weapon keeps its own header image slot layout.
+          // Prevent RowsWithOptionalImage from rendering a second image column.
+          imageMode="none"
+          imageSize={imageSize}
+          imageVisible={imageVisible}
+          imageSlot={imageSlot}
+          customTheme={customTheme}
+        >
+          <Box sx={{ opacity: activeForm === "secondary" ? 0.5 : 1 }}>
+            <CustomWeaponRows item={item} {...rowProps} />
+            {sphereData ? (
+              <SphereDataRow
+                sphereData={sphereData}
                 customTheme={customTheme}
                 imageMode={imageMode}
                 t={t}
               />
-            </Box>
-          </>
-        )}
+            ) : (
+              <CustomizationsAndQualityRow
+                item={item}
+                customTheme={customTheme}
+                imageMode={imageMode}
+                t={t}
+              />
+            )}
+          </Box>
+
+          {secondItem && (
+            <>
+              <Box
+                sx={{
+                  px: 1,
+                  pt: 0.5,
+                  pb: 0.25,
+                  background: customTheme.secondary + "33",
+                  borderTop: `1px solid ${customTheme.secondary}`,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    opacity: 0.7,
+                  }}
+                >
+                  {t("Transforming Form")}
+                </Typography>
+              </Box>
+              <Box sx={{ opacity: activeForm === "primary" ? 0.5 : 1 }}>
+                <CustomWeaponRows item={secondItem} {...rowProps} />
+                <CustomizationsAndQualityRow
+                  item={secondItem}
+                  customTheme={customTheme}
+                  imageMode={imageMode}
+                  t={t}
+                />
+              </Box>
+            </>
+          )}
+        </RowsWithOptionalImage>
       </CardContentWrapper>
     );
   },
@@ -1155,7 +1171,7 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
   });
 
   const withImage = isImageMode(imageMode);
-  const cols = withImage ? { name: 6, cost: 4 } : { name: 9, cost: 3 };
+  const cols = withImage ? { name: 8, cost: 4 } : { name: 9, cost: 3 };
 
   return (
     <CardContentWrapper
@@ -1169,29 +1185,27 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
       imageTempInfoText={imageTempInfoText}
       actionContent={actionContent}
     >
-      {showHeader && (
-        <Grid
-          container
-          onClick={onHeaderClick}
-          sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
-        >
-          <HeaderSpacer
-            imageMode={imageMode}
-            imageSize={imageSize}
-            imageVisible={imageVisible}
-          />
-          <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
-            <Grid size={cols.name}>
-              <Typography>{t("Accessory")}</Typography>
-            </Grid>
-            <Grid size={cols.cost}>
-              <Typography sx={{ textAlign: "center" }}>{t("Cost")}</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
-
       <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid container sx={{ flex: 1, pl: rowPl(imageMode) }}>
+                <Grid size={cols.name}>
+                  <Typography>{t("Accessory")}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Cost")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
         imageMode={imageMode}
         imageSize={imageSize}
         imageVisible={imageVisible}
@@ -1511,7 +1525,7 @@ export const SharedHoplosphereCard = React.memo(function SharedHoplosphereCard({
           )}
           {coagCount > 1 && (
             <Chip
-              label={`Coag ×${coagCount}`}
+              label={`Coag x${coagCount}`}
               size="small"
               sx={{
                 backgroundColor: customTheme.secondary,
@@ -1576,7 +1590,7 @@ export const SharedHoplosphereCard = React.memo(function SharedHoplosphereCard({
                   }}
                 >
                   <Chip
-                    label={`×${threshold}`}
+                    label={`x${threshold}`}
                     size="small"
                     variant={active ? "filled" : "outlined"}
                     sx={{

@@ -1,47 +1,172 @@
-import { RemoveCircleOutlined } from "@mui/icons-material";
-
-import { Grid, FormControl, IconButton, TextField } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Divider,
+  FormControl,
+  Grid,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomTextarea from "../common/CustomTextarea";
 import CustomHeader from "../common/CustomHeader";
-import { Add } from "@mui/icons-material";
+import {
+  Add,
+  ArrowDownward,
+  ArrowUpward,
+  Casino,
+  Delete,
+  ExpandMore,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useState } from "react";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
+
+function NoteContextMenu({
+  note,
+  npcName,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
+  showMoveUp,
+  showMoveDown,
+}) {
+  const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const open = (e) => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+  };
+  const close = () => setAnchorEl(null);
+
+  return (
+    <>
+      <IconButton component="span" onClick={open}>
+        <MenuIcon />
+      </IconButton>
+
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
+        <MenuItem
+          onClick={() => {
+            addMessage({
+              id: crypto.randomUUID(),
+              createdAt: Date.now(),
+              speaker: npcName || "NPC",
+              kind: "display",
+              itemType: "note",
+              name: note.name,
+              tags: [],
+              description: note.effect,
+            });
+            close();
+          }}
+        >
+          <ListItemIcon>
+            <Casino />
+          </ListItemIcon>
+          <ListItemText>{t("Roll")}</ListItemText>
+        </MenuItem>
+
+        <Divider />
+        <MenuItem
+          disabled={!showMoveUp}
+          onClick={() => {
+            close();
+            onMoveUp();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowUpward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Up")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!showMoveDown}
+          onClick={() => {
+            close();
+            onMoveDown();
+          }}
+        >
+          <ListItemIcon>
+            <ArrowDownward fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("Move Down")}</ListItemText>
+        </MenuItem>
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            close();
+            onDelete();
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <Delete color="error" />
+          </ListItemIcon>
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+}
 
 export default function EditNotes({ npc, setNpc }) {
   const { t } = useTranslate();
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingNoteIndex, setPendingNoteIndex] = useState(null);
-  const onChangeNotes = (i, key, value) => {
-    setNpc((prevState) => {
-      const newState = Object.assign({}, prevState);
-      newState.notes[i][key] = value;
-      return newState;
+
+  const onChange = (i, key, value) => {
+    setNpc((prev) => {
+      const notes = [...(prev.notes || [])];
+      notes[i] = { ...notes[i], [key]: value };
+      return { ...prev, notes };
     });
   };
 
-  const addNotes = () => {
-    setNpc((prevState) => ({
-      ...prevState,
-      notes: [
-        ...(prevState.notes || []),
-        {
-          name: "",
-          effect: "",
-        },
-      ],
+  const addNote = () => {
+    setNpc((prev) => ({
+      ...prev,
+      notes: [...(prev.notes || []), { name: "", effect: "" }],
     }));
   };
 
-  const removeNotes = (i) => {
-    setNpc((prevState) => ({
-      ...prevState,
-      notes: (prevState.notes || []).filter((_, index) => index !== i),
+  const removeNote = (i) => {
+    setNpc((prev) => ({
+      ...prev,
+      notes: (prev.notes || []).filter((_, idx) => idx !== i),
     }));
   };
 
-  const openDeleteDialog = (index) => {
-    setPendingNoteIndex(index);
+  const moveNote = (fromIndex, toIndex) => {
+    setNpc((prev) => {
+      const notes = [...(prev.notes || [])];
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= notes.length ||
+        toIndex >= notes.length
+      ) {
+        return prev;
+      }
+      [notes[fromIndex], notes[toIndex]] = [notes[toIndex], notes[fromIndex]];
+      return { ...prev, notes };
+    });
+  };
+
+  const openDeleteDialog = (i) => {
+    setPendingNoteIndex(i);
     setIsDeleteDialogOpen(true);
   };
 
@@ -49,56 +174,91 @@ export default function EditNotes({ npc, setNpc }) {
     <>
       <CustomHeader
         type="middle"
-        addItem={addNotes}
+        addItem={addNote}
         headerText={t("Notes")}
         icon={Add}
       />
-      {npc.notes?.map((notes, i) => {
-        return (
-          <Grid container key={i} spacing={1}>
-            <Grid sx={{ p: 0, m: 0 }}>
-              <IconButton onClick={() => openDeleteDialog(i)}>
-                <RemoveCircleOutlined />
+      {npc.notes?.map((note, i) => (
+        <Accordion
+          key={i}
+          disableGutters
+          elevation={0}
+          sx={{
+            border: "1px solid",
+            borderColor: "divider",
+            "&:before": { display: "none" },
+            mb: 0.5,
+          }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMore />}
+            sx={{
+              "& .MuiAccordionSummary-content": {
+                alignItems: "center",
+                overflow: "hidden",
+              },
+            }}
+          >
+            <Box
+              sx={{ display: "flex", alignItems: "center" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <IconButton
+                component="span"
+                onClick={() =>
+                  addMessage({
+                    id: crypto.randomUUID(),
+                    createdAt: Date.now(),
+                    speaker: npc.name || "NPC",
+                    kind: "display",
+                    itemType: "note",
+                    name: note.name,
+                    tags: [],
+                    description: note.effect,
+                  })
+                }
+              >
+                <Casino />
               </IconButton>
+              <NoteContextMenu
+                note={note}
+                npcName={npc.name}
+                onDelete={() => openDeleteDialog(i)}
+                onMoveUp={() => moveNote(i, i - 1)}
+                onMoveDown={() => moveNote(i, i + 1)}
+                showMoveUp={i > 0}
+                showMoveDown={i < (npc.notes?.length ?? 0) - 1}
+              />
+            </Box>
+            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+              <Typography noWrap>{note.name || t("(unnamed)")}</Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={1}>
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <TextField
+                    label={t("Name:")}
+                    value={note.name}
+                    onChange={(e) => onChange(i, "name", e.target.value)}
+                    size="small"
+                  />
+                </FormControl>
+              </Grid>
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <CustomTextarea
+                    label={t("Details:")}
+                    value={note.effect}
+                    onChange={(e) => onChange(i, "effect", e.target.value)}
+                  />
+                </FormControl>
+              </Grid>
             </Grid>
-            <Grid size="grow">
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="name"
-                  label={t("Name:")}
-                  value={notes.name}
-                  onChange={(e) => {
-                    return onChangeNotes(i, "name", e.target.value);
-                  }}
-                  size="small"
-                ></TextField>
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                {/* <TextField
-                  id="effect"
-                  label={t("Details:")}
-                  value={notes.effect}
-                  onChange={(e) => {
-                    return onChangeNotes(i, "effect", e.target.value);
-                  }}
-                  size="small"
-                  sx={{ mb: 2 }}
-                ></TextField> */}
-
-                <CustomTextarea
-                  label={t("Details:")}
-                  value={notes.effect}
-                  onChange={(e) => {
-                    return onChangeNotes(i, "effect", e.target.value);
-                  }}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-        );
-      })}
+          </AccordionDetails>
+        </Accordion>
+      ))}
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onClose={() => {
@@ -107,7 +267,7 @@ export default function EditNotes({ npc, setNpc }) {
         }}
         onConfirm={() => {
           if (pendingNoteIndex === null) return;
-          removeNotes(pendingNoteIndex);
+          removeNote(pendingNoteIndex);
           setIsDeleteDialogOpen(false);
           setPendingNoteIndex(null);
         }}

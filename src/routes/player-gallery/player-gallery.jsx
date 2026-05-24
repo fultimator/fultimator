@@ -5,6 +5,8 @@ import DeleteConfirmationDialog from "../../components/common/DeleteConfirmation
 import MigrationDialog from "../../components/common/MigrationDialog";
 import {
   playerNeedsMigration,
+  getPendingPlayerMigrations,
+  PLAYER_CURRENT_SCHEMA_VERSION,
   applyPreSaveTransforms,
   applyPostLoadTransforms,
 } from "../../components/player/playerTransforms";
@@ -12,8 +14,10 @@ import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router";
 
 import {
+  Chip,
   Divider,
   IconButton,
+  useMediaQuery,
   ListItemIcon,
   ListItemText,
   Menu as MuiMenu,
@@ -49,6 +53,9 @@ import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import {
   ContentPaste,
+  ChevronLeft,
+  ChevronRight,
+  Code,
   Delete,
   Download,
   DriveFileMove,
@@ -61,6 +68,7 @@ import {
   BugReport,
   ExpandLess,
   ExpandMore,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
@@ -79,7 +87,12 @@ import useDownload from "../../hooks/useDownload";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import SettingRow from "../../components/common/SettingRow";
 import classList from "../../libs/classes";
+import { buildItemText } from "../../libs/buildItemText";
 import MnemosphereCreateDialog from "../../components/player/equipment/technospheres/MnemosphereCreateDialog";
+import {
+  canonicalizeForTransfer,
+  normalizeOwnershipForTarget,
+} from "../../libs/exportTransforms";
 
 export default function PlayerGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -200,6 +213,7 @@ function Personal() {
 
   const filteredList = personalList
     ? personalList
+        .map(applyPostLoadTransforms)
         .filter((item) => {
           if (
             name !== "" &&
@@ -217,7 +231,10 @@ function Personal() {
         })
     : [];
 
-  const addPlayer = async function (options = defaultCreatePlayerOptions) {
+  const addPlayer = async function (
+    options = defaultCreatePlayerOptions,
+    forcedId = null,
+  ) {
     const technospheresEnabled = options.optionalRules?.technospheres ?? false;
     const technospheresVariant =
       options.optionalRules?.technospheresVariant ?? "standard";
@@ -395,6 +412,7 @@ function Personal() {
             ],
           }
         : {}),
+      ...(activeUid ? { uid: activeUid } : {}),
     };
 
     try {
@@ -402,11 +420,14 @@ function Personal() {
       const normalizedData = applyPreSaveTransforms(
         applyPostLoadTransforms(data),
       );
+      if (forcedId) {
+        await db.setDoc(db.doc("player-personal", forcedId), normalizedData);
+        return forcedId;
+      }
       const res = await db.addDoc(
         db.collection("player-personal"),
         normalizedData,
       );
-      console.debug(res);
       return res.id;
     } catch (e) {
       console.debug(e);
@@ -460,14 +481,24 @@ function Personal() {
     return newName;
   };
 
+  const preparePlayerTransferData = (player, target, nextName) => {
+    const canonical = canonicalizeForTransfer("pc", player);
+    return normalizeOwnershipForTarget(
+      { ...canonical, name: nextName, published: false },
+      target,
+      cloudUser?.uid,
+    );
+  };
+
   const exportSelectedAsJson = async () => {
     const selected = filteredList.filter((p) => selectedIds.has(p.id));
     if (!selected.length) return;
     const zip = new JSZip();
     selected.forEach((p) => {
+      const canonical = canonicalizeForTransfer("pc", p);
       zip.file(
         `${p.name.replace(/\s/g, "_").toLowerCase()}.json`,
-        JSON.stringify(p, null, 2),
+        JSON.stringify(canonical, null, 2),
       );
     });
     const content = await zip.generateAsync({ type: "blob" });
@@ -481,13 +512,7 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      const data = {
-        ...player,
-        name: newName,
-        uid: "local-user",
-        published: false,
-      };
-      delete data.id;
+      const data = preparePlayerTransferData(player, "local", newName);
       await localDb.addDoc(localDb.collection("player-personal"), data);
       notify(t("Copied to Local"));
     } catch {
@@ -506,14 +531,7 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      // Apply migrations before copying to cloud
-      const migrated = applyPostLoadTransforms(player);
-      const data = applyPreSaveTransforms({
-        ...migrated,
-        name: newName,
-        published: false,
-      });
-      delete data.id;
+      const data = preparePlayerTransferData(player, "cloud", newName);
       await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       notify(t("Copied to Cloud"));
     } catch {
@@ -528,13 +546,7 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      const data = {
-        ...player,
-        name: newName,
-        uid: "local-user",
-        published: false,
-      };
-      delete data.id;
+      const data = preparePlayerTransferData(player, "local", newName);
       await localDb.addDoc(localDb.collection("player-personal"), data);
       await db.deleteDoc(db.doc("player-personal", player.id));
       notify(t("Moved to Local"));
@@ -554,14 +566,7 @@ function Personal() {
       );
       const existingNames = existing.map((n) => n.name);
       const newName = uniqueName(player.name, existingNames);
-      // Apply migrations before moving to cloud
-      const migrated = applyPostLoadTransforms(player);
-      const data = applyPreSaveTransforms({
-        ...migrated,
-        name: newName,
-        published: false,
-      });
-      delete data.id;
+      const data = preparePlayerTransferData(player, "cloud", newName);
       await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       await db.deleteDoc(db.doc("player-personal", player.id));
       notify(t("Moved to Cloud"));
@@ -615,13 +620,7 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = {
-          ...p,
-          name: newName,
-          uid: "local-user",
-          published: false,
-        };
-        delete data.id;
+        const data = preparePlayerTransferData(p, "local", newName);
         await localDb.addDoc(localDb.collection("player-personal"), data);
       }
       notify(t("Copied to Local"));
@@ -645,14 +644,7 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        // Apply migrations before copying to cloud
-        const migrated = applyPostLoadTransforms(p);
-        const data = applyPreSaveTransforms({
-          ...migrated,
-          name: newName,
-          published: false,
-        });
-        delete data.id;
+        const data = preparePlayerTransferData(p, "cloud", newName);
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       }
       notify(t("Copied to Cloud"));
@@ -673,13 +665,7 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = {
-          ...p,
-          name: newName,
-          uid: "local-user",
-          published: false,
-        };
-        delete data.id;
+        const data = preparePlayerTransferData(p, "local", newName);
         await localDb.addDoc(localDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
@@ -706,14 +692,7 @@ function Personal() {
       for (const p of selected) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        // Apply migrations before moving to cloud
-        const migrated = applyPostLoadTransforms(p);
-        const data = applyPreSaveTransforms({
-          ...migrated,
-          name: newName,
-          published: false,
-        });
-        delete data.id;
+        const data = preparePlayerTransferData(p, "cloud", newName);
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
@@ -733,13 +712,7 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = {
-          ...p,
-          name: newName,
-          uid: "local-user",
-          published: false,
-        };
-        delete data.id;
+        const data = preparePlayerTransferData(p, "local", newName);
         await localDb.addDoc(localDb.collection("player-personal"), data);
       }
       notify(t("Copied to Local"));
@@ -761,14 +734,7 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        // Apply migrations before copying to cloud
-        const migrated = applyPostLoadTransforms(p);
-        const data = applyPreSaveTransforms({
-          ...migrated,
-          name: newName,
-          published: false,
-        });
-        delete data.id;
+        const data = preparePlayerTransferData(p, "cloud", newName);
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
       }
       notify(t("Copied to Cloud"));
@@ -788,13 +754,7 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        const data = {
-          ...p,
-          name: newName,
-          uid: "local-user",
-          published: false,
-        };
-        delete data.id;
+        const data = preparePlayerTransferData(p, "local", newName);
         await localDb.addDoc(localDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
@@ -819,14 +779,7 @@ function Personal() {
       for (const p of filteredList) {
         const newName = uniqueName(p.name, usedNames);
         usedNames.push(newName);
-        // Apply migrations before moving to cloud
-        const migrated = applyPostLoadTransforms(p);
-        const data = applyPreSaveTransforms({
-          ...migrated,
-          name: newName,
-          published: false,
-        });
-        delete data.id;
+        const data = preparePlayerTransferData(p, "cloud", newName);
         await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
         await db.deleteDoc(db.doc("player-personal", p.id));
       }
@@ -892,13 +845,16 @@ function Personal() {
   };
 
   const handleCreatePlayerConfirm = async () => {
-    const newPlayerId = await addPlayer(createPlayerOptions);
+    const newPlayerId = crypto.randomUUID();
     handleCloseCreatePlayerModal();
-    if (newPlayerId) {
-      navigate(`/player-edit/${newPlayerId}`, {
-        state: { from: "/pc-gallery" },
-      });
-    }
+    navigate(`/player-edit/${newPlayerId}`, {
+      state: { from: "/pc-gallery", creating: true },
+    });
+    void addPlayer(createPlayerOptions, newPlayerId).then((savedId) => {
+      if (!savedId) {
+        console.error("Failed to persist newly created player", newPlayerId);
+      }
+    });
     setCreatePlayerOptions(defaultCreatePlayerOptions);
   };
 
@@ -1377,6 +1333,7 @@ function Personal() {
         actors={stalePlayers}
         actorType="player"
         onMigrateAll={handleMigrateAllPlayers}
+        getMigrations={getPendingPlayerMigrations}
       />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
@@ -1725,7 +1682,67 @@ function PlayerGalleryCardActions({
 }) {
   const cardRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
+  const [actionsAnchor, setActionsAnchor] = useState(null);
+  const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
+  const isMobile = useMediaQuery("(max-width: 600px)");
   const [downloadImage] = useDownloadImage(player?.name || "player", cardRef);
+  const exportData = canonicalizeForTransfer(
+    "pc",
+    applyPreSaveTransforms(player),
+  );
+
+  const closeMenus = () => {
+    setActionsAnchor(null);
+    setActionsSubmenu(null);
+  };
+
+  const copyJsonToClipboard = async () => {
+    await navigator.clipboard.writeText(
+      JSON.stringify({ ...exportData, dataType: "pc" }, null, 2),
+    );
+    closeMenus();
+  };
+
+  const downloadJson = () => {
+    const safeName = (player?.name || "player")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
+    const blob = new Blob(
+      [JSON.stringify({ ...exportData, dataType: "pc" }, null, 2)],
+      {
+        type: "application/json;charset=utf-8",
+      },
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
+
+  const copyText = async (fmt) => {
+    const text = buildItemText("pc", exportData, fmt);
+    await navigator.clipboard.writeText(text);
+    closeMenus();
+  };
+
+  const downloadText = (fmt) => {
+    const text = buildItemText("pc", exportData, fmt);
+    const ext = fmt === "plain" ? "txt" : "md";
+    const safeName = (player?.name || "player")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
 
   return (
     <>
@@ -1742,24 +1759,192 @@ function PlayerGalleryCardActions({
           mt: "3px",
           display: "flex",
           alignItems: "center",
-          gap: 0.25,
+          gap: 1,
           flexWrap: "wrap",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <PlayerTransferButton
-          player={player}
-          copyPlayerToLocal={copyPlayerToLocal}
-          copyPlayerToCloud={copyPlayerToCloud}
-          movePlayerToLocal={movePlayerToLocal}
-          movePlayerToCloud={movePlayerToCloud}
-          t={t}
-        />
-        <Tooltip title={t("Download")}>
-          <IconButton onClick={downloadImage}>
-            <Download />
+        <Tooltip title={t("Actions")}>
+          <IconButton onClick={(e) => setActionsAnchor(e.currentTarget)}>
+            <MenuIcon />
           </IconButton>
         </Tooltip>
+        <MuiMenu
+          anchorEl={actionsAnchor}
+          open={Boolean(actionsAnchor)}
+          onClose={closeMenus}
+          slotProps={{
+            transition: { onExited: () => setActionsSubmenu(null) },
+          }}
+        >
+          {actionsSubmenu === null && [
+            <MenuItem
+              key="edit"
+              onClick={() => {
+                closeMenus();
+                handleNavigation(`/player-edit/${player.id}`);
+              }}
+            >
+              <ListItemIcon>
+                <Edit fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Edit")} />
+            </MenuItem>,
+            <MenuItem
+              key="sheet"
+              onClick={() => {
+                closeMenus();
+                handleNavigation(`/character-sheet/${player.id}`);
+              }}
+            >
+              <ListItemIcon>
+                <Badge fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Player Sheet")} />
+            </MenuItem>,
+            <MenuItem key="export" onClick={() => setActionsSubmenu("export")}>
+              <ListItemIcon>
+                <Code fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="transfer"
+              onClick={() => setActionsSubmenu("transfer")}
+            >
+              <ListItemIcon>
+                <FileCopy fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="delete"
+              onClick={() => {
+                closeMenus();
+                deletePlayer(player)();
+              }}
+            >
+              <ListItemIcon>
+                <Delete fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Delete")} />
+            </MenuItem>,
+            <MenuItem
+              key="share"
+              disabled={dbMode === "local"}
+              onClick={() => {
+                closeMenus();
+                sharePlayer(player.id);
+              }}
+            >
+              <ListItemIcon>
+                <Share fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Share URL")} />
+            </MenuItem>,
+            <MenuItem
+              key="download"
+              onClick={() => {
+                closeMenus();
+                downloadImage();
+              }}
+            >
+              <ListItemIcon>
+                <Download fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Download as Image")} />
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "export" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem key="copy-json" onClick={copyJsonToClipboard}>
+              {t("copy_json_clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-json" onClick={downloadJson}>
+              {t("export_json_file")}
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem key="copy-md" onClick={() => copyText("markdown")}>
+              {t("Copy Markdown to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>
+              {t("Export as Markdown (.md)")}
+            </MenuItem>,
+            <Divider key="div3" />,
+            <MenuItem key="copy-plain" onClick={() => copyText("plain")}>
+              {t("Copy Plaintext to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>
+              {t("Export as Plaintext (.txt)")}
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "transfer" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem
+              key="copy-local"
+              onClick={() => {
+                closeMenus();
+                copyPlayerToLocal(player)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="copy-cloud"
+              onClick={() => {
+                closeMenus();
+                copyPlayerToCloud(player)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Cloud")} />
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem
+              key="move-local"
+              onClick={() => {
+                closeMenus();
+                movePlayerToLocal(player)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="move-cloud"
+              onClick={() => {
+                closeMenus();
+                movePlayerToCloud(player)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>,
+          ]}
+        </MuiMenu>
         <Tooltip title={t("Edit")}>
           <IconButton
             onClick={() => handleNavigation(`/player-edit/${player.id}`)}
@@ -1767,30 +1952,64 @@ function PlayerGalleryCardActions({
             <Edit />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t("Delete")}>
-          <IconButton onClick={deletePlayer(player)}>
-            <Delete />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t("Share URL")}>
-          <span>
-            <IconButton
-              onClick={() => sharePlayer(player.id)}
-              disabled={dbMode === "local"}
-            >
-              <Share />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={t("Player Sheet")}>
-          <IconButton
-            onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
-          >
-            <Badge />
-          </IconButton>
-        </Tooltip>
-        <Export name={`${player.name}`} dataType="pc" data={player} />
+        {!isMobile && (
+          <>
+            <Tooltip title={t("Player Sheet")}>
+              <IconButton
+                onClick={() =>
+                  handleNavigation(`/character-sheet/${player.id}`)
+                }
+              >
+                <Badge />
+              </IconButton>
+            </Tooltip>
+            <PlayerTransferButton
+              player={player}
+              copyPlayerToLocal={copyPlayerToLocal}
+              copyPlayerToCloud={copyPlayerToCloud}
+              movePlayerToLocal={movePlayerToLocal}
+              movePlayerToCloud={movePlayerToCloud}
+              t={t}
+            />
+            <Tooltip title={t("Delete")}>
+              <IconButton onClick={deletePlayer(player)}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Share URL")}>
+              <span>
+                <IconButton
+                  onClick={() => sharePlayer(player.id)}
+                  disabled={dbMode === "local"}
+                >
+                  <Share />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t("Download as Image")}>
+              <IconButton onClick={downloadImage}>
+                <Download />
+              </IconButton>
+            </Tooltip>
+            <Export
+              name={`${player.name}`}
+              dataType="pc"
+              data={applyPreSaveTransforms(player)}
+            />
+          </>
+        )}
         <Box sx={{ ml: "auto" }} />
+        <Tooltip
+          title={`Schema version ${player.schemaVersion ?? 0} of ${PLAYER_CURRENT_SCHEMA_VERSION} (${playerNeedsMigration(player) ? "migration needed" : "up to date"})`}
+        >
+          <Chip
+            label={`v${player.schemaVersion ?? 0}`}
+            size="small"
+            color={playerNeedsMigration(player) ? "warning" : "default"}
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
         <Tooltip title={expanded ? t("Collapse Details") : t("Expand Details")}>
           <IconButton onClick={() => setExpanded((prev) => !prev)}>
             {expanded ? <ExpandLess /> : <ExpandMore />}

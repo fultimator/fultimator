@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,12 +16,16 @@ import {
   Divider,
   Tooltip,
   IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import LockIcon from "@mui/icons-material/Lock";
 import CloseIcon from "@mui/icons-material/Close";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
 import { useTranslate } from "../../../../translation/translate";
 import { resolveEffectiveSlot } from "./equipmentSlots";
 import {
@@ -30,15 +34,16 @@ import {
   getEquipConflicts,
 } from "./loadoutActions";
 import attributes from "../../../../libs/attributes";
-import { calculateCustomWeaponStats } from "../../common/playerCalculations";
 
 function moduleStatLine(module, t) {
   if (!module) return "-";
   if (module.type === "pilot_module_weapon") {
     if (module.isShield)
       return `DEF +${module.def ?? 0}  MDEF +${module.mdef ?? 0}`;
-    const a1 = attributes[module.att1]?.shortcaps ?? module.att1 ?? "";
-    const a2 = attributes[module.att2]?.shortcaps ?? module.att2 ?? "";
+    const a1Key = module.accuracy?.attr1;
+    const a2Key = module.accuracy?.attr2;
+    const a1 = attributes[a1Key]?.shortcaps ?? a1Key ?? "";
+    const a2 = attributes[a2Key]?.shortcaps ?? a2Key ?? "";
     const hands = module.cumbersome ? "2H" : "1H";
     const parts = [];
     if (a1 && a2) {
@@ -46,7 +51,8 @@ function moduleStatLine(module, t) {
     } else if (module.category) {
       parts.push(t(module.category));
     }
-    parts.push(`${module.damage ?? "?"} ${t(module.damageType ?? "")}`.trim());
+    const damageType = module.damage?.type;
+    parts.push(`${module.damage?.value ?? "?"} ${t(damageType ?? "")}`.trim());
     if (module.range) parts.push(t(module.range));
     parts.push(hands);
     return parts.join(" / ");
@@ -89,6 +95,8 @@ export default function SlotPickerDialog({
   onDisableModule,
   openModuleOverride = false,
   onClearOtherHandModule,
+  onImportFromCompendium,
+  onCreateNewItem,
 }) {
   const { t } = useTranslate();
   const getModuleLabel = (module) =>
@@ -102,14 +110,84 @@ export default function SlotPickerDialog({
   const [moduleOverrideOpen, setModuleOverrideOpen] = useState(false);
   const [hoveredModule, setHoveredModule] = useState(null);
   const [pendingModule, setPendingModule] = useState(null);
+  const [createMenuAnchorEl, setCreateMenuAnchorEl] = useState(null);
+  const wasOpenRef = useRef(false);
+
+  const currentlyEquipped = useMemo(() => {
+    if (!open || !player?.equippedSlots?.[slot]) return null;
+    const currentRef = player.equippedSlots[slot];
+    const inv = player?.equipment?.[0] || {};
+
+    let candidates = [];
+    if (slot === "mainHand") {
+      candidates = [
+        ...(inv.weapons ?? []).map((w, i) => ({
+          label: w.name,
+          source: "weapons",
+          index: i,
+          item: w,
+        })),
+        ...(inv.customWeapons ?? []).map((w, i) => ({
+          label: w.name,
+          source: "customWeapons",
+          index: i,
+          item: w,
+        })),
+      ];
+    } else if (slot === "offHand") {
+      candidates = [
+        ...(inv.weapons ?? []).map((w, i) => ({
+          label: w.name,
+          source: "weapons",
+          index: i,
+          item: w,
+        })),
+        ...(inv.shields ?? []).map((s, i) => ({
+          label: s.name,
+          source: "shields",
+          index: i,
+          item: s,
+        })),
+      ];
+    } else if (slot === "armor") {
+      candidates = (inv.armor ?? []).map((a, i) => ({
+        label: a.name,
+        source: "armor",
+        index: i,
+        item: a,
+      }));
+    } else if (slot === "accessory") {
+      candidates = (inv.accessories ?? []).map((a, i) => ({
+        label: a.name,
+        source: "accessories",
+        index: i,
+        item: a,
+      }));
+    }
+
+    return (
+      candidates.find((c) => {
+        if (c.source !== currentRef?.source) return false;
+        if (c.label !== currentRef?.name) return false;
+        if (currentRef.index !== undefined) return c.index === currentRef.index;
+        return true;
+      }) ?? null
+    );
+  }, [open, slot, player]);
 
   useEffect(() => {
-    if (open) {
+    if (open && !wasOpenRef.current) {
       setModuleOverrideOpen(openModuleOverride);
       setHoveredModule(null);
       setPendingModule(null);
+      if (currentlyEquipped) {
+        setPendingCandidate(currentlyEquipped);
+      } else {
+        setPendingCandidate(null);
+      }
     }
-  }, [open, openModuleOverride]);
+    wasOpenRef.current = open;
+  }, [open, openModuleOverride, currentlyEquipped]);
 
   const hasDualShieldBearer =
     player?.classes?.some((cls) =>
@@ -119,6 +197,14 @@ export default function SlotPickerDialog({
     ) ?? false;
 
   const inv = player?.equipment?.[0] || {};
+
+  const handleCreateForSlot = (kind) => {
+    if (!onCreateNewItem) return;
+    onCreateNewItem(kind, slot);
+  };
+  const defaultCreateKind =
+    slot === "armor" ? "armor" : slot === "accessory" ? "accessory" : "weapon";
+  const showCreateMenu = slot === "mainHand" || slot === "offHand";
 
   const mainHandHasTwoHanded = (() => {
     const res = resolveEffectiveSlot(player, "mainHand");
@@ -210,33 +296,33 @@ export default function SlotPickerDialog({
   /** Build the list of items valid for the given slot. */
   function getCandidates() {
     const formatWeapon = (w) => {
-      const att1 = attributes[w.att1]?.shortcaps ?? w.att1;
-      const att2 = attributes[w.att2]?.shortcaps ?? w.att2;
+      const acc = w.accuracy;
+      const dmg = w.damage;
+      const att1 =
+        attributes[acc?.attr1 ?? w.att1]?.shortcaps ?? acc?.attr1 ?? w.att1;
+      const att2 =
+        attributes[acc?.attr2 ?? w.att2]?.shortcaps ?? acc?.attr2 ?? w.att2;
       const atts = `${att1}+${att2}`;
-      const dmg = w.dmg ?? w.damage ?? "?";
+      const damage = dmg?.value ?? w.dmg ?? w.damage ?? "?";
+      const damageType = dmg?.type ?? w.type ?? "";
       const hands = w.hands === 2 || w.isTwoHand ? "2H" : "1H";
-      return `${atts} / ${dmg} ${t(w.type || "")} / ${hands}`;
+      return `${atts} / ${damage} ${t(damageType)} / ${hands}`;
     };
     const formatCustomWeapon = (w) => {
       const isSecondary = w.activeForm === "secondary";
-      const stats = calculateCustomWeaponStats(w, isSecondary);
-      const accuracyCheck = isSecondary
-        ? w.secondSelectedAccuracyCheck
-        : w.accuracyCheck;
-      const damageType = isSecondary ? w.secondSelectedType : w.type;
+      const accuracy = isSecondary
+        ? (w.secondAccuracy ?? w.accuracy)
+        : w.accuracy;
+      const damage = isSecondary ? (w.secondDamage ?? w.damage) : w.damage;
       const range = isSecondary ? w.secondSelectedRange : w.range;
       const att1 =
-        attributes[accuracyCheck?.att1]?.shortcaps ??
-        accuracyCheck?.att1 ??
-        "?";
+        attributes[accuracy?.attr1]?.shortcaps ?? accuracy?.attr1 ?? "?";
       const att2 =
-        attributes[accuracyCheck?.att2]?.shortcaps ??
-        accuracyCheck?.att2 ??
-        "?";
+        attributes[accuracy?.attr2]?.shortcaps ?? accuracy?.attr2 ?? "?";
       const hands = "2H";
       const rangeLabel =
         range === "weapon_range_ranged" ? t("Ranged") : t("Melee");
-      return `${att1}+${att2} / ${stats.damage ?? "?"} ${t(damageType || "")} / ${rangeLabel} / ${hands}`;
+      return `${att1}+${att2} / ${damage?.value ?? "?"} ${t(damage?.type || "")} / ${rangeLabel} / ${hands}`;
     };
 
     switch (slot) {
@@ -341,6 +427,7 @@ export default function SlotPickerDialog({
       if (c.inOtherSlot && !isUnarmedStrike(c)) return false;
       return true;
     });
+  const shouldShowEmptyPrompt = candidates.length === 0;
   const getCandidateSubText = (candidate) => candidate?.sub;
   const isTransformingCustomWeapon = (candidate) =>
     candidate?.source === "customWeapons" &&
@@ -580,11 +667,13 @@ export default function SlotPickerDialog({
                         <ListItemText
                           primary={getModuleLabel(m)}
                           secondary={moduleStatLine(m, t)}
-                          primaryTypographyProps={{
-                            variant: "body2",
-                            fontWeight: isPending || isActive ? 700 : 400,
+                          slotProps={{
+                            primary: {
+                              variant: "body2",
+                              fontWeight: isPending || isActive ? 700 : 400,
+                            },
+                            secondary: { variant: "caption" },
                           }}
-                          secondaryTypographyProps={{ variant: "caption" }}
                         />
                       </ListItemButton>
                     </ListItem>
@@ -645,6 +734,7 @@ export default function SlotPickerDialog({
           /* Regular item picker view */
           <>
             <DialogTitle
+              variant="h3"
               sx={{ fontWeight: "bold", textTransform: "uppercase" }}
             >
               {t("Choose item for")}: {slotLabel}
@@ -776,12 +866,14 @@ export default function SlotPickerDialog({
                   {t("Equipping item will clear slots")}
                 </Typography>
               )}
-              {candidates.length === 0 ? (
-                <Typography sx={{ p: 2, color: "text.secondary" }}>
-                  {mainHandHasTwoHanded && slot === "offHand"
-                    ? t("Off Hand is locked by a two-handed weapon.")
-                    : t("No items available for this slot.")}
-                </Typography>
+              {shouldShowEmptyPrompt ? (
+                <Box sx={{ p: 2 }}>
+                  <Typography sx={{ color: "text.secondary" }}>
+                    {mainHandHasTwoHanded && slot === "offHand"
+                      ? t("Off Hand is locked by a two-handed weapon.")
+                      : t("No items available for this slot.")}
+                  </Typography>
+                </Box>
               ) : (
                 <List dense disablePadding>
                   {candidates.map((c, i) => {
@@ -874,12 +966,14 @@ export default function SlotPickerDialog({
                               </Box>
                             }
                             secondary={getCandidateSubText(c)}
-                            primaryTypographyProps={{
-                              variant: "body2",
-                              fontWeight: isPending || isEquipped ? 700 : 400,
-                              component: "div",
+                            slotProps={{
+                              primary: {
+                                variant: "body2",
+                                fontWeight: isPending || isEquipped ? 700 : 400,
+                                component: "div",
+                              },
+                              secondary: { variant: "caption" },
                             }}
-                            secondaryTypographyProps={{ variant: "caption" }}
                           />
                           {isChecked && isTransformingCustomWeapon(c) && (
                             <Tooltip
@@ -918,6 +1012,78 @@ export default function SlotPickerDialog({
                   >
                     {t("Unequip")}
                   </Button>
+                )}
+                {!(mainHandHasTwoHanded && slot === "offHand") && (
+                  <>
+                    <Tooltip title={t("Create New")}>
+                      <span>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="primary"
+                          onClick={(e) => {
+                            if (showCreateMenu) {
+                              setCreateMenuAnchorEl(e.currentTarget);
+                              return;
+                            }
+                            handleCreateForSlot(defaultCreateKind);
+                          }}
+                          disabled={!onCreateNewItem}
+                          sx={{
+                            ml: currentRef ? 1 : 0,
+                            minWidth: 32,
+                            px: 0.75,
+                          }}
+                        >
+                          <AddIcon fontSize="small" />
+                        </Button>
+                      </span>
+                    </Tooltip>
+                    <Menu
+                      anchorEl={createMenuAnchorEl}
+                      open={Boolean(createMenuAnchorEl)}
+                      onClose={() => setCreateMenuAnchorEl(null)}
+                    >
+                      <MenuItem
+                        onClick={() => {
+                          setCreateMenuAnchorEl(null);
+                          handleCreateForSlot("weapon");
+                        }}
+                      >
+                        {t("Create New Weapon")}
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setCreateMenuAnchorEl(null);
+                          handleCreateForSlot("custom-weapon");
+                        }}
+                      >
+                        {t("Create New Custom Weapon")}
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          setCreateMenuAnchorEl(null);
+                          handleCreateForSlot("shield");
+                        }}
+                      >
+                        {t("Create New Shield")}
+                      </MenuItem>
+                    </Menu>
+                    <Tooltip title={t("Import from Compendium")}>
+                      <span>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="secondary"
+                          onClick={() => onImportFromCompendium?.(slot)}
+                          disabled={!onImportFromCompendium}
+                          sx={{ minWidth: 32, px: 0.75, ml: 0.75 }}
+                        >
+                          <SearchIcon fontSize="small" />
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  </>
                 )}
                 {vehicleModules.length > 0 && (
                   <Button

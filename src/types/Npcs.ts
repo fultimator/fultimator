@@ -1,103 +1,105 @@
-import { Weapon } from "./Equipment";
-import { Affinities } from "./Misc";
+import {
+  ResourceCost,
+  Accuracy,
+  Damage,
+  ActorAttributes,
+  ActorAffinities,
+  ActorImmunities,
+  ActorStatuses,
+  ActorResourcePool,
+  ActorResources,
+  ActorDerivedStat,
+  ActorDerived,
+} from "./Misc";
+import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
+import type { ActorEffect, ActionBehavior } from "./Effects";
+import type { Meta } from "../forms/schema/meta";
+import type {
+  NpcAttack as EquipmentNpcAttack,
+  NpcWeaponAttack as EquipmentNpcWeaponAttack,
+  NpcArmor as EquipmentNpcArmor,
+} from "./Equipment";
 
-export interface NpcAttributes {
-  might: number;
-  insight: number;
-  will: number;
-  dexterity: number;
-}
+export type NpcAttributes = ActorAttributes;
 
-export interface NpcArmor {
-  def: number;
-  name: string;
-  init: number;
-  mdefbonus: number;
-  cost: number;
-  mdef: number;
-  defbonus: number;
-  martial: boolean;
-}
+export type NpcArmor = EquipmentNpcArmor;
 
-export interface NpcAttack {
-  name: string;
-  range: string;
-  attr1: string;
-  attr2: string;
-  type: string;
-  special: string[];
-  extraDamage?: boolean;
-}
+export type NpcAttack = EquipmentNpcAttack;
 
-export interface NpcWeaponAttack {
-  extraDamage?: false;
-  weapon: Weapon;
-  name: string;
-  type: string;
-  special: string[];
-}
+export type NpcWeaponAttack = EquipmentNpcWeaponAttack;
 
 export interface NpcSpell {
-  effect?: string;
-  target?: string;
-  duration?: string;
+  fuid?: string;
   name: string;
-  range: string;
-  type: string | null;
-  damagetype: string;
-  attr1: string;
-  attr2: string;
-  mp?: string;
-  special: string[];
+  description: string;
+  book?: string;
+  accuracy: Accuracy;
+  isOffensive: boolean;
+  damage: Damage;
+  cost: ResourceCost;
+  maxTargets: number;
+  targetDescription: string;
+  duration: string;
+  range: "melee" | "ranged";
+  effect: string;
+  itemType: "spell";
+  spellType: string;
+  behavior?: ActionBehavior;
 }
 
 export interface NpcAction {
+  fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
-  spCost: number;
+  spCost?: number;
+  meta?: Meta;
+  behavior?: ActionBehavior;
 }
 
 export interface NpcSpecial {
+  fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
-  spCost: number;
+  spCost?: number;
+  meta?: Meta;
+  behavior?: ActionBehavior;
 }
 
 export interface NpcRareGear {
+  fuid?: string;
   name: string;
+  description?: string;
+  book?: string;
   effect: string;
+  behavior?: ActionBehavior;
 }
 
 export interface NpcExtra {
-  init?: boolean;
-  precision?: boolean;
-  hp?: string;
-  magic?: boolean;
-  def?: number;
-  mDef?: number;
-  defOverride?: boolean;
-  mDefOverride?: boolean;
+  statusImmunity?: number;
 }
 
-export interface NpcAffinities {
-  physical?: Affinities;
-  wind?: Affinities;
-  bolt?: Affinities;
-  dark?: Affinities;
-  earth?: Affinities;
-  ice?: Affinities;
-  light?: Affinities;
-  poison?: Affinities;
+export interface NpcFeature {
+  enabled: boolean;
 }
 
-export interface NpcImmunities {
-  slow: boolean;
-  dazed: boolean;
-  weak: boolean;
-  shaken: boolean;
-  enraged: boolean;
-  poisoned: boolean;
+export interface NpcFeatures {
+  init?: NpcFeature;
+  precision?: NpcFeature;
+  magic?: NpcFeature;
 }
+
+export type NpcAffinities = ActorAffinities;
+
+export type NpcImmunities = ActorImmunities;
+
+export type NpcResourcePool = ActorResourcePool;
+export type NpcResources = ActorResources;
+export type NpcDerivedStat = ActorDerivedStat;
+export type NpcDerived = ActorDerived;
 
 export interface NpcNotes {
   name: string;
@@ -124,14 +126,30 @@ export interface TypeNpc {
   actions?: NpcAction[];
   extra?: NpcExtra;
   rank?: string;
+  phases?: number;
+  villain?: string;
+  companionlvl?: number;
+  companionpclvl?: number;
+  multipart?: string;
   spells?: NpcSpell[];
   special?: NpcSpecial[];
   weaponattacks?: NpcWeaponAttack[];
   description?: string;
   armor?: NpcArmor;
-  sheild?: NpcArmor;
+  shield?: NpcArmor;
   raregear?: NpcRareGear[];
   label?: string;
   notes?: NpcNotes[];
   tags?: NpcTags[];
+  schemaVersion?: number;
+  createdBy?: string;
+  language?: string;
+  published?: boolean;
+  statuses?: ActorStatuses;
+  resources?: NpcResources;
+  derived?: NpcDerived;
+  features?: NpcFeatures;
+  bonuses?: ActorBonuses;
+  multipliers?: ActorMultipliers;
+  effects?: ActorEffect[];
 }

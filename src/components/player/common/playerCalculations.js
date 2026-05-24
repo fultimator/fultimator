@@ -73,7 +73,9 @@ export function newShade(hexColor, percent) {
  */
 export function calculateCustomWeaponStats(customWeapon, isSecondaryForm) {
   const customizations = isSecondaryForm
-    ? customWeapon.secondCurrentCustomizations || []
+    ? customWeapon.secondCustomizations ||
+      customWeapon.secondCurrentCustomizations ||
+      []
     : customWeapon.customizations || [];
 
   const category = isSecondaryForm
@@ -99,15 +101,29 @@ export function calculateCustomWeaponStats(customWeapon, isSecondaryForm) {
     }
   }
 
-  if (customWeapon.rareAccuracyBonus) precision += 1;
-  if (customWeapon.rareDamageBonus) damage += 4;
+  const rare = customWeapon.rare ?? {};
+  if ((rare.accuracyBonus ?? customWeapon.rareAccuracyBonus) === true)
+    precision += 1;
+  if ((rare.damageBonus ?? customWeapon.rareDamageBonus) === true) damage += 4;
 
   if (isSecondaryForm) {
-    damage += parseInt(customWeapon.secondDamageModifier || 0);
-    precision += parseInt(customWeapon.secondPrecModifier || 0);
+    damage += parseInt(
+      customWeapon.secondModifiers?.damage ??
+        customWeapon.secondDamageModifier ??
+        0,
+    );
+    precision += parseInt(
+      customWeapon.secondModifiers?.accuracy ??
+        customWeapon.secondPrecModifier ??
+        0,
+    );
   } else {
-    damage += parseInt(customWeapon.damageModifier || 0);
-    precision += parseInt(customWeapon.precModifier || 0);
+    damage += parseInt(
+      customWeapon.modifiers?.damage ?? customWeapon.damageModifier ?? 0,
+    );
+    precision += parseInt(
+      customWeapon.modifiers?.accuracy ?? customWeapon.precModifier ?? 0,
+    );
   }
 
   return { precision, damage };

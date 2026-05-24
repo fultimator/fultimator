@@ -1,613 +1,278 @@
 import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
   Grid,
-  InputLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  Stack,
+  FormControl,
   TextField,
-  Typography,
+  FormLabel,
+  BottomNavigation,
+  BottomNavigationAction,
+  Paper,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import { Martial } from "../icons";
-import { baseArmors } from "../../libs/equip";
-import { baseShields } from "../../libs/equip";
+import {
+  ShieldOutlined,
+  HealthAndSafetyOutlined,
+  QueryStatsOutlined,
+  TuneOutlined,
+} from "@mui/icons-material";
+import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { npcFieldConfig } from "../../forms/rendering/config/actorConfigs/npc";
+import { getFreeImmunities } from "../../forms/rendering/config/actorConfigs/npcSpeciesEffects";
 import { useTranslate } from "../../translation/translate";
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 
 export default function EditExtra({ npc, setNpc }) {
-  return (
-    <>
-      <Grid container spacing={2}>
-        <Grid size={6}>
-          <Stack spacing={1}>
-            <Defenses npc={npc} setNpc={setNpc} />
-            <SelectArmor npc={npc} setNpc={setNpc} />
-            <SelectShield npc={npc} setNpc={setNpc} />
-          </Stack>
-        </Grid>
-        <Grid size={6}>
-          <Stack spacing={1}>
-            <Init npc={npc} setNpc={setNpc} />
-            <Precision npc={npc} setNpc={setNpc} />
-            <Magic npc={npc} setNpc={setNpc} />
-            <HP npc={npc} setNpc={setNpc} />
-            <MP npc={npc} setNpc={setNpc} />
-            <ExtraInit npc={npc} setNpc={setNpc} />
-          </Stack>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2}>
-        <Grid size={6}>
-          <Immunities npc={npc} setNpc={setNpc} />
-        </Grid>
-        <Grid size={6}>
-          <Overrides npc={npc} setNpc={setNpc} />
-        </Grid>
-      </Grid>
-    </>
-  );
-}
-
-const Overrides = React.memo(({ npc, setNpc }) => {
   const { t } = useTranslate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [mobileTab, setMobileTab] = useState(0);
 
-  const freeImmunities = useMemo(() => {
-    const free = {
-      slow: false,
-      dazed: false,
-      weak: false,
-      shaken: false,
-      enraged: false,
-      poisoned: false,
-    };
-    if (
-      npc.species === "Construct" ||
-      npc.species === "Elemental" ||
-      npc.species === "Undead"
-    ) {
-      free.poisoned = true;
-    }
-    if (npc.species === "Plant") {
-      free.dazed = true;
-      free.shaken = true;
-      free.enraged = true;
-    }
-    return free;
-  }, [npc.species]);
+  const freeImmunities = useMemo(
+    () => getFreeImmunities(npc.species || ""),
+    [npc.species],
+  );
 
-  const speciesImmunitiesCount = useMemo(() => {
-    return Object.values(freeImmunities).filter(Boolean).length;
-  }, [freeImmunities]);
+  const speciesImmunityCount = useMemo(
+    () => Object.values(freeImmunities).filter(Boolean).length,
+    [freeImmunities],
+  );
 
-  const totalAllotted = useMemo(() => {
-    return (npc.extra?.statusImmunity || 0) * 2 + speciesImmunitiesCount;
-  }, [npc.extra?.statusImmunity, speciesImmunitiesCount]);
+  const totalAllotted = useMemo(
+    () => (npc.extra?.statusImmunity || 0) * 2 + speciesImmunityCount,
+    [npc.extra?.statusImmunity, speciesImmunityCount],
+  );
 
-  const totalPicked = useMemo(() => {
-    return Object.values(npc.immunities || {}).filter(Boolean).length;
-  }, [npc.immunities]);
+  const totalPicked = useMemo(
+    () => Object.values(npc.immunities || {}).filter(Boolean).length,
+    [npc.immunities],
+  );
 
-  const onChange = useCallback(
+  const handleStatusImmunityChange = useCallback(
     (e) => {
       let value = parseInt(e.target.value);
       if (isNaN(value)) value = 0;
       if (value < 0) value = 0;
       if (value > 3) value = 3;
-      setNpc((prevState) => ({
-        ...prevState,
-        extra: { ...prevState.extra, statusImmunity: value },
+      setNpc((prev) => ({
+        ...prev,
+        extra: { ...prev.extra, statusImmunity: value },
       }));
     },
     [setNpc],
   );
 
-  return (
-    <Stack spacing={2} sx={{ mt: 1 }}>
-      <FormLabel id="overrides">{t("Overrides")}</FormLabel>
-      <FormControl variant="standard" fullWidth>
-        <TextField
-          id="statusImmunity"
-          type="number"
-          slotProps={{
-            htmlInput: { inputMode: "numeric", pattern: "[0-9]*", min: 0 },
-            formHelperText: {
-              sx: {
-                color:
-                  totalPicked > totalAllotted ? "red !important" : "inherit",
-              },
-            },
-          }}
-          label={t("Status Effect Immunity")}
-          value={npc.extra?.statusImmunity || 0}
-          onChange={onChange}
-          helperText={`${t("Gain 2 Immunities per 1 SP")} — ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
-        ></TextField>
-      </FormControl>
-    </Stack>
-  );
-});
-
-const Immunities = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-
-  // List of all immunities from NpcImmunities
-  const allImmunities = useMemo(
-    () => ({
-      slow: false,
-      dazed: false,
-      weak: false,
-      shaken: false,
-      enraged: false,
-      poisoned: false,
-    }),
-    [],
-  );
-
-  const freeImmunities = useMemo(() => {
-    const free = { ...allImmunities };
-    if (
-      npc.species === "Construct" ||
-      npc.species === "Elemental" ||
-      npc.species === "Undead"
-    ) {
-      free.poisoned = true;
-    }
-    if (npc.species === "Plant") {
-      free.dazed = true;
-      free.shaken = true;
-      free.enraged = true;
-    }
-    return free;
-  }, [npc.species, allImmunities]);
-
-  const immunities = { ...allImmunities, ...(npc.immunities || {}) };
-
-  const onChange = useCallback(
-    (e) => {
-      const { name, checked } = e.target;
-      setNpc((prevState) => ({
-        ...prevState,
-        immunities: {
-          ...prevState.immunities,
-          [name]: checked,
-        },
-      }));
-    },
-    [setNpc],
-  );
-
-  return (
-    <FormGroup>
-      <FormLabel id="extra-defenses">{t("Immunities")}</FormLabel>
-      {Object.keys(allImmunities).map((immunity) => {
-        const isFree = freeImmunities[immunity];
-        return (
-          <FormControlLabel
-            key={immunity}
-            control={
-              <Checkbox
-                checked={immunities[immunity]}
-                onChange={onChange}
-                name={immunity}
+  if (isMobile) {
+    return (
+      <Grid container spacing={1}>
+        <Grid size={12}>
+          <Paper variant="outlined" sx={{ p: 1 }}>
+            <BottomNavigation
+              showLabels
+              value={mobileTab}
+              onChange={(_, newValue) => setMobileTab(newValue)}
+              sx={{ mb: 1 }}
+            >
+              <BottomNavigationAction
+                label={t("Defenses")}
+                icon={<ShieldOutlined />}
               />
-            }
-            label={
-              <Typography
-                sx={{
-                  color: isFree ? "green" : "inherit",
-                  fontWeight: isFree ? "bold" : "inherit",
+              <BottomNavigationAction
+                label={t("Immunities")}
+                icon={<HealthAndSafetyOutlined />}
+              />
+              <BottomNavigationAction
+                label={t("Stats")}
+                icon={<QueryStatsOutlined />}
+              />
+              <BottomNavigationAction
+                label={t("Overrides")}
+                icon={<TuneOutlined />}
+              />
+            </BottomNavigation>
+
+            {mobileTab === 0 && (
+              <Grid container spacing={1}>
+                <Grid size={12}>
+                  <Grid
+                    container
+                    spacing={0}
+                    sx={{
+                      "& .MuiFormGroup-root": {
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                        columnGap: 2,
+                        rowGap: 1,
+                      },
+                      "& .MuiFormGroup-root > .MuiFormLabel-root": {
+                        gridColumn: "1 / -1",
+                        mb: 0.5,
+                      },
+                      "& .MuiFormControl-root": {
+                        gridColumn: "1 / -1",
+                        mt: 1,
+                      },
+                      "& .MuiFormControl-root + .MuiFormControl-root": {
+                        mt: 1.25,
+                      },
+                    }}
+                  >
+                    <SchemaFieldRenderer
+                      config={npcFieldConfig}
+                      state={npc}
+                      onChange={setNpc}
+                      surface="edit"
+                      group="defenses"
+                      cols={2}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+            )}
+
+            {mobileTab === 1 && (
+              <Grid container spacing={1}>
+                <Grid size={12}>
+                  <Grid
+                    container
+                    spacing={0}
+                    sx={{
+                      "& .MuiFormGroup-root": {
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                        columnGap: 1,
+                      },
+                      "& .MuiFormGroup-root > .MuiFormLabel-root": {
+                        gridColumn: "1 / -1",
+                        mb: 0.5,
+                      },
+                    }}
+                  >
+                    <SchemaFieldRenderer
+                      config={npcFieldConfig}
+                      state={npc}
+                      onChange={setNpc}
+                      surface="edit"
+                      group="immunities"
+                      cols={2}
+                      extraProps={{ freeImmunities }}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+            )}
+
+            {mobileTab === 2 && (
+              <Grid container spacing={1}>
+                <SchemaFieldRenderer
+                  config={npcFieldConfig}
+                  state={npc}
+                  onChange={setNpc}
+                  surface="edit"
+                  group="stats"
+                  cols={3}
+                />
+              </Grid>
+            )}
+
+            {mobileTab === 3 && (
+              <FormControl variant="standard" fullWidth>
+                <TextField
+                  type="number"
+                  slotProps={{
+                    htmlInput: {
+                      inputMode: "numeric",
+                      pattern: "[0-9]*",
+                      min: 0,
+                    },
+                    formHelperText: {
+                      sx: {
+                        color:
+                          totalPicked > totalAllotted
+                            ? "red !important"
+                            : "inherit",
+                      },
+                    },
+                  }}
+                  label={t("Status Effect Immunity")}
+                  value={npc.extra?.statusImmunity || 0}
+                  onChange={handleStatusImmunityChange}
+                  helperText={`${t("Gain 2 Immunities per 1 SP")} - ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
+                />
+              </FormControl>
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
+    );
+  }
+
+  return (
+    <Grid container spacing={2}>
+      {/* Left: Defenses + Immunities */}
+      <Grid size={6}>
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={npcFieldConfig}
+            state={npc}
+            onChange={setNpc}
+            surface="edit"
+            group="defenses"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcFieldConfig}
+            state={npc}
+            onChange={setNpc}
+            surface="edit"
+            group="immunities"
+            cols={1}
+            extraProps={{ freeImmunities }}
+          />
+        </Grid>
+      </Grid>
+
+      {/* Right: Stats + Overrides */}
+      <Grid size={6}>
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={npcFieldConfig}
+            state={npc}
+            onChange={setNpc}
+            surface="edit"
+            group="stats"
+            cols={3}
+          />
+          <Grid size={12}>
+            <FormLabel sx={{ display: "block", mb: 1 }}>
+              {t("Overrides")}
+            </FormLabel>
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                type="number"
+                slotProps={{
+                  htmlInput: {
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                    min: 0,
+                  },
+                  formHelperText: {
+                    sx: {
+                      color:
+                        totalPicked > totalAllotted
+                          ? "red !important"
+                          : "inherit",
+                    },
+                  },
                 }}
-              >
-                {t(immunity.charAt(0).toUpperCase() + immunity.slice(1), true)}
-              </Typography>
-            }
-          />
-        );
-      })}
-    </FormGroup>
+                label={t("Status Effect Immunity")}
+                value={npc.extra?.statusImmunity || 0}
+                onChange={handleStatusImmunityChange}
+                helperText={`${t("Gain 2 Immunities per 1 SP")} - ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
   );
-});
-
-const Defenses = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      setNpc((prevState) => {
-        const newState = { ...prevState, extra: { ...prevState.extra } };
-        switch (e.target.value) {
-          case "00":
-            newState.extra.def = 0;
-            newState.extra.mDef = 0;
-            break;
-          case "12":
-            newState.extra.def = 1;
-            newState.extra.mDef = 2;
-            break;
-          case "21":
-            newState.extra.def = 2;
-            newState.extra.mDef = 1;
-            break;
-          case "33":
-            newState.extra.def = 3;
-            newState.extra.mDef = 3;
-            break;
-          case "24":
-            newState.extra.def = 2;
-            newState.extra.mDef = 4;
-            break;
-          case "42":
-            newState.extra.def = 4;
-            newState.extra.mDef = 2;
-            break;
-          default:
-            break;
-        }
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  const from = useMemo(() => {
-    const { def, mDef } = npc.extra || {};
-    if (def === 0) return "00";
-    if (def === 1) return "12";
-    if (mDef === 1) return "21";
-    if (def === 3) return "33";
-    if (def === 4) return "42";
-    if (mDef === 4) return "24";
-
-    return "00";
-  }, [npc.extra]);
-
-  const isDefenseOverridden = npc.extra?.defOverride || npc.extra?.mDefOverride;
-
-  return (
-    <FormControl disabled={isDefenseOverridden}>
-      <FormLabel id="extra-defenses">{t("Defenses")}</FormLabel>
-      <RadioGroup
-        size="small"
-        aria-labelledby="extra-defenses"
-        name="extra-defenses"
-        value={from}
-        onChange={onChange}
-      >
-        <FormControlLabel
-          value="00"
-          control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label={`+0 ${t("DEF", true)} / +0 ${t("M.DEF", true)}`}
-        />
-        <FormControlLabel
-          value="12"
-          control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label={`+1 ${t("DEF", true)} / +2 ${t("M.DEF", true)}`}
-        />
-        <FormControlLabel
-          value="21"
-          control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label={`+2 ${t("DEF", true)} / +1 ${t("M.DEF", true)}`}
-        />
-        <FormControlLabel
-          value="33"
-          control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label={`+3 ${t("DEF", true)} / +3 ${t("M.DEF", true)}`}
-        />
-        <FormControlLabel
-          value="24"
-          control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label={`+2 ${t("DEF", true)} / +4 ${t("M.DEF", true)}`}
-        />
-        <FormControlLabel
-          value="42"
-          control={<Radio size="small" sx={{ py: 0.8 }} />}
-          label={`+4 ${t("DEF", true)} / +2 ${t("M.DEF", true)}`}
-        />
-      </RadioGroup>
-    </FormControl>
-  );
-});
-
-const HP = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      setNpc((prevState) => {
-        const newState = {
-          ...prevState,
-          extra: { ...prevState.extra, hp: e.target.value },
-        };
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  return (
-    <FormControl variant="standard" fullWidth>
-      <TextField
-        id="HP"
-        type="number"
-        label={t("Extra HP:")}
-        value={npc.extra?.hp || 0}
-        onChange={onChange}
-        slotProps={{
-          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 },
-        }}
-      ></TextField>
-    </FormControl>
-  );
-});
-
-const MP = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      setNpc((prevState) => {
-        const newState = {
-          ...prevState,
-          extra: { ...prevState.extra, mp: e.target.value },
-        };
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  return (
-    <FormControl variant="standard" fullWidth>
-      <TextField
-        id="mp"
-        type="number"
-        label={t("Extra MP:")}
-        value={npc.extra?.mp || 0}
-        onChange={onChange}
-        slotProps={{
-          htmlInput: { inputMode: "numeric", pattern: "[0-9]*", step: 10 },
-        }}
-      ></TextField>
-    </FormControl>
-  );
-});
-
-const Init = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      setNpc((prevState) => {
-        const newState = {
-          ...prevState,
-          extra: { ...prevState.extra, init: e.target.checked },
-        };
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  return (
-    <FormGroup>
-      <FormLabel id="extra-defenses">{t("Bonuses")}</FormLabel>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={npc.extra?.init}
-            value={npc.extra?.init}
-            onChange={onChange}
-          />
-        }
-        label={`+4 ${t("Initiative", true)}`}
-      />
-    </FormGroup>
-  );
-});
-
-const ExtraInit = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      setNpc((prevState) => {
-        const newState = {
-          ...prevState,
-          extra: { ...prevState.extra, extrainit: e.target.value },
-        };
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  return (
-    <FormControl variant="standard" fullWidth>
-      <TextField
-        id="extrainit"
-        type="number"
-        label={t("Extra Init:")}
-        value={npc.extra?.extrainit || 0}
-        onChange={onChange}
-        slotProps={{
-          htmlInput: { inputMode: "numeric", pattern: "[0-9]*" },
-        }}
-      ></TextField>
-    </FormControl>
-  );
-});
-
-const Precision = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      setNpc((prevState) => {
-        const newState = {
-          ...prevState,
-          extra: { ...prevState.extra, precision: e.target.checked },
-        };
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  return (
-    <FormGroup>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={npc.extra?.precision}
-            value={npc.extra?.precision}
-            onChange={onChange}
-          />
-        }
-        label={`+3 ${t("bonus to all Accuracy Checks", true)}`}
-      />
-    </FormGroup>
-  );
-});
-
-const Magic = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      setNpc((prevState) => {
-        const newState = {
-          ...prevState,
-          extra: { ...prevState.extra, magic: e.target.checked },
-        };
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  return (
-    <FormGroup>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={npc.extra?.magic}
-            value={npc.extra?.magic}
-            onChange={onChange}
-          />
-        }
-        label={`+3 ${t("bonus to all Magic Checks", true)}`}
-      />
-    </FormGroup>
-  );
-});
-
-const SelectArmor = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      const armor = baseArmors.find((armor) => armor.name === e.target.value);
-
-      setNpc((prevState) => {
-        const newState = { ...prevState, armor };
-        if (!newState.extra) {
-          newState.extra = {};
-        }
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  const options = useMemo(() => {
-    const opts = [<MenuItem key={1} value="" disabled />];
-    for (const armor of baseArmors) {
-      opts.push(
-        <MenuItem key={armor.name} value={armor.name}>
-          {armor.name}
-          {armor.martial && <Martial />}{" "}
-        </MenuItem>,
-      );
-    }
-    return opts;
-  }, []);
-
-  let armor = npc.armor;
-  if (!armor) {
-    armor = baseArmors[0];
-  }
-
-  const isDefenseOverridden = npc.extra?.defOverride || npc.extra?.mDefOverride;
-
-  return (
-    <FormControl fullWidth sx={{ mt: 1 }} disabled={isDefenseOverridden}>
-      <InputLabel id="type">{t("Armor")}</InputLabel>
-      <Select
-        size="medium"
-        labelId="armor"
-        id="select-armor"
-        value={armor.name}
-        label={t("Armor")}
-        onChange={onChange}
-        disabled={isDefenseOverridden}
-      >
-        {options}
-      </Select>
-    </FormControl>
-  );
-});
-
-const SelectShield = React.memo(({ npc, setNpc }) => {
-  const { t } = useTranslate();
-  const onChange = useCallback(
-    (e) => {
-      const shield = baseShields.find(
-        (shield) => shield.name === e.target.value,
-      );
-
-      setNpc((prevState) => {
-        const newState = { ...prevState, shield };
-        if (!newState.extra) {
-          newState.extra = {};
-        }
-        return newState;
-      });
-    },
-    [setNpc],
-  );
-
-  const options = useMemo(() => {
-    const opts = [<MenuItem key={1} value="" disabled />];
-    for (const shield of baseShields) {
-      opts.push(
-        <MenuItem key={shield.name} value={shield.name}>
-          {shield.name}
-          {shield.martial && <Martial />}{" "}
-        </MenuItem>,
-      );
-    }
-    return opts;
-  }, []);
-
-  let shield = npc.shield;
-  if (!shield) {
-    shield = baseShields[0];
-  }
-
-  const isDefenseOverridden = npc.extra?.defOverride || npc.extra?.mDefOverride;
-
-  return (
-    <FormControl fullWidth sx={{ mt: 1 }} disabled={isDefenseOverridden}>
-      <InputLabel id="type">{t("Shield")}</InputLabel>
-      <Select
-        size="medium"
-        labelId="shield"
-        id="select-shield"
-        value={shield.name}
-        label={t("Shield")}
-        onChange={onChange}
-        disabled={isDefenseOverridden}
-      >
-        {options}
-      </Select>
-    </FormControl>
-  );
-});
+}

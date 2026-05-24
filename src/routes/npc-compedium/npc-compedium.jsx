@@ -32,10 +32,12 @@ import {
   MenuItem,
   CircularProgress,
   Fab,
+  Chip,
+  Box,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
 // import NpcUgly from "../../components/npc/Ugly";
 import {
   ArrowRight,
@@ -51,17 +53,21 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
-import allToken from "../icons/All-token.webp";
-import beastToken from "../icons/Beast-token.webp";
-import constructToken from "../icons/Construct-token.webp";
-import demonToken from "../icons/Demon-token.webp";
-import elementalToken from "../icons/Elemental-token.webp";
-import humanToken from "../icons/Human-token.webp";
-import monsterToken from "../icons/Monster-token.webp";
-import plantToken from "../icons/Plant-token.webp";
-import undeadToken from "../icons/Undead-token.webp";
+import allToken from "/images/routes/icons/species/All-token.webp";
+import beastToken from "/images/routes/icons/species/Beast-token.webp";
+import constructToken from "/images/routes/icons/species/Construct-token.webp";
+import demonToken from "/images/routes/icons/species/Demon-token.webp";
+import elementalToken from "/images/routes/icons/species/Elemental-token.webp";
+import humanToken from "/images/routes/icons/species/Human-token.webp";
+import monsterToken from "/images/routes/icons/species/Monster-token.webp";
+import plantToken from "/images/routes/icons/species/Plant-token.webp";
+import undeadToken from "/images/routes/icons/species/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import {
+  NPC_CURRENT_SCHEMA_VERSION,
+  applyNpcPostLoadTransforms,
+} from "../../components/npc/npcTransforms";
 import { useTranslate, languageOptions } from "../../translation/translate";
 
 import ReportContentDialog from "../../components/appbar/ReportContentDialog";
@@ -215,7 +221,7 @@ function Personal({ user }) {
 
   const copyNpc = function (npc) {
     return async function () {
-      const data = Object.assign({}, npc);
+      const data = JSON.parse(JSON.stringify(npc));
       data.uid = user.uid;
       delete data.id;
       data.published = false;
@@ -688,8 +694,9 @@ function Personal({ user }) {
   );
 }
 
-function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
+function Npc({ npc: rawNpc, copyNpc, shareNpc, reportNpc, collapseGet }) {
   const { t } = useTranslate();
+  const npc = applyNpcPostLoadTransforms(rawNpc);
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
 
@@ -702,20 +709,24 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
 
   return (
     <Grid
-      sx={{ marginBottom: 3 }}
+      sx={{
+        marginBottom: 3,
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
       size={{
         xs: 12,
         md: 12,
       }}
     >
-      <NpcPretty
+      <NpcActorCard
         npc={npc}
-        ref={ref}
-        npcImage={""}
+        cardRef={ref}
+        npcImage={npc.imgurl}
         collapse={collapse}
-        onClick={() => {
-          setCollapse(!collapse);
-        }}
+        variant="interactive"
+        onClick={() => setCollapse(!collapse)}
       />
       <Tooltip title={t("Copy to adversary designer")}>
         <IconButton onClick={copyNpc(npc)}>
@@ -738,9 +749,26 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
         </IconButton>
       </Tooltip>
       <Export name={`${npc.name}`} dataType="npc" data={npc} />
-      <span style={{ fontSize: 14 }}>
-        {t("Created By:")} {npc.createdBy}
-      </span>
+      <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>
+        <span style={{ fontSize: 14 }}>
+          {t("Created By:")} {npc.createdBy}
+        </span>
+        <Tooltip
+          title={`Schema version ${rawNpc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION}`}
+        >
+          <Chip
+            label={
+              NPC_CURRENT_SCHEMA_VERSION > 0
+                ? `v${rawNpc.schemaVersion ?? 0}/${NPC_CURRENT_SCHEMA_VERSION}`
+                : `V${rawNpc.schemaVersion ?? 0}`
+            }
+            size="small"
+            color="default"
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
+      </Box>
     </Grid>
   );
 }

@@ -16,13 +16,12 @@ import {
   Paper,
   useTheme,
   ThemeProvider,
-  useScrollTrigger,
 } from "@mui/material";
 import { Spa } from "@mui/icons-material";
 import { useState, useRef } from "react";
 import Layout from "../../components/Layout";
 import Weapons from "../equip/weapons/Weapons";
-import ArmorShield from "../equip/ArmorShield/ArmorShield";
+import { ArmorPanel, ShieldPanel } from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import Arcana from "../equip/Arcana/Arcana";
 import Qualities from "../equip/Qualities/Qualities";
@@ -35,6 +34,7 @@ import { useTranslate } from "../../translation/translate";
 import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import CustomTextarea from "../../components/common/CustomTextarea";
 import useDownloadImage from "../../hooks/useDownloadImage";
+import { useStickyTop } from "../../hooks/useStickyTop";
 import Export from "../../components/Export";
 import { Tooltip, IconButton } from "@mui/material";
 import { Download } from "@mui/icons-material";
@@ -89,12 +89,9 @@ const usesCosts = {
 function RitualsProjects() {
   const { t } = useTranslate();
   const theme = useTheme();
-  const appBarHidden = useScrollTrigger();
   const sectionGap = 4;
-  const appBarOffset = appBarHidden ? 0 : window.innerWidth < 600 ? 56 : 64;
-  const hotbarTop = appBarOffset + 8;
-  const hotbarHeight = 56;
-  const sectionScrollOffset = hotbarTop + hotbarHeight + 8;
+  const sectionScrollOffset = useStickyTop();
+  const hotbarTop = sectionScrollOffset - 64; // hotbarHeight(56) + gap(8)
 
   const scrollToSection = (sectionId) => {
     const target = document.getElementById(sectionId);
@@ -153,9 +150,16 @@ function RitualsProjects() {
             <Button
               size="small"
               variant="outlined"
-              onClick={() => scrollToSection("section-armor-shield")}
+              onClick={() => scrollToSection("section-armor")}
             >
-              {t("Armor & Shields")}
+              {t("Armor")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => scrollToSection("section-shield")}
+            >
+              {t("Shields")}
             </Button>
             <Button
               size="small"
@@ -229,10 +233,21 @@ function RitualsProjects() {
           container
           spacing={1}
           sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
-          id="section-armor-shield"
+          id="section-armor"
         >
           <Grid size={12}>
-            <ArmorShield />
+            <ArmorPanel />
+          </Grid>
+        </Grid>
+
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-shield"
+        >
+          <Grid size={12}>
+            <ShieldPanel />
           </Grid>
         </Grid>
 
@@ -276,8 +291,10 @@ function RitualsProjects() {
 function Rituals() {
   const { t } = useTranslate();
   const theme = useTheme();
+  const sectionScrollOffset = useStickyTop();
   const secondary = theme.palette.secondary.main;
   const cardRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
   const [ingredient, setIngredient] = useState(false);
@@ -286,6 +303,29 @@ function Rituals() {
   const [fastRitual, setFastRitual] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+
+  const handleClearFields = () => {
+    setPower("minor");
+    setArea("individual");
+    setIngredient(false);
+    setItemHeld(false);
+    setDLReduction(2);
+    setFastRitual(false);
+    setName("");
+    setDescription("");
+  };
+
+  const handleFileUpload = (data) => {
+    if (!data || data.dataType !== "ritual") return;
+    if (data.name !== undefined) setName(data.name);
+    if (data.description !== undefined) setDescription(data.description);
+    if (data.power !== undefined) setPower(data.power);
+    if (data.area !== undefined) setArea(data.area);
+    if (data.ingredient !== undefined) setIngredient(data.ingredient);
+    if (data.itemHeld !== undefined) setItemHeld(data.itemHeld);
+    if (data.dlReduction !== undefined) setDLReduction(data.dlReduction);
+    if (data.fastRitual !== undefined) setFastRitual(data.fastRitual);
+  };
   const [downloadImage, downloadSnackbar] = useDownloadImage(
     name || t("Custom Ritual"),
     cardRef,
@@ -358,7 +398,6 @@ function Rituals() {
                 <TextField
                   id="ritual-name"
                   label={t("Ritual Name")}
-                  size="small"
                   fullWidth
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -461,7 +500,7 @@ function Rituals() {
                     label={t("Override DL")}
                   />
                   {itemHeld && (
-                    <FormControl variant="standard" fullWidth>
+                    <FormControl fullWidth>
                       <InputLabel htmlFor="dlReduction">
                         {t("DL Reduction")}
                       </InputLabel>
@@ -502,12 +541,57 @@ function Rituals() {
                 </Typography>
               </Grid>
             </Grid>
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  {t("Upload JSON")}
+                </Button>
+              </Grid>
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={handleClearFields}
+                >
+                  {t("Clear All Fields")}
+                </Button>
+              </Grid>
+            </Grid>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    try {
+                      handleFileUpload(JSON.parse(reader.result));
+                    } catch {
+                      // ignore malformed JSON
+                    }
+                  };
+                  reader.readAsText(file);
+                }
+              }}
+              style={{ display: "none" }}
+            />
           </Paper>
         </Grid>
         <Grid
           size={{
             xs: 12,
             md: 6,
+          }}
+          sx={{
+            position: "sticky",
+            top: sectionScrollOffset,
+            alignSelf: "flex-start",
           }}
         >
           <SharedRitualCard
@@ -539,8 +623,10 @@ function Rituals() {
 function Projects() {
   const { t } = useTranslate();
   const theme = useTheme();
+  const sectionScrollOffset = useStickyTop();
   const secondary = theme.palette.secondary.main;
   const cardRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
   const [uses, setUses] = useState("consumable");
@@ -554,6 +640,31 @@ function Projects() {
     name || t("Custom Project"),
     cardRef,
   );
+
+  const handleClearFields = () => {
+    setPower("minor");
+    setArea("individual");
+    setUses("consumable");
+    setDefect(false);
+    setThinkerers(1);
+    setHelpers(0);
+    setVisionary(0);
+    setName("");
+    setDescription("");
+  };
+
+  const handleFileUpload = (data) => {
+    if (!data || data.dataType !== "project") return;
+    if (data.name !== undefined) setName(data.name);
+    if (data.description !== undefined) setDescription(data.description);
+    if (data.power !== undefined) setPower(data.power);
+    if (data.area !== undefined) setArea(data.area);
+    if (data.uses !== undefined) setUses(data.uses);
+    if (data.defect !== undefined) setDefect(data.defect);
+    if (data.tinkerers !== undefined) setThinkerers(data.tinkerers);
+    if (data.helpers !== undefined) setHelpers(data.helpers);
+    if (data.visionary !== undefined) setVisionary(data.visionary);
+  };
 
   const defectMod = defect ? 0.75 : 1;
   const cost =
@@ -615,7 +726,6 @@ function Projects() {
                 <TextField
                   id="project-name"
                   label={t("Project Name")}
-                  size="small"
                   fullWidth
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -734,12 +844,11 @@ function Projects() {
             <Divider sx={{ my: 1 }} />
             <Grid container spacing={1}>
               <Grid size={4}>
-                <FormControl variant="standard" fullWidth>
+                <FormControl fullWidth>
                   <TextField
                     id="tinkerers"
                     label={t("Number of Tinkerers")}
                     type="number"
-                    size="small"
                     min={1}
                     max={10}
                     value={tinkerers}
@@ -752,12 +861,11 @@ function Projects() {
                 </FormControl>
               </Grid>
               <Grid size={4}>
-                <FormControl variant="standard" fullWidth>
+                <FormControl fullWidth>
                   <TextField
                     id="helpers"
                     label={t("Number of Hired Helpers")}
                     type="number"
-                    size="small"
                     min={1}
                     max={10}
                     value={helpers}
@@ -770,12 +878,11 @@ function Projects() {
                 </FormControl>
               </Grid>
               <Grid size={4}>
-                <FormControl variant="standard" fullWidth>
+                <FormControl fullWidth>
                   <TextField
                     id="visionary"
                     label={t("Levels in Visionary")}
                     type="number"
-                    size="small"
                     min={1}
                     max={10}
                     value={visionary}
@@ -816,12 +923,57 @@ function Projects() {
                 )}
               </Grid>
             </Grid>
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  {t("Upload JSON")}
+                </Button>
+              </Grid>
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={handleClearFields}
+                >
+                  {t("Clear All Fields")}
+                </Button>
+              </Grid>
+            </Grid>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    try {
+                      handleFileUpload(JSON.parse(reader.result));
+                    } catch {
+                      // ignore malformed JSON
+                    }
+                  };
+                  reader.readAsText(file);
+                }
+              }}
+              style={{ display: "none" }}
+            />
           </Paper>
         </Grid>
         <Grid
           size={{
             xs: 12,
             md: 6,
+          }}
+          sx={{
+            position: "sticky",
+            top: sectionScrollOffset,
+            alignSelf: "flex-start",
           }}
         >
           <SharedProjectCard

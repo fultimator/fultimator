@@ -1,51 +1,85 @@
-import { Affinities } from "./Misc";
+import {
+  ResourceCost,
+  Accuracy,
+  Damage,
+  ActorAttributeValue,
+  ActorAffinities,
+  ActorImmunities,
+  ActorStatuses,
+  ActorResources,
+  ActorDerived,
+} from "./Misc";
+import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
+import type { ItemEffect, ActorEffect, ActionBehavior } from "./Effects";
+import type {
+  Weapon as EquipmentWeapon,
+  CustomWeapon as EquipmentCustomWeapon,
+  CustomWeaponCustomization,
+  SlotTier,
+  EquipmentShield,
+  EquipmentAccessory,
+  EquipmentArmor,
+} from "./Equipment";
 
-export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
+export type { SlotTier, CustomWeaponCustomization };
 
 export interface Hoplosphere {
   id: string;
+  fuid?: string;
   name: string;
   description: string;
+  book?: string;
   coagEffects?: Record<string, string>;
   socketable: "all" | "weapon";
   requiredSlots: 1 | 2;
   cost: number;
-  // changes: HoplosphereChange[] — deferred until effects system designed
+  effects?: ItemEffect[];
 }
 
 export interface MnemosphereSkill {
+  fuid?: string;
   name: string;
   specialSkill?: string;
   maxLvl: number;
   currentLvl: number;
+  behavior?: ActionBehavior;
 }
 
 export interface MnemosphereHeroic {
+  fuid?: string;
   name: string;
   specialSkill?: string;
+  behavior?: ActionBehavior;
 }
 
 export interface MnemosphereSpell {
+  fuid?: string;
   name: string;
   class: string;
   duration: string;
   isOffensive: boolean;
-  mpCostTarget: number;
+  cost: ResourceCost;
   maxTargets: number;
   targetDescription: string;
-  attr1: string;
-  attr2: string;
+  accuracy: Accuracy;
   effect1: string;
   effect2: string;
   effect3: string;
   effect4: string;
   effect5: string;
   effect6: string;
+  description: string;
+  special: string[];
+  range: "melee" | "ranged";
+  itemType: "spell";
+  damage?: Damage;
   spellType?: string;
+  behavior?: ActionBehavior;
 }
 
 export interface Mnemosphere {
   id: string;
+  fuid?: string;
   class: string;
   lvl: number;
   skills: MnemosphereSkill[];
@@ -77,10 +111,10 @@ export interface PlayerInfo {
 }
 
 export interface PlayerAttributes {
-  might: number;
-  insight: number;
-  will: number;
-  dexterity: number;
+  might: ActorAttributeValue;
+  insight: ActorAttributeValue;
+  willpower: ActorAttributeValue;
+  dexterity: ActorAttributeValue;
 }
 
 export interface StatValues {
@@ -94,35 +128,11 @@ export interface PlayerStats {
   ip: StatValues;
 }
 
-export interface PlayerStatuses {
-  slow: boolean;
-  dazed: boolean;
-  enraged: boolean;
-  weak: boolean;
-  shaken: boolean;
-  poisoned: boolean;
-}
+export type PlayerStatuses = ActorStatuses;
 
-export interface PlayerImmunities {
-  slow: boolean;
-  dazed: boolean;
-  weak: boolean;
-  shaken: boolean;
-  enraged: boolean;
-  poisoned: boolean;
-}
+export type PlayerImmunities = ActorImmunities;
 
-export interface PlayerAffinities {
-  physical: Affinities;
-  wind: Affinities;
-  bolt: Affinities;
-  dark: Affinities;
-  earth: Affinities;
-  fire: Affinities;
-  ice: Affinities;
-  light: Affinities;
-  poison: Affinities;
-}
+export type PlayerAffinities = ActorAffinities;
 
 export interface OtherBenefits {
   description: string;
@@ -136,11 +146,13 @@ export interface Benefits {
 }
 
 export interface Skills {
+  fuid?: string;
   name: string;
   description: string;
   currentLvl: number;
   maxLvl: number;
   specialSkill?: string;
+  behavior?: ActionBehavior;
 }
 
 export interface PlayerModifiers {
@@ -156,9 +168,12 @@ export interface PlayerModifiers {
 }
 
 export interface HeroicSkills {
+  fuid?: string;
   name: string;
   quote: string;
   description: string;
+  book?: string;
+  behavior?: ActionBehavior;
 }
 
 export interface PlayerSettings {
@@ -179,6 +194,7 @@ export interface PlayerSettings {
 }
 
 export interface VehicleModule {
+  fuid?: string;
   name: string;
   type: string;
   equippedSlot: string | null;
@@ -188,12 +204,9 @@ export interface VehicleModule {
   cumbersome?: boolean;
   def?: number;
   mdef?: number;
-  damage?: number;
-  prec?: number;
+  damage?: Damage;
+  accuracy?: Accuracy;
   range?: string;
-  damageType?: string;
-  att1?: string;
-  att2?: string;
   customName?: string;
   description?: string;
   isComplex?: boolean;
@@ -206,27 +219,35 @@ export interface Vehicle {
 }
 
 export interface Spells {
+  fuid?: string;
   name: string;
+  book?: string;
   class: string;
   duration: string;
   isOffensive: boolean;
-  mpCostTarget: number;
+  cost: ResourceCost;
   maxTargets: number;
   targetDescription: string;
-  attr1: string;
-  attr2: string;
+  accuracy: Accuracy;
   effect1: string;
   effect2: string;
   effect3: string;
   effect4: string;
   effect5: string;
   effect6: string;
+  description: string;
+  special: string[];
+  range: "melee" | "ranged";
+  itemType: "spell";
+  damage?: Damage;
   spellType?: string;
   vehicles?: Vehicle[];
   currentVehicles?: Vehicle[];
+  behavior?: ActionBehavior;
 }
 
 export interface PlayerClass {
+  fuid?: string;
   name: string;
   lvl: number;
   benefits: Benefits;
@@ -235,120 +256,26 @@ export interface PlayerClass {
   spells: Spells[];
 }
 
-export interface Weapons {
-  name: string;
-  quality: string;
-  value: number;
-  isRanged: boolean;
-  isTwoHand: boolean;
-  isMartial: boolean;
-  isExtraPrec: boolean;
-  isExtraDmg: boolean;
-  isCustom: boolean;
-  attr1: string;
-  attr2: string;
-  prec: number;
-  dmg: number;
-  isEquipped: boolean;
-}
-
-export interface CustomWeaponCustomization {
-  name: string;
-  effect: string;
-  martial: boolean;
-  customCost: number;
-}
-
-export interface CustomWeaponAccuracyCheck {
-  att1: string;
-  att2: string;
-}
-
-export interface CustomWeapons {
-  name: string;
-  category: string;
-  range: string;
-  accuracyCheck: CustomWeaponAccuracyCheck;
-  type: string;
-  customizations: CustomWeaponCustomization[];
-  selectedQuality?: string;
-  quality: string;
-  qualityCost: number;
-  cost?: number;
-  hands?: number;
-  martial?: boolean;
+export type Weapons = EquipmentWeapon & {
+  quality?: string;
+  value?: number;
+  isTwoHand?: boolean;
+  isCustom?: boolean;
   isEquipped?: boolean;
-  rareAccuracyBonus?: boolean;
-  rareDamageBonus?: boolean;
-  overrideAccuracyAttributes?: boolean;
+};
 
-  // Primary weapon modifiers (standard format)
-  damageModifier?: number;
-  precModifier?: number;
-  defModifier?: number;
-  mDefModifier?: number;
-  overrideDamageType?: boolean;
-  customDamageType?: string;
-
-  // Secondary weapon data (for transforming weapons)
-  secondWeaponName?: string;
-  secondSelectedCategory?: string;
-  secondSelectedRange?: string;
-  secondSelectedAccuracyCheck?: CustomWeaponAccuracyCheck;
-  secondSelectedType?: string;
-  secondCurrentCustomizations?: CustomWeaponCustomization[];
-  secondSelectedQuality?: string;
-  secondQuality?: string;
-  secondQualityCost?: number;
-
-  // Secondary weapon modifiers
-  secondDamageModifier?: number;
-  secondPrecModifier?: number;
-  secondDefModifier?: number;
-  secondMDefModifier?: number;
-  secondOverrideDamageType?: boolean;
-  secondCustomDamageType?: string;
-
+export type CustomWeapons = EquipmentCustomWeapon & {
+  selectedQuality?: string;
+  isEquipped?: boolean;
   // Data type identifier
   dataType?: string;
+};
 
-  // Technospheres
-  slots?: SlotTier;
-  slotted?: string[];
-}
+export type Shields = EquipmentShield;
 
-export interface Shields {
-  name: string;
-  quality: string;
-  value: number;
-  isMartial: boolean;
-  def: number;
-  mdef: number;
-  init: number;
-  isEquipped: boolean;
-}
+export type Accessories = EquipmentAccessory;
 
-export interface Accessories {
-  name: string;
-  quality: string;
-  value: number;
-  isEquipped: boolean;
-}
-
-export interface Armor {
-  name: string;
-  quality: string;
-  value: number;
-  isMartial: boolean;
-  def: number;
-  mdef: number;
-  init: number;
-  isEquipped: boolean;
-
-  // Technospheres
-  slots?: SlotTier;
-  slotted?: string[];
-}
+export type Armor = EquipmentArmor;
 
 export interface PlayerEquipment {
   weapons: Weapons[];
@@ -385,6 +312,7 @@ export interface Rituals {
 }
 
 export interface PlayerItems {
+  fuid?: string;
   name: string;
   description: string;
   value: number;
@@ -392,12 +320,14 @@ export interface PlayerItems {
 }
 
 export interface PlayerConsumables {
+  fuid?: string;
   name: string;
   description: string;
   ipCost: number;
 }
 
 export interface PlayerNotes {
+  fuid?: string;
   name: string;
   description: string;
 }
@@ -424,6 +354,12 @@ export interface TypePlayer {
   equippedSlots?: EquippedSlots;
   vehicleSlots?: VehicleSlots;
   settings?: PlayerSettings;
+  schemaVersion?: number;
+  resources?: ActorResources;
+  derived?: ActorDerived;
+  bonuses?: ActorBonuses;
+  multipliers?: ActorMultipliers;
+  effects?: ActorEffect[];
 }
 
 export type EquipmentSource =

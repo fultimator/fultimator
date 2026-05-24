@@ -5,7 +5,6 @@ import {
   AccordionSummary,
   Box,
   Chip,
-  Divider,
   Stack,
   Typography,
 } from "@mui/material";
@@ -92,7 +91,7 @@ function SpellTypeItemRow({ entry, customTheme, t }) {
                 variant="caption"
                 sx={{
                   fontWeight: "bold",
-                  color: customTheme.primary,
+                  color: "text.primary",
                   minWidth: 72,
                   flexShrink: 0,
                   pt: "2px",
@@ -237,13 +236,13 @@ function ClassSpellRow({ spell, customTheme, t }) {
           variant="caption"
           sx={{ color: "text.secondary", ml: "auto" }}
         >
-          {spell.mp} MP
+          {spell.cost?.amount} MP
         </Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ px: 2, py: 0.75 }}>
         <Box sx={{ display: "flex", gap: 1, mb: 0.25 }}>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            {spell.targetDesc}
+            {spell.targetDescription}
           </Typography>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
             ·
@@ -251,14 +250,14 @@ function ClassSpellRow({ spell, customTheme, t }) {
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
             {spell.duration}
           </Typography>
-          {spell.attr1 && spell.attr2 && (
+          {spell.accuracy?.attr1 && spell.accuracy?.attr2 && (
             <>
               <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 ·
               </Typography>
               <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                {attributes[spell.attr1]?.shortcaps} +{" "}
-                {attributes[spell.attr2]?.shortcaps}
+                {attributes[spell.accuracy.attr1]?.shortcaps} +{" "}
+                {attributes[spell.accuracy.attr2]?.shortcaps}
               </Typography>
             </>
           )}
@@ -551,6 +550,7 @@ export const SharedClassCard = React.memo(function SharedClassCard({
   }
 
   const classSpells = spellsByClass[item.name] || [];
+  const book = item.meta?.book;
   const hasCustomSpells =
     item.benefits?.spellClasses?.length > 0 && classSpells.length === 0;
   const hasSpells =
@@ -576,9 +576,9 @@ export const SharedClassCard = React.memo(function SharedClassCard({
               sx={headerBoxSx(customTheme, scale, onHeaderClick)}
             >
               <Typography>{t(item.name)}</Typography>
-              {item.book && (
+              {book && (
                 <Chip
-                  label={item.book}
+                  label={book}
                   size="small"
                   sx={{
                     textTransform: "capitalize",
@@ -639,6 +639,7 @@ export const SharedClassCard = React.memo(function SharedClassCard({
             onChange={(_, v) => setExpandedSpells(v)}
             sx={{
               borderTop: `1px solid ${customTheme.secondary}`,
+              borderRadius: "0 !important",
               "&:before": { display: "none" },
             }}
           >
@@ -766,8 +767,6 @@ export const SharedClassCard = React.memo(function SharedClassCard({
             </AccordionDetails>
           </Accordion>
         )}
-
-        <Divider />
 
         {item.skills?.map((skill, i) => (
           <Box
@@ -1025,27 +1024,31 @@ export const SharedHeroicCard = React.memo(function SharedHeroicCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box sx={nameRowSx(customTheme)}>
+        <Box
+          sx={{
+            ...nameRowSx(customTheme),
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
+          }}
+        >
           <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
             {t(item.name)}
           </Typography>
-        </Box>
-        {item.quote && (
-          <Box
-            sx={{
-              px: 2,
-              py: "5px",
-              borderBottom: `1px solid ${customTheme.secondary}`,
-            }}
-          >
+          {item.quote && (
             <Typography
               variant="body2"
-              sx={{ fontStyle: "italic", color: "text.secondary" }}
+              sx={{
+                fontStyle: "italic",
+                color: "text.secondary",
+                textAlign: "right",
+              }}
             >
               {t(item.quote)}
             </Typography>
-          </Box>
-        )}
+          )}
+        </Box>
         <Box sx={{ px: 2, py: 0.25, fontSize: "0.875rem" }}>
           <StyledMarkdown
             allowedElements={["p", "strong", "em", "ul", "ol", "li", "br"]}

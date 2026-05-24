@@ -18,7 +18,7 @@ export default function MagiseedContentSection({ formState, setFormState, t }) {
   // Function to create a new blank magiseed
   const createBlankMagiseed = useCallback(() => {
     return {
-      name: "magiseed_custom",
+      key: "magiseed_custom",
       customName: "",
       description: "",
       rangeStart: 0,
@@ -34,13 +34,13 @@ export default function MagiseedContentSection({ formState, setFormState, t }) {
 
   // Get available preset magiseeds that haven't been added yet
   const getAvailablePresets = useCallback(() => {
-    const addedPresetNames = currentMagiseeds
-      .map((m) => m.name)
-      .filter((name) => name !== "magiseed_custom");
+    const addedPresetKeys = currentMagiseeds
+      .map((m) => m.key)
+      .filter((k) => k !== "magiseed_custom");
     return magiseeds.filter(
       (preset) =>
         preset.name !== "magiseed_custom" &&
-        !addedPresetNames.includes(preset.name),
+        !addedPresetKeys.includes(preset.name),
     );
   }, [currentMagiseeds]);
 
@@ -50,8 +50,10 @@ export default function MagiseedContentSection({ formState, setFormState, t }) {
       const preset = magiseeds.find((m) => m.name === presetName);
       if (!preset) return;
 
+      const { name: _name, ...presetRest } = preset;
       const newMagiseed = {
-        ...preset,
+        ...presetRest,
+        key: preset.name,
         customName: "",
         description: preset.description,
       };
@@ -75,7 +77,7 @@ export default function MagiseedContentSection({ formState, setFormState, t }) {
         magiseeds: [
           ...(prev.magiseeds || []),
           {
-            name: item.name,
+            key: item.key || item.name,
             customName: "",
             description: item.description || "",
             rangeStart: item.rangeStart || 0,

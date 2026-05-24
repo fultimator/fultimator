@@ -1,6 +1,6 @@
 export const typeList = [
   "physical",
-  "wind",
+  "air",
   "bolt",
   "dark",
   "earth",

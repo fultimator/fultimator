@@ -123,7 +123,7 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
           </Grid>
         </Grid>
       </div>
-      {dance.dances.length === 0 ? (
+      {(dance.dances ?? []).length === 0 ? (
         <Typography
           sx={{
             padding: "3px 17px",
@@ -136,7 +136,7 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
           {t("dance_empty_dances")}
         </Typography>
       ) : (
-        dance.dances.map((dan, i) => (
+        (dance.dances ?? []).map((dan, i) => (
           <React.Fragment key={i}>
             <div
               style={{

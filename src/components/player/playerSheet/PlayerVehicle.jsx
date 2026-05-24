@@ -91,7 +91,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
 
   const currDex = calculateAttribute(
     player,
-    player.attributes.dexterity,
+    player.attributes.dexterity?.base,
     ["slow", "enraged"],
     ["dexUp"],
     6,
@@ -99,7 +99,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
   );
   const currInsight = calculateAttribute(
     player,
-    player.attributes.insight,
+    player.attributes.insight?.base,
     ["dazed", "enraged"],
     ["insUp"],
     6,
@@ -107,7 +107,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
   );
   const currMight = calculateAttribute(
     player,
-    player.attributes.might,
+    player.attributes.might?.base,
     ["weak", "poisoned"],
     ["migUp"],
     6,
@@ -115,7 +115,7 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
   );
   const currWillpower = calculateAttribute(
     player,
-    player.attributes.willpower,
+    player.attributes.willpower?.base,
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
@@ -132,17 +132,20 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
   const handleDiceRoll = (module) => {
     setCurrentModule(module);
 
-    const att1 = module.att1 || "dexterity";
-    const att2 = module.att2 || "might";
+    const accuracy = module.accuracy || {};
+    const damage = module.damage || {};
+    const attr1 = accuracy.attr1 || "dexterity";
+    const attr2 = accuracy.attr2 || "might";
 
-    let att1Value = attributeMap[att1] || 8;
-    let att2Value = attributeMap[att2] || 8;
+    let attr1Value = attributeMap[attr1] || 8;
+    let attr2Value = attributeMap[attr2] || 8;
 
-    let weaponPrec = module.prec || 0;
-    let weaponDamage = module.damage || 0;
+    let weaponPrec = accuracy.value ?? 0;
+    let weaponDamage = damage.value ?? 0;
+    const damageType = damage.type || "physical";
 
-    const die1 = Math.floor(Math.random() * att1Value) + 1;
-    const die2 = Math.floor(Math.random() * att2Value) + 1;
+    const die1 = Math.floor(Math.random() * attr1Value) + 1;
+    const die2 = Math.floor(Math.random() * attr2Value) + 1;
 
     // Check for critical failure
     const isCriticalFailure = die1 === 1 && die2 === 1;
@@ -185,14 +188,14 @@ export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
                 variant="h6"
                 sx={{ fontWeight: "bold", textTransform: "uppercase" }}
               >
-                {t(module.damageType || "Physical")}
+                {t(damageType)}
               </Typography>
             </Grid>
           </Grid>
           <Grid sx={{ marginTop: "20px" }} size={12}>
             <Typography component="span">
-              {` ${die1} [${attributes[att1].shortcaps}] + ${die2} [${
-                attributes[att2].shortcaps
+              {` ${die1} [${attributes[attr1].shortcaps}] + ${die2} [${
+                attributes[attr2].shortcaps
               }] ${
                 weaponPrec !== 0
                   ? weaponPrec > 0

@@ -61,28 +61,40 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
       onClose={onClose}
       onKeyDown={handleKeyDown}
       fullWidth
-      maxWidth="xs"
+      maxWidth="sm"
       slotProps={{
         paper: {
           sx: {
             borderRadius: 2,
+            overflow: "hidden",
           },
         },
       }}
     >
-      <DialogTitle variant="h3" sx={{ color: "error.main" }}>
+      <DialogTitle
+        variant="h3"
+        sx={{
+          color: "error.main",
+          px: 3,
+          py: 2,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+        }}
+      >
         {title}
       </DialogTitle>
-      <DialogContent>
-        <Typography variant="body1" sx={{ mb: 2 }}>
+      <DialogContent sx={{ px: 3, pt: "24px !important", pb: 2.5 }}>
+        <Typography
+          variant="body1"
+          sx={{ mb: itemPreview ? 2 : 2.5, lineHeight: 1.6 }}
+        >
           {message}
         </Typography>
 
-        {itemPreview && (
+        {itemPreview ? (
           <Box
             sx={{
-              mt: 2,
-              mb: 2,
+              mb: 2.5,
               p: 2,
               border: "1px solid",
               borderColor: "divider",
@@ -92,18 +104,41 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           >
             {itemPreview}
           </Box>
-        )}
+        ) : null}
 
-        <Typography
-          variant="body2"
-          color="error"
-          sx={{ fontWeight: "bold", mt: 2, mb: 2 }}
+        <Box
+          sx={{
+            p: 1.5,
+            borderRadius: 1,
+            bgcolor: "rgba(211, 47, 47, 0.08)",
+            border: "1px solid rgba(211, 47, 47, 0.25)",
+          }}
         >
-          {t("This action is permanent and cannot be undone.")}
-        </Typography>
+          <Typography
+            variant="body2"
+            color="error.main"
+            sx={{ fontWeight: 700, lineHeight: 1.45 }}
+          >
+            {t("This action is permanent and cannot be undone.")}
+          </Typography>
+        </Box>
       </DialogContent>
-      <DialogActions sx={{ p: 2, gap: 1 }}>
-        <Button onClick={onClose} variant="outlined" color="primary" fullWidth>
+      <DialogActions
+        sx={{
+          px: 3,
+          py: 2,
+          gap: 1.5,
+          borderTop: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          color="primary"
+          fullWidth
+          sx={{ minHeight: 42 }}
+        >
           {t("Cancel")}
         </Button>
         <Button
@@ -118,6 +153,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           }
           sx={{
             fontWeight: "bold",
+            minHeight: 42,
             "&:hover": {
               bgcolor: "error.dark",
             },

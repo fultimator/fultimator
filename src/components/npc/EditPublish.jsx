@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import { useTranslate, languageOptions } from "../../translation/translate";
 import { Publish } from "@mui/icons-material";
-import emaExample from "../../routes/npc-edit/emaExample.png";
+import emaExample from "/images/routes/npc-edit/emaExample.png";
 
 export default function EditPublish({
   npc,

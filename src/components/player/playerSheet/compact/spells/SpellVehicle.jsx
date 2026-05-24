@@ -210,60 +210,69 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
                 {t("Weapons")}
               </StyledTableCell>
             </TableRow>
-            {weaponModules.map((m, i) => (
-              <React.Fragment key={`weapon-${i}`}>
-                <TableRow>
-                  <StyledTableCell sx={{ fontWeight: "bold" }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      {highlightMatch(
-                        m.name === "pilot_custom_weapon"
-                          ? m.customName
-                          : t(m.name),
-                        searchQuery,
-                      )}
-                      {m.martial && (
-                        <Martial sx={{ fontSize: "0.85rem", ml: 0.5 }} />
-                      )}
-                    </Box>
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ textAlign: "center" }}>
-                    <OpenBracket />
-                    {attributes[m.att1 || "might"].shortcaps} +{" "}
-                    {attributes[m.att2 || "dexterity"].shortcaps}
-                    <CloseBracket />
-                    {m.prec !== 0 && (m.prec > 0 ? `+${m.prec}` : m.prec)}
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ textAlign: "center" }}>
-                    <OpenBracket />
-                    {t("HR")} {m.damage >= 0 ? "+" : ""}
-                    {m.damage}
-                    <CloseBracket />
-                    {types[m.damageType?.toLowerCase() || "physical"]?.long ||
-                      t(m.damageType || "Physical")}
-                  </StyledTableCell>
-                  <StyledTableCell sx={{ fontSize: "0.7rem" }}>
-                    {highlightMatch(t(m.category), searchQuery)}
-                  </StyledTableCell>
-                </TableRow>
-                <TableRow>
-                  <StyledTableCell colSpan={4} sx={{ py: 0.5 }}>
-                    <StyledMarkdown>
-                      {highlightMarkdownText(
-                        m.name === "pilot_custom_weapon"
-                          ? m.description
-                          : t(m.description),
-                        searchQuery,
-                      )}
-                    </StyledMarkdown>
-                  </StyledTableCell>
-                </TableRow>
-              </React.Fragment>
-            ))}
+            {weaponModules.map((m, i) => {
+              const accuracy = m.accuracy || {};
+              const damageObj = m.damage || {};
+              const att1 = accuracy.attr1 || "might";
+              const att2 = accuracy.attr2 || "dexterity";
+              const prec = accuracy.value ?? 0;
+              const damage = damageObj.value ?? 0;
+              const damageType = damageObj.type || "physical";
+
+              return (
+                <React.Fragment key={`weapon-${i}`}>
+                  <TableRow>
+                    <StyledTableCell sx={{ fontWeight: "bold" }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        {highlightMatch(
+                          m.name === "pilot_custom_weapon"
+                            ? m.customName
+                            : t(m.name),
+                          searchQuery,
+                        )}
+                        {m.martial && (
+                          <Martial sx={{ fontSize: "0.85rem", ml: 0.5 }} />
+                        )}
+                      </Box>
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      <OpenBracket />
+                      {attributes[att1]?.shortcaps || att1} +{" "}
+                      {attributes[att2]?.shortcaps || att2}
+                      <CloseBracket />
+                      {prec !== 0 && (prec > 0 ? `+${prec}` : prec)}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ textAlign: "center" }}>
+                      <OpenBracket />
+                      {t("HR")} {damage >= 0 ? "+" : ""}
+                      {damage}
+                      <CloseBracket />
+                      {types[damageType?.toLowerCase()]?.long || t(damageType)}
+                    </StyledTableCell>
+                    <StyledTableCell sx={{ fontSize: "0.7rem" }}>
+                      {highlightMatch(t(m.category), searchQuery)}
+                    </StyledTableCell>
+                  </TableRow>
+                  <TableRow>
+                    <StyledTableCell colSpan={4} sx={{ py: 0.5 }}>
+                      <StyledMarkdown>
+                        {highlightMarkdownText(
+                          m.name === "pilot_custom_weapon"
+                            ? m.description
+                            : t(m.description),
+                          searchQuery,
+                        )}
+                      </StyledMarkdown>
+                    </StyledTableCell>
+                  </TableRow>
+                </React.Fragment>
+              );
+            })}
           </>
         )}
 

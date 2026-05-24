@@ -21,7 +21,7 @@ import EditClassNameModal from "./EditClassNameModal";
 import AddSkillModal from "./AddSkillModal";
 import EditFreeBenefitsModal from "./EditFreeBenefitsModal";
 import EditSpellClassesModal from "./EditSpellClassesModal";
-import EditHeroicSkillModal from "./EditHeroicSkillModal";
+import ItemEditModal from "../../../forms/ui/ItemEditModal";
 import SelectCompanionModal from "./SelectCompanionModal";
 import spellClasses from "../../../libs/spellClasses";
 import Export from "../../Export";
@@ -59,6 +59,7 @@ export default function PlayerClassCard({
   isExpanded = false,
   onToggleExpand = () => {},
   showHeader = true,
+  noBorder = false,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -80,6 +81,7 @@ export default function PlayerClassCard({
     useState(false);
   const [editSkillIndex, setEditSkillIndex] = useState(null);
   const [skillName, setSkillName] = useState("");
+  const [skillFuid, setSkillFuid] = useState(undefined);
   const [maxLevel, setMaxLevel] = useState(1);
   const [description, setDescription] = useState("");
   const [specialSkill, setSpecialSkill] = useState("");
@@ -93,12 +95,8 @@ export default function PlayerClassCard({
     onConfirm: onRemove,
   });
 
-  const [heroic, setHeroic] = useState({
-    name: classItem.heroic ? classItem.heroic.name : "",
-    description: classItem.heroic ? classItem.heroic.description : "",
-  });
-
   const [className, setClassName] = useState(classItem.name);
+  const [classFuid, setClassFuid] = useState(classItem.fuid);
 
   const [selectedCompanion, setSelectedCompanion] = useState(
     classItem.companion ? classItem.companion : null,
@@ -131,8 +129,9 @@ export default function PlayerClassCard({
   };
 
   const handleOpenEditClassNameModal = () => {
-    setOpenEditClassNameModal(true);
     setClassName(classItem.name);
+    setClassFuid(classItem.fuid);
+    setOpenEditClassNameModal(true);
   };
 
   const handleCloseEditClassNameModal = () => {
@@ -140,7 +139,7 @@ export default function PlayerClassCard({
   };
 
   const handleSaveClassName = () => {
-    editClassName(className);
+    editClassName(className, classFuid);
     setOpenEditClassNameModal(false);
   };
 
@@ -254,7 +253,6 @@ export default function PlayerClassCard({
 
   const handleAddSkill = () => {
     if (editSkillIndex !== null) {
-      // Edit existing skill
       onEditSkill(
         classItem.name,
         editSkillIndex,
@@ -262,21 +260,22 @@ export default function PlayerClassCard({
         maxLevel,
         description,
         specialSkill,
+        skillFuid,
       );
     } else {
-      // Add new skill
       onAddSkill(
         classItem.name,
         skillName,
         maxLevel,
         description,
         specialSkill,
+        skillFuid,
       );
     }
 
-    // Reset the state and close the modal
     setOpenAddSkillModal(false);
     setSkillName("");
+    setSkillFuid(undefined);
     setMaxLevel(1);
     setDescription("");
     setEditSkillIndex(null);
@@ -286,6 +285,7 @@ export default function PlayerClassCard({
   const handleEditSkill = (index) => {
     const skill = classItem.skills[index];
     setSkillName(skill.skillName);
+    setSkillFuid(skill.fuid);
     setMaxLevel(skill.maxLvl);
     setDescription(skill.description);
     setEditSkillIndex(index);
@@ -298,6 +298,7 @@ export default function PlayerClassCard({
     setOpenAddSkillModal(false);
     setEditSkillIndex(null);
     setSkillName("");
+    setSkillFuid(undefined);
     setMaxLevel(1);
     setDescription("");
     setSpecialSkill("");
@@ -305,12 +306,6 @@ export default function PlayerClassCard({
 
   const handleEditHeroicSkill = () => {
     setOpenEditHeroicSkillModal(true);
-    setHeroic(heroic);
-  };
-
-  const handleSaveHeroicSkill = () => {
-    editHeroic(heroic);
-    setOpenEditHeroicSkillModal(false);
   };
 
   const handleSaveCompanion = () => {
@@ -396,6 +391,9 @@ export default function PlayerClassCard({
         onSave={handleSaveClassName}
         className={className}
         setClassName={setClassName}
+        classFuid={classFuid}
+        setClassFuid={setClassFuid}
+        isHomebrew={isHomebrew}
       />
       <AddSkillModal
         open={openAddSkillModal}
@@ -411,6 +409,8 @@ export default function PlayerClassCard({
         editSkillIndex={editSkillIndex}
         skillName={skillName}
         setSkillName={setSkillName}
+        skillFuid={skillFuid}
+        setSkillFuid={setSkillFuid}
         maxLevel={maxLevel}
         setMaxLevel={setMaxLevel}
         description={description}
@@ -451,6 +451,7 @@ export default function PlayerClassCard({
           editHeroic({
             name: item.name,
             description: item.description,
+            fuid: item.fuid,
             _packItemId: item._packItemId,
           });
         }}
@@ -458,12 +459,17 @@ export default function PlayerClassCard({
         restrictToTypes={["heroics"]}
         context="player"
       />
-      <EditHeroicSkillModal
+      <ItemEditModal
         open={openEditHeroicSkillModal}
         onClose={() => setOpenEditHeroicSkillModal(false)}
-        onSave={handleSaveHeroicSkill}
-        heroic={heroic}
-        setHeroic={setHeroic}
+        itemType="heroic"
+        item={classItem.heroic ?? null}
+        editIndex={null}
+        onSave={(saved) => {
+          editHeroic(saved);
+          setOpenEditHeroicSkillModal(false);
+        }}
+        onDelete={() => {}}
       />
       <SelectCompanionModal
         open={openSelectCompanionModal}
@@ -491,7 +497,7 @@ export default function PlayerClassCard({
   );
 
   const cardBody = (
-    <Grid container spacing={1}>
+    <Grid container spacing={1} sx={{ pb: noBorder ? 1 : 0 }}>
       {!isAccordion && showHeader && <Grid size={12}>{header}</Grid>}
       {warnings.map((warning, index) => (
         <Grid key={index} size={12}>
@@ -510,7 +516,7 @@ export default function PlayerClassCard({
               isEditMode={isEditMode}
             />
           </Grid>
-          <Grid style={{ margin: "-20px 0 0 0" }} size={12}>
+          <Grid style={{ margin: "-14px 0 0 0" }} size={12}>
             <ul>
               {classItem.benefits.hpplus !== 0 && (
                 <li>
@@ -628,7 +634,7 @@ export default function PlayerClassCard({
                 fontSize: "1rem",
               }}
             >
-              {isHomebrew ? skill.description : t(skill.description)}
+              {t(skill.description)}
             </StyledMarkdown>
           </Grid>
         ))}
@@ -728,32 +734,34 @@ export default function PlayerClassCard({
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              alignItems: "center",
+              mt: "16px",
+              px: "17px",
+              py: "3px",
             }}
           >
             <Button
               variant="contained"
               color="secondary"
-              sx={{ marginTop: "30px", fontSize: "0.9em" }}
+              sx={{ fontSize: "0.9em" }}
               onClick={() => setOpenEditSpellClassesModal(true)}
             >
               {t("Edit Class Spell Types")}
             </Button>
-
+            <Box sx={{ flexGrow: 1 }} />
+            <Export name={classItem.name} dataType="class" data={classItem} />
+            <Box sx={{ width: 8 }} />
             <Button
               variant="contained"
               color="error"
               onClick={handleDelete}
-              sx={{ marginTop: "30px", fontSize: "0.9em" }}
+              sx={{ fontSize: "0.9em" }}
             >
               {t("Remove Class")}
             </Button>
           </Box>
         </Grid>
       )}
-      <Grid size={12}>
-        <Export name={classItem.name} dataType="class" data={classItem} />
-      </Grid>
     </Grid>
   );
 
@@ -761,31 +769,46 @@ export default function PlayerClassCard({
     return (
       <>
         <Accordion
-          elevation={3}
+          elevation={noBorder ? 0 : 3}
+          disableGutters={noBorder}
           expanded={isExpanded}
           onChange={onToggleExpand}
           sx={{
-            border: "2px solid",
-            borderColor: secondary,
+            ...(noBorder
+              ? {
+                  border: "none",
+                  boxShadow: "none",
+                  borderBottom: "1px solid",
+                  borderColor: secondary,
+                  "&:last-child": { borderBottom: "none" },
+                }
+              : {
+                  border: "2px solid",
+                  borderColor: secondary,
+                }),
             "&.MuiAccordion-root": {
-              borderRadius: "8px !important",
+              borderRadius: noBorder ? "0 !important" : "8px !important",
               "&:before": { display: "none" },
             },
             "& .MuiAccordion-heading": {
-              borderRadius: "6px !important",
+              borderRadius: noBorder ? "0 !important" : "6px !important",
             },
             "&.Mui-expanded .MuiAccordion-heading": {
-              borderRadius: "6px 6px 0 0 !important",
+              borderRadius: noBorder
+                ? "0 !important"
+                : "6px 6px 0 0 !important",
             },
             "&.MuiAccordion-root .MuiAccordionSummary-root": {
-              borderRadius: isExpanded
-                ? "6px 6px 0 0 !important"
-                : "6px !important",
+              borderRadius: noBorder
+                ? "0 !important"
+                : isExpanded
+                  ? "6px 6px 0 0 !important"
+                  : "6px !important",
             },
           }}
         >
           {showHeader ? header : null}
-          <AccordionDetails sx={{ p: "15px" }}>{cardBody}</AccordionDetails>
+          <AccordionDetails sx={{ p: 0 }}>{cardBody}</AccordionDetails>
         </Accordion>
         {modals}
       </>

@@ -12,7 +12,7 @@ import {
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import Pretty from "../../../npc/Pretty";
+import NpcActorCard from "../../../shared/actorCards/npc/NpcActorCard";
 
 const StyledTableCellHeader = styled(TableCell)({
   padding: "4px 8px",
@@ -101,7 +101,7 @@ export default function PlayerCompanion({ player, searchQuery = "" }) {
           <TableRow>
             <StyledTableCell sx={{ width: 36 }} />
             <TableCell sx={{ p: 1 }}>
-              <Pretty npc={companion} collapse={true} />
+              <NpcActorCard npc={companion} collapse={true} />
             </TableCell>
           </TableRow>
         </TableBody>

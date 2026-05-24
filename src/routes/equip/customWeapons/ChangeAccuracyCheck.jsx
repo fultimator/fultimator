@@ -12,7 +12,7 @@ function ChangeAccuracyCheck({ value, onChange, disabled }) {
   };
 
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth size="small">
       <InputLabel id="type">{t("weapon_accuracy_check")}</InputLabel>
       <Select
         labelId="type"
@@ -21,6 +21,13 @@ function ChangeAccuracyCheck({ value, onChange, disabled }) {
         label={t("weapon_accuracy_check")}
         onChange={handleChange}
         disabled={disabled}
+        sx={{
+          "& .MuiSelect-select": {
+            minHeight: "unset !important",
+            paddingTop: "8.5px",
+            paddingBottom: "8.5px",
+          },
+        }}
       >
         {accuracyChecks.map((check, index) => (
           <MenuItem key={index} value={`${check.att1}_${check.att2}`}>

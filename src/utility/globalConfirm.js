@@ -1,3 +1,5 @@
+import { imperativeConfirm } from "../components/common/imperativeConfirm";
+
 const CONFIRM_TIMEOUT_MS = 1500;
 
 // Function to get the appropriate confirmation function
@@ -10,6 +12,13 @@ export const getConfirmFunction = () => {
 
 // Global confirm function with a safe fallback to avoid renderer hangs
 export const globalConfirm = async (message) => {
+  // Use the MUI dialog when the provider is mounted
+  const muiResult = imperativeConfirm(message);
+  if (muiResult !== null) {
+    return muiResult;
+  }
+
+  // Fallback for Electron or when provider is not mounted
   const confirmFunction = getConfirmFunction();
 
   try {

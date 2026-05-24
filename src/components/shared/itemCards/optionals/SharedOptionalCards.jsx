@@ -688,6 +688,23 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
     typeof item.zeroEffect === "object"
       ? (item.zeroEffect?.description ?? "")
       : "";
+  const campTargetLabel =
+    {
+      yourself: t("Yourself"),
+      ally: t("One ally"),
+      choice: t("Special"),
+    }[String(item.description ?? "").toLowerCase()] ?? item.description;
+  const isCampActivities = item.subtype === "camp-activities";
+  const campTargetValue =
+    String(item.description ?? "").toLowerCase() === "choice" &&
+    item.targetDescription
+      ? item.targetDescription
+      : campTargetLabel;
+  const clockSections =
+    typeof item.clock === "object" && item.clock !== null
+      ? item.clock.sections
+      : undefined;
+  const hasClockSections = Number.isFinite(Number(clockSections));
 
   return (
     <CardContentWrapper
@@ -704,12 +721,60 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
       <RowsWithOptionalImage
         header={
           showHeader && (
-            <Box
-              onClick={onHeaderClick}
-              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
-            >
-              <Typography>{subtypeLabel}</Typography>
-            </Box>
+            isCampActivities && hasClockSections ? (
+              <Grid
+                container
+                onClick={onHeaderClick}
+                sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
+              >
+                <Grid size={6}>
+                  <Typography>{subtypeLabel}</Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography sx={{ textAlign: "center" }}>{t("Target")}</Typography>
+                </Grid>
+                <Grid size={3}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Clock Sections")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            ) : isCampActivities ? (
+              <Grid
+                container
+                onClick={onHeaderClick}
+                sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
+              >
+                <Grid size={8}>
+                  <Typography>{subtypeLabel}</Typography>
+                </Grid>
+                <Grid size={4}>
+                  <Typography sx={{ textAlign: "center" }}>{t("Target")}</Typography>
+                </Grid>
+              </Grid>
+            ) : hasClockSections ? (
+              <Grid
+                container
+                onClick={onHeaderClick}
+                sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
+              >
+                <Grid size={8}>
+                  <Typography>{subtypeLabel}</Typography>
+                </Grid>
+                <Grid size={4}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("Clock Sections")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            ) : (
+              <Box
+                onClick={onHeaderClick}
+                sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+              >
+                <Typography>{subtypeLabel}</Typography>
+              </Box>
+            )
           )
         }
         imageMode={imageMode}
@@ -718,11 +783,73 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box sx={nameRowSx(customTheme)}>
-          <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
-            {item.name}
-          </Typography>
-        </Box>
+        {isCampActivities && hasClockSections ? (
+          <Grid container sx={nameRowSx(customTheme)}>
+            <Grid size={6}>
+              <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+                {item.name}
+              </Typography>
+            </Grid>
+            <Grid size={3}>
+              <Typography
+                sx={{ textAlign: "center", fontSize: scale.body, fontWeight: "bold" }}
+              >
+                {campTargetValue}
+              </Typography>
+            </Grid>
+            <Grid size={3}>
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: scale.body,
+                }}
+              >
+                {Number(clockSections)}
+              </Typography>
+            </Grid>
+          </Grid>
+        ) : isCampActivities ? (
+          <Grid container sx={nameRowSx(customTheme)}>
+            <Grid size={8}>
+              <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+                {item.name}
+              </Typography>
+            </Grid>
+            <Grid size={4}>
+              <Typography
+                sx={{ textAlign: "center", fontSize: scale.body, fontWeight: "bold" }}
+              >
+                {campTargetValue}
+              </Typography>
+            </Grid>
+          </Grid>
+        ) : hasClockSections ? (
+          <Grid container sx={nameRowSx(customTheme)}>
+            <Grid size={8}>
+              <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+                {item.name}
+              </Typography>
+            </Grid>
+            <Grid size={4}>
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontSize: scale.body,
+                }}
+              >
+                {Number(clockSections)}
+              </Typography>
+            </Grid>
+          </Grid>
+        ) : (
+          <Box sx={nameRowSx(customTheme)}>
+            <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+              {item.name}
+            </Typography>
+          </Box>
+        )}
 
         {item.subtype === "quirk" && (
           <>
@@ -734,11 +861,24 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
                   borderBottom: `1px solid ${customTheme.secondary}`,
                 }}
               >
-                <Typography
-                  variant="body2"
-                  sx={{ fontStyle: "italic", color: "text.secondary" }}
-                >
-                  {item.description}
+                <Typography variant="body2" component="div" sx={{ color: "text.secondary" }}>
+                  <StyledMarkdown
+                    allowedElements={["strong", "em", "p", "ul", "ol", "li", "br"]}
+                    unwrapDisallowed
+                    components={{
+                      p: ({ node: _node, ...props }) => (
+                        <p style={{ margin: 0 }} {...props} />
+                      ),
+                      ul: ({ node: _node, ...props }) => (
+                        <ul style={{ margin: 0, paddingLeft: "1.25em" }} {...props} />
+                      ),
+                      ol: ({ node: _node, ...props }) => (
+                        <ol style={{ margin: 0, paddingLeft: "1.25em" }} {...props} />
+                      ),
+                    }}
+                  >
+                    {item.description}
+                  </StyledMarkdown>
                 </Typography>
               </Box>
             )}
@@ -757,19 +897,6 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
 
         {item.subtype === "camp-activities" && (
           <>
-            {item.targetDescription && (
-              <Box
-                sx={{
-                  px: 2,
-                  py: "5px",
-                  borderBottom: `1px solid ${customTheme.secondary}`,
-                }}
-              >
-                <Typography variant="body2">
-                  <strong>{t("Target")}:</strong> {item.targetDescription}
-                </Typography>
-              </Box>
-            )}
             {item.effect && (
               <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
                 <StyledMarkdown

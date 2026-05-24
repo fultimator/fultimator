@@ -317,16 +317,17 @@ function renderSpellContent(spell, setPlayer, searchQuery, highlightMatchFn) {
       return (
         <SpellDefault
           spellName={highlightMatchFn(spell.name, searchQuery)}
-          mp={spell.mp}
+          mp={spell.cost?.amount}
+          perTarget={spell.cost?.perTarget ?? true}
           maxTargets={spell.maxTargets}
-          targetDesc={spell.targetDesc}
+          targetDescription={spell.targetDescription}
           duration={spell.duration}
           description={highlightMatchFn(spell.description, searchQuery)}
           isEditMode={false}
           isOffensive={spell.isOffensive}
           isMagisphere={spell.isMagisphere || false}
-          attr1={spell.attr1}
-          attr2={spell.attr2}
+          attr1={spell.accuracy?.attr1}
+          attr2={spell.accuracy?.attr2}
         />
       );
     case "gamble":

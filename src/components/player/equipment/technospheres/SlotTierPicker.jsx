@@ -44,7 +44,7 @@ export default function SlotTierPicker({
             title={
               <Box>
                 <div>
-                  {tier.label} — {tier.slots} slot{tier.slots > 1 ? "s" : ""},
+                  {tier.label} - {tier.slots} slot{tier.slots > 1 ? "s" : ""},
                   max {tier.mnemoMax} mnemosphere{tier.mnemoMax > 1 ? "s" : ""}
                 </div>
                 <div>{tier.costLabel}</div>

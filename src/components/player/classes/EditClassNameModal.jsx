@@ -1,4 +1,3 @@
-// EditClassNameModal.js
 import React from "react";
 import {
   Dialog,
@@ -11,6 +10,8 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
+import FuidField from "../../common/FuidField";
+import { slugify } from "../../../libs/slugify";
 
 export default function EditClassNameModal({
   open,
@@ -18,6 +19,9 @@ export default function EditClassNameModal({
   onSave,
   className,
   setClassName,
+  classFuid,
+  setClassFuid,
+  isHomebrew,
 }) {
   const { t } = useTranslate();
 
@@ -55,11 +59,20 @@ export default function EditClassNameModal({
         <Close />
       </IconButton>
       <DialogContent>
+        <FuidField
+          value={classFuid}
+          name={className}
+          onChange={setClassFuid}
+          disabled={!isHomebrew}
+        />
         <TextField
           fullWidth
           label={t("Class Name")}
           value={className}
           onChange={(e) => setClassName(e.target.value)}
+          onBlur={() => {
+            if (!classFuid) setClassFuid(slugify(className));
+          }}
           slotProps={{
             htmlInput: { maxLength: 50 },
           }}

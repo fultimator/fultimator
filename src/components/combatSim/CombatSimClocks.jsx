@@ -29,6 +29,114 @@ import Clock from "../player/playerSheet/Clock";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
+import { useClock } from "../../hooks/useClock";
+
+function CombatClock({ clock, index, onUpdate, onRemove, onReset, addLog }) {
+  const { logClockCurrentState } =
+    useCombatSimSettingsStore.getState().settings;
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
+
+  const { filledCount, set, increment, decrement } = useClock(
+    clock.sections,
+    clock.state,
+    (newState) => onUpdate(index, newState),
+  );
+
+  const logCurrentClock = () => {
+    if (logClockCurrentState) {
+      addLog("combat_sim_log_clock_current_state", "--isClock--", {
+        name: clock.name,
+        current: filledCount,
+        max: clock.sections,
+      });
+    }
+  };
+
+  return (
+    <Paper
+      sx={{
+        p: 2,
+        position: "relative",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          display: "flex",
+          gap: 0.5,
+        }}
+      >
+        <Tooltip title={t("Decrement")}>
+          <IconButton size="small" onClick={decrement}>
+            <RemoveCircleOutlined fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("clocks_reset_tooltip")}>
+          <IconButton
+            size="small"
+            onClick={() => onReset(index)}
+            sx={{ mr: 0.5 }}
+          >
+            <RestartAlt fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("Increment")}>
+          <IconButton size="small" onClick={increment}>
+            <Add fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t("clocks_remove_tooltip")}>
+          <IconButton
+            size="small"
+            onClick={() => onRemove(index)}
+            color="error"
+          >
+            <RemoveCircleOutlined fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Box sx={{ position: "absolute", left: 8, bottom: 8 }}>
+        <Tooltip title={t("combat_sim_clock_log_button")}>
+          <IconButton
+            size="small"
+            onClick={logCurrentClock}
+            color={isDarkMode ? "secondary" : "primary"}
+          >
+            <AccessTime fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Typography
+        variant="subtitle1"
+        sx={{
+          mb: 2,
+          fontWeight: "medium",
+          textAlign: "center",
+          mt: 1,
+        }}
+      >
+        {clock.name}
+      </Typography>
+      <Clock
+        numSections={clock.sections}
+        size={140}
+        state={clock.state}
+        setState={set}
+        isCharacterSheet={false}
+      />
+      <Typography variant="caption" sx={{ mt: 1, color: "text.secondary" }}>
+        {filledCount}/{clock.sections}
+      </Typography>
+    </Paper>
+  );
+}
 
 export default function CombatSimClocks({
   open,
@@ -50,9 +158,6 @@ export default function CombatSimClocks({
   const isMaxClocksReached = clocks.length >= 9;
   const isButtonDisabled = isClockNameEmpty || isMaxClocksReached;
   const shouldShowTooltip = isClockNameEmpty && !isMaxClocksReached;
-
-  const { logClockCurrentState } =
-    useCombatSimSettingsStore.getState().settings;
 
   useEffect(() => {
     if (clocks.length === 0) {
@@ -89,30 +194,6 @@ export default function CombatSimClocks({
     setClockSections(4);
   };
 
-  const handleClockStateChange = (index, newState) => {
-    onUpdate(index, newState);
-  };
-
-  const incrementClock = (index, clock) => {
-    const currentFilled = clock.state.filter(Boolean).length;
-    if (currentFilled < clock.sections) {
-      const newState = new Array(clock.sections).fill(false);
-      for (let i = 0; i <= currentFilled; i++) {
-        newState[i] = true;
-      }
-      onUpdate(index, newState);
-    }
-  };
-
-  const decrementClock = (index, clock) => {
-    const currentFilled = clock.state.filter(Boolean).length;
-    if (currentFilled > 0) {
-      const newState = [...clock.state];
-      newState[currentFilled - 1] = false;
-      onUpdate(index, newState);
-    }
-  };
-
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
@@ -120,17 +201,6 @@ export default function CombatSimClocks({
   const handleClose = () => {
     setExpanded(false);
     onClose();
-  };
-
-  const logCurrentClock = (index) => {
-    const clock = clocks[index];
-    if (logClockCurrentState) {
-      addLog("combat_sim_log_clock_current_state", "--isClock--", {
-        name: clock.name,
-        current: clock.state.filter(Boolean).length,
-        max: clock.sections,
-      });
-    }
   };
 
   return (
@@ -273,98 +343,14 @@ export default function CombatSimClocks({
                         md: 4,
                       }}
                     >
-                      <Paper
-                        sx={{
-                          p: 2,
-                          position: "relative",
-                          height: "100%",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            right: 8,
-                            top: 8,
-                            display: "flex",
-                            gap: 0.5,
-                          }}
-                        >
-                          <Tooltip title={t("Decrement")}>
-                            <IconButton
-                              size="small"
-                              onClick={() => decrementClock(index, clock)}
-                            >
-                              <RemoveCircleOutlined fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t("clocks_reset_tooltip")}>
-                            <IconButton
-                              size="small"
-                              onClick={() => onReset(index)}
-                              sx={{ mr: 0.5 }}
-                            >
-                              <RestartAlt fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t("Increment")}>
-                            <IconButton
-                              size="small"
-                              onClick={() => incrementClock(index, clock)}
-                            >
-                              <Add fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t("clocks_remove_tooltip")}>
-                            <IconButton
-                              size="small"
-                              onClick={() => onRemove(index)}
-                              color="error"
-                            >
-                              <RemoveCircleOutlined fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                        <Box sx={{ position: "absolute", left: 8, bottom: 8 }}>
-                          <Tooltip title={t("combat_sim_clock_log_button")}>
-                            <IconButton
-                              size="small"
-                              onClick={() => logCurrentClock(index)}
-                              color={isDarkMode ? "secondary" : "primary"}
-                            >
-                              <AccessTime fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                        <Typography
-                          variant="subtitle1"
-                          sx={{
-                            mb: 2,
-                            fontWeight: "medium",
-                            textAlign: "center",
-                            mt: 1,
-                          }}
-                        >
-                          {clock.name}
-                        </Typography>
-                        <Clock
-                          numSections={clock.sections}
-                          size={140}
-                          state={clock.state}
-                          setState={(newState) =>
-                            handleClockStateChange(index, newState)
-                          }
-                          isCharacterSheet={false}
-                        />
-                        <Typography
-                          variant="caption"
-                          sx={{ mt: 1, color: "text.secondary" }}
-                        >
-                          {clock.state.filter(Boolean).length}/{clock.sections}
-                        </Typography>
-                      </Paper>
+                      <CombatClock
+                        clock={clock}
+                        index={index}
+                        onUpdate={onUpdate}
+                        onRemove={onRemove}
+                        onReset={onReset}
+                        addLog={addLog}
+                      />
                     </Grid>
                   ))}
                 </Grid>

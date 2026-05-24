@@ -8,15 +8,21 @@ import {
   Grid,
   TextField,
   FormControl,
+  InputLabel,
   ToggleButton,
   Select,
   MenuItem,
+  ListItemText,
+  Box,
   IconButton,
   FormControlLabel,
   Switch,
+  Tooltip,
   Autocomplete,
 } from "@mui/material";
 import attributes from "../../../libs/attributes";
+import types from "../../../libs/types";
+import { TypeIcon } from "../../types";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { OffensiveSpellIcon } from "../../icons";
@@ -40,11 +46,6 @@ export default function SpellDefaultModal({
   } = useDeleteConfirmation({
     onConfirm: () => {},
   });
-  const [inputDuration, setInputDuration] = useState(
-    editedSpell.duration || "",
-  );
-  const [inputTarget, setInputTarget] = useState(editedSpell.targetDesc || "");
-
   const duration = [t("Scene"), t("Instantaneous"), t("Special")];
 
   const target = [
@@ -58,49 +59,47 @@ export default function SpellDefaultModal({
     t("Special"),
   ];
 
-  // useEffect(() => {
-  //   setEditedSpell(spell || {});
-  // }, [spell]);
-
   useEffect(() => {
     if (spell) {
       setEditedSpell(spell || {});
-      setInputDuration(spell.duration || "");
-      setInputTarget(spell.targetDesc || "");
     }
   }, [spell]);
 
+  const singleTargetDescriptions = [
+    t("One creature"),
+    t("Self"),
+    t("One equipped weapon"),
+  ];
+
   const handleChange = (field, value) => {
-    setEditedSpell((prev) => ({ ...prev, [field]: value }));
+    setEditedSpell((prev) => {
+      const next = { ...prev, [field]: value };
+      if (field === "targetDescription") {
+        if (singleTargetDescriptions.includes(value)) {
+          next.cost = {
+            ...(prev.cost ?? { resource: "mp", amount: 0 }),
+            perTarget: false,
+          };
+        } else if (value.startsWith(t("Up to"))) {
+          next.cost = {
+            ...(prev.cost ?? { resource: "mp", amount: 0 }),
+            perTarget: true,
+          };
+        }
+      }
+      return next;
+    });
   };
 
   const handleSave = () => {
     onSave(spell.index, editedSpell);
-  };
-  const handleDurationChange = (event, newValue) => {
-    setInputDuration(newValue);
-    handleChange("duration", newValue);
-  };
-
-  const handleDurationInputChange = (event, newValue) => {
-    setInputDuration(newValue);
-    handleChange("duration", newValue);
-  };
-
-  const handleTargetChange = (event, newValue) => {
-    setInputTarget(newValue);
-    handleChange("targetDesc", newValue);
-  };
-
-  const handleTargetInputChange = (event, newValue) => {
-    setInputTarget(newValue);
-    handleChange("targetDesc", newValue);
   };
 
   return (
     <Dialog
       open={open}
       onClose={onClose}
+      keepMounted={false}
       slotProps={{
         paper: {
           sx: {
@@ -175,16 +174,18 @@ export default function SpellDefaultModal({
               xs: 6,
               sm: 2,
             }}
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
             <TextField
               type="number"
-              label={t("MP x Target")}
+              label={editedSpell.cost?.perTarget ? t("MP x Target") : t("MP")}
               variant="outlined"
-              fullWidth
+              sx={{ flex: 1 }}
               value={
-                editedSpell.mp === null || editedSpell.mp === undefined
+                editedSpell.cost?.amount === null ||
+                editedSpell.cost?.amount === undefined
                   ? ""
-                  : editedSpell.mp.toString()
+                  : editedSpell.cost.amount.toString()
               }
               onChange={(e) => {
                 const value = e.target.value;
@@ -192,7 +193,13 @@ export default function SpellDefaultModal({
                   value === "" ||
                   (/^\d+$/.test(value) && +value >= 0 && +value <= 999)
                 ) {
-                  handleChange("mp", value === "" ? 0 : parseInt(value, 10));
+                  handleChange("cost", {
+                    ...(editedSpell.cost ?? {
+                      resource: "mp",
+                      perTarget: true,
+                    }),
+                    amount: value === "" ? 0 : parseInt(value, 10),
+                  });
                 }
               }}
               onBlur={(e) => {
@@ -202,9 +209,24 @@ export default function SpellDefaultModal({
                 } else if (value > 999) {
                   value = 999;
                 }
-                handleChange("mp", value);
+                handleChange("cost", {
+                  ...(editedSpell.cost ?? { resource: "mp", perTarget: true }),
+                  amount: value,
+                });
               }}
             />
+            <Tooltip title={t("Cost is per target hit")}>
+              <Switch
+                size="small"
+                checked={editedSpell.cost?.perTarget ?? true}
+                onChange={(e) =>
+                  handleChange("cost", {
+                    ...(editedSpell.cost ?? { resource: "mp", amount: 0 }),
+                    perTarget: e.target.checked,
+                  })
+                }
+              />
+            </Tooltip>
           </Grid>
           <Grid
             size={{
@@ -252,29 +274,23 @@ export default function SpellDefaultModal({
               sm: 6,
             }}
           >
-            {/* <TextField
-              label={t("Target Description")}
-              variant="outlined"
-              fullWidth
-              value={editedSpell.targetDesc || ""}
-              onChange={(e) => handleChange("targetDesc", e.target.value)}
-              inputProps={{ maxLength: 100 }}
-            /> */}
             <Autocomplete
-              id="target-autocomplete"
               options={target}
-              value={inputTarget}
-              onChange={handleTargetChange}
-              onInputChange={handleTargetInputChange}
+              value={editedSpell.targetDescription || ""}
+              onChange={(_, newValue) =>
+                handleChange("targetDescription", newValue ?? "")
+              }
+              onInputChange={(_, newValue) =>
+                handleChange("targetDescription", newValue)
+              }
               freeSolo
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label={t("Target Description")}
                   fullWidth
-                  slotProps={{
-                    htmlInput: { ...params.inputProps, maxLength: 100 },
-                  }}
+                  inputProps={{ ...params.inputProps, maxLength: 100 }}
+                  InputLabelProps={{ ...params.InputLabelProps, shrink: true }}
                 />
               )}
             />
@@ -285,84 +301,151 @@ export default function SpellDefaultModal({
               sm: 6,
             }}
           >
-            {/* <TextField
-              label={t("Duration")}
-              variant="outlined"
-              fullWidth
-              value={editedSpell.duration || ""}
-              onChange={(e) => handleChange("duration", e.target.value)}
-              inputProps={{ maxLength: 100 }}
-            /> */}
             <Autocomplete
-              id="duration-autocomplete"
               options={duration}
-              value={inputDuration}
-              onChange={handleDurationChange}
-              onInputChange={handleDurationInputChange}
+              value={editedSpell.duration || ""}
+              onChange={(_, newValue) =>
+                handleChange("duration", newValue ?? "")
+              }
+              onInputChange={(_, newValue) =>
+                handleChange("duration", newValue)
+              }
               freeSolo
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label={t("Duration")}
                   fullWidth
-                  slotProps={{
-                    htmlInput: { ...params.inputProps, maxLength: 50 },
-                  }}
+                  inputProps={{ ...params.inputProps, maxLength: 50 }}
+                  InputLabelProps={{ ...params.InputLabelProps, shrink: true }}
                 />
               )}
             />
           </Grid>
           {editedSpell.isOffensive ? (
             <>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 6,
-                }}
-              >
-                <Select
-                  fullWidth
-                  value={editedSpell.attr1 || "dexterity"}
-                  onChange={(e) => handleChange("attr1", e.target.value)}
-                >
-                  <MenuItem value={"dexterity"}>
-                    {attributes["dexterity"].shortcaps}
-                  </MenuItem>
-                  <MenuItem value={"insight"}>
-                    {attributes["insight"].shortcaps}
-                  </MenuItem>
-                  <MenuItem value={"might"}>
-                    {attributes["might"].shortcaps}
-                  </MenuItem>
-                  <MenuItem value={"will"}>
-                    {attributes["will"].shortcaps}
-                  </MenuItem>
-                </Select>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <FormControl fullWidth>
+                  <InputLabel>{t("Attr 1")}</InputLabel>
+                  <Select
+                    value={editedSpell.accuracy?.attr1 || "insight"}
+                    label={t("Attr 1")}
+                    onChange={(e) =>
+                      handleChange("accuracy", {
+                        ...(editedSpell.accuracy ?? {
+                          attr2: "will",
+                          value: 0,
+                          defense: "mdef",
+                        }),
+                        attr1: e.target.value,
+                      })
+                    }
+                  >
+                    {Object.keys(attributes).map((a) => (
+                      <MenuItem key={a} value={a}>
+                        {attributes[a].shortcaps}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 6,
-                }}
-              >
-                <Select
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <FormControl fullWidth>
+                  <InputLabel>{t("Attr 2")}</InputLabel>
+                  <Select
+                    value={editedSpell.accuracy?.attr2 || "will"}
+                    label={t("Attr 2")}
+                    onChange={(e) =>
+                      handleChange("accuracy", {
+                        ...(editedSpell.accuracy ?? {
+                          attr1: "insight",
+                          value: 0,
+                          defense: "mdef",
+                        }),
+                        attr2: e.target.value,
+                      })
+                    }
+                  >
+                    {Object.keys(attributes).map((a) => (
+                      <MenuItem key={a} value={a}>
+                        {attributes[a].shortcaps}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <TextField
+                  type="number"
+                  label={t("Damage")}
                   fullWidth
-                  value={editedSpell.attr2 || "dexterity"}
-                  onChange={(e) => handleChange("attr2", e.target.value)}
-                >
-                  <MenuItem value={"dexterity"}>
-                    {attributes["dexterity"].shortcaps}
-                  </MenuItem>
-                  <MenuItem value={"insight"}>
-                    {attributes["insight"].shortcaps}
-                  </MenuItem>
-                  <MenuItem value={"might"}>
-                    {attributes["might"].shortcaps}
-                  </MenuItem>
-                  <MenuItem value={"will"}>
-                    {attributes["will"].shortcaps}
-                  </MenuItem>
-                </Select>
+                  value={editedSpell.damage?.value ?? ""}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    handleChange("damage", {
+                      ...(editedSpell.damage ?? {
+                        type: "physical",
+                        hrZero: false,
+                      }),
+                      value: isNaN(val) ? 0 : val,
+                    });
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 3 }}>
+                <FormControl fullWidth>
+                  <InputLabel>{t("Damage Type")}</InputLabel>
+                  <Select
+                    value={editedSpell.damage?.type ?? "physical"}
+                    label={t("Damage Type")}
+                    onChange={(e) =>
+                      handleChange("damage", {
+                        ...(editedSpell.damage ?? { value: 0, hrZero: false }),
+                        type: e.target.value,
+                      })
+                    }
+                  >
+                    {Object.keys(types).map((dmg) => (
+                      <MenuItem
+                        key={dmg}
+                        value={dmg}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          paddingY: "6px",
+                        }}
+                      >
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <TypeIcon type={dmg} />
+                          <ListItemText sx={{ textTransform: "capitalize" }}>
+                            {types[dmg].long}
+                          </ListItemText>
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={editedSpell.damage?.hrZero === true}
+                      onChange={(e) =>
+                        handleChange("damage", {
+                          ...(editedSpell.damage ?? {
+                            value: 0,
+                            type: "physical",
+                          }),
+                          hrZero: e.target.checked,
+                        })
+                      }
+                    />
+                  }
+                  label="HR0"
+                />
               </Grid>
             </>
           ) : null}

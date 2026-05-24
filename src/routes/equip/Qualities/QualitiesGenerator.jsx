@@ -14,7 +14,7 @@ import CopyToClipboard from "../../../components/common/CopyToClipboard";
 
 const damageTypes = [
   "physical",
-  "wind",
+  "air",
   "bolt",
   "dark",
   "earth",

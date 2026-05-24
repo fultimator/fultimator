@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   IconButton,
   Box,
   Tabs,
@@ -15,19 +16,18 @@ import {
   Select,
   MenuItem,
   ToggleButton,
+  ToggleButtonGroup,
   Autocomplete,
   Chip,
-  OutlinedInput,
   Button,
   Stack,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Tooltip,
-  Divider,
-  ListSubheader,
   FormControlLabel,
   Checkbox,
+  Switch,
 } from "@mui/material";
 import {
   Add,
@@ -38,23 +38,16 @@ import {
 import DownloadIcon from "@mui/icons-material/Download";
 import LinkIcon from "@mui/icons-material/Link";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { OffensiveSpellIcon } from "../icons";
+import { OffensiveSpellIcon, Martial } from "../icons";
 import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import { useEquipmentForm } from "../player/common/hooks/useEquipmentForm";
 import { calculateCustomWeaponStats } from "../player/common/playerCalculations";
 import types from "../../libs/types";
-import classList from "../../libs/classes";
-import spellClassesList from "../../libs/spellClasses";
-import specialSkillsList from "../../libs/skills";
 import weapons from "../../libs/weapons";
-import weaponCategories from "../../libs/weaponCategories";
 import armor from "../../libs/armor";
 import shields from "../../libs/shields";
-import weaponQualities from "../../routes/equip/weapons/qualities";
-import armorShieldQualities from "../../routes/equip/ArmorShield/qualities";
 import {
   SharedSpellCard,
   SharedPlayerSpellCard,
@@ -94,6 +87,7 @@ import CustomTextarea from "../common/CustomTextarea";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { availableFrames } from "../../libs/pilotVehicleData";
 import { availableMagichantKeys } from "../player/spells/spellOptionData";
+import CompendiumViewerModal from "./CompendiumViewerModal";
 import {
   buildMnemosphere,
   getMnemosphereCost,
@@ -101,37 +95,93 @@ import {
   mnemosphereClassList,
 } from "../../libs/mnemospheres";
 
-import ChangeWeaponBase from "../../routes/equip/weapons/ChangeBase";
-import ChangeArmorBase from "../player/equipment/armor/ChangeBase";
-import ChangeShieldBase from "../player/equipment/shields/ChangeBase";
-import ChangeMartial from "../../routes/equip/common/ChangeMartial";
-import ChangeName from "../../routes/equip/common/ChangeName";
-import ChangeType from "../../routes/equip/weapons/ChangeType";
-import ChangeHands from "../../routes/equip/weapons/ChangeHands";
-import ChangeAttr from "../../routes/equip/weapons/ChangeAttr";
-import SelectWeaponQuality from "../../routes/equip/weapons/SelectQuality";
-import SelectArmorQuality from "../../routes/equip/ArmorShield/SelectQuality";
-import ChangeQuality from "../../routes/equip/common/ChangeQuality";
-import ChangeBonus from "../../routes/equip/weapons/ChangeBonus";
-import ApplyRework from "../../routes/equip/common/ApplyRework";
-import ChangeCategory from "../player/equipment/weapons/ChangeCategory";
-import ChangeModifiers from "../player/equipment/ChangeModifiers";
-
-// Custom weapon / accessory sub-components
-import ChangeCWCategory from "../../routes/equip/customWeapons/ChangeCategory";
-import ChangeRange from "../../routes/equip/customWeapons/ChangeRange";
-import ChangeAccuracyCheck from "../../routes/equip/customWeapons/ChangeAccuracyCheck";
-import ChangeCWType from "../../routes/equip/customWeapons/ChangeType";
-import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
-import SelectAccessoryQuality from "../../routes/equip/Accessories/SelectQuality";
-import accessoryQualities from "../../routes/equip/Accessories/qualities";
+import { TypeIcon } from "../types";
 import {
   categories as cwCategories,
-  range as cwRange,
   accuracyChecks as cwAccuracyChecks,
-  customizations as cwCustomizations,
-  types as cwTypes,
 } from "../../routes/equip/customWeapons/libs.jsx";
+import {
+  getWeaponAttr1,
+  getWeaponAttr2,
+  getWeaponPrec,
+  getWeaponRange,
+  getWeaponType,
+  normalizeCustomWeaponLike,
+  normalizeWeaponLike,
+  calcWeaponCost,
+  calcWeaponDamage,
+  calcWeaponPrec,
+} from "../../libs/weaponNormalization";
+import { validateWeaponPersisted } from "../../forms/schema/itemSchemas/weapon";
+import { validateCustomWeaponPersisted } from "../../forms/schema/itemSchemas/customWeapon";
+import { itemFormRegistry } from "../../forms/registry";
+import {
+  QUICK_CREATE_TAB_KEYS,
+  VIEWER_TYPE_TO_TAB_KEY,
+} from "./quickCreateTabKeys";
+
+const REG = itemFormRegistry;
+import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import {
+  weaponFieldConfig,
+  weaponGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/weapon";
+import {
+  armorFieldConfig,
+  armorGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/armor";
+import FuidField from "../common/FuidField";
+import {
+  shieldFieldConfig,
+  shieldGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/shield";
+import {
+  accessoryFieldConfig,
+  accessoryGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/accessory";
+import {
+  customWeaponFieldConfig,
+  customWeaponGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/customWeapon";
+import {
+  npcActionFieldConfig,
+  npcActionGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAction";
+import {
+  npcSpecialFieldConfig,
+  npcSpecialGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpecial";
+import {
+  npcAttackFieldConfig,
+  npcAttackGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcAttack";
+import {
+  npcSpellFieldConfig,
+  npcSpellGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/npcSpell";
+import {
+  qualityFieldConfig,
+  qualityGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/quality";
+import { playerSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/playerSpell";
+import {
+  heroicFieldConfig,
+  heroicGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/heroic";
+import {
+  classFieldConfig,
+  classGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/class";
+import {
+  hoplosphereFieldConfig,
+  hoplosphereGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/hoplosphere";
+import {
+  optionalFieldConfig,
+  optionalGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/optional";
+import { createDefaultStateFromFields } from "../../forms/registry/helpers";
+import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
 
 // Shared constants
 const slugify = (value = "") =>
@@ -141,92 +191,162 @@ const slugify = (value = "") =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const ATTRS = [
-  { value: "dexterity", label: "DEX" },
-  { value: "insight", label: "INS" },
-  { value: "might", label: "MIG" },
-  { value: "will", label: "WLP" },
-];
-const ATTRIBUTE_OPTIONS = ATTRS.map((attr) => attr.value);
-
-function isValidAttribute(value) {
-  return ATTRIBUTE_OPTIONS.includes(value);
+function createMetaFromBook(bookValue = "homebrew") {
+  const book = String(bookValue ?? "").trim() || "homebrew";
+  return {
+    book,
+    page: undefined,
+    bookName: "",
+    isOfficial: deriveIsOfficial(book),
+  };
 }
 
-function normalizeCustomWeaponAccuracyCheck(
-  value,
-  fallback = cwAccuracyChecks[0],
-) {
-  const att1 = Array.isArray(value) ? value[0] : value?.att1;
-  const att2 = Array.isArray(value) ? value[1] : value?.att2;
-  if (isValidAttribute(att1) && isValidAttribute(att2)) {
-    return { att1, att2 };
+function isPlainObject(value) {
+  return value != null && typeof value === "object" && !Array.isArray(value);
+}
+
+function mergeImportedIntoDefaults(defaultState, imported) {
+  if (Array.isArray(imported)) return [...imported];
+  if (!isPlainObject(imported)) return imported;
+  const base = isPlainObject(defaultState) ? { ...defaultState } : {};
+  for (const [key, value] of Object.entries(imported)) {
+    const existing = base[key];
+    if (Array.isArray(value)) {
+      base[key] = [...value];
+    } else if (isPlainObject(value)) {
+      base[key] = mergeImportedIntoDefaults(existing, value);
+    } else {
+      base[key] = value;
+    }
   }
-  return fallback;
+  return base;
 }
 
-function findCustomWeaponPresetAccuracyCheck(value) {
-  const normalized = normalizeCustomWeaponAccuracyCheck(value);
-  return (
-    cwAccuracyChecks.find(
-      (check) =>
-        check.att1 === normalized.att1 && check.att2 === normalized.att2,
-    ) ?? null
-  );
+function stripPrivateFields(value) {
+  if (Array.isArray(value)) return value.map(stripPrivateFields);
+  if (!isPlainObject(value)) return value;
+  const next = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (key.startsWith("_")) continue;
+    next[key] = stripPrivateFields(entry);
+  }
+  return next;
 }
 
-function hasAccurateCustomization(customizationList) {
-  return (customizationList ?? []).some(
-    (customization) => customization.name === "weapon_customization_accurate",
-  );
+function translateFlatState(state) {
+  const result = {};
+  for (const [key, value] of Object.entries(state)) {
+    if (typeof value === "string" && value) {
+      result[key] = staticT(value);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
 }
 
-const DURATION_OPTIONS = ["Scene", "Instantaneous", "Special"];
-const TARGET_OPTIONS = [
-  "Self",
-  "One creature",
-  "Up to two creatures",
-  "Up to three creatures",
-  "Up to four creatures",
-  "Up to five creatures",
-  "One equipped weapon",
-  "Special",
-];
+function importIntoSchemaForm(
+  fieldConfig,
+  setFormState,
+  item,
+  transform = null,
+  { translate = false } = {},
+) {
+  const defaults = createDefaultStateFromFields(fieldConfig);
+  const prepared = stripPrivateFields(transform ? transform(item) : item);
+  const merged = mergeImportedIntoDefaults(defaults, prepared);
+  setFormState(translate ? translateFlatState(merged) : merged);
+}
 
-const QUALITY_CATEGORIES = ["Offensive", "Defensive", "Enhancement"];
-const FILTER_OPTIONS = [
-  { label: "Weapons", value: "weapon" },
-  { label: "Custom Weapons", value: "customWeapon" },
-  { label: "Armor", value: "armor" },
-  { label: "Shields", value: "shield" },
-  { label: "Accessories", value: "accessory" },
-];
+const QUICK_CREATE_TAB_TO_VIEWER_TYPE = {
+  "npc-attack": "attacks",
+  "npc-spell": "spells",
+  "npc-special": "special",
+  "npc-action": "actions",
+  "player-spell": "player-spells",
+  quality: "qualities",
+  heroic: "heroics",
+  class: "classes",
+  mnemosphere: "mnemospheres",
+  hoplosphere: "hoplospheres",
+  weapon: "weapons",
+  "custom-weapon": "custom-weapons",
+  armor: "armor",
+  shield: "shields",
+  accessory: "accessories",
+  optional: "optionals",
+};
 
-const HEROIC_BOOK_OPTIONS = [
-  "core",
-  "rework",
-  "bonus",
-  "high",
-  "techno",
-  "natural",
-];
+const customWeaponQualityGroups = Object.entries(
+  qualities
+    .filter(
+      (q) => q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+    )
+    .filter(
+      (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
+    )
+    .reduce((acc, q) => {
+      const key = q.category || "Uncategorized";
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(q);
+      return acc;
+    }, {}),
+).map(([category, qs]) => ({
+  header: category,
+  options: qs.map((q) => ({
+    value: q.name,
+    label: `${q.name} (${q.cost}z)`,
+  })),
+}));
 
-const GROUPED_SPECIAL_SKILLS = specialSkillsList.reduce((acc, skill) => {
-  if (!acc[skill.class]) acc[skill.class] = [];
-  acc[skill.class].push(skill);
-  return acc;
-}, {});
-const CLASS_BOOK_SUGGESTIONS = [
-  "core",
-  "rework",
-  "bonus",
-  "high",
-  "techno",
-  "natural",
-  "homebrew",
-];
-const CLASS_NAME_OPTIONS = classList.map((c) => c.name);
+function localizeImportedClassItem(item) {
+  if (!item || typeof item !== "object") return item;
+  const next = { ...item };
+  if (Array.isArray(next.skills)) {
+    next.skills = next.skills.map((skill) =>
+      skill && typeof skill === "object"
+        ? {
+            ...skill,
+            description:
+              typeof skill.description === "string"
+                ? staticT(skill.description, null, true)
+                : skill.description,
+          }
+        : skill,
+    );
+  }
+  if (
+    next.benefits &&
+    typeof next.benefits === "object" &&
+    Array.isArray(next.benefits.custom)
+  ) {
+    next.benefits = {
+      ...next.benefits,
+      custom: next.benefits.custom.map((entry) =>
+        typeof entry === "string" ? staticT(entry, null, true) : entry,
+      ),
+    };
+  }
+  return next;
+}
 
+function normalizeImportedNpcSpellItem(item) {
+  if (!item || typeof item !== "object") return item;
+  const next = { ...item };
+  if (typeof next.effect === "string" && next.effect.trim()) return next;
+  if (Array.isArray(next.special) && typeof next.special[0] === "string") {
+    next.effect = next.special[0].trim();
+    return next;
+  }
+  if (typeof next.special === "string" && next.special.trim()) {
+    next.effect = next.special.trim();
+    return next;
+  }
+  if (typeof next.description === "string" && next.description.trim()) {
+    next.effect = next.description.trim();
+  }
+  return next;
+}
 // Only classes that use standard spells (spellType: "default")
 const STANDARD_SPELL_CLASSES = [
   "Chimerist",
@@ -236,6 +356,22 @@ const STANDARD_SPELL_CLASSES = [
   "Spiritist",
 ];
 const spellClasses = STANDARD_SPELL_CLASSES;
+const QuickCreateImportContext = React.createContext(null);
+
+function useQuickCreateImport() {
+  const ctx = React.useContext(QuickCreateImportContext);
+  if (!ctx)
+    throw new Error(
+      "useQuickCreateImport must be used within QuickCreateImportContext",
+    );
+  return ctx;
+}
+
+const QuickCreateSubtypeContext = React.createContext(null);
+
+function useQuickCreateSubtype() {
+  return React.useContext(QuickCreateSubtypeContext);
+}
 
 // Shared panel layout
 
@@ -272,7 +408,7 @@ function PanelLayout({
             md: 6,
           }}
         >
-          <Stack spacing={2}>
+          <Stack spacing={1}>
             <Box ref={previewRef}>{previewContent}</Box>
             <Box
               sx={{
@@ -317,455 +453,86 @@ function PanelLayout({
 
 function NpcAttackPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [range, setRange] = useState("melee");
-  const [attr1, setAttr1] = useState("dexterity");
-  const [attr2, setAttr2] = useState("dexterity");
-  const [dmgType, setDmgType] = useState("physical");
-  const [special, setSpecial] = useState("");
-  const [flathit, setFlathit] = useState(0);
-  const [flatdmg, setFlatdmg] = useState(0);
-
+  const { openImport } = useQuickCreateImport();
+  const buildState = () => createDefaultStateFromFields(npcAttackFieldConfig);
+  const [formState, setFormState] = useState(() => buildState());
   const data = {
-    itemType: "basic",
-    name: name.trim(),
-    range,
-    attr1,
-    attr2,
-    type: dmgType,
-    flathit: Number(flathit),
-    flatdmg: Number(flatdmg),
-    martial: false,
-    category: range === "melee" ? "Melee Attack" : "Ranged Attack",
-    special: special.trim() ? [special.trim()] : [],
+    ...formState,
+    name: String(formState.name ?? "").trim(),
+    fuid: formState.fuid || undefined,
   };
 
   const handleClear = () => {
-    setName("");
-    setRange("melee");
-    setAttr1("dexterity");
-    setAttr2("dexterity");
-    setDmgType("physical");
-    setSpecial("");
-    setFlathit(0);
-    setFlatdmg(0);
-  };
-
-  return (
-    <>
-      <PanelLayout
-        data={data}
-        itemName={data.name || ""}
-        formContent={
-          <Grid container spacing={2}>
-            <Grid size={12}>
-              <TextField
-                label={t("Name")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                fullWidth
-                size="small"
-                autoFocus
-              />
-            </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Range")}</InputLabel>
-                <Select
-                  value={range}
-                  label={t("Range")}
-                  onChange={(e) => setRange(e.target.value)}
-                >
-                  <MenuItem value="melee">{t("Melee")}</MenuItem>
-                  <MenuItem value="distance">{t("Distance")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                sm: 3,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Attr 1")}</InputLabel>
-                <Select
-                  value={attr1}
-                  label={t("Attr 1")}
-                  onChange={(e) => setAttr1(e.target.value)}
-                >
-                  {ATTRS.map((a) => (
-                    <MenuItem key={a.value} value={a.value}>
-                      {a.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                sm: 3,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Attr 2")}</InputLabel>
-                <Select
-                  value={attr2}
-                  label={t("Attr 2")}
-                  onChange={(e) => setAttr2(e.target.value)}
-                >
-                  {ATTRS.map((a) => (
-                    <MenuItem key={a.value} value={a.value}>
-                      {a.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Damage Type")}</InputLabel>
-                <Select
-                  value={dmgType}
-                  label={t("Damage Type")}
-                  onChange={(e) => setDmgType(e.target.value)}
-                >
-                  {Object.keys(types).map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {types[type].long}
-                    </MenuItem>
-                  ))}
-                  <MenuItem value="nodmg">{t("No Damage")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                label={t("Accuracy Bonus")}
-                value={flathit}
-                onChange={(e) => setFlathit(e.target.value)}
-                fullWidth
-                size="small"
-                type="number"
-                slotProps={{
-                  htmlInput: { min: 0 },
-                }}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                label={t("Damage Bonus")}
-                value={flatdmg}
-                onChange={(e) => setFlatdmg(e.target.value)}
-                fullWidth
-                size="small"
-                type="number"
-                slotProps={{
-                  htmlInput: { min: 0 },
-                }}
-              />
-            </Grid>
-            <Grid size={12}>
-              <CustomTextarea
-                label={t("Special")}
-                value={special}
-                onChange={(e) => setSpecial(e.target.value)}
-                helperText=""
-                placeholder={t("Optional special effect description")}
-              />
-            </Grid>
-            <Grid size={12}>
-              <Button size="small" variant="outlined" onClick={handleClear}>
-                {t("Clear All Fields")}
-              </Button>
-            </Grid>
-          </Grid>
-        }
-        previewContent={<SharedAttackCard item={data} />}
-        addButton={<AddToCompendiumButton itemType="npc-attack" data={data} />}
-        exportDataType="attacks"
-      />
-    </>
-  );
-}
-
-// NPC Spell panel
-
-function NpcSpellPanel() {
-  const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [isOffensive, setIsOffensive] = useState(false);
-  const [mp, setMp] = useState("");
-  const [maxTargets, setMaxTargets] = useState("");
-  const [duration, setDuration] = useState("");
-  const [target, setTarget] = useState("");
-  const [range, setRange] = useState("melee");
-  const [attr1, setAttr1] = useState("dexterity");
-  const [attr2, setAttr2] = useState("dexterity");
-  const [dmgType, setDmgType] = useState("physical");
-  const [damage, setDamage] = useState("");
-  const [special, setSpecial] = useState("");
-
-  const data = {
-    itemType: "spell",
-    name: name.trim(),
-    type: isOffensive ? "offensive" : "",
-    damagetype: dmgType,
-    damage: isOffensive && damage !== "" ? Number(damage) : undefined,
-    mp: mp === "" ? undefined : Number(mp),
-    maxTargets: maxTargets === "" ? undefined : Number(maxTargets),
-    duration: duration || undefined,
-    target: target || undefined,
-    range,
-    attr1,
-    attr2,
-    special: special.trim() ? [special.trim()] : [],
-  };
-
-  const handleClear = () => {
-    setName("");
-    setIsOffensive(false);
-    setMp("");
-    setMaxTargets("");
-    setDuration("");
-    setTarget("");
-    setRange("melee");
-    setAttr1("dexterity");
-    setAttr2("dexterity");
-    setDmgType("physical");
-    setDamage("");
-    setSpecial("");
+    setFormState(buildState());
   };
 
   return (
     <PanelLayout
+      data={data}
+      itemName={data.name || ""}
       formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 10,
-              sm: 11,
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            label={t("NPC Attack")}
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-attack"],
+                  (item) =>
+                    importIntoSchemaForm(
+                      npcAttackFieldConfig,
+                      setFormState,
+                      item,
+                      null,
+                      { translate: true },
+                    ),
+                ),
             }}
-          >
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 2,
-              sm: 1,
-            }}
-          >
-            <ToggleButton
-              value="offensive"
-              selected={isOffensive}
-              onChange={() => setIsOffensive((v) => !v)}
-              size="small"
-              sx={{ width: "100%" }}
-            >
-              <OffensiveSpellIcon />
-            </ToggleButton>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <TextField
-              label={t("MP x Target")}
-              value={mp}
-              onChange={(e) => setMp(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <TextField
-              label={t("Max Targets")}
-              value={maxTargets}
-              onChange={(e) => setMaxTargets(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <Autocomplete
-              freeSolo
-              options={DURATION_OPTIONS.map(t)}
-              inputValue={duration}
-              onInputChange={(_, v) => setDuration(v)}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Duration")} size="small" />
-              )}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <Autocomplete
-              freeSolo
-              options={TARGET_OPTIONS.map(t)}
-              inputValue={target}
-              onInputChange={(_, v) => setTarget(v)}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Target")} size="small" />
-              )}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Range")}</InputLabel>
-              <Select
-                value={range}
-                label={t("Range")}
-                onChange={(e) => setRange(e.target.value)}
-              >
-                <MenuItem value="melee">{t("Melee")}</MenuItem>
-                <MenuItem value="distance">{t("Distance")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          {isOffensive && (
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Damage Type")}</InputLabel>
-                <Select
-                  value={dmgType}
-                  label={t("Damage Type")}
-                  onChange={(e) => setDmgType(e.target.value)}
-                >
-                  {Object.keys(types).map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {types[type].long}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
-          {isOffensive && (
-            <Grid
-              size={{
-                xs: 6,
-                sm: 3,
-              }}
-            >
-              <TextField
-                label={t("Damage")}
-                value={damage}
-                onChange={(e) => setDamage(e.target.value)}
-                fullWidth
-                size="small"
-                type="number"
-                slotProps={{
-                  htmlInput: { min: 0 },
-                }}
-              />
-            </Grid>
-          )}
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 1")}</InputLabel>
-              <Select
-                value={attr1}
-                label={t("Attr 1")}
-                onChange={(e) => setAttr1(e.target.value)}
-              >
-                {ATTRS.map((a) => (
-                  <MenuItem key={a.value} value={a.value}>
-                    {a.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              sm: 3,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Attr 2")}</InputLabel>
-              <Select
-                value={attr2}
-                label={t("Attr 2")}
-                onChange={(e) => setAttr2(e.target.value)}
-              >
-                {ATTRS.map((a) => (
-                  <MenuItem key={a.value} value={a.value}>
-                    {a.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Special")}
-              value={special}
-              onChange={(e) => setSpecial(e.target.value)}
-              helperText=""
-              placeholder={t("Spell effect description")}
-            />
-          </Grid>
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="accuracy"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="damage"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="effect"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcAttackFieldConfig}
+            groupLabels={npcAttackGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -773,15 +540,126 @@ function NpcSpellPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={
-        <SharedSpellCard
-          item={{ ...data, effect: data.special?.join("; ") ?? "" }}
+      previewContent={<SharedAttackCard item={data} />}
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG["npc-attack"].addItemType}
+          data={data}
         />
       }
-      addButton={<AddToCompendiumButton itemType="npc-spell" data={data} />}
+      exportDataType={REG["npc-attack"].exportDataType}
+    />
+  );
+}
+
+// NPC Spell panel
+
+function NpcSpellPanel() {
+  const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
+  const buildState = () => createDefaultStateFromFields(npcSpellFieldConfig);
+  const [formState, setFormState] = useState(() => buildState());
+  const data = {
+    ...formState,
+    name: String(formState.name ?? "").trim(),
+    fuid: formState.fuid || undefined,
+  };
+
+  const handleClear = () => {
+    setFormState(buildState());
+  };
+
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            label={t("NPC Spell")}
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-spell"],
+                  (item) =>
+                    importIntoSchemaForm(
+                      npcSpellFieldConfig,
+                      setFormState,
+                      item,
+                      normalizeImportedNpcSpellItem,
+                      { translate: true },
+                    ),
+                ),
+            }}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="accuracy"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="damage"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="details"
+            cols={2}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="effect"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcSpellFieldConfig}
+            groupLabels={npcSpellGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
+          <Grid size={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>
+              {t("Clear All Fields")}
+            </Button>
+          </Grid>
+        </Grid>
+      }
+      previewContent={<SharedSpellCard item={data} />}
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG["npc-spell"].addItemType}
+          data={data}
+        />
+      }
       data={data}
       itemName={data.name}
-      exportDataType="spells"
+      exportDataType={REG["npc-spell"].exportDataType}
     />
   );
 }
@@ -790,62 +668,64 @@ function NpcSpellPanel() {
 
 function NpcSpecialPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [effect, setEffect] = useState("");
-  const [spCost, setSpCost] = useState("");
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(npcSpecialFieldConfig),
+  );
 
-  const data = {
-    name: name.trim(),
-    effect: effect.trim(),
-    spCost: spCost === "" ? undefined : Number(spCost),
-  };
+  const data = { ...formState, fuid: formState.fuid || undefined };
 
   const handleClear = () => {
-    setName("");
-    setEffect("");
-    setSpCost("");
+    setFormState(createDefaultStateFromFields(npcSpecialFieldConfig));
   };
 
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 4,
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            label={t("Special Rule")}
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-special"],
+                  (item) =>
+                    importIntoSchemaForm(
+                      npcSpecialFieldConfig,
+                      setFormState,
+                      item,
+                      null,
+                      { translate: true },
+                    ),
+                ),
             }}
-          >
-            <TextField
-              label={t("SP Cost")}
-              value={spCost}
-              onChange={(e) => setSpCost(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Effect")}
-              value={effect}
-              onChange={(e) => setEffect(e.target.value)}
-              helperText=""
-            />
-          </Grid>
+          />
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcSpecialFieldConfig}
+            groupLabels={npcSpecialGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -854,10 +734,15 @@ function NpcSpecialPanel() {
         </Grid>
       }
       previewContent={<SharedSpecialRuleCard item={data} />}
-      addButton={<AddToCompendiumButton itemType="npc-special" data={data} />}
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG["npc-special"].addItemType}
+          data={data}
+        />
+      }
       data={data}
       itemName={data.name || ""}
-      exportDataType="special"
+      exportDataType={REG["npc-special"].exportDataType}
     />
   );
 }
@@ -866,62 +751,64 @@ function NpcSpecialPanel() {
 
 function NpcActionPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [effect, setEffect] = useState("");
-  const [spCost, setSpCost] = useState("");
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(npcActionFieldConfig),
+  );
 
-  const data = {
-    name: name.trim(),
-    effect: effect.trim(),
-    spCost: spCost === "" ? undefined : Number(spCost),
-  };
+  const data = { ...formState, fuid: formState.fuid || undefined };
 
   const handleClear = () => {
-    setName("");
-    setEffect("");
-    setSpCost("");
+    setFormState(createDefaultStateFromFields(npcActionFieldConfig));
   };
 
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 4,
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            label={t("Other Action")}
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["npc-action"],
+                  (item) =>
+                    importIntoSchemaForm(
+                      npcActionFieldConfig,
+                      setFormState,
+                      item,
+                      null,
+                      { translate: true },
+                    ),
+                ),
             }}
-          >
-            <TextField
-              label={t("SP Cost")}
-              value={spCost}
-              onChange={(e) => setSpCost(e.target.value)}
-              fullWidth
-              size="small"
-              type="number"
-              slotProps={{
-                htmlInput: { min: 0 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Effect")}
-              value={effect}
-              onChange={(e) => setEffect(e.target.value)}
-              helperText=""
-            />
-          </Grid>
+          />
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={npcActionFieldConfig}
+            groupLabels={npcActionGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -930,36 +817,45 @@ function NpcActionPanel() {
         </Grid>
       }
       previewContent={<SharedActionCard item={data} />}
-      addButton={<AddToCompendiumButton itemType="npc-action" data={data} />}
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG["npc-action"].addItemType}
+          data={data}
+        />
+      }
       data={data}
       itemName={data.name || ""}
-      exportDataType="actions"
+      exportDataType={REG["npc-action"].exportDataType}
     />
   );
 }
 
 // Player Spell panel
 
-const NON_STATIC_TYPES = [
-  { value: "default", label: "Standard Spell" },
-  { value: "gift", label: "Gift" },
-  { value: "dance", label: "Dance" },
-  { value: "therioform", label: "Therioform" },
-  { value: "magichant-key", label: "Key (Chanter)" },
-  { value: "magichant", label: "Tone (Chanter)" },
-  { value: "symbol", label: "Symbol" },
-  { value: "invocation", label: "Invocation" },
-  { value: "arcanist", label: "Arcanum" },
-  { value: "arcanist-rework", label: "Arcanum (Rework)" },
-  { value: "tinkerer-alchemy", label: "Alchemy" },
-  { value: "tinkerer-infusion", label: "Infusion" },
-  { value: "cooking", label: "Delicacy" },
-  { value: "magiseed", label: "Magiseed" },
-  { value: "pilot-vehicle", label: "Pilot Vehicle" },
-];
+const SPELL_TYPE_TO_CLASS = {
+  gift: "Esper",
+  dance: "Dancer",
+  therioform: "Mutant",
+  "magichant-key": "Chanter",
+  magichant: "Chanter",
+  symbol: "Symbolist",
+  invocation: "Invoker",
+  arcanist: "Arcanist",
+  "arcanist-rework": "Arcanist-Rework",
+  "tinkerer-alchemy": "Tinkerer",
+  "tinkerer-infusion": "Tinkerer",
+  cooking: "Gourmet",
+  magiseed: "Floralist",
+  "pilot-vehicle": "Pilot",
+};
 
-const WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
-const INV_TYPES = ["Blast", "Hex", "Utility"];
+const PILOT_MODULE_BASE_COST = {
+  armor: 500,
+  weapon: 500,
+  support: 1000,
+};
+
+// Pilot-vehicle constants (used by pilot JSX fallback)
 const PILOT_SUBTYPES = [
   { value: "frame", label: "Vehicle Frame" },
   { value: "armor", label: "Armor Module" },
@@ -988,69 +884,35 @@ const PILOT_DAMAGE_TYPES = [
   "Light",
   "Poison",
 ];
-const PILOT_ATTRS = ["dexterity", "insight", "might", "willpower"];
 const PILOT_RANGES = ["Melee", "Ranged"];
-const MAGICHANT_KEY_TYPES = Array.from(
-  new Set(availableMagichantKeys.map((k) => k.type).filter(Boolean)),
-);
-const MAGICHANT_KEY_STATUSES = Array.from(
-  new Set(availableMagichantKeys.map((k) => k.status).filter(Boolean)),
-);
-const MAGICHANT_KEY_ATTRIBUTES = Array.from(
-  new Set(availableMagichantKeys.map((k) => k.attribute).filter(Boolean)),
-);
-const MAGICHANT_KEY_RECOVERIES = Array.from(
-  new Set(availableMagichantKeys.map((k) => k.recovery).filter(Boolean)),
-);
+
+function buildPlayerSpellPayload(state) {
+  return (
+    REG["player-spell"].buildPayload?.(state, {
+      compendiumClasses: [],
+      compendiumItems: [],
+      affinityOptions: [],
+    }) ?? null
+  );
+}
 
 function PlayerSpellPanel() {
   const { t } = useTranslate();
-  const [spellType, setSpellType] = useState("default");
-  const [spellClass, setSpellClass] = useState(spellClasses[0] ?? "");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [isOffensive, setIsOffensive] = useState(false);
-  const [mp, setMp] = useState("");
-  const [maxTargets, setMaxTargets] = useState("1");
-  const [targetDesc, setTargetDesc] = useState("");
-  const [duration, setDuration] = useState("");
-  const [attr1, setAttr1] = useState("insight");
-  const [attr2, setAttr2] = useState("will");
-  const [damage, setDamage] = useState("");
-  const [damageType, setDamageType] = useState("physical");
-  // Non-static type fields
-  const [effect, setEffect] = useState("");
-  const [event, setEvent] = useState("");
-  const [genoclepsis, setGenoclepsis] = useState("");
-  const [keyType, setKeyType] = useState("");
-  const [keyStatus, setKeyStatus] = useState("");
-  const [keyAttribute, setKeyAttribute] = useState("");
-  const [keyRecovery, setKeyRecovery] = useState("");
-  const [wellspring, setWellspring] = useState("");
-  const [invType, setInvType] = useState("");
-  // arcanist / arcanist-rework
-  const [domain, setDomain] = useState("");
-  const [domainDesc, setDomainDesc] = useState("");
-  const [merge, setMerge] = useState("");
-  const [mergeDesc, setMergeDesc] = useState("");
-  const [dismiss, setDismiss] = useState("");
-  const [dismissDesc, setDismissDesc] = useState("");
-  const [pulse, setPulse] = useState("");
-  const [pulseDesc, setPulseDesc] = useState("");
-  // tinkerer-alchemy, pilot-vehicle
-  const [itemCategory, setItemCategory] = useState("");
-  // tinkerer-infusion
-  const [infusionRank, setInfusionRank] = useState("");
-  // cooking : 12 roll-result effects (indices 0-11 = results 1-12)
-  const [cookingEffects, setCookingEffects] = useState(
-    Array.from({ length: 12 }, () => ""),
-  );
-  // magiseed
-  const [seedDescription, setSeedDescription] = useState("");
-  const [seedRangeStart, setSeedRangeStart] = useState(1);
-  const [seedRangeEnd, setSeedRangeEnd] = useState(4);
-  const [seedEffects, setSeedEffects] = useState({});
-  // pilot-vehicle
+  const { openImport } = useQuickCreateImport();
+  const initialSubtype = useQuickCreateSubtype();
+  const [formState, setFormState] = useState(() => {
+    const defaults = createDefaultStateFromFields(playerSpellFieldConfig);
+    if (initialSubtype) return { ...defaults, spellType: initialSubtype };
+    return defaults;
+  });
+
+  useEffect(() => {
+    if (initialSubtype) {
+      setFormState((prev) => ({ ...prev, spellType: initialSubtype }));
+    }
+  }, [initialSubtype]);
+
+  // Pilot-vehicle local state (kept as-is - schema renderer not used for pilot-vehicle)
   const [pilotSubtype, setPilotSubtype] = useState("frame");
   const [vehicleFrame, setVehicleFrame] = useState(
     availableFrames[0]?.name ?? "",
@@ -1062,54 +924,20 @@ function PlayerSpellPanel() {
   const [moduleRange, setModuleRange] = useState("");
   const [modulePrec, setModulePrec] = useState(0);
   const [moduleCumbersome, setModuleCumbersome] = useState(false);
-  const [moduleCost, setModuleCost] = useState(0);
+  const [moduleCost, setModuleCost] = useState(PILOT_MODULE_BASE_COST.armor);
   const [moduleDescription, setModuleDescription] = useState("");
-  // weapon-specific
+  const [pilotEffect, setPilotEffect] = useState("");
   const [weaponCategory, setWeaponCategory] = useState("Heavy");
   const [pilotAtt1, setPilotAtt1] = useState("might");
   const [pilotAtt2, setPilotAtt2] = useState("dexterity");
+  const [pilotDamageType, setPilotDamageType] = useState("Physical");
   const [quality, setQuality] = useState("");
   const [qualityCost, setQualityCost] = useState(0);
   const [isShield, setIsShield] = useState(false);
+  const spellType = formState.spellType ?? "default";
 
   const handleClear = () => {
-    setSpellType("default");
-    setSpellClass(spellClasses[0] ?? "");
-    setName("");
-    setDescription("");
-    setIsOffensive(false);
-    setMp("");
-    setMaxTargets("1");
-    setTargetDesc("");
-    setDuration("");
-    setAttr1("insight");
-    setAttr2("will");
-    setDamage("");
-    setDamageType("physical");
-    setEffect("");
-    setEvent("");
-    setGenoclepsis("");
-    setKeyType("");
-    setKeyStatus("");
-    setKeyAttribute("");
-    setKeyRecovery("");
-    setWellspring("");
-    setInvType("");
-    setDomain("");
-    setDomainDesc("");
-    setMerge("");
-    setMergeDesc("");
-    setDismiss("");
-    setDismissDesc("");
-    setPulse("");
-    setPulseDesc("");
-    setItemCategory("");
-    setInfusionRank("");
-    setCookingEffects(Array.from({ length: 12 }, () => ""));
-    setSeedDescription("");
-    setSeedRangeStart(1);
-    setSeedRangeEnd(4);
-    setSeedEffects({});
+    setFormState(createDefaultStateFromFields(playerSpellFieldConfig));
     setPilotSubtype("frame");
     setVehicleFrame(availableFrames[0]?.name ?? "");
     setModuleDef("");
@@ -1119,10 +947,11 @@ function PlayerSpellPanel() {
     setModuleRange("");
     setModulePrec(0);
     setModuleCumbersome(false);
-    setModuleCost(0);
+    setModuleCost(PILOT_MODULE_BASE_COST.armor);
     setModuleDescription("");
+    setPilotEffect("");
     setWeaponCategory("Heavy");
-    setDamageType("Physical");
+    setPilotDamageType("Physical");
     setPilotAtt1("might");
     setPilotAtt2("dexterity");
     setQuality("");
@@ -1130,668 +959,422 @@ function PlayerSpellPanel() {
     setIsShield(false);
   };
 
-  const data = {
-    class: spellClass,
-    name: name.trim(),
-    description: description.trim(),
-    isOffensive,
-    mp: mp === "" ? 0 : Number(mp),
-    maxTargets: maxTargets === "" ? 1 : Number(maxTargets),
-    targetDesc: targetDesc.trim() || "One creature",
-    duration: duration.trim() || "Instantaneous",
-    attr1,
-    attr2,
-    damage: isOffensive && damage !== "" ? Number(damage) : undefined,
-    damageType: isOffensive ? damageType : undefined,
-    spellType: "default",
+  const handleImportPlayerSpell = (item) => {
+    const imported = stripPrivateFields(item ?? {});
+    const importedType = String(imported.spellType ?? "default");
+    const nextSpellType =
+      importedType === "magichant" && imported.magichantSubtype === "key"
+        ? "magichant-key"
+        : importedType;
+
+    // Build flat state for schema form
+    const flatImport = {
+      spellType: nextSpellType || "default",
+      fuid: imported.fuid || undefined,
+      name: t(String(imported.name ?? "")),
+      class: String(imported.class ?? spellClasses[0] ?? ""),
+      isOffensive: Boolean(imported.isOffensive ?? false),
+      "cost.resource": "mp",
+      "cost.amount": imported.cost?.amount ?? 0,
+      "cost.perTarget": Boolean(imported.cost?.perTarget ?? true),
+      maxTargets: imported.maxTargets ?? 1,
+      targetDescription: t(
+        String(imported.targetDescription ?? "One creature"),
+      ),
+      duration: t(String(imported.duration ?? "Instantaneous")),
+      "accuracy.attr1": String(imported.accuracy?.attr1 ?? "insight"),
+      "accuracy.attr2": String(imported.accuracy?.attr2 ?? "will"),
+      "accuracy.value": 0,
+      "accuracy.defense": "mdef",
+      "damage.value": imported.damage?.value ?? 0,
+      "damage.type": String(imported.damage?.type ?? "physical"),
+      "damage.hrZero": Boolean(imported.damage?.hrZero ?? false),
+      description: t(String(imported.description ?? "")),
+      effect: t(
+        String(
+          imported.effect ??
+            imported.invocations?.[0]?.effect ??
+            imported.tones?.[0]?.effect ??
+            imported.symbols?.[0]?.effect ??
+            imported.dances?.[0]?.effect ??
+            imported.gifts?.[0]?.effect ??
+            imported.description ??
+            "",
+        ),
+      ),
+      event: t(String(imported.event ?? "")),
+      genoclepsis: t(String(imported.genoclepsis ?? "")),
+      domain: t(String(imported.domain ?? "")),
+      domainDesc: t(String(imported.domainDesc ?? "")),
+      merge: t(String(imported.merge ?? "")),
+      mergeDesc: t(String(imported.mergeDesc ?? "")),
+      dismiss: t(String(imported.dismiss ?? "")),
+      dismissDesc: t(String(imported.dismissDesc ?? "")),
+      pulse: t(String(imported.pulse ?? "")),
+      pulseDesc: t(String(imported.pulseDesc ?? "")),
+      wellspring: t(
+        String(
+          imported.wellspring ?? imported.invocations?.[0]?.wellspring ?? "",
+        ),
+      ),
+      invType: String(imported.type ?? imported.invocations?.[0]?.type ?? ""),
+      category: String(imported.category ?? ""),
+      infusionRank:
+        imported.infusionRank == null ? null : Number(imported.infusionRank),
+      keyType:
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? String(imported.type ?? "")
+          : "",
+      keyStatus:
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? String(imported.status ?? "")
+          : "",
+      keyAttribute:
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? String(imported.attribute ?? "")
+          : "",
+      keyRecovery:
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? String(imported.recovery ?? "")
+          : "",
+      cookingEffects: (() => {
+        const src = imported.cookbook?.effects ?? imported.cookbookEffects;
+        if (Array.isArray(src)) {
+          return src.map((r) => ({ effect: t(String(r?.effect ?? "")) }));
+        }
+        if (src && typeof src === "object") {
+          return Object.values(src).map((r) => ({
+            effect: t(String(r?.effect ?? r ?? "")),
+          }));
+        }
+        return Array.from({ length: 12 }, () => ({ effect: "" }));
+      })(),
+      seedDescription: t(
+        String(
+          imported.magiseeds?.[0]?.description ?? imported.description ?? "",
+        ),
+      ),
+      seedRangeStart:
+        imported.magiseeds?.[0]?.rangeStart ?? imported.rangeStart ?? 1,
+      seedRangeEnd: imported.magiseeds?.[0]?.rangeEnd ?? imported.rangeEnd ?? 4,
+      "meta.book": imported.meta?.book ?? "",
+      "meta.page": imported.meta?.page ?? undefined,
+      "meta.bookName": imported.meta?.bookName ?? "",
+      "meta.isOfficial": imported.meta?.isOfficial ?? false,
+    };
+
+    importIntoSchemaForm(playerSpellFieldConfig, setFormState, flatImport);
+
+    // Pilot-vehicle - keep separate state
+    if (nextSpellType === "pilot-vehicle") {
+      const sub = imported.pilotSubtype ?? "frame";
+      setPilotSubtype(sub);
+      if (imported.frame) setVehicleFrame(imported.frame);
+      if (imported.def !== undefined) setModuleDef(String(imported.def));
+      if (imported.mdef !== undefined) setModuleMdef(String(imported.mdef));
+      if (imported.martial !== undefined)
+        setModuleMartial(Boolean(imported.martial));
+      if (imported.cost !== undefined)
+        setModuleCost(
+          Number(imported.cost) || PILOT_MODULE_BASE_COST[sub] || 500,
+        );
+      if (imported.description)
+        setModuleDescription(String(imported.description));
+      if (imported.description || imported.effect)
+        setPilotEffect(String(imported.effect ?? imported.description ?? ""));
+      if (imported.category) setWeaponCategory(String(imported.category));
+      if (imported.accuracy?.attr1)
+        setPilotAtt1(String(imported.accuracy.attr1));
+      if (imported.accuracy?.attr2)
+        setPilotAtt2(String(imported.accuracy.attr2));
+      if (imported.accuracy?.value !== undefined)
+        setModulePrec(Number(imported.accuracy.value));
+      if (imported.damage?.value !== undefined)
+        setModuleDamage(String(imported.damage.value));
+      if (imported.damage?.type)
+        setPilotDamageType(String(imported.damage.type));
+      if (imported.range) setModuleRange(String(imported.range));
+      if (imported.cumbersome !== undefined)
+        setModuleCumbersome(Boolean(imported.cumbersome));
+      if (imported.quality !== undefined) setQuality(String(imported.quality));
+      if (imported.qualityCost !== undefined)
+        setQualityCost(Number(imported.qualityCost));
+      if (imported.isShield !== undefined)
+        setIsShield(Boolean(imported.isShield));
+    }
   };
 
-  const nonStaticData =
-    spellType === "default"
-      ? null
-      : {
-          name: name.trim(),
-          spellType: spellType === "magichant-key" ? "magichant" : spellType,
-          magichantSubtype:
-            spellType === "magichant-key"
-              ? "key"
-              : spellType === "magichant"
-                ? "tone"
-                : undefined,
-          // generic effect/description (therioform, magichant, symbol, dance, gift, tinkerer-infusion, etc.)
-          effect: effect.trim(),
-          description: effect.trim(),
-          event: event.trim(),
-          genoclepsis: genoclepsis.trim() || undefined,
-          status:
-            spellType === "magichant-key"
-              ? keyStatus.trim() || undefined
-              : undefined,
-          attribute:
-            spellType === "magichant-key"
-              ? keyAttribute.trim() || undefined
-              : undefined,
-          recovery:
-            spellType === "magichant-key"
-              ? keyRecovery.trim() || undefined
-              : undefined,
-          duration: duration || undefined,
-          // invocation
-          wellspring: wellspring.trim() || undefined,
-          type:
-            spellType === "magichant-key"
-              ? keyType.trim() || undefined
-              : invType.trim() || undefined,
-          // arcanist / arcanist-rework
-          domain: domain.trim() || undefined,
-          domainDesc: domainDesc.trim() || undefined,
-          merge: merge.trim() || undefined,
-          mergeDesc: mergeDesc.trim() || undefined,
-          dismiss: dismiss.trim() || undefined,
-          dismissDesc: dismissDesc.trim() || undefined,
-          pulse: pulse.trim() || undefined,
-          pulseDesc: pulseDesc.trim() || undefined,
-          // tinkerer-alchemy / pilot-vehicle category
-          category: itemCategory.trim() || undefined,
-          // tinkerer-infusion
-          infusionRank: infusionRank !== "" ? Number(infusionRank) : undefined,
-          // cooking
-          ...(spellType === "cooking" && {
-            cookbookEffects: cookingEffects.map((fx, i) => ({
-              id: i + 1,
-              effect: fx.trim(),
-              customChoices: {},
-            })),
-          }),
-          // magiseed
-          ...(spellType === "magiseed" && {
-            description: seedDescription.trim(),
-            rangeStart: Number(seedRangeStart),
-            rangeEnd: Number(seedRangeEnd),
-            effects: seedEffects,
-          }),
-          // pilot-vehicle : flat structure per subtype for later import into player-edit
-          ...(spellType === "pilot-vehicle" &&
-            (() => {
-              const frameData = availableFrames.find(
-                (f) => f.name === vehicleFrame,
-              );
-              const base = {
-                pilotSubtype,
-                customName: name.trim(),
-                enabled: false,
-                equipped: false,
-                equippedSlot: null,
-              };
-              if (pilotSubtype === "frame")
-                return {
-                  ...base,
-                  frame: vehicleFrame,
-                  passengers: frameData?.passengers ?? 0,
-                  distance: frameData?.distance ?? 1,
-                  description: effect.trim(),
-                };
-              if (pilotSubtype === "armor")
-                return {
-                  ...base,
-                  name: "pilot_custom_armor",
-                  type: "pilot_module_armor",
-                  category: "Armor",
-                  cost: Number(moduleCost) || 0,
-                  def: Number(moduleDef) || 0,
-                  mdef: Number(moduleMdef) || 0,
-                  martial: moduleMartial,
-                  description: moduleDescription.trim() || undefined,
-                };
-              if (pilotSubtype === "weapon")
-                return {
-                  ...base,
-                  name: "pilot_custom_weapon",
-                  type: "pilot_module_weapon",
-                  category: weaponCategory,
-                  cost: Number(moduleCost) || 0,
-                  damage: Number(moduleDamage) || 0,
-                  range: moduleRange || "Melee",
-                  damageType,
-                  prec: Number(modulePrec) || 0,
-                  cumbersome: moduleCumbersome,
-                  att1: pilotAtt1,
-                  att2: pilotAtt2,
-                  quality: quality.trim(),
-                  qualityCost: Number(qualityCost) || 0,
-                  isShield,
-                  equippedSlot: "main",
-                };
-              // support
-              return {
-                ...base,
-                name: "pilot_custom_support",
-                type: "pilot_module_support",
-                description: effect.trim(),
-                isComplex: true,
-                cost: Number(moduleCost) || 0,
-              };
-            })()),
-        };
+  // Build pilot-vehicle payload from local pilot state (schema renderer not used)
+  const pilotPayload = (() => {
+    const name = (formState.name ?? "").trim();
+    const fuid = formState.fuid || undefined;
+    const frameData = availableFrames.find((f) => f.name === vehicleFrame);
+    const base = {
+      spellType: "pilot-vehicle",
+      name,
+      fuid,
+      pilotSubtype,
+      customName: name,
+      enabled: false,
+      equipped: false,
+      equippedSlot: null,
+    };
+    if (pilotSubtype === "frame")
+      return {
+        ...base,
+        frame: vehicleFrame,
+        passengers: frameData?.passengers ?? 0,
+        distance: frameData?.distance ?? 1,
+        description: pilotEffect.trim(),
+      };
+    if (pilotSubtype === "armor")
+      return {
+        ...base,
+        name: "pilot_custom_armor",
+        type: "pilot_module_armor",
+        category: "Armor",
+        cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.armor,
+        def: Number(moduleDef) || 0,
+        mdef: Number(moduleMdef) || 0,
+        martial: moduleMartial,
+        description: moduleDescription.trim() || undefined,
+      };
+    if (pilotSubtype === "weapon")
+      return {
+        ...base,
+        name: "pilot_custom_weapon",
+        type: "pilot_module_weapon",
+        category: weaponCategory,
+        cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.weapon,
+        accuracy: {
+          attr1: pilotAtt1,
+          attr2: pilotAtt2,
+          value: Number(modulePrec) || 0,
+          defense: "def",
+        },
+        damage: {
+          value: Number(moduleDamage) || 0,
+          type: String(pilotDamageType || "Physical").toLowerCase(),
+          hrZero: false,
+        },
+        range: moduleRange || "Melee",
+        cumbersome: moduleCumbersome,
+        quality: quality.trim(),
+        qualityCost: Number(qualityCost) || 0,
+        isShield,
+        equippedSlot: "main",
+      };
+    // support
+    return {
+      ...base,
+      name: "pilot_custom_support",
+      type: "pilot_module_support",
+      description: pilotEffect.trim(),
+      isComplex: true,
+      cost: Number(moduleCost) || PILOT_MODULE_BASE_COST.support,
+    };
+  })();
 
+  const payload =
+    spellType === "pilot-vehicle"
+      ? pilotPayload
+      : buildPlayerSpellPayload(formState);
   return (
     <PanelLayout
-      data={spellType === "default" ? data : nonStaticData}
-      itemName={name.trim() || ""}
+      data={payload}
+      itemName={(formState.name ?? "").trim() || ""}
       formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 5,
+        <Grid container spacing={1} sx={{ alignItems: "center" }}>
+          {/* Core: spellType, fuid, name */}
+          <SchemaFieldRenderer
+            config={playerSpellFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="quickCreate"
+            group="core"
+            label={t("Player Spell")}
+            cols={1}
+            extraProps={{
+              onBrowse: () =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE["player-spell"],
+                  handleImportPlayerSpell,
+                  {
+                    initialSpellClass: SPELL_TYPE_TO_CLASS[spellType] ?? "",
+                    ...(spellType === "pilot-vehicle"
+                      ? { initialModuleTypeFilter: pilotSubtype }
+                      : {}),
+                  },
+                ),
             }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Spell Type")}</InputLabel>
-              <Select
-                value={spellType}
-                label={t("Spell Type")}
-                onChange={(e) => setSpellType(e.target.value)}
-              >
-                {NON_STATIC_TYPES.map((st) => (
-                  <MenuItem key={st.value} value={st.value}>
-                    {t(st.label)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          {spellType === "default" && (
-            <Grid
-              size={{
-                xs: 12,
-                sm: 7,
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel>{t("Class")}</InputLabel>
-                <Select
-                  value={spellClass}
-                  label={t("Class")}
-                  onChange={(e) => setSpellClass(e.target.value)}
-                >
-                  {spellClasses.map((c) => (
-                    <MenuItem key={c} value={c}>
-                      {t(c)}
-                    </MenuItem>
-                  ))}
-                  <MenuItem value="">{t("Custom")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          )}
-          {spellType !== "default" ? (
-            <Grid
-              container
-              spacing={2}
-              sx={{ alignItems: "center", mt: 0, ml: 0 }}
-            >
+          />
+
+          {/* Pilot-vehicle fallback - not handled by schema renderer */}
+          {spellType === "pilot-vehicle" ? (
+            <>
               <Grid size={12}>
-                <TextField
-                  label={t("Name")}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  fullWidth
+                <ToggleButtonGroup
+                  value={pilotSubtype}
+                  exclusive
+                  onChange={(_, v) => {
+                    if (v !== null) {
+                      setPilotSubtype(v);
+                      if (v === "armor" || v === "weapon" || v === "support") {
+                        setModuleCost(PILOT_MODULE_BASE_COST[v]);
+                      }
+                    }
+                  }}
                   size="small"
-                  autoFocus
-                />
+                  fullWidth
+                >
+                  {PILOT_SUBTYPES.map((s) => (
+                    <ToggleButton key={s.value} value={s.value}>
+                      {t(s.label)}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
               </Grid>
 
-              {/* Gift */}
-              {spellType === "gift" && (
-                <Grid size={12}>
-                  <TextField
-                    label={t("Event / Trigger")}
-                    value={event}
-                    onChange={(e) => setEvent(e.target.value)}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-              )}
-
-              {/* Therioform */}
-              {spellType === "therioform" && (
-                <Grid size={12}>
-                  <TextField
-                    label={t("Genoclepsis (optional)")}
-                    value={genoclepsis}
-                    onChange={(e) => setGenoclepsis(e.target.value)}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-              )}
-
-              {/* Magichant Key */}
-              {spellType === "magichant-key" && (
-                <>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("magichant_type")}</InputLabel>
-                      <Select
-                        value={keyType}
-                        label={t("magichant_type")}
-                        onChange={(e) => setKeyType(e.target.value)}
-                      >
-                        <MenuItem value="">{t("Select")}</MenuItem>
-                        {MAGICHANT_KEY_TYPES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(value)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("magichant_status_effect")}</InputLabel>
-                      <Select
-                        value={keyStatus}
-                        label={t("magichant_status_effect")}
-                        onChange={(e) => setKeyStatus(e.target.value)}
-                      >
-                        <MenuItem value="">{t("Select")}</MenuItem>
-                        {MAGICHANT_KEY_STATUSES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(value)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("magichant_attribute")}</InputLabel>
-                      <Select
-                        value={keyAttribute}
-                        label={t("magichant_attribute")}
-                        onChange={(e) => setKeyAttribute(e.target.value)}
-                      >
-                        <MenuItem value="">{t("Select")}</MenuItem>
-                        {MAGICHANT_KEY_ATTRIBUTES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(value)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("magichant_recovery")}</InputLabel>
-                      <Select
-                        value={keyRecovery}
-                        label={t("magichant_recovery")}
-                        onChange={(e) => setKeyRecovery(e.target.value)}
-                      >
-                        <MenuItem value="">{t("Select")}</MenuItem>
-                        {MAGICHANT_KEY_RECOVERIES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {t(value)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </>
-              )}
-
-              {/* Dance */}
-              {spellType === "dance" && (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <Autocomplete
-                    freeSolo
-                    options={DURATION_OPTIONS.map(t)}
-                    inputValue={duration}
-                    onInputChange={(_, v) => setDuration(v)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={t("Duration")}
-                        size="small"
-                      />
-                    )}
-                  />
-                </Grid>
-              )}
-
-              {/* Invocation */}
-              {spellType === "invocation" && (
-                <>
-                  <Grid size={6}>
-                    <Autocomplete
-                      options={WELLSPRINGS}
-                      value={wellspring || null}
-                      onChange={(_, v) => setWellspring(v ?? "")}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={t("Wellspring")}
-                          size="small"
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid size={6}>
-                    <Autocomplete
-                      options={INV_TYPES}
-                      value={invType || null}
-                      onChange={(_, v) => setInvType(v ?? "")}
-                      renderInput={(params) => (
-                        <TextField {...params} label={t("Type")} size="small" />
-                      )}
-                    />
-                  </Grid>
-                </>
-              )}
-
-              {/* Arcanum / Arcanum Rework */}
-              {(spellType === "arcanist" ||
-                spellType === "arcanist-rework") && (
-                <>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 4,
-                    }}
-                  >
-                    <TextField
-                      label={t("Domain name")}
-                      value={domain}
-                      onChange={(e) => setDomain(e.target.value)}
-                      fullWidth
-                      size="small"
-                    />
-                  </Grid>
+              {/* Frame */}
+              {pilotSubtype === "frame" && (
+                <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                   <Grid size={12}>
-                    <CustomTextarea
-                      label={t("Domain effect")}
-                      value={domainDesc}
-                      onChange={(e) => setDomainDesc(e.target.value)}
-                      helperText=""
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 4,
-                    }}
-                  >
-                    <TextField
-                      label={t("Merge name")}
-                      value={merge}
-                      onChange={(e) => setMerge(e.target.value)}
-                      fullWidth
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid size={12}>
-                    <CustomTextarea
-                      label={t("Merge effect")}
-                      value={mergeDesc}
-                      onChange={(e) => setMergeDesc(e.target.value)}
-                      helperText=""
-                    />
-                  </Grid>
-                  {spellType === "arcanist-rework" && (
-                    <>
-                      <Grid
-                        size={{
-                          xs: 12,
-                          sm: 4,
-                        }}
-                      >
-                        <TextField
-                          label={t("Pulse name")}
-                          value={pulse}
-                          onChange={(e) => setPulse(e.target.value)}
-                          fullWidth
-                          size="small"
-                        />
-                      </Grid>
-                      <Grid size={12}>
-                        <CustomTextarea
-                          label={t("Pulse effect")}
-                          value={pulseDesc}
-                          onChange={(e) => setPulseDesc(e.target.value)}
-                          helperText=""
-                        />
-                      </Grid>
-                    </>
-                  )}
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 4,
-                    }}
-                  >
-                    <TextField
-                      label={t("Dismiss name")}
-                      value={dismiss}
-                      onChange={(e) => setDismiss(e.target.value)}
-                      fullWidth
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid size={12}>
-                    <CustomTextarea
-                      label={t("Dismiss effect")}
-                      value={dismissDesc}
-                      onChange={(e) => setDismissDesc(e.target.value)}
-                      helperText=""
-                    />
-                  </Grid>
-                </>
-              )}
-
-              {/* Tinkerer Alchemy */}
-              {spellType === "tinkerer-alchemy" && (
-                <Grid size={12}>
-                  <TextField
-                    label={t("Category")}
-                    value={itemCategory}
-                    onChange={(e) => setItemCategory(e.target.value)}
-                    fullWidth
-                    size="small"
-                  />
-                </Grid>
-              )}
-
-              {/* Tinkerer Infusion */}
-              {spellType === "tinkerer-infusion" && (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 4,
-                  }}
-                >
-                  <TextField
-                    label={t("Rank")}
-                    value={infusionRank}
-                    onChange={(e) => setInfusionRank(e.target.value)}
-                    fullWidth
-                    size="small"
-                    type="number"
-                    slotProps={{
-                      htmlInput: { min: 1, max: 3 },
-                    }}
-                  />
-                </Grid>
-              )}
-
-              {/* Cooking : one text field per roll result 1-12 */}
-              {spellType === "cooking" && (
-                <>
-                  {cookingEffects.map((fx, i) => (
-                    <Grid key={i} size={12}>
-                      <CustomTextarea
-                        label={`${t("Roll")} ${i + 1}`}
-                        value={fx}
-                        onChange={(e) => {
-                          const next = [...cookingEffects];
-                          next[i] = e.target.value;
-                          setCookingEffects(next);
-                        }}
-                        helperText=""
-                      />
-                    </Grid>
-                  ))}
-                </>
-              )}
-
-              {/* Magiseed : description + per-tick effects */}
-              {spellType === "magiseed" && (
-                <>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      sm: 3,
-                    }}
-                  >
-                    <TextField
-                      label={t("Range Start")}
-                      value={seedRangeStart}
-                      type="number"
-                      fullWidth
-                      size="small"
-                      onChange={(e) =>
-                        setSeedRangeStart(Number(e.target.value))
-                      }
-                      slotProps={{
-                        htmlInput: { min: 0, max: 4 },
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
                       }}
-                    />
+                    >
+                      {t("Frame")}
+                    </Typography>
                   </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      sm: 3,
-                    }}
-                  >
-                    <TextField
-                      label={t("Range End")}
-                      value={seedRangeEnd}
-                      type="number"
-                      fullWidth
-                      size="small"
-                      onChange={(e) => setSeedRangeEnd(Number(e.target.value))}
-                      slotProps={{
-                        htmlInput: { min: 1, max: 6 },
-                      }}
-                    />
+                  <Grid size={12}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("Frame")}</InputLabel>
+                      <Select
+                        value={vehicleFrame}
+                        label={t("Frame")}
+                        onChange={(e) => setVehicleFrame(e.target.value)}
+                      >
+                        {availableFrames.map((f) => (
+                          <MenuItem key={f.name} value={f.name}>
+                            {t(f.name)} - {t("Passengers")}: {f.passengers} |{" "}
+                            {t("Distance")}: {f.distance}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
                   <Grid size={12}>
                     <CustomTextarea
                       label={t("Description")}
-                      value={seedDescription}
-                      onChange={(e) => setSeedDescription(e.target.value)}
+                      value={pilotEffect}
+                      onChange={(e) => setPilotEffect(e.target.value)}
                       helperText=""
                     />
                   </Grid>
-                  {Array.from(
-                    { length: seedRangeEnd - seedRangeStart + 1 },
-                    (_, i) => {
-                      const tick = seedRangeStart + i;
-                      return (
-                        <Grid key={tick} size={12}>
-                          <CustomTextarea
-                            label={`${t("Tick")} ${tick}`}
-                            value={seedEffects[tick] ?? ""}
-                            onChange={(e) =>
-                              setSeedEffects((prev) => ({
-                                ...prev,
-                                [tick]: e.target.value,
-                              }))
-                            }
-                            helperText=""
-                          />
-                        </Grid>
-                      );
-                    },
-                  )}
-                </>
+                </Grid>
               )}
 
-              {/* Pilot Vehicle */}
-              {spellType === "pilot-vehicle" && (
-                <>
+              {/* Support Module */}
+              {pilotSubtype === "support" && (
+                <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
                   <Grid size={12}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("Component Type")}</InputLabel>
-                      <Select
-                        value={pilotSubtype}
-                        label={t("Component Type")}
-                        onChange={(e) => setPilotSubtype(e.target.value)}
-                      >
-                        {PILOT_SUBTYPES.map((s) => (
-                          <MenuItem key={s.value} value={s.value}>
-                            {t(s.label)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-
-                  {/* Frame */}
-                  {pilotSubtype === "frame" && (
-                    <Grid size={12}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>{t("Frame")}</InputLabel>
-                        <Select
-                          value={vehicleFrame}
-                          label={t("Frame")}
-                          onChange={(e) => setVehicleFrame(e.target.value)}
-                        >
-                          {availableFrames.map((f) => (
-                            <MenuItem key={f.name} value={f.name}>
-                              {t(f.name)} - {t("Passengers")}: {f.passengers} ·{" "}
-                              {t("Distance")}: {f.distance}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  )}
-
-                  {/* Cost : shown for all module types */}
-                  {pilotSubtype !== "frame" && (
-                    <Grid
-                      size={{
-                        xs: 6,
-                        sm: 4,
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
                       }}
                     >
+                      {t("Support Module")}
+                    </Typography>
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 4 }}>
+                    <TextField
+                      label={t("Cost")}
+                      value={moduleCost}
+                      type="number"
+                      fullWidth
+                      size="small"
+                      onChange={(e) => setModuleCost(e.target.value)}
+                      slotProps={{ htmlInput: { min: 0 } }}
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <CustomTextarea
+                      label={t("Effect")}
+                      value={pilotEffect}
+                      onChange={(e) => setPilotEffect(e.target.value)}
+                      helperText=""
+                    />
+                  </Grid>
+                </Grid>
+              )}
+
+              {/* Armor Module */}
+              {pilotSubtype === "armor" && (
+                <>
+                  <Grid
+                    size={12}
+                    container
+                    spacing={1}
+                    sx={{ mb: 0.75, alignItems: "center" }}
+                  >
+                    <Grid size={12}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        {t("Armor")}
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      size="auto"
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <ToggleButton
+                        value="martial"
+                        selected={moduleMartial}
+                        onChange={() => setModuleMartial((v) => !v)}
+                        size="small"
+                      >
+                        <Martial />
+                      </ToggleButton>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField
+                        label={moduleMartial ? "DEF" : t("DEX die") + " + DEF"}
+                        value={moduleDef}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleDef(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField
+                        label={
+                          moduleMartial ? "MDEF" : t("INS die") + " + MDEF"
+                        }
+                        value={moduleMdef}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleMdef(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
                       <TextField
                         label={t("Cost")}
                         value={moduleCost}
@@ -1799,449 +1382,365 @@ function PlayerSpellPanel() {
                         fullWidth
                         size="small"
                         onChange={(e) => setModuleCost(e.target.value)}
-                        slotProps={{
-                          htmlInput: { min: 0 },
-                        }}
+                        slotProps={{ htmlInput: { min: 0 } }}
                       />
                     </Grid>
-                  )}
-
-                  {/* Armor Module */}
-                  {pilotSubtype === "armor" && (
-                    <>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 3,
-                        }}
-                      >
-                        <TextField
-                          label="DEF"
-                          value={moduleDef}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModuleDef(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 3,
-                        }}
-                      >
-                        <TextField
-                          label="MDEF"
-                          value={moduleMdef}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModuleMdef(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        sx={{ display: "flex", alignItems: "center" }}
-                        size={{
-                          xs: 4,
-                          sm: 2,
-                        }}
-                      >
-                        <ToggleButton
-                          value="martial"
-                          selected={moduleMartial}
-                          onChange={() => setModuleMartial((v) => !v)}
-                          size="small"
-                          sx={{ width: "100%" }}
-                        >
-                          {t("Martial")}
-                        </ToggleButton>
-                      </Grid>
-                      <Grid size={12}>
-                        <CustomTextarea
-                          label={t("Description (optional)")}
-                          value={moduleDescription}
-                          onChange={(e) => setModuleDescription(e.target.value)}
-                          helperText=""
-                        />
-                      </Grid>
-                    </>
-                  )}
-
-                  {/* Weapon Module */}
-                  {pilotSubtype === "weapon" && (
-                    <>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 4,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Category")}</InputLabel>
-                          <Select
-                            value={weaponCategory}
-                            label={t("Category")}
-                            onChange={(e) => setWeaponCategory(e.target.value)}
-                          >
-                            {PILOT_WEAPON_CATEGORIES.map((c) => (
-                              <MenuItem key={c} value={c}>
-                                {c}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 4,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Damage Type")}</InputLabel>
-                          <Select
-                            value={damageType}
-                            label={t("Damage Type")}
-                            onChange={(e) => setDamageType(e.target.value)}
-                          >
-                            {PILOT_DAMAGE_TYPES.map((d) => (
-                              <MenuItem key={d} value={d}>
-                                {d}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 4,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Range")}</InputLabel>
-                          <Select
-                            value={moduleRange || "Melee"}
-                            label={t("Range")}
-                            onChange={(e) => setModuleRange(e.target.value)}
-                          >
-                            {PILOT_RANGES.map((r) => (
-                              <MenuItem key={r} value={r}>
-                                {r}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 3,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Att 1")}</InputLabel>
-                          <Select
-                            value={pilotAtt1}
-                            label={t("Att 1")}
-                            onChange={(e) => setPilotAtt1(e.target.value)}
-                          >
-                            {PILOT_ATTRS.map((a) => (
-                              <MenuItem key={a} value={a}>
-                                {t(a)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 6,
-                          sm: 3,
-                        }}
-                      >
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{t("Att 2")}</InputLabel>
-                          <Select
-                            value={pilotAtt2}
-                            label={t("Att 2")}
-                            onChange={(e) => setPilotAtt2(e.target.value)}
-                          >
-                            {PILOT_ATTRS.map((a) => (
-                              <MenuItem key={a} value={a}>
-                                {t(a)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 2,
-                        }}
-                      >
-                        <TextField
-                          label="HR+"
-                          value={moduleDamage}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModuleDamage(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 2,
-                        }}
-                      >
-                        <TextField
-                          label={t("+Acc")}
-                          value={modulePrec}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setModulePrec(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        size={{
-                          xs: 4,
-                          sm: 2,
-                        }}
-                      >
-                        <TextField
-                          label={t("Quality Cost")}
-                          value={qualityCost}
-                          type="number"
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setQualityCost(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid size={12}>
-                        <TextField
-                          label={t("Quality")}
-                          value={quality}
-                          fullWidth
-                          size="small"
-                          onChange={(e) => setQuality(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid
-                        sx={{ display: "flex", alignItems: "center" }}
-                        size={6}
-                      >
-                        <ToggleButton
-                          value="cumbersome"
-                          selected={moduleCumbersome}
-                          onChange={() => setModuleCumbersome((v) => !v)}
-                          size="small"
-                          sx={{ width: "100%" }}
-                        >
-                          {t("Cumbersome")}
-                        </ToggleButton>
-                      </Grid>
-                      <Grid
-                        sx={{ display: "flex", alignItems: "center" }}
-                        size={6}
-                      >
-                        <ToggleButton
-                          value="isShield"
-                          selected={isShield}
-                          onChange={() => setIsShield((v) => !v)}
-                          size="small"
-                          sx={{ width: "100%" }}
-                        >
-                          {t("Shield")}
-                        </ToggleButton>
-                      </Grid>
-                    </>
-                  )}
+                  </Grid>
+                  <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+                    <Grid size={12}>
+                      <CustomTextarea
+                        label={t("Description (optional)")}
+                        value={moduleDescription}
+                        onChange={(e) => setModuleDescription(e.target.value)}
+                        helperText=""
+                      />
+                    </Grid>
+                  </Grid>
                 </>
               )}
 
-              {/* Generic effect/description for types that use it */}
-              {!(
-                spellType === "arcanist" ||
-                spellType === "arcanist-rework" ||
-                spellType === "cooking" ||
-                spellType === "magiseed" ||
-                spellType === "magichant-key"
-              ) &&
-                !(
-                  spellType === "pilot-vehicle" &&
-                  (pilotSubtype === "armor" || pilotSubtype === "weapon")
-                ) && (
-                  <Grid size={12}>
-                    <CustomTextarea
-                      label={
-                        spellType === "therioform" ||
-                        spellType === "pilot-vehicle"
-                          ? t("Description")
-                          : t("Effect")
-                      }
-                      value={effect}
-                      onChange={(e) => setEffect(e.target.value)}
-                      helperText=""
-                    />
+              {/* Weapon Module */}
+              {pilotSubtype === "weapon" && (
+                <>
+                  <Grid
+                    size={12}
+                    container
+                    spacing={1}
+                    sx={{ mb: 0.75, alignItems: "center" }}
+                  >
+                    <Grid size={12}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        {t("Weapon")}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Category")}</InputLabel>
+                        <Select
+                          value={weaponCategory}
+                          label={t("Category")}
+                          onChange={(e) => setWeaponCategory(e.target.value)}
+                        >
+                          {PILOT_WEAPON_CATEGORIES.map((c) => (
+                            <MenuItem key={c} value={c}>
+                              {c}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Range")}</InputLabel>
+                        <Select
+                          value={moduleRange || "Melee"}
+                          label={t("Range")}
+                          onChange={(e) => setModuleRange(e.target.value)}
+                        >
+                          {PILOT_RANGES.map((r) => (
+                            <MenuItem key={r} value={r}>
+                              {r}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid
+                      size={{ xs: 6, sm: 2 }}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <ToggleButton
+                        value="cumbersome"
+                        selected={moduleCumbersome}
+                        onChange={() => setModuleCumbersome((v) => !v)}
+                        size="small"
+                        sx={{ width: "100%" }}
+                      >
+                        {t("Cumbersome")}
+                      </ToggleButton>
+                    </Grid>
+                    <Grid
+                      size={{ xs: 6, sm: 2 }}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <ToggleButton
+                        value="isShield"
+                        selected={isShield}
+                        onChange={() => setIsShield((v) => !v)}
+                        size="small"
+                        sx={{ width: "100%" }}
+                      >
+                        {t("Shield")}
+                      </ToggleButton>
+                    </Grid>
                   </Grid>
-                )}
-            </Grid>
+                  <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+                    <Grid size={12}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        {t("Accuracy")}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Att 1")}</InputLabel>
+                        <Select
+                          value={pilotAtt1}
+                          label={t("Att 1")}
+                          onChange={(e) => setPilotAtt1(e.target.value)}
+                        >
+                          {[
+                            { value: "dexterity", label: "DEX" },
+                            { value: "insight", label: "INS" },
+                            { value: "might", label: "MIG" },
+                            { value: "will", label: "WLP" },
+                          ].map((a) => (
+                            <MenuItem key={a.value} value={a.value}>
+                              {t(a.label)}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Att 2")}</InputLabel>
+                        <Select
+                          value={pilotAtt2}
+                          label={t("Att 2")}
+                          onChange={(e) => setPilotAtt2(e.target.value)}
+                        >
+                          {[
+                            { value: "dexterity", label: "DEX" },
+                            { value: "insight", label: "INS" },
+                            { value: "might", label: "MIG" },
+                            { value: "will", label: "WLP" },
+                          ].map((a) => (
+                            <MenuItem key={a.value} value={a.value}>
+                              {t(a.label)}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField
+                        label={t("+Acc")}
+                        value={modulePrec}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModulePrec(e.target.value)}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+                    <Grid size={12}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        {t("Damage")}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 4 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>{t("Damage Type")}</InputLabel>
+                        <Select
+                          value={pilotDamageType}
+                          label={t("Damage Type")}
+                          onChange={(e) => setPilotDamageType(e.target.value)}
+                        >
+                          {PILOT_DAMAGE_TYPES.map((d) => (
+                            <MenuItem key={d} value={d}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              >
+                                <TypeIcon type={String(d).toLowerCase()} />
+                                <span>
+                                  {String(d).replace(/\b\w/g, (c) =>
+                                    c.toUpperCase(),
+                                  )}
+                                </span>
+                              </Box>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 2 }}>
+                      <TextField
+                        label="HR+"
+                        value={moduleDamage}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleDamage(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField
+                        label={t("Cost")}
+                        value={moduleCost}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setModuleCost(e.target.value)}
+                        slotProps={{ htmlInput: { min: 0 } }}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+                    <Grid size={12}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        {t("Quality")}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 6, sm: 3 }}>
+                      <TextField
+                        label={t("Quality Cost")}
+                        value={qualityCost}
+                        type="number"
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setQualityCost(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid size={12}>
+                      <TextField
+                        label={t("Quality")}
+                        value={quality}
+                        fullWidth
+                        size="small"
+                        onChange={(e) => setQuality(e.target.value)}
+                      />
+                    </Grid>
+                  </Grid>
+                </>
+              )}
+            </>
           ) : (
             <>
-              <Grid
-                size={{
-                  xs: 10,
-                  sm: 6,
-                }}
-              >
-                <TextField
-                  label={t("Name")}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  fullWidth
-                  size="small"
-                  autoFocus
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 2,
-                  sm: 1,
-                }}
-              >
-                <ToggleButton
-                  value="offensive"
-                  selected={isOffensive}
-                  onChange={() => setIsOffensive((v) => !v)}
-                  size="small"
-                  sx={{ width: "100%" }}
-                >
-                  <OffensiveSpellIcon />
-                </ToggleButton>
-              </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 3,
-                }}
-              >
-                <TextField
-                  label={t("MP")}
-                  value={mp}
-                  onChange={(e) => setMp(e.target.value)}
-                  fullWidth
-                  size="small"
-                  type="number"
-                  slotProps={{
-                    htmlInput: { min: 0 },
-                  }}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 3,
-                }}
-              >
-                <TextField
-                  label={t("Max Targets")}
-                  value={maxTargets}
-                  onChange={(e) => setMaxTargets(e.target.value)}
-                  fullWidth
-                  size="small"
-                  type="number"
-                  slotProps={{
-                    htmlInput: { min: 0 },
-                  }}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <Autocomplete
-                  freeSolo
-                  options={TARGET_OPTIONS.map(t)}
-                  inputValue={targetDesc}
-                  onInputChange={(_, v) => setTargetDesc(v)}
-                  renderInput={(params) => (
-                    <TextField {...params} label={t("Target")} size="small" />
-                  )}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <Autocomplete
-                  freeSolo
-                  options={DURATION_OPTIONS.map(t)}
-                  inputValue={duration}
-                  onInputChange={(_, v) => setDuration(v)}
-                  renderInput={(params) => (
-                    <TextField {...params} label={t("Duration")} size="small" />
-                  )}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 3,
-                }}
-              >
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t("Attr 1")}</InputLabel>
-                  <Select
-                    value={attr1}
-                    label={t("Attr 1")}
-                    onChange={(e) => setAttr1(e.target.value)}
-                  >
-                    {ATTRS.map((a) => (
-                      <MenuItem key={a.value} value={a.value}>
-                        {a.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid
-                size={{
-                  xs: 6,
-                  sm: 3,
-                }}
-              >
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t("Attr 2")}</InputLabel>
-                  <Select
-                    value={attr2}
-                    label={t("Attr 2")}
-                    onChange={(e) => setAttr2(e.target.value)}
-                  >
-                    {ATTRS.map((a) => (
-                      <MenuItem key={a.value} value={a.value}>
-                        {a.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Description")}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
+              {/* cost / target / accuracy / damage / description - default spell only */}
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="cost"
+                label={t("Cost")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="target"
+                label={t("Target")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="accuracy"
+                label={t("Accuracy")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="damage"
+                label={t("Damage")}
+                hidden={spellType !== "default" || !formState.isOffensive}
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="description"
+                label={t("Details")}
+                hidden={spellType !== "default"}
+                cols={1}
+              />
+              {/* effect / type-specific fields - non-default spells */}
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="effect"
+                label={t("Details")}
+                hidden={spellType === "default"}
+                cols={1}
+              />
+              {/* arcanist fields */}
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="arcanist"
+                label={t("Arcanum")}
+                hidden={
+                  spellType !== "arcanist" && spellType !== "arcanist-rework"
+                }
+                cols={1}
+              />
+              {/* meta */}
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="meta"
+                label={t("Metadata")}
+                cols={2}
+              />
             </>
           )}
+
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -2251,46 +1750,46 @@ function PlayerSpellPanel() {
       }
       previewContent={
         spellType === "default" ? (
-          <SharedPlayerSpellCard item={data} />
+          <SharedPlayerSpellCard item={payload} />
         ) : spellType === "gamble" ? (
-          <SharedGambleSpellCard item={nonStaticData} />
+          <SharedGambleSpellCard item={payload} />
         ) : spellType === "gift" ? (
-          <SharedGiftCard item={nonStaticData} />
+          <SharedGiftCard item={payload} />
         ) : spellType === "dance" ? (
-          <SharedDanceCard item={nonStaticData} />
+          <SharedDanceCard item={payload} />
         ) : spellType === "therioform" ? (
-          <SharedTherioformCard item={nonStaticData} />
+          <SharedTherioformCard item={payload} />
         ) : spellType === "magichant" || spellType === "magichant-key" ? (
-          <SharedMagichantCard item={nonStaticData} />
+          <SharedMagichantCard item={payload} />
         ) : spellType === "symbol" ? (
-          <SharedSymbolCard item={nonStaticData} />
+          <SharedSymbolCard item={payload} />
         ) : spellType === "invocation" ? (
-          <SharedInvocationCard item={nonStaticData} />
+          <SharedInvocationCard item={payload} />
         ) : spellType === "magiseed" ? (
-          <SharedMagiseedCard item={nonStaticData} />
+          <SharedMagiseedCard item={payload} />
         ) : spellType === "tinkerer-alchemy" ? (
-          <SharedAlchemyCard item={nonStaticData} />
+          <SharedAlchemyCard item={payload} />
         ) : spellType === "tinkerer-infusion" ? (
-          <SharedInfusionCard item={nonStaticData} />
+          <SharedInfusionCard item={payload} />
         ) : spellType === "tinkerer-magitech" ? (
-          <SharedMagitechCard item={nonStaticData} />
+          <SharedMagitechCard item={payload} />
         ) : spellType === "cooking" ? (
-          <SharedCookingCard item={nonStaticData} />
+          <SharedCookingCard item={payload} />
         ) : spellType === "pilot-vehicle" ? (
-          <SharedPilotVehicleCard item={nonStaticData} />
+          <SharedPilotVehicleCard item={payload} />
         ) : spellType === "arcanist" || spellType === "arcanist-rework" ? (
-          <SharedArcanumCard item={nonStaticData} />
+          <SharedArcanumCard item={payload} />
         ) : (
-          <SharedPlayerSpellCard item={data} />
+          <SharedPlayerSpellCard item={payload} />
         )
       }
       addButton={
         <AddToCompendiumButton
-          itemType="player-spell"
-          data={spellType === "default" ? data : nonStaticData}
+          itemType={REG["player-spell"].addItemType}
+          data={payload}
         />
       }
-      exportDataType="player-spells"
+      exportDataType={REG["player-spell"].exportDataType}
     />
   );
 }
@@ -2299,27 +1798,16 @@ function PlayerSpellPanel() {
 
 function QualityPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState(QUALITY_CATEGORIES[0]);
-  const [quality, setQuality] = useState("");
-  const [cost, setCost] = useState(0);
-  const [filter, setFilter] = useState([]);
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(qualityFieldConfig),
+  );
   const [qualityTab, setQualityTab] = useState(0);
 
-  const data = {
-    name: name.trim(),
-    category,
-    quality: quality.trim(),
-    cost: Number(cost),
-    filter,
-  };
+  const data = { ...formState, fuid: formState.fuid || undefined };
 
   const handleClear = () => {
-    setName("");
-    setCategory(QUALITY_CATEGORIES[0]);
-    setQuality("");
-    setCost(0);
-    setFilter([]);
+    setFormState(createDefaultStateFromFields(qualityFieldConfig));
   };
 
   return (
@@ -2337,18 +1825,21 @@ function QualityPanel() {
             <Tab label={t("Generator")} />
           </Tabs>
           {qualityTab === 0 ? (
-            <Grid container spacing={2}>
+            <Grid container spacing={1}>
               <Grid size={12}>
                 <Autocomplete
                   options={qualities}
                   getOptionLabel={(q) => q.name}
                   onChange={(_, q) => {
                     if (q) {
-                      setName(q.name);
-                      setCategory(q.category);
-                      setQuality(q.quality);
-                      setCost(q.cost);
-                      setFilter(q.filter || []);
+                      setFormState((prev) => ({
+                        ...prev,
+                        name: q.name,
+                        category: q.category,
+                        quality: q.quality,
+                        cost: q.cost,
+                        filter: q.filter || [],
+                      }));
                     }
                   }}
                   renderInput={(params) => (
@@ -2361,110 +1852,53 @@ function QualityPanel() {
                   size="small"
                 />
               </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
+              <SchemaFieldRenderer
+                config={qualityFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                cols={2}
+                extraProps={{
+                  name: String(formState.name ?? ""),
+                  onBrowse: () =>
+                    openImport(
+                      QUICK_CREATE_TAB_TO_VIEWER_TYPE.quality,
+                      (item) =>
+                        importIntoSchemaForm(
+                          qualityFieldConfig,
+                          setFormState,
+                          item,
+                          null,
+                          { translate: true },
+                        ),
+                    ),
                 }}
-              >
-                <TextField
-                  label={t("Name")}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  fullWidth
-                  size="small"
-                  autoFocus
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth>
-                  <InputLabel>{t("Category")}</InputLabel>
-                  <Select
-                    value={category}
-                    label={t("Category")}
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    {QUALITY_CATEGORIES.map((cat) => (
-                      <MenuItem key={cat} value={cat}>
-                        {t(cat)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Quality Effect")}
-                  value={quality}
-                  onChange={(e) => setQuality(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <TextField
-                  label={t("Cost")}
-                  value={cost}
-                  onChange={(e) => setCost(e.target.value)}
-                  fullWidth
-                  size="small"
-                  type="number"
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth>
-                  <InputLabel id="qc-filter-label">
-                    {t("Applicable to")}
-                  </InputLabel>
-                  <Select
-                    labelId="qc-filter-label"
-                    multiple
-                    value={filter}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      setFilter(typeof v === "string" ? v.split(",") : v);
-                    }}
-                    input={<OutlinedInput label={t("Applicable to")} />}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {selected.map((v) => (
-                          <Chip
-                            key={v}
-                            label={t(
-                              FILTER_OPTIONS.find((o) => o.value === v)
-                                ?.label ?? v,
-                            )}
-                            size="small"
-                          />
-                        ))}
-                      </Box>
-                    )}
-                  >
-                    {FILTER_OPTIONS.map((o) => (
-                      <MenuItem key={o.value} value={o.value}>
-                        {t(o.label)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+              />
+              <SchemaFieldRenderer
+                config={qualityFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="body"
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={qualityFieldConfig}
+                groupLabels={qualityGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="meta"
+                cols={2}
+              />
             </Grid>
           ) : (
-            <QualitiesGenerator onGenerate={(text) => setQuality(text)} />
+            <QualitiesGenerator
+              onGenerate={(text) =>
+                setFormState((prev) => ({ ...prev, quality: text }))
+              }
+            />
           )}
           <Box sx={{ mt: 2 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
@@ -2473,23 +1907,11 @@ function QualityPanel() {
           </Box>
         </Box>
       }
-      previewContent={
-        data.name ? (
-          <SharedQualityCard item={data} />
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography
-              sx={{
-                color: "text.secondary",
-              }}
-            >
-              Fill in the form to see a preview
-            </Typography>
-          </Box>
-        )
+      previewContent={<SharedQualityCard item={data} />}
+      addButton={
+        <AddToCompendiumButton itemType={REG.quality.addItemType} data={data} />
       }
-      addButton={<AddToCompendiumButton itemType="quality" data={data} />}
-      exportDataType="qualities"
+      exportDataType={REG.quality.exportDataType}
     />
   );
 }
@@ -2498,119 +1920,59 @@ function QualityPanel() {
 
 function HeroicPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [book, setBook] = useState("");
-  const [quote, setQuote] = useState("");
-  const [description, setDescription] = useState("");
-  const [applicableTo, setApplicableTo] = useState([]);
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(heroicFieldConfig),
+  );
 
-  const data = {
-    name: name.trim(),
-    book,
-    quote: quote.trim(),
-    description: description.trim(),
-    applicableTo,
-  };
+  const data = { ...formState, fuid: formState.fuid || undefined };
 
   const handleClear = () => {
-    setName("");
-    setBook("");
-    setQuote("");
-    setDescription("");
-    setApplicableTo([]);
+    setFormState(createDefaultStateFromFields(heroicFieldConfig));
   };
 
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.heroic, (item) =>
+                  importIntoSchemaForm(
+                    heroicFieldConfig,
+                    setFormState,
+                    item,
+                    null,
+                    { translate: true },
+                  ),
+                ),
             }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Book")}</InputLabel>
-              <Select
-                value={book}
-                label={t("Book")}
-                onChange={(e) => setBook(e.target.value)}
-              >
-                <MenuItem value="">{t("None")}</MenuItem>
-                {HEROIC_BOOK_OPTIONS.map((b) => (
-                  <MenuItem
-                    key={b}
-                    value={b}
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {b}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <Autocomplete
-              multiple
-              options={CLASS_NAME_OPTIONS}
-              value={applicableTo}
-              onChange={(_, v) => setApplicableTo(v)}
-              freeSolo
-              renderValue={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    key={option}
-                    label={option}
-                    size="small"
-                    {...getTagProps({ index })}
-                  />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t("Applicable To")}
-                  size="small"
-                  placeholder={t("Select classes...")}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              label={t("Quote")}
-              value={quote}
-              onChange={(e) => setQuote(e.target.value)}
-              fullWidth
-              size="small"
-              slotProps={{
-                htmlInput: { maxLength: 200 },
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <CustomTextarea
-              label={t("Description")}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              helperText=""
-              maxLength={1500}
-            />
-          </Grid>
+          />
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -2619,10 +1981,12 @@ function HeroicPanel() {
         </Grid>
       }
       previewContent={<SharedHeroicCard item={data} />}
-      addButton={<AddToCompendiumButton itemType="heroic" data={data} />}
+      addButton={
+        <AddToCompendiumButton itemType={REG.heroic.addItemType} data={data} />
+      }
       data={data}
       itemName={data.name || ""}
-      exportDataType="heroics"
+      exportDataType={REG.heroic.exportDataType}
     />
   );
 }
@@ -2636,387 +2000,111 @@ function HeroicPanel() {
 //   custom: [], spellClasses: [],
 // };
 
-const BLANK_SKILL = {
-  skillName: "",
-  maxLvl: 1,
-  description: "",
-  specialSkill: "",
-  currentLvl: 0,
-};
-
 function ClassPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [book, setBook] = useState("homebrew");
-  const [hpplus, setHpplus] = useState(0);
-  const [mpplus, setMpplus] = useState(0);
-  const [ipplus, setIpplus] = useState(0);
-  const [martials, setMartials] = useState({
-    armor: false,
-    shields: false,
-    melee: false,
-    ranged: false,
-  });
-  const [ritualism, setRitualism] = useState(false);
-  const [customBenefits, setCustomBenefits] = useState([]);
-  const [customBenefitToDelete, setCustomBenefitToDelete] = useState(null);
-  const [spellClassesSelected, setSpellClassesSelected] = useState([]);
-  const [skills, setSkills] = useState(
-    Array.from({ length: 5 }, () => ({ ...BLANK_SKILL })),
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(classFieldConfig),
   );
 
-  const updateSkillField = (idx, field, value) =>
-    setSkills((prev) =>
-      prev.map((s, i) => (i === idx ? { ...s, [field]: value } : s)),
-    );
+  const normalizedCustomBenefits = Array.isArray(formState.benefits?.custom)
+    ? formState.benefits.custom
+        .map((entry) => {
+          if (typeof entry === "string") return entry;
+          if (entry && typeof entry === "object") {
+            const value = entry.value;
+            return typeof value === "string" ? value : "";
+          }
+          return "";
+        })
+        .filter((entry) => entry.trim())
+    : [];
 
   const classData = {
-    name: name.trim(),
-    book: book.trim() || "homebrew",
+    ...formState,
+    name: String(formState.name ?? "").trim(),
+    fuid: formState.fuid || undefined,
+    meta: createMetaFromBook(formState.meta?.book),
     benefits: {
-      hpplus: Number(hpplus) || 0,
-      mpplus: Number(mpplus) || 0,
-      ipplus: Number(ipplus) || 0,
-      isCustomBenefit: customBenefits.length > 0,
-      martials,
-      rituals: { ritualism },
-      custom: customBenefits,
-      spellClasses: spellClassesSelected,
+      ...(formState.benefits ?? {}),
+      custom: normalizedCustomBenefits,
+      isCustomBenefit: normalizedCustomBenefits.length > 0,
     },
-    skills,
+    skills: Array.isArray(formState.skills) ? formState.skills : [],
   };
 
   const handleClear = () => {
-    setName("");
-    setBook("homebrew");
-    setHpplus(0);
-    setMpplus(0);
-    setIpplus(0);
-    setMartials({ armor: false, shields: false, melee: false, ranged: false });
-    setRitualism(false);
-    setCustomBenefits([]);
-    setCustomBenefitToDelete(null);
-    setSpellClassesSelected([]);
-    setSkills(Array.from({ length: 5 }, () => ({ ...BLANK_SKILL })));
+    setFormState(createDefaultStateFromFields(classFieldConfig));
   };
 
   return (
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={2}>
-            <Grid
-              size={{
-                xs: 8,
-                sm: 9,
+          <Grid container spacing={1}>
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="core"
+              cols={2}
+              extraProps={{
+                name: String(formState.name ?? ""),
+                onBrowse: () =>
+                  openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.class, (item) =>
+                    importIntoSchemaForm(
+                      classFieldConfig,
+                      setFormState,
+                      item,
+                      localizeImportedClassItem,
+                      { translate: true },
+                    ),
+                  ),
               }}
-            >
-              <TextField
-                label={t("Class Name")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                fullWidth
-                size="small"
-                autoFocus
-                slotProps={{
-                  htmlInput: { maxLength: 50 },
-                }}
-              />
-            </Grid>
-            <Grid
-              size={{
-                xs: 4,
-                sm: 3,
-              }}
-            >
-              <Autocomplete
-                freeSolo
-                options={CLASS_BOOK_SUGGESTIONS}
-                inputValue={book}
-                onInputChange={(_, v) => setBook(v)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t("Book")}
-                    size="small"
-                    placeholder="homebrew"
-                  />
-                )}
-              />
-            </Grid>
-
-            <Grid size={12}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "0.75rem",
-                  letterSpacing: "0.05em",
-                  mb: 0.5,
-                }}
-              >
-                {t("Free Benefits")}
-              </Typography>
-            </Grid>
-            <Grid size={4}>
-              <TextField
-                label={t("HP+")}
-                type="number"
-                value={hpplus}
-                onChange={(e) => setHpplus(Number(e.target.value))}
-                fullWidth
-                size="small"
-                slotProps={{
-                  htmlInput: { min: 0, step: 5 },
-                }}
-              />
-            </Grid>
-            <Grid size={4}>
-              <TextField
-                label={t("MP+")}
-                type="number"
-                value={mpplus}
-                onChange={(e) => setMpplus(Number(e.target.value))}
-                fullWidth
-                size="small"
-                slotProps={{
-                  htmlInput: { min: 0, step: 5 },
-                }}
-              />
-            </Grid>
-            <Grid size={4}>
-              <TextField
-                label={t("IP+")}
-                type="number"
-                value={ipplus}
-                onChange={(e) => setIpplus(Number(e.target.value))}
-                fullWidth
-                size="small"
-                slotProps={{
-                  htmlInput: { min: 0, step: 2 },
-                }}
-              />
-            </Grid>
-
-            <Grid size={12}>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {[
-                  { key: "melee", label: t("Martial Melee") },
-                  { key: "ranged", label: t("Martial Ranged") },
-                  { key: "shields", label: t("Martial Shields") },
-                  { key: "armor", label: t("Martial Armor") },
-                ].map(({ key, label }) => (
-                  <Chip
-                    key={key}
-                    label={label}
-                    size="small"
-                    clickable
-                    color={martials[key] ? "primary" : "default"}
-                    variant={martials[key] ? "filled" : "outlined"}
-                    onClick={() =>
-                      setMartials((m) => ({ ...m, [key]: !m[key] }))
-                    }
-                  />
-                ))}
-                <Chip
-                  label={t("Ritualism")}
-                  size="small"
-                  clickable
-                  color={ritualism ? "primary" : "default"}
-                  variant={ritualism ? "filled" : "outlined"}
-                  onClick={() => setRitualism((v) => !v)}
-                />
-              </Box>
-            </Grid>
-
-            {customBenefits.map((cb, i) => (
-              <Grid
-                key={i}
-                sx={{ display: "flex", gap: 1, alignItems: "center" }}
-                size={12}
-              >
-                <TextField
-                  label={`${t("Custom Benefit")} ${i + 1}`}
-                  value={cb}
-                  onChange={(e) =>
-                    setCustomBenefits((arr) =>
-                      arr.map((v, j) => (j === i ? e.target.value : v)),
-                    )
-                  }
-                  fullWidth
-                  size="small"
-                  slotProps={{
-                    htmlInput: { maxLength: 500 },
-                  }}
-                />
-                <IconButton
-                  size="small"
-                  color="error"
-                  onClick={() => setCustomBenefitToDelete(i)}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Grid>
-            ))}
-            <Grid size={12}>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => setCustomBenefits((arr) => [...arr, ""])}
-              >
-                + {t("Add Custom Benefit")}
-              </Button>
-            </Grid>
-
-            <Grid size={12}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "0.75rem",
-                  letterSpacing: "0.05em",
-                  mb: 0.5,
-                }}
-              >
-                {t("Spell Types")}
-              </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {spellClassesList.map((sc) => (
-                  <Chip
-                    key={sc}
-                    label={t(sc)}
-                    size="small"
-                    clickable
-                    color={
-                      spellClassesSelected.includes(sc)
-                        ? "secondary"
-                        : "default"
-                    }
-                    variant={
-                      spellClassesSelected.includes(sc) ? "filled" : "outlined"
-                    }
-                    onClick={() =>
-                      setSpellClassesSelected((prev) =>
-                        prev.includes(sc)
-                          ? prev.filter((s) => s !== sc)
-                          : [...prev, sc],
-                      )
-                    }
-                  />
-                ))}
-              </Box>
-            </Grid>
-
-            <Grid size={12}>
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  textTransform: "uppercase",
-                  fontSize: "0.75rem",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                {t("Skills")}
-              </Typography>
-            </Grid>
-            {skills.map((skill, i) => (
-              <Grid key={i} size={12}>
-                <Box
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                    borderRadius: 1,
-                    p: 1.5,
-                  }}
-                >
-                  <Grid container spacing={1}>
-                    <Grid
-                      size={{
-                        xs: 9,
-                        sm: 10,
-                      }}
-                    >
-                      <TextField
-                        label={`${t("Skill Name")} ${i + 1}`}
-                        value={skill.skillName}
-                        onChange={(e) =>
-                          updateSkillField(i, "skillName", e.target.value)
-                        }
-                        fullWidth
-                        size="small"
-                        slotProps={{
-                          htmlInput: { maxLength: 50 },
-                        }}
-                      />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 3,
-                        sm: 2,
-                      }}
-                    >
-                      <TextField
-                        label={t("Max Lvl")}
-                        type="number"
-                        value={skill.maxLvl}
-                        onChange={(e) =>
-                          updateSkillField(
-                            i,
-                            "maxLvl",
-                            Math.max(1, Math.min(10, Number(e.target.value))),
-                          )
-                        }
-                        fullWidth
-                        size="small"
-                        slotProps={{
-                          htmlInput: { min: 1, max: 10 },
-                        }}
-                      />
-                    </Grid>
-                    <Grid size={12}>
-                      <CustomTextarea
-                        label={t("Description")}
-                        value={skill.description}
-                        onChange={(e) =>
-                          updateSkillField(i, "description", e.target.value)
-                        }
-                        helperText=""
-                        maxLength={1500}
-                      />
-                    </Grid>
-                    <Grid size={12}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>{t("Special Skill Effect")}</InputLabel>
-                        <Select
-                          value={skill.specialSkill}
-                          onChange={(e) =>
-                            updateSkillField(i, "specialSkill", e.target.value)
-                          }
-                          label={t("Special Skill Effect")}
-                        >
-                          <MenuItem value="">
-                            <em>{t("None")}</em>
-                          </MenuItem>
-                          {Object.keys(GROUPED_SPECIAL_SKILLS)
-                            .sort((a, b) => t(a).localeCompare(t(b)))
-                            .flatMap((cls) => [
-                              <ListSubheader key={cls}>{t(cls)}</ListSubheader>,
-                              ...GROUPED_SPECIAL_SKILLS[cls].map((s) => (
-                                <MenuItem key={s.name} value={s.name}>
-                                  {t(s.name)}
-                                </MenuItem>
-                              )),
-                            ])}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Grid>
-            ))}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="benefits"
+              label="Free Benefits"
+              cols={3}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="martials"
+              cols={1}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="spellClasses"
+              cols={1}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="skills"
+              cols={1}
+            />
+            <SchemaFieldRenderer
+              config={classFieldConfig}
+              groupLabels={classGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="meta"
+              cols={2}
+            />
             <Grid size={12}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
@@ -3028,34 +2116,19 @@ function ClassPanel() {
           <SharedClassCard
             item={{
               ...classData,
-              skills: classData.skills.filter((s) => s.skillName.trim()),
+              skills: classData.skills.filter((s) => s.skillName?.trim?.()),
             }}
           />
         }
-        addButton={<AddToCompendiumButton itemType="class" data={classData} />}
+        addButton={
+          <AddToCompendiumButton
+            itemType={REG.class.addItemType}
+            data={classData}
+          />
+        }
         data={classData}
         itemName={classData.name || ""}
-        exportDataType="classes"
-      />
-      <DeleteConfirmationDialog
-        open={customBenefitToDelete !== null}
-        onClose={() => setCustomBenefitToDelete(null)}
-        onConfirm={() => {
-          if (customBenefitToDelete !== null) {
-            setCustomBenefits((arr) =>
-              arr.filter((_, j) => j !== customBenefitToDelete),
-            );
-          }
-        }}
-        title={t("Delete")}
-        message={t("Are you sure you want to delete this custom benefit?")}
-        itemPreview={
-          customBenefitToDelete !== null ? (
-            <Typography variant="h4">
-              {customBenefits[customBenefitToDelete] || t("Custom Benefit")}
-            </Typography>
-          ) : null
-        }
+        exportDataType={REG.class.exportDataType}
       />
     </>
   );
@@ -3063,86 +2136,123 @@ function ClassPanel() {
 
 // Weapon panel (inline form)
 
+function buildWeaponPanelState() {
+  const base = weapons[0];
+  return {
+    fuid: undefined,
+    base,
+    name: base.name,
+    category: base.category ?? "",
+    type: getWeaponType(base),
+    hands: base.hands,
+    att1: getWeaponAttr1(base),
+    att2: getWeaponAttr2(base),
+    martial: base.martial || false,
+    damageHrZero: false,
+    damageBonus: false,
+    damageReworkBonus: false,
+    precBonus: false,
+    rareBonuses: {
+      precBonus: false,
+      damageBonus: false,
+      damageReworkBonus: false,
+    },
+    rework: false,
+    quality: "",
+    qualityCost: 0,
+    totalBonus: 0,
+    selectedQuality: "",
+    qualityName: "",
+    qualityApplicableTo: ["weapon"],
+    range: getWeaponRange(base),
+    precModifier: 0,
+    damageModifier: 0,
+    defModifier: 0,
+    mDefModifier: 0,
+    isEquipped: false,
+  };
+}
+
+function QualityPickerDialog({ open, onClose, onSelect, filterType }) {
+  return (
+    <CompendiumViewerModal
+      open={open}
+      onClose={onClose}
+      onAddItem={(item) => {
+        onSelect(item);
+        onClose();
+      }}
+      initialType="qualities"
+      restrictToTypes={["qualities"]}
+      initialQualityFilters={[filterType]}
+    />
+  );
+}
+
 function WeaponPanel() {
   const { t } = useTranslate();
-  const [base, setBase] = useState(weapons[0]);
-  const [name, setName] = useState(weapons[0].name);
-  const [category, setCategory] = useState(weapons[0].category ?? "");
-  const [type, setType] = useState(weapons[0].type);
-  const [hands, setHands] = useState(weapons[0].hands);
-  const [att1, setAtt1] = useState(weapons[0].att1);
-  const [att2, setAtt2] = useState(weapons[0].att2);
-  const [martial, setMartial] = useState(false);
-  const [damageBonus, setDamageBonus] = useState(false);
-  const [damageReworkBonus, setDamageReworkBonus] = useState(false);
-  const [precBonus, setPrecBonus] = useState(false);
-  const [rework, setRework] = useState(false);
-  const [quality, setQuality] = useState("");
-  const [qualityCost, setQualityCost] = useState(0);
-  const [totalBonus, setTotalBonus] = useState(0);
-  const [selectedQuality, setSelectedQuality] = useState("");
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(buildWeaponPanelState);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
+
   const {
-    precModifier,
-    setPrecModifier,
-    damageModifier,
-    setDamageModifier,
-    defModifier,
-    setDefModifier,
-    mDefModifier,
-    setMDefModifier,
-    modifiersExpanded,
-    setModifiersExpanded,
-    modifiers,
-    clearModifiers,
-  } = useEquipmentForm(null);
-
-  const calcCost = () => {
-    let cost = base.cost;
-    if (type !== "physical") cost += 100;
-    if (base.att1 !== att1 || base.att2 !== att2) {
-      if (att1 === att2) cost += 50;
-    }
-    if (!rework && damageBonus) cost += 200;
-    if (!rework && base.prec !== 1 && precBonus) cost += 100;
-    else if (rework && base.prec <= 1 && precBonus) cost += 100;
-    cost += parseInt(qualityCost);
-    return cost;
-  };
-
-  const calcDamage = () => {
-    let damage = base.damage;
-    if (base.hands === 1 && hands === 2) damage += 4;
-    if (base.hands === 2 && hands === 1) damage -= 4;
-    if (!rework && damageBonus) damage += 4;
-    if (rework && damageReworkBonus)
-      damage += Math.floor(calcCost() / 1000) * 2;
-    damage += parseInt(damageModifier);
-    return damage;
-  };
-
-  const calcPrec = () => {
-    let prec = base.prec;
-    if (!rework && prec !== 1 && precBonus) prec = 1;
-    if (rework && prec === 1 && precBonus) prec = 2;
-    else if (rework && prec === 0 && precBonus) prec = 1;
-    prec += parseInt(precModifier);
-    return prec;
-  };
-
-  const cost = calcCost();
-  const damage = calcDamage();
-  const prec = calcPrec();
-
-  useEffect(() => {
-    setTotalBonus(Math.floor(cost / 1000) * 2);
-  }, [damageReworkBonus, cost, qualityCost, rework]);
-
-  const weaponObj = {
     base,
     name,
     category,
-    melee: base.melee || false,
-    ranged: base.ranged || false,
+    type,
+    hands,
+    att1,
+    att2,
+    martial,
+    damageHrZero,
+    damageBonus,
+    damageReworkBonus,
+    precBonus,
+    rework,
+    quality,
+    qualityCost,
+    totalBonus,
+    selectedQuality,
+    precModifier,
+    damageModifier,
+    defModifier,
+    mDefModifier,
+  } = formState;
+
+  const cost = calcWeaponCost({
+    base,
+    type,
+    att1,
+    att2,
+    rework,
+    damageBonus,
+    precBonus,
+    qualityCost,
+  });
+  const damage = calcWeaponDamage({
+    base,
+    hands,
+    rework,
+    damageBonus,
+    damageReworkBonus,
+    damageModifier,
+    cost,
+  });
+  const prec = calcWeaponPrec({ base, rework, precBonus, precModifier });
+
+  useEffect(() => {
+    setFormState((prev) => ({
+      ...prev,
+      totalBonus: Math.floor(cost / 1000) * 2,
+    }));
+  }, [damageReworkBonus, cost, qualityCost, rework]);
+
+  const weaponObj = normalizeWeaponLike({
+    base,
+    name,
+    fuid: formState.fuid || undefined,
+    category,
+    range: getWeaponRange(base),
     type,
     hands,
     att1,
@@ -3157,1168 +2267,876 @@ function WeaponPanel() {
     totalBonus,
     selectedQuality,
     cost,
-    damage,
+    damage: { value: damage, type, hrZero: damageHrZero },
     prec,
-    ...modifiers(),
-  };
+    precModifier: parseInt(precModifier),
+    damageModifier: parseInt(damageModifier),
+    defModifier: parseInt(defModifier),
+    mDefModifier: parseInt(mDefModifier),
+  });
+
+  if (import.meta.env.DEV && name) {
+    const result = validateWeaponPersisted(weaponObj);
+    if (!result.success) {
+      console.warn(
+        "[QuickCreateModal] weapon schema validation failed",
+        result.error.issues,
+      );
+    }
+  }
 
   const handleClear = () => {
-    setBase(weapons[0]);
-    setName(weapons[0].name);
-    setCategory(weapons[0].category ?? "");
-    setType(weapons[0].type);
-    setHands(weapons[0].hands);
-    setAtt1(weapons[0].att1);
-    setAtt2(weapons[0].att2);
-    setMartial(weapons[0].martial || false);
-    setDamageBonus(false);
-    setDamageReworkBonus(false);
-    setPrecBonus(false);
-    setRework(false);
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    setTotalBonus(0);
-    clearModifiers();
+    setFormState(buildWeaponPanelState());
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={1} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 10,
-              md: 4,
-            }}
-          >
-            <ChangeWeaponBase
-              value={base.name}
-              onChange={(e) => {
-                const b = weapons.find((el) => el.name === e.target.value);
-                setBase(b);
-                setName(t(b.name));
-                setCategory(b.category);
-                setType(b.type);
-                setHands(b.hands);
-                setAtt1(b.att1);
-                setAtt2(b.att2);
-                setMartial(b.martial);
-                setDamageBonus(false);
-                setDamageReworkBonus(false);
-                setPrecBonus(false);
-              }}
-            />
-          </Grid>
-          <Grid size={2}>
-            <ChangeMartial martial={martial} setMartial={setMartial} />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              md: 6,
-            }}
-          >
-            <ChangeName
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            <ChangeCategory
-              value={category}
-              onChange={(e) => {
-                const cat = weaponCategories.find(
-                  (el) => el === e.target.value,
-                );
-                setCategory(cat);
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              md: 4,
-            }}
-          >
-            <ChangeType
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 6,
-              md: 4,
-            }}
-          >
-            <ChangeHands
-              value={hands}
-              onChange={(e) => setHands(e.target.value)}
-            />
-          </Grid>
-          <Grid size={12}>
-            <ChangeAttr
-              att1={att1}
-              att2={att2}
-              setAtt1={(e) => setAtt1(e.target.value)}
-              setAtt2={(e) => setAtt2(e.target.value)}
-            />
-          </Grid>
-          <Grid size={6}>
-            <SelectWeaponQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const q = weaponQualities.find(
-                  (el) => el.name === e.target.value,
-                );
-                setSelectedQuality(q.name);
-                setQuality(q.quality);
-                setQualityCost(q.cost);
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid size={12}>
-                  <Typography variant="h6">
-                    {t("Rare Weapon Options")}
-                  </Typography>
-                  <Divider sx={{ mt: 0.5 }} />
-                </Grid>
-                <Grid size={12}>
-                  <ChangeBonus
-                    basePrec={base.prec}
-                    precBonus={precBonus}
-                    damageBonus={damageBonus}
-                    damageReworkBonus={damageReworkBonus}
-                    setPrecBonus={setPrecBonus}
-                    setDamageBonus={setDamageBonus}
-                    setDamageReworkBonus={setDamageReworkBonus}
-                    rework={rework}
-                    totalBonus={totalBonus}
-                  />
-                </Grid>
-                {[
-                  {
-                    label: "Accuracy Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "Damage Modifier",
-                    value: damageModifier,
-                    set: setDamageModifier,
-                  },
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid key={label} size={6}>
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Grid size={12}>
-            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid
+              size={12}
+              container
+              spacing={1}
+              sx={{ mb: 0.75, alignItems: "center" }}
+            >
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Weapon")}
+                cols={2}
+                extraProps={{
+                  name: String(name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.weapon, (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(
+                          buildWeaponPanelState(),
+                          stripPrivateFields(item),
+                        ),
+                      ),
+                    ),
+                }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="accuracy"
+                cols={2}
+              />
+            </Grid>
+            <Grid
+              size={12}
+              container
+              spacing={1}
+              sx={{ mb: 0.75, alignItems: "center" }}
+            >
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="damage"
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="rareBonus"
+                cols={1}
+                extraProps={{
+                  rework,
+                  totalBonus,
+                  basePrec: getWeaponPrec(base),
+                }}
+              />
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="rare"
+                cols={2}
+              />
+              <SchemaFieldRenderer
+                config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
               </Button>
-              <ApplyRework rework={rework} setRework={setRework} />
-            </Stack>
+            </Grid>
           </Grid>
-        </Grid>
-      }
-      previewContent={<SharedWeaponCard item={weaponObj} />}
-      addButton={<AddToCompendiumButton itemType="weapon" data={weaponObj} />}
-      data={weaponObj}
-      itemName={weaponObj.name || ""}
-      exportDataType="weapons"
-    />
+        }
+        previewContent={<SharedWeaponCard item={weaponObj} />}
+        addButton={
+          <AddToCompendiumButton
+            itemType={REG.weapon.addItemType}
+            data={weaponObj}
+          />
+        }
+        data={weaponObj}
+        itemName={weaponObj.name || ""}
+        exportDataType={REG.weapon.exportDataType}
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="weapon"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
+          }))
+        }
+      />
+    </>
   );
 }
 
 // Armor panel (inline form)
 
+function buildArmorPanelState() {
+  const base = armor[0];
+  return {
+    fuid: undefined,
+    itemType: "armor",
+    base,
+    name: base.name,
+    martial: base.martial ?? false,
+    def: base.def,
+    mdef: base.mdef,
+    init: base.init ?? 0,
+    rework: false,
+    quality: "",
+    qualityCost: 0,
+    selectedQuality: "",
+    qualityApplicableTo: ["armor"],
+    isSlotsVariant: false,
+    slots: "alpha",
+    slotted: [],
+    cost: base.cost,
+    defModifier: 0,
+    mDefModifier: 0,
+    initModifier: 0,
+    magicModifier: 0,
+    precModifier: 0,
+    damageMeleeModifier: 0,
+    damageRangedModifier: 0,
+    isEquipped: false,
+  };
+}
+
 function ArmorPanel() {
   const { t } = useTranslate();
-  const [base, setBase] = useState(armor[0]);
-  const [name, setName] = useState(armor[0].name);
-  const [quality, setQuality] = useState("");
-  const [qualityCost, setQualityCost] = useState(0);
-  const [selectedQuality, setSelectedQuality] = useState("");
-  const [init, setInit] = useState(armor[0].init ?? 0);
-  const [rework, setRework] = useState(false);
-  const {
-    defModifier,
-    setDefModifier,
-    mDefModifier,
-    setMDefModifier,
-    initModifier,
-    setInitModifier,
-    magicModifier,
-    setMagicModifier,
-    precModifier,
-    setPrecModifier,
-    damageMeleeModifier,
-    setDamageMeleeModifier,
-    damageRangedModifier,
-    setDamageRangedModifier,
-    modifiersExpanded,
-    setModifiersExpanded,
-    modifiers,
-    clearModifiers,
-  } = useEquipmentForm(null);
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(buildArmorPanelState);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
-  const cost = base.cost + parseInt(qualityCost);
+  const { base, name, quality, cost } = formState;
 
   const armorObj = {
     base,
     ...base,
     name,
+    martial: Boolean(formState.martial),
+    fuid: formState.fuid || undefined,
     cost,
     quality,
-    qualityCost,
-    selectedQuality,
-    init,
-    rework,
+    qualityCost: formState.qualityCost,
+    selectedQuality: formState.selectedQuality,
+    init: formState.init,
+    rework: formState.rework,
     category: "Armor",
-    defModifier: parseInt(defModifier),
-    mDefModifier: parseInt(mDefModifier),
-    initModifier: parseInt(initModifier),
-    ...modifiers(),
+    defModifier: parseInt(formState.defModifier),
+    mDefModifier: parseInt(formState.mDefModifier),
+    initModifier: parseInt(formState.initModifier),
+    magicModifier: parseInt(formState.magicModifier),
+    precModifier: parseInt(formState.precModifier),
+    damageMeleeModifier: parseInt(formState.damageMeleeModifier),
+    damageRangedModifier: parseInt(formState.damageRangedModifier),
+    modifiers: {
+      def: parseInt(formState.defModifier),
+      mdef: parseInt(formState.mDefModifier),
+      init: parseInt(formState.initModifier),
+      magic: parseInt(formState.magicModifier),
+      accuracy: parseInt(formState.precModifier),
+      damageMelee: parseInt(formState.damageMeleeModifier),
+      damageRanged: parseInt(formState.damageRangedModifier),
+    },
   };
 
   const handleClear = () => {
-    setBase(armor[0]);
-    setName(armor[0].name);
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    setInit(armor[0].init ?? 0);
-    setRework(false);
-    clearModifiers();
+    setFormState(buildArmorPanelState());
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            <ChangeArmorBase
-              value={base.name}
-              onChange={(e) => {
-                const b = armor.find((el) => el.name === e.target.value);
-                setBase(b);
-                setName(t(b.name));
-                setInit(b.init ?? 0);
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            <SelectArmorQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const q = armorShieldQualities.find(
-                  (el) => el.name === e.target.value,
-                );
-                setSelectedQuality(q.name);
-                setQuality(q.quality);
-                setQualityCost(q.cost);
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            <ChangeName
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Grid>
-          <Grid size={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                {[
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                  {
-                    label: "INIT Modifier",
-                    value: initModifier,
-                    set: setInitModifier,
-                  },
-                  {
-                    label: "Magic Modifier",
-                    value: magicModifier,
-                    set: setMagicModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "Damage (Melee) Modifier",
-                    value: damageMeleeModifier,
-                    set: setDamageMeleeModifier,
-                  },
-                  {
-                    label: "Damage (Ranged) Modifier",
-                    value: damageRangedModifier,
-                    set: setDamageRangedModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid
-                    key={label}
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Grid size={12}>
-            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={armorFieldConfig}
+                groupLabels={armorGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Armor")}
+                cols={2}
+                extraProps={{
+                  name: String(name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.armor, (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(
+                          buildArmorPanelState(),
+                          stripPrivateFields(item),
+                        ),
+                      ),
+                    ),
+                }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={armorFieldConfig}
+                groupLabels={armorGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={armorFieldConfig}
+                groupLabels={armorGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
               </Button>
-              <ApplyRework rework={rework} setRework={setRework} />
-            </Stack>
+            </Grid>
           </Grid>
-        </Grid>
-      }
-      previewContent={<SharedArmorCard item={armorObj} />}
-      addButton={<AddToCompendiumButton itemType="armor" data={armorObj} />}
-      data={armorObj}
-      itemName={armorObj.name || ""}
-      exportDataType="armor"
-    />
+        }
+        previewContent={<SharedArmorCard item={armorObj} />}
+        addButton={
+          <AddToCompendiumButton
+            itemType={REG.armor.addItemType}
+            data={armorObj}
+          />
+        }
+        data={armorObj}
+        itemName={armorObj.name || ""}
+        exportDataType={REG.armor.exportDataType}
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="armor"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
+          }))
+        }
+      />
+    </>
   );
 }
 
 // Shield panel (inline form)
 
+function buildShieldPanelState() {
+  const base = shields[0];
+  return {
+    fuid: undefined,
+    itemType: "shield",
+    base,
+    name: base.name,
+    martial: base.martial ?? false,
+    def: base.def,
+    mdef: base.mdef,
+    init: base.init ?? 0,
+    rework: false,
+    quality: "",
+    qualityCost: 0,
+    selectedQuality: "",
+    qualityApplicableTo: ["shield"],
+    cost: base.cost,
+    defModifier: 0,
+    mDefModifier: 0,
+    initModifier: 0,
+    magicModifier: 0,
+    precModifier: 0,
+    damageMeleeModifier: 0,
+    damageRangedModifier: 0,
+    isEquipped: false,
+  };
+}
+
 function ShieldPanel() {
   const { t } = useTranslate();
-  const [base, setBase] = useState(shields[0]);
-  const [name, setName] = useState(shields[0].name);
-  const [quality, setQuality] = useState("");
-  const [qualityCost, setQualityCost] = useState(0);
-  const [selectedQuality, setSelectedQuality] = useState("");
-  const [init, setInit] = useState(shields[0].init ?? 0);
-  const [rework, setRework] = useState(false);
-  const {
-    defModifier,
-    setDefModifier,
-    mDefModifier,
-    setMDefModifier,
-    initModifier,
-    setInitModifier,
-    magicModifier,
-    setMagicModifier,
-    precModifier,
-    setPrecModifier,
-    damageMeleeModifier,
-    setDamageMeleeModifier,
-    damageRangedModifier,
-    setDamageRangedModifier,
-    modifiersExpanded,
-    setModifiersExpanded,
-    modifiers,
-    clearModifiers,
-  } = useEquipmentForm(null);
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(buildShieldPanelState);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
-  const cost = base.cost + parseInt(qualityCost);
+  const { base, name, quality, cost } = formState;
 
   const shieldObj = {
     base,
     ...base,
     name,
+    martial: Boolean(formState.martial),
+    fuid: formState.fuid || undefined,
     cost,
     quality,
-    qualityCost,
-    selectedQuality,
-    init,
-    rework,
+    qualityCost: formState.qualityCost,
+    selectedQuality: formState.selectedQuality,
+    init: formState.init,
+    rework: formState.rework,
     category: "Shield",
-    defModifier: parseInt(defModifier),
-    mDefModifier: parseInt(mDefModifier),
-    initModifier: parseInt(initModifier),
-    ...modifiers(),
+    defModifier: parseInt(formState.defModifier),
+    mDefModifier: parseInt(formState.mDefModifier),
+    initModifier: parseInt(formState.initModifier),
+    magicModifier: parseInt(formState.magicModifier),
+    precModifier: parseInt(formState.precModifier),
+    damageMeleeModifier: parseInt(formState.damageMeleeModifier),
+    damageRangedModifier: parseInt(formState.damageRangedModifier),
+    modifiers: {
+      def: parseInt(formState.defModifier),
+      mdef: parseInt(formState.mDefModifier),
+      init: parseInt(formState.initModifier),
+      magic: parseInt(formState.magicModifier),
+      accuracy: parseInt(formState.precModifier),
+      damageMelee: parseInt(formState.damageMeleeModifier),
+      damageRanged: parseInt(formState.damageRangedModifier),
+    },
   };
 
   const handleClear = () => {
-    setBase(shields[0]);
-    setName(t(shields[0].name));
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    setInit(shields[0].init ?? 0);
-    setRework(false);
-    clearModifiers();
+    setFormState(buildShieldPanelState());
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            <ChangeShieldBase
-              value={base.name}
-              onChange={(e) => {
-                const b = shields.find((el) => el.name === e.target.value);
-                setBase(b);
-                setName(t(b.name));
-                setInit(b.init ?? 0);
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            <SelectArmorQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const q = armorShieldQualities.find(
-                  (el) => el.name === e.target.value,
-                );
-                setSelectedQuality(q.name);
-                setQuality(q.quality);
-                setQualityCost(q.cost);
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-          >
-            <ChangeName
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Grid>
-          <Grid size={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                {[
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                  {
-                    label: "INIT Modifier",
-                    value: initModifier,
-                    set: setInitModifier,
-                  },
-                  {
-                    label: "Magic Modifier",
-                    value: magicModifier,
-                    set: setMagicModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "Damage (Melee) Modifier",
-                    value: damageMeleeModifier,
-                    set: setDamageMeleeModifier,
-                  },
-                  {
-                    label: "Damage (Ranged) Modifier",
-                    value: damageRangedModifier,
-                    set: setDamageRangedModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid
-                    key={label}
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Grid size={12}>
-            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={shieldFieldConfig}
+                groupLabels={shieldGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Shield")}
+                cols={2}
+                extraProps={{
+                  name: String(name ?? ""),
+                  onBrowse: () =>
+                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.shield, (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(
+                          buildShieldPanelState(),
+                          stripPrivateFields(item),
+                        ),
+                      ),
+                    ),
+                }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={shieldFieldConfig}
+                groupLabels={shieldGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={shieldFieldConfig}
+                groupLabels={shieldGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
               </Button>
-              <ApplyRework rework={rework} setRework={setRework} />
-            </Stack>
+            </Grid>
           </Grid>
-        </Grid>
-      }
-      previewContent={<SharedShieldCard item={shieldObj} />}
-      addButton={<AddToCompendiumButton itemType="shield" data={shieldObj} />}
-      data={shieldObj}
-      itemName={shieldObj.name || ""}
-      exportDataType="shields"
-    />
+        }
+        previewContent={<SharedShieldCard item={shieldObj} />}
+        addButton={
+          <AddToCompendiumButton
+            itemType={REG.shield.addItemType}
+            data={shieldObj}
+          />
+        }
+        data={shieldObj}
+        itemName={shieldObj.name || ""}
+        exportDataType={REG.shield.exportDataType}
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="shield"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
+          }))
+        }
+      />
+    </>
   );
 }
 
 // Custom Weapon panel
 
+function buildCWPanelState() {
+  return {
+    fuid: undefined,
+    itemType: "customWeapon",
+    name: "",
+    category: cwCategories[0],
+    range: "melee",
+    hands: 2,
+    martial: false,
+    accuracy: {
+      attr1: "dexterity",
+      attr2: "insight",
+      value: 0,
+      defense: "def",
+    },
+    damage: { value: 0, type: "physical", hrZero: false },
+    modifiers: { damage: 0, accuracy: 0, def: 0, mdef: 0 },
+    rare: {
+      accuracyBonus: false,
+      damageBonus: false,
+      overrideDamageType: false,
+      overrideAccuracyAttributes: false,
+    },
+    customizations: [],
+    quality: "",
+    qualityCost: 0,
+    cost: 300,
+    slots: "alpha",
+    slotted: [],
+    secondName: "",
+    secondCategory: cwCategories[0],
+    secondRange: "melee",
+    secondAccuracy: undefined,
+    secondDamage: undefined,
+    secondModifiers: { damage: 0, accuracy: 0, def: 0, mdef: 0 },
+    secondCustomizations: [],
+    dataType: "weapon",
+    selectedQuality: "",
+    qualityName: "",
+    qualityApplicableTo: ["customWeapon"],
+    isEquipped: false,
+    selectedCategory: cwCategories[0],
+    selectedRange: "melee",
+    selectedAccuracyCheck: {
+      attr1: cwAccuracyChecks[0].att1,
+      attr2: cwAccuracyChecks[0].att2,
+    },
+    customDamageType: "physical",
+    rareOverrideDamageTypeValue: "physical",
+    primaryHrZero: false,
+    rareAccuracyBonus: false,
+    rareDamageBonus: false,
+    overrideDamageType: false,
+    overrideAccuracyAttributes: false,
+    precModifier: 0,
+    damageModifier: 0,
+    defModifier: 0,
+    mDefModifier: 0,
+    hasTransforming: false,
+    secondWeaponName: "",
+    secondSelectedCategory: cwCategories[0],
+    secondSelectedRange: "melee",
+    secondSelectedAccuracyCheck: {
+      attr1: cwAccuracyChecks[0].att1,
+      attr2: cwAccuracyChecks[0].att2,
+    },
+    secondaryHrZero: false,
+    secondOverrideDamageType: false,
+    secondCustomDamageType: "physical",
+    secondPrecModifier: 0,
+    secondDamageModifier: 0,
+    secondDefModifier: 0,
+    secondMDefModifier: 0,
+    isSlotsVariant: false,
+  };
+}
+
 function CustomWeaponPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState(cwCategories[0]);
-  const [range, setRange] = useState(cwRange[0]);
-  const [accuracyCheck, setAccuracyCheck] = useState(cwAccuracyChecks[0]);
-  const [type, setType] = useState(cwTypes[0]);
-  const [customizations, setCustomizations] = useState([]);
-  const [selectedCustomization, setSelectedCustomization] = useState("");
-  const [secondWeaponName, setSecondWeaponName] = useState("");
-  const [secondSelectedCategory, setSecondSelectedCategory] = useState(
-    cwCategories[0],
-  );
-  const [secondSelectedRange, setSecondSelectedRange] = useState(cwRange[0]);
-  const [secondSelectedAccuracyCheck, setSecondSelectedAccuracyCheck] =
-    useState(cwAccuracyChecks[0]);
-  const [secondSelectedType, setSecondSelectedType] = useState(cwTypes[0]);
-  const [secondCurrentCustomizations, setSecondCurrentCustomizations] =
-    useState([]);
-  const [secondSelectedCustomization, setSecondSelectedCustomization] =
-    useState("");
-  const [secondDamageModifier, setSecondDamageModifier] = useState(0);
-  const [secondPrecModifier, setSecondPrecModifier] = useState(0);
-  const [secondDefModifier, setSecondDefModifier] = useState(0);
-  const [secondMDefModifier, setSecondMDefModifier] = useState(0);
-  const [secondOverrideDamageType, setSecondOverrideDamageType] =
-    useState(false);
-  const [secondCustomDamageType, setSecondCustomDamageType] =
-    useState("physical");
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(buildCWPanelState);
+  const [modifiersExpanded, setModifiersExpanded] = useState(false);
   const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
-  const [overrideDamageType, setOverrideDamageType] = useState(false);
-  const [customDamageType, setCustomDamageType] = useState("physical");
-  const [quality, setQuality] = useState("");
-  const [qualityCost, setQualityCost] = useState(0);
-  const [selectedQuality, setSelectedQuality] = useState("");
-  const [rareAccuracyBonus, setRareAccuracyBonus] = useState(false);
-  const [rareDamageBonus, setRareDamageBonus] = useState(false);
-  const [overrideAccuracyAttributes, setOverrideAccuracyAttributes] =
-    useState(false);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
+
   const {
+    selectedCategory,
+    selectedAccuracyCheck,
+    overrideAccuracyAttributes,
+    rareAccuracyBonus,
+    hasTransforming,
+    secondSelectedCategory,
+    primaryHrZero,
+    customDamageType,
+    rareOverrideDamageTypeValue,
+    overrideDamageType,
     damageModifier,
-    setDamageModifier,
     precModifier,
-    setPrecModifier,
-    defModifier,
-    setDefModifier,
-    mDefModifier,
-    setMDefModifier,
-    modifiersExpanded,
-    setModifiersExpanded,
-    modifiers,
-    clearModifiers,
-  } = useEquipmentForm(null);
-  const hasTransforming = customizations.some(
-    (c) => c.name === "weapon_customization_transforming",
+    secondSelectedAccuracyCheck,
+    secondaryHrZero,
+    secondOverrideDamageType,
+    secondCustomDamageType,
+    secondDamageModifier,
+    secondPrecModifier,
+    secondCustomizations,
+    qualityCost,
+    selectedQuality,
+    quality,
+  } = formState;
+
+  const customizations = formState.customizations ?? [];
+
+  const { precision, damage } = calculateCustomWeaponStats(
+    {
+      category: selectedCategory,
+      customizations,
+      rareAccuracyBonus,
+      rareDamageBonus: formState.rareDamageBonus,
+      damageModifier: parseInt(damageModifier) || 0,
+      precModifier: parseInt(precModifier) || 0,
+    },
+    false,
   );
-  const hasAccurate = hasAccurateCustomization(customizations);
 
-  useEffect(() => {
-    if (hasTransforming && secondCurrentCustomizations.length === 0) {
-      const transformingCustomization = cwCustomizations.find(
-        (c) => c.name === "weapon_customization_transforming",
-      );
-      if (transformingCustomization) {
-        setSecondCurrentCustomizations([transformingCustomization]);
-      }
-    } else if (!hasTransforming) {
-      setSecondCurrentCustomizations([]);
-      setSecondWeaponName("");
-    }
-  }, [hasTransforming, secondCurrentCustomizations.length]);
-
-  const hasElementalCustomization = customizations.some(
+  const pHasElemental = customizations.some(
     (c) => c.name === "weapon_customization_elemental",
   );
-  const isDamageTypeEnabled = hasElementalCustomization || overrideDamageType;
-  const secondHasElementalCustomization = secondCurrentCustomizations.some(
+  const primaryType = pHasElemental
+    ? (formState.damage?.type ?? customDamageType ?? "physical")
+    : overrideDamageType
+      ? (rareOverrideDamageTypeValue ?? "physical")
+      : "physical";
+
+  const { precision: secondPrecision, damage: secondDamage } = hasTransforming
+    ? calculateCustomWeaponStats(
+        {
+          secondSelectedCategory: formState.secondSelectedCategory,
+          secondCurrentCustomizations: secondCustomizations,
+          rareAccuracyBonus,
+          rareDamageBonus: formState.rareDamageBonus,
+          secondDamageModifier: parseInt(secondDamageModifier) || 0,
+          secondPrecModifier: parseInt(secondPrecModifier) || 0,
+        },
+        true,
+      )
+    : { precision: 0, damage: 0 };
+
+  const s2HasElemental = (secondCustomizations ?? []).some(
     (c) => c.name === "weapon_customization_elemental",
   );
+  const secondType = s2HasElemental
+    ? (formState.secondDamage?.type ?? secondCustomDamageType ?? "physical")
+    : overrideDamageType
+      ? (rareOverrideDamageTypeValue ?? "physical")
+      : "physical";
 
-  const calculateTotalCost = () => {
-    const baseCost = 300;
-    const transformingCost = hasTransforming ? 100 : 0;
-    const qualityCostValue = parseInt(qualityCost) || 0;
-    const rareAccuracyCost = rareAccuracyBonus ? 100 : 0;
-    const rareDamageCost = rareDamageBonus ? 200 : 0;
-    const damageTypeOverrideCost = overrideDamageType ? 100 : 0;
-    const singleAttributeAccuracyCost =
-      overrideAccuracyAttributes && accuracyCheck.att1 === accuracyCheck.att2
-        ? 50
-        : 0;
-    return (
-      baseCost +
-      transformingCost +
-      qualityCostValue +
-      rareAccuracyCost +
-      rareDamageCost +
-      damageTypeOverrideCost +
-      singleAttributeAccuracyCost
-    );
-  };
-  const isMartial = () => {
-    const martialCustomizations = [
-      "weapon_customization_quick",
-      "weapon_customization_magicdefenseboost",
-      "weapon_customization_powerful",
-    ];
-    if (customizations.some((c) => martialCustomizations.includes(c.name))) {
-      return true;
-    }
-    const { damage } = calculateCustomWeaponStats(
-      {
-        category,
-        customizations,
-        rareAccuracyBonus,
-        rareDamageBonus,
-        damageModifier,
-        precModifier,
-      },
-      false,
-    );
-    if (damage >= 10) return true;
-    if (!hasTransforming) return false;
+  const singleAttributeAccuracyCost =
+    overrideAccuracyAttributes &&
+    selectedAccuracyCheck.attr1 === selectedAccuracyCheck.attr2
+      ? 50
+      : 0;
+  const totalCost =
+    300 +
+    (hasTransforming ? 100 : 0) +
+    (parseInt(qualityCost) || 0) +
+    (rareAccuracyBonus ? 100 : 0) +
+    (formState.rareDamageBonus ? 200 : 0) +
+    (overrideDamageType ? 100 : 0) +
+    singleAttributeAccuracyCost;
 
-    const { damage: secondaryDamage } = calculateCustomWeaponStats(
-      {
-        secondSelectedCategory,
-        secondCurrentCustomizations,
-        rareAccuracyBonus,
-        rareDamageBonus,
-        secondDamageModifier,
-        secondPrecModifier,
-      },
-      true,
-    );
-    return secondaryDamage >= 10;
-  };
-
-  const weaponObj = {
-    name,
-    category,
-    range,
-    accuracyCheck: { att1: accuracyCheck.att1, att2: accuracyCheck.att2 },
-    type,
+  const weaponObj = normalizeCustomWeaponLike({
+    name: formState.name,
+    fuid: formState.fuid || undefined,
+    category: selectedCategory,
+    range: formState.selectedRange,
+    accuracy: {
+      attr1: selectedAccuracyCheck.attr1,
+      attr2: selectedAccuracyCheck.attr2,
+      value: precision,
+      defense: "def",
+    },
+    damage: { value: damage, type: primaryType, hrZero: primaryHrZero },
     customizations,
     quality,
     qualityCost,
     selectedQuality,
-    cost: calculateTotalCost(),
+    cost: totalCost,
     hands: 2,
-    martial: isMartial(),
+    martial: formState.martial,
     rareAccuracyBonus,
-    rareDamageBonus,
+    rareDamageBonus: formState.rareDamageBonus,
     overrideAccuracyAttributes,
-    secondWeaponName,
-    secondSelectedCategory,
-    secondSelectedRange,
-    secondSelectedAccuracyCheck: {
-      att1: overrideAccuracyAttributes
-        ? accuracyCheck.att1
-        : secondSelectedAccuracyCheck.att1,
-      att2: overrideAccuracyAttributes
-        ? accuracyCheck.att2
-        : secondSelectedAccuracyCheck.att2,
+    secondWeaponName: formState.secondWeaponName,
+    secondSelectedCategory: formState.secondSelectedCategory,
+    secondSelectedRange: formState.secondSelectedRange,
+    secondAccuracy: {
+      attr1: overrideAccuracyAttributes
+        ? selectedAccuracyCheck.attr1
+        : secondSelectedAccuracyCheck.attr1,
+      attr2: overrideAccuracyAttributes
+        ? selectedAccuracyCheck.attr2
+        : secondSelectedAccuracyCheck.attr2,
+      value: secondPrecision,
+      defense: "def",
     },
-    secondSelectedType,
-    secondCurrentCustomizations,
-    secondDamageModifier: parseInt(secondDamageModifier),
-    secondPrecModifier: parseInt(secondPrecModifier),
-    secondDefModifier: parseInt(secondDefModifier),
-    secondMDefModifier: parseInt(secondMDefModifier),
+    secondDamage: {
+      value: secondDamage,
+      type: secondType,
+      hrZero: secondaryHrZero,
+    },
+    secondCurrentCustomizations: secondCustomizations,
+    secondDefModifier: parseInt(formState.secondDefModifier) || 0,
+    secondMDefModifier: parseInt(formState.secondMDefModifier) || 0,
     secondOverrideDamageType,
-    secondCustomDamageType,
-    damageModifier: parseInt(damageModifier),
-    precModifier: parseInt(precModifier),
-    defModifier: parseInt(defModifier),
-    mDefModifier: parseInt(mDefModifier),
+    defModifier: parseInt(formState.defModifier) || 0,
+    mDefModifier: parseInt(formState.mDefModifier) || 0,
     overrideDamageType,
-    customDamageType,
-    ...modifiers(),
-  };
+    precModifier: parseInt(precModifier) || 0,
+    damageModifier: parseInt(damageModifier) || 0,
+  });
+
+  if (import.meta.env.DEV && formState.name) {
+    const result = validateCustomWeaponPersisted(weaponObj);
+    if (!result.success) {
+      console.warn(
+        "[QuickCreateModal/CustomWeapon] customWeapon schema validation failed",
+        result.error.issues,
+      );
+    }
+  }
 
   const handleClear = () => {
-    setName("");
-    setCategory(cwCategories[0]);
-    setRange(cwRange[0]);
-    setAccuracyCheck(cwAccuracyChecks[0]);
-    setType(cwTypes[0]);
-    setCustomizations([]);
-    setSelectedCustomization("");
-    setSecondWeaponName("");
-    setSecondSelectedCategory(cwCategories[0]);
-    setSecondSelectedRange(cwRange[0]);
-    setSecondSelectedAccuracyCheck(cwAccuracyChecks[0]);
-    setSecondSelectedType(cwTypes[0]);
-    setSecondCurrentCustomizations([]);
-    setSecondSelectedCustomization("");
-    setSecondDamageModifier(0);
-    setSecondPrecModifier(0);
-    setSecondDefModifier(0);
-    setSecondMDefModifier(0);
-    setSecondOverrideDamageType(false);
-    setSecondCustomDamageType("physical");
+    setFormState(buildCWPanelState());
+    setModifiersExpanded(false);
     setSecondModifiersExpanded(false);
-    setOverrideDamageType(false);
-    setCustomDamageType("physical");
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    setRareAccuracyBonus(false);
-    setRareDamageBonus(false);
-    setOverrideAccuracyAttributes(false);
-    clearModifiers();
   };
 
-  const handleOverrideAccuracyAttributesChange = (checked) => {
-    setOverrideAccuracyAttributes(checked);
-    if (!checked) {
-      setAccuracyCheck(
-        findCustomWeaponPresetAccuracyCheck(accuracyCheck) ??
-          cwAccuracyChecks[0],
-      );
-    }
+  const coreExtraProps = {
+    selectedCategory,
+    rareAccuracyBonus,
+    isSecondForm: false,
   };
-
-  const handleCategoryChange = (e) => {
-    const newCat = e.target.value;
-    setCategory(newCat);
-    setType(cwTypes[0]);
-    if (
-      newCat === "weapon_category_arcane" ||
-      newCat === "weapon_category_dagger"
-    ) {
-      setCustomizations((prev) =>
-        prev.filter((c) => c.name !== "weapon_customization_powerful"),
-      );
-    }
-  };
-  const handleSecondCategoryChange = (e) => {
-    const newCat = e.target.value;
-    setSecondSelectedCategory(newCat);
-    setSecondSelectedType(cwTypes[0]);
-    if (
-      newCat === "weapon_category_arcane" ||
-      newCat === "weapon_category_dagger"
-    ) {
-      setSecondCurrentCustomizations((prev) =>
-        prev.filter((c) => c.name !== "weapon_customization_powerful"),
-      );
-    }
+  const secondaryExtraProps = {
+    selectedCategory: secondSelectedCategory,
+    rareAccuracyBonus,
+    isSecondForm: true,
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid size={12}>
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <ChangeCWCategory
-              value={category}
-              onChange={handleCategoryChange}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <ChangeRange
-              value={range}
-              onChange={(e) => setRange(e.target.value)}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <ChangeCWType
-              value={
-                isDamageTypeEnabled
-                  ? overrideDamageType
-                    ? customDamageType
-                    : type
-                  : "physical"
-              }
-              onChange={(e) => {
-                if (overrideDamageType) {
-                  setCustomDamageType(e.target.value);
-                } else {
-                  setType(e.target.value);
-                }
-              }}
-              disabled={!isDamageTypeEnabled}
-            />
-          </Grid>
-          {overrideAccuracyAttributes ? (
-            <>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth>
-                  <InputLabel>{t("Change Attr 1")}</InputLabel>
-                  <Select
-                    value={accuracyCheck.att1}
-                    label={t("Change Attr 1")}
-                    onChange={(e) =>
-                      setAccuracyCheck((current) => ({
-                        ...normalizeCustomWeaponAccuracyCheck(current),
-                        att1: e.target.value,
-                      }))
-                    }
-                  >
-                    {ATTRS.map((attribute) => (
-                      <MenuItem key={attribute.value} value={attribute.value}>
-                        {t(attribute.label)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth>
-                  <InputLabel>{t("Change Attr 2")}</InputLabel>
-                  <Select
-                    value={accuracyCheck.att2}
-                    label={t("Change Attr 2")}
-                    onChange={(e) =>
-                      setAccuracyCheck((current) => ({
-                        ...normalizeCustomWeaponAccuracyCheck(current),
-                        att2: e.target.value,
-                      }))
-                    }
-                  >
-                    {ATTRS.map((attribute) => (
-                      <MenuItem key={attribute.value} value={attribute.value}>
-                        {t(attribute.label)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            </>
-          ) : (
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
+              size={12}
+              container
+              spacing={1}
+              sx={{ mb: 0.75, alignItems: "center" }}
             >
-              <ChangeAccuracyCheck
-                value={accuracyCheck}
-                onChange={(val) => setAccuracyCheck(val)}
+              <SchemaFieldRenderer
+                config={customWeaponFieldConfig}
+                groupLabels={customWeaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Custom Weapon")}
+                cols={2}
+                extraProps={{
+                  ...coreExtraProps,
+                  name: String(formState.name ?? ""),
+                  onBrowse: () =>
+                    openImport(
+                      QUICK_CREATE_TAB_TO_VIEWER_TYPE["custom-weapon"],
+                      (item) =>
+                        setFormState((prev) =>
+                          mergeImportedIntoDefaults(
+                            buildCWPanelState(),
+                            stripPrivateFields(item),
+                          ),
+                        ),
+                    ),
+                }}
               />
             </Grid>
-          )}
-          <Grid size={12}>
-            <ChangeCustomizations
-              selectedCustomization={selectedCustomization}
-              setSelectedCustomization={setSelectedCustomization}
-              onCustomizationAdd={(c) =>
-                setCustomizations((prev) => [...prev, c])
-              }
-              onCustomizationRemove={(name) =>
-                setCustomizations((prev) => prev.filter((c) => c.name !== name))
-              }
-              currentCustomizations={customizations}
-              selectedCategory={category}
-              isSecondForm={false}
-              rareAccuracyBonus={rareAccuracyBonus}
-            />
-          </Grid>
-          {hasTransforming && (
-            <>
-              <Grid size={12}>
-                <Divider sx={{ mt: 1, mb: 0.5 }} />
-                <Typography variant="h6">
-                  {t("weapon_customization_transforming_form")}
-                </Typography>
-              </Grid>
-              <Grid size={12}>
-                <TextField
-                  label={t("weapon_customization_transforming_form_name")}
-                  value={secondWeaponName}
-                  onChange={(e) => setSecondWeaponName(e.target.value)}
-                  fullWidth
-                  size="small"
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={customWeaponFieldConfig}
+                groupLabels={customWeaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="accuracy"
+                cols={2}
+              />
+            </Grid>
+            <Grid
+              size={12}
+              container
+              spacing={1}
+              sx={{ mb: 0.75, alignItems: "center" }}
+            >
+              <SchemaFieldRenderer
+                config={customWeaponFieldConfig}
+                groupLabels={customWeaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="damage"
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={customWeaponFieldConfig}
+                groupLabels={customWeaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                cols={2}
+                extraProps={{
+                  groups: customWeaponQualityGroups,
+                  onBrowse: () => setQualityPickerOpen(true),
                 }}
-              >
-                <ChangeCWCategory
-                  value={secondSelectedCategory}
-                  onChange={handleSecondCategoryChange}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <ChangeRange
-                  value={secondSelectedRange}
-                  onChange={(e) => setSecondSelectedRange(e.target.value)}
-                />
-              </Grid>
-              {overrideAccuracyAttributes ? (
-                <>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth>
-                      <InputLabel>{t("Change Attr 1")}</InputLabel>
-                      <Select
-                        value={accuracyCheck.att1}
-                        label={t("Change Attr 1")}
-                        onChange={(e) =>
-                          setAccuracyCheck((current) => ({
-                            ...normalizeCustomWeaponAccuracyCheck(current),
-                            att1: e.target.value,
-                          }))
-                        }
-                      >
-                        {ATTRS.map((attribute) => (
-                          <MenuItem
-                            key={attribute.value}
-                            value={attribute.value}
-                          >
-                            {t(attribute.label)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <FormControl fullWidth>
-                      <InputLabel>{t("Change Attr 2")}</InputLabel>
-                      <Select
-                        value={accuracyCheck.att2}
-                        label={t("Change Attr 2")}
-                        onChange={(e) =>
-                          setAccuracyCheck((current) => ({
-                            ...normalizeCustomWeaponAccuracyCheck(current),
-                            att2: e.target.value,
-                          }))
-                        }
-                      >
-                        {ATTRS.map((attribute) => (
-                          <MenuItem
-                            key={attribute.value}
-                            value={attribute.value}
-                          >
-                            {t(attribute.label)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </>
-              ) : (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <ChangeAccuracyCheck
-                    value={secondSelectedAccuracyCheck}
-                    onChange={(val) => setSecondSelectedAccuracyCheck(val)}
+              />
+            </Grid>
+            <Accordion
+              sx={{ width: "100%", mb: 2 }}
+              expanded={modifiersExpanded}
+              onChange={() => setModifiersExpanded(!modifiersExpanded)}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{t("Modifiers")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={1}>
+                  <SchemaFieldRenderer
+                    config={customWeaponFieldConfig}
+                    groupLabels={customWeaponGroupLabels}
+                    state={formState}
+                    onChange={setFormState}
+                    surface="edit"
+                    group="rare"
+                    cols={2}
+                  />
+                  <SchemaFieldRenderer
+                    config={customWeaponFieldConfig}
+                    groupLabels={customWeaponGroupLabels}
+                    state={formState}
+                    onChange={setFormState}
+                    surface="edit"
+                    group="modifiers"
+                    cols={2}
                   />
                 </Grid>
-              )}
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <ChangeCWType
-                  value={secondSelectedType}
-                  onChange={(e) => setSecondSelectedType(e.target.value)}
-                  disabled={!secondHasElementalCustomization}
-                />
-              </Grid>
-              <Grid size={12}>
-                <ChangeCustomizations
-                  selectedCustomization={secondSelectedCustomization}
-                  setSelectedCustomization={setSecondSelectedCustomization}
-                  onCustomizationAdd={(c) =>
-                    setSecondCurrentCustomizations((prev) => [...prev, c])
-                  }
-                  onCustomizationRemove={(name) =>
-                    setSecondCurrentCustomizations((prev) =>
-                      prev.filter((c) => c.name !== name),
-                    )
-                  }
-                  currentCustomizations={secondCurrentCustomizations}
-                  selectedCategory={secondSelectedCategory}
-                  isSecondForm={true}
-                />
-              </Grid>
-              <Grid size={12}>
+              </AccordionDetails>
+            </Accordion>
+            {hasTransforming && (
+              <>
+                <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+                  <SchemaFieldRenderer
+                    config={customWeaponFieldConfig}
+                    groupLabels={customWeaponGroupLabels}
+                    state={formState}
+                    onChange={setFormState}
+                    surface="edit"
+                    group="secondary"
+                    label={t("weapon_customization_transforming_form")}
+                    cols={2}
+                    extraProps={secondaryExtraProps}
+                  />
+                </Grid>
                 <Accordion
-                  sx={{ width: "100%", marginLeft: "10px" }}
+                  sx={{ width: "100%", mb: 2 }}
                   expanded={secondModifiersExpanded}
                   onChange={() =>
                     setSecondModifiersExpanded(!secondModifiersExpanded)
@@ -4330,423 +3148,237 @@ function CustomWeaponPanel() {
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Grid container spacing={2}>
-                      {[
-                        {
-                          label: "Damage Modifier",
-                          value: secondDamageModifier,
-                          set: setSecondDamageModifier,
-                        },
-                        {
-                          label: "Precision Modifier",
-                          value: secondPrecModifier,
-                          set: setSecondPrecModifier,
-                        },
-                        {
-                          label: "DEF Modifier",
-                          value: secondDefModifier,
-                          set: setSecondDefModifier,
-                        },
-                        {
-                          label: "MDEF Modifier",
-                          value: secondMDefModifier,
-                          set: setSecondMDefModifier,
-                        },
-                      ].map(({ label, value, set }) => (
-                        <Grid key={label} size={6}>
-                          <ChangeModifiers
-                            label={label}
-                            value={value}
-                            onChange={(e) => set(e.target.value)}
-                          />
-                        </Grid>
-                      ))}
+                    <Grid container spacing={1}>
+                      <SchemaFieldRenderer
+                        config={customWeaponFieldConfig}
+                        groupLabels={customWeaponGroupLabels}
+                        state={formState}
+                        onChange={setFormState}
+                        surface="edit"
+                        group="secondaryModifiers"
+                        cols={2}
+                        extraProps={secondaryExtraProps}
+                      />
                     </Grid>
                   </AccordionDetails>
                 </Accordion>
-              </Grid>
-            </>
-          )}
-          <Grid size={12}>
-            <SelectWeaponQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const q = weaponQualities.find(
-                  (el) => el.name === e.target.value,
-                );
-                setSelectedQuality(q.name);
-                setQuality(q.quality);
-                setQualityCost(q.cost);
-              }}
-            />
+              </>
+            )}
+            <Grid size={12}>
+              <Button size="small" variant="outlined" onClick={handleClear}>
+                {t("Clear All Fields")}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid size={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid size={12}>
-                  <Typography variant="h6">
-                    {t("Rare Weapon Options")}
-                  </Typography>
-                  <Divider sx={{ mt: 0.5 }} />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={overrideDamageType}
-                        onChange={(e) =>
-                          setOverrideDamageType(e.target.checked)
-                        }
-                      />
-                    }
-                    label={`${t("override_damage_type")} (+100z)`}
-                  />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={overrideAccuracyAttributes}
-                        onChange={(e) =>
-                          handleOverrideAccuracyAttributesChange(
-                            e.target.checked,
-                          )
-                        }
-                      />
-                    }
-                    label={t("override_accuracy_attributes")}
-                  />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={rareAccuracyBonus}
-                        disabled={hasAccurate && !rareAccuracyBonus}
-                        onChange={(e) => {
-                          setRareAccuracyBonus(e.target.checked);
-                          if (
-                            e.target.checked &&
-                            selectedCustomization ===
-                              "weapon_customization_accurate"
-                          ) {
-                            setSelectedCustomization("");
-                          }
-                        }}
-                      />
-                    }
-                    label={`+1 ${t("Accuracy")} (+100z)`}
-                  />
-                </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={rareDamageBonus}
-                        onChange={(e) => setRareDamageBonus(e.target.checked)}
-                      />
-                    }
-                    label={`+4 ${t("Damage")} (+200z)`}
-                  />
-                </Grid>
-                {[
-                  {
-                    label: "Damage Modifier",
-                    value: damageModifier,
-                    set: setDamageModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid
-                    key={label}
-                    size={{
-                      xs: 12,
-                      sm: 6,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Grid size={12}>
-            <Button size="small" variant="outlined" onClick={handleClear}>
-              {t("Clear All Fields")}
-            </Button>
-          </Grid>
-        </Grid>
-      }
-      previewContent={<SharedCustomWeaponCard item={weaponObj} />}
-      addButton={
-        <AddToCompendiumButton itemType="custom-weapon" data={weaponObj} />
-      }
-      data={weaponObj}
-      itemName={weaponObj.name || ""}
-      exportDataType="custom-weapons"
-    />
+        }
+        previewContent={<SharedCustomWeaponCard item={weaponObj} />}
+        addButton={
+          <AddToCompendiumButton
+            itemType={REG["custom-weapon"].addItemType}
+            data={weaponObj}
+          />
+        }
+        data={weaponObj}
+        itemName={weaponObj.name || ""}
+        exportDataType={REG["custom-weapon"].exportDataType}
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="customWeapon"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
+          }))
+        }
+      />
+    </>
   );
 }
 
 // Accessory panel
 
+function buildAccessoryPanelState() {
+  return {
+    fuid: undefined,
+    itemType: "accessory",
+    name: "",
+    quality: "",
+    qualityCost: 0,
+    selectedQuality: "",
+    qualityApplicableTo: ["accessory"],
+    cost: 0,
+    defModifier: 0,
+    mDefModifier: 0,
+    initModifier: 0,
+    magicModifier: 0,
+    precModifier: 0,
+    damageMeleeModifier: 0,
+    damageRangedModifier: 0,
+    isEquipped: false,
+  };
+}
+
 function AccessoryPanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [quality, setQuality] = useState("");
-  const [qualityCost, setQualityCost] = useState(0);
-  const [selectedQuality, setSelectedQuality] = useState("");
-  const {
-    defModifier,
-    setDefModifier,
-    mDefModifier,
-    setMDefModifier,
-    initModifier,
-    setInitModifier,
-    magicModifier,
-    setMagicModifier,
-    precModifier,
-    setPrecModifier,
-    damageMeleeModifier,
-    setDamageMeleeModifier,
-    damageRangedModifier,
-    setDamageRangedModifier,
-    modifiersExpanded,
-    setModifiersExpanded,
-    _modifiers,
-    clearModifiers,
-  } = useEquipmentForm(null);
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(buildAccessoryPanelState);
+  const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
-  const cost = parseInt(qualityCost);
+  const { name, quality, cost } = formState;
 
   const accessoryObj = {
     name,
+    fuid: formState.fuid || undefined,
     cost,
     quality,
-    qualityCost,
-    selectedQuality,
-    defModifier: parseInt(defModifier),
-    mDefModifier: parseInt(mDefModifier),
-    initModifier: parseInt(initModifier),
-    magicModifier: parseInt(magicModifier),
-    precModifier: parseInt(precModifier),
-    damageMeleeModifier: parseInt(damageMeleeModifier),
-    damageRangedModifier: parseInt(damageRangedModifier),
+    qualityCost: formState.qualityCost,
+    selectedQuality: formState.selectedQuality,
+    defModifier: parseInt(formState.defModifier),
+    mDefModifier: parseInt(formState.mDefModifier),
+    initModifier: parseInt(formState.initModifier),
+    magicModifier: parseInt(formState.magicModifier),
+    precModifier: parseInt(formState.precModifier),
+    damageMeleeModifier: parseInt(formState.damageMeleeModifier),
+    damageRangedModifier: parseInt(formState.damageRangedModifier),
+    modifiers: {
+      def: parseInt(formState.defModifier),
+      mdef: parseInt(formState.mDefModifier),
+      init: parseInt(formState.initModifier),
+      magic: parseInt(formState.magicModifier),
+      accuracy: parseInt(formState.precModifier),
+      damageMelee: parseInt(formState.damageMeleeModifier),
+      damageRanged: parseInt(formState.damageRangedModifier),
+    },
   };
 
   const handleClear = () => {
-    setName("");
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    clearModifiers();
+    setFormState(buildAccessoryPanelState());
   };
 
   return (
-    <PanelLayout
-      formContent={
-        <Grid container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
+    <>
+      <PanelLayout
+        formContent={
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                label={t("Accessory")}
+                cols={2}
+                extraProps={{
+                  name: String(name ?? ""),
+                  onBrowse: () =>
+                    openImport(
+                      QUICK_CREATE_TAB_TO_VIEWER_TYPE.accessory,
+                      (item) =>
+                        setFormState((prev) =>
+                          mergeImportedIntoDefaults(
+                            buildAccessoryPanelState(),
+                            stripPrivateFields(item),
+                          ),
+                        ),
+                    ),
+                }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
+              />
+            </Grid>
+            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
+              <SchemaFieldRenderer
+                config={accessoryFieldConfig}
+                groupLabels={accessoryGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                cols={2}
+              />
+            </Grid>
+            <Grid size={12}>
+              <Button size="small" variant="outlined" onClick={handleClear}>
+                {t("Clear All Fields")}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <SelectAccessoryQuality
-              quality={selectedQuality}
-              setQuality={(e) => {
-                const q = accessoryQualities.find(
-                  (el) => el.name === e.target.value,
-                );
-                setSelectedQuality(q.name);
-                setQuality(q.quality);
-                setQualityCost(q.cost);
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <ChangeQuality
-              quality={quality}
-              setQuality={(e) => setQuality(e.target.value)}
-              qualityCost={qualityCost}
-              setQualityCost={(e) => setQualityCost(e.target.value)}
-            />
-          </Grid>
-          <Accordion
-            sx={{ width: "100%", marginLeft: "10px" }}
-            expanded={modifiersExpanded}
-            onChange={() => setModifiersExpanded(!modifiersExpanded)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{t("Modifiers")}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                {[
-                  {
-                    label: "DEF Modifier",
-                    value: defModifier,
-                    set: setDefModifier,
-                  },
-                  {
-                    label: "MDEF Modifier",
-                    value: mDefModifier,
-                    set: setMDefModifier,
-                  },
-                  {
-                    label: "INIT Modifier",
-                    value: initModifier,
-                    set: setInitModifier,
-                  },
-                  {
-                    label: "Magic Modifier",
-                    value: magicModifier,
-                    set: setMagicModifier,
-                  },
-                  {
-                    label: "Precision Modifier",
-                    value: precModifier,
-                    set: setPrecModifier,
-                  },
-                  {
-                    label: "Damage (Melee) Modifier",
-                    value: damageMeleeModifier,
-                    set: setDamageMeleeModifier,
-                  },
-                  {
-                    label: "Damage (Ranged) Modifier",
-                    value: damageRangedModifier,
-                    set: setDamageRangedModifier,
-                  },
-                ].map(({ label, value, set }) => (
-                  <Grid
-                    key={label}
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={label}
-                      value={value}
-                      onChange={(e) => set(e.target.value)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-          <Grid size={12}>
-            <Button size="small" variant="outlined" onClick={handleClear}>
-              {t("Clear All Fields")}
-            </Button>
-          </Grid>
-        </Grid>
-      }
-      previewContent={<SharedAccessoryCard item={accessoryObj} />}
-      addButton={
-        <AddToCompendiumButton itemType="accessory" data={accessoryObj} />
-      }
-      data={accessoryObj}
-      itemName={accessoryObj.name || ""}
-      exportDataType="accessories"
-    />
+        }
+        previewContent={<SharedAccessoryCard item={accessoryObj} />}
+        addButton={
+          <AddToCompendiumButton
+            itemType={REG.accessory.addItemType}
+            data={accessoryObj}
+          />
+        }
+        data={accessoryObj}
+        itemName={accessoryObj.name || ""}
+        exportDataType={REG.accessory.exportDataType}
+      />
+      <QualityPickerDialog
+        open={qualityPickerOpen}
+        onClose={() => setQualityPickerOpen(false)}
+        filterType="accessory"
+        onSelect={(q) =>
+          setFormState((prev) => ({
+            ...prev,
+            selectedQuality: q.name,
+            qualityName: q.name,
+            quality: q.quality ?? "",
+            qualityCost: q.cost ?? 0,
+            qualityApplicableTo: Array.isArray(q.filter) ? q.filter : [],
+          }))
+        }
+      />
+    </>
   );
 }
 
 // Optional panel
 
-const OPTIONAL_SUBTYPES = [
-  { value: "quirk", label: "Quirk" },
-  { value: "camp-activities", label: "Camp Activities" },
-  { value: "zero-trigger", label: "Zero Trigger" },
-  { value: "zero-effect", label: "Zero Effect" },
-  { value: "zero-power", label: "Zero Power" },
-  { value: "other", label: "Other" },
-];
-
 function OptionalPanel() {
   const { t } = useTranslate();
+  const { openImport } = useQuickCreateImport();
   const { packs } = useCompendiumPacks();
-  const [subtype, setSubtype] = useState("quirk");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [effect, setEffect] = useState("");
-  const [targetDescription, setTargetDescription] = useState("");
-  const [clockSections, setClockSections] = useState(6);
-  const [showClock, setShowClock] = useState(false);
+  const initialSubtype = useQuickCreateSubtype();
+
+  const [formState, setFormState] = useState(() => {
+    const defaults = createDefaultStateFromFields(optionalFieldConfig);
+    const validSubtypes =
+      optionalFieldConfig
+        .find((f) => f.key === "subtype")
+        ?.componentProps?.options?.map((o) => o.value) ?? [];
+    return {
+      ...defaults,
+      subtype:
+        initialSubtype && validSubtypes.includes(initialSubtype)
+          ? initialSubtype
+          : "quirk",
+    };
+  });
+
+  // zero-power: pack-sourced objects, not schema-driveable
   const [zeroTrigger, setZeroTrigger] = useState(null);
   const [zeroEffect, setZeroEffect] = useState(null);
 
-  // Collect zero-trigger / zero-effect items from all active packs
   const allOptionals = packs.flatMap((p) => {
     if (p.active === false) return [];
     const packFuid = p.fuid || p.name;
@@ -4769,67 +3401,92 @@ function OptionalPanel() {
   const zeroEffectOptions = allOptionals.filter(
     (i) => i.subtype === "zero-effect",
   );
-  const campTargetOptions = [
-    t("Yourself"),
-    t("One ally"),
-    t("Yourself or one ally"),
-  ];
 
-  const data =
-    subtype === "quirk"
+  const subtype = formState.subtype;
+
+  const data = String(formState.name ?? "").trim()
+    ? subtype === "zero-power"
       ? {
           subtype,
-          name: name.trim(),
-          description: description.trim(),
-          effect: effect.trim(),
-        }
-      : subtype === "camp-activities"
-        ? {
-            subtype,
-            name: name.trim(),
-            targetDescription: targetDescription.trim(),
-            effect: effect.trim(),
-          }
-        : subtype === "zero-trigger" || subtype === "zero-effect"
-          ? { subtype, name: name.trim(), description: description.trim() }
-          : subtype === "zero-power"
+          name: String(formState.name).trim(),
+          fuid: formState.fuid || undefined,
+          zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
+          zeroEffectRef: zeroEffect?._sourceRef ?? "",
+          zeroTrigger: zeroTrigger
             ? {
-                subtype,
-                name: name.trim(),
-                zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
-                zeroEffectRef: zeroEffect?._sourceRef ?? "",
-                zeroTrigger: zeroTrigger
-                  ? {
-                      name: zeroTrigger.name ?? "",
-                      description: zeroTrigger.description ?? "",
-                    }
-                  : "",
-                zeroEffect: zeroEffect
-                  ? {
-                      name: zeroEffect.name ?? "",
-                      description: zeroEffect.description ?? "",
-                    }
-                  : "",
-                clock: { sections: Number(clockSections) },
+                name: zeroTrigger.name ?? "",
+                description: zeroTrigger.description ?? "",
               }
-            : /* other */ {
-                subtype,
-                name: name.trim(),
-                description: description.trim(),
-                effect: effect.trim(),
-                ...(showClock
-                  ? { clock: { sections: Number(clockSections) } }
-                  : {}),
-              };
+            : "",
+          zeroEffect: zeroEffect
+            ? {
+                name: zeroEffect.name ?? "",
+                description: zeroEffect.description ?? "",
+              }
+            : "",
+          ...(formState.description
+            ? { description: String(formState.description).trim() }
+            : {}),
+          clock: { sections: Number(formState.clockSections) || 6 },
+          meta: createMetaFromBook("homebrew"),
+        }
+      : {
+          subtype,
+          name: String(formState.name).trim(),
+          fuid: formState.fuid || undefined,
+          ...(subtype === "camp-activities"
+            ? {
+                description: String(formState.target || "").trim(),
+              }
+            : formState.description != null
+              ? { description: String(formState.description).trim() }
+              : {}),
+          ...(formState.targetDescription != null
+            ? { targetDescription: String(formState.targetDescription).trim() }
+            : {}),
+          ...(formState.effect != null
+            ? { effect: String(formState.effect).trim() }
+            : {}),
+          ...(formState.showClock && formState.clockSections
+            ? { clock: { sections: Number(formState.clockSections) } }
+            : {}),
+          meta: createMetaFromBook("homebrew"),
+        }
+    : { subtype, name: "", meta: createMetaFromBook("homebrew") };
 
   const handleClear = () => {
-    setSubtype("quirk");
-    setName("");
-    setDescription("");
-    setEffect("");
-    setTargetDescription("");
-    setClockSections(6);
-    setShowClock(false);
+    setFormState(createDefaultStateFromFields(optionalFieldConfig));
+    setZeroTrigger(null);
+    setZeroEffect(null);
+  };
+
+  const handleImport = (item) => {
+    const imported = stripPrivateFields(item ?? {});
+    const defaults = createDefaultStateFromFields(optionalFieldConfig);
+    const sections =
+      imported?.clock?.sections ?? imported?.clockSections ?? imported?.clock;
+    const parsedSections = Number(sections);
+    setFormState({
+      ...defaults,
+      subtype: String(imported.subtype ?? "quirk"),
+      name: String(imported.name ?? ""),
+      fuid: imported.fuid || "",
+      description:
+        imported.subtype === "camp-activities"
+          ? ""
+          : String(imported.description ?? ""),
+      target:
+        imported.subtype === "camp-activities"
+          ? String(imported.description ?? "")
+          : "",
+      targetDescription: String(imported.targetDescription ?? ""),
+      effect: String(imported.effect ?? ""),
+      clockSections:
+        Number.isFinite(parsedSections) && parsedSections > 0
+          ? parsedSections
+          : 6,
+      showClock: Number.isFinite(parsedSections) && parsedSections > 0,
+    });
     setZeroTrigger(null);
     setZeroEffect(null);
   };
@@ -4839,131 +3496,46 @@ function OptionalPanel() {
       data={data}
       itemName={data.name || ""}
       formContent={
-        <Grid container spacing={2}>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={optionalFieldConfig}
+            groupLabels={optionalGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            label={t("Optional Rule")}
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE.optional,
+                  handleImport,
+                  { initialOptionalSubtypes: [formState.subtype] },
+                ),
             }}
-          >
-            <TextField
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Subtype")}</InputLabel>
-              <Select
-                value={subtype}
-                label={t("Subtype")}
-                onChange={(e) => setSubtype(e.target.value)}
-              >
-                {OPTIONAL_SUBTYPES.map((s) => (
-                  <MenuItem key={s.value} value={s.value}>
-                    {t(s.label)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          {subtype === "quirk" && (
-            <>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Description")}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Effect")}
-                  value={effect}
-                  onChange={(e) => setEffect(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-            </>
-          )}
-
-          {subtype === "camp-activities" && (
-            <>
-              <Grid size={12}>
-                <Autocomplete
-                  freeSolo
-                  options={campTargetOptions}
-                  value={targetDescription}
-                  onInputChange={(_, value) => setTargetDescription(value)}
-                  onChange={(_, value) =>
-                    setTargetDescription(typeof value === "string" ? value : "")
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t("Target")}
-                      size="small"
-                      helperText={t(
-                        "Suggested: Yourself, One ally, Yourself or one ally",
-                      )}
-                    />
-                  )}
-                  size="small"
-                />
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Effect")}
-                  value={effect}
-                  onChange={(e) => setEffect(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-            </>
-          )}
-
-          {(subtype === "zero-trigger" || subtype === "zero-effect") && (
-            <Grid size={12}>
-              <CustomTextarea
-                label={t("Description")}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                helperText=""
-              />
-            </Grid>
-          )}
-
+          />
+          <SchemaFieldRenderer
+            config={optionalFieldConfig}
+            groupLabels={optionalGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
+          <SchemaFieldRenderer
+            config={optionalFieldConfig}
+            groupLabels={optionalGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="clock"
+            cols={2}
+          />
           {subtype === "zero-power" && (
             <>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <TextField
-                  label={t("Clock Sections")}
-                  value={clockSections}
-                  onChange={(e) => setClockSections(e.target.value)}
-                  fullWidth
-                  size="small"
-                  type="number"
-                  slotProps={{
-                    htmlInput: { min: 2, max: 12 },
-                  }}
-                />
-              </Grid>
               <Grid size={12}>
                 <Autocomplete
                   options={zeroTriggerOptions}
@@ -5026,65 +3598,6 @@ function OptionalPanel() {
               </Grid>
             </>
           )}
-
-          {subtype === "other" && (
-            <>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Description")}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Effect")}
-                  value={effect}
-                  onChange={(e) => setEffect(e.target.value)}
-                  helperText=""
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t("Clock")}</InputLabel>
-                  <Select
-                    value={showClock ? "yes" : "no"}
-                    label={t("Clock")}
-                    onChange={(e) => setShowClock(e.target.value === "yes")}
-                  >
-                    <MenuItem value="no">{t("No Clock")}</MenuItem>
-                    <MenuItem value="yes">{t("With Clock")}</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              {showClock && (
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 6,
-                  }}
-                >
-                  <TextField
-                    label={t("Clock Sections")}
-                    value={clockSections}
-                    onChange={(e) => setClockSections(e.target.value)}
-                    fullWidth
-                    size="small"
-                    type="number"
-                    slotProps={{
-                      htmlInput: { min: 2, max: 12 },
-                    }}
-                  />
-                </Grid>
-              )}
-            </>
-          )}
           <Grid size={12}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -5092,23 +3605,14 @@ function OptionalPanel() {
           </Grid>
         </Grid>
       }
-      previewContent={
-        data.name ? (
-          <SharedOptionalCard item={data} />
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography
-              sx={{
-                color: "text.secondary",
-              }}
-            >
-              {t("Fill in the form to see a preview")}
-            </Typography>
-          </Box>
-        )
+      previewContent={<SharedOptionalCard item={data} />}
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG.optional.addItemType}
+          data={data}
+        />
       }
-      addButton={<AddToCompendiumButton itemType="optional" data={data} />}
-      exportDataType="optionals"
+      exportDataType={REG.optional.exportDataType}
     />
   );
 }
@@ -5122,13 +3626,16 @@ function MnemospherePanel() {
   const [selectedLvl, setSelectedLvl] = useState(1);
 
   const data = selectedClass
-    ? buildMnemosphere(selectedClass, Number(selectedLvl))
+    ? {
+        ...buildMnemosphere(selectedClass, Number(selectedLvl)),
+        meta: createMetaFromBook("homebrew"),
+      }
     : null;
 
   return (
     <PanelLayout
       formContent={
-        <Stack spacing={2}>
+        <Stack spacing={1}>
           <FormControl fullWidth size="small">
             <InputLabel>{t("Class")}</InputLabel>
             <Select
@@ -5163,35 +3670,37 @@ function MnemospherePanel() {
         </Stack>
       }
       previewContent={
-        data ? (
-          <SharedMnemosphereCard item={data} />
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography color="text.secondary">
-              {t("Fill in the form to see a preview")}
-            </Typography>
-          </Box>
-        )
+        <SharedMnemosphereCard
+          item={
+            data || {
+              name: "",
+              cost: 0,
+              skills: [],
+            }
+          }
+        />
       }
       addButton={
         data ? (
-          <AddToCompendiumButton itemType="mnemosphere" data={data} />
+          <AddToCompendiumButton
+            itemType={REG.mnemosphere.addItemType}
+            data={data}
+          />
         ) : null
       }
       data={data}
       itemName={data?.name || ""}
-      exportDataType="mnemospheres"
+      exportDataType={REG.mnemosphere.exportDataType}
     />
   );
 }
 
 function HoplospherePanel() {
   const { t } = useTranslate();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [requiredSlots, setRequiredSlots] = useState(1);
-  const [socketable, setSocketable] = useState("all");
-  const [cost, setCost] = useState(500);
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(hoplosphereFieldConfig),
+  );
   const [coagEffects, setCoagEffects] = useState([]);
 
   const handleCoagChange = (index, field, value) => {
@@ -5208,13 +3717,19 @@ function HoplospherePanel() {
     setCoagEffects((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const data = name.trim()
+  const handleClear = () => {
+    setFormState(createDefaultStateFromFields(hoplosphereFieldConfig));
+    setCoagEffects([]);
+  };
+
+  const data = String(formState.name ?? "").trim()
     ? {
-        name: name.trim(),
-        description,
-        requiredSlots: Number(requiredSlots),
-        socketable,
-        cost: Number(cost) || 0,
+        name: String(formState.name ?? "").trim(),
+        fuid: formState.fuid || undefined,
+        description: formState.description,
+        requiredSlots: Number(formState.requiredSlots),
+        socketable: formState.socketable,
+        cost: Number(formState.cost) || 0,
         coagEffects: coagEffects.reduce((acc, row) => {
           const threshold = Number(row.threshold);
           const effect = String(row.effect ?? "").trim();
@@ -5225,72 +3740,73 @@ function HoplospherePanel() {
 
           return acc;
         }, {}),
+        meta: deriveIsOfficial(formState) ?? createMetaFromBook("homebrew"),
       }
     : null;
 
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={hoplosphereFieldConfig}
+            groupLabels={hoplosphereGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="core"
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(
+                  QUICK_CREATE_TAB_TO_VIEWER_TYPE.hoplosphere,
+                  (item) => {
+                    const defaults = createDefaultStateFromFields(
+                      hoplosphereFieldConfig,
+                    );
+                    const merged = mergeImportedIntoDefaults(
+                      defaults,
+                      stripPrivateFields(item),
+                    );
+                    setFormState(merged);
+                    const importedCoag = merged?.coagEffects;
+                    if (importedCoag && typeof importedCoag === "object") {
+                      const rows = Object.entries(importedCoag)
+                        .map(([threshold, effect]) => ({
+                          threshold: Number(threshold),
+                          effect: String(effect ?? ""),
+                        }))
+                        .filter(
+                          (row) => row.threshold > 1 && row.effect.trim(),
+                        );
+                      setCoagEffects(rows);
+                    } else {
+                      setCoagEffects([]);
+                    }
+                  },
+                ),
+            }}
+          />
+          <SchemaFieldRenderer
+            config={hoplosphereFieldConfig}
+            groupLabels={hoplosphereGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="body"
+            cols={1}
+          />
           <Grid size={12}>
-            <TextField
-              fullWidth
-              size="small"
-              label={t("Name")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              fullWidth
-              multiline
-              minRows={3}
-              size="small"
-              label={t("Description")}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Slots")}</InputLabel>
-              <Select
-                value={requiredSlots}
-                label={t("Slots")}
-                onChange={(e) => setRequiredSlots(e.target.value)}
-              >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("Socketable")}</InputLabel>
-              <Select
-                value={socketable}
-                label={t("Socketable")}
-                onChange={(e) => setSocketable(e.target.value)}
-              >
-                <MenuItem value="all">{t("All")}</MenuItem>
-                <MenuItem value="weapon">{t("Weapon only")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              fullWidth
-              size="small"
-              type="number"
-              label={t("Cost")}
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
-              slotProps={{ input: { inputProps: { min: 0 } } }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                fontSize: "0.75rem",
+                letterSpacing: "0.05em",
+              }}
+            >
               {t("Coagulation")}
             </Typography>
             <Stack spacing={1}>
@@ -5312,17 +3828,16 @@ function HoplospherePanel() {
                     sx={{ width: { xs: 1, sm: 140 } }}
                     slotProps={{ input: { inputProps: { min: 2 } } }}
                   />
-                  <TextField
-                    label={t("Effect")}
-                    size="small"
-                    multiline
-                    minRows={2}
-                    value={row.effect}
-                    onChange={(e) =>
-                      handleCoagChange(index, "effect", e.target.value)
-                    }
-                    fullWidth
-                  />
+                  <Box sx={{ flex: 1 }}>
+                    <CustomTextarea
+                      label={t("hoplosphere.coag.effect")}
+                      value={row.effect}
+                      onChange={(e) =>
+                        handleCoagChange(index, "effect", e.target.value)
+                      }
+                      helperText=""
+                    />
+                  </Box>
                   <IconButton
                     aria-label={t("Remove coagulation effect")}
                     onClick={() => handleRemoveCoag(index)}
@@ -5343,70 +3858,75 @@ function HoplospherePanel() {
               </Button>
             </Stack>
           </Grid>
+          <SchemaFieldRenderer
+            config={hoplosphereFieldConfig}
+            groupLabels={hoplosphereGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            group="meta"
+            cols={2}
+          />
+          <Grid size={12}>
+            <Button size="small" variant="outlined" onClick={handleClear}>
+              {t("Clear All Fields")}
+            </Button>
+          </Grid>
         </Grid>
       }
       previewContent={
-        data ? (
-          <SharedHoplosphereCard item={data} />
-        ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography color="text.secondary">
-              {t("Fill in the form to see a preview")}
-            </Typography>
-          </Box>
-        )
+        <SharedHoplosphereCard
+          item={
+            data || {
+              name: "",
+              description: "",
+              requiredSlots: 1,
+              socketable: "all",
+              cost: 0,
+              coagEffects: {},
+            }
+          }
+        />
       }
       addButton={
         data ? (
-          <AddToCompendiumButton itemType="hoplosphere" data={data} />
+          <AddToCompendiumButton
+            itemType={REG.hoplosphere.addItemType}
+            data={data}
+          />
         ) : null
       }
       data={data}
       itemName={data?.name || ""}
-      exportDataType="hoplospheres"
+      exportDataType={REG.hoplosphere.exportDataType}
     />
   );
 }
 
-const TABS = [
-  { key: "npc-attack", label: "NPC Attack", Panel: NpcAttackPanel },
-  { key: "npc-spell", label: "NPC Spell", Panel: NpcSpellPanel },
-  { key: "npc-special", label: "Special Rule", Panel: NpcSpecialPanel },
-  { key: "npc-action", label: "Other Action", Panel: NpcActionPanel },
-  { key: "player-spell", label: "Player Spell", Panel: PlayerSpellPanel },
-  { key: "quality", label: "Quality", Panel: QualityPanel },
-  { key: "heroic", label: "Heroic Skill", Panel: HeroicPanel },
-  { key: "class", label: "Class", Panel: ClassPanel },
-  { key: "mnemosphere", label: "Mnemosphere", Panel: MnemospherePanel },
-  { key: "hoplosphere", label: "Hoplosphere", Panel: HoplospherePanel },
-  { key: "weapon", label: "Weapon", Panel: WeaponPanel },
-  { key: "custom-weapon", label: "Custom Weapon", Panel: CustomWeaponPanel },
-  { key: "armor", label: "Armor", Panel: ArmorPanel },
-  { key: "shield", label: "Shield", Panel: ShieldPanel },
-  { key: "accessory", label: "Accessory", Panel: AccessoryPanel },
-  { key: "optional", label: "Optional", Panel: OptionalPanel },
-];
-
-// Viewer type → Quick Create tab key
-
-const VIEWER_TYPE_TO_TAB_KEY = {
-  attacks: "npc-attack",
-  spells: "npc-spell",
-  special: "npc-special",
-  actions: "npc-action",
-  "player-spells": "player-spell",
-  qualities: "quality",
-  heroics: "heroic",
-  classes: "class",
-  mnemospheres: "mnemosphere",
-  hoplospheres: "hoplosphere",
-  weapons: "weapon",
-  "custom-weapons": "custom-weapon",
-  armor: "armor",
-  shields: "shield",
-  accessories: "accessory",
-  optionals: "optional",
+const TAB_CONFIG = {
+  "npc-attack": { Panel: NpcAttackPanel },
+  "npc-spell": { Panel: NpcSpellPanel },
+  "npc-special": { Panel: NpcSpecialPanel },
+  "npc-action": { Panel: NpcActionPanel },
+  "player-spell": { Panel: PlayerSpellPanel },
+  quality: { Panel: QualityPanel },
+  heroic: { Panel: HeroicPanel },
+  class: { Panel: ClassPanel },
+  mnemosphere: { Panel: MnemospherePanel },
+  hoplosphere: { Panel: HoplospherePanel },
+  weapon: { Panel: WeaponPanel },
+  "custom-weapon": { Panel: CustomWeaponPanel },
+  armor: { Panel: ArmorPanel },
+  shield: { Panel: ShieldPanel },
+  accessory: { Panel: AccessoryPanel },
+  optional: { Panel: OptionalPanel },
 };
+
+const TABS = QUICK_CREATE_TAB_KEYS.map((key) => ({
+  key,
+  label: itemFormRegistry[key].label,
+  ...TAB_CONFIG[key],
+}));
 
 // Main component
 
@@ -5414,8 +3934,15 @@ export default function QuickCreateModal({
   open,
   onClose,
   lockedToViewerType,
+  initialSubtype,
 }) {
   const { t } = useTranslate();
+  const tabsWrapRef = useRef(null);
+  const tabsDragRef = useRef({
+    active: false,
+    startX: 0,
+    startScrollLeft: 0,
+  });
 
   const lockedTabKey = lockedToViewerType
     ? VIEWER_TYPE_TO_TAB_KEY[lockedToViewerType]
@@ -5425,10 +3952,50 @@ export default function QuickCreateModal({
   const initialTab = lockedTabIdx >= 0 ? lockedTabIdx : 0;
 
   const [tab, setTab] = useState(initialTab);
+  const [importRequest, setImportRequest] = useState(null);
 
   useEffect(() => {
-    if (open && lockedTabIdx >= 0) setTab(lockedTabIdx);
+    if (open) setTab(lockedTabIdx >= 0 ? lockedTabIdx : 0);
   }, [open, lockedTabIdx]);
+
+  const getTabsScroller = () =>
+    tabsWrapRef.current?.querySelector?.(".MuiTabs-scroller") ?? null;
+
+  const handleTabsPointerDown = (event) => {
+    const scroller = getTabsScroller();
+    if (!scroller) return;
+    tabsDragRef.current = {
+      active: true,
+      startX: event.clientX,
+      startScrollLeft: scroller.scrollLeft,
+    };
+  };
+
+  const handleTabsPointerMove = (event) => {
+    const scroller = getTabsScroller();
+    if (!scroller || !tabsDragRef.current.active) return;
+    const deltaX = event.clientX - tabsDragRef.current.startX;
+    scroller.scrollLeft = tabsDragRef.current.startScrollLeft - deltaX;
+  };
+
+  const stopTabsDrag = () => {
+    tabsDragRef.current.active = false;
+  };
+
+  const handleTabsWheel = (event) => {
+    const scroller = getTabsScroller();
+    if (!scroller) return;
+    if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+      scroller.scrollLeft += event.deltaY;
+      event.preventDefault();
+    }
+  };
+
+  const openImport = (viewerType, onImport, extraProps = {}) => {
+    setImportRequest({ viewerType, onImport, extraProps });
+  };
+
+  const closeImport = () => setImportRequest(null);
 
   return (
     <Dialog
@@ -5442,7 +4009,7 @@ export default function QuickCreateModal({
         },
       }}
     >
-      <DialogTitle sx={{ pb: 0 }}>
+      <DialogTitle>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <AutoFixHigh fontSize="small" />
           {t("Quick Create")}
@@ -5455,7 +4022,15 @@ export default function QuickCreateModal({
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Box
+        ref={tabsWrapRef}
+        sx={{ borderBottom: 1, borderColor: "divider" }}
+        onPointerDown={handleTabsPointerDown}
+        onPointerMove={handleTabsPointerMove}
+        onPointerUp={stopTabsDrag}
+        onPointerLeave={stopTabsDrag}
+        onWheel={handleTabsWheel}
+      >
         <Tabs
           value={tab}
           onChange={(_, v) => setTab(v)}
@@ -5463,21 +4038,36 @@ export default function QuickCreateModal({
           scrollButtons="auto"
         >
           {TABS.map((item, idx) => (
-            <Tab
-              key={item.key}
-              label={t(item.label)}
-              disabled={lockedTabIdx >= 0 && idx !== lockedTabIdx}
-            />
+            <Tab key={item.key} label={t(item.label)} disabled={false} />
           ))}
         </Tabs>
       </Box>
-      <DialogContent sx={{ p: 0, flex: 1, overflow: "auto" }}>
-        {TABS.map(({ key, Panel }, idx) => (
-          <Box key={key} hidden={tab !== idx} sx={{ height: "100%" }}>
-            {tab === idx && <Panel />}
-          </Box>
-        ))}
-      </DialogContent>
+      <QuickCreateImportContext.Provider value={{ openImport }}>
+        <QuickCreateSubtypeContext.Provider value={initialSubtype ?? null}>
+          <DialogContent sx={{ p: 0, flex: 1, overflow: "auto" }}>
+            {TABS.map(({ key, Panel }, idx) => (
+              <Box key={key} hidden={tab !== idx} sx={{ height: "100%" }}>
+                {tab === idx && <Panel />}
+              </Box>
+            ))}
+          </DialogContent>
+        </QuickCreateSubtypeContext.Provider>
+      </QuickCreateImportContext.Provider>
+      <CompendiumViewerModal
+        open={Boolean(importRequest)}
+        onClose={closeImport}
+        onAddItem={(item) => {
+          importRequest?.onImport?.(item);
+          closeImport();
+        }}
+        initialType={
+          importRequest?.viewerType ?? QUICK_CREATE_TAB_TO_VIEWER_TYPE.class
+        }
+        restrictToTypes={
+          importRequest?.viewerType ? [importRequest.viewerType] : undefined
+        }
+        {...(importRequest?.extraProps ?? {})}
+      />
     </Dialog>
   );
 }

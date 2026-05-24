@@ -55,7 +55,10 @@ export default function SpellInvoker({ spell, setPlayer }) {
         if (cls.name === spell.className) {
           const newSpells = cls.spells.map((s) => {
             if (s.spellType === "invocation") {
-              let activeWellsprings = [...(s.activeWellsprings || [])];
+              const prevTracker = s.tracker || {};
+              let activeWellsprings = [
+                ...(prevTracker.activeWellsprings || []),
+              ];
               if (activeWellsprings.includes(wellspring)) {
                 activeWellsprings = activeWellsprings.filter(
                   (w) => w !== wellspring,
@@ -66,7 +69,7 @@ export default function SpellInvoker({ spell, setPlayer }) {
                 }
                 activeWellsprings.push(wellspring);
               }
-              return { ...s, activeWellsprings };
+              return { ...s, tracker: { ...prevTracker, activeWellsprings } };
             }
             return s;
           });
@@ -93,9 +96,11 @@ export default function SpellInvoker({ spell, setPlayer }) {
             </Typography>
             <Box sx={{ display: "flex", gap: 0.5, mt: 0.5, flexWrap: "wrap" }}>
               {["Air", "Earth", "Fire", "Lightning", "Water"].map((ws) => {
-                const isActive = spell.activeWellsprings?.includes(ws);
+                const spellTracker = spell.tracker || {};
+                const isActive = spellTracker.activeWellsprings?.includes(ws);
                 const isInner =
-                  spell.innerWellspring && spell.chosenWellspring === ws;
+                  spellTracker.innerWellspring &&
+                  spellTracker.chosenWellspring === ws;
                 const isSelected = isActive || isInner;
                 const backgroundColor = getWellspringColor(ws, isSelected);
                 const selectedTextColor = getSelectedTextColor(ws);
@@ -136,11 +141,12 @@ export default function SpellInvoker({ spell, setPlayer }) {
         {/* Invocations */}
         {availableInvocations
           .filter((invocation) => {
-            if (spell.activeWellsprings?.includes(invocation.wellspring))
+            const t2 = spell.tracker || {};
+            if (t2.activeWellsprings?.includes(invocation.wellspring))
               return true;
             if (
-              spell.innerWellspring &&
-              spell.chosenWellspring === invocation.wellspring
+              t2.innerWellspring &&
+              t2.chosenWellspring === invocation.wellspring
             )
               return true;
             return false;

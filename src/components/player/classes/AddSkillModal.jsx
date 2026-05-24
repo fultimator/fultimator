@@ -21,6 +21,8 @@ import { Close, Info } from "@mui/icons-material";
 import skills from "../../../libs/skills";
 import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
+import FuidField from "../../common/FuidField";
+import { slugify } from "../../../libs/slugify";
 
 export default function AddSkillModal({
   open,
@@ -28,6 +30,8 @@ export default function AddSkillModal({
   editSkillIndex,
   skillName,
   setSkillName,
+  skillFuid,
+  setSkillFuid,
   maxLevel,
   setMaxLevel,
   description,
@@ -106,9 +110,19 @@ export default function AddSkillModal({
               fullWidth
               value={skillName}
               onChange={(e) => setSkillName(e.target.value)}
+              onBlur={() => {
+                if (!skillFuid) setSkillFuid(slugify(skillName));
+              }}
               slotProps={{
                 htmlInput: { maxLength: 50 },
               }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12 }} sx={{ order: -1 }}>
+            <FuidField
+              value={skillFuid}
+              name={skillName}
+              onChange={setSkillFuid}
             />
           </Grid>
           <Grid
@@ -194,7 +208,10 @@ export default function AddSkillModal({
                       {t(skillClass)}
                     </ListSubheader>,
                     groupedSkills[skillClass].map((skill) => (
-                      <MenuItem key={skill.name} value={skill.name}>
+                      <MenuItem
+                        key={`${skillClass}-${skill.name}`}
+                        value={skill.name}
+                      >
                         {t(skill.name)}
                       </MenuItem>
                     )),

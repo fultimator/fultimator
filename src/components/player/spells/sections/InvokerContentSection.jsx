@@ -16,10 +16,11 @@ import ReactMarkdown from "react-markdown";
  */
 export default function InvokerContentSection({ formState, setFormState, t }) {
   const theme = useTheme();
-  const activeWellsprings = formState.activeWellsprings || [];
+  const tracker = formState.tracker || {};
+  const activeWellsprings = tracker.activeWellsprings || [];
   const skillLevel = formState.skillLevel || 1;
-  const innerWellspring = formState.innerWellspring || false;
-  const chosenWellspring = formState.chosenWellspring || "";
+  const innerWellspring = tracker.innerWellspring || false;
+  const chosenWellspring = tracker.chosenWellspring || "";
 
   const wellspringList = [
     { name: "Air", icon: Air },
@@ -51,11 +52,11 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
 
   const handleWellspringToggle = (wellspring) => {
     setFormState((prev) => {
-      const current = prev.activeWellsprings || [];
+      const prevTracker = prev.tracker || {};
+      const current = prevTracker.activeWellsprings || [];
       const isActive = current.includes(wellspring);
 
       if (innerWellspring && chosenWellspring === wellspring && isActive) {
-        // Don't allow deselecting the inner wellspring
         return prev;
       }
 
@@ -63,9 +64,12 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
         ? current.filter((w) => w !== wellspring)
         : current.length < 2
           ? [...current, wellspring]
-          : [current[1], wellspring]; // Replace first with new
+          : [current[1], wellspring];
 
-      return { ...prev, activeWellsprings: newWellsprings };
+      return {
+        ...prev,
+        tracker: { ...prevTracker, activeWellsprings: newWellsprings },
+      };
     });
   };
 

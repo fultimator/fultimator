@@ -26,12 +26,18 @@ import CombatLog from "../../components/combatSim/CombatLog";
 import { Cloud as CloudIcon, DragHandle } from "@mui/icons-material";
 import debounce from "lodash.debounce";
 import { globalConfirm } from "../../utility/globalConfirm";
-import { useNavigate } from "react-router";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
+import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
+import NpcEditModal from "../../components/combatSim/NpcEditModal";
 import { SignIn } from "../../components/auth";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
+import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
+import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../components/player/playerTransforms";
+import { buildDamageContext, resolveDamage } from "../../pipelines/damagePipeline";
+import { getActorBonuses } from "../../libs/actorBonuses";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
 export default function CombatSimulator() {
   const { authLoading, dbMode, cloudUser, activeUid } = useDatabaseContext();
@@ -91,12 +97,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // ========== Base States ==========
   const { id } = useParams(); // Get the encounter ID from the URL
   const theme = useTheme();
-  const isDarkMode = theme.palette.mode === "dark"; // Check if dark mode is enabled
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const inputRef = useRef(null);
   const [loading, setLoading] = useState(true); // Loading state
   const [initialized, setInitialized] = useState(false); // Initialized state
-  const navigate = useNavigate();
 
   // ========== DB (active adapter - uid auto-injected in cloud mode) ==========
   const [encounterData, setEncounterData] = useState(null);
@@ -202,11 +206,24 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const prevClocksRef = useRef(null);
   const prevNotesRef = useRef(null);
   const [tabIndex, setTabIndex] = useState(0); // NPC sheet tab index
-  const [selectedStudy, setSelectedStudy] = useState(0); // NPC study level
+  const [selectedStudy, setSelectedStudy] = useState(0); // NPC study level (0 = full sheet, 1-3 = study tiers)
   const [isSaveSnackbarOpen, setIsSaveSnackbarOpen] = useState(false); // Save notification state
   const isDifferentUser = !isLocalMode && encounter?.uid !== user?.uid;
   const isPrivate = encounter?.private && isDifferentUser;
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+  const [npcEditModalOpen, setNpcEditModalOpen] = useState(false);
+
+  // Sync actors to shared store so the chat panel can read them without a Firestore round-trip.
+  const setEncounterActors = useCombatEncounterStore((s) => s.setActors);
+  const setActiveActorName = useCombatEncounterStore(
+    (s) => s.setActiveActorName,
+  );
+  const clearEncounterActors = useCombatEncounterStore((s) => s.clearActors);
+  const clearTargets = useCombatEncounterStore((s) => s.clearTargets);
+  useEffect(() => {
+    setEncounterActors(id, selectedNPCs, selectedPCs);
+  }, [id, selectedNPCs, selectedPCs]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => clearEncounterActors(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ========== Log States ==========
   const [logs, setLogs] = useState([]);
@@ -249,8 +266,16 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     if (encounterData && !initialized) {
       setEncounter(encounterData);
       setEncounterName(encounterData.name || "Unnamed Encounter");
-      setSelectedNPCs(encounterData.selectedNPCs || []);
-      setSelectedPCs(encounterData.selectedPCs || []);
+      setSelectedNPCs(
+        (encounterData.selectedNPCs || []).map((npc) =>
+          applyNpcPostLoadTransforms(npc),
+        ),
+      );
+      setSelectedPCs(
+        (encounterData.selectedPCs || []).map((pc) =>
+          applyPlayerPostLoadTransforms(pc),
+        ),
+      );
       setLogs(encounterData.logs || []);
       setEncounterClocks(encounterData.clocks || []);
       setEncounterNotes(encounterData.notes || []);
@@ -396,6 +421,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     const interval = setInterval(updateRelativeTime, 60000);
     return () => clearInterval(interval);
   }, [lastSaved, lastAutoSaved]);
+
+  const addMessage = useChatMessagesStore((s) => s.addMessage);
 
   // Handle Log state
   const addLog = (message, name, value, status) => {
@@ -546,23 +573,25 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const handleSelectNPC = async (npcId) => {
     if (selectedNPCs.length < 30) {
       const npc = await getNpc(npcId); // Fetch full NPC data using getNpc
+      if (!npc) return;
+      const normalizedNpc = applyNpcPostLoadTransforms(npc);
 
       // Calculate Ultima value only if the NPC is a villain
       let ultimaValue = null;
-      if (npc.villain === "minor") {
+      if (normalizedNpc.villain === "minor") {
         ultimaValue = 5;
-      } else if (npc.villain === "major") {
+      } else if (normalizedNpc.villain === "major") {
         ultimaValue = 10;
-      } else if (npc.villain === "superme") {
+      } else if (normalizedNpc.villain === "superme") {
         ultimaValue = 15;
       }
 
       // Create combatStats object and conditionally add ultima
       const combatStats = {
         notes: "",
-        currentHp: calcHP(npc),
-        currentMp: calcMP(npc),
-        turns: new Array(getTurnCount(npc.rank)).fill(false),
+        currentHp: calcHP(normalizedNpc),
+        currentMp: calcMP(normalizedNpc),
+        turns: new Array(getTurnCount(normalizedNpc.rank)).fill(false),
         statusEffects: [],
         combatNotes: "",
         ...(ultimaValue !== null && { ultima: ultimaValue }), // Only add ultima if it's not null
@@ -571,16 +600,18 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       setSelectedNPCs((prev) => [
         ...prev,
         {
-          ...npc,
+          ...normalizedNpc,
           id: npcId,
-          combatId: `${npc.id}-${Date.now()}`,
+          sourceDocId: npcId,
+          sourceCollection: "npc-personal",
+          combatId: `${npcId}-${Date.now()}`,
           combatStats: combatStats,
         },
       ]);
 
       if (logNpcAdded) {
         // Add log entry to logs array
-        addLog("combat_sim_log_npc_added", npc.name);
+        addLog("combat_sim_log_npc_added", normalizedNpc.name);
       }
     } else {
       if (window.electron) {
@@ -594,15 +625,18 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Handle Select PC from the player list
   const handleSelectPC = (player) => {
     if (selectedNPCs.length + selectedPCs.length < 30) {
+      const normalizedPlayer = applyPlayerPostLoadTransforms(player);
       setSelectedPCs((prev) => [
         ...prev,
         {
-          ...player,
+          ...normalizedPlayer,
           id: player.id,
+          sourceDocId: player.id,
+          sourceCollection: "player-personal",
           combatId: `${player.id}-${Date.now()}`,
           combatStats: {
-            currentHp: player.stats?.hp?.max ?? 0,
-            currentMp: player.stats?.mp?.max ?? 0,
+            currentHp: normalizedPlayer.stats?.hp?.max ?? 0,
+            currentMp: normalizedPlayer.stats?.mp?.max ?? 0,
             turns: [false],
             statusEffects: [],
             combatNotes: "",
@@ -630,7 +664,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const handlePcClick = (pcCombatId) => {
     const pc = selectedPCs.find((pc) => pc.combatId === pcCombatId);
     setSelectedPC(pc);
-    setSelectedNPC(null); // clear NPC selection
+    setSelectedNPC(null);
+    setActiveActorName(pc?.name ?? null);
   };
 
   // Handle Update PC Turns
@@ -705,9 +740,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Handle NPC Click in the selected NPCs list
   const handleNpcClick = (npcCombatId) => {
     const npc = selectedNPCs.find((npc) => npc.combatId === npcCombatId);
-    setSelectedNPC(npc); // Set clicked NPC as the selected NPC
-    setSelectedPC(null); // clear PC selection
+    setSelectedNPC(npc);
+    setSelectedPC(null);
     setSelectedStudy(0);
+    setActiveActorName(npc?.name ?? null);
   };
 
   // Handle Study Change
@@ -814,9 +850,15 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     // NPC path
     if (!isHealing && statType === "HP") {
-      adjustedValue = -Number(
-        calculateDamage(npcClicked, value, damageType, isGuarding),
-      );
+      const dmgCtx = buildDamageContext({
+        baseDamage: Number(value) || 0,
+        damageType: damageType || "untyped",
+        npcAffinities: npcClicked.affinities || {},
+        temporaryAffinities: npcClicked.runtimeActor?.temporaryAffinities,
+        isGuarding,
+        incomingDamageBonuses: getActorBonuses(npcClicked).incomingDamage,
+      });
+      adjustedValue = -resolveDamage(dmgCtx).finalDamage;
     } else {
       adjustedValue = isHealing ? Number(value) : -Number(value);
     }
@@ -959,47 +1001,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     }
   };
 
-  // Calculate damage with affinities
-  function calculateDamage(
-    npc,
-    damageValue,
-    damageType = "",
-    isGuarding = false,
-  ) {
-    const affinities = npc.affinities || {};
-    const damage = parseInt(damageValue, 10) || 0;
-
-    // Default damage value
-    let finalDamage = damage;
-
-    if (affinities[damageType]) {
-      switch (affinities[damageType]) {
-        case "vu": // Vulnerable (x2)
-          finalDamage = isGuarding ? damage : damage * 2;
-          break;
-        case "rs": // Resistant (x0.5, rounded down)
-          finalDamage = Math.floor(damage * 0.5);
-          break;
-        case "ab": // Absorb (turn damage into healing)
-          finalDamage = -damage;
-          break;
-        case "im": // Immune (no damage)
-          finalDamage = 0;
-          break;
-        default:
-          break;
-      }
-    } else if (isGuarding) {
-      finalDamage = Math.floor(damage * 0.5);
-    }
-
-    if (isGuarding && damageType === "") {
-      finalDamage = Math.floor(damage * 0.5);
-    }
-
-    return finalDamage;
-  }
-
   // Handle Input Change in HP/MP Dialog
   const handleChange = (e) => {
     const inputValue = e.target.value;
@@ -1076,7 +1077,9 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Calculate Current Attribute Value based on Status Effects
   function calcAttr(statusEffect1, statusEffect2, attribute, npc) {
     // Define the base attribute value (e.g., dexterity)
-    let attributeValue = npc?.attributes?.[attribute] || 6; // Default to 6 if attribute is missing
+    const rawAttr = npc?.attributes?.[attribute];
+    let attributeValue =
+      (rawAttr && typeof rawAttr === "object" ? rawAttr.base : rawAttr) || 6;
 
     // Check in npc.combatStats.statusEffects for the status effects
     if (npc.combatStats.statusEffects?.includes(statusEffect1)) {
@@ -1196,20 +1199,34 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     }
   };
 
-  const handleEditNPC = async () => {
+  const handleEditNPC = () => {
     if (!selectedNPC) return;
-    if (isDirty) {
-      const confirm = await globalConfirm(
-        "You have unsaved changes. Are you sure you want to leave?",
-      );
-      if (!confirm) return;
-    }
-    // Navigate to the NPC editor at /npc-gallery/:npcId
-    navigate(`/npc-gallery/${selectedNPC.id}`, {
-      state: {
-        from: `/combat-sim/${id}`,
-      },
-    });
+    setNpcEditModalOpen(true);
+  };
+
+  const handleNpcEditSaved = (updatedNpc) => {
+    setSelectedNPCs((prev) =>
+      prev.map((npc) =>
+        npc.combatId === selectedNPC.combatId
+          ? {
+              ...npc,
+              ...updatedNpc,
+              combatId: npc.combatId,
+              combatStats: npc.combatStats,
+            }
+          : npc,
+      ),
+    );
+    setSelectedNPC((prev) =>
+      prev
+        ? {
+            ...prev,
+            ...updatedNpc,
+            combatId: prev.combatId,
+            combatStats: prev.combatStats,
+          }
+        : prev,
+    );
   };
 
   const handleSaveClock = (newClock) => {
@@ -1416,6 +1433,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             onSortEnd={handleSortEnd}
             onClockClick={() => setClockDialogOpen(true)}
             onNotesClick={() => setNotesDialogOpen(true)}
+            onClearAll={() => {
+              clearTargets();
+              setSelectedNPC(null);
+              setSelectedPC(null);
+            }}
             selectedPCs={selectedPCs}
             handleRemovePC={handleRemovePC}
             handlePcClick={handlePcClick}
@@ -1486,6 +1508,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             npcRef={null}
             isMobile={isMobile}
             addLog={addLog}
+            addMessage={addMessage}
             openLogs={() => setLogOpen(true)}
             npcDetailWidth={`${npcDetailWidth}%`}
             checkNewTurn={checkNewTurn}
@@ -1551,6 +1574,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         </Snackbar>
       )}
       {downloadSnackbar}
+      <NpcEditModal
+        npcId={selectedNPC?.id}
+        open={npcEditModalOpen}
+        onClose={() => setNpcEditModalOpen(false)}
+        onSaved={handleNpcEditSaved}
+      />
     </Box>
   );
 };

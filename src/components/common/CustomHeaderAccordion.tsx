@@ -12,6 +12,32 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
+function normalizeNestedButtons(node: React.ReactNode): React.ReactNode {
+  if (!React.isValidElement(node)) return node;
+
+  const elementType = node.type as { muiName?: string; displayName?: string };
+  const isIconButton =
+    elementType?.muiName === "IconButton" ||
+    elementType?.displayName === "IconButton";
+
+  const children = node.props?.children
+    ? React.Children.map(node.props.children, normalizeNestedButtons)
+    : node.props?.children;
+
+  if (isIconButton) {
+    return React.cloneElement(node, {
+      component: "span",
+      children,
+    });
+  }
+
+  if (children !== node.props?.children) {
+    return React.cloneElement(node, { children });
+  }
+
+  return node;
+}
+
 const CustomHeaderAccordion = ({
   isExpanded = true,
   //handleAccordionChange,
@@ -57,11 +83,13 @@ const CustomHeaderAccordion = ({
         )}
         <Typography
           variant="h2"
-          component="legend"
+          component="div"
           sx={{
             color: "#ffffff",
             textTransform: "uppercase",
             fontSize: "1.5em",
+            width: "100%",
+            boxSizing: "border-box",
           }}
         >
           {headerText}
@@ -74,6 +102,7 @@ const CustomHeaderAccordion = ({
         {openCompendium && (
           <Tooltip title={`Search ${headerText}`}>
             <IconButton
+              component="span"
               onClick={openCompendium}
               sx={{
                 px: 1,
@@ -91,6 +120,7 @@ const CustomHeaderAccordion = ({
         {addItem && (
           <Tooltip title={`Add ${headerText}`}>
             <IconButton
+              component="span"
               onClick={addItem}
               sx={{
                 px: 1,
@@ -105,7 +135,7 @@ const CustomHeaderAccordion = ({
             </IconButton>
           </Tooltip>
         )}
-        {actions}
+        {normalizeNestedButtons(actions)}
       </Box>
     </AccordionSummary>
   );

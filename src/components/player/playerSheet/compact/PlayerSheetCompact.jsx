@@ -95,8 +95,8 @@ import CompactLoadout from "./CompactLoadout";
 import CompactSphereInventory from "./CompactSphereInventory";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { calculateAttribute } from "../../common/playerCalculations";
-import ExpIcon from "../../../svgs/exp.svg?react";
-import ExpDisabledIcon from "../../../svgs/exp_disabled.svg?react";
+import ExpIcon from "/src/components/svgs/exp.svg?react";
+import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
 
 // const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 // const StyledTableCell = styled(TableCell)({ padding: 0 });
@@ -828,7 +828,7 @@ export default function PlayerCardSheet({
 
   const currDex = calculateAttribute(
     player,
-    player.attributes.dexterity,
+    player.attributes.dexterity?.base,
     ["slow", "enraged"],
     ["dexUp"],
     6,
@@ -836,7 +836,7 @@ export default function PlayerCardSheet({
   );
   const currInsight = calculateAttribute(
     player,
-    player.attributes.insight,
+    player.attributes.insight?.base,
     ["dazed", "enraged"],
     ["insUp"],
     6,
@@ -844,7 +844,7 @@ export default function PlayerCardSheet({
   );
   const currMight = calculateAttribute(
     player,
-    player.attributes.might,
+    player.attributes.might?.base,
     ["weak", "poisoned"],
     ["migUp"],
     6,
@@ -852,7 +852,7 @@ export default function PlayerCardSheet({
   );
   const currWillpower = calculateAttribute(
     player,
-    player.attributes.willpower,
+    player.attributes.willpower?.base,
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
@@ -911,7 +911,7 @@ export default function PlayerCardSheet({
   const armorDefModifier = armorModule
     ? 0
     : equippedArmor !== null
-      ? equippedArmor.defModifier || 0
+      ? (equippedArmor.modifiers?.def ?? equippedArmor.defModifier ?? 0)
       : 0;
 
   const currDef =
@@ -919,14 +919,21 @@ export default function PlayerCardSheet({
     (equippedShield !== null ? equippedShield.def : 0) +
     (player.modifiers?.def || 0) +
     armorDefModifier +
-    (equippedShield !== null ? equippedShield.defModifier || 0 : 0) +
-    (equippedAccessory !== null ? equippedAccessory.defModifier || 0 : 0) +
+    (equippedShield !== null
+      ? (equippedShield.modifiers?.def ?? equippedShield.defModifier ?? 0)
+      : 0) +
+    (equippedAccessory !== null
+      ? (equippedAccessory.modifiers?.def ?? equippedAccessory.defModifier ?? 0)
+      : 0) +
     equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.defModifier || 0),
+      (total, weapon) =>
+        total + (weapon.modifiers?.def ?? weapon.defModifier ?? 0),
       0,
     ) +
     equippedCustomWeapons.reduce(
-      (total, weapon) => total + (parseInt(weapon.defModifier || 0, 10) || 0),
+      (total, weapon) =>
+        total +
+        (parseInt(weapon.modifiers?.def ?? weapon.defModifier ?? 0, 10) || 0),
       0,
     ) +
     dodgeBonus;
@@ -942,7 +949,7 @@ export default function PlayerCardSheet({
   const armorMDefModifier = armorModule
     ? 0
     : equippedArmor !== null
-      ? equippedArmor.mDefModifier || 0
+      ? (equippedArmor.modifiers?.mdef ?? equippedArmor.mDefModifier ?? 0)
       : 0;
 
   const currMDef =
@@ -950,14 +957,23 @@ export default function PlayerCardSheet({
     (equippedShield !== null ? equippedShield.mdef : 0) +
     (player.modifiers?.mdef || 0) +
     armorMDefModifier +
-    (equippedShield !== null ? equippedShield.mDefModifier || 0 : 0) +
-    (equippedAccessory !== null ? equippedAccessory.mDefModifier || 0 : 0) +
+    (equippedShield !== null
+      ? (equippedShield.modifiers?.mdef ?? equippedShield.mDefModifier ?? 0)
+      : 0) +
+    (equippedAccessory !== null
+      ? (equippedAccessory.modifiers?.mdef ??
+        equippedAccessory.mDefModifier ??
+        0)
+      : 0) +
     equippedWeapons.reduce(
-      (total, weapon) => total + (weapon.mDefModifier || 0),
+      (total, weapon) =>
+        total + (weapon.modifiers?.mdef ?? weapon.mDefModifier ?? 0),
       0,
     ) +
     equippedCustomWeapons.reduce(
-      (total, weapon) => total + (parseInt(weapon.mDefModifier || 0, 10) || 0),
+      (total, weapon) =>
+        total +
+        (parseInt(weapon.modifiers?.mdef ?? weapon.mDefModifier ?? 0, 10) || 0),
       0,
     );
 
@@ -1837,7 +1853,12 @@ function Header({
               }
               variant="standard"
               size="small"
+              fullWidth
               sx={{
+                flex: 1,
+                minWidth: 0,
+                width: "100%",
+                "& .MuiInput-root": { width: "100%" },
                 "& .MuiInputBase-input": {
                   color: "#fff",
                   fontFamily: "Antonio",
@@ -2379,9 +2400,23 @@ function Stats({
   const handleAttrChange = (key) => (e) => {
     setPlayer((p) => ({
       ...p,
-      attributes: { ...p.attributes, [key]: e.target.value },
+      attributes: {
+        ...p.attributes,
+        [key]: { ...p.attributes[key], base: e.target.value },
+      },
     }));
     if (updateMaxStats) updateMaxStats();
+  };
+
+  const handleAffinityChange = (type) => (nextAffinity) => {
+    if (!setPlayer) return;
+    setPlayer((p) => ({
+      ...p,
+      affinities: {
+        ...(p.affinities ?? {}),
+        [type]: nextAffinity || "",
+      },
+    }));
   };
 
   return (
@@ -2471,13 +2506,16 @@ function Stats({
                       {label}{" "}
                     </Typography>
                     <Select
-                      value={player.attributes[key]}
+                      value={player.attributes[key]?.base}
                       onChange={handleAttrChange(key)}
                       variant="outlined"
                       size="small"
                       sx={{
                         ...attrSelectSx,
-                        color: getAttributeColor(player.attributes[key], curr),
+                        color: getAttributeColor(
+                          player.attributes[key]?.base,
+                          curr,
+                        ),
                       }}
                     >
                       {[6, 8, 10, 12].map((v) => (
@@ -2501,7 +2539,10 @@ function Stats({
                     style={{
                       fontFamily: "'Antonio', fantasy, sans-serif",
                       fontSize: key === "willpower" ? "0.9rem" : "0.875rem",
-                      color: getAttributeColor(player.attributes[key], curr),
+                      color: getAttributeColor(
+                        player.attributes[key]?.base,
+                        curr,
+                      ),
                     }}
                   >
                     {label} d{curr}
@@ -2627,7 +2668,7 @@ function Stats({
           <AffinityGrid container>
             {[
               "physical",
-              "wind",
+              "air",
               "bolt",
               "dark",
               "earth",
@@ -2647,6 +2688,8 @@ function Stats({
                 <TypeAffinity
                   type={type}
                   affinity={player.affinities?.[type] || ""}
+                  editable={Boolean(isEditMode && setPlayer)}
+                  onChangeAffinity={handleAffinityChange(type)}
                 />
               </Grid>
             ))}

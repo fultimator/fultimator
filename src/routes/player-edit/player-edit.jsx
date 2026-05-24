@@ -1,6 +1,17 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
+import { useAppDrawerStore } from "../../store/appDrawerStore";
+import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import { useThemeStore } from "../../store/themeStore";
+import {
+  TAB_RAIL_WIDTH,
+  APP_DRAWER_WIDTH,
+} from "../../components/app-drawer/constants";
+import {
+  useDrawerScrollTop,
+  useDrawerSave,
+} from "../../hooks/useDrawerActions";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";
 import {
@@ -29,6 +40,8 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import PlayerCard from "../../components/player/playerSheet/PlayerCard";
@@ -42,7 +55,6 @@ import EditPlayerZeroPower from "../../components/player/informations/EditPlayer
 import EditPlayerOther from "../../components/player/informations/EditPlayerOthers";
 import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffinities";
 import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
-import EditPlayerStats from "../../components/player/stats/EditPlayerStats";
 import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
 import EditPlayerImmunities from "../../components/player/stats/EditPlayerImmunities";
 import EditManualStats from "../../components/player/stats/EditManualStats";
@@ -52,7 +64,6 @@ import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
 import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
 import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
 import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
-import GenericRolls from "../../components/player/playerSheet/GenericRolls";
 import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
 import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
 import PlayerArcana from "../../components/player/playerSheet/PlayerArcana";
@@ -120,6 +131,12 @@ import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
 import CustomHeader from "../../components/common/CustomHeader";
 import SettingRow from "../../components/common/SettingRow";
 import MigrateFromCompendiumDialog from "../../components/player/settings/MigrateFromCompendiumDialog";
+import useLevelUpFlow from "../../components/player/common/hooks/useLevelUpFlow";
+import {
+  canLevelUpFromExp as canLevelUpFromExpCheck,
+  applyExpLevelUp,
+} from "../../components/player/common/levelUpLogic";
+import { executeCommand } from "../../components/app-drawer/panels/chat/domain/commands";
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -127,6 +144,7 @@ export default function PlayerEdit() {
   const secondary = theme.palette.secondary.main;
   const ternary = theme.palette.ternary.main;
   const isSmallScreen = useMediaQuery("(max-width: 899px)");
+  const isDesktop = useMediaQuery("(min-width: 769px)");
   const location = useLocation();
 
   const [isSpecialSkillsModalOpen, setIsSpecialSkillsModalOpen] =
@@ -190,9 +208,24 @@ export default function PlayerEdit() {
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [playerTemp, setPlayerTemp] = useState(player);
+  const [playerTemp, setPlayerTemp] = useState(() =>
+    player
+      ? applyPostLoadTransforms(JSON.parse(JSON.stringify(player)))
+      : player,
+  );
   const [openTab, setOpenTab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const setDrawerIsOpen = useAppDrawerStore((s) => s.setIsOpen);
+  const setDrawerActiveTab = useAppDrawerStore((s) => s.setActiveTab);
+  const setChatComposerPrefill = useAppDrawerStore(
+    (s) => s.setChatComposerPrefill,
+  );
+  const addChatMessage = useChatMessagesStore((s) => s.addMessage);
+  const setChatActorDocOverride = useAppDrawerStore(
+    (s) => s.setChatActorDocOverride,
+  );
+  const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
+  const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
   const [compactView, setCompactView] = useState(false);
   const [compactViewExpanded, setCompactViewExpanded] = useState(false);
 
@@ -203,8 +236,18 @@ export default function PlayerEdit() {
 
   const [isSheetEditMode, setIsSheetEditMode] = useState(true);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
-  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
-  const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
+  const {
+    levelUpDialogOpen,
+    levelUpCelebrationOpen,
+    openLevelUpDialog,
+    closeLevelUpDialog,
+    closeCelebration,
+    confirmLevelUp,
+  } = useLevelUpFlow();
+  const [confettiSize, setConfettiSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
+  });
   const [mnemoLevelUpId, setMnemoLevelUpId] = useState(null);
 
   // Local players are always owned by whoever is running the app.
@@ -213,22 +256,28 @@ export default function PlayerEdit() {
     isUsingLocalDb || Boolean(user && player && user.uid === player.uid);
   const isEditMode = isOwner && isSheetEditMode;
 
+  const handleSave = useCallback(() => {
+    setIsUpdated(false);
+    const playerToSave = {
+      ...playerTemp,
+      settings: {
+        ...playerTemp?.settings,
+        defaultView: compactView ? "compact" : "normal",
+      },
+    };
+    activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
+    setSavedSnackbarOpen(true);
+  }, [ref, playerTemp, compactView, activeSetDoc]);
+
   const handleCtrlS = useCallback(
     (e) => {
       if (e.ctrlKey && e.key === "s") {
         e.preventDefault();
         if (!isOwner) return;
-        const playerToSave = {
-          ...playerTemp,
-          settings: {
-            ...playerTemp?.settings,
-            defaultView: compactView ? "compact" : "normal",
-          },
-        };
-        activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
+        handleSave();
       }
     },
-    [ref, playerTemp, compactView, isOwner, activeSetDoc],
+    [isOwner, handleSave],
   );
 
   useEffect(() => {
@@ -242,6 +291,14 @@ export default function PlayerEdit() {
   }, [handleCtrlS]);
 
   useEffect(() => {
+    const onResize = () =>
+      setConfettiSize({ width: window.innerWidth, height: window.innerHeight });
+    onResize();
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
     if (player) {
       const updatedPlayerTemp = applyPostLoadTransforms(
         JSON.parse(JSON.stringify(player)),
@@ -252,11 +309,18 @@ export default function PlayerEdit() {
     }
   }, [player]);
 
+  useEffect(() => {
+    setChatActorDocOverride(
+      playerTemp ? JSON.parse(JSON.stringify(playerTemp)) : null,
+    );
+    return () => {
+      setChatActorDocOverride(null);
+    };
+  }, [playerTemp, setChatActorDocOverride]);
+
   const playerBaseline = useMemo(() => {
     if (!player) return null;
-    return applyPreSaveTransforms(
-      applyPostLoadTransforms(JSON.parse(JSON.stringify(player))),
-    );
+    return applyPreSaveTransforms(JSON.parse(JSON.stringify(player)));
   }, [player]);
 
   useEffect(() => {
@@ -265,6 +329,9 @@ export default function PlayerEdit() {
       : playerTemp;
     setIsUpdated(!deepEqual(current, playerBaseline));
   }, [playerTemp, playerBaseline]);
+
+  useDrawerSave({ canSave: isOwner && isUpdated, onSave: handleSave });
+  useDrawerScrollTop(showScrollTop);
 
   usePrompt(t("unsaved_changes"), isUpdated);
 
@@ -290,6 +357,7 @@ export default function PlayerEdit() {
   const handleTabChange = (event, newValue) => {
     setOpenTab(newValue);
     setDrawerOpen(false);
+    setDrawerIsOpen(false);
   };
 
   const toggleDrawer = (open) => (event) => {
@@ -300,11 +368,60 @@ export default function PlayerEdit() {
       return;
     }
     setDrawerOpen(open);
+    setDrawerIsOpen(open);
   };
 
+  const handleQuickCheck = useCallback(
+    (payload) => {
+      if (typeof payload === "string") {
+        const kind = payload;
+        if (kind === "group") return;
+        if (!["attribute", "open", "opposed"].includes(kind)) return;
+        setDrawerActiveTab("chat");
+        setChatComposerPrefill(`/check ${kind} `);
+        setDrawerIsOpen(true);
+        return;
+      }
+      const normalizedKind =
+        payload?.kind === "attribute" ? "attribute" : "open";
+      const primary = payload?.primary || "dex";
+      const secondary = payload?.secondary || "ins";
+      const modifier = Number(payload?.modifier) || 0;
+      const hasDifficulty =
+        Number.isFinite(payload?.difficulty) && Number(payload?.difficulty) > 0;
+      const difficulty = hasDifficulty ? Number(payload.difficulty) : null;
+      const command = [
+        "/check",
+        normalizedKind,
+        primary,
+        secondary,
+        String(modifier),
+        ...(difficulty != null ? [String(difficulty)] : []),
+      ].join(" ");
+      const result = executeCommand(command, {
+        speaker: playerTemp?.name || "Player",
+        playerDoc: playerTemp || null,
+      });
+      if (result && result.ok) {
+        result.messages.forEach(addChatMessage);
+      } else {
+        setChatComposerPrefill(command);
+      }
+      setDrawerActiveTab("chat");
+      setDrawerIsOpen(true);
+    },
+    [
+      addChatMessage,
+      playerTemp,
+      setDrawerActiveTab,
+      setChatComposerPrefill,
+      setDrawerIsOpen,
+    ],
+  );
+
   const recalculatePlayerMaxStats = useCallback((prevPlayer) => {
-    const mig = Number(prevPlayer.attributes?.might) || 0;
-    const wil = Number(prevPlayer.attributes?.willpower) || 0;
+    const mig = Number(prevPlayer.attributes?.might?.base) || 0;
+    const wil = Number(prevPlayer.attributes?.willpower?.base) || 0;
     const lvl = Number(prevPlayer.lvl) || 0;
 
     const baseMaxHP = mig * 5 + lvl;
@@ -340,8 +457,10 @@ export default function PlayerEdit() {
     }
 
     if (prevPlayer.modifiers) {
-      hpBonus += Number(prevPlayer.modifiers.hp) || 0;
-      mpBonus += Number(prevPlayer.modifiers.mp) || 0;
+      hpBonus +=
+        Number(prevPlayer.resources?.hp.bonus ?? prevPlayer.modifiers.hp) || 0;
+      mpBonus +=
+        Number(prevPlayer.resources?.mp.bonus ?? prevPlayer.modifiers.mp) || 0;
       ipBonus += Number(prevPlayer.modifiers.ip) || 0;
     }
 
@@ -425,7 +544,6 @@ export default function PlayerEdit() {
     unarmedStrikeOptions.find((o) => o.name === "Unarmed Strike") ??
     null;
   const canLevelUpFromExp =
-    isOwner &&
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
     (playerTemp?.lvl || 0) < 50;
 
@@ -844,7 +962,7 @@ export default function PlayerEdit() {
                   isExpanded={compactViewExpanded}
                   updateMaxStats={updateMaxStats}
                   canLevelUpFromExp={canLevelUpFromExp}
-                  onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+                  onLevelUpRequest={openLevelUpDialog}
                   onToggleEditMode={
                     isOwner ? () => setIsSheetEditMode((v) => !v) : undefined
                   }
@@ -871,9 +989,8 @@ export default function PlayerEdit() {
                 isCharacterSheet={false}
                 updateMaxStats={updateMaxStats}
                 canLevelUpFromExp={canLevelUpFromExp}
-                onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+                onLevelUpRequest={openLevelUpDialog}
               />
-              <Divider sx={{ my: 1 }} />
               {/* TODO: Add Zenit somewhere else */}
               {/* <PlayerNumbers
                 player={playerTemp}
@@ -882,8 +999,13 @@ export default function PlayerEdit() {
                 isOwner={isOwner}
               />
               <Divider sx={{ my: 1 }} /> */}
-              <GenericRolls player={playerTemp} isEditMode={isEditMode} />
-              <Divider sx={{ my: 1 }} />
+              {isOwner && (
+                <PlayerControls
+                  player={playerTemp}
+                  setPlayer={setPlayerTemp}
+                  onQuickCheck={handleQuickCheck}
+                />
+              )}
               <PlayerBonds
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
@@ -894,9 +1016,6 @@ export default function PlayerEdit() {
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
               />
-              {isOwner && (
-                <PlayerControls player={playerTemp} setPlayer={setPlayerTemp} />
-              )}
               <Divider sx={{ my: 1 }} />
               <PlayerLoadout
                 player={playerTemp}
@@ -904,6 +1023,7 @@ export default function PlayerEdit() {
                 isEditMode={isEditMode}
                 isOwner={isOwner}
               />
+              <Divider sx={{ my: 1 }} />
               <PlayerEquipment
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
@@ -1016,6 +1136,7 @@ export default function PlayerEdit() {
             updateMaxStats={updateMaxStats}
             isEditMode={isEditMode}
             advancement={advancement}
+            onLevelUpRequest={openLevelUpDialog}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerTraits
@@ -1072,13 +1193,6 @@ export default function PlayerEdit() {
             setPlayer={setPlayerTemp}
             isEditMode={isEditMode}
             updateMaxStats={updateMaxStats}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerStats
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            updateMaxStats={updateMaxStats}
-            isEditMode={isEditMode}
           />
           <Divider sx={{ my: 1 }} />
           <EditPlayerAffinities
@@ -1295,9 +1409,12 @@ export default function PlayerEdit() {
                       variant="outlined"
                       size="small"
                       onClick={() => {
-                        setOptionalRulesDraft(
-                          playerTemp?.settings?.optionalRules ?? {},
-                        );
+                        const rules = playerTemp?.settings?.optionalRules ?? {};
+                        setOptionalRulesDraft({
+                          ...rules,
+                          technospheresVariant:
+                            rules.technospheresVariant ?? "standard",
+                        });
                         setIsOptionalRulesModalOpen(true);
                       }}
                     >
@@ -1363,7 +1480,12 @@ export default function PlayerEdit() {
         sx={{
           position: "fixed",
           bottom: 16,
-          right: 16,
+          right: appDrawerOpen
+            ? APP_DRAWER_WIDTH + 16
+            : isDesktop
+              ? TAB_RAIL_WIDTH + 16
+              : 16,
+          transition: "right 0.3s ease",
           zIndex: 1200,
           display: "flex",
           flexDirection: "column-reverse",
@@ -1371,23 +1493,12 @@ export default function PlayerEdit() {
           gap: 1,
         }}
       >
-        {/* Save Button, shown if there are unsaved changes */}
         {isUpdated && isOwner && (
           <Tooltip title={t("Save")} placement="left">
             <Fab
               color="primary"
               aria-label="save"
-              onClick={() => {
-                setIsUpdated(false);
-                const playerToSave = {
-                  ...playerTemp,
-                  settings: {
-                    ...playerTemp?.settings,
-                    defaultView: compactView ? "compact" : "normal",
-                  },
-                };
-                activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
-              }}
+              onClick={handleSave}
               size="medium"
             >
               <Save fontSize="medium" />
@@ -1433,7 +1544,7 @@ export default function PlayerEdit() {
         open={levelUpDialogOpen}
         onClose={() => {
           setMnemoLevelUpId(null);
-          setLevelUpDialogOpen(false);
+          closeLevelUpDialog();
         }}
         maxWidth="sm"
         fullWidth
@@ -1493,32 +1604,30 @@ export default function PlayerEdit() {
             color="error"
             onClick={() => {
               setMnemoLevelUpId(null);
-              setLevelUpDialogOpen(false);
+              closeLevelUpDialog();
             }}
           >
             {t("Cancel")}
           </Button>
           <Button
             variant="contained"
-            onClick={() => {
-              const selectedMnemoId = canInvestMnemosphereLevel
-                ? mnemoLevelUpId
-                : null;
-              setPlayerTemp((prev) => {
-                if (!prev) return prev;
-                const currentExp = parseInt(prev.info?.exp, 10) || 0;
-                if (currentExp < 10 || (prev.lvl || 0) >= 50) return prev;
-                const leveled = recalculatePlayerMaxStats({
-                  ...prev,
-                  lvl: Math.min(50, (prev.lvl || 0) + 1),
-                  info: { ...prev.info, exp: Math.max(0, currentExp - 10) },
-                });
-                return applyMnemoLevelUp(leveled, selectedMnemoId);
-              });
-              setMnemoLevelUpId(null);
-              setLevelUpDialogOpen(false);
-              setLevelUpCelebrationOpen(true);
-            }}
+            onClick={() =>
+              confirmLevelUp(() => {
+                if (!canLevelUpFromExpCheck(playerTemp)) return false;
+                const selectedMnemoId = canInvestMnemosphereLevel
+                  ? mnemoLevelUpId
+                  : null;
+                setPlayerTemp((prev) =>
+                  applyExpLevelUp(prev, {
+                    recalculateMaxStats: recalculatePlayerMaxStats,
+                    afterLevelUp: (leveled) =>
+                      applyMnemoLevelUp(leveled, selectedMnemoId),
+                  }),
+                );
+                setMnemoLevelUpId(null);
+                return true;
+              })
+            }
           >
             {t("Level Up")}
           </Button>
@@ -1526,7 +1635,7 @@ export default function PlayerEdit() {
       </Dialog>
       <Dialog
         open={levelUpCelebrationOpen}
-        onClose={() => setLevelUpCelebrationOpen(false)}
+        onClose={closeCelebration}
         maxWidth="sm"
         fullWidth
       >
@@ -1537,16 +1646,16 @@ export default function PlayerEdit() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            onClick={() => setLevelUpCelebrationOpen(false)}
-          >
+          <Button variant="contained" onClick={closeCelebration}>
             {t("OK")}
           </Button>
         </DialogActions>
       </Dialog>
       {levelUpCelebrationOpen && (
         <Confetti
+          width={confettiSize.width}
+          height={confettiSize.height}
+          style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none" }}
           recycle={true}
           numberOfPieces={250}
           run={levelUpCelebrationOpen}
@@ -1858,6 +1967,21 @@ export default function PlayerEdit() {
         onSuccess={null}
         webhookUrl={import.meta.env.VITE_DISCORD_REPORT_BUG_WEBHOOK_URL}
       />
+      <Snackbar
+        open={savedSnackbarOpen}
+        autoHideDuration={2500}
+        onClose={() => setSavedSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSavedSnackbarOpen(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {t("Saved")}
+        </Alert>
+      </Snackbar>
     </Layout>
   );
 }

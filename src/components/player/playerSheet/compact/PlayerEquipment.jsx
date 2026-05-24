@@ -54,15 +54,13 @@ import {
   Error as ErrorIcon,
 } from "@mui/icons-material";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
-import {
-  calculateAttribute,
-  calculateCustomWeaponStats,
-} from "../../common/playerCalculations";
+import { calculateAttribute } from "../../common/playerCalculations";
 import {
   deriveVehicleSlots,
   isTwoHandedEquipped,
 } from "../../equipment/slots/equipmentSlots";
 import { clearSlotAction } from "../../equipment/slots/loadoutActions";
+import { normalizeWeaponLike } from "../../../../libs/weaponNormalization";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({
@@ -120,6 +118,20 @@ function highlightMarkdownText(markdown, query) {
   const safeQuery = trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const regex = new RegExp(`(${safeQuery})`, "ig");
   return source.replace(regex, "<mark>$1</mark>");
+}
+
+function normalizeAttrKey(raw) {
+  const key = String(raw || "").toLowerCase();
+  if (key === "dex" || key === "dexterity") return "dexterity";
+  if (key === "ins" || key === "insight") return "insight";
+  if (key === "mig" || key === "might") return "might";
+  if (key === "wlp" || key === "will" || key === "willpower")
+    return "willpower";
+  return "dexterity";
+}
+
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
 }
 
 export default function PlayerEquipment({
@@ -218,7 +230,7 @@ export default function PlayerEquipment({
   const inv = player.equipment?.[0];
 
   const formatCustomWeapon = (customWeapon, forceSecondaryForm = null) => {
-    const isTransforming = customWeapon.customizations?.some(
+    const isTransforming = asArray(customWeapon.customizations).some(
       (c) => c.name === "weapon_customization_transforming",
     );
     const isSecondaryForm =
@@ -228,13 +240,12 @@ export default function PlayerEquipment({
     const weaponName = isSecondaryForm
       ? customWeapon.secondWeaponName || `${customWeapon.name} (Transforming)`
       : customWeapon.name;
-    const stats = calculateCustomWeaponStats(customWeapon, isSecondaryForm);
-    const accuracyCheck = isSecondaryForm
-      ? customWeapon.secondSelectedAccuracyCheck
-      : customWeapon.accuracyCheck;
-    const damageType = isSecondaryForm
-      ? customWeapon.secondSelectedType
-      : customWeapon.type;
+    const accuracy = isSecondaryForm
+      ? (customWeapon.secondAccuracy ?? customWeapon.accuracy)
+      : customWeapon.accuracy;
+    const damage = isSecondaryForm
+      ? (customWeapon.secondDamage ?? customWeapon.damage)
+      : customWeapon.damage;
     const category = isSecondaryForm
       ? customWeapon.secondSelectedCategory
       : customWeapon.category;
@@ -247,8 +258,8 @@ export default function PlayerEquipment({
       "weapon_customization_powerful",
     ];
     const customizations = isSecondaryForm
-      ? customWeapon.secondCurrentCustomizations || []
-      : customWeapon.customizations || [];
+      ? asArray(customWeapon.secondCurrentCustomizations)
+      : asArray(customWeapon.customizations);
     const isMartial = customizations.some((c) =>
       martialCustomizations.includes(c.name),
     );
@@ -257,11 +268,12 @@ export default function PlayerEquipment({
       name: weaponName,
       cost: customWeapon.cost || 300,
       category: category,
-      att1: accuracyCheck?.att1 || "dexterity",
-      att2: accuracyCheck?.att2 || "might",
-      prec: stats.precision,
-      damage: stats.damage,
-      type: damageType || "physical",
+      accuracy,
+      damage,
+      att1: accuracy?.attr1 || "dexterity",
+      att2: accuracy?.attr2 || "might",
+      prec: accuracy?.value ?? 0,
+      type: damage?.type || "physical",
       hands: 2,
       melee:
         (isSecondaryForm
@@ -425,11 +437,14 @@ export default function PlayerEquipment({
   const precMeleeModifier =
     (player.modifiers?.meleePrec || 0) +
     (equippedArmorItems.length > 0
-      ? equippedArmorItems[0].precModifier || 0
+      ? (equippedArmorItems[0].modifiers?.accuracy ?? 0)
       : 0) +
-    equippedShields.reduce((total, s) => total + (s.precModifier || 0), 0) +
+    equippedShields.reduce(
+      (total, s) => total + (s.modifiers?.accuracy ?? 0),
+      0,
+    ) +
     equippedAccessoryItems.reduce(
-      (total, a) => total + (a.precModifier || 0),
+      (total, a) => total + (a.modifiers?.accuracy ?? 0),
       0,
     ) +
     meleeMasteryModifier;
@@ -437,11 +452,14 @@ export default function PlayerEquipment({
   const precRangedModifier =
     (player.modifiers?.rangedPrec || 0) +
     (equippedArmorItems.length > 0
-      ? equippedArmorItems[0].precModifier || 0
+      ? (equippedArmorItems[0].modifiers?.accuracy ?? 0)
       : 0) +
-    equippedShields.reduce((total, s) => total + (s.precModifier || 0), 0) +
+    equippedShields.reduce(
+      (total, s) => total + (s.modifiers?.accuracy ?? 0),
+      0,
+    ) +
     equippedAccessoryItems.reduce(
-      (total, a) => total + (a.precModifier || 0),
+      (total, a) => total + (a.modifiers?.accuracy ?? 0),
       0,
     ) +
     rangedMasteryModifier;
@@ -474,7 +492,7 @@ export default function PlayerEquipment({
 
   const currDex = calculateAttribute(
     player,
-    player.attributes.dexterity,
+    player.attributes.dexterity?.base,
     ["slow", "enraged"],
     ["dexUp"],
     6,
@@ -482,7 +500,7 @@ export default function PlayerEquipment({
   );
   const currInsight = calculateAttribute(
     player,
-    player.attributes.insight,
+    player.attributes.insight?.base,
     ["dazed", "enraged"],
     ["insUp"],
     6,
@@ -490,7 +508,7 @@ export default function PlayerEquipment({
   );
   const currMight = calculateAttribute(
     player,
-    player.attributes.might,
+    player.attributes.might?.base,
     ["weak", "poisoned"],
     ["migUp"],
     6,
@@ -498,7 +516,7 @@ export default function PlayerEquipment({
   );
   const currWillpower = calculateAttribute(
     player,
-    player.attributes.willpower,
+    player.attributes.willpower?.base,
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
@@ -747,8 +765,13 @@ export default function PlayerEquipment({
 
   const handleDiceRoll = (weapon) => {
     setCurrentWeapon(weapon);
-    const v1 = attributeMap[weapon.att1],
-      v2 = attributeMap[weapon.att2];
+    const attr1 = normalizeAttrKey(weapon.accuracy?.attr1);
+    const attr2 = normalizeAttrKey(weapon.accuracy?.attr2);
+    const weaponPrec = weapon.accuracy?.value ?? 0;
+    const weaponDamage = weapon.damage?.value ?? 0;
+    const weaponType = weapon.damage?.type ?? "physical";
+    const v1 = attributeMap[attr1] ?? currDex,
+      v2 = attributeMap[attr2] ?? currMight;
     const d1 = Math.floor(Math.random() * v1) + 1,
       d2 = Math.floor(Math.random() * v2) + 1;
     const isCritFail = d1 === 1 && d2 === 1,
@@ -756,11 +779,11 @@ export default function PlayerEquipment({
     const acc =
       d1 +
       d2 +
-      weapon.prec +
+      weaponPrec +
       (weapon.melee ? precMeleeModifier : precRangedModifier);
     const dmg =
       Math.max(d1, d2) +
-      weapon.damage +
+      weaponDamage +
       (weapon.melee ? damageMeleeModifier : damageRangedModifier);
 
     const content = (
@@ -772,13 +795,13 @@ export default function PlayerEquipment({
         <Grid size={6}>
           <Typography variant="h3">{t("Damage")}</Typography>
           <Typography variant="h1">{dmg}</Typography>
-          <Typography variant="h6">{t(weapon.type)}</Typography>
+          <Typography variant="h6">{t(weaponType)}</Typography>
         </Grid>
         <Grid sx={{ mt: 2 }} size={12}>
-          <Typography>{`${d1} [${attributes[weapon.att1].shortcaps}] + ${d2} [${attributes[weapon.att2].shortcaps}] ${weapon.prec !== 0 ? (weapon.prec > 0 ? "+" : "") + weapon.prec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : ""}`}</Typography>
+          <Typography>{`${d1} [${attributes[attr1]?.shortcaps ?? "DEX"}] + ${d2} [${attributes[attr2]?.shortcaps ?? "MIG"}] ${weaponPrec !== 0 ? (weaponPrec > 0 ? "+" : "") + weaponPrec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : ""}`}</Typography>
           <Typography sx={{ fontWeight: "bold" }}>
             {t("Damage")}:{" "}
-            {`max(${d1}, ${d2}) + ${weapon.damage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : ""}`}
+            {`max(${d1}, ${d2}) + ${weaponDamage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : ""}`}
           </Typography>
         </Grid>
       </Grid>
@@ -831,23 +854,16 @@ export default function PlayerEquipment({
                 : "accessories";
       let newItem;
       if (type === "weapons")
-        newItem = {
+        newItem = normalizeWeaponLike({
+          ...item,
           base: item,
           name: item.name,
           category: item.category || "",
-          melee: item.melee || false,
-          ranged: !item.melee,
-          type: item.type,
-          hands: item.hands,
-          att1: item.att1,
-          att2: item.att2,
           martial: item.martial || false,
           quality: "",
           cost: item.cost || 0,
-          damage: item.damage || 0,
-          prec: item.prec || 0,
           isEquipped: false,
-        };
+        });
       else if (type === "armor" || type === "shields")
         newItem = {
           base: item,
@@ -855,8 +871,8 @@ export default function PlayerEquipment({
           quality: "",
           category: type === "armor" ? "Armor" : "Shield",
           martial: item.martial || false,
-          def: item.def || item.defbonus || 0,
-          mdef: item.mdef || item.mdefbonus || 0,
+          def: item.def || 0,
+          mdef: item.mdef || 0,
           init: item.init || 0,
           cost: item.cost || 0,
           isEquipped: false,
@@ -1216,22 +1232,29 @@ function EquipmentRow({
 
   const renderStats = () => {
     if (item.equipType === "weapon" || item.equipType === "custom-weapon") {
+      const accuracy = item.accuracy ?? {};
+      const damage = item.damage ?? {};
+      const attr1 = normalizeAttrKey(accuracy.attr1);
+      const attr2 = normalizeAttrKey(accuracy.attr2);
+      const prec = accuracy.value ?? 0;
+      const damageValue = damage.value ?? 0;
+      const damageType = damage.type ?? "physical";
       return (
         <>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               <OpenBracket />
-              {`${attributes[item.att1].shortcaps} + ${attributes[item.att2].shortcaps}`}
+              {`${attributes[attr1]?.shortcaps ?? "DEX"} + ${attributes[attr2]?.shortcaps ?? "MIG"}`}
               <CloseBracket />
-              {item.prec !== 0 ? (item.prec > 0 ? "+" : "") + item.prec : ""}
+              {prec !== 0 ? (prec > 0 ? "+" : "") + prec : ""}
             </Typography>
           </StyledTableCell>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
             <Typography sx={{ textAlign: "center" }}>
               <OpenBracket />
-              {t("HR")} {item.damage >= 0 ? "+" : ""} {item.damage}
+              {t("HR")} {damageValue >= 0 ? "+" : ""} {damageValue}
               <CloseBracket />
-              {types[item.type].long}
+              {types[damageType]?.long ?? types.physical.long}
             </Typography>
           </StyledTableCell>
         </>
@@ -1460,9 +1483,10 @@ function EquipmentRow({
                   </>
                 )}
                 {item.isCustomWeapon &&
-                  (item.isSecondaryForm
-                    ? item.originalData.secondCurrentCustomizations
-                    : item.originalData.customizations || []
+                  asArray(
+                    item.isSecondaryForm
+                      ? item.originalData?.secondCurrentCustomizations
+                      : item.originalData?.customizations,
                   ).map((c, i) => (
                     <React.Fragment key={i}>
                       <Diamond color={theme.primary} sx={{ mx: 0.5 }} />

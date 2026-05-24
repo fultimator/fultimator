@@ -37,7 +37,7 @@ import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFu
 import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
 import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import MnemoReceptaclePanel from "../../components/player/equipment/technospheres/MnemoReceptaclePanel";
-import powered_by_fu from "../powered_by_fu.png";
+import powered_by_fu from "/images/routes/powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
   Download,
@@ -58,6 +58,8 @@ import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
 } from "../../components/player/playerTransforms";
+import useLevelUpFlow from "../../components/player/common/hooks/useLevelUpFlow";
+import { canLevelUpFromExp as canLevelUpFromExpCheck } from "../../components/player/common/levelUpLogic";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();
@@ -109,14 +111,32 @@ export default function CharacterSheet() {
   const [isUpdated, setIsUpdated] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  const [levelUpDialogOpen, setLevelUpDialogOpen] = useState(false);
-  const [levelUpCelebrationOpen, setLevelUpCelebrationOpen] = useState(false);
+  const {
+    levelUpDialogOpen,
+    levelUpCelebrationOpen,
+    openLevelUpDialog,
+    closeLevelUpDialog,
+    closeCelebration,
+    confirmLevelUp,
+  } = useLevelUpFlow();
+  const [confettiSize, setConfettiSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
+  });
 
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 250);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onResize = () =>
+      setConfettiSize({ width: window.innerWidth, height: window.innerHeight });
+    onResize();
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   useEffect(() => {
@@ -138,13 +158,13 @@ export default function CharacterSheet() {
   }, [playerData]);
 
   useEffect(() => {
-    if (player && playerDataBaseline) {
-      if (!deepEqual(applyPreSaveTransforms(player), playerDataBaseline)) {
-        setIsUpdated(true);
-      } else {
-        setIsUpdated(false);
-      }
-    }
+    if (!player || !playerDataBaseline) return;
+    const timer = setTimeout(() => {
+      setIsUpdated(
+        !deepEqual(applyPreSaveTransforms(player), playerDataBaseline),
+      );
+    }, 300);
+    return () => clearTimeout(timer);
   }, [player, playerDataBaseline]);
 
   usePrompt(
@@ -175,8 +195,8 @@ export default function CharacterSheet() {
     if (player) {
       setPlayer((prevPlayer) => {
         const lvl = Number(prevPlayer.lvl) || 0;
-        const might = Number(prevPlayer.attributes?.might) || 0;
-        const willpower = Number(prevPlayer.attributes?.willpower) || 0;
+        const might = Number(prevPlayer.attributes?.might?.base) || 0;
+        const willpower = Number(prevPlayer.attributes?.willpower?.base) || 0;
 
         const baseMaxHP = lvl + might * 5;
         const baseMaxMP = lvl + willpower * 5;
@@ -213,8 +233,10 @@ export default function CharacterSheet() {
         }
 
         if (prevPlayer.modifiers) {
-          hpBonus += prevPlayer.modifiers.hp || 0;
-          mpBonus += prevPlayer.modifiers.mp || 0;
+          hpBonus +=
+            prevPlayer.resources?.hp.bonus ?? prevPlayer.modifiers.hp ?? 0;
+          mpBonus +=
+            prevPlayer.resources?.mp.bonus ?? prevPlayer.modifiers.mp ?? 0;
           ipBonus += prevPlayer.modifiers.ip || 0;
         }
 
@@ -339,125 +361,129 @@ export default function CharacterSheet() {
     }
   };
 
-  const canLevelUpFromExp =
-    isOwner &&
-    (parseInt(player?.info?.exp, 10) || 0) >= 10 &&
-    (player?.lvl || 0) < 50;
+  const canLevelUpFromExp = canLevelUpFromExpCheck(player);
 
-  const handleConfirmLevelUpFromExp = () => {
-    setPlayer((prevPlayer) => {
-      if (!prevPlayer) return prevPlayer;
+  const handleConfirmLevelUpFromExp = () =>
+    confirmLevelUp(() => {
+      if (!canLevelUpFromExpCheck(player)) return false;
+      setPlayer((prevPlayer) => {
+        if (!prevPlayer) return prevPlayer;
 
-      const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
-      if (currentExp < 10 || (prevPlayer.lvl || 0) >= 50) return prevPlayer;
+        const currentExp = parseInt(prevPlayer.info?.exp, 10) || 0;
+        if (currentExp < 10 || (prevPlayer.lvl || 0) >= 50) return prevPlayer;
 
-      const leveledPlayer = {
-        ...prevPlayer,
-        lvl: Math.min(50, (prevPlayer.lvl || 0) + 1),
-        info: {
-          ...prevPlayer.info,
-          exp: Math.max(0, currentExp - 10),
-        },
-      };
+        const leveledPlayer = {
+          ...prevPlayer,
+          lvl: Math.min(50, (prevPlayer.lvl || 0) + 1),
+          info: {
+            ...prevPlayer.info,
+            exp: Math.max(0, currentExp - 10),
+          },
+        };
 
-      // Recalculate max stats for the new level
-      const mig = Number(leveledPlayer.attributes?.might) || 0;
-      const wil = Number(leveledPlayer.attributes?.willpower) || 0;
-      const lvl = Number(leveledPlayer.lvl) || 0;
+        // Recalculate max stats for the new level
+        const mig = Number(leveledPlayer.attributes?.might?.base) || 0;
+        const wil = Number(leveledPlayer.attributes?.willpower?.base) || 0;
+        const lvl = Number(leveledPlayer.lvl) || 0;
 
-      const baseMaxHP = mig * 5 + lvl;
-      const baseMaxMP = wil * 5 + lvl;
+        const baseMaxHP = mig * 5 + lvl;
+        const baseMaxMP = wil * 5 + lvl;
 
-      let hpBonus = 0;
-      let mpBonus = 0;
-      let ipBonus = 0;
+        let hpBonus = 0;
+        let mpBonus = 0;
+        let ipBonus = 0;
 
-      const innateClassesCS2 =
-        leveledPlayer.settings?.optionalRules?.innateClasses ?? [];
-      const isTechnospheresCS2 =
-        leveledPlayer.settings?.optionalRules?.technospheres ?? false;
-      const technospheresVariantCS2 =
-        leveledPlayer.settings?.optionalRules?.technospheresVariant ??
-        "standard";
-      const usesInnateClassRulesCS2 =
-        isTechnospheresCS2 && technospheresVariantCS2 !== "hoplospheres";
-      (leveledPlayer.classes || []).forEach((cls) => {
-        if (!cls.benefits) return;
-        if (usesInnateClassRulesCS2 && !innateClassesCS2.includes(cls.name))
-          return;
-        hpBonus += Number(cls.benefits.hpplus) || 0;
-        mpBonus += Number(cls.benefits.mpplus) || 0;
-        ipBonus += Number(cls.benefits.ipplus) || 0;
+        const innateClassesCS2 =
+          leveledPlayer.settings?.optionalRules?.innateClasses ?? [];
+        const isTechnospheresCS2 =
+          leveledPlayer.settings?.optionalRules?.technospheres ?? false;
+        const technospheresVariantCS2 =
+          leveledPlayer.settings?.optionalRules?.technospheresVariant ??
+          "standard";
+        const usesInnateClassRulesCS2 =
+          isTechnospheresCS2 && technospheresVariantCS2 !== "hoplospheres";
+        (leveledPlayer.classes || []).forEach((cls) => {
+          if (!cls.benefits) return;
+          if (usesInnateClassRulesCS2 && !innateClassesCS2.includes(cls.name))
+            return;
+          hpBonus += Number(cls.benefits.hpplus) || 0;
+          mpBonus += Number(cls.benefits.mpplus) || 0;
+          ipBonus += Number(cls.benefits.ipplus) || 0;
+        });
+
+        if (
+          isTechnospheresCS2 &&
+          (technospheresVariantCS2 === "standard" ||
+            technospheresVariantCS2 === "mnemospheres")
+        ) {
+          hpBonus += 5;
+          mpBonus += 5;
+        }
+
+        if (leveledPlayer.modifiers) {
+          hpBonus +=
+            Number(
+              leveledPlayer.resources?.hp.bonus ?? leveledPlayer.modifiers.hp,
+            ) || 0;
+          mpBonus +=
+            Number(
+              leveledPlayer.resources?.mp.bonus ?? leveledPlayer.modifiers.mp,
+            ) || 0;
+          ipBonus += Number(leveledPlayer.modifiers.ip) || 0;
+        }
+
+        const fortressBonus = (leveledPlayer.classes || [])
+          .map((cls) => cls.skills || [])
+          .flat()
+          .filter((skill) => skill.specialSkill === "Fortress")
+          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
+          .reduce((a, b) => a + b, 0);
+        hpBonus += fortressBonus;
+
+        const focusedBonus = (leveledPlayer.classes || [])
+          .map((cls) => cls.skills || [])
+          .flat()
+          .filter((skill) => skill.specialSkill === "Focused")
+          .map((skill) => (Number(skill.currentLvl) || 0) * 3)
+          .reduce((a, b) => a + b, 0);
+        mpBonus += focusedBonus;
+
+        const maxHP = baseMaxHP + hpBonus;
+        const maxMP = baseMaxMP + mpBonus;
+        const maxIP = 6 + ipBonus;
+
+        return {
+          ...leveledPlayer,
+          stats: {
+            hp: {
+              ...leveledPlayer.stats.hp,
+              max: maxHP,
+              current: Math.min(
+                Number(leveledPlayer.stats.hp.current) || 0,
+                maxHP,
+              ),
+            },
+            mp: {
+              ...leveledPlayer.stats.mp,
+              max: maxMP,
+              current: Math.min(
+                Number(leveledPlayer.stats.mp.current) || 0,
+                maxMP,
+              ),
+            },
+            ip: {
+              ...leveledPlayer.stats.ip,
+              max: maxIP,
+              current: Math.min(
+                Number(leveledPlayer.stats.ip.current) || 0,
+                maxIP,
+              ),
+            },
+          },
+        };
       });
-
-      if (
-        isTechnospheresCS2 &&
-        (technospheresVariantCS2 === "standard" ||
-          technospheresVariantCS2 === "mnemospheres")
-      ) {
-        hpBonus += 5;
-        mpBonus += 5;
-      }
-
-      if (leveledPlayer.modifiers) {
-        hpBonus += Number(leveledPlayer.modifiers.hp) || 0;
-        mpBonus += Number(leveledPlayer.modifiers.mp) || 0;
-        ipBonus += Number(leveledPlayer.modifiers.ip) || 0;
-      }
-
-      const fortressBonus = (leveledPlayer.classes || [])
-        .map((cls) => cls.skills || [])
-        .flat()
-        .filter((skill) => skill.specialSkill === "Fortress")
-        .map((skill) => (Number(skill.currentLvl) || 0) * 3)
-        .reduce((a, b) => a + b, 0);
-      hpBonus += fortressBonus;
-
-      const focusedBonus = (leveledPlayer.classes || [])
-        .map((cls) => cls.skills || [])
-        .flat()
-        .filter((skill) => skill.specialSkill === "Focused")
-        .map((skill) => (Number(skill.currentLvl) || 0) * 3)
-        .reduce((a, b) => a + b, 0);
-      mpBonus += focusedBonus;
-
-      const maxHP = baseMaxHP + hpBonus;
-      const maxMP = baseMaxMP + mpBonus;
-      const maxIP = 6 + ipBonus;
-
-      return {
-        ...leveledPlayer,
-        stats: {
-          hp: {
-            ...leveledPlayer.stats.hp,
-            max: maxHP,
-            current: Math.min(
-              Number(leveledPlayer.stats.hp.current) || 0,
-              maxHP,
-            ),
-          },
-          mp: {
-            ...leveledPlayer.stats.mp,
-            max: maxMP,
-            current: Math.min(
-              Number(leveledPlayer.stats.mp.current) || 0,
-              maxMP,
-            ),
-          },
-          ip: {
-            ...leveledPlayer.stats.ip,
-            max: maxIP,
-            current: Math.min(
-              Number(leveledPlayer.stats.ip.current) || 0,
-              maxIP,
-            ),
-          },
-        },
-      };
+      return true;
     });
-    setLevelUpDialogOpen(false);
-    setLevelUpCelebrationOpen(true);
-  };
 
   if (!player) {
     return null;
@@ -552,7 +578,7 @@ export default function CharacterSheet() {
                   characterImage={player.info.imgurl}
                   updateMaxStats={updateMaxStats}
                   canLevelUpFromExp={canLevelUpFromExp}
-                  onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+                  onLevelUpRequest={openLevelUpDialog}
                 />
                 <PlayerNumbers
                   player={player}
@@ -723,7 +749,7 @@ export default function CharacterSheet() {
               characterImage={player.info.imgurl}
               id="character-sheet-short"
               canLevelUpFromExp={canLevelUpFromExp}
-              onLevelUpRequest={() => setLevelUpDialogOpen(true)}
+              onLevelUpRequest={openLevelUpDialog}
               updateMaxStats={updateMaxStats}
             />
           </Grid>
@@ -776,7 +802,7 @@ export default function CharacterSheet() {
       )}
       <Dialog
         open={levelUpDialogOpen}
-        onClose={() => setLevelUpDialogOpen(false)}
+        onClose={closeLevelUpDialog}
         maxWidth="sm"
         fullWidth
       >
@@ -788,7 +814,7 @@ export default function CharacterSheet() {
           <Button
             variant="contained"
             color="error"
-            onClick={() => setLevelUpDialogOpen(false)}
+            onClick={closeLevelUpDialog}
           >
             {t("Cancel")}
           </Button>
@@ -799,7 +825,7 @@ export default function CharacterSheet() {
       </Dialog>
       <Dialog
         open={levelUpCelebrationOpen}
-        onClose={() => setLevelUpCelebrationOpen(false)}
+        onClose={closeCelebration}
         maxWidth="sm"
         fullWidth
       >
@@ -810,16 +836,16 @@ export default function CharacterSheet() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            onClick={() => setLevelUpCelebrationOpen(false)}
-          >
+          <Button variant="contained" onClick={closeCelebration}>
             {t("OK")}
           </Button>
         </DialogActions>
       </Dialog>
       {levelUpCelebrationOpen && (
         <Confetti
+          width={confettiSize.width}
+          height={confettiSize.height}
+          style={{ position: "fixed", top: 0, left: 0, pointerEvents: "none" }}
           recycle={true}
           numberOfPieces={250}
           run={levelUpCelebrationOpen}

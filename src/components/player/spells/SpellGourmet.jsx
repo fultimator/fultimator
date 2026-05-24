@@ -125,30 +125,21 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
     );
   };
 
-  // Memoize spell data to prevent unnecessary re-renders
   const spellData = useMemo(() => {
     if (!spell) return null;
 
-    // Convert cookbook effects from object format to array for display
-    let cookbookEffectsArray = [];
-    if (spell.cookbookEffects) {
-      cookbookEffectsArray = Object.entries(spell.cookbookEffects).map(
-        ([key, data]) => ({
-          tasteCombination:
-            data.taste1 && data.taste2
-              ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
-              : key
-                  .split("_")
-                  .map((t) => t.charAt(0).toUpperCase() + t.slice(1))
-                  .join(" + "),
-          effect: data.effect,
-          customChoices: data.customChoices || {},
-          taste1: data.taste1,
-          taste2: data.taste2,
-          key: key,
-        }),
-      );
-    }
+    const effects = spell.cookbook?.effects || [];
+    const cookbookEffectsArray = effects.map((data, idx) => ({
+      tasteCombination:
+        data.taste1 && data.taste2
+          ? `${data.taste1.charAt(0).toUpperCase() + data.taste1.slice(1)} + ${data.taste2.charAt(0).toUpperCase() + data.taste2.slice(1)}`
+          : `Effect ${idx + 1}`,
+      effect: data.effect,
+      customChoices: data.customChoices || {},
+      taste1: data.taste1,
+      taste2: data.taste2,
+      key: `${data.taste1 || ""}${data.taste2 || ""}_${idx}`,
+    }));
 
     return {
       name: spell.spellName || "Unnamed Cooking Spell",
@@ -289,7 +280,7 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
                     fontWeight: "bold",
                   }}
                 >
-                  {effect.tasteCombination || "—"}
+                  {effect.tasteCombination || "-"}
                 </Typography>
               </Box>
               <Box sx={{ flex: 1 }}>

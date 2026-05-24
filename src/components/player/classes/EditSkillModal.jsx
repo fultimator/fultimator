@@ -19,6 +19,8 @@ import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { Close, Info } from "@mui/icons-material";
 import skills from "../../../libs/skills";
+import FuidField from "../../common/FuidField";
+import { slugify } from "../../../libs/slugify";
 
 export default function EditSkillModal({
   open,
@@ -96,10 +98,21 @@ export default function EditSkillModal({
               onChange={(e) =>
                 setSkill({ ...skill, skillName: e.target.value })
               }
+              onBlur={() => {
+                if (!skill.fuid)
+                  setSkill({ ...skill, fuid: slugify(skill.skillName) });
+              }}
               fullWidth
               slotProps={{
                 htmlInput: { maxLength: 100 },
               }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12 }} sx={{ order: -1 }}>
+            <FuidField
+              value={skill.fuid}
+              name={skill.skillName}
+              onChange={(fuid) => setSkill({ ...skill, fuid })}
             />
           </Grid>
           <Grid
@@ -179,7 +192,7 @@ export default function EditSkillModal({
                     </ListSubheader>,
                     groupedSkills[skillClass].map((groupedSkill) => (
                       <MenuItem
-                        key={groupedSkill.name}
+                        key={`${skillClass}-${groupedSkill.name}`}
                         value={groupedSkill.name}
                       >
                         {t(groupedSkill.name)}

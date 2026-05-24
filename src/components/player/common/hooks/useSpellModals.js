@@ -24,7 +24,14 @@ export function useSpellModals() {
 
   const openModal = (modalName, spell, spellClass, spellIndex) => {
     setCurrentModal(modalName);
-    setSpellBeingEdited(spell);
+    // Unified spell modals use `spell.index` for save/delete actions.
+    // Ensure the active list index is always available, even when the spell
+    // object itself does not carry an `index` field.
+    setSpellBeingEdited(
+      spell && typeof spell === "object"
+        ? { ...spell, index: spellIndex }
+        : spell,
+    );
     setEditingSpellClass(spellClass);
     setEditingSpellIndex(spellIndex);
   };

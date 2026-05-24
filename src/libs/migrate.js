@@ -4,6 +4,7 @@ import {
   resolveRef,
   resolveRefMeta,
 } from "../utils/compendiumRefs";
+import skills from "./skills";
 
 function clamp(value, max) {
   return Math.min(value, max);
@@ -23,6 +24,8 @@ export function diffItem(instance, source, type) {
     case "class": {
       if (changed(instance.name, source.name))
         diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
 
       const instSkills = instance.skills ?? [];
       const srcSkills = source.skills ?? [];
@@ -45,6 +48,13 @@ export function diffItem(instance, source, type) {
                 : ""),
           );
         }
+        if (!instSkill.fuid) {
+          const skillName = srcSkill.skillName ?? srcSkill.name ?? "";
+          const expectedFuid =
+            srcSkill.fuid ?? skills.find((s) => s.name === skillName)?.fuid;
+          if (expectedFuid)
+            diffs.push(`Skill "${skillName}": ID missing -> "${expectedFuid}"`);
+        }
       });
       if (instSkills.length > srcSkills.length)
         diffs.push(
@@ -61,12 +71,39 @@ export function diffItem(instance, source, type) {
         changed(instance.spells, source.spells)
       )
         diffs.push("Spell list changed");
+
+      if (source.benefits !== undefined) {
+        const srcB = source.benefits;
+        const instB = instance.benefits ?? {};
+        const srcSpellClasses = srcB.spellClasses ?? [];
+        const instSpellClasses = instB.spellClasses ?? [];
+        const missingSpellClasses = srcSpellClasses.filter(
+          (sc) => !instSpellClasses.includes(sc),
+        );
+        if (missingSpellClasses.length > 0)
+          diffs.push(
+            `Benefits: spell types added (${missingSpellClasses.join(", ")})`,
+          );
+        const srcCustom = srcB.custom ?? [];
+        const instCustom = instB.custom ?? [];
+        const missingCustom = srcCustom.filter((c) => !instCustom.includes(c));
+        if (missingCustom.length > 0)
+          diffs.push(
+            `Benefits: ${missingCustom.length} custom benefit(s) added`,
+          );
+        if (changed(srcB.martials, instB.martials))
+          diffs.push("Benefits: martial proficiencies changed");
+        if (changed(srcB.rituals, instB.rituals))
+          diffs.push("Benefits: ritual access changed");
+      }
       break;
     }
 
     case "hoplosphere": {
       if (changed(instance.name, source.name))
         diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
       if (changed(instance.description, source.description))
         diffs.push("Description changed");
       if (changed(instance.cost, source.cost))
@@ -87,6 +124,8 @@ export function diffItem(instance, source, type) {
     case "heroic": {
       if (changed(instance.name, source.name))
         diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
       if (changed(instance.description, source.description))
         diffs.push("Description changed");
       break;
@@ -95,32 +134,32 @@ export function diffItem(instance, source, type) {
     case "player-spell": {
       const fields = [
         "name",
-        "mp",
+        "cost",
         "maxTargets",
-        "targetDesc",
+        "targetDescription",
         "duration",
         "description",
         "isOffensive",
-        "attr1",
-        "attr2",
+        "accuracy",
         "opportunity",
         "quality",
       ];
       for (const f of fields) {
         if (changed(instance[f], source[f])) diffs.push(`${f}: changed`);
       }
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
       break;
     }
 
     case "npc-spell": {
       const fields = [
         "name",
-        "attr1",
-        "attr2",
+        "accuracy",
         "type",
-        "mp",
+        "cost",
         "maxTargets",
-        "target",
+        "targetDescription",
         "duration",
         "effect",
         "special",
@@ -128,6 +167,8 @@ export function diffItem(instance, source, type) {
       for (const f of fields) {
         if (changed(instance[f], source[f])) diffs.push(`${f}: changed`);
       }
+      if (source.fuid && !instance.fuid)
+        diffs.push(`ID: missing -> "${source.fuid}"`);
       break;
     }
 
@@ -150,15 +191,48 @@ export function applyMigration(instance, source, type) {
       const mergedSkills = srcSkills.map((srcSkill, i) => {
         const inst = instSkills[i] ?? {};
         const newMaxLvl = srcSkill.maxLvl ?? inst.maxLvl ?? 0;
+        const skillName = srcSkill.skillName ?? srcSkill.name ?? "";
+        const skillFuid =
+          inst.fuid ??
+          srcSkill.fuid ??
+          skills.find((s) => s.name === skillName)?.fuid;
         return {
           ...srcSkill,
           currentLvl: clamp(inst.currentLvl ?? 0, newMaxLvl),
+          ...(skillFuid && { fuid: skillFuid }),
         };
       });
+      const mergedBenefits = (() => {
+        const src = source.benefits;
+        const inst = instance.benefits ?? {};
+        if (!src) return inst;
+        const srcCustom = src.custom ?? [];
+        const instCustom = inst.custom ?? [];
+        const appendedCustom = [
+          ...instCustom,
+          ...srcCustom.filter((sc) => !instCustom.includes(sc)),
+        ];
+        const srcSpellClasses = src.spellClasses ?? [];
+        const instSpellClasses = inst.spellClasses ?? [];
+        const appendedSpellClasses = [
+          ...instSpellClasses,
+          ...srcSpellClasses.filter((sc) => !instSpellClasses.includes(sc)),
+        ];
+        return {
+          ...src,
+          hpplus: inst.hpplus ?? src.hpplus,
+          mpplus: inst.mpplus ?? src.mpplus,
+          ipplus: inst.ipplus ?? src.ipplus,
+          custom: appendedCustom,
+          spellClasses: appendedSpellClasses,
+        };
+      })();
       return {
         ...instance,
         name: source.name ?? instance.name,
+        fuid: source.fuid ?? instance.fuid,
         skills: mergedSkills,
+        benefits: mergedBenefits,
         ...(source.heroic !== undefined && { heroic: source.heroic }),
         ...(source.spells !== undefined && { spells: source.spells }),
       };
@@ -168,6 +242,7 @@ export function applyMigration(instance, source, type) {
       return {
         ...instance,
         name: source.name ?? instance.name,
+        fuid: source.fuid ?? instance.fuid,
         description: source.description ?? instance.description,
         cost: source.cost ?? instance.cost,
         requiredSlots: source.requiredSlots ?? instance.requiredSlots,
@@ -179,20 +254,20 @@ export function applyMigration(instance, source, type) {
       return {
         ...instance,
         name: source.name ?? instance.name,
+        fuid: source.fuid ?? instance.fuid,
         description: source.description ?? instance.description,
       };
 
     case "player-spell": {
       const fields = [
         "name",
-        "mp",
+        "cost",
         "maxTargets",
-        "targetDesc",
+        "targetDescription",
         "duration",
         "description",
         "isOffensive",
-        "attr1",
-        "attr2",
+        "accuracy",
         "opportunity",
         "quality",
       ];
@@ -200,18 +275,18 @@ export function applyMigration(instance, source, type) {
       for (const f of fields) {
         if (source[f] !== undefined) patch[f] = source[f];
       }
+      if (source.fuid) patch.fuid = source.fuid;
       return { ...instance, ...patch };
     }
 
     case "npc-spell": {
       const fields = [
         "name",
-        "attr1",
-        "attr2",
+        "accuracy",
         "type",
-        "mp",
+        "cost",
         "maxTargets",
-        "target",
+        "targetDescription",
         "duration",
         "effect",
         "special",
@@ -220,6 +295,7 @@ export function applyMigration(instance, source, type) {
       for (const f of fields) {
         if (source[f] !== undefined) patch[f] = source[f];
       }
+      if (source.fuid) patch.fuid = source.fuid;
       return { ...instance, ...patch };
     }
 

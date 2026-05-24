@@ -162,9 +162,19 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
               pb: 0.75,
               display: "flex",
               gap: 0.5,
+              alignItems: "center",
               flexWrap: "wrap",
             }}
           >
+            <Typography
+              sx={{
+                fontWeight: "bold",
+                fontSize: "0.75rem",
+                lineHeight: 1,
+              }}
+            >
+              {t("Applicable To")}:
+            </Typography>
             {item.filter.map((f) => (
               <Chip
                 key={f}

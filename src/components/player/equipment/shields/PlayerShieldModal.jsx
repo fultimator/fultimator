@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslate } from "../../../../translation/translate";
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Grid,
-  Typography,
-  Divider,
   Button,
   Dialog,
   DialogTitle,
@@ -14,22 +9,20 @@ import {
   DialogActions,
   IconButton,
   Box,
+  Typography,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import shields from "../../../../libs/shields";
-import qualities from "../../../../routes/equip/ArmorShield/qualities";
-import ChangeBase from "./ChangeBase";
-import SelectQuality from "../../../../routes/equip/ArmorShield/SelectQuality";
-import ChangeName from "../../../../routes/equip/common/ChangeName";
-import ChangeQuality from "../../../../routes/equip/common/ChangeQuality";
-import ApplyRework from "../../../../routes/equip/common/ApplyRework";
 import { SharedShieldCard } from "../../../../components/shared/itemCards";
-import ChangeModifiers from "../ChangeModifiers";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import useUploadJSON from "../../../../hooks/useUploadJSON";
-import { useEquipmentForm } from "../../common/hooks/useEquipmentForm";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
+import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
+import { shieldFieldConfig } from "../../../../forms/rendering/config/itemConfigs/shield";
+import {
+  validateShieldPersisted,
+  buildShieldFormState,
+  buildShieldSavePayload,
+} from "../../../../forms/schema/itemSchemas/shield";
+import { normalizeDefensiveItem } from "../../../../libs/equipmentDefensiveNormalization";
 
 export default function PlayerShieldModal({
   open,
@@ -40,42 +33,16 @@ export default function PlayerShieldModal({
   onDeleteShield,
 }) {
   const { t } = useTranslate();
-
-  const [base, setBase] = useState(shield?.base || shields[0]);
-  const [name, setName] = useState(shield?.name || shields[0].name);
-  const [quality, setQuality] = useState(shield?.quality || "");
-  const [martial, setMartial] = useState(shield?.martial || false);
-  const [qualityCost, setQualityCost] = useState(shield?.qualityCost || 0);
-  const [selectedQuality, setSelectedQuality] = useState(
-    shield?.selectedQuality || "",
+  const [formState, setFormState] = useState(() =>
+    buildShieldFormState(shield),
   );
-  const [init, setInit] = useState(shield?.init || 0);
-  const [rework, setRework] = useState(shield?.rework || false);
-  const {
-    defModifier,
-    setDefModifier,
-    mDefModifier,
-    setMDefModifier,
-    initModifier,
-    setInitModifier,
-    magicModifier,
-    setMagicModifier,
-    precModifier,
-    setPrecModifier,
-    damageMeleeModifier,
-    setDamageMeleeModifier,
-    damageRangedModifier,
-    setDamageRangedModifier,
-    isEquipped,
-    _setIsEquipped,
-    modifiersExpanded,
-    setModifiersExpanded,
-    expandModifiers,
-    modifiers,
-    clearModifiers,
-  } = useEquipmentForm(shield);
-
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setFormState(buildShieldFormState(shield));
+  }, [shield]);
+
+  const { name, base, quality, cost } = formState;
 
   const {
     isOpen: deleteDialogOpen,
@@ -90,136 +57,44 @@ export default function PlayerShieldModal({
     },
   });
 
-  useEffect(() => {
-    setBase(shield?.base || shields[0]);
-    setName(shield?.name || t(shields[0].name));
-    setQuality(shield?.quality || "");
-    setMartial(shield?.martial || false);
-    setQualityCost(shield?.qualityCost || 0);
-    setSelectedQuality(shield?.selectedQuality || "");
-    setInit(shield?.init || 0);
-    setRework(shield?.rework || false);
-    // modifier fields are handled by useEquipmentForm
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shield]);
-
-  const { handleFileUpload } = useUploadJSON((data) => {
-    if (data) {
-      const {
-        base,
-        name,
-        quality,
-        martial,
-        qualityCost,
-        init,
-        rework,
-        defModifier,
-        mDefModifier,
-        initModifier,
-        magicModifier,
-        precModifier,
-        damageMeleeModifier,
-        damageRangedModifier,
-      } = data;
-
-      if (base.category === "Shield") {
-        handleClearFields();
-
-        if (base) {
-          setBase(base);
-        }
-        if (name) {
-          setName(name);
-        }
-        if (quality) {
-          setQuality(quality);
-        }
-        if (martial) {
-          setMartial(martial);
-        }
-        if (qualityCost) {
-          setQualityCost(qualityCost);
-        }
-        if (init) {
-          setInit(init);
-        }
-        if (rework) {
-          setRework(rework);
-        }
-        if (defModifier) {
-          setDefModifier(defModifier);
-          expandModifiers();
-        }
-        if (mDefModifier) {
-          setMDefModifier(mDefModifier);
-          expandModifiers();
-        }
-        if (initModifier) {
-          setInitModifier(initModifier);
-          expandModifiers();
-        }
-        if (magicModifier) {
-          setMagicModifier(magicModifier);
-          expandModifiers();
-        }
-        if (precModifier) {
-          setPrecModifier(precModifier);
-          expandModifiers();
-        }
-        if (damageMeleeModifier) {
-          setDamageMeleeModifier(damageMeleeModifier);
-          expandModifiers();
-        }
-        if (damageRangedModifier) {
-          setDamageRangedModifier(damageRangedModifier);
-          expandModifiers();
-        }
+  const handleFileUpload = (rawData) => {
+    const data = normalizeDefensiveItem(rawData);
+    if (data && data.base?.category === "Shield") {
+      const normalized = { ...buildShieldFormState(data), ...data };
+      const validation = validateShieldPersisted(normalized);
+      if (!validation.success) {
+        console.warn(
+          "[PlayerShieldModal] uploaded shield failed validation",
+          validation.error.issues,
+        );
+        fileInputRef.current.value = null;
+        return;
       }
+      setFormState(buildShieldFormState(data));
     }
     fileInputRef.current.value = null;
-  });
-
-  function calcCost() {
-    let cost = base.cost;
-    // Quality
-    cost += parseInt(qualityCost);
-    return cost;
-  }
-
-  const cost = calcCost();
-
-  const handleClearFields = () => {
-    setBase(shields[0]);
-    setName(t(shields[0].name));
-    setMartial(shields[0].martial);
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    setInit(shields[0].init);
-    setRework(false);
-    clearModifiers();
   };
 
   const handleSave = () => {
-    const updatedShield = {
-      base,
-      name,
-      quality,
-      martial,
-      qualityCost,
-      selectedQuality,
-      init,
-      rework,
-      cost,
-      category: "Shield",
-      def: base.def,
-      mdef: base.mdef,
-      ...modifiers(),
-      isEquipped: martial !== shield?.martial ? false : isEquipped,
-    };
+    const updatedShield = buildShieldSavePayload(formState, shield);
+
+    if (import.meta.env.DEV) {
+      const result = validateShieldPersisted(updatedShield);
+      if (!result.success) {
+        console.warn(
+          "[PlayerShieldModal] shield schema validation failed",
+          result.error.issues,
+        );
+      }
+    }
 
     onAddShield(updatedShield);
   };
+
+  const handleClearFields = () => {
+    setFormState(buildShieldFormState(null));
+  };
+
   return (
     <>
       <Dialog
@@ -227,10 +102,7 @@ export default function PlayerShieldModal({
         onClose={onClose}
         slotProps={{
           paper: {
-            sx: {
-              width: "100%",
-              maxWidth: "lg",
-            },
+            sx: { width: "100%", maxWidth: "lg" },
           },
         }}
       >
@@ -250,175 +122,46 @@ export default function PlayerShieldModal({
           <Close />
         </IconButton>
         <DialogContent>
-          <Grid container spacing={2} sx={{ alignItems: "center" }}>
-            {/* Form */}
+          <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
+            {/* Left column: form fields */}
+            <Grid size={{ xs: 12, md: 7 }}>
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={shieldFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="core"
+                  label={t("Shield")}
+                  cols={2}
+                />
+              </Grid>
 
-            {/* Change Base */}
-            <Grid
-              size={{
-                xs: 12,
-                md: 4,
-              }}
-            >
-              <ChangeBase
-                value={base.name}
-                onChange={(e) => {
-                  const base = shields.find((el) => el.name === e.target.value);
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={shieldFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="quality"
+                  label={t("Quality")}
+                  cols={2}
+                />
+              </Grid>
 
-                  setBase(base);
-                  setName(t(base.name));
-                  setMartial(base.martial);
-                  setInit(base.init);
-                }}
-              />
-            </Grid>
-            {/* <Grid size={2}>
-                  <ChangeMartial martial={martial} setMartial={setMartial} />
-                </Grid> */}
-            <Grid
-              size={{
-                xs: 12,
-                md: 4,
-              }}
-            >
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value,
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
-                }}
-              />
-            </Grid>
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={shieldFieldConfig}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="modifiers"
+                  label={t("Modifiers")}
+                  cols={2}
+                />
+              </Grid>
 
-            <Grid
-              size={{
-                xs: 12,
-                md: 4,
-              }}
-            >
-              <ChangeName
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Grid>
-            <Grid size={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-            </Grid>
-            <Accordion
-              sx={{ width: "100%", marginLeft: "10px" }}
-              expanded={modifiersExpanded}
-              onChange={() => setModifiersExpanded(!modifiersExpanded)}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography>{t("Modifiers")}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"DEF Modifier"}
-                      value={defModifier}
-                      onChange={(e) => setDefModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"MDEF Modifier"}
-                      value={mDefModifier}
-                      onChange={(e) => setMDefModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"INIT Modifier"}
-                      value={initModifier}
-                      onChange={(e) => setInitModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Magic Modifier"}
-                      value={magicModifier}
-                      onChange={(e) => setMagicModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Precision Modifier"}
-                      value={precModifier}
-                      onChange={(e) => setPrecModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Damage (Melee) Modifier"}
-                      value={damageMeleeModifier}
-                      onChange={(e) => setDamageMeleeModifier(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid
-                    size={{
-                      xs: 6,
-                      md: 4,
-                    }}
-                  >
-                    <ChangeModifiers
-                      label={"Damage (Ranged) Modifier"}
-                      value={damageRangedModifier}
-                      onChange={(e) => setDamageRangedModifier(e.target.value)}
-                    />
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-            <Grid size={12}>
-              <Divider />
-            </Grid>
-            <Grid sx={{ py: 0 }} size={12}>
-              <Grid container spacing={2} sx={{ alignItems: "center" }}>
+              <Grid container spacing={1} sx={{ alignItems: "center" }}>
                 <Grid>
                   <Button
                     variant="outlined"
@@ -432,45 +175,51 @@ export default function PlayerShieldModal({
                     {t("Clear All Fields")}
                   </Button>
                 </Grid>
-                {/* Rework */}
-                <Grid size="grow">
-                  <ApplyRework rework={rework} setRework={setRework} />
-                </Grid>
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept=".json"
-                  onChange={handleFileUpload}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        try {
+                          handleFileUpload(JSON.parse(String(reader.result)));
+                        } catch (error) {
+                          console.warn(
+                            "[PlayerShieldModal] invalid JSON upload",
+                            error,
+                          );
+                          fileInputRef.current.value = null;
+                        }
+                      };
+                      reader.readAsText(file);
+                    }
+                  }}
                   style={{ display: "none" }}
                 />
               </Grid>
             </Grid>
-            <Grid size={12}>
-              <Divider sx={{ my: 2 }} />
+
+            {/* Right column: preview card */}
+            <Grid size={{ xs: 12, md: 5 }} sx={{ position: "sticky", top: 0 }}>
+              <SharedShieldCard
+                item={{
+                  base,
+                  ...base,
+                  name,
+                  cost,
+                  martial: formState.martial,
+                  quality,
+                  init: formState.init,
+                  rework: formState.rework,
+                  defModifier: parseInt(formState.defModifier),
+                  mDefModifier: parseInt(formState.mDefModifier),
+                  initModifier: parseInt(formState.initModifier),
+                }}
+              />
             </Grid>
-          </Grid>
-          {/* Pretty */}
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <SharedShieldCard
-              item={{
-                base,
-                ...base,
-                name: name,
-                cost: cost,
-                martial: martial,
-                quality: quality,
-                init: init,
-                rework: rework,
-                defModifier: parseInt(defModifier),
-                mDefModifier: parseInt(mDefModifier),
-                initModifier: parseInt(initModifier),
-              }}
-            />
           </Grid>
         </DialogContent>
         <DialogActions>

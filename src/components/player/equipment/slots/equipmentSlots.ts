@@ -22,22 +22,29 @@ export type AnyEquipmentItem =
 // deriveVehicleSlots
 export type ResolvedPlayerItem = AnyEquipmentItem;
 // deriveEquippedSlots
+export type VehicleSlotMap = {
+  main: string | null;
+  off: string | null;
+  armor: string | null;
+  support: string[];
+};
+
 export type ResolvedVehicleModule = {
   name: string;
+  key?: string;
   type: string;
-  equippedSlot: string | null;
-  enabled: boolean;
-  equipped: boolean;
   isShield?: boolean;
   cumbersome?: boolean;
   def?: number;
   mdef?: number;
-  damage?: number;
-  prec?: number;
+  damage?: { value: number; type: string; hrZero: boolean };
+  accuracy?: {
+    attr1: string;
+    attr2: string;
+    value: number;
+    defense: "def" | "mdef";
+  };
   range?: string;
-  damageType?: string;
-  att1?: string;
-  att2?: string;
   customName?: string;
   description?: string;
   isComplex?: boolean;
@@ -46,6 +53,7 @@ export type ResolvedVehicleModule = {
 export type ResolvedVehicle = {
   customName: string;
   enabled: boolean;
+  slots?: VehicleSlotMap;
   modules: ResolvedVehicleModule[];
 };
 // isTwoHandedEquipped
@@ -82,51 +90,32 @@ export function getActiveVehicle(player: TypePlayer): ResolvedVehicle | null {
 }
 
 /**
- * Build VehicleSlots from the active vehicle's module state.
- * Only modules where `module.enabled === true` contribute to overrides.
- * Called after every module enabled/equipped change.
+ * Build VehicleSlots from the active vehicle's slots object.
+ * Reads directly from vehicle.slots instead of walking module flags.
+ * Called after every module slot change.
  */
 export function deriveVehicleSlots(player: TypePlayer): VehicleSlots {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return {};
 
-  const slots: VehicleSlots = {
-    mainHand: null,
-    offHand: null,
+  const s: VehicleSlotMap = vehicle.slots ?? {
+    main: null,
+    off: null,
     armor: null,
-    accessory: null,
     support: [],
   };
-
-  const ref = (m: ResolvedVehicleModule): VehicleModuleRef => ({
-    vehicleName: vehicle.customName,
-    moduleName: m.name,
+  const ref = (key: string): VehicleModuleRef => ({
+    vehicleName: vehicle.customName ?? "",
+    moduleName: key,
   });
 
-  for (const module of vehicle.modules) {
-    if (!module.enabled) continue;
-
-    if (module.type === "pilot_module_weapon") {
-      if (module.equippedSlot === "main") {
-        slots.mainHand = ref(module);
-      } else if (module.equippedSlot === "off") {
-        slots.offHand = ref(module);
-      } else if (module.equippedSlot === "both") {
-        // Cumbersome — occupies both hands
-        slots.mainHand = ref(module);
-        slots.offHand = ref(module);
-      }
-    } else if (module.type === "pilot_module_armor") {
-      slots.armor = ref(module);
-    } else if (module.type === "pilot_module_accessory") {
-      slots.accessory = ref(module);
-    } else if (module.type === "pilot_module_support") {
-      const count = module.isComplex ? 2 : 1;
-      for (let i = 0; i < count; i++) slots.support!.push(ref(module));
-    }
-  }
-
-  return slots;
+  return {
+    mainHand: s.main ? ref(s.main) : null,
+    offHand: s.off ? ref(s.off) : null,
+    armor: s.armor ? ref(s.armor) : null,
+    accessory: null,
+    support: (s.support ?? []).map((k: string) => ref(k)),
+  };
 }
 
 /**
@@ -224,7 +213,7 @@ export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
 }
 
 /**
- * Compatibility shim — use this instead of reading item.isEquipped directly
+ * Compatibility shim - use this instead of reading item.isEquipped directly
  * in stat calculations and display code.
  *
  * If `player.equippedSlots` exists → returns true if the item's name appears
@@ -362,7 +351,7 @@ export function resolveEffectiveSlot(
     const vRef = vs[slot as keyof VehicleSlots];
     if (vRef && typeof vRef === "object" && !Array.isArray(vRef)) {
       const module = vehicle.modules.find(
-        (m) => m.name === (vRef as VehicleModuleRef).moduleName && m.enabled,
+        (m) => (m.key ?? m.name) === (vRef as VehicleModuleRef).moduleName,
       );
       if (module) return { kind: "vehicleModule", module, vehicle };
     }
@@ -397,7 +386,7 @@ export function resolveEffectiveSlot(
  * the player is in memory, items must have correct `isEquipped` flags so that
  * `syncSlots` / `deriveEquippedSlots` can work correctly on every equip change.
  *
- * Do NOT call this inside `syncSlots` — doing so would overwrite explicit
+ * Do NOT call this inside `syncSlots` - doing so would overwrite explicit
  * equip/unequip changes with the stale pre-change slot state.
  */
 export function rehydrateIsEquipped(player: TypePlayer): TypePlayer {
@@ -454,7 +443,7 @@ export function rehydrateIsEquipped(player: TypePlayer): TypePlayer {
  * After any equip change, call this to re-derive both slot caches and
  * return a new player object ready to pass to setPlayer.
  *
- * This keeps equippedSlots as the authoritative source going forward —
+ * This keeps equippedSlots as the authoritative source going forward -
  * all stat reads should use isItemEquipped(player, item) rather than
  * item.isEquipped directly.
  */

@@ -2,10 +2,15 @@ import React from "react";
 import { Typography, LinearProgress, Card, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import avatar_image from "../../avatar.jpg";
+import avatar_image from "/images/components/avatar.jpg";
 import Diamond from "../../Diamond";
 import { styled } from "@mui/system";
-import { DefIcon, MdefIcon, InitIcon } from "../../icons";
+import {
+  DexAttributeIcon,
+  InsAttributeIcon,
+  MigAttributeIcon,
+  WlpAttributeIcon,
+} from "../../icons";
 import { TypeAffinity } from "../stats/types";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
@@ -92,12 +97,12 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
   background: theme.palette.background.default,
   border: `0.5px solid ${theme.palette.divider}`,
   borderRadius: theme.shape.borderRadius,
-  padding: "4px 6px",
+  padding: "3px 6px",
   [theme.breakpoints.up("md")]: {
-    padding: "6px 8px",
+    padding: "4px 8px",
   },
   [theme.breakpoints.up("lg")]: {
-    padding: "8px 10px",
+    padding: "5px 10px",
   },
   textAlign: "center",
   flex: 1,
@@ -129,15 +134,15 @@ function CombatStat({ icon, label, value, theme }) {
           fontFamily: "'Antonio', fantasy, sans-serif",
           fontWeight: "bold",
           fontSize: {
-            xs: "0.55rem",
-            sm: "0.62rem",
-            md: "0.68rem",
-            lg: "0.74rem",
+            xs: "0.62rem",
+            sm: "0.7rem",
+            md: "0.76rem",
+            lg: "0.82rem",
           },
           letterSpacing: "0.06em",
           textTransform: "uppercase",
           color: theme.palette.text.secondary,
-          lineHeight: 1.2,
+          lineHeight: 1.1,
         }}
       >
         {label}
@@ -147,16 +152,16 @@ function CombatStat({ icon, label, value, theme }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "2px",
+          gap: "1px",
         }}
       >
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            "& svg": {
-              width: { xs: 14, sm: 18, md: 20 },
-              height: { xs: 14, sm: 18, md: 20 },
+            "& svg, & img": {
+              width: { xs: 22, sm: 26, md: 28 },
+              height: { xs: 22, sm: 26, md: 28 },
             },
           }}
         >
@@ -199,7 +204,7 @@ export default function PlayerCardGallery({
 
   const currDex = calculateAttribute(
     player,
-    player.attributes.dexterity,
+    player.attributes.dexterity?.base,
     ["slow", "enraged"],
     ["dexUp"],
     6,
@@ -207,7 +212,7 @@ export default function PlayerCardGallery({
   );
   const currInsight = calculateAttribute(
     player,
-    player.attributes.insight,
+    player.attributes.insight?.base,
     ["dazed", "enraged"],
     ["insUp"],
     6,
@@ -215,7 +220,7 @@ export default function PlayerCardGallery({
   );
   const currMight = calculateAttribute(
     player,
-    player.attributes.might,
+    player.attributes.might?.base,
     ["weak", "poisoned"],
     ["migUp"],
     6,
@@ -223,7 +228,7 @@ export default function PlayerCardGallery({
   );
   const currWillpower = calculateAttribute(
     player,
-    player.attributes.willpower,
+    player.attributes.willpower?.base,
     ["shaken", "poisoned"],
     ["wlpUp"],
     6,
@@ -288,12 +293,21 @@ export default function PlayerCardGallery({
     baseDef +
     equippedShields.reduce((acc, s) => acc + (s.def || 0), 0) +
     (player.modifiers?.def || 0) +
-    (armorModule ? 0 : equippedArmor?.defModifier || 0) +
-    equippedShields.reduce((acc, s) => acc + (s.defModifier || 0), 0) +
-    (equippedAccessory?.defModifier || 0) +
-    equippedWeapons.reduce((acc, w) => acc + (w.defModifier || 0), 0) +
+    (armorModule
+      ? 0
+      : (equippedArmor?.modifiers?.def ?? equippedArmor?.defModifier ?? 0)) +
+    equippedShields.reduce(
+      (acc, s) => acc + (s?.modifiers?.def ?? s?.defModifier ?? 0),
+      0,
+    ) +
+    (equippedAccessory?.modifiers?.def ?? equippedAccessory?.defModifier ?? 0) +
+    equippedWeapons.reduce(
+      (acc, w) => acc + (w?.modifiers?.def ?? w?.defModifier ?? 0),
+      0,
+    ) +
     equippedCustomWeapons.reduce(
-      (acc, w) => acc + (parseInt(w.defModifier || 0, 10) || 0),
+      (acc, w) =>
+        acc + (parseInt(w?.modifiers?.def ?? w?.defModifier ?? 0, 10) || 0),
       0,
     ) +
     dodgeBonus;
@@ -310,12 +324,23 @@ export default function PlayerCardGallery({
     baseMDef +
     equippedShields.reduce((acc, s) => acc + (s.mdef || 0), 0) +
     (player.modifiers?.mdef || 0) +
-    (armorModule ? 0 : equippedArmor?.mDefModifier || 0) +
-    equippedShields.reduce((acc, s) => acc + (s.mDefModifier || 0), 0) +
-    (equippedAccessory?.mDefModifier || 0) +
-    equippedWeapons.reduce((acc, w) => acc + (w.mDefModifier || 0), 0) +
+    (armorModule
+      ? 0
+      : (equippedArmor?.modifiers?.mdef ?? equippedArmor?.mDefModifier ?? 0)) +
+    equippedShields.reduce(
+      (acc, s) => acc + (s?.modifiers?.mdef ?? s?.mDefModifier ?? 0),
+      0,
+    ) +
+    (equippedAccessory?.modifiers?.mdef ??
+      equippedAccessory?.mDefModifier ??
+      0) +
+    equippedWeapons.reduce(
+      (acc, w) => acc + (w?.modifiers?.mdef ?? w?.mDefModifier ?? 0),
+      0,
+    ) +
     equippedCustomWeapons.reduce(
-      (acc, w) => acc + (parseInt(w.mDefModifier || 0, 10) || 0),
+      (acc, w) =>
+        acc + (parseInt(w?.modifiers?.mdef ?? w?.mDefModifier ?? 0, 10) || 0),
       0,
     );
 
@@ -330,10 +355,25 @@ export default function PlayerCardGallery({
   const inCrisis = player.stats.hp.current <= player.stats.hp.max / 2;
 
   const ATTRIBUTES = [
-    { key: "dexterity", label: t("DEX"), curr: currDex },
-    { key: "insight", label: t("INS"), curr: currInsight },
-    { key: "might", label: t("MIG"), curr: currMight },
-    { key: "willpower", label: t("WLP"), curr: currWillpower },
+    {
+      key: "dexterity",
+      label: t("DEX"),
+      curr: currDex,
+      Icon: DexAttributeIcon,
+    },
+    {
+      key: "insight",
+      label: t("INS"),
+      curr: currInsight,
+      Icon: InsAttributeIcon,
+    },
+    { key: "might", label: t("MIG"), curr: currMight, Icon: MigAttributeIcon },
+    {
+      key: "willpower",
+      label: t("WLP"),
+      curr: currWillpower,
+      Icon: WlpAttributeIcon,
+    },
   ];
   const visibleClasses = (player.classes || []).filter((c) => c && c.name);
   const hasDescription = Boolean(player.info?.description?.trim());
@@ -423,7 +463,7 @@ export default function PlayerCardGallery({
         return t(spellType || "System");
     }
   };
-  const listNames = (items = [], nameKey = "name", customKey = "customName") =>
+  const listNames = (items = [], nameKey = "key", customKey = "customName") =>
     items
       .map(
         (item) =>
@@ -441,12 +481,22 @@ export default function PlayerCardGallery({
         activeVehicle.customName || t(activeVehicle.name || "pilot_vehicle");
       const frameName = t(activeVehicle.frame || "pilot_frame_exoskeleton");
       const modules = activeVehicle.modules || [];
-      const enabledModules = modules.filter((m) => m.enabled);
+      const slots = activeVehicle.slots || {};
+      const isEquipped = (module) => {
+        const key = module?.key ?? module?.name;
+        return (
+          slots.main === key ||
+          slots.off === key ||
+          slots.armor === key ||
+          (slots.support || []).includes(key)
+        );
+      };
+      const enabledModules = modules.filter(isEquipped);
       const enabledNames = enabledModules
         .map((m) => m.customName || t(m.name || ""))
         .filter(Boolean);
       const otherNames = modules
-        .filter((m) => !m.enabled)
+        .filter((m) => !isEquipped(m))
         .map((m) => m.customName || t(m.name || ""))
         .filter(Boolean);
       const enabledText = enabledNames.length
@@ -461,16 +511,17 @@ export default function PlayerCardGallery({
       const seeds = spell.magiseeds || [];
       const current = spell.currentMagiseed;
       const currentName = current
-        ? current.customName || t(current.name || "")
+        ? current.customName || t(current.key || current.name || "")
         : t("magiseed_no_magiseed");
       const otherSeeds = seeds
         .filter((seed) => {
           if (!current) return true;
-          const seedName = seed?.customName || seed?.name || "";
-          const currentSeedName = current?.customName || current?.name || "";
+          const seedName = seed?.customName || seed?.key || seed?.name || "";
+          const currentSeedName =
+            current?.customName || current?.key || current?.name || "";
           return seedName !== currentSeedName;
         })
-        .map((seed) => seed.customName || t(seed.name || ""))
+        .map((seed) => seed.customName || t(seed.key || seed.name || ""))
         .filter(Boolean);
       const othersText = otherSeeds.length
         ? ` - ${t("Others")}: ${otherSeeds.join(", ")}`
@@ -484,9 +535,10 @@ export default function PlayerCardGallery({
       return `${t("Deck")}: ${cardsInDeck} - ${t("Hand")}: ${hand} - ${t("Discard")}: ${discard}`;
     }
     if (spell.spellType === "invocation") {
-      const wells = spell.activeWellsprings || [];
-      const inner = spell.innerWellspring
-        ? ` + ${spell.chosenWellspring || ""}`
+      const tracker = spell.tracker || {};
+      const wells = tracker.activeWellsprings || [];
+      const inner = tracker.innerWellspring
+        ? ` + ${tracker.chosenWellspring || ""}`
         : "";
       return `${t("Wellsprings")}: ${wells.join(", ") || "-"}${inner}`;
     }
@@ -507,7 +559,7 @@ export default function PlayerCardGallery({
       return symbols.length ? symbols.join(", ") : t("symbol_empty_symbols");
     }
     if (spell.spellType === "cooking") {
-      return `${t("Effects")}: ${spell.cookbookEffects?.length || 0}`;
+      return `${t("Effects")}: ${spell.cookbook?.effects?.length || 0}`;
     }
     if (spell.spellType?.startsWith("tinkerer-")) {
       const counts = [
@@ -612,8 +664,6 @@ export default function PlayerCardGallery({
             flexDirection: "column",
             minWidth: 0,
             overflow: "hidden",
-            height: "100%",
-            justifyContent: "space-between",
           }}
         >
           {/* Top section: avatar + bars */}
@@ -687,22 +737,21 @@ export default function PlayerCardGallery({
             />
           </Box>
 
-          {/* Attributes (always 2x2) */}
+          {/* Attributes (always 2x2, 1 column on mobile) */}
           <Box
             sx={{
               display: "grid",
-              mt: "auto",
               pt: 0.75,
               borderTop: `0.5px solid ${theme.palette.divider}`,
               width: "100%",
               minWidth: 0,
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
               gap: "6px",
-              px: 0.25,
+              px: 0.5,
               pb: 0.75,
             }}
           >
-            {ATTRIBUTES.map(({ key, label, curr }) => (
+            {ATTRIBUTES.map(({ key, label, curr, Icon }) => (
               <Box
                 key={`grid-${key}`}
                 sx={{
@@ -713,20 +762,24 @@ export default function PlayerCardGallery({
                   background: theme.palette.background.default,
                   border: `0.5px solid ${theme.palette.divider}`,
                   borderRadius: "6px",
-                  px: { xs: 0.75, md: 1 },
+                  px: { xs: 0.5, md: 0.75 },
                   py: { xs: 0.5, md: 0.65 },
                 }}
               >
                 <Typography
                   sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 0.3,
                     fontFamily: "'Antonio'",
                     fontWeight: "bold",
-                    fontSize: { xs: "0.68rem", md: "0.76rem", lg: "0.84rem" },
+                    fontSize: { xs: "0.74rem", md: "0.84rem", lg: "0.92rem" },
                     lineHeight: 1,
                     whiteSpace: "nowrap",
                     letterSpacing: "0.04em",
                   }}
                 >
+                  <Icon size="1.2em" />
                   {label}
                 </Typography>
                 <Typography
@@ -734,7 +787,10 @@ export default function PlayerCardGallery({
                     fontFamily: "'Antonio', fantasy, sans-serif",
                     fontSize: { xs: "0.78rem", md: "0.9rem", lg: "0.98rem" },
                     fontWeight: "bold",
-                    color: getAttributeColor(player.attributes[key], curr),
+                    color: getAttributeColor(
+                      player.attributes[key]?.base,
+                      curr,
+                    ),
                     lineHeight: 1,
                     whiteSpace: "nowrap",
                   }}
@@ -751,8 +807,8 @@ export default function PlayerCardGallery({
           sx={{
             display: "flex",
             flexDirection: "column",
-            p: { xs: 0.5, sm: 1, md: 1.25, lg: 1.5 },
-            gap: { xs: 0.75, sm: 1, md: 1.2, lg: 1.4 },
+            p: { xs: 0.5, sm: 0.75, md: 1, lg: 1.25 },
+            gap: { xs: 0.75, sm: 0.75, md: 0.875, lg: 1 },
             minWidth: 0,
           }}
         >
@@ -764,7 +820,7 @@ export default function PlayerCardGallery({
               overflow: "hidden",
             }}
           >
-            <Box sx={{ background: primary, px: 1, py: "2px" }}>
+            <Box sx={{ background: primary, px: 1, py: "4px" }}>
               <Typography
                 sx={{
                   color: custom.white,
@@ -868,7 +924,6 @@ export default function PlayerCardGallery({
               display: "flex",
               flex: { xs: 1, [loadoutBreakpoint]: "0 0 auto" },
               minHeight: 0,
-              pt: 0.25,
               width: "100%",
               minWidth: 0,
               overflow: "hidden",
@@ -884,7 +939,7 @@ export default function PlayerCardGallery({
                 flexDirection: "column",
               }}
             >
-              <Box sx={{ background: primary, px: 1, py: "2px" }}>
+              <Box sx={{ background: primary, px: 1, py: "4px" }}>
                 <Typography
                   sx={{
                     color: custom.white,
@@ -939,24 +994,66 @@ export default function PlayerCardGallery({
             <CombatStat
               theme={theme}
               label={t("DEF")}
-              icon={<DefIcon size="18px" color={isDark ? "white" : "black"} />}
+              icon={
+                <Box
+                  component="img"
+                  src="/assets/icons/stats/icon_def.png"
+                  alt={t("DEF")}
+                  sx={{ objectFit: "contain", display: "block" }}
+                />
+              }
               value={currDef}
             />
             <CombatStat
               theme={theme}
               label={t("M.DEF")}
-              icon={<MdefIcon size="18px" color={isDark ? "white" : "black"} />}
+              icon={
+                <Box
+                  component="img"
+                  src="/assets/icons/stats/icon_mdef.png"
+                  alt={t("M.DEF")}
+                  sx={{ objectFit: "contain", display: "block" }}
+                />
+              }
               value={currMDef}
             />
             <CombatStat
               theme={theme}
               label={t("INIT")}
-              icon={<InitIcon size="18px" color={isDark ? "white" : "black"} />}
+              icon={
+                <Box
+                  component="img"
+                  src="/assets/icons/stats/icon_clock.png"
+                  alt={t("INIT")}
+                  sx={{ objectFit: "contain", display: "block" }}
+                />
+              }
               value={(currInit > 0 ? "+" : "") + currInit}
             />
           </Box>
         </Box>
       </Box>
+      {/* Affinity Strip */}
+      <AffinityStrip>
+        {[
+          "physical",
+          "air",
+          "bolt",
+          "dark",
+          "earth",
+          "fire",
+          "ice",
+          "light",
+          "poison",
+        ].map((type) => (
+          <AffinityCell key={type}>
+            <TypeAffinity
+              type={type}
+              affinity={player.affinities?.[type] || ""}
+            />
+          </AffinityCell>
+        ))}
+      </AffinityStrip>
       {isExpanded && (
         <Box
           sx={{
@@ -1163,27 +1260,6 @@ export default function PlayerCardGallery({
           </Box>
         </Box>
       )}
-      {/* Affinity Strip */}
-      <AffinityStrip>
-        {[
-          "physical",
-          "wind",
-          "bolt",
-          "dark",
-          "earth",
-          "fire",
-          "ice",
-          "light",
-          "poison",
-        ].map((type) => (
-          <AffinityCell key={type}>
-            <TypeAffinity
-              type={type}
-              affinity={player.affinities?.[type] || ""}
-            />
-          </AffinityCell>
-        ))}
-      </AffinityStrip>
     </Card>
   );
 }

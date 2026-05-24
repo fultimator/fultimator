@@ -15,6 +15,7 @@ import { SharedArcanumCard } from "../../../components/shared/itemCards";
 import ChangeName from "../common/ChangeName";
 import ApplyRework from "../common/ApplyRework";
 import { useTranslate } from "../../../translation/translate";
+import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomTextarea from "../../../components/common/CustomTextarea";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";
@@ -24,6 +25,7 @@ import useDownloadImage from "../../../hooks/useDownloadImage";
 function Arcana() {
   const { t } = useTranslate();
   const theme = useTheme();
+  const stickyTop = useStickyTop();
   const secondary = theme.palette.secondary.main;
 
   const [name, setName] = useState("Arcanum");
@@ -283,6 +285,7 @@ function Arcana() {
           xs: 12,
           sm: 6,
         }}
+        sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
       >
         <div ref={cardRef}>
           <SharedArcanumCard

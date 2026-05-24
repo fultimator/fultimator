@@ -10,8 +10,9 @@ import { StyledTableCell, StyledMarkdown } from "./StyledSpellComponents";
 export default function SpellDefault({
   spellName,
   mp,
+  perTarget,
   maxTargets,
-  targetDesc,
+  targetDescription,
   duration,
   description,
   isOffensive,
@@ -56,11 +57,13 @@ export default function SpellDefault({
           <StyledTableCell align="center" sx={{ width: "15%" }}>
             <Typography sx={{ fontSize: "0.85rem" }}>
               {mp}
-              {maxTargets !== 1 ? " × " + t("T") : ""}
+              {perTarget && maxTargets !== 1 ? ` × ${t("T")}` : ""}
             </Typography>
           </StyledTableCell>
           <StyledTableCell align="center" sx={{ width: "20%" }}>
-            <Typography sx={{ fontSize: "0.85rem" }}>{targetDesc}</Typography>
+            <Typography sx={{ fontSize: "0.85rem" }}>
+              {targetDescription}
+            </Typography>
           </StyledTableCell>
           <StyledTableCell align="center" sx={{ width: "25%" }}>
             <Typography sx={{ fontSize: "0.85rem" }}>{duration}</Typography>
