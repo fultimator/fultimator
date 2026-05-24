@@ -113,7 +113,8 @@
     "vite-plugin-electron-renderer": "^0.14.5",
     "vite-plugin-pwa": "^0.21.2",
     "vite-plugin-svgr": "^4.3.0",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.6",
+    "workbox-window": "^7.3.0"
   },
   "browserslist": {
     "production": [
