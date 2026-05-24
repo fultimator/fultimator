@@ -64,7 +64,8 @@ export function TypeAffinity({
   onChangeAffinity,
 }) {
   const { t } = useTranslate();
-  const normalizedAffinity = String(affinity ?? "").toLowerCase();
+  const rawAffinity = String(affinity ?? "").toLowerCase();
+  const normalizedAffinity = rawAffinity === "no" ? "" : rawAffinity;
   const disabled = normalizedAffinity === "";
   const value = ["", "rs", "im", "ab", "vu"].includes(normalizedAffinity)
     ? normalizedAffinity
@@ -168,7 +169,7 @@ export function TypeAffinity({
             letterSpacing: "0.03em",
           }}
         >
-          {value ? value.toUpperCase() : "-"}
+          {value ? value.toUpperCase() : ""}
         </Typography>
         <KeyboardArrowDownIcon
           sx={{

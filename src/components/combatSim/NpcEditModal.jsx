@@ -153,7 +153,7 @@ export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
       maxWidth="lg"
       fullWidth
       fullScreen={isSmallScreen}
-      PaperProps={{ sx: { height: isSmallScreen ? "100%" : "90vh" } }}
+      paperprops={{ sx: { height: isSmallScreen ? "100%" : "90vh" } }}
     >
       <DialogTitle sx={{ borderBottom: "none" }}>
         {npcTemp?.name ?? t("Edit NPC")}

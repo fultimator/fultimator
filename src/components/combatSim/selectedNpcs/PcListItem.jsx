@@ -6,15 +6,17 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   IconButton,
-  Checkbox,
   Tooltip,
 } from "@mui/material";
-import { Delete, TouchApp } from "@mui/icons-material";
+import { Delete, TouchApp, DragIndicator } from "@mui/icons-material";
+import TurnTokens from "./TurnTokens";
 import { GiDeathSkull } from "react-icons/gi";
 import { IoIosWarning } from "react-icons/io";
 import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import { useCombatEncounterStore } from "../../../stores/combatEncounterStore";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function PcListItem({
   pc,
@@ -25,17 +27,40 @@ export default function PcListItem({
   handleHpMpClick,
   handleUpdatePcTurns,
   isMobile,
+  combatActive = false,
+  isActiveFaction = false,
+  activeTurnIndex = null,
+  onStartTurn,
+  onEndTurn,
+  useDragAndDrop = true,
+  onRowNode,
 }) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const isDarkMode = theme.palette.mode === "dark";
 
-  const { targets, setTarget, toggleTarget, runtimeActors } = useCombatEncounterStore();
+  const { targets, setTarget, toggleTarget, runtimeActors } =
+    useCombatEncounterStore();
   const [hovered, setHovered] = useState(false);
   const pcName = pc.name || pc.characterName || "Unknown";
   const isTargeted = targets.some((t) => t.combatId === pc.combatId);
   const runtime = runtimeActors[pc.combatId];
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: pc.combatId });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    position: "relative",
+    zIndex: isDragging ? 1000 : 1,
+  };
 
   useEffect(() => {
     if (!hovered) return;
@@ -61,6 +86,11 @@ export default function PcListItem({
 
   return (
     <ListItem
+      ref={(node) => {
+        setNodeRef(node);
+        onRowNode?.(pc.combatId, node);
+      }}
+      style={style}
       onClick={(e) =>
         e.target.type !== "checkbox" && handleListItemClick(pc.combatId)
       }
@@ -76,38 +106,54 @@ export default function PcListItem({
             : selectedPcID === pc.combatId
               ? "1px solid " + primary
               : "1px solid #ddd",
-        marginY: 1,
+        marginY: 0.5,
         borderRadius: 1,
         position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: isTargeted
-          ? isDarkMode
-            ? "rgba(237,177,80,0.08)"
-            : "rgba(237,177,80,0.06)"
-          : isDarkMode
-            ? currentHp === 0
-              ? "#5c1010"
-              : "#2a2a4a"
-            : currentHp === 0
-              ? "#ffe6e6"
-              : "#f0f0ff",
+        backgroundColor: isDarkMode
+          ? currentHp === 0
+            ? "#5c1010"
+            : "rgba(76,175,80,0.08)"
+          : currentHp === 0
+            ? "#ffe6e6"
+            : "rgba(76,175,80,0.06)",
         "&:hover": {
           backgroundColor: isDarkMode
             ? currentHp === 0
               ? "#6f0000"
-              : "#3a3a5c"
+              : "rgba(76,175,80,0.14)"
             : currentHp === 0
               ? "#ffcccc"
-              : "#e0e0ff",
+              : "rgba(76,175,80,0.10)",
         },
-        paddingY: 1,
+        paddingY: 0.75,
         flexDirection: "row",
         overflow: "visible",
         cursor: "pointer",
       }}
     >
+      {useDragAndDrop && (
+        <Box
+          {...attributes}
+          {...listeners}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 24,
+            mr: 0.5,
+            color: theme.palette.text.secondary,
+            cursor: "grab",
+            touchAction: "none",
+            "&:hover": { color: theme.palette.text.primary },
+          }}
+        >
+          <DragIndicator fontSize="small" />
+        </Box>
+      )}
+
       {/* Selected indicator badge */}
       {selectedPcID === pc.combatId && (
         <Tooltip title="Selected" enterDelay={300}>
@@ -169,10 +215,10 @@ export default function PcListItem({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          width: isMobile ? "5px" : "10px",
+          width: isMobile ? 8 : 10,
           height: "100%",
           borderRight: "1px solid #ccc",
-          padding: "0 10px",
+          padding: "0 8px",
           gap: "2px",
         }}
       >
@@ -283,7 +329,13 @@ export default function PcListItem({
             </Tooltip>
           </>
         }
-        sx={{ flex: 1, paddingLeft: 2, fontWeight: "500", overflow: "hidden" }}
+        sx={{
+          flex: 1,
+          paddingLeft: 1,
+          fontWeight: "500",
+          overflow: "hidden",
+          my: 0,
+        }}
       />
 
       <ListItemSecondaryAction
@@ -291,26 +343,21 @@ export default function PcListItem({
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-end",
-          minWidth: "80px",
+          minWidth: "68px",
           flexShrink: 0,
           zIndex: 5,
         }}
       >
-        <Tooltip
-          title={t("combat_sim_check_turn")}
-          enterDelay={500}
-          enterNextDelay={500}
-        >
-          <Checkbox
-            checked={pc.combatStats?.turns?.[0] ?? false}
-            onChange={(e) => {
-              e.stopPropagation();
-              handleUpdatePcTurns(pc.combatId, [e.target.checked]);
-            }}
-            color="success"
-            sx={{ padding: "2px", zIndex: 10 }}
-          />
-        </Tooltip>
+        <TurnTokens
+          turns={pc.combatStats?.turns ?? [false]}
+          combatActive={combatActive}
+          isActiveFaction={isActiveFaction}
+          activeTurnIndex={activeTurnIndex}
+          onStartTurn={onStartTurn}
+          onEndTurn={onEndTurn}
+          onToggle={(newTurns) => handleUpdatePcTurns(pc.combatId, newTurns)}
+          color="primary"
+        />
         <IconButton
           edge="end"
           color="error"
@@ -318,7 +365,7 @@ export default function PcListItem({
             e.stopPropagation();
             handleRemovePC(pc.combatId);
           }}
-          sx={{ padding: 1 }}
+          sx={{ padding: 0.5, ml: 0.25 }}
         >
           <Tooltip
             title={t("combat_sim_delete")}

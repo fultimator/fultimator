@@ -73,8 +73,7 @@ import MagichantKeysContentSection from "../../spells/sections/MagichantKeysCont
 import MagichantTonesContentSection from "../../spells/sections/MagichantTonesContentSection";
 import PlayerNoteModal from "../../informations/PlayerNoteModal";
 import ReactMarkdown from "react-markdown";
-import { styled } from "@mui/system";
-import { TypeAffinity } from "../../../types";
+import DefenseAffinityRow from "../../../shared/actorCards/common/DefenseAffinityRow";
 import PlayerEquipment from "./PlayerEquipment";
 import PlayerClasses from "./PlayerClasses";
 import PlayerSpells from "./PlayerSpells";
@@ -100,14 +99,6 @@ import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
 
 // const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
 // const StyledTableCell = styled(TableCell)({ padding: 0 });
-
-const AffinityGrid = styled(Grid)(({ theme }) => ({
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  borderTop: `1px solid ${theme.palette.divider}`,
-  borderLeft: `1px solid ${theme.palette.divider}`,
-  borderImage: `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.background.paper}) 1`,
-  marginLeft: theme.spacing(0.25),
-}));
 
 export default function PlayerCardSheet({
   player,
@@ -2383,7 +2374,6 @@ function Stats({
   const theme = useTheme();
   const custom = useCustomTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const borderImage = `linear-gradient(45deg, #b9a9be, ${theme.transparent}) 1`;
   const getAttributeColor = (base, current) => {
     if (current < base) return theme.palette.error.main;
     if (current > base) return theme.palette.success.main;
@@ -2427,6 +2417,7 @@ function Stats({
         fontWeight: "bold",
         textAlign: "center",
         fontSize: isMobile ? "0.74rem" : "0.9rem",
+        containerType: "inline-size",
       }}
     >
       <Grid container>
@@ -2439,6 +2430,9 @@ function Stats({
             mr: isMobile ? "1px" : "2px",
             my: "2px",
             flexBasis: "calc(50% - 2px)",
+            "@container (max-width: 560px)": {
+              flexBasis: "calc(100% - 2px)",
+            },
           }}
         >
           <Grid
@@ -2561,6 +2555,9 @@ function Stats({
             ml: isMobile ? "1px" : "2px",
             my: "2px",
             flexBasis: "calc(50% - 2px)",
+            "@container (max-width: 560px)": {
+              flexBasis: "calc(100% - 2px)",
+            },
           }}
         >
           <Grid
@@ -2604,6 +2601,32 @@ function Stats({
             <Grid sx={{ py: 0.4 }} size="grow">
               {t("Init.")} {currInit}
             </Grid>
+            <Grid
+              sx={{
+                py: 0.4,
+                px: isMobile ? 0.5 : 1,
+                bgcolor: custom.mode === "dark" ? "#1B1D1E" : "#efecf5",
+                display: "none",
+                "@container (max-width: 560px)": {
+                  display: "block",
+                },
+              }}
+            >
+              {t("DEF")} +{currDef}
+            </Grid>
+            <Grid
+              sx={{
+                py: 0.4,
+                px: isMobile ? 0.5 : 1,
+                bgcolor: custom.mode === "dark" ? "#1B1D1E" : "#efecf5",
+                display: "none",
+                "@container (max-width: 560px)": {
+                  display: "block",
+                },
+              }}
+            >
+              {t("M.DEF")} +{currMDef}
+            </Grid>
           </Grid>
         </Grid>
         <Grid
@@ -2611,17 +2634,15 @@ function Stats({
             borderBottom: "1px solid #281127",
             borderTop: "1px solid #281127",
             borderRight: "1px solid #281127",
-            borderImage,
+            borderImage: `linear-gradient(45deg, #b9a9be, ${theme.transparent}) 1`,
             mr: isMobile ? "1px" : "2px",
             flexBasis: "calc(25% - 2px)",
+            "@container (max-width: 560px)": {
+              display: "none",
+            },
           }}
         >
-          <Grid
-            container
-            sx={{
-              justifyItems: "space-between",
-            }}
-          >
+          <Grid container sx={{ justifyItems: "space-between" }}>
             <Grid
               sx={{
                 bgcolor: custom.mode === "dark" ? "#1B1D1E" : "#efecf5",
@@ -2636,7 +2657,7 @@ function Stats({
               <Typography
                 component="span"
                 variant="body2"
-                style={{
+                sx={{
                   fontFamily: "'Antonio', fantasy, sans-serif",
                   fontSize: "0.75rem",
                 }}
@@ -2654,7 +2675,7 @@ function Stats({
               <Typography
                 component="span"
                 variant="body2"
-                style={{
+                sx={{
                   fontFamily: "'Antonio', fantasy, sans-serif",
                   fontSize: "0.75rem",
                 }}
@@ -2664,36 +2685,32 @@ function Stats({
             </Grid>
           </Grid>
         </Grid>
-        <Grid size="grow">
-          <AffinityGrid container>
-            {[
-              "physical",
-              "air",
-              "bolt",
-              "dark",
-              "earth",
-              "fire",
-              "ice",
-              "light",
-              "poison",
-            ].map((type) => (
-              <Grid
-                key={type}
-                sx={{
-                  py: 0.4,
-                  borderRight: `1px solid ${theme.palette.divider}`,
-                }}
-                size="grow"
-              >
-                <TypeAffinity
-                  type={type}
-                  affinity={player.affinities?.[type] || ""}
-                  editable={Boolean(isEditMode && setPlayer)}
-                  onChangeAffinity={handleAffinityChange(type)}
-                />
-              </Grid>
-            ))}
-          </AffinityGrid>
+        <Grid
+          sx={{
+            flexGrow: 1,
+            flexBasis: 0,
+            minWidth: 0,
+            "@container (max-width: 560px)": {
+              flexBasis: "calc(100% - 2px)",
+            },
+          }}
+        >
+          <DefenseAffinityRow
+            t={t}
+            defValue={`+${currDef}`}
+            mDefValue={`+${currMDef}`}
+            affinities={player.affinities}
+            panelBg={custom.mode === "dark" ? "#1B1D1E" : "#efecf5"}
+            panelBorder={custom.mode === "dark" ? "#42484B" : "#ffffff"}
+            dividerColor={theme.palette.divider}
+            borderImage={`linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.background.paper}) 1`}
+            editable={Boolean(isEditMode && setPlayer)}
+            onChangeAffinity={handleAffinityChange}
+            compactBreakpoint={560}
+            showDefenseColumnsDesktop={false}
+            mx={0}
+            mb={0}
+          />
         </Grid>
       </Grid>
     </Typography>

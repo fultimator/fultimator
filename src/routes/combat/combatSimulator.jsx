@@ -29,13 +29,19 @@ import { globalConfirm } from "../../utility/globalConfirm";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
+import InitiativeDialog from "../../components/combatSim/InitiativeDialog";
 import NpcEditModal from "../../components/combatSim/NpcEditModal";
 import { SignIn } from "../../components/auth";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
 import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../components/player/playerTransforms";
-import { buildDamageContext, resolveDamage } from "../../pipelines/damagePipeline";
+import {
+  buildDamageContext,
+  resolveDamage,
+} from "../../pipelines/damagePipeline";
+import { scanForTrigger } from "../../pipelines/triggerScanner";
+import { fireTriggers } from "../../pipelines/triggerExecutor";
 import { getActorBonuses } from "../../libs/actorBonuses";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 
@@ -178,6 +184,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
   // ========== Encounter States ==========
   const [encounter, setEncounter] = useState(null); // Current encounter
+  const [combatActive, setCombatActive] = useState(false);
+  const [initiative, setInitiative] = useState("players");
+  const [currentTurn, setCurrentTurn] = useState("players");
+  // { combatId, turnIndex, faction } — whichever actor has an in-progress turn
+  const [activeTurn, setActiveTurn] = useState(null);
+  const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false);
   const [encounterName, setEncounterName] = useState(""); // Encounter name
   const [isEditing, setIsEditing] = useState(false); // Encounter name editing state
   const [npcList, setNpcList] = useState([]); // Available NPCs
@@ -220,6 +232,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   );
   const clearEncounterActors = useCombatEncounterStore((s) => s.clearActors);
   const clearTargets = useCombatEncounterStore((s) => s.clearTargets);
+  const runtimeActors = useCombatEncounterStore((s) => s.runtimeActors);
   useEffect(() => {
     setEncounterActors(id, selectedNPCs, selectedPCs);
   }, [id, selectedNPCs, selectedPCs]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -508,8 +521,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       })),
     );
 
-    // Increment the round
+    // Increment the round and reset turn to initiative winner
     setEncounter((prev) => ({ ...prev, round: prev.round + 1 }));
+    if (combatActive) {
+      setCurrentTurn(initiative);
+      setActiveTurn(null);
+    }
 
     if (logNewRound) {
       // Add log entry
@@ -518,32 +535,101 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   };
 
   // Handle Update NPC Turns
-  const handleUpdateNpcTurns = (combatId, newTurns) => {
-    setSelectedNPCs((prev) =>
-      prev.map((npc) =>
-        npc.combatId === combatId
-          ? { ...npc, combatStats: { ...npc.combatStats, turns: newTurns } }
-          : npc,
-      ),
-    );
+  const handleStartActorTurn = (combatId, turnIndex, faction) => {
+    if (activeTurn) return; // another turn already in progress
+    setActiveTurn({ combatId, turnIndex, faction });
+  };
 
-    // Add log entry if new turns have been checked so oldTurns < newTurns
-    const npc = selectedNPCs.find((npc) => npc.combatId === combatId);
-    if (npc) {
-      const oldTurns = npc.combatStats.turns || [];
-      const newTurnsCount = newTurns.filter((turn) => turn).length;
-      const oldTurnsCount = oldTurns.filter((turn) => turn).length;
-      if (newTurnsCount > oldTurnsCount) {
-        if (logTurnChecked) {
+  const handleEndActorTurn = (combatId, turnIndex, faction, isNpc) => {
+    setActiveTurn(null);
+    if (isNpc) {
+      const nextNPCs = selectedNPCs.map((n) => {
+        if (n.combatId !== combatId) return n;
+        const newTurns = [...(n.combatStats?.turns ?? [])];
+        newTurns[turnIndex] = true;
+        return { ...n, combatStats: { ...n.combatStats, turns: newTurns } };
+      });
+      setSelectedNPCs(nextNPCs);
+      if (logTurnChecked) {
+        const npc = selectedNPCs.find((n) => n.combatId === combatId);
+        if (npc) {
+          const takenCount =
+            (npc.combatStats?.turns ?? []).filter(Boolean).length + 1;
           addLog(
             "combat_sim_log_turn_checked",
             npc.name +
-              (npc?.combatStats?.combatNotes
+              (npc.combatStats?.combatNotes
                 ? "【" + npc.combatStats.combatNotes + "】"
                 : ""),
-            newTurnsCount,
+            takenCount,
           );
         }
+      }
+      setCurrentTurn(determineNextTurn("npcs", nextNPCs, selectedPCs));
+    } else {
+      const nextPCs = selectedPCs.map((p) => {
+        if (p.combatId !== combatId) return p;
+        const newTurns = [...(p.combatStats?.turns ?? [])];
+        newTurns[turnIndex] = true;
+        return { ...p, combatStats: { ...p.combatStats, turns: newTurns } };
+      });
+      setSelectedPCs(nextPCs);
+      if (logTurnChecked) {
+        const pc = selectedPCs.find((p) => p.combatId === combatId);
+        if (pc) {
+          const takenCount =
+            (pc.combatStats?.turns ?? []).filter(Boolean).length + 1;
+          addLog("combat_sim_log_turn_checked", pc.name, takenCount);
+        }
+      }
+      setCurrentTurn(determineNextTurn("players", selectedNPCs, nextPCs));
+    }
+  };
+
+  // After a turn is taken, flip currentTurn to the other faction if they still have turns left.
+  // nextNpcs/nextPCs are the up-to-date arrays (state setters are async).
+  const determineNextTurn = (lastFaction, nextNPCs, nextPCs) => {
+    const other = lastFaction === "npcs" ? "players" : "npcs";
+    const otherHasTurns =
+      other === "npcs"
+        ? nextNPCs.some((n) => n.combatStats?.turns?.some((t) => !t))
+        : nextPCs.some((p) => p.combatStats?.turns?.some((t) => !t));
+    const sameHasTurns =
+      lastFaction === "npcs"
+        ? nextNPCs.some((n) => n.combatStats?.turns?.some((t) => !t))
+        : nextPCs.some((p) => p.combatStats?.turns?.some((t) => !t));
+    if (otherHasTurns) return other;
+    if (sameHasTurns) return lastFaction;
+    return lastFaction; // all turns exhausted, round over
+  };
+
+  const handleUpdateNpcTurns = (combatId, newTurns) => {
+    const npc = selectedNPCs.find((npc) => npc.combatId === combatId);
+    const oldTurns = npc?.combatStats?.turns || [];
+    const oldTurnsCount = oldTurns.filter((t) => t).length;
+    const newTurnsCount = newTurns.filter((t) => t).length;
+    const turnWasTaken = newTurnsCount > oldTurnsCount;
+
+    const nextNPCs = selectedNPCs.map((n) =>
+      n.combatId === combatId
+        ? { ...n, combatStats: { ...n.combatStats, turns: newTurns } }
+        : n,
+    );
+    setSelectedNPCs(nextNPCs);
+
+    if (npc && turnWasTaken) {
+      if (logTurnChecked) {
+        addLog(
+          "combat_sim_log_turn_checked",
+          npc.name +
+            (npc?.combatStats?.combatNotes
+              ? "【" + npc.combatStats.combatNotes + "】"
+              : ""),
+          newTurnsCount,
+        );
+      }
+      if (combatActive) {
+        setCurrentTurn(determineNextTurn("npcs", nextNPCs, selectedPCs));
       }
     }
   };
@@ -643,6 +729,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           },
         },
       ]);
+
+      if (logNpcAdded) {
+        addLog("combat_sim_log_npc_added", normalizedPlayer.name);
+      }
     }
   };
 
@@ -654,9 +744,14 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       );
       if (!confirmRemove) return;
     }
+    const pcToRemove = selectedPCs.find((pc) => pc.combatId === pcCombatId);
     setSelectedPCs((prev) => prev.filter((pc) => pc.combatId !== pcCombatId));
     if (selectedPC?.combatId === pcCombatId) {
       setSelectedPC(null);
+    }
+
+    if (pcToRemove && logNpcRemoved) {
+      addLog("combat_sim_log_npc_removed", pcToRemove.name);
     }
   };
 
@@ -670,13 +765,27 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
   // Handle Update PC Turns
   const handleUpdatePcTurns = (combatId, newTurns) => {
-    setSelectedPCs((prev) =>
-      prev.map((pc) =>
-        pc.combatId === combatId
-          ? { ...pc, combatStats: { ...pc.combatStats, turns: newTurns } }
-          : pc,
-      ),
+    const pc = selectedPCs.find((p) => p.combatId === combatId);
+    const oldTurns = pc?.combatStats?.turns || [];
+    const oldTurnsCount = oldTurns.filter((t) => t).length;
+    const newTurnsCount = newTurns.filter((t) => t).length;
+    const turnWasTaken = newTurnsCount > oldTurnsCount;
+
+    const nextPCs = selectedPCs.map((p) =>
+      p.combatId === combatId
+        ? { ...p, combatStats: { ...p.combatStats, turns: newTurns } }
+        : p,
     );
+    setSelectedPCs(nextPCs);
+
+    if (pc && turnWasTaken) {
+      if (logTurnChecked) {
+        addLog("combat_sim_log_turn_checked", pc.name, newTurnsCount);
+      }
+      if (combatActive) {
+        setCurrentTurn(determineNextTurn("players", selectedNPCs, nextPCs));
+      }
+    }
   };
 
   // Handle Remove NPC from the selected NPCs list
@@ -737,6 +846,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     setSelectedNPCs(sortedNPCs);
   };
 
+  const handlePcSortEnd = (sortedPCs) => {
+    setSelectedPCs(sortedPCs);
+  };
+
   // Handle NPC Click in the selected NPCs list
   const handleNpcClick = (npcCombatId) => {
     const npc = selectedNPCs.find((npc) => npc.combatId === npcCombatId);
@@ -784,6 +897,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       adjustedValue = isHealing ? Number(value) : -Number(value);
       const maxHP = npcClicked.stats?.hp?.max ?? 0;
       const maxMP = npcClicked.stats?.mp?.max ?? 0;
+      const actorName = npcClicked.name;
+      const projectedHp =
+        npcClicked.combatStats.currentHp +
+        (statType === "HP" ? adjustedValue : 0);
 
       setSelectedPCs((prev) =>
         prev.map((pc) => {
@@ -842,6 +959,45 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
               statType === "MP" ? newMp : selectedPC.combatStats.currentMp,
           },
         });
+      }
+
+      if (
+        adjustedValue < 0 &&
+        statType === "HP" &&
+        damageType !== "" &&
+        logNpcDamage
+      ) {
+        addLog(
+          "combat_sim_log_npc_damage",
+          actorName,
+          Math.abs(adjustedValue),
+          damageType,
+        );
+      } else if (adjustedValue < 0 && statType === "HP" && logNpcDamageNoType) {
+        addLog(
+          "combat_sim_log_npc_damage_no_type",
+          actorName,
+          Math.abs(adjustedValue),
+        );
+      } else if (adjustedValue < 0 && statType === "MP" && logNpcUsedMp) {
+        addLog(
+          "combat_sim_log_npc_used_mp",
+          actorName,
+          Math.abs(adjustedValue),
+        );
+      } else if (adjustedValue > 0 && logNpcHeal) {
+        addLog(
+          "combat_sim_log_npc_heal",
+          actorName,
+          Math.abs(adjustedValue),
+          statType,
+        );
+      }
+
+      if (projectedHp <= 0 && logNpcFainted) {
+        setTimeout(() => {
+          addLog("combat_sim_log_npc_fainted", actorName);
+        }, 200);
       }
 
       handleClose();
@@ -1345,6 +1501,35 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         round={encounter.round}
         handleIncreaseRound={handleIncreaseRound}
         handleDecreaseRound={handleDecreaseRound}
+        combatActive={combatActive}
+        onToggleCombat={() => {
+          if (combatActive) {
+            setCombatActive(false);
+            setActiveTurn(null);
+            setCurrentTurn("players");
+            setInitiative("players");
+            setSelectedNPCs((prev) =>
+              prev.map((npc) => ({
+                ...npc,
+                combatStats: {
+                  ...npc.combatStats,
+                  turns: npc.combatStats.turns
+                    ? npc.combatStats.turns.map(() => false)
+                    : [],
+                },
+              })),
+            );
+            setSelectedPCs((prev) =>
+              prev.map((pc) => ({
+                ...pc,
+                combatStats: { ...pc.combatStats, turns: [false] },
+              })),
+            );
+            setEncounter((prev) => ({ ...prev, round: 1 }));
+          } else {
+            setInitiativeDialogOpen(true);
+          }
+        }}
         isMobile={isMobile}
         isDifferentUser={isDifferentUser}
         isAutoSaveEnabled={autosaveEnabled}
@@ -1431,6 +1616,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             isDifferentUser={isDifferentUser}
             useDragAndDrop={npcReorderingMethod === "dragAndDrop"}
             onSortEnd={handleSortEnd}
+            onSortEndPC={handlePcSortEnd}
             onClockClick={() => setClockDialogOpen(true)}
             onNotesClick={() => setNotesDialogOpen(true)}
             onClearAll={() => {
@@ -1444,6 +1630,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             handleHpMpClickPC={(type, pc) => handleOpen(type, pc, "pc")}
             handleUpdatePcTurns={handleUpdatePcTurns}
             selectedPcID={selectedPC?.combatId}
+            combatActive={combatActive}
+            initiative={initiative}
+            currentTurn={currentTurn}
+            activeTurn={activeTurn}
+            onStartActorTurn={handleStartActorTurn}
+            onEndActorTurn={handleEndActorTurn}
           />
           {/* Combat Log */}
           {!hideLogs && (
@@ -1547,6 +1739,44 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         inputRef={inputRef}
       />
       {/* Notes Dialog */}
+      <InitiativeDialog
+        open={initiativeDialogOpen}
+        pcCount={selectedPCs.length}
+        npcCount={selectedNPCs.length}
+        onConfirm={(won) => {
+          setInitiative(won);
+          setCurrentTurn(won);
+          setInitiativeDialogOpen(false);
+          setCombatActive(true);
+
+          const allActors = [
+            ...selectedNPCs.map((doc) => ({
+              doc,
+              runtime: runtimeActors[doc.combatId],
+            })),
+            ...selectedPCs.map((doc) => ({
+              doc,
+              runtime: runtimeActors[doc.combatId],
+            })),
+          ].filter((a) => a.runtime != null);
+
+          const matches = scanForTrigger("combat-start", allActors);
+          for (const { chatOutput } of fireTriggers(matches)) {
+            if (!chatOutput) continue;
+            addMessage({
+              id: crypto.randomUUID(),
+              createdAt: Date.now(),
+              speaker: chatOutput.speaker,
+              kind: "display",
+              itemType: chatOutput.itemType,
+              name: chatOutput.itemName,
+              tags: [],
+              description: chatOutput.text,
+            });
+          }
+        }}
+        onCancel={() => setInitiativeDialogOpen(false)}
+      />
       <GeneralNotesDialog
         open={notesDialogOpen}
         onClose={() => setNotesDialogOpen(false)}

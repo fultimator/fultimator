@@ -3,7 +3,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import Diamond from "../../../Diamond";
-import { TypeAffinity } from "../../../types";
+import DefenseAffinityRow from "../common/DefenseAffinityRow";
 import {
   calcHP,
   calcMP,
@@ -82,12 +82,14 @@ export function NpcStats({ npc }) {
           mx: "2px",
           mt: "2px",
           display: "grid",
-          gridTemplateColumns: {
-            xs: "repeat(4, minmax(0, 1fr))",
-            sm: "repeat(4, minmax(76px, 0.9fr)) auto auto auto auto minmax(68px, auto)",
-          },
+          gridTemplateColumns:
+            "repeat(4, minmax(76px, 0.9fr)) auto auto auto auto minmax(68px, auto)",
           alignItems: "stretch",
-          fontSize: { xs: "0.82rem", sm: "0.9rem" },
+          fontSize: "0.9rem",
+          "@container (max-width: 560px)": {
+            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            fontSize: "0.82rem",
+          },
         }}
       >
         <Box
@@ -120,13 +122,22 @@ export function NpcStats({ npc }) {
         <Box
           sx={{
             bgcolor: theme.mode === "dark" ? "#1B1D1E" : "#f9f8fb",
-            borderRight: { sm: `1px solid ${panelBorder}` },
+            borderRight: `1px solid ${panelBorder}`,
             py: 0.4,
+            "@container (max-width: 560px)": {
+              borderRight: "none",
+            },
           }}
         >
           {t("WLP")} d{npc.attributes?.will?.base}
         </Box>
-        <Box sx={{ px: 1, py: 0.4, display: { xs: "none", sm: "block" } }}>
+        <Box
+          sx={{
+            px: 1,
+            py: 0.4,
+            "@container (max-width: 560px)": { display: "none" },
+          }}
+        >
           {t("HP")}
         </Box>
         <Box
@@ -135,9 +146,9 @@ export function NpcStats({ npc }) {
             px: 1.5,
             color: "white.main",
             bgcolor: "red.main",
-            display: { xs: "none", sm: "block" },
             lineHeight: 1.05,
             whiteSpace: "nowrap",
+            "@container (max-width: 560px)": { display: "none" },
           }}
         >
           {calcHP(npc)} <Diamond color="white.main" />{" "}
@@ -147,8 +158,8 @@ export function NpcStats({ npc }) {
           sx={{
             px: 1,
             py: 0.4,
-            display: { xs: "none", sm: "block" },
             whiteSpace: "nowrap",
+            "@container (max-width: 560px)": { display: "none" },
           }}
         >
           {t("MP")}
@@ -159,8 +170,8 @@ export function NpcStats({ npc }) {
             py: 0.4,
             color: "white.main",
             bgcolor: "cyan.main",
-            display: { xs: "none", sm: "block" },
             whiteSpace: "nowrap",
+            "@container (max-width: 560px)": { display: "none" },
           }}
         >
           {calcMP(npc)}
@@ -169,9 +180,9 @@ export function NpcStats({ npc }) {
           sx={{
             py: 0.4,
             px: 1,
-            display: { xs: "none", sm: "block" },
             lineHeight: 1.05,
             whiteSpace: "nowrap",
+            "@container (max-width: 560px)": { display: "none" },
           }}
         >
           {t("Init.")} {calcInit(npc)}
@@ -181,7 +192,7 @@ export function NpcStats({ npc }) {
       {/* Row 2 (mobile only): HP / MP / Init */}
       <Box
         sx={{
-          display: { xs: "grid", sm: "none" },
+          display: "none",
           borderBottom: "1px solid #281127",
           borderRight: "1px solid #281127",
           borderTop: "1px solid #281127",
@@ -191,6 +202,9 @@ export function NpcStats({ npc }) {
           gridTemplateColumns: "auto auto auto auto",
           alignItems: "stretch",
           fontSize: "0.8rem",
+          "@container (max-width: 560px)": {
+            display: "grid",
+          },
         }}
       >
         <Box sx={{ px: 1, py: 0.4 }}>{t("HP")}</Box>
@@ -206,31 +220,7 @@ export function NpcStats({ npc }) {
         >
           {calcMP(npc)}
         </Box>
-        <Box sx={{ py: 0.4, gridColumn: "1 / -1", bgcolor: panelBg }}>
-          {t("Init.")} {calcInit(npc)}
-        </Box>
-      </Box>
-
-      {/* Row 3: DEF/M.DEF + Affinities */}
-      <Grid
-        container
-        sx={{
-          borderBottom: "1px solid #281127",
-          borderTop: "1px solid #281127",
-          borderLeft: "1px solid #281127",
-          borderImage,
-          mx: "2px",
-          mb: "2px",
-        }}
-      >
-        <Grid
-          sx={{
-            bgcolor: panelBg,
-            borderRight: `1px solid ${panelBorder}`,
-            py: 0.4,
-            px: 1,
-          }}
-        >
+        <Box sx={{ py: 0.4, px: 1, bgcolor: panelBg }}>
           {npc.armor?.def > 0 || npc.extra?.defOverride ? (
             <>
               {t("DEF")} {calcDef(npc)}
@@ -240,15 +230,8 @@ export function NpcStats({ npc }) {
               {t("DEF")} +{calcDef(npc)}
             </>
           )}
-        </Grid>
-        <Grid
-          sx={{
-            bgcolor: panelBg,
-            borderRight: `1px solid ${panelBorder}`,
-            py: 0.4,
-            px: 1,
-          }}
-        >
+        </Box>
+        <Box sx={{ py: 0.4, px: 1, bgcolor: panelBg }}>
           {npc.extra?.mDefOverride ? (
             <>
               {t("M.DEF")} {calcMDef(npc)}
@@ -258,66 +241,23 @@ export function NpcStats({ npc }) {
               {t("M.DEF")} +{calcMDef(npc)}
             </>
           )}
-        </Grid>
-        {npc.affinities && (
-          <>
-            <Grid
-              sx={{ py: 0.4, borderRight: "1px solid #42484B" }}
-              size="grow"
-            >
-              <TypeAffinity
-                type="physical"
-                affinity={npc.affinities.physical}
-              />
-            </Grid>
-            <Grid
-              sx={{ py: 0.4, borderRight: "1px solid #604365" }}
-              size="grow"
-            >
-              <TypeAffinity type="air" affinity={npc.affinities.air} />
-            </Grid>
-            <Grid
-              sx={{ py: 0.4, borderRight: "1px solid #6f5375" }}
-              size="grow"
-            >
-              <TypeAffinity type="bolt" affinity={npc.affinities.bolt} />
-            </Grid>
-            <Grid
-              sx={{ py: 0.4, borderRight: "1px solid #816687" }}
-              size="grow"
-            >
-              <TypeAffinity type="dark" affinity={npc.affinities.dark} />
-            </Grid>
-            <Grid
-              sx={{ py: 0.4, borderRight: "1px solid #957d9b" }}
-              size="grow"
-            >
-              <TypeAffinity type="earth" affinity={npc.affinities.earth} />
-            </Grid>
-            <Grid
-              sx={{ py: 0.4, borderRight: "1px solid #ac97b0" }}
-              size="grow"
-            >
-              <TypeAffinity type="fire" affinity={npc.affinities.fire} />
-            </Grid>
-            <Grid
-              sx={{ py: 0.4, borderRight: "1px solid #c4b4c7" }}
-              size="grow"
-            >
-              <TypeAffinity type="ice" affinity={npc.affinities.ice} />
-            </Grid>
-            <Grid
-              sx={{ py: 0.4, borderRight: "1px solid #e0d7e2" }}
-              size="grow"
-            >
-              <TypeAffinity type="light" affinity={npc.affinities.light} />
-            </Grid>
-            <Grid sx={{ py: 0.4 }} size="grow">
-              <TypeAffinity type="poison" affinity={npc.affinities.poison} />
-            </Grid>
-          </>
-        )}
-      </Grid>
+        </Box>
+        <Box sx={{ py: 0.4, px: 1, bgcolor: panelBg }}>
+          {t("Init.")} {calcInit(npc)}
+        </Box>
+      </Box>
+
+      {/* Row 3: DEF/M.DEF + Affinities */}
+      <DefenseAffinityRow
+        t={t}
+        defValue={`${npc.armor?.def > 0 || npc.extra?.defOverride ? "" : "+"}${calcDef(npc)}`}
+        mDefValue={`${npc.extra?.mDefOverride ? "" : "+"}${calcMDef(npc)}`}
+        affinities={npc.affinities}
+        panelBg={panelBg}
+        panelBorder={panelBorder}
+        dividerColor={panelBorder}
+        borderImage={borderImage}
+      />
     </Typography>
   );
 }

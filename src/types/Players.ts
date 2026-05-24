@@ -10,7 +10,7 @@ import {
   ActorDerived,
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
-import type { ItemEffect, ActorEffect, ActionBehavior } from "./Effects";
+import type { Passive, Behavior, ActorEffect } from "./Effects";
 import type {
   Weapon as EquipmentWeapon,
   CustomWeapon as EquipmentCustomWeapon,
@@ -33,7 +33,7 @@ export interface Hoplosphere {
   socketable: "all" | "weapon";
   requiredSlots: 1 | 2;
   cost: number;
-  effects?: ItemEffect[];
+  passives?: Passive[];
 }
 
 export interface MnemosphereSkill {
@@ -42,14 +42,16 @@ export interface MnemosphereSkill {
   specialSkill?: string;
   maxLvl: number;
   currentLvl: number;
-  behavior?: ActionBehavior;
+  passives?: Passive[];
+  behaviors?: Behavior[];
 }
 
 export interface MnemosphereHeroic {
   fuid?: string;
   name: string;
   specialSkill?: string;
-  behavior?: ActionBehavior;
+  passives?: Passive[];
+  behaviors?: Behavior[];
 }
 
 export interface MnemosphereSpell {
@@ -74,7 +76,8 @@ export interface MnemosphereSpell {
   itemType: "spell";
   damage?: Damage;
   spellType?: string;
-  behavior?: ActionBehavior;
+  passives?: Passive[];
+  behaviors?: Behavior[];
 }
 
 export interface Mnemosphere {
@@ -152,7 +155,8 @@ export interface Skills {
   currentLvl: number;
   maxLvl: number;
   specialSkill?: string;
-  behavior?: ActionBehavior;
+  passives?: Passive[];
+  behaviors?: Behavior[];
 }
 
 export interface PlayerModifiers {
@@ -173,7 +177,8 @@ export interface HeroicSkills {
   quote: string;
   description: string;
   book?: string;
-  behavior?: ActionBehavior;
+  passives?: Passive[];
+  behaviors?: Behavior[];
 }
 
 export interface PlayerSettings {
@@ -243,7 +248,8 @@ export interface Spells {
   spellType?: string;
   vehicles?: Vehicle[];
   currentVehicles?: Vehicle[];
-  behavior?: ActionBehavior;
+  passives?: Passive[];
+  behaviors?: Behavior[];
 }
 
 export interface PlayerClass {
