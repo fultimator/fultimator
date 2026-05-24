@@ -17,10 +17,11 @@ import {
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../common/CustomHeader";
-import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcActionFieldConfig,
   npcActionGroupLabels,
+  npcActionTabs,
 } from "../../forms/rendering/config/itemConfigs/npcAction";
 import {
   Add,
@@ -366,56 +367,22 @@ export default function EditActions({ npc, setNpc }) {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container spacing={1}>
-                    <SchemaFieldRenderer
-                      config={npcActionFieldConfig}
-                      groupLabels={npcActionGroupLabels}
-                      state={action}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const actions = [...(prev.actions || [])];
-                          actions[i] = next;
-                          return { ...prev, actions };
-                        });
-                      }}
-                      surface="edit"
-                      group="core"
-                      label={t("Other Action")}
-                      cols={2}
-                      extraProps={{ name: String(action.name ?? "") }}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcActionFieldConfig}
-                      groupLabels={npcActionGroupLabels}
-                      state={action}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const actions = [...(prev.actions || [])];
-                          actions[i] = next;
-                          return { ...prev, actions };
-                        });
-                      }}
-                      surface="edit"
-                      group="body"
-                      cols={1}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcActionFieldConfig}
-                      groupLabels={npcActionGroupLabels}
-                      state={action}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const actions = [...(prev.actions || [])];
-                          actions[i] = next;
-                          return { ...prev, actions };
-                        });
-                      }}
-                      surface="edit"
-                      group="meta"
-                      cols={2}
-                      hidden
-                    />
-                  </Grid>
+                  <TabbedSchemaFormRenderer
+                    tabs={npcActionTabs}
+                    config={npcActionFieldConfig}
+                    groupLabels={npcActionGroupLabels}
+                    state={action}
+                    onChange={(next) => {
+                      setNpc((prev) => {
+                        const actions = [...(prev.actions || [])];
+                        actions[i] = next;
+                        return { ...prev, actions };
+                      });
+                    }}
+                    surface="edit"
+                    cols={2}
+                    extraProps={{ name: String(action.name ?? "") }}
+                  />
                 </AccordionDetails>
               </Accordion>
             </Grid>

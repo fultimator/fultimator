@@ -18,10 +18,11 @@ import {
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../common/CustomHeader";
-import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcAttackFieldConfig,
   npcAttackGroupLabels,
+  npcAttackTabs,
 } from "../../forms/rendering/config/itemConfigs/npcAttack";
 import {
   Add,
@@ -447,86 +448,22 @@ export default function EditAttacks({ npc, setNpc }) {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container spacing={1}>
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const attacks = [...(prev.attacks || [])];
-                          attacks[i] = next;
-                          return { ...prev, attacks };
-                        });
-                      }}
-                      surface="edit"
-                      group="core"
-                      label={t("Attack")}
-                      cols={2}
-                      extraProps={{ name: String(attack.name ?? "") }}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const attacks = [...(prev.attacks || [])];
-                          attacks[i] = next;
-                          return { ...prev, attacks };
-                        });
-                      }}
-                      surface="edit"
-                      group="accuracy"
-                      cols={2}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const attacks = [...(prev.attacks || [])];
-                          attacks[i] = next;
-                          return { ...prev, attacks };
-                        });
-                      }}
-                      surface="edit"
-                      group="damage"
-                      cols={2}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const attacks = [...(prev.attacks || [])];
-                          attacks[i] = next;
-                          return { ...prev, attacks };
-                        });
-                      }}
-                      surface="edit"
-                      group="effect"
-                      cols={1}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const attacks = [...(prev.attacks || [])];
-                          attacks[i] = next;
-                          return { ...prev, attacks };
-                        });
-                      }}
-                      surface="edit"
-                      group="meta"
-                      cols={2}
-                      hidden
-                    />
-                  </Grid>
+                  <TabbedSchemaFormRenderer
+                    tabs={npcAttackTabs}
+                    config={npcAttackFieldConfig}
+                    groupLabels={npcAttackGroupLabels}
+                    state={attack}
+                    onChange={(next) => {
+                      setNpc((prev) => {
+                        const attacks = [...(prev.attacks || [])];
+                        attacks[i] = next;
+                        return { ...prev, attacks };
+                      });
+                    }}
+                    surface="edit"
+                    cols={2}
+                    extraProps={{ name: String(attack.name ?? "") }}
+                  />
                 </AccordionDetails>
               </Accordion>
             </Grid>

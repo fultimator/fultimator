@@ -29,10 +29,11 @@ import {
   buildWeaponSavePayload,
   calcWeaponPreview,
 } from "../../../../forms/schema/itemSchemas/weapon";
-import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
+import { TabbedSchemaFormRenderer } from "../../../../forms/rendering/TabbedSchemaFormRenderer";
 import {
   weaponFieldConfig,
   weaponGroupLabels,
+  weaponTabs,
 } from "../../../../forms/rendering/config/itemConfigs/weapon";
 
 export default function PlayerWeaponModal({
@@ -158,97 +159,27 @@ export default function PlayerWeaponModal({
           <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
             {/* Left column: form fields */}
             <Grid size={{ xs: 12, md: 7 }}>
-              {/* Core: base, name, category, hands, martial */}
-              <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
-                <SchemaFieldRenderer
-                  config={weaponFieldConfig}
-                  groupLabels={weaponGroupLabels}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="core"
-                  label={t("Weapon")}
-                  cols={2}
-                />
-              </Grid>
-
-              {/* Accuracy: att1, att2 */}
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={weaponFieldConfig}
-                  groupLabels={weaponGroupLabels}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="accuracy"
-                  cols={2}
-                />
-              </Grid>
-
-              {/* Damage: type, hrZero */}
-              <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
-                <SchemaFieldRenderer
-                  config={weaponFieldConfig}
-                  groupLabels={weaponGroupLabels}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="damage"
-                  cols={2}
-                />
-              </Grid>
-
-              {/* Quality: preset, text, cost */}
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={weaponFieldConfig}
-                  groupLabels={weaponGroupLabels}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="quality"
-                  cols={2}
-                />
-              </Grid>
-
-              {/* Rare bonuses */}
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={weaponFieldConfig}
-                  groupLabels={weaponGroupLabels}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="rareBonus"
-                  cols={1}
-                  extraProps={{
-                    rework,
-                    totalBonus,
-                    basePrec: getWeaponPrec(base),
-                  }}
-                />
-                <SchemaFieldRenderer
-                  config={weaponFieldConfig}
-                  groupLabels={weaponGroupLabels}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="rare"
-                  cols={2}
-                />
-                <SchemaFieldRenderer
-                  config={weaponFieldConfig}
-                  groupLabels={weaponGroupLabels}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="modifiers"
-                  cols={2}
-                />
-              </Grid>
+              <TabbedSchemaFormRenderer
+                tabs={weaponTabs}
+                config={weaponFieldConfig}
+                groupLabels={weaponGroupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                cols={2}
+                extraProps={{
+                  rework,
+                  totalBonus,
+                  basePrec: getWeaponPrec(base),
+                }}
+              />
 
               {/* Controls: upload, clear */}
-              <Grid container spacing={1} sx={{ alignItems: "center", mb: 1 }}>
+              <Grid
+                container
+                spacing={1}
+                sx={{ alignItems: "center", mb: 1, mt: 2 }}
+              >
                 <Grid>
                   <Button
                     variant="outlined"

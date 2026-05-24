@@ -18,10 +18,11 @@ import {
 import { useState } from "react";
 import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../common/CustomHeader";
-import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcSpecialFieldConfig,
   npcSpecialGroupLabels,
+  npcSpecialTabs,
 } from "../../forms/rendering/config/itemConfigs/npcSpecial";
 import {
   Add,
@@ -367,56 +368,22 @@ export default function EditSpecial({ npc, setNpc }) {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container spacing={1}>
-                    <SchemaFieldRenderer
-                      config={npcSpecialFieldConfig}
-                      groupLabels={npcSpecialGroupLabels}
-                      state={special}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const special = [...(prev.special || [])];
-                          special[i] = next;
-                          return { ...prev, special };
-                        });
-                      }}
-                      surface="edit"
-                      group="core"
-                      label={t("Special Rule")}
-                      cols={2}
-                      extraProps={{ name: String(special.name ?? "") }}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcSpecialFieldConfig}
-                      groupLabels={npcSpecialGroupLabels}
-                      state={special}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const special = [...(prev.special || [])];
-                          special[i] = next;
-                          return { ...prev, special };
-                        });
-                      }}
-                      surface="edit"
-                      group="body"
-                      cols={1}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcSpecialFieldConfig}
-                      groupLabels={npcSpecialGroupLabels}
-                      state={special}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const special = [...(prev.special || [])];
-                          special[i] = next;
-                          return { ...prev, special };
-                        });
-                      }}
-                      surface="edit"
-                      group="meta"
-                      cols={2}
-                      hidden
-                    />
-                  </Grid>
+                  <TabbedSchemaFormRenderer
+                    tabs={npcSpecialTabs}
+                    config={npcSpecialFieldConfig}
+                    groupLabels={npcSpecialGroupLabels}
+                    state={special}
+                    onChange={(next) => {
+                      setNpc((prev) => {
+                        const special = [...(prev.special || [])];
+                        special[i] = next;
+                        return { ...prev, special };
+                      });
+                    }}
+                    surface="edit"
+                    cols={2}
+                    extraProps={{ name: String(special.name ?? "") }}
+                  />
                 </AccordionDetails>
               </Accordion>
             </Grid>

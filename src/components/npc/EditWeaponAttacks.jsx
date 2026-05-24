@@ -25,10 +25,11 @@ import weapons from "../../libs/weapons";
 import { CloseBracket, OpenBracket } from "../Bracket";
 import { useTranslate } from "../../translation/translate";
 import CustomHeader from "../common/CustomHeader";
-import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcAttackFieldConfig,
   npcAttackGroupLabels,
+  npcAttackTabs,
 } from "../../forms/rendering/config/itemConfigs/npcAttack";
 import {
   Add,
@@ -511,64 +512,23 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container spacing={1}>
-                    {/* Weapon preset picker, not in schema config */}
-                    <Grid size={12}>
-                      <SelectWeapon
-                        attack={attack}
-                        onChange={(fields) =>
-                          updateAttack({ ...attack, ...fields })
-                        }
-                      />
-                    </Grid>
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={updateAttack}
-                      surface="edit"
-                      group="core"
-                      cols={2}
-                      extraProps={{ name: String(attack.name ?? "") }}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={updateAttack}
-                      surface="edit"
-                      group="accuracy"
-                      cols={2}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={updateAttack}
-                      surface="edit"
-                      group="damage"
-                      cols={2}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={updateAttack}
-                      surface="edit"
-                      group="effect"
-                      cols={1}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={updateAttack}
-                      surface="edit"
-                      group="meta"
-                      cols={2}
-                      hidden
-                    />
-                  </Grid>
+                  {/* Weapon preset picker, not in schema config */}
+                  <SelectWeapon
+                    attack={attack}
+                    onChange={(fields) =>
+                      updateAttack({ ...attack, ...fields })
+                    }
+                  />
+                  <TabbedSchemaFormRenderer
+                    tabs={npcAttackTabs}
+                    config={npcAttackFieldConfig}
+                    groupLabels={npcAttackGroupLabels}
+                    state={attack}
+                    onChange={updateAttack}
+                    surface="edit"
+                    cols={2}
+                    extraProps={{ name: String(attack.name ?? "") }}
+                  />
                 </AccordionDetails>
               </Accordion>
             </Grid>

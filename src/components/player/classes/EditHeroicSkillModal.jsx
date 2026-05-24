@@ -11,10 +11,11 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import { Close } from "@mui/icons-material";
 import FuidField from "../../common/FuidField";
-import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
+import { TabbedSchemaFormRenderer } from "../../../forms/rendering/TabbedSchemaFormRenderer";
 import {
   heroicFieldConfig,
   heroicGroupLabels,
+  heroicTabs,
 } from "../../../forms/rendering/config/itemConfigs/heroic";
 
 export default function EditHeroicSkillModal({
@@ -63,34 +64,16 @@ export default function EditHeroicSkillModal({
               onChange={(fuid) => setHeroic({ ...heroic, fuid })}
             />
           </Grid>
-          <SchemaFieldRenderer
-            config={heroicFieldConfig}
-            groupLabels={heroicGroupLabels}
-            state={heroic}
-            onChange={setHeroic}
-            surface="edit"
-            group="core"
-            cols={2}
-          />
-          <SchemaFieldRenderer
-            config={heroicFieldConfig}
-            groupLabels={heroicGroupLabels}
-            state={heroic}
-            onChange={setHeroic}
-            surface="edit"
-            group="body"
-            cols={1}
-          />
-          <SchemaFieldRenderer
-            config={heroicFieldConfig}
-            groupLabels={heroicGroupLabels}
-            state={heroic}
-            onChange={setHeroic}
-            surface="edit"
-            group="meta"
-            cols={2}
-          />
         </Grid>
+        <TabbedSchemaFormRenderer
+          tabs={heroicTabs}
+          config={heroicFieldConfig}
+          groupLabels={heroicGroupLabels}
+          state={heroic}
+          onChange={setHeroic}
+          surface="edit"
+          cols={2}
+        />
       </DialogContent>
       <DialogActions>
         <Button

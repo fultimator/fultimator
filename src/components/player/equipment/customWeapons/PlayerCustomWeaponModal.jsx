@@ -9,12 +9,9 @@ import {
   Grid,
   IconButton,
   Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
 } from "@mui/material";
 import { useTranslate } from "../../../../translation/translate";
-import { Close, ExpandMore } from "@mui/icons-material";
+import { Close } from "@mui/icons-material";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { SharedCustomWeaponCard } from "../../../../components/shared/itemCards";
@@ -28,14 +25,17 @@ import {
 import { calculateCustomWeaponStats } from "../../common/playerCalculations";
 import { buildSphereData } from "../../../../libs/technospheres";
 import { validateCustomWeaponPersisted } from "../../../../forms/schema/itemSchemas/customWeapon";
-import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
-import { customWeaponFieldConfig } from "../../../../forms/rendering/config/itemConfigs/customWeapon";
+import { TabbedSchemaFormRenderer } from "../../../../forms/rendering/TabbedSchemaFormRenderer";
+import {
+  customWeaponFieldConfig,
+  customWeaponGroupLabels,
+  customWeaponTabs,
+} from "../../../../forms/rendering/config/itemConfigs/customWeapon";
 
 // Quality grouped options built once at module load.
 const qualities = allQualities
   .filter(
-    (q) =>
-      q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+    (q) => q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
   )
   .filter(
     (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
@@ -71,25 +71,6 @@ function normalizeAccuracyCheck(
     return { attr1, attr2 };
   }
   return fallback;
-}
-
-function hasAnyPrimaryModifier(item) {
-  return (
-    (item?.modifiers?.accuracy ?? item?.precModifier ?? 0) !== 0 ||
-    (item?.modifiers?.damage ?? item?.damageModifier ?? 0) !== 0 ||
-    (item?.modifiers?.def ?? item?.defModifier ?? 0) !== 0 ||
-    (item?.modifiers?.mdef ?? item?.mDefModifier ?? 0) !== 0 ||
-    !!(item?.rare?.overrideDamageType ?? item?.overrideDamageType)
-  );
-}
-
-function hasAnySecondaryModifier(item) {
-  return !!(
-    item?.secondModifiers?.damage ||
-    item?.secondModifiers?.accuracy ||
-    item?.secondModifiers?.def ||
-    item?.secondModifiers?.mdef
-  );
 }
 
 function buildInitialFormState(customWeapon, isSlotsVariant) {
@@ -327,17 +308,8 @@ export default function PlayerCustomWeaponModal({
   const [formState, setFormState] = useState(() =>
     buildInitialFormState(customWeapon, isSlotsVariant),
   );
-  const [modifiersExpanded, setModifiersExpanded] = useState(() =>
-    hasAnyPrimaryModifier(customWeapon),
-  );
-  const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(() =>
-    hasAnySecondaryModifier(customWeapon),
-  );
-
   useEffect(() => {
     setFormState(buildInitialFormState(customWeapon, isSlotsVariant));
-    setModifiersExpanded(hasAnyPrimaryModifier(customWeapon));
-    setSecondModifiersExpanded(hasAnySecondaryModifier(customWeapon));
   }, [customWeapon, isSlotsVariant]);
 
   const {
@@ -537,27 +509,11 @@ export default function PlayerCustomWeaponModal({
 
   const handleClearFields = () => {
     setFormState(buildInitialFormState(null, isSlotsVariant));
-    setModifiersExpanded(false);
-    setSecondModifiersExpanded(false);
   };
 
   const handleFileUpload = (data) => {
     if (data && data.dataType === "weapon") {
       setFormState(buildInitialFormState(data, isSlotsVariant));
-      const rare = data.rare ?? {};
-      setModifiersExpanded(
-        !!(rare.overrideDamageType ?? data.overrideDamageType) ||
-          (data.modifiers?.accuracy ?? data.precModifier ?? 0) !== 0 ||
-          (data.modifiers?.damage ?? data.damageModifier ?? 0) !== 0 ||
-          (data.modifiers?.def ?? data.defModifier ?? 0) !== 0 ||
-          (data.modifiers?.mdef ?? data.mDefModifier ?? 0) !== 0,
-      );
-      setSecondModifiersExpanded(
-        (data.secondModifiers?.damage ?? 0) !== 0 ||
-          (data.secondModifiers?.accuracy ?? 0) !== 0 ||
-          (data.secondModifiers?.def ?? 0) !== 0 ||
-          (data.secondModifiers?.mdef ?? 0) !== 0,
-      );
     }
   };
 
@@ -566,11 +522,6 @@ export default function PlayerCustomWeaponModal({
     selectedCategory,
     rareAccuracyBonus,
     isSecondForm: false,
-  };
-  const secondaryExtraProps = {
-    selectedCategory: secondSelectedCategory,
-    rareAccuracyBonus,
-    isSecondForm: true,
   };
   const slotsExtraProps = {
     isWeapon: true,
@@ -670,196 +621,48 @@ export default function PlayerCustomWeaponModal({
         <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
           {/* Left column: form fields */}
           <Grid size={{ xs: 12, md: 7 }}>
-            {/* Core: name, category, range, equipped, customizations */}
-            <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
-              <SchemaFieldRenderer
-                config={customWeaponFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="core"
-                label={t("Custom Weapon")}
-                cols={2}
-                extraProps={coreExtraProps}
-              />
-            </Grid>
-
-            {/* Accuracy: preset picker (hidden when overrideAccuracyAttributes is on) */}
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <SchemaFieldRenderer
-                config={customWeaponFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="accuracy"
-                label={t("Accuracy")}
-                cols={2}
-              />
-            </Grid>
-
-            {/* Damage: hrZero + elemental/override type */}
-            <Grid container spacing={2} sx={{ mb: 2, alignItems: "center" }}>
-              <SchemaFieldRenderer
-                config={customWeaponFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="damage"
-                label={t("Damage")}
-                cols={2}
-              />
-            </Grid>
-
-            {/* Quality or Slots */}
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              {isSlotsVariant ? (
-                <SchemaFieldRenderer
-                  config={customWeaponFieldConfig}
-                  state={formState}
-                  onChange={(next) => {
-                    if (next.slots !== formState.slots) {
-                      const newTier = SLOT_TIERS.find(
-                        (tier) => tier.value === next.slots,
-                      );
-                      const hoplospheres =
-                        player?.equipment?.[0]?.hoplospheres ?? [];
-                      const kept = [];
-                      let cost = 0;
-                      for (const id of formState.slotted ?? []) {
-                        const hoplo = hoplospheres.find((h) => h.id === id);
-                        const slotCost = hoplo?.requiredSlots ?? 1;
-                        if (cost + slotCost <= (newTier?.slots ?? 1)) {
-                          kept.push(id);
-                          cost += slotCost;
-                        }
-                      }
-                      setFormState({ ...next, slotted: kept });
-                    } else {
-                      setFormState(next);
+            <TabbedSchemaFormRenderer
+              tabs={customWeaponTabs}
+              config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
+              state={formState}
+              onChange={(next) => {
+                if (isSlotsVariant && next.slots !== formState.slots) {
+                  const newTier = SLOT_TIERS.find(
+                    (tier) => tier.value === next.slots,
+                  );
+                  const hoplospheres =
+                    player?.equipment?.[0]?.hoplospheres ?? [];
+                  const kept = [];
+                  let cost = 0;
+                  for (const id of formState.slotted ?? []) {
+                    const hoplo = hoplospheres.find((h) => h.id === id);
+                    const slotCost = hoplo?.requiredSlots ?? 1;
+                    if (cost + slotCost <= (newTier?.slots ?? 1)) {
+                      kept.push(id);
+                      cost += slotCost;
                     }
-                  }}
-                  surface="edit"
-                  group="slots"
-                  label={t("Slots")}
-                  cols={1}
-                  extraProps={slotsExtraProps}
-                />
-              ) : (
-                <SchemaFieldRenderer
-                  config={customWeaponFieldConfig}
-                  state={formState}
-                  onChange={(next) => {
-                    if (
-                      next.selectedQuality !== formState.selectedQuality &&
-                      next.selectedQuality
-                    ) {
-                      const q = qualities.find(
-                        (qu) => qu.name === next.selectedQuality,
-                      );
-                      if (q) {
-                        setFormState({
-                          ...next,
-                          qualityName: q.name,
-                          quality: q.quality,
-                          qualityCost: q.cost,
-                          qualityApplicableTo: Array.isArray(q.filter)
-                            ? q.filter
-                            : [],
-                        });
-                        return;
-                      }
-                    }
-                    setFormState(next);
-                  }}
-                  surface="edit"
-                  group="quality"
-                  label={t("Quality")}
-                  cols={2}
-                  extraProps={qualityExtraProps}
-                />
-              )}
-            </Grid>
-
-            {/* Modifiers + Rare accordion */}
-            <Accordion
-              sx={{ width: "100%", mb: 2 }}
-              expanded={modifiersExpanded}
-              onChange={() => setModifiersExpanded(!modifiersExpanded)}
-            >
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>{t("Modifiers")}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  <SchemaFieldRenderer
-                    config={customWeaponFieldConfig}
-                    state={formState}
-                    onChange={setFormState}
-                    surface="edit"
-                    group="rare"
-                    label={t("Rare Weapon Options")}
-                    cols={2}
-                  />
-
-                  <SchemaFieldRenderer
-                    config={customWeaponFieldConfig}
-                    state={formState}
-                    onChange={setFormState}
-                    surface="edit"
-                    group="modifiers"
-                    label={t("Modifiers")}
-                    cols={2}
-                  />
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-
-            {/* Secondary weapon (transforming) */}
-            {hasTransforming && (
-              <>
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                  <SchemaFieldRenderer
-                    config={customWeaponFieldConfig}
-                    state={formState}
-                    onChange={setFormState}
-                    surface="edit"
-                    group="secondary"
-                    label={t("weapon_customization_transforming_form")}
-                    cols={2}
-                    extraProps={secondaryExtraProps}
-                  />
-                </Grid>
-                <Accordion
-                  sx={{ width: "100%", mb: 2 }}
-                  expanded={secondModifiersExpanded}
-                  onChange={() =>
-                    setSecondModifiersExpanded(!secondModifiersExpanded)
                   }
-                >
-                  <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography>
-                      {t("weapon_customization_transforming_form_modifiers")}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Grid container spacing={2}>
-                      <SchemaFieldRenderer
-                        config={customWeaponFieldConfig}
-                        state={formState}
-                        onChange={setFormState}
-                        surface="edit"
-                        group="secondaryModifiers"
-                        cols={2}
-                        extraProps={secondaryExtraProps}
-                      />
-                    </Grid>
-                  </AccordionDetails>
-                </Accordion>
-              </>
-            )}
+                  setFormState({ ...next, slotted: kept });
+                } else {
+                  setFormState(next);
+                }
+              }}
+              surface="edit"
+              cols={2}
+              extraProps={{
+                ...coreExtraProps,
+                ...slotsExtraProps,
+                ...qualityExtraProps,
+              }}
+            />
 
             {/* Controls: upload, clear */}
-            <Grid container spacing={1} sx={{ alignItems: "center", mb: 1 }}>
+            <Grid
+              container
+              spacing={1}
+              sx={{ alignItems: "center", mb: 1, mt: 2 }}
+            >
               <Grid>
                 <Button
                   variant="outlined"

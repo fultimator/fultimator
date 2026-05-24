@@ -15,8 +15,11 @@ import { Close } from "@mui/icons-material";
 import { SharedAccessoryCard } from "../../../../components/shared/itemCards";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
-import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
-import { accessoryFieldConfig } from "../../../../forms/rendering/config/itemConfigs/accessory";
+import { TabbedSchemaFormRenderer } from "../../../../forms/rendering/TabbedSchemaFormRenderer";
+import {
+  accessoryFieldConfig,
+  accessoryTabs,
+} from "../../../../forms/rendering/config/itemConfigs/accessory";
 import {
   validateAccessoryPersisted,
   buildAccessoryFormState,
@@ -144,43 +147,16 @@ export default function PlayerAccessoryModal({
           <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
             {/* Left column: form fields */}
             <Grid size={{ xs: 12, md: 7 }}>
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={accessoryFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="core"
-                  label={t("Accessory")}
-                  cols={2}
-                />
-              </Grid>
+              <TabbedSchemaFormRenderer
+                tabs={accessoryTabs}
+                config={accessoryFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                cols={2}
+              />
 
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={accessoryFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="quality"
-                  label={t("Quality")}
-                  cols={2}
-                />
-              </Grid>
-
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={accessoryFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="modifiers"
-                  label={t("Modifiers")}
-                  cols={2}
-                />
-              </Grid>
-
-              <Grid container spacing={1} sx={{ alignItems: "center" }}>
+              <Grid container spacing={1} sx={{ alignItems: "center", mt: 2 }}>
                 <Grid>
                   <Button
                     variant="outlined"

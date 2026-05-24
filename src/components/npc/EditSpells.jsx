@@ -18,10 +18,11 @@ import {
 } from "@mui/material";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import CustomHeader from "../common/CustomHeader";
-import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcSpellFieldConfig,
   npcSpellGroupLabels,
+  npcSpellTabs,
 } from "../../forms/rendering/config/itemConfigs/npcSpell";
 import {
   Add,
@@ -492,87 +493,22 @@ export default function EditSpells({ npc, setNpc }) {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Grid container spacing={1}>
-                    <SchemaFieldRenderer
-                      config={npcSpellFieldConfig}
-                      groupLabels={npcSpellGroupLabels}
-                      state={spell}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const spells = [...(prev.spells || [])];
-                          spells[i] = next;
-                          return { ...prev, spells };
-                        });
-                      }}
-                      surface="edit"
-                      group="core"
-                      label={t("Spell")}
-                      cols={2}
-                      extraProps={{ name: String(spell.name ?? "") }}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcSpellFieldConfig}
-                      groupLabels={npcSpellGroupLabels}
-                      state={spell}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const spells = [...(prev.spells || [])];
-                          spells[i] = next;
-                          return { ...prev, spells };
-                        });
-                      }}
-                      surface="edit"
-                      group="accuracy"
-                      cols={2}
-                      hidden={!spell.isOffensive}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcSpellFieldConfig}
-                      groupLabels={npcSpellGroupLabels}
-                      state={spell}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const spells = [...(prev.spells || [])];
-                          spells[i] = next;
-                          return { ...prev, spells };
-                        });
-                      }}
-                      surface="edit"
-                      group="damage"
-                      cols={2}
-                      hidden={!spell.isOffensive}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcSpellFieldConfig}
-                      groupLabels={npcSpellGroupLabels}
-                      state={spell}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const spells = [...(prev.spells || [])];
-                          spells[i] = next;
-                          return { ...prev, spells };
-                        });
-                      }}
-                      surface="edit"
-                      group="details"
-                      cols={2}
-                    />
-                    <SchemaFieldRenderer
-                      config={npcSpellFieldConfig}
-                      groupLabels={npcSpellGroupLabels}
-                      state={spell}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const spells = [...(prev.spells || [])];
-                          spells[i] = next;
-                          return { ...prev, spells };
-                        });
-                      }}
-                      surface="edit"
-                      group="effect"
-                      cols={1}
-                    />
-                  </Grid>
+                  <TabbedSchemaFormRenderer
+                    tabs={npcSpellTabs}
+                    config={npcSpellFieldConfig}
+                    groupLabels={npcSpellGroupLabels}
+                    state={spell}
+                    onChange={(next) => {
+                      setNpc((prev) => {
+                        const spells = [...(prev.spells || [])];
+                        spells[i] = next;
+                        return { ...prev, spells };
+                      });
+                    }}
+                    surface="edit"
+                    cols={2}
+                    extraProps={{ name: String(spell.name ?? "") }}
+                  />
                 </AccordionDetails>
               </Accordion>
             </Grid>

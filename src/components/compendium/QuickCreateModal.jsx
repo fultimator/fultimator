@@ -122,51 +122,65 @@ import {
 
 const REG = itemFormRegistry;
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
+import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
 import {
   weaponFieldConfig,
   weaponGroupLabels,
+  weaponTabs,
 } from "../../forms/rendering/config/itemConfigs/weapon";
 import {
   armorFieldConfig,
   armorGroupLabels,
+  armorTabs,
 } from "../../forms/rendering/config/itemConfigs/armor";
 import FuidField from "../common/FuidField";
 import {
   shieldFieldConfig,
   shieldGroupLabels,
+  shieldTabs,
 } from "../../forms/rendering/config/itemConfigs/shield";
 import {
   accessoryFieldConfig,
   accessoryGroupLabels,
+  accessoryTabs,
 } from "../../forms/rendering/config/itemConfigs/accessory";
 import {
   customWeaponFieldConfig,
   customWeaponGroupLabels,
+  customWeaponTabs,
 } from "../../forms/rendering/config/itemConfigs/customWeapon";
 import {
   npcActionFieldConfig,
   npcActionGroupLabels,
+  npcActionTabs,
 } from "../../forms/rendering/config/itemConfigs/npcAction";
 import {
   npcSpecialFieldConfig,
   npcSpecialGroupLabels,
+  npcSpecialTabs,
 } from "../../forms/rendering/config/itemConfigs/npcSpecial";
 import {
   npcAttackFieldConfig,
   npcAttackGroupLabels,
+  npcAttackTabs,
 } from "../../forms/rendering/config/itemConfigs/npcAttack";
 import {
   npcSpellFieldConfig,
   npcSpellGroupLabels,
+  npcSpellTabs,
 } from "../../forms/rendering/config/itemConfigs/npcSpell";
 import {
   qualityFieldConfig,
   qualityGroupLabels,
 } from "../../forms/rendering/config/itemConfigs/quality";
-import { playerSpellFieldConfig } from "../../forms/rendering/config/itemConfigs/playerSpell";
+import {
+  playerSpellFieldConfig,
+  playerSpellTabs,
+} from "../../forms/rendering/config/itemConfigs/playerSpell";
 import {
   heroicFieldConfig,
   heroicGroupLabels,
+  heroicTabs,
 } from "../../forms/rendering/config/itemConfigs/heroic";
 import {
   classFieldConfig,
@@ -175,6 +189,7 @@ import {
 import {
   hoplosphereFieldConfig,
   hoplosphereGroupLabels,
+  hoplosphereTabs,
 } from "../../forms/rendering/config/itemConfigs/hoplosphere";
 import {
   optionalFieldConfig,
@@ -471,15 +486,14 @@ function NpcAttackPanel() {
       data={data}
       itemName={data.name || ""}
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
+        <>
+          <TabbedSchemaFormRenderer
+            tabs={npcAttackTabs}
             config={npcAttackFieldConfig}
             groupLabels={npcAttackGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="core"
-            label={t("NPC Attack")}
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -497,48 +511,12 @@ function NpcAttackPanel() {
                 ),
             }}
           />
-          <SchemaFieldRenderer
-            config={npcAttackFieldConfig}
-            groupLabels={npcAttackGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="accuracy"
-            cols={2}
-          />
-          <SchemaFieldRenderer
-            config={npcAttackFieldConfig}
-            groupLabels={npcAttackGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="damage"
-            cols={2}
-          />
-          <SchemaFieldRenderer
-            config={npcAttackFieldConfig}
-            groupLabels={npcAttackGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="effect"
-            cols={1}
-          />
-          <SchemaFieldRenderer
-            config={npcAttackFieldConfig}
-            groupLabels={npcAttackGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="meta"
-            cols={2}
-          />
-          <Grid size={12}>
+          <Box sx={{ mt: 1 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </>
       }
       previewContent={<SharedAttackCard item={data} />}
       addButton={
@@ -572,15 +550,14 @@ function NpcSpellPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
+        <>
+          <TabbedSchemaFormRenderer
+            tabs={npcSpellTabs}
             config={npcSpellFieldConfig}
             groupLabels={npcSpellGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="core"
-            label={t("NPC Spell")}
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -598,57 +575,12 @@ function NpcSpellPanel() {
                 ),
             }}
           />
-          <SchemaFieldRenderer
-            config={npcSpellFieldConfig}
-            groupLabels={npcSpellGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="accuracy"
-            cols={2}
-          />
-          <SchemaFieldRenderer
-            config={npcSpellFieldConfig}
-            groupLabels={npcSpellGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="damage"
-            cols={2}
-          />
-          <SchemaFieldRenderer
-            config={npcSpellFieldConfig}
-            groupLabels={npcSpellGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="details"
-            cols={2}
-          />
-          <SchemaFieldRenderer
-            config={npcSpellFieldConfig}
-            groupLabels={npcSpellGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="effect"
-            cols={1}
-          />
-          <SchemaFieldRenderer
-            config={npcSpellFieldConfig}
-            groupLabels={npcSpellGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="meta"
-            cols={2}
-          />
-          <Grid size={12}>
+          <Box sx={{ mt: 1 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </>
       }
       previewContent={<SharedSpellCard item={data} />}
       addButton={
@@ -682,15 +614,14 @@ function NpcSpecialPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
+        <>
+          <TabbedSchemaFormRenderer
+            tabs={npcSpecialTabs}
             config={npcSpecialFieldConfig}
             groupLabels={npcSpecialGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="core"
-            label={t("Special Rule")}
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -708,30 +639,12 @@ function NpcSpecialPanel() {
                 ),
             }}
           />
-          <SchemaFieldRenderer
-            config={npcSpecialFieldConfig}
-            groupLabels={npcSpecialGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="body"
-            cols={1}
-          />
-          <SchemaFieldRenderer
-            config={npcSpecialFieldConfig}
-            groupLabels={npcSpecialGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="meta"
-            cols={2}
-          />
-          <Grid size={12}>
+          <Box sx={{ mt: 1 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </>
       }
       previewContent={<SharedSpecialRuleCard item={data} />}
       addButton={
@@ -765,15 +678,14 @@ function NpcActionPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
+        <>
+          <TabbedSchemaFormRenderer
+            tabs={npcActionTabs}
             config={npcActionFieldConfig}
             groupLabels={npcActionGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="core"
-            label={t("Other Action")}
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -791,30 +703,12 @@ function NpcActionPanel() {
                 ),
             }}
           />
-          <SchemaFieldRenderer
-            config={npcActionFieldConfig}
-            groupLabels={npcActionGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="body"
-            cols={1}
-          />
-          <SchemaFieldRenderer
-            config={npcActionFieldConfig}
-            groupLabels={npcActionGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="meta"
-            cols={2}
-          />
-          <Grid size={12}>
+          <Box sx={{ mt: 1 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </>
       }
       previewContent={<SharedActionCard item={data} />}
       addButton={
@@ -1184,15 +1078,13 @@ function PlayerSpellPanel() {
       data={payload}
       itemName={(formState.name ?? "").trim() || ""}
       formContent={
-        <Grid container spacing={1} sx={{ alignItems: "center" }}>
-          {/* Core: spellType, fuid, name */}
-          <SchemaFieldRenderer
+        <>
+          <TabbedSchemaFormRenderer
+            tabs={playerSpellTabs}
             config={playerSpellFieldConfig}
             state={formState}
             onChange={setFormState}
             surface="quickCreate"
-            group="core"
-            label={t("Player Spell")}
             cols={1}
             extraProps={{
               onBrowse: () =>
@@ -1209,8 +1101,8 @@ function PlayerSpellPanel() {
             }}
           />
 
-          {/* Pilot-vehicle fallback - not handled by schema renderer */}
-          {spellType === "pilot-vehicle" ? (
+          {/* Pilot-vehicle custom UI - not schema-driven */}
+          {spellType === "pilot-vehicle" && (
             <>
               <Grid size={12}>
                 <ToggleButtonGroup
@@ -1651,102 +1543,14 @@ function PlayerSpellPanel() {
                 </>
               )}
             </>
-          ) : (
-            <>
-              {/* cost / target / accuracy / damage / description - default spell only */}
-              <SchemaFieldRenderer
-                config={playerSpellFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="quickCreate"
-                group="cost"
-                label={t("Cost")}
-                hidden={spellType !== "default"}
-                cols={1}
-              />
-              <SchemaFieldRenderer
-                config={playerSpellFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="quickCreate"
-                group="target"
-                label={t("Target")}
-                hidden={spellType !== "default"}
-                cols={1}
-              />
-              <SchemaFieldRenderer
-                config={playerSpellFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="quickCreate"
-                group="accuracy"
-                label={t("Accuracy")}
-                hidden={spellType !== "default"}
-                cols={1}
-              />
-              <SchemaFieldRenderer
-                config={playerSpellFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="quickCreate"
-                group="damage"
-                label={t("Damage")}
-                hidden={spellType !== "default" || !formState.isOffensive}
-                cols={1}
-              />
-              <SchemaFieldRenderer
-                config={playerSpellFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="quickCreate"
-                group="description"
-                label={t("Details")}
-                hidden={spellType !== "default"}
-                cols={1}
-              />
-              {/* effect / type-specific fields - non-default spells */}
-              <SchemaFieldRenderer
-                config={playerSpellFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="quickCreate"
-                group="effect"
-                label={t("Details")}
-                hidden={spellType === "default"}
-                cols={1}
-              />
-              {/* arcanist fields */}
-              <SchemaFieldRenderer
-                config={playerSpellFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="quickCreate"
-                group="arcanist"
-                label={t("Arcanum")}
-                hidden={
-                  spellType !== "arcanist" && spellType !== "arcanist-rework"
-                }
-                cols={1}
-              />
-              {/* meta */}
-              <SchemaFieldRenderer
-                config={playerSpellFieldConfig}
-                state={formState}
-                onChange={setFormState}
-                surface="quickCreate"
-                group="meta"
-                label={t("Metadata")}
-                cols={2}
-              />
-            </>
           )}
 
-          <Grid size={12}>
+          <Box sx={{ mt: 1 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </>
       }
       previewContent={
         spellType === "default" ? (
@@ -1934,13 +1738,14 @@ function HeroicPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
+        <>
+          <TabbedSchemaFormRenderer
+            tabs={heroicTabs}
             config={heroicFieldConfig}
+            groupLabels={heroicGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="core"
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -1956,29 +1761,12 @@ function HeroicPanel() {
                 ),
             }}
           />
-          <SchemaFieldRenderer
-            config={heroicFieldConfig}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="body"
-            cols={1}
-          />
-          <SchemaFieldRenderer
-            config={heroicFieldConfig}
-            groupLabels={heroicGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="meta"
-            cols={2}
-          />
-          <Grid size={12}>
+          <Box sx={{ mt: 1 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </>
       }
       previewContent={<SharedHeroicCard item={data} />}
       addButton={
@@ -2293,115 +2081,38 @@ function WeaponPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            <Grid
-              size={12}
-              container
-              spacing={1}
-              sx={{ mb: 0.75, alignItems: "center" }}
-            >
-              <SchemaFieldRenderer
-                config={weaponFieldConfig}
-                groupLabels={weaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="core"
-                label={t("Weapon")}
-                cols={2}
-                extraProps={{
-                  name: String(name ?? ""),
-                  onBrowse: () =>
-                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.weapon, (item) =>
-                      setFormState((prev) =>
-                        mergeImportedIntoDefaults(
-                          buildWeaponPanelState(),
-                          stripPrivateFields(item),
-                        ),
+          <>
+            <TabbedSchemaFormRenderer
+              tabs={weaponTabs}
+              config={weaponFieldConfig}
+              groupLabels={weaponGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              cols={2}
+              extraProps={{
+                name: String(name ?? ""),
+                onBrowse: () =>
+                  openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.weapon, (item) =>
+                    setFormState((prev) =>
+                      mergeImportedIntoDefaults(
+                        buildWeaponPanelState(),
+                        stripPrivateFields(item),
                       ),
                     ),
-                }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={weaponFieldConfig}
-                groupLabels={weaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="accuracy"
-                cols={2}
-              />
-            </Grid>
-            <Grid
-              size={12}
-              container
-              spacing={1}
-              sx={{ mb: 0.75, alignItems: "center" }}
-            >
-              <SchemaFieldRenderer
-                config={weaponFieldConfig}
-                groupLabels={weaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="damage"
-                cols={2}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={weaponFieldConfig}
-                groupLabels={weaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="quality"
-                cols={2}
-                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={weaponFieldConfig}
-                groupLabels={weaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="rareBonus"
-                cols={1}
-                extraProps={{
-                  rework,
-                  totalBonus,
-                  basePrec: getWeaponPrec(base),
-                }}
-              />
-              <SchemaFieldRenderer
-                config={weaponFieldConfig}
-                groupLabels={weaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="rare"
-                cols={2}
-              />
-              <SchemaFieldRenderer
-                config={weaponFieldConfig}
-                groupLabels={weaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="modifiers"
-                cols={2}
-              />
-            </Grid>
-            <Grid size={12}>
+                  ),
+                onBrowseQuality: () => setQualityPickerOpen(true),
+                rework,
+                totalBonus,
+                basePrec: getWeaponPrec(base),
+              }}
+            />
+            <Box sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </>
         }
         previewContent={<SharedWeaponCard item={weaponObj} />}
         addButton={
@@ -2513,60 +2224,35 @@ function ArmorPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={armorFieldConfig}
-                groupLabels={armorGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="core"
-                label={t("Armor")}
-                cols={2}
-                extraProps={{
-                  name: String(name ?? ""),
-                  onBrowse: () =>
-                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.armor, (item) =>
-                      setFormState((prev) =>
-                        mergeImportedIntoDefaults(
-                          buildArmorPanelState(),
-                          stripPrivateFields(item),
-                        ),
+          <>
+            <TabbedSchemaFormRenderer
+              tabs={armorTabs}
+              config={armorFieldConfig}
+              groupLabels={armorGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              cols={2}
+              extraProps={{
+                name: String(name ?? ""),
+                onBrowse: () =>
+                  openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.armor, (item) =>
+                    setFormState((prev) =>
+                      mergeImportedIntoDefaults(
+                        buildArmorPanelState(),
+                        stripPrivateFields(item),
                       ),
                     ),
-                }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={armorFieldConfig}
-                groupLabels={armorGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="quality"
-                cols={2}
-                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={armorFieldConfig}
-                groupLabels={armorGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="modifiers"
-                cols={2}
-              />
-            </Grid>
-            <Grid size={12}>
+                  ),
+                onBrowseQuality: () => setQualityPickerOpen(true),
+              }}
+            />
+            <Box sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </>
         }
         previewContent={<SharedArmorCard item={armorObj} />}
         addButton={
@@ -2675,60 +2361,35 @@ function ShieldPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={shieldFieldConfig}
-                groupLabels={shieldGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="core"
-                label={t("Shield")}
-                cols={2}
-                extraProps={{
-                  name: String(name ?? ""),
-                  onBrowse: () =>
-                    openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.shield, (item) =>
-                      setFormState((prev) =>
-                        mergeImportedIntoDefaults(
-                          buildShieldPanelState(),
-                          stripPrivateFields(item),
-                        ),
+          <>
+            <TabbedSchemaFormRenderer
+              tabs={shieldTabs}
+              config={shieldFieldConfig}
+              groupLabels={shieldGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              cols={2}
+              extraProps={{
+                name: String(name ?? ""),
+                onBrowse: () =>
+                  openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.shield, (item) =>
+                    setFormState((prev) =>
+                      mergeImportedIntoDefaults(
+                        buildShieldPanelState(),
+                        stripPrivateFields(item),
                       ),
                     ),
-                }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={shieldFieldConfig}
-                groupLabels={shieldGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="quality"
-                cols={2}
-                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={shieldFieldConfig}
-                groupLabels={shieldGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="modifiers"
-                cols={2}
-              />
-            </Grid>
-            <Grid size={12}>
+                  ),
+                onBrowseQuality: () => setQualityPickerOpen(true),
+              }}
+            />
+            <Box sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </>
         }
         previewContent={<SharedShieldCard item={shieldObj} />}
         addButton={
@@ -2843,8 +2504,6 @@ function CustomWeaponPanel() {
   const { t } = useTranslate();
   const { openImport } = useQuickCreateImport();
   const [formState, setFormState] = useState(buildCWPanelState);
-  const [modifiersExpanded, setModifiersExpanded] = useState(false);
-  const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
   const [qualityPickerOpen, setQualityPickerOpen] = useState(false);
 
   const {
@@ -2995,8 +2654,6 @@ function CustomWeaponPanel() {
 
   const handleClear = () => {
     setFormState(buildCWPanelState());
-    setModifiersExpanded(false);
-    setSecondModifiersExpanded(false);
   };
 
   const coreExtraProps = {
@@ -3004,172 +2661,44 @@ function CustomWeaponPanel() {
     rareAccuracyBonus,
     isSecondForm: false,
   };
-  const secondaryExtraProps = {
-    selectedCategory: secondSelectedCategory,
-    rareAccuracyBonus,
-    isSecondForm: true,
-  };
 
   return (
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            <Grid
-              size={12}
-              container
-              spacing={1}
-              sx={{ mb: 0.75, alignItems: "center" }}
-            >
-              <SchemaFieldRenderer
-                config={customWeaponFieldConfig}
-                groupLabels={customWeaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="core"
-                label={t("Custom Weapon")}
-                cols={2}
-                extraProps={{
-                  ...coreExtraProps,
-                  name: String(formState.name ?? ""),
-                  onBrowse: () =>
-                    openImport(
-                      QUICK_CREATE_TAB_TO_VIEWER_TYPE["custom-weapon"],
-                      (item) =>
-                        setFormState((prev) =>
-                          mergeImportedIntoDefaults(
-                            buildCWPanelState(),
-                            stripPrivateFields(item),
-                          ),
+          <>
+            <TabbedSchemaFormRenderer
+              tabs={customWeaponTabs}
+              config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              cols={2}
+              extraProps={{
+                ...coreExtraProps,
+                name: String(formState.name ?? ""),
+                onBrowse: () =>
+                  openImport(
+                    QUICK_CREATE_TAB_TO_VIEWER_TYPE["custom-weapon"],
+                    (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(
+                          buildCWPanelState(),
+                          stripPrivateFields(item),
                         ),
-                    ),
-                }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={customWeaponFieldConfig}
-                groupLabels={customWeaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="accuracy"
-                cols={2}
-              />
-            </Grid>
-            <Grid
-              size={12}
-              container
-              spacing={1}
-              sx={{ mb: 0.75, alignItems: "center" }}
-            >
-              <SchemaFieldRenderer
-                config={customWeaponFieldConfig}
-                groupLabels={customWeaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="damage"
-                cols={2}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={customWeaponFieldConfig}
-                groupLabels={customWeaponGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="quality"
-                cols={2}
-                extraProps={{
-                  groups: customWeaponQualityGroups,
-                  onBrowse: () => setQualityPickerOpen(true),
-                }}
-              />
-            </Grid>
-            <Accordion
-              sx={{ width: "100%", mb: 2 }}
-              expanded={modifiersExpanded}
-              onChange={() => setModifiersExpanded(!modifiersExpanded)}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{t("Modifiers")}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={1}>
-                  <SchemaFieldRenderer
-                    config={customWeaponFieldConfig}
-                    groupLabels={customWeaponGroupLabels}
-                    state={formState}
-                    onChange={setFormState}
-                    surface="edit"
-                    group="rare"
-                    cols={2}
-                  />
-                  <SchemaFieldRenderer
-                    config={customWeaponFieldConfig}
-                    groupLabels={customWeaponGroupLabels}
-                    state={formState}
-                    onChange={setFormState}
-                    surface="edit"
-                    group="modifiers"
-                    cols={2}
-                  />
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-            {hasTransforming && (
-              <>
-                <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-                  <SchemaFieldRenderer
-                    config={customWeaponFieldConfig}
-                    groupLabels={customWeaponGroupLabels}
-                    state={formState}
-                    onChange={setFormState}
-                    surface="edit"
-                    group="secondary"
-                    label={t("weapon_customization_transforming_form")}
-                    cols={2}
-                    extraProps={secondaryExtraProps}
-                  />
-                </Grid>
-                <Accordion
-                  sx={{ width: "100%", mb: 2 }}
-                  expanded={secondModifiersExpanded}
-                  onChange={() =>
-                    setSecondModifiersExpanded(!secondModifiersExpanded)
-                  }
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>
-                      {t("weapon_customization_transforming_form_modifiers")}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Grid container spacing={1}>
-                      <SchemaFieldRenderer
-                        config={customWeaponFieldConfig}
-                        groupLabels={customWeaponGroupLabels}
-                        state={formState}
-                        onChange={setFormState}
-                        surface="edit"
-                        group="secondaryModifiers"
-                        cols={2}
-                        extraProps={secondaryExtraProps}
-                      />
-                    </Grid>
-                  </AccordionDetails>
-                </Accordion>
-              </>
-            )}
-            <Grid size={12}>
+                      ),
+                  ),
+                groups: customWeaponQualityGroups,
+                onBrowseQuality: () => setQualityPickerOpen(true),
+              }}
+            />
+            <Box sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </>
         }
         previewContent={<SharedCustomWeaponCard item={weaponObj} />}
         addButton={
@@ -3265,62 +2794,37 @@ function AccessoryPanel() {
     <>
       <PanelLayout
         formContent={
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={accessoryFieldConfig}
-                groupLabels={accessoryGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="core"
-                label={t("Accessory")}
-                cols={2}
-                extraProps={{
-                  name: String(name ?? ""),
-                  onBrowse: () =>
-                    openImport(
-                      QUICK_CREATE_TAB_TO_VIEWER_TYPE.accessory,
-                      (item) =>
-                        setFormState((prev) =>
-                          mergeImportedIntoDefaults(
-                            buildAccessoryPanelState(),
-                            stripPrivateFields(item),
-                          ),
+          <>
+            <TabbedSchemaFormRenderer
+              tabs={accessoryTabs}
+              config={accessoryFieldConfig}
+              groupLabels={accessoryGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              cols={2}
+              extraProps={{
+                name: String(name ?? ""),
+                onBrowse: () =>
+                  openImport(
+                    QUICK_CREATE_TAB_TO_VIEWER_TYPE.accessory,
+                    (item) =>
+                      setFormState((prev) =>
+                        mergeImportedIntoDefaults(
+                          buildAccessoryPanelState(),
+                          stripPrivateFields(item),
                         ),
-                    ),
-                }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={accessoryFieldConfig}
-                groupLabels={accessoryGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="quality"
-                cols={2}
-                extraProps={{ onBrowse: () => setQualityPickerOpen(true) }}
-              />
-            </Grid>
-            <Grid size={12} container spacing={1} sx={{ mb: 0.75 }}>
-              <SchemaFieldRenderer
-                config={accessoryFieldConfig}
-                groupLabels={accessoryGroupLabels}
-                state={formState}
-                onChange={setFormState}
-                surface="edit"
-                group="modifiers"
-                cols={2}
-              />
-            </Grid>
-            <Grid size={12}>
+                      ),
+                  ),
+                onBrowseQuality: () => setQualityPickerOpen(true),
+              }}
+            />
+            <Box sx={{ mt: 1 }}>
               <Button size="small" variant="outlined" onClick={handleClear}>
                 {t("Clear All Fields")}
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </>
         }
         previewContent={<SharedAccessoryCard item={accessoryObj} />}
         addButton={
@@ -3747,14 +3251,14 @@ function HoplospherePanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
-            config={hoplosphereFieldConfig}
+        <>
+          <TabbedSchemaFormRenderer
+            tabs={hoplosphereTabs}
+            config={hoplosphereFieldConfig.filter((f) => f.group !== "coag")}
             groupLabels={hoplosphereGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="core"
             cols={2}
             extraProps={{
               name: String(formState.name ?? ""),
@@ -3787,15 +3291,6 @@ function HoplospherePanel() {
                   },
                 ),
             }}
-          />
-          <SchemaFieldRenderer
-            config={hoplosphereFieldConfig}
-            groupLabels={hoplosphereGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="body"
-            cols={1}
           />
           <Grid size={12}>
             <Typography
@@ -3858,21 +3353,12 @@ function HoplospherePanel() {
               </Button>
             </Stack>
           </Grid>
-          <SchemaFieldRenderer
-            config={hoplosphereFieldConfig}
-            groupLabels={hoplosphereGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="meta"
-            cols={2}
-          />
-          <Grid size={12}>
+          <Box sx={{ mt: 1 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </>
       }
       previewContent={
         <SharedHoplosphereCard

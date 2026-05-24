@@ -15,8 +15,11 @@ import { Close } from "@mui/icons-material";
 import { SharedArmorCard } from "../../../../components/shared/itemCards";
 import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
-import { SchemaFieldRenderer } from "../../../../forms/rendering/SchemaFieldRenderer";
-import { armorFieldConfig } from "../../../../forms/rendering/config/itemConfigs/armor";
+import { TabbedSchemaFormRenderer } from "../../../../forms/rendering/TabbedSchemaFormRenderer";
+import {
+  armorFieldConfig,
+  armorTabs,
+} from "../../../../forms/rendering/config/itemConfigs/armor";
 import {
   validateArmorPersisted,
   buildArmorFormState,
@@ -159,64 +162,23 @@ export default function PlayerArmorModal({
           <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
             {/* Left column: form fields */}
             <Grid size={{ xs: 12, md: 7 }}>
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={armorFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="core"
-                  label={t("Armor")}
-                  cols={2}
-                />
-              </Grid>
+              <TabbedSchemaFormRenderer
+                tabs={armorTabs}
+                config={armorFieldConfig}
+                state={formState}
+                onChange={(next) => {
+                  if (isSlotsVariant && next.slots !== formState.slots) {
+                    handleSlotTierChange(next.slots);
+                  } else {
+                    setFormState(next);
+                  }
+                }}
+                surface="edit"
+                cols={2}
+                extraProps={{ player, isWeapon: false }}
+              />
 
-              {isSlotsVariant ? (
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                  <SchemaFieldRenderer
-                    config={armorFieldConfig}
-                    state={formState}
-                    onChange={(next) => {
-                      if (next.slots !== formState.slots) {
-                        handleSlotTierChange(next.slots);
-                      } else {
-                        setFormState(next);
-                      }
-                    }}
-                    surface="edit"
-                    group="slots"
-                    label={t("Technospheres")}
-                    cols={1}
-                    extraProps={{ player, isWeapon: false }}
-                  />
-                </Grid>
-              ) : (
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                  <SchemaFieldRenderer
-                    config={armorFieldConfig}
-                    state={formState}
-                    onChange={setFormState}
-                    surface="edit"
-                    group="quality"
-                    label={t("Quality")}
-                    cols={2}
-                  />
-                </Grid>
-              )}
-
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                <SchemaFieldRenderer
-                  config={armorFieldConfig}
-                  state={formState}
-                  onChange={setFormState}
-                  surface="edit"
-                  group="modifiers"
-                  label={t("Modifiers")}
-                  cols={2}
-                />
-              </Grid>
-
-              <Grid container spacing={1} sx={{ alignItems: "center" }}>
+              <Grid container spacing={1} sx={{ alignItems: "center", mt: 2 }}>
                 <Grid>
                   <Button
                     variant="outlined"
