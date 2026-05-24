@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { resolveActorEffects } from "./actorEffectsResolver";
-import type { ItemEffect } from "../types/Effects";
+import type { Passive } from "../types/Effects";
 import type { TypeNpc } from "../types/Npcs";
 import type { TypePlayer } from "../types/Players";
 
 function transferredAccuracy(
   value: number,
   key = "bonuses.accuracy.all",
-): ItemEffect {
+): Passive {
   return {
     id: `effect-${value}`,
     name: `Accuracy ${value}`,
@@ -76,12 +76,12 @@ describe("resolveActorEffects", () => {
     const equipped = {
       itemType: "weapon",
       name: "Equipped Sword",
-      effects: [transferredAccuracy(2, "bonuses.accuracy.sword")],
+      passives: [transferredAccuracy(2, "bonuses.accuracy.sword")],
     };
     const inventory = {
       itemType: "weapon",
       name: "Inventory Sword",
-      effects: [transferredAccuracy(7, "bonuses.accuracy.sword")],
+      passives: [transferredAccuracy(7, "bonuses.accuracy.sword")],
     };
     const player = {
       ...playerWithEquipment({
@@ -108,13 +108,13 @@ describe("resolveActorEffects", () => {
           itemType: "weapon",
           name: "Old Equipped Sword",
           isEquipped: true,
-          effects: [transferredAccuracy(3, "bonuses.accuracy.sword")],
+          passives: [transferredAccuracy(3, "bonuses.accuracy.sword")],
         },
         {
           itemType: "weapon",
           name: "Old Inventory Sword",
           isEquipped: false,
-          effects: [transferredAccuracy(9, "bonuses.accuracy.sword")],
+          passives: [transferredAccuracy(9, "bonuses.accuracy.sword")],
         },
       ],
       customWeapons: [],
@@ -162,7 +162,7 @@ describe("resolveActorEffects", () => {
             socketable: "weapon",
             requiredSlots: 1,
             cost: 0,
-            effects: [transferredAccuracy(2)],
+            passives: [transferredAccuracy(2)],
           },
           {
             id: "hoplo-stored",
@@ -171,7 +171,7 @@ describe("resolveActorEffects", () => {
             socketable: "weapon",
             requiredSlots: 1,
             cost: 0,
-            effects: [transferredAccuracy(5)],
+            passives: [transferredAccuracy(5)],
           },
           {
             id: "hoplo-armor",
@@ -180,7 +180,7 @@ describe("resolveActorEffects", () => {
             socketable: "all",
             requiredSlots: 1,
             cost: 0,
-            effects: [transferredAccuracy(11)],
+            passives: [transferredAccuracy(11)],
           },
         ],
         mnemospheres: [

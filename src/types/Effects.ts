@@ -39,7 +39,7 @@ export interface EffectPredicate {
   crisisInteraction?: CrisisInteraction;
 }
 
-export interface ItemEffect {
+export interface Passive {
   id: string;
   name: string;
   disabled?: boolean;
@@ -61,7 +61,7 @@ export interface ActorEffect {
   predicate?: EffectPredicate;
 }
 
-// AppliesEffect 
+// AppliesEffect
 
 export type AppliesEffectTarget = "single" | "all" | "self" | "cover-target";
 
@@ -74,11 +74,11 @@ export interface AppliesEffect {
   predicate?: EffectPredicate;
 }
 
-// AppliedEffect (runtime - lives on RuntimeActor) 
+// AppliedEffect (runtime - lives on RuntimeActor)
 
 export interface AppliedEffect {
   id: string;
-  origin?: string;            // source item fuid; same-origin recasts replace
+  origin?: string; // source item fuid; same-origin recasts replace
   changesFingerprint: string; // stable JSON of sorted changes[]; identical effects do not stack
   changes?: EffectChange[];
   grants?: GrantData[];
@@ -90,13 +90,17 @@ export interface AppliedEffect {
 
 // ExprValue - a runtime expression referencing pipeline bindings.
 // Supported bindings: $sl, @source.<dot.path>, @target.<dot.path>, @item.<dot.path>
-// Supported operators: + and - only.
+// Supported operators: + - * / (standard precedence - * and / before + and -)
 // Unknown bindings resolve to 0. Used wherever a numeric amount can vary at runtime.
 export interface ExprValue {
   expr: string;
 }
 
-export type AfterEffectAmount = number | "half-damage" | "half-loss" | ExprValue;
+export type AfterEffectAmount =
+  | number
+  | "half-damage"
+  | "half-loss"
+  | ExprValue;
 
 export type AfterEffectTarget = "self" | "targets" | "cover-target";
 
@@ -108,7 +112,7 @@ export interface AfterEffect {
   predicate?: EffectPredicate;
 }
 
-// ActionTrigger 
+// ActionTrigger
 
 export type TriggerAction = "guard" | "attack" | "spell" | "equipment";
 
@@ -133,12 +137,37 @@ export type ActionTrigger =
   | { kind: "on-hit"; condition?: OnHitCondition }
   | { kind: "on-damage-taken" };
 
-// ActionBehavior - groups all execution-time behavior on an item.
-// Execution order: trigger -> effects -> appliesEffect -> afterEffects
+// EffectBranch - one of several mutually exclusive outcomes the player chooses at resolution.
 
-export interface ActionBehavior {
-  trigger?: ActionTrigger;
-  effects?: ItemEffect[];
+export interface EffectBranch {
+  label: string;
   appliesEffect?: AppliesEffect;
   afterEffects?: AfterEffect[];
+}
+
+// ManualBehavior - marks a skill whose resolution can't be automated.
+// The pipeline skips execution and the chat card shows the hint text instead.
+
+export type ManualReason =
+  | "prompt-required"
+  | "free-attack"
+  | "future-effect"
+  | "other";
+
+export interface ManualBehavior {
+  reason?: ManualReason;
+  hint?: string;
+}
+
+export interface Behavior {
+  id: string;
+  name: string;
+  trigger?: ActionTrigger;
+  predicate?: EffectPredicate;
+  voluntaryNoDamage?: boolean;
+  appliesEffect?: AppliesEffect;
+  afterEffects?: AfterEffect[];
+  branches?: EffectBranch[];
+  manual?: ManualBehavior;
+  chatOutput?: { text: string };
 }
