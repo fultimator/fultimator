@@ -55,6 +55,7 @@ import {
   DialogActions,
   CircularProgress,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import Layout from "../../components/Layout";
 import { ManageModulesModal } from "../../components/manage-modules";
@@ -260,6 +261,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
 }) {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isPackMode = selectedCompendium !== "official";
   const baseTypes = isPackMode ? PACK_ITEM_TYPES : ITEM_TYPES;
   const activeTypes = restrictToTypes?.length
@@ -291,9 +294,29 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     disableScrollLock: true,
     keepMounted: true,
     slotProps: {
+      root: {
+        sx: {
+          zIndex: (theme) => theme.zIndex.drawer + 3,
+        },
+      },
       paper: {
         sx: {
-          zIndex: (theme) => theme.zIndex.modal + 2,
+          zIndex: (theme) => theme.zIndex.drawer + 3,
+        },
+      },
+    },
+  };
+  const autocompleteOverlayProps = {
+    disablePortal: false,
+    slotProps: {
+      popper: {
+        sx: {
+          zIndex: (theme) => theme.zIndex.drawer + 3,
+        },
+      },
+      paper: {
+        sx: {
+          zIndex: (theme) => theme.zIndex.drawer + 3,
         },
       },
     },
@@ -550,6 +573,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
 
         {(selectedType === "classes" || selectedType === "heroics") && (
           <Autocomplete
+            {...(isMobile ? autocompleteOverlayProps : {})}
             multiple
             limitTags={1}
             size="small"
@@ -608,6 +632,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
 
         {selectedType === "heroics" && (
           <Autocomplete
+            {...(isMobile ? autocompleteOverlayProps : {})}
             multiple
             limitTags={1}
             size="small"
@@ -641,6 +666,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
 
         {selectedType === "optionals" && (
           <Autocomplete
+            {...(isMobile ? autocompleteOverlayProps : {})}
             multiple
             limitTags={1}
             size="small"
@@ -699,6 +725,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           <>
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
               <Autocomplete
+                {...(isMobile ? autocompleteOverlayProps : {})}
                 multiple
                 limitTags={1}
                 size="small"
@@ -737,6 +764,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
 
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
               <Autocomplete
+                {...(isMobile ? autocompleteOverlayProps : {})}
                 multiple
                 limitTags={1}
                 size="small"
