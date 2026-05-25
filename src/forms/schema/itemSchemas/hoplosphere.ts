@@ -3,6 +3,7 @@ import { MetaSchema } from "../meta";
 import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const HoplosphereSchema = z.object({
+  itemType: z.literal("hoplosphere").default("hoplosphere"),
   name: z.string().min(1),
   fuid: z.string().optional(),
   description: z.string().default(""),

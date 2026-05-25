@@ -48,7 +48,6 @@ export const WeaponSchema = z.object({
   itemType: z.literal("weapon"),
   name: z.string().min(1),
   description: z.string().optional(),
-  book: z.string().default("homebrew"),
   category: z.string(),
   range: z.enum(["melee", "ranged"]),
   hands: z.union([z.literal(1), z.literal(2)]),
@@ -172,7 +171,11 @@ export function buildWeaponFormState(
     },
     damage: { value: dmg.value ?? 0, type, hrZero: damageHrZero },
     itemType: "weapon",
-    book: item?.book ?? "homebrew",
+    meta: {
+      isOfficial: false,
+      ...(item?.meta ?? {}),
+      book: item?.meta?.book ?? (item as { book?: string })?.book ?? "homebrew",
+    },
   } as WeaponPersisted;
 }
 

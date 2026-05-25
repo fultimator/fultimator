@@ -10,6 +10,7 @@ const SkillSchema = z.looseObject({
 });
 
 export const ClassSchema = z.object({
+  itemType: z.literal("class").default("class"),
   name: z.string().min(1),
   fuid: z.string().optional(),
   meta: MetaSchema.optional(),

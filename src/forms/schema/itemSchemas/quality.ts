@@ -2,6 +2,7 @@ import { z } from "zod";
 import { MetaSchema } from "../meta";
 
 export const QualitySchema = z.object({
+  itemType: z.literal("quality").default("quality"),
   fuid: z.string().optional(),
   name: z.string().min(1),
   category: z.string().default("misc"),

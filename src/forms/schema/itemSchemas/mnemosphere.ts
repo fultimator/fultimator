@@ -2,6 +2,7 @@ import { z } from "zod";
 import { MetaSchema } from "../meta";
 
 export const MnemosphereSchema = z.looseObject({
+  itemType: z.literal("mnemosphere").default("mnemosphere"),
   fuid: z.string().optional(),
   name: z.string().min(1),
   class: z.string().optional(),

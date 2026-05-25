@@ -16,7 +16,6 @@ export const AccessorySchema = z.object({
   itemType: z.literal("accessory"),
   name: z.string().min(1),
   description: z.string().optional(),
-  book: z.string().default("homebrew"),
   quality: z.string().optional(),
   cost: z.number().int().nonnegative().optional(),
   meta: MetaSchema.optional(),
@@ -70,7 +69,11 @@ export function buildAccessoryFormState(
   return {
     itemType: "accessory",
     fuid: item?.fuid,
-    book: item?.book ?? "homebrew",
+    meta: {
+      isOfficial: false,
+      ...(item?.meta ?? {}),
+      book: item?.meta?.book ?? (item as { book?: string })?.book ?? "homebrew",
+    },
     name: item?.name ?? "",
     quality: item?.quality ?? "",
     qualityCost: item?.qualityCost ?? 0,
