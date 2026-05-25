@@ -6,22 +6,11 @@ import NotesMarkdown from "../../../../common/NotesMarkdown";
 import { TagRow } from "./primitives";
 import { formatSpellType } from "./primitives-utils";
 import Clock from "../../../../player/playerSheet/Clock";
+import { ACTION_ICON_SRC_BY_KEY } from "../../../../actionIconSrc";
 
 interface DisplayMessageTemplateProps {
   message: DisplayMessage;
 }
-
-const DISPLAY_ICON_SRC: Record<string, string | undefined> = {
-  equipment: "/assets/icons/actions/action_equipment.png",
-  spell: "/assets/icons/actions/action_spell.png",
-  skill: "/assets/icons/actions/action_skill.png",
-  inventory: "/assets/icons/actions/action_inventory.png",
-  objective: "/assets/icons/actions/action_objective.png",
-  guard: "/assets/icons/actions/action_guard.png",
-  hinder: "/assets/icons/actions/action_hinder.png",
-  attack: "/assets/icons/actions/action_attack.png",
-  study: "/assets/icons/actions/action_study.png",
-};
 
 export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
   message,
@@ -30,7 +19,11 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
     t === "default" ? formatSpellType(t) : t,
   );
   const iconSrc =
-    DISPLAY_ICON_SRC[String(message.itemType || "").toLowerCase()];
+    ACTION_ICON_SRC_BY_KEY[
+      String(
+        message.itemType || "",
+      ).toLowerCase() as keyof typeof ACTION_ICON_SRC_BY_KEY
+    ];
   const clockSections = Number(message.clock?.sections) || 0;
   const clockState =
     clockSections > 0
@@ -51,8 +44,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
         borderRadius: 1.5,
         border: "1px solid",
         borderColor: "divider",
-        background:
-          "linear-gradient(180deg, rgba(233, 240, 236, 0.75) 0%, rgba(221, 234, 229, 0.88) 100%)",
+        backgroundColor: "background.paper",
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -65,7 +57,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
               borderRadius: 0.5,
               border: "1px solid",
               borderColor: "divider",
-              backgroundColor: "background.default",
+              backgroundColor: "action.hover",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -117,10 +109,9 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                 px: 1.2,
                 py: 1,
                 border: "1px solid",
-                borderColor: "rgba(0, 0, 0, 0.2)",
+                borderColor: "divider",
                 borderRadius: 1,
-                backgroundColor: "rgba(214, 230, 224, 0.75)",
-                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.35)",
+                backgroundColor: "action.hover",
                 minHeight: 72,
               }}
             >
@@ -146,10 +137,9 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                 px: 1.2,
                 py: 1,
                 border: "1px solid",
-                borderColor: "rgba(0, 0, 0, 0.2)",
+                borderColor: "divider",
                 borderRadius: 1,
-                backgroundColor: "rgba(214, 230, 224, 0.75)",
-                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.35)",
+                backgroundColor: "action.hover",
                 minHeight: 72,
               }}
             >
@@ -176,10 +166,9 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                 px: 1.2,
                 py: 1,
                 border: "1px solid",
-                borderColor: "rgba(0, 0, 0, 0.2)",
+                borderColor: "divider",
                 borderRadius: 1,
-                backgroundColor: "rgba(214, 230, 224, 0.75)",
-                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.35)",
+                backgroundColor: "action.hover",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "flex-start",

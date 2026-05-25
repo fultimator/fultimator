@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material";
 import type { ActionMessage } from "../types";
 import { t } from "../../../../../translation/translate";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
+import { ACTION_ICON_SRC_BY_KEY } from "../../../../actionIconSrc";
 import { TagRow } from "./primitives";
 import { ChatActionZone } from "./ChatActionZone";
 
@@ -32,18 +33,6 @@ const ACTION_RULE_KEY: Record<string, string[]> = {
   spell: ["spell_rule"],
   skill: ["skill_rule"],
   other: ["other_rule"],
-};
-
-const ACTION_ICON_SRC: Record<string, string | undefined> = {
-  attack: "/assets/icons/actions/action_attack.png",
-  equipment: "/assets/icons/actions/action_equipment.png",
-  guard: "/assets/icons/actions/action_guard.png",
-  hinder: "/assets/icons/actions/action_hinder.png",
-  inventory: "/assets/icons/actions/action_inventory.png",
-  objective: "/assets/icons/actions/action_objective.png",
-  spell: "/assets/icons/actions/action_spell.png",
-  skill: "/assets/icons/actions/action_skill.png",
-  study: "/assets/icons/actions/action_study.png",
 };
 
 function resolveLocalizedKey(candidates: string[], fallback: string): string {
@@ -77,7 +66,8 @@ export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
     resolveLocalizedKey(labelCandidates, message.action),
   );
   const description = resolveLocalizedKey(ruleCandidates, "");
-  const actionIconSrc = ACTION_ICON_SRC[actionKey];
+  const actionIconSrc =
+    ACTION_ICON_SRC_BY_KEY[actionKey as keyof typeof ACTION_ICON_SRC_BY_KEY];
 
   return (
     <>
@@ -150,8 +140,14 @@ export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
       )}
       {actionKey === "guard" && (
         <>
-          <ChatActionZone guardVariant="no-cover" speakerCombatId={speakerCombatId} />
-          <ChatActionZone guardVariant="cover" speakerCombatId={speakerCombatId} />
+          <ChatActionZone
+            guardVariant="no-cover"
+            speakerCombatId={speakerCombatId}
+          />
+          <ChatActionZone
+            guardVariant="cover"
+            speakerCombatId={speakerCombatId}
+          />
         </>
       )}
     </>

@@ -124,6 +124,23 @@ export const effectChangeRowFields = makeEffectChangeRowFields(
 export const BLANK_EFFECT_CHANGE = { key: "", mode: 2, value: "0" };
 
 // ---------------------------------------------------------------------------
+// Group keys for behavior/passive sections
+// ---------------------------------------------------------------------------
+
+export const BEHAVIOR_GROUPS = {
+  trigger: "behavior-trigger",
+  selfEffects: "behavior-self-effects",
+  appliesEffect: "behavior-applies",
+  afterEffects: "behavior-after-effects",
+} as const;
+
+export const PASSIVE_GROUPS = {
+  core: "passive-core",
+  duration: "passive-duration",
+  changes: "passive-changes",
+} as const;
+
+// ---------------------------------------------------------------------------
 // Passive row fields (used inside the top-level passives object-list)
 // ---------------------------------------------------------------------------
 
@@ -169,6 +186,7 @@ function makePassiveRowFields(
       component: "text",
       defaultValue: "",
       order: 0,
+      group: PASSIVE_GROUPS.core,
       gridSize: 12,
       validationHints: { required: true },
     },
@@ -179,6 +197,7 @@ function makePassiveRowFields(
       component: "checkbox",
       defaultValue: false,
       order: 1,
+      group: PASSIVE_GROUPS.core,
       gridSize: 4,
     },
     {
@@ -188,6 +207,7 @@ function makePassiveRowFields(
       component: "checkbox",
       defaultValue: false,
       order: 2,
+      group: PASSIVE_GROUPS.core,
       gridSize: 4,
     },
     {
@@ -197,6 +217,7 @@ function makePassiveRowFields(
       component: "select",
       defaultValue: "none",
       order: 3,
+      group: PASSIVE_GROUPS.duration,
       gridSize: 6,
       componentProps: { options: EFFECT_DURATION_EVENT_OPTIONS },
     },
@@ -207,6 +228,7 @@ function makePassiveRowFields(
       component: "select",
       defaultValue: "self",
       order: 4,
+      group: PASSIVE_GROUPS.duration,
       gridSize: 6,
       componentProps: { options: EFFECT_TRACKING_OPTIONS },
       dependencies: (s) => {
@@ -225,6 +247,7 @@ function makePassiveRowFields(
       component: "select",
       defaultValue: "none",
       order: 5,
+      group: PASSIVE_GROUPS.duration,
       gridSize: 6,
       componentProps: { options: CRISIS_INTERACTION_OPTIONS },
     },
@@ -236,6 +259,7 @@ function makePassiveRowFields(
       component: "object-list",
       defaultValue: [],
       order: 6,
+      group: PASSIVE_GROUPS.changes,
       gridSize: 12,
       dependencies: (s) => s.transfer === true,
       componentProps: {
@@ -254,6 +278,7 @@ function makePassiveRowFields(
       component: "object-list",
       defaultValue: [],
       order: 6,
+      group: PASSIVE_GROUPS.changes,
       gridSize: 12,
       dependencies: (s) => s.transfer !== true,
       componentProps: {
@@ -682,10 +707,15 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
     component: "text",
     defaultValue: "",
     order: 0,
+    group: BEHAVIOR_GROUPS.selfEffects,
     gridSize: 12,
     validationHints: { required: true },
   },
-  ...actionTriggerRowFields.map((f) => ({ ...f, order: (f.order ?? 0) + 10 })),
+  ...actionTriggerRowFields.map((f) => ({
+    ...f,
+    order: (f.order ?? 0) + 10,
+    group: BEHAVIOR_GROUPS.trigger,
+  })),
   {
     key: "chatOutput.text",
     kind: "editable",
@@ -693,12 +723,17 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
     component: "textarea",
     defaultValue: "",
     order: 99,
+    group: BEHAVIOR_GROUPS.selfEffects,
     gridSize: 12,
     dependencies: (s) =>
       (s._triggerKind as string | undefined) !== "none" &&
       (s._triggerKind as string | undefined) != null,
   },
-  ...appliesEffectRowFields.map((f) => ({ ...f, order: (f.order ?? 0) + 100 })),
+  ...appliesEffectRowFields.map((f) => ({
+    ...f,
+    order: (f.order ?? 0) + 100,
+    group: BEHAVIOR_GROUPS.appliesEffect,
+  })),
   {
     key: "afterEffects",
     kind: "editable",
@@ -706,6 +741,7 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
     component: "object-list",
     defaultValue: [],
     order: 200,
+    group: BEHAVIOR_GROUPS.afterEffects,
     gridSize: 12,
     componentProps: {
       fields: afterEffectRowFields,
@@ -726,22 +762,17 @@ export const BLANK_BEHAVIOR = () => ({
   _triggerKind: "none",
 });
 
-// ---------------------------------------------------------------------------
-// Group keys for the behavior tab sections
-// ---------------------------------------------------------------------------
-
-export const BEHAVIOR_GROUPS = {
-  trigger: "behavior-trigger",
-  selfEffects: "behavior-self-effects",
-  appliesEffect: "behavior-applies",
-  afterEffects: "behavior-after-effects",
-} as const;
-
 export const behaviorGroupLabels: Record<string, string> = {
-  [BEHAVIOR_GROUPS.trigger]: "behavior.trigger.kind",
-  [BEHAVIOR_GROUPS.selfEffects]: "passive.list",
+  [BEHAVIOR_GROUPS.trigger]: "behavior.trigger.action",
+  [BEHAVIOR_GROUPS.selfEffects]: "behavior.effects",
   [BEHAVIOR_GROUPS.appliesEffect]: "behavior.appliesEffect.label",
   [BEHAVIOR_GROUPS.afterEffects]: "behavior.afterEffects",
+};
+
+export const passiveGroupLabels: Record<string, string> = {
+  [PASSIVE_GROUPS.core]: "section.core",
+  [PASSIVE_GROUPS.duration]: "passive.duration",
+  [PASSIVE_GROUPS.changes]: "passive.changes",
 };
 
 // ---------------------------------------------------------------------------
@@ -764,6 +795,8 @@ export function makePassivesTabField(
       fields: makePassiveRowFields(itemScopedKeys),
       itemDefaults: BLANK_PASSIVE,
       addLabel: "passive.add",
+      variant: "behavior-card",
+      groupLabels: passiveGroupLabels,
       rowLabel: (row: Record<string, unknown>) =>
         typeof row.name === "string" && row.name ? row.name : "Passive",
     },
@@ -789,6 +822,8 @@ export const behaviorsTabField: FieldConfig<Record<string, unknown>> = {
     fields: behaviorRowFields,
     itemDefaults: BLANK_BEHAVIOR,
     addLabel: "behavior.add",
+    variant: "behavior-card",
+    groupLabels: behaviorGroupLabels,
     rowLabel: (row: Record<string, unknown>) =>
       typeof row.name === "string" && row.name ? row.name : "Behavior",
   },

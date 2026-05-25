@@ -157,6 +157,14 @@ export type AttackOverrideDraft = {
 
 export type AttackOverrides = Partial<AttackOverrideDraft>;
 
+export type SpellOverrideDraft = {
+  attr1: Attribute;
+  attr2: Attribute;
+  accuracyDelta: number;
+  damageDelta: number;
+  hrZero: boolean;
+};
+
 export type CheckModifier = { label: string; value: number };
 
 export const DIFFICULTY_PRESETS: { label: string; value: number }[] = [

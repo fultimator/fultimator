@@ -176,6 +176,7 @@ export const ChatPanel: React.FC = () => {
   const [clearLogsDialogOpen, setClearLogsDialogOpen] = useState(false);
   const [supportPickerOpen, setSupportPickerOpen] = useState(false);
   const [vehiclePickerOpen, setVehiclePickerOpen] = useState(false);
+  const [pendingVehicleToggle, setPendingVehicleToggle] = useState(false);
   const [equipmentSlotPickerOpen, setEquipmentSlotPickerOpen] = useState<
     "mainHand" | "offHand" | "armor" | "accessory" | null
   >(null);
@@ -209,6 +210,9 @@ export const ChatPanel: React.FC = () => {
     [combatSimActors],
   );
   const selectedCombatSimActor = combatSimActorsByName.get(selectedSpeaker);
+  const isNpcSpeaker = isCombatSim
+    ? selectedCombatSimActor?.source === "npc"
+    : false;
 
   const baseActiveActorDoc = isCombatSim
     ? selectedSpeaker === DEFAULT_SPEAKER
@@ -283,6 +287,50 @@ export const ChatPanel: React.FC = () => {
     return () => {
       window.removeEventListener("chat:run-command", handler);
     };
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          slot?: string;
+          actorDoc?: Record<string, unknown> | null;
+        }>
+      ).detail;
+      if (!detail?.slot) return;
+      if (detail.actorDoc) setActiveActorDocOverride(detail.actorDoc);
+      setEquipmentSlotPickerOpen(
+        detail.slot as "mainHand" | "offHand" | "armor" | "accessory",
+      );
+    };
+    window.addEventListener("chat:open-equipment-slot", handler);
+    return () =>
+      window.removeEventListener("chat:open-equipment-slot", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{ actorDoc?: Record<string, unknown> | null }>
+      ).detail;
+      if (detail?.actorDoc) setActiveActorDocOverride(detail.actorDoc);
+      setPendingVehicleToggle(true);
+    };
+    window.addEventListener("chat:toggle-vehicle", handler);
+    return () => window.removeEventListener("chat:toggle-vehicle", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{ actorDoc?: Record<string, unknown> | null }>
+      ).detail;
+      if (detail?.actorDoc) setActiveActorDocOverride(detail.actorDoc);
+      setSupportPickerOpen(true);
+    };
+    window.addEventListener("chat:open-support-modules", handler);
+    return () =>
+      window.removeEventListener("chat:open-support-modules", handler);
   }, []);
 
   useEffect(() => {
@@ -420,9 +468,14 @@ export const ChatPanel: React.FC = () => {
 
       const docId = activeActorDoc.id as string;
       const db = UUID_RE.test(docId) ? localDb : cloudDb;
-      const isNpc = isCombatSim
-        ? selectedCombatSimActor?.source === "npc"
-        : !playerDoc || selectedSpeaker !== contextActorName;
+      const sourceCollection = activeActorDoc.sourceCollection as
+        | string
+        | undefined;
+      const isNpc = sourceCollection
+        ? sourceCollection === "npc-personal"
+        : isCombatSim
+          ? selectedCombatSimActor?.source === "npc"
+          : !playerDoc || selectedSpeaker !== contextActorName;
       const collection = isNpc ? "npc-personal" : "player-personal";
       const docRef = db.doc(collection, docId);
 
@@ -479,6 +532,30 @@ export const ChatPanel: React.FC = () => {
       selectedSpeaker,
     ],
   );
+
+  useEffect(() => {
+    if (!pendingVehicleToggle) return;
+    setPendingVehicleToggle(false);
+    const doc = activeActorDocRef.current as unknown as TypePlayer | null;
+    if (!doc) return;
+    const pilotInfo = getPilotSpellInfo(doc);
+    if (!pilotInfo) return;
+    const vehicles = Array.isArray(pilotInfo.spell.currentVehicles)
+      ? pilotInfo.spell.currentVehicles
+      : Array.isArray(pilotInfo.spell.vehicles)
+        ? pilotInfo.spell.vehicles
+        : [];
+    const isActive = vehicles.some((v: { enabled?: boolean }) => v.enabled);
+    if (!isActive) {
+      setVehiclePickerOpen(true);
+      return;
+    }
+    setActiveActorDoc((prev) => {
+      const pi = getPilotSpellInfo(prev);
+      if (!pi) return prev;
+      return toggleActiveVehicle(prev, pi);
+    });
+  }, [pendingVehicleToggle, setActiveActorDoc]);
 
   useEffect(() => {
     if (!speakerOptions.includes(selectedSpeaker)) {
@@ -601,6 +678,7 @@ export const ChatPanel: React.FC = () => {
         speakerOptions={speakerOptions}
         selectedSpeaker={selectedSpeaker}
         playerDoc={activeActorDoc}
+        isNpc={isNpcSpeaker}
         onSpeakerChange={(s) => {
           localStorage.setItem(LOCAL_SPEAKER_KEY, s);
           setSelectedSpeaker(s);

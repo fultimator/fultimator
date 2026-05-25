@@ -128,15 +128,23 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
     setActiveActorName: (name) => set({ activeActorName: name }),
 
     clearActors: () =>
-      set({
-        encounterId: null,
-        selectedNPCs: [],
-        selectedPCs: [],
-        actorDocsById: {},
-        runtimeActors: {},
-        activeActorName: null,
-        targets: [],
-        interactionMode: "select",
+      set((state) => {
+        devLog("[combatEncounterStore] clearActors", {
+          encounterId: state.encounterId,
+          prevNPCs: state.selectedNPCs.length,
+          prevPCs: state.selectedPCs.length,
+          prevRuntime: Object.keys(state.runtimeActors).length,
+        });
+        return {
+          encounterId: null,
+          selectedNPCs: [],
+          selectedPCs: [],
+          actorDocsById: {},
+          runtimeActors: {},
+          activeActorName: null,
+          targets: [],
+          interactionMode: "select",
+        };
       }),
 
     setTarget: (ref) => set({ targets: [ref] }),

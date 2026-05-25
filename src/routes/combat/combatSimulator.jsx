@@ -15,7 +15,7 @@ import BattleHeader from "../../components/combatSim/BattleHeader";
 import SelectorPanel from "../../components/combatSim/SelectorPanel";
 import PCDetail from "../../components/combatSim/PCDetail";
 import { calcHP, calcMP } from "../../libs/npcs";
-import SelectedNpcs from "../../components/combatSim/SelectedNpcs";
+import SelectedActors from "../../components/combatSim/SelectedActors";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import NPCDetail from "../../components/combatSim/NPCDetail";
 import CombatSimClocks from "../../components/combatSim/CombatSimClocks";
@@ -1597,7 +1597,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           }}
         >
           {/* Selected NPCs */}
-          <SelectedNpcs
+          <SelectedActors
             selectedNPCs={selectedNPCs}
             handleResetTurns={handleResetTurns}
             handleMoveUp={handleMoveUp}

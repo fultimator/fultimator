@@ -96,7 +96,26 @@ export const BaseMessageTemplate: React.FC<BaseMessageTemplateProps> = ({
             anchorEl={anchorEl}
             open={menuOpen}
             onClose={handleMenuClose}
-            slotProps={{ paper: { sx: { minWidth: 160 } } }}
+            slotProps={{
+              paper: {
+                sx: {
+                  minWidth: 160,
+                  "& .MuiMenuItem-root": {
+                    color: "text.primary",
+                    "& .MuiListItemIcon-root": {
+                      color: "text.secondary",
+                    },
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                      color: "text.primary",
+                    },
+                    "&:hover .MuiListItemIcon-root": {
+                      color: "text.primary",
+                    },
+                  },
+                },
+              },
+            }}
           >
             {onRetarget && (
               <MenuItem onClick={handleRetarget}>

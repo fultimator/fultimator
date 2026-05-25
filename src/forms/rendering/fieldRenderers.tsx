@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -16,6 +16,7 @@ import {
   OutlinedInput,
   ListItemText,
   ListSubheader,
+  Menu,
   MenuItem,
   Radio,
   RadioGroup,
@@ -27,6 +28,8 @@ import {
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { Clear, Search } from "@mui/icons-material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   Martial,
   MartialOutline,
@@ -41,7 +44,9 @@ import SlotEditor from "../../components/player/equipment/technospheres/SlotEdit
 import { TypeIcon, TypeName } from "../../components/types";
 import { useTranslate } from "../../translation/translate";
 import type { FieldRendererProps } from "./fieldRendererProps";
+import type { GroupLabels } from "./config/fieldConfig";
 import { affinityStrToNum, affinityNumToStr } from "./npcAffinityUtils";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 
 // Typed wrapper for untyped JSX components.
 interface ChangeAccuracyCheckProps {
@@ -677,7 +682,7 @@ export function RareBonusBlockRenderer({
           <FormControlLabel
             control={
               <Checkbox
-                checked={v.precBonus}
+                checked={!!v.precBonus}
                 onChange={(e) => emit({ precBonus: e.target.checked })}
                 disabled={
                   (rework && basePrec >= 2) || (!rework && basePrec >= 1)
@@ -692,7 +697,7 @@ export function RareBonusBlockRenderer({
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={v.damageBonus}
+                  checked={!!v.damageBonus}
                   onChange={(e) => emit({ damageBonus: e.target.checked })}
                 />
               }
@@ -705,7 +710,7 @@ export function RareBonusBlockRenderer({
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={v.damageReworkBonus}
+                  checked={!!v.damageReworkBonus}
                   onChange={(e) =>
                     emit({ damageReworkBonus: e.target.checked })
                   }
@@ -1159,14 +1164,18 @@ export function ObjectListRenderer({
   componentProps,
 }: FieldRendererProps) {
   const { t } = useTranslate();
-  const fields =
-    (componentProps?.fields as import("./config/fieldConfig").ItemFieldConfig<
-      Record<string, unknown>
-    >) ?? [];
+  const fields = useMemo(
+    () =>
+      (componentProps?.fields as import("./config/fieldConfig").ItemFieldConfig<
+        Record<string, unknown>
+      >) ?? [],
+    [componentProps?.fields],
+  );
   const itemDefaults =
     (componentProps?.itemDefaults as Record<string, unknown>) ?? {};
   const fixedCount = componentProps?.fixedCount as number | undefined;
   const addLabel = (componentProps?.addLabel as string) ?? "Add";
+  const variant = (componentProps?.variant as string | undefined) ?? "";
   const rowLabel = componentProps?.rowLabel as
     | ((row: Record<string, unknown>, i: number) => string)
     | undefined;
@@ -1179,19 +1188,82 @@ export function ObjectListRenderer({
         onChange: (next: Record<string, unknown>) => void;
         surface?: "quickCreate" | "create" | "edit";
         cols?: 1 | 2 | 3 | 4;
+        group?: string;
+        groupLabels?: GroupLabels;
       }) => React.ReactNode)
     | undefined;
+  const nestedGroupLabels = componentProps?.groupLabels as
+    | GroupLabels
+    | undefined;
 
-  const rows = (value as Record<string, unknown>[]) ?? [];
+  const rows = useMemo(
+    () => (value as Record<string, unknown>[]) ?? [],
+    [value],
+  );
+  const isBehaviorCard = variant === "behavior-card";
+  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const [menuRowIndex, setMenuRowIndex] = useState<number | null>(null);
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    setExpandedRows((prev) => {
+      const next: Record<number, boolean> = {};
+      rows.forEach((_, i) => {
+        next[i] = prev[i] ?? false;
+      });
+      return next;
+    });
+  }, [rows]);
 
   const updateRow = (i: number, next: Record<string, unknown>) => {
     const updated = rows.map((r, idx) => (idx === i ? next : r));
     onCommit(updated);
   };
 
-  const addRow = () => onCommit([...rows, { ...itemDefaults }]);
+  const addRow = () => {
+    const nextIndex = rows.length;
+    if (isBehaviorCard) {
+      setExpandedRows((prev) => ({ ...prev, [nextIndex]: true }));
+    }
+    onCommit([...rows, { ...itemDefaults }]);
+  };
 
   const removeRow = (i: number) => onCommit(rows.filter((_, idx) => idx !== i));
+  const requestDeleteRow = (i: number) => setDeleteIndex(i);
+  const confirmDeleteRow = () => {
+    if (deleteIndex == null) return;
+    removeRow(deleteIndex);
+    setDeleteIndex(null);
+  };
+  const visibleGroupedFields = useMemo(() => {
+    if (!isBehaviorCard) return null;
+    const withoutFormState = fields.filter((f) => f.kind !== "form-state");
+    const keys: string[] = [];
+    for (const f of withoutFormState) {
+      const g = f.group ?? "";
+      if (!keys.includes(g)) keys.push(g);
+    }
+    return keys;
+  }, [fields, isBehaviorCard]);
+  const toggleExpanded = (i: number) =>
+    setExpandedRows((prev) => ({ ...prev, [i]: !prev[i] }));
+  const openMenu = (event: React.MouseEvent<HTMLElement>, rowIndex: number) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+    setMenuRowIndex(rowIndex);
+  };
+  const closeMenu = () => {
+    setMenuAnchorEl(null);
+    setMenuRowIndex(null);
+  };
+  const toggleEnabled = (i: number, checked: boolean) => {
+    const row = rows[i] ?? {};
+    updateRow(i, {
+      ...row,
+      disabled: !checked,
+    });
+  };
 
   return (
     <Box
@@ -1207,54 +1279,167 @@ export function ObjectListRenderer({
             p: 1.5,
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 1,
-            }}
-          >
-            {rowLabel && (
-              <Typography
-                variant="caption"
-                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+          {isBehaviorCard ? (
+            <>
+              <Box
+                onClick={() => toggleExpanded(i)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  cursor: "pointer",
+                  minHeight: 40,
+                }}
               >
-                {rowLabel(row, i)}
-              </Typography>
-            )}
-            {fixedCount === undefined && (
-              <IconButton
-                size="small"
-                color="error"
-                onClick={() => removeRow(i)}
-                sx={{ ml: "auto" }}
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 500, flexGrow: 1, overflow: "hidden" }}
+                  noWrap
+                >
+                  {rowLabel ? rowLabel(row, i) : `Item ${i + 1}`}
+                </Typography>
+                <Box
+                  onClick={(e) => e.stopPropagation()}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="caption" sx={{ mr: 0.5 }}>
+                    {t("Enabled")}
+                  </Typography>
+                  <Checkbox
+                    size="small"
+                    checked={row.disabled !== true}
+                    onChange={(e) => toggleEnabled(i, e.target.checked)}
+                  />
+                </Box>
+                <IconButton size="small" onClick={(e) => openMenu(e, i)}>
+                  <MenuIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleExpanded(i);
+                  }}
+                >
+                  <ExpandMoreIcon
+                    fontSize="small"
+                    sx={{
+                      transform: expandedRows[i]
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
+                      transition: "transform 0.15s ease",
+                    }}
+                  />
+                </IconButton>
+              </Box>
+              {expandedRows[i] && (
+                <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                  {renderNestedFields && visibleGroupedFields
+                    ? visibleGroupedFields.map((groupKey) => (
+                        <React.Fragment key={`${i}-${groupKey || "default"}`}>
+                          {renderNestedFields({
+                            config: fields,
+                            state: row,
+                            onChange: (next) => updateRow(i, next),
+                            surface: "edit",
+                            cols:
+                              fields.filter(
+                                (f) =>
+                                  f.kind !== "form-state" &&
+                                  f.kind !== "computed" &&
+                                  f.component,
+                              ).length > 3
+                                ? 2
+                                : 1,
+                            group: groupKey || undefined,
+                            groupLabels: nestedGroupLabels,
+                          })}
+                        </React.Fragment>
+                      ))
+                    : null}
+                </Grid>
+              )}
+            </>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
               >
-                <Delete fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-          <Grid container spacing={1}>
-            {renderNestedFields
-              ? renderNestedFields({
-                  config: fields,
-                  state: row,
-                  onChange: (next) => updateRow(i, next),
-                  surface: "edit",
-                  cols:
-                    fields.filter(
-                      (f) =>
-                        f.kind !== "form-state" &&
-                        f.kind !== "computed" &&
-                        f.component,
-                    ).length > 3
-                      ? 2
-                      : 1,
-                })
-              : null}
-          </Grid>
+                {rowLabel && (
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                  >
+                    {rowLabel(row, i)}
+                  </Typography>
+                )}
+                {fixedCount === undefined && (
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => requestDeleteRow(i)}
+                    sx={{ ml: "auto" }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+              <Grid container spacing={1}>
+                {renderNestedFields
+                  ? renderNestedFields({
+                      config: fields,
+                      state: row,
+                      onChange: (next) => updateRow(i, next),
+                      surface: "edit",
+                      cols:
+                        fields.filter(
+                          (f) =>
+                            f.kind !== "form-state" &&
+                            f.kind !== "computed" &&
+                            f.component,
+                        ).length > 3
+                          ? 2
+                          : 1,
+                    })
+                  : null}
+              </Grid>
+            </>
+          )}
         </Box>
       ))}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={closeMenu}
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuRowIndex != null) requestDeleteRow(menuRowIndex);
+            closeMenu();
+          }}
+          sx={{ color: "error.main" }}
+          disabled={fixedCount !== undefined || menuRowIndex == null}
+        >
+          {t("Delete")}
+        </MenuItem>
+      </Menu>
+      <DeleteConfirmationDialog
+        open={deleteIndex !== null}
+        onClose={() => setDeleteIndex(null)}
+        onConfirm={confirmDeleteRow}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          deleteIndex !== null
+            ? (rowLabel?.(rows[deleteIndex] ?? {}, deleteIndex) ?? "")
+            : ""
+        }
+      />
       {fixedCount === undefined && (
         <Box>
           <Button

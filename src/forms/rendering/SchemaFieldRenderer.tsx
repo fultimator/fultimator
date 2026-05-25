@@ -179,12 +179,16 @@ export function SchemaFieldRenderer<
             onChange,
             surface = "edit",
             cols = 2,
+            group,
+            groupLabels,
           }: {
             config: ItemFieldConfig<Record<string, unknown>>;
             state: Record<string, unknown>;
             onChange: (next: Record<string, unknown>) => void;
             surface?: FormSurface;
             cols?: 1 | 2 | 3 | 4;
+            group?: string;
+            groupLabels?: GroupLabels;
           }) => (
             <SchemaFieldRenderer
               config={config}
@@ -192,6 +196,8 @@ export function SchemaFieldRenderer<
               onChange={onChange}
               surface={surface}
               cols={cols}
+              group={group}
+              groupLabels={groupLabels}
             />
           ),
         };

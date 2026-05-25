@@ -77,6 +77,18 @@ export function useChatStore(
         return;
       } else if (result.ok === true) {
         result.messages.map(hydrateTargetsSnapshot).forEach(addMessage);
+        for (const out of result.activeBehaviorOutputs ?? []) {
+          addMessage({
+            id: crypto.randomUUID(),
+            createdAt: Date.now(),
+            speaker: out.speaker,
+            kind: "display",
+            itemType: out.itemType,
+            name: out.itemName,
+            tags: [],
+            description: out.text,
+          });
+        }
         setCommandError(null);
       }
     }

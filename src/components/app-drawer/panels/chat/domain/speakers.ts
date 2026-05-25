@@ -37,6 +37,7 @@ export type SpellOption = {
   arg: string;
   name: string;
   description?: string;
+  effect?: string;
   spellType?: string;
   isOffensive?: boolean;
   attr1?: Attribute;
@@ -90,6 +91,7 @@ export function resolveSpellOptions(
       name,
       description:
         typeof spell.description === "string" ? spell.description : undefined,
+      effect: typeof spell.effect === "string" ? spell.effect : undefined,
       spellType,
       isOffensive,
       attr1: toAttr(acc?.attr1),

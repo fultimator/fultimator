@@ -37,6 +37,31 @@ import type {
   DamagePipelineTarget,
   DieSides,
 } from "../types";
+import type { Behavior } from "../../../../../types/Effects";
+
+export interface ActiveBehaviorOutput {
+  speaker: string;
+  itemName: string;
+  itemType: string;
+  text: string;
+}
+
+function collectActiveBehaviorOutputs(
+  behaviors: Behavior[] | undefined,
+  speaker: string,
+  itemName: string,
+  itemType: string,
+): ActiveBehaviorOutput[] {
+  if (!behaviors) return [];
+  const out: ActiveBehaviorOutput[] = [];
+  for (const beh of behaviors) {
+    if (beh.trigger && beh.trigger.kind !== "active") continue;
+    const text = beh.chatOutput?.text?.trim();
+    if (!text) continue;
+    out.push({ speaker, itemName, itemType, text });
+  }
+  return out;
+}
 
 export type CommandContext = {
   speaker: string;
@@ -217,6 +242,91 @@ export function parseActionAttackArgs(rawArg: string): {
     i += 2;
   }
   return { weaponName, overrides };
+}
+
+export function parseActionSpellArgs(rawArg: string): {
+  spellArg?: string;
+  overrides: {
+    attr1?: Attribute;
+    attr2?: Attribute;
+    accuracyDelta?: number;
+    damageDelta?: number;
+    hrZero?: boolean;
+  };
+} {
+  const trimmed = rawArg.trim();
+  if (!trimmed) return { overrides: {} };
+
+  let spellArg = "";
+  let rest = "";
+  if (trimmed.startsWith('"')) {
+    const endQuote = trimmed.indexOf('"', 1);
+    if (endQuote !== -1) {
+      spellArg = trimmed.slice(1, endQuote);
+      rest = trimmed.slice(endQuote + 1).trim();
+    } else {
+      spellArg = trimmed.slice(1);
+    }
+  } else {
+    const flagIdx = trimmed.indexOf(" --");
+    const hr0Idx = trimmed.toLowerCase().indexOf(" hr0");
+    const splitIdx = [flagIdx, hr0Idx]
+      .filter((i) => i !== -1)
+      .sort((a, b) => a - b)[0];
+    if (splitIdx === undefined) {
+      spellArg = trimmed;
+    } else {
+      spellArg = trimmed.slice(0, splitIdx).trim();
+      rest = trimmed.slice(splitIdx + 1).trim();
+    }
+  }
+
+  const overrides: {
+    attr1?: Attribute;
+    attr2?: Attribute;
+    accuracyDelta?: number;
+    damageDelta?: number;
+    hrZero?: boolean;
+  } = {};
+  if (!rest) return { spellArg, overrides };
+  const tokens = rest.split(/\s+/);
+  for (let i = 0; i < tokens.length; ) {
+    const rawFlag = tokens[i];
+    if (
+      rawFlag?.toLowerCase() === "hr0" ||
+      rawFlag?.toLowerCase() === "--hr0"
+    ) {
+      overrides.hrZero = true;
+      i += 1;
+      continue;
+    }
+    if (!rawFlag?.startsWith("--")) {
+      i += 1;
+      continue;
+    }
+    const flag = rawFlag.toLowerCase();
+    const value = tokens[i + 1];
+    if (!value || value.startsWith("--")) {
+      i += 1;
+      continue;
+    }
+    if (flag === "--attr1" && VALID_ATTRIBUTES.has(value.toLowerCase())) {
+      overrides.attr1 = value.toLowerCase() as Attribute;
+    } else if (
+      flag === "--attr2" &&
+      VALID_ATTRIBUTES.has(value.toLowerCase())
+    ) {
+      overrides.attr2 = value.toLowerCase() as Attribute;
+    } else if (flag === "--acc") {
+      const n = parseInt(value, 10);
+      if (!Number.isNaN(n)) overrides.accuracyDelta = n;
+    } else if (flag === "--dmg") {
+      const n = parseInt(value, 10);
+      if (!Number.isNaN(n)) overrides.damageDelta = n;
+    }
+    i += 2;
+  }
+  return { spellArg, overrides };
 }
 
 function parseCheckArgs(args: string):
@@ -456,13 +566,16 @@ const actionCommand: Command = {
     }
 
     if (subAction.toLowerCase() === "spell" && weaponArg) {
+      const { spellArg, overrides: spellOverrides } =
+        parseActionSpellArgs(rawArg);
+      const effectiveArg = spellArg ?? weaponArg;
       const options = resolveSpellOptions(context.playerDoc);
       const spell = options.find((o) => {
         const unquoted = o.spellType ? `${o.name} ${o.spellType}` : o.name;
-        return unquoted === weaponArg;
+        return unquoted === effectiveArg;
       });
       if (!spell) {
-        return { error: `Unknown spell "${weaponArg}".` };
+        return { error: `Unknown spell "${effectiveArg}".` };
       }
       if (!spell.isOffensive) {
         return [
@@ -475,19 +588,29 @@ const actionCommand: Command = {
             name: spell.name,
             tags: ["Spell", spell.spellType ?? "default", "Non-Offensive"],
             description: spell.description,
+            effect: spell.effect,
           } as import("../types").ChatMessage,
         ];
       }
-      const primary = spell.attr1 ?? "ins";
-      const secondary = spell.attr2 ?? "wlp";
+      const primary = (spellOverrides.attr1 ??
+        spell.attr1 ??
+        "ins") as Attribute;
+      const secondary = (spellOverrides.attr2 ??
+        spell.attr2 ??
+        "wlp") as Attribute;
       const dieSizes = {
-        primary: resolveAttributeDie(context.playerDoc, primary as Attribute),
-        secondary: resolveAttributeDie(
-          context.playerDoc,
-          secondary as Attribute,
-        ),
+        primary: resolveAttributeDie(context.playerDoc, primary),
+        secondary: resolveAttributeDie(context.playerDoc, secondary),
       };
-      const intent = prepareMagicCheck(spell);
+      const intent = prepareMagicCheck({
+        ...spell,
+        attr1: primary,
+        attr2: secondary,
+        accuracyBonus:
+          (spell.accuracyBonus ?? 0) + (spellOverrides.accuracyDelta ?? 0),
+        baseDamage: (spell.baseDamage ?? 0) + (spellOverrides.damageDelta ?? 0),
+        damageHrZero: spellOverrides.hrZero ?? spell.damageHrZero,
+      });
       const rolls = rollMagicCheck(dieSizes);
       const result = processMagicCheck(
         intent,
@@ -605,7 +728,11 @@ export function getActiveCommand(input: string): Command | null {
 }
 
 export type CommandOutcome =
-  | { ok: true; messages: ChatMessage[] }
+  | {
+      ok: true;
+      messages: ChatMessage[];
+      activeBehaviorOutputs?: ActiveBehaviorOutput[];
+    }
   | { ok: false; error: string };
 export type CommandResult = CommandOutcome | null; // null = not a command
 
@@ -622,5 +749,58 @@ export function executeCommand(
   const args = spaceIdx === -1 ? "" : input.slice(spaceIdx + 1);
   const result = cmd.execute(args, context);
   if ("error" in result) return { ok: false, error: result.error };
-  return { ok: true, messages: result };
+  const activeBehaviorOutputs = resolveActiveBehaviorOutputs(
+    name,
+    args,
+    context,
+  );
+  return { ok: true, messages: result, activeBehaviorOutputs };
+}
+
+function resolveActiveBehaviorOutputs(
+  cmdName: string,
+  args: string,
+  context: CommandContext,
+): ActiveBehaviorOutput[] {
+  if (cmdName !== "action" && cmdName !== "a") return [];
+  if (!context.playerDoc) return [];
+
+  const spaceIdx = args.indexOf(" ");
+  const subAction = (
+    spaceIdx === -1 ? args : args.slice(0, spaceIdx)
+  ).toLowerCase();
+  const rawArg = spaceIdx === -1 ? "" : args.slice(spaceIdx + 1).trim();
+
+  if (subAction === "attack") {
+    const { weaponName } = parseActionAttackArgs(rawArg);
+    if (!weaponName) return [];
+    const options = resolveAttackOptions(context.playerDoc);
+    const weapon = options.find((o) => o.name === weaponName) as
+      | ((typeof options)[number] & { behaviors?: Behavior[] })
+      | undefined;
+    if (!weapon) return [];
+    return collectActiveBehaviorOutputs(
+      weapon.behaviors,
+      context.speaker,
+      weapon.name,
+      "weapon",
+    );
+  }
+
+  if (subAction === "spell") {
+    const options = resolveSpellOptions(context.playerDoc);
+    const spell = options.find((o) => {
+      const unquoted = o.spellType ? `${o.name} ${o.spellType}` : o.name;
+      return unquoted === rawArg;
+    }) as ((typeof options)[number] & { behaviors?: Behavior[] }) | undefined;
+    if (!spell) return [];
+    return collectActiveBehaviorOutputs(
+      spell.behaviors,
+      context.speaker,
+      spell.name,
+      "spell",
+    );
+  }
+
+  return [];
 }
