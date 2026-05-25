@@ -16,6 +16,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import { TouchApp, EditOutlined as EditIcon } from "@mui/icons-material";
+import { ActionIcon, DistanceIcon, MeleeIcon } from "../icons";
 import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
 import {
@@ -195,7 +196,7 @@ export default function SelectedActors({
         const shouldOpenUpward =
           spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
         setOpenUpward(shouldOpenUpward);
-        const menuWidth = 200;
+        const menuWidth = 240;
         const clampedLeft = Math.max(
           8,
           Math.min(btnRect.left, window.innerWidth - menuWidth - 8),
@@ -220,6 +221,7 @@ export default function SelectedActors({
         label: opt.name,
         command: `/action attack ${opt.arg}`,
         customizable: opt,
+        attackRange: opt.range,
       }));
     }
 
@@ -265,6 +267,58 @@ export default function SelectedActors({
             disabled: slot.isLocked,
           };
         });
+    }
+
+    if (actionKey === "skill") {
+      if (isSelectedNpc) {
+        const otherActions = Array.isArray(selectedActorDoc.actions)
+          ? selectedActorDoc.actions
+              .filter((a) => a && typeof a === "object")
+              .map((a, idx) => ({
+                key: `npc-action-${idx}`,
+                label: a.name || `Action ${idx + 1}`,
+                showActionIcon: true,
+                command: "/action skill",
+              }))
+          : [];
+
+        const specialRules = Array.isArray(selectedActorDoc.special)
+          ? selectedActorDoc.special
+              .filter((s) => s && typeof s === "object")
+              .map((s, idx) => ({
+                key: `npc-special-${idx}`,
+                label: s.name || `Special ${idx + 1}`,
+                showActionIcon: true,
+                command: "/action skill",
+              }))
+          : [];
+
+        return [...otherActions, ...specialRules];
+      }
+
+      const classes = Array.isArray(selectedActorDoc.classes)
+        ? selectedActorDoc.classes
+        : [];
+      const classSkills = classes.flatMap((cls, classIdx) => {
+        const skills = Array.isArray(cls?.skills) ? cls.skills : [];
+        return skills
+          .filter((sk) => (sk?.currentLvl ?? 0) > 0)
+          .map((sk, skillIdx) => ({
+            key: `pc-skill-${classIdx}-${skillIdx}`,
+            label: sk.skillName || sk.name || `Skill ${skillIdx + 1}`,
+            command: "/action skill",
+          }));
+      });
+
+      const heroicSkills = classes
+        .filter((cls) => cls?.heroic?.name)
+        .map((cls, classIdx) => ({
+          key: `pc-heroic-${classIdx}`,
+          label: cls.heroic.name,
+          command: "/action skill",
+        }));
+
+      return [...classSkills, ...heroicSkills];
     }
 
     return [];
@@ -382,13 +436,7 @@ export default function SelectedActors({
             }}
             onMouseEnter={(e) => openMenu(action, e.currentTarget)}
             onClick={(e) => {
-              const directFire = [
-                "guard",
-                "inventory",
-                "objective",
-                "skill",
-                "other",
-              ];
+              const directFire = ["guard", "inventory", "objective", "other"];
               if (action === "study") {
                 cancelOpen();
                 closeMenu();
@@ -434,10 +482,11 @@ export default function SelectedActors({
               left: menuAnchorPos.left,
               zIndex: 1500,
               p: 0.75,
-              minWidth: 200,
+              minWidth: 240,
+              maxWidth: 240,
               display: "flex",
               flexDirection: "column",
-              gap: 0.4,
+              gap: 0.45,
               backgroundColor: "background.paper",
               border: "1px solid",
               borderColor: "divider",
@@ -447,119 +496,170 @@ export default function SelectedActors({
             }}
           >
             {activeActionItems.length > 0 ? (
-              activeActionItems.map((item) => (
-                <Box
-                  key={item.key ?? item.label}
-                  sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                >
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    fullWidth
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0.5,
+                }}
+              >
+                {activeActionItems.map((item) => (
+                  <Box
+                    key={item.key ?? item.label}
                     sx={{
-                      textTransform: "none",
-                      justifyContent: "flex-start",
-                      borderRadius: 999,
-                      py: 0.3,
-                      px: 1,
-                      color: "text.primary",
-                      borderColor: "divider",
-                      backgroundColor: "background.paper",
-                      "&:hover": {
-                        backgroundColor: "action.hover",
-                        borderColor: "divider",
-                        color: "text.primary",
-                      },
-                    }}
-                    disabled={item.disabled}
-                    onClick={() => {
-                      if (item.slotKey) {
-                        setDrawerTab("chat");
-                        setDrawerOpen(true);
-                        setTimeout(() => {
-                          window.dispatchEvent(
-                            new window.CustomEvent("chat:open-equipment-slot", {
-                              detail: {
-                                slot: item.slotKey,
-                                actorDoc: selectedActorDoc,
-                              },
-                            }),
-                          );
-                        }, 0);
-                        setActiveActionKey(null);
-                        activeActionKeyRef.current = null;
-                      } else if (item.actionType) {
-                        setDrawerTab("chat");
-                        setDrawerOpen(true);
-                        const eventName =
-                          item.actionType === "toggleVehicle"
-                            ? "chat:toggle-vehicle"
-                            : item.actionType === "openSupportModules"
-                              ? "chat:open-support-modules"
-                              : null;
-                        if (eventName) {
-                          setTimeout(() => {
-                            window.dispatchEvent(
-                              new window.CustomEvent(eventName, {
-                                detail: { actorDoc: selectedActorDoc },
-                              }),
-                            );
-                          }, 0);
-                        }
-                        setActiveActionKey(null);
-                        activeActionKeyRef.current = null;
-                      } else {
-                        applyCommand(item.command);
-                      }
+                      display: "flex",
+                      alignItems: "stretch",
+                      gap: 0.45,
+                      minHeight: 32,
                     }}
                   >
-                    {item.label}
-                  </Button>
-                  {item.customizable && (
-                    <IconButton
+                    <Button
                       size="small"
+                      variant="outlined"
+                      fullWidth
                       sx={{
-                        flexShrink: 0,
-                        border: "1px solid",
-                        borderColor: "divider",
+                        textTransform: "none",
+                        justifyContent: "flex-start",
                         borderRadius: 999,
-                        p: 0.35,
-                        backgroundColor: "background.paper",
+                        py: 0.35,
+                        px: 1,
+                        minHeight: 32,
                         color: "text.primary",
-                        "&:hover": { backgroundColor: "action.hover" },
-                      }}
-                      onClick={(e) =>
-                        openCustomizer(item.customizable, e.currentTarget)
-                      }
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  )}
-                  {item.spellCustomizable && (
-                    <IconButton
-                      size="small"
-                      sx={{
-                        flexShrink: 0,
-                        border: "1px solid",
                         borderColor: "divider",
-                        borderRadius: 999,
-                        p: 0.35,
                         backgroundColor: "background.paper",
-                        color: "text.primary",
-                        "&:hover": { backgroundColor: "action.hover" },
+                        "&:hover": {
+                          backgroundColor: "action.hover",
+                          borderColor: "divider",
+                          color: "text.primary",
+                        },
                       }}
-                      onClick={(e) =>
-                        openSpellCustomizer(
-                          item.spellCustomizable,
-                          e.currentTarget,
-                        )
-                      }
+                      disabled={item.disabled}
+                      onClick={() => {
+                        if (item.slotKey) {
+                          setDrawerTab("chat");
+                          setDrawerOpen(true);
+                          setTimeout(() => {
+                            window.dispatchEvent(
+                              new window.CustomEvent(
+                                "chat:open-equipment-slot",
+                                {
+                                  detail: {
+                                    slot: item.slotKey,
+                                    actorDoc: selectedActorDoc,
+                                  },
+                                },
+                              ),
+                            );
+                          }, 0);
+                          setActiveActionKey(null);
+                          activeActionKeyRef.current = null;
+                        } else if (item.actionType) {
+                          setDrawerTab("chat");
+                          setDrawerOpen(true);
+                          const eventName =
+                            item.actionType === "toggleVehicle"
+                              ? "chat:toggle-vehicle"
+                              : item.actionType === "openSupportModules"
+                                ? "chat:open-support-modules"
+                                : null;
+                          if (eventName) {
+                            setTimeout(() => {
+                              window.dispatchEvent(
+                                new window.CustomEvent(eventName, {
+                                  detail: { actorDoc: selectedActorDoc },
+                                }),
+                              );
+                            }, 0);
+                          }
+                          setActiveActionKey(null);
+                          activeActionKeyRef.current = null;
+                        } else {
+                          applyCommand(item.command);
+                        }
+                      }}
                     >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  )}
-                </Box>
-              ))
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.75,
+                        }}
+                      >
+                        {activeActionKey === "attack" && (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              fontSize: "0.95em",
+                            }}
+                          >
+                            {item.attackRange === "ranged" ? (
+                              <DistanceIcon />
+                            ) : (
+                              <MeleeIcon />
+                            )}
+                          </Box>
+                        )}
+                        {item.showActionIcon && (
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <ActionIcon />
+                          </Box>
+                        )}
+                        <Box sx={{ fontWeight: 700, lineHeight: 1.15 }}>
+                          {item.label}
+                        </Box>
+                      </Box>
+                    </Button>
+                    {item.customizable && (
+                      <IconButton
+                        size="small"
+                        sx={{
+                          flexShrink: 0,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 999,
+                          p: 0.4,
+                          minWidth: 32,
+                          minHeight: 32,
+                          backgroundColor: "background.paper",
+                          color: "text.primary",
+                          "&:hover": { backgroundColor: "action.hover" },
+                        }}
+                        onClick={(e) =>
+                          openCustomizer(item.customizable, e.currentTarget)
+                        }
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    {item.spellCustomizable && (
+                      <IconButton
+                        size="small"
+                        sx={{
+                          flexShrink: 0,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 999,
+                          p: 0.4,
+                          minWidth: 32,
+                          minHeight: 32,
+                          backgroundColor: "background.paper",
+                          color: "text.primary",
+                          "&:hover": { backgroundColor: "action.hover" },
+                        }}
+                        onClick={(e) =>
+                          openSpellCustomizer(
+                            item.spellCustomizable,
+                            e.currentTarget,
+                          )
+                        }
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </Box>
+                ))}
+              </Box>
             ) : (
               <Button
                 size="small"

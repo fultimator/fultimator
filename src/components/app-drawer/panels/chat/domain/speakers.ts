@@ -71,6 +71,23 @@ function toAttr(raw: unknown): Attribute | undefined {
   return LONG_TO_ATTR[raw.toLowerCase()] ?? undefined;
 }
 
+function toNumber(raw: unknown): number | undefined {
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  if (typeof raw === "string") {
+    const parsed = Number(raw);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return undefined;
+}
+
+function toRange(raw: unknown): "melee" | "ranged" {
+  if (typeof raw !== "string") return "melee";
+  const normalized = raw.toLowerCase();
+  return normalized === "ranged" || normalized === "weapon_range_ranged"
+    ? "ranged"
+    : "melee";
+}
+
 export function resolveSpellOptions(
   doc: Record<string, unknown> | null,
 ): SpellOption[] {
@@ -90,17 +107,19 @@ export function resolveSpellOptions(
       arg: quoteArg(spellType ? `${name} ${spellType}` : name),
       name,
       description:
-        typeof spell.description === "string" ? spell.description : undefined,
+        typeof spell.description === "string"
+          ? spell.description
+          : typeof spell.effect === "string"
+            ? spell.effect
+            : undefined,
       effect: typeof spell.effect === "string" ? spell.effect : undefined,
       spellType,
       isOffensive,
       attr1: toAttr(acc?.attr1),
       attr2: toAttr(acc?.attr2),
-      baseDamage: typeof dmg?.value === "number" ? dmg.value : 0,
+      baseDamage: toNumber(dmg?.value) ?? 0,
       accuracyBonus:
-        typeof acc?.value === "number" && acc.value !== 0
-          ? acc.value
-          : undefined,
+        (toNumber(acc?.value) ?? 0) !== 0 ? toNumber(acc?.value) : undefined,
       accuracyDefense: typeof acc?.defense === "string" ? acc.defense : "mdef",
       damageType: typeof dmg?.type === "string" ? dmg.type : "physical",
       damageHrZero: dmg?.hrZero === true,
@@ -163,10 +182,7 @@ function extractPcWeaponStats(
 > {
   if (!item) return {};
   const acc = item.accuracy as Record<string, unknown> | undefined;
-  const normalizedRange =
-    item.range === "ranged" || item.range === "weapon_range_ranged"
-      ? "ranged"
-      : "melee";
+  const normalizedRange = toRange(item.range);
   const category =
     typeof item.category === "string" ? item.category : undefined;
   const hands = item.hands === 2 ? 2 : item.hands === 1 ? 1 : undefined;
@@ -229,6 +245,7 @@ export function resolveAttackOptions(
             attr2: toAttr(acc?.attr2),
             damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
             damageHrZero: dmg?.hrZero === true,
+            range: toRange(a.range),
           });
         }
       }
@@ -256,10 +273,7 @@ export function resolveAttackOptions(
             damageHrZero: dmg?.hrZero === true,
             hands: wa.hands === 2 ? 2 : wa.hands === 1 ? 1 : undefined,
             category: typeof wa.category === "string" ? wa.category : undefined,
-            range:
-              wa.range === "ranged" || wa.range === "weapon_range_ranged"
-                ? "ranged"
-                : "melee",
+            range: toRange(wa.range),
           });
         }
       }
@@ -411,10 +425,7 @@ export function resolveAttackOptions(
                       ? module.category
                       : undefined,
                   isWeaponModule: true,
-                  range:
-                    module.range === "ranged" || module.range === "Ranged"
-                      ? "ranged"
-                      : "melee",
+                  range: toRange(module.range),
                 });
               };
 
