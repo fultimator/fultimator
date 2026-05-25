@@ -11,6 +11,15 @@ import {
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
 import type { Passive, Behavior, ActorEffect } from "./Effects";
+import type { Hoplosphere } from "../forms/schema/itemSchemas/hoplosphere";
+import type { Mnemosphere } from "../forms/schema/itemSchemas/mnemosphere";
+import type { PlayerPersisted as PlayerPersistedSchemaType } from "../forms/schema/actorSchemas/pc";
+import type {
+  SlotRef as CanonicalSlotRef,
+  EquippedSlots as CanonicalEquippedSlots,
+  VehicleModuleRef as CanonicalVehicleModuleRef,
+  VehicleSlots as CanonicalVehicleSlots,
+} from "../forms/schema/actorSchemas/pc";
 import type {
   Weapon as EquipmentWeapon,
   CustomWeapon as EquipmentCustomWeapon,
@@ -23,72 +32,13 @@ import type {
 
 export type { SlotTier, CustomWeaponCustomization };
 
-export interface Hoplosphere {
-  id: string;
-  fuid?: string;
-  name: string;
-  description: string;
-  book?: string;
-  coagEffects?: Record<string, string>;
-  socketable: "all" | "weapon";
-  requiredSlots: 1 | 2;
-  cost: number;
-  passives?: Passive[];
-}
-
-export interface MnemosphereSkill {
-  fuid?: string;
-  name: string;
-  specialSkill?: string;
-  maxLvl: number;
-  currentLvl: number;
-  passives?: Passive[];
-  behaviors?: Behavior[];
-}
-
-export interface MnemosphereHeroic {
-  fuid?: string;
-  name: string;
-  specialSkill?: string;
-  passives?: Passive[];
-  behaviors?: Behavior[];
-}
-
-export interface MnemosphereSpell {
-  fuid?: string;
-  name: string;
-  class: string;
-  duration: string;
-  isOffensive: boolean;
-  cost: ResourceCost;
-  maxTargets: number;
-  targetDescription: string;
-  accuracy: Accuracy;
-  effect1: string;
-  effect2: string;
-  effect3: string;
-  effect4: string;
-  effect5: string;
-  effect6: string;
-  description: string;
-  special: string[];
-  range: "melee" | "ranged";
-  itemType: "spell";
-  damage?: Damage;
-  spellType?: string;
-  passives?: Passive[];
-  behaviors?: Behavior[];
-}
-
-export interface Mnemosphere {
-  id: string;
-  fuid?: string;
-  class: string;
-  lvl: number;
-  skills: MnemosphereSkill[];
-  heroic: MnemosphereHeroic[];
-  spells: MnemosphereSpell[];
-}
+export type { Hoplosphere } from "../forms/schema/itemSchemas/hoplosphere";
+export type { Mnemosphere } from "../forms/schema/itemSchemas/mnemosphere";
+export type {
+  Skill as MnemosphereSkill,
+  HeroicSkill as MnemosphereHeroic,
+} from "../forms/schema/itemSchemas/class";
+export type { PlayerSpell as MnemosphereSpell } from "../forms/schema/itemSchemas/spells";
 
 export interface Bonds {
   name: string;
@@ -368,6 +318,9 @@ export interface TypePlayer {
   effects?: ActorEffect[];
 }
 
+// Canonical schema-derived player type
+export type PlayerCanonical = PlayerPersistedSchemaType;
+
 export type EquipmentSource =
   | "weapons"
   | "customWeapons"
@@ -411,3 +364,8 @@ export interface VehicleSlots {
   accessory?: VehicleModuleRef | null;
   support?: (VehicleModuleRef | null)[];
 }
+
+export type CanonicalSlotRefType = CanonicalSlotRef;
+export type CanonicalEquippedSlotsType = CanonicalEquippedSlots;
+export type CanonicalVehicleModuleRefType = CanonicalVehicleModuleRef;
+export type CanonicalVehicleSlotsType = CanonicalVehicleSlots;

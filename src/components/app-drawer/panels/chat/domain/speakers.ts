@@ -703,6 +703,9 @@ export function resolveEquipmentSlots(
 ): EquipmentSlot[] {
   if (!doc) return [];
 
+  // NPCs use attacks[]/weaponattacks[] only
+  if (Array.isArray(doc.attacks) || Array.isArray(doc.weaponattacks)) return [];
+
   const player = doc as unknown as TypePlayer;
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);
   const slotConfig: Array<{

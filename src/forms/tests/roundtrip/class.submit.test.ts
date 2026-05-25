@@ -70,13 +70,13 @@ describe("class schema roundtrip", () => {
       skills: [
         {
           fuid: "sk-001",
-          skillName: "Wanderer",
+          name: "Wanderer",
           maxLvl: 5,
           description: "Move fast.",
           specialSkill: "",
         },
         {
-          skillName: "Pathfinder",
+          name: "Pathfinder",
           maxLvl: 3,
           description: "Find paths.",
           specialSkill: "",
@@ -122,9 +122,7 @@ describe("class schema roundtrip", () => {
   it("skill maxLvl out of range fails schema", () => {
     const result = ClassSchema.safeParse({
       ...BASE_CLASS,
-      skills: [
-        { skillName: "Bad", maxLvl: 11, description: "", specialSkill: "" },
-      ],
+      skills: [{ name: "Bad", maxLvl: 11, description: "", specialSkill: "" }],
     });
     expect(result.success).toBe(false);
   });
