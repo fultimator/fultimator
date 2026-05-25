@@ -12,8 +12,7 @@ import {
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
-import NpcSelector from "./NpcSelector";
-import PcSelector from "./PcSelector";
+import { NpcSelector, PcSelector } from "./ActorSelector";
 
 export default function SelectorPanel({
   isMobile,
@@ -27,7 +26,6 @@ export default function SelectorPanel({
   loadingPlayers,
 }) {
   const theme = useTheme();
-  const isDarkMode = theme.palette.mode === "dark";
   const [isExpanded, setIsExpanded] = useState(true);
   const [selectorTab, setSelectorTab] = useState(0);
 

@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import BattleHeader from "../../components/combatSim/BattleHeader";
-import SelectorPanel from "../../components/combatSim/SelectorPanel";
 import PCDetail from "../../components/combatSim/PCDetail";
 import { calcHP, calcMP } from "../../libs/npcs";
 import SelectedActors from "../../components/combatSim/SelectedActors";
@@ -28,6 +27,7 @@ import debounce from "lodash.debounce";
 import { globalConfirm } from "../../utility/globalConfirm";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
+import { useCombatActorSelectStore } from "../../store/combatActorSelectStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
 import InitiativeDialog from "../../components/combatSim/InitiativeDialog";
 import NpcEditModal from "../../components/combatSim/NpcEditModal";
@@ -200,13 +200,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const [selectedPC, setSelectedPC] = useState(null); // Selected PC (for PC Sheet)
   const [npcClicked, setNpcClicked] = useState(null); // Entity clicked for HP/MP change
   const [clickedEntityType, setClickedEntityType] = useState("npc"); // "npc" | "pc"
-  const [npcDrawerOpen, setNpcDrawerOpen] = useState(false); // Selector Drawer open (mobile)
   const [lastSaved, setLastSaved] = useState(null); // Last saved time
   const [lastAutoSaved, setLastAutoSaved] = useState(null); // Last auto-saved time
   const [encounterNotes, setEncounterNotes] = useState([]); // Encounter notes
 
   // ========== UI Interaction States ==========
-  const [npcDetailWidth, setNpcDetailWidth] = useState(30); // NPC detail width (%)
+  const [npcDetailWidth, setNpcDetailWidth] = useState(36); // NPC detail width (%)
   const isResizing = useRef(false); // Resizing flag
   const startX = useRef(0);
   const startWidth = useRef(npcDetailWidth);
@@ -233,6 +232,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const clearEncounterActors = useCombatEncounterStore((s) => s.clearActors);
   const clearTargets = useCombatEncounterStore((s) => s.clearTargets);
   const runtimeActors = useCombatEncounterStore((s) => s.runtimeActors);
+  const setActorSelectPanelData = useCombatActorSelectStore(
+    (s) => s.setPanelData,
+  );
+  const clearActorSelectPanelData = useCombatActorSelectStore(
+    (s) => s.clearPanelData,
+  );
   useEffect(() => {
     setEncounterActors(id, selectedNPCs, selectedPCs);
   }, [id, selectedNPCs, selectedPCs]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -260,9 +265,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const [downloadImage, downloadSnackbar] = useDownloadImage();
 
   // Helper for fetching single NPC
-  const getNpc = async (npcId) => {
-    return db.getDoc(db.doc("npc-personal", npcId));
-  };
+  const getNpc = useCallback(
+    async (npcId) => {
+      return db.getDoc(db.doc("npc-personal", npcId));
+    },
+    [db],
+  );
 
   // Sync NPC selector list whenever the live collection updates
   useEffect(() => {
@@ -438,7 +446,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const addMessage = useChatMessagesStore((s) => s.addMessage);
 
   // Handle Log state
-  const addLog = (message, name, value, status) => {
+  const addLog = useCallback((message, name, value, status) => {
     const newLog = {
       id: Date.now(),
       timestamp: new Date(),
@@ -448,7 +456,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       value3: status,
     };
     setLogs((prev) => [newLog, ...prev]);
-  };
+  }, []);
 
   const clearLogs = () => {
     setLogs([]);
@@ -648,93 +656,127 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   };
 
   // Determine number of turns based on rank
-  const getTurnCount = (rank) => {
+  const getTurnCount = useCallback((rank) => {
     if (rank === "soldier" || rank === "champion1" || !rank) return 1;
     if (rank === "elite") return 2;
     const match = rank.match(/champion(\d)/);
     return match ? parseInt(match[1], 10) : 1;
-  };
+  }, []);
 
   // Handle Select NPC from the list of available NPCs
-  const handleSelectNPC = async (npcId) => {
-    if (selectedNPCs.length < 30) {
-      const npc = await getNpc(npcId); // Fetch full NPC data using getNpc
-      if (!npc) return;
-      const normalizedNpc = applyNpcPostLoadTransforms(npc);
+  const handleSelectNPC = useCallback(
+    async (npcId) => {
+      if (selectedNPCs.length < 30) {
+        const npc = await getNpc(npcId); // Fetch full NPC data using getNpc
+        if (!npc) return;
+        const normalizedNpc = applyNpcPostLoadTransforms(npc);
 
-      // Calculate Ultima value only if the NPC is a villain
-      let ultimaValue = null;
-      if (normalizedNpc.villain === "minor") {
-        ultimaValue = 5;
-      } else if (normalizedNpc.villain === "major") {
-        ultimaValue = 10;
-      } else if (normalizedNpc.villain === "superme") {
-        ultimaValue = 15;
-      }
+        // Calculate Ultima value only if the NPC is a villain
+        let ultimaValue = null;
+        if (normalizedNpc.villain === "minor") {
+          ultimaValue = 5;
+        } else if (normalizedNpc.villain === "major") {
+          ultimaValue = 10;
+        } else if (normalizedNpc.villain === "superme") {
+          ultimaValue = 15;
+        }
 
-      // Create combatStats object and conditionally add ultima
-      const combatStats = {
-        notes: "",
-        currentHp: calcHP(normalizedNpc),
-        currentMp: calcMP(normalizedNpc),
-        turns: new Array(getTurnCount(normalizedNpc.rank)).fill(false),
-        statusEffects: [],
-        combatNotes: "",
-        ...(ultimaValue !== null && { ultima: ultimaValue }), // Only add ultima if it's not null
-      };
+        // Create combatStats object and conditionally add ultima
+        const combatStats = {
+          notes: "",
+          currentHp: calcHP(normalizedNpc),
+          currentMp: calcMP(normalizedNpc),
+          turns: new Array(getTurnCount(normalizedNpc.rank)).fill(false),
+          statusEffects: [],
+          combatNotes: "",
+          ...(ultimaValue !== null && { ultima: ultimaValue }), // Only add ultima if it's not null
+        };
 
-      setSelectedNPCs((prev) => [
-        ...prev,
-        {
-          ...normalizedNpc,
-          id: npcId,
-          sourceDocId: npcId,
-          sourceCollection: "npc-personal",
-          combatId: `${npcId}-${Date.now()}`,
-          combatStats: combatStats,
-        },
-      ]);
+        setSelectedNPCs((prev) => [
+          ...prev,
+          {
+            ...normalizedNpc,
+            id: npcId,
+            sourceDocId: npcId,
+            sourceCollection: "npc-personal",
+            combatId: `${npcId}-${Date.now()}`,
+            combatStats: combatStats,
+          },
+        ]);
 
-      if (logNpcAdded) {
-        // Add log entry to logs array
-        addLog("combat_sim_log_npc_added", normalizedNpc.name);
-      }
-    } else {
-      if (window.electron) {
+        if (logNpcAdded) {
+          // Add log entry to logs array
+          addLog("combat_sim_log_npc_added", normalizedNpc.name);
+        }
+      } else if (window.electron) {
         window.electron.alert(t("combat_sim_too_many_npcs"));
       } else {
         alert(t("combat_sim_too_many_npcs"));
       }
-    }
-  };
+    },
+    [selectedNPCs.length, logNpcAdded, getNpc, getTurnCount, addLog],
+  );
 
   // Handle Select PC from the player list
-  const handleSelectPC = (player) => {
-    if (selectedNPCs.length + selectedPCs.length < 30) {
-      const normalizedPlayer = applyPlayerPostLoadTransforms(player);
-      setSelectedPCs((prev) => [
-        ...prev,
-        {
-          ...normalizedPlayer,
-          id: player.id,
-          sourceDocId: player.id,
-          sourceCollection: "player-personal",
-          combatId: `${player.id}-${Date.now()}`,
-          combatStats: {
-            currentHp: normalizedPlayer.stats?.hp?.max ?? 0,
-            currentMp: normalizedPlayer.stats?.mp?.max ?? 0,
-            turns: [false],
-            statusEffects: [],
-            combatNotes: "",
+  const handleSelectPC = useCallback(
+    (player) => {
+      if (selectedNPCs.length + selectedPCs.length < 30) {
+        const normalizedPlayer = applyPlayerPostLoadTransforms(player);
+        setSelectedPCs((prev) => [
+          ...prev,
+          {
+            ...normalizedPlayer,
+            id: player.id,
+            sourceDocId: player.id,
+            sourceCollection: "player-personal",
+            combatId: `${player.id}-${Date.now()}`,
+            combatStats: {
+              currentHp: normalizedPlayer.stats?.hp?.max ?? 0,
+              currentMp: normalizedPlayer.stats?.mp?.max ?? 0,
+              turns: [false],
+              statusEffects: [],
+              combatNotes: "",
+            },
           },
-        },
-      ]);
+        ]);
 
-      if (logNpcAdded) {
-        addLog("combat_sim_log_npc_added", normalizedPlayer.name);
+        if (logNpcAdded) {
+          addLog("combat_sim_log_npc_added", normalizedPlayer.name);
+        }
       }
+    },
+    [selectedNPCs.length, selectedPCs.length, logNpcAdded, addLog],
+  );
+
+  useEffect(() => {
+    if (isDifferentUser) {
+      clearActorSelectPanelData();
+      return;
     }
-  };
+    setActorSelectPanelData({
+      npcList,
+      playerList,
+      loadingNpcs,
+      loadingPlayers,
+      handleSelectNPC,
+      handleSelectPC,
+    });
+  }, [
+    npcList,
+    playerList,
+    loadingNpcs,
+    loadingPlayers,
+    handleSelectNPC,
+    handleSelectPC,
+    isDifferentUser,
+    clearActorSelectPanelData,
+    setActorSelectPanelData,
+  ]);
+
+  useEffect(
+    () => () => clearActorSelectPanelData(),
+    [clearActorSelectPanelData],
+  );
 
   // Handle Remove PC from the selected PCs list
   const handleRemovePC = async (pcCombatId) => {
@@ -1550,21 +1592,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         addLog={addLog}
       />
 
-      {isMobile && (
-        <SelectorPanel
-          isMobile={isMobile}
-          npcDrawerOpen={npcDrawerOpen}
-          setNpcDrawerOpen={setNpcDrawerOpen}
-          npcList={npcList}
-          handleSelectNPC={handleSelectNPC}
-          playerList={playerList}
-          handleSelectPC={handleSelectPC}
-          loadingNpcs={loadingNpcs}
-          loadingPlayers={loadingPlayers}
-        />
-      )}
-
-      {/* Three Columns: NPC Selector, Selected NPCs, NPC Sheet */}
+      {/* Main Columns: Selected NPCs + NPC/PC Sheet */}
       <Box
         sx={{
           display: "flex",
@@ -1572,20 +1600,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           height: isMobile ? "calc(100vh - 195px)" : "calc(100vh - 157px)",
         }}
       >
-        {/* Selector Panel (NPC + PC tabs) */}
-        {!isMobile && !isDifferentUser && (
-          <SelectorPanel
-            isMobile={isMobile}
-            npcDrawerOpen={npcDrawerOpen}
-            setNpcDrawerOpen={setNpcDrawerOpen}
-            npcList={npcList}
-            handleSelectNPC={handleSelectNPC}
-            playerList={playerList}
-            handleSelectPC={handleSelectPC}
-            loadingNpcs={loadingNpcs}
-            loadingPlayers={loadingPlayers}
-          />
-        )}
         <Box
           sx={{
             flex: 1,

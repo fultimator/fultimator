@@ -8,6 +8,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import {
+  GroupAdd as GroupAddIcon,
   Bookmark as BookmarkIcon,
   ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
   ChevronLeft as ChevronLeftIcon,
@@ -19,12 +20,19 @@ import { ChatPanel } from "./panels/chat";
 import { CustomizerPanel } from "./panels/CustomizerPanel";
 import { SavedThemesPanel } from "./panels/SavedThemesPanel";
 import { useAppDrawerStore, type DrawerTab } from "../../store/appDrawerStore";
+import { useCombatActorSelectStore } from "../../store/combatActorSelectStore";
+import { ActorSelectPanel } from "./panels/ActorSelectPanel";
 
-const TABS: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
+const BASE_TABS: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
   {
     id: "chat",
     label: "Chat",
     icon: <ChatBubbleOutlineIcon fontSize="small" />,
+  },
+  {
+    id: "actorSelect",
+    label: "Actor Select",
+    icon: <GroupAddIcon fontSize="small" />,
   },
   {
     id: "customizer",
@@ -53,6 +61,16 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
   const activeTab = useAppDrawerStore((s) => s.activeTab);
   const setActiveTab = useAppDrawerStore((s) => s.setActiveTab);
   const drawerBottomActions = useAppDrawerStore((s) => s.drawerBottomActions);
+  const actorSelectEnabled = useCombatActorSelectStore((s) => s.enabled);
+  const tabs = BASE_TABS.filter(
+    (tab) => tab.id !== "actorSelect" || actorSelectEnabled,
+  );
+
+  React.useEffect(() => {
+    if (activeTab === "actorSelect" && !actorSelectEnabled) {
+      setActiveTab("chat");
+    }
+  }, [activeTab, actorSelectEnabled, setActiveTab]);
 
   return (
     <Drawer
@@ -160,7 +178,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
 
           <Divider flexItem />
 
-          {TABS.map(({ id, label, icon }) => (
+          {tabs.map(({ id, label, icon }) => (
             <Tooltip key={id} title={label} placement="left">
               <IconButton
                 aria-label={label}
@@ -235,6 +253,9 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
         >
           <Box sx={{ flex: 1, overflowY: "auto" }}>
             {activeTab === "chat" && <ChatPanel />}
+            {activeTab === "actorSelect" && actorSelectEnabled && (
+              <ActorSelectPanel />
+            )}
             {activeTab === "customizer" && <CustomizerPanel />}
             {activeTab === "themes" && <SavedThemesPanel />}
           </Box>
