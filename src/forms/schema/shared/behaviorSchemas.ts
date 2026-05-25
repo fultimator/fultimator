@@ -179,3 +179,16 @@ export const BehaviorSchema = z.object({
   manual: ManualBehaviorSchema.optional(),
   chatOutput: z.object({ text: z.string() }).optional(),
 });
+
+export type EffectChange = z.infer<typeof EffectChangeSchema>;
+export type GrantData = z.infer<typeof GrantDataSchema>;
+export type EffectDuration = z.infer<typeof EffectDurationSchema>;
+export type EffectPredicate = z.infer<typeof EffectPredicateSchema>;
+export type ExprValue = z.infer<typeof ExprValueSchema>;
+export type Passive = z.infer<typeof PassiveSchema>;
+export type AfterEffect = z.infer<typeof AfterEffectSchema>;
+export type AppliesEffect = z.infer<typeof AppliesEffectSchema>;
+export type ActionTrigger = z.infer<typeof ActionTriggerSchema>;
+export type EffectBranch = z.infer<typeof EffectBranchSchema>;
+export type ManualBehavior = z.infer<typeof ManualBehaviorSchema>;
+export type Behavior = z.infer<typeof BehaviorSchema>;
