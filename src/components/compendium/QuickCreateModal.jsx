@@ -195,6 +195,18 @@ import {
   optionalFieldConfig,
   optionalGroupLabels,
 } from "../../forms/rendering/config/itemConfigs/optional";
+import {
+  itemFieldConfig,
+  itemGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/item";
+import {
+  consumableFieldConfig,
+  consumableGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/consumable";
+import {
+  noteFieldConfig,
+  noteGroupLabels,
+} from "../../forms/rendering/config/itemConfigs/note";
 import { createDefaultStateFromFields } from "../../forms/registry/helpers";
 import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
 
@@ -290,6 +302,9 @@ const QUICK_CREATE_TAB_TO_VIEWER_TYPE = {
   shield: "shields",
   accessory: "accessories",
   optional: "optionals",
+  item: "items",
+  consumable: "consumables",
+  note: "notes",
 };
 
 const customWeaponQualityGroups = Object.entries(
@@ -3389,6 +3404,148 @@ function HoplospherePanel() {
   );
 }
 
+// Item panel
+
+function ItemPanel() {
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(itemFieldConfig),
+  );
+  const data = { ...formState, fuid: formState.fuid || undefined };
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={itemFieldConfig}
+            groupLabels={itemGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.item, (item) =>
+                  importIntoSchemaForm(
+                    itemFieldConfig,
+                    setFormState,
+                    item,
+                    null,
+                    {
+                      translate: true,
+                    },
+                  ),
+                ),
+            }}
+          />
+        </Grid>
+      }
+      addButton={
+        <AddToCompendiumButton itemType={REG.item.addItemType} data={data} />
+      }
+      data={data}
+      itemName={data.name || ""}
+      exportDataType={REG.item.exportDataType}
+    />
+  );
+}
+
+// Consumable panel
+
+function ConsumablePanel() {
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(consumableFieldConfig),
+  );
+  const data = { ...formState, fuid: formState.fuid || undefined };
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={consumableFieldConfig}
+            groupLabels={consumableGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.consumable, (item) =>
+                  importIntoSchemaForm(
+                    consumableFieldConfig,
+                    setFormState,
+                    item,
+                    null,
+                    { translate: true },
+                  ),
+                ),
+            }}
+          />
+        </Grid>
+      }
+      addButton={
+        <AddToCompendiumButton
+          itemType={REG.consumable.addItemType}
+          data={data}
+        />
+      }
+      data={data}
+      itemName={data.name || ""}
+      exportDataType={REG.consumable.exportDataType}
+    />
+  );
+}
+
+// Note panel
+
+function NotePanel() {
+  const { openImport } = useQuickCreateImport();
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(noteFieldConfig),
+  );
+  const data = { ...formState, fuid: formState.fuid || undefined };
+  return (
+    <PanelLayout
+      formContent={
+        <Grid container spacing={1}>
+          <SchemaFieldRenderer
+            config={noteFieldConfig}
+            groupLabels={noteGroupLabels}
+            state={formState}
+            onChange={setFormState}
+            surface="edit"
+            cols={2}
+            extraProps={{
+              name: String(formState.name ?? ""),
+              onBrowse: () =>
+                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.note, (item) =>
+                  importIntoSchemaForm(
+                    noteFieldConfig,
+                    setFormState,
+                    item,
+                    null,
+                    {
+                      translate: true,
+                    },
+                  ),
+                ),
+            }}
+          />
+        </Grid>
+      }
+      addButton={
+        <AddToCompendiumButton itemType={REG.note.addItemType} data={data} />
+      }
+      data={data}
+      itemName={data.name || ""}
+      exportDataType={REG.note.exportDataType}
+    />
+  );
+}
+
 const TAB_CONFIG = {
   "npc-attack": { Panel: NpcAttackPanel },
   "npc-spell": { Panel: NpcSpellPanel },
@@ -3406,6 +3563,9 @@ const TAB_CONFIG = {
   shield: { Panel: ShieldPanel },
   accessory: { Panel: AccessoryPanel },
   optional: { Panel: OptionalPanel },
+  item: { Panel: ItemPanel },
+  consumable: { Panel: ConsumablePanel },
+  note: { Panel: NotePanel },
 };
 
 const TABS = QUICK_CREATE_TAB_KEYS.map((key) => ({

@@ -29,6 +29,7 @@ import {
 } from "@mui/icons-material";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 
 function NoteContextMenu({
   note,
@@ -66,7 +67,7 @@ function NoteContextMenu({
               itemType: "note",
               name: note.name,
               tags: [],
-              description: note.effect,
+              description: note.effect || note.description,
             });
             close();
           }}
@@ -126,6 +127,7 @@ export default function EditNotes({ npc, setNpc }) {
   const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingNoteIndex, setPendingNoteIndex] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const onChange = (i, key, value) => {
     setNpc((prev) => {
@@ -138,7 +140,7 @@ export default function EditNotes({ npc, setNpc }) {
   const addNote = () => {
     setNpc((prev) => ({
       ...prev,
-      notes: [...(prev.notes || []), { name: "", effect: "" }],
+      notes: [...(prev.notes || []), { name: "", description: "", effect: "" }],
     }));
   };
 
@@ -177,6 +179,7 @@ export default function EditNotes({ npc, setNpc }) {
         addItem={addNote}
         headerText={t("Notes")}
         icon={Add}
+        openCompendium={() => setModalOpen(true)}
       />
       {npc.notes?.map((note, i) => (
         <Accordion
@@ -214,7 +217,7 @@ export default function EditNotes({ npc, setNpc }) {
                     itemType: "note",
                     name: note.name,
                     tags: [],
-                    description: note.effect,
+                    description: note.effect || note.description,
                   })
                 }
               >
@@ -249,8 +252,17 @@ export default function EditNotes({ npc, setNpc }) {
               <Grid size={12}>
                 <FormControl fullWidth>
                   <CustomTextarea
-                    label={t("Details:")}
-                    value={note.effect}
+                    label={t("Description:")}
+                    value={note.description ?? ""}
+                    onChange={(e) => onChange(i, "description", e.target.value)}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid size={12}>
+                <FormControl fullWidth>
+                  <CustomTextarea
+                    label={t("Effect:")}
+                    value={note.effect ?? ""}
                     onChange={(e) => onChange(i, "effect", e.target.value)}
                   />
                 </FormControl>
@@ -259,6 +271,27 @@ export default function EditNotes({ npc, setNpc }) {
           </AccordionDetails>
         </Accordion>
       ))}
+      <CompendiumViewerModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        context="npc"
+        initialType="note"
+        initialCompendium="personal"
+        onAddItem={(item) => {
+          setNpc((prev) => ({
+            ...prev,
+            notes: [
+              ...(prev.notes || []),
+              {
+                name: item.name ?? "",
+                description: item.description ?? "",
+                effect: item.effect ?? "",
+                fuid: item.fuid,
+              },
+            ],
+          }));
+        }}
+      />
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onClose={() => {

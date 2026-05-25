@@ -70,6 +70,12 @@ import {
   npcSpellTabs,
 } from "../rendering/config/itemConfigs/npcSpell";
 import { classFieldConfig } from "../rendering/config/itemConfigs/class";
+import { itemFieldConfig } from "../rendering/config/itemConfigs/item";
+import { consumableFieldConfig } from "../rendering/config/itemConfigs/consumable";
+import { noteFieldConfig } from "../rendering/config/itemConfigs/note";
+import { ItemSchema } from "../schema/itemSchemas/item";
+import { ConsumableSchema } from "../schema/itemSchemas/consumable";
+import { NoteSchema } from "../schema/itemSchemas/note";
 import { optionalFieldConfig } from "../rendering/config/itemConfigs/optional";
 import { mnemosphereFieldConfig } from "../rendering/config/itemConfigs/mnemosphere";
 import {
@@ -104,6 +110,9 @@ const labelByKey: Record<CompendiumItemType, string> = {
   shield: "Shield",
   accessory: "Accessory",
   optional: "Optional",
+  item: "Item",
+  consumable: "Consumable",
+  note: "Note",
 };
 
 const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
@@ -640,6 +649,39 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
       return null;
     },
   },
+  item: {
+    key: "item",
+    label: labelByKey.item,
+    implementation: "schema-config",
+    addItemType: "item",
+    exportDataType: "items",
+    schema: ItemSchema,
+    fields: itemFieldConfig,
+    defaultState: () => createDefaultStateFromFields(itemFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(ItemSchema),
+  },
+  consumable: {
+    key: "consumable",
+    label: labelByKey.consumable,
+    implementation: "schema-config",
+    addItemType: "consumable",
+    exportDataType: "consumables",
+    schema: ConsumableSchema,
+    fields: consumableFieldConfig,
+    defaultState: () => createDefaultStateFromFields(consumableFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(ConsumableSchema),
+  },
+  note: {
+    key: "note",
+    label: labelByKey.note,
+    implementation: "schema-config",
+    addItemType: "note",
+    exportDataType: "notes",
+    schema: NoteSchema,
+    fields: noteFieldConfig,
+    defaultState: () => createDefaultStateFromFields(noteFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(NoteSchema),
+  },
 };
 
 const exportDataTypeByKey: Record<CompendiumItemType, string> = {
@@ -659,6 +701,9 @@ const exportDataTypeByKey: Record<CompendiumItemType, string> = {
   shield: "shields",
   accessory: "accessories",
   optional: "optionals",
+  item: "items",
+  consumable: "consumables",
+  note: "notes",
 };
 
 export const itemFormRegistry: Record<CompendiumItemType, ItemFormDefinition> =

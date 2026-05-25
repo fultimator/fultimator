@@ -4,6 +4,7 @@ export const NoteSchema = z.object({
   fuid: z.string().optional(),
   name: z.string(),
   description: z.string().default(""),
+  effect: z.string().optional(),
 });
 
 export type Note = z.infer<typeof NoteSchema>;

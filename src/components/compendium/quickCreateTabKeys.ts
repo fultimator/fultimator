@@ -17,6 +17,9 @@ export const QUICK_CREATE_TAB_KEYS = [
   "shield",
   "accessory",
   "optional",
+  "item",
+  "consumable",
+  "note",
 ] as const satisfies readonly CompendiumItemType[];
 
 export type QuickCreateTabKey = (typeof QUICK_CREATE_TAB_KEYS)[number];
@@ -38,4 +41,7 @@ export const VIEWER_TYPE_TO_TAB_KEY = {
   shields: "shield",
   accessories: "accessory",
   optionals: "optional",
+  items: "item",
+  consumables: "consumable",
+  notes: "note",
 } as const;

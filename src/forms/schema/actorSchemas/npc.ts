@@ -253,7 +253,9 @@ export const NpcRareGearSchema = z.object({
 });
 
 export const NpcNotesSchema = z.object({
+  fuid: z.string().optional(),
   name: z.string(),
+  description: z.string().optional(),
   effect: z.string().optional(),
 });
 
