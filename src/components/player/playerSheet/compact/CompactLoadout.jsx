@@ -12,7 +12,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Grid,
   List,
   ListItem,
   ListItemButton,
@@ -30,7 +29,7 @@ import CasinoIcon from "@mui/icons-material/Casino";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
-import { SwapHoriz } from "@mui/icons-material";
+import { SwapHoriz, Message } from "@mui/icons-material";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import {
@@ -49,7 +48,16 @@ import {
 } from "../../equipment/slots/loadoutSelectors";
 import { useLoadoutStore } from "../../../../store/playerLoadoutStore";
 import { calculateAttribute } from "../../common/playerCalculations";
-import attributes from "../../../../libs/attributes";
+import {
+  prepareAccuracyCheck,
+  rollAccuracyCheck,
+  processAccuracyCheck,
+  buildAccuracyCheckMessage,
+} from "../../../app-drawer/panels/chat/domain/accuracy-checks";
+import {
+  sendRollMessage,
+  sendDisplayMessage,
+} from "../../../../hooks/useRollToChat";
 import SlotPickerDialog from "../../equipment/slots/SlotPickerDialog";
 import VehicleEnterDialog from "../../equipment/slots/VehicleEnterDialog";
 import SpellPilotVehiclesModal from "../../spells/SpellPilotVehiclesModal";
@@ -148,7 +156,6 @@ export default function CompactLoadout({
     useState(false);
   const [supportPickerOpen, setSupportPickerOpen] = useState(false);
   const [equipOpen, setEquipOpen] = useState(false);
-  const [rollDialog, setRollDialog] = useState(null);
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
   const [vehicleEnterOpen, setVehicleEnterOpen] = useState(false);
   const [createItemType, setCreateItemType] = useState(null);
@@ -230,18 +237,28 @@ export default function CompactLoadout({
         : resolveEffectiveSlot(player, slot);
     if (!resolved) return;
 
-    let att1, att2, prec, damage, type;
+    let weaponOption;
     if (resolved.kind === "vehicleModule") {
       const m = resolved.module;
       if (m.type !== "pilot_module_weapon" || m.isShield) return;
-      const acc = m.accuracy;
-      const dmg = m.damage;
-      att1 = acc?.attr1;
-      att2 = acc?.attr2;
-      if (!att1 || !att2) return;
-      prec = acc?.value ?? 0;
-      damage = dmg?.value ?? 0;
-      type = dmg?.type ?? "";
+      const acc = m.accuracy ?? {};
+      const dmg = m.damage ?? {};
+      if (!acc.attr1 || !acc.attr2) return;
+      weaponOption = {
+        arg: m.customName || m.name || slot,
+        name: m.customName || m.name || slot,
+        attr1: acc.attr1,
+        attr2: acc.attr2,
+        accuracyBonus: acc.value ?? 0,
+        baseDamage: dmg.value ?? 0,
+        damageType: dmg.type ?? "physical",
+        accuracyDefense: acc.defense ?? "def",
+        isWeaponModule: true,
+        range:
+          m.range === "ranged" || m.range === "weapon_range_ranged"
+            ? "ranged"
+            : "melee",
+      };
     } else {
       const item = resolved.item;
       const isSecondary = item.activeForm === "secondary";
@@ -251,34 +268,34 @@ export default function CompactLoadout({
       const dmg = isSecondary
         ? (item.secondDamage ?? item.damage)
         : item.damage;
-      att1 = acc?.attr1;
-      att2 = acc?.attr2;
-      if (!att1 || !att2) return;
-      prec = acc?.value ?? 0;
-      damage = dmg?.value ?? 0;
-      type = dmg?.type ?? "";
+      if (!acc?.attr1 || !acc?.attr2) return;
+      weaponOption = {
+        arg: item.name || slot,
+        name: item.name || slot,
+        attr1: acc.attr1,
+        attr2: acc.attr2,
+        accuracyBonus: acc.value ?? 0,
+        baseDamage: dmg?.value ?? 0,
+        damageType: dmg?.type ?? "physical",
+        accuracyDefense: acc.defense ?? "def",
+        hands: item.hands,
+        category: item.category,
+        range:
+          item.range === "ranged" || item.range === "weapon_range_ranged"
+            ? "ranged"
+            : "melee",
+      };
     }
 
-    const die1 = getAttrDie(att1);
-    const die2 = getAttrDie(att2);
-    const r1 = Math.floor(Math.random() * die1) + 1;
-    const r2 = Math.floor(Math.random() * die2) + 1;
-    setRollDialog({
-      slot,
-      att1,
-      att2,
-      die1,
-      die2,
-      r1,
-      r2,
-      prec,
-      damage,
-      type,
-      accuracy: r1 + r2 + prec,
-      damageRoll: Math.max(r1, r2) + damage,
-      isCritSuccess: r1 >= 6 && r2 >= 6 && r1 === r2,
-      isCritFail: r1 === 1 && r2 === 1,
-    });
+    const speaker = player?.info?.name || player?.name || "";
+    const intent = prepareAccuracyCheck(weaponOption);
+    const dieSizes = {
+      primary: getAttrDie(intent.primary),
+      secondary: getAttrDie(intent.secondary),
+    };
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(intent, rolls, dieSizes, speaker);
+    sendRollMessage(buildAccuracyCheckMessage(result));
   };
 
   // Swap (Transforming weapon)
@@ -378,7 +395,8 @@ export default function CompactLoadout({
         <Box
           sx={{
             background: theme.primary,
-            px: 0.75,
+            pl: "46px",
+            pr: 0.75,
             py: 0.35,
             display: "flex",
             alignItems: "center",
@@ -451,6 +469,8 @@ export default function CompactLoadout({
             const showSwap =
               (slot === "mainHand" || slot === "offHand") &&
               hasTransforming(resolved);
+            const showChat =
+              !isEmpty && !locked && !isVehicle && slot !== "mainHand";
 
             const name = locked
               ? slot === "offHand"
@@ -551,7 +571,7 @@ export default function CompactLoadout({
                 >
                   {highlightMatch(name, searchQuery)}
                 </Typography>
-                {(showSwap || showRoll) && (
+                {(showSwap || showRoll || showChat) && (
                   <Box sx={{ display: "flex", flexShrink: 0, ml: 0.25 }}>
                     {showSwap && (
                       <Tooltip title={t("weapon_customization_swap_form")}>
@@ -561,20 +581,7 @@ export default function CompactLoadout({
                             e.stopPropagation();
                             handleSwapSlot(slot);
                           }}
-                          sx={{
-                            p: 0.25,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            color: "text.secondary",
-                            backgroundColor: "action.selected",
-                            backgroundImage: actionGradient,
-                            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.30)",
-                            "&:hover": {
-                              backgroundColor: "action.selected",
-                              backgroundImage: actionGradient,
-                              color: "text.primary",
-                            },
-                          }}
+                          sx={{ p: 0.25 }}
                         >
                           <SwapHoriz sx={{ fontSize: "0.85rem" }} />
                         </IconButton>
@@ -588,22 +595,57 @@ export default function CompactLoadout({
                             e.stopPropagation();
                             handleRollSlot(slot);
                           }}
-                          sx={{
-                            p: 0.25,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            color: "text.secondary",
-                            backgroundColor: "action.selected",
-                            backgroundImage: actionGradient,
-                            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.30)",
-                            "&:hover": {
-                              backgroundColor: "action.selected",
-                              backgroundImage: actionGradient,
-                              color: "text.primary",
-                            },
-                          }}
+                          sx={{ p: 0.25 }}
                         >
                           <CasinoIcon sx={{ fontSize: "0.85rem" }} />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {showChat && (
+                      <Tooltip title={t("Send to Chat")}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const item = resolved.item;
+                            const tags = [];
+                            if (slot === "armor") {
+                              const def = item.def ?? 0;
+                              const mdef = item.mdef ?? 0;
+                              const init = item.init ?? 0;
+                              tags.push(
+                                `DEF: ${item.martial ? def : def === 0 ? t("DEX die") : `${t("DEX die")} + ${def}`}`,
+                              );
+                              tags.push(
+                                `M.DEF: ${mdef === 0 ? t("INS die") : `${t("INS die")} + ${mdef}`}`,
+                              );
+                              if (init !== 0)
+                                tags.push(`Init ${init > 0 ? "+" : ""}${init}`);
+                            } else if (slot === "offHand") {
+                              const source =
+                                player.equippedSlots?.offHand?.source;
+                              if (source === "shields") {
+                                const def = item.def ?? 0;
+                                const mdef = item.mdef ?? 0;
+                                const init = item.init ?? 0;
+                                tags.push(`DEF +${def}`);
+                                tags.push(`M.DEF +${mdef}`);
+                                if (init !== 0)
+                                  tags.push(
+                                    `Init ${init > 0 ? "+" : ""}${init}`,
+                                  );
+                              }
+                            }
+                            sendDisplayMessage("item", item.name, {
+                              speaker: player?.info?.name || player?.name || "",
+                              tags,
+                              description:
+                                item.quality || item.description || undefined,
+                            });
+                          }}
+                          sx={{ p: 0.25 }}
+                        >
+                          <Message sx={{ fontSize: "0.85rem" }} />
                         </IconButton>
                       </Tooltip>
                     )}
@@ -937,106 +979,6 @@ export default function CompactLoadout({
             </Button>
           </DialogActions>
         </Dialog>
-        {/* Roll result dialog */}
-        {rollDialog && (
-          <Dialog
-            open
-            onClose={() => setRollDialog(null)}
-            maxWidth="xs"
-            fullWidth
-            slotProps={{
-              paper: { sx: { width: { xs: "90%", md: "30%" } } },
-            }}
-          >
-            <DialogTitle
-              variant="h3"
-              sx={{
-                backgroundColor: rollDialog.isCritFail
-                  ? "#bb2124"
-                  : rollDialog.isCritSuccess
-                    ? "#22bb33"
-                    : "#aaaaaa",
-              }}
-            >
-              {rollDialog.isCritFail
-                ? t("Critical Failure!")
-                : rollDialog.isCritSuccess
-                  ? t("Critical Success!")
-                  : t("Result")}
-            </DialogTitle>
-            <DialogContent sx={{ mt: 1 }}>
-              <Grid container spacing={2} sx={{ textAlign: "center", pt: 1 }}>
-                <Grid size={6}>
-                  <Typography
-                    variant="h3"
-                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                  >
-                    {t("Accuracy")}
-                  </Typography>
-                  <Typography variant="h1">{rollDialog.accuracy}</Typography>
-                </Grid>
-                <Grid size={6}>
-                  <Typography
-                    variant="h3"
-                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                  >
-                    {t("Damage")}
-                  </Typography>
-                  <Typography variant="h1">{rollDialog.damageRoll}</Typography>
-                  {rollDialog.type && (
-                    <Typography
-                      variant="h6"
-                      sx={{ fontWeight: "bold", textTransform: "uppercase" }}
-                    >
-                      {t(rollDialog.type)}
-                    </Typography>
-                  )}
-                </Grid>
-                <Grid sx={{ mt: 1 }} size={12}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "text.secondary",
-                    }}
-                  >
-                    {rollDialog.r1} [
-                    {attributes[rollDialog.att1]?.shortcaps ?? rollDialog.att1}]
-                    {" + "}
-                    {rollDialog.r2} [
-                    {attributes[rollDialog.att2]?.shortcaps ?? rollDialog.att2}]
-                    {rollDialog.prec !== 0 ? ` + ${rollDialog.prec}` : ""}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "text.secondary",
-                    }}
-                  >
-                    {t("Damage")}: {Math.max(rollDialog.r1, rollDialog.r2)} +{" "}
-                    {rollDialog.damage}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => setRollDialog(null)}
-                color="secondary"
-                variant="contained"
-              >
-                {t("Close")}
-              </Button>
-              <Button
-                onClick={() => handleRollSlot(rollDialog.slot)}
-                color="primary"
-                variant="contained"
-                autoFocus
-              >
-                {t("Re-roll")}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        )}
         {/* Vehicle swap modal */}
         {vehicleModalOpen && pilotSpellInfo && (
           <SpellPilotVehiclesModal

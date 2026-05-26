@@ -1,14 +1,8 @@
 import React, { useState, useMemo } from "react";
 import {
   Alert,
-  Grid,
   Typography,
   Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   Box,
   Collapse,
   IconButton,
@@ -52,6 +46,7 @@ import {
   Add,
   Search as SearchIcon,
   Error as ErrorIcon,
+  Message,
 } from "@mui/icons-material";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { calculateAttribute } from "../../common/playerCalculations";
@@ -61,6 +56,16 @@ import {
 } from "../../equipment/slots/equipmentSlots";
 import { clearSlotAction } from "../../equipment/slots/loadoutActions";
 import { normalizeWeaponLike } from "../../../../libs/weaponNormalization";
+import {
+  prepareAccuracyCheck,
+  rollAccuracyCheck,
+  processAccuracyCheck,
+  buildAccuracyCheckMessage,
+} from "../../../app-drawer/panels/chat/domain/accuracy-checks";
+import {
+  sendRollMessage,
+  sendDisplayMessage,
+} from "../../../../hooks/useRollToChat";
 
 // Styled Components
 const StyledTableCellHeader = styled(TableCell)({
@@ -155,10 +160,6 @@ export default function PlayerEquipment({
   const theme = useCustomTheme();
   const { openRows, toggleRow } = usePlayerSheetCompactStore();
 
-  const [dialogMessage, setDialogMessage] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogSeverity, setDialogSeverity] = useState("info");
-  const [currentWeapon, setCurrentWeapon] = useState(null);
   const [compendiumType, setCompendiumType] = useState(null);
   const isTechnospheres =
     player?.settings?.optionalRules?.technospheres ?? false;
@@ -764,69 +765,37 @@ export default function PlayerEquipment({
   };
 
   const handleDiceRoll = (weapon) => {
-    setCurrentWeapon(weapon);
     const attr1 = normalizeAttrKey(weapon.accuracy?.attr1);
     const attr2 = normalizeAttrKey(weapon.accuracy?.attr2);
-    const weaponPrec = weapon.accuracy?.value ?? 0;
-    const weaponDamage = weapon.damage?.value ?? 0;
-    const weaponType = weapon.damage?.type ?? "physical";
-    const v1 = attributeMap[attr1] ?? currDex,
-      v2 = attributeMap[attr2] ?? currMight;
-    const d1 = Math.floor(Math.random() * v1) + 1,
-      d2 = Math.floor(Math.random() * v2) + 1;
-    const isCritFail = d1 === 1 && d2 === 1,
-      isCritSucc = d1 >= 6 && d2 >= 6 && d1 === d2;
-    const acc =
-      d1 +
-      d2 +
-      weaponPrec +
-      (weapon.melee ? precMeleeModifier : precRangedModifier);
-    const dmg =
-      Math.max(d1, d2) +
-      weaponDamage +
-      (weapon.melee ? damageMeleeModifier : damageRangedModifier);
+    const isRanged = !weapon.melee;
+    const precModifier = isRanged ? precRangedModifier : precMeleeModifier;
+    const damageModifier = isRanged
+      ? damageRangedModifier
+      : damageMeleeModifier;
 
-    const content = (
-      <Grid container spacing={2} sx={{ textAlign: "center" }}>
-        <Grid size={6}>
-          <Typography variant="h3">{t("Accuracy")}</Typography>
-          <Typography variant="h1">{acc}</Typography>
-        </Grid>
-        <Grid size={6}>
-          <Typography variant="h3">{t("Damage")}</Typography>
-          <Typography variant="h1">{dmg}</Typography>
-          <Typography variant="h6">{t(weaponType)}</Typography>
-        </Grid>
-        <Grid sx={{ mt: 2 }} size={12}>
-          <Typography>{`${d1} [${attributes[attr1]?.shortcaps ?? "DEX"}] + ${d2} [${attributes[attr2]?.shortcaps ?? "MIG"}] ${weaponPrec !== 0 ? (weaponPrec > 0 ? "+" : "") + weaponPrec : ""} ${weapon.melee ? (precMeleeModifier !== 0 ? (precMeleeModifier > 0 ? "+" : "") + precMeleeModifier : "") : precRangedModifier !== 0 ? (precRangedModifier > 0 ? "+" : "") + precRangedModifier : ""}`}</Typography>
-          <Typography sx={{ fontWeight: "bold" }}>
-            {t("Damage")}:{" "}
-            {`max(${d1}, ${d2}) + ${weaponDamage} ${weapon.melee ? (damageMeleeModifier !== 0 ? (damageMeleeModifier > 0 ? "+" : "") + damageMeleeModifier : "") : damageRangedModifier !== 0 ? (damageRangedModifier > 0 ? "+" : "") + damageRangedModifier : ""}`}
-          </Typography>
-        </Grid>
-      </Grid>
-    );
-    if (isCritFail) {
-      setDialogSeverity("error");
-      setDialogMessage(
-        <>
-          <Typography variant="h1">{t("Critical Failure")}!</Typography>
-          {content}
-        </>,
-      );
-    } else if (isCritSucc) {
-      setDialogSeverity("success");
-      setDialogMessage(
-        <>
-          <Typography variant="h1">{t("Critical Success")}!</Typography>
-          {content}
-        </>,
-      );
-    } else {
-      setDialogSeverity("info");
-      setDialogMessage(content);
-    }
-    setDialogOpen(true);
+    const weaponOption = {
+      arg: weapon.name || "",
+      name: weapon.name || "",
+      attr1,
+      attr2,
+      accuracyBonus: (weapon.accuracy?.value ?? 0) + precModifier,
+      baseDamage: (weapon.damage?.value ?? 0) + damageModifier,
+      damageType: weapon.damage?.type ?? "physical",
+      accuracyDefense: weapon.accuracy?.defense ?? "def",
+      hands: weapon.hands,
+      category: weapon.category,
+      range: isRanged ? "ranged" : "melee",
+    };
+
+    const speaker = player?.info?.name || player?.name || "";
+    const intent = prepareAccuracyCheck(weaponOption);
+    const dieSizes = {
+      primary: attributeMap[attr1] ?? currDex,
+      secondary: attributeMap[attr2] ?? currMight,
+    };
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(intent, rolls, dieSizes, speaker);
+    sendRollMessage(buildAccuracyCheckMessage(result));
   };
 
   const handleEditItem = (item) => {
@@ -895,7 +864,7 @@ export default function PlayerEquipment({
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       {groupedItems.map((group) => (
         <TableContainer key={group.key} component={Paper} sx={{ mb: 1 }}>
-          <Table size="small" sx={{ width: "100%" }}>
+          <Table size="small" sx={{ width: "100%", tableLayout: "fixed" }}>
             <TableHead>
               <TableRow
                 sx={{
@@ -1106,34 +1075,6 @@ export default function PlayerEquipment({
           )}
         </Alert>
       </Snackbar>
-      <Dialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        slotProps={{
-          paper: { sx: { width: { xs: "90%", md: "30%" } } },
-        }}
-      >
-        <DialogTitle
-          variant="h3"
-          sx={{
-            backgroundColor:
-              dialogSeverity === "error"
-                ? "#bb2124"
-                : dialogSeverity === "success"
-                  ? "#22bb33"
-                  : "#aaaaaa",
-          }}
-        >
-          {t("Result")}
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>{dialogMessage}</DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>{t("Close")}</Button>
-          <Button onClick={() => handleDiceRoll(currentWeapon)}>
-            {t("Re-roll")}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }
@@ -1242,17 +1183,33 @@ function EquipmentRow({
       return (
         <>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
-            <Typography sx={{ textAlign: "center" }}>
+            <Typography
+              sx={{
+                textAlign: "center",
+                fontSize: "0.72rem",
+                lineHeight: 1.2,
+                wordBreak: "break-word",
+              }}
+            >
               <OpenBracket />
-              {`${attributes[attr1]?.shortcaps ?? "DEX"} + ${attributes[attr2]?.shortcaps ?? "MIG"}`}
+              {`${attributes[attr1]?.shortcaps ?? "DEX"}+${attributes[attr2]?.shortcaps ?? "MIG"}`}
               <CloseBracket />
               {prec !== 0 ? (prec > 0 ? "+" : "") + prec : ""}
             </Typography>
           </StyledTableCell>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
-            <Typography sx={{ textAlign: "center" }}>
+            <Typography
+              sx={{
+                textAlign: "center",
+                fontSize: "0.72rem",
+                lineHeight: 1.2,
+                wordBreak: "break-word",
+              }}
+            >
               <OpenBracket />
-              {t("HR")} {damageValue >= 0 ? "+" : ""} {damageValue}
+              {t("HR")}
+              {damageValue >= 0 ? "+" : ""}
+              {damageValue}
               <CloseBracket />
               {types[damageType]?.long ?? types.physical.long}
             </Typography>
@@ -1264,8 +1221,14 @@ function EquipmentRow({
       return (
         <>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
-            <Typography sx={{ textAlign: "center" }}>
-              {/* <Box component="span" sx={{ display: { xs: 'none', md: 'inline' }, mr: 0.5 }}>{t("DEF")}:</Box> */}
+            <Typography
+              sx={{
+                textAlign: "center",
+                fontSize: "0.72rem",
+                lineHeight: 1.2,
+                wordBreak: "break-word",
+              }}
+            >
               {item.equipType === "shield"
                 ? `+${item.def + (item.defModifier || 0)}`
                 : item.martial
@@ -1276,8 +1239,14 @@ function EquipmentRow({
             </Typography>
           </StyledTableCell>
           <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
-            <Typography sx={{ textAlign: "center" }}>
-              {/* <Box component="span" sx={{ display: { xs: 'none', md: 'inline' }, mr: 0.5 }}>{t("M.DEF")}:</Box> */}
+            <Typography
+              sx={{
+                textAlign: "center",
+                fontSize: "0.72rem",
+                lineHeight: 1.2,
+                wordBreak: "break-word",
+              }}
+            >
               {item.equipType === "shield"
                 ? `+${item.mdef + (item.mDefModifier || 0)}`
                 : item.mdef + (item.mDefModifier || 0) === 0
@@ -1292,7 +1261,7 @@ function EquipmentRow({
       <>
         <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }}>
           <Typography
-            sx={{ textAlign: "center" }}
+            sx={{ textAlign: "center", fontSize: "0.72rem", lineHeight: 1.2 }}
           >{`${item.cost}z`}</Typography>
         </StyledTableCell>
         <StyledTableCell sx={{ width: { xs: 62, sm: 92 } }} />
@@ -1430,6 +1399,47 @@ function EquipmentRow({
                 </IconButton>
               </>
             )}
+            {item.equipType !== "weapon" &&
+              item.equipType !== "custom-weapon" && (
+                <Tooltip title={t("Send to Chat")} arrow>
+                  <IconButton
+                    size="small"
+                    sx={{ p: 0.25 }}
+                    onClick={() => {
+                      const tags = [];
+                      if (item.equipType === "armor") {
+                        const def = item.def + (item.defModifier || 0);
+                        const mdef = item.mdef + (item.mDefModifier || 0);
+                        const init = item.init + (item.initModifier || 0);
+                        tags.push(
+                          `DEF: ${item.martial ? def : def === 0 ? t("DEX die") : `${t("DEX die")} + ${def}`}`,
+                        );
+                        tags.push(
+                          `M.DEF: ${mdef === 0 ? t("INS die") : `${t("INS die")} + ${mdef}`}`,
+                        );
+                        if (init !== 0)
+                          tags.push(`Init ${init > 0 ? "+" : ""}${init}`);
+                      } else if (item.equipType === "shield") {
+                        const def = item.def + (item.defModifier || 0);
+                        const mdef = item.mdef + (item.mDefModifier || 0);
+                        const init = item.init + (item.initModifier || 0);
+                        tags.push(`DEF +${def}`);
+                        tags.push(`M.DEF +${mdef}`);
+                        if (init !== 0)
+                          tags.push(`Init ${init > 0 ? "+" : ""}${init}`);
+                      }
+                      sendDisplayMessage("item", t(item.name), {
+                        speaker: player?.info?.name || player?.name || "",
+                        tags,
+                        description:
+                          item.quality || item.description || undefined,
+                      });
+                    }}
+                  >
+                    <Message sx={{ fontSize: "1.1rem" }} />
+                  </IconButton>
+                </Tooltip>
+              )}
           </Box>
         </StyledTableCell>
       </TableRow>

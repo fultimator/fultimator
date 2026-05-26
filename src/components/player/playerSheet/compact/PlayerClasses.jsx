@@ -27,6 +27,7 @@ import {
   Remove,
   Edit,
   Search,
+  Message,
 } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import ReactMarkdown from "react-markdown";
@@ -35,6 +36,7 @@ import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
+import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
 import {
   getSlottedMnemospheres,
   getMnemosphereSkillDescription,
@@ -916,20 +918,55 @@ export default function PlayerClasses({
                                                   textAlign: "right",
                                                 }}
                                               >
-                                                {isEditMode && onEditSkill && (
-                                                  <IconButton
-                                                    size="small"
-                                                    onClick={() =>
-                                                      onEditSkill(
-                                                        classIdx,
-                                                        originalSkillIdx,
-                                                      )
-                                                    }
-                                                    sx={{ p: 0.25 }}
+                                                <Box
+                                                  sx={{
+                                                    display: "flex",
+                                                    justifyContent: "flex-end",
+                                                    alignItems: "center",
+                                                  }}
+                                                >
+                                                  {isEditMode &&
+                                                    onEditSkill && (
+                                                      <IconButton
+                                                        size="small"
+                                                        onClick={() =>
+                                                          onEditSkill(
+                                                            classIdx,
+                                                            originalSkillIdx,
+                                                          )
+                                                        }
+                                                        sx={{ p: 0.25 }}
+                                                      >
+                                                        <Edit fontSize="small" />
+                                                      </IconButton>
+                                                    )}
+                                                  <Tooltip
+                                                    title={t("Send to Chat")}
                                                   >
-                                                    <Edit fontSize="small" />
-                                                  </IconButton>
-                                                )}
+                                                    <IconButton
+                                                      size="small"
+                                                      sx={{ p: 0.25 }}
+                                                      onClick={() =>
+                                                        sendDisplayMessage(
+                                                          "skill",
+                                                          t(skill.skillName),
+                                                          {
+                                                            speaker:
+                                                              player?.info
+                                                                ?.name ||
+                                                              player?.name ||
+                                                              "",
+                                                            description:
+                                                              translatedDescription ||
+                                                              undefined,
+                                                          },
+                                                        )
+                                                      }
+                                                    >
+                                                      <Message fontSize="small" />
+                                                    </IconButton>
+                                                  </Tooltip>
+                                                </Box>
                                               </StyledTableCell>
                                             </TableRow>
                                             <TableRow>
@@ -1046,18 +1083,58 @@ export default function PlayerClasses({
                                               textAlign: "right",
                                             }}
                                           >
-                                            {isEditMode && setPlayer && (
-                                              <IconButton
-                                                size="small"
-                                                onClick={() =>
-                                                  setHeroicPickerClassIdx(
-                                                    classIdx,
-                                                  )
-                                                }
-                                              >
-                                                <Search fontSize="small" />
-                                              </IconButton>
-                                            )}
+                                            <Box
+                                              sx={{
+                                                display: "flex",
+                                                justifyContent: "flex-end",
+                                                alignItems: "center",
+                                              }}
+                                            >
+                                              {isEditMode && setPlayer && (
+                                                <IconButton
+                                                  size="small"
+                                                  onClick={() =>
+                                                    setHeroicPickerClassIdx(
+                                                      classIdx,
+                                                    )
+                                                  }
+                                                >
+                                                  <Search fontSize="small" />
+                                                </IconButton>
+                                              )}
+                                              {cls.heroic?.name && (
+                                                <Tooltip
+                                                  title={t("Send to Chat")}
+                                                >
+                                                  <IconButton
+                                                    size="small"
+                                                    sx={{ p: 0.25 }}
+                                                    onClick={() =>
+                                                      sendDisplayMessage(
+                                                        "heroic skill",
+                                                        t(cls.heroic.name),
+                                                        {
+                                                          speaker:
+                                                            player?.info
+                                                              ?.name ||
+                                                            player?.name ||
+                                                            "",
+                                                          description: cls
+                                                            .heroic.description
+                                                            ? t(
+                                                                cls.heroic
+                                                                  .description,
+                                                              )
+                                                            : undefined,
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <Message fontSize="small" />
+                                                  </IconButton>
+                                                </Tooltip>
+                                              )}
+                                            </Box>
                                           </StyledTableCell>
                                         </TableRow>
                                         <TableRow>
@@ -1169,20 +1246,57 @@ export default function PlayerClasses({
                                                 textAlign: "right",
                                               }}
                                             >
-                                              {isEditMode && onEditSpell && (
-                                                <IconButton
-                                                  size="small"
-                                                  onClick={() =>
-                                                    onEditSpell(
-                                                      classIdx,
-                                                      spellIdx,
-                                                      spell,
-                                                    )
-                                                  }
+                                              <Box
+                                                sx={{
+                                                  display: "flex",
+                                                  justifyContent: "flex-end",
+                                                  alignItems: "center",
+                                                }}
+                                              >
+                                                {isEditMode && onEditSpell && (
+                                                  <IconButton
+                                                    size="small"
+                                                    onClick={() =>
+                                                      onEditSpell(
+                                                        classIdx,
+                                                        spellIdx,
+                                                        spell,
+                                                      )
+                                                    }
+                                                  >
+                                                    <Edit fontSize="small" />
+                                                  </IconButton>
+                                                )}
+                                                <Tooltip
+                                                  title={t("Send to Chat")}
                                                 >
-                                                  <Edit fontSize="small" />
-                                                </IconButton>
-                                              )}
+                                                  <IconButton
+                                                    size="small"
+                                                    sx={{ p: 0.25 }}
+                                                    onClick={() =>
+                                                      sendDisplayMessage(
+                                                        "spell",
+                                                        getSpellName(spell, t),
+                                                        {
+                                                          speaker:
+                                                            player?.info
+                                                              ?.name ||
+                                                            player?.name ||
+                                                            "",
+                                                          description:
+                                                            spell.description
+                                                              ? t(
+                                                                  spell.description,
+                                                                )
+                                                              : undefined,
+                                                        },
+                                                      )
+                                                    }
+                                                  >
+                                                    <Message fontSize="small" />
+                                                  </IconButton>
+                                                </Tooltip>
+                                              </Box>
                                             </StyledTableCell>
                                           </TableRow>
                                           <TableRow>

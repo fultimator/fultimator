@@ -23,6 +23,7 @@ import {
   Edit,
   Add,
   Search,
+  Casino,
 } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { useTranslate } from "../../../../translation/translate";
@@ -42,6 +43,14 @@ import SpellTherioform from "./spells/SpellTherioform";
 import SpellVehicle from "./spells/SpellVehicle";
 import SpellDeck from "./spells/SpellDeck";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import { calculateAttribute } from "../../common/playerCalculations";
+import {
+  prepareMagicCheck,
+  rollMagicCheck,
+  processMagicCheck,
+  buildMagicCheckMessage,
+} from "../../../app-drawer/panels/chat/domain/magic-checks";
+import { sendRollMessage } from "../../../../hooks/useRollToChat";
 import UnifiedSpellModal from "../../spells/modals/UnifiedSpellModal";
 import DefaultSpellSection from "../../spells/sections/DefaultSpellSection";
 import ArcanistGeneralSection from "../../spells/sections/ArcanistGeneralSection";
@@ -1157,6 +1166,61 @@ export default function PlayerSpellsFull({
     );
   };
 
+  const getAttrDie = (attr) => {
+    const keyMap = {
+      dex: "dexterity",
+      ins: "insight",
+      mig: "might",
+      wlp: "willpower",
+    };
+    const full = keyMap[attr] ?? attr;
+    const cfgMap = {
+      dexterity: [["slow", "enraged"], ["dexUp"]],
+      insight: [["dazed", "enraged"], ["insUp"]],
+      might: [["weak", "poisoned"], ["migUp"]],
+      willpower: [["shaken", "poisoned"], ["wlpUp"]],
+    };
+    const [neg, pos] = cfgMap[full] ?? [[], []];
+    return calculateAttribute(
+      player,
+      player?.attributes?.[full]?.base ?? 8,
+      neg,
+      pos,
+      6,
+      12,
+    );
+  };
+
+  const handleRollSpell = (spell) => {
+    const isOffensive = spell.isOffensive === true;
+    if (!isOffensive) return;
+    const acc = spell.accuracy ?? {};
+    const dmg = spell.damage ?? {};
+    const attr1 = acc.attr1 ?? "ins";
+    const attr2 = acc.attr2 ?? "wlp";
+    const spellOption = {
+      arg: spell.name || "",
+      name: spell.name || "",
+      attr1,
+      attr2,
+      accuracyBonus: acc.value ?? 0,
+      baseDamage: dmg.value ?? 0,
+      damageType: dmg.type ?? "physical",
+      accuracyDefense: acc.defense ?? "mdef",
+      damageHrZero: dmg.hrZero === true,
+      spellType: spell.spellType,
+    };
+    const speaker = player?.info?.name || player?.name || "";
+    const intent = prepareMagicCheck(spellOption);
+    const dieSizes = {
+      primary: getAttrDie(attr1),
+      secondary: getAttrDie(attr2),
+    };
+    const rolls = rollMagicCheck(dieSizes);
+    const result = processMagicCheck(intent, rolls, dieSizes, speaker);
+    sendRollMessage(buildMagicCheckMessage(result));
+  };
+
   const filterSpells = (spells, query) => {
     if (!query) return spells;
     const q = query.toLowerCase();
@@ -1273,15 +1337,19 @@ export default function PlayerSpellsFull({
               <TableHead>
                 <TableRow sx={{ background: theme.primary }}>
                   <StyledTableCellHeader sx={{ width: 36 }} />
-                  <StyledTableCellHeader>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Typography
-                        variant="h4"
-                        sx={{ textTransform: "uppercase", color: "white" }}
-                      >
-                        {t("Spells") + " - " + t(c.name)}
-                      </Typography>
-                    </Box>
+                  <StyledTableCellHeader sx={{ overflow: "hidden" }}>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        textTransform: "uppercase",
+                        color: "white",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {t("Spells") + " - " + t(c.name)}
+                    </Typography>
                   </StyledTableCellHeader>
                   <StyledTableCellHeader
                     sx={{
@@ -1376,26 +1444,25 @@ export default function PlayerSpellsFull({
                           }}
                           sx={{
                             cursor: "pointer",
-                            minWidth: { xs: 60, sm: 100 },
-                            wordBreak: "break-word",
+                            overflow: "hidden",
                           }}
                         >
                           <Box
                             sx={{
                               display: "flex",
                               alignItems: "center",
-                              flexWrap: "wrap",
                               gap: 0.5,
+                              overflow: "hidden",
                             }}
                           >
                             <Typography
                               variant="body2"
                               sx={{
                                 fontWeight: "bold",
-                                mr: 0.5,
                                 fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                                wordBreak: "break-word",
-                                overflowWrap: "break-word",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
                               }}
                             >
                               {highlightMatch(spellName, searchQuery)}
@@ -1428,18 +1495,44 @@ export default function PlayerSpellsFull({
                             textAlign: "right",
                           }}
                         >
-                          <Tooltip title={t("Edit")}>
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditSpell(spell, spellIndex, classIndex);
-                              }}
-                              sx={{ p: 0.5 }}
-                            >
-                              <Edit fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "flex-end",
+                              alignItems: "center",
+                            }}
+                          >
+                            {spell.isOffensive && (
+                              <Tooltip title={t("Roll")}>
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRollSpell(spell);
+                                  }}
+                                  sx={{ p: 0.5 }}
+                                >
+                                  <Casino fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            <Tooltip title={t("Edit")}>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditSpell(
+                                    spell,
+                                    spellIndex,
+                                    classIndex,
+                                  );
+                                }}
+                                sx={{ p: 0.5 }}
+                              >
+                                <Edit fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
                         </StyledTableCell>
                       </TableRow>
 
@@ -1612,18 +1705,40 @@ export default function PlayerSpellsFull({
                       <StyledTableCell
                         sx={{ width: { xs: 110, sm: 110 }, textAlign: "right" }}
                       >
-                        <Tooltip title={t("Edit")}>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenEditMnemoSpell(spell);
-                            }}
-                            sx={{ p: 0.5 }}
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            alignItems: "center",
+                          }}
+                        >
+                          {spell.isOffensive && (
+                            <Tooltip title={t("Roll")}>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRollSpell(spell);
+                                }}
+                                sx={{ p: 0.5 }}
+                              >
+                                <Casino fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          <Tooltip title={t("Edit")}>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenEditMnemoSpell(spell);
+                              }}
+                              sx={{ p: 0.5 }}
+                            >
+                              <Edit fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </StyledTableCell>
                     </TableRow>
                     <TableRow>

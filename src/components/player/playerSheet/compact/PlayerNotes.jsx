@@ -108,14 +108,18 @@ function NoteClockRow({
       <StyledTableCell sx={{ width: 36, pl: 1 }} />
       <StyledTableCell
         sx={{
-          minWidth: { xs: 60, sm: 100 },
-          wordBreak: "break-word",
+          overflow: "hidden",
           pl: 1,
         }}
       >
         <Typography
           variant="body2"
-          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+          sx={{
+            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
         >
           {highlightMatch(clock.name, searchQuery)}
         </Typography>
@@ -311,30 +315,22 @@ export default function PlayerNotes({
                     }}
                     sx={{
                       cursor: note.description ? "pointer" : "default",
-                      minWidth: { xs: 60, sm: 100 },
-                      wordBreak: "break-word",
+                      overflow: "hidden",
                     }}
                   >
-                    <Box
+                    <Typography
+                      variant="body2"
                       sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 0.5,
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: "bold",
-                          textTransform: "uppercase",
-                          wordBreak: "break-word",
-                          overflowWrap: "break-word",
-                          fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                        }}
-                      >
-                        {highlightMatch(note.name, searchQuery)}
-                      </Typography>
-                    </Box>
+                      {highlightMatch(note.name, searchQuery)}
+                    </Typography>
                   </StyledTableCell>
                   <StyledTableCell
                     sx={{
