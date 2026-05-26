@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -80,9 +79,8 @@ const NPCDetail = ({
   handleIncreaseUltima,
   npcRef,
   isMobile,
-  addLog,
+  emitLog,
   addMessage,
-  openLogs,
   npcDetailWidth,
   checkNewTurn,
   handleEditNPC,
@@ -97,17 +95,12 @@ const NPCDetail = ({
 
   const {
     autoUseMP,
-    autoOpenLogs,
     showBaseAttackEffect,
     showWeaponAttackEffect,
     showSpellEffect,
     autoCheckTurnAfterRoll,
-    hideLogs,
-    logSpellUse,
     studyValues,
   } = useCombatSimSettingsStore.getState().settings;
-
-  //console.log(studyValues);
 
   if (!selectedNPC) return null;
 
@@ -197,44 +190,29 @@ const NPCDetail = ({
         secondary: resolveNpcAttributeDie(normalizeAttrKey(attr2Raw)),
       };
       const magicBonus = calcMagic(selectedNPC);
-      const intent = prepareMagicCheck(
-        {
-          arg: spellData.name,
-          name: spellData.name,
-          attr1: toAttr(attr1Raw),
-          attr2: toAttr(attr2Raw),
-          accuracyBonus: magicBonus !== 0 ? magicBonus : undefined,
-          baseDamage: 0,
-          damageType: spellData.damage?.type ?? "physical",
-          damageHrZero: spellData.damageHrZero ?? false,
-          description:
-            showSpellEffect && spellData.effect ? spellData.effect : undefined,
-        },
-      );
+      const intent = prepareMagicCheck({
+        arg: spellData.name,
+        name: spellData.name,
+        attr1: toAttr(attr1Raw),
+        attr2: toAttr(attr2Raw),
+        accuracyBonus: magicBonus !== 0 ? magicBonus : undefined,
+        baseDamage: 0,
+        damageType: spellData.damage?.type ?? "physical",
+        damageHrZero: spellData.damageHrZero ?? false,
+        description:
+          showSpellEffect && spellData.effect ? spellData.effect : undefined,
+      });
       const rolls = rollMagicCheck(dieSizes);
       const result = processMagicCheck(intent, rolls, dieSizes, npcSpeaker);
       if (addMessage) addMessage(buildMagicCheckMessage(result));
     } else {
-      if (logSpellUse) {
-        addLog(
-          "combat_sim_log_spell_use",
-          selectedNPC.name +
-            (selectedNPC?.combatStats?.combatNotes
-              ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : ""),
-          spellData.name,
-          numTargets,
-          {
-            effect: showSpellEffect && spellData.effect ? spellData.effect : "",
-            markdown: true,
-          },
-        );
-      }
+      emitLog({
+        type: "spell-use",
+        actorName: selectedNPC.name,
+        spellName: spellData.name,
+      });
     }
 
-    if (autoOpenLogs) {
-      openLogs();
-    }
     if (isMobile) {
       setSelectedNPC(null);
     }
@@ -288,9 +266,6 @@ const NPCDetail = ({
     const result = processAccuracyCheck(intent, rolls, dieSizes, npcSpeaker);
     if (addMessage) addMessage(buildAccuracyCheckMessage(result));
 
-    if (autoOpenLogs) {
-      openLogs();
-    }
     if (isMobile) {
       setSelectedNPC(null);
     }
@@ -336,11 +311,16 @@ const NPCDetail = ({
   ) => {
     const labelToAttr = (label) => {
       switch (label.toUpperCase()) {
-        case "DEX": return "dex";
-        case "INS": return "ins";
-        case "MIG": return "mig";
-        case "WLP": return "wlp";
-        default: return "dex";
+        case "DEX":
+          return "dex";
+        case "INS":
+          return "ins";
+        case "MIG":
+          return "mig";
+        case "WLP":
+          return "wlp";
+        default:
+          return "dex";
       }
     };
 
@@ -366,9 +346,6 @@ const NPCDetail = ({
       }
     }
 
-    if (autoOpenLogs) {
-      openLogs();
-    }
     if (autoCheckTurnAfterRoll) {
       setTimeout(() => {
         checkNewTurn(selectedNPC.combatId);
@@ -542,7 +519,7 @@ const NPCDetail = ({
             setSelectedNPC={setSelectedNPC}
             selectedNPCs={selectedNPCs}
             setSelectedNPCs={setSelectedNPCs}
-            addLog={addLog}
+            emitLog={emitLog}
           />
         )}
       </Box>
@@ -605,7 +582,7 @@ const NPCDetail = ({
           </Button>
         </Box>
       )}
-      {tabIndex === 2 && !isMobile && !hideLogs && (
+      {tabIndex === 2 && !isMobile && (
         <Box
           sx={{
             borderTop: "1px solid " + theme.palette.divider,
@@ -788,7 +765,7 @@ const NPCDetail = ({
               </Box>
             </Grid>
           )}
-          {tabIndex === 2 && !hideLogs && (
+          {tabIndex === 2 && (
             <Grid size={12}>
               <StandardRollsSection
                 selectedNPC={selectedNPC}

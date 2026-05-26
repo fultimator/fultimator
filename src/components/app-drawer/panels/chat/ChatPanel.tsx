@@ -50,7 +50,10 @@ import type { TypePlayer } from "../../../../types/Players";
 import { applyPostLoadTransforms } from "../../../../components/player/playerTransforms";
 import { applyNpcPostLoadTransforms } from "../../../../components/npc/npcTransforms";
 import type { TypeNpc } from "../../../../types/Npcs";
-import type { ChatMessage } from "./types";
+import type { ChatMessage, LogMessage } from "./types";
+import { LogMessageTemplate } from "./message-templates/LogMessageTemplate";
+import { useEncounterChatStore } from "../../../../stores/encounterChatStore";
+import { useChatChannelStore } from "../../../../stores/chatChannelStore";
 import {
   prepareCheck,
   rollCheck,
@@ -82,6 +85,14 @@ const isRetargetableMessage = (
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const CHECK_KINDS = new Set([
+  "accuracy",
+  "magic",
+  "attribute",
+  "open",
+  "opposed",
+]);
 
 const SLOT_LABELS: Record<
   "mainHand" | "offHand" | "armor" | "accessory",
@@ -264,6 +275,44 @@ export const ChatPanel: React.FC = () => {
 
   const store = useChatStore(selectedSpeaker, activeActorDoc);
   const { addMessage } = store;
+
+  const activeChannelId = useChatChannelStore((s) => s.activeChannelId);
+  const visibleKinds = useChatChannelStore((s) => s.visibleKinds);
+  const encounterMessages = useEncounterChatStore((s) => s.messages);
+  const deleteEncounterMessage = useEncounterChatStore((s) => s.deleteMessage);
+  const clearEncounterMessages = useEncounterChatStore((s) => s.clearMessages);
+  const setEncounterMessages = useEncounterChatStore((s) => s.setMessages);
+  const encounterId = useEncounterChatStore((s) => s.encounterId);
+
+  const activeMessages = useMemo(() => {
+    let merged: ChatMessage[];
+    if (activeChannelId.startsWith("encounter:")) {
+      const tagged = store.messages.filter(
+        (m) => m.channelId === activeChannelId,
+      );
+      merged = [...tagged, ...(encounterMessages as ChatMessage[])];
+    } else {
+      merged = [...store.messages];
+    }
+    merged.sort((a, b) => a.createdAt - b.createdAt);
+
+    return merged.filter((m) => {
+      if (m.kind === "log") return visibleKinds.includes("logs");
+      if (CHECK_KINDS.has(m.kind)) return visibleKinds.includes("checks");
+      return visibleKinds.includes("chat");
+    });
+  }, [activeChannelId, store.messages, encounterMessages, visibleKinds]);
+
+  const deleteActiveMessage = useCallback(
+    (id: string) => {
+      if (store.messages.some((m) => m.id === id)) {
+        store.deleteMessage(id);
+      } else {
+        deleteEncounterMessage(id);
+      }
+    },
+    [store, deleteEncounterMessage],
+  );
   const liveTargets = useCombatEncounterStore((s) => s.targets);
 
   useEffect(() => {
@@ -357,58 +406,39 @@ export const ChatPanel: React.FC = () => {
 
   const handleRetargetMessage = useCallback(
     (messageId: string) => {
-      const source = store.messages.find((m) => m.id === messageId);
+      const inEncounter = encounterMessages.some((m) => m.id === messageId);
+      const pool = inEncounter ? encounterMessages : store.messages;
+      const source = pool.find((m) => m.id === messageId);
       if (!source || !isRetargetableMessage(source)) return;
 
-      const markedMessages: ChatMessage[] = store.messages.map((m) => {
+      const updateTargets = (m: ChatMessage): ChatMessage => {
         if (m.id !== messageId) return m;
         if (m.kind === "accuracy") {
           return {
             ...m,
-            check: {
-              ...m.check,
-              retargetSuperseded: true,
-            },
+            check: { ...m.check, targetsSnapshot: [...liveTargets] },
           };
         }
         if (m.kind === "magic") {
           return {
             ...m,
-            check: {
-              ...m.check,
-              retargetSuperseded: true,
-            },
+            check: { ...m.check, targetsSnapshot: [...liveTargets] },
           };
         }
         return m;
-      });
+      };
 
-      const regenerated: ChatMessage =
-        source.kind === "accuracy"
-          ? {
-              ...source,
-              id: crypto.randomUUID(),
-              createdAt: Date.now(),
-              check: {
-                ...source.check,
-                targetsSnapshot: [...liveTargets],
-                retargetSuperseded: false,
-              },
-            }
-          : {
-              ...source,
-              id: crypto.randomUUID(),
-              createdAt: Date.now(),
-              check: {
-                ...source.check,
-                targetsSnapshot: [...liveTargets],
-                retargetSuperseded: false,
-              },
-            };
-
-      store.setMessages([...markedMessages, regenerated]);
+      if (inEncounter) {
+        if (!encounterId) return;
+        setEncounterMessages(
+          encounterId,
+          (encounterMessages as ChatMessage[]).map(updateTargets),
+        );
+      } else {
+        store.setMessages(store.messages.map(updateTargets));
+      }
     },
-    [liveTargets, store],
+    [liveTargets, store, encounterMessages, encounterId, setEncounterMessages],
   );
 
   const handleOppose = useCallback(
@@ -581,18 +611,23 @@ export const ChatPanel: React.FC = () => {
 
   useEffect(() => {
     const prev = previousMessageCountRef.current;
-    if (store.messages.length > prev) {
+    const total = activeMessages.length;
+    if (total > prev) {
       endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-    previousMessageCountRef.current = store.messages.length;
-  }, [store.messages.length]);
+    previousMessageCountRef.current = total;
+  }, [activeMessages.length]);
 
   const handleExport = () => {
     try {
+      const allMessages = [
+        ...store.messages,
+        ...(encounterMessages as ChatMessage[]),
+      ].sort((a, b) => a.createdAt - b.createdAt);
       const blob = new Blob(
         [
           JSON.stringify(
-            { exportedAt: new Date().toISOString(), messages: store.messages },
+            { exportedAt: new Date().toISOString(), messages: allMessages },
             null,
             2,
           ),
@@ -640,31 +675,70 @@ export const ChatPanel: React.FC = () => {
                 gap: 1,
               }}
             >
-              {store.messages.length === 0 && (
+              {activeMessages.length === 0 && (
                 <Typography variant="body2" color="text.secondary">
                   Start chatting or roll from the dice tray below.
                 </Typography>
               )}
-              {store.messages.map((message) => (
-                <BaseMessageTemplate
-                  key={message.id}
-                  speaker={message.speaker || AUTHOR_NAME}
-                  timeAgo={formatTimeAgo(message.createdAt)}
-                  onDelete={() => store.deleteMessage(message.id)}
-                  onRetarget={
-                    isRetargetableMessage(message)
-                      ? () => handleRetargetMessage(message.id)
-                      : undefined
-                  }
-                  dimmed={
-                    isRetargetableMessage(message)
-                      ? message.check.retargetSuperseded === true
-                      : false
-                  }
-                >
-                  <MessageContent message={message} />
-                </BaseMessageTemplate>
-              ))}
+              {activeMessages.map((message) => {
+                if (message.kind === "log") {
+                  const logMsg = message as LogMessage;
+                  return (
+                    <Box
+                      key={logMsg.id}
+                      sx={{
+                        alignSelf: "flex-start",
+                        width: "100%",
+                        px: 1.25,
+                        py: 0.5,
+                        borderRadius: 1.5,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        backgroundColor: "background.paper",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                        opacity: 0.85,
+                      }}
+                    >
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <LogMessageTemplate event={logMsg.event} />
+                      </Box>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ flexShrink: 0 }}
+                      >
+                        {formatTimeAgo(logMsg.createdAt)}
+                      </Typography>
+                    </Box>
+                  );
+                }
+                return (
+                  <BaseMessageTemplate
+                    key={message.id}
+                    speaker={
+                      (message as ChatMessage & { speaker?: string }).speaker ||
+                      AUTHOR_NAME
+                    }
+                    timeAgo={formatTimeAgo(message.createdAt)}
+                    onDelete={() => deleteActiveMessage(message.id)}
+                    onRetarget={
+                      isRetargetableMessage(message)
+                        ? () => handleRetargetMessage(message.id)
+                        : undefined
+                    }
+                    dimmed={
+                      isRetargetableMessage(message)
+                        ? message.check.retargetSuperseded === true
+                        : false
+                    }
+                  >
+                    <MessageContent message={message} />
+                  </BaseMessageTemplate>
+                );
+              })}
               <Box ref={endOfMessagesRef} />
             </Box>
           </Box>
@@ -684,6 +758,7 @@ export const ChatPanel: React.FC = () => {
           setSelectedSpeaker(s);
         }}
         onExport={handleExport}
+        totalMessageCount={activeMessages.length}
         onClearRequest={() => setClearLogsDialogOpen(true)}
         onOpenEquipmentSlot={setEquipmentSlotPickerOpen}
         onToggleVehicle={() => {
@@ -742,7 +817,10 @@ export const ChatPanel: React.FC = () => {
       <DeleteConfirmationDialog
         open={clearLogsDialogOpen}
         onClose={() => setClearLogsDialogOpen(false)}
-        onConfirm={() => store.clearAll()}
+        onConfirm={() => {
+          store.clearAll();
+          clearEncounterMessages();
+        }}
         title="Clear Chat Logs"
         message="Are you sure you want to delete all chat messages and roll history?"
         enableCtrlBypass={false}

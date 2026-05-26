@@ -14,6 +14,7 @@ import type {
   OpenCheckMessage,
   OpposedCheckMessage,
 } from "../types";
+// LogMessage is rendered directly in ChatPanel (slim card, no BaseMessageTemplate wrapper)
 import { useChatActions } from "../ChatActionsContext.shared";
 
 type TemplateComponent = React.FC<{ message: ChatMessage }>;
@@ -101,6 +102,7 @@ const registry: Record<ChatMessage["kind"], TemplateComponent> = {
   accuracy: AccuracyTemplate,
   magic: MagicTemplate,
   display: DisplayTemplate,
+  log: () => null, // rendered by ChatPanel directly as a slim card
 };
 
 export const MessageContent: TemplateComponent = ({ message }) => {

@@ -4,6 +4,8 @@ import { buildRollMessage, buildTextMessage } from "./domain/rolls";
 import { executeCommand } from "./domain/commands";
 import { useChatMessagesStore } from "../../../../store/chatMessagesStore";
 import { useCombatEncounterStore } from "../../../../stores/combatEncounterStore";
+import { useChatChannelStore } from "../../../../stores/chatChannelStore";
+import { useEncounterChatStore } from "../../../../stores/encounterChatStore";
 import type { ChatMessage, DieSides } from "./types";
 
 export type PendingDice = Partial<Record<DieSides, number>>;
@@ -20,19 +22,12 @@ function hydrateTargetsSnapshot(message: ChatMessage): ChatMessage {
   if (message.kind === "accuracy") {
     return {
       ...message,
-      check: {
-        ...message.check,
-        targetsSnapshot: [...latestTargets],
-      },
+      check: { ...message.check, targetsSnapshot: [...latestTargets] },
     };
   }
-
   return {
     ...message,
-    check: {
-      ...message.check,
-      targetsSnapshot: [...latestTargets],
-    },
+    check: { ...message.check, targetsSnapshot: [...latestTargets] },
   };
 }
 
@@ -40,8 +35,28 @@ export function useChatStore(
   selectedSpeaker: string,
   playerDoc: Record<string, unknown> | null = null,
 ) {
-  const { messages, addMessage, deleteMessage, clearAll, setMessages } =
-    useChatMessagesStore();
+  const {
+    messages,
+    addMessage: addGlobalMessage,
+    deleteMessage,
+    clearAll,
+    setMessages,
+  } = useChatMessagesStore();
+  const activeChannelId = useChatChannelStore((s) => s.activeChannelId);
+  const addMessage = (message: ChatMessage) => {
+    const encId = useEncounterChatStore.getState().encounterId;
+    if (encId) {
+      useEncounterChatStore.getState().addMessage({
+        ...message,
+        channelId: `encounter:${encId}`,
+      } as ChatMessage);
+    } else {
+      addGlobalMessage({
+        ...message,
+        channelId: activeChannelId,
+      } as ChatMessage);
+    }
+  };
   const [pendingDice, setPendingDice] = useState<PendingDice>({});
   const [pendingD100, setPendingD100] = useState(0);
   const [pendingModifier, setPendingModifier] = useState(0);

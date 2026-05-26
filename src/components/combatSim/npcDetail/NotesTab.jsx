@@ -8,7 +8,7 @@ const NotesTab = ({
   setSelectedNPC,
   selectedNPCs,
   setSelectedNPCs,
-  addLog,
+  emitLog,
 }) => {
   const [customLog, setCustomLog] = useState("");
 
@@ -21,10 +21,9 @@ const NotesTab = ({
     const trimmedLog = customLog.trim();
     if (!trimmedLog) return;
 
-    // Add log entry
-    addLog(npcName + ": " + trimmedLog);
+    emitLog({ type: "text", text: npcName + ": " + trimmedLog });
 
-    setCustomLog(""); // Clear the textfield after sending
+    setCustomLog("");
   };
 
   return (

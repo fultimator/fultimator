@@ -1,4 +1,4 @@
-import type { ChatMessage } from "../types";
+import type { ChatMessage, LogMessage } from "../types";
 
 const isCheckResult = (check: unknown): boolean => {
   if (!check || typeof check !== "object") return false;
@@ -48,12 +48,7 @@ export const isValidChatMessage = (item: unknown): item is ChatMessage => {
     );
   }
 
-  if (message.kind === "accuracy") {
-    const check = message.check as Record<string, unknown> | undefined;
-    return !!check && typeof check.accuracyTotal === "number";
-  }
-
-  if (message.kind === "magic") {
+  if (message.kind === "accuracy" || message.kind === "magic") {
     const check = message.check as Record<string, unknown> | undefined;
     return !!check && typeof check.accuracyTotal === "number";
   }
@@ -66,5 +61,23 @@ export const isValidChatMessage = (item: unknown): item is ChatMessage => {
     );
   }
 
+  if (message.kind === "log") {
+    const event = message.event as Record<string, unknown> | undefined;
+    return !!event && typeof event.type === "string";
+  }
+
   return false;
+};
+
+export const isValidLogMessage = (item: unknown): item is LogMessage => {
+  if (!item || typeof item !== "object") return false;
+  const m = item as Record<string, unknown>;
+  return (
+    m.kind === "log" &&
+    typeof m.id === "string" &&
+    typeof m.createdAt === "number" &&
+    typeof m.channelId === "string" &&
+    !!m.event &&
+    typeof (m.event as Record<string, unknown>).type === "string"
+  );
 };

@@ -52,11 +52,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
 
   useEffect(() => {
     if (!Array.isArray(check.targetsSnapshot)) return;
-    setActiveTargets((prev) => {
-      const byId = new Set(check.targetsSnapshot.map((t) => t.combatId));
-      const appended = prev.filter((t) => !byId.has(t.combatId));
-      return [...check.targetsSnapshot, ...appended];
-    });
+    setActiveTargets([...check.targetsSnapshot]);
   }, [check.targetsSnapshot]);
 
   const speakerCombatId = (check as unknown as Record<string, unknown>)

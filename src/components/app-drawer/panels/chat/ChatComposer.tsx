@@ -87,6 +87,7 @@ interface ChatComposerProps {
   selectedSpeaker: string;
   playerDoc: Record<string, unknown> | null;
   isNpc?: boolean;
+  totalMessageCount?: number;
   onSpeakerChange: (speaker: string) => void;
   onExport: () => void;
   onClearRequest: () => void;
@@ -106,6 +107,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   selectedSpeaker,
   playerDoc,
   isNpc = false,
+  totalMessageCount,
   onSpeakerChange,
   onExport,
   onClearRequest,
@@ -153,7 +155,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   }, [prefillInput]);
 
   const canSend = Boolean(input.trim()) || store.hasPendingRoll;
-  const hasMessages = store.messages.length > 0;
+  const hasMessages =
+    totalMessageCount != null
+      ? totalMessageCount > 0
+      : store.messages.length > 0;
   const blockedCommand =
     activeCommand?.name === "check" && !playerDoc ? activeCommand : null;
   const showPopup =

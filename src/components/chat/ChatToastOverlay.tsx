@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box, Card, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import { useEncounterChatStore } from "../../stores/encounterChatStore";
 import { useThemeStore } from "../../store/themeStore";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
 import { MessageContent } from "../app-drawer/panels/chat/message-templates/registry";
@@ -28,7 +29,15 @@ interface ToastEntry {
 }
 
 export const ChatToastOverlay: React.FC = () => {
-  const messages = useChatMessagesStore((s) => s.messages);
+  const globalMessages = useChatMessagesStore((s) => s.messages);
+  const encounterMessages = useEncounterChatStore((s) => s.messages);
+  const messages = React.useMemo(
+    () =>
+      [...globalMessages, ...encounterMessages].sort(
+        (a, b) => a.createdAt - b.createdAt,
+      ),
+    [globalMessages, encounterMessages],
+  );
   const drawerOpen = useThemeStore((s) => s.drawerOpen);
   const setDrawerOpen = useThemeStore((s) => s.setDrawerOpen);
   const activeTab = useAppDrawerStore((s) => s.activeTab);
@@ -249,7 +258,8 @@ const ToastCard: React.FC<ToastCardProps> = ({
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 700 }} noWrap>
-          {toast.message.speaker ?? "NPC"}
+          {("speaker" in toast.message ? toast.message.speaker : undefined) ??
+            "NPC"}
         </Typography>
         <IconButton
           size="small"
