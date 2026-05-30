@@ -97,7 +97,7 @@ import {
   SharedQualityCard,
   SharedMnemosphereCard,
   SharedHoplosphereCard,
-} from "../../components/shared/itemCards";
+} from "../../components/shared/items";
 
 import classList from "../../libs/classes";
 import {

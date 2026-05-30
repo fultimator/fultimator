@@ -39,7 +39,7 @@ import {
   QueryStats,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
-import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
+import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 // import NpcUgly from "../../components/npc/Ugly";
 import EditBasics from "../../components/npc/EditBasics";
 import ExplainSkills from "../../components/npc/ExplainSkills";
@@ -66,7 +66,7 @@ import deepEqual from "deep-equal";
 import {
   applyNpcPostLoadTransforms,
   applyNpcPreSaveTransforms,
-} from "../../components/npc/npcTransforms";
+} from "../../libs/actor";
 import { NpcProvider } from "../../components/npc/NpcContext";
 
 // Combine all blacklisted names into a single array

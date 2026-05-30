@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { validateCustomWeaponPersisted } from "../../schema/itemSchemas/customWeapon";
-import { calculateCustomWeaponStats } from "../../../components/player/common/playerCalculations";
+import { calculateCustomWeaponStats } from "../../../libs/playerCalculations";
 import { normalizeCustomWeaponLike } from "../../../libs/weaponNormalization";
 
 function buildCustomWeaponPayload(overrides: Record<string, unknown> = {}) {

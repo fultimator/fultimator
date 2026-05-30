@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { AutoAwesome, Download, Search } from "@mui/icons-material";
 import { useState, useRef } from "react";
-import { SharedArcanumCard } from "../../../components/shared/itemCards";
+import { SharedArcanumCard } from "../../../components/shared/items";
 import ChangeName from "../common/ChangeName";
 import ApplyRework from "../common/ApplyRework";
 import { useTranslate } from "../../../translation/translate";

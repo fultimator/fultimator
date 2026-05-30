@@ -1,7 +1,7 @@
 import { Grid, Paper, Button, useTheme, Tabs, Tab, IconButton, Tooltip } from "@mui/material";
 import { AutoAwesome, Download } from "@mui/icons-material";
 import { useState, useRef } from "react";
-import { SharedQualityCard } from "../../../components/shared/itemCards";
+import { SharedQualityCard } from "../../../components/shared/items";
 import { useTranslate } from "../../../translation/translate";
 import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";

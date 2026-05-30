@@ -17,6 +17,7 @@
     "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
     "paths": {
+      "/src/*": ["./src/*"],
       "@platform/*": ["./src/platform/web/*"],
       "@routes/*": ["./src/routes/*"]
     }

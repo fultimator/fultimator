@@ -31,7 +31,7 @@ const NotesMarkdown = ({
   children,
   compact = false,
   uniform = false,
-  fontSize,
+  fontSize = undefined,
   ...props
 }) => {
   const theme = useTheme();

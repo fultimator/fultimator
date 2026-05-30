@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
 import allArmor from "../../../libs/armor";
-import { SLOT_TIERS } from "../../../components/player/equipment/technospheres/slotTiers";
+import { SLOT_TIERS } from "../../../libs/player/slotTiers";
 import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
 
 const SlotTierValues = ["alpha", "beta", "gamma", "delta"] as const;

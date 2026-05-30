@@ -34,11 +34,11 @@ import specialSkillsList from "../../libs/skills";
 import { availableFrames } from "../../libs/pilotVehicleData";
 import { Chip } from "@mui/material";
 
-import PlayerWeaponModal from "../player/equipment/weapons/PlayerWeaponModal";
-import PlayerArmorModal from "../player/equipment/armor/PlayerArmorModal";
-import PlayerShieldModal from "../player/equipment/shields/PlayerShieldModal";
-import PlayerCustomWeaponModal from "../player/equipment/customWeapons/PlayerCustomWeaponModal";
-import PlayerAccessoryModal from "../player/equipment/accessories/PlayerAccessoryModal";
+import PlayerWeaponModal from "/src/components/shared/actors/pc/editors/equipment/weapons/PlayerWeaponModal";
+import PlayerArmorModal from "/src/components/shared/actors/pc/editors/equipment/armor/PlayerArmorModal";
+import PlayerShieldModal from "/src/components/shared/actors/pc/editors/equipment/shields/PlayerShieldModal";
+import PlayerCustomWeaponModal from "/src/components/shared/actors/pc/editors/equipment/customWeapons/PlayerCustomWeaponModal";
+import PlayerAccessoryModal from "/src/components/shared/actors/pc/editors/equipment/accessories/PlayerAccessoryModal";
 import CustomTextarea from "../common/CustomTextarea";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";

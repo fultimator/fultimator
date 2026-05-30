@@ -33,8 +33,8 @@ import NpcEditModal from "../../components/combatSim/NpcEditModal";
 import { SignIn } from "../../components/auth";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
-import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
-import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../components/player/playerTransforms";
+import { applyNpcPostLoadTransforms } from "../../libs/actor";
+import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../libs/actor";
 import {
   buildDamageContext,
   resolveDamage,

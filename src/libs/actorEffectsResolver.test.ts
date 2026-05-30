@@ -22,7 +22,7 @@ function playerWithEquipment(
   return {
     classes: [],
     equipment: [equipment],
-  } as TypePlayer;
+  } as unknown as TypePlayer;
 }
 
 describe("resolveActorEffects", () => {
@@ -47,7 +47,7 @@ describe("resolveActorEffects", () => {
         },
       ],
       equipment: [],
-    } as TypePlayer;
+    } as unknown as TypePlayer;
 
     const { bonuses } = resolveActorEffects(player);
 
@@ -65,7 +65,7 @@ describe("resolveActorEffects", () => {
           },
         },
       ],
-    } as TypeNpc;
+    } as unknown as TypeNpc;
 
     const { bonuses } = resolveActorEffects(npc);
 
@@ -90,11 +90,11 @@ describe("resolveActorEffects", () => {
         shields: [],
         armor: [],
         accessories: [],
-      } as TypePlayer["equipment"][number]),
+      } as unknown as TypePlayer["equipment"][number]),
       equippedSlots: {
         mainHand: { source: "weapons", name: "Equipped Sword", index: 0 },
       },
-    } as TypePlayer;
+    } as unknown as TypePlayer;
 
     const { bonuses } = resolveActorEffects(player);
 
@@ -121,7 +121,7 @@ describe("resolveActorEffects", () => {
       shields: [],
       armor: [],
       accessories: [],
-    } as TypePlayer["equipment"][number]);
+    } as unknown as TypePlayer["equipment"][number]);
 
     const { bonuses } = resolveActorEffects(player);
 
@@ -200,12 +200,12 @@ describe("resolveActorEffects", () => {
             spells: [],
           },
         ],
-      } as TypePlayer["equipment"][number]),
+      } as unknown as TypePlayer["equipment"][number]),
       equippedSlots: {
         mainHand: { source: "customWeapons", name: "Socketed Bow", index: 0 },
         armor: { source: "armor", name: "Socketed Armor", index: 0 },
       },
-    } as TypePlayer;
+    } as unknown as TypePlayer;
 
     const { bonuses } = resolveActorEffects(player);
 
@@ -224,7 +224,7 @@ describe("resolveActorEffects", () => {
       ],
       classes: [],
       equipment: [],
-    } as TypePlayer;
+    } as unknown as TypePlayer;
 
     expect(
       resolveActorEffects(player, { inCrisis: false }).bonuses.accuracy.all,

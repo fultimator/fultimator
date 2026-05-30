@@ -23,7 +23,7 @@ import {
   availableMagichantTones,
   availableSymbols,
   invocationsByWellspring,
-} from "../components/player/spells/spellOptionData";
+} from "../libs/player/spellOptionData";
 import { t as staticT } from "../translation/translate";
 
 export const CLASS_BOOK_OPTIONS = [

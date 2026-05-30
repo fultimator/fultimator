@@ -152,6 +152,7 @@ export interface PlayerSettings {
 export interface VehicleModule {
   fuid?: string;
   name: string;
+  key?: string;
   type: string;
   equippedSlot: string | null;
   enabled: boolean;
@@ -169,8 +170,16 @@ export interface VehicleModule {
 }
 
 export interface Vehicle {
+  frame?: string;
   customName: string;
   enabled: boolean;
+  maxEnabledModules?: number;
+  slots?: {
+    main: string | null;
+    off: string | null;
+    armor: string | null;
+    support: string[];
+  };
   modules: VehicleModule[];
 }
 

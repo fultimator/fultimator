@@ -25,7 +25,7 @@ import {
   ExpandLess,
   AccessTime,
 } from "@mui/icons-material";
-import Clock from "../player/playerSheet/Clock";
+import Clock from "/src/components/shared/actors/pc/playerSheet/optional/Clock";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";

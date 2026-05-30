@@ -29,7 +29,7 @@ import CustomWeapons from "../equip/customWeapons/CustomWeapons.jsx";
 import {
   SharedRitualCard,
   SharedProjectCard,
-} from "../../components/shared/itemCards";
+} from "../../components/shared/items";
 import { useTranslate } from "../../translation/translate";
 import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import CustomTextarea from "../../components/common/CustomTextarea";

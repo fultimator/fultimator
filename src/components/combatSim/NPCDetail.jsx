@@ -24,7 +24,7 @@ import {
   Edit,
   Download,
 } from "@mui/icons-material";
-import NpcActorCard from "../shared/actorCards/npc/NpcActorCard";
+import NpcActorCard from "../shared/actors/npc/NpcActorCard";
 import StatsTab from "./npcDetail/StatsTab";
 import NotesTab from "./npcDetail/NotesTab";
 import AttributeSection from "./npcDetail/AttributeSection";

@@ -1,4 +1,4 @@
-import { availableMagichantKeys } from "../../../../../components/player/spells/spellOptionData";
+import { availableMagichantKeys } from "../../../../../libs/player/spellOptionData";
 
 export const SPELL_TYPE_OPTIONS = [
   { value: "default", label: "Standard Spell" },

@@ -8,7 +8,7 @@ import {
   BEHAVIOR_GROUPS,
 } from "../shared/behaviorFields";
 import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
-import { calculateCustomWeaponStats } from "../../../../components/player/common/playerCalculations";
+import { calculateCustomWeaponStats } from "../../../../libs/playerCalculations";
 import { Attributes, Elements } from "../../../../types/Misc";
 import { categories } from "../../../../routes/equip/customWeapons/libs";
 import allQualities from "../../../../libs/qualities";

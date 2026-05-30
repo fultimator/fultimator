@@ -9,7 +9,7 @@ import {
   PLAYER_CURRENT_SCHEMA_VERSION,
   applyPreSaveTransforms,
   applyPostLoadTransforms,
-} from "../../components/player/playerTransforms";
+} from "../../libs/actor";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router";
 
@@ -73,7 +73,7 @@ import {
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
 import { useTranslate } from "../../translation/translate";
-import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGallery";
+import PlayerCardGallery from "/src/libs/player/PlayerCardGallery";
 import Export from "../../components/Export";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -88,7 +88,7 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import SettingRow from "../../components/common/SettingRow";
 import classList from "../../libs/classes";
 import { buildItemText } from "../../libs/buildItemText";
-import MnemosphereCreateDialog from "../../components/player/equipment/technospheres/MnemosphereCreateDialog";
+import MnemosphereCreateDialog from "/src/libs/player/MnemosphereCreateDialog";
 import {
   canonicalizeForTransfer,
   normalizeOwnershipForTarget,

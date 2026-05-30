@@ -26,7 +26,7 @@ import { NpcProvider } from "../../components/npc/NpcContext";
 import {
   applyNpcPostLoadTransforms,
   applyNpcPreSaveTransforms,
-} from "../../components/npc/npcTransforms";
+} from "../../libs/actor";
 import EditBasics from "../../components/npc/EditBasics";
 import EditAffinities from "../../components/npc/EditAffinities";
 import EditExtra from "../../components/npc/EditExtra";
@@ -40,7 +40,7 @@ import EditNotes from "../../components/npc/EditNotes";
 import ExplainAffinities from "../../components/npc/ExplainAffinities";
 import ExplainSkills from "../../components/npc/ExplainSkills";
 import CustomHeader from "../../components/common/CustomHeader";
-import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
+import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import { useTranslate } from "../../translation/translate";
 import { globalConfirm } from "../../utility/globalConfirm";
 import { calcAvailableSkills, calcUsedSkills } from "../../libs/npcs";

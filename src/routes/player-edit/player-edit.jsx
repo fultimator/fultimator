@@ -45,14 +45,13 @@ import {
   Alert,
 } from "@mui/material";
 import Layout from "../../components/Layout";
-import { PcActorCard, PcActorCardCompact } from "../../components/shared/actorCards";
-import InformationTab from "../../components/shared/actorCards/pc/tabs/InformationTab";
-import StatsTab from "../../components/shared/actorCards/pc/tabs/StatsTab";
-import ClassesTab from "../../components/shared/actorCards/pc/tabs/ClassesTab";
-import SpellsTab from "../../components/shared/actorCards/pc/tabs/SpellsTab";
-import BackpackTab from "../../components/shared/actorCards/pc/tabs/BackpackTab";
-import NotesTab from "../../components/shared/actorCards/pc/tabs/NotesTab";
-import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
+import { PcActorCard, PcActorCardCompact } from "../../components/shared/actors";
+import InformationTab from "../../components/shared/actors/pc/tabs/InformationTab";
+import StatsTab from "../../components/shared/actors/pc/tabs/StatsTab";
+import ClassesTab from "../../components/shared/actors/pc/tabs/ClassesTab";
+import SpellsTab from "../../components/shared/actors/pc/tabs/SpellsTab";
+import BackpackTab from "../../components/shared/actors/pc/tabs/BackpackTab";
+import NotesTab from "../../components/shared/actors/pc/tabs/NotesTab";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import {
@@ -89,18 +88,18 @@ import { fixVerticalLabels, expandCompactHeaderForExport } from "../../utility/s
 import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
-} from "../../components/player/playerTransforms";
+} from "../../libs/actor";
 import classList from "../../libs/classes";
-import { syncAutomaticClassLevels } from "../../components/player/classes/classLevelUtils";
+import { syncAutomaticClassLevels } from "../../libs/player/classLevelUtils";
 import { buildMnemosphere } from "../../libs/mnemospheres";
 import CustomHeader from "../../components/common/CustomHeader";
 import SettingRow from "../../components/common/SettingRow";
-import MigrateFromCompendiumDialog from "../../components/player/settings/MigrateFromCompendiumDialog";
-import useLevelUpFlow from "../../components/player/common/hooks/useLevelUpFlow";
+import MigrateFromCompendiumDialog from "/src/libs/player/MigrateFromCompendiumDialog";
+import useLevelUpFlow from "../../libs/player/hooks/useLevelUpFlow";
 import {
   canLevelUpFromExp as canLevelUpFromExpCheck,
   applyExpLevelUp,
-} from "../../components/player/common/levelUpLogic";
+} from "../../libs/player/levelUpLogic";
 import { executeCommand } from "../../components/app-drawer/panels/chat/domain/commands";
 
 export default function PlayerEdit() {

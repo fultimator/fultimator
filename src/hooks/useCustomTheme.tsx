@@ -29,8 +29,18 @@ interface CustomTheme {
 export const useCustomTheme = (): CustomTheme => {
   const theme = useTheme<Theme>();
 
-  const paperOverrides = (theme.components?.MuiPaper as Components<Theme>["MuiPaper"])?.styleOverrides?.root;
-  const panelRadius = typeof paperOverrides?.borderRadius === "number" ? paperOverrides.borderRadius : 4;
+  const paperOverrides = (
+    theme.components?.MuiPaper as Components<Theme>["MuiPaper"]
+  )?.styleOverrides?.root;
+  const panelRadius =
+    typeof paperOverrides === "object" &&
+    paperOverrides !== null &&
+    !Array.isArray(paperOverrides) &&
+    "borderRadius" in paperOverrides &&
+    typeof (paperOverrides as { borderRadius?: unknown }).borderRadius ===
+      "number"
+      ? ((paperOverrides as { borderRadius: number }).borderRadius ?? 4)
+      : 4;
 
   return {
     primary: theme.palette.primary.main,

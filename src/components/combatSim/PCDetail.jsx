@@ -2,7 +2,7 @@ import React from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import PlayerCardSheet from "../player/playerSheet/compact/PlayerSheetCompact";
+import PlayerCardSheet from "/src/components/shared/actors/pc/legacy-player/playerSheet/compact/PlayerSheetCompact";
 
 export default function PCDetail({
   selectedPC,

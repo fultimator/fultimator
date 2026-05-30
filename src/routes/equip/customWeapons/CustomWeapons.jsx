@@ -12,13 +12,13 @@ import { useStickyTop } from "../../../hooks/useStickyTop";
 import { AutoAwesome, Download, Search } from "@mui/icons-material";
 import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
-import { SharedCustomWeaponCard } from "../../../components/shared/itemCards";
+import { SharedCustomWeaponCard } from "../../../components/shared/items";
 import Export from "../../../components/Export";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import allQualities from "../../../libs/qualities";
 import groupBy from "../../../libs/groupby";
-import { calculateCustomWeaponStats } from "../../../components/player/common/playerCalculations";
+import { calculateCustomWeaponStats } from "../../../libs/playerCalculations";
 import { categories, accuracyChecks } from "./libs.jsx";
 import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
 import {

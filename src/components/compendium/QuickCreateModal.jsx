@@ -43,7 +43,7 @@ import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import { calculateCustomWeaponStats } from "../player/common/playerCalculations";
+import { calculateCustomWeaponStats } from "../../libs/playerCalculations";
 import types from "../../libs/types";
 import weapons from "../../libs/weapons";
 import armor from "../../libs/armor";
@@ -79,14 +79,14 @@ import {
   SharedQualityCard,
   SharedMnemosphereCard,
   SharedHoplosphereCard,
-} from "../shared/itemCards";
+} from "../shared/items";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
 import qualities from "../../libs/qualities";
 import CustomTextarea from "../common/CustomTextarea";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 import { availableFrames } from "../../libs/pilotVehicleData";
-import { availableMagichantKeys } from "../player/spells/spellOptionData";
+import { availableMagichantKeys } from "../../libs/player/spellOptionData";
 import CompendiumViewerModal from "./CompendiumViewerModal";
 import {
   buildMnemosphere,

@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import html2canvas from "html2canvas";
 import Confetti from "react-confetti";
-import { PcActorCard, PcActorCardCompact } from "../../components/shared/actorCards";
+import { PcActorCard, PcActorCardCompact } from "../../components/shared/actors";
 import powered_by_fu from "/images/routes/powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
@@ -40,9 +40,9 @@ import { usePrompt } from "../../hooks/usePrompt";
 import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
-} from "../../components/player/playerTransforms";
-import useLevelUpFlow from "../../components/player/common/hooks/useLevelUpFlow";
-import { canLevelUpFromExp as canLevelUpFromExpCheck } from "../../components/player/common/levelUpLogic";
+} from "../../libs/actor";
+import useLevelUpFlow from "../../libs/player/hooks/useLevelUpFlow";
+import { canLevelUpFromExp as canLevelUpFromExpCheck } from "../../libs/player/levelUpLogic";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();

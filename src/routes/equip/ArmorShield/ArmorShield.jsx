@@ -14,7 +14,7 @@ import shieldBases from "../../../libs/shields";
 import {
   SharedArmorCard,
   SharedShieldCard,
-} from "../../../components/shared/itemCards";
+} from "../../../components/shared/items";
 import { useTranslate } from "../../../translation/translate";
 import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";

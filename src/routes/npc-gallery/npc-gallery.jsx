@@ -34,7 +34,7 @@ import {
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
+import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import {
   Delete,
   ChevronLeft,
@@ -78,7 +78,7 @@ import {
   NPC_CURRENT_SCHEMA_VERSION,
   applyNpcPreSaveTransforms,
   applyNpcPostLoadTransforms,
-} from "../../components/npc/npcTransforms";
+} from "../../libs/actor";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import {
   canonicalizeForTransfer,

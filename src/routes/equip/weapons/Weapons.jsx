@@ -11,7 +11,7 @@ import CompendiumViewerModal from "../../../components/compendium/CompendiumView
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useEffect, useRef } from "react";
 import weapons from "../../../libs/weapons";
-import { SharedWeaponCard } from "../../../components/shared/itemCards";
+import { SharedWeaponCard } from "../../../components/shared/items";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";

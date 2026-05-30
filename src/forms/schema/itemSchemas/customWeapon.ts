@@ -6,8 +6,8 @@ import {
   categories,
   accuracyChecks,
 } from "../../../routes/equip/customWeapons/libs";
-import { calculateCustomWeaponStats } from "../../../components/player/common/playerCalculations";
-import { SLOT_TIERS } from "../../../components/player/equipment/technospheres/slotTiers";
+import { calculateCustomWeaponStats } from "../../../libs/playerCalculations";
+import { SLOT_TIERS } from "../../../libs/player/slotTiers";
 import {
   WeaponAccuracySchema,
   WeaponDamageSchema,

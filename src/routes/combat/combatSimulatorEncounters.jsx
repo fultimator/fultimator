@@ -58,12 +58,12 @@ import {
   applyNpcPostLoadTransforms,
   getPendingNpcMigrations,
   npcNeedsMigration,
-} from "../../components/npc/npcTransforms";
+} from "../../libs/actor";
 import {
   applyPostLoadTransforms,
   getPendingPlayerMigrations,
   playerNeedsMigration,
-} from "../../components/player/playerTransforms";
+} from "../../libs/actor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 

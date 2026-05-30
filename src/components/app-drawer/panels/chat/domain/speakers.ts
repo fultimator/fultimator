@@ -5,12 +5,12 @@ import { useCombatEncounterStore } from "../../../../../stores/combatEncounterSt
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
-} from "../../../../player/equipment/slots/equipmentSlots";
+} from "../../../../../libs/player/slots/equipmentSlots";
 import {
   getAvailableSupportModules,
   getPilotSpellInfo,
   getSlotLocks,
-} from "../../../../player/equipment/slots/loadoutSelectors";
+} from "../../../../../libs/player/slots/loadoutSelectors";
 import type { TypePlayer } from "../../../../../types/Players";
 import { DEFAULT_SPEAKER } from "../constants";
 import type { Attribute } from "../types";

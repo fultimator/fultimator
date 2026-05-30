@@ -42,13 +42,13 @@ import type { OpposeTarget } from "./ChatActionsContext.shared";
 import type { OpposedCheckMessage } from "./types";
 import { MessageListErrorBoundary } from "./MessageListErrorBoundary";
 import { ChatComposer } from "./ChatComposer";
-import SlotPickerDialog from "../../../player/equipment/slots/SlotPickerDialog";
-import VehicleEnterDialog from "../../../player/equipment/slots/VehicleEnterDialog";
+import SlotPickerDialog from "/src/components/shared/actors/pc/editors/equipment/slots/SlotPickerDialog.jsx";
+import VehicleEnterDialog from "/src/components/shared/actors/pc/editors/equipment/slots/VehicleEnterDialog.jsx";
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import { useDatabase } from "../../../../hooks/useDatabase";
 import type { TypePlayer } from "../../../../types/Players";
-import { applyPostLoadTransforms } from "../../../../components/player/playerTransforms";
-import { applyNpcPostLoadTransforms } from "../../../../components/npc/npcTransforms";
+import { applyPostLoadTransforms } from "../../../../libs/actor";
+import { applyNpcPostLoadTransforms } from "../../../../libs/actor";
 import type { TypeNpc } from "../../../../types/Npcs";
 import type { ChatMessage, LogMessage } from "./types";
 import { LogMessageTemplate } from "./message-templates/LogMessageTemplate";
@@ -66,7 +66,7 @@ import {
   getEquippedModuleForSlot,
   getEquippedModulesForSlot,
   getPilotSpellInfo,
-} from "../../../player/equipment/slots/loadoutSelectors";
+} from "../../../../libs/player/slots/loadoutSelectors";
 import {
   disableModuleForSlot,
   enterVehicleAction,
@@ -74,8 +74,8 @@ import {
   selectModuleForSlot,
   toggleSupportModuleAction,
   toggleActiveVehicle,
-} from "../../../player/equipment/slots/loadoutActions";
-import { getActiveVehicle } from "../../../player/equipment/slots/equipmentSlots";
+} from "../../../../libs/player/slots/loadoutActions";
+import { getActiveVehicle } from "../../../../libs/player/slots/equipmentSlots";
 import { useTranslate } from "../../../../translation/translate";
 
 const isRetargetableMessage = (

@@ -11,25 +11,29 @@ import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 function normalizeNestedButtons(node: React.ReactNode): React.ReactNode {
   if (!React.isValidElement(node)) return node;
+  const element = node as React.ReactElement<{
+    children?: React.ReactNode;
+    component?: React.ElementType;
+  }>;
 
-  const elementType = node.type as { muiName?: string; displayName?: string };
+  const elementType = element.type as { muiName?: string; displayName?: string };
   const isIconButton =
     elementType?.muiName === "IconButton" ||
     elementType?.displayName === "IconButton";
 
-  const children = node.props?.children
-    ? React.Children.map(node.props.children, normalizeNestedButtons)
-    : node.props?.children;
+  const children = element.props?.children
+    ? React.Children.map(element.props.children, normalizeNestedButtons)
+    : element.props?.children;
 
   if (isIconButton) {
-    return React.cloneElement(node, {
+    return React.cloneElement(element, {
       component: "span",
       children,
     });
   }
 
-  if (children !== node.props?.children) {
-    return React.cloneElement(node, { children });
+  if (children !== element.props?.children) {
+    return React.cloneElement(element, { children });
   }
 
   return node;
