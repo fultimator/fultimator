@@ -146,10 +146,10 @@ function patchInv(
   return { ...player, equipment };
 }
 
-function applyModuleUpdater(
+function applyVehicleUpdater(
   player: TypePlayer,
   pilotInfo: PilotSpellInfo,
-  updaterFn: (modules: VehicleModule[]) => VehicleModule[],
+  updaterFn: (vehicle: Vehicle) => Vehicle,
 ): TypePlayer {
   const { classIndex, spellIndex } = pilotInfo;
   const classes = (player.classes ?? []).map((cls: PlayerClass, ci: number) =>
@@ -177,9 +177,7 @@ function applyModuleUpdater(
                         : -1;
                   const updatedVehicles = vehicles.map(
                     (v: Vehicle, vi: number) =>
-                      vi !== targetIndex
-                        ? v
-                        : { ...v, modules: updaterFn(v.modules ?? []) },
+                      vi !== targetIndex ? v : updaterFn(v),
                   );
                   return {
                     ...s,
@@ -191,6 +189,17 @@ function applyModuleUpdater(
         },
   );
   return syncSlots({ ...player, classes });
+}
+
+function applyModuleUpdater(
+  player: TypePlayer,
+  pilotInfo: PilotSpellInfo,
+  updaterFn: (modules: VehicleModule[]) => VehicleModule[],
+): TypePlayer {
+  return applyVehicleUpdater(player, pilotInfo, (v) => ({
+    ...v,
+    modules: updaterFn(v.modules ?? []),
+  }));
 }
 
 // Equip / Unequip
@@ -499,23 +508,55 @@ export function disableModuleForSlot(
   pilotInfo: PilotSpellInfo,
   slot: string,
 ): TypePlayer {
-  return applyModuleUpdater(player, pilotInfo, (modules) =>
-    modules.map((m: VehicleModule) => {
-      const matches =
-        (slot === "armor" && m.type === "pilot_module_armor") ||
-        (slot === "mainHand" &&
+  return applyVehicleUpdater(player, pilotInfo, (v) => {
+    const modules = v.modules ?? [];
+    const slots = {
+      main: v.slots?.main ?? null,
+      off: v.slots?.off ?? null,
+      armor: v.slots?.armor ?? null,
+      support: [...(v.slots?.support ?? [])],
+    };
+
+    const occupiesRequestedSlot = (m: VehicleModule) => {
+      const s = m.equippedSlot;
+      if (slot === "armor") {
+        return (
+          m.type === "pilot_module_armor" &&
+          (s === "armor" || slots.armor === (m.key ?? m.name))
+        );
+      }
+      if (slot === "mainHand") {
+        return (
           m.type === "pilot_module_weapon" &&
-          (m.equippedSlot === "main" ||
-            m.equippedSlot === "mainHand" ||
-            m.equippedSlot === "both")) ||
-        (slot === "offHand" &&
+          (s === "main" || s === "mainHand" || s === "both" || slots.main === (m.key ?? m.name))
+        );
+      }
+      if (slot === "offHand") {
+        return (
           m.type === "pilot_module_weapon" &&
-          (m.equippedSlot === "off" ||
-            m.equippedSlot === "offHand" ||
-            m.equippedSlot === "both"));
-      return matches ? { ...m, enabled: false } : m;
-    }),
-  );
+          (s === "off" || s === "offHand" || s === "both" || slots.off === (m.key ?? m.name))
+        );
+      }
+      return false;
+    };
+
+    const keysToClear = new Set<string>();
+    const nextModules = modules.map((m: VehicleModule) => {
+      if (!occupiesRequestedSlot(m)) return m;
+      const key = m.key ?? m.name;
+      if (key) keysToClear.add(key);
+      return { ...m, enabled: false, equipped: false };
+    });
+
+    if (keysToClear.size > 0) {
+      if (slots.main && keysToClear.has(slots.main)) slots.main = null;
+      if (slots.off && keysToClear.has(slots.off)) slots.off = null;
+      if (slots.armor && keysToClear.has(slots.armor)) slots.armor = null;
+      slots.support = slots.support.filter((k: string) => !keysToClear.has(k));
+    }
+
+    return { ...v, modules: nextModules, slots };
+  });
 }
 
 /**
@@ -624,6 +665,48 @@ export function saveVehiclesAction(
   updatedPilot: { vehicles: Vehicle[]; showInPlayerSheet?: boolean },
 ): TypePlayer {
   const { classIndex, spellIndex } = pilotInfo;
+  const currentSpell = (player.classes ?? [])[classIndex]?.spells?.[spellIndex];
+  const existingVehicles = Array.isArray(currentSpell?.vehicles)
+    ? currentSpell.vehicles
+    : Array.isArray(currentSpell?.currentVehicles)
+      ? currentSpell.currentVehicles
+      : [];
+  const isGenericModuleName = (name: string | undefined) =>
+    name === "pilot_module_armor" ||
+    name === "pilot_module_weapon" ||
+    name === "pilot_module_support";
+  const normalizedVehicles = (updatedPilot.vehicles ?? []).map(
+    (vehicle: Vehicle, vi: number) => {
+      const prevVehicle = existingVehicles?.[vi];
+      const prevModules = prevVehicle?.modules ?? [];
+      const modules = (vehicle.modules ?? []).map((module, mi) => {
+        const prevModule = prevModules?.[mi];
+        const nextName =
+          !module?.name || isGenericModuleName(module.name)
+            ? module?.key && !isGenericModuleName(module.key)
+              ? module.key
+              : prevModule?.key && !isGenericModuleName(prevModule.key)
+                ? prevModule.key
+                : prevModule?.name && !isGenericModuleName(prevModule.name)
+                  ? prevModule.name
+                  : module?.name
+            : module.name;
+        return {
+          ...module,
+          name: nextName,
+          customName:
+            module?.customName ??
+            prevModule?.customName ??
+            "",
+          description:
+            module?.description ??
+            prevModule?.description ??
+            "",
+        };
+      });
+      return { ...vehicle, modules };
+    },
+  );
   const classes = (player.classes ?? []).map((cls: PlayerClass, ci: number) =>
     ci !== classIndex
       ? cls
@@ -634,8 +717,8 @@ export function saveVehiclesAction(
               ? s
               : {
                   ...s,
-                  vehicles: updatedPilot.vehicles,
-                  currentVehicles: updatedPilot.vehicles,
+                  vehicles: normalizedVehicles,
+                  currentVehicles: normalizedVehicles,
                   showInPlayerSheet: updatedPilot.showInPlayerSheet,
                 },
           ),

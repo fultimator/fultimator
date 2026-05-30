@@ -50,15 +50,13 @@ export default function ArcanistGeneralSection({ formState, setFormState, t }) {
           sm: 12,
         }}
       >
-        <TextField
+        <CustomTextarea
           label={t("Arcana Description")}
-          variant="outlined"
           fullWidth
           value={formState.description || ""}
           onChange={(e) => handleChange("description", e.target.value)}
-          slotProps={{
-            htmlInput: { maxLength: 50 },
-          }}
+          maxRows={10}
+          maxLength={1500}
         />
       </Grid>
       <Grid

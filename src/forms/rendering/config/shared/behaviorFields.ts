@@ -19,10 +19,7 @@ export const PASSIVE_ITEM_TABS: TabDefinition[] = [
   { key: "passives", label: "tab.passives" },
   { key: "behaviors", label: "tab.behaviors" },
 ];
-
-// ---------------------------------------------------------------------------
 // EffectChange key autocomplete options
-// ---------------------------------------------------------------------------
 
 export const EFFECT_CHANGE_KEY_OPTIONS: string[] = [
   "bonuses.accuracy.all",
@@ -71,10 +68,7 @@ const EFFECT_MODE_OPTIONS = [
   { value: 4, label: "effect.mode.upgrade" },
   { value: 5, label: "effect.mode.custom" },
 ];
-
-// ---------------------------------------------------------------------------
 // EffectChange row fields (used inside Passive.changes object-list)
-// ---------------------------------------------------------------------------
 
 function makeEffectChangeRowFields(
   keyOptions: string[],
@@ -122,10 +116,7 @@ export const effectChangeRowFields = makeEffectChangeRowFields(
 );
 
 export const BLANK_EFFECT_CHANGE = { key: "", mode: 2, value: "0" };
-
-// ---------------------------------------------------------------------------
 // Group keys for behavior/passive sections
-// ---------------------------------------------------------------------------
 
 export const BEHAVIOR_GROUPS = {
   trigger: "behavior-trigger",
@@ -139,10 +130,7 @@ export const PASSIVE_GROUPS = {
   duration: "passive-duration",
   changes: "passive-changes",
 } as const;
-
-// ---------------------------------------------------------------------------
 // Passive row fields (used inside the top-level passives object-list)
-// ---------------------------------------------------------------------------
 
 const EFFECT_DURATION_EVENT_OPTIONS = [
   { value: "none", label: "effect.duration.none" },
@@ -310,10 +298,7 @@ export const BLANK_PASSIVE = () => ({
 
 /** @deprecated Use BLANK_PASSIVE */
 export const BLANK_ITEM_EFFECT = BLANK_PASSIVE;
-
-// ---------------------------------------------------------------------------
 // AfterEffect row fields
-// ---------------------------------------------------------------------------
 
 const AFTER_EFFECT_RESOURCE_OPTIONS = [
   { value: "hp", label: "resource.hp" },
@@ -456,10 +441,7 @@ export const BLANK_AFTER_EFFECT = {
   target: "targets",
   predicate: { crisisInteraction: "none" },
 };
-
-// ---------------------------------------------------------------------------
 // AppliesEffect fields (relative keys - used inside a behavior row)
-// ---------------------------------------------------------------------------
 
 const APPLIES_EFFECT_TARGET_OPTIONS = [
   { value: "single", label: "appliesEffect.target.single" },
@@ -550,10 +532,7 @@ export const appliesEffectRowFields: ItemFieldConfig<Record<string, unknown>> =
 
 /** @deprecated Use appliesEffectRowFields (scoped to behavior row) */
 export const appliesEffectFields = appliesEffectRowFields;
-
-// ---------------------------------------------------------------------------
 // ActionTrigger row fields (relative keys - used inside a behavior row)
-// ---------------------------------------------------------------------------
 
 const TRIGGER_KIND_OPTIONS = [
   { value: "none", label: "trigger.kind.none" },
@@ -686,11 +665,8 @@ export const actionTriggerRowFields: ItemFieldConfig<Record<string, unknown>> =
 
 /** @deprecated Use actionTriggerRowFields (scoped to behavior row) */
 export const actionTriggerFields = actionTriggerRowFields;
-
-// ---------------------------------------------------------------------------
 // Behavior row fields (id + name + trigger + appliesEffect + afterEffects)
 // Used inside the top-level behaviors object-list.
-// ---------------------------------------------------------------------------
 
 export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
   {
@@ -774,10 +750,7 @@ export const passiveGroupLabels: Record<string, string> = {
   [PASSIVE_GROUPS.duration]: "passive.duration",
   [PASSIVE_GROUPS.changes]: "passive.changes",
 };
-
-// ---------------------------------------------------------------------------
 // Passives tab field (shared by all item types)
-// ---------------------------------------------------------------------------
 
 export function makePassivesTabField(
   itemScopedKeys: string[],
@@ -804,10 +777,7 @@ export function makePassivesTabField(
 }
 
 export const passivesTabField = makePassivesTabField([]);
-
-// ---------------------------------------------------------------------------
 // Behaviors tab field (shared by all item types)
-// ---------------------------------------------------------------------------
 
 export const behaviorsTabField: FieldConfig<Record<string, unknown>> = {
   key: "behaviors",
@@ -828,10 +798,7 @@ export const behaviorsTabField: FieldConfig<Record<string, unknown>> = {
       typeof row.name === "string" && row.name ? row.name : "Behavior",
   },
 };
-
-// ---------------------------------------------------------------------------
 // Legacy exports - kept for existing item configs during migration
-// ---------------------------------------------------------------------------
 
 /** @deprecated Item configs now use passivesTabField + behaviorsTabField directly */
 export const behaviorGroupFields: FieldConfig<Record<string, unknown>>[] = [

@@ -33,7 +33,6 @@ import CasinoIcon from "@mui/icons-material/Casino";
 import { SwapHoriz } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { useTheme } from "@mui/material/styles";
 import attributes from "../../../libs/attributes";
 import {
   resolveEffectiveSlot,
@@ -117,7 +116,6 @@ function SlotCard({
   label,
   resolved,
   locked,
-  isEditMode,
   onClick,
   hasModule,
   onRoll,
@@ -125,7 +123,6 @@ function SlotCard({
   isAux,
   primary,
   ternary,
-  ternaryContrast,
 }) {
   const { t } = useTranslate();
   const isVehicle = resolved?.kind === "vehicleModule";
@@ -383,7 +380,7 @@ function SlotCard({
 
 // VehicleSupportCard
 
-function VehicleSupportCard({ label, module, isEditMode, onClick }) {
+function VehicleSupportCard({ label, module, onClick }) {
   const { t } = useTranslate();
   const clickable = !!onClick;
   const content = (
@@ -504,12 +501,10 @@ export default function PlayerLoadout({
   isOwner,
 }) {
   const { t } = useTranslate();
-  const muiTheme = useTheme();
   const theme = useCustomTheme();
   const primary = theme.primary;
   const secondary = theme.secondary;
   const ternary = theme.ternary || "#999";
-  const ternaryContrast = muiTheme.palette.getContrastText(ternary);
   const canClickSlot = isEditMode || !!isOwner || !!setPlayer;
   const addMessage = useChatMessagesStore((s) => s.addMessage);
 
@@ -540,7 +535,7 @@ export default function PlayerLoadout({
         : resolveEffectiveSlot(player, slot);
     if (!resolved) return;
 
-    let att1, att2, prec, damage, type, defense, range, hrZero;
+    let att1, att2, prec, damage, type, defense, range, hrZero, category, hands, isWeaponModule;
     if (resolved.kind === "vehicleModule") {
       const m = resolved.module;
       if (m.type !== "pilot_module_weapon" || m.isShield) return;
@@ -555,6 +550,8 @@ export default function PlayerLoadout({
       defense = acc?.defense ?? "def";
       range = m?.range ?? "melee";
       hrZero = dmg?.hrZero === true;
+      category = m?.category;
+      isWeaponModule = true;
     } else {
       const item = resolved.item;
       const isSecondary = item.activeForm === "secondary";
@@ -573,6 +570,8 @@ export default function PlayerLoadout({
       defense = acc?.defense ?? "def";
       range = item?.range ?? (item?.melee ? "melee" : "ranged");
       hrZero = dmg?.hrZero === true;
+      category = item?.category;
+      hands = item?.hands;
     }
     const toRollKey = (attr) => {
       const key = String(attr || "").toLowerCase();
@@ -604,7 +603,10 @@ export default function PlayerLoadout({
       damageType: type || "physical",
       accuracyDefense: defense,
       range,
-      hrZero,
+      category,
+      hands,
+      isWeaponModule,
+      damageHrZero: hrZero,
     });
     const rolls = rollAccuracyCheck(dieSizes);
     const result = processAccuracyCheck(
@@ -877,7 +879,6 @@ export default function PlayerLoadout({
                 }
                 primary={primary}
                 ternary={ternary}
-                ternaryContrast={ternaryContrast}
               />
             </Grid>
           ))}
@@ -899,7 +900,6 @@ export default function PlayerLoadout({
                 onRoll={() => handleRollSlot("aux")}
                 primary={primary}
                 ternary={ternary}
-                ternaryContrast={ternaryContrast}
               />
             </Grid>
           )}
@@ -968,7 +968,6 @@ export default function PlayerLoadout({
                     label={`${t("Support")} ${i + 1}`}
                     module={entry.module}
                     vehicle={activeVehicle}
-                    isEditMode={canClickSlot}
                     onClick={
                       canClickSlot
                         ? () => setSupportPickerOpen(true)
@@ -990,7 +989,6 @@ export default function PlayerLoadout({
                     label={`${t("Support")} 1`}
                     module={null}
                     vehicle={activeVehicle}
-                    isEditMode={canClickSlot}
                     onClick={
                       canClickSlot
                         ? () => setSupportPickerOpen(true)

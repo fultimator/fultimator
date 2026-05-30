@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material/styles";
-import type { Theme } from "@mui/material/styles";
+import type { Components, Theme } from "@mui/material/styles";
 
 // Define a CustomTheme interface to include all theme properties you need
 interface CustomTheme {
@@ -10,6 +10,7 @@ interface CustomTheme {
   white: string;
   transparent: string;
   mode: "light" | "dark";
+  panelRadius: number;
   background: {
     default: string;
     paper: string;
@@ -28,12 +29,16 @@ interface CustomTheme {
 export const useCustomTheme = (): CustomTheme => {
   const theme = useTheme<Theme>();
 
+  const paperOverrides = (theme.components?.MuiPaper as Components<Theme>["MuiPaper"])?.styleOverrides?.root;
+  const panelRadius = typeof paperOverrides?.borderRadius === "number" ? paperOverrides.borderRadius : 4;
+
   return {
     primary: theme.palette.primary.main,
     secondary: theme.palette.secondary.main,
     ternary: theme.palette.ternary?.main || "",
     quaternary: theme.palette.quaternary?.main || "",
     white: theme.palette.common.white,
+    panelRadius,
     transparent:
       theme.palette.mode === "dark"
         ? "rgba(0, 0, 0, 0)"

@@ -214,7 +214,7 @@ function RitualsProjects() {
           id="section-weapons"
         >
           <Grid size={12}>
-            <Weapons />
+            <Weapons variant="print" />
           </Grid>
         </Grid>
 
@@ -225,7 +225,7 @@ function RitualsProjects() {
           id="section-custom-weapons"
         >
           <Grid size={12}>
-            <CustomWeapons />
+            <CustomWeapons variant="print" />
           </Grid>
         </Grid>
 
@@ -236,7 +236,7 @@ function RitualsProjects() {
           id="section-armor"
         >
           <Grid size={12}>
-            <ArmorPanel />
+            <ArmorPanel variant="print" />
           </Grid>
         </Grid>
 
@@ -247,7 +247,7 @@ function RitualsProjects() {
           id="section-shield"
         >
           <Grid size={12}>
-            <ShieldPanel />
+            <ShieldPanel variant="print" />
           </Grid>
         </Grid>
 
@@ -258,7 +258,7 @@ function RitualsProjects() {
           id="section-accessories"
         >
           <Grid size={12}>
-            <Accessories />
+            <Accessories variant="print" />
           </Grid>
         </Grid>
 
@@ -269,7 +269,7 @@ function RitualsProjects() {
           id="section-arcana"
         >
           <Grid size={12}>
-            <Arcana />
+            <Arcana variant="print" />
           </Grid>
         </Grid>
 
@@ -280,7 +280,7 @@ function RitualsProjects() {
           id="section-qualities"
         >
           <Grid size={12}>
-            <Qualities />
+            <Qualities variant="print" />
           </Grid>
         </Grid>
       </Layout>
@@ -596,6 +596,7 @@ function Rituals() {
         >
           <SharedRitualCard
             item={ritualPreview}
+            variant="print"
             showImageToggle
             imageMode="slot"
             cardRef={cardRef}
@@ -978,6 +979,7 @@ function Projects() {
         >
           <SharedProjectCard
             item={projectPreview}
+            variant="print"
             showImageToggle
             imageMode="slot"
             cardRef={cardRef}

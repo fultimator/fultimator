@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { toSlug } from "../../../libs/compendium";
 
 /**
  * Manages the 12 compendium filter states + their change handlers.
@@ -107,10 +106,7 @@ export function useCompendiumFilters({
   const isPilotClassSelected = selectedSpellClassKey === "pilot";
   const isChanterClassSelected = selectedSpellClassKey === "chanter";
   const isInvokerClassSelected = selectedSpellClassKey === "invoker";
-
-  // ---------------------------------------------------------------------------
   // Handlers - each resets search + selection and optionally scrolls
-  // ---------------------------------------------------------------------------
 
   const handleTypeChange = useCallback(
     (type, { scrollRef } = {}) => {

@@ -5,7 +5,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton,
   TextField,
   Grid,
   Typography,
@@ -13,11 +12,12 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { Close, Add, RemoveCircleOutlined } from "@mui/icons-material";
+import { Add, RemoveCircleOutlined } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
+import ActorEditModal from "../../../forms/ui/ActorEditModal";
 
 export default function PlayerNoteModal({
   open,
@@ -101,124 +101,111 @@ export default function PlayerNoteModal({
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
-          {editNoteIndex !== null ? t("Edit Note") : t("Add Note")}
-          <IconButton
-            aria-label="close"
-            onClick={onClose}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={2}>
-            <Grid size={12}>
-              <TextField
-                fullWidth
-                label={t("Note Name")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                slotProps={{
-                  htmlInput: { maxLength: 50 },
-                }}
-              />
-            </Grid>
-            <Grid size={12}>
-              <CustomTextarea
-                label={t("Description")}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                maxRows={10}
-              />
-            </Grid>
-            <Grid size={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={showInPlayerSheet}
-                    onChange={(e) => setShowInPlayerSheet(e.target.checked)}
-                  />
-                }
-                label={t("Show in Character Sheet")}
-              />
-            </Grid>
-            <Grid size={12}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 1,
-                }}
-              >
-                <Typography variant="h6">{t("Clocks")}</Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<Add />}
-                  onClick={() => setClockDialogOpen(true)}
-                  disabled={clocks.length >= 4}
-                >
-                  {t("Add Clock")}
-                </Button>
-              </Box>
-              <Grid container spacing={1}>
-                {clocks.map((clock, index) => (
-                  <Grid key={index} size={12}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        p: 1,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 1,
-                      }}
-                    >
-                      <Typography variant="body2">
-                        <strong>{clock.name}</strong> ({clock.sections}{" "}
-                        {t("sections")})
-                      </Typography>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleRemoveClock(index)}
-                      >
-                        <RemoveCircleOutlined fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "space-between", px: 3, py: 2 }}>
-          <Box>
+      <ActorEditModal
+        open={open}
+        onClose={onClose}
+        onConfirm={handleSave}
+        title={editNoteIndex !== null ? t("Edit Note") : t("Add Note")}
+        maxWidth="sm"
+        actions={
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             {editNoteIndex !== null && (
               <Button variant="contained" color="error" onClick={handleDelete}>
                 {t("Delete")}
               </Button>
             )}
-          </Box>
-          <Box>
-            <Button onClick={onClose} sx={{ mr: 1 }}>
-              {t("Cancel")}
-            </Button>
+            <Box sx={{ flexGrow: 1 }} />
+            <Button onClick={onClose}>{t("Cancel")}</Button>
             <Button variant="contained" color="primary" onClick={handleSave}>
               {t("Save")}
             </Button>
           </Box>
-        </DialogActions>
-      </Dialog>
+        }
+      >
+        <Grid container spacing={2}>
+          <Grid size={12}>
+            <TextField
+              fullWidth
+              label={t("Note Name")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              slotProps={{
+                htmlInput: { maxLength: 50 },
+              }}
+            />
+          </Grid>
+          <Grid size={12}>
+            <CustomTextarea
+              label={t("Description")}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxRows={10}
+            />
+          </Grid>
+          <Grid size={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={showInPlayerSheet}
+                  onChange={(e) => setShowInPlayerSheet(e.target.checked)}
+                />
+              }
+              label={t("Show in Character Sheet")}
+            />
+          </Grid>
+          <Grid size={12}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1,
+              }}
+            >
+              <Typography variant="h6">{t("Clocks")}</Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<Add />}
+                onClick={() => setClockDialogOpen(true)}
+                disabled={clocks.length >= 4}
+              >
+                {t("Add Clock")}
+              </Button>
+            </Box>
+            <Grid container spacing={1}>
+              {clocks.map((clock, index) => (
+                <Grid key={index} size={12}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      p: 1,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: 1,
+                    }}
+                  >
+                    <Typography variant="body2">
+                      <strong>{clock.name}</strong> ({clock.sections}{" "}
+                      {t("sections")})
+                    </Typography>
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => handleRemoveClock(index)}
+                      sx={{ minWidth: 0, p: 0.5 }}
+                    >
+                      <RemoveCircleOutlined fontSize="small" />
+                    </Button>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
+        </Grid>
+      </ActorEditModal>
       {/* Add Clock Dialog */}
       <Dialog open={clockDialogOpen} onClose={() => setClockDialogOpen(false)}>
         <DialogTitle variant="h3">{t("Add Clock")}</DialogTitle>

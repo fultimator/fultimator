@@ -41,11 +41,23 @@ export function isImageMode(imageMode) {
 }
 
 export function getVariantScale(variant) {
-  if (variant === "sheet")
-    return { header: "0.9rem", body: "0.85rem", headingRow: "0.85rem" };
-  if (variant === "equip")
-    return { header: "1rem", body: "0.95rem", headingRow: "0.95rem" };
+  if (variant === "interactive")
+    return { header: "0.88rem", body: "0.84rem", headingRow: "0.84rem" };
+  if (variant === "print")
+    return { header: "1.1rem", body: "0.98rem", headingRow: "1rem" };
   return { header: "0.95rem", body: "0.9rem", headingRow: "0.9rem" };
+}
+
+function resolveHeaderMinHeight(scale) {
+  const headerSize = Number.parseFloat(scale?.header ?? "0.95");
+  if (headerSize >= 1.05) return "44px";
+  if (headerSize <= 0.89) return "34px";
+  return HEADER_MIN_HEIGHT;
+}
+
+function resolveHeaderWeight(scale) {
+  const headerSize = Number.parseFloat(scale?.header ?? "0.95");
+  return headerSize >= 1.05 ? 700 : 600;
 }
 
 export function resolveImageTempInfoText(t, key) {
@@ -81,7 +93,7 @@ export function headerBoxSx(
     pl: imageSpacerWidth ? `${imageSpacerWidth + 16}px` : 2,
     pr: 2,
     py: 0.5,
-    minHeight: HEADER_MIN_HEIGHT,
+    minHeight: resolveHeaderMinHeight(scale),
     background: customTheme.primary,
     color: "#ffffff",
     cursor: onHeaderClick ? "pointer" : "default",
@@ -92,7 +104,7 @@ export function headerBoxSx(
     "& .MuiTypography-root": {
       color: "inherit",
       textTransform: "uppercase",
-      fontWeight: 600,
+      fontWeight: resolveHeaderWeight(scale),
       fontSize: scale.header,
       fontFamily: "Antonio",
       letterSpacing: "0.5px",
@@ -104,7 +116,7 @@ export function headerBoxSx(
 export function headerGridSx(customTheme, scale, onHeaderClick, imageMode) {
   return {
     alignItems: "center",
-    minHeight: HEADER_MIN_HEIGHT,
+    minHeight: resolveHeaderMinHeight(scale),
     px: 2,
     py: isImageMode(imageMode) ? 0 : 0.5,
     background: customTheme.primary,
@@ -113,7 +125,7 @@ export function headerGridSx(customTheme, scale, onHeaderClick, imageMode) {
     "& .MuiTypography-root": {
       color: "inherit",
       textTransform: "uppercase",
-      fontWeight: 600,
+      fontWeight: resolveHeaderWeight(scale),
       fontSize: scale.header,
       fontFamily: "Antonio",
       letterSpacing: "0.5px",

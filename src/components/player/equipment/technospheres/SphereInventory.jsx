@@ -1,18 +1,15 @@
 import React, { useState } from "react";
 import useSphereBank from "./useSphereBank";
 import {
-  Accordion,
-  AccordionDetails,
   Alert,
   Box,
+  Collapse,
   Divider,
-  Grid,
   IconButton,
   Menu,
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Paper,
   Snackbar,
   Tooltip,
   Typography,
@@ -23,14 +20,16 @@ import {
   Menu as MenuIcon,
   LinkOff,
   AddLink,
+  Search,
+  KeyboardArrowDown,
+  KeyboardArrowUp,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../../translation/translate";
 import { SharedHoplosphereCard } from "../../../shared/itemCards";
 import { getHoplosphereCoagKey } from "../../../../libs/technospheres";
+import { getMnemosphereCost } from "../../../../libs/mnemospheres";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
-import CustomHeader from "../../../common/CustomHeader";
-import CustomHeaderAccordion from "../../../common/CustomHeaderAccordion";
+import SectionCard from "../../../shared/actorCards/common/SectionCard";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import MnemosphereClassCard from "../../classes/MnemosphereClassCard";
 import CompendiumSphereImportDialog from "./CompendiumSphereImportDialog";
@@ -87,6 +86,7 @@ function SphereMenu({
   onUnslot,
   onSlotOpen,
   deleteLabel,
+  deleteMessage,
 }) {
   const { t } = useTranslate();
   const [anchor, setAnchor] = useState(null);
@@ -178,7 +178,7 @@ function SphereMenu({
           onDelete(id);
         }}
         title={t("Delete") + " " + deleteLabel}
-        message={t("This action cannot be undone.")}
+        message={deleteMessage ?? t("This action cannot be undone.")}
       />
     </>
   );
@@ -186,8 +186,6 @@ function SphereMenu({
 
 export default function SphereInventory({ player, setPlayer, advancement }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
   const technospheresVariant =
     player?.settings?.optionalRules?.technospheresVariant ?? "standard";
   const isTechnospheres =
@@ -214,13 +212,25 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
     addMnemo: handleAddMnemo,
     addHoplo: handleAddHoplo,
     addFromCompendium: handleAddFromCompendium,
-    deleteMnemo: handleDeleteMnemo,
+    sellMnemo: handleSellMnemo,
     deleteHoplo: handleDeleteHoplo,
     changeMnemoSkillLevel: handleChangeMnemoSkillLevel,
     investMnemoLevel: handleInvestMnemoLevel,
     refundMnemoLevel: handleRefundMnemoLevel,
     getMnemoAvailableLevels,
   } = useSphereBank(player, setPlayer);
+
+  const handleSellMnemoWithSnackbar = (id) => {
+    const mnemo = mnemospheres.find((m) => m.id === id);
+    handleSellMnemo(id);
+    if (mnemo) {
+      const refund = getMnemosphereCost(mnemo.lvl ?? 1);
+      setSnackbar({
+        severity: "success",
+        message: `${t("Mnemosphere sold for")} ${refund}z`,
+      });
+    }
+  };
 
   const handleUnslot = (id) => {
     setPlayer((prev) => {
@@ -282,13 +292,6 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
         : [eq0New];
       return { ...prev, equipment };
     });
-  };
-
-  const accordionSx = {
-    borderRadius: "8px",
-    border: "2px solid",
-    borderColor: secondary,
-    marginBottom: 3,
   };
 
   const handleCompendiumAdd = (item, type) => {
@@ -373,77 +376,73 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
 
       {!mnemoHidden && (
         <>
-          <Paper
-            elevation={3}
-            sx={{
-              p: "15px",
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-              mb: 2,
-            }}
+          <SectionCard
+            title={t("Mnemosphere Bank")}
+            sx={{ mb: 2 }}
+            actions={
+              <Box sx={{ display: "flex", gap: "2px" }}>
+                <Tooltip title={t("Search Compendium")} arrow>
+                  <IconButton size="small" sx={{ color: "#fff", p: "4px" }} onClick={() => setCompendiumType("mnemospheres")}>
+                    <Search sx={{ fontSize: "1.3rem" }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t("Add Mnemosphere")} arrow>
+                  <IconButton size="small" sx={{ color: "#fff", p: "4px" }} onClick={() => setCreateMnemoOpen(true)}>
+                    <Add sx={{ fontSize: "1.3rem" }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            }
           >
-            <Grid container spacing={2}>
-              <Grid size={12}>
-                <CustomHeader
-                  type="top"
-                  headerText={t("Mnemosphere Bank")}
-                  icon={Add}
-                  customTooltip={t("Add Mnemosphere")}
-                  addItem={() => setCreateMnemoOpen(true)}
-                  openCompendium={() => setCompendiumType("mnemospheres")}
-                />
-              </Grid>
-              {mnemospheres.length === 0 && (
-                <Grid size={12}>
-                  <Typography variant="h3" align="center">
-                    {t("No mnemospheres added yet")}
-                  </Typography>
-                </Grid>
-              )}
-            </Grid>
-          </Paper>
-
-          {mnemospheres.map((m) => (
-            <Box key={m.id} sx={{ mb: 3 }}>
-              <MnemosphereClassCard
-                item={m}
-                editable={true}
-                isAccordion
-                showHeaderMeta
-                isSlotted={isSphereSlotted(player, m.id)}
-                isExpanded={mnemoExpanded === m.id}
-                onToggleExpand={() =>
-                  setMnemoExpanded((current) =>
-                    current === m.id ? null : m.id,
-                  )
-                }
-                actions={
-                  <SphereMenu
-                    id={m.id}
-                    slotted={isSphereSlotted(player, m.id)}
-                    onDelete={handleDeleteMnemo}
-                    onUnslot={handleUnslot}
-                    onSlotOpen={isIntegrated ? null : () => setSlotTarget(m)}
-                    deleteLabel={`${t(m.class)} Lv.${m.lvl ?? 1}`}
+            {mnemospheres.length === 0 ? (
+              <Typography variant="h3" align="center" sx={{ p: 2 }}>
+                {t("No mnemospheres added yet")}
+              </Typography>
+            ) : (
+              <Box sx={{ p: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+                {mnemospheres.map((m) => (
+                  <MnemosphereClassCard
+                    key={m.id}
+                    item={m}
+                    editable={true}
+                    isAccordion
+                    showHeaderMeta
+                    isSlotted={isSphereSlotted(player, m.id)}
+                    isExpanded={mnemoExpanded === m.id}
+                    onToggleExpand={() =>
+                      setMnemoExpanded((current) =>
+                        current === m.id ? null : m.id,
+                      )
+                    }
+                    actions={
+                      <SphereMenu
+                        id={m.id}
+                        slotted={isSphereSlotted(player, m.id)}
+                        onDelete={handleSellMnemoWithSnackbar}
+                        onUnslot={handleUnslot}
+                        onSlotOpen={isIntegrated ? null : () => setSlotTarget(m)}
+                        deleteLabel={`${t(m.class)} Lv.${m.lvl ?? 1}`}
+                        deleteMessage={`${t("You will receive")} ${getMnemosphereCost(m.lvl ?? 1)}z. ${t("Invested levels are permanently lost.")}`}
+                      />
+                    }
+                    onIncreaseSkillLevel={(skillIndex) =>
+                      handleChangeMnemoSkillLevel(m.id, skillIndex, 1)
+                    }
+                    onDecreaseSkillLevel={(skillIndex) =>
+                      handleChangeMnemoSkillLevel(m.id, skillIndex, -1)
+                    }
+                    availableLevels={getMnemoAvailableLevels(m)}
+                    onInvestLevel={
+                      !advancement ? () => handleInvestMnemoLevel(m.id) : null
+                    }
+                    onRefundLevel={
+                      !advancement ? () => handleRefundMnemoLevel(m.id) : null
+                    }
                   />
-                }
-                onIncreaseSkillLevel={(skillIndex) =>
-                  handleChangeMnemoSkillLevel(m.id, skillIndex, 1)
-                }
-                onDecreaseSkillLevel={(skillIndex) =>
-                  handleChangeMnemoSkillLevel(m.id, skillIndex, -1)
-                }
-                availableLevels={getMnemoAvailableLevels(m)}
-                onInvestLevel={
-                  !advancement ? () => handleInvestMnemoLevel(m.id) : null
-                }
-                onRefundLevel={
-                  !advancement ? () => handleRefundMnemoLevel(m.id) : null
-                }
-              />
-            </Box>
-          ))}
+                ))}
+              </Box>
+            )}
+          </SectionCard>
         </>
       )}
 
@@ -451,84 +450,69 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
         <>
           {!isHoplospheresOnly && <Divider sx={{ my: 3 }} />}
 
-          <Paper
-            elevation={3}
-            sx={{
-              p: "15px",
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-              mb: 2,
-            }}
+          <SectionCard
+            title={t("Hoplosphere Bank")}
+            sx={{ mb: 2 }}
+            actions={
+              <Box sx={{ display: "flex", gap: "2px" }}>
+                <Tooltip title={t("Search Compendium")} arrow>
+                  <IconButton size="small" sx={{ color: "#fff", p: "4px" }} onClick={() => setCompendiumType("hoplospheres")}>
+                    <Search sx={{ fontSize: "1.3rem" }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t("Add Hoplosphere")} arrow>
+                  <IconButton size="small" sx={{ color: "#fff", p: "4px" }} onClick={() => setCreateHoploOpen(true)}>
+                    <Add sx={{ fontSize: "1.3rem" }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            }
           >
-            <Grid container spacing={2}>
-              <Grid size={12}>
-                <CustomHeader
-                  type="top"
-                  headerText={t("Hoplosphere Bank")}
-                  icon={Add}
-                  customTooltip={t("Add Hoplosphere")}
-                  addItem={() => setCreateHoploOpen(true)}
-                  openCompendium={() => setCompendiumType("hoplospheres")}
-                />
-              </Grid>
-              {hoplospheres.length === 0 && (
-                <Grid size={12}>
-                  <Typography variant="h3" align="center">
-                    {t("No hoplospheres added yet")}
-                  </Typography>
-                </Grid>
-              )}
-            </Grid>
-          </Paper>
+            {hoplospheres.length === 0 ? (
+              <Typography variant="h3" align="center" sx={{ p: 2 }}>
+                {t("No hoplospheres added yet")}
+              </Typography>
+            ) : (
+              <Box sx={{ p: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+                {hoplospheres.map((h) => {
+                  const slotted = isSphereSlotted(player, h.id);
+                  const coagCount = getCoagCount(player, h, hoplospheres);
+                  const isExpanded = hoploExpanded === h.id;
+                  const label = `${h.name}${coagCount > 1 ? ` ×${coagCount}` : ""} - ${h.requiredSlots} ${t("slot")}${h.requiredSlots > 1 ? "s" : ""} - ${h.cost}z${slotted ? ` - ${t("Slotted")}` : ""}`;
+                  return (
+                    <SectionCard
+                      key={h.id}
+                      title={label}
+                      onHeaderClick={() => setHoploExpanded((c) => (c === h.id ? null : h.id))}
+                      actions={
+                        <Box sx={{ display: "flex", alignItems: "center", gap: "2px" }}>
+                          <SphereMenu
+                            id={h.id}
+                            slotted={slotted}
+                            onDelete={handleDeleteHoplo}
+                            onUnslot={handleUnslot}
+                            onSlotOpen={() => setSlotTarget(h)}
+                            deleteLabel={h.name}
+                          />
+                          <IconButton size="small" sx={{ color: "#fff", p: "2px" }} onClick={() => setHoploExpanded((c) => (c === h.id ? null : h.id))}>
+                            {isExpanded ? <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} /> : <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />}
+                          </IconButton>
+                        </Box>
+                      }
+                    >
+                      <Collapse in={isExpanded}>
+                        <Box sx={{ p: 1 }}>
+                          <SharedHoplosphereCard item={h} showCard variant="sheet" coagCount={coagCount} />
+                        </Box>
+                      </Collapse>
+                    </SectionCard>
+                  );
+                })}
+              </Box>
+            )}
+          </SectionCard>
         </>
       )}
-
-      {!isMnemospheresOnly &&
-        hoplospheres.map((h) => {
-          const slotted = isSphereSlotted(player, h.id);
-          const coagCount = getCoagCount(player, h, hoplospheres);
-          return (
-            <Accordion
-              key={h.id}
-              elevation={3}
-              sx={accordionSx}
-              expanded={hoploExpanded === h.id}
-              onChange={() =>
-                setHoploExpanded((current) => (current === h.id ? null : h.id))
-              }
-            >
-              <CustomHeaderAccordion
-                isExpanded={hoploExpanded === h.id}
-                headerText={`${h.name}${coagCount > 1 ? ` ×${coagCount}` : ""} - ${h.requiredSlots} ${t("slot")}${
-                  h.requiredSlots > 1 ? "s" : ""
-                } - ${h.cost}z${slotted ? ` - ${t("Slotted")}` : ""}`}
-                actions={
-                  <SphereMenu
-                    id={h.id}
-                    slotted={slotted}
-                    onDelete={handleDeleteHoplo}
-                    onUnslot={handleUnslot}
-                    onSlotOpen={() => setSlotTarget(h)}
-                    deleteLabel={h.name}
-                  />
-                }
-              />
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  <Grid size={12}>
-                    <SharedHoplosphereCard
-                      item={h}
-                      showCard
-                      variant="sheet"
-                      coagCount={coagCount}
-                    />
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          );
-        })}
 
       <MnemosphereCreateDialog
         open={createMnemoOpen}

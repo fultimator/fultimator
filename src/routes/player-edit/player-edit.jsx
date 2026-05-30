@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
+import { flushSync } from "react-dom";
 import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
@@ -44,32 +45,14 @@ import {
   Alert,
 } from "@mui/material";
 import Layout from "../../components/Layout";
-import PlayerCard from "../../components/player/playerSheet/PlayerCard";
-import EditPlayerBasics from "../../components/player/informations/EditPlayerBasics";
-import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
-import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
-import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
-import EditPlayerQuirk from "../../components/player/informations/EditPlayerQuirk";
-import EditPlayerCampActivities from "../../components/player/informations/EditPlayerCampActivities";
-import EditPlayerZeroPower from "../../components/player/informations/EditPlayerZeroPower";
-import EditPlayerOther from "../../components/player/informations/EditPlayerOthers";
-import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffinities";
-import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
-import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
-import EditPlayerImmunities from "../../components/player/stats/EditPlayerImmunities";
-import EditManualStats from "../../components/player/stats/EditManualStats";
-import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses";
-import PlayerControls from "../../components/player/playerSheet/PlayerControls";
-import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
-import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
+import { PcActorCard, PcActorCardCompact } from "../../components/shared/actorCards";
+import InformationTab from "../../components/shared/actorCards/pc/tabs/InformationTab";
+import StatsTab from "../../components/shared/actorCards/pc/tabs/StatsTab";
+import ClassesTab from "../../components/shared/actorCards/pc/tabs/ClassesTab";
+import SpellsTab from "../../components/shared/actorCards/pc/tabs/SpellsTab";
+import BackpackTab from "../../components/shared/actorCards/pc/tabs/BackpackTab";
+import NotesTab from "../../components/shared/actorCards/pc/tabs/NotesTab";
 import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
-import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
-import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
-import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
-import PlayerArcana from "../../components/player/playerSheet/PlayerArcana";
-import PlayerSkills from "../../components/player/playerSheet/PlayerSkills";
-import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
-import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import {
@@ -91,20 +74,7 @@ import deepEqual from "deep-equal";
 import html2canvas from "html2canvas";
 import Confetti from "react-confetti";
 import useDownload from "../../hooks/useDownload";
-import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
-import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
-import PlayerCampActivities from "../../components/player/playerSheet/PlayerCampActivities";
-import PlayerZeroPower from "../../components/player/playerSheet/PlayerZeroPower";
-import PlayerOthers from "../../components/player/playerSheet/PlayerOthers";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
-import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
-import PlayerMagichant from "../../components/player/playerSheet/PlayerMagichant";
-import PlayerGift from "../../components/player/playerSheet/PlayerGift";
-import PlayerTherioforms from "../../components/player/playerSheet/PlayerTherioforms";
-import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
-import PlayerInvoker from "../../components/player/playerSheet/PlayerInvoker";
-import PlayerGourmet from "../../components/player/playerSheet/PlayerGourmet";
-import PlayerDeck from "../../components/player/playerSheet/PlayerDeck.jsx";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import {
   CharacterSheetIcon,
@@ -115,11 +85,7 @@ import {
   NotesIcon2 as NotesIcon,
 } from "../../components/icons";
 
-import PlayerSymbol from "../../components/player/playerSheet/PlayerSymbol";
-import PlayerMagiseed from "../../components/player/playerSheet/PlayerMagiseed";
-import PlayerDance from "../../components/player/playerSheet/PlayerDance";
-import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
-import { fixVerticalLabels } from "../../utility/screenshotFix";
+import { fixVerticalLabels, expandCompactHeaderForExport } from "../../utility/screenshotFix";
 import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
@@ -127,7 +93,6 @@ import {
 import classList from "../../libs/classes";
 import { syncAutomaticClassLevels } from "../../components/player/classes/classLevelUtils";
 import { buildMnemosphere } from "../../libs/mnemospheres";
-import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
 import CustomHeader from "../../components/common/CustomHeader";
 import SettingRow from "../../components/common/SettingRow";
 import MigrateFromCompendiumDialog from "../../components/player/settings/MigrateFromCompendiumDialog";
@@ -338,20 +303,37 @@ export default function PlayerEdit() {
   const [download] = useDownload();
 
   const takeScreenshot = async () => {
+    const wasEditMode = isSheetEditMode;
+    if (wasEditMode) {
+      flushSync(() => {
+        setIsSheetEditMode(false);
+      });
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    }
+
     const element = document.getElementById(
       compactView ? "character-sheet-short" : "character-sheet",
     );
-    const canvas = await html2canvas(element, {
-      useCORS: true,
-      ignoreCORS: true,
-      scale: 2,
-      backgroundColor: theme.palette.background.default,
-      onclone: (clonedDoc) => {
-        fixVerticalLabels(element, clonedDoc);
-      },
-    });
-    const data = canvas.toDataURL("image/png");
-    download(data, `${playerTemp.name}.png`);
+    try {
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        scale: 2,
+        backgroundColor: theme.palette.background.default,
+        onclone: (clonedDoc) => {
+          fixVerticalLabels(element, clonedDoc);
+          expandCompactHeaderForExport(element, clonedDoc);
+        },
+      });
+      const data = canvas.toDataURL("image/png");
+      download(data, `${playerTemp.name}.png`);
+    } finally {
+      if (wasEditMode) {
+        setIsSheetEditMode(true);
+      }
+    }
   };
 
   const handleTabChange = (event, newValue) => {
@@ -776,7 +758,7 @@ export default function PlayerEdit() {
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 5)}>
                   <EquipmentIcon color="black" size="1.5em" />
-                  <ListItemText primary={t("Equipment")} sx={{ ml: 1 }} />
+                  <ListItemText primary={t("Backpack")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 6)}>
                   <NotesIcon color="black" size="1.5em" />
@@ -826,7 +808,7 @@ export default function PlayerEdit() {
                 onClick={(e) => handleTabChange(e, 5)}
                 isActive={openTab === 5}
               >
-                {t("Equipment")}
+                {t("Backpack")}
               </Tab>
               <Tab
                 onClick={(e) => handleTabChange(e, 6)}
@@ -951,11 +933,11 @@ export default function PlayerEdit() {
                 </Box>
               </Grid>
               <Grid container size={12}>
-                <PlayerCardSheet
-                  player={playerTemp}
-                  setPlayer={setPlayerTemp}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
+                <PcActorCardCompact
+                  pc={playerTemp}
+                  onUpdate={setPlayerTemp}
+                  isInteractive={isEditMode}
+                  isOwner={isOwner}
                   optionalRules={optionalRules}
                   characterImage={playerTemp.info.imgurl}
                   id="character-sheet-short"
@@ -976,70 +958,39 @@ export default function PlayerEdit() {
                       : undefined
                   }
                   onAddFeature={isEditMode ? () => setOpenTab(4) : undefined}
+                  clockSections={ritualClockSections}
+                  setClockSections={setRitualClockSections}
+                  clockState={ritualClockState}
+                  setClockState={setRitualClockState}
                 />
               </Grid>
             </Grid>
           ) : (
             <div id="character-sheet">
-              <PlayerCard
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-                isOwner={isOwner}
-                isCharacterSheet={false}
-                updateMaxStats={updateMaxStats}
-                canLevelUpFromExp={canLevelUpFromExp}
-                onLevelUpRequest={openLevelUpDialog}
-              />
-              {/* TODO: Add Zenit somewhere else */}
-              {/* <PlayerNumbers
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-                isOwner={isOwner}
-              />
-              <Divider sx={{ my: 1 }} /> */}
-              {isOwner && (
+              {/* {isOwner && (
                 <PlayerControls
                   player={playerTemp}
                   setPlayer={setPlayerTemp}
                   onQuickCheck={handleQuickCheck}
                 />
-              )}
-              <PlayerBonds
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerNotes
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <Divider sx={{ my: 1 }} />
-              <PlayerLoadout
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
+              )} */}
+              <PcActorCard
+                pc={playerTemp}
+                onUpdate={setPlayerTemp}
+                isInteractive={isEditMode}
                 isOwner={isOwner}
+                onQuickCheck={handleQuickCheck}
+                characterImage={playerTemp.info.imgurl}
+                updateMaxStats={updateMaxStats}
+                canLevelUpFromExp={canLevelUpFromExp}
+                onLevelUpRequest={openLevelUpDialog}
+                optionalRules={optionalRules}
+                clockSections={ritualClockSections}
+                setClockSections={setRitualClockSections}
+                clockState={ritualClockState}
+                setClockState={setRitualClockState}
               />
-              <Divider sx={{ my: 1 }} />
-              <PlayerEquipment
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerVehicle
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerSkills
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerSpells
+              {/* <PlayerSkills
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
@@ -1049,31 +1000,6 @@ export default function PlayerEdit() {
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
               />
-              <PlayerRituals
-                player={playerTemp}
-                isEditMode={isEditMode}
-                clockSections={ritualClockSections}
-                setClockSections={setRitualClockSections}
-                clockState={ritualClockState}
-                setClockState={setRitualClockState}
-              />
-              {optionalRules.quirks && (
-                <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
-              )}
-              {optionalRules.campActivities && (
-                <PlayerCampActivities
-                  player={playerTemp}
-                  setPlayer={setPlayerTemp}
-                  isEditMode={isEditMode}
-                />
-              )}
-              {optionalRules.zeroPower && (
-                <PlayerZeroPower
-                  player={playerTemp}
-                  setPlayer={setPlayerTemp}
-                  isEditMode={isEditMode}
-                />
-              )}
               <PlayerGadgets
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
@@ -1119,134 +1045,56 @@ export default function PlayerEdit() {
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
-              />
-              <PlayerOthers
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerCompanion player={playerTemp} isEditMode={isEditMode} />
+              /> */}
             </div>
           )}
         </TabPanel>
         <TabPanel value={1} currentValue={openTab}>
-          <EditPlayerBasics
+          <InformationTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
+            isOwner={isOwner}
+            optionalRules={optionalRules}
             updateMaxStats={updateMaxStats}
-            isEditMode={isEditMode}
             advancement={advancement}
             onLevelUpRequest={openLevelUpDialog}
           />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerTraits
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerBonds
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          {optionalRules.quirks && (
-            <>
-              <EditPlayerQuirk
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <Divider sx={{ my: 1 }} />
-            </>
-          )}
-          {optionalRules.campActivities && (
-            <>
-              <EditPlayerCampActivities
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <Divider sx={{ my: 1 }} />
-            </>
-          )}
-          {optionalRules.zeroPower && (
-            <>
-              <EditPlayerZeroPower
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <Divider sx={{ my: 1 }} />
-            </>
-          )}
-          <EditPlayerOther
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
         </TabPanel>
         <TabPanel value={2} currentValue={openTab}>
-          <EditPlayerAttributes
+          <StatsTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
+            isOwner={isOwner}
             updateMaxStats={updateMaxStats}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerAffinities
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerStatuses
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerImmunities
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditManualStats
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            updateMaxStats={updateMaxStats}
-            isEditMode={isEditMode}
           />
         </TabPanel>
         <TabPanel value={3} currentValue={openTab}>
-          <EditPlayerClasses
+          <ClassesTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
+            isOwner={isOwner}
             updateMaxStats={updateMaxStats}
-            isEditMode={isEditMode}
           />
         </TabPanel>
         <TabPanel value={4} currentValue={openTab}>
-          <EditPlayerSpells
+          <SpellsTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
+            isOwner={isOwner}
           />
         </TabPanel>
         <TabPanel value={5} currentValue={openTab}>
-          <EditPlayerEquipment
+          <BackpackTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
+            isOwner={isOwner}
           />
         </TabPanel>
         <TabPanel value={6} currentValue={openTab}>
-          <EditPlayerNotes
+          <NotesTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
+            isOwner={isOwner}
           />
         </TabPanel>
         <TabPanel value={7} currentValue={openTab}>

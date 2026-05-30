@@ -70,7 +70,7 @@ function buildInitialState(weapon) {
   };
 }
 
-function Weapons() {
+function Weapons({ variant = "equip" }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -426,7 +426,7 @@ function Weapons() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <SharedWeaponCard
               item={base}
-              variant="equip"
+              variant={variant}
               imageMode="slot"
               showImageToggle
             />
@@ -436,7 +436,7 @@ function Weapons() {
             <div ref={cardRef}>
               <SharedWeaponCard
                 item={customItem}
-                variant="equip"
+                variant={variant}
                 imageMode="slot"
                 showImageToggle
                 actionContent={

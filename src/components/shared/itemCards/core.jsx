@@ -179,7 +179,7 @@ export function RowsWithOptionalImage({
           sx={{
             flex: `0 0 ${imageSize}px`,
             width: `${imageSize}px`,
-            height: `${imageSize}px`,
+            minHeight: `${imageSize}px`,
             background: getImageBackground(customTheme),
             border: `1px solid ${customTheme.secondary}`,
             boxSizing: "border-box",

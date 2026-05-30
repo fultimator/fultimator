@@ -95,7 +95,7 @@ function OtherRow({
           onClick={(e) => e.stopPropagation()}
         >
           <Tooltip title={t("Roll")}>
-            <IconButton
+            <IconButton component="span"
               size="small"
               onClick={() => onRoll(other)}
               sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}
@@ -103,7 +103,7 @@ function OtherRow({
               <Casino sx={{ fontSize: "1.2rem" }} />
             </IconButton>
           </Tooltip>
-          <IconButton
+          <IconButton component="span"
             size="small"
             onClick={(e) => {
               e.stopPropagation();
@@ -151,7 +151,7 @@ function OtherRow({
 
         <Box onClick={(e) => e.stopPropagation()}>
           <Tooltip title={t("Edit")}>
-            <IconButton
+            <IconButton component="span"
               size="small"
               onClick={() => onEdit(index)}
               sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}

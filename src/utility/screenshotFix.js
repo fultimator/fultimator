@@ -55,3 +55,57 @@ export const fixVerticalLabels = (originalRoot, clonedDoc) => {
     }
   });
 };
+
+/**
+ * Expands compact PC header description area in the cloned DOM so exports
+ * preserve more text and avoid clipped description blocks.
+ *
+ * @param {HTMLElement} originalRoot
+ * @param {Document} clonedDoc
+ */
+export const expandCompactHeaderForExport = (originalRoot, clonedDoc) => {
+  if (!clonedDoc || !originalRoot) return;
+  const clonedRoot = clonedDoc.getElementById(originalRoot.id);
+  if (!clonedRoot) return;
+
+  const body = clonedRoot.querySelector('[data-pc-compact-header-body="true"]');
+  if (body) {
+    // Keep compact, predictable header proportions in export.
+    body.style.setProperty("height", "228px", "important");
+    body.style.setProperty("max-height", "228px", "important");
+    body.style.setProperty("min-height", "228px", "important");
+    body.style.setProperty("align-items", "stretch", "important");
+  }
+
+  const wrap = clonedRoot.querySelector('[data-pc-compact-description-wrap="true"]');
+  if (wrap) {
+    wrap.style.setProperty("overflow", "visible", "important");
+    wrap.style.setProperty("flex", "1 1 auto", "important");
+  }
+
+  const text = clonedRoot.querySelector('[data-pc-compact-description-text="true"]');
+  if (text) {
+    // Allow enough description, but preserve space for traits.
+    text.style.setProperty("overflow", "hidden", "important");
+    text.style.setProperty("display", "-webkit-box", "important");
+    text.style.setProperty("-webkit-box-orient", "vertical", "important");
+    text.style.setProperty("-webkit-line-clamp", "6", "important");
+  }
+
+  const paragraphs = clonedRoot.querySelectorAll('[data-pc-compact-description-text="true"] p');
+  paragraphs.forEach((p) => {
+    p.style.setProperty("display", "block", "important");
+    p.style.setProperty("overflow", "visible", "important");
+    p.style.removeProperty("-webkit-line-clamp");
+    p.style.removeProperty("-webkit-box-orient");
+  });
+
+  const traits = clonedRoot.querySelector('[data-pc-compact-traits-wrap="true"]');
+  if (traits) {
+    traits.style.setProperty("display", "flex", "important");
+    traits.style.setProperty("align-items", "center", "important");
+    traits.style.setProperty("overflow", "hidden", "important");
+    traits.style.setProperty("min-height", "84px", "important");
+    traits.style.setProperty("flex", "0 0 auto", "important");
+  }
+};

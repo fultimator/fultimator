@@ -20,23 +20,7 @@ import {
 } from "@mui/material";
 import html2canvas from "html2canvas";
 import Confetti from "react-confetti";
-import PlayerCard from "../../components/player/playerSheet/PlayerCard";
-import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
-import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
-import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
-import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
-import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
-import PlayerCampActivities from "../../components/player/playerSheet/PlayerCampActivities";
-import PlayerZeroPower from "../../components/player/playerSheet/PlayerZeroPower";
-import PlayerOthers from "../../components/player/playerSheet/PlayerOthers";
-import PlayerClasses from "../../components/player/playerSheet/PlayerClasses";
-import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
-import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
-import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
-import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFull";
-import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
-import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
-import MnemoReceptaclePanel from "../../components/player/equipment/technospheres/MnemoReceptaclePanel";
+import { PcActorCard, PcActorCardCompact } from "../../components/shared/actorCards";
 import powered_by_fu from "/images/routes/powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
@@ -46,12 +30,11 @@ import {
   Save,
   KeyboardArrowUp,
 } from "@mui/icons-material";
-import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
 // import { getPc } from "../../utility/db";
 import { useTheme } from "@mui/material/styles";
 import { FullscreenTwoTone, FullscreenExitTwoTone } from "@mui/icons-material";
 import useDownload from "../../hooks/useDownload";
-import { fixVerticalLabels } from "../../utility/screenshotFix";
+import { fixVerticalLabels, expandCompactHeaderForExport } from "../../utility/screenshotFix";
 import deepEqual from "deep-equal";
 import { usePrompt } from "../../hooks/usePrompt";
 import {
@@ -342,6 +325,7 @@ export default function CharacterSheet() {
         windowWidth: fullCharacterSheet ? 1400 : 600,
         onclone: (clonedDoc) => {
           fixVerticalLabels(element, clonedDoc);
+          expandCompactHeaderForExport(element, clonedDoc);
         },
       });
       const imgData = canvas.toDataURL("image/png");
@@ -495,6 +479,8 @@ export default function CharacterSheet() {
     campActivities: settings.optionalRules?.campActivities ?? false,
     zeroPower: settings.optionalRules?.zeroPower ?? false,
     technospheres: settings.optionalRules?.technospheres ?? false,
+    technospheresVariant: settings.optionalRules?.technospheresVariant ?? "standard",
+    innateClasses: settings.optionalRules?.innateClasses ?? [],
   };
 
   return (
@@ -558,154 +544,23 @@ export default function CharacterSheet() {
         </Grid>
       </Grid>
       {fullCharacterSheet ? (
-        <Grid container spacing={2} sx={{ padding: 1 }} id="character-sheet">
-          <Grid
-            container
-            spacing={2}
-            size={{
-              xs: 12,
-              md: 6,
-            }}
-          >
-            <Grid size={12}>
-              <Stack direction="column" spacing={2}>
-                <PlayerCard
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isOwner={isOwner}
-                  isCharacterSheet={true}
-                  characterImage={player.info.imgurl}
-                  updateMaxStats={updateMaxStats}
-                  canLevelUpFromExp={canLevelUpFromExp}
-                  onLevelUpRequest={openLevelUpDialog}
-                />
-                <PlayerNumbers
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isOwner={isOwner}
-                  isCharacterSheet={true}
-                />
-                {/* <PlayerTraits player={player} isCharacterSheet={true} /> */}
-                <PlayerBonds
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                />
-                <PlayerRituals
-                  player={player}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                  clockSections={ritualClockSections}
-                  setClockSections={setRitualClockSections}
-                  clockState={ritualClockState}
-                  setClockState={setRitualClockState}
-                />
-                {optionalRules.zeroPower && (
-                  <PlayerZeroPower
-                    player={player}
-                    setPlayer={handleSetPlayer}
-                    isEditMode={isEditMode}
-                  />
-                )}
-                {optionalRules.campActivities && (
-                  <PlayerCampActivities
-                    player={player}
-                    setPlayer={handleSetPlayer}
-                    isEditMode={isEditMode}
-                  />
-                )}
-                <PlayerOthers
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                />
-                <PlayerLoadout
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                  isOwner={isOwner}
-                />
-                <PlayerEquipment
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isOwner={isOwner}
-                  isCharacterSheet={true}
-                />
-                <PlayerVehicle
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                />
-                <PlayerNotes
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                />
-
-                <PlayerSpellsFull
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                />
-              </Stack>
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            spacing={2}
-            size={{
-              xs: 12,
-              md: 6,
-            }}
-          >
-            <Grid size={12}>
-              <Stack direction="column" spacing={2}>
-                <PlayerClasses
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                  updateMaxStats={updateMaxStats}
-                />
-                {optionalRules.technospheres &&
-                  ["integrated", "mnemospheres"].includes(
-                    player?.settings?.optionalRules?.technospheresVariant ??
-                      "standard",
-                  ) && (
-                    <MnemoReceptaclePanel
-                      player={player}
-                      setPlayer={handleSetPlayer}
-                      readOnly={!isEditMode}
-                    />
-                  )}
-                {optionalRules.quirks && (
-                  <PlayerQuirk
-                    player={player}
-                    isEditMode={isEditMode}
-                    isCharacterSheet={true}
-                  />
-                )}
-              </Stack>
-            </Grid>
-          </Grid>
-
-          <Grid size={12}>
-            <PlayerCompanion
-              player={player}
-              setPlayer={handleSetPlayer}
-              isEditMode={isEditMode}
-              isCharacterSheet={true}
-            />
-          </Grid>
-          <Grid container size={12}>
+        <Box id="character-sheet" sx={{ p: 1 }}>
+          <PcActorCard
+            pc={player}
+            onUpdate={handleSetPlayer}
+            isInteractive={isEditMode}
+            isOwner={isOwner}
+            characterImage={player.info.imgurl}
+            updateMaxStats={updateMaxStats}
+            canLevelUpFromExp={canLevelUpFromExp}
+            onLevelUpRequest={openLevelUpDialog}
+            optionalRules={optionalRules}
+            clockSections={ritualClockSections}
+            setClockSections={setRitualClockSections}
+            clockState={ritualClockState}
+            setClockState={setRitualClockState}
+          />
+          <Grid container size={12} sx={{ mt: 2 }}>
             <Grid size={4}>
               <img
                 src={powered_by_fu}
@@ -729,7 +584,7 @@ export default function CharacterSheet() {
               </Typography>
             </Grid>
           </Grid>
-        </Grid>
+        </Box>
       ) : (
         <Grid
           container
@@ -739,18 +594,22 @@ export default function CharacterSheet() {
           }}
         >
           <Grid container size={12}>
-            <PlayerCardSheet
-              player={player}
-              setPlayer={handleSetPlayer}
-              isEditMode={isEditMode}
+            <PcActorCardCompact
+              pc={player}
+              onUpdate={handleSetPlayer}
+              isInteractive={isEditMode}
               isOwner={isOwner}
-              isCharacterSheet={true}
               optionalRules={optionalRules}
               characterImage={player.info.imgurl}
               id="character-sheet-short"
               canLevelUpFromExp={canLevelUpFromExp}
               onLevelUpRequest={openLevelUpDialog}
               updateMaxStats={updateMaxStats}
+              onToggleEditMode={isOwner ? () => setIsSheetEditMode((v) => !v) : undefined}
+              clockSections={ritualClockSections}
+              setClockSections={setRitualClockSections}
+              clockState={ritualClockState}
+              setClockState={setRitualClockState}
             />
           </Grid>
         </Grid>

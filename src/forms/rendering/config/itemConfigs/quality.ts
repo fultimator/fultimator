@@ -1,15 +1,37 @@
 import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
-import type { Quality } from "../../../schema/itemSchemas/quality";
-import type { SelectOption } from "../../fieldRenderers";
-import { metaFieldConfig } from "../metaFieldConfig";
+import allQualities from "../../../../libs/qualities";
+import groupBy from "../../../../libs/groupby";
+import type { SelectGroup } from "../../fieldRenderers";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 
-export type QualityFormState = Quality;
+export type QualityFormState = {
+  name: string;
+  category: string;
+  quality: string;
+  cost: number;
+  filter: string[];
+  selectedBase: string;
+};
+
 const QUALITY_LABEL_PREFIX = "quality";
 
-const QUALITY_CATEGORIES = ["Offensive", "Defensive", "Enhancement"];
+const baseGroups: SelectGroup[] = Object.entries(
+  groupBy(allQualities, "category") as Record<
+    string,
+    { name: string; cost: number; quality: string; category: string; filter?: string[] }[]
+  >,
+).map(([category, qs]) => ({
+  header: category,
+  options: qs.map((q) => ({ value: q.name, label: `${q.name} (${q.cost}z)` })),
+}));
 
-const FILTER_OPTIONS: SelectOption[] = [
+const categoryOptions = [
+  { value: "Offensive", label: "Offensive" },
+  { value: "Defensive", label: "Defensive" },
+  { value: "Enhancement", label: "Enhancement" },
+];
+
+const filterOptions = [
   { value: "weapon", label: "Weapons" },
   { value: "customWeapon", label: "Custom Weapons" },
   { value: "armor", label: "Armor" },
@@ -17,33 +39,49 @@ const FILTER_OPTIONS: SelectOption[] = [
   { value: "accessory", label: "Accessories" },
 ];
 
-const categoryOptions: SelectOption[] = QUALITY_CATEGORIES.map((c) => ({
-  value: c,
-  label: c,
-}));
-
 const G = {
   core: "core",
-  body: "body",
-  meta: "meta",
+  quality: "quality",
 } as const;
 
 export const qualityGroupLabels: GroupLabels = {
-  core: "section.core",
-  body: "section.body",
-  meta: "section.meta",
+  quality: "section.quality",
 };
 
 export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
   {
-    key: "fuid",
-    kind: "editable",
-    label: prefixedLabel(QUALITY_LABEL_PREFIX, SHARED_LABEL_KEYS.fuid),
-    component: "fuid",
+    key: "selectedBase",
+    kind: "form-state",
+    label: "shared.quality.preset",
+    component: "grouped-select",
     defaultValue: "",
     group: G.core,
-    order: -1,
-    gridSize: 12,
+    order: 0,
+    componentProps: { groups: baseGroups, allowClear: true },
+    onChangeEffects: {
+      name: (s) => {
+        const q = allQualities.find((el: { name: string }) => el.name === s.selectedBase);
+        return q ? q.name : s.name;
+      },
+      category: (s) => {
+        const q = allQualities.find((el: { name: string }) => el.name === s.selectedBase);
+        return q ? q.category : s.category;
+      },
+      quality: (s) => {
+        const q = allQualities.find((el: { name: string }) => el.name === s.selectedBase);
+        return q ? q.quality : s.quality;
+      },
+      cost: (s) => {
+        const q = allQualities.find((el: { name: string }) => el.name === s.selectedBase);
+        return q ? q.cost : s.cost;
+      },
+      filter: (s) => {
+        const q = allQualities.find(
+          (el: { name: string; filter?: string[] }) => el.name === s.selectedBase,
+        );
+        return Array.isArray(q?.filter) ? q.filter : s.filter;
+      },
+    },
   },
   {
     key: "name",
@@ -52,19 +90,28 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
     component: "text",
     defaultValue: "",
     group: G.core,
-    order: 0,
+    order: 1,
     validationHints: { required: true },
-    fullWidth: true,
   },
   {
     key: "category",
     kind: "editable",
-    label: prefixedLabel(QUALITY_LABEL_PREFIX, SHARED_LABEL_KEYS.category),
+    label: "quality.category",
     component: "select",
-    defaultValue: QUALITY_CATEGORIES[0],
+    defaultValue: "Offensive",
     group: G.core,
-    order: 1,
+    order: 2,
     componentProps: { options: categoryOptions },
+  },
+  {
+    key: "quality",
+    kind: "editable",
+    label: "shared.quality.text",
+    component: "textarea",
+    defaultValue: "",
+    group: G.quality,
+    order: 10,
+    fullWidth: true,
   },
   {
     key: "cost",
@@ -72,31 +119,24 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
     label: prefixedLabel(QUALITY_LABEL_PREFIX, SHARED_LABEL_KEYS.cost),
     component: "number",
     defaultValue: 0,
-    group: G.core,
-    order: 2,
+    group: G.quality,
+    order: 11,
     parse: (v) => Number(v) || 0,
     validationHints: { min: 0 },
-  },
-  {
-    key: "quality",
-    kind: "editable",
-    label: "quality.effect",
-    component: "textarea",
-    defaultValue: "",
-    group: G.body,
-    order: 3,
-    fullWidth: true,
   },
   {
     key: "filter",
     kind: "editable",
     label: "quality.applicableTo",
-    component: "select",
+    component: "autocomplete",
     defaultValue: [],
-    group: G.meta,
-    order: 4,
+    group: G.quality,
+    order: 12,
     fullWidth: true,
-    componentProps: { options: FILTER_OPTIONS, multiple: true },
+    componentProps: {
+      options: filterOptions,
+      multiple: true,
+      freeSolo: false,
+    },
   },
-  ...(metaFieldConfig as unknown as ItemFieldConfig<QualityFormState>),
 ];

@@ -34,6 +34,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import StatTooltip from "../../../common/StatTooltip";
 import { usePlayerSheetCompactStore } from "../../../../store/playerSheetCompactStore";
 import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
 import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
@@ -66,6 +67,25 @@ const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
 });
+
+function LevelCounter({ value, max, primary }) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: "2px" }}>
+      {[value, max].map((val, i) => (
+        <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
+          {i === 1 && (
+            <Box component="span" sx={{ color: "#fff", fontFamily: "Antonio", fontWeight: 700, fontSize: "0.85rem", px: "1px" }}>
+              /
+            </Box>
+          )}
+          <Box sx={{ background: "#fff", color: primary, fontFamily: "Antonio", fontWeight: 700, fontSize: "0.85rem", px: 0.5, py: "1px", minWidth: 24, textAlign: "center", borderRadius: "2px" }}>
+            {val}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
+}
 
 const StyledMarkdown = ({ children, ...props }) => (
   <div style={{ whiteSpace: "pre-line", display: "inline" }}>
@@ -413,6 +433,32 @@ export default function PlayerClasses({
     [usesInnateClassRules, mnemoHidden, player],
   );
 
+  const characterLevel = player?.lvl ?? 0;
+  const totalInnateLevel = useMemo(
+    () => (player.classes ?? []).reduce((s, c) => s + (parseInt(c.lvl) || 0), 0),
+    [player.classes],
+  );
+  const totalMnemoInvested = player?.info?.mnemoLevelsSpent ?? 0;
+
+  const bankSpheres = player?.equipment?.[0]?.mnemospheres ?? [];
+  const mnemoBreakdown = (() => {
+    const rows = bankSpheres
+      .map((m) => ({
+        invested: Math.max(0, (m.lvl ?? 1) - (m.baseLvl ?? m.lvl ?? 1)),
+        label: `${m.class ?? m.name ?? "?"} Lv.${m.lvl ?? 1}`,
+      }))
+      .filter((r) => r.invested > 0)
+      .map((r) => ({ label: r.label, value: `+${r.invested}` }));
+    const fromBank = bankSpheres.reduce(
+      (s, m) => s + Math.max(0, (m.lvl ?? 1) - (m.baseLvl ?? m.lvl ?? 1)),
+      0,
+    );
+    const soldOrDeleted = totalMnemoInvested - fromBank;
+    if (soldOrDeleted > 0)
+      rows.push({ label: "Sold / deleted", value: `+${soldOrDeleted}`, dim: true });
+    return rows;
+  })();
+
   const warnings = useMemo(() => {
     const w = [];
     if (usesInnateClassRules) {
@@ -422,10 +468,7 @@ export default function PlayerClasses({
       const innateTotal = player.classes
         ? player.classes.reduce((s, c) => s + parseInt(c.lvl), 0)
         : 0;
-      const mnemoTotal = slottedMnemospheres.reduce(
-        (s, m) => s + (m.lvl ?? 0),
-        0,
-      );
+      const mnemoTotal = player.info?.mnemoLevelsSpent ?? 0;
       if (innateTotal + mnemoTotal !== player.lvl)
         w.push(
           "Sum of innate class levels and invested mnemosphere levels isn't equal to character level.",
@@ -447,7 +490,7 @@ export default function PlayerClasses({
         w.push("Sum of class levels isn't equal to character level.");
     }
     return w;
-  }, [player.classes, player.lvl, slottedMnemospheres, usesInnateClassRules]);
+  }, [player.classes, player.lvl, player.info?.mnemoLevelsSpent, usesInnateClassRules]);
 
   const handleAddHeroic = (item) => {
     if (heroicPickerClassIdx === null || !setPlayer) return;
@@ -520,7 +563,7 @@ export default function PlayerClasses({
                 </Typography>
               </StyledTableCellHeader>
               <StyledTableCellHeader
-                sx={{ width: { xs: 90, sm: 100 }, textAlign: "right" }}
+                sx={{ width: { xs: 110, sm: 130 }, textAlign: "right" }}
               >
                 <Box
                   sx={{
@@ -556,7 +599,9 @@ export default function PlayerClasses({
                       )}
                     </>
                   )}
-                  {/* {!isEditMode && <Typography variant="caption" sx={{ fontWeight: "bold", textTransform: 'uppercase', color: '#fff', opacity: 0.8, fontSize: '0.65rem' }}>{t("Actions")}</Typography>} */}
+                  {usesInnateClassRules && (
+                    <LevelCounter value={totalInnateLevel} max={characterLevel} primary={theme.primary} />
+                  )}
                 </Box>
               </StyledTableCellHeader>
             </TableRow>
@@ -1383,11 +1428,21 @@ export default function PlayerClasses({
                     {t("Level")}
                   </Typography>
                 </StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: { xs: 90, sm: 100 } }} />
+                <StyledTableCellHeader sx={{ width: { xs: 110, sm: 130 }, textAlign: "right" }}>
+                  <StatTooltip
+                    title={t("Invested Mnemosphere Levels")}
+                    breakdown={mnemoBreakdown.length > 0 ? mnemoBreakdown : undefined}
+                    total={totalMnemoInvested}
+                    display="flex"
+                    sx={{ justifyContent: "flex-end" }}
+                  >
+                    <LevelCounter value={totalMnemoInvested} max={characterLevel} primary={theme.primary} />
+                  </StatTooltip>
+                </StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody>
-              {slottedMnemospheres.map((mnemo, mnemoIdx) => {
+              {slottedMnemospheres.map((mnemo) => {
                 const mnemoKey = `mnemo-class-${mnemo.id}`;
                 const skills = mnemo.skills ?? [];
                 const heroic = mnemo.heroic ?? [];

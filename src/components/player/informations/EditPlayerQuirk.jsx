@@ -38,6 +38,8 @@ function toFormState(quirk) {
     name: quirk?.name ?? "",
     description: quirk?.description ?? "",
     effect: quirk?.effect ?? "",
+    hasClock: !!quirk?.clock,
+    clockSections: quirk?.clock?.sections ?? 6,
   };
 }
 
@@ -46,6 +48,7 @@ function fromFormState(form) {
     name: form.name ?? "",
     description: form.description ?? "",
     effect: form.effect ?? "",
+    clock: form.hasClock ? { sections: form.clockSections ?? 6 } : undefined,
   };
 }
 
@@ -64,7 +67,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
   const quirk = useMemo(() => player.quirk, [player.quirk]);
   const hasQuirk = Boolean(
     quirk &&
-    (quirk.name?.trim() || quirk.description?.trim() || quirk.effect?.trim()),
+    (quirk.name?.trim() || quirk.description?.trim() || quirk.effect?.trim() || quirk.clock),
   );
 
   return (
@@ -129,7 +132,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Tooltip title={t("Roll")}>
-                    <IconButton
+                    <IconButton component="span"
                       size="small"
                       onClick={() =>
                         addMessage({
@@ -149,7 +152,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
                       <Casino sx={{ fontSize: "1.2rem" }} />
                     </IconButton>
                   </Tooltip>
-                  <IconButton
+                  <IconButton component="span"
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -201,7 +204,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
                 </Box>
                 <Box onClick={(e) => e.stopPropagation()}>
                   <Tooltip title={t("Edit")}>
-                    <IconButton
+                    <IconButton component="span"
                       size="small"
                       onClick={() => {
                         setCreating(false);
@@ -233,7 +236,22 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
           item={toFormState(creating ? null : quirk)}
           editIndex={creating || !hasQuirk ? null : 0}
           onSave={(payload) => {
-            setPlayer((prev) => ({ ...prev, quirk: fromFormState(payload) }));
+            const next = fromFormState(payload);
+            setPlayer((prev) => {
+              const prevSections = prev.quirk?.clock?.sections;
+              const nextSections = next.clock?.sections;
+              const resetClock =
+                next.clock && prevSections !== nextSections;
+              return {
+                ...prev,
+                quirk: {
+                  ...next,
+                  clockState: resetClock
+                    ? new Array(nextSections).fill(false)
+                    : (prev.quirk?.clockState ?? undefined),
+                },
+              };
+            });
             setEditorOpen(false);
             setCreating(false);
           }}
@@ -261,6 +279,7 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
                 name: item.name ?? "",
                 description: item.description ?? "",
                 effect: item.effect ?? "",
+                clock: item.clock,
               },
             }));
             setCompendiumOpen(false);

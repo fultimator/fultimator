@@ -9,7 +9,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { AutoAwesome, Download } from "@mui/icons-material";
+import { AutoAwesome, Download, Search } from "@mui/icons-material";
 import { useState, useRef } from "react";
 import { SharedArcanumCard } from "../../../components/shared/itemCards";
 import ChangeName from "../common/ChangeName";
@@ -20,9 +20,10 @@ import CustomTextarea from "../../../components/common/CustomTextarea";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
+import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 
-function Arcana() {
+function Arcana({ variant = "equip" }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const stickyTop = useStickyTop();
@@ -38,6 +39,8 @@ function Arcana() {
   const [dismissName, setDismissName] = useState("");
   const [dismissBenefit, setDismissBenefit] = useState("");
   const [rework, setRework] = useState(false);
+
+  const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const fileInputRef = useRef(null);
   const cardRef = useRef(null);
@@ -105,6 +108,21 @@ function Arcana() {
     }
   };
 
+  const handleArcanumSelected = (item) => {
+    if (item.name) setName(item.name);
+    setDescription(item.description || (item.descriptionKey ? t(item.descriptionKey) : ""));
+    setDomain(item.domain || (item.domainDesc ? t(item.domainDesc) : ""));
+    setMergeName(item.mergeName || (item.merge ? t(item.merge) : ""));
+    setMergeBenefit(item.mergeBenefit || (item.mergeDesc ? t(item.mergeDesc) : ""));
+    setPulseName(item.pulseName || (item.pulse ? t(item.pulse) : ""));
+    setPulseBenefit(item.pulseBenefit || (item.pulseDesc ? t(item.pulseDesc) : ""));
+    setDismissName(item.dismissName || (item.dismiss ? t(item.dismiss) : ""));
+    setDismissBenefit(item.dismissBenefit || (item.dismissDesc ? t(item.dismissDesc) : ""));
+    if (item.rework !== undefined) setRework(item.rework);
+    else if (item.spellType === "arcanist-rework") setRework(true);
+    setCompendiumOpen(false);
+  };
+
   const handleClearFields = () => {
     setName("Arcanum");
     setDescription("");
@@ -139,6 +157,8 @@ function Arcana() {
           <CustomHeaderAlt
             headerText={t("Arcana")}
             icon={<AutoAwesome fontSize="large" />}
+            actionIcon={<Search fontSize="large" />}
+            onAction={() => setCompendiumOpen(true)}
           />
           <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid size={6}>
@@ -158,15 +178,14 @@ function Arcana() {
               </FormControl>
             </Grid>
             <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="description"
-                  label={t("Description")}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  size="small"
-                ></TextField>
-              </FormControl>
+              <CustomTextarea
+                label={t("Description")}
+                fullWidth
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                maxRows={10}
+                maxLength={1500}
+              />
             </Grid>
             <Grid size={12}>
               <FormControl variant="standard" fullWidth>
@@ -290,7 +309,7 @@ function Arcana() {
         <div ref={cardRef}>
           <SharedArcanumCard
             item={arcanumData}
-            variant="equip"
+            variant={variant}
             imageMode="slot"
             showImageToggle
             actionContent={
@@ -317,6 +336,14 @@ function Arcana() {
         </div>
       </Grid>
       {downloadSnackbar}
+      <CompendiumViewerModal
+        open={compendiumOpen}
+        onClose={() => setCompendiumOpen(false)}
+        onAddItem={handleArcanumSelected}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        initialSpellClass="Arcanist"
+      />
     </Grid>
   );
 }

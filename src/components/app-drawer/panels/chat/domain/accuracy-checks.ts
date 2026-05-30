@@ -38,7 +38,7 @@ export function prepareAccuracyCheck(
     category: weapon.category,
     range: weapon.range,
     isWeaponModule: weapon.isWeaponModule,
-    hrZero: options?.hrZero ?? false,
+    hrZero: options?.hrZero ?? weapon.damageHrZero ?? false,
   };
 }
 

@@ -23,6 +23,18 @@ const WEAPON_FIELDS = [
   "special",
   "meta",
   "base",
+  "fuid",
+  "passives",
+  "behaviors",
+  "att1",
+  "att2",
+  "type",
+  "damageHrZero",
+  "rareBonuses",
+  "precModifier",
+  "damageModifier",
+  "defModifier",
+  "mDefModifier",
   "damageBonus",
   "damageReworkBonus",
   "precBonus",
@@ -64,6 +76,8 @@ const CUSTOM_WEAPON_FIELDS = [
   "selectedQuality",
   "isEquipped",
   "dataType",
+  "passives",
+  "behaviors",
 ] as const;
 
 const ACCESSORY_FIELDS = [

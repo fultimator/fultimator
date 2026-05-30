@@ -64,40 +64,9 @@ export function getPilotSpellInfo(player: TypePlayer): PilotSpellInfo | null {
 
 // Vehicle module queries
 
-/**
- * All modules installed on the active vehicle that are equipped in `slot`,
- * with their original array index attached.
- */
-export function getEquippedModulesForSlot(
+function getIndexedModules(
   player: TypePlayer,
-  slot: string,
-): IndexedModule[] {
-  const vehicle = getActiveVehicle(player);
-  if (!vehicle) return [];
-  const s: VehicleSlotMap = vehicle.slots ?? {
-    main: null,
-    off: null,
-    armor: null,
-    support: [],
-  };
-  return vehicle.modules
-    .map((m, originalIndex) => ({ ...m, originalIndex }))
-    .filter((m) => {
-      const key = m.key ?? m.name;
-      if (slot === "armor") return s.armor === key;
-      if (slot === "mainHand") return s.main === key || s.off === key;
-      if (slot === "offHand") return s.main === key || s.off === key;
-      return false;
-    }) as IndexedModule[];
-}
-
-/**
- * The single active module for `slot` derived from vehicle.slots, or null.
- */
-export function getEquippedModuleForSlot(
-  player: TypePlayer,
-  slot: string,
-): IndexedModule | null {
+): { mods: IndexedModule[]; s: VehicleSlotMap } | null {
   const vehicle = getActiveVehicle(player);
   if (!vehicle) return null;
   const s: VehicleSlotMap = vehicle.slots ?? {
@@ -109,20 +78,44 @@ export function getEquippedModuleForSlot(
   const mods = vehicle.modules.map((m, originalIndex) => ({
     ...m,
     originalIndex,
-  }));
+  })) as IndexedModule[];
+  return { mods, s };
+}
 
-  if (slot === "armor") {
-    const found = mods.find((m) => (m.key ?? m.name) === s.armor);
-    return (found as IndexedModule) ?? null;
-  }
-  if (slot === "mainHand") {
-    const found = mods.find((m) => (m.key ?? m.name) === s.main);
-    return (found as IndexedModule) ?? null;
-  }
-  if (slot === "offHand") {
-    const found = mods.find((m) => (m.key ?? m.name) === s.off);
-    return (found as IndexedModule) ?? null;
-  }
+/**
+ * All modules installed on the active vehicle that are equipped in `slot`,
+ * with their original array index attached.
+ */
+export function getEquippedModulesForSlot(
+  player: TypePlayer,
+  slot: string,
+): IndexedModule[] {
+  const result = getIndexedModules(player);
+  if (!result) return [];
+  const { mods, s } = result;
+  return mods.filter((m) => {
+    const key = m.key ?? m.name;
+    if (slot === "armor") return s.armor === key;
+    if (slot === "mainHand") return s.main === key || s.off === key;
+    if (slot === "offHand") return s.main === key || s.off === key;
+    return false;
+  });
+}
+
+/**
+ * The single active module for `slot` derived from vehicle.slots, or null.
+ */
+export function getEquippedModuleForSlot(
+  player: TypePlayer,
+  slot: string,
+): IndexedModule | null {
+  const result = getIndexedModules(player);
+  if (!result) return null;
+  const { mods, s } = result;
+
+  if (slot === "armor") return mods.find((m) => (m.key ?? m.name) === s.armor) ?? null;
+  if (slot === "mainHand") return mods.find((m) => (m.key ?? m.name) === s.main) ?? null;
+  if (slot === "offHand") return mods.find((m) => (m.key ?? m.name) === s.off) ?? null;
   return null;
 }
 
@@ -267,27 +260,30 @@ export function getAvailableSupportModules(
 }
 
 /**
- * Deduplicated list of active support slot entries for display (complex modules
- * occupy 2 slots but appear only once in this list).
+ * List of enabled support modules for display in compact loadout.
+ *
+ * Uses active vehicle module state as source of truth so UI always reflects
+ * toggles immediately, even when legacy slot maps are out of sync.
  */
 export function getSupportSlots(player: TypePlayer): SupportSlotEntry[] {
-  const vs = player.vehicleSlots;
   const vehicle = getActiveVehicle(player);
-  if (!vs?.support?.length) return [];
+  if (!vehicle) return [];
 
-  const seen = new Set<string>();
-  return (vs.support ?? [])
-    .map((ref) => {
-      if (!ref) return null;
-      const key = `${ref.vehicleName}|${ref.moduleName}`;
-      if (seen.has(key)) return null;
-      seen.add(key);
-      const module =
-        vehicle?.modules.find((m) => (m.key ?? m.name) === ref.moduleName) ??
-        null;
-      return { ref, module } as SupportSlotEntry;
-    })
-    .filter((e): e is SupportSlotEntry => e !== null);
+  const vehicleName = vehicle.customName ?? "";
+  return (vehicle.modules ?? [])
+    .map((module) => ({
+      module,
+      key: module.key ?? module.name,
+    }))
+    .filter(
+      ({ module }) =>
+        module.type === "pilot_module_support" &&
+        (module.enabled || module.equipped),
+    )
+    .map(({ module, key }) => ({
+      ref: { vehicleName, moduleName: key },
+      module,
+    }));
 }
 
 // Technosphere benefit application

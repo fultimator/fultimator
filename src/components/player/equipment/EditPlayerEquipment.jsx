@@ -11,7 +11,6 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Paper,
   Stack,
   Tooltip,
   Typography,
@@ -27,7 +26,9 @@ import {
   Menu as MenuIcon,
   RadioButtonUnchecked,
 } from "@mui/icons-material";
-import CustomHeader from "../../common/CustomHeader";
+import SectionCard from "../../shared/actorCards/common/SectionCard";
+import SearchIcon from "@mui/icons-material/Search";
+import { useTranslate } from "../../../translation/translate";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
 import SphereInventory from "./technospheres/SphereInventory";
 import { clearSlotAction, equipItemToSlot } from "./slots/loadoutActions";
@@ -496,8 +497,7 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
           <Stack
             direction="row"
             spacing={1}
-            alignItems="center"
-            flexWrap="wrap"
+            sx={{ alignItems: "center", flexWrap: "wrap" }}
           >
             <Typography noWrap>{item?.name || "Unnamed Weapon"}</Typography>
           </Stack>
@@ -506,10 +506,8 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
         <Stack
           direction="row"
           spacing={0.25}
-          alignItems="center"
-          justifyContent="center"
           onClick={(e) => e.stopPropagation()}
-          sx={{ ml: 1, alignSelf: "center", minHeight: CONTROL_SIZE }}
+          sx={{ ml: 1, alignSelf: "center", minHeight: CONTROL_SIZE, alignItems: "center", justifyContent: "center" }}
         >
           {metaText(item, equipType) ? (
             <Typography
@@ -531,6 +529,7 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
 
           <Tooltip title="Edit">
             <IconButton
+              component="span"
               size="small"
               onClick={onEdit}
               disabled={!canEdit || !onEditItem}
@@ -572,6 +571,7 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
                 }}
               >
                 <IconButton
+                  component="span"
                   size="small"
                   onClick={onEquipToggle}
                   disabled={!canEdit}
@@ -612,6 +612,7 @@ function EquipmentRow({ row, player, setPlayer, canEdit, onEditItem }) {
               }}
             >
               <IconButton
+                component="span"
                 size="small"
                 onClick={onSwap}
                 disabled={!canEdit || !isEquipped}
@@ -654,28 +655,34 @@ function EquipmentGroup({
   player,
   setPlayer,
   canEdit,
-  headerType,
   onOpenCompendium,
   onAddItem,
   onEditItem,
 }) {
+  const { t } = useTranslate();
   return (
-    <Grid container spacing={1}>
-      <Grid size={12}>
-        <CustomHeader
-          type={headerType}
-          headerText={title}
-          showIconButton={canEdit}
-          icon={Add}
-          addItem={onAddItem}
-          openCompendium={onOpenCompendium}
-        />
-      </Grid>
-      <Grid size={12}>
+    <SectionCard
+      title={title}
+      actions={
+        canEdit ? (
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Tooltip title={t("Open Compendium")}>
+              <IconButton size="small" sx={{ color: "#fff" }} onClick={onOpenCompendium}>
+                <SearchIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Add Item")}>
+              <IconButton size="small" sx={{ color: "#fff" }} onClick={onAddItem}>
+                <Add fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ) : null
+      }
+    >
+      <Box sx={{ p: 1.5 }}>
         {rows.length === 0 ? (
-          <Typography color="text.secondary" variant="body2">
-            No items.
-          </Typography>
+          <Typography color="text.secondary" variant="body2">{t("No items.")}</Typography>
         ) : (
           <Grid container spacing={1}>
             {rows.map((row) => (
@@ -694,8 +701,8 @@ function EquipmentGroup({
             ))}
           </Grid>
         )}
-      </Grid>
-    </Grid>
+      </Box>
+    </SectionCard>
   );
 }
 
@@ -855,88 +862,73 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
 
   return (
     <>
-      <Paper
-        elevation={3}
-        sx={{
-          p: "15px",
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: "secondary.main",
-        }}
-      >
-        <Stack spacing={2}>
-          <EquipmentGroup
-            title="Weapon"
-            rows={weapons}
-            player={player}
-            setPlayer={setPlayer}
-            canEdit={isEditMode}
-            headerType="top"
-            onOpenCompendium={() => {
-              setCompendiumType("weapons");
-              setCompendiumOpen(true);
-            }}
-            onAddItem={() => handleAddNew("weapons")}
-            onEditItem={openEditDialog}
-          />
-          <EquipmentGroup
-            title="Custom Weapon"
-            rows={customWeapons}
-            player={player}
-            setPlayer={setPlayer}
-            canEdit={isEditMode}
-            headerType="middle"
-            onOpenCompendium={() => {
-              setCompendiumType("custom-weapons");
-              setCompendiumOpen(true);
-            }}
-            onAddItem={() => handleAddNew("customWeapons")}
-            onEditItem={openEditDialog}
-          />
-          <EquipmentGroup
-            title="Shield"
-            rows={shields}
-            player={player}
-            setPlayer={setPlayer}
-            canEdit={isEditMode}
-            headerType="middle"
-            onOpenCompendium={() => {
-              setCompendiumType("shields");
-              setCompendiumOpen(true);
-            }}
-            onAddItem={() => handleAddNew("shields")}
-            onEditItem={openEditDialog}
-          />
-          <EquipmentGroup
-            title="Armor"
-            rows={armor}
-            player={player}
-            setPlayer={setPlayer}
-            canEdit={isEditMode}
-            headerType="middle"
-            onOpenCompendium={() => {
-              setCompendiumType("armor");
-              setCompendiumOpen(true);
-            }}
-            onAddItem={() => handleAddNew("armor")}
-            onEditItem={openEditDialog}
-          />
-          <EquipmentGroup
-            title="Accessory"
-            rows={accessories}
-            player={player}
-            setPlayer={setPlayer}
-            canEdit={isEditMode}
-            headerType="middle"
-            onOpenCompendium={() => {
-              setCompendiumType("accessories");
-              setCompendiumOpen(true);
-            }}
-            onAddItem={() => handleAddNew("accessories")}
-            onEditItem={openEditDialog}
-          />
-        </Stack>
-      </Paper>
+      <Stack spacing={2}>
+        <EquipmentGroup
+          title="Weapon"
+          rows={weapons}
+          player={player}
+          setPlayer={setPlayer}
+          canEdit={isEditMode}
+          onOpenCompendium={() => {
+            setCompendiumType("weapons");
+            setCompendiumOpen(true);
+          }}
+          onAddItem={() => handleAddNew("weapons")}
+          onEditItem={openEditDialog}
+        />
+        <EquipmentGroup
+          title="Custom Weapon"
+          rows={customWeapons}
+          player={player}
+          setPlayer={setPlayer}
+          canEdit={isEditMode}
+          onOpenCompendium={() => {
+            setCompendiumType("custom-weapons");
+            setCompendiumOpen(true);
+          }}
+          onAddItem={() => handleAddNew("customWeapons")}
+          onEditItem={openEditDialog}
+        />
+        <EquipmentGroup
+          title="Shield"
+          rows={shields}
+          player={player}
+          setPlayer={setPlayer}
+          canEdit={isEditMode}
+          onOpenCompendium={() => {
+            setCompendiumType("shields");
+            setCompendiumOpen(true);
+          }}
+          onAddItem={() => handleAddNew("shields")}
+          onEditItem={openEditDialog}
+        />
+        <EquipmentGroup
+          title="Armor"
+          rows={armor}
+          player={player}
+          setPlayer={setPlayer}
+          canEdit={isEditMode}
+          onOpenCompendium={() => {
+            setCompendiumType("armor");
+            setCompendiumOpen(true);
+          }}
+          onAddItem={() => handleAddNew("armor")}
+          onEditItem={openEditDialog}
+        />
+        <EquipmentGroup
+          title="Accessory"
+          rows={accessories}
+          player={player}
+          setPlayer={setPlayer}
+          canEdit={isEditMode}
+          onOpenCompendium={() => {
+            setCompendiumType("accessories");
+            setCompendiumOpen(true);
+          }}
+          onAddItem={() => handleAddNew("accessories")}
+          onEditItem={openEditDialog}
+        />
+      </Stack>
 
       <CompendiumViewerModal
         open={compendiumOpen}

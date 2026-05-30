@@ -35,7 +35,7 @@ function buildInitialState() {
   };
 }
 
-function Accessories() {
+function Accessories({ variant = "equip" }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -192,7 +192,7 @@ function Accessories() {
         >
           <div ref={cardRef}>
             <SharedAccessoryCard
-              variant="equip"
+              variant={variant}
               item={formState}
               imageMode="slot"
               showImageToggle

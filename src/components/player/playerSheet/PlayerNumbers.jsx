@@ -15,7 +15,8 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../../translation/translate";
-import zenitIcon from "/assets/icons/resources/zenit.png";
+
+const zenitIcon = "/assets/icons/resources/zenit.png";
 
 function ZenitDialog({ open, handleClose, currentValue, onApply, t }) {
   const [amount, setAmount] = useState("");

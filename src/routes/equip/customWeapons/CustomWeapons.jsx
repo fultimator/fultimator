@@ -253,7 +253,7 @@ function buildInitialState(data) {
   };
 }
 
-function CustomWeapons() {
+function CustomWeapons({ variant = "equip" }) {
   const { t } = useTranslate();
   const stickyTop = useStickyTop();
   const theme = useTheme();
@@ -611,7 +611,7 @@ function CustomWeapons() {
         sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
       >
         <SharedCustomWeaponCard
-          variant="equip"
+          variant={variant}
           item={exportData}
           cardRef={weaponCardsRef}
           imageMode="slot"

@@ -86,13 +86,16 @@ function collectEffectiveEffects(
   return out;
 }
 
-type ItemWithPassives = { passives?: Passive[] };
+type ItemWithEffects = {
+  passives?: Passive[];
+  behavior?: { effects?: Passive[] };
+};
 
-function itemPassives(item: ItemWithPassives): Passive[] {
-  return item.passives ?? [];
+function itemPassives(item: ItemWithEffects): Passive[] {
+  return [...(item.passives ?? []), ...(item.behavior?.effects ?? [])];
 }
 
-function* walkItems(actor: Actor): Generator<ItemWithPassives> {
+function* walkItems(actor: Actor): Generator<ItemWithEffects> {
   if (isPlayer(actor)) {
     for (const klass of actor.classes ?? []) {
       if (Array.isArray(klass.skills)) for (const s of klass.skills) yield s;

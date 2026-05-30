@@ -1381,7 +1381,8 @@ function rehydrateVehicleModules(player: TypePlayer): TypePlayer {
   const migrateModule = (
     m: Record<string, unknown>,
   ): Record<string, unknown> => {
-    const name = m.name as string | undefined;
+    // Modules saved post-migration have `key` but no `name`; support both.
+    const name = (m.name ?? m.key) as string | undefined;
     const isCustom = !name || CUSTOM_MODULE_NAMES.has(name);
 
     if (!isCustom) {
@@ -1391,7 +1392,11 @@ function rehydrateVehicleModules(player: TypePlayer): TypePlayer {
         for (const key of MODULE_INSTANCE_FIELDS) {
           if (m[key] !== undefined) instanceState[key] = m[key];
         }
-        return { ...staticEntry, ...instanceState };
+        const hydrated = { ...staticEntry, ...instanceState };
+        // Ensure both `key` and `name` are present for display and lookup.
+        if (!hydrated.key && hydrated.name) hydrated.key = hydrated.name;
+        if (!hydrated.name && hydrated.key) hydrated.name = hydrated.key;
+        return hydrated;
       }
     }
 

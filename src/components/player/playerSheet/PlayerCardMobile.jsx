@@ -42,13 +42,10 @@ import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import { useThemeStore } from "../../../store/themeStore";
 import { calculateAttribute, newShade } from "../common/playerCalculations";
 import { isItemEquipped } from "../equipment/slots/equipmentSlots";
-
-// ---------------------------------------------------------------------------
-// Styled components (copied from PlayerCard.jsx - not exported there)
-// ---------------------------------------------------------------------------
+// Styled components
 
 const GradientLinearProgress = styled(LinearProgress)(
-  ({ theme, color1, color2 }) => ({
+  ({ color1, color2 }) => ({
     height: 20,
     borderRadius: 0,
     backgroundColor: "transparent",
@@ -60,7 +57,7 @@ const GradientLinearProgress = styled(LinearProgress)(
   }),
 );
 
-const StatBarWrapper = styled(Box)(({ theme }) => ({
+const StatBarWrapper = styled(Box)(() => ({
   position: "relative",
   "& .stat-label": {
     position: "absolute",
@@ -105,7 +102,7 @@ const CombatStatCard = styled(Box)(({ theme }) => ({
   flex: 1,
 }));
 
-const StyledMarkdown = styled(ReactMarkdown)(({ theme }) => ({
+const StyledMarkdown = styled(ReactMarkdown)(() => ({
   whiteSpace: "pre-line",
   fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
   "& p": {
@@ -138,10 +135,7 @@ const DescriptionWrapper = styled(Box, {
     transition: "height 0.3s ease-in-out",
   },
 }));
-
-// ---------------------------------------------------------------------------
-// Sub-components (copied from PlayerCard.jsx)
-// ---------------------------------------------------------------------------
+// Sub-components
 
 function StatChangeDialog({ open, handleClose, stat, value, max, onApply, t }) {
   const [amount, setValue] = useState("");
@@ -344,10 +338,7 @@ function CombatStat({
   }
   return card;
 }
-
-// ---------------------------------------------------------------------------
 // Main Component
-// ---------------------------------------------------------------------------
 
 export default function PlayerCardMobile({
   player,
@@ -728,9 +719,7 @@ export default function PlayerCardMobile({
           : {}),
       }}
     >
-      {/* ------------------------------------------------------------------ */}
-      {/* 1. HEADER - gradient bar with player name */}
-      {/* ------------------------------------------------------------------ */}
+      {/* HEADER */}
       <Box
         sx={{
           background: `linear-gradient(90deg, ${primary} 0%, ${secondary} 100%)`,
@@ -965,10 +954,7 @@ export default function PlayerCardMobile({
           </>
         )}
       </Box>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* 2. AVATAR + STAT BARS side by side */}
-      {/* ------------------------------------------------------------------ */}
+      {/* AVATAR + STAT BARS */}
       <Box sx={{ display: "flex", alignItems: "stretch" }}>
         {/* Avatar - left ~35% */}
         <Box
@@ -1152,10 +1138,7 @@ export default function PlayerCardMobile({
           </StatTooltip>
         </Box>
       </Box>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* 3. DESCRIPTION (if present) */}
-      {/* ------------------------------------------------------------------ */}
+      {/* DESCRIPTION */}
       {player.info.description && (
         <Box
           sx={{
@@ -1179,10 +1162,7 @@ export default function PlayerCardMobile({
           </DescriptionWrapper>
         </Box>
       )}
-
-      {/* ------------------------------------------------------------------ */}
-      {/* 4. TRAITS */}
-      {/* ------------------------------------------------------------------ */}
+      {/* TRAITS */}
       <Box
         sx={{
           border: `0.5px solid ${theme.palette.divider}`,
@@ -1310,10 +1290,7 @@ export default function PlayerCardMobile({
           )}
         </Box>
       </Box>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* 5. ATTRIBUTES + STATUSES */}
-      {/* ------------------------------------------------------------------ */}
+      {/* ATTRIBUTES + STATUSES */}
       <Box
         sx={{
           border: `0.5px solid ${theme.palette.divider}`,
@@ -1483,10 +1460,7 @@ export default function PlayerCardMobile({
           )}
         </Box>
       </Box>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* 6. COMBAT STATS - 2x2 grid */}
-      {/* ------------------------------------------------------------------ */}
+      {/* COMBAT STATS */}
       <Box
         sx={{
           mx: 1,
@@ -1857,10 +1831,7 @@ export default function PlayerCardMobile({
           />
         )}
       </Box>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* 7. AFFINITY STRIP - 3x3 grid */}
-      {/* ------------------------------------------------------------------ */}
+      {/* AFFINITY STRIP */}
       <AffinityStrip sx={{ mt: 1 }}>
         {[
           "physical",

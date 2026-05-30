@@ -723,6 +723,23 @@ function applyGradientOpacity(
   return `linear-gradient(rgba(${overlayColor},${overlayOpacity})), ${background}`;
 }
 
+export function getThemePanelRadius({
+  mode,
+  primary,
+  secondary,
+  ternary,
+  quaternary,
+  paper,
+  profile = "default",
+  panelRadiusOverride,
+  styleCustomization,
+}: Pick<ThemeComponentFactoryOptions, "mode" | "primary" | "secondary" | "ternary" | "quaternary" | "paper" | "profile" | "panelRadiusOverride" | "styleCustomization">): number {
+  const tokens = buildProfileTokens(profile, mode, primary, secondary, ternary, quaternary, paper, styleCustomization);
+  if (panelRadiusOverride !== null && panelRadiusOverride !== undefined)
+    return panelRadiusOverride;
+  return tokens.panelRadius;
+}
+
 export function createThemeComponents({
   mode,
   primary,

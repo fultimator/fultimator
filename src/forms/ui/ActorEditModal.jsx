@@ -9,7 +9,7 @@ import {
   Divider,
   Box,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { Close } from "@mui/icons-material";
 
 export default function ActorEditModal({
   open,
@@ -47,36 +47,18 @@ export default function ActorEditModal({
       onKeyDown={handleKeyDown}
       fullWidth
       maxWidth={maxWidth}
-      slotProps={{
-        paper: {
-          sx: {
-            borderRadius: 2,
-            overflow: "hidden",
-          },
-        },
-      }}
+      slotProps={{ paper: { sx: { width: "100%" } } }}
     >
-      <DialogTitle
-        variant="h3"
-        sx={{
-          fontWeight: 700,
-          textTransform: "uppercase",
-          px: 3,
-          py: 2,
-          borderBottom: "1px solid",
-          borderColor: "divider",
-          pr: 6,
-        }}
-      >
+      <DialogTitle variant="h3" sx={{ fontWeight: 700 }}>
         {title}
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
-          sx={{ position: "absolute", right: 10, top: 10, color: "grey.500" }}
-        >
-          <CloseIcon />
-        </IconButton>
       </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={{ position: "absolute", right: 8, top: 8, color: "grey.500" }}
+      >
+        <Close />
+      </IconButton>
 
       <DialogContent sx={{ px: 3, pt: "20px !important", pb: 2.5 }}>
         {subtitle ? (

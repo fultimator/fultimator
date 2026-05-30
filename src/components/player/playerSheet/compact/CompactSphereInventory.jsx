@@ -29,11 +29,11 @@ import {
   Add,
   AddLink,
   Delete,
-  Edit,
   KeyboardArrowDown,
   KeyboardArrowUp,
+  Edit,
   LinkOff,
-  MoreVert,
+  Menu as MenuIcon,
   Remove,
   Search as SearchIcon,
 } from "@mui/icons-material";
@@ -124,9 +124,9 @@ function SphereDeleteMenu({
             e.stopPropagation();
             setAnchor(e.currentTarget);
           }}
-          sx={{ color: "#fff", p: 0.25 }}
+          sx={{ p: 0.25 }}
         >
-          <MoreVert sx={{ fontSize: "1.1rem" }} />
+          <MenuIcon sx={{ fontSize: "1.1rem" }} />
         </IconButton>
       </Tooltip>
       <Menu

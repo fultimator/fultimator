@@ -61,6 +61,7 @@ export interface PlayerInfo {
   exp: number;
   zenit: number;
   imgurl: string;
+  mnemoLevelsSpent?: number;
 }
 
 export interface PlayerAttributes {

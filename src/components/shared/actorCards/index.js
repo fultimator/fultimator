@@ -9,3 +9,26 @@ export { NpcRareGear } from "./npc/NpcRareGear";
 export { NpcEquipment } from "./npc/NpcEquipment";
 export { NpcHeader } from "./npc/NpcHeader";
 export { default as NpcActorCard } from "./npc/NpcActorCard";
+
+export { PcActorCardCompact, PcCompactHeader } from "./pc-compact/index.js";
+
+export {
+  PcActorCard,
+  PcHeader,
+  PcStats,
+  PcAffinities,
+  PcNumbers,
+  PcClasses,
+  PcSpells,
+  PcRituals,
+  PcQuirk,
+  PcCampActivities,
+  PcZeroPower,
+  PcVehicle,
+  PcCompanion,
+  PcOthers,
+  PcMnemoReceptacle,
+  spellDisplayRegistry,
+  spellModalRegistry,
+  spellTypeToModalName,
+} from "./pc/index.js";

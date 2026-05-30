@@ -1,18 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { TypeAffinity } from "../../../player/stats/types";
-
-const AFFINITY_TYPES = [
-  "physical",
-  "air",
-  "bolt",
-  "dark",
-  "earth",
-  "fire",
-  "ice",
-  "light",
-  "poison",
-];
+import { AFFINITY_TYPES } from "../core-utils";
 
 export default function DefenseAffinityRow({
   t,
@@ -114,6 +103,17 @@ export default function DefenseAffinityRow({
             justifyContent: "center",
             alignItems: "center",
             minWidth: 0,
+            "& img, & svg": { width: "1.35em !important", height: "1.35em !important" },
+            "& .MuiTypography-root": { fontSize: "0.88rem", letterSpacing: 0 },
+            [`@container (max-width: 380px)`]: {
+              py: 0.25,
+              "& img, & svg": { width: "1.1em !important", height: "1.1em !important" },
+              "& .MuiTypography-root": { fontSize: "0.72rem" },
+            },
+            [`@container (max-width: 300px)`]: {
+              "& .MuiTypography-root": { display: "none" },
+              "& img, & svg": { width: "1.4em !important", height: "1.4em !important" },
+            },
           }}
         >
           <TypeAffinity

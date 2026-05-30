@@ -123,6 +123,7 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
         >
           <Grid size={4}>
             <Typography
+              component="div"
               sx={{
                 fontWeight: "bold",
                 fontSize: scale.body,
@@ -324,6 +325,7 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
         >
           <Grid size={4}>
             <Typography
+              component="div"
               sx={{
                 fontWeight: "bold",
                 display: "flex",
@@ -526,6 +528,7 @@ export const SharedGambleSpellCard = React.memo(function SharedGambleSpellCard({
         >
           <Grid size={4}>
             <Typography
+              component="div"
               sx={{
                 fontWeight: "bold",
                 fontSize: scale.body,
@@ -702,10 +705,10 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
               }}
             >
               <Grid size="grow">
-                <Typography>{t("Gift")}</Typography>
+                <Typography sx={{ fontFamily: "Antonio" }}>{t("Gift")}</Typography>
               </Grid>
               <Grid size={7}>
-                <Typography sx={{ textAlign: "center" }}>
+                <Typography sx={{ textAlign: "center", fontFamily: "Antonio" }}>
                   {t("Event")}
                 </Typography>
               </Grid>
@@ -821,10 +824,10 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
               }}
             >
               <Grid size="grow">
-                <Typography>{t("Dance")}</Typography>
+                <Typography sx={{ fontFamily: "Antonio" }}>{t("Dance")}</Typography>
               </Grid>
               <Grid size={7}>
-                <Typography sx={{ textAlign: "center" }}>
+                <Typography sx={{ textAlign: "center", fontFamily: "Antonio" }}>
                   {t("Duration")}
                 </Typography>
               </Grid>
@@ -926,10 +929,10 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
               }}
             >
               <Grid size="grow">
-                <Typography>{t("Therioform")}</Typography>
+                <Typography sx={{ fontFamily: "Antonio" }}>{t("Therioform")}</Typography>
               </Grid>
               <Grid size={7}>
-                <Typography sx={{ textAlign: "center" }}>
+                <Typography sx={{ textAlign: "center", fontFamily: "Antonio" }}>
                   {t("Genoclepsis Suggestions")}
                 </Typography>
               </Grid>
@@ -1028,10 +1031,28 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
   });
 
   const isRework = item.rework || item.spellType === "arcanist-rework";
-  const background = `linear-gradient(90deg, ${customTheme.ternary} 0%, transparent 100%)`;
+
+  const isPrint = variant === "print";
+  const background = isPrint
+    ? customTheme.mode === "dark"
+      ? `linear-gradient(90deg, ${customTheme.ternary} 0%, #181a1b 100%)`
+      : `linear-gradient(90deg, ${customTheme.ternary} 0%, #ffffff 100%)`
+    : `linear-gradient(90deg, ${customTheme.ternary} 0%, transparent 100%)`;
+  const ARCANUM_IMAGE_SIZE = isPrint ? 160 : 128;
+  const headerFontSize = isPrint ? "1.5rem" : scale.header;
+  const headerPy = isPrint ? 1.5 : 0.5;
+  const descFontSize = isPrint ? "1rem" : undefined;
+  const descFontStyle = isPrint ? "italic" : undefined;
+  const domainFontSize = isPrint ? "1rem" : undefined;
+  const sectionNameFontSize = isPrint ? "1.1rem" : scale.body;
+  const sectionLabelFontSize = isPrint ? "0.85rem" : "0.75rem";
+  const benefitFontSize = isPrint ? "1rem" : "0.875rem";
+  const benefitColor = isPrint ? "text.primary" : "text.secondary";
 
   const labelPillSx = {
-    backgroundImage: `linear-gradient(to right, ${customTheme.primary}, ${darken(customTheme.secondary, 0.3)})`,
+    ...(isPrint
+      ? { background: customTheme.primary }
+      : { backgroundImage: `linear-gradient(to right, ${customTheme.primary}, ${darken(customTheme.secondary, 0.3)})` }),
     px: 2,
     py: 0.5,
     color: "#ffffff",
@@ -1056,12 +1077,12 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
     if (!benefit && !name) return null;
     return (
       <Box sx={{ borderTop: `1px solid ${customTheme.secondary}` }}>
-        <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-          <Box sx={labelPillSx}>
+        <Box sx={{ display: "flex", alignItems: "stretch", width: "100%" }}>
+          <Box sx={{ ...labelPillSx, alignSelf: "stretch" }}>
             <Typography
               sx={{
                 fontWeight: "bold",
-                fontSize: "0.75rem",
+                fontSize: sectionLabelFontSize,
                 color: "inherit",
                 textTransform: "uppercase",
               }}
@@ -1071,18 +1092,18 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
           </Box>
           <Box sx={nameBandSx}>
             {name && (
-              <Typography sx={{ fontWeight: "bold", fontSize: scale.body }}>
+              <Typography sx={{ fontWeight: "bold", fontSize: sectionNameFontSize }}>
                 {name}
               </Typography>
             )}
           </Box>
         </Box>
         {benefit && (
-          <Box sx={{ px: 2, py: 0.75, fontSize: "0.875rem" }}>
+          <Box sx={{ px: 2, py: isPrint ? 1 : 0.75, fontSize: benefitFontSize }}>
             <Typography
               variant="body2"
               component="div"
-              sx={{ color: "text.secondary", lineHeight: 1.5 }}
+              sx={{ color: benefitColor, lineHeight: isPrint ? 1.7 : 1.5, fontSize: benefitFontSize }}
             >
               {md(benefit)}
             </Typography>
@@ -1112,8 +1133,6 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
     : (item.dismissBenefit ?? "");
   const dismissName = item.dismissName ?? "";
   const dismissLabel = item.dismiss ? t(item.dismiss) : t("Dismiss");
-
-  const ARCANUM_IMAGE_SIZE = 128;
 
   return (
     <CardContentWrapper
@@ -1150,7 +1169,7 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
             onClick={onHeaderClick}
             sx={{
               px: 2,
-              py: 0.5,
+              py: headerPy,
               minHeight: 32,
               background: customTheme.primary,
               color: "#ffffff",
@@ -1163,7 +1182,7 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
           >
             <Typography
               sx={{
-                fontSize: scale.header,
+                fontSize: headerFontSize,
                 fontWeight: 700,
                 fontFamily: "Antonio",
                 textTransform: "uppercase",
@@ -1174,7 +1193,7 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
             >
               {t(item.name)}
             </Typography>
-            {isRework && (
+            {isRework && !isPrint && (
               <Chip
                 label={t("Rework")}
                 size="small"
@@ -1206,7 +1225,7 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
               <Typography
                 variant="body2"
                 component="div"
-                sx={{ lineHeight: 1.5 }}
+                sx={{ lineHeight: 1.5, fontSize: descFontSize, fontStyle: descFontStyle }}
               >
                 {md(item.description)}
               </Typography>
@@ -1216,13 +1235,13 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
             <Box
               sx={{
                 px: 2,
-                minHeight: 32,
+                minHeight: isPrint ? 44 : 32,
                 display: "flex",
                 alignItems: "center",
                 borderBottom: `1px solid ${customTheme.secondary}`,
               }}
             >
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ fontSize: domainFontSize }}>
                 <strong>{t("Domains")}:</strong> {domainDesc || domainText}
               </Typography>
             </Box>
@@ -1778,16 +1797,6 @@ export const SharedMagiseedCard = React.memo(function SharedMagiseedCard({
     alignItems: "center",
     minWidth: "fit-content",
     flexShrink: 0,
-  };
-
-  const nameBandSx = {
-    background: `linear-gradient(90deg, ${customTheme.ternary} 0%, transparent 100%)`,
-    px: 2,
-    py: 0.5,
-    display: "flex",
-    alignItems: "center",
-    flex: 1,
-    minHeight: "28px",
   };
 
   const tiers =
@@ -2669,18 +2678,6 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
     item.recovery;
   const typeLabel = isKey ? t("Magichant Key") : t("Magichant Tone");
 
-  const keyDetails = isKey
-    ? [
-        { label: t("Type"), value: item.type ? t(item.type) : "" },
-        { label: t("Status"), value: item.status ? t(item.status) : "" },
-        {
-          label: t("Attribute"),
-          value: item.attribute ? t(item.attribute) : "",
-        },
-        { label: t("Recovery"), value: item.recovery ? t(item.recovery) : "" },
-      ].filter((e) => e.value)
-    : [];
-
   return (
     <CardContentWrapper
       showCard={showCard}
@@ -2705,7 +2702,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
               }}
             >
               <Grid size="grow">
-                <Typography>{typeLabel}</Typography>
+                <Typography sx={{ fontFamily: "Antonio" }}>{typeLabel}</Typography>
               </Grid>
               <Grid size={2}>
                 <Typography sx={{ textAlign: "center" }}>

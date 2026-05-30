@@ -62,6 +62,7 @@ export function TypeAffinity({
   iconSize,
   editable = false,
   onChangeAffinity,
+  showDropdownArrow = true,
 }) {
   const { t } = useTranslate();
   const rawAffinity = String(affinity ?? "").toLowerCase();
@@ -171,14 +172,16 @@ export function TypeAffinity({
         >
           {value ? value.toUpperCase() : ""}
         </Typography>
-        <KeyboardArrowDownIcon
-          sx={{
-            fontSize: "0.95rem",
-            color: "text.secondary",
-            opacity: 0.9,
-            ml: 0.1,
-          }}
-        />
+        {showDropdownArrow && (
+          <KeyboardArrowDownIcon
+            sx={{
+              fontSize: "0.95rem",
+              color: "text.secondary",
+              opacity: 0.9,
+              ml: 0.1,
+            }}
+          />
+        )}
       </ButtonBase>
       <Menu
         anchorEl={anchorEl}

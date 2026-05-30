@@ -68,8 +68,16 @@ import PlayerCustomWeaponModal from "../../equipment/customWeapons/PlayerCustomW
 import PlayerShieldModal from "../../equipment/shields/PlayerShieldModal";
 import PlayerArmorModal from "../../equipment/armor/PlayerArmorModal";
 import PlayerAccessoryModal from "../../equipment/accessories/PlayerAccessoryModal";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 // const SLOTS = ['mainHand', 'offHand', 'armor', 'accessory'];
+const LOADOUT_LABEL_COL_WIDTH = { xs: "58px", sm: "68px" };
+const LOADOUT_STATUS_ICON_BOX = "12px";
+const LOADOUT_ACTION_COL_WIDTH = "48px";
+const LOADOUT_ROW_MIN_HEIGHT = "40px";
+const LOADOUT_ROW_PX = 0.75;
+const LOADOUT_ROW_PY = 0.35;
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -126,6 +134,33 @@ function hasTransforming(resolved) {
   );
 }
 
+function getVehicleModuleDisplayName(module, t) {
+  const custom = String(module?.customName ?? "").trim();
+  if (custom) return custom;
+  const translatedName = String(t(module?.name ?? module?.key ?? "") || "").trim();
+  if (translatedName.length > 1) return translatedName;
+  const translatedType = String(t(module?.type || "") || "").trim();
+  if (translatedType.length > 1) return translatedType;
+  return t("Vehicle Module");
+}
+
+function getSupportModuleDisplayName(module, t) {
+  const base = getVehicleModuleDisplayName(module, t);
+  const genericSupportLabels = new Set([
+    t("Vehicle Module"),
+    t("Support Module"),
+    t("pilot_module_support"),
+  ]);
+  if (base && !genericSupportLabels.has(base)) return base;
+  const desc = String(
+    (module?.name ?? module?.key) === "pilot_custom_support"
+      ? module?.description || ""
+      : t(module?.description || ""),
+  ).trim();
+  if (desc.length > 1) return desc.slice(0, 36);
+  return t("Support Module");
+}
+
 // function moduleStatLine(module) {
 //   if (!module) return '-';
 //   if (module.type === 'pilot_module_weapon') {
@@ -162,8 +197,6 @@ export default function CompactLoadout({
   const [slotImportOpen, setSlotImportOpen] = useState(false);
   const [slotImportType, setSlotImportType] = useState("weapons");
   const canClickSlot = isEditMode || !!setPlayer;
-  const actionGradient =
-    "linear-gradient(135deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.14) 100%)";
 
   const store = useLoadoutStore();
   useEffect(() => {
@@ -203,11 +236,11 @@ export default function CompactLoadout({
 
   // Slot click routing
   const handleSlotClick = (slot) => {
-    const hasModuleCandidates =
+    const hasActiveModuleInSlot =
       ["mainHand", "offHand", "armor"].includes(slot) &&
       Boolean(activeVehicle) &&
-      getEquippedModulesForSlot(player, slot).length > 0;
-    setPickerOpenModuleOverride(hasModuleCandidates);
+      Boolean(getEquippedModuleForSlot(player, slot));
+    setPickerOpenModuleOverride(hasActiveModuleInSlot);
     setPickerSlot(slot);
   };
 
@@ -245,8 +278,8 @@ export default function CompactLoadout({
       const dmg = m.damage ?? {};
       if (!acc.attr1 || !acc.attr2) return;
       weaponOption = {
-        arg: m.customName || m.name || slot,
-        name: m.customName || m.name || slot,
+        arg: m.customName || m.name || m.key || slot,
+        name: m.customName || m.name || m.key || slot,
         attr1: acc.attr1,
         attr2: acc.attr2,
         accuracyBonus: acc.value ?? 0,
@@ -254,6 +287,8 @@ export default function CompactLoadout({
         damageType: dmg.type ?? "physical",
         accuracyDefense: acc.defense ?? "def",
         isWeaponModule: true,
+        category: m.category,
+        damageHrZero: dmg.hrZero === true,
         range:
           m.range === "ranged" || m.range === "weapon_range_ranged"
             ? "ranged"
@@ -389,7 +424,7 @@ export default function CompactLoadout({
   };
 
   return (
-    <TableContainer component={Paper} sx={{ mb: 1 }}>
+    <TableContainer component={Paper} sx={{ mb: 1, containerType: "inline-size" }}>
       <Box>
         {/* Header */}
         <Box
@@ -415,7 +450,7 @@ export default function CompactLoadout({
             {t("Loadout")}
           </Typography>
 
-          {pilotSpellInfo && isEditMode && (
+          {pilotSpellInfo && canClickSlot && (
             <>
               <Tooltip
                 title={activeVehicle ? t("Exit Vehicle") : t("Enter Vehicle")}
@@ -423,20 +458,22 @@ export default function CompactLoadout({
                 <IconButton
                   size="small"
                   onClick={handleToggleVehicle}
-                  sx={{ color: activeVehicle ? "#ff7070" : "#aaffaa", p: 0.15 }}
+                  sx={{ color: activeVehicle ? "#ff7070" : "#aaffaa", p: 0.15, width: 22, height: 22 }}
                 >
                   <DirectionsWalkIcon sx={{ fontSize: "1rem" }} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t("Swap Vehicle")}>
-                <IconButton
-                  size="small"
-                  onClick={() => setVehicleModalOpen(true)}
-                  sx={{ color: "#fff", p: 0.15 }}
-                >
-                  <SyncAltIcon sx={{ fontSize: "1rem" }} />
-                </IconButton>
-              </Tooltip>
+              {isEditMode && (
+                <Tooltip title={t("Swap Vehicle")}>
+                  <IconButton
+                    size="small"
+                    onClick={() => setVehicleModalOpen(true)}
+                    sx={{ color: "#fff", p: 0.15, width: 22, height: 22 }}
+                  >
+                    <SyncAltIcon sx={{ fontSize: "1rem" }} />
+                  </IconButton>
+                </Tooltip>
+              )}
             </>
           )}
 
@@ -444,7 +481,7 @@ export default function CompactLoadout({
             <IconButton
               size="small"
               onClick={() => setEquipOpen((v) => !v)}
-              sx={{ color: "#fff", p: 0.15 }}
+              sx={{ color: "#fff", p: 0.15, width: 22, height: 22 }}
             >
               {equipOpen ? (
                 <ExpandLessIcon fontSize="small" />
@@ -455,7 +492,7 @@ export default function CompactLoadout({
           )}
         </Box>
         {/* Main 4 slots + aux */}
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", "@container (max-width: 400px)": { gridTemplateColumns: "1fr" } }}>
           {visibleSlots.map(({ slot, resolved, locked, isAux }) => {
             const isEmpty = !resolved;
             const isVehicle = resolved?.kind === "vehicleModule";
@@ -470,16 +507,20 @@ export default function CompactLoadout({
               (slot === "mainHand" || slot === "offHand") &&
               hasTransforming(resolved);
             const showChat =
-              !isEmpty && !locked && !isVehicle && slot !== "mainHand";
+              !isEmpty &&
+              !locked &&
+              ((!isVehicle && slot !== "mainHand") ||
+                (isVehicle &&
+                  resolved?.module?.type !== "pilot_module_weapon"));
 
             const name = locked
               ? slot === "offHand"
                 ? t("2-Handed")
                 : t("Locked")
               : isEmpty
-                ? t("- Empty -")
+                ? "- Empty -"
                 : isVehicle
-                  ? resolved.module.customName || t(resolved.module.name)
+                  ? getVehicleModuleDisplayName(resolved.module, t)
                   : (() => {
                       const item = resolved.item;
                       if (
@@ -495,8 +536,9 @@ export default function CompactLoadout({
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  px: 0.75,
-                  py: 0.35,
+                  px: LOADOUT_ROW_PX,
+                  py: LOADOUT_ROW_PY,
+                  minHeight: LOADOUT_ROW_MIN_HEIGHT,
                   borderBottom: "1px solid",
                   borderColor: "divider",
                   minWidth: 0,
@@ -512,42 +554,46 @@ export default function CompactLoadout({
                     whiteSpace: "nowrap",
                     flexShrink: 0,
                     mr: 0.5,
-                    width: { xs: "58px", sm: "68px" },
+                    width: LOADOUT_LABEL_COL_WIDTH,
                   }}
                 >
                   {slotLabel(t, slot)}
                 </Typography>
-                {locked && (
-                  <LockIcon
-                    sx={{
-                      fontSize: "0.65rem",
-                      color: "text.disabled",
-                      flexShrink: 0,
-                      mr: 0.5,
-                    }}
-                  />
-                )}
-                {isVehicle && !locked && (
-                  <PrecisionManufacturingIcon
-                    sx={{
-                      fontSize: "0.65rem",
-                      color: "success.main",
-                      flexShrink: 0,
-                      mr: 0.25,
-                    }}
-                  />
-                )}
-                {hasModule && !isVehicle && !isEmpty && !locked && (
-                  <PrecisionManufacturingIcon
-                    sx={{
-                      fontSize: "0.65rem",
-                      color: "success.light",
-                      opacity: 0.6,
-                      flexShrink: 0,
-                      mr: 0.25,
-                    }}
-                  />
-                )}
+                <Box
+                  sx={{
+                    width: LOADOUT_STATUS_ICON_BOX,
+                    height: LOADOUT_STATUS_ICON_BOX,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    mr: 0.35,
+                  }}
+                >
+                  {locked ? (
+                    <LockIcon
+                      sx={{
+                        fontSize: "0.65rem",
+                        color: "text.disabled",
+                      }}
+                    />
+                  ) : isVehicle ? (
+                    <PrecisionManufacturingIcon
+                      sx={{
+                        fontSize: "0.65rem",
+                        color: "success.main",
+                      }}
+                    />
+                  ) : hasModule && !isEmpty ? (
+                    <PrecisionManufacturingIcon
+                      sx={{
+                        fontSize: "0.65rem",
+                        color: "success.light",
+                        opacity: 0.6,
+                      }}
+                    />
+                  ) : null}
+                </Box>
                 <Typography
                   component="span"
                   noWrap
@@ -557,13 +603,14 @@ export default function CompactLoadout({
                     color: locked
                       ? "text.disabled"
                       : isEmpty
-                        ? "text.disabled"
+                        ? "text.secondary"
                         : isVehicle
                           ? "success.main"
                           : isAux
                             ? "warning.main"
                             : "text.primary",
                     fontStyle: isEmpty || locked ? "italic" : "normal",
+                    opacity: isEmpty ? 0.72 : 1,
                     flex: 1,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -571,8 +618,18 @@ export default function CompactLoadout({
                 >
                   {highlightMatch(name, searchQuery)}
                 </Typography>
-                {(showSwap || showRoll || showChat) && (
-                  <Box sx={{ display: "flex", flexShrink: 0, ml: 0.25 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexShrink: 0,
+                    ml: 0.25,
+                    width: LOADOUT_ACTION_COL_WIDTH,
+                    minWidth: LOADOUT_ACTION_COL_WIDTH,
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  {(showSwap || showRoll || showChat) && (
+                    <>
                     {showSwap && (
                       <Tooltip title={t("weapon_customization_swap_form")}>
                         <IconButton
@@ -607,41 +664,72 @@ export default function CompactLoadout({
                           size="small"
                           onClick={(e) => {
                             e.stopPropagation();
-                            const item = resolved.item;
                             const tags = [];
-                            if (slot === "armor") {
-                              const def = item.def ?? 0;
-                              const mdef = item.mdef ?? 0;
-                              const init = item.init ?? 0;
-                              tags.push(
-                                `DEF: ${item.martial ? def : def === 0 ? t("DEX die") : `${t("DEX die")} + ${def}`}`,
+                            if (isVehicle) {
+                              const module = resolved.module;
+                              if (module.type === "pilot_module_armor") {
+                                tags.push(`DEF +${module.def ?? 0}`);
+                                tags.push(`M.DEF +${module.mdef ?? 0}`);
+                              } else if (
+                                module.type === "pilot_module_support"
+                              ) {
+                                tags.push(t("Support Module"));
+                              }
+                              sendDisplayMessage(
+                                "item",
+                                getVehicleModuleDisplayName(module, t),
+                                {
+                                  speaker:
+                                    player?.info?.name || player?.name || "",
+                                  tags,
+                                  description:
+                                    (module.name ?? module.key) === "pilot_custom_support"
+                                      ? module.description || undefined
+                                      : t(module.description || "") ||
+                                        undefined,
+                                },
                               );
-                              tags.push(
-                                `M.DEF: ${mdef === 0 ? t("INS die") : `${t("INS die")} + ${mdef}`}`,
-                              );
-                              if (init !== 0)
-                                tags.push(`Init ${init > 0 ? "+" : ""}${init}`);
-                            } else if (slot === "offHand") {
-                              const source =
-                                player.equippedSlots?.offHand?.source;
-                              if (source === "shields") {
+                            } else {
+                              const item = resolved.item;
+                              if (slot === "armor") {
                                 const def = item.def ?? 0;
                                 const mdef = item.mdef ?? 0;
                                 const init = item.init ?? 0;
-                                tags.push(`DEF +${def}`);
-                                tags.push(`M.DEF +${mdef}`);
+                                tags.push(
+                                  `DEF: ${item.martial ? def : def === 0 ? t("DEX die") : `${t("DEX die")} + ${def}`}`,
+                                );
+                                tags.push(
+                                  `M.DEF: ${mdef === 0 ? t("INS die") : `${t("INS die")} + ${mdef}`}`,
+                                );
                                 if (init !== 0)
                                   tags.push(
                                     `Init ${init > 0 ? "+" : ""}${init}`,
                                   );
+                              } else if (slot === "offHand") {
+                                const source =
+                                  player.equippedSlots?.offHand?.source;
+                                if (source === "shields") {
+                                  const def = item.def ?? 0;
+                                  const mdef = item.mdef ?? 0;
+                                  const init = item.init ?? 0;
+                                  tags.push(`DEF +${def}`);
+                                  tags.push(`M.DEF +${mdef}`);
+                                  if (init !== 0)
+                                    tags.push(
+                                      `Init ${init > 0 ? "+" : ""}${init}`,
+                                    );
+                                }
                               }
+                              sendDisplayMessage("item", item.name, {
+                                speaker:
+                                  player?.info?.name || player?.name || "",
+                                tags,
+                                description:
+                                  item.quality ||
+                                  item.description ||
+                                  undefined,
+                              });
                             }
-                            sendDisplayMessage("item", item.name, {
-                              speaker: player?.info?.name || player?.name || "",
-                              tags,
-                              description:
-                                item.quality || item.description || undefined,
-                            });
                           }}
                           sx={{ p: 0.25 }}
                         >
@@ -649,8 +737,9 @@ export default function CompactLoadout({
                         </IconButton>
                       </Tooltip>
                     )}
-                  </Box>
-                )}
+                    </>
+                  )}
+                </Box>
               </Box>
             );
 
@@ -716,8 +805,9 @@ export default function CompactLoadout({
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      px: 0.75,
-                      py: 0.35,
+                      px: LOADOUT_ROW_PX,
+                      py: LOADOUT_ROW_PY,
+                      minHeight: LOADOUT_ROW_MIN_HEIGHT,
                       borderBottom: "1px solid",
                       borderColor: "divider",
                       minWidth: 0,
@@ -741,10 +831,10 @@ export default function CompactLoadout({
                         whiteSpace: "nowrap",
                         flexShrink: 0,
                         mr: 0.5,
-                        width: { xs: "58px", sm: "68px" },
+                        width: LOADOUT_LABEL_COL_WIDTH,
                       }}
                     >
-                      {`${t("Support")} ${i + 1}`}
+                      {t("Support")}
                     </Typography>
                     <Typography
                       component="span"
@@ -762,10 +852,49 @@ export default function CompactLoadout({
                       {isEmpty
                         ? t("- Empty -")
                         : highlightMatch(
-                            entry.module.customName || t(entry.module.name),
+                            getSupportModuleDisplayName(entry.module, t),
                             searchQuery,
                           )}
                     </Typography>
+                    <Box
+                      sx={{
+                        width: LOADOUT_ACTION_COL_WIDTH,
+                        minWidth: LOADOUT_ACTION_COL_WIDTH,
+                        flexShrink: 0,
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                      }}
+                    >
+                      {!isEmpty && (
+                        <Tooltip title={t("Send to Chat")}>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const module = entry.module;
+                              sendDisplayMessage(
+                                "item",
+                                getSupportModuleDisplayName(module, t),
+                                {
+                                  speaker:
+                                    player?.info?.name || player?.name || "",
+                                  tags: [t("Support Module")],
+                                  description:
+                                    module?.name === "pilot_custom_support"
+                                      ? module?.description || undefined
+                                      : t(module?.description || "") ||
+                                        undefined,
+                                },
+                              );
+                            }}
+                            sx={{ p: 0.25 }}
+                          >
+                            <Message sx={{ fontSize: "0.85rem" }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Box>
                   </Box>
                 );
                 return canClickSlot ? (
@@ -949,21 +1078,39 @@ export default function CompactLoadout({
                           />
                         </ListItemIcon>
                         <ListItemText
-                          primary={m.customName || t(m.name)}
+                          primary={getSupportModuleDisplayName(m, t)}
                           secondary={
-                            m.isComplex
-                              ? `${t("Complex")} - ${(m.name === "pilot_custom_support" ? m.description : t(m.description || "")).slice(0, 40)}`
-                              : (m.name === "pilot_custom_support"
-                                  ? m.description
-                                  : t(m.description || "")
-                                ).slice(0, 50)
+                            <Typography
+                              component="div"
+                              sx={{
+                                fontSize: "0.72rem",
+                                color: "text.secondary",
+                                lineHeight: 1.35,
+                                mt: 0.25,
+                              }}
+                            >
+                              {m.isComplex ? `${t("Complex")} - ` : ""}
+                              <ReactMarkdown
+                                rehypePlugins={[rehypeRaw]}
+                                components={{
+                                  p: (p) => (
+                                    <p style={{ margin: 0, display: "inline" }} {...p} />
+                                  ),
+                                  strong: (p) => <strong style={{ fontWeight: 700 }} {...p} />,
+                                  em: (p) => <em style={{ fontStyle: "italic" }} {...p} />,
+                                }}
+                              >
+                                {(m.name ?? m.key) === "pilot_custom_support"
+                                  ? m.description || ""
+                                  : t(m.description || "")}
+                              </ReactMarkdown>
+                            </Typography>
                           }
                           slotProps={{
                             primary: {
                               variant: "body2",
                               fontWeight: m.enabled ? 700 : 400,
                             },
-                            secondary: { variant: "caption" },
                           }}
                         />
                       </ListItemButton>

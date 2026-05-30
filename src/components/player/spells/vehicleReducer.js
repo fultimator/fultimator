@@ -16,6 +16,7 @@ const createDefaultModule = (moduleType) => {
   const baseModule = availableModules[moduleType][0];
   return {
     ...baseModule,
+    key: baseModule.key ?? baseModule.name,
   };
 };
 
@@ -177,6 +178,7 @@ export const vehicleReducer = (state, action) => {
             const currentModule = vehicle.modules[moduleIndex];
             vehicle.modules[moduleIndex] = {
               ...selectedModule,
+              key: selectedModule.key ?? selectedModule.name,
               customName:
                 selectedModule.name === "pilot_custom_armor" ||
                 selectedModule.name === "pilot_custom_weapon" ||
@@ -346,10 +348,11 @@ export const vehicleReducer = (state, action) => {
       vehicle.modules = [...(vehicle.modules || [])];
       const module = vehicle.modules[moduleIndex];
 
+      const moduleName = module.name ?? module.key;
       const isCurrentlyCustom =
-        module.name === "pilot_custom_armor" ||
-        module.name === "pilot_custom_weapon" ||
-        module.name === "pilot_custom_support";
+        moduleName === "pilot_custom_armor" ||
+        moduleName === "pilot_custom_weapon" ||
+        moduleName === "pilot_custom_support";
 
       let customName =
         module.type === "pilot_module_armor" ||
@@ -357,7 +360,7 @@ export const vehicleReducer = (state, action) => {
         module.type === "pilot_module_support"
           ? isCurrentlyCustom
             ? module.customName
-            : t(module.name)
+            : t(moduleName)
           : "";
 
       let customDescription = isCurrentlyCustom

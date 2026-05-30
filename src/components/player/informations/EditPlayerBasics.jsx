@@ -14,11 +14,12 @@ import {
 import { useTranslate } from "../../../translation/translate";
 import CustomTextarea from "../../common/CustomTextarea";
 import CustomHeader from "../../common/CustomHeader";
-import zenitIcon from "/assets/icons/resources/zenit.png";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
-import fpBorderlessIcon from "/assets/icons/resources/fp_borderless.png";
 import { Code } from "@mui/icons-material";
+
+const zenitIcon = "/assets/icons/resources/zenit.png";
+const fpBorderlessIcon = "/assets/icons/resources/fp_borderless.png";
 
 export default function EditPlayerBasics({
   player,

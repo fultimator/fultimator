@@ -98,14 +98,27 @@ const VehicleModule = memo(
       onModuleChange(vehicleIndex, moduleIndex, "name", e.target.value);
     };
 
+    const isGenericModuleTypeName = (name) =>
+      name === "pilot_module_armor" ||
+      name === "pilot_module_weapon" ||
+      name === "pilot_module_support";
+
+    const moduleName = module.name ?? module.key;
+    const resolvedModuleName =
+      isGenericModuleTypeName(moduleName) &&
+      module.key &&
+      !isGenericModuleTypeName(module.key)
+        ? module.key
+        : moduleName;
+
     const isCustomModule =
-      module.name === "pilot_custom_armor" ||
-      module.name === "pilot_custom_weapon" ||
-      module.name === "pilot_custom_support";
+      resolvedModuleName === "pilot_custom_armor" ||
+      resolvedModuleName === "pilot_custom_weapon" ||
+      resolvedModuleName === "pilot_custom_support";
 
     const moduleDisplayName = isCustomModule
       ? module.customName || t("pilot_custom")
-      : t(module.name);
+      : t(resolvedModuleName);
 
     return (
       <>
@@ -301,7 +314,7 @@ const VehicleModule = memo(
                 }}
               >
                 <ModuleDropdown
-                  value={module.name}
+                  value={resolvedModuleName || ""}
                   onChange={handleModuleDropdownChange}
                 />
               </Grid>

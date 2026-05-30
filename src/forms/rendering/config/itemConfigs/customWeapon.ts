@@ -279,6 +279,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     order: 20,
     componentProps: { options: typeOptions },
     dependencies: (s) =>
+      s.overrideDamageType === true ||
       (s.customizations ?? []).some(
         (c) => c.name === "weapon_customization_elemental",
       ),

@@ -22,7 +22,6 @@ import {
   TableRow,
   Paper,
   Chip,
-  Drawer,
   Fab,
   IconButton,
   Tooltip,
@@ -34,7 +33,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
 import AddIcon from "@mui/icons-material/Add";
@@ -108,15 +106,10 @@ import {
   QUALITY_CATEGORY_OPTIONS,
   ITEM_TYPES,
   PACK_ITEM_TYPES,
-  VIEWER_TO_PACK_TYPE,
-  getItems,
   toSlug,
 } from "../../libs/compendium";
 
 const INVOKER_WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
-const normalizeWellspring = (value = "") => String(value).trim().toLowerCase();
-const getItemWellspring = (item) =>
-  item?.wellspring ?? item?.Wellspring ?? item?.category ?? "";
 
 function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
@@ -152,10 +145,7 @@ function SidebarSecondaryLabel(type, t) {
   if (type === "optionals") return t("Subtype");
   return t("Cost");
 }
-
-// ---------------------------------------------------------------------------
 // Sidebar
-// ---------------------------------------------------------------------------
 
 const SidebarRow = React.memo(function SidebarRow({
   item,
@@ -254,7 +244,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onCompendiumChange,
   onNewPack,
   onManagePack,
-  onImportPack,
   activePack,
   onToggleLock,
   onOpenQuickCreate,
@@ -297,12 +286,12 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     slotProps: {
       root: {
         sx: {
-          zIndex: (theme) => theme.zIndex.drawer + 3,
+          zIndex: (theme) => theme.zIndex.modal + 3,
         },
       },
       paper: {
         sx: {
-          zIndex: (theme) => theme.zIndex.drawer + 3,
+          zIndex: (theme) => theme.zIndex.modal + 3,
         },
       },
     },
@@ -312,12 +301,12 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     slotProps: {
       popper: {
         sx: {
-          zIndex: (theme) => theme.zIndex.drawer + 3,
+          zIndex: (theme) => theme.zIndex.modal + 3,
         },
       },
       paper: {
         sx: {
-          zIndex: (theme) => theme.zIndex.drawer + 3,
+          zIndex: (theme) => theme.zIndex.modal + 3,
         },
       },
     },
@@ -846,10 +835,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     </Box>
   );
 });
-
-// ---------------------------------------------------------------------------
 // Card dispatcher
-// ---------------------------------------------------------------------------
 
 export const ItemCard = React.memo(function ItemCard({
   type,
@@ -939,12 +925,7 @@ export const ItemCard = React.memo(function ItemCard({
       return null;
   }
 });
-
-// ---------------------------------------------------------------------------
 // Main CompendiumViewer (full-page route)
-// ---------------------------------------------------------------------------
-
-const SIDEBAR_WIDTH = 300;
 
 function CompendiumViewer() {
   const { t } = useTranslate();
@@ -1264,10 +1245,7 @@ function CompendiumViewer() {
         setSearchParams(newParams);
         if (scrollRef?.current) scrollRef.current.scrollTop = 0;
       },
-      handleCompendiumChange: (
-        compendium,
-        { onManageModules, scrollRef } = {},
-      ) => {
+      handleCompendiumChange: (compendium, { scrollRef } = {}) => {
         if (compendium === "__manage_modules__") {
           setManageModulesOpen(true);
           return;

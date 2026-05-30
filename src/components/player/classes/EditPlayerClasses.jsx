@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useTheme } from "@mui/material/styles";
 import {
-  Paper,
-  Grid,
   Box,
   TextField,
   Button,
-  Divider,
   Typography,
   Alert,
   Dialog,
@@ -18,10 +14,10 @@ import {
   Tooltip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import SearchIcon from "@mui/icons-material/Search";
 import { UnfoldLess, UnfoldMore } from "@mui/icons-material";
 import { useTranslate } from "../../../translation/translate";
-import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import CustomHeader from "../../common/CustomHeader";
+import SectionCard from "../../shared/actorCards/common/SectionCard";
 import PlayerClassCard from "./PlayerClassCard";
 import useUploadJSON from "../../../hooks/useUploadJSON";
 import CompendiumViewerModal from "../../compendium/CompendiumViewerModal";
@@ -100,10 +96,7 @@ export default function EditPlayerClasses({
   );
   const getMnemoInvested = (m) => (m.lvl ?? 1) - (m.baseLvl ?? m.lvl ?? 1);
 
-  const totalMnemoLevel = slottedMnemospheres.reduce(
-    (acc, m) => acc + getMnemoInvested(m),
-    0,
-  );
+  const totalMnemoLevel = player.info?.mnemoLevelsSpent ?? 0;
 
   const classSummary = (player.classes ?? [])
     .map((cls) => {
@@ -124,8 +117,6 @@ export default function EditPlayerClasses({
     .join(" · ");
 
   const fileInputRef = useRef(null);
-  const customTheme = useCustomTheme();
-
   const syncInnateClasses = (nextPlayer) => {
     if (!usesInnateClassRules) return nextPlayer;
 
@@ -550,148 +541,148 @@ export default function EditPlayerClasses({
   };
 
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-
   return (
     <>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          backgroundColor: customTheme.primary,
-          color: customTheme.white,
-          fontFamily: "Antonio, sans-serif",
-          textTransform: "uppercase",
-          fontSize: "0.85em",
-          px: "10px",
-          py: "5px",
-          borderRadius: "8px 8px 0 0",
-          border: "2px solid",
-          borderColor: secondary,
-          borderBottom: "none",
-          mb: 0,
-        }}
-      >
-        <Box sx={{ flex: 1 }}>
-          {classSummary && (
+      <SectionCard
+        title={t(usesInnateClassRules ? "Innate Classes" : "Classes")}
+        actions={
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography
-              variant="body2"
               sx={{
-                color: customTheme.white,
-                fontFamily: "inherit",
-                textTransform: "none",
+                color: "#fff",
+                fontFamily: "Antonio",
+                fontSize: "0.8rem",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
               }}
             >
-              {usesInnateClassRules && <strong>{t("Classes")}: </strong>}
-              {classSummary}
+              {t("Total Invested Levels")} {totalInnateLevel} / {player.lvl}
             </Typography>
-          )}
-          {mnemoSummary && (
-            <Typography
-              variant="body2"
-              sx={{
-                color: "rgba(255,255,255,0.75)",
-                fontFamily: "inherit",
-                textTransform: "none",
-              }}
-            >
-              <strong>{t("Mnemospheres")}: </strong>
-              {mnemoSummary}
-            </Typography>
-          )}
-          {!classSummary && !mnemoSummary && (
-            <Typography
-              variant="body2"
-              sx={{
-                color: "rgba(255,255,255,0.75)",
-                fontFamily: "inherit",
-                textTransform: "none",
-              }}
-            >
-              {t("No classes or mnemospheres yet.")}
-            </Typography>
-          )}
-        </Box>
-        <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
-          <IconButton
-            onClick={toggleAll}
-            size="small"
-            sx={{ color: customTheme.white }}
-          >
-            {allExpanded ? <UnfoldLess /> : <UnfoldMore />}
-          </IconButton>
-        </Tooltip>
-      </Box>
-      <Paper
-        elevation={3}
-        sx={{
-          borderRadius: "0 0 8px 8px",
-          border: "2px solid",
-          borderColor: secondary,
-          borderTop: "none",
-          mb: 2,
-          overflow: "hidden",
-        }}
-      >
-        <Box sx={{ p: "15px" }}>
-          <Grid container spacing={1}>
-            <Grid size={12}>
-              <CustomHeader
-                type="top"
-                squareTop
-                headerText={t(
-                  usesInnateClassRules ? "Innate Classes" : "Classes",
-                )}
-                rightLabel={t("Total Invested Levels")}
-                rightValue={totalInnateLevel}
-                rightMax={player.lvl}
-                showIconButton={isEditMode && canAddMoreClasses}
-                icon={AddIcon}
-                customTooltip={t(
-                  usesInnateClassRules
-                    ? "Add Blank Innate Class"
-                    : "Add Blank Class",
-                )}
-                addItem={
-                  isEditMode && canAddMoreClasses
-                    ? () => setDialogOpen(true)
-                    : undefined
-                }
-                openCompendium={
-                  isEditMode && canAddMoreClasses
-                    ? () => setCompendiumOpen(true)
-                    : undefined
-                }
-              />
-            </Grid>
-            {isEditMode &&
-              warnings.map((warning, index) => (
-                <Grid key={index} size={12}>
-                  <Alert
-                    variant="filled"
-                    severity="warning"
-                    sx={{
-                      color: customTheme.text.primary,
-                      "& .MuiAlert-icon": {
-                        color: customTheme.text.primary,
-                      },
-                    }}
+            {isEditMode && canAddMoreClasses && (
+              <>
+                <Tooltip title={t("Search Compendium")}>
+                  <IconButton
+                    size="small"
+                    sx={{ color: "#fff" }}
+                    onClick={() => setCompendiumOpen(true)}
                   >
-                    {t(warning)}
-                  </Alert>
-                </Grid>
-              ))}
-          </Grid>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleFileUpload}
-            style={{ display: "none" }}
-          />
+                    <SearchIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip
+                  title={t(
+                    usesInnateClassRules
+                      ? "Add Blank Innate Class"
+                      : "Add Blank Class",
+                  )}
+                >
+                  <IconButton
+                    size="small"
+                    sx={{ color: "#fff" }}
+                    onClick={() => setDialogOpen(true)}
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
+          </Box>
+        }
+        sx={{ mb: 2 }}
+      >
+        {/* Summary bar */}
+        <Box
+          sx={{
+            px: 2,
+            py: 1,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box sx={{ flex: 1 }}>
+            {classSummary && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.primary",
+                  fontFamily: "Antonio, sans-serif",
+                  textTransform: "none",
+                }}
+              >
+                {usesInnateClassRules && <strong>{t("Classes")}: </strong>}
+                {classSummary}
+              </Typography>
+            )}
+            {mnemoSummary && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  fontFamily: "Antonio, sans-serif",
+                  textTransform: "none",
+                }}
+              >
+                <strong>{t("Mnemospheres")}: </strong>
+                {mnemoSummary}
+              </Typography>
+            )}
+            {!classSummary && !mnemoSummary && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  fontFamily: "Antonio, sans-serif",
+                  textTransform: "none",
+                }}
+              >
+                {t("No classes or mnemospheres yet.")}
+              </Typography>
+            )}
+          </Box>
+          <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
+            <IconButton
+              onClick={toggleAll}
+              size="small"
+              sx={{ color: "text.secondary" }}
+            >
+              {allExpanded ? <UnfoldLess /> : <UnfoldMore />}
+            </IconButton>
+          </Tooltip>
         </Box>
+
+        {/* Warnings */}
+        {isEditMode &&
+          warnings.map((warning, index) => (
+            <Alert
+              key={index}
+              variant="filled"
+              severity="warning"
+              sx={{
+                mx: 2,
+                my: 1,
+                color: "text.primary",
+                "& .MuiAlert-icon": {
+                  color: "text.primary",
+                },
+              }}
+            >
+              {t(warning)}
+            </Alert>
+          ))}
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileUpload}
+          style={{ display: "none" }}
+        />
+
+        {/* Empty state */}
         {player.classes.length === 0 && (
           <Box sx={{ p: "15px" }}>
             <Typography variant="h3" align="center">
@@ -703,6 +694,8 @@ export default function EditPlayerClasses({
             </Typography>
           </Box>
         )}
+
+        {/* Class cards */}
         {player.classes &&
           player.classes.map((cls, index) => {
             const clsLvl = automaticClassLevel
@@ -754,52 +747,38 @@ export default function EditPlayerClasses({
               />
             );
           })}
-      </Paper>
+      </SectionCard>
+
       {usesInnateClassRules && (
-        <>
-          <Divider
-            sx={{ borderColor: secondary, borderBottomWidth: 2, mb: 2 }}
-          />
-          <Paper
-            elevation={3}
-            sx={{
-              p: "15px",
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-              mb: 2,
-            }}
-          >
-            <Grid container spacing={2}>
-              <Grid size={12}>
-                <CustomHeader
-                  type="top"
-                  headerText={t("Slotted Mnemospheres")}
-                  rightLabel={t("Total Invested Levels")}
-                  rightValue={totalMnemoLevel}
-                  showIconButton={false}
-                />
-              </Grid>
-              {slottedMnemospheres.length === 0 ? (
-                <Grid size={12}>
-                  <Typography variant="h3" align="center">
-                    {t("No slotted mnemospheres")}
-                  </Typography>
-                </Grid>
-              ) : (
-                <Grid size={12}>
-                  <Alert severity="info" variant="outlined">
-                    {t(
-                      "Each mnemosphere has its own level (1–5). Equipping one grants access to its skills. Use +/- to set its level and allocate skill points within it.",
-                    )}
-                  </Alert>
-                </Grid>
+        <SectionCard
+          title={t("Slotted Mnemospheres")}
+          actions={
+            <Typography
+              sx={{
+                color: "rgba(255,255,255,0.8)",
+                fontFamily: "Antonio",
+                fontSize: "0.8rem",
+                mr: 1,
+              }}
+            >
+              {t("Total Invested Levels")} {totalMnemoLevel}
+            </Typography>
+          }
+          sx={{ mb: 2 }}
+        >
+          {slottedMnemospheres.length === 0 ? (
+            <Box sx={{ p: "15px" }}>
+              <Typography variant="h3" align="center">
+                {t("No slotted mnemospheres")}
+              </Typography>
+            </Box>
+          ) : (
+            <Alert severity="info" variant="outlined" sx={{ mx: 2, my: 1 }}>
+              {t(
+                "Each mnemosphere has its own level (1-5). Equipping one grants access to its skills. Use +/- to set its level and allocate skill points within it.",
               )}
-            </Grid>
-          </Paper>
-          <Divider
-            sx={{ borderColor: secondary, borderBottomWidth: 2, mb: 2 }}
-          />
+            </Alert>
+          )}
           {slottedMnemospheres.map((mnemo) => (
             <Box key={mnemo.id} sx={{ mb: 2 }}>
               <MnemosphereClassCard
@@ -823,6 +802,7 @@ export default function EditPlayerClasses({
                     : null
                 }
                 isAccordion
+                showAllSkills
                 showHeaderMeta
                 isSlotted
                 isExpanded={!!expandedMnemos[mnemo.id]}
@@ -835,7 +815,7 @@ export default function EditPlayerClasses({
               />
             </Box>
           ))}
-        </>
+        </SectionCard>
       )}
       <CompendiumViewerModal
         open={compendiumOpen}

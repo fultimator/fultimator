@@ -65,10 +65,7 @@ const CompendiumViewerModal = ({
   const customTheme = useCustomTheme();
   const muiTheme = useTheme();
   const isDesktop = useMediaQuery(muiTheme.breakpoints.up("md"));
-
-  // ---------------------------------------------------------------------------
   // Filter state (via hook)
-  // ---------------------------------------------------------------------------
   const {
     filters,
     handlers,
@@ -89,10 +86,7 @@ const CompendiumViewerModal = ({
   });
 
   const { selectedType, selectedCompendium } = filters;
-
-  // ---------------------------------------------------------------------------
   // Pack state
-  // ---------------------------------------------------------------------------
   const {
     packs,
     createPack,
@@ -174,10 +168,7 @@ const CompendiumViewerModal = ({
       ),
     [editingRequires, editingAutoRequires],
   );
-
-  // ---------------------------------------------------------------------------
   // Pack handlers (wrap filter handleCompendiumChange to also support manage modules)
-  // ---------------------------------------------------------------------------
   const handleCompendiumChange = useCallback(
     (compendium) => {
       handlers.handleCompendiumChange(compendium, {
@@ -255,10 +246,7 @@ const CompendiumViewerModal = ({
       setImporting(false);
     }
   }, [importing, importUrl, importFromManifestUrl]);
-
-  // ---------------------------------------------------------------------------
   // Context mismatch validation
-  // ---------------------------------------------------------------------------
   const selectedTypeContext = ITEM_TYPES.find(
     (x) => x.key === selectedType,
   )?.context;
@@ -267,11 +255,8 @@ const CompendiumViewerModal = ({
     selectedTypeContext &&
     selectedTypeContext !== "both" &&
     selectedTypeContext !== context;
-
-  // ---------------------------------------------------------------------------
   // Item to add (uses selectedIdx resolved in CompendiumBrowser via useCompendiumItems)
   // We re-derive the selected item here for the footer "Add Item" button
-  // ---------------------------------------------------------------------------
   const [resolvedSelectedItem, setResolvedSelectedItem] = useState(null);
 
   const handleSelectedItemChange = useCallback((item) => {

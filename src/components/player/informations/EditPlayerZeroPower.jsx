@@ -141,7 +141,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Tooltip title={t("Roll")}>
-                    <IconButton
+                    <IconButton component="span"
                       size="small"
                       onClick={() =>
                         addMessage({
@@ -177,7 +177,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
                       <Casino sx={{ fontSize: "1.2rem" }} />
                     </IconButton>
                   </Tooltip>
-                  <IconButton
+                  <IconButton component="span"
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -240,7 +240,7 @@ export default function EditPlayerZeroPower({ player, setPlayer, isEditMode }) {
                 </Box>
                 <Box onClick={(e) => e.stopPropagation()}>
                   <Tooltip title={t("Edit")}>
-                    <IconButton
+                    <IconButton component="span"
                       size="small"
                       onClick={() => {
                         setCreating(false);

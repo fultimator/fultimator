@@ -101,6 +101,7 @@ function ItemPanel({
   groupLabels,
   SharedCard,
   itemTypeFilter,
+  variant = "equip",
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -259,7 +260,7 @@ function ItemPanel({
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <SharedCard
               item={formState.base}
-              variant="equip"
+              variant={variant}
               imageMode="slot"
               showImageToggle
             />
@@ -269,7 +270,7 @@ function ItemPanel({
             <div ref={cardRef}>
               <SharedCard
                 item={customItem}
-                variant="equip"
+                variant={variant}
                 imageMode="slot"
                 showImageToggle
                 actionContent={
@@ -321,7 +322,7 @@ function ItemPanel({
   );
 }
 
-export function ArmorPanel() {
+export function ArmorPanel({ variant = "equip" }) {
   return (
     <ItemPanel
       title="Armor"
@@ -330,11 +331,12 @@ export function ArmorPanel() {
       groupLabels={armorGroupLabels}
       SharedCard={SharedArmorCard}
       itemTypeFilter="armor"
+      variant={variant}
     />
   );
 }
 
-export function ShieldPanel() {
+export function ShieldPanel({ variant = "equip" }) {
   return (
     <ItemPanel
       title="Shield"
@@ -343,6 +345,7 @@ export function ShieldPanel() {
       groupLabels={shieldGroupLabels}
       SharedCard={SharedShieldCard}
       itemTypeFilter="shield"
+      variant={variant}
     />
   );
 }
