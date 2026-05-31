@@ -20,7 +20,7 @@ import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
 import ItemEditModal from "/src/forms/ui/ItemEditModal";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
-import { useChatMessagesStore } from "/src/store/chatMessagesStore";
+import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
 import { SharedOptionalCard } from "/src/components/shared/items";
 
@@ -48,7 +48,7 @@ function fromFormState(form) {
 
 export default function EditPlayerQuirk({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const addMessage = useAddChatMessage();
   const { ensurePersonalPack, addItem } = useCompendiumPacks();
 
   const [editorOpen, setEditorOpen] = useState(false);

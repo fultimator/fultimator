@@ -7,7 +7,7 @@ import Diamond from "/src/components/Diamond";
 import { MeleeIcon, DistanceIcon } from "/src/components/icons";
 import attributes from "/src/libs/attributes";
 import { calcDamage, calcPrecision } from "/src/libs/npcs";
-import { useChatMessagesStore } from "/src/store/chatMessagesStore";
+import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import {
   prepareAccuracyCheck,
   rollAccuracyCheck,
@@ -23,7 +23,7 @@ import {
 
 function AttackRow({ attack, npc, attackType, showRoll }) {
   const { t } = useTranslate();
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const addMessage = useAddChatMessage();
   const isWeapon = attackType === "weapon";
 
   const handleRoll = (e) => {

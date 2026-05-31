@@ -45,6 +45,7 @@ import { getActorBonuses } from "../../libs/actorBonuses";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
 import { useEncounterChatStore } from "../../stores/encounterChatStore";
 import { useChatChannelStore } from "../../stores/chatChannelStore";
+import { isValidChatMessage } from "../../components/app-drawer/panels/chat/domain/validation";
 import { emitCombatLog } from "../../libs/combatLogEmitter";
 
 export default function CombatSimulator() {
@@ -300,7 +301,9 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       if (encounterData.activeTurn !== undefined)
         setActiveTurn(encounterData.activeTurn);
 
-      setEncounterChat(id, encounterData.chatMessages ?? []);
+      setEncounterChat(id, (encounterData.chatMessages ?? []).filter(
+        (m) => isValidChatMessage(m) && m.kind !== "display",
+      ));
       setEncounterChannel(id, encounterData.name || "Unnamed Encounter");
 
       // Seed refs so the change-detection effect doesn't fire dirty on first render
@@ -538,6 +541,27 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
   // Handle Increase/Decrease Round
   const handleIncreaseRound = () => {
+    setSelectedNPCs((prev) =>
+      prev.map((npc) => ({
+        ...npc,
+        combatStats: {
+          ...npc.combatStats,
+          turns: npc.combatStats.turns
+            ? npc.combatStats.turns.map(() => false)
+            : [],
+        },
+      })),
+    );
+    setSelectedPCs((prev) =>
+      prev.map((pc) => ({
+        ...pc,
+        combatStats: { ...pc.combatStats, turns: [false] },
+      })),
+    );
+    if (combatActive) {
+      setCurrentTurn(initiative);
+      setActiveTurn(null);
+    }
     setEncounter((prev) => ({ ...prev, round: prev.round + 1 }));
     emitLog({
       type: "round-change",

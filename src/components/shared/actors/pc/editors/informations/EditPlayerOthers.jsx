@@ -19,7 +19,7 @@ import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import ItemEditModal from "/src/forms/ui/ItemEditModal";
-import { useChatMessagesStore } from "/src/store/chatMessagesStore";
+import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
 import { SharedOptionalCard } from "/src/components/shared/items";
 
@@ -98,7 +98,7 @@ function OtherRow({ other, index, isEditMode, onEdit, onDelete, onRoll, onAddToC
 
 export default function EditPlayerOther({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const addMessage = useAddChatMessage();
   const { ensurePersonalPack, addItem } = useCompendiumPacks();
 
   const [editIndex, setEditIndex] = useState(null);

@@ -40,6 +40,7 @@ import { useTheme } from "@mui/material/styles";
 import RollsTab from "./npcDetail/RollsTab";
 import StandardRollsSection from "./npcDetail/StandardRollsSection";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
+import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import {
   prepareAccuracyCheck,
   rollAccuracyCheck,
@@ -92,6 +93,13 @@ const NPCDetail = ({
   const [numTargets, setNumTargets] = useState(1);
   const [error, setError] = useState("");
   const [clickedData, setClickedData] = useState({});
+
+  const withTargets = (msg) => {
+    if (msg.kind !== "accuracy" && msg.kind !== "magic") return msg;
+    const targets = useCombatEncounterStore.getState().targets;
+    if (!targets.length) return msg;
+    return { ...msg, check: { ...msg.check, targetsSnapshot: [...targets] } };
+  };
 
   const {
     autoUseMP,
@@ -204,7 +212,7 @@ const NPCDetail = ({
       });
       const rolls = rollMagicCheck(dieSizes);
       const result = processMagicCheck(intent, rolls, dieSizes, npcSpeaker);
-      if (addMessage) addMessage(buildMagicCheckMessage(result));
+      if (addMessage) addMessage(withTargets(buildMagicCheckMessage(result)));
     } else {
       emitLog({
         type: "spell-use",
@@ -264,7 +272,7 @@ const NPCDetail = ({
 
     const rolls = rollAccuracyCheck(dieSizes);
     const result = processAccuracyCheck(intent, rolls, dieSizes, npcSpeaker);
-    if (addMessage) addMessage(buildAccuracyCheckMessage(result));
+    if (addMessage) addMessage(withTargets(buildAccuracyCheckMessage(result)));
 
     if (isMobile) {
       setSelectedNPC(null);

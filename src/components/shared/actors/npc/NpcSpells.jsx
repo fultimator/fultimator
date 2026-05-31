@@ -7,7 +7,7 @@ import Diamond from "/src/components/Diamond";
 import { SpellIcon, OffensiveSpellIcon } from "/src/components/icons";
 import attributes from "/src/libs/attributes";
 import { calcMagic } from "/src/libs/npcs";
-import { useChatMessagesStore } from "/src/store/chatMessagesStore";
+import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import {
   prepareMagicCheck,
   rollMagicCheck,
@@ -18,7 +18,7 @@ import { StyledMarkdown, ClickableName, ATTR_SHORT } from "./shared";
 
 function SpellRow({ spell, npc, showRoll }) {
   const { t } = useTranslate();
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const addMessage = useAddChatMessage();
   const isOffensive = spell.isOffensive === true || spell.type === "offensive";
   const spellAccuracyBonus = spell.accuracy?.value ?? 0;
 

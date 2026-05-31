@@ -35,7 +35,8 @@ import { PlayerArmorModal } from "/src/components/shared/actors/pc/editors";
 import { PlayerAccessoryModal } from "/src/components/shared/actors/pc/editors";
 import { calculateAttribute } from "/src/libs/playerCalculations";
 import { availableModules } from "/src/libs/pilotVehicleData";
-import { useChatMessagesStore } from "/src/store/chatMessagesStore";
+import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
+import { useCombatEncounterStore } from "/src/stores/combatEncounterStore";
 import {
   buildAccuracyCheckMessage,
   prepareAccuracyCheck,
@@ -104,7 +105,7 @@ export default function CardLoadout({
   const [slotImportType, setSlotImportType] = useState("weapons");
 
   const store = useLoadoutStore();
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const addMessage = useAddChatMessage();
   useEffect(() => {
     store.init(setPlayer);
   }, [setPlayer, store]);
@@ -229,7 +230,12 @@ export default function CardLoadout({
     const rolls = rollAccuracyCheck(dieSizes);
     const speaker = player?.info?.name || player?.name || "Player";
     const result = processAccuracyCheck(intent, rolls, dieSizes, speaker);
-    addMessage(buildAccuracyCheckMessage(result));
+    const msg = buildAccuracyCheckMessage(result);
+    const targets = useCombatEncounterStore.getState().targets;
+    if (targets.length > 0) {
+      msg.check = { ...msg.check, targetsSnapshot: [...targets] };
+    }
+    addMessage(msg);
   };
 
   const sendSlotToChat = (slot, resolved) => {
@@ -452,7 +458,9 @@ export default function CardLoadout({
         </IconButton>
       </Tooltip>
     ) : locked ? (
-      <LockIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.75)" }} />
+      <Box sx={{ width: compact ? 28 : 32, height: compact ? 28 : 32, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <LockIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.75)" }} />
+      </Box>
     ) : null;
 
     const slotActionsWithSpacer = hideActions ? null : slotActions ?? (

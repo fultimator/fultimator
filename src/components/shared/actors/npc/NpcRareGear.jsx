@@ -2,13 +2,13 @@ import React, { Fragment } from "react";
 import { Grid, Typography } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
 import { useActorCardSetup, isInteractive } from "/src/components/shared/actors/core-utils";
-import { useChatMessagesStore } from "/src/store/chatMessagesStore";
+import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import Diamond from "/src/components/Diamond";
 import { RareItemIcon } from "/src/components/icons";
 import { SpanMarkdown, ClickableName } from "./shared";
 
 function RareGearRow({ item, npc, showRoll }) {
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const addMessage = useAddChatMessage();
 
   const handleSend = (e) => {
     e.stopPropagation();
