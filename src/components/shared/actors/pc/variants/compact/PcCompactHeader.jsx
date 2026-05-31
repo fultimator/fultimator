@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import avatar_image from "/images/components/avatar.jpg";
 import {
   Box,
   Grid,
@@ -232,7 +233,7 @@ export default function PcCompactHeader({
 
   const hasDescription = Boolean(pc.info?.description?.trim());
   const [descExpanded, setDescExpanded] = useState(false);
-  const imgSrc = characterImage || pc.info?.imgurl;
+  const imgSrc = characterImage || pc.info?.imgurl || avatar_image;
   const imageColumnWidth = isPortraitImage ? "152px" : "128px";
   const topSectionHeight = { xs: "128px", sm: "144px" };
   const nameRowDirection = isNarrowHeader ? "column" : "row";
@@ -534,8 +535,7 @@ export default function PcCompactHeader({
           }}
         >
           {/* Portrait */}
-          {imgSrc ? (
-            <Box
+          <Box
               sx={{
                 minWidth: imageColumnWidth,
                 width: imageColumnWidth,
@@ -642,6 +642,7 @@ export default function PcCompactHeader({
                     right: 4,
                     bottom: 4,
                     p: 0.25,
+                    zIndex: 2,
                     color: "rgba(255,255,255,0.72)",
                     backgroundColor: "rgba(0,0,0,0.25)",
                     border: "1px solid rgba(255,255,255,0.2)",
@@ -662,31 +663,6 @@ export default function PcCompactHeader({
                 </IconButton>
               </Tooltip>
             </Box>
-          ) : (
-            <Box
-              sx={{
-                minWidth: imageColumnWidth,
-                width: imageColumnWidth,
-                height: "100%",
-                background:
-                  custom.mode === "dark"
-                    ? theme.palette.background.paper
-                    : "white",
-                border: "1px solid #684268",
-                borderTop: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "text.secondary",
-                fontStyle: "italic",
-                fontSize: "0.75rem",
-                padding: 1,
-                textAlign: "center",
-              }}
-            >
-              No Image
-            </Box>
-          )}
 
           <Box
             data-pc-compact-traits-wrap="true"

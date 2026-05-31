@@ -16,7 +16,6 @@ export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
         isEditMode={isEditMode}
         compact={false}
         showSectionCard
-        inlineActions
       />
 
       {isTechnospheres && (

@@ -1,21 +1,21 @@
 import React from "react";
 import { Typography, LinearProgress, Card, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import avatar_image from "/images/components/avatar.jpg";
-import Diamond from "../../components/Diamond";
+import Diamond from "/src/components/Diamond";
 import { styled } from "@mui/system";
 import {
   DexAttributeIcon,
   InsAttributeIcon,
   MigAttributeIcon,
   WlpAttributeIcon,
-} from "../../components/icons";
-import { TypeAffinity } from "../../components/shared/actors/common/TypeAffinity";
-import { useCustomTheme } from "../../hooks/useCustomTheme";
-import { calculateAttribute, newShade } from "../playerCalculations";
-import { isItemEquipped } from "./slots/equipmentSlots";
-import CardLoadout from "../../components/shared/actors/pc/playerSheet/CardLoadout";
+} from "/src/components/icons";
+import { TypeAffinity } from "/src/components/shared/actors/common/TypeAffinity";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { calculateAttribute, newShade } from "/src/libs/playerCalculations";
+import { isItemEquipped } from "/src/libs/player/slots/equipmentSlots";
+import CardLoadout from "/src/components/shared/actors/pc/playerSheet/CardLoadout";
 // Styled Components
 // Sub-components
 const GradientLinearProgress = styled(LinearProgress)(
@@ -957,20 +957,7 @@ export default function PlayerCardGallery({
                   {t("Loadout")}
                 </Typography>
               </Box>
-              <Box
-                sx={{
-                  px: 1,
-                  py: "6px",
-                  minHeight: 0,
-                  flex: 1,
-                  "& *": {
-                    wordBreak: "break-word",
-                    overflowWrap: "break-word",
-                    whiteSpace: "normal !important",
-                    minWidth: "0 !important",
-                  },
-                }}
-              >
+              <Box sx={{ px: 1, py: "6px", minHeight: 0, flex: 1 }}>
                 <CardLoadout
                   player={player}
                   setPlayer={setPlayer}
@@ -978,6 +965,8 @@ export default function PlayerCardGallery({
                   showHeader={false}
                   showSideDivider={false}
                   showSupportColumn
+                  compact
+                  hideActions
                 />
               </Box>
             </Box>

@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import avatar_image from "/images/components/avatar.jpg";
 import {
   Box,
   Typography,
@@ -87,7 +88,11 @@ export default function PortraitModal({ open, onClose, pc, onUpdate }) {
                 }}
               />
             ) : (
-              <Typography variant="caption" color="text.secondary">{t("No image")}</Typography>
+              <img
+                src={avatar_image}
+                alt="Default portrait"
+                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block", opacity: 0.4 }}
+              />
             )}
           </Box>
           <TextField

@@ -144,10 +144,11 @@ export function getSlotLocks(player: TypePlayer): {
   const offHandLocked = (() => {
     if (mainHandResolved?.kind === "vehicleModule") {
       if (mainHandResolved.module.cumbersome) return true;
-      if (isTwoHandedEquipped(player)) return true;
       if (!getEquippedModuleForSlot(player, "offHand")) return true;
       return false;
     }
+    // Only apply two-handed lock when no vehicle module is overriding either hand
+    if (offHandResolved?.kind === "vehicleModule") return false;
     return isTwoHandedEquipped(player);
   })();
 

@@ -637,9 +637,14 @@ function CardSlot({ children, singleColumn = false, itemRef }) {
 }
 
 function TabPanel({ value, index, children }) {
+  const active = value === index;
   return (
-    <div role="tabpanel" hidden={value !== index}>
-      {value === index && <Box>{children}</Box>}
+    <div
+      role="tabpanel"
+      hidden={!active}
+      style={active ? { flex: 1, overflowY: "auto", minHeight: 0, display: "flex", flexDirection: "column" } : undefined}
+    >
+      {active && <Box sx={{ flex: 1 }}>{children}</Box>}
     </div>
   );
 }
@@ -712,11 +717,6 @@ const ResponsivePreviewFrame = React.forwardRef(function ResponsivePreviewFrame(
               position: "relative",
               transition:
                 "width 0.2s ease, height 0.2s ease, border-radius 0.2s ease",
-              "& > :first-of-type": {
-                flex: 1,
-                overflowY: "auto",
-                minHeight: 0,
-              },
             }
           : { position: "relative", transition: "all 0.2s ease" }
       }
@@ -1109,7 +1109,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
 
   return (
     <ResponsivePreviewFrame ref={setFrameNode} viewport={viewport}>
-      <Stack spacing={4} sx={{ p: viewport === "desktop" ? 0 : 1 }}>
+      <Stack spacing={4} sx={{ p: viewport === "desktop" ? 0 : 1, flex: 1, overflowY: "auto", minHeight: 0 }}>
         <Section
           label="Equipment"
           sectionRef={(node) => {

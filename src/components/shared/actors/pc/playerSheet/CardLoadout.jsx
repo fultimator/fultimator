@@ -92,6 +92,7 @@ export default function CardLoadout({
   showSideDivider = true,
   showSupportColumn = false,
   compact = false,
+  hideActions = false,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -141,7 +142,6 @@ export default function CardLoadout({
     setPickerSlot(slot);
   };
 
-  const primary = theme.palette.primary.main;
   const divider = theme.palette.divider;
   const supportLabel = t("pilot_module_support");
 
@@ -452,12 +452,10 @@ export default function CardLoadout({
         </IconButton>
       </Tooltip>
     ) : locked ? (
-      <IconButton size="small" disabled>
-        <LockIcon fontSize="small" sx={{ color: "rgba(255,255,255,0.75)" }} />
-      </IconButton>
+      <LockIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.75)" }} />
     ) : null;
 
-    const slotActionsWithSpacer = slotActions ?? (
+    const slotActionsWithSpacer = hideActions ? null : slotActions ?? (
       <Box
         sx={{
           width: compact ? 28 : 32,

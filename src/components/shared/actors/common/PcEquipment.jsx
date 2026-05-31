@@ -266,6 +266,9 @@ function CompactItemRow({
   handleDiceRoll,
   handleEdit,
   checkIfEquippable,
+  equipToSlot,
+  unequipItem,
+  hasDualShieldBearer,
   theme,
   t,
   onPreviewItem,
@@ -328,73 +331,220 @@ function CompactItemRow({
       : item.equipType === "shield" ? ShieldIcon
       : AccessoryIcon;
 
+  const [menuAnchor, setMenuAnchor] = useState(null);
   const badge = getBadge();
-  const equipBtn = (
-    <IconButton size="small" onClick={(e) => handleEquipment(item, e)} disabled={!!getDefaultUnarmedStrikeInfo()}>
-      {badge !== null ? <Icon /> : !checkIfEquippable(item) ? <ErrorIcon sx={{ color: "error.light" }} /> : <RadioButtonUnchecked sx={{ fontSize: "1.35rem" }} />}
-    </IconButton>
-  );
+  const isWeapon = item.equipType === "weapon" || item.equipType === "custom-weapon";
+  const sendToChatAction = () => {
+    const tags = [];
+    if (item.equipType === "armor") {
+      const def = item.def + (item.defModifier || 0);
+      const mdef = item.mdef + (item.mDefModifier || 0);
+      const init = item.init + (item.initModifier || 0);
+      tags.push(`DEF: ${item.martial ? def : def === 0 ? t("DEX die") : `${t("DEX die")} + ${def}`}`);
+      tags.push(`M.DEF: ${mdef === 0 ? t("INS die") : `${t("INS die")} + ${mdef}`}`);
+      if (init !== 0) tags.push(`Init ${init > 0 ? "+" : ""}${init}`);
+    } else if (item.equipType === "shield") {
+      const def = item.def + (item.defModifier || 0);
+      const mdef = item.mdef + (item.mDefModifier || 0);
+      const init = item.initModifier || 0;
+      tags.push(`DEF +${def}`);
+      tags.push(`M.DEF +${mdef}`);
+      if (init !== 0) tags.push(`Init ${init > 0 ? "+" : ""}${init}`);
+    }
+    sendDisplayMessage("item", t(item.name), { speaker: player?.info?.name || player?.name || "", tags, description: item.quality || item.description || undefined });
+  };
 
   return (
-    <ItemRowCard
-      onCardClick={() => onPreviewItem?.(item)}
-      label={
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.25, minWidth: 0 }}>
-          <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
-            {highlightMatch(t(item.name), searchQuery)}
-          </Typography>
-          {item.martial && <Martial />}
-        </Box>
-      }
-      subtitle={<ItemStatSubtitle item={item} />}
-      actions={
-        <>
-          <Tooltip title={checkIfEquippable(item) ? t("Equip") : t("Not proficient")} arrow>
-            {badge !== null ? (
-              <Badge badgeContent={badge} color="primary" sx={{ width: 28, height: 28, flexShrink: 0, "& .MuiBadge-badge": { fontSize: "0.55rem", height: 11, minWidth: 11, p: 0, top: 1, right: 1, transform: "none" } }}>
-                {equipBtn}
-              </Badge>
-            ) : equipBtn}
-          </Tooltip>
-          {(item.equipType === "weapon" || item.equipType === "custom-weapon") && (
-            <IconButton size="small" onClick={() => handleDiceRoll(item)}><Casino /></IconButton>
-          )}
-          {item.equipType !== "weapon" && item.equipType !== "custom-weapon" && (
-            <Tooltip title={t("Send to Chat")} arrow>
-              <IconButton size="small" onClick={() => {
-                const tags = [];
-                if (item.equipType === "armor") {
-                  const def = item.def + (item.defModifier || 0);
-                  const mdef = item.mdef + (item.mDefModifier || 0);
-                  const init = item.init + (item.initModifier || 0);
-                  tags.push(`DEF: ${item.martial ? def : def === 0 ? t("DEX die") : `${t("DEX die")} + ${def}`}`);
-                  tags.push(`M.DEF: ${mdef === 0 ? t("INS die") : `${t("INS die")} + ${mdef}`}`);
-                  if (init !== 0) tags.push(`Init ${init > 0 ? "+" : ""}${init}`);
-                } else if (item.equipType === "shield") {
-                  const def = item.def + (item.defModifier || 0);
-                  const mdef = item.mdef + (item.mDefModifier || 0);
-                  const init = item.initModifier || 0;
-                  tags.push(`DEF +${def}`);
-                  tags.push(`M.DEF +${mdef}`);
-                  if (init !== 0) tags.push(`Init ${init > 0 ? "+" : ""}${init}`);
-                }
-                sendDisplayMessage("item", t(item.name), { speaker: player?.info?.name || player?.name || "", tags, description: item.quality || item.description || undefined });
-              }}><Message /></IconButton>
-            </Tooltip>
-          )}
-        </>
-      }
-      variant="outlined"
-      compact
-      paperSx={{
-        transition: "border-color 0.15s ease",
-        "&:hover": { borderColor: "primary.main" },
-      }}
-    />
+    <>
+      <ItemRowCard
+        onCardClick={() => onPreviewItem?.(item)}
+        label={
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.25, minWidth: 0 }}>
+            <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
+              {highlightMatch(t(item.name), searchQuery)}
+            </Typography>
+            {item.martial && <Martial />}
+          </Box>
+        }
+        subtitle={<ItemStatSubtitle item={item} />}
+        actions={
+          <>
+            {isWeapon ? (
+              <IconButton size="small" onClick={() => handleDiceRoll(item)}><Casino /></IconButton>
+            ) : (
+              <Tooltip title={t("Send to Chat")} arrow>
+                <IconButton size="small" onClick={sendToChatAction}><Message /></IconButton>
+              </Tooltip>
+            )}
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchor(e.currentTarget); }}>
+              <MenuIcon sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </>
+        }
+        variant="outlined"
+        compact
+        paperSx={{
+          transition: "border-color 0.15s ease",
+          "&:hover": { borderColor: "primary.main" },
+        }}
+      />
+      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
+        {(() => {
+          const eq0 = player.equipment?.[0];
+          const isDefaultUnarmed = !!getDefaultUnarmedStrikeInfo();
+          const canEquip = isEditMode && !isDefaultUnarmed;
+
+          if (badge !== null) {
+            // Already equipped — show Unequip
+            return (
+              <MenuItem
+                disabled={!isEditMode}
+                onClick={(e) => { handleEquipment(item, e); setMenuAnchor(null); }}
+              >
+                <Badge badgeContent={badge} color="primary" sx={{ mr: 1.5, "& .MuiBadge-badge": { fontSize: "0.55rem", height: 11, minWidth: 11, p: 0 } }}><Icon fontSize="small" /></Badge>
+                <ListItemText>{`${t("Unequip")}${badge && badge !== "E" ? ` (${badge})` : ""}`}</ListItemText>
+              </MenuItem>
+            );
+          }
+
+          const equipIcon = !checkIfEquippable(item)
+            ? <ErrorIcon fontSize="small" sx={{ mr: 1.5, color: "error.light" }} />
+            : <RadioButtonUnchecked fontSize="small" sx={{ mr: 1.5 }} />;
+
+          // Weapons (single-hand) — show Main Hand / Off Hand
+          if (item.equipType === "weapon" && item.hands !== 2 && !item.isTwoHand) {
+            const source = "weapons";
+            const arr = eq0?.[source] ?? [];
+            const idx = item.originalIndex !== undefined ? item.originalIndex : arr.findIndex((it) => it.name === item.name);
+            return [
+              <MenuItem
+                key="main"
+                disabled={!canEquip}
+                onClick={() => { equipToSlot(source, item.name, idx, "mainHand", false); setMenuAnchor(null); }}
+              >
+                {equipIcon}
+                <ListItemText>{t("Main Hand")}</ListItemText>
+              </MenuItem>,
+              <MenuItem
+                key="off"
+                disabled={!canEquip}
+                onClick={() => { equipToSlot(source, item.name, idx, "offHand", false); setMenuAnchor(null); }}
+              >
+                {equipIcon}
+                <ListItemText>{t("Off Hand")}</ListItemText>
+              </MenuItem>,
+            ];
+          }
+
+          // Shields with Dual Shieldbearer — show Main Hand / Off Hand
+          if (item.equipType === "shield" && hasDualShieldBearer) {
+            const source = "shields";
+            const arr = eq0?.[source] ?? [];
+            const idx = item.originalIndex !== undefined ? item.originalIndex : arr.findIndex((it) => it.name === item.name);
+            return [
+              <MenuItem
+                key="main"
+                disabled={!canEquip}
+                onClick={() => { equipToSlot(source, item.name, idx, "mainHand", false); setMenuAnchor(null); }}
+              >
+                {equipIcon}
+                <ListItemText>{t("Main Hand")}</ListItemText>
+              </MenuItem>,
+              <MenuItem
+                key="off"
+                disabled={!canEquip}
+                onClick={() => { equipToSlot(source, item.name, idx, "offHand", false); setMenuAnchor(null); }}
+              >
+                {equipIcon}
+                <ListItemText>{t("Off Hand")}</ListItemText>
+              </MenuItem>,
+            ];
+          }
+
+          // Everything else (2H weapon, custom-weapon, armor, accessory, shield without DSB)
+          return (
+            <MenuItem
+              disabled={!canEquip}
+              onClick={(e) => { handleEquipment(item, e); setMenuAnchor(null); }}
+            >
+              {equipIcon}
+              <ListItemText>{t("Equip")}</ListItemText>
+            </MenuItem>
+          );
+        })()}
+        <MenuItem
+          disabled={!isEditMode}
+          onClick={() => { handleEdit(item); setMenuAnchor(null); }}
+        >
+          <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+          <ListItemText>{t("Edit")}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
   );
 }
 
 // --- Compact transforming weapon pair ---
+
+function TransformingFormCard({ form, isActive, isEquipped, isEditMode, onInactiveClick, onEquip, onRoll, onEdit, checkIfEquippable, searchQuery, theme, t }) {
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const Icon = form.melee ? MeleeIcon : DistanceIcon;
+  const badge = isEquipped ? "M+O" : null;
+
+  return (
+    <>
+      <ItemRowCard
+        onCardClick={() => {
+          if (!isActive) { onInactiveClick?.(); return; }
+        }}
+        label={
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.25, minWidth: 0 }}>
+            <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
+              {highlightMatch(t(form.name), searchQuery)}
+            </Typography>
+            {form.martial && <Martial />}
+          </Box>
+        }
+        subtitle={<ItemStatSubtitle item={form} />}
+        actions={isActive ? (
+          <>
+            <IconButton size="small" onClick={() => onRoll(form)}><Casino /></IconButton>
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchor(e.currentTarget); }}>
+              <MenuIcon sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </>
+        ) : null}
+        variant="outlined"
+        compact
+        paperSx={{
+          flex: 1,
+          minWidth: 0,
+          opacity: isActive ? 1 : 0.4,
+          transition: "opacity 0.25s ease, border-color 0.15s ease",
+          "&:hover": { borderColor: theme.primary },
+        }}
+      />
+      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
+        <MenuItem
+          disabled={!isEditMode}
+          onClick={(e) => { onEquip(form, e); setMenuAnchor(null); }}
+        >
+          {badge !== null
+            ? <Badge badgeContent={badge} color="primary" sx={{ mr: 1.5, "& .MuiBadge-badge": { fontSize: "0.55rem", height: 11, minWidth: 11, p: 0 } }}><Icon fontSize="small" /></Badge>
+            : !checkIfEquippable(form)
+              ? <ErrorIcon fontSize="small" sx={{ mr: 1.5, color: "error.light" }} />
+              : <RadioButtonUnchecked fontSize="small" sx={{ mr: 1.5 }} />
+          }
+          <ListItemText>{badge !== null ? t("Unequip") : t("Equip")}</ListItemText>
+        </MenuItem>
+        <MenuItem disabled={!isEditMode} onClick={() => { onEdit(form); setMenuAnchor(null); }}>
+          <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+          <ListItemText>{t("Edit")}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+}
 
 function CompactTransformingPair({
   item,
@@ -414,52 +564,38 @@ function CompactTransformingPair({
   const cwName = item.originalData?.name;
   const slots = player.equippedSlots ?? {};
   const isEquipped = slots.mainHand?.source === "customWeapons" && slots.mainHand?.name === cwName;
-
-  const renderFormCard = (form, isActive, onInactiveClick) => {
-    const Icon = form.melee ? MeleeIcon : DistanceIcon;
-    return (
-      <ItemRowCard
-        onCardClick={() => {
-          if (!isActive) { onInactiveClick?.(); return; }
-          onPreviewItem?.(form);
-        }}
-        label={
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.25, minWidth: 0 }}>
-            <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
-              {highlightMatch(t(form.name), searchQuery)}
-            </Typography>
-            {form.martial && <Martial />}
-          </Box>
-        }
-        subtitle={<ItemStatSubtitle item={form} />}
-        actions={isActive ? (
-          <>
-            <Tooltip title={checkIfEquippable(form) ? t("Equip") : t("Not proficient")} arrow>
-              <IconButton size="small" onClick={(e) => handleEquipment(form, e)}>
-                {isEquipped ? <Icon /> : !checkIfEquippable(form) ? <ErrorIcon sx={{ color: "error.light" }} /> : <RadioButtonUnchecked sx={{ fontSize: "1.35rem" }} />}
-              </IconButton>
-            </Tooltip>
-            <IconButton size="small" onClick={() => handleDiceRoll(form)}><Casino /></IconButton>
-          </>
-        ) : null}
-        variant="outlined"
-        compact
-        paperSx={{
-          flex: 1,
-          minWidth: 0,
-          opacity: isActive ? 1 : 0.4,
-          transition: "opacity 0.25s ease, border-color 0.15s ease",
-          "&:hover": { borderColor: theme.primary },
-        }}
-      />
-    );
-  };
-
   const swapFn = () => handleSwapForm(item.primaryForm);
+
   return (
     <Box sx={{ gridColumn: "1 / -1", display: "flex", alignItems: "stretch", gap: "4px" }}>
-      {renderFormCard(item.primaryForm, isPrimaryActive, swapFn)}
-      {renderFormCard(item.secondaryForm, !isPrimaryActive, swapFn)}
+      <TransformingFormCard
+        form={item.primaryForm}
+        isActive={isPrimaryActive}
+        isEquipped={isEquipped}
+        isEditMode={isEditMode}
+        onInactiveClick={swapFn}
+        onEquip={handleEquipment}
+        onRoll={handleDiceRoll}
+        onEdit={handleEdit}
+        checkIfEquippable={checkIfEquippable}
+        searchQuery={searchQuery}
+        theme={theme}
+        t={t}
+      />
+      <TransformingFormCard
+        form={item.secondaryForm}
+        isActive={!isPrimaryActive}
+        isEquipped={isEquipped}
+        isEditMode={isEditMode}
+        onInactiveClick={swapFn}
+        onEquip={handleEquipment}
+        onRoll={handleDiceRoll}
+        onEdit={handleEdit}
+        checkIfEquippable={checkIfEquippable}
+        searchQuery={searchQuery}
+        theme={theme}
+        t={t}
+      />
     </Box>
   );
 }
@@ -472,14 +608,15 @@ const FullItemRow = memo(function FullItemRow({
   index,
   slotLabel,
   isEditMode,
-  inlineActions,
   onEquip,
+  onEquipToSlot,
   onDelete,
   onEdit,
   onRoll,
   onSendToChat,
   onAddToCompendium,
   onPreview,
+  hasDualShieldBearer,
   t,
 }) {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -528,84 +665,60 @@ const FullItemRow = memo(function FullItemRow({
               </IconButton>
             </Tooltip>
           )}
-          {inlineActions ? (
-            <>
-              {isEditMode && (
-                <Tooltip title={isEquipped ? `${t("Unequip")}${slotLabel ? ` (${slotLabel})` : ""}` : t("Equip")}>
-                  {slotLabel ? (
-                    <Badge badgeContent={slotLabel} color="primary" sx={{ width: 28, height: 28, flexShrink: 0, "& .MuiBadge-badge": { fontSize: "0.55rem", height: 11, minWidth: 11, p: 0, top: 1, right: 1, transform: "none" } }}>
-                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip(source, index, item, isTwoHand, slotLabel, e); }}>
-                        <EquipIcon />
-                      </IconButton>
-                    </Badge>
-                  ) : (
-                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip(source, index, item, isTwoHand, slotLabel, e); }}>
-                      <RadioButtonUnchecked sx={{ fontSize: "1.35rem" }} />
-                    </IconButton>
-                  )}
-                </Tooltip>
+          <>
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchorEl(e.currentTarget); }}>
+              <MenuIcon />
+            </IconButton>
+            <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
+              {isEquipped ? (
+                <MenuItem disabled={!isEditMode} onClick={() => { onEquip(source, index, item, isTwoHand, slotLabel, null); setMenuAnchorEl(null); }}>
+                  <EquipIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                  <ListItemText>{`${t("Unequip")}${slotLabel && slotLabel !== "E" ? ` (${slotLabel})` : ""}`}</ListItemText>
+                </MenuItem>
+              ) : source === "weapons" && !isTwoHand ? (
+                [
+                  <MenuItem key="main" disabled={!isEditMode} onClick={() => { onEquipToSlot?.(source, index, item, "mainHand"); setMenuAnchorEl(null); }}>
+                    <RadioButtonUnchecked fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                    <ListItemText>{t("Main Hand")}</ListItemText>
+                  </MenuItem>,
+                  <MenuItem key="off" disabled={!isEditMode} onClick={() => { onEquipToSlot?.(source, index, item, "offHand"); setMenuAnchorEl(null); }}>
+                    <RadioButtonUnchecked fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                    <ListItemText>{t("Off Hand")}</ListItemText>
+                  </MenuItem>,
+                ]
+              ) : source === "shields" && hasDualShieldBearer ? (
+                [
+                  <MenuItem key="main" disabled={!isEditMode} onClick={() => { onEquipToSlot?.(source, index, item, "mainHand"); setMenuAnchorEl(null); }}>
+                    <RadioButtonUnchecked fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                    <ListItemText>{t("Main Hand")}</ListItemText>
+                  </MenuItem>,
+                  <MenuItem key="off" disabled={!isEditMode} onClick={() => { onEquipToSlot?.(source, index, item, "offHand"); setMenuAnchorEl(null); }}>
+                    <RadioButtonUnchecked fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                    <ListItemText>{t("Off Hand")}</ListItemText>
+                  </MenuItem>,
+                ]
+              ) : (
+                <MenuItem disabled={!isEditMode} onClick={(e) => { onEquip(source, index, item, isTwoHand, slotLabel, e); setMenuAnchorEl(null); }}>
+                  <RadioButtonUnchecked fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                  <ListItemText>{t("Equip")}</ListItemText>
+                </MenuItem>
               )}
-              {isEditMode && (
-                <Tooltip title={t("Edit")}>
-                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit(source, index, item); }}>
-                    <Edit />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {isEditMode && (
-                <Tooltip title={t("Delete")}>
-                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(source, index, item); }} sx={{ color: "error.light" }}>
-                    <Delete />
-                  </IconButton>
-                </Tooltip>
-              )}
+              <MenuItem disabled={!isEditMode} onClick={() => { onEdit(source, index, item); setMenuAnchorEl(null); }}>
+                <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                <ListItemText>{t("Edit")}</ListItemText>
+              </MenuItem>
+              <MenuItem disabled={!isEditMode} onClick={() => { onDelete(source, index, item); setMenuAnchorEl(null); }} sx={{ "&:not(.Mui-disabled)": { color: "error.main" } }}>
+                <Delete fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                <ListItemText>{t("Delete")}</ListItemText>
+              </MenuItem>
               {onAddToCompendium && (
-                <>
-                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchorEl(e.currentTarget); }}>
-                    <MenuIcon />
-                  </IconButton>
-                  <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
-                    <MenuItem onClick={async () => { await onAddToCompendium(source, item); setMenuAnchorEl(null); }}>
-                      <AddToPhotosIcon fontSize="small" sx={{ flexShrink: 0 }} />
-                      <ListItemText>{t("Add to Compendium")}</ListItemText>
-                    </MenuItem>
-                  </Menu>
-                </>
+                <MenuItem onClick={async () => { await onAddToCompendium(source, item); setMenuAnchorEl(null); }}>
+                  <AddToPhotosIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                  <ListItemText>{t("Add to Compendium")}</ListItemText>
+                </MenuItem>
               )}
-            </>
-          ) : (
-            <>
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchorEl(e.currentTarget); }}>
-                <MenuIcon />
-              </IconButton>
-              <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
-                {isEditMode && (
-                  <MenuItem onClick={() => { onEdit(source, index, item); setMenuAnchorEl(null); }}>
-                    <Edit fontSize="small" sx={{ flexShrink: 0 }} />
-                    <ListItemText>{t("Edit")}</ListItemText>
-                  </MenuItem>
-                )}
-                {onAddToCompendium && (
-                  <MenuItem onClick={async () => { await onAddToCompendium(source, item); setMenuAnchorEl(null); }}>
-                    <AddToPhotosIcon fontSize="small" sx={{ flexShrink: 0 }} />
-                    <ListItemText>{t("Add to Compendium")}</ListItemText>
-                  </MenuItem>
-                )}
-                {isEditMode && (
-                  <MenuItem onClick={(e) => { onEquip(source, index, item, isTwoHand, slotLabel, e); setMenuAnchorEl(null); }}>
-                    {isEquipped ? <EquipIcon fontSize="small" sx={{ flexShrink: 0 }} /> : <RadioButtonUnchecked fontSize="small" sx={{ flexShrink: 0 }} />}
-                    <ListItemText>{isEquipped ? `${t("Unequip")}${slotLabel ? ` (${slotLabel})` : ""}` : t("Equip")}</ListItemText>
-                  </MenuItem>
-                )}
-                {isEditMode && (
-                  <MenuItem onClick={() => { onDelete(source, index, item); setMenuAnchorEl(null); }} sx={{ color: "error.main" }}>
-                    <Delete fontSize="small" sx={{ flexShrink: 0 }} />
-                    <ListItemText>{t("Delete")}</ListItemText>
-                  </MenuItem>
-                )}
-              </Menu>
-            </>
-          )}
+            </Menu>
+          </>
         </>
       }
     />
@@ -619,7 +732,6 @@ const FullTransformingPair = memo(function FullTransformingPair({
   index,
   slotLabel,
   isEditMode,
-  inlineActions,
   onEdit,
   onEquip,
   onDelete,
@@ -668,84 +780,36 @@ const FullTransformingPair = memo(function FullTransformingPair({
                           <Casino />
                         </IconButton>
                       </Tooltip>
-                      {inlineActions ? (
-                        <>
-                          {isEditMode && (
-                            <Tooltip title={isEquipped ? `${t("Unequip")}${slotLabel ? ` (${slotLabel})` : ""}` : t("Equip")}>
-                              {slotLabel ? (
-                                <Badge badgeContent={slotLabel} color="primary" sx={{ width: 28, height: 28, flexShrink: 0, "& .MuiBadge-badge": { fontSize: "0.55rem", height: 11, minWidth: 11, p: 0, top: 1, right: 1, transform: "none" } }}>
-                                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip("customWeapons", index, item, true, slotLabel); }}>
-                                    <MeleeIcon />
-                                  </IconButton>
-                                </Badge>
-                              ) : (
-                                <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip("customWeapons", index, item, true, slotLabel); }}>
-                                  <RadioButtonUnchecked sx={{ fontSize: "1.35rem" }} />
-                                </IconButton>
-                              )}
-                            </Tooltip>
-                          )}
-                          {isEditMode && (
-                            <Tooltip title={t("Edit")}>
-                              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit("customWeapons", index, item); }}>
-                                <Edit />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                          {isEditMode && (
-                            <Tooltip title={t("Delete")}>
-                              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete("customWeapons", index, item); }} sx={{ color: "error.light" }}>
-                                <Delete />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                          {onAddToCompendium && (
-                            <>
-                              <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchorEl(e.currentTarget); }}>
-                                <MenuIcon />
-                              </IconButton>
-                              <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
-                                <MenuItem onClick={async () => { await onAddToCompendium("customWeapons", item); setMenuAnchorEl(null); }}>
-                                  <AddToPhotosIcon fontSize="small" sx={{ flexShrink: 0 }} />
-                                  <ListItemText>{t("Add to Compendium")}</ListItemText>
-                                </MenuItem>
-                              </Menu>
-                            </>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchorEl(e.currentTarget); }}>
-                            <MenuIcon />
-                          </IconButton>
-                          <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
-                            {isEditMode && (
-                              <MenuItem onClick={() => { onEdit("customWeapons", index, item); setMenuAnchorEl(null); }}>
-                                <Edit fontSize="small" sx={{ flexShrink: 0 }} />
-                                <ListItemText>{t("Edit")}</ListItemText>
-                              </MenuItem>
-                            )}
-                            {onAddToCompendium && (
-                              <MenuItem onClick={async () => { await onAddToCompendium("customWeapons", item); setMenuAnchorEl(null); }}>
-                                <AddToPhotosIcon fontSize="small" sx={{ flexShrink: 0 }} />
-                                <ListItemText>{t("Add to Compendium")}</ListItemText>
-                              </MenuItem>
-                            )}
-                            {isEditMode && (
-                              <MenuItem onClick={() => { onEquip("customWeapons", index, item, true, slotLabel); setMenuAnchorEl(null); }}>
-                                {isEquipped ? <MeleeIcon fontSize="small" sx={{ flexShrink: 0 }} /> : <RadioButtonUnchecked fontSize="small" sx={{ flexShrink: 0 }} />}
-                                <ListItemText>{isEquipped ? `${t("Unequip")}${slotLabel ? ` (${slotLabel})` : ""}` : t("Equip")}</ListItemText>
-                              </MenuItem>
-                            )}
-                            {isEditMode && (
-                              <MenuItem onClick={() => { onDelete("customWeapons", index, item); setMenuAnchorEl(null); }} sx={{ color: "error.main" }}>
-                                <Delete fontSize="small" sx={{ flexShrink: 0 }} />
-                                <ListItemText>{t("Delete")}</ListItemText>
-                              </MenuItem>
-                            )}
-                          </Menu>
-                        </>
-                      )}
+                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchorEl(e.currentTarget); }}>
+                        <MenuIcon />
+                      </IconButton>
+                      <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
+                        {isEquipped ? (
+                          <MenuItem disabled={!isEditMode} onClick={() => { onEquip("customWeapons", index, item, true, slotLabel, null); setMenuAnchorEl(null); }}>
+                            <MeleeIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                            <ListItemText>{`${t("Unequip")}${slotLabel ? ` (${slotLabel})` : ""}`}</ListItemText>
+                          </MenuItem>
+                        ) : (
+                          <MenuItem disabled={!isEditMode} onClick={() => { onEquip("customWeapons", index, item, true, slotLabel, null); setMenuAnchorEl(null); }}>
+                            <RadioButtonUnchecked fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                            <ListItemText>{t("Equip")}</ListItemText>
+                          </MenuItem>
+                        )}
+                        <MenuItem disabled={!isEditMode} onClick={() => { onEdit("customWeapons", index, item); setMenuAnchorEl(null); }}>
+                          <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                          <ListItemText>{t("Edit")}</ListItemText>
+                        </MenuItem>
+                        <MenuItem disabled={!isEditMode} onClick={() => { onDelete("customWeapons", index, item); setMenuAnchorEl(null); }} sx={{ "&:not(.Mui-disabled)": { color: "error.main" } }}>
+                          <Delete fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                          <ListItemText>{t("Delete")}</ListItemText>
+                        </MenuItem>
+                        {onAddToCompendium && (
+                          <MenuItem onClick={async () => { await onAddToCompendium("customWeapons", item); setMenuAnchorEl(null); }}>
+                            <AddToPhotosIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+                            <ListItemText>{t("Add to Compendium")}</ListItemText>
+                          </MenuItem>
+                        )}
+                      </Menu>
                     </>
                   ) : (
                     <Tooltip title={t("weapon_customization_swap_form")}>
@@ -830,7 +894,6 @@ export default function PcEquipment({
   showBonusRows = false,
   showSectionCard = true,
   noShadow = false,
-  inlineActions = false,
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -1224,6 +1287,11 @@ export default function PcEquipment({
     setPlayer((prev) => equipItemToSlot(prev, targetSlot, { source, label: item?.name || "", index, item }));
   }, [setPlayer, player?.equippedSlots, hasDualShieldBearer, isTwoHandedEquipped, player]);
 
+  const handleEquipToSlot = useCallback((source, index, item, slot) => {
+    if (!setPlayer) return;
+    setPlayer((prev) => equipItemToSlot(prev, slot, { source, label: item?.name || "", index, item }));
+  }, [setPlayer]);
+
   const handleSwapForm = useCallback((item) => {
     if (!setPlayer) return;
     // compact mode passes the primaryForm object; full mode passes original cw index
@@ -1446,6 +1514,9 @@ export default function PcEquipment({
                   handleDiceRoll={handleDiceRoll}
                   handleEdit={handleEdit}
                   checkIfEquippable={checkIfEquippable}
+                  equipToSlot={equipToSlot}
+                  unequipItem={unequipItem}
+                  hasDualShieldBearer={hasDualShieldBearer}
                   theme={theme}
                   t={t}
                   onPreviewItem={setPreviewItem}
@@ -1547,7 +1618,6 @@ export default function PcEquipment({
                     index={row.index}
                     slotLabel={slotLabel}
                     isEditMode={isEditMode}
-                    inlineActions={inlineActions}
                     onEdit={openEditDialog}
                     onEquip={handleEquipFull}
                     onDelete={requestDelete}
@@ -1567,14 +1637,15 @@ export default function PcEquipment({
                     index={row.index}
                     slotLabel={slotLabel}
                     isEditMode={isEditMode}
-                    inlineActions={inlineActions}
                     onEdit={openEditDialog}
                     onEquip={handleEquipFull}
+                    onEquipToSlot={handleEquipToSlot}
                     onDelete={requestDelete}
                     onRoll={handleDiceRoll}
                     onSendToChat={handleSendToChat}
                     onAddToCompendium={handleAddToCompendium}
                     onPreview={(it, equipType) => setPreviewItem({ ...it, equipType, _source: row.source, _index: row.index })}
+                    hasDualShieldBearer={hasDualShieldBearer}
                     t={t}
                   />
                 </Grid>
