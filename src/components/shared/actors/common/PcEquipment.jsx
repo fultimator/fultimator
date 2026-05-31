@@ -506,11 +506,6 @@ const FullItemRow = memo(function FullItemRow({
       onCardClick={() => onPreview?.(item, equipType)}
       label={
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, minWidth: 0 }}>
-          {slotLabel && (
-            <Typography component="span" sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.75rem", color: "primary.main", flexShrink: 0, lineHeight: 1 }}>
-              {slotLabel}
-            </Typography>
-          )}
           <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1rem", textTransform: "uppercase", lineHeight: 1.3 }}>
             {item?.name || t("Unnamed")}
           </Typography>
@@ -537,9 +532,17 @@ const FullItemRow = memo(function FullItemRow({
             <>
               {isEditMode && (
                 <Tooltip title={isEquipped ? `${t("Unequip")}${slotLabel ? ` (${slotLabel})` : ""}` : t("Equip")}>
-                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip(source, index, item, isTwoHand, slotLabel, e); }}>
-                    {isEquipped ? <EquipIcon /> : <RadioButtonUnchecked sx={{ fontSize: "1.35rem" }} />}
-                  </IconButton>
+                  {slotLabel ? (
+                    <Badge badgeContent={slotLabel} color="primary" sx={{ width: 28, height: 28, flexShrink: 0, "& .MuiBadge-badge": { fontSize: "0.55rem", height: 11, minWidth: 11, p: 0, top: 1, right: 1, transform: "none" } }}>
+                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip(source, index, item, isTwoHand, slotLabel, e); }}>
+                        <EquipIcon />
+                      </IconButton>
+                    </Badge>
+                  ) : (
+                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip(source, index, item, isTwoHand, slotLabel, e); }}>
+                      <RadioButtonUnchecked sx={{ fontSize: "1.35rem" }} />
+                    </IconButton>
+                  )}
                 </Tooltip>
               )}
               {isEditMode && (
@@ -650,11 +653,6 @@ const FullTransformingPair = memo(function FullTransformingPair({
                 variant="outlined"
                 label={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, minWidth: 0 }}>
-                    {isActive && slotLabel && (
-                      <Typography component="span" sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.75rem", color: "primary.main", flexShrink: 0, lineHeight: 1 }}>
-                        {slotLabel}
-                      </Typography>
-                    )}
                     <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1rem", textTransform: "uppercase", lineHeight: 1.3 }}>
                       {fd.name}
                     </Typography>
@@ -674,9 +672,17 @@ const FullTransformingPair = memo(function FullTransformingPair({
                         <>
                           {isEditMode && (
                             <Tooltip title={isEquipped ? `${t("Unequip")}${slotLabel ? ` (${slotLabel})` : ""}` : t("Equip")}>
-                              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip("customWeapons", index, item, true, slotLabel); }}>
-                                {isEquipped ? <MeleeIcon /> : <RadioButtonUnchecked sx={{ fontSize: "1.35rem" }} />}
-                              </IconButton>
+                              {slotLabel ? (
+                                <Badge badgeContent={slotLabel} color="primary" sx={{ width: 28, height: 28, flexShrink: 0, "& .MuiBadge-badge": { fontSize: "0.55rem", height: 11, minWidth: 11, p: 0, top: 1, right: 1, transform: "none" } }}>
+                                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip("customWeapons", index, item, true, slotLabel); }}>
+                                    <MeleeIcon />
+                                  </IconButton>
+                                </Badge>
+                              ) : (
+                                <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEquip("customWeapons", index, item, true, slotLabel); }}>
+                                  <RadioButtonUnchecked sx={{ fontSize: "1.35rem" }} />
+                                </IconButton>
+                              )}
                             </Tooltip>
                           )}
                           {isEditMode && (
@@ -781,7 +787,7 @@ function BonusRow({ label, value, compact }) {
 
 // --- resolveSlotLabel (full variant) ---
 
-function resolveSlotLabel(source, index, slots, itemName) {
+function resolveSlotLabel(source, index, slots, itemName, item) {
   const mainRef = slots?.mainHand;
   const offRef = slots?.offHand;
   const armorRef = slots?.armor;
@@ -790,6 +796,9 @@ function resolveSlotLabel(source, index, slots, itemName) {
   const inOff = offRef?.source === source && (offRef?.index === index || offRef?.name === itemName);
   const inArmor = source === "armor" && armorRef && (armorRef?.index === index || armorRef?.name === itemName);
   const inAccessory = source === "accessories" && accessoryRef && (accessoryRef?.index === index || accessoryRef?.name === itemName);
+  const isTwoHand =
+    source === "customWeapons" || item?.hands === 2 || item?.isTwoHand;
+  if (inMain && isTwoHand) return "M+O";
   if (inMain && inOff) return "M+O";
   if (inMain) return "M";
   if (inOff) return "O";
@@ -1529,7 +1538,7 @@ export default function PcEquipment({
             </Grid>
           ) : (
             rows.map((row) => {
-              const slotLabel = resolveSlotLabel(row.source, row.index, equippedSlots, row.item?.name);
+              const slotLabel = resolveSlotLabel(row.source, row.index, equippedSlots, row.item?.name, row.item);
               if (row.source === "customWeapons" && isTransformingCustomWeapon(row.item)) {
                 return (
                   <FullTransformingPair
