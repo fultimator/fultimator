@@ -10,7 +10,7 @@ import {
   Autocomplete,
   Divider,
 } from "@mui/material";
-import PortraitModal from "../../panels/PortraitModal";
+import PortraitModal from "/src/components/shared/actors/pc/panels/PortraitModal";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { Add, Remove, Edit as EditIcon } from "@mui/icons-material";

@@ -1,9 +1,9 @@
 import React from "react";
 import { Grid, Typography, Divider } from "@mui/material";
-import SectionCard from "../../../common/SectionCard";
-import { useTranslate } from "../../../../../../translation/translate";
-import { useCustomTheme } from "../../../../../../hooks/useCustomTheme";
-import NotesMarkdown from "../../../../../common/NotesMarkdown";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
 
 export default function PlayerCampActivities({ player }) {
   const { t } = useTranslate();

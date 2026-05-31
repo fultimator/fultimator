@@ -1,4 +1,4 @@
-import PlayerCampActivities from "../../playerSheet/optional/PlayerCampActivities";
+import PlayerCampActivities from "/src/components/shared/actors/pc/playerSheet/optional/PlayerCampActivities";
 
 export default function PcCampActivities({
   pc,

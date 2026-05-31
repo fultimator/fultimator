@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { Box, Typography, IconButton, InputBase, Tooltip } from "@mui/material";
-import SectionCard from "../../common/SectionCard";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { Remove, Add } from "@mui/icons-material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
-import { useTranslate } from "../../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import {
   HpResourceIcon,
   MpResourceIcon,
   IpResourceIcon,
   FpResourceIcon,
   ZenitResourceIcon,
-} from "../../../../icons";
-import { GradientLinearProgress } from "../shared";
-import { newShade } from "../../../../../libs/playerCalculations";
-import StatTooltip from "../../../../common/StatTooltip";
+} from "/src/components/icons";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { newShade } from "/src/libs/playerCalculations";
+import StatTooltip from "/src/components/common/StatTooltip";
 
 function useBarShell() {
   const theme = useTheme();

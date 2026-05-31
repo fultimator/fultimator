@@ -2,8 +2,8 @@ import React from "react";
 import { Box, Chip, Grid, Typography } from "@mui/material";
 import { darken } from "@mui/material/styles";
 
-import Diamond from "../../../Diamond";
-import EditableImage from "../../../EditableImage";
+import Diamond from "/src/components/Diamond";
+import EditableImage from "/src/components/EditableImage";
 import {
   useCardSetup,
   headerBoxSx,
@@ -11,9 +11,9 @@ import {
   nameRowSx,
   CARD_DEFAULTS,
   isImageMode,
-} from "../core-utils";
-import { StyledMarkdown, md } from "../markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "../core";
+} from "/src/components/shared/items/core-utils";
+import { StyledMarkdown, md } from "/src/components/shared/items/markdown";
+import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
 
 function dataRowSx(customTheme, background, extraSx = {}) {
   return {

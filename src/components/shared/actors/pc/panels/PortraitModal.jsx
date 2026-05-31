@@ -15,7 +15,7 @@ import {
 import { InfoOutlined } from "@mui/icons-material";
 import FitScreenIcon from "@mui/icons-material/FitScreen";
 import CropFreeIcon from "@mui/icons-material/CropFree";
-import { useTranslate } from "../../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 
 export default function PortraitModal({ open, onClose, pc, onUpdate }) {
   const { t } = useTranslate();

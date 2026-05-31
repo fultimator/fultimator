@@ -1,4 +1,4 @@
-import PlayerNotes from "../playerSheet/PlayerNotes";
+import PlayerNotes from "/src/components/shared/actors/pc/playerSheet/PlayerNotes";
 
 export default function NotesTab({ player, setPlayer, isOwner }) {
   return (

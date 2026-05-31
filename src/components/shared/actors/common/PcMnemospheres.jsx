@@ -22,21 +22,21 @@ import {
   Star,
 } from "@mui/icons-material";
 import MessageOutlined from "@mui/icons-material/MessageOutlined";
-import NotesMarkdown from "../../../common/NotesMarkdown";
-import StatTooltip from "../../../common/StatTooltip";
-import { useTranslate } from "../../../../translation/translate";
-import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
+import StatTooltip from "/src/components/common/StatTooltip";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import SectionCard from "./SectionCard";
-import CompactSectionHeader from "../pc/variants/compact/CompactSectionHeader";
-import { highlightMatch, highlightMarkdownText } from "../pc/variants/compact/highlightUtils";
-import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
+import { highlightMatch, highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import {
   getMnemosphereSkillDescription,
   getMnemosphereHeroicDescription,
-} from "../../../../libs/player/mnemosphereClassUtils";
-import { getMnemosphereCost } from "../../../../libs/mnemospheres";
+} from "/src/libs/player/mnemosphereClassUtils";
+import { getMnemosphereCost } from "/src/libs/mnemospheres";
 import ItemRowCard from "./ItemRowCard";
-import { SharedSkillCard, SharedHeroicCard } from "../../items/class/SharedClassCards";
+import { SharedSkillCard, SharedHeroicCard } from "/src/components/shared/items/class/SharedClassCards";
 
 function DescriptionArea({ children }) {
   return (

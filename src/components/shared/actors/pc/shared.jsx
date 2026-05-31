@@ -1,7 +1,7 @@
 import { styled } from "@mui/system";
 import { Box, LinearProgress, Paper, Typography } from "@mui/material";
 import ReactMarkdown from "react-markdown";
-import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
 
 export const GradientLinearProgress = styled(LinearProgress)(
   ({ theme, color1, color2 }) => ({

@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import attributes from "../../../../libs/attributes";
-import { spellsByClass } from "../../../../libs/classes";
+import attributes from "/src/libs/attributes";
+import { spellsByClass } from "/src/libs/classes";
 import {
   getSpellTypeItemCount,
   INVOCATION_WELLSPRING_GROUPS,
@@ -25,9 +25,9 @@ import {
   headerBoxSx,
   nameRowSx,
   CARD_DEFAULTS,
-} from "../core-utils";
-import { StyledMarkdown, md } from "../markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "../core";
+} from "/src/components/shared/items/core-utils";
+import { StyledMarkdown, md } from "/src/components/shared/items/markdown";
+import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
 
 function SpellTypeItemRow({ entry, customTheme, t }) {
   const [open, setOpen] = useState(false);

@@ -2,12 +2,12 @@ import React from "react";
 import { Box, Typography, IconButton, Tooltip } from "@mui/material";
 import { Edit, ChatOutlined } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../../../translation/translate";
-import NotesMarkdown from "../../../common/NotesMarkdown";
-import ClockControls from "../pc/variants/compact/ClockControls";
-import { highlightMatch } from "../core-utils";
-import { highlightMarkdownText } from "../pc/variants/compact/highlightUtils";
-import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
+import { useTranslate } from "/src/translation/translate";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
+import ClockControls from "/src/components/shared/actors/pc/variants/compact/ClockControls";
+import { highlightMatch } from "/src/components/shared/actors/core-utils";
+import { highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import ItemRowCard from "./ItemRowCard";
 
 function NoteClockCard({ clock, clockIndex, noteOriginalIndex, setPlayer, searchQuery, compact, primary }) {

@@ -1,11 +1,11 @@
 import { Box, Card, Paper } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useThemeStore } from "../../../../store/themeStore";
+import { useThemeStore } from "/src/store/themeStore";
 import PcHeader, { PcNameBar } from "./panels/PcHeader";
-import PcStatsSummary from "../common/PcStatsSummary";
+import PcStatsSummary from "/src/components/shared/actors/common/PcStatsSummary";
 import PcAffinities from "./panels/PcAffinities";
 import PcTraitsDescription from "./panels/PcTraitsDescription";
-import PcClasses from "../common/PcClasses";
+import PcClasses from "/src/components/shared/actors/common/PcClasses";
 import PlayerBonds from "./playerSheet/PlayerBonds";
 import CardLoadout from "./playerSheet/CardLoadout";
 import PlayerEquipment from "./playerSheet/PlayerEquipment";

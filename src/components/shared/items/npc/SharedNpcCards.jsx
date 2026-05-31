@@ -1,18 +1,18 @@
 import React from "react";
 import { Box, Chip, Grid, Typography } from "@mui/material";
 
-import { Martial } from "../../../icons";
-import { OpenBracket, CloseBracket } from "../../../Bracket";
-import attributes from "../../../../libs/attributes";
-import types from "../../../../libs/types";
+import { Martial } from "/src/components/icons";
+import { OpenBracket, CloseBracket } from "/src/components/Bracket";
+import attributes from "/src/libs/attributes";
+import types from "/src/libs/types";
 import {
   useCardSetup,
   headerBoxSx,
   headerGridSx,
   CARD_DEFAULTS,
-} from "../core-utils";
-import { StyledMarkdown } from "../markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "../core";
+} from "/src/components/shared/items/core-utils";
+import { StyledMarkdown } from "/src/components/shared/items/markdown";
+import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
 
 export const SharedAttackCard = React.memo(function SharedAttackCard({
   item,

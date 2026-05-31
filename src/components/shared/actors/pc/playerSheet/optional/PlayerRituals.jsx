@@ -18,13 +18,13 @@ import {
   Chip,
   Stack,
 } from "@mui/material";
-import { useTranslate } from "../../../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import Clock from "./Clock";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import SectionCard from "../../../common/SectionCard";
-import CompactSectionHeader from "../../variants/compact/CompactSectionHeader";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 
 export default function PlayerRituals({
   player,

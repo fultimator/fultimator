@@ -1,22 +1,22 @@
 import React, { useMemo } from "react";
 import { Typography, Grid, Box, IconButton, Tooltip } from "@mui/material";
-import SectionCard from "../../common/SectionCard";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { Casino, Message } from "@mui/icons-material";
-import { useTranslate } from "../../../../../translation/translate";
-import { useSpellModals } from "../../../../../hooks/useSpellModals";
-import { getActiveMnemosphereSkills } from "../../../../../libs/player/slots/loadoutSelectors";
-import spellDisplayRegistry from "../spells/spellDisplayRegistry";
+import { useTranslate } from "/src/translation/translate";
+import { useSpellModals } from "/src/hooks/useSpellModals";
+import { getActiveMnemosphereSkills } from "/src/libs/player/slots/loadoutSelectors";
+import spellDisplayRegistry from "/src/components/shared/actors/pc/spells/spellDisplayRegistry";
 import spellModalRegistry, {
   spellTypeToModalName,
-} from "../spells/spellModalRegistry";
-import { calculateAttribute } from "../../../../../libs/playerCalculations";
+} from "/src/components/shared/actors/pc/spells/spellModalRegistry";
+import { calculateAttribute } from "/src/libs/playerCalculations";
 import {
   prepareMagicCheck,
   rollMagicCheck,
   processMagicCheck,
   buildMagicCheckMessage,
-} from "../../../../app-drawer/panels/chat/domain/magic-checks";
-import { sendRollMessage, sendDisplayMessage } from "../../../../../hooks/useRollToChat";
+} from "/src/components/app-drawer/panels/chat/domain/magic-checks";
+import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 export default function PcSpells({
   pc,

@@ -15,8 +15,8 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import EditableImage from "../../EditableImage";
-import { useTranslate } from "../../../translation/translate";
+import EditableImage from "/src/components/EditableImage";
+import { useTranslate } from "/src/translation/translate";
 import {
   getImageBackground,
   isImageMode,

@@ -1,19 +1,19 @@
 import React, { Fragment } from "react";
 import { Grid, Typography } from "@mui/material";
-import { useTranslate } from "../../../../translation/translate";
-import { useActorCardSetup, isInteractive } from "../core-utils";
-import { OpenBracket, CloseBracket } from "../../../Bracket";
-import Diamond from "../../../Diamond";
-import { MeleeIcon, DistanceIcon } from "../../../icons";
-import attributes from "../../../../libs/attributes";
-import { calcDamage, calcPrecision } from "../../../../libs/npcs";
-import { useChatMessagesStore } from "../../../../store/chatMessagesStore";
+import { useTranslate } from "/src/translation/translate";
+import { useActorCardSetup, isInteractive } from "/src/components/shared/actors/core-utils";
+import { OpenBracket, CloseBracket } from "/src/components/Bracket";
+import Diamond from "/src/components/Diamond";
+import { MeleeIcon, DistanceIcon } from "/src/components/icons";
+import attributes from "/src/libs/attributes";
+import { calcDamage, calcPrecision } from "/src/libs/npcs";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
 import {
   prepareAccuracyCheck,
   rollAccuracyCheck,
   processAccuracyCheck,
   buildAccuracyCheckMessage,
-} from "../../../app-drawer/panels/chat/domain/accuracy-checks";
+} from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
 import {
   SpanMarkdown,
   ClickableName,

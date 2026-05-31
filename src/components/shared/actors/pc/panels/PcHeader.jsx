@@ -13,13 +13,13 @@ import PortraitModal from "./PortraitModal";
 import FitScreenIcon from "@mui/icons-material/FitScreen";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import { useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../../../../translation/translate";
-import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
-import Diamond from "../../../../Diamond";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import Diamond from "/src/components/Diamond";
 import avatar_image from "/images/components/avatar.jpg";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
-import { StyledMarkdown } from "../shared";
+import { StyledMarkdown } from "/src/components/shared/actors/pc/shared";
 
 const THEMES = [
   "Ambition",

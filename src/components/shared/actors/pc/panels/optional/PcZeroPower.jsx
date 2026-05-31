@@ -1,4 +1,4 @@
-import PlayerZeroPower from "../../playerSheet/optional/PlayerZeroPower";
+import PlayerZeroPower from "/src/components/shared/actors/pc/playerSheet/optional/PlayerZeroPower";
 
 export default function PcZeroPower({ pc, isInteractive = false, onUpdate }) {
   return (

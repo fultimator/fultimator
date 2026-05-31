@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, ButtonBase, Menu, MenuItem, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import StatTooltip from "../../../common/StatTooltip";
+import StatTooltip from "/src/components/common/StatTooltip";
 import {
   BoltIcon,
   DarkIcon,
@@ -12,8 +12,8 @@ import {
   PhysicalIcon,
   PoisonIcon,
   AirIcon,
-} from "../../../icons";
-import { useTranslate } from "../../../../translation/translate";
+} from "/src/components/icons";
+import { useTranslate } from "/src/translation/translate";
 // import { typeList } from "../../typeConstants";
 const AFFINITY_OPTIONS = [
   { value: "", labelKey: "None", fallback: "None" },

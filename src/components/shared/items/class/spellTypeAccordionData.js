@@ -2,7 +2,7 @@ import {
   arcanumList,
   tinkererAlchemy,
   tinkererInfusion,
-} from "../../../../libs/classes";
+} from "/src/libs/classes";
 import {
   availableDances,
   availableGifts,
@@ -11,9 +11,9 @@ import {
   availableSymbols,
   availableTherioforms,
   invocationsByWellspring,
-} from "../../../../libs/player/spellOptionData";
-import { magiseeds } from "../../../../libs/floralistMagiseedData";
-import { availableModules } from "../../../../libs/pilotVehicleData";
+} from "/src/libs/player/spellOptionData";
+import { magiseeds } from "/src/libs/floralistMagiseedData";
+import { availableModules } from "/src/libs/pilotVehicleData";
 
 export const SPELL_TYPE_DESC_KEYS = {
   dance: ["dance_details_1"],

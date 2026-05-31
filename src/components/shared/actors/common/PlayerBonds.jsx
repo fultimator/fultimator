@@ -13,14 +13,14 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import SectionCard from "./SectionCard";
-import CompactSectionHeader from "../pc/variants/compact/CompactSectionHeader";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 import BondCard from "./BondCard";
 import AddIcon from "@mui/icons-material/Add";
-import { useDeleteConfirmation } from "../../../../hooks/useDeleteConfirmation";
-import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
-import ActorEditModal from "../../../../forms/ui/ActorEditModal";
+import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import ActorEditModal from "/src/forms/ui/ActorEditModal";
 
 const POSITIVE = ["admiration", "loyality", "affection"];
 const NEGATIVE = ["inferiority", "mistrust", "hatred"];

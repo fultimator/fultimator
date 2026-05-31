@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
-import StatTooltip from "../../../../common/StatTooltip";
-import { TypeAffinity } from "../../common/TypeAffinity";
-import { AffinityStrip, AffinityCell } from "../shared";
-import { AFFINITY_TYPES } from "../../core-utils";
+import StatTooltip from "/src/components/common/StatTooltip";
+import { TypeAffinity } from "/src/components/shared/actors/common/TypeAffinity";
+import { AffinityStrip, AffinityCell } from "/src/components/shared/actors/pc/shared";
+import { AFFINITY_TYPES } from "/src/components/shared/actors/core-utils";
 
 function AffinityIconOnly({ type, affinity, iconSize, editable, onChangeAffinity }) {
   return (

@@ -13,12 +13,12 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { alpha } from "@mui/material/styles";
-import { useTranslate } from "../../../../translation/translate";
-import { HpResourceIcon, MpResourceIcon, IpResourceIcon } from "../../../icons";
-import StatTooltip from "../../../common/StatTooltip";
-import { newShade } from "../../../../libs/playerCalculations";
-import { GradientLinearProgress } from "../pc/shared";
-import { RESOURCE_SCALES } from "../scaleTokens";
+import { useTranslate } from "/src/translation/translate";
+import { HpResourceIcon, MpResourceIcon, IpResourceIcon } from "/src/components/icons";
+import StatTooltip from "/src/components/common/StatTooltip";
+import { newShade } from "/src/libs/playerCalculations";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { RESOURCE_SCALES } from "/src/components/shared/actors/scaleTokens";
 
 function StatChangeDialog({ open, onClose, stat, value, max, onApply, t }) {
   const [amount, setAmount] = useState("");

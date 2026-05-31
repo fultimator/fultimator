@@ -1,11 +1,11 @@
 import React from "react";
 import { Box, Chip, darken, Grid, Stack, Typography } from "@mui/material";
 
-import EditableImage from "../../../EditableImage";
-import { OffensiveSpellIcon, Martial } from "../../../icons";
-import { OpenBracket, CloseBracket } from "../../../Bracket";
-import Diamond from "../../../Diamond";
-import attributes from "../../../../libs/attributes";
+import EditableImage from "/src/components/EditableImage";
+import { OffensiveSpellIcon, Martial } from "/src/components/icons";
+import { OpenBracket, CloseBracket } from "/src/components/Bracket";
+import Diamond from "/src/components/Diamond";
+import attributes from "/src/libs/attributes";
 import {
   useCardSetup,
   isImageMode,
@@ -14,9 +14,9 @@ import {
   nameRowSx,
   bodyBoxSx,
   CARD_DEFAULTS,
-} from "../core-utils";
-import { StyledMarkdown, md } from "../markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "../core";
+} from "/src/components/shared/items/core-utils";
+import { StyledMarkdown, md } from "/src/components/shared/items/markdown";
+import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
 
 export const SharedSpellCard = React.memo(function SharedSpellCard({
   item,
@@ -2756,6 +2756,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
             <Grid size={2} sx={{ textAlign: "center" }}>
               <Typography
                 variant="body2"
+                component="div"
                 sx={{ color: "text.secondary", "& p": { margin: 0 } }}
               >
                 {item.type ? md(t(item.type)) : "-"}
@@ -2764,6 +2765,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
             <Grid size={3} sx={{ textAlign: "center" }}>
               <Typography
                 variant="body2"
+                component="div"
                 sx={{ color: "text.secondary", "& p": { margin: 0 } }}
               >
                 {item.status ? md(t(item.status)) : "-"}
@@ -2772,6 +2774,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
             <Grid size={2} sx={{ textAlign: "center" }}>
               <Typography
                 variant="body2"
+                component="div"
                 sx={{ color: "text.secondary", "& p": { margin: 0 } }}
               >
                 {item.attribute ? md(t(item.attribute)) : "-"}
@@ -2780,6 +2783,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
             <Grid size={2} sx={{ textAlign: "center" }}>
               <Typography
                 variant="body2"
+                component="div"
                 sx={{ color: "text.secondary", "& p": { margin: 0 } }}
               >
                 {item.recovery ? md(t(item.recovery)) : "-"}

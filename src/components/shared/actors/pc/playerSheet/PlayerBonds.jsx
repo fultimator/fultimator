@@ -1,1 +1,1 @@
-export { default } from "../../common/PlayerBonds";
+export { default } from "/src/components/shared/actors/common/PlayerBonds";

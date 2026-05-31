@@ -5,12 +5,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import SectionCard from "../../common/SectionCard";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { useTheme } from "@mui/material/styles";
-import { useCustomTheme } from "../../../../../hooks/useCustomTheme";
-import { useTranslate } from "../../../../../translation/translate";
-import CustomTextarea from "../../../../common/CustomTextarea";
-import NotesMarkdown from "../../../../common/NotesMarkdown";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { useTranslate } from "/src/translation/translate";
+import CustomTextarea from "/src/components/common/CustomTextarea";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
 
 const THEME_KEYS = [
   "Ambition",

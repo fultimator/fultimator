@@ -1,8 +1,8 @@
 import React from "react";
-import { useTranslate } from "../../../translation/translate";
-import { useCustomTheme } from "../../../hooks/useCustomTheme";
-import { calculateAttribute } from "../../../libs/playerCalculations";
-import { isItemEquipped } from "../../../libs/player/slots/equipmentSlots";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { calculateAttribute } from "/src/libs/playerCalculations";
+import { isItemEquipped } from "/src/libs/player/slots/equipmentSlots";
 
 export const ACTOR_DEFAULTS = {
   variant: "interactive",

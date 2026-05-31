@@ -12,13 +12,13 @@ import {
 } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import MessageOutlined from "@mui/icons-material/MessageOutlined";
-import NotesMarkdown from "../../../common/NotesMarkdown";
-import { useTranslate } from "../../../../translation/translate";
-import { useCustomTheme } from "../../../../hooks/useCustomTheme";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import SectionCard from "./SectionCard";
-import { highlightMatch, highlightMarkdownText } from "../pc/variants/compact/highlightUtils";
-import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
-import { getHoplosphereCoagKey } from "../../../../libs/technospheres";
+import { highlightMatch, highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
+import { getHoplosphereCoagKey } from "/src/libs/technospheres";
 
 function getSlottedHoplospheres(pc) {
   const eq0 = pc?.equipment?.[0] ?? {};

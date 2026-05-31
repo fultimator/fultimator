@@ -1,4 +1,4 @@
-import PlayerRituals from "../../playerSheet/optional/PlayerRituals";
+import PlayerRituals from "/src/components/shared/actors/pc/playerSheet/optional/PlayerRituals";
 
 export default function PcRituals({
   pc,

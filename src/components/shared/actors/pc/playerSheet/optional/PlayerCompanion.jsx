@@ -1,10 +1,10 @@
 import React from "react";
 import { Grid, Typography, Paper, Divider, Button } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import { useNavigate } from "react-router"; // Use useNavigate instead of useHistory
-import NpcActorCard from "../../../npc/NpcActorCard";
-import { useCustomTheme } from "../../../../../../hooks/useCustomTheme";
+import NpcActorCard from "/src/components/shared/actors/npc/NpcActorCard";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
 
 export default function PlayerCompanion({
   player,

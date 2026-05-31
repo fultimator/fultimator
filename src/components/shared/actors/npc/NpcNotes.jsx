@@ -1,10 +1,10 @@
 import React, { Fragment } from "react";
 import { Grid, Typography } from "@mui/material";
-import { useTranslate } from "../../../../translation/translate";
-import { useActorCardSetup, isInteractive } from "../core-utils";
-import { useChatMessagesStore } from "../../../../store/chatMessagesStore";
-import Diamond from "../../../Diamond";
-import { NotesIcon } from "../../../icons";
+import { useTranslate } from "/src/translation/translate";
+import { useActorCardSetup, isInteractive } from "/src/components/shared/actors/core-utils";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
+import Diamond from "/src/components/Diamond";
+import { NotesIcon } from "/src/components/icons";
 import { SpanMarkdown, ClickableName } from "./shared";
 
 function NoteRow({ note, npc, showRoll }) {

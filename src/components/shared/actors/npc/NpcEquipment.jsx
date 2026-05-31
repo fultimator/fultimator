@@ -1,11 +1,11 @@
 import React from "react";
 import { Grid, Typography } from "@mui/material";
-import { useTranslate } from "../../../../translation/translate";
-import { useActorCardSetup } from "../core-utils";
-import { OpenBracket, CloseBracket } from "../../../Bracket";
-import Diamond from "../../../Diamond";
-import { Martial } from "../../../icons";
-import attributes from "../../../../libs/attributes";
+import { useTranslate } from "/src/translation/translate";
+import { useActorCardSetup } from "/src/components/shared/actors/core-utils";
+import { OpenBracket, CloseBracket } from "/src/components/Bracket";
+import Diamond from "/src/components/Diamond";
+import { Martial } from "/src/components/icons";
+import attributes from "/src/libs/attributes";
 import { SpanMarkdown, damageTypeLabels } from "./shared";
 
 export function NpcEquipment({ npc }) {

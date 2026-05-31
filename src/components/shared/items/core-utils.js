@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { useTranslate } from "../../../translation/translate";
-import { useCustomTheme } from "../../../hooks/useCustomTheme";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
 
 export const DEFAULT_IMAGE_TEMP_INFO_KEY = "equipment_image_temporary_notice";
 const DEFAULT_IMAGE_TEMP_INFO_FALLBACK =

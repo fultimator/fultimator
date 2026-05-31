@@ -32,42 +32,42 @@ import {
   Edit,
 } from "@mui/icons-material";
 import MessageOutlined from "@mui/icons-material/MessageOutlined";
-import NotesMarkdown from "../../../common/NotesMarkdown";
-import { useTranslate } from "../../../../translation/translate";
-import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import CompendiumViewerModal from "../../../compendium/CompendiumViewerModal";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import { EditPlayerClassModal } from "/src/components/shared/actors/pc/editors";
 import PcMnemospheres from "./PcMnemospheres";
-import FuidField from "../../../common/FuidField";
-import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
+import FuidField from "/src/components/common/FuidField";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import {
   getSlottedMnemospheres,
-} from "../../../../libs/player/mnemosphereClassUtils";
-import SpellDefault from "../pc/variants/compact/spells/SpellDefault";
-import SpellArcanist from "../pc/variants/compact/spells/SpellArcanist";
-import SpellEntropistGamble from "../pc/variants/compact/spells/SpellEntropistGamble";
-import SpellInvoker from "../pc/variants/compact/spells/SpellInvoker";
-import SpellGourmet from "../pc/variants/compact/spells/SpellGourmet";
-import SpellMagiseed from "../pc/variants/compact/spells/SpellMagiseed";
-import SpellGadget from "../pc/variants/compact/spells/SpellGadget";
-import SpellMagichant from "../pc/variants/compact/spells/SpellMagichant";
-import SpellSymbol from "../pc/variants/compact/spells/SpellSymbol";
-import SpellDance from "../pc/variants/compact/spells/SpellDance";
-import SpellGift from "../pc/variants/compact/spells/SpellGift";
-import SpellTherioform from "../pc/variants/compact/spells/SpellTherioform";
-import SpellVehicle from "../pc/variants/compact/spells/SpellVehicle";
-import SpellDeck from "../pc/variants/compact/spells/SpellDeck";
-import { highlightMatch, highlightMarkdownText } from "../pc/variants/compact/highlightUtils";
+} from "/src/libs/player/mnemosphereClassUtils";
+import SpellDefault from "/src/components/shared/actors/pc/variants/compact/spells/SpellDefault";
+import SpellArcanist from "/src/components/shared/actors/pc/variants/compact/spells/SpellArcanist";
+import SpellEntropistGamble from "/src/components/shared/actors/pc/variants/compact/spells/SpellEntropistGamble";
+import SpellInvoker from "/src/components/shared/actors/pc/variants/compact/spells/SpellInvoker";
+import SpellGourmet from "/src/components/shared/actors/pc/variants/compact/spells/SpellGourmet";
+import SpellMagiseed from "/src/components/shared/actors/pc/variants/compact/spells/SpellMagiseed";
+import SpellGadget from "/src/components/shared/actors/pc/variants/compact/spells/SpellGadget";
+import SpellMagichant from "/src/components/shared/actors/pc/variants/compact/spells/SpellMagichant";
+import SpellSymbol from "/src/components/shared/actors/pc/variants/compact/spells/SpellSymbol";
+import SpellDance from "/src/components/shared/actors/pc/variants/compact/spells/SpellDance";
+import SpellGift from "/src/components/shared/actors/pc/variants/compact/spells/SpellGift";
+import SpellTherioform from "/src/components/shared/actors/pc/variants/compact/spells/SpellTherioform";
+import SpellVehicle from "/src/components/shared/actors/pc/variants/compact/spells/SpellVehicle";
+import SpellDeck from "/src/components/shared/actors/pc/variants/compact/spells/SpellDeck";
+import { highlightMatch, highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
 import {
   isAutomaticClassLevelEnabled,
   syncAutomaticClassLevels,
-} from "../../../../libs/player/classLevelUtils";
-import useSphereBank from "../../../../hooks/useSphereBank";
+} from "/src/libs/player/classLevelUtils";
+import useSphereBank from "/src/hooks/useSphereBank";
 import SectionCard from "./SectionCard";
 import ItemRowCard from "./ItemRowCard";
-import CompactSectionHeader from "../pc/variants/compact/CompactSectionHeader";
-import { SharedSkillCard, SharedHeroicCard } from "../../items/class/SharedClassCards";
-import { SharedPlayerSpellCard } from "../../items/spells/SharedSpellCards";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
+import { SharedSkillCard, SharedHeroicCard } from "/src/components/shared/items/class/SharedClassCards";
+import { SharedPlayerSpellCard } from "/src/components/shared/items/spells/SharedSpellCards";
 // Utilities
 
 function SectionSubHeader({ children, theme }) {

@@ -4,25 +4,25 @@ import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { styled } from "@mui/system";
 
-import { Martial } from "../../../icons";
-import { SLOT_TIERS } from "../../../../libs/player/slotTiers";
-import { getMnemosphereCost } from "../../../../libs/mnemospheres";
-import { OpenBracket, CloseBracket } from "../../../Bracket";
-import Diamond from "../../../Diamond";
-import attributes from "../../../../libs/attributes";
-import types from "../../../../libs/types";
+import { Martial } from "/src/components/icons";
+import { SLOT_TIERS } from "/src/libs/player/slotTiers";
+import { getMnemosphereCost } from "/src/libs/mnemospheres";
+import { OpenBracket, CloseBracket } from "/src/components/Bracket";
+import Diamond from "/src/components/Diamond";
+import attributes from "/src/libs/attributes";
+import types from "/src/libs/types";
 import {
   CARD_DEFAULTS,
   useCardSetup,
   isImageMode,
   headerBoxSx,
   nameRowSx,
-} from "../core-utils";
+} from "/src/components/shared/items/core-utils";
 import {
   CardContentWrapper,
   HeaderSpacer,
   RowsWithOptionalImage,
-} from "../core";
+} from "/src/components/shared/items/core";
 
 const ROW_MIN_HEIGHT = "38px";
 const ROW_MIN_HEIGHT_NO_IMAGE = "40px";

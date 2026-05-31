@@ -1,9 +1,9 @@
 import React from "react";
 import { Typography } from "@mui/material";
-import { OpenBracket, CloseBracket } from "../../../Bracket";
-import types from "../../../../libs/types";
-import attributes from "../../../../libs/attributes";
-import { useTranslate } from "../../../../translation/translate";
+import { OpenBracket, CloseBracket } from "/src/components/Bracket";
+import types from "/src/libs/types";
+import attributes from "/src/libs/attributes";
+import { useTranslate } from "/src/translation/translate";
 
 function normalizeAttrKey(raw) {
   const key = String(raw || "").toLowerCase();

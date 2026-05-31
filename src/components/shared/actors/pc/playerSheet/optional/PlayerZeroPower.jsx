@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Typography, Divider, Box, Paper, IconButton } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
-import SectionCard from "../../../common/SectionCard";
-import CompactSectionHeader from "../../variants/compact/CompactSectionHeader";
-import { useTranslate } from "../../../../../../translation/translate";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
+import { useTranslate } from "/src/translation/translate";
 import { useTheme } from "@mui/material/styles";
-import NotesMarkdown from "../../../../../common/NotesMarkdown";
-import ClockControls from "../../variants/compact/ClockControls";
-import { highlightMatch, highlightMarkdownText } from "../../variants/compact/highlightUtils";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
+import ClockControls from "/src/components/shared/actors/pc/variants/compact/ClockControls";
+import { highlightMatch, highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
 
 export default function PlayerZeroPower({ player, setPlayer, compact = false, searchQuery = "" }) {
   const { t } = useTranslate();

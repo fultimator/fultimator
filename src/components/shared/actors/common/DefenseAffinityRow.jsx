@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { TypeAffinity } from "./TypeAffinity";
-import { AFFINITY_TYPES } from "../core-utils";
+import { AFFINITY_TYPES } from "/src/components/shared/actors/core-utils";
 
 export default function DefenseAffinityRow({
   t,

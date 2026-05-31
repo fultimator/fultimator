@@ -6,9 +6,9 @@ import {
   headerGridSx,
   CARD_DEFAULTS,
   isImageMode,
-} from "../core-utils";
-import { StyledMarkdown } from "../markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "../core";
+} from "/src/components/shared/items/core-utils";
+import { StyledMarkdown } from "/src/components/shared/items/markdown";
+import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
 
 function dataRowSx(customTheme, background, extraSx = {}) {
   return {

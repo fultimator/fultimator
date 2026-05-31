@@ -1,4 +1,4 @@
-import PlayerVehicle from "../../playerSheet/optional/PlayerVehicle";
+import PlayerVehicle from "/src/components/shared/actors/pc/playerSheet/optional/PlayerVehicle";
 
 export default function PcVehicle({ pc, isInteractive = false, onUpdate }) {
   return (

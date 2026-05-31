@@ -9,18 +9,18 @@ import {
   Paper,
 } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp, StickyNote2Outlined } from "@mui/icons-material";
-import SectionCard from "../../../common/SectionCard";
-import CompactSectionHeader from "../../variants/compact/CompactSectionHeader";
-import { useTranslate } from "../../../../../../translation/translate";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
+import { useTranslate } from "/src/translation/translate";
 import { useTheme } from "@mui/material/styles";
 import Clock from "./Clock";
-import ClockControls from "../../variants/compact/ClockControls";
+import ClockControls from "/src/components/shared/actors/pc/variants/compact/ClockControls";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { useClock } from "../../../../../../hooks/useClock";
-import NotesMarkdown from "../../../../../common/NotesMarkdown";
-import { highlightMatch, highlightMarkdownText } from "../../variants/compact/highlightUtils";
+import { useClock } from "/src/hooks/useClock";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
+import { highlightMatch, highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
 
 function OtherItemCompact({ other, index, setPlayer, searchQuery, normalizedQuery, primary, t }) {
   const muiTheme = useTheme();

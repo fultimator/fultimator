@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Grid, Typography, Box, Dialog } from "@mui/material";
-import { useTranslate } from "../../../../translation/translate";
-import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import Diamond from "../../../Diamond";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import Diamond from "/src/components/Diamond";
 import { StyledMarkdown } from "./shared";
 
 function Rank({ npc }) {

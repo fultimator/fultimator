@@ -1,4 +1,4 @@
-import PlayerQuirk from "../../playerSheet/optional/PlayerQuirk";
+import PlayerQuirk from "/src/components/shared/actors/pc/playerSheet/optional/PlayerQuirk";
 
 export default function PcQuirk({ pc, isInteractive = false, onUpdate }) {
   return (

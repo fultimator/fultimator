@@ -1,16 +1,16 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
-import { useTranslate } from "../../../../translation/translate";
-import { useCustomTheme } from "../../../../hooks/useCustomTheme";
-import Diamond from "../../../Diamond";
-import DefenseAffinityRow from "../common/DefenseAffinityRow";
+import { useTranslate } from "/src/translation/translate";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import Diamond from "/src/components/Diamond";
+import DefenseAffinityRow from "/src/components/shared/actors/common/DefenseAffinityRow";
 import {
   calcHP,
   calcMP,
   calcInit,
   calcDef,
   calcMDef,
-} from "../../../../libs/npcs";
+} from "/src/libs/npcs";
 
 export function NpcStudyStats({ npc }) {
   const { t } = useTranslate();

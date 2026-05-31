@@ -1,4 +1,4 @@
-import PlayerOthers from "../../playerSheet/optional/PlayerOthers";
+import PlayerOthers from "/src/components/shared/actors/pc/playerSheet/optional/PlayerOthers";
 
 export default function PcOthers({ pc, isInteractive = false, onUpdate }) {
   return (

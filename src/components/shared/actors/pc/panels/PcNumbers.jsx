@@ -14,7 +14,7 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 
 const zenitIcon = "/assets/icons/resources/zenit.png";
 

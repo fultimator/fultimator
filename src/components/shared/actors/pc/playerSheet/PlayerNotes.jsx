@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Paper, IconButton, Tooltip, Box, Typography } from "@mui/material";
-import SectionCard from "../../common/SectionCard";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { Add } from "@mui/icons-material";
-import { useTranslate } from "../../../../../translation/translate";
-import CompactSectionHeader from "../variants/compact/CompactSectionHeader";
-import NoteCard from "../../common/NoteCard";
+import { useTranslate } from "/src/translation/translate";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
+import NoteCard from "/src/components/shared/actors/common/NoteCard";
 import { PlayerNoteModal } from "/src/components/shared/actors/pc/editors";
-import { usePlayerSheetCompactStore } from "../../../../../store/playerSheetCompactStore";
+import { usePlayerSheetCompactStore } from "/src/store/playerSheetCompactStore";
 
 export default function PlayerNotes({
   player,

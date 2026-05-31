@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { alpha, useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import {
   DexAttributeIcon,
   InsAttributeIcon,
@@ -24,11 +24,11 @@ import {
   CheckGroupIcon,
   CheckOpenIcon,
   CheckOpposedIcon,
-} from "../../../icons";
-import StatTooltip from "../../../common/StatTooltip";
-import { calculateAttribute } from "../../../../libs/playerCalculations";
-import { deriveCombatStats } from "../core-utils";
-import { CombatStatCard } from "../pc/shared";
+} from "/src/components/icons";
+import StatTooltip from "/src/components/common/StatTooltip";
+import { calculateAttribute } from "/src/libs/playerCalculations";
+import { deriveCombatStats } from "/src/components/shared/actors/core-utils";
+import { CombatStatCard } from "/src/components/shared/actors/pc/shared";
 
 // -- Modifier +/- controls for DEF / M.DEF / INIT --
 

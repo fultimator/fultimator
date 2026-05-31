@@ -11,18 +11,18 @@ import {
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import {
   DexAttributeIcon,
   InsAttributeIcon,
   MigAttributeIcon,
   WlpAttributeIcon,
-} from "../../../../icons";
-import StatTooltip from "../../../../common/StatTooltip";
-import { calculateAttribute } from "../../../../../libs/playerCalculations";
-import { deriveCombatStats } from "../../core-utils";
-import { CombatStatCard } from "../shared";
-import PcResources from "../../common/PcResources";
+} from "/src/components/icons";
+import StatTooltip from "/src/components/common/StatTooltip";
+import { calculateAttribute } from "/src/libs/playerCalculations";
+import { deriveCombatStats } from "/src/components/shared/actors/core-utils";
+import { CombatStatCard } from "/src/components/shared/actors/pc/shared";
+import PcResources from "/src/components/shared/actors/common/PcResources";
 
 function CombatStatDisplay({ icon, label, value, tooltip }) {
   const card = (

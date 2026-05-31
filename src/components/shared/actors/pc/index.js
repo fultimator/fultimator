@@ -10,7 +10,7 @@ export { default as PcHeader } from "./panels/PcHeader";
 export { default as PcStats } from "./panels/PcStats";
 export { default as PcAffinities } from "./panels/PcAffinities";
 export { default as PcNumbers } from "./panels/PcNumbers";
-export { default as PcClasses } from "../common/PcClasses";
+export { default as PcClasses } from "/src/components/shared/actors/common/PcClasses";
 export { default as PcSpells } from "./panels/PcSpells";
 
 // Panels - optional rules

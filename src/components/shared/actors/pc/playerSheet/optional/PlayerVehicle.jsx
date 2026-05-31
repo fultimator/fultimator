@@ -7,21 +7,21 @@ import {
   Divider,
   Box,
 } from "@mui/material";
-import SectionCard from "../../../common/SectionCard";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { useTheme } from "@mui/material/styles";
-import { useTranslate } from "../../../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import { Casino, Message } from "@mui/icons-material";
-import { useCustomTheme } from "../../../../../../hooks/useCustomTheme";
-import { availableFrames } from "../../../../../../libs/pilotVehicleData";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { availableFrames } from "/src/libs/pilotVehicleData";
 import { SpellPilotVehiclesModal } from "/src/components/shared/actors/pc/editors";
-import { calculateAttribute } from "../../../../../../libs/playerCalculations";
+import { calculateAttribute } from "/src/libs/playerCalculations";
 import {
   prepareAccuracyCheck,
   rollAccuracyCheck,
   processAccuracyCheck,
   buildAccuracyCheckMessage,
-} from "../../../../../app-drawer/panels/chat/domain/accuracy-checks";
-import { sendRollMessage, sendDisplayMessage } from "../../../../../../hooks/useRollToChat";
+} from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 function ModuleRow({ name, onChat, onRoll, t }) {
   const theme = useTheme();

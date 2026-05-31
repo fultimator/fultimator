@@ -1,5 +1,5 @@
 import React from "react";
-import MnemoReceptaclePanel from "../../equipment/technospheres/MnemoReceptaclePanel";
+import MnemoReceptaclePanel from "/src/components/shared/actors/pc/equipment/technospheres/MnemoReceptaclePanel";
 
 export default function PcMnemoReceptacle({ pc, isInteractive, onUpdate }) {
   return (

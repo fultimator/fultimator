@@ -1,9 +1,9 @@
 import { Box, Card, IconButton, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import EditIcon from "@mui/icons-material/Edit";
-import { useTranslate } from "../../../../translation/translate";
-import StatTooltip from "../../../common/StatTooltip";
-import { highlightMatch } from "../core-utils";
+import { useTranslate } from "/src/translation/translate";
+import StatTooltip from "/src/components/common/StatTooltip";
+import { highlightMatch } from "/src/components/shared/actors/core-utils";
 
 const POSITIVE_SENTIMENTS = ["admiration", "loyality", "affection"];
 const NEGATIVE_SENTIMENTS = ["inferiority", "mistrust", "hatred"];

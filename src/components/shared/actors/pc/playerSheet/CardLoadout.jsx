@@ -10,38 +10,38 @@ import CasinoIcon from "@mui/icons-material/Casino";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import LockIcon from "@mui/icons-material/Lock";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
-import { useTranslate } from "../../../../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import { useTheme } from "@mui/material/styles";
-import SectionCard from "../../common/SectionCard";
-import CompactSectionHeader from "../variants/compact/CompactSectionHeader";
-import ItemRowCard from "../../common/ItemRowCard";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
-} from "../../../../../libs/player/slots/equipmentSlots";
+} from "/src/libs/player/slots/equipmentSlots";
 import {
   getSlotLocks,
   getEquippedModulesForSlot,
   getEquippedModuleForSlot,
   getEquippedSupportModules,
-} from "../../../../../libs/player/slots/loadoutSelectors";
-import { useLoadoutStore } from "../../../../../store/playerLoadoutStore";
+} from "/src/libs/player/slots/loadoutSelectors";
+import { useLoadoutStore } from "/src/store/playerLoadoutStore";
 import { SlotPickerDialog } from "/src/components/shared/actors/pc/editors";
-import CompendiumViewerModal from "../../../../compendium/CompendiumViewerModal";
+import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import { PlayerWeaponModal } from "/src/components/shared/actors/pc/editors";
 import { PlayerCustomWeaponModal } from "/src/components/shared/actors/pc/editors";
 import { PlayerShieldModal } from "/src/components/shared/actors/pc/editors";
 import { PlayerArmorModal } from "/src/components/shared/actors/pc/editors";
 import { PlayerAccessoryModal } from "/src/components/shared/actors/pc/editors";
-import { calculateAttribute } from "../../../../../libs/playerCalculations";
-import { availableModules } from "../../../../../libs/pilotVehicleData";
-import { useChatMessagesStore } from "../../../../../store/chatMessagesStore";
+import { calculateAttribute } from "/src/libs/playerCalculations";
+import { availableModules } from "/src/libs/pilotVehicleData";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
 import {
   buildAccuracyCheckMessage,
   prepareAccuracyCheck,
   processAccuracyCheck,
   rollAccuracyCheck,
-} from "../../../../app-drawer/panels/chat/domain/accuracy-checks";
+} from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
 
 const SLOT_LABEL_KEY = {
   mainHand: "MAIN",
