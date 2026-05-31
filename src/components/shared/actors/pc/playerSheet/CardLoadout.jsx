@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Paper,
   Typography,
-  ButtonBase,
   Tooltip,
   IconButton,
+  Paper,
 } from "@mui/material";
 import CasinoIcon from "@mui/icons-material/Casino";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
@@ -14,6 +13,8 @@ import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturi
 import { useTranslate } from "../../../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import SectionCard from "../../common/SectionCard";
+import CompactSectionHeader from "../variants/compact/CompactSectionHeader";
+import ItemRowCard from "../../common/ItemRowCard";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
@@ -90,6 +91,7 @@ export default function CardLoadout({
   showHeader = true,
   showSideDivider = true,
   showSupportColumn = false,
+  compact = false,
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -335,8 +337,8 @@ export default function CardLoadout({
           display: "flex",
           alignItems: "center",
           gap: 0.45,
-          px: 0.9,
-          py: 0.55,
+          px: "6px",
+          py: "4px",
           minWidth: 0,
           width: "100%",
           height: "100%",
@@ -346,18 +348,18 @@ export default function CardLoadout({
         <Typography
           sx={{
             fontFamily: "Antonio",
-            fontSize: { xs: "0.66rem", sm: "0.74rem", lg: "0.78rem" },
-            fontWeight: 800,
+            fontSize: compact ? "0.68rem" : "0.72rem",
+            fontWeight: 700,
             textTransform: "uppercase",
-            letterSpacing: "0.05em",
+            letterSpacing: "0.08em",
             color: theme.palette.text.secondary,
             whiteSpace: "nowrap",
             flexShrink: 0,
-            width: { xs: "34px", sm: "42px", lg: "54px" },
           }}
         >
           {t(SLOT_LABEL_KEY[key])}
         </Typography>
+        <Box sx={{ width: "1px", alignSelf: "stretch", my: "6px", bgcolor: theme.palette.divider, flexShrink: 0 }} />
 
         {/* Lock / vehicle icon */}
         {locked && (
@@ -399,8 +401,9 @@ export default function CardLoadout({
             noWrap
             sx={{
               fontFamily: "Antonio",
-              fontSize: { xs: "0.85rem", sm: "0.92rem" },
-              fontWeight: isEmpty || locked ? 500 : 700,
+              fontSize: compact ? "0.9rem" : "1rem",
+              fontWeight: isEmpty || locked ? 500 : 800,
+              textTransform: "uppercase",
               color: locked
                 ? theme.palette.text.disabled
                 : isEmpty
@@ -422,21 +425,7 @@ export default function CardLoadout({
       </Box>
     );
 
-    const rowContent = clickable ? (
-      <ButtonBase
-        onClick={() => handleSlotClick(key)}
-        sx={{
-          display: "flex",
-          textAlign: "left",
-          minWidth: 0,
-          height: "100%",
-          flex: 1,
-          "&:hover": { bgcolor: "action.hover" },
-        }}
-      >
-        {inner}
-      </ButtonBase>
-    ) : (
+    const rowContent = (
       <Box
         key={key}
         sx={{
@@ -450,65 +439,46 @@ export default function CardLoadout({
       </Box>
     );
 
-    return (
-      <Paper
-        key={key}
-        variant="outlined"
+    const slotActions = isRollable ? (
+      <Tooltip title={t("Roll")}>
+        <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleRollSlot(key); }}>
+          <CasinoIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    ) : canSendToChat ? (
+      <Tooltip title={t("Send to chat")}>
+        <IconButton size="small" onClick={(e) => { e.stopPropagation(); sendSlotToChat(key, resolved); }}>
+          <ChatOutlinedIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    ) : locked ? (
+      <IconButton size="small" disabled>
+        <LockIcon fontSize="small" sx={{ color: "rgba(255,255,255,0.75)" }} />
+      </IconButton>
+    ) : null;
+
+    const slotActionsWithSpacer = slotActions ?? (
+      <Box
         sx={{
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "stretch",
-          minHeight: 44,
-          borderRadius: "4px",
-          bgcolor:
-            theme.palette.mode === "dark"
-              ? "rgba(255,255,255,0.03)"
-              : "background.paper",
+          width: compact ? 28 : 32,
+          height: compact ? 28 : 32,
+          flexShrink: 0,
         }}
-      >
-        {rowContent}
-        <Box
-          sx={{
-            bgcolor: primary,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            alignSelf: "stretch",
-            width: 38,
-            flexShrink: 0,
-          }}
-        >
-          {isRollable ? (
-            <Tooltip title={t("Roll")}>
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRollSlot(key);
-                }}
-                sx={{ p: 0.5, color: "#fff" }}
-              >
-                <CasinoIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          ) : canSendToChat ? (
-            <Tooltip title={t("Send to chat")}>
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  sendSlotToChat(key, resolved);
-                }}
-                sx={{ p: 0.5, color: "#fff" }}
-              >
-                <ChatOutlinedIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          ) : locked ? (
-            <LockIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.75)" }} />
-          ) : null}
-        </Box>
-      </Paper>
+      />
+    );
+
+    return (
+      <ItemRowCard
+        key={key}
+        label={rowContent}
+        onClick={clickable ? () => handleSlotClick(key) : undefined}
+        actions={slotActionsWithSpacer}
+        variant="outlined"
+        compact={compact}
+        paperSx={{
+          bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "background.paper",
+        }}
+      />
     );
   };
 
@@ -712,6 +682,17 @@ export default function CardLoadout({
   );
 
   if (showHeader) {
+    if (compact) {
+      return (
+        <>
+          <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
+            <CompactSectionHeader title={t("Loadout")} />
+            <Box sx={{ p: "4px" }}>{slotContent}</Box>
+          </Paper>
+          {dialogs}
+        </>
+      );
+    }
     return (
       <>
         <SectionCard title={t("Loadout")}>

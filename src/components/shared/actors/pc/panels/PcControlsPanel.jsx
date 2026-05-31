@@ -237,6 +237,7 @@ function ResourceCell({
   onApply,
   steps = [],
   tooltip,
+  isInteractive = false,
 }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}>
@@ -253,7 +254,7 @@ function ResourceCell({
           onSetCrisis={onSetCrisis}
         />
       </StatTooltip>
-      <DeltaControls onApply={onApply} steps={steps} />
+      {isInteractive && <DeltaControls onApply={onApply} steps={steps} />}
     </Box>
   );
 }
@@ -351,7 +352,7 @@ function FpCell({ value, onApply, tooltip, isInteractive = false }) {
           </Box>
         </BarShell>
       </StatTooltip>
-      <DeltaControls onApply={onApply} steps={[1, 2, 3]} />
+      {isInteractive && <DeltaControls onApply={onApply} steps={[1, 2, 3]} />}
     </Box>
   );
 }
@@ -426,12 +427,12 @@ function IpCell({ value, max, onApply, tooltip, isInteractive = false }) {
           </Box>
         </BarShell>
       </StatTooltip>
-      <DeltaControls onApply={onApply} steps={[1, 2, 3]} />
+      {isInteractive && <DeltaControls onApply={onApply} steps={[1, 2, 3]} />}
     </Box>
   );
 }
 
-function ZenitRow({ value, onApply, tooltip }) {
+function ZenitRow({ value, onApply, tooltip, isInteractive = false }) {
   const { t } = useTranslate();
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
 
@@ -453,7 +454,7 @@ function ZenitRow({ value, onApply, tooltip }) {
           </Box>
         </BarShell>
       </StatTooltip>
-      <DeltaControls onApply={onApply} defaultValue={10} steps={[10, 100, 1000]} />
+      {isInteractive && <DeltaControls onApply={onApply} defaultValue={10} steps={[10, 100, 1000]} />}
     </Box>
   );
 }
@@ -577,12 +578,14 @@ export default function PcControlsPanel({ pc, isInteractive = false, onUpdate })
             onApply={applyStat("hp")}
             steps={[1, 5, 10, 20]}
             tooltip={hpTooltip}
+            isInteractive={isInteractive}
           />
           <ResourceCell
             label={t("MP")} Icon={MpResourceIcon}
             value={pc.stats.mp.current} max={pc.stats.mp.max}
             color1={mpColor1} color2={theme.palette.info.main}
             onApply={applyStat("mp")} steps={[1, 5, 10, 20]} tooltip={mpTooltip}
+            isInteractive={isInteractive}
           />
         </Box>
 
@@ -602,7 +605,7 @@ export default function PcControlsPanel({ pc, isInteractive = false, onUpdate })
           />
         </Box>
 
-        <ZenitRow value={pc.info.zenit ?? 0} onApply={applyZenit} tooltip={zenitTooltip} />
+        <ZenitRow value={pc.info.zenit ?? 0} onApply={applyZenit} tooltip={zenitTooltip} isInteractive={isInteractive} />
       </Box>
     </SectionCard>
   );

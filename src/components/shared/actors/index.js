@@ -10,10 +10,12 @@ export { NpcEquipment } from "./npc/NpcEquipment";
 export { NpcHeader } from "./npc/NpcHeader";
 export { default as NpcActorCard } from "./npc/NpcActorCard";
 
-export { PcActorCardCompact, PcCompactHeader } from "./pc-compact/index.js";
+export { PcActorCardCompact, PcCompactHeader } from "./pc/index.js";
 
 export {
   PcActorCard,
+  PlayerSheetFull,
+  PlayerSheetCompact,
   PcHeader,
   PcStats,
   PcAffinities,

@@ -8,6 +8,7 @@ export default function ClassesTab({ player, setPlayer, isOwner, updateMaxStats 
       isInteractive={isOwner}
       onUpdate={setPlayer}
       updateMaxStats={updateMaxStats}
+      defaultExpanded={!isOwner}
     />
   );
 }

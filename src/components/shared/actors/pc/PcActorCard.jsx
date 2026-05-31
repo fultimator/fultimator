@@ -186,7 +186,7 @@ export default function PcActorCard({
           <PlayerBonds {...ownerPsProps} />
           <CardLoadout {...ownerPsProps} isOwner={ownerInteractive} showHeader showSideDivider showSupportColumn={false} />
           <PlayerEquipment {...ownerPsProps} />
-          <PlayerNotes {...ownerPsProps} />
+          <PlayerNotes {...ownerPsProps} defaultExpanded={!ownerInteractive} speaker={pc?.name ?? ""} />
           <PcRituals
             {...sharedProps}
             clockSections={clockSections}
@@ -211,7 +211,7 @@ export default function PcActorCard({
             overflow: "hidden",
           }}
         >
-          <PcClasses {...ownerSharedProps} variant="full" updateMaxStats={updateMaxStats} />
+          <PcClasses {...ownerSharedProps} variant="full" updateMaxStats={updateMaxStats} defaultExpanded={!ownerInteractive} />
           {optionalRules.technospheres &&
             ["integrated", "mnemospheres"].includes(
               optionalRules.technospheresVariant ?? "standard",

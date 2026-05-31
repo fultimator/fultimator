@@ -4,8 +4,13 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
   IconButton,
+  Paper,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -13,7 +18,6 @@ import {
   Add,
   KeyboardArrowDown,
   KeyboardArrowUp,
-  MoreVert,
   Remove,
   Star,
 } from "@mui/icons-material";
@@ -23,15 +27,17 @@ import StatTooltip from "../../../common/StatTooltip";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import SectionCard from "./SectionCard";
-import { highlightMatch, highlightMarkdownText } from "../pc-compact/highlightUtils";
+import CompactSectionHeader from "../pc/variants/compact/CompactSectionHeader";
+import { highlightMatch, highlightMarkdownText } from "../pc/variants/compact/highlightUtils";
 import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
 import {
   getMnemosphereSkillDescription,
   getMnemosphereHeroicDescription,
 } from "../../../../libs/player/mnemosphereClassUtils";
 import { getMnemosphereCost } from "../../../../libs/mnemospheres";
+import ItemRowCard from "./ItemRowCard";
+import { SharedSkillCard, SharedHeroicCard } from "../../items/class/SharedClassCards";
 
-// DescriptionArea (compact card descriptions)
 function DescriptionArea({ children }) {
   return (
     <Box sx={{ px: 1.5, py: 0.75, borderTop: "1px solid", borderColor: "divider", lineHeight: 1.5, color: "text.secondary" }}>
@@ -40,7 +46,6 @@ function DescriptionArea({ children }) {
   );
 }
 
-// SectionSubHeader (colored band label, e.g. "Skills")
 function SectionSubHeader({ children, theme }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", px: 2, py: 0.5, background: theme.ternary, minHeight: 32 }}>
@@ -49,7 +54,6 @@ function SectionSubHeader({ children, theme }) {
   );
 }
 
-// Non-compact skill row - matches SkillCard in PcClasses
 function MnemoSkillRow({ skill, isInteractive, budgetExhausted, onIncrease, onDecrease, translatedDescription, searchQuery, theme, t, pc }) {
   const [descOpen, setDescOpen] = useState(true);
   const hasDesc = !!translatedDescription;
@@ -66,6 +70,7 @@ function MnemoSkillRow({ skill, isInteractive, budgetExhausted, onIncrease, onDe
       sx={{ borderTop: `1px solid ${theme.secondary}`, overflow: "hidden", background: "transparent", "&:before": { display: "none" } }}
     >
       <AccordionSummary
+        component="div"
         sx={{
           minHeight: 0,
           p: 0,
@@ -75,46 +80,44 @@ function MnemoSkillRow({ skill, isInteractive, budgetExhausted, onIncrease, onDe
           cursor: hasDesc ? "pointer" : "default",
         }}
       >
-      <Box sx={{ display: "flex", alignItems: "center", px: 2, py: 0.5, gap: 1, minHeight: 40, width: "100%" }}>
-        <Typography sx={{ fontFamily: "Antonio", fontWeight: "bold", fontSize: { xs: "1rem", sm: "1.1rem" }, textTransform: "uppercase", color: "#fff", flex: 1, lineHeight: 1.3 }}>
-          {highlightMatch(t(skill.skillName ?? skill.name ?? ""), searchQuery)}
-        </Typography>
-        {isInteractive ? (
-          <Box sx={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
-            <Tooltip title={t("Decrease Level")}><span>
-              <IconButton component="span" size="small" sx={{ p: "3px", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px" }}
-                onClick={onDecrease} disabled={skill.currentLvl <= 0}>
-                <Remove sx={{ fontSize: "1rem" }} />
-              </IconButton>
-            </span></Tooltip>
-            <Typography sx={{ fontFamily: "Antonio", fontSize: "0.85rem", fontWeight: "bold", color: "#fff", lineHeight: 1, minWidth: 40, textAlign: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", px: 2, py: 0.5, gap: 1, minHeight: 40, width: "100%" }}>
+          <Typography sx={{ fontFamily: "Antonio", fontWeight: "bold", fontSize: { xs: "1rem", sm: "1.1rem" }, textTransform: "uppercase", color: "#fff", flex: 1, lineHeight: 1.3 }}>
+            {highlightMatch(t(skill.skillName ?? skill.name ?? ""), searchQuery)}
+          </Typography>
+          {isInteractive ? (
+            <Box sx={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+              <Tooltip title={t("Decrease Level")}><span>
+                <IconButton size="small" sx={{ p: "3px", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px" }} onClick={onDecrease} disabled={skill.currentLvl <= 0}>
+                  <Remove sx={{ fontSize: "1rem" }} />
+                </IconButton>
+              </span></Tooltip>
+              <Typography sx={{ fontFamily: "Antonio", fontSize: "0.85rem", fontWeight: "bold", color: "#fff", lineHeight: 1, minWidth: 40, textAlign: "center" }}>
+                SL{skill.currentLvl}/{skill.maxLvl}
+              </Typography>
+              <Tooltip title={t("Increase Level")}><span>
+                <IconButton size="small" sx={{ p: "3px", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px" }} onClick={onIncrease} disabled={skill.currentLvl >= skill.maxLvl || budgetExhausted}>
+                  <Add sx={{ fontSize: "1rem" }} />
+                </IconButton>
+              </span></Tooltip>
+            </Box>
+          ) : (
+            <Typography sx={{ fontFamily: "Antonio", fontSize: "0.85rem", fontWeight: "bold", color: "rgba(255,255,255,0.9)", lineHeight: 1 }}>
               SL{skill.currentLvl}/{skill.maxLvl}
             </Typography>
-            <Tooltip title={t("Increase Level")}><span>
-              <IconButton component="span" size="small" sx={{ p: "3px", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px" }}
-                onClick={onIncrease} disabled={skill.currentLvl >= skill.maxLvl || budgetExhausted}>
-                <Add sx={{ fontSize: "1rem" }} />
-              </IconButton>
-            </span></Tooltip>
-          </Box>
-        ) : (
-          <Typography sx={{ fontFamily: "Antonio", fontSize: "0.85rem", fontWeight: "bold", color: "rgba(255,255,255,0.9)", lineHeight: 1 }}>
-            SL{skill.currentLvl}/{skill.maxLvl}
-          </Typography>
-        )}
-        <Tooltip title={t("Send to Chat")}>
-          <IconButton component="span" size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px", flexShrink: 0 }}
-            onClick={(e) => { e.stopPropagation(); sendDisplayMessage("skill", t(skill.skillName ?? skill.name ?? ""), { speaker: pc?.info?.name || pc?.name || "", description: translatedDescription || undefined }); }}>
-            <MessageOutlined sx={{ fontSize: "1.2rem" }} />
-          </IconButton>
-        </Tooltip>
-        {translatedDescription && (
-          <IconButton component="span" size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.7)", flexShrink: 0 }}
-            onClick={(e) => { e.stopPropagation(); setDescOpen((v) => !v); }}>
-            {descOpen ? <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} /> : <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />}
-          </IconButton>
-        )}
-      </Box>
+          )}
+          <Tooltip title={t("Send to Chat")}>
+            <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px", flexShrink: 0 }}
+              onClick={(e) => { e.stopPropagation(); sendDisplayMessage("skill", t(skill.skillName ?? skill.name ?? ""), { speaker: pc?.info?.name || pc?.name || "", description: translatedDescription || undefined }); }}>
+              <MessageOutlined sx={{ fontSize: "1.2rem" }} />
+            </IconButton>
+          </Tooltip>
+          {translatedDescription && (
+            <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.7)", flexShrink: 0 }}
+              onClick={(e) => { e.stopPropagation(); setDescOpen((v) => !v); }}>
+              {descOpen ? <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} /> : <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />}
+            </IconButton>
+          )}
+        </Box>
       </AccordionSummary>
       {hasDesc && (
         <AccordionDetails sx={{ p: 0 }}>
@@ -127,7 +130,6 @@ function MnemoSkillRow({ skill, isInteractive, budgetExhausted, onIncrease, onDe
   );
 }
 
-// Non-compact heroic row - matches HeroicCard in PcClasses
 function MnemoHeroicRow({ heroicSkill, translatedDescription, searchQuery, theme, t, pc }) {
   const [descOpen, setDescOpen] = useState(true);
   const hasDesc = !!translatedDescription;
@@ -144,6 +146,7 @@ function MnemoHeroicRow({ heroicSkill, translatedDescription, searchQuery, theme
       sx={{ borderTop: `1px solid ${theme.secondary}`, overflow: "hidden", background: "transparent", "&:before": { display: "none" } }}
     >
       <AccordionSummary
+        component="div"
         sx={{
           minHeight: 0,
           p: 0,
@@ -153,26 +156,26 @@ function MnemoHeroicRow({ heroicSkill, translatedDescription, searchQuery, theme
           cursor: hasDesc ? "pointer" : "default",
         }}
       >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2, py: 0.5, minHeight: 40, width: "100%" }}>
-        <Star sx={{ color: "gold", fontSize: "1.2rem", flexShrink: 0 }} />
-        <Typography sx={{ fontFamily: "Antonio", fontWeight: "bold", fontSize: { xs: "1rem", sm: "1.1rem" }, textTransform: "uppercase", color: "#fff", flex: 1, lineHeight: 1.3 }}>
-          {highlightMatch(t(heroicSkill.name ?? ""), searchQuery)}
-        </Typography>
-        {hasDesc && (
-          <Tooltip title={t("Send to Chat")}>
-            <IconButton component="span" size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px", flexShrink: 0 }}
-              onClick={(e) => { e.stopPropagation(); sendDisplayMessage("heroic skill", t(heroicSkill.name ?? ""), { speaker: pc?.info?.name || pc?.name || "", description: translatedDescription || undefined }); }}>
-              <MessageOutlined sx={{ fontSize: "1.2rem" }} />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 2, py: 0.5, minHeight: 40, width: "100%" }}>
+          <Star sx={{ color: "gold", fontSize: "1.2rem", flexShrink: 0 }} />
+          <Typography sx={{ fontFamily: "Antonio", fontWeight: "bold", fontSize: { xs: "1rem", sm: "1.1rem" }, textTransform: "uppercase", color: "#fff", flex: 1, lineHeight: 1.3 }}>
+            {highlightMatch(t(heroicSkill.name ?? ""), searchQuery)}
+          </Typography>
+          {hasDesc && (
+            <Tooltip title={t("Send to Chat")}>
+              <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px", flexShrink: 0 }}
+                onClick={(e) => { e.stopPropagation(); sendDisplayMessage("heroic skill", t(heroicSkill.name ?? ""), { speaker: pc?.info?.name || pc?.name || "", description: translatedDescription || undefined }); }}>
+                <MessageOutlined sx={{ fontSize: "1.2rem" }} />
+              </IconButton>
+            </Tooltip>
+          )}
+          {hasDesc && (
+            <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.7)", flexShrink: 0 }}
+              onClick={(e) => { e.stopPropagation(); setDescOpen((v) => !v); }}>
+              {descOpen ? <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} /> : <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />}
             </IconButton>
-          </Tooltip>
-        )}
-        {hasDesc && (
-          <IconButton component="span" size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.7)", flexShrink: 0 }}
-            onClick={(e) => { e.stopPropagation(); setDescOpen((v) => !v); }}>
-            {descOpen ? <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} /> : <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />}
-          </IconButton>
-        )}
-      </Box>
+          )}
+        </Box>
       </AccordionSummary>
       {hasDesc && (
         <AccordionDetails sx={{ p: 0 }}>
@@ -261,15 +264,10 @@ function MnemoCard({ mnemo, isInteractive, budgetExhausted, onIncreaseSkillLevel
               </Box>
               <Tooltip title={t("Invest Level")}><span>
                 <IconButton component="span" size="small" sx={{ p: "6px", color: "#fff", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px" }}
-                  onClick={() => onInvestLevel?.()} disabled={!onInvestLevel || sphereLvl >= 5}>
+                  onClick={() => onInvestLevel?.()} disabled={!onInvestLevel || sphereLvl >= 5 || (availableLevels != null && availableLevels <= 0)}>
                   <Add sx={{ fontSize: "1.15rem" }} />
                 </IconButton>
               </span></Tooltip>
-              {availableLevels != null && (
-                <Typography sx={{ fontFamily: "Antonio", fontSize: "0.8rem", whiteSpace: "nowrap", color: budgetExhausted ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.9)" }}>
-                  {availableLevels} {t("lvl avail.")}
-                </Typography>
-              )}
             </>
           ) : (
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 36, px: "8px", borderRadius: "4px", bgcolor: "rgba(255,255,255,0.18)" }}>
@@ -340,8 +338,9 @@ function MnemoCard({ mnemo, isInteractive, budgetExhausted, onIncreaseSkillLevel
 }
 
 // Single mnemosphere card (compact)
-function MnemoCardCompact({ mnemo, searchQuery, theme, t }) {
+function MnemoCardCompact({ mnemo, searchQuery, theme, t, pc }) {
   const [collapsed, setCollapsed] = useState(true);
+  const [preview, setPreview] = useState(null);
 
   const skills = (mnemo.skills ?? []).filter((s) => (s.currentLvl ?? 0) >= 1);
   const heroics = mnemo.heroic ?? [];
@@ -372,6 +371,7 @@ function MnemoCardCompact({ mnemo, searchQuery, theme, t }) {
       sx={{ mb: 0.5, border: "1px solid", borderColor: "divider", borderRadius: 1, overflow: "hidden", "&:before": { display: "none" } }}
     >
       <AccordionSummary
+        component="div"
         sx={{
           minHeight: 0,
           p: 0,
@@ -390,41 +390,78 @@ function MnemoCardCompact({ mnemo, searchQuery, theme, t }) {
         </IconButton>
       </Box>
       </AccordionSummary>
-      <AccordionDetails sx={{ p: 0 }}>
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: "4px", p: "4px" }}>
-          {filteredSkills.map((skill, skillIdx) => {
-            const desc = t(getMnemosphereSkillDescription(mnemo, skill) ?? "");
-            return (
-              <Box key={`skill-${skillIdx}`} sx={{ border: "1px solid", borderColor: theme.secondary, borderRadius: `${theme.panelRadius}px`, overflow: "hidden" }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, px: "6px", py: "6px" }}>
-                  <MoreVert sx={{ fontSize: "0.6rem", opacity: 0.5, flexShrink: 0 }} />
-                  <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem", lineHeight: 1.3, flex: 1 }} noWrap>
-                    {highlightMatch(t(skill.skillName ?? skill.name ?? ""), searchQuery)}
-                  </Typography>
-                  <Box sx={{ fontFamily: "Antonio", fontSize: "0.8rem", fontWeight: "bold", flexShrink: 0 }}>
+      <AccordionDetails sx={{ p: "4px", display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: "4px" }}>
+        {filteredSkills.map((skill, skillIdx) => {
+          const desc = t(getMnemosphereSkillDescription(mnemo, skill) ?? "");
+          return (
+            <ItemRowCard
+              key={`skill-${skillIdx}`}
+              compact
+              variant="outlined"
+              onCardClick={desc ? () => setPreview({ type: "skill", skill, desc }) : undefined}
+              paperSx={{ transition: "border-color 0.15s ease", "&:hover": { borderColor: theme.secondary } }}
+              label={
+                <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
+                  {highlightMatch(t(skill.skillName ?? skill.name ?? ""), searchQuery)}
+                </Typography>
+              }
+              actions={
+                <>
+                  <Box sx={{ fontFamily: "Antonio", fontSize: "0.8rem", fontWeight: "bold", color: "#fff", px: "4px", flexShrink: 0 }}>
                     {skill.currentLvl}/{skill.maxLvl}
                   </Box>
-                </Box>
-                {desc && <DescriptionArea><NotesMarkdown uniform fontSize="1rem">{highlightMarkdownText(desc, searchQuery)}</NotesMarkdown></DescriptionArea>}
-              </Box>
-            );
-          })}
-          {filteredHeroics.map((h, hIdx) => {
-            const desc = t(getMnemosphereHeroicDescription(mnemo, h) ?? "");
-            return (
-              <Box key={`heroic-${hIdx}`} sx={{ gridColumn: "1 / -1", border: "1px solid", borderColor: theme.secondary, borderRadius: `${theme.panelRadius}px`, overflow: "hidden" }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, px: "6px", py: "6px" }}>
-                  <Star sx={{ color: theme.secondary, fontSize: "1rem", flexShrink: 0 }} />
-                  <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem", lineHeight: 1.3, flex: 1, color: theme.secondary }} noWrap>
-                    {highlightMatch(t(h.name ?? ""), searchQuery)}
-                  </Typography>
-                </Box>
-                {desc && <DescriptionArea><NotesMarkdown uniform fontSize="1rem">{highlightMarkdownText(desc, searchQuery)}</NotesMarkdown></DescriptionArea>}
-              </Box>
-            );
-          })}
-        </Box>
+                  <Tooltip title={t("Send to Chat")}>
+                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); sendDisplayMessage("skill", t(skill.skillName ?? skill.name ?? ""), { speaker: pc?.info?.name || pc?.name || "", description: desc || undefined }); }}>
+                      <MessageOutlined />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              }
+            />
+          );
+        })}
+        {filteredHeroics.map((h, hIdx) => {
+          const desc = t(getMnemosphereHeroicDescription(mnemo, h) ?? "");
+          return (
+            <ItemRowCard
+              key={`heroic-${hIdx}`}
+              compact
+              variant="outlined"
+              onCardClick={desc ? () => setPreview({ type: "heroic", heroic: h, desc }) : undefined}
+              paperSx={{ gridColumn: "1 / -1", transition: "border-color 0.15s ease", "&:hover": { borderColor: theme.secondary } }}
+              label={
+                <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
+                  <Star sx={{ fontSize: "0.85rem", color: theme.secondary, verticalAlign: "middle", mr: "4px", mb: "2px" }} />
+                  {highlightMatch(t(h.name ?? ""), searchQuery)}
+                </Typography>
+              }
+              actions={
+                desc ? (
+                  <Tooltip title={t("Send to Chat")}>
+                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); sendDisplayMessage("heroic skill", t(h.name ?? ""), { speaker: pc?.info?.name || pc?.name || "", description: desc || undefined }); }}>
+                      <MessageOutlined />
+                    </IconButton>
+                  </Tooltip>
+                ) : null
+              }
+            />
+          );
+        })}
       </AccordionDetails>
+
+      <Dialog open={Boolean(preview)} onClose={() => setPreview(null)} fullWidth maxWidth="sm">
+        <DialogContent sx={{ p: 0 }}>
+          {preview?.type === "skill" && (
+            <SharedSkillCard item={{ skillName: preview.skill.skillName ?? preview.skill.name ?? "", description: preview.skill.description, currentLvl: preview.skill.currentLvl, className: mnemo.class ?? mnemo.name ?? "" }} />
+          )}
+          {preview?.type === "heroic" && (
+            <SharedHeroicCard item={preview.heroic} />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPreview(null)} variant="contained">{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
     </Accordion>
   );
 }
@@ -447,8 +484,8 @@ export default function PcMnemospheres({
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const [open, setOpen] = useState(true);
   const isCompact = variant === "compact";
+  const [open, setOpen] = useState(!isCompact);
 
   const bankSpheres = allMnemospheres ?? [];
   const breakdown = bankSpheres
@@ -486,46 +523,56 @@ export default function PcMnemospheres({
 
   if (!slottedMnemospheres?.length) return null;
 
-  return (
-    <SectionCard title={t("Mnemospheres")} actions={actions} sx={{ mb: 1 }}>
-      <Collapse in={open}>
-        <Box sx={{ p: isCompact ? "4px" : 1 }}>
-          {slottedMnemospheres.map((mnemo) => {
-            if (isCompact) {
-              return (
-                <MnemoCardCompact
-                  key={`mnemo-${mnemo.id}`}
-                  mnemo={mnemo}
-                  searchQuery={searchQuery}
-                  theme={theme}
-                  t={t}
-                />
-              );
-            }
-
-            const availableLevels = getMnemoAvailableLevels ? getMnemoAvailableLevels(mnemo) : null;
-            const budgetExhausted = availableLevels !== null && availableLevels <= 0;
-
+  const content = (
+    <Collapse in={open}>
+      <Box sx={{ p: isCompact ? "4px" : 1 }}>
+        {slottedMnemospheres.map((mnemo) => {
+          if (isCompact) {
             return (
-              <MnemoCard
+              <MnemoCardCompact
                 key={`mnemo-${mnemo.id}`}
                 mnemo={mnemo}
-                isInteractive={isInteractive}
-                budgetExhausted={budgetExhausted}
-                onIncreaseSkillLevel={(skillIdx) => onChangeMnemoSkillLevel?.(mnemo.id, skillIdx, 1)}
-                onDecreaseSkillLevel={(skillIdx) => onChangeMnemoSkillLevel?.(mnemo.id, skillIdx, -1)}
-                onInvestLevel={isInteractive ? () => onInvestLevel?.(mnemo.id) : null}
-                onRefundLevel={isInteractive ? () => onRefundLevel?.(mnemo.id) : null}
-                availableLevels={isInteractive ? availableLevels : null}
                 searchQuery={searchQuery}
                 theme={theme}
                 t={t}
                 pc={pc}
               />
             );
-          })}
-        </Box>
-      </Collapse>
+          }
+
+          const availableLevels = getMnemoAvailableLevels ? getMnemoAvailableLevels(mnemo) : null;
+          const budgetExhausted = availableLevels !== null && availableLevels <= 0;
+
+          return (
+            <MnemoCard
+              key={`mnemo-${mnemo.id}`}
+              mnemo={mnemo}
+              isInteractive={isInteractive}
+              budgetExhausted={budgetExhausted}
+              onIncreaseSkillLevel={(skillIdx) => onChangeMnemoSkillLevel?.(mnemo.id, skillIdx, 1)}
+              onDecreaseSkillLevel={(skillIdx) => onChangeMnemoSkillLevel?.(mnemo.id, skillIdx, -1)}
+              onInvestLevel={isInteractive ? () => onInvestLevel?.(mnemo.id) : null}
+              onRefundLevel={isInteractive ? () => onRefundLevel?.(mnemo.id) : null}
+              availableLevels={isInteractive ? availableLevels : null}
+              searchQuery={searchQuery}
+              theme={theme}
+              t={t}
+              pc={pc}
+            />
+          );
+        })}
+      </Box>
+    </Collapse>
+  );
+
+  return isCompact ? (
+    <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
+      <CompactSectionHeader title={t("Mnemospheres")}>{actions}</CompactSectionHeader>
+      {content}
+    </Paper>
+  ) : (
+    <SectionCard title={t("Mnemospheres")} actions={actions} sx={{ mb: 1 }}>
+      {content}
     </SectionCard>
   );
 }

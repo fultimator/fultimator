@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
 import {
+  Box,
   Grid,
-  Paper,
   Checkbox,
   FormControlLabel,
   Typography,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "/src/translation/translate";
-import CustomHeader from "/src/components/common/CustomHeader";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import ReactMarkdown from "react-markdown";
 
 export default function EditPlayerImmunities({
@@ -17,8 +16,6 @@ export default function EditPlayerImmunities({
   isEditMode,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
 
   // Ensure player.immunities is defined with default values if not present
   useEffect(() => {
@@ -61,22 +58,8 @@ export default function EditPlayerImmunities({
   };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: 2,
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
-      <Grid size={12}>
-        <CustomHeader
-          type="top"
-          headerText={t("Status Effect Immunities")}
-          showIconButton={false}
-        />
-      </Grid>
+    <SectionCard title={t("Status Effect Immunities")}>
+      <Box sx={{ p: 2 }}>
       <Grid container spacing={1}>
         {Object.keys(statusDescriptions).map((status) => (
           <Grid
@@ -112,6 +95,7 @@ export default function EditPlayerImmunities({
           </Grid>
         ))}
       </Grid>
-    </Paper>
+      </Box>
+    </SectionCard>
   );
 }

@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import html2canvas from "html2canvas";
 import Confetti from "react-confetti";
-import { PcActorCard, PcActorCardCompact } from "../../components/shared/actors";
+import { PlayerSheetFull, PlayerSheetCompact } from "../../components/shared/actors";
 import powered_by_fu from "/images/routes/powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
@@ -545,7 +545,7 @@ export default function CharacterSheet() {
       </Grid>
       {fullCharacterSheet ? (
         <Box id="character-sheet" sx={{ p: 1 }}>
-          <PcActorCard
+          <PlayerSheetFull
             pc={player}
             onUpdate={handleSetPlayer}
             isInteractive={isEditMode}
@@ -594,7 +594,7 @@ export default function CharacterSheet() {
           }}
         >
           <Grid container size={12}>
-            <PcActorCardCompact
+            <PlayerSheetCompact
               pc={player}
               onUpdate={handleSetPlayer}
               isInteractive={isEditMode}

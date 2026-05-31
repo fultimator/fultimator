@@ -3,7 +3,6 @@ import {
   Grid,
   Typography,
   Paper,
-  Divider,
   Checkbox,
   FormControlLabel,
   Button,
@@ -13,23 +12,19 @@ import {
   Radio,
   Input,
   InputLabel,
-  Table,
-  TableCell,
-  TableHead,
-  TableRow,
   IconButton,
   Tooltip,
+  Box,
+  Chip,
+  Stack,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { styled } from "@mui/system";
 import { useTranslate } from "../../../../../../translation/translate";
 import Clock from "./Clock";
-import { useCustomTheme } from "../../../../../../hooks/useCustomTheme";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-
-const StyledTableCellHeader = styled(TableCell)({ padding: 0, color: "#fff" });
+import SectionCard from "../../../common/SectionCard";
+import CompactSectionHeader from "../../variants/compact/CompactSectionHeader";
 
 export default function PlayerRituals({
   player,
@@ -42,10 +37,6 @@ export default function PlayerRituals({
   compact = false,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const custom = useCustomTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
 
   const [power, setPower] = useState("minor");
   const [area, setArea] = useState("individual");
@@ -57,595 +48,264 @@ export default function PlayerRituals({
   const ingredientMod = ingredient ? 0.5 : 1;
   const itemHeldMod = itemHeld ? dlReduction : 0;
 
-  function calcPM() {
-    return powerPMs[power] * areaPMs[area] * ingredientMod;
-  }
-
-  function calcLD() {
-    return powerLDs[power] - itemHeldMod;
-  }
-
-  function calcClock() {
-    let clockValue = powerClocks[power];
-    if (fastRitual && clockValue >= 6) {
-      clockValue -= 2;
-    }
-    return clockValue;
-  }
-
-  const hasRitualism = player.classes.some(
-    (playerClass) => playerClass.benefits.rituals.ritualism,
-  );
-
-  const hasSpiritism = player.classes.some((playerClass) =>
-    playerClass.skills.some(
-      (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Spiritism",
-    ),
-  );
-
-  const hasArcanism = player.classes.some((playerClass) =>
-    playerClass.skills.some(
-      (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Arcanism",
-    ),
-  );
-
-  const hasElementalism = player.classes.some((playerClass) =>
-    playerClass.skills.some(
-      (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Elementalism",
-    ),
-  );
-
-  const hasEntropism = player.classes.some((playerClass) =>
-    playerClass.skills.some(
-      (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Entropism",
-    ),
-  );
-
-  const hasChimerism = player.classes.some((playerClass) =>
-    playerClass.skills.some(
-      (skill) =>
-        skill.currentLvl > 0 && skill.specialSkill === "Ritual Chimerism",
-    ),
-  );
-
-  const resetClock = () => {
-    setClockState(new Array(clockSections).fill(false));
+  const calcPM = () => powerPMs[power] * areaPMs[area] * ingredientMod;
+  const calcLD = () => powerLDs[power] - itemHeldMod;
+  const calcClock = () => {
+    let v = powerClocks[power];
+    if (fastRitual && v >= 6) v -= 2;
+    return v;
   };
 
-  const setNewClock = () => {
-    setClockSections(calcClock());
-    resetClock();
-  };
+  const hasRitualism = (player?.classes ?? []).some((c) => c?.benefits?.rituals?.ritualism);
+  const hasSpiritism = (player?.classes ?? []).some((c) =>
+    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Spiritism"),
+  );
+  const hasArcanism = (player?.classes ?? []).some((c) =>
+    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Arcanism"),
+  );
+  const hasElementalism = (player?.classes ?? []).some((c) =>
+    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Elementalism"),
+  );
+  const hasEntropism = (player?.classes ?? []).some((c) =>
+    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Entropism"),
+  );
+  const hasChimerism = (player?.classes ?? []).some((c) =>
+    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Chimerism"),
+  );
 
+  const ritualTypes = [
+    { checked: hasArcanism, label: "Arcanism" },
+    { checked: hasChimerism, label: "Chimerism" },
+    { checked: hasElementalism, label: "Elementalism" },
+    { checked: hasEntropism, label: "Entropism" },
+    { checked: hasRitualism, label: "Ritualism" },
+    { checked: hasSpiritism, label: "Spiritism" },
+  ];
+
+  const hasAny = ritualTypes.some((r) => r.checked);
+
+  const resetClock = () => setClockState(new Array(clockSections).fill(false));
+  const setNewClock = () => { setClockSections(calcClock()); resetClock(); };
   const incrementClock = () => {
-    const currentFilled = clockState.filter(Boolean).length;
-    if (currentFilled < clockSections) {
-      const newState = new Array(clockSections).fill(false);
-      for (let i = 0; i <= currentFilled; i++) {
-        newState[i] = true;
-      }
-      setClockState(newState);
+    const filled = clockState.filter(Boolean).length;
+    if (filled < clockSections) {
+      const next = new Array(clockSections).fill(false);
+      for (let i = 0; i <= filled; i++) next[i] = true;
+      setClockState(next);
     }
   };
-
   const decrementClock = () => {
-    const currentFilled = clockState.filter(Boolean).length;
-    if (currentFilled > 0) {
-      const newState = [...clockState];
-      newState[currentFilled - 1] = false;
-      setClockState(newState);
+    const filled = clockState.filter(Boolean).length;
+    if (filled > 0) {
+      const next = [...clockState];
+      next[filled - 1] = false;
+      setClockState(next);
     }
   };
 
-  if (
-    !hasRitualism &&
-    !hasSpiritism &&
-    !hasArcanism &&
-    !hasElementalism &&
-    !hasEntropism &&
-    !hasChimerism
-  ) {
+  if (!hasAny) {
     if (compact) {
       return (
-        <Typography
-          sx={{
-            fontStyle: "italic",
-            color: "text.secondary",
-            fontSize: "0.9rem",
-            py: 1,
-          }}
-        >
-          No rituals
+        <Typography sx={{ fontStyle: "italic", color: "text.secondary", fontSize: "0.9rem", py: 1 }}>
+          {t("No rituals")}
         </Typography>
       );
     }
     return null;
   }
 
-  const checkboxFontSize = compact
-    ? { xs: "0.8em" }
-    : { xs: "0.8em", sm: "1.0em", md: "1.2em" };
-
-  const verticalHeader = (
-    <Typography
-      sx={{
-        writingMode: "vertical-lr",
-        textTransform: "uppercase",
-        marginLeft: "-1px",
-        marginRight: "10px",
-        marginTop: "-1px",
-        marginBottom: "-1px",
-        background: primary,
-        color: custom.white,
-        borderRadius: "0 8px 8px 0",
-        transform: "rotate(180deg)",
-        fontFamily: "Antonio",
-        fontSize: "1.1rem",
-        fontWeight: 800,
-        letterSpacing: "0.06em",
-        minHeight: "100px",
-      }}
-      align="center"
-    >
-      {t("Rituals")}
-    </Typography>
+  // Ritual type chips row
+  const typesRow = (
+    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, px: 1.5, py: 1 }}>
+      {ritualTypes.map(({ checked, label }) => (
+        <Chip
+          key={label}
+          label={t(label)}
+          size="small"
+          variant={checked ? "filled" : "outlined"}
+          color={checked ? "primary" : "default"}
+          sx={{ opacity: checked ? 1 : 0.4, fontSize: "0.75rem", height: 24 }}
+        />
+      ))}
+    </Box>
   );
 
-  const checkboxGrid = (
-    <Grid
-      container
-      spacing={compact ? 0 : 2}
-      sx={{ padding: compact ? "0.2em 0.4em" : "0.7em" }}
-    >
-      {[
-        { checked: hasArcanism, label: "Arcanism" },
-        { checked: hasChimerism, label: "Chimerism" },
-        { checked: hasElementalism, label: "Elementalism" },
-        { checked: hasEntropism, label: "Entropism" },
-        { checked: hasRitualism, label: "Ritualism" },
-        { checked: hasSpiritism, label: "Spiritism" },
-      ].map(({ checked, label }) => (
-        <Grid
-          key={label}
-          size={{
-            xs: 4,
-            md: 2,
-          }}
-        >
-          <FormControlLabel
-            sx={compact ? { margin: 0 } : undefined}
-            control={
-              <Checkbox
-                checked={checked}
-                size={compact ? "small" : "medium"}
-                sx={{
-                  pointerEvents: "none",
-                  opacity: 1,
-                  ...(compact && { p: "2px" }),
-                }}
-              />
-            }
-            label={
-              <Typography sx={{ fontSize: checkboxFontSize }}>
-                {t(label)}
+  // Calculator section (only in edit mode)
+  const calculator = isEditMode && (
+    <Box sx={{ px: 1.5, pb: 1.5 }}>
+      {/* Two-column: options left, clock right */}
+      <Grid container spacing={2} alignItems="stretch">
+        {/* Left: Potency + Area + Reductions */}
+        <Grid size={{ xs: 12, sm: 7 }}>
+          <Grid container spacing={1}>
+            {/* Potency */}
+            <Grid size={6}>
+              <Typography variant="caption" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}>
+                {t("Potency")}
               </Typography>
-            }
-          />
-        </Grid>
-      ))}
-
-      {isEditMode && (
-        <Grid
-          container
-          spacing={compact ? 1 : 2}
-          sx={{ p: compact ? "0.4em" : 0.75 }}
-        >
-          <Grid
-            size={{
-              xs: 12,
-              md: 8,
-            }}
-          >
-            <RitualsCalculator
-              compact={compact}
-              power={power}
-              setPower={setPower}
-              area={area}
-              setArea={setArea}
-              ingredient={ingredient}
-              setIngredient={setIngredient}
-              itemHeld={itemHeld}
-              setItemHeld={setItemHeld}
-              fastRitual={fastRitual}
-              setFastRitual={setFastRitual}
-              dlReduction={dlReduction}
-              setDLReduction={setDLReduction}
-              calcPM={calcPM()}
-              calcLD={calcLD()}
-              calcClock={calcClock()}
-            />
+              <RadioGroup value={power} onChange={(e) => setPower(e.target.value)} sx={{ mt: 0.25 }}>
+                {["minor", "medium", "major", "extreme"].map((val) => (
+                  <FormControlLabel
+                    key={val}
+                    value={val}
+                    sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+                    control={<Radio size="small" sx={{ p: "3px" }} />}
+                    label={t(val.charAt(0).toUpperCase() + val.slice(1))}
+                  />
+                ))}
+              </RadioGroup>
+            </Grid>
+            {/* Area */}
+            <Grid size={6}>
+              <Typography variant="caption" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}>
+                {t("Area")}
+              </Typography>
+              <RadioGroup value={area} onChange={(e) => setArea(e.target.value)} sx={{ mt: 0.25 }}>
+                {["individual", "small", "large", "huge"].map((val) => (
+                  <FormControlLabel
+                    key={val}
+                    value={val}
+                    sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+                    control={<Radio size="small" sx={{ p: "3px" }} />}
+                    label={t(val.charAt(0).toUpperCase() + val.slice(1))}
+                  />
+                ))}
+              </RadioGroup>
+            </Grid>
+            {/* Reductions */}
+            <Grid size={12}>
+              <Typography variant="caption" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}>
+                {t("Reductions")}
+              </Typography>
+              <Stack sx={{ mt: 0.25 }}>
+                <FormControlLabel
+                  sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+                  control={<Checkbox checked={ingredient} size="small" sx={{ p: "3px" }} onChange={(e) => setIngredient(e.target.checked)} />}
+                  label={t("Using special ingredient")}
+                />
+                <FormControlLabel
+                  sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+                  control={<Checkbox checked={itemHeld} size="small" sx={{ p: "3px" }} onChange={(e) => setItemHeld(e.target.checked)} />}
+                  label={t("Relevant item held")}
+                />
+                {itemHeld && (
+                  <FormControl variant="standard" sx={{ maxWidth: 120, ml: 3.5, mt: 0.5 }}>
+                    <InputLabel htmlFor="dlReduction" sx={{ fontSize: "0.85rem" }}>
+                      {t("DL Reduction")}
+                    </InputLabel>
+                    <Input
+                      id="dlReduction"
+                      type="number"
+                      value={dlReduction}
+                      onChange={(e) => setDLReduction(e.target.value)}
+                      sx={{ fontSize: "0.9rem" }}
+                    />
+                  </FormControl>
+                )}
+                <FormControlLabel
+                  sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+                  control={<Checkbox checked={fastRitual} size="small" sx={{ p: "3px" }} onChange={(e) => setFastRitual(e.target.checked)} />}
+                  label={t("Fast Ritual")}
+                />
+              </Stack>
+            </Grid>
           </Grid>
+        </Grid>
 
-          <Grid
-            container
+        {/* Right: Clock */}
+        <Grid size={{ xs: 12, sm: 5 }} sx={{ display: "flex" }}>
+          <Box
             sx={{
-              justifyContent: "center",
+              flex: 1,
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "4px",
+              display: "flex",
+              flexDirection: "column",
               alignItems: "center",
-              textAlign: "center",
-            }}
-            size={{
-              xs: 12,
-              md: 4,
+              justifyContent: "center",
+              gap: 2,
+              py: 3,
+              px: 1.5,
             }}
           >
             <Clock
               numSections={clockSections}
-              size={compact ? 140 : 200}
+              size={compact ? 120 : 180}
               state={clockState}
               setState={setClockState}
             />
-          </Grid>
-
-          <Grid
-            size={{
-              xs: 12,
-              md: 8,
-            }}
-          >
-            <Button
-              variant="contained"
-              size={compact ? "small" : "medium"}
-              sx={{ width: "100%" }}
-              onClick={setNewClock}
-            >
-              {t("Set New Clock")}
-            </Button>
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              md: 4,
-            }}
-            container
-            sx={{ justifyContent: "center", gap: compact ? 0.5 : 1 }}
-          >
-            <Tooltip title={t("Decrement")} arrow>
-              <IconButton
-                color="primary"
-                onClick={decrementClock}
-                size={compact ? "small" : "medium"}
-                variant="outlined"
-              >
-                <RemoveIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Reset")} arrow>
-              <IconButton
-                color="primary"
-                onClick={resetClock}
-                size={compact ? "small" : "medium"}
-                variant="outlined"
-              >
-                <RestartAltIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Increment")} arrow>
-              <IconButton
-                color="primary"
-                onClick={incrementClock}
-                size={compact ? "small" : "medium"}
-                variant="outlined"
-              >
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          </Grid>
+            <Stack direction="row" spacing={0.5}>
+              <Tooltip title={t("Decrement")} arrow>
+                <IconButton onClick={decrementClock} size="small">
+                  <RemoveIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Reset")} arrow>
+                <IconButton onClick={resetClock} size="small">
+                  <RestartAltIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Increment")} arrow>
+                <IconButton onClick={incrementClock} size="small">
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          </Box>
         </Grid>
-      )}
-    </Grid>
+      </Grid>
+
+      {/* Result bar + Set New Clock */}
+      <Box
+        sx={{
+          mt: 1.5,
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          borderTop: "1px solid",
+          borderColor: "divider",
+          pt: 1.5,
+        }}
+      >
+        <Box sx={{ display: "flex", flex: 1, justifyContent: "space-around" }}>
+          {[
+            { value: calcPM(), label: t("MP") },
+            { value: calcLD(), label: t("DL") },
+            { value: calcClock(), label: t("Clock") },
+          ].map(({ value, label }) => (
+            <Box key={label} sx={{ textAlign: "center" }}>
+              <Typography sx={{ fontWeight: 700, fontSize: "1.5rem", lineHeight: 1 }}>{value}</Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</Typography>
+            </Box>
+          ))}
+        </Box>
+        <Button variant="contained" size="small" onClick={setNewClock} sx={{ flexShrink: 0 }}>
+          {t("Set New Clock")}
+        </Button>
+      </Box>
+    </Box>
   );
 
   if (compact) {
     return (
-      <>
-        {isCharacterSheet ? (
-          <Table>
-            <TableHead>
-              <TableRow
-                sx={{
-                  background: primary,
-                  "& .MuiTypography-root": {
-                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                    textTransform: "uppercase",
-                  },
-                }}
-              >
-                <StyledTableCellHeader sx={{ width: 36 }} />
-                <StyledTableCellHeader>
-                  <Typography variant="h4">{t("Rituals")}</Typography>
-                </StyledTableCellHeader>
-              </TableRow>
-            </TableHead>
-          </Table>
-        ) : (
-          verticalHeader
-        )}
-        {checkboxGrid}
-      </>
+      <Paper elevation={0} variant="outlined" sx={{ mb: 1, overflow: "hidden" }}>
+        <CompactSectionHeader title={t("Rituals")} />
+        {typesRow}
+        {calculator}
+      </Paper>
     );
   }
 
   return (
-    <>
-      <Divider sx={{ my: 1 }} />
-      <Paper
-        elevation={3}
-        sx={{
-          borderRadius: "8px",
-          border: "2px solid",
-          borderColor: secondary,
-          display: "flex",
-          flexDirection: isCharacterSheet ? "column" : undefined,
-          boxShadow: isCharacterSheet ? "none" : undefined,
-          overflow: "hidden",
-        }}
-      >
-        {isCharacterSheet ? (
-          <Typography
-            sx={{
-              textTransform: "uppercase",
-              px: 1,
-              py: "2px",
-              background: primary,
-              color: custom.white,
-              fontFamily: "Antonio",
-              fontSize: { xs: "1.1rem", sm: "1.2rem" },
-              fontWeight: 800,
-              letterSpacing: "0.06em",
-              lineHeight: 1.25,
-            }}
-          >
-            {t("Rituals")}
-          </Typography>
-        ) : (
-          verticalHeader
-        )}
-        {checkboxGrid}
-      </Paper>
-    </>
+    <SectionCard title={t("Rituals")} noShadow={isCharacterSheet} sx={{ mb: 1 }}>
+      {typesRow}
+      {calculator}
+    </SectionCard>
   );
 }
 
-const powerPMs = {
-  minor: 20,
-  medium: 30,
-  major: 40,
-  extreme: 50,
-};
-
-const powerLDs = {
-  minor: 7,
-  medium: 10,
-  major: 13,
-  extreme: 16,
-};
-
-const powerClocks = {
-  minor: 4,
-  medium: 6,
-  major: 6,
-  extreme: 8,
-};
-
-const areaPMs = {
-  individual: 1,
-  small: 2,
-  large: 3,
-  huge: 4,
-};
-
-function RitualsCalculator({
-  compact = false,
-  power,
-  setPower,
-  area,
-  setArea,
-  ingredient,
-  setIngredient,
-  itemHeld,
-  setItemHeld,
-  fastRitual,
-  setFastRitual,
-  dlReduction,
-  setDLReduction,
-  calcPM,
-  calcLD,
-  calcClock,
-}) {
-  const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-
-  const labelFontSize = compact
-    ? { xs: "0.75em" }
-    : { xs: "0.8em", sm: "1.0em", md: "1.2em" };
-  const legendFontSize = compact
-    ? { xs: "0.8em" }
-    : { xs: "0.9em", sm: "1.1em", md: "1.3em" };
-  const controlSize = compact ? "small" : "medium";
-  const controlSx = compact ? { p: "2px" } : undefined;
-
-  return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: compact ? "8px" : "14px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
-      <Grid container>
-        <Grid size={4}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
-              {t("Potency")}
-            </FormLabel>
-            <RadioGroup
-              aria-label="power"
-              name="power-group"
-              value={power}
-              onChange={(e) => setPower(e.target.value)}
-            >
-              {["minor", "medium", "major", "extreme"].map((val) => (
-                <FormControlLabel
-                  key={val}
-                  value={val}
-                  sx={compact ? { margin: 0 } : undefined}
-                  control={<Radio size={controlSize} sx={controlSx} />}
-                  label={
-                    <Typography sx={{ fontSize: labelFontSize }}>
-                      {t(val.charAt(0).toUpperCase() + val.slice(1))}
-                    </Typography>
-                  }
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
-        </Grid>
-        <Grid size={4}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
-              {t("Area")}
-            </FormLabel>
-            <RadioGroup
-              aria-label="area"
-              name="area-group"
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-            >
-              {["individual", "small", "large", "huge"].map((val) => (
-                <FormControlLabel
-                  key={val}
-                  value={val}
-                  sx={compact ? { margin: 0 } : undefined}
-                  control={<Radio size={controlSize} sx={controlSx} />}
-                  label={
-                    <Typography sx={{ fontSize: labelFontSize }}>
-                      {t(val.charAt(0).toUpperCase() + val.slice(1))}
-                    </Typography>
-                  }
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
-        </Grid>
-        <Grid size={4}>
-          <FormControl component="fieldset">
-            <FormLabel component="legend" sx={{ fontSize: legendFontSize }}>
-              {t("Reductions")}
-            </FormLabel>
-
-            {[
-              {
-                value: ingredient,
-                onChange: setIngredient,
-                label: "Using special ingredient",
-              },
-              {
-                value: itemHeld,
-                onChange: setItemHeld,
-                label: "Relevant item held",
-              },
-            ].map(({ value, onChange, label }) => (
-              <FormControlLabel
-                key={label}
-                sx={compact ? { margin: 0 } : undefined}
-                control={
-                  <Checkbox value={value} size={controlSize} sx={controlSx} />
-                }
-                onChange={(e) => onChange(e.target.checked)}
-                label={
-                  <Typography sx={{ fontSize: labelFontSize }}>
-                    {t(label)}
-                  </Typography>
-                }
-              />
-            ))}
-            {itemHeld && (
-              <FormControl variant="standard" fullWidth>
-                <InputLabel
-                  htmlFor="dlReduction"
-                  sx={{ fontSize: labelFontSize }}
-                >
-                  {t("DL Reduction")}
-                </InputLabel>
-                <Input
-                  id="dlReduction"
-                  type="number"
-                  value={dlReduction}
-                  onChange={(e) => setDLReduction(e.target.value)}
-                  sx={compact ? { fontSize: "0.85em" } : undefined}
-                />
-              </FormControl>
-            )}
-
-            <FormControlLabel
-              sx={compact ? { margin: 0 } : undefined}
-              control={
-                <Checkbox
-                  value={fastRitual}
-                  size={controlSize}
-                  sx={controlSx}
-                />
-              }
-              onChange={(e) => setFastRitual(e.target.checked)}
-              label={
-                <Typography sx={{ fontSize: labelFontSize }}>
-                  {t("Fast Ritual")}
-                </Typography>
-              }
-            />
-          </FormControl>
-        </Grid>
-      </Grid>
-      <Divider />
-      <Grid container sx={{ m: compact ? 0.5 : 1 }}>
-        <Grid size={4}>
-          <Typography
-            sx={{
-              fontSize: compact ? "0.8em" : undefined,
-              fontWeight: "bold",
-            }}
-          >
-            {calcPM} {t("MP")}
-          </Typography>
-        </Grid>
-        <Grid size={4}>
-          <Typography
-            sx={{
-              fontSize: compact ? "0.8em" : undefined,
-              fontWeight: "bold",
-            }}
-          >
-            {calcLD} {t("DL")}
-          </Typography>
-        </Grid>
-        <Grid size={4}>
-          <Typography
-            sx={{
-              fontSize: compact ? "0.8em" : undefined,
-              fontWeight: "bold",
-            }}
-          >
-            {t("Clock")} {calcClock}
-          </Typography>
-        </Grid>
-      </Grid>
-    </Paper>
-  );
-}
+const powerPMs = { minor: 20, medium: 30, major: 40, extreme: 50 };
+const powerLDs = { minor: 7, medium: 10, major: 13, extreme: 16 };
+const powerClocks = { minor: 4, medium: 6, major: 6, extreme: 8 };
+const areaPMs = { individual: 1, small: 2, large: 3, huge: 4 };

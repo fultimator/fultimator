@@ -15,6 +15,7 @@ import { classFieldConfig } from "/src/forms/rendering/config/itemConfigs/class"
 import { createDefaultStateFromFields } from "/src/forms/registry/helpers";
 import { SharedClassCard } from "/src/components/shared/items/class/SharedClassCards";
 import PanelLayout from "/src/forms/ui/PanelLayout";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 
 // Map player class object → schema form state
 function playerClassToFormState(cls) {
@@ -84,9 +85,10 @@ function formStateToClassPatch(formState) {
   };
 }
 
-export default function EditPlayerClassModal({ open, onClose, cls, onSave }) {
+export default function EditPlayerClassModal({ open, onClose, cls, onSave, onDelete }) {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(() => createDefaultStateFromFields(classFieldConfig));
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (open && cls) {
@@ -179,9 +181,22 @@ export default function EditPlayerClassModal({ open, onClose, cls, onSave }) {
         />
       </DialogContent>
       <DialogActions>
+        {onDelete && (
+          <Button variant="outlined" color="error" onClick={() => setDeleteConfirmOpen(true)} sx={{ mr: "auto" }}>
+            {t("Delete")}
+          </Button>
+        )}
         <Button onClick={onClose}>{t("Cancel")}</Button>
         <Button variant="contained" onClick={handleSave}>{t("Save Changes")}</Button>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={() => onDelete?.()}
+        title={t("Delete Class")}
+        message={t("Are you sure you want to delete this class?")}
+        itemPreview={formState.name ? t(formState.name) : t("Unnamed Class")}
+      />
     </Dialog>
   );
 }

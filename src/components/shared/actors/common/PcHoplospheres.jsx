@@ -16,7 +16,7 @@ import NotesMarkdown from "../../../common/NotesMarkdown";
 import { useTranslate } from "../../../../translation/translate";
 import { useCustomTheme } from "../../../../hooks/useCustomTheme";
 import SectionCard from "./SectionCard";
-import { highlightMatch, highlightMarkdownText } from "../pc-compact/highlightUtils";
+import { highlightMatch, highlightMarkdownText } from "../pc/variants/compact/highlightUtils";
 import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
 import { getHoplosphereCoagKey } from "../../../../libs/technospheres";
 

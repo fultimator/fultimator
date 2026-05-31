@@ -1,5 +1,9 @@
 // Layout components
 export { default as PcActorCard } from "./PcActorCard";
+export { default as PlayerSheetFull } from "./variants/full/PlayerSheetFull";
+export { default as PlayerSheetCompact } from "./variants/compact/PlayerSheetCompact";
+export { default as PcActorCardCompact } from "./variants/compact/PcActorCardCompact";
+export { default as PcCompactHeader } from "./variants/compact/PcCompactHeader";
 
 // Panels - core
 export { default as PcHeader } from "./panels/PcHeader";

@@ -170,7 +170,7 @@ export function deriveEquippedSlots(player: TypePlayer): EquippedSlots {
     for (let i = 0; i < weapons.length; i++) {
       const w = weapons[i];
       if (!w.isEquipped) continue;
-      const is2H = w.isTwoHand;
+      const is2H = w.isTwoHand || w.hands === 2;
       if (is2H) {
         slots.mainHand = ref("weapons", w.name, i);
         break;
@@ -273,7 +273,7 @@ export function isTwoHandedEquipped(player: TypePlayer): boolean {
     ref.index !== undefined
       ? (inv?.weapons ?? [])[ref.index]
       : (inv?.weapons ?? []).find((x) => x.name === ref.name);
-  return w?.isTwoHand || false;
+  return w?.isTwoHand || w?.hands === 2 || false;
 }
 
 /**
@@ -328,7 +328,7 @@ export function validateSlots(player: TypePlayer): TypePlayer {
       : slots.mainHand.index !== undefined
         ? (inv?.weapons ?? [])[slots.mainHand.index]
         : (inv?.weapons ?? []).find((x) => x.name === slots.mainHand!.name);
-    if (isCustom || w?.isTwoHand) slots.offHand = null;
+    if (isCustom || w?.isTwoHand || w?.hands === 2) slots.offHand = null;
   }
 
   return { ...player, equippedSlots: slots };

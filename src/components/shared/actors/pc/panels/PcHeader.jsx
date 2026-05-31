@@ -6,8 +6,10 @@ import {
   Autocomplete,
   IconButton,
   Tooltip,
+  Dialog,
 } from "@mui/material";
-import { Add, Remove } from "@mui/icons-material";
+import { Add, Remove, Edit as EditIcon } from "@mui/icons-material";
+import PortraitModal from "./PortraitModal";
 import FitScreenIcon from "@mui/icons-material/FitScreen";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import { useTheme } from "@mui/material/styles";
@@ -313,6 +315,7 @@ export function PcNameBar({
   );
 }
 
+
 export default function PcHeader({
   pc,
   isInteractive = false,
@@ -331,6 +334,8 @@ export default function PcHeader({
 
   const [isDescExpanded, setIsDescExpanded] = useState(false);
   const [showFade, setShowFade] = useState(false);
+  const [portraitModalOpen, setPortraitModalOpen] = useState(false);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const descRef = useRef(null);
 
   const themes = THEMES.map(t);
@@ -343,7 +348,8 @@ export default function PcHeader({
   if (compactPortraitOnly) {
     const fitMode =
       pc.info?.portraitFitMode === "contain" ? "contain" : "cover";
-    const toggleFit = () =>
+    const toggleFit = (e) => {
+      e.stopPropagation();
       onUpdate?.((prev) => ({
         ...prev,
         info: {
@@ -351,55 +357,101 @@ export default function PcHeader({
           portraitFitMode: fitMode === "contain" ? "cover" : "contain",
         },
       }));
+    };
 
     return (
-      <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
-        <img
-          src={avatarSrc}
-          alt="Player Avatar"
-          style={{
+      <>
+        <Box
+          sx={{
+            position: "relative",
             width: "100%",
             height: "100%",
-            objectFit: fitMode,
-            objectPosition: "center top",
-            display: "block",
+            cursor: "pointer",
           }}
-        />
-        {onUpdate && (
-          <Tooltip
-            title={
-              fitMode === "contain"
-                ? t("Switch to Cover")
-                : t("Switch to Contain")
-            }
+          onClick={() => isInteractive && onUpdate ? setPortraitModalOpen(true) : setImageDialogOpen(true)}
+        >
+          <img
+            src={avatarSrc}
+            alt="Player Avatar"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: fitMode,
+              objectPosition: "center top",
+              display: "block",
+            }}
+          />
+          <Box
+            data-html2canvas-ignore="true"
+            sx={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: 0,
+              transition: "opacity 0.15s",
+              background: "rgba(0,0,0,0.35)",
+              "&:hover": { opacity: 1 },
+            }}
           >
-            <IconButton
-              size="small"
-              onClick={toggleFit}
-              data-html2canvas-ignore="true"
-              sx={{
-                position: "absolute",
-                right: 4,
-                bottom: 4,
-                p: 0.25,
-                color: "rgba(255,255,255,0.72)",
-                backgroundColor: "rgba(0,0,0,0.25)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                "&:hover": {
-                  backgroundColor: "rgba(0,0,0,0.4)",
-                  color: "#fff",
-                },
-              }}
+            {isInteractive && onUpdate
+              ? <EditIcon sx={{ color: "#fff", fontSize: "2rem" }} />
+              : <CropFreeIcon sx={{ color: "#fff", fontSize: "2rem" }} />
+            }
+          </Box>
+          {onUpdate && (
+            <Tooltip
+              title={
+                fitMode === "contain"
+                  ? t("Switch to Cover")
+                  : t("Switch to Contain")
+              }
             >
-              {fitMode === "contain" ? (
-                <CropFreeIcon sx={{ fontSize: "0.8rem" }} />
-              ) : (
-                <FitScreenIcon sx={{ fontSize: "0.8rem" }} />
-              )}
-            </IconButton>
-          </Tooltip>
+              <IconButton
+                size="small"
+                onClick={toggleFit}
+                data-html2canvas-ignore="true"
+                sx={{
+                  position: "absolute",
+                  right: 4,
+                  bottom: 4,
+                  p: 0.25,
+                  color: "rgba(255,255,255,0.72)",
+                  backgroundColor: "rgba(0,0,0,0.25)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  "&:hover": {
+                    backgroundColor: "rgba(0,0,0,0.4)",
+                    color: "#fff",
+                  },
+                }}
+              >
+                {fitMode === "contain" ? (
+                  <CropFreeIcon sx={{ fontSize: "0.8rem" }} />
+                ) : (
+                  <FitScreenIcon sx={{ fontSize: "0.8rem" }} />
+                )}
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+        {isInteractive && onUpdate && (
+          <PortraitModal
+            open={portraitModalOpen}
+            onClose={() => setPortraitModalOpen(false)}
+            pc={pc}
+            onUpdate={onUpdate}
+          />
         )}
-      </Box>
+        <Dialog open={imageDialogOpen} onClose={() => setImageDialogOpen(false)} maxWidth="md" fullWidth>
+          <img
+            src={avatarSrc}
+            alt="Player Avatar"
+            style={{ width: "100%", height: "auto", display: "block", cursor: "pointer" }}
+            onClick={() => setImageDialogOpen(false)}
+          />
+        </Dialog>
+      </>
     );
   }
 
@@ -422,7 +474,9 @@ export default function PcHeader({
         sx={{
           position: "relative",
           backgroundColor: theme.palette.background.paper,
+          cursor: "pointer",
         }}
+        onClick={() => isInteractive && onUpdate ? setPortraitModalOpen(true) : setImageDialogOpen(true)}
       >
         <img
           src={avatarSrc}
@@ -436,6 +490,25 @@ export default function PcHeader({
             display: "block",
           }}
         />
+        <Box
+          data-html2canvas-ignore="true"
+          sx={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: 0,
+            transition: "opacity 0.15s",
+            background: "rgba(0,0,0,0.35)",
+            "&:hover": { opacity: 1 },
+          }}
+        >
+          {isInteractive && onUpdate
+            ? <EditIcon sx={{ color: "#fff", fontSize: "2rem" }} />
+            : <CropFreeIcon sx={{ color: "#fff", fontSize: "2rem" }} />
+          }
+        </Box>
         {inCrisis && (
           <Box
             sx={{
@@ -456,6 +529,22 @@ export default function PcHeader({
           </Box>
         )}
       </Box>
+      {isInteractive && onUpdate && (
+        <PortraitModal
+          open={portraitModalOpen}
+          onClose={() => setPortraitModalOpen(false)}
+          pc={pc}
+          onUpdate={onUpdate}
+        />
+      )}
+      <Dialog open={imageDialogOpen} onClose={() => setImageDialogOpen(false)} maxWidth="md" fullWidth>
+        <img
+          src={avatarSrc}
+          alt="Player Avatar"
+          style={{ width: "100%", height: "auto", display: "block", cursor: "pointer" }}
+          onClick={() => setImageDialogOpen(false)}
+        />
+      </Dialog>
 
       {pc.info.description && (
         <Box

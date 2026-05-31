@@ -1,15 +1,14 @@
 import React from "react";
 import {
+  Box,
   FormControl,
   Grid,
   Typography,
-  useTheme,
-  Paper,
   Slider,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import CustomHeader from "/src/components/common/CustomHeader";
-import ExplainPlayerAttributes from "/src/components/shared/actors/pc/legacy-player/stats/ExplainPlayerAttributes";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import ExplainPlayerAttributes from "/src/components/shared/actors/pc/editors/stats/ExplainPlayerAttributes";
 
 export default function EditPlayerAttributes({
   player,
@@ -18,8 +17,6 @@ export default function EditPlayerAttributes({
   updateMaxStats,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
 
   const onChange = (key) => {
     return (e, value) => {
@@ -69,23 +66,9 @@ export default function EditPlayerAttributes({
   ];
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
+    <SectionCard title={t("Attributes")}>
+      <Box sx={{ p: "15px" }}>
       <Grid container spacing={2}>
-        <Grid size={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Attributes")}
-            showIconButton={false}
-          />
-        </Grid>
         {/* Attributes control */}
         <Grid
           size={{
@@ -135,6 +118,7 @@ export default function EditPlayerAttributes({
           <ExplainPlayerAttributes />
         </Grid>
       </Grid>
-    </Paper>
+      </Box>
+    </SectionCard>
   );
 }

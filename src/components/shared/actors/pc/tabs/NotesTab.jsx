@@ -1,11 +1,12 @@
-import { EditPlayerNotes } from "/src/components/shared/actors/pc/editors";
+import PlayerNotes from "../playerSheet/PlayerNotes";
 
 export default function NotesTab({ player, setPlayer, isOwner }) {
   return (
-    <EditPlayerNotes
+    <PlayerNotes
       player={player}
       setPlayer={setPlayer}
       isEditMode={isOwner}
+      showAll
     />
   );
 }

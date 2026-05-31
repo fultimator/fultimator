@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Grid, TextField, Paper } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Box, Grid, TextField } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import CustomHeader from "/src/components/common/CustomHeader";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 
 export default function EditManualStats({
   player,
@@ -11,8 +10,6 @@ export default function EditManualStats({
   isEditMode,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
 
   // Initialize state with player's current manual modifier values
   const [hpModifier, setHPModifier] = useState(player.modifiers?.hp || 0);
@@ -63,23 +60,9 @@ export default function EditManualStats({
   ]);
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
+    <SectionCard title={t("Edit Stats Manually")}>
+      <Box sx={{ p: "15px" }}>
       <Grid container spacing={2}>
-        <Grid size={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Edit Stats Manually")}
-            showIconButton={false}
-          />
-        </Grid>
         <Grid
           size={{
             xs: 12,
@@ -321,6 +304,7 @@ export default function EditManualStats({
           />
         </Grid>
       </Grid>
-    </Paper>
+      </Box>
+    </SectionCard>
   );
 }

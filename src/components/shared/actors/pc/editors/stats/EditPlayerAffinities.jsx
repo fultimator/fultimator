@@ -1,22 +1,19 @@
 import React from "react";
 import { Fragment } from "react";
 import {
+  Box,
   Grid,
-  useTheme,
-  Paper,
   FormControl,
   Slider,
   Typography,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import CustomHeader from "/src/components/common/CustomHeader";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { TypeIcon, TypeName } from "/src/components/types";
 import { typeList } from "/src/components/typeConstants";
 
-export default function EditPlayerAffinities({ player, setPlayer }) {
+export default function EditPlayerAffinities({ player, setPlayer, isEditMode = true }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
 
   const onChangeAffinity = (type) => {
     return (e) => {
@@ -66,23 +63,9 @@ export default function EditPlayerAffinities({ player, setPlayer }) {
   };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
+    <SectionCard title={t("Affinity")}>
+      <Box sx={{ p: "15px" }}>
       <Grid container>
-        <Grid size={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Affinity")}
-            showIconButton={false}
-          />
-        </Grid>
         {/* Affinities control */}
         <Grid
           size={{
@@ -174,6 +157,7 @@ export default function EditPlayerAffinities({ player, setPlayer }) {
                         size="medium"
                         value={value}
                         onChange={onChangeAffinity(typeKey)}
+                        disabled={!isEditMode}
                       />
                     </FormControl>
                   </Grid>
@@ -183,6 +167,7 @@ export default function EditPlayerAffinities({ player, setPlayer }) {
           </Grid>
         </Grid>
       </Grid>
-    </Paper>
+      </Box>
+    </SectionCard>
   );
 }

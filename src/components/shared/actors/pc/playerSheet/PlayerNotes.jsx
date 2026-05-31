@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Paper, IconButton, Tooltip, Box } from "@mui/material";
+import { Paper, IconButton, Tooltip, Box, Typography } from "@mui/material";
 import SectionCard from "../../common/SectionCard";
 import { Add } from "@mui/icons-material";
 import { useTranslate } from "../../../../../translation/translate";
-import CompactSectionHeader from "../../pc-compact/CompactSectionHeader";
+import CompactSectionHeader from "../variants/compact/CompactSectionHeader";
 import NoteCard from "../../common/NoteCard";
 import { PlayerNoteModal } from "/src/components/shared/actors/pc/editors";
+import { usePlayerSheetCompactStore } from "../../../../../store/playerSheetCompactStore";
 
 export default function PlayerNotes({
   player,
@@ -15,13 +16,35 @@ export default function PlayerNotes({
   onAddNote,
   onEditNote,
   compact = false,
+  defaultExpanded = false,
+  speaker = "",
+  showAll = false,
 }) {
   const { t } = useTranslate();
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
-  const [openRows, setOpenRowsState] = useState({});
-  const toggleRow = (key) =>
-    setOpenRowsState((prev) => ({ ...prev, [key]: !prev[key] }));
+  // Compact persistent tab uses store slices; all other modes use local state.
+  const storeNoteRows = usePlayerSheetCompactStore((s) => s.openRows.notes);
+  const storeToggleRow = usePlayerSheetCompactStore((s) => s.toggleRow);
+  const [localOpenRows, setLocalOpenRows] = useState(() => {
+    if (!defaultExpanded) return {};
+    return Object.fromEntries(
+      (player.notes || []).map((_, i) => [`note-${i}`, true]),
+    );
+  });
+
+  const useStore = compact && !defaultExpanded;
+  const isOpen = (noteKey, descriptionMatch) => {
+    if (useStore) return !!storeNoteRows[noteKey] || descriptionMatch;
+    // In showAll (tab) mode, notes are open by default unless explicitly closed
+    if (showAll) return localOpenRows[noteKey] !== false || descriptionMatch;
+    return !!localOpenRows[noteKey] || descriptionMatch;
+  };
+  const toggleRow = (noteKey) => {
+    if (useStore) storeToggleRow("notes", noteKey);
+    else if (showAll) setLocalOpenRows((prev) => ({ ...prev, [noteKey]: prev[noteKey] === false }));
+    else setLocalOpenRows((prev) => ({ ...prev, [noteKey]: !prev[noteKey] }));
+  };
 
   const [openNoteModal, setOpenNoteModal] = useState(false);
   const [editNoteIndex, setEditNoteIndex] = useState(null);
@@ -61,7 +84,7 @@ export default function PlayerNotes({
 
   const visibleNotes = (player.notes || [])
     .map((note, index) => ({ ...note, originalIndex: index }))
-    .filter((note) => note.showInPlayerSheet !== false)
+    .filter((note) => showAll || note.showInPlayerSheet !== false)
     .filter((note) =>
       !normalizedQuery ||
       note.name?.toLowerCase().includes(normalizedQuery) ||
@@ -69,16 +92,54 @@ export default function PlayerNotes({
       note.clocks?.some((clock) => clock?.name?.toLowerCase().includes(normalizedQuery)),
     );
 
-  if (visibleNotes.length === 0 && !(isEditMode && handleAddNote)) return null;
+  if (visibleNotes.length === 0 && !isEditMode) return null;
 
-  return (
-    <>
-      {compact ? (
-        <Paper
-          elevation={0}
-          variant="outlined"
-          sx={{ mb: 1, overflow: "hidden" }}
-        >
+  const noteList = (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
+      {visibleNotes.length === 0 && (
+        <Typography color="text.secondary" variant="body2" sx={{ px: 0.5, py: 0.25 }}>{t("No notes.")}</Typography>
+      )}
+      {visibleNotes.map((note, noteIndex) => {
+        const noteKey = `note-${noteIndex}`;
+        const descriptionMatch = !!normalizedQuery && !!note.description?.toLowerCase().includes(normalizedQuery);
+        return (
+          <NoteCard
+            key={noteIndex}
+            note={note}
+            noteIndex={noteIndex}
+            isOpen={isOpen(noteKey, descriptionMatch)}
+            onToggle={() => toggleRow(noteKey)}
+            setPlayer={setPlayer}
+            searchQuery={searchQuery}
+            isEditMode={isEditMode}
+            onEdit={handleEditNote}
+            compact={compact}
+            speaker={speaker}
+          />
+        );
+      })}
+    </Box>
+  );
+
+  const modal = !onAddNote && (
+    <PlayerNoteModal
+      open={openNoteModal}
+      onClose={() => {
+        setOpenNoteModal(false);
+        setNoteBeingEdited(null);
+        setEditNoteIndex(null);
+      }}
+      editNoteIndex={editNoteIndex}
+      note={noteBeingEdited}
+      onSaveNote={handleSaveNote}
+      onDeleteNote={handleDeleteNote}
+    />
+  );
+
+  if (compact) {
+    return (
+      <>
+        <Paper elevation={0} variant="outlined" sx={{ mb: 1, overflow: "hidden" }}>
           <CompactSectionHeader title={t("Notes")}>
             {isEditMode && (
               <Tooltip title={t("Add Note")}>
@@ -88,78 +149,29 @@ export default function PlayerNotes({
               </Tooltip>
             )}
           </CompactSectionHeader>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
-            {visibleNotes.map((note, noteIndex) => {
-              const noteKey = `note-${noteIndex}`;
-              const descriptionMatchesQuery = !!normalizedQuery && !!note.description?.toLowerCase().includes(normalizedQuery);
-              const isOpen = !!openRows[noteKey] || descriptionMatchesQuery;
-              return (
-                <NoteCard
-                  key={noteIndex}
-                  note={note}
-                  noteIndex={noteIndex}
-                  isOpen={isOpen}
-                  onToggle={() => toggleRow(noteKey)}
-                  setPlayer={setPlayer}
-                  searchQuery={searchQuery}
-                  isEditMode={isEditMode}
-                  onEdit={handleEditNote}
-                  compact={compact}
-                />
-              );
-            })}
-          </Box>
+          {noteList}
         </Paper>
-      ) : (
-        <SectionCard
-          title={t("Notes")}
-          actions={
-            isEditMode && (
-              <IconButton size="small" onClick={handleAddNote} sx={{ p: 0.5, color: "#fff" }}>
-                <Add fontSize="small" />
-              </IconButton>
-            )
-          }
-          sx={{ mb: 1 }}
-        >
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
-            {visibleNotes.map((note, noteIndex) => {
-              const noteKey = `note-${noteIndex}`;
-              const descriptionMatchesQuery = !!normalizedQuery && !!note.description?.toLowerCase().includes(normalizedQuery);
-              const isOpen = !!openRows[noteKey] || descriptionMatchesQuery;
-              return (
-                <NoteCard
-                  key={noteIndex}
-                  note={note}
-                  noteIndex={noteIndex}
-                  isOpen={isOpen}
-                  onToggle={() => toggleRow(noteKey)}
-                  setPlayer={setPlayer}
-                  searchQuery={searchQuery}
-                  isEditMode={isEditMode}
-                  onEdit={handleEditNote}
-                  compact={compact}
-                />
-              );
-            })}
-          </Box>
-        </SectionCard>
-      )}
+        {modal}
+      </>
+    );
+  }
 
-      {!onAddNote && (
-        <PlayerNoteModal
-          open={openNoteModal}
-          onClose={() => {
-            setOpenNoteModal(false);
-            setNoteBeingEdited(null);
-            setEditNoteIndex(null);
-          }}
-          editNoteIndex={editNoteIndex}
-          note={noteBeingEdited}
-          onSaveNote={handleSaveNote}
-          onDeleteNote={handleDeleteNote}
-        />
-      )}
+  return (
+    <>
+      <SectionCard
+        title={t("Notes")}
+        actions={
+          isEditMode && (
+            <IconButton size="small" onClick={handleAddNote} sx={{ p: 0.5, color: "#fff" }}>
+              <Add fontSize="small" />
+            </IconButton>
+          )
+        }
+        sx={{ mb: 1 }}
+      >
+        {noteList}
+      </SectionCard>
+      {modal}
     </>
   );
 }

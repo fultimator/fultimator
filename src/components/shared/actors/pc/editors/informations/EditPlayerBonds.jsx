@@ -3,15 +3,14 @@ import {
   Grid,
   IconButton,
   TextField,
-  useTheme,
-  Paper,
   Checkbox,
   FormControlLabel,
   Box,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import CustomHeader from "/src/components/common/CustomHeader";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import RemoveCircleOutlined from "@mui/icons-material/RemoveCircleOutlined";
 import { Add } from "@mui/icons-material";
 import { useState } from "react";
@@ -19,8 +18,6 @@ import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationD
 
 export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingBondIndex, setPendingBondIndex] = useState(null);
 
@@ -110,25 +107,20 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
   };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
+    <SectionCard
+      title={t("Bonds")}
+      actions={
+        isEditMode && (
+          <Tooltip title={t("Add Bond")}>
+            <IconButton size="small" onClick={addNewBond} sx={{ color: "#fff" }}>
+              <Add fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )
+      }
     >
+      <Box sx={{ p: "15px" }}>
       <Grid container spacing={2}>
-        <Grid size={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Bonds")}
-            addItem={isEditMode ? addNewBond : null}
-            icon={Add}
-            showIconButton={isEditMode}
-          />
-        </Grid>
         {player.info.bonds.map((bond, index) => (
           <Grid key={index} size={12}>
             <Grid container spacing={2} sx={{ alignItems: "center" }}>
@@ -282,6 +274,7 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
           </Grid>
         ))}
       </Grid>
+      </Box>
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onClose={() => {
@@ -302,6 +295,6 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
             : ""
         }
       />
-    </Paper>
+    </SectionCard>
   );
 }

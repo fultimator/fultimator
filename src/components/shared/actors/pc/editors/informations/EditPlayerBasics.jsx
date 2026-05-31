@@ -1,22 +1,20 @@
 import React, { useCallback } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
+  Box,
   FormControl,
   Grid,
   IconButton,
   TextField,
-  useTheme,
-  Paper,
   Button,
   InputAdornment,
   Snackbar,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
 import CustomTextarea from "/src/components/common/CustomTextarea";
-import CustomHeader from "/src/components/common/CustomHeader";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
-import { Code } from "@mui/icons-material";
 
 const zenitIcon = "/assets/icons/resources/zenit.png";
 const fpBorderlessIcon = "/assets/icons/resources/fp_borderless.png";
@@ -30,9 +28,6 @@ export default function EditPlayerBasics({
   onLevelUpRequest,
 }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
-
   const [imgUrlTemp, setImgUrlTemp] = React.useState(player.info.imgurl);
 
   const [isImageError, setIsImageError] = React.useState(false);
@@ -97,25 +92,9 @@ export default function EditPlayerBasics({
   }, []);
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
+    <SectionCard title={t("Basic Information")}>
+      <Box sx={{ p: "15px" }}>
       <Grid container spacing={2}>
-        <Grid size={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Basic Information")}
-            addItem={() => console.log(player)}
-            icon={Code}
-            customTooltip="Console.log Player Object"
-          />
-        </Grid>
         <Grid
           size={{
             xs: 12,
@@ -407,7 +386,8 @@ export default function EditPlayerBasics({
           </>
         ) : null}
       </Grid>
-    </Paper>
+      </Box>
+    </SectionCard>
   );
 }
 

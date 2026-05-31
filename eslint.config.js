@@ -110,31 +110,6 @@ export default [
           varsIgnorePattern: "^_",
         },
       ],
-      "no-restricted-imports": [
-        "error",
-        {
-          patterns: [
-            {
-              group: ["**/shared/actorCards/**", "**/actorCards/**"],
-              message:
-                "Use src/components/shared/actors/* instead of deprecated actorCards paths.",
-            },
-            {
-              group: ["**/shared/itemCards/**", "**/itemCards/**"],
-              message:
-                "Use src/components/shared/items/* instead of deprecated itemCards paths.",
-            },
-            {
-              group: [
-                "**/components/player/playerTransforms",
-                "**/components/npc/npcTransforms",
-              ],
-              message:
-                "Import transforms from src/libs/actor (barrel) instead of legacy component paths.",
-            },
-          ],
-        },
-      ],
     },
   },
   eslintConfigPrettier,

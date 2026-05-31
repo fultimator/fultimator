@@ -1,19 +1,19 @@
-import SpellDefault from "../../pc-compact/spells/SpellDefault";
-import SpellArcanist from "../../pc-compact/spells/SpellArcanist";
-import SpellEntropistGamble from "../../pc-compact/spells/SpellEntropistGamble";
+import SpellDefault from "../variants/compact/spells/SpellDefault";
+import SpellArcanist from "../variants/compact/spells/SpellArcanist";
+import SpellEntropistGamble from "../variants/compact/spells/SpellEntropistGamble";
 import { SpellTinkererAlchemy } from "/src/components/shared/actors/pc/spells";
 import { SpellTinkererInfusion } from "/src/components/shared/actors/pc/spells";
 import { SpellTinkererMagitech } from "/src/components/shared/actors/pc/spells";
 import { SpellChanter } from "/src/components/shared/actors/pc/spells";
-import SpellSymbolist from "../../pc-compact/spells/SpellSymbol";
-import SpellDancer from "../../pc-compact/spells/SpellDance";
-import SpellGift from "../../pc-compact/spells/SpellGift";
+import SpellSymbolist from "../variants/compact/spells/SpellSymbol";
+import SpellDancer from "../variants/compact/spells/SpellDance";
+import SpellGift from "../variants/compact/spells/SpellGift";
 import { SpellMutant } from "/src/components/shared/actors/pc/spells";
-import SpellPilot from "../../pc-compact/spells/SpellVehicle";
-import SpellMagiseed from "../../pc-compact/spells/SpellMagiseed";
-import SpellGourmet from "../../pc-compact/spells/SpellGourmet";
-import SpellInvoker from "../../pc-compact/spells/SpellInvoker";
-import SpellDeck from "../../pc-compact/spells/SpellDeck";
+import SpellPilot from "../variants/compact/spells/SpellVehicle";
+import SpellMagiseed from "../variants/compact/spells/SpellMagiseed";
+import SpellGourmet from "../variants/compact/spells/SpellGourmet";
+import SpellInvoker from "../variants/compact/spells/SpellInvoker";
+import SpellDeck from "../variants/compact/spells/SpellDeck";
 
 // Each entry: { Component, buildProps(spell, handlers) }
 // handlers: { onEdit, onEditSubModal, isEditMode }

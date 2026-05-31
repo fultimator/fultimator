@@ -1,36 +1,30 @@
 import React, { useMemo, useState } from "react";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Grid,
   IconButton,
-  ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
-  Paper,
   Tooltip,
   Typography,
-  useTheme,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Casino from "@mui/icons-material/Casino";
 import Delete from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
-import CustomHeader from "/src/components/common/CustomHeader";
+import Search from "@mui/icons-material/Search";
+import { useTranslate } from "/src/translation/translate";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import ItemEditModal from "/src/forms/ui/ItemEditModal";
-import { useTranslate } from "/src/translation/translate";
 import { useChatMessagesStore } from "/src/store/chatMessagesStore";
 import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
 import { SharedOptionalCard } from "/src/components/shared/items";
 
 const CAMP_ACTIVITY_SUBTYPES = ["camp-activities"];
-const CONTROL_SIZE = 32;
 
 function toFormState(activity) {
   return {
@@ -51,135 +45,65 @@ function fromFormState(form) {
   };
 }
 
-function ActivityRow({
-  activity,
-  index,
-  onEdit,
-  onDelete,
-  onRoll,
-  onAddToCompendium,
-}) {
+function ActivityRow({ activity, index, isEditMode, onEdit, onDelete, onRoll, onAddToCompendium }) {
   const { t } = useTranslate();
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [expanded, setExpanded] = useState(false);
+  const hasDetails = activity.description || activity.targetDescription || activity.effect;
 
   return (
-    <Accordion
-      disableGutters
-      elevation={0}
-      sx={{
-        border: "1px solid",
-        borderColor: "divider",
-        mb: 0.75,
-        "&:before": { display: "none" },
-      }}
-    >
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        sx={{
-          minHeight: 56,
-          "&.Mui-expanded": { minHeight: 56 },
-          "& .MuiAccordionSummary-content": {
-            alignItems: "center",
-            my: 0,
-            "&.Mui-expanded": { my: 0 },
-          },
-        }}
-      >
-        <Box
-          sx={{ display: "flex", alignItems: "center" }}
-          onClick={(e) => e.stopPropagation()}
-        >
+    <ItemRowCard
+      variant="outlined"
+      onCardClick={hasDetails ? () => setExpanded((v) => !v) : undefined}
+      label={activity.name || t("Unnamed Camp Activity")}
+      actions={
+        <>
           <Tooltip title={t("Roll")}>
-            <IconButton component="span"
-              size="small"
-              onClick={() => onRoll(activity)}
-              sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}
-            >
-              <Casino sx={{ fontSize: "1.2rem" }} />
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onRoll(activity); }}>
+              <Casino />
             </IconButton>
           </Tooltip>
-          <IconButton component="span"
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuAnchorEl(e.currentTarget);
-            }}
-            sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}
-          >
-            <MenuIcon sx={{ fontSize: "1.2rem" }} />
+          {isEditMode && (
+            <Tooltip title={t("Edit")}>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit(index); }}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchorEl(e.currentTarget); }}>
+            <MenuIcon />
           </IconButton>
-          <Menu
-            anchorEl={menuAnchorEl}
-            open={Boolean(menuAnchorEl)}
-            onClose={() => setMenuAnchorEl(null)}
-          >
-            <MenuItem
-              onClick={async (e) => {
-                e.stopPropagation();
-                await onAddToCompendium(activity);
-                setMenuAnchorEl(null);
-              }}
-            >
+          <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={() => setMenuAnchorEl(null)}>
+            <MenuItem onClick={async (e) => { e.stopPropagation(); await onAddToCompendium(activity); setMenuAnchorEl(null); }}>
               <ListItemText>{t("Add to Compendium")}</ListItemText>
             </MenuItem>
-            <MenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(index);
-                setMenuAnchorEl(null);
-              }}
-              sx={{ color: "error.main" }}
-            >
-              <ListItemIcon>
-                <Delete color="error" fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>{t("Delete")}</ListItemText>
-            </MenuItem>
+            {isEditMode && (
+              <MenuItem onClick={(e) => { e.stopPropagation(); onDelete(index); setMenuAnchorEl(null); }} sx={{ color: "error.main" }}>
+                <Delete fontSize="small" sx={{ mr: 1 }} />
+                <ListItemText>{t("Delete")}</ListItemText>
+              </MenuItem>
+            )}
           </Menu>
+        </>
+      }
+    >
+      {expanded && hasDetails && (
+        <Box sx={{ px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.03)", borderTop: "1px solid", borderColor: "divider" }}>
+          <SharedOptionalCard item={{ ...activity, subtype: "camp-activities" }} />
         </Box>
-        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography noWrap sx={{ fontWeight: 700 }}>
-            {activity.name || t("Unnamed Camp Activity")}
-          </Typography>
-        </Box>
-        <Box onClick={(e) => e.stopPropagation()}>
-          <Tooltip title={t("Edit")}>
-            <IconButton component="span"
-              size="small"
-              onClick={() => onEdit(index)}
-              sx={{ width: CONTROL_SIZE, height: CONTROL_SIZE }}
-            >
-              <EditIcon sx={{ fontSize: "1.2rem" }} />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </AccordionSummary>
-      <AccordionDetails>
-        <SharedOptionalCard
-          item={{ ...activity, subtype: "camp-activities" }}
-        />
-      </AccordionDetails>
-    </Accordion>
+      )}
+    </ItemRowCard>
   );
 }
 
-export default function EditPlayerCampActivities({
-  player,
-  setPlayer,
-  isEditMode,
-}) {
+export default function EditPlayerCampActivities({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
   const addMessage = useChatMessagesStore((s) => s.addMessage);
   const { ensurePersonalPack, addItem } = useCompendiumPacks();
   const [editIndex, setEditIndex] = useState(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
-  const activities = useMemo(
-    () => player.campActivities ?? [],
-    [player.campActivities],
-  );
+  const activities = useMemo(() => player.campActivities ?? [], [player.campActivities]);
 
   const editingItem = createOpen
     ? toFormState(null)
@@ -187,93 +111,80 @@ export default function EditPlayerCampActivities({
       ? toFormState(activities[editIndex])
       : null;
 
-  return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
-      <Grid container spacing={1}>
-        <Grid size={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Camp Activities (Max 2)")}
-            showIconButton={isEditMode}
-            addItem={() => setCreateOpen(true)}
-            openCompendium={
-              isEditMode ? () => setCompendiumOpen(true) : undefined
-            }
-            icon={AddIcon}
-            customTooltip={t("Add Camp Activity")}
-          />
-        </Grid>
-        {activities.length === 0 ? (
-          <Grid size={12} sx={{ py: 2 }}>
-            <Typography sx={{ textAlign: "center", color: "text.secondary" }}>
-              {t("No camp activities yet.")}
-            </Typography>
-          </Grid>
-        ) : (
-          <Grid size={12}>
-            {activities.map((activity, index) => (
-              <ActivityRow
-                key={`${activity.name || "camp"}-${index}`}
-                activity={activity}
-                index={index}
-                onEdit={setEditIndex}
-                onDelete={(i) =>
-                  setPlayer((prev) => ({
-                    ...prev,
-                    campActivities: (prev.campActivities ?? []).filter(
-                      (_, idx) => idx !== i,
-                    ),
-                  }))
-                }
-                onRoll={(entry) =>
-                  addMessage({
-                    id: crypto.randomUUID(),
-                    createdAt: Date.now(),
-                    speaker: player?.name || "Player",
-                    kind: "display",
-                    itemType: "optional",
-                    name: entry.name || t("Camp Activity"),
-                    tags: [t("Camp Activities")],
-                    description: entry.description,
-                    ...(entry.targetDescription
-                      ? { targetDescription: entry.targetDescription }
-                      : {}),
-                    effect: entry.effect || "",
-                  })
-                }
-                onAddToCompendium={async (entry) => {
-                  const pack = await ensurePersonalPack();
-                  await addItem(pack.id, "optional", {
-                    subtype: "camp-activities",
-                    name: entry.name || "",
-                    description: entry.description,
-                    ...(entry.targetDescription
-                      ? { targetDescription: entry.targetDescription }
-                      : {}),
-                    effect: entry.effect || "",
-                  });
-                }}
-              />
-            ))}
-          </Grid>
-        )}
-      </Grid>
+  const handleRoll = (entry) =>
+    addMessage({
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      speaker: player?.name || "Player",
+      kind: "display",
+      itemType: "optional",
+      name: entry.name || t("Camp Activity"),
+      tags: [t("Camp Activities")],
+      description: entry.description,
+      ...(entry.targetDescription ? { targetDescription: entry.targetDescription } : {}),
+      effect: entry.effect || "",
+    });
 
-      {(createOpen || editIndex !== null) && editingItem ? (
+  const handleAddToCompendium = async (entry) => {
+    const pack = await ensurePersonalPack();
+    await addItem(pack.id, "optional", {
+      subtype: "camp-activities",
+      name: entry.name || "",
+      description: entry.description,
+      ...(entry.targetDescription ? { targetDescription: entry.targetDescription } : {}),
+      effect: entry.effect || "",
+    });
+  };
+
+  const handleDelete = (i) =>
+    setPlayer((prev) => ({
+      ...prev,
+      campActivities: (prev.campActivities ?? []).filter((_, idx) => idx !== i),
+    }));
+
+  return (
+    <SectionCard
+      title={t("Camp Activities (Max 2)")}
+      actions={
+        isEditMode && (
+          <Box sx={{ display: "flex", gap: 0.5 }}>
+            <Tooltip title={t("Add Camp Activity")}>
+              <IconButton size="small" onClick={() => setCreateOpen(true)} sx={{ color: "#fff" }}>
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Open Compendium")}>
+              <IconButton size="small" onClick={() => setCompendiumOpen(true)} sx={{ color: "#fff" }}>
+                <Search fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )
+      }
+    >
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 0.75 }}>
+        {activities.length === 0 ? (
+          <Typography color="text.secondary" variant="body2" sx={{ px: 0.5, py: 0.25 }}>{t("No camp activities yet.")}</Typography>
+        ) : (
+          activities.map((activity, index) => (
+            <ActivityRow
+              key={`${activity.name || "camp"}-${index}`}
+              activity={activity}
+              index={index}
+              isEditMode={isEditMode}
+              onEdit={setEditIndex}
+              onDelete={handleDelete}
+              onRoll={handleRoll}
+              onAddToCompendium={handleAddToCompendium}
+            />
+          ))
+        )}
+      </Box>
+
+      {(createOpen || editIndex !== null) && editingItem && (
         <ItemEditModal
           open
-          onClose={() => {
-            setCreateOpen(false);
-            setEditIndex(null);
-          }}
+          onClose={() => { setCreateOpen(false); setEditIndex(null); }}
           itemType="campActivity"
           item={editingItem}
           editIndex={createOpen ? null : editIndex}
@@ -282,8 +193,7 @@ export default function EditPlayerCampActivities({
             setPlayer((prev) => {
               const next = [...(prev.campActivities ?? [])];
               if (createOpen) next.push(nextEntry);
-              else if (editIndex !== null && next[editIndex])
-                next[editIndex] = nextEntry;
+              else if (editIndex !== null && next[editIndex]) next[editIndex] = nextEntry;
               return { ...prev, campActivities: next };
             });
             setCreateOpen(false);
@@ -300,9 +210,9 @@ export default function EditPlayerCampActivities({
           }}
           ctx={{ player, setPlayer }}
         />
-      ) : null}
+      )}
 
-      {isEditMode ? (
+      {isEditMode && (
         <CompendiumViewerModal
           open={compendiumOpen}
           onClose={() => setCompendiumOpen(false)}
@@ -323,7 +233,7 @@ export default function EditPlayerCampActivities({
           restrictToTypes={["optionals"]}
           initialOptionalSubtypes={CAMP_ACTIVITY_SUBTYPES}
         />
-      ) : null}
-    </Paper>
+      )}
+    </SectionCard>
   );
 }

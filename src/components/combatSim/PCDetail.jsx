@@ -2,7 +2,7 @@ import React from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import PlayerCardSheet from "/src/components/shared/actors/pc/legacy-player/playerSheet/compact/PlayerSheetCompact";
+import { PlayerSheetCompact } from "/src/components/shared/actors/pc";
 
 export default function PCDetail({
   selectedPC,
@@ -47,12 +47,10 @@ export default function PCDetail({
 
       {/* Player Sheet */}
       <Box sx={{ p: 1, flexGrow: 1 }}>
-        <PlayerCardSheet
-          player={selectedPC}
-          setPlayer={() => {}}
-          isMainTab={true}
-          isEditMode={false}
-          isCharacterSheet={true}
+        <PlayerSheetCompact
+          pc={selectedPC}
+          onUpdate={() => {}}
+          
           characterImage={selectedPC?.info?.imgurl ?? null}
           id={selectedPC?.id}
         />

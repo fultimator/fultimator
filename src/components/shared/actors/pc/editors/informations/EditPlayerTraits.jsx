@@ -1,19 +1,16 @@
 import {
+  Box,
   FormControl,
   Grid,
   TextField,
-  useTheme,
-  Paper,
   Autocomplete,
 } from "@mui/material";
 import React, { useState, useMemo } from "react";
 import { useTranslate } from "/src/translation/translate";
-import CustomHeader from "/src/components/common/CustomHeader";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 
 export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
 
   const themes = useMemo(
     () => [
@@ -66,23 +63,9 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
   };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        p: "15px",
-        borderRadius: "8px",
-        border: "2px solid",
-        borderColor: secondary,
-      }}
-    >
+    <SectionCard title={t("Traits")}>
+      <Box sx={{ p: "15px" }}>
       <Grid container spacing={2}>
-        <Grid size={12}>
-          <CustomHeader
-            type="top"
-            headerText={t("Traits")}
-            showIconButton={false}
-          />
-        </Grid>
         <Grid
           size={{
             xs: 12,
@@ -149,6 +132,7 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
           </FormControl>
         </Grid>
       </Grid>
-    </Paper>
+      </Box>
+    </SectionCard>
   );
 }

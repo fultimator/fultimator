@@ -1,4 +1,4 @@
-import { Divider } from "@mui/material";
+import { Box } from "@mui/material";
 import { EditPlayerBasics } from "/src/components/shared/actors/pc/editors";
 import { EditPlayerTraits } from "/src/components/shared/actors/pc/editors";
 import { EditPlayerBonds } from "/src/components/shared/actors/pc/editors";
@@ -17,7 +17,7 @@ export default function InformationTab({
   onLevelUpRequest,
 }) {
   return (
-    <>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
       <EditPlayerBasics
         player={player}
         setPlayer={setPlayer}
@@ -26,30 +26,12 @@ export default function InformationTab({
         advancement={advancement}
         onLevelUpRequest={onLevelUpRequest}
       />
-      <Divider sx={{ my: 1 }} />
       <EditPlayerTraits player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-      <Divider sx={{ my: 1 }} />
       <EditPlayerBonds player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-      {optionalRules.quirks && (
-        <>
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerQuirk player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-        </>
-      )}
-      {optionalRules.campActivities && (
-        <>
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerCampActivities player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-        </>
-      )}
-      {optionalRules.zeroPower && (
-        <>
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerZeroPower player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-        </>
-      )}
-      <Divider sx={{ my: 1 }} />
       <EditPlayerOther player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-    </>
+      {optionalRules.quirks && <EditPlayerQuirk player={player} setPlayer={setPlayer} isEditMode={isOwner} />}
+      {optionalRules.campActivities && <EditPlayerCampActivities player={player} setPlayer={setPlayer} isEditMode={isOwner} />}
+      {optionalRules.zeroPower && <EditPlayerZeroPower player={player} setPlayer={setPlayer} isEditMode={isOwner} />}
+    </Box>
   );
 }

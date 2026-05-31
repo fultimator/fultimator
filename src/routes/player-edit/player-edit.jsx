@@ -45,7 +45,7 @@ import {
   Alert,
 } from "@mui/material";
 import Layout from "../../components/Layout";
-import { PcActorCard, PcActorCardCompact } from "../../components/shared/actors";
+import { PlayerSheetFull, PlayerSheetCompact } from "../../components/shared/actors";
 import InformationTab from "../../components/shared/actors/pc/tabs/InformationTab";
 import StatsTab from "../../components/shared/actors/pc/tabs/StatsTab";
 import ClassesTab from "../../components/shared/actors/pc/tabs/ClassesTab";
@@ -932,7 +932,7 @@ export default function PlayerEdit() {
                 </Box>
               </Grid>
               <Grid container size={12}>
-                <PcActorCardCompact
+                <PlayerSheetCompact
                   pc={playerTemp}
                   onUpdate={setPlayerTemp}
                   isInteractive={isEditMode}
@@ -973,7 +973,7 @@ export default function PlayerEdit() {
                   onQuickCheck={handleQuickCheck}
                 />
               )} */}
-              <PcActorCard
+              <PlayerSheetFull
                 pc={playerTemp}
                 onUpdate={setPlayerTemp}
                 isInteractive={isEditMode}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Paper,
   Typography,
@@ -20,7 +20,6 @@ import {
   TextField,
 } from "@mui/material";
 import {
-  MoreVert,
   Star,
   AutoFixHigh,
   ExpandMore,
@@ -44,29 +43,31 @@ import { sendDisplayMessage } from "../../../../hooks/useRollToChat";
 import {
   getSlottedMnemospheres,
 } from "../../../../libs/player/mnemosphereClassUtils";
-import SpellDefault from "../pc-compact/spells/SpellDefault";
-import SpellArcanist from "../pc-compact/spells/SpellArcanist";
-import SpellEntropistGamble from "../pc-compact/spells/SpellEntropistGamble";
-import SpellInvoker from "../pc-compact/spells/SpellInvoker";
-import SpellGourmet from "../pc-compact/spells/SpellGourmet";
-import SpellMagiseed from "../pc-compact/spells/SpellMagiseed";
-import SpellGadget from "../pc-compact/spells/SpellGadget";
-import SpellMagichant from "../pc-compact/spells/SpellMagichant";
-import SpellSymbol from "../pc-compact/spells/SpellSymbol";
-import SpellDance from "../pc-compact/spells/SpellDance";
-import SpellGift from "../pc-compact/spells/SpellGift";
-import SpellTherioform from "../pc-compact/spells/SpellTherioform";
-import SpellVehicle from "../pc-compact/spells/SpellVehicle";
-import SpellDeck from "../pc-compact/spells/SpellDeck";
-import { highlightMatch, highlightMarkdownText } from "../pc-compact/highlightUtils";
+import SpellDefault from "../pc/variants/compact/spells/SpellDefault";
+import SpellArcanist from "../pc/variants/compact/spells/SpellArcanist";
+import SpellEntropistGamble from "../pc/variants/compact/spells/SpellEntropistGamble";
+import SpellInvoker from "../pc/variants/compact/spells/SpellInvoker";
+import SpellGourmet from "../pc/variants/compact/spells/SpellGourmet";
+import SpellMagiseed from "../pc/variants/compact/spells/SpellMagiseed";
+import SpellGadget from "../pc/variants/compact/spells/SpellGadget";
+import SpellMagichant from "../pc/variants/compact/spells/SpellMagichant";
+import SpellSymbol from "../pc/variants/compact/spells/SpellSymbol";
+import SpellDance from "../pc/variants/compact/spells/SpellDance";
+import SpellGift from "../pc/variants/compact/spells/SpellGift";
+import SpellTherioform from "../pc/variants/compact/spells/SpellTherioform";
+import SpellVehicle from "../pc/variants/compact/spells/SpellVehicle";
+import SpellDeck from "../pc/variants/compact/spells/SpellDeck";
+import { highlightMatch, highlightMarkdownText } from "../pc/variants/compact/highlightUtils";
 import {
   isAutomaticClassLevelEnabled,
   syncAutomaticClassLevels,
 } from "../../../../libs/player/classLevelUtils";
 import useSphereBank from "../../../../hooks/useSphereBank";
 import SectionCard from "./SectionCard";
-
-import CompactSectionHeader from "../pc-compact/CompactSectionHeader";
+import ItemRowCard from "./ItemRowCard";
+import CompactSectionHeader from "../pc/variants/compact/CompactSectionHeader";
+import { SharedSkillCard, SharedHeroicCard } from "../../items/class/SharedClassCards";
+import { SharedPlayerSpellCard } from "../../items/spells/SharedSpellCards";
 // Utilities
 
 function SectionSubHeader({ children, theme }) {
@@ -306,7 +307,7 @@ function SkillStars({ current, max, secondaryColor }) {
 }
 // SkillCard
 
-function SkillCard({ skill, originalIdx, classIdx, translatedDescription, pc, isInteractive, onUpdate, updateMaxStats, searchQuery, compact, theme, t }) {
+function SkillCard({ skill, originalIdx, classIdx, translatedDescription, pc, isInteractive, onUpdate, updateMaxStats, searchQuery, compact, theme, t, onPreview }) {
   const [descOpen, setDescOpen] = useState(!compact);
   const cls = pc?.classes?.[classIdx];
   const totalSkillLevels = (cls?.skills ?? []).reduce((sum, s) => sum + (Number(s.currentLvl) || 0), 0);
@@ -340,6 +341,7 @@ function SkillCard({ skill, originalIdx, classIdx, translatedDescription, pc, is
         sx={{ borderTop: `1px solid ${theme.secondary}`, overflow: "hidden", background: "transparent", "&:before": { display: "none" } }}
       >
         <AccordionSummary
+          component="div"
           sx={{
             minHeight: 0,
             p: 0,
@@ -400,37 +402,42 @@ function SkillCard({ skill, originalIdx, classIdx, translatedDescription, pc, is
   }
 
   return (
-    <Box onClick={() => translatedDescription && setDescOpen((v) => !v)}
-      sx={{ border: "1px solid", borderColor: theme.secondary, borderRadius: `${theme.panelRadius}px`, overflow: "hidden", cursor: translatedDescription ? "pointer" : "default", "&:hover": { borderColor: theme.secondary, opacity: 0.85 }, transition: "opacity 0.15s ease" }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, px: "6px", py: "6px" }}>
-        <MoreVert sx={{ fontSize: "0.6rem", opacity: 0.5, flexShrink: 0 }} />
-        <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem", lineHeight: 1.3, flex: 1 }} noWrap>
+    <ItemRowCard
+      compact
+      variant="outlined"
+      onCardClick={translatedDescription ? () => onPreview?.({ type: "skill", skill }) : undefined}
+      paperSx={{
+        transition: "border-color 0.15s ease",
+        "&:hover": { borderColor: theme.secondary },
+      }}
+      label={
+        <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
           {highlightMatch(t(skill.skillName), searchQuery)}
         </Typography>
-        {isInteractive && onUpdate ? (
-          <Box sx={{ display: "flex", alignItems: "center", gap: "2px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
-            <Tooltip title={t("Decrease Level")}><span>
-              <IconButton size="small" sx={{ p: 0, width: 28, height: 28 }} onClick={handleDecrement} disabled={skill.currentLvl <= 0}><Remove sx={{ fontSize: "1.1rem" }} /></IconButton>
-            </span></Tooltip>
-            <Box sx={{ fontFamily: "Antonio", fontSize: "0.8rem", fontWeight: "bold", minWidth: 28, textAlign: "center" }}>{skill.currentLvl}/{skill.maxLvl}</Box>
-            <Tooltip title={t("Increase Level")}><span>
-              <IconButton size="small" sx={{ p: 0, width: 28, height: 28 }} onClick={handleIncrement} disabled={skill.currentLvl >= skill.maxLvl}><Add sx={{ fontSize: "1.1rem" }} /></IconButton>
-            </span></Tooltip>
-          </Box>
-        ) : (
-          <Box sx={{ fontFamily: "Antonio", fontSize: "0.8rem", fontWeight: "bold", flexShrink: 0 }}>{skill.currentLvl}/{skill.maxLvl}</Box>
-        )}
-        <Tooltip title={t("Send to Chat")}>
-          <IconButton size="small" sx={{ p: 0, width: 28, height: 28 }}
-            onClick={(e) => { e.stopPropagation(); sendDisplayMessage("skill", t(skill.skillName), { speaker: pc?.info?.name || pc?.name || "", description: translatedDescription || undefined }); }}>
-            <MessageOutlined sx={{ fontSize: "1.2rem" }} />
-          </IconButton>
-        </Tooltip>
-      </Box>
-      {translatedDescription && (descOpen || !!searchQuery?.trim()) && (
-        <DescriptionArea><NotesMarkdown uniform fontSize="1rem">{highlightMarkdownText(translatedDescription, searchQuery)}</NotesMarkdown></DescriptionArea>
-      )}
-    </Box>
+      }
+      actions={
+        <>
+          {isInteractive && onUpdate ? (
+            <Box sx={{ display: "flex", alignItems: "center", gap: "2px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+              <Tooltip title={t("Decrease Level")}><span>
+                <IconButton size="small" sx={{ p: 0, width: 28, height: 28 }} onClick={handleDecrement} disabled={skill.currentLvl <= 0}><Remove sx={{ fontSize: "1.1rem" }} /></IconButton>
+              </span></Tooltip>
+              <Box sx={{ fontFamily: "Antonio", fontSize: "0.8rem", fontWeight: "bold", minWidth: 28, textAlign: "center", color: "#fff" }}>{skill.currentLvl}/{skill.maxLvl}</Box>
+              <Tooltip title={t("Increase Level")}><span>
+                <IconButton size="small" sx={{ p: 0, width: 28, height: 28 }} onClick={handleIncrement} disabled={skill.currentLvl >= skill.maxLvl || atClassLevelCap}><Add sx={{ fontSize: "1.1rem" }} /></IconButton>
+              </span></Tooltip>
+            </Box>
+          ) : (
+            <Box sx={{ fontFamily: "Antonio", fontSize: "0.8rem", fontWeight: "bold", color: "#fff", px: "4px", flexShrink: 0 }}>{skill.currentLvl}/{skill.maxLvl}</Box>
+          )}
+          <Tooltip title={t("Send to Chat")}>
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); sendDisplayMessage("skill", t(skill.skillName), { speaker: pc?.info?.name || pc?.name || "", description: translatedDescription || undefined }); }}>
+              <MessageOutlined />
+            </IconButton>
+          </Tooltip>
+        </>
+      }
+    />
   );
 }
 
@@ -438,6 +445,7 @@ function SkillCard({ skill, originalIdx, classIdx, translatedDescription, pc, is
 
 function SpellCard({ spell, onUpdate, searchQuery, compact, theme, t }) {
   const [descOpen, setDescOpen] = useState(!compact);
+  const [preview, setPreview] = useState(false);
   const spellName = getSpellName(spell, t);
   const complex = isComplexSpell(spell);
 
@@ -454,6 +462,7 @@ function SpellCard({ spell, onUpdate, searchQuery, compact, theme, t }) {
         sx={{ borderTop: `1px solid ${theme.secondary}`, overflow: "hidden", background: "transparent", "&:before": { display: "none" } }}
       >
         <AccordionSummary
+          component="div"
           sx={{
             minHeight: 0,
             p: 0,
@@ -488,29 +497,43 @@ function SpellCard({ spell, onUpdate, searchQuery, compact, theme, t }) {
   }
 
   return (
-    <Box onClick={() => setDescOpen((v) => !v)}
-      sx={{ gridColumn: complex ? "1 / -1" : undefined, border: "1px solid", borderColor: theme.secondary, borderRadius: `${theme.panelRadius}px`, overflow: "hidden", cursor: "pointer", "&:hover": { opacity: 0.85 }, transition: "opacity 0.15s ease" }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, px: "6px", py: "6px" }}>
-        <AutoFixHigh sx={{ fontSize: "0.9rem", color: theme.secondary, flexShrink: 0 }} />
-        <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem", lineHeight: 1.3, flex: 1 }} noWrap>
-          {highlightMatch(spellName, searchQuery)}
-        </Typography>
-        <Tooltip title={t("Send to Chat")}>
-          <IconButton size="small" sx={{ p: 0, width: 28, height: 28 }}
-            onClick={(e) => { e.stopPropagation(); sendDisplayMessage("spell", spellName, { speaker: "", description: spell.description ? t(spell.description) : undefined }); }}>
-            <MessageOutlined sx={{ fontSize: "1.2rem" }} />
-          </IconButton>
-        </Tooltip>
-      </Box>
-      {(descOpen || !!searchQuery?.trim()) && (
-        <DescriptionArea>{renderSpellContent(spell, onUpdate, searchQuery, highlightMatch)}</DescriptionArea>
-      )}
-    </Box>
+    <>
+      <ItemRowCard
+        compact
+        variant="outlined"
+        onCardClick={() => setPreview(true)}
+        paperSx={{
+          gridColumn: complex ? "1 / -1" : undefined,
+          transition: "border-color 0.15s ease",
+          "&:hover": { borderColor: theme.secondary },
+        }}
+        label={
+          <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
+            {highlightMatch(spellName, searchQuery)}
+          </Typography>
+        }
+        actions={
+          <Tooltip title={t("Send to Chat")}>
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); sendDisplayMessage("spell", spellName, { speaker: "", description: spell.description ? t(spell.description) : undefined }); }}>
+              <MessageOutlined />
+            </IconButton>
+          </Tooltip>
+        }
+      />
+      <Dialog open={preview} onClose={() => setPreview(false)} fullWidth maxWidth="sm">
+        <DialogContent sx={{ p: 0 }}>
+          <SharedPlayerSpellCard item={spell} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPreview(false)} variant="contained">{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
 // HeroicCard
 
-function HeroicCard({ cls, classIdx, isInteractive, onUpdate, pc, searchQuery, setHeroicPickerClassIdx, compact, theme, t }) {
+function HeroicCard({ cls, classIdx, isInteractive, onUpdate, pc, searchQuery, setHeroicPickerClassIdx, compact, theme, t, onPreview }) {
   const [descOpen, setDescOpen] = useState(!compact);
   const hasHeroic = !!cls.heroic?.name;
   const translatedDesc = cls.heroic?.description ? t(cls.heroic.description) : "";
@@ -528,6 +551,7 @@ function HeroicCard({ cls, classIdx, isInteractive, onUpdate, pc, searchQuery, s
         sx={{ borderTop: `1px solid ${theme.secondary}`, overflow: "hidden", background: "transparent", "&:before": { display: "none" } }}
       >
         <AccordionSummary
+          component="div"
           sx={{
             minHeight: 0,
             p: 0,
@@ -542,14 +566,6 @@ function HeroicCard({ cls, classIdx, isInteractive, onUpdate, pc, searchQuery, s
           <Typography sx={{ fontFamily: "Antonio", fontWeight: "bold", fontSize: { xs: "1rem", sm: "1.1rem" }, textTransform: "uppercase", color: hasHeroic ? "#fff" : "rgba(255,255,255,0.5)", flex: 1, lineHeight: 1.3 }}>
             {hasHeroic ? highlightMatch(t(cls.heroic.name), searchQuery) : <em>{t("No Heroic Skill")}</em>}
           </Typography>
-          {isInteractive && onUpdate && (
-            <Tooltip title={t("Search Heroic Skill")}>
-              <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px", flexShrink: 0 }}
-                onClick={(e) => { e.stopPropagation(); setHeroicPickerClassIdx(classIdx); }}>
-                <Search sx={{ fontSize: "1rem" }} />
-              </IconButton>
-            </Tooltip>
-          )}
           {hasHeroic && (
             <Tooltip title={t("Send to Chat")}>
               <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: "4px", flexShrink: 0 }}
@@ -578,34 +594,29 @@ function HeroicCard({ cls, classIdx, isInteractive, onUpdate, pc, searchQuery, s
   }
 
   return (
-    <Box onClick={() => hasHeroic && translatedDesc && setDescOpen((v) => !v)}
-      sx={{ border: "1px solid", borderColor: theme.secondary, borderRadius: `${theme.panelRadius}px`, overflow: "hidden", cursor: hasHeroic && translatedDesc ? "pointer" : "default", "&:hover": { opacity: 0.85 }, transition: "opacity 0.15s ease" }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, px: "6px", py: "6px" }}>
-        <Star sx={{ color: theme.secondary, fontSize: "1rem", flexShrink: 0 }} />
-        <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem", lineHeight: 1.3, flex: 1, color: hasHeroic ? theme.secondary : "text.disabled" }} noWrap>
+    <ItemRowCard
+      compact
+      variant="outlined"
+      onCardClick={hasHeroic && translatedDesc ? () => onPreview?.({ type: "heroic", heroic: cls.heroic }) : undefined}
+      paperSx={{
+        transition: "border-color 0.15s ease",
+        "&:hover": { borderColor: theme.secondary },
+      }}
+      label={
+        <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3, color: hasHeroic ? "inherit" : "text.disabled" }}>
           {hasHeroic ? highlightMatch(t(cls.heroic.name), searchQuery) : <em>{t("No Heroic Skill")}</em>}
         </Typography>
-        {isInteractive && onUpdate && (
-          <Tooltip title={t("Search Heroic Skill")}>
-            <IconButton size="small" sx={{ p: 0, width: 28, height: 28 }}
-              onClick={(e) => { e.stopPropagation(); setHeroicPickerClassIdx(classIdx); }}>
-              <Search sx={{ fontSize: "1rem" }} />
-            </IconButton>
-          </Tooltip>
-        )}
-        {hasHeroic && (
+      }
+      actions={
+        hasHeroic ? (
           <Tooltip title={t("Send to Chat")}>
-            <IconButton size="small" sx={{ p: 0, width: 28, height: 28 }}
-              onClick={(e) => { e.stopPropagation(); sendDisplayMessage("heroic skill", t(cls.heroic.name), { speaker: pc?.info?.name || pc?.name || "", description: translatedDesc || undefined }); }}>
-              <MessageOutlined sx={{ fontSize: "1.2rem" }} />
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); sendDisplayMessage("heroic skill", t(cls.heroic.name), { speaker: pc?.info?.name || pc?.name || "", description: translatedDesc || undefined }); }}>
+              <MessageOutlined />
             </IconButton>
           </Tooltip>
-        )}
-      </Box>
-      {translatedDesc && (descOpen || !!searchQuery?.trim()) && (
-        <DescriptionArea><NotesMarkdown uniform fontSize="1rem">{highlightMarkdownText(translatedDesc, searchQuery)}</NotesMarkdown></DescriptionArea>
-      )}
-    </Box>
+        ) : null
+      }
+    />
   );
 }
 // SpellTypeAccordion
@@ -655,8 +666,13 @@ function SpellTypeAccordion({ spellType, spells, classIdx, onUpdate, searchQuery
 }
 // ClassSection
 
-function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, onLevelChange, onRemoveClass, onEditClass, pc, searchQuery, setHeroicPickerClassIdx, compact, theme, t }) {
-  const [collapsed, setCollapsedState] = useState(true);
+function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, onLevelChange, onRemoveClass, onEditClass, pc, searchQuery, setHeroicPickerClassIdx, compact, defaultExpanded = false, theme, t }) {
+  const [collapsed, setCollapsedState] = useState(compact ? true : !defaultExpanded);
+  const [preview, setPreview] = useState(null);
+  useEffect(() => {
+    if (!compact) return;
+    if (searchQuery?.trim()) setCollapsedState(false);
+  }, [compact, searchQuery]);
 
   const visibleSpells = (cls.spells || []).filter(isVisibleSpell);
 
@@ -683,45 +699,80 @@ function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, 
 
   if (compact) {
     return (
-      <Paper elevation={0} variant="outlined" sx={{ mb: 1, overflow: "hidden" }}>
-        <CompactSectionHeader title={highlightMatch(t(cls.name), searchQuery)}>
+      <>
+      <Accordion
+        disableGutters
+        elevation={0}
+        variant="outlined"
+        expanded={!collapsed}
+        onChange={() => setCollapsedState((v) => !v)}
+        sx={{ mb: 1, overflow: "hidden", "&:before": { display: "none" } }}
+      >
+        <AccordionSummary
+          component="div"
+          sx={{
+            minHeight: 0,
+            pl: "46px",
+            pr: "6px",
+            py: "2.8px",
+            background: theme.primary,
+            "& .MuiAccordionSummary-content": { m: 0, alignItems: "center" },
+            "& .MuiAccordionSummary-expandIconWrapper": { display: "none" },
+          }}
+        >
+          <Typography sx={{ flex: 1, color: "#fff", fontFamily: "Antonio", fontSize: { xs: "0.75rem", sm: "0.875rem" }, textTransform: "uppercase" }}>
+            {highlightMatch(t(cls.name), searchQuery)}
+          </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: "2px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 28, px: "8px", borderRadius: "4px", bgcolor: "rgba(255,255,255,0.18)" }}>
               <Typography sx={{ color: "#fff", fontFamily: "Antonio", fontSize: "0.85rem", fontWeight: "bold", lineHeight: 1 }}>Lv {cls.lvl}/10</Typography>
             </Box>
             {onEditClass && (
               <Tooltip title={t("Edit Class")} arrow>
-                <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)" }} onClick={() => onEditClass(classIdx)}>
+                <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)" }} onClick={(e) => { e.stopPropagation(); onEditClass(classIdx); }}>
                   <Edit sx={{ fontSize: "1rem" }} />
                 </IconButton>
               </Tooltip>
             )}
-            <IconButton size="small" sx={{ p: "3px", color: "#fff" }} onClick={() => setCollapsedState((v) => !v)}>
+            <IconButton size="small" sx={{ p: "3px", color: "#fff" }} onClick={(e) => { e.stopPropagation(); setCollapsedState((v) => !v); }}>
               {collapsed ? <KeyboardArrowDown sx={{ fontSize: "1.15rem" }} /> : <KeyboardArrowUp sx={{ fontSize: "1.15rem" }} />}
             </IconButton>
           </Box>
-        </CompactSectionHeader>
-        {!collapsed && (
-          <>
-            {hasBenefits(cls.benefits) && (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, px: "10px", py: "4px", borderBottom: "1px solid", borderColor: "divider", bgcolor: "rgba(0,0,0,0.02)" }}>
-                <BenefitChips benefits={cls.benefits} />
-              </Box>
-            )}
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: "4px", p: "4px" }}>
-              {filteredSkills.map(({ skill, originalIdx }) => (
-                <SkillCard key={`skill-${classIdx}-${originalIdx}`} skill={skill} originalIdx={originalIdx} classIdx={classIdx} translatedDescription={t(skill.description || "")} pc={pc} isInteractive={isInteractive} onUpdate={onUpdate} updateMaxStats={updateMaxStats} searchQuery={searchQuery} compact={true} theme={theme} t={t} />
-              ))}
-              {heroicVisible && (
-                <HeroicCard cls={cls} classIdx={classIdx} isInteractive={isInteractive} onUpdate={onUpdate} pc={pc} searchQuery={searchQuery} setHeroicPickerClassIdx={setHeroicPickerClassIdx} compact={true} theme={theme} t={t} />
-              )}
-              {filteredSpells.map((spell, spellIdx) => (
-                <SpellCard key={`spell-${classIdx}-${spellIdx}`} spell={spell} onUpdate={onUpdate} searchQuery={searchQuery} compact={true} theme={theme} t={t} />
-              ))}
+        </AccordionSummary>
+        <AccordionDetails sx={{ p: 0 }}>
+          {hasBenefits(cls.benefits) && (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, px: "10px", py: "4px", borderBottom: "1px solid", borderColor: "divider", bgcolor: "rgba(0,0,0,0.02)" }}>
+              <BenefitChips benefits={cls.benefits} />
             </Box>
-          </>
-        )}
-      </Paper>
+          )}
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: "4px", p: "4px" }}>
+            {filteredSkills.map(({ skill, originalIdx }) => (
+              <SkillCard key={`skill-${classIdx}-${originalIdx}`} skill={skill} originalIdx={originalIdx} classIdx={classIdx} translatedDescription={t(skill.description || "")} pc={pc} isInteractive={isInteractive} onUpdate={onUpdate} updateMaxStats={updateMaxStats} searchQuery={searchQuery} compact={true} theme={theme} t={t} onPreview={setPreview} />
+            ))}
+            {heroicVisible && (
+              <HeroicCard cls={cls} classIdx={classIdx} isInteractive={isInteractive} onUpdate={onUpdate} pc={pc} searchQuery={searchQuery} setHeroicPickerClassIdx={setHeroicPickerClassIdx} compact={true} theme={theme} t={t} onPreview={setPreview} />
+            )}
+            {filteredSpells.map((spell, spellIdx) => (
+              <SpellCard key={`spell-${classIdx}-${spellIdx}`} spell={spell} onUpdate={onUpdate} searchQuery={searchQuery} compact={true} theme={theme} t={t} />
+            ))}
+          </Box>
+        </AccordionDetails>
+      </Accordion>
+
+      <Dialog open={Boolean(preview)} onClose={() => setPreview(null)} fullWidth maxWidth="sm">
+        <DialogContent sx={{ p: 0 }}>
+          {preview?.type === "skill" && (
+            <SharedSkillCard item={{ ...preview.skill, skillName: preview.skill.skillName, description: preview.skill.description, currentLvl: preview.skill.currentLvl, className: cls.name }} />
+          )}
+          {preview?.type === "heroic" && (
+            <SharedHeroicCard item={preview.heroic} />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPreview(null)} variant="contained">{t("Close")}</Button>
+        </DialogActions>
+      </Dialog>
+      </>
     );
   }
 
@@ -819,6 +870,7 @@ export default function PcClasses({
   onUpdate,
   updateMaxStats,
   searchQuery = "",
+  defaultExpanded = false,
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -835,6 +887,7 @@ export default function PcClasses({
 
   const [heroicPickerClassIdx, setHeroicPickerClassIdx] = useState(null);
   const [editClassIdx, setEditClassIdx] = useState(null);
+  const [pendingEditClassRef, setPendingEditClassRef] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newClassName, setNewClassName] = useState("");
   const [newClassFuid, setNewClassFuid] = useState(undefined);
@@ -857,18 +910,56 @@ export default function PcClasses({
     });
   };
 
-  const addClassToPlayer = (name, isHomebrew, fuid) => {
+  const addClassToPlayer = (name, isHomebrew, fuid, sourceItem = null, autoOpenEditor = false) => {
     const classExists = (pc?.classes ?? []).some((cls) => cls.name.toLowerCase() === name.toLowerCase());
     if (classExists) { alert(t("This class type already exists for the character")); return; }
+    const sortedSkills = (sourceItem?.skills || []).slice().sort((a, b) => {
+      if (a.skillName < b.skillName) return -1;
+      if (a.skillName > b.skillName) return 1;
+      return 0;
+    });
     applyUpdate((prev) => ({
       ...prev,
-      classes: [...(Array.isArray(prev.classes) ? prev.classes : []), { name, fuid, lvl: 1, benefits: {}, skills: [], heroic: { name: "", description: "" }, spells: [], isHomebrew: isHomebrew || false }],
+      classes: [...(Array.isArray(prev.classes) ? prev.classes : []), {
+        name,
+        fuid,
+        lvl: 1,
+        _packItemId: sourceItem?._packItemId,
+        benefits: {
+          ...(sourceItem?.benefits ?? {}),
+          rituals: {
+            ritualism: false,
+            arcanism: false,
+            elementalism: false,
+            ...(sourceItem?.benefits?.rituals ?? {}),
+          },
+        },
+        skills: sortedSkills,
+        heroic: sourceItem?.heroic || { name: "", description: "" },
+        spells: sourceItem?.spells || [],
+        isHomebrew: isHomebrew || false,
+      }],
     }));
+    if (autoOpenEditor) {
+      setPendingEditClassRef({ name, fuid: fuid ?? null });
+    } else {
+      setPendingEditClassRef(null);
+    }
     if (updateMaxStats) updateMaxStats();
     setDialogOpen(false);
     setNewClassName("");
     setNewClassFuid(undefined);
   };
+
+  useEffect(() => {
+    if (!pendingEditClassRef) return;
+    const idx = (pc?.classes ?? []).findIndex(
+      (cls) => cls?.name === pendingEditClassRef.name && (cls?.fuid ?? null) === pendingEditClassRef.fuid,
+    );
+    if (idx < 0) return;
+    setEditClassIdx(idx);
+    setPendingEditClassRef(null);
+  }, [pendingEditClassRef, pc?.classes]);
 
   const handleRemoveClass = (index) => {
     applyUpdate((prev) => ({ ...prev, classes: prev.classes.filter((_, i) => i !== index) }));
@@ -958,49 +1049,63 @@ export default function PcClasses({
     );
   });
 
-  return (
-    <>
-      <SectionCard
-        title={t(usesInnateClassRules ? "Innate Classes" : "Classes")}
-        onHeaderClick={() => setSectionsOpen((v) => !v)}
-        noShadow={isCompact}
-        sx={{ minWidth: 0, mb: 1 }}
-        actions={
-          <Box sx={{ display: "flex", alignItems: "center", gap: isCompact ? 0.5 : 1 }}>
-            <Typography sx={{ color: "rgba(255,255,255,0.8)", fontFamily: "Antonio", fontWeight: 700, fontSize: isCompact ? { xs: "0.65rem", sm: "0.75rem" } : { xs: "0.75rem", sm: "0.875rem" }, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap", flexShrink: 0 }}>
-              {t("Total Invested Levels")}
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: "2px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
-              {[totalInvested, usesInnateClassRules ? characterLevel - totalMnemoInvested : characterLevel].map((val, i) => (
-                <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
-                  {i === 1 && <Typography sx={{ color: "#fff", fontFamily: "Antonio", fontWeight: 700, fontSize: isCompact ? "0.8rem" : "1rem", px: "2px" }}>/</Typography>}
-                  <Box sx={{ background: "#fff", color: theme.primary, fontFamily: "Antonio", fontWeight: 700, fontSize: isCompact ? "0.8rem" : "1rem", px: isCompact ? 0.5 : 0.75, py: "1px", minWidth: isCompact ? 24 : 32, textAlign: "center", borderRadius: "2px" }}>{val}</Box>
-                </Box>
-              ))}
-            </Box>
-            {isInteractive && canAddMoreClasses && (
-              <Box sx={{ display: "flex", gap: "2px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
-                <Tooltip title={t("Search Compendium")} arrow>
-                  <IconButton size="small" onClick={() => setCompendiumOpen(true)} sx={{ color: "#fff", p: isCompact ? "2px" : "4px" }}>
-                    <Search sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={t("Add Blank Class")} arrow>
-                  <IconButton size="small" onClick={() => setDialogOpen(true)} sx={{ color: "#fff", p: isCompact ? "2px" : "4px" }}>
-                    <Add sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            )}
-            <IconButton size="small" onClick={(e) => { e.stopPropagation(); setSectionsOpen((v) => !v); }} sx={{ color: "#fff", p: "2px", flexShrink: 0 }}>
-              {sectionsOpen ? <KeyboardArrowUp sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} /> : <KeyboardArrowDown sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />}
-            </IconButton>
+  const classesActions = (
+    <Box sx={{ display: "flex", alignItems: "center", gap: isCompact ? 0.5 : 1 }}>
+      {isInteractive && (
+        <>
+          <Tooltip title={t("Add Blank Class")}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDialogOpen(true);
+                }}
+                disabled={!canAddMoreClasses}
+                sx={{ color: "#fff", p: "2px", flexShrink: 0 }}
+              >
+                <Add sx={{ fontSize: isCompact ? "1rem" : "1.1rem" }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={t("Search Class Compendium")}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCompendiumOpen(true);
+                }}
+                sx={{ color: "#fff", p: "2px", flexShrink: 0 }}
+              >
+                <Search sx={{ fontSize: isCompact ? "1rem" : "1.1rem" }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </>
+      )}
+      <Typography sx={{ color: "rgba(255,255,255,0.8)", fontFamily: "Antonio", fontWeight: 700, fontSize: isCompact ? { xs: "0.65rem", sm: "0.75rem" } : { xs: "0.75rem", sm: "0.875rem" }, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap", flexShrink: 0 }}>
+        {t("Total Invested Levels")}
+      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: "2px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+        {[totalInvested, usesInnateClassRules ? characterLevel - totalMnemoInvested : characterLevel].map((val, i) => (
+          <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
+            {i === 1 && <Typography sx={{ color: "#fff", fontFamily: "Antonio", fontWeight: 700, fontSize: isCompact ? "0.8rem" : "1rem", px: "2px" }}>/</Typography>}
+            <Box sx={{ background: "#fff", color: theme.primary, fontFamily: "Antonio", fontWeight: 700, fontSize: isCompact ? "0.8rem" : "1rem", px: isCompact ? 0.5 : 0.75, py: "1px", minWidth: isCompact ? 24 : 32, textAlign: "center", borderRadius: "2px" }}>{val}</Box>
           </Box>
-        }
-      >
+        ))}
+      </Box>
+      <IconButton size="small" onClick={(e) => { e.stopPropagation(); setSectionsOpen((v) => !v); }} sx={{ color: "#fff", p: "2px", flexShrink: 0 }}>
+        {sectionsOpen ? <KeyboardArrowUp sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} /> : <KeyboardArrowDown sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />}
+      </IconButton>
+    </Box>
+  );
 
-        <Collapse in={sectionsOpen}>
-          <Box sx={{ p: isCompact ? "4px" : 1 }}>
+  const classesContent = (
+    <>
+
+      <Collapse in={sectionsOpen}>
+        <Box sx={{ p: isCompact ? "4px" : 1 }}>
             {warnings.length > 0 && (
               <Box sx={{ mb: 0.5 }}>
                 {warnings.map((w, i) => (
@@ -1030,6 +1135,7 @@ export default function PcClasses({
                 searchQuery={searchQuery}
                 setHeroicPickerClassIdx={setHeroicPickerClassIdx}
                 compact={isCompact}
+                defaultExpanded={defaultExpanded}
                 theme={theme}
                 t={t}
               />
@@ -1049,35 +1155,60 @@ export default function PcClasses({
                 {t("No classes added yet")}
               </Typography>
             )}
+        </Box>
+      </Collapse>
+
+      <EditPlayerClassModal
+        open={editClassIdx !== null}
+        onClose={() => setEditClassIdx(null)}
+        cls={editingClass}
+        onSave={(patch) => handleSaveClassEdit(editClassIdx, patch)}
+        onDelete={() => {
+          handleRemoveClass(editClassIdx);
+          setEditClassIdx(null);
+        }}
+      />
+
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{t("Add Blank Class")}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+            <TextField fullWidth label={t("Class Name")} value={newClassName} onChange={(e) => setNewClassName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && newClassName.trim() && addClassToPlayer(newClassName.trim(), true, newClassFuid, null, true)} />
+            <FuidField value={newClassFuid} name={newClassName} onChange={setNewClassFuid} />
           </Box>
-        </Collapse>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>{t("Cancel")}</Button>
+          <Button variant="contained" disabled={!newClassName.trim()} onClick={() => addClassToPlayer(newClassName.trim(), true, newClassFuid, null, true)}>{t("Add")}</Button>
+        </DialogActions>
+      </Dialog>
 
-        <EditPlayerClassModal
-          open={editClassIdx !== null}
-          onClose={() => setEditClassIdx(null)}
-          cls={editingClass}
-          onSave={(patch) => handleSaveClassEdit(editClassIdx, patch)}
-        />
+      <CompendiumViewerModal open={compendiumOpen} onClose={() => setCompendiumOpen(false)} onAddItem={(item) => { if (!item) return; setPendingEditClassRef(null); addClassToPlayer(item.name, item.isHomebrew ?? false, item.fuid, item, false); setCompendiumOpen(false); }} initialType="classes" restrictToTypes={["classes"]} context="player" />
 
-        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>{t("Add Blank Class")}</DialogTitle>
-          <DialogContent>
-            <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 2 }}>
-              <TextField fullWidth label={t("Class Name")} value={newClassName} onChange={(e) => setNewClassName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && newClassName.trim() && addClassToPlayer(newClassName.trim(), true, newClassFuid)} />
-              <FuidField value={newClassFuid} name={newClassName} onChange={setNewClassFuid} />
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDialogOpen(false)}>{t("Cancel")}</Button>
-            <Button variant="contained" disabled={!newClassName.trim()} onClick={() => addClassToPlayer(newClassName.trim(), true, newClassFuid)}>{t("Add")}</Button>
-          </DialogActions>
-        </Dialog>
+      <CompendiumViewerModal open={heroicPickerClassIdx !== null} onClose={() => setHeroicPickerClassIdx(null)} onAddItem={handleAddHeroic} initialType="heroics" restrictToTypes={["heroics"]} context="player" />
+    </>
+  );
 
-        <CompendiumViewerModal open={compendiumOpen} onClose={() => setCompendiumOpen(false)} onAddItem={(item) => { if (!item) return; addClassToPlayer(item.name, item.isHomebrew ?? false, item.fuid); setCompendiumOpen(false); }} initialType="classes" restrictToTypes={["classes"]} context="player" />
-
-        <CompendiumViewerModal open={heroicPickerClassIdx !== null} onClose={() => setHeroicPickerClassIdx(null)} onAddItem={handleAddHeroic} initialType="heroics" restrictToTypes={["heroics"]} context="player" />
-      </SectionCard>
+  return (
+    <>
+      {isCompact ? (
+        <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
+          <CompactSectionHeader title={t(usesInnateClassRules ? "Innate Classes" : "Classes")}>
+            {classesActions}
+          </CompactSectionHeader>
+          {classesContent}
+        </Paper>
+      ) : (
+        <SectionCard
+          title={t(usesInnateClassRules ? "Innate Classes" : "Classes")}
+          onHeaderClick={() => setSectionsOpen((v) => !v)}
+          sx={{ minWidth: 0, mb: 1 }}
+          actions={classesActions}
+        >
+          {classesContent}
+        </SectionCard>
+      )}
 
       {usesInnateClassRules && slottedMnemospheres.length > 0 && (
         <PcMnemospheres
