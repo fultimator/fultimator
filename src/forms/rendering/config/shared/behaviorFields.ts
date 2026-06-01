@@ -85,6 +85,9 @@ function makeEffectChangeRowFields(
       componentProps: {
         options: keyOptions,
         freeSolo: true,
+        ...(keyOptions.length === 0
+          ? { noOptionsText: "No stat keys available for this type" }
+          : {}),
       },
     },
     {
@@ -753,8 +756,18 @@ export const passiveGroupLabels: Record<string, string> = {
 // Passives tab field (shared by all item types)
 
 export function makePassivesTabField(
-  itemScopedKeys: string[],
+  itemScopedKeys: string[] | ((outerState: Record<string, unknown>) => string[]),
 ): FieldConfig<Record<string, unknown>> {
+  const staticFields =
+    typeof itemScopedKeys === "function" ? null : makePassiveRowFields(itemScopedKeys);
+  const shared = {
+    itemDefaults: BLANK_PASSIVE,
+    addLabel: "passive.add",
+    variant: "behavior-card",
+    groupLabels: passiveGroupLabels,
+    rowLabel: (row: Record<string, unknown>) =>
+      typeof row.name === "string" && row.name ? row.name : "Passive",
+  };
   return {
     key: "passives",
     kind: "editable",
@@ -764,15 +777,13 @@ export function makePassivesTabField(
     defaultValue: [],
     order: 0,
     gridSize: 12,
-    componentProps: {
-      fields: makePassiveRowFields(itemScopedKeys),
-      itemDefaults: BLANK_PASSIVE,
-      addLabel: "passive.add",
-      variant: "behavior-card",
-      groupLabels: passiveGroupLabels,
-      rowLabel: (row: Record<string, unknown>) =>
-        typeof row.name === "string" && row.name ? row.name : "Passive",
-    },
+    componentProps:
+      typeof itemScopedKeys === "function"
+        ? (outerState: Record<string, unknown>) => ({
+            ...shared,
+            fields: makePassiveRowFields(itemScopedKeys(outerState)),
+          })
+        : { ...shared, fields: staticFields! },
   };
 }
 

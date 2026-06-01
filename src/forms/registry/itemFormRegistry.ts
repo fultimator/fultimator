@@ -498,10 +498,10 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
               {
                 key: s.name.trim() || "magichant_custom_name",
                 customName: "",
-                type: s.keyType.trim(),
-                status: s.keyStatus.trim(),
-                attribute: s.keyAttribute.trim(),
-                recovery: s.keyRecovery.trim(),
+                type: s.type.trim(),
+                status: s.status.trim(),
+                attribute: s.attribute.trim(),
+                recovery: s.recovery.trim(),
               },
             ],
             tones: [],
@@ -549,7 +549,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
             {
               key: s.name.trim() || "invoker_custom_name",
               customName: "",
-              type: s.invType.trim(),
+              type: s.type.trim(),
               effect: s.effect.trim(),
               wellspring: s.wellspring.trim(),
             },

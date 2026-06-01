@@ -20,7 +20,7 @@ import {
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../../shared/itemScopedKeys";
+import { PLAYER_SPELL_SCOPED_KEYS_BY_TYPE } from "../../shared/itemScopedKeys";
 
 export type { PlayerSpellFormState, PlayerSpellUiType } from "./types";
 export { DEFAULT_ITEM_TABS as playerSpellTabs };
@@ -74,7 +74,7 @@ export const playerSpellFieldConfig: ItemFieldConfig<PlayerSpellFormState> = [
   ...magiseedFields,
   ...(metaFieldConfig as unknown as ItemFieldConfig<PlayerSpellFormState>),
   makePassivesTabField(
-    ITEM_SCOPED_KEYS.playerSpell,
+    (s) => PLAYER_SPELL_SCOPED_KEYS_BY_TYPE[s.spellType as string] ?? [],
   ) as unknown as FieldConfig<PlayerSpellFormState>,
   behaviorsTabField as unknown as FieldConfig<PlayerSpellFormState>,
 ];

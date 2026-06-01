@@ -1009,12 +1009,26 @@ export function AutocompleteRenderer({
     return { value: val, label: val };
   });
   const freeSolo = (componentProps?.freeSolo as boolean) ?? false;
+  const noOptionsText = componentProps?.noOptionsText as string | undefined;
   const multiple =
     (componentProps?.multiple as boolean | undefined) ?? Array.isArray(value);
   const optionLabels = options.map((o) => o.value as string);
   const selectedMulti = Array.isArray(value) ? value : [];
   const selectedSingle =
     typeof value === "string" && value.trim().length > 0 ? value : null;
+
+  if (noOptionsText !== undefined && options.length === 0) {
+    return (
+      <TextField
+        label={t(label)}
+        value=""
+        disabled
+        size="small"
+        fullWidth
+        helperText={noOptionsText}
+      />
+    );
+  }
 
   // Cast needed: MUI Autocomplete freeSolo generic can't be satisfied with a
   // runtime boolean; the FreeSolo type param must be a literal true/false.

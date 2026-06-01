@@ -17,7 +17,7 @@ export const invocationFields: ItemFieldConfig<PlayerSpellFormState> = [
     componentProps: { options: WELLSPRING_OPTIONS, freeSolo: true },
   },
   {
-    key: "invType",
+    key: "type",
     kind: "editable",
     label: "spell.invocation.type",
     component: "select",

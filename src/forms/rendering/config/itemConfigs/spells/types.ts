@@ -55,16 +55,15 @@ export type PlayerSpellFormState = {
   event: string;
   // therioform fields
   genoclepsis: string;
-  // magichant-key fields
-  keyType: string;
-  keyStatus: string;
-  keyAttribute: string;
-  keyRecovery: string;
+  // magichant-key fields (renamed from keyType/keyStatus/keyAttribute/keyRecovery)
+  type: string;
+  status: string;
+  attribute: string;
+  recovery: string;
   // magichant tone / dance / symbol / gift effect
   effect: string;
-  // invocation fields
+  // invocation fields (wellspring + type, which is shared with magichant-key)
   wellspring: string;
-  invType: string;
   // cooking fields - array of { effect: string } objects for object-list renderer
   cookingEffects: Array<{ effect: string }>;
   // magiseed fields

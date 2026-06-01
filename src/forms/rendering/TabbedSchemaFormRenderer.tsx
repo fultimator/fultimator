@@ -18,6 +18,8 @@ interface TabbedSchemaFormRendererProps<
   groupLabels?: GroupLabels;
   cols?: 1 | 2 | 3 | 4;
   extraProps?: Record<string, unknown>;
+  onTabChange?: (tabKey: string) => void;
+  excludeGroups?: string[];
 }
 
 // Fields with no tab property fall into the first tab.
@@ -42,6 +44,8 @@ export function TabbedSchemaFormRenderer<
   groupLabels,
   cols = 2,
   extraProps,
+  onTabChange,
+  excludeGroups,
 }: TabbedSchemaFormRendererProps<TFormState>) {
   const { t } = useTranslate();
   const [activeTab, setActiveTab] = useState(0);
@@ -65,10 +69,13 @@ export function TabbedSchemaFormRenderer<
   const activeTabDef = tabs[activeTab];
   const visibleFields = fieldsForTab(config, activeTabDef.key, activeTab === 0);
 
-  // Collect unique groups in order of first appearance within the tab
+  // Collect unique groups that have at least one field visible under the current state
   const groups: string[] = [];
   for (const f of visibleFields) {
+    if (f.kind === "computed" || !f.component) continue;
+    if (f.dependencies && !f.dependencies(state)) continue;
     const g = f.group ?? "";
+    if (excludeGroups?.includes(g)) continue;
     if (!groups.includes(g)) groups.push(g);
   }
 
@@ -76,7 +83,10 @@ export function TabbedSchemaFormRenderer<
     <Box>
       <Tabs
         value={activeTab}
-        onChange={(_, v: number) => setActiveTab(v)}
+        onChange={(_, v: number) => {
+          setActiveTab(v);
+          onTabChange?.(tabs[v].key);
+        }}
         variant="scrollable"
         scrollButtons="auto"
         sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}

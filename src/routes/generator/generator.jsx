@@ -24,6 +24,7 @@ import Weapons from "../equip/weapons/Weapons";
 import { ArmorPanel, ShieldPanel } from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import Arcana from "../equip/Arcana/Arcana";
+import Spells from "../equip/Spells/Spells";
 import Qualities from "../equip/Qualities/Qualities";
 import CustomWeapons from "../equip/customWeapons/CustomWeapons.jsx";
 import {
@@ -178,6 +179,13 @@ function RitualsProjects() {
             <Button
               size="small"
               variant="outlined"
+              onClick={() => scrollToSection("section-spells")}
+            >
+              {t("Spells")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
               onClick={() => scrollToSection("section-qualities")}
             >
               {t("Qualities")}
@@ -270,6 +278,17 @@ function RitualsProjects() {
         >
           <Grid size={12}>
             <Arcana variant="print" />
+          </Grid>
+        </Grid>
+
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-spells"
+        >
+          <Grid size={12}>
+            <Spells variant="print" />
           </Grid>
         </Grid>
 

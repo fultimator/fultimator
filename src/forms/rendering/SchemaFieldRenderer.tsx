@@ -167,9 +167,13 @@ export function SchemaFieldRenderer<
                 Object.entries(extraProps).filter(([k]) => k !== "onBrowse"),
               )
           : undefined;
+        const resolvedComponentProps =
+          typeof field.componentProps === "function"
+            ? field.componentProps(state)
+            : field.componentProps;
         const mergedProps = filteredExtra
-          ? { ...field.componentProps, ...filteredExtra }
-          : field.componentProps;
+          ? { ...resolvedComponentProps, ...filteredExtra }
+          : resolvedComponentProps;
         const componentPropsWithNestedRenderer = {
           ...(mergedProps ?? {}),
           ...(field.component === "fuid" ? { name: state.name ?? "" } : {}),

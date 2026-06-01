@@ -44,3 +44,25 @@ export const ITEM_SCOPED_KEYS: Record<string, string[]> = {
   hoplosphere: [],
   playerSpell: ["accuracy.value", "damage.value", "cost.amount", "maxTargets"],
 };
+
+// Per-spellType scoped keys - only fields that exist on that spell type's schema.
+export const PLAYER_SPELL_SCOPED_KEYS_BY_TYPE: Record<string, string[]> = {
+  default: ["accuracy.value", "damage.value", "damage.type", "cost.amount", "maxTargets"],
+  arcanist: [],
+  "arcanist-rework": [],
+  gift: [],
+  dance: [],
+  therioform: [],
+  symbol: [],
+  invocation: [],
+  "magichant-key": [],
+  magichant: [],
+  "tinkerer-alchemy": [],
+  "tinkerer-infusion": [],
+  "tinkerer-magitech": [],
+  "pilot-vehicle": [],
+  cooking: [],
+  magiseed: [],
+  gamble: [],
+  deck: [],
+};

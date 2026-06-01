@@ -821,6 +821,8 @@ function PlayerSpellPanel() {
     }
   }, [initialSubtype]);
 
+  const [activeTabKey, setActiveTabKey] = useState("attributes");
+
   // Pilot-vehicle local state (kept as-is - schema renderer not used for pilot-vehicle)
   const [pilotSubtype, setPilotSubtype] = useState("frame");
   const [vehicleFrame, setVehicleFrame] = useState(
@@ -926,23 +928,23 @@ function PlayerSpellPanel() {
           imported.wellspring ?? imported.invocations?.[0]?.wellspring ?? "",
         ),
       ),
-      invType: String(imported.type ?? imported.invocations?.[0]?.type ?? ""),
+      type: String(
+        importedType === "magichant" && imported.magichantSubtype === "key"
+          ? (imported.type ?? "")
+          : (imported.type ?? imported.invocations?.[0]?.type ?? "")
+      ),
       category: String(imported.category ?? ""),
       infusionRank:
         imported.infusionRank == null ? null : Number(imported.infusionRank),
-      keyType:
-        importedType === "magichant" && imported.magichantSubtype === "key"
-          ? String(imported.type ?? "")
-          : "",
-      keyStatus:
+      status:
         importedType === "magichant" && imported.magichantSubtype === "key"
           ? String(imported.status ?? "")
           : "",
-      keyAttribute:
+      attribute:
         importedType === "magichant" && imported.magichantSubtype === "key"
           ? String(imported.attribute ?? "")
           : "",
-      keyRecovery:
+      recovery:
         importedType === "magichant" && imported.magichantSubtype === "key"
           ? String(imported.recovery ?? "")
           : "",
@@ -1101,6 +1103,8 @@ function PlayerSpellPanel() {
             onChange={setFormState}
             surface="quickCreate"
             cols={1}
+            onTabChange={setActiveTabKey}
+            excludeGroups={spellType === "pilot-vehicle" ? ["meta"] : undefined}
             extraProps={{
               onBrowse: () =>
                 openImport(
@@ -1117,7 +1121,7 @@ function PlayerSpellPanel() {
           />
 
           {/* Pilot-vehicle custom UI - not schema-driven */}
-          {spellType === "pilot-vehicle" && (
+          {spellType === "pilot-vehicle" && activeTabKey === "attributes" && (
             <>
               <Grid size={12}>
                 <ToggleButtonGroup
@@ -1560,6 +1564,19 @@ function PlayerSpellPanel() {
             </>
           )}
 
+          {spellType === "pilot-vehicle" && activeTabKey === "attributes" && (
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <SchemaFieldRenderer
+                config={playerSpellFieldConfig}
+                state={formState}
+                onChange={setFormState}
+                surface="quickCreate"
+                group="meta"
+                cols={1}
+              />
+            </Grid>
+          )}
+
           <Box sx={{ mt: 1 }}>
             <Button size="small" variant="outlined" onClick={handleClear}>
               {t("Clear All Fields")}
@@ -1672,7 +1689,7 @@ function QualityPanel() {
                 />
               </Grid>
               <SchemaFieldRenderer
-                config={qualityFieldConfig}
+                config={qualityFieldConfig.filter((f) => f.key !== "selectedBase")}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
