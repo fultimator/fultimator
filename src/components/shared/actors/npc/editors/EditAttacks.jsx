@@ -66,8 +66,27 @@ const SUMMARY_META_SX = {
   mr: 1,
   fontWeight: "bold",
   flexShrink: 0,
-  "@container (max-width: 460px)": {
-    display: "none",
+  " (max-width: 460px)": {
+    whiteSpace: "normal",
+    fontSize: "0.72rem",
+    lineHeight: 1.2,
+    mr: 0,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  " (max-width:600px)": {
+    whiteSpace: "normal",
+    fontSize: "0.72rem",
+    lineHeight: 1.2,
+    mr: 0,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
 };
 
@@ -328,13 +347,21 @@ export default function EditAttacks({ npc, setNpc }) {
       actions={
         <>
           <Tooltip title={t("Search Compendium")}>
-            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={() => setModalOpen(true)}
+              sx={{ color: "#fff" }}
+            >
               <Search fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
             <IconButton size="small" onClick={toggleAll} sx={{ color: "#fff" }}>
-              {allExpanded ? <UnfoldLess fontSize="small" /> : <UnfoldMore fontSize="small" />}
+              {allExpanded ? (
+                <UnfoldLess fontSize="small" />
+              ) : (
+                <UnfoldMore fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
           <Tooltip title={t("Add Attack")}>
@@ -346,125 +373,140 @@ export default function EditAttacks({ npc, setNpc }) {
       }
     >
       <Box sx={{ p: 1 }}>
-      <Grid container spacing={1}>
-        {npc.attacks?.map((attack, i) => {
-          const attr1 = ATTR_SHORT[attack.accuracy?.attr1] ?? "DEX";
-          const attr2 = ATTR_SHORT[attack.accuracy?.attr2] ?? "DEX";
-          const accBonus = attack.accuracy?.value ?? 0;
-          const dmgValue = attack.damage?.value ?? 0;
-          const dmgType = attack.damage?.type ?? "physical";
-          const hrZero = attack.damage?.hrZero === true;
+        <Grid container spacing={1}>
+          {npc.attacks?.map((attack, i) => {
+            const attr1 = ATTR_SHORT[attack.accuracy?.attr1] ?? "DEX";
+            const attr2 = ATTR_SHORT[attack.accuracy?.attr2] ?? "DEX";
+            const accBonus = attack.accuracy?.value ?? 0;
+            const dmgValue = attack.damage?.value ?? 0;
+            const dmgType = attack.damage?.type ?? "physical";
+            const hrZero = attack.damage?.hrZero === true;
 
-          const handleRoll = (e) => {
-            e.stopPropagation();
-            const dieSizes = {
-              primary: npc.attributes?.[attack.accuracy?.attr1]?.base ?? 6,
-              secondary: npc.attributes?.[attack.accuracy?.attr2]?.base ?? 6,
+            const handleRoll = (e) => {
+              e.stopPropagation();
+              const dieSizes = {
+                primary: npc.attributes?.[attack.accuracy?.attr1]?.base ?? 6,
+                secondary: npc.attributes?.[attack.accuracy?.attr2]?.base ?? 6,
+              };
+              const intent = prepareAccuracyCheck({
+                attr1: ATTR_ROLL[attack.accuracy?.attr1] ?? "dex",
+                attr2: ATTR_ROLL[attack.accuracy?.attr2] ?? "dex",
+                accuracyBonus: accBonus,
+                name: attack.name,
+                description: attack.effect ?? attack.special?.[0] ?? undefined,
+                baseDamage: dmgValue,
+                damageType: dmgType,
+                accuracyDefense: attack.accuracy?.defense ?? "def",
+                range: attack.range,
+                hrZero,
+              });
+              const rolls = rollAccuracyCheck(dieSizes);
+              const result = processAccuracyCheck(
+                intent,
+                rolls,
+                dieSizes,
+                npc.name || "NPC",
+              );
+              addMessage(buildAccuracyCheckMessage(result));
             };
-            const intent = prepareAccuracyCheck({
-              attr1: ATTR_ROLL[attack.accuracy?.attr1] ?? "dex",
-              attr2: ATTR_ROLL[attack.accuracy?.attr2] ?? "dex",
-              accuracyBonus: accBonus,
-              name: attack.name,
-              description: attack.effect ?? attack.special?.[0] ?? undefined,
-              baseDamage: dmgValue,
-              damageType: dmgType,
-              accuracyDefense: attack.accuracy?.defense ?? "def",
-              range: attack.range,
-              hrZero,
-            });
-            const rolls = rollAccuracyCheck(dieSizes);
-            const result = processAccuracyCheck(
-              intent,
-              rolls,
-              dieSizes,
-              npc.name || "NPC",
-            );
-            addMessage(buildAccuracyCheckMessage(result));
-          };
 
-          return (
-            <Grid key={i} size={{ xs: 12, md: 6 }} sx={{ containerType: "inline-size" }}>
-              <ItemRowCard
-                label={
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        color: "text.secondary",
-                      }}
-                    >
-                      {attack.range === "ranged" ? (
-                        <DistanceIcon />
-                      ) : (
-                        <MeleeIcon />
-                      )}
-                    </Box>
-                    <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1rem", textTransform: "uppercase" }}>
-                      {attack.name || t("(unnamed)")}
-                    </Typography>
-                  </Box>
-                }
-                subtitle={
-                  <Typography variant="body2" sx={SUMMARY_META_SX}>
-                    <OpenBracket />
-                    {attr1}+{attr2}
-                    <CloseBracket />
-                    {accBonus !== 0 && `${accBonus > 0 ? "+" : ""}${accBonus}`}
-                    {" ⬥ "}
-                    <OpenBracket />
-                    {hrZero ? "HR0" : "HR+"}
-                    {dmgValue}
-                    <CloseBracket />
-                    <TypeName type={dmgType} />
-                  </Typography>
-                }
-                actions={
-                  <>
-                    <Tooltip title={t("Roll")}>
-                      <IconButton component="span" onClick={handleRoll}>
-                        <Casino />
-                      </IconButton>
-                    </Tooltip>
-                    <AttackContextMenu
-                      attack={attack}
-                      onDelete={() => openDeleteDialog(i)}
-                      onMoveUp={() => moveAttack(i, i - 1)}
-                      onMoveDown={() => moveAttack(i, i + 1)}
-                      showMoveUp={i > 0}
-                      showMoveDown={i < (npc.attacks?.length ?? 0) - 1}
-                    />
-                  </>
-                }
-                onClick={() => toggleExpanded(i)}
-                paperSx={{ mb: 0.5 }}
+            return (
+              <Grid
+                key={i}
+                size={{ xs: 12, md: 6 }}
+                sx={{ containerType: "inline-size" }}
               >
-                {expandedSet.has(i) && (
-                  <Box sx={{ p: 1 }}>
-                    <TabbedSchemaFormRenderer
-                      tabs={npcAttackTabs}
-                      config={npcAttackFieldConfig}
-                      groupLabels={npcAttackGroupLabels}
-                      state={attack}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const attacks = [...(prev.attacks || [])];
-                          attacks[i] = next;
-                          return { ...prev, attacks };
-                        });
-                      }}
-                      surface="edit"
-                      cols={2}
-                      extraProps={{ name: String(attack.name ?? "") }}
-                    />
-                  </Box>
-                )}
-              </ItemRowCard>
-            </Grid>
-          );
-        })}
-      </Grid>
+                <ItemRowCard
+                  label={
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "text.secondary",
+                        }}
+                      >
+                        {attack.range === "ranged" ? (
+                          <DistanceIcon />
+                        ) : (
+                          <MeleeIcon />
+                        )}
+                      </Box>
+                      <Typography
+                        noWrap
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontWeight: 800,
+                          fontSize: "1rem",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {attack.name || t("(unnamed)")}
+                      </Typography>
+                    </Box>
+                  }
+                  subtitle={
+                    <Typography variant="body2" sx={SUMMARY_META_SX}>
+                      <OpenBracket />
+                      {attr1}+{attr2}
+                      <CloseBracket />
+                      {accBonus !== 0 &&
+                        `${accBonus > 0 ? "+" : ""}${accBonus}`}
+                      {" ⬥ "}
+                      <OpenBracket />
+                      {hrZero ? "HR0" : "HR+"}
+                      {dmgValue}
+                      <CloseBracket />
+                      <TypeName type={dmgType} />
+                    </Typography>
+                  }
+                  actions={
+                    <>
+                      <Tooltip title={t("Roll")}>
+                        <IconButton component="span" onClick={handleRoll}>
+                          <Casino />
+                        </IconButton>
+                      </Tooltip>
+                      <AttackContextMenu
+                        attack={attack}
+                        onDelete={() => openDeleteDialog(i)}
+                        onMoveUp={() => moveAttack(i, i - 1)}
+                        onMoveDown={() => moveAttack(i, i + 1)}
+                        showMoveUp={i > 0}
+                        showMoveDown={i < (npc.attacks?.length ?? 0) - 1}
+                      />
+                    </>
+                  }
+                  onClick={() => toggleExpanded(i)}
+                  paperSx={{ mb: 0.5 }}
+                >
+                  {expandedSet.has(i) && (
+                    <Box sx={{ p: 1 }}>
+                      <TabbedSchemaFormRenderer
+                        tabs={npcAttackTabs}
+                        config={npcAttackFieldConfig}
+                        groupLabels={npcAttackGroupLabels}
+                        state={attack}
+                        onChange={(next) => {
+                          setNpc((prev) => {
+                            const attacks = [...(prev.attacks || [])];
+                            attacks[i] = next;
+                            return { ...prev, attacks };
+                          });
+                        }}
+                        surface="edit"
+                        cols={2}
+                        extraProps={{ name: String(attack.name ?? "") }}
+                      />
+                    </Box>
+                  )}
+                </ItemRowCard>
+              </Grid>
+            );
+          })}
+        </Grid>
       </Box>
       <CompendiumViewerModal
         open={modalOpen}

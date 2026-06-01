@@ -61,8 +61,27 @@ const SUMMARY_META_SX = {
   mr: 1,
   fontWeight: "bold",
   flexShrink: 0,
-  "@container (max-width: 460px)": {
-    display: "none",
+  " (max-width: 460px)": {
+    whiteSpace: "normal",
+    fontSize: "0.72rem",
+    lineHeight: 1.2,
+    mr: 0,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+  " (max-width:600px)": {
+    whiteSpace: "normal",
+    fontSize: "0.72rem",
+    lineHeight: 1.2,
+    mr: 0,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
 };
 
@@ -337,13 +356,21 @@ export default function EditSpells({ npc, setNpc }) {
       actions={
         <>
           <Tooltip title={t("Search Compendium")}>
-            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={() => setModalOpen(true)}
+              sx={{ color: "#fff" }}
+            >
               <Search fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
             <IconButton size="small" onClick={toggleAll} sx={{ color: "#fff" }}>
-              {allExpanded ? <UnfoldLess fontSize="small" /> : <UnfoldMore fontSize="small" />}
+              {allExpanded ? (
+                <UnfoldLess fontSize="small" />
+              ) : (
+                <UnfoldMore fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
           <Tooltip title={t("Add Spell")}>
@@ -355,148 +382,174 @@ export default function EditSpells({ npc, setNpc }) {
       }
     >
       <Box sx={{ p: 1 }}>
-      <Grid container spacing={1}>
-        {npc.spells?.map((spell, i) => {
-          const attr1 = ATTR_SHORT[spell.accuracy?.attr1] ?? "INS";
-          const attr2 = ATTR_SHORT[spell.accuracy?.attr2] ?? "WLP";
-          const accBonus = spell.accuracy?.value ?? 0;
-          const dmgValue = spell.damage?.value ?? 0;
-          const dmgType = spell.damage?.type ?? "physical";
-          const hrZero = spell.damage?.hrZero === true;
-          const mpStr = `${spell.cost?.amount ?? 0}${spell.cost?.perTarget ? " × T" : ""} MP`;
+        <Grid container spacing={1}>
+          {npc.spells?.map((spell, i) => {
+            const attr1 = ATTR_SHORT[spell.accuracy?.attr1] ?? "INS";
+            const attr2 = ATTR_SHORT[spell.accuracy?.attr2] ?? "WLP";
+            const accBonus = spell.accuracy?.value ?? 0;
+            const dmgValue = spell.damage?.value ?? 0;
+            const dmgType = spell.damage?.type ?? "physical";
+            const hrZero = spell.damage?.hrZero === true;
+            const mpStr = `${spell.cost?.amount ?? 0}${spell.cost?.perTarget ? " × T" : ""} MP`;
 
-          const handleRoll = (e) => {
-            e.stopPropagation();
-            if (!spell.isOffensive) {
-              const tags = [
-                mpStr,
-                spell.targetDescription,
-                spell.duration,
-              ].filter(Boolean);
-              addMessage({
-                id: crypto.randomUUID(),
-                createdAt: Date.now(),
-                speaker: npc.name || "NPC",
-                kind: "display",
-                itemType: "spell",
+            const handleRoll = (e) => {
+              e.stopPropagation();
+              if (!spell.isOffensive) {
+                const tags = [
+                  mpStr,
+                  spell.targetDescription,
+                  spell.duration,
+                ].filter(Boolean);
+                addMessage({
+                  id: crypto.randomUUID(),
+                  createdAt: Date.now(),
+                  speaker: npc.name || "NPC",
+                  kind: "display",
+                  itemType: "spell",
+                  name: spell.name,
+                  tags,
+                  description: spell.effect ?? spell.special?.[0] ?? "",
+                });
+                return;
+              }
+              const attrMap = {
+                dexterity: "dex",
+                insight: "ins",
+                might: "mig",
+                will: "wlp",
+              };
+              const dieSizes = {
+                primary: npc.attributes?.[spell.accuracy?.attr1]?.base ?? 6,
+                secondary: npc.attributes?.[spell.accuracy?.attr2]?.base ?? 6,
+              };
+              const intent = prepareMagicCheck({
+                attr1: attrMap[spell.accuracy?.attr1] ?? "ins",
+                attr2: attrMap[spell.accuracy?.attr2] ?? "wlp",
+                accuracyBonus: accBonus,
                 name: spell.name,
-                tags,
-                description: spell.effect ?? spell.special?.[0] ?? "",
+                description: spell.effect ?? spell.special?.[0] ?? undefined,
+                baseDamage: dmgValue,
+                damageType: dmgType,
+                accuracyDefense: "mdef",
+                damageHrZero: hrZero,
+                spellType: spell.spellType ?? "npc",
               });
-              return;
-            }
-            const attrMap = {
-              dexterity: "dex",
-              insight: "ins",
-              might: "mig",
-              will: "wlp",
+              const rolls = rollMagicCheck(dieSizes);
+              const result = processMagicCheck(
+                intent,
+                rolls,
+                dieSizes,
+                npc.name || "NPC",
+              );
+              addMessage(buildMagicCheckMessage(result));
             };
-            const dieSizes = {
-              primary: npc.attributes?.[spell.accuracy?.attr1]?.base ?? 6,
-              secondary: npc.attributes?.[spell.accuracy?.attr2]?.base ?? 6,
-            };
-            const intent = prepareMagicCheck({
-              attr1: attrMap[spell.accuracy?.attr1] ?? "ins",
-              attr2: attrMap[spell.accuracy?.attr2] ?? "wlp",
-              accuracyBonus: accBonus,
-              name: spell.name,
-              description: spell.effect ?? spell.special?.[0] ?? undefined,
-              baseDamage: dmgValue,
-              damageType: dmgType,
-              accuracyDefense: "mdef",
-              damageHrZero: hrZero,
-              spellType: spell.spellType ?? "npc",
-            });
-            const rolls = rollMagicCheck(dieSizes);
-            const result = processMagicCheck(
-              intent,
-              rolls,
-              dieSizes,
-              npc.name || "NPC",
-            );
-            addMessage(buildMagicCheckMessage(result));
-          };
 
-          return (
-            <Grid key={i} size={{ xs: 12, md: 6 }} sx={{ containerType: "inline-size" }}>
-              <ItemRowCard
-                label={
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, overflow: "hidden" }}>
-                    <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary", flexShrink: 0 }}>
-                      <SpellIcon />
-                    </Box>
-                    <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1rem", textTransform: "uppercase" }}>
-                      {spell.name || t("(unnamed)")}
-                    </Typography>
-                    {spell.isOffensive && <OffensiveSpellIcon />}
-                  </Box>
-                }
-                subtitle={
-                  <Typography variant="body2" sx={SUMMARY_META_SX}>
-                    {spell.isOffensive && (
-                      <>
-                        <OpenBracket />
-                        {attr1}+{attr2}
-                        <CloseBracket />
-                        {accBonus !== 0 &&
-                          `${accBonus > 0 ? "+" : ""}${accBonus}`}
-                        {" ⬥ "}
-                        <OpenBracket />
-                        {hrZero ? "HR0" : "HR+"}
-                        {dmgValue}
-                        <CloseBracket />
-                        <TypeName type={dmgType} />
-                        {" ⬥ "}
-                      </>
-                    )}
-                    {mpStr}
-                  </Typography>
-                }
-                actions={
-                  <>
-                    <Tooltip title={t("Roll")}>
-                      <IconButton component="span" onClick={handleRoll}>
-                        <Casino />
-                      </IconButton>
-                    </Tooltip>
-                    <SpellContextMenu
-                      spell={spell}
-                      onDelete={() => openDeleteDialog(i)}
-                      onMoveUp={() => moveSpell(i, i - 1)}
-                      onMoveDown={() => moveSpell(i, i + 1)}
-                      showMoveUp={i > 0}
-                      showMoveDown={i < (npc.spells?.length ?? 0) - 1}
-                    />
-                  </>
-                }
-                onClick={() => toggleExpanded(i)}
-                paperSx={{ mb: 0.5 }}
+            return (
+              <Grid
+                key={i}
+                size={{ xs: 12, md: 6 }}
+                sx={{ containerType: "inline-size" }}
               >
-                {expandedSet.has(i) && (
-                  <Box sx={{ p: 1 }}>
-                    <TabbedSchemaFormRenderer
-                      tabs={npcSpellTabs}
-                      config={npcSpellFieldConfig}
-                      groupLabels={npcSpellGroupLabels}
-                      state={spell}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const spells = [...(prev.spells || [])];
-                          spells[i] = next;
-                          return { ...prev, spells };
-                        });
+                <ItemRowCard
+                  label={
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
+                        overflow: "hidden",
                       }}
-                      surface="edit"
-                      cols={2}
-                      extraProps={{ name: String(spell.name ?? "") }}
-                    />
-                  </Box>
-                )}
-              </ItemRowCard>
-            </Grid>
-          );
-        })}
-      </Grid>
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          color: "text.secondary",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <SpellIcon />
+                      </Box>
+                      <Typography
+                        noWrap
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontWeight: 800,
+                          fontSize: "1rem",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {spell.name || t("(unnamed)")}
+                      </Typography>
+                      {spell.isOffensive && <OffensiveSpellIcon />}
+                    </Box>
+                  }
+                  subtitle={
+                    <Typography variant="body2" sx={SUMMARY_META_SX}>
+                      {spell.isOffensive && (
+                        <>
+                          <OpenBracket />
+                          {attr1}+{attr2}
+                          <CloseBracket />
+                          {accBonus !== 0 &&
+                            `${accBonus > 0 ? "+" : ""}${accBonus}`}
+                          {" ⬥ "}
+                          <OpenBracket />
+                          {hrZero ? "HR0" : "HR+"}
+                          {dmgValue}
+                          <CloseBracket />
+                          <TypeName type={dmgType} />
+                          {" ⬥ "}
+                        </>
+                      )}
+                      {mpStr}
+                    </Typography>
+                  }
+                  actions={
+                    <>
+                      <Tooltip title={t("Roll")}>
+                        <IconButton component="span" onClick={handleRoll}>
+                          <Casino />
+                        </IconButton>
+                      </Tooltip>
+                      <SpellContextMenu
+                        spell={spell}
+                        onDelete={() => openDeleteDialog(i)}
+                        onMoveUp={() => moveSpell(i, i - 1)}
+                        onMoveDown={() => moveSpell(i, i + 1)}
+                        showMoveUp={i > 0}
+                        showMoveDown={i < (npc.spells?.length ?? 0) - 1}
+                      />
+                    </>
+                  }
+                  onClick={() => toggleExpanded(i)}
+                  paperSx={{ mb: 0.5 }}
+                >
+                  {expandedSet.has(i) && (
+                    <Box sx={{ p: 1 }}>
+                      <TabbedSchemaFormRenderer
+                        tabs={npcSpellTabs}
+                        config={npcSpellFieldConfig}
+                        groupLabels={npcSpellGroupLabels}
+                        state={spell}
+                        onChange={(next) => {
+                          setNpc((prev) => {
+                            const spells = [...(prev.spells || [])];
+                            spells[i] = next;
+                            return { ...prev, spells };
+                          });
+                        }}
+                        surface="edit"
+                        cols={2}
+                        extraProps={{ name: String(spell.name ?? "") }}
+                      />
+                    </Box>
+                  )}
+                </ItemRowCard>
+              </Grid>
+            );
+          })}
+        </Grid>
       </Box>
       <CompendiumViewerModal
         open={modalOpen}
