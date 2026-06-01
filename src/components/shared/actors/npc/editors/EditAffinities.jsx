@@ -1,10 +1,10 @@
 import { Grid } from "@mui/material";
-import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
-import { npcFieldConfig } from "../../forms/rendering/config/actorConfigs/npc";
+import { SchemaFieldRenderer } from "/src/forms/rendering/SchemaFieldRenderer";
+import { npcFieldConfig } from "/src/forms/rendering/config/actorConfigs/npc";
 
 export default function EditAffinities({ npc, setNpc }) {
   return (
-    <Grid container sx={{ pr: 2, py: 2 }} rowSpacing={2}>
+    <Grid container rowSpacing={2}>
       <SchemaFieldRenderer
         config={npcFieldConfig}
         state={npc}

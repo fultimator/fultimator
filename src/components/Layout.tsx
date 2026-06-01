@@ -158,6 +158,8 @@ const Layout: React.FC<LayoutProps> = ({
 
   // Determine if the current path is the homepage
   const isHomepage = location.pathname === "/";
+  const usesCompactHeader = !loading && (isNpcEdit || isPcEdit);
+  const contentTopOffset = usesCompactHeader ? "4.5em" : "6em";
 
   return (
     <>
@@ -217,9 +219,9 @@ const Layout: React.FC<LayoutProps> = ({
         }}
       >
         {fullWidth ? (
-          <div style={{ marginTop: "5em" }}>{children}</div>
+          <div style={{ marginTop: contentTopOffset }}>{children}</div>
         ) : (
-          <Container style={{ marginTop: "6em", alignItems: "center" }}>
+          <Container style={{ marginTop: contentTopOffset, alignItems: "center" }}>
             {children}
           </Container>
         )}

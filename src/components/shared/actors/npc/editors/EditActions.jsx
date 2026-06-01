@@ -1,7 +1,4 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Alert,
   Box,
   Divider,
@@ -12,31 +9,33 @@ import {
   Menu,
   MenuItem,
   Snackbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { useTranslate } from "../../translation/translate";
-import CustomHeader from "../common/CustomHeader";
-import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
+import { useTranslate } from "/src/translation/translate";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import { Search, UnfoldLess, UnfoldMore } from "@mui/icons-material";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcActionFieldConfig,
   npcActionGroupLabels,
   npcActionTabs,
-} from "../../forms/rendering/config/itemConfigs/npcAction";
+} from "/src/forms/rendering/config/itemConfigs/npcAction";
 import {
   Add,
   ArrowDownward,
   ArrowUpward,
   Casino,
   Delete,
-  ExpandMore,
   LibraryAdd,
   Menu as MenuIcon,
 } from "@mui/icons-material";
-import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
-import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
 
 function ActionContextMenu({
   action,
@@ -284,45 +283,45 @@ export default function EditActions({ npc, setNpc }) {
   };
 
   return (
-    <>
-      <CustomHeader
-        type="top"
-        addItem={addActions}
-        headerText={t("Other Actions")}
-        icon={Add}
-        openCompendium={() => setModalOpen(true)}
-        onExpandCollapse={toggleAll}
-        allExpanded={allExpanded}
-      />
+    <SectionCard
+      title={t("Other Actions")}
+      actions={
+        <>
+          <Tooltip title={t("Search Compendium")}>
+            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+              <Search fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
+            <IconButton size="small" onClick={toggleAll} sx={{ color: "#fff" }}>
+              {allExpanded ? <UnfoldLess fontSize="small" /> : <UnfoldMore fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t("Add Action")}>
+            <IconButton size="small" onClick={addActions} sx={{ color: "#fff" }}>
+              <Add fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </>
+      }
+    >
+      <Box sx={{ p: 1 }}>
       <Grid container spacing={1}>
         {npc.actions?.map((action, i) => {
           return (
             <Grid key={i} size={12}>
-              <Accordion
-                expanded={expandedSet.has(i)}
-                onChange={() => toggleExpanded(i)}
-                disableGutters
-                elevation={0}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  "&:before": { display: "none" },
-                  mb: 0.5,
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  sx={{
-                    "& .MuiAccordionSummary-content": {
-                      alignItems: "center",
-                      overflow: "hidden",
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{ display: "flex", alignItems: "center" }}
-                    onClick={(e) => e.stopPropagation()}
+              <ItemRowCard
+                label={action.name || t("(unnamed)")}
+                subtitle={
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "text.secondary", whiteSpace: "nowrap" }}
                   >
+                    SP: {action.spCost ?? 1}
+                  </Typography>
+                }
+                actions={
+                  <>
                     <IconButton
                       component="span"
                       onClick={() =>
@@ -349,46 +348,37 @@ export default function EditActions({ npc, setNpc }) {
                       showMoveUp={i > 0}
                       showMoveDown={i < (npc.actions?.length ?? 0) - 1}
                     />
+                  </>
+                }
+                onClick={() => toggleExpanded(i)}
+                paperSx={{ mb: 0.5 }}
+              >
+                {expandedSet.has(i) && (
+                  <Box sx={{ p: 1 }}>
+                    <TabbedSchemaFormRenderer
+                      tabs={npcActionTabs}
+                      config={npcActionFieldConfig}
+                      groupLabels={npcActionGroupLabels}
+                      state={action}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const actions = [...(prev.actions || [])];
+                          actions[i] = next;
+                          return { ...prev, actions };
+                        });
+                      }}
+                      surface="edit"
+                      cols={2}
+                      extraProps={{ name: String(action.name ?? "") }}
+                    />
                   </Box>
-                  <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
-                    <Typography noWrap>
-                      {action.name || t("(unnamed)")}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "text.secondary",
-                      whiteSpace: "nowrap",
-                      mr: 1,
-                    }}
-                  >
-                    SP: {action.spCost ?? 1}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <TabbedSchemaFormRenderer
-                    tabs={npcActionTabs}
-                    config={npcActionFieldConfig}
-                    groupLabels={npcActionGroupLabels}
-                    state={action}
-                    onChange={(next) => {
-                      setNpc((prev) => {
-                        const actions = [...(prev.actions || [])];
-                        actions[i] = next;
-                        return { ...prev, actions };
-                      });
-                    }}
-                    surface="edit"
-                    cols={2}
-                    extraProps={{ name: String(action.name ?? "") }}
-                  />
-                </AccordionDetails>
-              </Accordion>
+                )}
+              </ItemRowCard>
             </Grid>
           );
         })}
       </Grid>
+      </Box>
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -430,6 +420,6 @@ export default function EditActions({ npc, setNpc }) {
             : ""
         }
       />
-    </>
+    </SectionCard>
   );
 }

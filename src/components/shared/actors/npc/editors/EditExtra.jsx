@@ -13,12 +13,11 @@ import {
   ShieldOutlined,
   HealthAndSafetyOutlined,
   QueryStatsOutlined,
-  TuneOutlined,
 } from "@mui/icons-material";
-import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
-import { npcFieldConfig } from "../../forms/rendering/config/actorConfigs/npc";
-import { getFreeImmunities } from "../../forms/rendering/config/actorConfigs/npcSpeciesEffects";
-import { useTranslate } from "../../translation/translate";
+import { SchemaFieldRenderer } from "/src/forms/rendering/SchemaFieldRenderer";
+import { npcFieldConfig } from "/src/forms/rendering/config/actorConfigs/npc";
+import { getFreeImmunities } from "/src/forms/rendering/config/actorConfigs/npcSpeciesEffects";
+import { useTranslate } from "/src/translation/translate";
 import React, { useMemo, useCallback, useState } from "react";
 
 export default function EditExtra({ npc, setNpc }) {
@@ -84,10 +83,6 @@ export default function EditExtra({ npc, setNpc }) {
                 label={t("Stats")}
                 icon={<QueryStatsOutlined />}
               />
-              <BottomNavigationAction
-                label={t("Overrides")}
-                icon={<TuneOutlined />}
-              />
             </BottomNavigation>
 
             {mobileTab === 0 && (
@@ -132,6 +127,23 @@ export default function EditExtra({ npc, setNpc }) {
             {mobileTab === 1 && (
               <Grid container spacing={1}>
                 <Grid size={12}>
+                  <FormControl variant="standard" fullWidth sx={{ mb: 1 }}>
+                    <TextField
+                      type="number"
+                      slotProps={{
+                        htmlInput: { inputMode: "numeric", pattern: "[0-9]*", min: 0 },
+                        formHelperText: {
+                          sx: { color: totalPicked > totalAllotted ? "red !important" : "inherit" },
+                        },
+                      }}
+                      label={t("Status Effect Immunity")}
+                      value={npc.extra?.statusImmunity || 0}
+                      onChange={handleStatusImmunityChange}
+                      helperText={`${t("Gain 2 Immunities per 1 SP")} - ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid size={12}>
                   <Grid
                     container
                     spacing={0}
@@ -172,33 +184,6 @@ export default function EditExtra({ npc, setNpc }) {
                   cols={3}
                 />
               </Grid>
-            )}
-
-            {mobileTab === 3 && (
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  type="number"
-                  slotProps={{
-                    htmlInput: {
-                      inputMode: "numeric",
-                      pattern: "[0-9]*",
-                      min: 0,
-                    },
-                    formHelperText: {
-                      sx: {
-                        color:
-                          totalPicked > totalAllotted
-                            ? "red !important"
-                            : "inherit",
-                      },
-                    },
-                  }}
-                  label={t("Status Effect Immunity")}
-                  value={npc.extra?.statusImmunity || 0}
-                  onChange={handleStatusImmunityChange}
-                  helperText={`${t("Gain 2 Immunities per 1 SP")} - ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
-                />
-              </FormControl>
             )}
           </Paper>
         </Grid>

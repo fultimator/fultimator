@@ -6,7 +6,8 @@ import { OpenBracket, CloseBracket } from "/src/components/Bracket";
 import Diamond from "/src/components/Diamond";
 import { Martial } from "/src/components/icons";
 import attributes from "/src/libs/attributes";
-import { SpanMarkdown, damageTypeLabels } from "./shared";
+import { damageTypeLabels } from "./npcShared";
+import { SpanMarkdown } from "./NpcMarkdown";
 
 export function NpcEquipment({ npc }) {
   const { t, background } = useActorCardSetup();

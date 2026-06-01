@@ -14,12 +14,8 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
-import {
-  SpanMarkdown,
-  ClickableName,
-  ATTR_SHORT,
-  damageTypeLabels,
-} from "./shared";
+import { ATTR_SHORT, damageTypeLabels } from "./npcShared";
+import { SpanMarkdown, ClickableName } from "./NpcMarkdown";
 
 function AttackRow({ attack, npc, attackType, showRoll }) {
   const { t } = useTranslate();
@@ -136,7 +132,7 @@ export function NpcAttacks({ npc, variant = "interactive" }) {
 
   return (
     <Grid container>
-      <Grid sx={{ mt: 1, px: 2, py: 0.3, background }} size={12}>
+      <Grid sx={{ mt: 0, px: 2, py: 0.3, background }} size={12}>
         <Typography
           sx={{
             color: "white.main",

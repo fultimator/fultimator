@@ -1,7 +1,7 @@
 import React from "react";
 import { Grid } from "@mui/material";
-import { SchemaFieldRenderer } from "../../forms/rendering/SchemaFieldRenderer";
-import { npcFieldConfig } from "../../forms/rendering/config/actorConfigs/npc";
+import { SchemaFieldRenderer } from "/src/forms/rendering/SchemaFieldRenderer";
+import { npcFieldConfig } from "/src/forms/rendering/config/actorConfigs/npc";
 
 export function EditAttributes({ npc, setNpc }) {
   return (

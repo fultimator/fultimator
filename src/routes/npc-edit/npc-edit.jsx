@@ -15,7 +15,6 @@ import {
   BottomNavigation,
   BottomNavigationAction,
   Grid,
-  Divider,
   Fab,
   Tooltip,
   IconButton,
@@ -40,25 +39,26 @@ import {
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
-// import NpcUgly from "../../components/npc/Ugly";
-import EditBasics from "../../components/npc/EditBasics";
-import ExplainSkills from "../../components/npc/ExplainSkills";
-import EditAttacks from "../../components/npc/EditAttacks";
-import EditWeaponAttacks from "../../components/npc/EditWeaponAttacks";
-import EditAffinities from "../../components/npc/EditAffinities";
-import EditSpecial from "../../components/npc/EditSpecial";
-import ExplainAffinities from "../../components/npc/ExplainAffinities";
-import EditExtra from "../../components/npc/EditExtra";
-import EditSpells from "../../components/npc/EditSpells";
-import EditActions from "../../components/npc/EditActions";
-import EditNotes from "../../components/npc/EditNotes";
-import EditRareGear from "../../components/npc/EditRareGear";
-import EditPublish from "../../components/npc/EditPublish";
+import {
+  EditBasics,
+  ExplainSkills,
+  EditAttacks,
+  EditWeaponAttacks,
+  EditAffinities,
+  EditSpecial,
+  ExplainAffinities,
+  EditExtra,
+  EditSpells,
+  EditActions,
+  EditNotes,
+  EditRareGear,
+  EditPublish,
+} from "/src/components/shared/actors/npc/editors";
 import Probs from "../probs/probs";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { useTranslate } from "../../translation/translate";
-import CustomHeader from "../../components/common/CustomHeader";
+import SectionCard from "../../components/shared/actors/common/SectionCard";
 import TagList from "../../components/TagList";
 import { moderators } from "../../libs/userGroups";
 import blacklist from "../../translation/blacklist.json";
@@ -67,7 +67,7 @@ import {
   applyNpcPostLoadTransforms,
   applyNpcPreSaveTransforms,
 } from "../../libs/actor";
-import { NpcProvider } from "../../components/npc/NpcContext";
+import { NpcProvider } from "/src/components/shared/actors/npc/context";
 
 // Combine all blacklisted names into a single array
 const mergedBlacklistNames = blacklist.flatMap((item) => Object.values(item));
@@ -379,7 +379,6 @@ export default function NpcEdit() {
             Moderator view
           </Alert>
         )}
-        {isSmallScreen && <Divider sx={{ my: 1 }} />}
 
         {(!isSmallScreen || mobileTab === 0) && (
           <>
@@ -406,7 +405,6 @@ export default function NpcEdit() {
                 }}
               >
                 <ExplainSkills npc={npcTemp} />
-                <Divider sx={{ my: 1 }} />
 
                 <Tooltip title={t("Download as Image")}>
                   <IconButton onClick={DownloadImage}>
@@ -438,8 +436,6 @@ export default function NpcEdit() {
                   </Tooltip>
                 )}
 
-                <Divider sx={{ my: 1 }} />
-
                 {!isLocalNpc && (
                   <EditPublish
                     npc={npcTemp}
@@ -458,188 +454,82 @@ export default function NpcEdit() {
                   />
                 )}
                 {isOwner && (
-                  <>
-                    <Divider sx={{ my: 1 }} />
-                    <TagList npc={npcTemp} setNpc={setNpcTemp} />
-                  </>
+                  <TagList npc={npcTemp} setNpc={setNpcTemp} />
                 )}
               </Grid>
             </Grid>
-            <Divider sx={{ my: 1 }} />
           </>
         )}
 
         {/* NPC Edit Options for Creator */}
         {isOwner && (
           <>
-            {(!isSmallScreen || mobileTab === 1) && (
-              <>
-                <Paper
-                  id="edit-section-basics"
-                  elevation={3}
-                  sx={{
-                    p: "15px",
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                  }}
-                >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                mt: 2,
+                mb: isSmallScreen ? 24 : 20,
+              }}
+            >
+              {(!isSmallScreen || mobileTab === 1) && (
+                <Box id="edit-section-basics" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <EditBasics npc={npcTemp} setNpc={setNpcTemp} />
-                </Paper>
-                <Divider sx={{ my: 1 }} />
-              </>
-            )}
+                </Box>
+              )}
 
-            {(!isSmallScreen || mobileTab === 2) && (
-              <>
-                <Paper
-                  id="edit-section-affinities"
-                  elevation={3}
-                  sx={{
-                    p: "15px",
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                  }}
-                >
-                  <Grid container spacing={2}>
-                    <Grid
-                      size={{
-                        xs: 12,
-                        md: 6,
-                      }}
-                    >
-                      <CustomHeader
-                        type="top"
-                        headerText={t("Affinity")}
-                        showIconButton={false}
-                      />
-                      <ExplainAffinities npc={npcTemp} />
-                      <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 12,
-                        md: 6,
-                      }}
-                    >
-                      <CustomHeader
-                        type={isSmallScreen ? "middle" : "top"}
-                        headerText={t("Bonuses")}
-                        showIconButton={false}
-                      />
-                      <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
-                    </Grid>
+              {(!isSmallScreen || mobileTab === 2) && (
+                <Grid id="edit-section-affinities" container spacing={2}>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <SectionCard title={t("Affinity")}>
+                      <Box sx={{ p: 2 }}>
+                        <ExplainAffinities npc={npcTemp} />
+                        <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
+                      </Box>
+                    </SectionCard>
                   </Grid>
-                </Paper>
-                <Divider sx={{ my: 1 }} />
-              </>
-            )}
-
-            {(!isSmallScreen || mobileTab === 3) && (
-              <>
-                <Paper
-                  id="edit-section-attacks"
-                  elevation={3}
-                  sx={{
-                    p: "15px",
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                  }}
-                >
-                  <Grid container>
-                    <Grid size={12}>
-                      <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
-                    </Grid>
-                    <Grid size={12}>
-                      <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
-                    </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <SectionCard title={t("Bonuses")}>
+                      <Box sx={{ p: 2 }}>
+                        <EditExtra npc={npcTemp} setNpc={setNpcTemp} />
+                      </Box>
+                    </SectionCard>
                   </Grid>
-                </Paper>
-                <Divider sx={{ my: 1 }} />
-              </>
-            )}
+                </Grid>
+              )}
 
-            {(!isSmallScreen || mobileTab === 4) && (
-              <>
-                <Paper
-                  id="edit-section-spells"
-                  elevation={3}
-                  sx={{
-                    p: "15px",
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                  }}
-                >
+              {(!isSmallScreen || mobileTab === 3) && (
+                <Box id="edit-section-attacks" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
+                  <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
+                </Box>
+              )}
+
+              {(!isSmallScreen || mobileTab === 4) && (
+                <Box id="edit-section-spells">
                   <EditSpells npc={npcTemp} setNpc={setNpcTemp} />
-                </Paper>
-                <Divider sx={{ my: 1 }} />
-              </>
-            )}
+                </Box>
+              )}
 
-            {(!isSmallScreen || mobileTab === 5) && (
-              <>
-                <Paper
-                  id="edit-section-extras"
-                  elevation={3}
-                  sx={{
-                    p: "15px",
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                  }}
-                >
-                  <Grid container spacing={2}>
-                    <Grid
-                      size={{
-                        xs: 12,
-                        md: 6,
-                      }}
-                    >
-                      <div id="edit-section-actions">
-                        <EditActions npc={npcTemp} setNpc={setNpcTemp} />
-                      </div>
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 12,
-                        md: 6,
-                      }}
-                    >
-                      <div id="edit-section-special">
-                        <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
-                      </div>
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 12,
-                        md: 6,
-                      }}
-                    >
-                      <div id="edit-section-raregear">
-                        <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
-                      </div>
-                    </Grid>
-                    <Grid
-                      size={{
-                        xs: 12,
-                        md: 6,
-                      }}
-                    >
-                      <div id="edit-section-notes">
-                        <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
-                      </div>
-                    </Grid>
+              {(!isSmallScreen || mobileTab === 5) && (
+                <Grid id="edit-section-extras" container spacing={2}>
+                  <Grid size={{ xs: 12, md: 6 }} id="edit-section-actions">
+                    <EditActions npc={npcTemp} setNpc={setNpcTemp} />
                   </Grid>
-                </Paper>
-                <Divider sx={{ my: 1 }} />
-              </>
-            )}
+                  <Grid size={{ xs: 12, md: 6 }} id="edit-section-special">
+                    <EditSpecial npc={npcTemp} setNpc={setNpcTemp} />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }} id="edit-section-raregear">
+                    <EditRareGear npc={npcTemp} setNpc={setNpcTemp} />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }} id="edit-section-notes">
+                    <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
+                  </Grid>
+                </Grid>
+              )}
 
-            {(!isSmallScreen || mobileTab === 5) && (
-              <>
+              {(!isSmallScreen || mobileTab === 5) && (
                 <Paper
                   id="edit-section-attackchance"
                   elevation={3}
@@ -652,10 +542,8 @@ export default function NpcEdit() {
                 >
                   <Probs />
                 </Paper>
-                <Divider sx={{ my: 1 }} />
-              </>
-            )}
-            <Divider sx={{ my: 2, mb: isSmallScreen ? 24 : 20 }} />
+              )}
+            </Box>
           </>
         )}
         {/* <NpcUgly npc={npcTemp} /> */}

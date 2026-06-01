@@ -5,7 +5,7 @@ import { useActorCardSetup, isInteractive } from "/src/components/shared/actors/
 import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import Diamond from "/src/components/Diamond";
 import { RareItemIcon } from "/src/components/icons";
-import { SpanMarkdown, ClickableName } from "./shared";
+import { SpanMarkdown, ClickableName } from "./NpcMarkdown";
 
 function RareGearRow({ item, npc, showRoll }) {
   const addMessage = useAddChatMessage();

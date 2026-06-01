@@ -38,7 +38,6 @@ import {
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
-// import NpcUgly from "../../components/npc/Ugly";
 import {
   ArrowRight,
   ArrowLeft,

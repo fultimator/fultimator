@@ -16,17 +16,17 @@ import {
   Divider,
   Box,
 } from "@mui/material";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { Close } from "@mui/icons-material";
-import Diamond from "../Diamond";
-import { OffensiveSpellIcon } from "../icons";
-import { Martial } from "../icons";
-import { npcSpells } from "../../libs/npcSpells";
-import { npcAttacks } from "../../libs/npcAttacks";
-import attributes from "../../libs/attributes";
-import { CloseBracket, OpenBracket } from "../Bracket";
-import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
+import Diamond from "/src/components/Diamond";
+import { OffensiveSpellIcon } from "/src/components/icons";
+import { Martial } from "/src/components/icons";
+import { npcSpells } from "/src/libs/npcSpells";
+import { npcAttacks } from "/src/libs/npcAttacks";
+import attributes from "/src/libs/attributes";
+import { CloseBracket, OpenBracket } from "/src/components/Bracket";
+import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
 
 // Maps selectedType → CompendiumItemType stored in packs
 const TYPE_TO_PACK_TYPE = {

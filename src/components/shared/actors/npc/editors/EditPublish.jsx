@@ -17,7 +17,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { useTranslate, languageOptions } from "../../translation/translate";
+import { useTranslate, languageOptions } from "/src/translation/translate";
 import { Publish } from "@mui/icons-material";
 import emaExample from "/images/routes/npc-edit/emaExample.png";
 

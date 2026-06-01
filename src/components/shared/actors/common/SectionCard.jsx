@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Box, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 /**
@@ -18,8 +18,7 @@ export default function SectionCard({ title, actions, children, noShadow = false
   const secondary = theme.palette.secondary.main;
 
   return (
-    <Paper
-      elevation={3}
+    <Box
       sx={{
         borderRadius: "8px",
         display: "flex",
@@ -27,7 +26,8 @@ export default function SectionCard({ title, actions, children, noShadow = false
         border: "2px solid",
         borderColor: secondary,
         overflow: "hidden",
-        ...(noShadow ? { boxShadow: "none" } : {}),
+        bgcolor: "background.paper",
+        boxShadow: noShadow ? "none" : "0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12)",
         ...sx,
       }}
     >
@@ -76,6 +76,6 @@ export default function SectionCard({ title, actions, children, noShadow = false
         )}
       </Box>
       {children}
-    </Paper>
+    </Box>
   );
 }

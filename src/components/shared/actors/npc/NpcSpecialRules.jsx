@@ -4,7 +4,7 @@ import { useTranslate } from "/src/translation/translate";
 import { useActorCardSetup, isInteractive } from "/src/components/shared/actors/core-utils";
 import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import Diamond from "/src/components/Diamond";
-import { SpanMarkdown, ClickableName } from "./shared";
+import { SpanMarkdown, ClickableName } from "./NpcMarkdown";
 
 function SpecialRow({ item, npc, showRoll }) {
   const addMessage = useAddChatMessage();

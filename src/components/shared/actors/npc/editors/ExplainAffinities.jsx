@@ -1,7 +1,7 @@
 import { Card, Typography } from "@mui/material";
-import { useTranslate } from "../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
-import { useCustomTheme } from "../../hooks/useCustomTheme";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
 
 export default function ExplainAffinities({ npc }) {
   const { t } = useTranslate();
@@ -15,6 +15,7 @@ export default function ExplainAffinities({ npc }) {
     <Card
       sx={{
         p: 1.61,
+        mb: 2,
         background,
       }}
     >

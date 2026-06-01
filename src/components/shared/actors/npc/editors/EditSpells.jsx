@@ -1,8 +1,5 @@
 import { useState } from "react";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Alert,
   Box,
   Divider,
@@ -16,37 +13,40 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useTranslate, t as staticT } from "../../translation/translate";
-import CustomHeader from "../common/CustomHeader";
-import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
+import { useTranslate, t as staticT } from "/src/translation/translate";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcSpellFieldConfig,
   npcSpellGroupLabels,
   npcSpellTabs,
-} from "../../forms/rendering/config/itemConfigs/npcSpell";
+} from "/src/forms/rendering/config/itemConfigs/npcSpell";
 import {
   Add,
   ArrowDownward,
   ArrowUpward,
   Casino,
   Delete,
-  ExpandMore,
   LibraryAdd,
+  Search,
+  UnfoldLess,
+  UnfoldMore,
   Menu as MenuIcon,
 } from "@mui/icons-material";
-import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
-import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
 import {
   prepareMagicCheck,
   rollMagicCheck,
   processMagicCheck,
   buildMagicCheckMessage,
-} from "../app-drawer/panels/chat/domain/magic-checks";
-import { TypeName } from "../types";
-import { SpellIcon, OffensiveSpellIcon } from "../icons";
-import { OpenBracket, CloseBracket } from "../Bracket";
+} from "/src/components/app-drawer/panels/chat/domain/magic-checks";
+import { TypeName } from "/src/components/types";
+import { SpellIcon, OffensiveSpellIcon } from "/src/components/icons";
+import { OpenBracket, CloseBracket } from "/src/components/Bracket";
 
 const ATTR_SHORT = {
   dexterity: "DEX",
@@ -332,16 +332,29 @@ export default function EditSpells({ npc, setNpc }) {
   };
 
   return (
-    <>
-      <CustomHeader
-        type="top"
-        openCompendium={() => setModalOpen(true)}
-        addItem={addSpell}
-        headerText={t("Spells")}
-        icon={Add}
-        onExpandCollapse={toggleAll}
-        allExpanded={allExpanded}
-      />
+    <SectionCard
+      title={t("Spells")}
+      actions={
+        <>
+          <Tooltip title={t("Search Compendium")}>
+            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+              <Search fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
+            <IconButton size="small" onClick={toggleAll} sx={{ color: "#fff" }}>
+              {allExpanded ? <UnfoldLess fontSize="small" /> : <UnfoldMore fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t("Add Spell")}>
+            <IconButton size="small" onClick={addSpell} sx={{ color: "#fff" }}>
+              <Add fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </>
+      }
+    >
+      <Box sx={{ p: 1 }}>
       <Grid container spacing={1}>
         {npc.spells?.map((spell, i) => {
           const attr1 = ATTR_SHORT[spell.accuracy?.attr1] ?? "INS";
@@ -405,34 +418,42 @@ export default function EditSpells({ npc, setNpc }) {
           };
 
           return (
-            <Grid key={i} size={{ xs: 12, md: 6 }}>
-              <Accordion
-                expanded={expandedSet.has(i)}
-                onChange={() => toggleExpanded(i)}
-                disableGutters
-                elevation={0}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  "&:before": { display: "none" },
-                  mb: 0.5,
-                  containerType: "inline-size",
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  sx={{
-                    "& .MuiAccordionSummary-content": {
-                      alignItems: "center",
-                      overflow: "hidden",
-                      minWidth: 0,
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{ display: "flex", alignItems: "center" }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
+            <Grid key={i} size={{ xs: 12, md: 6 }} sx={{ containerType: "inline-size" }}>
+              <ItemRowCard
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, overflow: "hidden" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary", flexShrink: 0 }}>
+                      <SpellIcon />
+                    </Box>
+                    <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1rem", textTransform: "uppercase" }}>
+                      {spell.name || t("(unnamed)")}
+                    </Typography>
+                    {spell.isOffensive && <OffensiveSpellIcon />}
+                  </Box>
+                }
+                subtitle={
+                  <Typography variant="body2" sx={SUMMARY_META_SX}>
+                    {spell.isOffensive && (
+                      <>
+                        <OpenBracket />
+                        {attr1}+{attr2}
+                        <CloseBracket />
+                        {accBonus !== 0 &&
+                          `${accBonus > 0 ? "+" : ""}${accBonus}`}
+                        {" ⬥ "}
+                        <OpenBracket />
+                        {hrZero ? "HR0" : "HR+"}
+                        {dmgValue}
+                        <CloseBracket />
+                        <TypeName type={dmgType} />
+                        {" ⬥ "}
+                      </>
+                    )}
+                    {mpStr}
+                  </Typography>
+                }
+                actions={
+                  <>
                     <Tooltip title={t("Roll")}>
                       <IconButton component="span" onClick={handleRoll}>
                         <Casino />
@@ -446,75 +467,37 @@ export default function EditSpells({ npc, setNpc }) {
                       showMoveUp={i > 0}
                       showMoveDown={i < (npc.spells?.length ?? 0) - 1}
                     />
+                  </>
+                }
+                onClick={() => toggleExpanded(i)}
+                paperSx={{ mb: 0.5 }}
+              >
+                {expandedSet.has(i) && (
+                  <Box sx={{ p: 1 }}>
+                    <TabbedSchemaFormRenderer
+                      tabs={npcSpellTabs}
+                      config={npcSpellFieldConfig}
+                      groupLabels={npcSpellGroupLabels}
+                      state={spell}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const spells = [...(prev.spells || [])];
+                          spells[i] = next;
+                          return { ...prev, spells };
+                        });
+                      }}
+                      surface="edit"
+                      cols={2}
+                      extraProps={{ name: String(spell.name ?? "") }}
+                    />
                   </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      color: "text.secondary",
-                      mx: 0.5,
-                    }}
-                  >
-                    <SpellIcon />
-                  </Box>
-                  <Box
-                    sx={{
-                      flexGrow: 1,
-                      mx: 1,
-                      overflow: "hidden",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.5,
-                    }}
-                  >
-                    <Typography noWrap>
-                      {spell.name || t("(unnamed)")}
-                    </Typography>
-                    {spell.isOffensive && <OffensiveSpellIcon />}
-                  </Box>
-                  <Typography variant="body2" sx={SUMMARY_META_SX}>
-                    {spell.isOffensive && (
-                      <>
-                        <OpenBracket />
-                        {attr1}+{attr2}
-                        <CloseBracket />
-                        {accBonus !== 0 &&
-                          `${accBonus > 0 ? "+" : ""}${accBonus}`}
-                        {" ⬥ "}
-                        <OpenBracket />
-                        {hrZero ? "HR0" : "HR+"}
-                        {dmgValue}
-                        <CloseBracket />
-                        <TypeName type={dmgType} />
-                        {" ⬥ "}
-                      </>
-                    )}
-                    {mpStr}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <TabbedSchemaFormRenderer
-                    tabs={npcSpellTabs}
-                    config={npcSpellFieldConfig}
-                    groupLabels={npcSpellGroupLabels}
-                    state={spell}
-                    onChange={(next) => {
-                      setNpc((prev) => {
-                        const spells = [...(prev.spells || [])];
-                        spells[i] = next;
-                        return { ...prev, spells };
-                      });
-                    }}
-                    surface="edit"
-                    cols={2}
-                    extraProps={{ name: String(spell.name ?? "") }}
-                  />
-                </AccordionDetails>
-              </Accordion>
+                )}
+              </ItemRowCard>
             </Grid>
           );
         })}
       </Grid>
+      </Box>
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -585,6 +568,6 @@ export default function EditSpells({ npc, setNpc }) {
             : ""
         }
       />
-    </>
+    </SectionCard>
   );
 }

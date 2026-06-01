@@ -1,7 +1,4 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Alert,
   Box,
   Divider,
@@ -12,32 +9,36 @@ import {
   Menu,
   MenuItem,
   Snackbar,
+  Tooltip,
   Typography,
   useMediaQuery,
 } from "@mui/material";
 import { useState } from "react";
-import { useTranslate } from "../../translation/translate";
-import CustomHeader from "../common/CustomHeader";
-import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
+import { useTranslate } from "/src/translation/translate";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcSpecialFieldConfig,
   npcSpecialGroupLabels,
   npcSpecialTabs,
-} from "../../forms/rendering/config/itemConfigs/npcSpecial";
+} from "/src/forms/rendering/config/itemConfigs/npcSpecial";
 import {
   Add,
   ArrowDownward,
   ArrowUpward,
   Casino,
   Delete,
-  ExpandMore,
   LibraryAdd,
   Menu as MenuIcon,
+  Search,
+  UnfoldLess,
+  UnfoldMore,
 } from "@mui/icons-material";
-import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
-import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
 
 function SpecialContextMenu({
   special,
@@ -285,48 +286,46 @@ export default function EditSpecial({ npc, setNpc }) {
   };
 
   return (
-    <>
-      <CustomHeader
-        type={isSmallScreen ? "middle" : "top"}
-        addItem={addSpecial}
-        headerText={t("Special Rules")}
-        icon={Add}
-        openCompendium={() => setModalOpen(true)}
-        onExpandCollapse={toggleAll}
-        allExpanded={allExpanded}
-      />
+    <SectionCard
+      title={t("Special Rules")}
+      actions={
+        <>
+          <Tooltip title={t("Search Compendium")}>
+            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+              <Search fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
+            <IconButton size="small" onClick={toggleAll} sx={{ color: "#fff" }}>
+              {allExpanded ? <UnfoldLess fontSize="small" /> : <UnfoldMore fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t("Add Special Rule")}>
+            <IconButton size="small" onClick={addSpecial} sx={{ color: "#fff" }}>
+              <Add fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </>
+      }
+    >
+      <Box sx={{ p: 1 }}>
       <Grid container spacing={1}>
         {npc.special?.map((special, i) => {
           return (
             <Grid key={i} size={12}>
-              <Accordion
-                expanded={expandedSet.has(i)}
-                onChange={() => toggleExpanded(i)}
-                disableGutters
-                elevation={0}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  "&:before": { display: "none" },
-                  mb: 0.5,
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  sx={{
-                    "& .MuiAccordionSummary-content": {
-                      alignItems: "center",
-                      overflow: "hidden",
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{ display: "flex", alignItems: "center" }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
+              <ItemRowCard
+                label={special.name || t("(unnamed)")}
+                subtitle={
+                  <Typography variant="body2" sx={{ color: "text.secondary", whiteSpace: "nowrap" }}>
+                    SP: {special.spCost ?? 1}
+                  </Typography>
+                }
+                actions={
+                  <>
                     <IconButton
                       component="span"
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
                         addMessage({
                           id: crypto.randomUUID(),
                           createdAt: Date.now(),
@@ -336,8 +335,8 @@ export default function EditSpecial({ npc, setNpc }) {
                           name: special.name,
                           tags: [`SP: ${special.spCost ?? 1}`],
                           description: special.effect,
-                        })
-                      }
+                        });
+                      }}
                     >
                       <Casino />
                     </IconButton>
@@ -350,46 +349,37 @@ export default function EditSpecial({ npc, setNpc }) {
                       showMoveUp={i > 0}
                       showMoveDown={i < (npc.special?.length ?? 0) - 1}
                     />
+                  </>
+                }
+                onClick={() => toggleExpanded(i)}
+                paperSx={{ mb: 0.5 }}
+              >
+                {expandedSet.has(i) && (
+                  <Box sx={{ p: 1 }}>
+                    <TabbedSchemaFormRenderer
+                      tabs={npcSpecialTabs}
+                      config={npcSpecialFieldConfig}
+                      groupLabels={npcSpecialGroupLabels}
+                      state={special}
+                      onChange={(next) => {
+                        setNpc((prev) => {
+                          const special = [...(prev.special || [])];
+                          special[i] = next;
+                          return { ...prev, special };
+                        });
+                      }}
+                      surface="edit"
+                      cols={2}
+                      extraProps={{ name: String(special.name ?? "") }}
+                    />
                   </Box>
-                  <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
-                    <Typography noWrap>
-                      {special.name || t("(unnamed)")}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "text.secondary",
-                      whiteSpace: "nowrap",
-                      mr: 1,
-                    }}
-                  >
-                    SP: {special.spCost ?? 1}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <TabbedSchemaFormRenderer
-                    tabs={npcSpecialTabs}
-                    config={npcSpecialFieldConfig}
-                    groupLabels={npcSpecialGroupLabels}
-                    state={special}
-                    onChange={(next) => {
-                      setNpc((prev) => {
-                        const special = [...(prev.special || [])];
-                        special[i] = next;
-                        return { ...prev, special };
-                      });
-                    }}
-                    surface="edit"
-                    cols={2}
-                    extraProps={{ name: String(special.name ?? "") }}
-                  />
-                </AccordionDetails>
-              </Accordion>
+                )}
+              </ItemRowCard>
             </Grid>
           );
         })}
       </Grid>
+      </Box>
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -431,6 +421,6 @@ export default function EditSpecial({ npc, setNpc }) {
             : ""
         }
       />
-    </>
+    </SectionCard>
   );
 }

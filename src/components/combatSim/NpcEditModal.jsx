@@ -22,23 +22,25 @@ import {
 } from "@mui/material";
 import { Save, Menu as MenuIcon } from "@mui/icons-material";
 import { useDatabase } from "../../hooks/useDatabase";
-import { NpcProvider } from "../../components/npc/NpcContext";
+import { NpcProvider } from "/src/components/shared/actors/npc/context";
 import {
   applyNpcPostLoadTransforms,
   applyNpcPreSaveTransforms,
 } from "../../libs/actor";
-import EditBasics from "../../components/npc/EditBasics";
-import EditAffinities from "../../components/npc/EditAffinities";
-import EditExtra from "../../components/npc/EditExtra";
-import EditAttacks from "../../components/npc/EditAttacks";
-import EditWeaponAttacks from "../../components/npc/EditWeaponAttacks";
-import EditSpells from "../../components/npc/EditSpells";
-import EditActions from "../../components/npc/EditActions";
-import EditSpecial from "../../components/npc/EditSpecial";
-import EditRareGear from "../../components/npc/EditRareGear";
-import EditNotes from "../../components/npc/EditNotes";
-import ExplainAffinities from "../../components/npc/ExplainAffinities";
-import ExplainSkills from "../../components/npc/ExplainSkills";
+import {
+  EditBasics,
+  EditAffinities,
+  EditExtra,
+  EditAttacks,
+  EditWeaponAttacks,
+  EditSpells,
+  EditActions,
+  EditSpecial,
+  EditRareGear,
+  EditNotes,
+  ExplainAffinities,
+  ExplainSkills,
+} from "/src/components/shared/actors/npc/editors";
 import CustomHeader from "../../components/common/CustomHeader";
 import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import { useTranslate } from "../../translation/translate";

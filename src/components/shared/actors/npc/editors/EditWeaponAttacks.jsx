@@ -1,52 +1,55 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Alert,
   Box,
   Divider,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
+  Select,
   Snackbar,
   Tooltip,
   Typography,
 } from "@mui/material";
+import { Martial, MeleeIcon, DistanceIcon } from "/src/components/icons";
 import { useState } from "react";
-import { useTranslate } from "../../translation/translate";
-import CustomHeader from "../common/CustomHeader";
-import { TabbedSchemaFormRenderer } from "../../forms/rendering/TabbedSchemaFormRenderer";
+import attributes from "/src/libs/attributes";
+import weapons from "/src/libs/weapons";
+import { CloseBracket, OpenBracket } from "/src/components/Bracket";
+import { useTranslate } from "/src/translation/translate";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcAttackFieldConfig,
   npcAttackGroupLabels,
   npcAttackTabs,
-} from "../../forms/rendering/config/itemConfigs/npcAttack";
+} from "/src/forms/rendering/config/itemConfigs/npcAttack";
 import {
   Add,
   ArrowDownward,
   ArrowUpward,
   Casino,
   Delete,
-  ExpandMore,
   LibraryAdd,
   Menu as MenuIcon,
+  UnfoldLess,
+  UnfoldMore,
 } from "@mui/icons-material";
-import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
-import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
 import {
   prepareAccuracyCheck,
   rollAccuracyCheck,
   processAccuracyCheck,
   buildAccuracyCheckMessage,
-} from "../app-drawer/panels/chat/domain/accuracy-checks";
-import { TypeName } from "../types";
-import { MeleeIcon, DistanceIcon } from "../icons";
-import { OpenBracket, CloseBracket } from "../Bracket";
+} from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { TypeName } from "/src/components/types";
 
 const ATTR_SHORT = {
   dexterity: "DEX",
@@ -73,7 +76,61 @@ const SUMMARY_META_SX = {
   },
 };
 
-function AttackContextMenu({
+function weaponToAttackFields(weapon) {
+  return {
+    range: weapon.range ?? "melee",
+    accuracy: {
+      attr1: weapon.accuracy?.attr1 ?? "dexterity",
+      attr2: weapon.accuracy?.attr2 ?? "might",
+      value: weapon.accuracy?.value ?? 0,
+      defense: "def",
+    },
+    damage: {
+      value: weapon.damage?.value ?? 0,
+      type: weapon.damage?.type ?? "physical",
+      hrZero: weapon.damage?.hrZero === true,
+    },
+  };
+}
+
+function SelectWeapon({ attack, onChange }) {
+  const { t } = useTranslate();
+  const selectedWeapon =
+    weapons.find(
+      (w) =>
+        w.accuracy?.attr1 === attack.accuracy?.attr1 &&
+        w.accuracy?.attr2 === attack.accuracy?.attr2 &&
+        w.damage?.value === attack.damage?.value,
+    ) ?? weapons[0];
+
+  return (
+    <FormControl fullWidth size="small">
+      <InputLabel>{t("Weapon:")}</InputLabel>
+      <Select
+        value={selectedWeapon.name}
+        label={t("Weapon:")}
+        onChange={(e) => {
+          const w = weapons.find((w) => w.name === e.target.value);
+          if (w) onChange(weaponToAttackFields(w));
+        }}
+      >
+        {weapons.map((w) => (
+          <MenuItem key={w.name} value={w.name}>
+            {w.name} {w.martial && <Martial />} <OpenBracket />
+            {attributes[w.accuracy?.attr1]?.shortcaps}+
+            {attributes[w.accuracy?.attr2]?.shortcaps}
+            {w.accuracy?.value > 0 && `+${w.accuracy.value}`}
+            <CloseBracket /> <OpenBracket />
+            {t("HR +")} {w.damage?.value}
+            <CloseBracket />
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+}
+
+function WeaponAttackContextMenu({
   attack,
   onDelete,
   onMoveUp,
@@ -222,21 +279,20 @@ function AttackContextMenu({
   );
 }
 
-export default function EditAttacks({ npc, setNpc }) {
+export default function EditWeaponAttacks({ npc, setNpc }) {
   const { t } = useTranslate();
   const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [expandedSet, setExpandedSet] = useState(new Set());
-  const [modalOpen, setModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingAttackIndex, setPendingAttackIndex] = useState(null);
 
   const allExpanded =
-    (npc.attacks?.length ?? 0) > 0 &&
-    expandedSet.size === (npc.attacks?.length ?? 0);
+    (npc.weaponattacks?.length ?? 0) > 0 &&
+    expandedSet.size === (npc.weaponattacks?.length ?? 0);
 
   const toggleAll = () => {
     if (allExpanded) setExpandedSet(new Set());
-    else setExpandedSet(new Set((npc.attacks ?? []).map((_, i) => i)));
+    else setExpandedSet(new Set((npc.weaponattacks ?? []).map((_, i) => i)));
   };
 
   const toggleExpanded = (i) => {
@@ -250,24 +306,16 @@ export default function EditAttacks({ npc, setNpc }) {
 
   const addAttack = () => {
     setNpc((prev) => {
-      const nextIndex = prev.attacks?.length ?? 0;
+      const nextIndex = prev.weaponattacks?.length ?? 0;
       setExpandedSet((s) => new Set([...s, nextIndex]));
       return {
         ...prev,
-        attacks: [
-          ...(prev.attacks || []),
+        weaponattacks: [
+          ...(prev.weaponattacks || []),
           {
-            itemType: "basic",
+            ...weaponToAttackFields(weapons[0]),
             name: "",
             fuid: "",
-            range: "melee",
-            accuracy: {
-              attr1: "dexterity",
-              attr2: "dexterity",
-              value: 0,
-              defense: "def",
-            },
-            damage: { value: 0, type: "physical", hrZero: false },
             effect: "",
           },
         ],
@@ -286,26 +334,28 @@ export default function EditAttacks({ npc, setNpc }) {
     });
     setNpc((prev) => ({
       ...prev,
-      attacks: (prev.attacks || []).filter((_, index) => index !== i),
+      weaponattacks: (prev.weaponattacks || []).filter(
+        (_, index) => index !== i,
+      ),
     }));
   };
 
   const moveAttack = (fromIndex, toIndex) => {
     setNpc((prev) => {
-      const attacks = [...(prev.attacks || [])];
+      const weaponattacks = [...(prev.weaponattacks || [])];
       if (
         fromIndex < 0 ||
         toIndex < 0 ||
-        fromIndex >= attacks.length ||
-        toIndex >= attacks.length
+        fromIndex >= weaponattacks.length ||
+        toIndex >= weaponattacks.length
       ) {
         return prev;
       }
-      [attacks[fromIndex], attacks[toIndex]] = [
-        attacks[toIndex],
-        attacks[fromIndex],
+      [weaponattacks[fromIndex], weaponattacks[toIndex]] = [
+        weaponattacks[toIndex],
+        weaponattacks[fromIndex],
       ];
-      return { ...prev, attacks };
+      return { ...prev, weaponattacks };
     });
     setExpandedSet((prev) => {
       const next = new Set(prev);
@@ -325,18 +375,26 @@ export default function EditAttacks({ npc, setNpc }) {
   };
 
   return (
-    <>
-      <CustomHeader
-        type="top"
-        openCompendium={() => setModalOpen(true)}
-        addItem={addAttack}
-        headerText={t("Basic Attacks")}
-        icon={Add}
-        onExpandCollapse={toggleAll}
-        allExpanded={allExpanded}
-      />
+    <SectionCard
+      title={t("Attacks with Weapons")}
+      actions={
+        <>
+          <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
+            <IconButton size="small" onClick={toggleAll} sx={{ color: "#fff" }}>
+              {allExpanded ? <UnfoldLess fontSize="small" /> : <UnfoldMore fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t("Add Weapon Attack")}>
+            <IconButton size="small" onClick={addAttack} sx={{ color: "#fff" }}>
+              <Add fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </>
+      }
+    >
+      <Box sx={{ p: 1 }}>
       <Grid container spacing={1}>
-        {npc.attacks?.map((attack, i) => {
+        {npc.weaponattacks?.map((attack, i) => {
           const attr1 = ATTR_SHORT[attack.accuracy?.attr1] ?? "DEX";
           const attr2 = ATTR_SHORT[attack.accuracy?.attr2] ?? "DEX";
           const accBonus = attack.accuracy?.value ?? 0;
@@ -347,8 +405,14 @@ export default function EditAttacks({ npc, setNpc }) {
           const handleRoll = (e) => {
             e.stopPropagation();
             const dieSizes = {
-              primary: npc.attributes?.[attack.accuracy?.attr1]?.base ?? 6,
-              secondary: npc.attributes?.[attack.accuracy?.attr2]?.base ?? 6,
+              primary:
+                npc.attributes?.[attack.accuracy?.attr1]?.base ??
+                npc.attributes?.[attack.accuracy?.attr1] ??
+                6,
+              secondary:
+                npc.attributes?.[attack.accuracy?.attr2]?.base ??
+                npc.attributes?.[attack.accuracy?.attr2] ??
+                6,
             };
             const intent = prepareAccuracyCheck({
               attr1: ATTR_ROLL[attack.accuracy?.attr1] ?? "dex",
@@ -372,136 +436,98 @@ export default function EditAttacks({ npc, setNpc }) {
             addMessage(buildAccuracyCheckMessage(result));
           };
 
+          const updateAttack = (next) => {
+            setNpc((prev) => {
+              const weaponattacks = [...(prev.weaponattacks || [])];
+              weaponattacks[i] = next;
+              return { ...prev, weaponattacks };
+            });
+          };
+
           return (
-            <Grid key={i} size={{ xs: 12, md: 6 }}>
-              <Accordion
-                expanded={expandedSet.has(i)}
-                onChange={() => toggleExpanded(i)}
-                disableGutters
-                elevation={0}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  "&:before": { display: "none" },
-                  mb: 0.5,
-                  containerType: "inline-size",
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  sx={{
-                    "& .MuiAccordionSummary-content": {
-                      alignItems: "center",
-                      overflow: "hidden",
-                      minWidth: 0,
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{ display: "flex", alignItems: "center" }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Tooltip title={t("Roll")}>
-                      <IconButton component="span" onClick={handleRoll}>
-                        <Casino />
-                      </IconButton>
-                    </Tooltip>
-                    <AttackContextMenu
-                      attack={attack}
-                      onDelete={() => openDeleteDialog(i)}
-                      onMoveUp={() => moveAttack(i, i - 1)}
-                      onMoveDown={() => moveAttack(i, i + 1)}
-                      showMoveUp={i > 0}
-                      showMoveDown={i < (npc.attacks?.length ?? 0) - 1}
-                    />
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      color: "text.secondary",
-                      mx: 0.5,
-                    }}
-                  >
-                    {attack.range === "ranged" ? (
-                      <DistanceIcon />
-                    ) : (
-                      <MeleeIcon />
-                    )}
-                  </Box>
-                  <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
+            <Grid key={i} size={{ xs: 12, md: 6 }} sx={{ containerType: "inline-size" }}>
+              <ItemRowCard
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        color: "text.secondary",
+                      }}
+                    >
+                      {attack.range === "ranged" ? (
+                        <DistanceIcon />
+                      ) : (
+                        <MeleeIcon />
+                      )}
+                    </Box>
                     <Typography noWrap>
                       {attack.name || t("(unnamed)")}
                     </Typography>
                   </Box>
+                }
+                subtitle={
                   <Typography variant="body2" sx={SUMMARY_META_SX}>
                     <OpenBracket />
                     {attr1}+{attr2}
                     <CloseBracket />
                     {accBonus !== 0 && `${accBonus > 0 ? "+" : ""}${accBonus}`}
-                    {" ⬥ "}
+                    {" ⬥ "}
                     <OpenBracket />
                     {hrZero ? "HR0" : "HR+"}
                     {dmgValue}
                     <CloseBracket />
                     <TypeName type={dmgType} />
                   </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <TabbedSchemaFormRenderer
-                    tabs={npcAttackTabs}
-                    config={npcAttackFieldConfig}
-                    groupLabels={npcAttackGroupLabels}
-                    state={attack}
-                    onChange={(next) => {
-                      setNpc((prev) => {
-                        const attacks = [...(prev.attacks || [])];
-                        attacks[i] = next;
-                        return { ...prev, attacks };
-                      });
-                    }}
-                    surface="edit"
-                    cols={2}
-                    extraProps={{ name: String(attack.name ?? "") }}
-                  />
-                </AccordionDetails>
-              </Accordion>
+                }
+                actions={
+                  <>
+                    <Tooltip title={t("Roll")}>
+                      <IconButton component="span" onClick={handleRoll}>
+                        <Casino />
+                      </IconButton>
+                    </Tooltip>
+                    <WeaponAttackContextMenu
+                      attack={attack}
+                      onDelete={() => openDeleteDialog(i)}
+                      onMoveUp={() => moveAttack(i, i - 1)}
+                      onMoveDown={() => moveAttack(i, i + 1)}
+                      showMoveUp={i > 0}
+                      showMoveDown={i < (npc.weaponattacks?.length ?? 0) - 1}
+                    />
+                  </>
+                }
+                onClick={() => toggleExpanded(i)}
+                paperSx={{ mb: 0.5 }}
+              >
+                {expandedSet.has(i) && (
+                  <Box sx={{ p: 1 }}>
+                    {/* Weapon preset picker, not in schema config */}
+                    <SelectWeapon
+                      attack={attack}
+                      onChange={(fields) =>
+                        updateAttack({ ...attack, ...fields })
+                      }
+                    />
+                    <TabbedSchemaFormRenderer
+                      tabs={npcAttackTabs}
+                      config={npcAttackFieldConfig}
+                      groupLabels={npcAttackGroupLabels}
+                      state={attack}
+                      onChange={updateAttack}
+                      surface="edit"
+                      cols={2}
+                      extraProps={{ name: String(attack.name ?? "") }}
+                    />
+                  </Box>
+                )}
+              </ItemRowCard>
             </Grid>
           );
         })}
       </Grid>
-      <CompendiumViewerModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        context="npc"
-        initialType="attacks"
-        onAddItem={(item) => {
-          setNpc((prev) => ({
-            ...prev,
-            attacks: [
-              ...(prev.attacks || []),
-              {
-                itemType: "basic",
-                fuid: item.fuid ?? "",
-                name: item.name,
-                range: item.ranged === true ? "ranged" : "melee",
-                accuracy: {
-                  attr1: item.accuracy?.attr1 ?? "dexterity",
-                  attr2: item.accuracy?.attr2 ?? "dexterity",
-                  value: item.accuracy?.value ?? 0,
-                  defense: item.accuracy?.defense ?? "def",
-                },
-                damage: {
-                  value: item.damage?.value ?? 0,
-                  type: item.damage?.type ?? "physical",
-                  hrZero: item.damage?.hrZero === true,
-                },
-                effect: item.effect || item.special?.[0] || "",
-              },
-            ],
-          }));
-        }}
-      />
+      </Box>
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onClose={() => {
@@ -518,10 +544,10 @@ export default function EditAttacks({ npc, setNpc }) {
         message={t("Are you sure you want to delete?")}
         itemPreview={
           pendingAttackIndex !== null
-            ? npc.attacks?.[pendingAttackIndex]?.name || ""
+            ? npc.weaponattacks?.[pendingAttackIndex]?.name || ""
             : ""
         }
       />
-    </>
+    </SectionCard>
   );
 }

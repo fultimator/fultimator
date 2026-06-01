@@ -29,9 +29,9 @@ import {
   calcUsedSkillsFromEquip,
   calcUsedSkillsFromOtherActions,
   calcUsedSkillsFromStatusImmunity,
-} from "../../libs/npcs";
+} from "/src/libs/npcs";
 
-import { useTranslate } from "../../translation/translate";
+import { useTranslate } from "/src/translation/translate";
 
 export default function ExplainSkills({ npc }) {
   const { t } = useTranslate();

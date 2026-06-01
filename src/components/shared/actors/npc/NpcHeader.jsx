@@ -3,7 +3,7 @@ import { Grid, Typography, Box, Dialog } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import Diamond from "/src/components/Diamond";
-import { StyledMarkdown } from "./shared";
+import { StyledMarkdown } from "./NpcMarkdown";
 
 function Rank({ npc }) {
   const { t } = useTranslate();

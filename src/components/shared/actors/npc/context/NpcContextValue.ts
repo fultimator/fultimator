@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import { TypeNpc } from "../../types/Npcs";
+import { TypeNpc } from "/src/types/Npcs";
 
 interface NpcContextValue {
   npcTemp: TypeNpc;

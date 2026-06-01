@@ -14,7 +14,8 @@ import {
   processMagicCheck,
   buildMagicCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/magic-checks";
-import { StyledMarkdown, ClickableName, ATTR_SHORT } from "./shared";
+import { ATTR_SHORT } from "./npcShared";
+import { StyledMarkdown, ClickableName } from "./NpcMarkdown";
 
 function SpellRow({ spell, npc, showRoll }) {
   const { t } = useTranslate();

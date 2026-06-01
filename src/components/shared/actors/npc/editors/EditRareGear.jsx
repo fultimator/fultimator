@@ -1,7 +1,4 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Divider,
   FormControl,
@@ -12,23 +9,24 @@ import {
   Menu,
   MenuItem,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
-import CustomHeader from "../common/CustomHeader";
+import { useTranslate } from "/src/translation/translate";
+import CustomTextarea from "/src/components/common/CustomTextarea";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
 import {
   Add,
   ArrowDownward,
   ArrowUpward,
   Casino,
   Delete,
-  ExpandMore,
   Menu as MenuIcon,
 } from "@mui/icons-material";
-import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
 
 function RareGearContextMenu({
   raregear,
@@ -126,6 +124,19 @@ export default function EditRareGear({ npc, setNpc }) {
   const addMessage = useChatMessagesStore((s) => s.addMessage);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingGearIndex, setPendingGearIndex] = useState(null);
+  const [expandedSet, setExpandedSet] = useState(new Set());
+
+  const toggleExpanded = (i) => {
+    setExpandedSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) {
+        next.delete(i);
+      } else {
+        next.add(i);
+      }
+      return next;
+    });
+  };
 
   const onChange = (i, key, value) => {
     setNpc((prev) => {
@@ -174,38 +185,23 @@ export default function EditRareGear({ npc, setNpc }) {
   };
 
   return (
-    <>
-      <CustomHeader
-        type="middle"
-        addItem={addRareGear}
-        headerText={t("Rare Equipment")}
-        icon={Add}
-      />
+    <SectionCard
+      title={t("Rare Equipment")}
+      actions={
+        <Tooltip title={t("Add Rare Equipment")}>
+          <IconButton size="small" onClick={addRareGear} sx={{ color: "#fff" }}>
+            <Add fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      }
+    >
+      <Box sx={{ p: 1 }}>
       {npc.raregear?.map((raregear, i) => (
-        <Accordion
+        <ItemRowCard
           key={i}
-          disableGutters
-          elevation={0}
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            "&:before": { display: "none" },
-            mb: 0.5,
-          }}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMore />}
-            sx={{
-              "& .MuiAccordionSummary-content": {
-                alignItems: "center",
-                overflow: "hidden",
-              },
-            }}
-          >
-            <Box
-              sx={{ display: "flex", alignItems: "center" }}
-              onClick={(e) => e.stopPropagation()}
-            >
+          label={raregear.name || t("(unnamed)")}
+          actions={
+            <>
               <IconButton
                 component="span"
                 onClick={() =>
@@ -232,36 +228,39 @@ export default function EditRareGear({ npc, setNpc }) {
                 showMoveUp={i > 0}
                 showMoveDown={i < (npc.raregear?.length ?? 0) - 1}
               />
-            </Box>
-            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
-              <Typography noWrap>{raregear.name || t("(unnamed)")}</Typography>
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={1}>
-              <Grid size={12}>
-                <FormControl fullWidth>
-                  <TextField
-                    label={t("Name:")}
-                    value={raregear.name}
-                    onChange={(e) => onChange(i, "name", e.target.value)}
-                    size="small"
-                  />
-                </FormControl>
+            </>
+          }
+          onClick={() => toggleExpanded(i)}
+          paperSx={{ mb: 0.5 }}
+        >
+          {expandedSet.has(i) && (
+            <Box sx={{ p: 1 }}>
+              <Grid container spacing={1}>
+                <Grid size={12}>
+                  <FormControl fullWidth>
+                    <TextField
+                      label={t("Name:")}
+                      value={raregear.name}
+                      onChange={(e) => onChange(i, "name", e.target.value)}
+                      size="small"
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid size={12}>
+                  <FormControl fullWidth>
+                    <CustomTextarea
+                      label={t("Effect:")}
+                      value={raregear.effect}
+                      onChange={(e) => onChange(i, "effect", e.target.value)}
+                    />
+                  </FormControl>
+                </Grid>
               </Grid>
-              <Grid size={12}>
-                <FormControl fullWidth>
-                  <CustomTextarea
-                    label={t("Effect:")}
-                    value={raregear.effect}
-                    onChange={(e) => onChange(i, "effect", e.target.value)}
-                  />
-                </FormControl>
-              </Grid>
-            </Grid>
-          </AccordionDetails>
-        </Accordion>
+            </Box>
+          )}
+        </ItemRowCard>
       ))}
+      </Box>
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onClose={() => {
@@ -282,6 +281,6 @@ export default function EditRareGear({ npc, setNpc }) {
             : ""
         }
       />
-    </>
+    </SectionCard>
   );
 }

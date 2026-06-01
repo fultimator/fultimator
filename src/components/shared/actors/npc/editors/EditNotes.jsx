@@ -1,7 +1,4 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Box,
   Divider,
   FormControl,
@@ -12,24 +9,26 @@ import {
   Menu,
   MenuItem,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { useTranslate } from "../../translation/translate";
-import CustomTextarea from "../common/CustomTextarea";
-import CustomHeader from "../common/CustomHeader";
+import { useTranslate } from "/src/translation/translate";
+import CustomTextarea from "/src/components/common/CustomTextarea";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
 import {
   Add,
   ArrowDownward,
   ArrowUpward,
   Casino,
   Delete,
-  ExpandMore,
   Menu as MenuIcon,
+  Search,
 } from "@mui/icons-material";
-import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
-import { useChatMessagesStore } from "../../store/chatMessagesStore";
-import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { useChatMessagesStore } from "/src/store/chatMessagesStore";
+import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 
 function NoteContextMenu({
   note,
@@ -128,6 +127,15 @@ export default function EditNotes({ npc, setNpc }) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingNoteIndex, setPendingNoteIndex] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [expandedSet, setExpandedSet] = useState(new Set());
+
+  const toggleExpanded = (i) => {
+    setExpandedSet((prev) => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
+  };
 
   const onChange = (i, key, value) => {
     setNpc((prev) => {
@@ -173,39 +181,30 @@ export default function EditNotes({ npc, setNpc }) {
   };
 
   return (
-    <>
-      <CustomHeader
-        type="middle"
-        addItem={addNote}
-        headerText={t("Notes")}
-        icon={Add}
-        openCompendium={() => setModalOpen(true)}
-      />
+    <SectionCard
+      title={t("Notes")}
+      actions={
+        <>
+          <Tooltip title={t("Search Compendium")}>
+            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+              <Search fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t("Add Note")}>
+            <IconButton size="small" onClick={addNote} sx={{ color: "#fff" }}>
+              <Add fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </>
+      }
+    >
+      <Box sx={{ p: 1 }}>
       {npc.notes?.map((note, i) => (
-        <Accordion
+        <ItemRowCard
           key={i}
-          disableGutters
-          elevation={0}
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            "&:before": { display: "none" },
-            mb: 0.5,
-          }}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMore />}
-            sx={{
-              "& .MuiAccordionSummary-content": {
-                alignItems: "center",
-                overflow: "hidden",
-              },
-            }}
-          >
-            <Box
-              sx={{ display: "flex", alignItems: "center" }}
-              onClick={(e) => e.stopPropagation()}
-            >
+          label={note.name || t("(unnamed)")}
+          actions={
+            <>
               <IconButton
                 component="span"
                 onClick={() =>
@@ -232,45 +231,48 @@ export default function EditNotes({ npc, setNpc }) {
                 showMoveUp={i > 0}
                 showMoveDown={i < (npc.notes?.length ?? 0) - 1}
               />
+            </>
+          }
+          onClick={() => toggleExpanded(i)}
+          paperSx={{ mb: 0.5 }}
+        >
+          {expandedSet.has(i) && (
+            <Box sx={{ p: 1 }}>
+              <Grid container spacing={1}>
+                <Grid size={12}>
+                  <FormControl fullWidth>
+                    <TextField
+                      label={t("Name:")}
+                      value={note.name}
+                      onChange={(e) => onChange(i, "name", e.target.value)}
+                      size="small"
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid size={12}>
+                  <FormControl fullWidth>
+                    <CustomTextarea
+                      label={t("Description:")}
+                      value={note.description ?? ""}
+                      onChange={(e) => onChange(i, "description", e.target.value)}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid size={12}>
+                  <FormControl fullWidth>
+                    <CustomTextarea
+                      label={t("Effect:")}
+                      value={note.effect ?? ""}
+                      onChange={(e) => onChange(i, "effect", e.target.value)}
+                    />
+                  </FormControl>
+                </Grid>
+              </Grid>
             </Box>
-            <Box sx={{ flexGrow: 1, mx: 1, overflow: "hidden" }}>
-              <Typography noWrap>{note.name || t("(unnamed)")}</Typography>
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={1}>
-              <Grid size={12}>
-                <FormControl fullWidth>
-                  <TextField
-                    label={t("Name:")}
-                    value={note.name}
-                    onChange={(e) => onChange(i, "name", e.target.value)}
-                    size="small"
-                  />
-                </FormControl>
-              </Grid>
-              <Grid size={12}>
-                <FormControl fullWidth>
-                  <CustomTextarea
-                    label={t("Description:")}
-                    value={note.description ?? ""}
-                    onChange={(e) => onChange(i, "description", e.target.value)}
-                  />
-                </FormControl>
-              </Grid>
-              <Grid size={12}>
-                <FormControl fullWidth>
-                  <CustomTextarea
-                    label={t("Effect:")}
-                    value={note.effect ?? ""}
-                    onChange={(e) => onChange(i, "effect", e.target.value)}
-                  />
-                </FormControl>
-              </Grid>
-            </Grid>
-          </AccordionDetails>
-        </Accordion>
+          )}
+        </ItemRowCard>
       ))}
+      </Box>
       <CompendiumViewerModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -312,6 +314,6 @@ export default function EditNotes({ npc, setNpc }) {
             : ""
         }
       />
-    </>
+    </SectionCard>
   );
 }

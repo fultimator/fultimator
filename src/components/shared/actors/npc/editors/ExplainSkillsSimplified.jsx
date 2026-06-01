@@ -40,8 +40,8 @@ import {
   calcUsedSkillsFromOtherActions,
   calcUsedSkillsFromEquip,
   calcUsedSkillsFromStatusImmunity,
-} from "../../libs/npcs";
-import { useTranslate } from "../../translation/translate";
+} from "/src/libs/npcs";
+import { useTranslate } from "/src/translation/translate";
 import { darken } from "@mui/material/styles";
 
 const SkillTableRow = ({ label, value, isHeader }) => (
