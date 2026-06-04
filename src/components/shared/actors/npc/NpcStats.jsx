@@ -22,6 +22,7 @@ export function NpcStudyStats({ npc }) {
         fontWeight: "bold",
         textAlign: "center",
         fontSize: "0.9rem",
+        textShadow: "none",
       }}
     >
       <Grid
@@ -70,6 +71,7 @@ export function NpcStats({ npc }) {
         fontWeight: "bold",
         textAlign: "center",
         fontSize: "0.9rem",
+        textShadow: "none",
       }}
     >
       {/* Row 1: Attributes + HP/MP/Init */}

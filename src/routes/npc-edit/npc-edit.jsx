@@ -55,8 +55,12 @@ import {
   EditPublish,
 } from "/src/components/shared/actors/npc/editors";
 import Probs from "../probs/probs";
-import useDownloadImage from "../../hooks/useDownloadImage";
+import html2canvas from "html2canvas";
+import useDownload from "../../hooks/useDownload";
+import useNpcPrintPDF from "../../hooks/useNpcPrintPDF";
+import { buildAppPDF } from "../../hooks/usePrintPDF";
 import Export from "../../components/Export";
+import ExportDialog from "../../components/shared/actors/pc/export/ExportDialog";
 import { useTranslate } from "../../translation/translate";
 import SectionCard from "../../components/shared/actors/common/SectionCard";
 import TagList from "../../components/TagList";
@@ -206,9 +210,59 @@ export default function NpcEdit() {
     };
   }, [npc?.name]);
 
-  // Download image hook and reference
   const prettyRef = useRef();
-  const [downloadImage] = useDownloadImage(npc?.name, prettyRef);
+  const [download] = useDownload();
+  const [printPDF] = useNpcPrintPDF();
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const captureCanvas = async (settings = {}) => {
+    const { scale = 2, printMode = false } = settings;
+    const element = prettyRef.current;
+    if (!element) return null;
+
+    const bgColor = printMode ? "#ffffff" : (theme.palette.mode === "dark" ? "#1f1f1f" : "#ffffff");
+
+    try {
+      const canvas = await html2canvas(element, {
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        scale,
+        backgroundColor: bgColor,
+      });
+      return { canvas };
+    } catch (error) {
+      console.error("Error capturing NPC screenshot:", error);
+      return null;
+    }
+  };
+
+  const handleExport = async (settings) => {
+    setIsExporting(true);
+    try {
+      if (settings.format === "pdf") {
+        await printPDF(npc);
+      } else if (settings.format === "app-pdf") {
+        const result = await captureCanvas({ ...settings, scale: 1 });
+        if (result) {
+          const filename = `${(npc?.name || "npc").replace(/\s+/g, "_").toLowerCase()}_sheet.pdf`;
+          await buildAppPDF(result.canvas, prettyRef.current, 1, filename);
+        }
+      } else {
+        const result = await captureCanvas(settings);
+        if (result) {
+          const filename = `${(npc?.name || "npc").replace(/\s+/g, "_").toLowerCase()}.png`;
+          await download(result.canvas.toDataURL("image/png"), filename);
+        }
+      }
+      setExportDialogOpen(false);
+    } catch (err) {
+      console.error("Export error:", err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Check if the 'json' query parameter is true and return the JSON response
   const urlParams = new URLSearchParams(location.search);
@@ -361,11 +415,6 @@ export default function NpcEdit() {
     setOpenShareSnackbar(false);
   };
 
-  // Function to download NPC as image
-  function DownloadImage() {
-    setTimeout(downloadImage, 100);
-  }
-
   return (
     <NpcProvider npcData={npcTemp}>
       <Layout unsavedChanges={isUpdated}>
@@ -407,7 +456,7 @@ export default function NpcEdit() {
                 <ExplainSkills npc={npcTemp} />
 
                 <Tooltip title={t("Download as Image")}>
-                  <IconButton onClick={DownloadImage}>
+                  <IconButton onClick={() => setExportDialogOpen(true)}>
                     <Download />
                   </IconButton>
                 </Tooltip>
@@ -694,7 +743,15 @@ export default function NpcEdit() {
             </Box>
           </Paper>
         )}
-      </Layout>
+      <ExportDialog
+        open={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        onDownload={handleExport}
+        isLoading={isExporting}
+        title={t("Export NPC Sheet")}
+        officialPdfDescription={t("Fill the official Fabula Ultima NPC sheet")}
+      />
+    </Layout>
     </NpcProvider>
   );
 }

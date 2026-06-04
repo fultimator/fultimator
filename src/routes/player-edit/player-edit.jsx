@@ -84,7 +84,9 @@ import {
   NotesIcon2 as NotesIcon,
 } from "../../components/icons";
 
-import { fixVerticalLabels, expandCompactHeaderForExport } from "../../utility/screenshotFix";
+import { fixVerticalLabels, expandCompactHeaderForExport, expandAccordionsForExport, applyPrintModeToClone, hideEditControlsInClone } from "../../utility/screenshotFix";
+import usePrintPDF, { buildAppPDF } from "../../hooks/usePrintPDF";
+import ExportDialog from "../../components/shared/actors/pc/export/ExportDialog";
 import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
@@ -300,38 +302,113 @@ export default function PlayerEdit() {
   usePrompt(t("unsaved_changes"), isUpdated);
 
   const [download] = useDownload();
+  const [printPDF] = usePrintPDF();
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
 
-  const takeScreenshot = async () => {
-    const wasEditMode = isSheetEditMode;
-    if (wasEditMode) {
-      flushSync(() => {
-        setIsSheetEditMode(false);
-      });
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-      await new Promise((resolve) => requestAnimationFrame(resolve));
+  useEffect(() => {
+    const images = document.querySelectorAll("img");
+    const promises = [];
+    images.forEach((image) => {
+      if (!image.complete) {
+        promises.push(new Promise((resolve) => { image.onload = resolve; }));
+      }
+    });
+    Promise.all(promises).then(() => setImagesLoaded(true));
+    return () => { images.forEach((image) => { image.onload = null; }); };
+  }, [playerTemp]);
+
+  const captureCanvas = async (settings = {}) => {
+    if (!imagesLoaded) return null;
+    const { theme: themeOption = "current", scale = 2, printMode = false } = settings;
+    const elementId = compactView ? "character-sheet-short" : "character-sheet";
+    const element = document.getElementById(elementId);
+    if (!element) return null;
+    const originalWidth = element.style.width;
+    const originalMaxHeight = element.style.maxHeight;
+    const originalOverflow = element.style.overflow;
+    const captureWidth = compactView ? "600px" : "1400px";
+    let bgColor;
+    if (themeOption === "light" || printMode) {
+      bgColor = "#ffffff";
+    } else if (themeOption === "dark") {
+      bgColor = "#121212";
+    } else {
+      bgColor = theme.palette.mode === "dark" ? theme.palette.background.default : "#ffffff";
     }
-
-    const element = document.getElementById(
-      compactView ? "character-sheet-short" : "character-sheet",
-    );
     try {
+      element.style.width = captureWidth;
+      element.style.maxHeight = "none";
+      element.style.overflow = "visible";
       const canvas = await html2canvas(element, {
         useCORS: true,
         allowTaint: true,
         logging: false,
-        scale: 2,
-        backgroundColor: theme.palette.background.default,
+        scale,
+        backgroundColor: bgColor,
+        windowWidth: compactView ? 600 : 1400,
         onclone: (clonedDoc) => {
           fixVerticalLabels(element, clonedDoc);
           expandCompactHeaderForExport(element, clonedDoc);
+          hideEditControlsInClone(clonedDoc, elementId);
+          if (settings.format === "app-pdf") {
+            expandAccordionsForExport(element, clonedDoc);
+          }
+          if (printMode) {
+            applyPrintModeToClone(clonedDoc, elementId);
+          }
         },
       });
-      const data = canvas.toDataURL("image/png");
-      download(data, `${playerTemp.name}.png`);
-    } finally {
-      if (wasEditMode) {
-        setIsSheetEditMode(true);
+      element.style.width = originalWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
+      return { canvas, element, scale };
+    } catch (error) {
+      console.error("Error capturing canvas:", error);
+      element.style.width = originalWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
+      return null;
+    }
+  };
+
+  const handleExport = async (settings) => {
+    setIsExporting(true);
+    const wasEditMode = isSheetEditMode;
+    if (wasEditMode) {
+      flushSync(() => setIsSheetEditMode(false));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    try {
+      if (settings.format === "pdf") {
+        await printPDF(playerTemp);
+      } else if (settings.format === "app-pdf") {
+        const expandClassBtn = document.querySelector("[data-expand-all-classes='collapsed']");
+        const expandMnemoBtn = document.querySelector("[data-expand-all-mnemo='collapsed']");
+        if (expandClassBtn) expandClassBtn.click();
+        if (expandMnemoBtn) expandMnemoBtn.click();
+        if (expandClassBtn || expandMnemoBtn) {
+          await new Promise((r) => setTimeout(r, 350)); // wait for MUI transitions
+        }
+        const result = await captureCanvas({ ...settings, scale: 1 });
+        if (result) {
+          await buildAppPDF(result.canvas, result.element, result.scale, `${playerTemp.name ?? "character"}_sheet.pdf`);
+        }
+      } else {
+        const result = await captureCanvas(settings);
+        if (result) {
+          await download(result.canvas.toDataURL("image/png"), `${playerTemp.name ?? "character"}_sheet.png`);
+        }
       }
+      setExportDialogOpen(false);
+    } catch (err) {
+      console.error("Export error:", err);
+    } finally {
+      if (wasEditMode) setIsSheetEditMode(true);
+      setIsExporting(false);
     }
   };
 
@@ -863,7 +940,7 @@ export default function PlayerEdit() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={takeScreenshot}
+                onClick={() => setExportDialogOpen(true)}
                 style={{ width: "100%" }}
                 startIcon={<Download />}
               >
@@ -1798,6 +1875,12 @@ export default function PlayerEdit() {
           </Button>
         </DialogActions>
       </Dialog>
+      <ExportDialog
+        open={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        onDownload={handleExport}
+        isLoading={isExporting}
+      />
       <MigrateFromCompendiumDialog
         open={isMigrateDialogOpen}
         onClose={() => setIsMigrateDialogOpen(false)}

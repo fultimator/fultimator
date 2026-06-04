@@ -109,3 +109,60 @@ export const expandCompactHeaderForExport = (originalRoot, clonedDoc) => {
     traits.style.setProperty("flex", "0 0 auto", "important");
   }
 };
+
+/**
+ * Forces all MUI Accordion / Collapse panels to fully expand in the cloned DOM
+ *
+ * @param {HTMLElement} originalRoot
+ * @param {Document} clonedDoc
+ */
+export const expandAccordionsForExport = (originalRoot, clonedDoc) => {
+  if (!clonedDoc || !originalRoot) return;
+  const clonedRoot = clonedDoc.getElementById(originalRoot.id);
+  if (!clonedRoot) return;
+
+  // MUI emotion sets height/visibility as inline styles; !important overrides beat them.
+  clonedRoot.querySelectorAll(".MuiCollapse-root, .MuiCollapse-hidden").forEach((el) => {
+    el.style.setProperty("height", "auto", "important");
+    el.style.setProperty("min-height", "0", "important");
+    el.style.setProperty("overflow", "visible", "important");
+    el.style.setProperty("visibility", "visible", "important");
+    el.style.setProperty("display", "block", "important");
+  });
+
+  clonedRoot.querySelectorAll(".MuiCollapse-wrapper, .MuiCollapse-wrapperInner").forEach((el) => {
+    el.style.setProperty("height", "auto", "important");
+    el.style.setProperty("overflow", "visible", "important");
+    el.style.setProperty("visibility", "visible", "important");
+  });
+};
+
+/**
+ * Adjusts the cloned DOM for print/export mode by hiding edit controls and
+ * forcing a white background.
+ *
+ * @param {Document} clonedDoc
+ * @param {string} rootId
+ */
+export const hideEditControlsInClone = (clonedDoc, rootId) => {
+  if (!clonedDoc) return;
+  const root = clonedDoc.getElementById(rootId);
+  if (!root) return;
+  const hide = (el) => el.style.setProperty("display", "none", "important");
+  root.querySelectorAll("[data-edit-control]").forEach(hide);
+  const actionBar = clonedDoc.getElementById("sheet-action-bar");
+  if (actionBar) hide(actionBar);
+};
+
+export const applyPrintModeToClone = (clonedDoc, rootId) => {
+  if (!clonedDoc) return;
+  const root = clonedDoc.getElementById(rootId);
+  if (!root) return;
+
+  hideEditControlsInClone(clonedDoc, rootId);
+
+  root.style.backgroundColor = "#ffffff";
+  root.querySelectorAll(".MuiPaper-root").forEach((el) => {
+    el.style.backgroundColor = "#ffffff";
+  });
+};

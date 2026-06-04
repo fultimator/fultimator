@@ -22,12 +22,11 @@ const STORAGE_KEY = "export-settings";
 
 const DEFAULT_SETTINGS = {
   format: "png",
-  theme: "current",
   scale: 2,
   printMode: false,
 };
 
-export default function ExportDialog({ open, onClose, onDownload, isLoading }) {
+export default function ExportDialog({ open, onClose, onDownload, isLoading, title, officialPdfDescription }) {
   const { t } = useTranslate();
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
@@ -60,7 +59,7 @@ export default function ExportDialog({ open, onClose, onDownload, isLoading }) {
 
   return (
     <Dialog open={open} onClose={isLoading ? undefined : onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>{t("Export Character Sheet")}</DialogTitle>
+      <DialogTitle>{title ?? t("Export Character Sheet")}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>
           <FormControl>
@@ -93,7 +92,7 @@ export default function ExportDialog({ open, onClose, onDownload, isLoading }) {
                   <Stack>
                     <Typography variant="body2">{t("Official PDF")}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {t("Fill the official Fabula Ultima character sheet")}
+                      {officialPdfDescription ?? t("Fill the official Fabula Ultima character sheet")}
                     </Typography>
                   </Stack>
                 }
@@ -104,31 +103,6 @@ export default function ExportDialog({ open, onClose, onDownload, isLoading }) {
           {showCaptureOptions && (
             <>
               <Divider />
-              <FormControl>
-                <FormLabel>{t("Theme")}</FormLabel>
-                <RadioGroup
-                  row
-                  value={settings.theme}
-                  onChange={(e) => set("theme", e.target.value)}
-                >
-                  <FormControlLabel
-                    value="light"
-                    control={<Radio />}
-                    label={t("Light")}
-                  />
-                  <FormControlLabel
-                    value="dark"
-                    control={<Radio />}
-                    label={t("Dark")}
-                  />
-                  <FormControlLabel
-                    value="current"
-                    control={<Radio />}
-                    label={t("Current")}
-                  />
-                </RadioGroup>
-              </FormControl>
-
               {showScaleOption && (
                 <FormControl>
                   <FormLabel>{t("Scale")}</FormLabel>

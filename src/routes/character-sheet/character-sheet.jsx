@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { flushSync } from "react-dom";
 import { useLocation, useParams } from "react-router";
 import { useTranslate } from "../../translation/translate";
 import { useDatabase } from "../../hooks/useDatabase";
@@ -34,7 +35,15 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { FullscreenTwoTone, FullscreenExitTwoTone } from "@mui/icons-material";
 import useDownload from "../../hooks/useDownload";
-import { fixVerticalLabels, expandCompactHeaderForExport } from "../../utility/screenshotFix";
+import usePrintPDF, { buildAppPDF } from "../../hooks/usePrintPDF";
+import {
+  fixVerticalLabels,
+  expandCompactHeaderForExport,
+  expandAccordionsForExport,
+  applyPrintModeToClone,
+  hideEditControlsInClone,
+} from "../../utility/screenshotFix";
+import ExportDialog from "../../components/shared/actors/pc/export/ExportDialog";
 import deepEqual from "deep-equal";
 import { usePrompt } from "../../hooks/usePrompt";
 import {
@@ -48,6 +57,9 @@ export default function CharacterSheet() {
   const { t } = useTranslate();
   const theme = useTheme();
   const [download] = useDownload();
+  const [printPDF] = usePrintPDF();
+  const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
+  const [isExporting, setIsExporting] = React.useState(false);
   const location = useLocation();
   const { cloudUser: user, dbMode } = useDatabaseContext();
   let params = useParams();
@@ -287,28 +299,34 @@ export default function CharacterSheet() {
     };
   }, [player]);
 
-  const takeScreenshot = async () => {
-    if (!imagesLoaded) {
-      // Images are not loaded yet, prevent taking screenshot
-      return;
-    }
+  const captureCanvas = async (settings = {}) => {
+    if (!imagesLoaded) return null;
 
-    const element = document.getElementById(
-      fullCharacterSheet ? "character-sheet" : "character-sheet-short",
-    );
+    const { theme: themeOption = "current", scale = 2, printMode = false } = settings;
 
-    if (!element) return;
+    const elementId = fullCharacterSheet ? "character-sheet" : "character-sheet-short";
+    const element = document.getElementById(elementId);
+    if (!element) return null;
 
-    // Save original styles
     const originalWidth = element.style.width;
     const originalMaxHeight = element.style.maxHeight;
     const originalOverflow = element.style.overflow;
 
-    // 1400px for full sheet (2 columns), 600px for short sheet (1 column)
     const captureWidth = fullCharacterSheet ? "1400px" : "600px";
 
+    let bgColor;
+    if (themeOption === "light" || printMode) {
+      bgColor = "#ffffff";
+    } else if (themeOption === "dark") {
+      bgColor = "#121212";
+    } else {
+      bgColor =
+        theme.palette.mode === "dark"
+          ? theme.palette.background.default
+          : "#ffffff";
+    }
+
     try {
-      // Temporarily apply capture styles
       element.style.width = captureWidth;
       element.style.maxHeight = "none";
       element.style.overflow = "visible";
@@ -317,31 +335,75 @@ export default function CharacterSheet() {
         useCORS: true,
         allowTaint: true,
         logging: false,
-        scale: 2,
-        backgroundColor:
-          theme.palette.mode === "dark"
-            ? theme.palette.background.default
-            : "#ffffff",
+        scale,
+        backgroundColor: bgColor,
         windowWidth: fullCharacterSheet ? 1400 : 600,
         onclone: (clonedDoc) => {
           fixVerticalLabels(element, clonedDoc);
           expandCompactHeaderForExport(element, clonedDoc);
+          hideEditControlsInClone(clonedDoc, elementId);
+          if (settings.format === "app-pdf") {
+            expandAccordionsForExport(element, clonedDoc);
+          }
+          if (printMode) {
+            applyPrintModeToClone(clonedDoc, elementId);
+          }
         },
       });
-      const imgData = canvas.toDataURL("image/png");
 
       // Restore original styles
       element.style.width = originalWidth;
       element.style.maxHeight = originalMaxHeight;
       element.style.overflow = originalOverflow;
 
-      await download(imgData, player.name + "_sheet.png");
+      return { canvas, element, scale };
     } catch (error) {
       console.error("Error capturing screenshot:", error);
       // Restore original styles even if there's an error
       element.style.width = originalWidth;
       element.style.maxHeight = originalMaxHeight;
       element.style.overflow = originalOverflow;
+      return null;
+    }
+  };
+
+  const handleExport = async (settings) => {
+    setIsExporting(true);
+    const wasEditMode = isSheetEditMode;
+    if (wasEditMode) {
+      flushSync(() => setIsSheetEditMode(false));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    try {
+      if (settings.format === "pdf") {
+        await printPDF(player);
+      } else if (settings.format === "app-pdf") {
+        // Expand all class and mnemosphere accordions before capture
+        const expandClassBtn = document.querySelector("[data-expand-all-classes='collapsed']");
+        const expandMnemoBtn = document.querySelector("[data-expand-all-mnemo='collapsed']");
+        if (expandClassBtn) expandClassBtn.click();
+        if (expandMnemoBtn) expandMnemoBtn.click();
+        if (expandClassBtn || expandMnemoBtn) {
+          await new Promise((r) => setTimeout(r, 350)); // wait for MUI transitions
+        }
+        const result = await captureCanvas({ ...settings, scale: 1 });
+        if (result) {
+          await buildAppPDF(result.canvas, result.element, result.scale, `${player.name ?? "character"}_sheet.pdf`);
+        }
+      } else {
+        const result = await captureCanvas(settings);
+        if (result) {
+          await download(result.canvas.toDataURL("image/png"), `${player.name ?? "character"}_sheet.png`);
+        }
+      }
+      setExportDialogOpen(false);
+    } catch (err) {
+      console.error("Export error:", err);
+    } finally {
+      if (wasEditMode) setIsSheetEditMode(true);
+      setIsExporting(false);
     }
   };
 
@@ -485,13 +547,13 @@ export default function CharacterSheet() {
 
   return (
     <Layout fullWidth={true} unsavedChanges={isUpdated}>
-      <Grid container spacing={1} sx={{ paddingX: 1 }}>
+      <Grid container spacing={1} sx={{ paddingX: 1 }} id="sheet-action-bar">
         <Grid size={isMobile ? 8 : 10}>
           <Button
             variant="contained"
             color="primary"
-            onClick={takeScreenshot}
-            style={{ marginBottom: "16px", width: "100%" }} // Add margin to separate from grid
+            onClick={() => setExportDialogOpen(true)}
+            style={{ marginBottom: "16px", width: "100%" }}
             startIcon={<Download />}
           >
             {t("Download Character Sheet")}
@@ -503,7 +565,7 @@ export default function CharacterSheet() {
               variant="outlined"
               color="primary"
               onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
-              style={{ marginBottom: "16px", width: "100%" }} // Add margin to separate from grid
+              style={{ marginBottom: "16px", width: "100%" }}
               sx={{ display: isMobile ? "none" : "flex" }}
             >
               {fullCharacterSheet
@@ -659,6 +721,12 @@ export default function CharacterSheet() {
           </Tooltip>
         </Box>
       )}
+      <ExportDialog
+        open={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        onDownload={handleExport}
+        isLoading={isExporting}
+      />
       <Dialog
         open={levelUpDialogOpen}
         onClose={closeLevelUpDialog}
