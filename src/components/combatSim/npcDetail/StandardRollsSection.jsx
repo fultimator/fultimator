@@ -60,8 +60,8 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
 
   const quickCheckSx = {
     borderRadius: 1.2,
-    px: 0.9,
-    py: 0.7,
+    px: 0.75,
+    py: 0.5,
     justifyContent: "center",
     alignItems: "center",
     color: "text.primary",
@@ -69,7 +69,7 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
     borderColor: "divider",
     backgroundColor: "background.paper",
     width: "100%",
-    minHeight: 82,
+    minHeight: 48,
     "&:hover": {
       backgroundColor: "action.hover",
     },
@@ -108,15 +108,15 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
   };
 
   const quickCheckButtons = [
-    { key: "group", title: "Group Check", icon: <CheckGroupIcon size="2.1em" />, l1: "Group", l2: "Check" },
-    { key: "attribute", title: "Attribute Check", icon: <CheckAttributeIcon size="2.1em" />, l1: "Attribute", l2: "Check" },
-    { key: "open", title: "Open Check", icon: <CheckOpenIcon size="2.1em" />, l1: "Open", l2: "Check" },
-    { key: "opposed", title: "Opposed Check", icon: <CheckOpposedIcon size="2.1em" />, l1: "Opposed", l2: "Check" },
+    { key: "group", title: "Group Check", icon: <CheckGroupIcon size="1.8em" />, l1: "Group", l2: "Check" },
+    { key: "attribute", title: "Attribute Check", icon: <CheckAttributeIcon size="1.8em" />, l1: "Attribute", l2: "Check" },
+    { key: "open", title: "Open Check", icon: <CheckOpenIcon size="1.8em" />, l1: "Open", l2: "Check" },
+    { key: "opposed", title: "Opposed Check", icon: <CheckOpposedIcon size="1.8em" />, l1: "Opposed", l2: "Check" },
   ];
 
   return (
     <>
-      <Box sx={{ py: 1, px: 1.25 }}>
+      <Box sx={{ py: 0.75, px: 1 }}>
         <Box
           sx={{
             display: "grid",
@@ -134,21 +134,18 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
                 <Box
                   sx={{
                     display: "inline-flex",
-                    flexDirection: "column",
+                    flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 0.35,
-                    textAlign: "center",
+                    gap: 0.6,
                   }}
                 >
-                  <Box sx={{ display: "inline-flex" }}>{item.icon}</Box>
+                  <Box sx={{ display: "inline-flex", flexShrink: 0 }}>{item.icon}</Box>
                   <Typography
                     variant="caption"
-                    sx={{ lineHeight: 1.05, fontWeight: 700 }}
+                    sx={{ lineHeight: 1.1, fontWeight: 700, textAlign: "left" }}
                   >
-                    {t(item.l1)}
-                    <br />
-                    {t(item.l2)}
+                    {t(item.l1)}<br />{t(item.l2)}
                   </Typography>
                 </Box>
               </IconButton>

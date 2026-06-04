@@ -57,6 +57,8 @@ export default [
         HTMLDivElement: "readonly",
         Blob: "readonly",
         File: "readonly",
+        HTMLCanvasElement: "readonly",
+        atob: "readonly",
         crypto: "readonly",
         TextEncoder: "readonly",
         DOMException: "readonly",

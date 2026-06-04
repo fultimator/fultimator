@@ -1,8 +1,15 @@
-import { useState } from "react";
-import { Box, Typography, IconButton, InputBase, Tooltip } from "@mui/material";
+import { useRef, useState } from "react";
+import {
+  Box,
+  Typography,
+  IconButton,
+  InputBase,
+  Tooltip,
+  Button,
+} from "@mui/material";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { Remove, Add } from "@mui/icons-material";
-import { alpha, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
 import {
@@ -15,65 +22,20 @@ import {
 import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
 import { newShade } from "/src/libs/playerCalculations";
 import StatTooltip from "/src/components/common/StatTooltip";
+import { getActorBonuses, getActorMultipliers } from "/src/libs/actorBonuses";
+import { buildResourceContext, resolveResource } from "/src/pipelines/resourcePipeline";
+import { buildDamageContext, resolveDamage } from "/src/pipelines/damagePipeline";
+import EditResourcesModal from "/src/components/shared/actors/common/EditResourcesModal";
+import {
+  getDeltaOverlaySx,
+  getPipFlashSx,
+  PIP_STRIPES,
+  useAnimatedDeltaPercent,
+  useAnimatedDeltaNumber,
+} from "/src/components/shared/actors/common/resourceBarMotion";
+import { useBarShell, LABEL_SX, VALUE_SX, DAMAGE_TYPES } from "/src/components/shared/actors/common/barShellUtils";
+import BarShell from "/src/components/shared/actors/common/BarShell";
 
-function useBarShell() {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
-  return {
-    theme,
-    isDark,
-    shellBg: alpha(theme.palette.primary.main, isDark ? 0.26 : 0.16),
-    shellBorder: alpha(theme.palette.primary.main, isDark ? 0.72 : 0.45),
-    labelBg: alpha(theme.palette.primary.main, isDark ? 0.62 : 0.5),
-    labelBorder: alpha(theme.palette.common.white, isDark ? 0.3 : 0.5),
-    trackBg: alpha(theme.palette.primary.main, isDark ? 0.4 : 0.28),
-  };
-}
-
-const LABEL_SX = {
-  width: 64,
-  flexShrink: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "3px",
-  fontFamily: "Antonio",
-  fontWeight: "bold",
-  fontSize: "0.95rem",
-  color: "#fff",
-  letterSpacing: "0.04em",
-  textTransform: "uppercase",
-};
-
-const VALUE_SX = {
-  width: 64,
-  flexShrink: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontFamily: "Antonio",
-  fontWeight: "bold",
-  fontSize: "0.95rem",
-  color: "#fff",
-};
-
-function BarShell({ shellBg, shellBorder, children }) {
-  return (
-    <Box
-      sx={{
-        height: 34,
-        display: "flex",
-        alignItems: "stretch",
-        overflow: "hidden",
-        bgcolor: shellBg,
-        border: `1px solid ${shellBorder}`,
-        borderRadius: "3px",
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
 
 function StatBar({
   label,
@@ -85,9 +47,13 @@ function StatBar({
   crisis = false,
   crisisTooltip = "",
   onSetCrisis = null,
+  onClick,
+  isClickable = false,
 }) {
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
   const [crisisHover, setCrisisHover] = useState(false);
+  const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
+  const { animatedPct, delta } = useAnimatedDeltaPercent(pct, { moveMs: 760, deltaMs: 1800 });
 
   return (
     <BarShell shellBg={shellBg} shellBorder={shellBorder}>
@@ -95,14 +61,34 @@ function StatBar({
         {Icon && <Icon size="1.4em" />}
         <span style={{ lineHeight: 1 }}>{label}</span>
       </Box>
-      <Box sx={{ flex: 1, position: "relative", bgcolor: trackBg }}>
+      <Box
+        onClick={isClickable ? onClick : undefined}
+        sx={{
+          flex: 1,
+          position: "relative",
+          bgcolor: trackBg,
+          cursor: isClickable ? "pointer" : "default",
+        }}
+      >
         <GradientLinearProgress
           variant="determinate"
-          value={max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0}
+          value={animatedPct}
           color1={color1}
           color2={color2}
-          sx={{ height: "100% !important", "&, & .MuiLinearProgress-bar": { borderRadius: 0 } }}
+          sx={{
+            height: "100% !important",
+            "&, & .MuiLinearProgress-bar": { borderRadius: 0 },
+            "& .MuiLinearProgress-bar": (t) => ({
+              transition: t.transitions.create("transform", {
+                duration: t.transitions.duration.complex,
+                easing: t.transitions.easing.easeOut,
+              }),
+            }),
+          }}
         />
+        {delta && Math.abs(delta.to - delta.from) > 0.0001 && (
+          <Box key={delta.seq} sx={getDeltaOverlaySx(delta, "pcDeltaFade")} />
+        )}
         {crisis && (
           <Tooltip title={crisisTooltip} placement="top">
             <Box
@@ -138,12 +124,21 @@ function StatBar({
           </Tooltip>
         )}
       </Box>
-      <Box sx={{ ...VALUE_SX, bgcolor: labelBg, borderLeft: `1px solid ${labelBorder}` }}>
+      <Box
+        onClick={isClickable ? onClick : undefined}
+        sx={{
+          ...VALUE_SX,
+          bgcolor: labelBg,
+          borderLeft: `1px solid ${labelBorder}`,
+          cursor: isClickable ? "pointer" : "default",
+        }}
+      >
         {value}/{max}
       </Box>
     </BarShell>
   );
 }
+
 
 function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
   const [amount, setAmount] = useState(String(defaultValue));
@@ -238,6 +233,7 @@ function ResourceCell({
   steps = [],
   tooltip,
   isInteractive = false,
+  onBarClick,
 }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}>
@@ -252,6 +248,8 @@ function ResourceCell({
           crisis={crisis}
           crisisTooltip={crisisTooltip}
           onSetCrisis={onSetCrisis}
+          isClickable={isInteractive}
+          onClick={onBarClick}
         />
       </StatTooltip>
       {isInteractive && <DeltaControls onApply={onApply} steps={steps} />}
@@ -263,8 +261,12 @@ const MAX_FP_PIPS = 6;
 
 function FpCell({ value, onApply, tooltip, isInteractive = false }) {
   const { t } = useTranslate();
-  const { theme, shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
+  const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
   const filled = Math.min(value, MAX_FP_PIPS);
+  const { animatedValue: animatedFilled, delta: fpDelta } = useAnimatedDeltaNumber(filled, {
+    moveMs: 280,
+    deltaMs: 460,
+  });
   const overflow = value > MAX_FP_PIPS ? value - MAX_FP_PIPS : 0;
   const [hoveredPip, setHoveredPip] = useState(null);
   const previewCount = hoveredPip !== null ? hoveredPip + 1 : filled;
@@ -288,10 +290,9 @@ function FpCell({ value, onApply, tooltip, isInteractive = false }) {
             onMouseLeave={() => setHoveredPip(null)}
           >
             {Array.from({ length: MAX_FP_PIPS }).map((_, i) => {
-              const isFilled = i < filled;
               const isPreview = i < previewCount;
-              const isAddedPreview = isPreview && !isFilled;
-              const isDimmedFilled = !isPreview && isFilled;
+              const animFill = Math.max(0, Math.min(1, animatedFilled - i));
+              const fpChanged = fpDelta ? (i < fpDelta.from) !== (i < fpDelta.to) : false;
               return (
                 <Box
                   key={i}
@@ -304,40 +305,29 @@ function FpCell({ value, onApply, tooltip, isInteractive = false }) {
                     justifyContent: "center",
                     cursor: isInteractive ? "pointer" : "default",
                     flexShrink: 0,
+                    position: "relative",
+                    overflow: "hidden",
+                    ...getPipFlashSx({
+                      changed: fpChanged,
+                      keyframeName: "fpDeltaFade",
+                      fromOpacity: 0.9,
+                      stripe: PIP_STRIPES.strong,
+                    }),
                   }}
                 >
-                  {isPreview ? (
-                    <Box
-                      sx={
-                        isAddedPreview
-                          ? {
-                              opacity: 1,
-                              filter:
-                                "drop-shadow(0 0 2px rgba(255,255,255,0.55)) saturate(1.25) brightness(1.15)",
-                            }
-                          : { opacity: 1 }
-                      }
-                    >
-                      <FpResourceIcon size="1.8em" />
-                    </Box>
-                  ) : isDimmedFilled ? (
-                    <Box sx={{ opacity: 0.28 }}>
-                      <FpResourceIcon size="1.8em" />
-                    </Box>
-                  ) : (
-                    <Box
-                      sx={{
-                        width: "1.35em",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        opacity: 0.38,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <FpResourceIcon size="1.8em" />
-                    </Box>
-                  )}
+                  <Box
+                    sx={{
+                      width: "1.35em",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      opacity: hoveredPip === null ? 0.2 + animFill * 0.8 : isPreview ? 1 : 0.28,
+                      filter: animFill > 0.6 ? "drop-shadow(0 0 2px rgba(255,255,255,0.45))" : "none",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <FpResourceIcon size="1.8em" />
+                  </Box>
                 </Box>
               );
             })}
@@ -359,11 +349,13 @@ function FpCell({ value, onApply, tooltip, isInteractive = false }) {
 
 function IpCell({ value, max, onApply, tooltip, isInteractive = false }) {
   const { t } = useTranslate();
-  const { theme, isDark, shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
+  const { isDark, shellBg, shellBorder, labelBg, labelBorder, trackBg, theme } = useBarShell();
   const color1 = isDark ? newShade(theme.palette.success.main, 10) : newShade(theme.palette.success.main, 80);
   const color2 = theme.palette.success.main;
-  const previewColor1 = isDark ? newShade(theme.palette.info.main, 10) : newShade(theme.palette.info.main, 80);
-  const previewColor2 = theme.palette.info.main;
+  const { animatedValue, delta: ipDelta } = useAnimatedDeltaNumber(value, {
+    moveMs: 280,
+    deltaMs: 460,
+  });
   const [hoveredPip, setHoveredPip] = useState(null);
   const previewCount = hoveredPip !== null ? hoveredPip + 1 : value;
 
@@ -387,10 +379,9 @@ function IpCell({ value, max, onApply, tooltip, isInteractive = false }) {
           >
             {Array.from({ length: max }).map((_, i) => (
               (() => {
-                const isFilled = i < value;
                 const isPreview = i < previewCount;
-                const isAddedPreview = isPreview && !isFilled;
-                const isDimmedFilled = !isPreview && isFilled;
+                const animFill = Math.max(0, Math.min(1, animatedValue - i));
+                const ipChanged = ipDelta ? (i < ipDelta.from) !== (i < ipDelta.to) : false;
                 return (
                   <Box
                     key={i}
@@ -401,21 +392,23 @@ function IpCell({ value, max, onApply, tooltip, isInteractive = false }) {
                       minWidth: 0,
                       borderRadius: "2px",
                       background:
-                        isAddedPreview
-                          ? `linear-gradient(to bottom, ${previewColor1}, ${previewColor2})`
-                          : isPreview || isDimmedFilled
-                            ? `linear-gradient(to bottom, ${color1}, ${color2})`
-                          : "transparent",
-                      border: `1px solid ${
-                        isAddedPreview
-                          ? previewColor2
-                          : isPreview || isDimmedFilled
-                            ? color2
-                            : shellBorder
-                      }`,
-                      opacity: isPreview ? 1 : isDimmedFilled ? 0.28 : 0.4,
+                        animFill > 0.01 ? `linear-gradient(to bottom, ${color1}, ${color2})` : "transparent",
+                      border: `1px solid ${animFill > 0.01 ? color2 : shellBorder}`,
+                      opacity: hoveredPip === null ? 0.22 + animFill * 0.78 : isPreview ? 1 : 0.28,
                       cursor: isInteractive ? "pointer" : "default",
-                      transition: "background 0.2s, opacity 0.2s",
+                      transition: (t) =>
+                        t.transitions.create(["background", "opacity"], {
+                          duration: t.transitions.duration.standard,
+                          easing: t.transitions.easing.easeOut,
+                        }),
+                      position: "relative",
+                      overflow: "hidden",
+                      ...getPipFlashSx({
+                        changed: ipChanged,
+                        keyframeName: "ipPipDeltaFade",
+                        fromOpacity: 0.9,
+                        stripe: PIP_STRIPES.subtle,
+                      }),
                     }}
                   />
                 );
@@ -502,6 +495,95 @@ export default function PcControlsPanel({ pc, isInteractive = false, onUpdate })
       info: { ...prev.info, zenit: Math.max(0, (prev.info.zenit ?? 0) + delta) },
     }));
   };
+  const [resourceDialog, setResourceDialog] = useState(null);
+
+  const openResourceDialog = (resource) => {
+    if (!isInteractive) return;
+    setResourceDialog(resource);
+  };
+
+  const closeResourceDialog = () => setResourceDialog(null);
+
+  const setResourceCurrent = (resourceKey) => (nextCurrent) => {
+    if (!isInteractive || !onUpdate) return;
+    onUpdate((prev) => {
+      const maxValue = prev.stats[resourceKey].max ?? 0;
+      const bounded = Math.max(0, Math.min(nextCurrent ?? 0, maxValue));
+      return {
+        ...prev,
+        stats: {
+          ...prev.stats,
+          [resourceKey]: {
+            ...prev.stats[resourceKey],
+            current: bounded,
+          },
+        },
+      };
+    });
+  };
+
+  const applyResourceDialogChange = (resourceKey) => (payload) => {
+    if (!isInteractive || !onUpdate) return;
+    const amount = Math.max(0, parseInt(payload?.amount, 10) || 0);
+    if (amount <= 0) return;
+
+    onUpdate((prev) => {
+      const bonuses = getActorBonuses(prev);
+      const multipliers = getActorMultipliers(prev);
+      const currentValue = prev.stats[resourceKey].current ?? 0;
+      const maxValue = prev.stats[resourceKey].max ?? 0;
+
+      let delta = 0;
+
+      if (resourceKey === "hp" && payload.mode === "damage") {
+        const effectiveAffinities = payload.isGuarding
+          ? DAMAGE_TYPES.reduce((acc, type) => {
+            if (type !== "untyped") acc[type] = "rs";
+            return acc;
+          }, {})
+          : (prev.affinities ?? {});
+        const dmgCtx = buildDamageContext({
+          baseDamage: amount,
+          damageType: payload.damageType ?? "physical",
+          npcAffinities: effectiveAffinities,
+          isGuarding: payload.isGuarding,
+          incomingDamageBonuses: bonuses.incomingDamage,
+        });
+        const dmgResult = resolveDamage(dmgCtx);
+        delta = -dmgResult.finalDamage;
+      } else {
+        const direction = payload.mode === "heal" ? "recovery" : "loss";
+        const rCtx = buildResourceContext({
+          resource: resourceKey,
+          amount,
+          direction,
+          voluntary: direction === "loss",
+          currentValue,
+          maxValue,
+          incomingLossBonuses: bonuses.incomingLoss,
+          incomingLossMultipliers: multipliers.incomingLoss,
+          incomingRecoveryBonuses: bonuses.incomingRecovery,
+          incomingRecoveryMultipliers: multipliers.incomingRecovery,
+          outgoingRecoveryBonuses: bonuses.outgoingRecovery,
+          outgoingRecoveryMultipliers: multipliers.outgoingRecovery,
+        });
+        const resolved = resolveResource(rCtx).resolvedAmount;
+        delta = direction === "recovery" ? resolved : -resolved;
+      }
+
+      const nextCurrent = Math.max(0, Math.min(currentValue + delta, maxValue));
+      return {
+        ...prev,
+        stats: {
+          ...prev.stats,
+          [resourceKey]: {
+            ...prev.stats[resourceKey],
+            current: nextCurrent,
+          },
+        },
+      };
+    });
+  };
 
   const hpColor1 = isDark ? newShade(theme.palette.error.main, 10) : newShade(theme.palette.error.main, 80);
   const mpColor1 = isDark ? newShade(theme.palette.info.main, 10) : newShade(theme.palette.info.main, 80);
@@ -579,6 +661,7 @@ export default function PcControlsPanel({ pc, isInteractive = false, onUpdate })
             steps={[1, 5, 10, 20]}
             tooltip={hpTooltip}
             isInteractive={isInteractive}
+            onBarClick={() => openResourceDialog("hp")}
           />
           <ResourceCell
             label={t("MP")} Icon={MpResourceIcon}
@@ -586,6 +669,7 @@ export default function PcControlsPanel({ pc, isInteractive = false, onUpdate })
             color1={mpColor1} color2={theme.palette.info.main}
             onApply={applyStat("mp")} steps={[1, 5, 10, 20]} tooltip={mpTooltip}
             isInteractive={isInteractive}
+            onBarClick={() => openResourceDialog("mp")}
           />
         </Box>
 
@@ -596,6 +680,7 @@ export default function PcControlsPanel({ pc, isInteractive = false, onUpdate })
             onApply={applyStat("ip")}
             tooltip={ipTooltip}
             isInteractive={isInteractive}
+            onBarClick={() => openResourceDialog("ip")}
           />
           <FpCell
             value={pc.info.fabulapoints ?? 0}
@@ -607,6 +692,38 @@ export default function PcControlsPanel({ pc, isInteractive = false, onUpdate })
 
         <ZenitRow value={pc.info.zenit ?? 0} onApply={applyZenit} tooltip={zenitTooltip} isInteractive={isInteractive} />
       </Box>
+      {resourceDialog && (
+        <EditResourcesModal
+          open
+          onClose={closeResourceDialog}
+          title={resourceDialog.toUpperCase()}
+          resourceKey={resourceDialog}
+          current={pc.stats[resourceDialog].current}
+          max={pc.stats[resourceDialog].max}
+          damageTypes={DAMAGE_TYPES}
+          resolvePreviewDelta={({ amount, mode, damageType, isGuarding, resourceKey }) => {
+            if (mode === "heal") return amount;
+            if (resourceKey !== "hp") return -amount;
+            const effectiveAffinities = isGuarding
+              ? DAMAGE_TYPES.reduce((acc, type) => {
+                if (type !== "untyped") acc[type] = "rs";
+                return acc;
+              }, {})
+              : (pc.affinities ?? {});
+            const bonuses = getActorBonuses(pc);
+            const dmgCtx = buildDamageContext({
+              baseDamage: amount,
+              damageType: damageType ?? "physical",
+              npcAffinities: effectiveAffinities,
+              isGuarding,
+              incomingDamageBonuses: bonuses.incomingDamage,
+            });
+            return -resolveDamage(dmgCtx).finalDamage;
+          }}
+          onApply={applyResourceDialogChange(resourceDialog)}
+          onSetCurrent={setResourceCurrent(resourceDialog)}
+        />
+      )}
     </SectionCard>
   );
 }

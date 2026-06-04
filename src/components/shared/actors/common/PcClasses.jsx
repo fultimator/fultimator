@@ -11,7 +11,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Collapse,
+
   Dialog,
   DialogTitle,
   DialogContent,
@@ -30,6 +30,8 @@ import {
   Remove,
   DeleteForever,
   Edit,
+  UnfoldMore,
+  UnfoldLess,
 } from "@mui/icons-material";
 import MessageOutlined from "@mui/icons-material/MessageOutlined";
 import NotesMarkdown from "/src/components/common/NotesMarkdown";
@@ -666,13 +668,17 @@ function SpellTypeAccordion({ spellType, spells, classIdx, onUpdate, searchQuery
 }
 // ClassSection
 
-function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, onLevelChange, onRemoveClass, onEditClass, pc, searchQuery, setHeroicPickerClassIdx, compact, defaultExpanded = false, theme, t }) {
+function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, onLevelChange, onRemoveClass, onEditClass, pc, searchQuery, setHeroicPickerClassIdx, compact, defaultExpanded = false, forceExpanded, theme, t }) {
   const [collapsed, setCollapsedState] = useState(compact ? true : !defaultExpanded);
   const [preview, setPreview] = useState(null);
   useEffect(() => {
     if (!compact) return;
     if (searchQuery?.trim()) setCollapsedState(false);
   }, [compact, searchQuery]);
+  useEffect(() => {
+    if (forceExpanded === null) return;
+    setCollapsedState(!forceExpanded.expanded);
+  }, [forceExpanded]);
 
   const visibleSpells = (cls.spells || []).filter(isVisibleSpell);
 
@@ -892,7 +898,7 @@ export default function PcClasses({
   const [newClassName, setNewClassName] = useState("");
   const [newClassFuid, setNewClassFuid] = useState(undefined);
   const [compendiumOpen, setCompendiumOpen] = useState(false);
-  const [sectionsOpen, setSectionsOpen] = useState(true);
+  const [expandSignal, setExpandSignal] = useState(null); // null=unset, {expanded,seq}
 
   const syncClassLevels = (next) => automaticClassLevel ? syncAutomaticClassLevels(next) : next;
 
@@ -1095,17 +1101,25 @@ export default function PcClasses({
           </Box>
         ))}
       </Box>
-      <IconButton size="small" onClick={(e) => { e.stopPropagation(); setSectionsOpen((v) => !v); }} sx={{ color: "#fff", p: "2px", flexShrink: 0 }}>
-        {sectionsOpen ? <KeyboardArrowUp sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} /> : <KeyboardArrowDown sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />}
-      </IconButton>
+      <Tooltip title={expandSignal?.expanded ? t("Collapse All Classes") : t("Expand All Classes")}>
+        <IconButton
+          size="small"
+          data-expand-all-classes={expandSignal?.expanded ? "expanded" : "collapsed"}
+          onClick={(e) => { e.stopPropagation(); setExpandSignal((v) => ({ expanded: !v?.expanded, seq: (v?.seq ?? 0) + 1 })); }}
+          sx={{ color: "#fff", p: "2px", flexShrink: 0 }}
+        >
+          {expandSignal?.expanded
+            ? <UnfoldLess sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />
+            : <UnfoldMore sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />}
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 
   const classesContent = (
     <>
 
-      <Collapse in={sectionsOpen}>
-        <Box sx={{ p: isCompact ? "4px" : 1 }}>
+      <Box sx={{ p: isCompact ? "4px" : 1 }}>
             {warnings.length > 0 && (
               <Box sx={{ mb: 0.5 }}>
                 {warnings.map((w, i) => (
@@ -1136,6 +1150,7 @@ export default function PcClasses({
                 setHeroicPickerClassIdx={setHeroicPickerClassIdx}
                 compact={isCompact}
                 defaultExpanded={defaultExpanded}
+                forceExpanded={expandSignal}
                 theme={theme}
                 t={t}
               />
@@ -1155,8 +1170,7 @@ export default function PcClasses({
                 {t("No classes added yet")}
               </Typography>
             )}
-        </Box>
-      </Collapse>
+      </Box>
 
       <EditPlayerClassModal
         open={editClassIdx !== null}
@@ -1202,7 +1216,6 @@ export default function PcClasses({
       ) : (
         <SectionCard
           title={t(usesInnateClassRules ? "Innate Classes" : "Classes")}
-          onHeaderClick={() => setSectionsOpen((v) => !v)}
           sx={{ minWidth: 0, mb: 1 }}
           actions={classesActions}
         >

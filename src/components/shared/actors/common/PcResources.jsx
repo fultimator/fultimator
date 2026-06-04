@@ -19,6 +19,13 @@ import StatTooltip from "/src/components/common/StatTooltip";
 import { newShade } from "/src/libs/playerCalculations";
 import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
 import { RESOURCE_SCALES } from "/src/components/shared/actors/scaleTokens";
+import {
+  getDeltaOverlaySx,
+  getPipFlashSx,
+  PIP_STRIPES,
+  useAnimatedDeltaPercent,
+  useAnimatedDeltaNumber,
+} from "/src/components/shared/actors/common/resourceBarMotion";
 
 function StatChangeDialog({ open, onClose, stat, value, max, onApply, t }) {
   const [amount, setAmount] = useState("");
@@ -186,6 +193,8 @@ function CompactResourceBar({
   crisisLine = false,
 }) {
   const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
+  const { animatedPct, delta } = useAnimatedDeltaPercent(pct, { moveMs: 760, deltaMs: 1800 });
+
   return (
     <ResourceBarShell
       {...{
@@ -205,15 +214,24 @@ function CompactResourceBar({
       <Box sx={{ flex: 1, position: "relative", bgcolor: trackBg }}>
         <GradientLinearProgress
           variant="determinate"
-          value={pct}
+          value={animatedPct}
           color1={color1}
           color2={color2}
           sx={{
             height: "100% !important",
             padding: 0,
             "&, & .MuiLinearProgress-bar": { borderRadius: 0 },
+            "& .MuiLinearProgress-bar": (t) => ({
+              transition: t.transitions.create("transform", {
+                duration: t.transitions.duration.complex,
+                easing: t.transitions.easing.easeOut,
+              }),
+            }),
           }}
         />
+        {delta && Math.abs(delta.to - delta.from) > 0.0001 && (
+          <Box key={delta.seq} sx={getDeltaOverlaySx(delta, "pcResourcesDeltaFade")} />
+        )}
         {crisisLine && (
           <Box
             sx={{
@@ -232,7 +250,7 @@ function CompactResourceBar({
   );
 }
 
-function SegmentedResourceBar({
+export function SegmentedResourceBar({
   label,
   value,
   max,
@@ -248,6 +266,11 @@ function SegmentedResourceBar({
   Icon,
   rs,
 }) {
+  const { animatedValue, delta: pipDelta } = useAnimatedDeltaNumber(value, {
+    moveMs: 280,
+    deltaMs: 460,
+  });
+
   return (
     <ResourceBarShell
       {...{
@@ -276,19 +299,57 @@ function SegmentedResourceBar({
         }}
       >
         {Array.from({ length: max }).map((_, i) => {
-          const filled = i < value;
+          const animFill = Math.max(0, Math.min(1, animatedValue - i));
+          const pipChanged = pipDelta ? (i < pipDelta.from) !== (i < pipDelta.to) : false;
+          const changed = pipChanged && pipDelta && i >= Math.min(pipDelta.from, pipDelta.to);
           return (
             <Box
               key={i}
               sx={{
                 flex: 1,
                 borderRadius: "1px",
-                background: filled
-                  ? `linear-gradient(to bottom, ${color1}, ${color2})`
-                  : "transparent",
-                border: `1px solid ${filled ? color2 : shellBorder}`,
-                opacity: filled ? 1 : 0.45,
-                transition: "background 0.2s, opacity 0.2s",
+                background:
+                  animFill > 0.01
+                    ? `linear-gradient(to bottom, ${color1}, ${color2})`
+                    : "transparent",
+                border: `1px solid ${animFill > 0.01 ? color2 : shellBorder}`,
+                opacity: 0.2 + animFill * 0.8,
+                transition: (t) =>
+                  t.transitions.create(["background", "opacity"], {
+                    duration: t.transitions.duration.standard,
+                    easing: t.transitions.easing.easeOut,
+                  }),
+                position: "relative",
+                overflow: "hidden",
+                ...(changed
+                  ? {
+                      "&::after": {
+                        content: '""',
+                        position: "absolute",
+                        inset: 0,
+                        background: `
+                          linear-gradient(
+                            to bottom,
+                            ${alpha("#ffffff", 0.28)},
+                            ${alpha("#ffffff", 0.1)}
+                          ),
+                          ${PIP_STRIPES.subtle}
+                        `,
+                        animation:
+                          "ipDeltaFade 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                        pointerEvents: "none",
+                      },
+                      "@keyframes ipDeltaFade": {
+                        from: { opacity: 0.9 },
+                        to: { opacity: 0 },
+                      },
+                    }
+                  : getPipFlashSx({
+                      changed: pipChanged,
+                      keyframeName: "ipPipDeltaFade",
+                      fromOpacity: 0.85,
+                      stripe: PIP_STRIPES.subtle,
+                    })),
               }}
             />
           );

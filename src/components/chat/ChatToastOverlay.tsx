@@ -28,9 +28,23 @@ interface ToastEntry {
   exiting: boolean;
 }
 
+function shouldToastMessage(message: ChatMessage): boolean {
+  if (message.kind === "log") return false;
+  return (
+    message.kind === "generic" ||
+    message.kind === "attribute" ||
+    message.kind === "open" ||
+    message.kind === "opposed" ||
+    message.kind === "accuracy" ||
+    message.kind === "magic" ||
+    message.kind === "display"
+  );
+}
+
 export const ChatToastOverlay: React.FC = () => {
   const globalMessages = useChatMessagesStore((s) => s.messages);
   const encounterMessages = useEncounterChatStore((s) => s.messages);
+  const encounterHydrated = useEncounterChatStore((s) => s.isHydrated);
   const messages = React.useMemo(
     () =>
       [...globalMessages, ...encounterMessages].sort(
@@ -45,11 +59,26 @@ export const ChatToastOverlay: React.FC = () => {
 
   const [toasts, setToasts] = useState<ToastEntry[]>([]);
   const mountedCountRef = useRef<number | null>(null);
+  const messagesLengthRef = useRef<number>(0);
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  // Keep a live ref so the hydration effect below always reads the current length.
+  messagesLengthRef.current = messages.length;
 
   useEffect(() => {
     mountedCountRef.current = messages.length;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // When the encounter chat is bulk-loaded (hydrated), advance the baseline so
+  // pre-existing messages are never toasted. Uses a ref for messages.length to
+  // avoid a stale closure when the store clears and reloads within a session.
+  const prevHydratedRef = useRef(false);
+  useEffect(() => {
+    if (encounterHydrated && !prevHydratedRef.current) {
+      mountedCountRef.current = messagesLengthRef.current;
+    }
+    prevHydratedRef.current = encounterHydrated;
+  }, [encounterHydrated]);
 
   const dismissToast = (id: string) => {
     const t = timers.current.get(id);
@@ -94,6 +123,7 @@ export const ChatToastOverlay: React.FC = () => {
     if (drawerOpen && activeTab === "chat") return;
 
     newMessages.forEach((msg) => {
+      if (!shouldToastMessage(msg)) return;
       if (timers.current.has(msg.id)) return;
       timers.current.set(
         msg.id,

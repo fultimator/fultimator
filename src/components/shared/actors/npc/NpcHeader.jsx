@@ -97,7 +97,7 @@ export function NpcHeader({ npc, npcImage }) {
           sx={{
             background,
             borderRight,
-            px: 2,
+            px: 1,
             flex: "1 1 auto",
           }}
         >
@@ -115,7 +115,7 @@ export function NpcHeader({ npc, npcImage }) {
         </Grid>
         <Grid
           sx={{
-            px: 2,
+            px: 1,
             py: 0.5,
             borderLeft,
             borderBottom,
@@ -180,7 +180,7 @@ export function NpcHeader({ npc, npcImage }) {
           {(npc.villain || npc.phases || npc.multipart) && (
             <Box
               sx={{
-                px: 2,
+                px: 1,
                 py: 0.5,
                 borderBottom,
                 borderImage: borderImageBody,
@@ -203,7 +203,7 @@ export function NpcHeader({ npc, npcImage }) {
           )}
           <Box
             sx={{
-              px: 2,
+              px: 1,
               py: 0.5,
               borderBottom,
               borderImage: borderImageBody,
@@ -212,7 +212,7 @@ export function NpcHeader({ npc, npcImage }) {
           >
             <StyledMarkdown>{npc.description}</StyledMarkdown>
           </Box>
-          <Box sx={{ px: 2, py: 0.5 }}>
+          <Box sx={{ px: 1, py: 0.5 }}>
             <Typography>
               <strong>{t("Typical Traits:")} </strong>
               {npc.traits}

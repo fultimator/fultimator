@@ -24,6 +24,8 @@ import { deriveCombatStats } from "/src/components/shared/actors/core-utils";
 import { CombatStatCard } from "/src/components/shared/actors/pc/shared";
 import PcResources from "/src/components/shared/actors/common/PcResources";
 
+const STAT_LABEL_SHADOW = "-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000";
+
 function CombatStatDisplay({ icon, label, value, tooltip }) {
   const card = (
     <CombatStatCard sx={{ px: { xs: "6px", sm: "8px" }, py: "4px" }}>
@@ -52,6 +54,7 @@ function CombatStatDisplay({ icon, label, value, tooltip }) {
             color: "#fff",
             lineHeight: 1.2,
             whiteSpace: "nowrap",
+            textShadow: STAT_LABEL_SHADOW,
           }}
         >
           {label}
@@ -201,12 +204,13 @@ export default function PcStats({
     { key: "shaken", label: t("Shaken") },
   ];
 
-  const statusLabel = (label) => (
+  const statusLabel = (label, checked) => (
     <Typography
       variant="body2"
       sx={{
         fontFamily: "'Antonio', fantasy, sans-serif",
         fontSize: { xs: "0.68rem", sm: "0.8rem", md: "0.86rem", lg: "0.92rem" },
+        textShadow: checked ? STAT_LABEL_SHADOW : "none",
       }}
     >
       {label}
@@ -388,7 +392,7 @@ export default function PcStats({
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <FormControlLabel
                     control={statusCheckbox(leftStatus.key)}
-                    label={statusLabel(leftStatus.label)}
+                    label={statusLabel(leftStatus.label, pc.statuses?.[leftStatus.key])}
                     sx={{ margin: 0 }}
                   />
                 </Box>
@@ -403,7 +407,7 @@ export default function PcStats({
                   {rightStatus && (
                     <FormControlLabel
                       control={statusCheckbox(rightStatus.key)}
-                      label={statusLabel(rightStatus.label)}
+                      label={statusLabel(rightStatus.label, pc.statuses?.[rightStatus.key])}
                       sx={{ margin: 0 }}
                     />
                   )}
@@ -652,6 +656,7 @@ export default function PcStats({
                   color: "#fff",
                   lineHeight: 1.2,
                   whiteSpace: "nowrap",
+                  textShadow: STAT_LABEL_SHADOW,
                 }}
               >
                 FP

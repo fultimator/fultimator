@@ -1,16 +1,16 @@
 export const RESOURCE_SCALES = {
   sm: {
-    fontSize: "0.75rem",
+    fontSize: "0.9rem",
     barHeight: "24px",
-    labelWidth: "52px",
+    labelWidth: "62px",
     iconSize: "1.25em",
     p: "4px",
     gap: "2px",
   },
   lg: {
-    fontSize: "1rem",
+    fontSize: "0.9rem",
     barHeight: "28px",
-    labelWidth: "76px",
+    labelWidth: "62px",
     iconSize: "1.25em",
     p: "6px",
     gap: "4px",

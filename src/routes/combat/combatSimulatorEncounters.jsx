@@ -843,7 +843,7 @@ const CombatSimEncounters = () => {
         open={notification.open}
         autoHideDuration={4000}
         onClose={handleNotificationClose}
-        TransitionComponent={Fade}
+        slots={{ transition: Fade }}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert

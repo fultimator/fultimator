@@ -647,6 +647,7 @@ export default function EditPlayerClasses({
               onClick={toggleAll}
               size="small"
               sx={{ color: "text.secondary" }}
+              data-expand-all-classes={allExpanded ? "expanded" : "collapsed"}
             >
               {allExpanded ? <UnfoldLess /> : <UnfoldMore />}
             </IconButton>

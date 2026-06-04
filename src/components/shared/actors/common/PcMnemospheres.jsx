@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
   Button,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -20,6 +19,8 @@ import {
   KeyboardArrowUp,
   Remove,
   Star,
+  UnfoldLess,
+  UnfoldMore,
 } from "@mui/icons-material";
 import MessageOutlined from "@mui/icons-material/MessageOutlined";
 import NotesMarkdown from "/src/components/common/NotesMarkdown";
@@ -55,7 +56,7 @@ function SectionSubHeader({ children, theme }) {
 }
 
 function MnemoSkillRow({ skill, isInteractive, budgetExhausted, onIncrease, onDecrease, translatedDescription, searchQuery, theme, t, pc }) {
-  const [descOpen, setDescOpen] = useState(true);
+  const [descOpen, setDescOpen] = useState(false);
   const hasDesc = !!translatedDescription;
   const forceOpen = !!searchQuery?.trim();
   const expanded = hasDesc ? (descOpen || forceOpen) : false;
@@ -131,7 +132,7 @@ function MnemoSkillRow({ skill, isInteractive, budgetExhausted, onIncrease, onDe
 }
 
 function MnemoHeroicRow({ heroicSkill, translatedDescription, searchQuery, theme, t, pc }) {
-  const [descOpen, setDescOpen] = useState(true);
+  const [descOpen, setDescOpen] = useState(false);
   const hasDesc = !!translatedDescription;
   const forceOpen = !!searchQuery?.trim();
   const expanded = hasDesc ? (descOpen || forceOpen) : false;
@@ -189,8 +190,12 @@ function MnemoHeroicRow({ heroicSkill, translatedDescription, searchQuery, theme
 }
 
 // Single mnemosphere card (non-compact)
-function MnemoCard({ mnemo, isInteractive, budgetExhausted, onIncreaseSkillLevel, onDecreaseSkillLevel, onInvestLevel, onRefundLevel, availableLevels, searchQuery, theme, t, pc }) {
-  const [expanded, setExpanded] = useState(true);
+function MnemoCard({ mnemo, isInteractive, budgetExhausted, onIncreaseSkillLevel, onDecreaseSkillLevel, onInvestLevel, onRefundLevel, availableLevels, searchQuery, forceExpanded, theme, t, pc }) {
+  const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    if (forceExpanded === null) return;
+    setExpanded(forceExpanded.expanded);
+  }, [forceExpanded]);
   const secondary = theme.secondary;
 
   const sphereLvl = mnemo.lvl ?? 1;
@@ -338,8 +343,12 @@ function MnemoCard({ mnemo, isInteractive, budgetExhausted, onIncreaseSkillLevel
 }
 
 // Single mnemosphere card (compact)
-function MnemoCardCompact({ mnemo, searchQuery, theme, t, pc }) {
+function MnemoCardCompact({ mnemo, searchQuery, forceExpanded, theme, t, pc }) {
   const [collapsed, setCollapsed] = useState(true);
+  useEffect(() => {
+    if (forceExpanded === null) return;
+    setCollapsed(!forceExpanded.expanded);
+  }, [forceExpanded]);
   const [preview, setPreview] = useState(null);
 
   const skills = (mnemo.skills ?? []).filter((s) => (s.currentLvl ?? 0) >= 1);
@@ -485,7 +494,7 @@ export default function PcMnemospheres({
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isCompact = variant === "compact";
-  const [open, setOpen] = useState(!isCompact);
+  const [expandSignal, setExpandSignal] = useState(null); // null=unset, {expanded,seq}
 
   const bankSpheres = allMnemospheres ?? [];
   const breakdown = bankSpheres
@@ -515,54 +524,64 @@ export default function PcMnemospheres({
           </StatTooltip>
         </>
       )}
-      <IconButton component="span" size="small" sx={{ color: "#fff", p: "2px", flexShrink: 0 }} onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}>
-        {open ? <KeyboardArrowUp sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} /> : <KeyboardArrowDown sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />}
-      </IconButton>
+      <Tooltip title={expandSignal?.expanded ? t("Collapse All") : t("Expand All")}>
+        <IconButton
+          component="span"
+          size="small"
+          data-expand-all-mnemo={expandSignal?.expanded ? "expanded" : "collapsed"}
+          sx={{ color: "#fff", p: "2px", flexShrink: 0 }}
+          onClick={(e) => { e.stopPropagation(); setExpandSignal((v) => ({ expanded: !v?.expanded, seq: (v?.seq ?? 0) + 1 })); }}
+        >
+          {expandSignal?.expanded
+            ? <UnfoldLess sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />
+            : <UnfoldMore sx={{ fontSize: isCompact ? "1.1rem" : "1.3rem" }} />}
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 
   if (!slottedMnemospheres?.length) return null;
 
   const content = (
-    <Collapse in={open}>
-      <Box sx={{ p: isCompact ? "4px" : 1 }}>
-        {slottedMnemospheres.map((mnemo) => {
-          if (isCompact) {
-            return (
-              <MnemoCardCompact
-                key={`mnemo-${mnemo.id}`}
-                mnemo={mnemo}
-                searchQuery={searchQuery}
-                theme={theme}
-                t={t}
-                pc={pc}
-              />
-            );
-          }
-
-          const availableLevels = getMnemoAvailableLevels ? getMnemoAvailableLevels(mnemo) : null;
-          const budgetExhausted = availableLevels !== null && availableLevels <= 0;
-
+    <Box sx={{ p: isCompact ? "4px" : 1 }}>
+      {slottedMnemospheres.map((mnemo) => {
+        if (isCompact) {
           return (
-            <MnemoCard
+            <MnemoCardCompact
               key={`mnemo-${mnemo.id}`}
               mnemo={mnemo}
-              isInteractive={isInteractive}
-              budgetExhausted={budgetExhausted}
-              onIncreaseSkillLevel={(skillIdx) => onChangeMnemoSkillLevel?.(mnemo.id, skillIdx, 1)}
-              onDecreaseSkillLevel={(skillIdx) => onChangeMnemoSkillLevel?.(mnemo.id, skillIdx, -1)}
-              onInvestLevel={isInteractive ? () => onInvestLevel?.(mnemo.id) : null}
-              onRefundLevel={isInteractive ? () => onRefundLevel?.(mnemo.id) : null}
-              availableLevels={isInteractive ? availableLevels : null}
               searchQuery={searchQuery}
+              forceExpanded={expandSignal}
               theme={theme}
               t={t}
               pc={pc}
             />
           );
-        })}
-      </Box>
-    </Collapse>
+        }
+
+        const availableLevels = getMnemoAvailableLevels ? getMnemoAvailableLevels(mnemo) : null;
+        const budgetExhausted = availableLevels !== null && availableLevels <= 0;
+
+        return (
+          <MnemoCard
+            key={`mnemo-${mnemo.id}`}
+            mnemo={mnemo}
+            isInteractive={isInteractive}
+            budgetExhausted={budgetExhausted}
+            onIncreaseSkillLevel={(skillIdx) => onChangeMnemoSkillLevel?.(mnemo.id, skillIdx, 1)}
+            onDecreaseSkillLevel={(skillIdx) => onChangeMnemoSkillLevel?.(mnemo.id, skillIdx, -1)}
+            onInvestLevel={isInteractive ? () => onInvestLevel?.(mnemo.id) : null}
+            onRefundLevel={isInteractive ? () => onRefundLevel?.(mnemo.id) : null}
+            availableLevels={isInteractive ? availableLevels : null}
+            searchQuery={searchQuery}
+            forceExpanded={expandSignal}
+            theme={theme}
+            t={t}
+            pc={pc}
+          />
+        );
+      })}
+    </Box>
   );
 
   return isCompact ? (

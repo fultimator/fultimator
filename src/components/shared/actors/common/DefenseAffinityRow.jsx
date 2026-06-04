@@ -3,6 +3,8 @@ import { Box, Typography } from "@mui/material";
 import { TypeAffinity } from "./TypeAffinity";
 import { AFFINITY_TYPES } from "/src/components/shared/actors/core-utils";
 
+const STAT_LABEL_SHADOW = "-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000";
+
 export default function DefenseAffinityRow({
   t,
   defValue,
@@ -60,6 +62,7 @@ export default function DefenseAffinityRow({
               sx={{
                 fontFamily: "'Antonio', fantasy, sans-serif",
                 fontSize: "0.75rem",
+                textShadow: STAT_LABEL_SHADOW,
               }}
             >
               {t("DEF")} {defValue}
@@ -82,6 +85,7 @@ export default function DefenseAffinityRow({
               sx={{
                 fontFamily: "'Antonio', fantasy, sans-serif",
                 fontSize: "0.75rem",
+                textShadow: STAT_LABEL_SHADOW,
               }}
             >
               {t("M.DEF")} {mDefValue}

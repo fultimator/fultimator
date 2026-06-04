@@ -5,6 +5,7 @@ interface EncounterChatState {
   encounterId: string | null;
   messages: ChatMessage[];
   isDirty: boolean;
+  isHydrated: boolean;
   addMessage: (message: ChatMessage) => void;
   deleteMessage: (id: string) => void;
   setMessages: (encounterId: string, messages: ChatMessage[]) => void;
@@ -17,6 +18,7 @@ export const useEncounterChatStore = create<EncounterChatState>((set) => ({
   encounterId: null,
   messages: [],
   isDirty: false,
+  isHydrated: false,
 
   addMessage: (message) =>
     set((state) => ({
@@ -31,11 +33,11 @@ export const useEncounterChatStore = create<EncounterChatState>((set) => ({
     })),
 
   setMessages: (encounterId, messages) =>
-    set({ encounterId, messages, isDirty: false }),
+    set({ encounterId, messages, isDirty: false, isHydrated: true }),
 
   markClean: () => set({ isDirty: false }),
 
   clearMessages: () => set({ messages: [], isDirty: true }),
 
-  clear: () => set({ encounterId: null, messages: [], isDirty: false }),
+  clear: () => set({ encounterId: null, messages: [], isDirty: false, isHydrated: false }),
 }));
