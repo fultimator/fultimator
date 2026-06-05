@@ -199,6 +199,7 @@ export default function PcActorCard({
             <PcCampActivities {...sharedProps} />
           )}
           {optionalRules.quirks && <PcQuirk {...sharedProps} />}
+          <PcOthers {...sharedProps} />
         </Box>
 
         <Box
@@ -216,7 +217,6 @@ export default function PcActorCard({
             ["integrated", "mnemospheres"].includes(
               optionalRules.technospheresVariant ?? "standard",
             ) && <PcMnemoReceptacle {...ownerSharedProps} />}
-          <PcOthers {...sharedProps} />
           <PcVehicle {...sharedProps} />
           <PcCompanion {...sharedProps} />
         </Box>

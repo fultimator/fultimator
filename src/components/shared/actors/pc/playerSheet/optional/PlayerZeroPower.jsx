@@ -1,19 +1,21 @@
-import React, { useState } from "react";
-import { Typography, Divider, Box, Paper, IconButton } from "@mui/material";
-import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { useState } from "react";
+import { Typography, Box, Paper, IconButton, Tooltip } from "@mui/material";
+import { Edit, ChatOutlined } from "@mui/icons-material";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 import { useTranslate } from "/src/translation/translate";
 import { useTheme } from "@mui/material/styles";
-import NotesMarkdown from "/src/components/common/NotesMarkdown";
 import ClockControls from "/src/components/shared/actors/pc/variants/compact/ClockControls";
-import { highlightMatch, highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
+import { highlightMatch } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
+import { SharedZeroPowerCard } from "/src/components/shared/items";
 
-export default function PlayerZeroPower({ player, setPlayer, compact = false, searchQuery = "" }) {
+export default function PlayerZeroPower({ player, setPlayer, isEditMode = false, onEdit, speaker = "", compact = false, searchQuery = "", headerActions }) {
   const { t } = useTranslate();
   const muiTheme = useTheme();
   const primary = muiTheme.palette.primary.main;
-  const [descOpen, setDescOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const zeroPower = player.zeroPower;
   const sections = zeroPower?.clock?.sections ?? 6;
@@ -31,12 +33,57 @@ export default function PlayerZeroPower({ player, setPlayer, compact = false, se
   const effectName = typeof zeroPower.zeroEffect === "string" ? zeroPower.zeroEffect : (zeroPower.zeroEffect?.name ?? "");
   const effectDesc = typeof zeroPower.zeroEffect === "object" ? (zeroPower.zeroEffect?.description ?? "") : "";
 
-  const hasDetails = triggerName || effectName;
+  const hasDetails = !!(triggerName || triggerDesc || effectName || effectDesc);
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const forceOpen = !!normalizedQuery && (
+    triggerName?.toLowerCase().includes(normalizedQuery) ||
+    triggerDesc?.toLowerCase().includes(normalizedQuery) ||
+    effectName?.toLowerCase().includes(normalizedQuery) ||
+    effectDesc?.toLowerCase().includes(normalizedQuery)
+  );
+  const open = isOpen || forceOpen;
+
+  const handleSendToChat = (e) => {
+    e.stopPropagation();
+    sendDisplayMessage("zeroPower", zeroPower.name, {
+      description: [triggerName, triggerDesc].filter(Boolean).join(" — ") || undefined,
+      effect: [effectName, effectDesc].filter(Boolean).join(" — ") || undefined,
+      speaker,
+    });
+  };
+
+  const actions = (
+    <>
+      <Tooltip title={t("Send to chat")} arrow>
+        <IconButton size="small" onClick={handleSendToChat}><ChatOutlined /></IconButton>
+      </Tooltip>
+      {isEditMode && (
+        <Tooltip title={t("Edit")} arrow>
+          <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit?.(); }}><Edit /></IconButton>
+        </Tooltip>
+      )}
+    </>
+  );
+
+  const body = open ? (
+    <Box sx={{ px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.03)", borderTop: "1px solid", borderColor: "divider" }}>
+      <SharedZeroPowerCard item={{ ...zeroPower, clock: zeroPower.clock?.sections || 6 }} />
+    </Box>
+  ) : null;
+
+  const clock = (
+    <ClockControls
+      sections={sections} state={clockState} setState={persistState}
+      label={<Typography sx={{ fontWeight: "bold", fontSize: compact ? "0.85rem" : "0.9rem", lineHeight: 1.3 }} noWrap>{t("Clock")}</Typography>}
+      clockSize={compact ? 36 : 60}
+      compact={compact}
+      theme={{ primary }}
+    />
+  );
 
   if (compact) {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-    const matches =
-      !normalizedQuery ||
+    const matches = !normalizedQuery ||
       zeroPower.name?.toLowerCase().includes(normalizedQuery) ||
       triggerName?.toLowerCase().includes(normalizedQuery) ||
       triggerDesc?.toLowerCase().includes(normalizedQuery) ||
@@ -44,123 +91,33 @@ export default function PlayerZeroPower({ player, setPlayer, compact = false, se
       effectDesc?.toLowerCase().includes(normalizedQuery);
     if (!matches) return null;
 
-    const forceOpen =
-      !!normalizedQuery &&
-      (triggerName?.toLowerCase().includes(normalizedQuery) ||
-        triggerDesc?.toLowerCase().includes(normalizedQuery) ||
-        effectName?.toLowerCase().includes(normalizedQuery) ||
-        effectDesc?.toLowerCase().includes(normalizedQuery));
-    const isOpen = descOpen || forceOpen;
-
     return (
       <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
-        <CompactSectionHeader title={t("Zero Power")} />
+        <CompactSectionHeader title={t("Zero Power")}>{headerActions}</CompactSectionHeader>
         <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: "4px" }}>
-          <Box
-            onClick={() => hasDetails && setDescOpen((v) => !v)}
-            sx={{
-              border: "1px solid", borderColor: "divider",
-              borderRadius: `${muiTheme.shape.borderRadius}px`, overflow: "hidden",
-              cursor: hasDetails ? "pointer" : "default",
-              transition: "border-color 0.15s ease",
-              "&:hover": { borderColor: primary },
-            }}
+          <ItemRowCard compact onCardClick={hasDetails ? () => setIsOpen((v) => !v) : undefined} variant="outlined"
+            label={<Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>{highlightMatch(zeroPower.name, searchQuery)}</Typography>}
+            actions={actions}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, px: "8px", py: "5px" }}>
-              {hasDetails && (
-                <IconButton size="small" sx={{ p: 0, flexShrink: 0 }} onClick={(e) => { e.stopPropagation(); setDescOpen((v) => !v); }}>
-                  {isOpen ? <KeyboardArrowUp sx={{ fontSize: "1rem" }} /> : <KeyboardArrowDown sx={{ fontSize: "1rem" }} />}
-                </IconButton>
-              )}
-              <Typography sx={{ flex: 1, fontWeight: "bold", fontSize: "0.85rem", textTransform: "uppercase", lineHeight: 1.3 }} noWrap>
-                {highlightMatch(zeroPower.name, searchQuery)}
-              </Typography>
-            </Box>
-            {hasDetails && isOpen && (
-              <Box sx={{ px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.03)", borderTop: "1px solid", borderColor: "divider" }}>
-                {triggerName && (
-                  <Typography sx={{ fontSize: "0.85rem", mb: 0.5, lineHeight: 1.45, color: "text.secondary" }}>
-                    <strong>{t("Trigger")}: </strong>{highlightMatch(triggerName, searchQuery)}
-                  </Typography>
-                )}
-                {triggerDesc && <NotesMarkdown compact>{highlightMarkdownText(triggerDesc, searchQuery)}</NotesMarkdown>}
-                {effectName && (
-                  <Typography sx={{ fontSize: "0.85rem", mb: 0.5, lineHeight: 1.45, color: "text.secondary" }}>
-                    <strong>{t("Effect")}: </strong>{highlightMatch(effectName, searchQuery)}
-                  </Typography>
-                )}
-                {effectDesc && <NotesMarkdown compact>{highlightMarkdownText(effectDesc, searchQuery)}</NotesMarkdown>}
-              </Box>
-            )}
-          </Box>
-          <ClockControls
-            sections={sections} state={clockState} setState={persistState}
-            label={<Typography sx={{ fontWeight: "bold", fontSize: "0.85rem", lineHeight: 1.3 }} noWrap>{t("Clock")}</Typography>}
-            clockSize={36} compact theme={{ primary }}
-          />
+            {body}
+          </ItemRowCard>
+          {clock}
         </Box>
       </Paper>
     );
   }
 
-  const labelPillSx = {
-    background: primary, px: "10px", py: "4px", color: "#fff",
-    display: "flex", alignItems: "center", alignSelf: "stretch",
-    flexShrink: 0, minWidth: 72, justifyContent: "center",
-  };
-  const nameBandSx = { px: "10px", py: "4px", display: "flex", alignItems: "center", flex: 1, minHeight: 32, bgcolor: "rgba(0,0,0,0.02)" };
-
   return (
-    <>
-      <Divider sx={{ my: 1 }} />
-      <SectionCard title={t("Zero Power")} noShadow>
-        <Box sx={{ display: "flex", alignItems: "stretch", borderBottom: "1px solid", borderColor: "divider" }}>
-          <Box sx={{ flex: 1, px: "10px", py: "6px", display: "flex", alignItems: "center" }}>
-            <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: { xs: "1rem", sm: "1.1rem" }, textTransform: "uppercase", letterSpacing: "0.04em", lineHeight: 1.2 }}>
-              {zeroPower.name}
-            </Typography>
-          </Box>
-          {sections > 0 && (
-            <Box sx={{ px: "10px", pr: "12px", display: "flex", alignItems: "center", borderLeft: "1px solid", borderColor: "divider" }}>
-              <ClockControls sections={sections} state={clockState} setState={persistState} clockSize={44} compact theme={{ primary }} label={null} />
-            </Box>
-          )}
-        </Box>
-        {(triggerName || triggerDesc) && (
-          <Box sx={{ borderBottom: "1px solid", borderColor: "divider" }}>
-            <Box sx={{ display: "flex", alignItems: "stretch" }}>
-              <Box sx={labelPillSx}>
-                <Typography sx={{ fontFamily: "Antonio", fontWeight: 700, fontSize: "0.75rem", textTransform: "uppercase", color: "inherit", letterSpacing: "0.05em" }}>{t("Trigger")}</Typography>
-              </Box>
-              <Box sx={nameBandSx}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "0.9rem", lineHeight: 1.4 }}>{triggerName}</Typography>
-              </Box>
-            </Box>
-            {triggerDesc && (
-              <Box sx={{ px: "10px", py: "6px", borderTop: "1px solid", borderColor: "divider" }}>
-                <NotesMarkdown compact>{triggerDesc}</NotesMarkdown>
-              </Box>
-            )}
-          </Box>
-        )}
-        {(effectName || effectDesc) && (
-          <Box>
-            <Box sx={{ display: "flex", alignItems: "stretch" }}>
-              <Box sx={labelPillSx}>
-                <Typography sx={{ fontFamily: "Antonio", fontWeight: 700, fontSize: "0.75rem", textTransform: "uppercase", color: "inherit", letterSpacing: "0.05em" }}>{t("Effect")}</Typography>
-              </Box>
-              <Box sx={nameBandSx}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "0.9rem", lineHeight: 1.4 }}>{effectName}</Typography>
-              </Box>
-            </Box>
-            {effectDesc && (
-              <Box sx={{ px: "10px", py: "6px", borderTop: "1px solid", borderColor: "divider" }}>
-                <NotesMarkdown compact>{effectDesc}</NotesMarkdown>
-              </Box>
-            )}
-          </Box>
-        )}
-      </SectionCard>
-    </>
+    <SectionCard title={t("Zero Power")} noShadow sx={{ mb: 1 }} actions={headerActions}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
+        <ItemRowCard onCardClick={hasDetails ? () => setIsOpen((v) => !v) : undefined} elevation={3} paperSx={{ borderRadius: "8px" }}
+          label={<Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: { xs: "1.0rem", sm: "1.1rem" }, textTransform: "uppercase", lineHeight: 1.3 }}>{zeroPower.name}</Typography>}
+          actions={actions}
+        >
+          {body}
+        </ItemRowCard>
+        {clock}
+      </Box>
+    </SectionCard>
   );
 }
