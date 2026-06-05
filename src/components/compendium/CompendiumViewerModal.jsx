@@ -46,6 +46,20 @@ import QuickCreateModal from "./QuickCreateModal";
 import { ManageModulesModal } from "../manage-modules";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
+// Maps compendium class display names to their spellType values for QuickCreate
+const CLASS_NAME_TO_SPELL_TYPE = {
+  Invoker: "invocation",
+  Esper: "gift",
+  Dancer: "dance",
+  Mutant: "therioform",
+  Chanter: "magichant",
+  Symbolist: "symbol",
+  Arcanist: "arcanist",
+  Gourmet: "cooking",
+  Floralist: "magiseed",
+  Pilot: "pilot-vehicle",
+};
+
 const CompendiumViewerModal = ({
   open,
   onClose,
@@ -589,7 +603,7 @@ const CompendiumViewerModal = ({
         lockedToViewerType={selectedType}
         initialSubtype={
           selectedType === "player-spells"
-            ? (filters.selectedSpellClass ?? undefined)
+            ? (CLASS_NAME_TO_SPELL_TYPE[filters.selectedSpellClass] ?? filters.selectedSpellClass ?? undefined)
             : selectedType === "optionals" &&
                 filters.selectedOptionalSubtypes?.length === 1
               ? filters.selectedOptionalSubtypes[0]

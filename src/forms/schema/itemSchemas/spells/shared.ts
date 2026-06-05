@@ -49,6 +49,7 @@ export const PlayerSpellNonStaticBaseSchema = z.object({
     "magichant",
     "symbol",
     "invocation",
+    "wellspring",
     "arcanist",
     "arcanist-rework",
     "tinkerer-alchemy",

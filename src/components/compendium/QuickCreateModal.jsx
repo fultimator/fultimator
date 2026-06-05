@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -43,6 +43,7 @@ import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
+import { STANDARD_WELLSPRINGS, affinityIconSrc } from "../../libs/player/wellsprings";
 import { calculateCustomWeaponStats } from "../../libs/playerCalculations";
 import types from "../../libs/types";
 import weapons from "../../libs/weapons";
@@ -79,6 +80,7 @@ import {
   SharedQualityCard,
   SharedMnemosphereCard,
   SharedHoplosphereCard,
+  SharedWellspringCard,
 } from "../shared/items";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import QualitiesGenerator from "../../routes/equip/Qualities/QualitiesGenerator";
@@ -847,6 +849,23 @@ function PlayerSpellPanel() {
   const [isShield, setIsShield] = useState(false);
   const spellType = formState.spellType ?? "default";
 
+  const { packs: spellPacks } = useCompendiumPacks();
+  const wellspringOptions = useMemo(() => {
+    const map = new Map(STANDARD_WELLSPRINGS.map((w) => [w.key, w.icon]));
+    for (const pack of spellPacks) {
+      for (const item of pack.items) {
+        if (item.type === "player-spell" && item.data?.spellType === "wellspring" && item.data?.name) {
+          map.set(String(item.data.name), String(item.data.icon || "untyped"));
+        }
+      }
+    }
+    return Array.from(map.entries()).map(([name, icon]) => ({
+      value: name,
+      label: name,
+      icon: affinityIconSrc(icon),
+    }));
+  }, [spellPacks]);
+
   const handleClear = () => {
     setFormState(createDefaultStateFromFields(playerSpellFieldConfig));
     setPilotSubtype("frame");
@@ -1117,6 +1136,7 @@ function PlayerSpellPanel() {
                       : {}),
                   },
                 ),
+              ...(spellType === "invocation" ? { options: wellspringOptions } : {}),
             }}
           />
 
@@ -1615,6 +1635,8 @@ function PlayerSpellPanel() {
           <SharedPilotVehicleCard item={payload} />
         ) : spellType === "arcanist" || spellType === "arcanist-rework" ? (
           <SharedArcanumCard item={payload} />
+        ) : spellType === "wellspring" ? (
+          <SharedWellspringCard item={payload} />
         ) : (
           <SharedPlayerSpellCard item={payload} />
         )

@@ -23,6 +23,9 @@ import { Add, Close, Delete as DeleteIcon } from "@mui/icons-material";
 import { OffensiveSpellIcon } from "../icons";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useTranslate } from "../../translation/translate";
+import { affinityIconSrc, AFFINITY_ICON_OPTIONS } from "../../libs/player/wellsprings";
+import { BevelColorPicker } from "../app-drawer/pickers/ColorPicker";
+import { IconPicker } from "../shared/actors/pc/spells/sections/InvokerCustomSection";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import {
   buildMnemosphere,
@@ -97,6 +100,7 @@ const NON_STATIC_TYPES = [
   { value: "magichant", label: "Tone (Chanter)" },
   { value: "symbol", label: "Symbol" },
   { value: "invocation", label: "Invocation" },
+  { value: "wellspring", label: "Wellspring" },
   { value: "arcanist", label: "Arcanum" },
   { value: "arcanist-rework", label: "Arcanum (Rework)" },
   { value: "tinkerer-alchemy", label: "Alchemy" },
@@ -105,7 +109,8 @@ const NON_STATIC_TYPES = [
   { value: "magiseed", label: "Magiseed" },
   { value: "pilot-vehicle", label: "Pilot Vehicle" },
 ];
-const WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
+const WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water", "Ice", "Dark", "Light", "Poison", "Physical"];
+const WELLSPRING_ICON = { Air: "air", Earth: "earth", Fire: "fire", Lightning: "bolt", Water: "water", Ice: "ice", Dark: "dark", Light: "light", Poison: "poison", Physical: "physical" };
 const INV_TYPES = ["Blast", "Hex", "Utility"];
 const PILOT_SUBTYPES = [
   { value: "frame", label: "Vehicle Frame" },
@@ -598,8 +603,36 @@ const spellClasses = STANDARD_SPELL_CLASSES;
 
 function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
   const { t } = useTranslate();
-  const { addItem, updateItem } = useCompendiumPacks();
+  const { addItem, updateItem, packs } = useCompendiumPacks();
   const customTheme = useCustomTheme();
+
+  const compendiumWellsprings = useMemo(() => {
+    const names = new Set(WELLSPRINGS);
+    const extras = [];
+    for (const pack of packs) {
+      for (const item of pack.items) {
+        if (item.type === "player-spell" && item.data?.spellType === "wellspring" && item.data?.name) {
+          const name = String(item.data.name);
+          if (!names.has(name)) {
+            names.add(name);
+            extras.push({ name, icon: String(item.data.icon || "untyped") });
+          }
+        }
+      }
+    }
+    return extras;
+  }, [packs]);
+
+  const allWellspringOptions = useMemo(
+    () => [...WELLSPRINGS, ...compendiumWellsprings.map((w) => w.name)],
+    [compendiumWellsprings],
+  );
+
+  const allWellspringIconMap = useMemo(() => {
+    const map = { ...WELLSPRING_ICON };
+    for (const w of compendiumWellsprings) map[w.name] = w.icon;
+    return map;
+  }, [compendiumWellsprings]);
 
   const [spellType, setSpellType] = useState(
     editData?.spellType === "magichant" && editData?.magichantSubtype === "key"
@@ -640,6 +673,9 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
   const [keyRecovery, setKeyRecovery] = useState(editData?.recovery ?? "");
   const [wellspring, setWellspring] = useState(editData?.wellspring ?? "");
   const [invType, setInvType] = useState(editData?.type ?? "");
+  const [wsColor, setWsColor] = useState(editData?.color ?? "#888888");
+  const [wsTextColor, setWsTextColor] = useState(editData?.textColor ?? "white");
+  const [wsIcon, setWsIcon] = useState(editData?.icon ?? "untyped");
   const [domain, setDomain] = useState(editData?.domain ?? "");
   const [domainDesc, setDomainDesc] = useState(editData?.domainDesc ?? "");
   const [merge, setMerge] = useState(editData?.merge ?? "");
@@ -755,6 +791,9 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     setKeyRecovery(editData?.recovery ?? "");
     setWellspring(editData?.wellspring ?? "");
     setInvType(editData?.type ?? "");
+    setWsColor(editData?.color ?? "#888888");
+    setWsTextColor(editData?.textColor ?? "white");
+    setWsIcon(editData?.icon ?? "untyped");
     setDomain(editData?.domain ?? "");
     setDomainDesc(editData?.domainDesc ?? "");
     setMerge(editData?.merge ?? "");
@@ -848,6 +887,9 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
         genoclepsis: genoclepsis.trim() || undefined,
         duration: duration.trim() || undefined,
         wellspring: wellspring.trim() || undefined,
+        color: spellType === "wellspring" ? wsColor : undefined,
+        textColor: spellType === "wellspring" ? wsTextColor : undefined,
+        icon: spellType === "wellspring" ? wsIcon : undefined,
         type:
           spellType === "magichant-key"
             ? keyType.trim() || undefined
@@ -1309,16 +1351,42 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                     }}
                   >
                     <Autocomplete
-                      options={WELLSPRINGS}
+                      freeSolo
+                      options={allWellspringOptions}
                       value={wellspring || null}
                       onChange={(_, v) => setWellspring(v ?? "")}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={t("Wellspring")}
-                          size="small"
-                        />
-                      )}
+                      onInputChange={(_, v) => setWellspring(v ?? "")}
+                      renderOption={(props, opt) => {
+                        const { key, ...rest } = props;
+                        const icon = allWellspringIconMap[opt] || opt.toLowerCase();
+                        return (
+                          <li key={key} {...rest}>
+                            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <img src={affinityIconSrc(icon)} width={18} height={18} style={{ objectFit: "contain", flexShrink: 0 }} alt={opt} />
+                              {opt}
+                            </span>
+                          </li>
+                        );
+                      }}
+                      renderInput={(params) => {
+                        const icon = allWellspringIconMap[wellspring];
+                        return (
+                          <TextField
+                            {...params}
+                            label={t("Wellspring")}
+                            size="small"
+                            InputProps={{
+                              ...params.InputProps,
+                              startAdornment: icon ? (
+                                <>
+                                  <img src={affinityIconSrc(icon)} width={18} height={18} style={{ objectFit: "contain", flexShrink: 0, marginRight: 4, verticalAlign: "middle" }} alt={wellspring} />
+                                  {params.InputProps?.startAdornment}
+                                </>
+                              ) : params.InputProps?.startAdornment,
+                            }}
+                          />
+                        );
+                      }}
                     />
                   </Grid>
                   <Grid
@@ -1335,6 +1403,37 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                         <TextField {...params} label={t("Type")} size="small" />
                       )}
                     />
+                  </Grid>
+                </>
+              )}
+              {spellType === "wellspring" && (
+                <>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Typography variant="body2" sx={{ flexShrink: 0 }}>{t("Color")}</Typography>
+                      <BevelColorPicker
+                        value={wsColor}
+                        onChange={setWsColor}
+                        onReset={() => setWsColor("#888888")}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <FormControl size="small" fullWidth>
+                      <InputLabel>{t("Text Color")}</InputLabel>
+                      <Select
+                        value={wsTextColor}
+                        onChange={(e) => setWsTextColor(e.target.value)}
+                        label={t("Text Color")}
+                      >
+                        <MenuItem value="white">{t("White")}</MenuItem>
+                        <MenuItem value="black">{t("Black")}</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid size={12}>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>{t("Icon")}</Typography>
+                    <IconPicker value={wsIcon} onChange={setWsIcon} />
                   </Grid>
                 </>
               )}
@@ -1850,6 +1949,7 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                 spellType !== "arcanist-rework" &&
                 spellType !== "cooking" &&
                 spellType !== "magichant-key" &&
+                spellType !== "wellspring" &&
                 !(
                   spellType === "pilot-vehicle" &&
                   (pilotSubtype === "armor" || pilotSubtype === "weapon")

@@ -539,21 +539,21 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         return {
           ...base,
           spellType: "invocation" as const,
-          spellName: s.name.trim() || "Invocation",
-          tracker: {
-            innerWellspring: false,
-            chosenWellspring: null,
-            activeWellsprings: [],
-          },
-          invocations: [
-            {
-              key: s.name.trim() || "invoker_custom_name",
-              customName: "",
-              type: s.type.trim(),
-              effect: s.effect.trim(),
-              wellspring: s.wellspring.trim(),
-            },
-          ],
+          name: s.name.trim(),
+          type: s.type.trim(),
+          effect: s.effect.trim(),
+          wellspring: s.wellspring.trim(),
+        };
+      }
+
+      if (spellType === "wellspring") {
+        return {
+          ...base,
+          spellType: "wellspring" as const,
+          name: s.name.trim(),
+          color: (s.color as string) || "#888888",
+          textColor: (s.textColor as "black" | "white") || "white",
+          icon: (s.icon as string) || "untyped",
         };
       }
 

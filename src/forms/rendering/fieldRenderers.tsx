@@ -27,6 +27,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
+import { BevelColorPicker } from "../../components/app-drawer/pickers/ColorPicker";
 import { Clear, Search } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -92,6 +93,7 @@ const TypedSlotEditor = SlotEditor as React.ComponentType<SlotEditorProps>;
 export interface SelectOption {
   value: string | number;
   label: string;
+  icon?: string;
 }
 export interface SelectGroup {
   header: string;
@@ -170,6 +172,26 @@ export function TextRenderer({
       variant="outlined"
       size="small"
     />
+  );
+}
+
+export function ColorRenderer({
+  label,
+  value,
+  onCommit,
+  disabled,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const color = (value as string) ?? "#888888";
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Typography variant="body2" sx={{ flexShrink: 0 }}>{t(label)}</Typography>
+      <BevelColorPicker
+        value={color}
+        onChange={disabled ? () => {} : onCommit}
+        onReset={() => onCommit("#888888")}
+      />
+    </Box>
   );
 }
 
@@ -326,11 +348,15 @@ export function SelectRenderer({
   const normalizedValue = multiple
     ? ((value as string[]) ?? [])
     : ((value as string | number) ?? "");
+  const optionForValue = (selected: string | number) =>
+    options.find((opt) => opt.value === selected);
   const labelForValue = (selected: string | number) =>
     translateOrHumanize(
       t,
-      String(options.find((opt) => opt.value === selected)?.label ?? selected),
+      String(optionForValue(selected)?.label ?? selected),
     );
+  const iconForValue = (selected: string | number) =>
+    optionForValue(selected)?.icon;
 
   return (
     <FormControl variant="outlined" fullWidth size="small">
@@ -347,7 +373,17 @@ export function SelectRenderer({
           if (Array.isArray(selected)) {
             return selected.map((entry) => labelForValue(entry)).join(", ");
           }
-          return labelForValue(selected as string | number);
+          const icon = iconForValue(selected as string | number);
+          const lbl = labelForValue(selected as string | number);
+          if (icon) {
+            return (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <img src={icon} width={16} height={16} style={{ objectFit: "contain", flexShrink: 0 }} alt="" />
+                {lbl}
+              </Box>
+            );
+          }
+          return lbl;
         }}
         startAdornment={
           onBrowse ? (
@@ -378,7 +414,14 @@ export function SelectRenderer({
                 sx={{ p: 0, mr: 1 }}
               />
             )}
-            {multiple ? <ListItemText primary={t(opt.label)} /> : t(opt.label)}
+            {opt.icon ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <img src={opt.icon} width={16} height={16} style={{ objectFit: "contain", flexShrink: 0 }} alt="" />
+                {multiple ? <ListItemText primary={t(opt.label)} /> : t(opt.label)}
+              </Box>
+            ) : (
+              multiple ? <ListItemText primary={t(opt.label)} /> : t(opt.label)
+            )}
           </MenuItem>
         ))}
       </Select>
@@ -1003,7 +1046,7 @@ export function AutocompleteRenderer({
       "value" in (entry as Record<string, unknown>)
     ) {
       const opt = entry as SelectOption;
-      return { value: opt.value, label: opt.label ?? String(opt.value) };
+      return { value: opt.value, label: opt.label ?? String(opt.value), icon: opt.icon };
     }
     const val = String(entry ?? "");
     return { value: val, label: val };
@@ -1016,6 +1059,13 @@ export function AutocompleteRenderer({
   const selectedMulti = Array.isArray(value) ? value : [];
   const selectedSingle =
     typeof value === "string" && value.trim().length > 0 ? value : null;
+
+  const inputRef = React.useRef<string>(typeof value === "string" ? value : "");
+  React.useEffect(() => {
+    if (freeSolo && !multiple && typeof value === "string") {
+      inputRef.current = value;
+    }
+  }, [value, freeSolo, multiple]);
 
   if (noOptionsText !== undefined && options.length === 0) {
     return (
@@ -1040,6 +1090,16 @@ export function AutocompleteRenderer({
       freeSolo={freeSolo}
       options={optionLabels}
       value={multiple ? selectedMulti : selectedSingle}
+      onInputChange={
+        freeSolo && !multiple
+          ? (_: unknown, val: string) => { inputRef.current = val; }
+          : undefined
+      }
+      onBlur={
+        freeSolo && !multiple
+          ? () => { if (inputRef.current !== (value ?? "")) onCommit(inputRef.current); }
+          : undefined
+      }
       onChange={(_: unknown, newValue: string[] | string | null) =>
         onCommit(
           multiple
@@ -1059,31 +1119,61 @@ export function AutocompleteRenderer({
       renderOption={(props: object, opt: string) => {
         const found = options.find((o) => o.value === opt);
         const human = found ? translateOrHumanize(t, found.label) : String(opt);
-        const isRaw = found && found.label === found.value;
         const { key, ...liProps } =
           props as React.HTMLAttributes<HTMLLIElement> & { key?: React.Key };
         return (
           <li key={key} {...liProps}>
-            {isRaw ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  lineHeight: 1.2,
-                }}
-              >
-                <span>{human}</span>
-                <span style={{ fontSize: "0.7rem", opacity: 0.55 }}>{opt}</span>
-              </Box>
-            ) : (
-              human
-            )}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {found?.icon && (
+                <img
+                  src={found.icon}
+                  width={16}
+                  height={16}
+                  style={{ objectFit: "contain", flexShrink: 0 }}
+                  alt=""
+                />
+              )}
+              <span>{human}</span>
+            </Box>
           </li>
         );
       }}
-      renderInput={(params: object) => (
-        <TextField {...(params as object)} label={t(label)} size="small" />
-      )}
+      renderInput={(params: object) => {
+        const selectedOpt = options.find((o) => o.value === (value as string));
+        const p = params as Record<string, unknown>;
+        const existingSlotProps = (p.slotProps as Record<string, unknown>) ?? {};
+        const existingInput = (existingSlotProps.input as Record<string, unknown>) ?? {};
+        const slotProps = selectedOpt?.icon
+          ? {
+              ...existingSlotProps,
+              input: {
+                ...existingInput,
+                startAdornment: (
+                  <>
+                    <InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}>
+                      <img
+                        src={selectedOpt.icon}
+                        width={16}
+                        height={16}
+                        style={{ objectFit: "contain" }}
+                        alt=""
+                      />
+                    </InputAdornment>
+                    {existingInput.startAdornment as React.ReactNode}
+                  </>
+                ),
+              },
+            }
+          : existingSlotProps;
+        return (
+          <TextField
+            {...(params as object)}
+            slotProps={slotProps}
+            label={t(label)}
+            size="small"
+          />
+        );
+      }}
       size="small"
     />
   );

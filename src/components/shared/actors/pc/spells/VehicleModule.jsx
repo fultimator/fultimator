@@ -6,6 +6,7 @@ const AccordionSummaryDiv = forwardRef(function AccordionSummaryDiv(
     disableRipple: _disableRipple,
     internalNativeButton: _internalNativeButton,
     focusVisibleClassName: _focusVisibleClassName,
+    alignItems: _alignItems,
     ...props
   },
   ref,

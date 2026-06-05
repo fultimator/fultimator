@@ -53,6 +53,7 @@ import PilotGeneralSection from "/src/components/shared/actors/pc/spells/section
 import PilotContentSection from "/src/components/shared/actors/pc/spells/sections/PilotContentSection";
 import InvokerGeneralSection from "/src/components/shared/actors/pc/spells/sections/InvokerGeneralSection";
 import InvokerContentSection from "/src/components/shared/actors/pc/spells/sections/InvokerContentSection";
+import InvokerCustomSection from "/src/components/shared/actors/pc/spells/sections/InvokerCustomSection";
 import GourmetGeneralSection from "/src/components/shared/actors/pc/spells/sections/GourmetGeneralSection";
 import GourmetContentSection from "/src/components/shared/actors/pc/spells/sections/GourmetContentSection";
 import GourmetInventoryTab from "/src/components/shared/actors/pc/spells/sections/GourmetInventoryTab";
@@ -1112,14 +1113,14 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               if (idx === spellIndex && spell.spellType === "invocation") {
                 const tracker = spell.tracker || {};
                 const currentWellsprings = tracker.activeWellsprings || [];
-                const hasInnerWellspring =
-                  tracker.innerWellspring && tracker.chosenWellspring;
-                const isInnerWellspring =
-                  hasInnerWellspring &&
-                  tracker.chosenWellspring === wellspringName;
+                const innerWellspringEnabled = spell.innerWellspring || tracker.innerWellspring || false;
+                const chosenWellspring = spell.chosenWellspring || tracker.chosenWellspring || "";
+                const alwaysActive = spell.alwaysActiveWellsprings || [];
+                const isLocked =
+                  (innerWellspringEnabled && chosenWellspring === wellspringName) ||
+                  alwaysActive.includes(wellspringName);
 
-                // Don't allow toggling the inner wellspring
-                if (isInnerWellspring) {
+                if (isLocked) {
                   return spell;
                 }
 
@@ -2673,12 +2674,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                   const tracker = spell.tracker || {};
                                   const currentWellsprings =
                                     tracker.activeWellsprings || [];
-                                  const hasInner =
-                                    tracker.innerWellspring &&
-                                    tracker.chosenWellspring;
+                                  const innerEnabled = spell.innerWellspring || tracker.innerWellspring || false;
+                                  const chosen = spell.chosenWellspring || tracker.chosenWellspring || "";
+                                  const alwaysActive = spell.alwaysActiveWellsprings || [];
                                   if (
-                                    hasInner &&
-                                    tracker.chosenWellspring === wellspringName
+                                    (innerEnabled && chosen === wellspringName) ||
+                                    alwaysActive.includes(wellspringName)
                                   )
                                     return;
                                   let newWellsprings;
@@ -3117,6 +3118,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             component: InvokerGeneralSection,
             props: {},
             order: 1,
+          },
+          {
+            id: "custom",
+            title: "Custom Wellsprings",
+            component: InvokerCustomSection,
+            props: {},
+            order: 2,
           },
         ]}
       />

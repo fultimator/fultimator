@@ -21,6 +21,7 @@ export {
   SharedInfusionCard,
   SharedMagitechCard,
   SharedInvocationCard,
+  SharedWellspringCard,
   SharedCookingCard,
   SharedMagiseedCard,
   SharedPilotVehicleCard,

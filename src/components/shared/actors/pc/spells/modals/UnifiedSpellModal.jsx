@@ -197,6 +197,7 @@ export default function UnifiedSpellModal({
             ...formState,
             availableInvocations: buildInvokerAvailableInvocations(
               formState?.skillLevel,
+              formState?.invocations,
             ),
           }
         : formState;

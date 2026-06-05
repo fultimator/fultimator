@@ -78,6 +78,7 @@ import {
   SharedInfusionCard,
   SharedMagitechCard,
   SharedInvocationCard,
+  SharedWellspringCard,
   SharedCookingCard,
   SharedMagiseedCard,
   SharedPilotVehicleCard,
@@ -109,7 +110,7 @@ import {
   toSlug,
 } from "../../libs/compendium";
 
-const INVOKER_WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
+const INVOKER_WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water", "Ice", "Dark", "Light", "Poison", "Physical"];
 
 function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
@@ -552,11 +553,21 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               MenuProps={selectMenuProps}
             >
               <MenuItem value="">{t("All")}</MenuItem>
-              {INVOKER_WELLSPRINGS.map((wellspring) => (
-                <MenuItem key={wellspring} value={wellspring}>
-                  {t(wellspring)}
-                </MenuItem>
-              ))}
+              {(() => {
+                const seen = new Set(INVOKER_WELLSPRINGS);
+                const extra = [];
+                for (const pack of packs ?? []) {
+                  for (const item of pack.items ?? []) {
+                    if (item.type === "player-spell" && item.data?.spellType === "wellspring" && item.data?.name) {
+                      const name = String(item.data.name);
+                      if (!seen.has(name)) { seen.add(name); extra.push(name); }
+                    }
+                  }
+                }
+                return [...INVOKER_WELLSPRINGS, ...extra].map((w) => (
+                  <MenuItem key={w} value={w}>{t(w)}</MenuItem>
+                ));
+              })()}
             </Select>
           </FormControl>
         )}
@@ -880,6 +891,8 @@ export const ItemCard = React.memo(function ItemCard({
         return <SharedSymbolCard {...sharedProps} />;
       } else if (item.spellType === "invocation") {
         return <SharedInvocationCard {...sharedProps} />;
+      } else if (item.spellType === "wellspring") {
+        return <SharedWellspringCard {...sharedProps} />;
       } else if (item.spellType === "magiseed") {
         return <SharedMagiseedCard {...sharedProps} />;
       } else if (item.spellType === "tinkerer-alchemy") {

@@ -12,6 +12,7 @@ import { therioformFields } from "./therioform";
 import { magichantFields } from "./magichant";
 import { symbolFields } from "./symbol";
 import { invocationFields } from "./invocation";
+import { wellspringFields } from "./wellspring";
 import { cookingFields } from "./cooking";
 import { magiseedFields } from "./magiseed";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "../sharedLabelKeys";
@@ -70,6 +71,7 @@ export const playerSpellFieldConfig: ItemFieldConfig<PlayerSpellFormState> = [
   ...magichantFields,
   ...symbolFields,
   ...invocationFields,
+  ...wellspringFields,
   ...cookingFields,
   ...magiseedFields,
   ...(metaFieldConfig as unknown as ItemFieldConfig<PlayerSpellFormState>),

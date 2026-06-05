@@ -25,5 +25,7 @@ export const isInvocation = (s: PlayerSpellFormState) =>
 export const isCooking = (s: PlayerSpellFormState) => s.spellType === "cooking";
 export const isMagiseed = (s: PlayerSpellFormState) =>
   s.spellType === "magiseed";
+export const isWellspring = (s: PlayerSpellFormState) =>
+  s.spellType === "wellspring";
 
 export const showDuration = (s: PlayerSpellFormState) => isDefault(s);

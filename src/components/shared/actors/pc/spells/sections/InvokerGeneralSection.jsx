@@ -8,8 +8,10 @@ import {
   Select,
   MenuItem,
   Box,
+  Chip,
+  Tooltip,
 } from "@mui/material";
-import { invocationsByWellspring } from "/src/libs/player/spellOptionData";
+import { resolveWellsprings, affinityIconSrc } from "/src/libs/player/wellsprings";
 
 /**
  * InvokerGeneralSection - Settings tab for Invoker spell
@@ -20,6 +22,14 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
   const chosenWellspring = formState.chosenWellspring || "";
   const innerWellspring = formState.innerWellspring || false;
   const showInPlayerSheet = formState.showInPlayerSheet !== false;
+  const customWellsprings = formState.customWellsprings || [];
+  const alwaysActiveWellsprings = formState.alwaysActiveWellsprings || [];
+
+  const allWellsprings = resolveWellsprings(customWellsprings);
+
+  const handleAlwaysActiveChange = (newValue) => {
+    setFormState((prev) => ({ ...prev, alwaysActiveWellsprings: newValue }));
+  };
 
   const handleSkillLevelChange = (newLevel) => {
     setFormState((prev) => ({ ...prev, skillLevel: Number(newLevel) }));
@@ -36,33 +46,6 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
   const handleShowInPlayerSheetChange = (e) => {
     setFormState((prev) => ({ ...prev, showInPlayerSheet: e.target.checked }));
   };
-
-  // const getAvailableInvocations = (level) => {
-  //   const availableTypes = [];
-  //   switch (level) {
-  //     case 1:
-  //       availableTypes.push("Blast");
-  //       break;
-  //     case 2:
-  //       availableTypes.push("Blast", "Hex");
-  //       break;
-  //     case 3:
-  //       availableTypes.push("Blast", "Hex", "Utility");
-  //       break;
-  //     default:
-  //       return [];
-  //   }
-
-  //   const invocations = [];
-  //   Object.entries(invocationsByWellspring).forEach(([wellspring, invs]) => {
-  //     invs.forEach((inv) => {
-  //       if (availableTypes.includes(inv.type)) {
-  //         invocations.push({ ...inv, wellspring });
-  //       }
-  //     });
-  //   });
-  //   return invocations;
-  // };
 
   return (
     <Grid container spacing={3}>
@@ -95,13 +78,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
             <MenuItem value={3}>{t("Skill Level 3 (All Types)")}</MenuItem>
           </Select>
         </FormControl>
-        <Typography
-          variant="body2"
-          sx={{
-            color: "text.secondary",
-            mt: 1,
-          }}
-        >
+        <Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
           {t("Skill level determines which invocation types are available")}
         </Typography>
       </Grid>
@@ -116,12 +93,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
           }
           label={t("Inner Wellspring")}
         />
-        <Typography
-          variant="body2"
-          sx={{
-            color: "text.secondary",
-          }}
-        >
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {t("When enabled, one wellspring is locked as the inner wellspring")}
         </Typography>
       </Grid>
@@ -134,10 +106,35 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
               value={chosenWellspring}
               onChange={(e) => handleChosenWellspringChange(e.target.value)}
               label={t("Inner Wellspring")}
+              renderValue={(val) => {
+                const w = allWellsprings.find((x) => x.key === val);
+                if (!w) return val;
+                return (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <img
+                      src={affinityIconSrc(w.icon)}
+                      width={18}
+                      height={18}
+                      style={{ objectFit: "contain", flexShrink: 0 }}
+                      alt={w.key}
+                    />
+                    {w.key}
+                  </Box>
+                );
+              }}
             >
-              {Object.keys(invocationsByWellspring).map((wellspring) => (
-                <MenuItem key={wellspring} value={wellspring}>
-                  {t(wellspring)}
+              {allWellsprings.map((w) => (
+                <MenuItem key={w.key} value={w.key}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <img
+                      src={affinityIconSrc(w.icon)}
+                      width={18}
+                      height={18}
+                      style={{ objectFit: "contain", flexShrink: 0 }}
+                      alt={w.key}
+                    />
+                    {w.key}
+                  </Box>
                 </MenuItem>
               ))}
             </Select>
@@ -147,30 +144,93 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
       {/* Available Invocations Preview */}
       <Grid size={12}>
         <Typography variant="h6" gutterBottom>
+          {t("invoker_always_active")}
+        </Typography>
+        <Typography variant="body2" sx={{ color: "text.secondary", mb: 1.5 }}>
+          {t("invoker_always_active_hint")}
+        </Typography>
+        <FormControl fullWidth>
+          <InputLabel>{t("invoker_always_active")}</InputLabel>
+          <Select
+            multiple
+            value={alwaysActiveWellsprings}
+            onChange={(e) => handleAlwaysActiveChange(e.target.value)}
+            label={t("invoker_always_active")}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((val) => {
+                  const w = allWellsprings.find((x) => x.key === val);
+                  const isOrphaned = !w;
+                  const removeVal = (e) => {
+                    e.stopPropagation();
+                    handleAlwaysActiveChange(alwaysActiveWellsprings.filter((v) => v !== val));
+                  };
+                  return (
+                    <Tooltip key={val} title={isOrphaned ? t("invoker_missing_wellspring") : ""} arrow disableHoverListener={!isOrphaned}>
+                    <Chip
+                      size="small"
+                      label={
+                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          {w && (
+                            <img
+                              src={affinityIconSrc(w.icon)}
+                              width={14}
+                              height={14}
+                              style={{ objectFit: "contain", flexShrink: 0 }}
+                              alt={val}
+                            />
+                          )}
+                          <span style={isOrphaned ? { textDecoration: "line-through" } : undefined}>
+                            {val}
+                          </span>
+                        </span>
+                      }
+                      onClick={isOrphaned ? removeVal : undefined}
+                      onDelete={removeVal}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      sx={{
+                        height: 24,
+                        ...(isOrphaned && {
+                          borderColor: "error.main",
+                          color: "error.main",
+                          bgcolor: "transparent",
+                          border: "1px solid",
+                          cursor: "pointer",
+                        }),
+                      }}
+                    />
+                    </Tooltip>
+                  );
+                })}
+              </Box>
+            )}
+          >
+            {allWellsprings.map((w) => (
+              <MenuItem key={w.key} value={w.key} disabled={alwaysActiveWellsprings.includes(w.key)}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <img
+                    src={affinityIconSrc(w.icon)}
+                    width={18}
+                    height={18}
+                    style={{ objectFit: "contain", flexShrink: 0 }}
+                    alt={w.key}
+                  />
+                  {w.key}
+                </Box>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid size={12}>
+        <Typography variant="h6" gutterBottom>
           {t("Available Invocation Types")}
         </Typography>
         <Box sx={{ p: 2, bgcolor: "action.hover", borderRadius: 1 }}>
-          {(() => {
-            const _availableTypes = [];
-            switch (skillLevel) {
-              case 1:
-                return <Typography>{t("Blast")}</Typography>;
-              case 2:
-                return (
-                  <Typography>
-                    {t("Blast")}, {t("Hex")}
-                  </Typography>
-                );
-              case 3:
-                return (
-                  <Typography>
-                    {t("Blast")}, {t("Hex")}, {t("Utility")}
-                  </Typography>
-                );
-              default:
-                return <Typography>{t("None")}</Typography>;
-            }
-          })()}
+          {skillLevel === 1 && <Typography>{t("Blast")}</Typography>}
+          {skillLevel === 2 && <Typography>{t("Blast")}, {t("Hex")}</Typography>}
+          {skillLevel === 3 && <Typography>{t("Blast")}, {t("Hex")}, {t("Utility")}</Typography>}
+          {skillLevel !== 1 && skillLevel !== 2 && skillLevel !== 3 && <Typography>{t("None")}</Typography>}
         </Box>
       </Grid>
     </Grid>

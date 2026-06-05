@@ -1,70 +1,109 @@
-import { Grid, Typography, Box, Card, CardContent, Chip } from "@mui/material";
+import { Grid, Typography, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import {
-  Air,
-  Terrain,
-  LocalFireDepartment,
-  ElectricBolt,
-  Water,
-} from "@mui/icons-material";
+import { resolveWellsprings, affinityIconSrc } from "/src/libs/player/wellsprings";
 import { invocationsByWellspring } from "/src/libs/player/spellOptionData";
-import ReactMarkdown from "react-markdown";
-
 /**
  * InvokerContentSection - Content tab for Invoker spell
  * Manages active wellsprings and displays available invocations
  */
-export default function InvokerContentSection({ formState, setFormState, t }) {
+import { SharedInvocationCard } from "/src/components/shared/items";
+
+function WellspringChip({ wellspring, isSelected, isInner, isAlways, onClick }) {
   const theme = useTheme();
+  const isLocked = isInner || isAlways;
+  const lockColor = isInner ? "#4CAF50" : "#FF9800";
+  const lockGlow = isInner
+    ? "0 0 0 3px #4CAF50, 0 0 8px rgba(76, 175, 80, 0.4)"
+    : "0 0 0 3px #FF9800, 0 0 8px rgba(255, 152, 0, 0.4)";
+
+  const bgColor = isSelected
+    ? wellspring.color
+    : theme.palette.mode === "dark"
+      ? "rgba(255, 255, 255, 0.12)"
+      : "rgba(0, 0, 0, 0.08)";
+
+  return (
+    <Box
+      component="button"
+      type="button"
+      onClick={isLocked ? undefined : onClick}
+      sx={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 0.75,
+        px: 1.25,
+        py: 0.5,
+        borderRadius: "16px",
+        border: "2px solid",
+        borderColor: isLocked
+          ? lockColor
+          : isSelected
+            ? wellspring.color
+            : theme.palette.mode === "dark"
+              ? "rgba(255,255,255,0.3)"
+              : "rgba(0,0,0,0.3)",
+        backgroundColor: bgColor,
+        fontWeight: isSelected ? "bold" : "normal",
+        fontSize: "0.8125rem",
+        fontFamily: (theme) => theme.typography.fontFamily,
+        cursor: isLocked ? "default" : "pointer",
+        opacity: isLocked ? 0.9 : 1,
+        transition: "border-color 0.15s, background-color 0.15s",
+        ...(isLocked && { boxShadow: lockGlow }),
+        "&:hover": !isLocked ? { borderColor: wellspring.color, opacity: 0.85 } : {},
+      }}
+    >
+      <img
+        src={affinityIconSrc(wellspring.icon)}
+        width={18}
+        height={18}
+        style={{
+          objectFit: "contain",
+          filter: isSelected ? undefined : "grayscale(0.4)",
+        }}
+        alt={wellspring.key}
+      />
+      <span
+        style={{
+          color: isSelected ? wellspring.textColor : undefined,
+        }}
+      >
+        {wellspring.key}
+      </span>
+    </Box>
+  );
+}
+
+export default function InvokerContentSection({ formState, setFormState, t }) {
   const tracker = formState.tracker || {};
   const activeWellsprings = tracker.activeWellsprings || [];
   const skillLevel = formState.skillLevel || 1;
-  const innerWellspring = tracker.innerWellspring || false;
-  const chosenWellspring = tracker.chosenWellspring || "";
+  const innerWellspring = formState.innerWellspring || tracker.innerWellspring || false;
+  const chosenWellspring = formState.chosenWellspring || tracker.chosenWellspring || "";
+  const customWellsprings = formState.customWellsprings || [];
+  const customInvocations = formState.invocations || [];
+  const alwaysActiveWellsprings = formState.alwaysActiveWellsprings || [];
 
-  const wellspringList = [
-    { name: "Air", icon: Air },
-    { name: "Earth", icon: Terrain },
-    { name: "Fire", icon: LocalFireDepartment },
-    { name: "Lightning", icon: ElectricBolt },
-    { name: "Water", icon: Water },
-  ];
+  const effectiveWellsprings = [...new Set([...activeWellsprings, ...alwaysActiveWellsprings])];
 
-  const getWellspringColor = (wellspring, isActive) => {
-    if (!isActive) {
-      return theme.palette.mode === "dark"
-        ? "rgba(255, 255, 255, 0.12)"
-        : "rgba(0, 0, 0, 0.08)";
-    }
-    const colorMap = {
-      Air: "#87cfeb",
-      Earth: "#8B4513",
-      Fire: "#D63B00",
-      Lightning: "#E6C800",
-      Water: "#2F6FA1",
-    };
-    return colorMap[wellspring] || theme.palette.primary.main;
-  };
+  const allWellsprings = resolveWellsprings(customWellsprings);
 
-  const getSelectedTextColor = (wellspring) => {
-    return wellspring === "Air" || wellspring === "Lightning" ? "#000" : "#fff";
-  };
-
-  const handleWellspringToggle = (wellspring) => {
+  const handleWellspringToggle = (wellspringKey) => {
     setFormState((prev) => {
       const prevTracker = prev.tracker || {};
       const current = prevTracker.activeWellsprings || [];
-      const isActive = current.includes(wellspring);
+      const isActive = current.includes(wellspringKey);
 
-      if (innerWellspring && chosenWellspring === wellspring && isActive) {
+      if ((innerWellspring && chosenWellspring === wellspringKey && isActive) ||
+        alwaysActiveWellsprings.includes(wellspringKey)) {
         return prev;
       }
 
       const newWellsprings = isActive
-        ? current.filter((w) => w !== wellspring)
+        ? current.filter((w) => w !== wellspringKey)
         : current.length < 2
-          ? [...current, wellspring]
-          : [current[1], wellspring];
+          ? [...current, wellspringKey]
+          : [current[1], wellspringKey];
 
       return {
         ...prev,
@@ -76,35 +115,39 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
   const getAvailableInvocations = () => {
     const availableTypes = [];
     switch (skillLevel) {
-      case 1:
-        availableTypes.push("Blast");
-        break;
-      case 2:
-        availableTypes.push("Blast", "Hex");
-        break;
-      case 3:
-        availableTypes.push("Blast", "Hex", "Utility");
-        break;
-      default:
-        return [];
+      case 1: availableTypes.push("Blast"); break;
+      case 2: availableTypes.push("Blast", "Hex"); break;
+      case 3: availableTypes.push("Blast", "Hex", "Utility"); break;
+      default: return [];
     }
 
-    const invocations = [];
-    activeWellsprings.forEach((wellspring) => {
-      const wellspringInvs = invocationsByWellspring[wellspring] || [];
+    const results = [];
+
+    effectiveWellsprings.forEach((wellspringKey) => {
+      const wellspringInvs = invocationsByWellspring[wellspringKey] || [];
       wellspringInvs.forEach((inv) => {
         if (availableTypes.includes(inv.type)) {
-          invocations.push({ ...inv, wellspring });
+          results.push({ ...inv, wellspring: wellspringKey, isCustom: false });
         }
       });
     });
-    return invocations;
+
+    customInvocations
+      .filter(
+        (inv) =>
+          inv.wellspring &&
+          inv.key &&
+          availableTypes.includes(inv.type) &&
+          effectiveWellsprings.includes(inv.wellspring),
+      )
+      .forEach((inv) => {
+        results.push({ ...inv, name: inv.customName || inv.key, isCustom: true });
+      });
+
+    return results;
   };
 
   const availableInvocations = getAvailableInvocations();
-  const markdownComponents = {
-    p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
-  };
 
   return (
     <Grid container spacing={2}>
@@ -114,65 +157,18 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           {t("Active Wellsprings")} (Max 2)
         </Typography>
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
-          {wellspringList.map((wellspring) => {
-            const isActive = activeWellsprings.includes(wellspring.name);
-            const isInner =
-              innerWellspring && chosenWellspring === wellspring.name;
-            const isSelected = isActive || isInner;
-            const backgroundColor = getWellspringColor(
-              wellspring.name,
-              isSelected,
-            );
-            const selectedTextColor = getSelectedTextColor(wellspring.name);
-            const IconComponent = wellspring.icon;
-
+          {allWellsprings.map((wellspring) => {
+            const isActive = activeWellsprings.includes(wellspring.key);
+            const isInner = innerWellspring && chosenWellspring === wellspring.key;
+            const isAlways = alwaysActiveWellsprings.includes(wellspring.key);
             return (
-              <Chip
-                key={wellspring.name}
-                label={t(`invoker_${wellspring.name.toLowerCase()}`)}
-                icon={<IconComponent />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (!isInner) handleWellspringToggle(wellspring.name);
-                }}
-                variant={isSelected ? "filled" : "outlined"}
-                sx={{
-                  backgroundColor,
-                  color: isSelected
-                    ? `${selectedTextColor} !important`
-                    : "text.primary",
-                  border: isSelected
-                    ? undefined
-                    : `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"}`,
-                  borderColor: isInner ? "#4CAF50" : backgroundColor,
-                  borderWidth: isSelected ? "2px" : "1px",
-                  fontWeight: isSelected ? "bold" : "normal",
-                  cursor: isInner ? "default" : "pointer",
-                  opacity: isInner ? 0.9 : 1,
-                  "& .MuiChip-label": {
-                    color: isSelected
-                      ? `${selectedTextColor} !important`
-                      : undefined,
-                    fontSize: "0.75rem",
-                    fontWeight: isSelected ? "bold" : "normal",
-                  },
-                  "& .MuiChip-icon": {
-                    color: isSelected
-                      ? `${selectedTextColor} !important`
-                      : backgroundColor,
-                  },
-                  "&:hover": {
-                    opacity: isInner ? 0.9 : 0.8,
-                    color: isSelected
-                      ? `${selectedTextColor} !important`
-                      : "text.primary",
-                  },
-                  ...(isInner && {
-                    boxShadow:
-                      "0 0 0 3px #4CAF50, 0 0 8px rgba(76, 175, 80, 0.4)",
-                    border: "2px solid #2E7D32",
-                  }),
-                }}
+              <WellspringChip
+                key={wellspring.key}
+                wellspring={wellspring}
+                isSelected={isActive || isInner || isAlways}
+                isInner={isInner}
+                isAlways={isAlways}
+                onClick={() => handleWellspringToggle(wellspring.key)}
               />
             );
           })}
@@ -184,45 +180,14 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           {t("Available Invocations")} ({availableInvocations.length})
         </Typography>
         {availableInvocations.length === 0 ? (
-          <Typography
-            sx={{
-              color: "text.secondary",
-              fontStyle: "italic",
-            }}
-          >
+          <Typography sx={{ color: "text.secondary", fontStyle: "italic" }}>
             {t("Select wellsprings to see available invocations")}
           </Typography>
         ) : (
           <Grid container spacing={1}>
             {availableInvocations.map((inv, idx) => (
-              <Grid
-                key={idx}
-                size={{
-                  xs: 12,
-                  sm: 6,
-                  md: 4,
-                }}
-              >
-                <Card>
-                  <CardContent>
-                    <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                      {t(inv.name)}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: "text.secondary",
-                      }}
-                    >
-                      {inv.type} • {t(inv.wellspring)}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      <ReactMarkdown components={markdownComponents}>
-                        {t(inv.effect)}
-                      </ReactMarkdown>
-                    </Typography>
-                  </CardContent>
-                </Card>
+              <Grid key={idx} size={{ xs: 12, sm: 6, md: 4 }}>
+                <SharedInvocationCard item={inv} wellsprings={allWellsprings} />
               </Grid>
             ))}
           </Grid>

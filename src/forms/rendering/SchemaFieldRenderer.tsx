@@ -164,7 +164,7 @@ export function SchemaFieldRenderer<
             field.component === "autocomplete"
             ? extraProps
             : Object.fromEntries(
-                Object.entries(extraProps).filter(([k]) => k !== "onBrowse"),
+                Object.entries(extraProps).filter(([k]) => k !== "onBrowse" && k !== "options"),
               )
           : undefined;
         const resolvedComponentProps =

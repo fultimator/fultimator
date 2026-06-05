@@ -16,6 +16,13 @@ const InvocationItemSchema = z.object({
   wellspring: z.string().default(""),
 });
 
+const CustomWellspringSchema = z.object({
+  name: z.string(),
+  color: z.string().default("#888"),
+  textColor: z.enum(["black", "white"]).default("white"),
+  icon: z.string().default("untyped"),
+});
+
 export const PlayerSpellInvocationSchema =
   PlayerSpellNonStaticBaseSchema.extend({
     spellType: z.literal("invocation"),
@@ -26,4 +33,5 @@ export const PlayerSpellInvocationSchema =
       activeWellsprings: [],
     })),
     invocations: z.array(InvocationItemSchema).default([]),
+    customWellsprings: z.array(CustomWellspringSchema).default([]),
   });

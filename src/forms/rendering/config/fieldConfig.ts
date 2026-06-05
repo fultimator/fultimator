@@ -21,6 +21,7 @@ export type ComponentToken =
   | "martial-toggle"
   | "offensive-toggle"
   | "autocomplete"
+  | "color"
   | "toggle-group"
   | "chip-multi-select"
   | "object-list"
