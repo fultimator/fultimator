@@ -196,18 +196,22 @@ import {
 import {
   optionalFieldConfig,
   optionalGroupLabels,
+  optionalTabs,
 } from "../../forms/rendering/config/itemConfigs/optional";
 import {
   itemFieldConfig,
   itemGroupLabels,
+  itemTabs,
 } from "../../forms/rendering/config/itemConfigs/item";
 import {
   consumableFieldConfig,
   consumableGroupLabels,
+  consumableTabs,
 } from "../../forms/rendering/config/itemConfigs/consumable";
 import {
   noteFieldConfig,
   noteGroupLabels,
+  noteTabs,
 } from "../../forms/rendering/config/itemConfigs/note";
 import { createDefaultStateFromFields } from "../../forms/registry/helpers";
 import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
@@ -3049,21 +3053,24 @@ function OptionalPanel() {
     setZeroEffect(null);
   };
 
+  const [activeTab, setActiveTab] = useState(0);
+
   return (
     <PanelLayout
       data={data}
       itemName={data.name || ""}
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
+        <Box>
+          <TabbedSchemaFormRenderer
+            tabs={optionalTabs}
             config={optionalFieldConfig}
             groupLabels={optionalGroupLabels}
             state={formState}
             onChange={setFormState}
             surface="edit"
-            group="core"
-            label={t("Optional Rule")}
             cols={2}
+            excludeGroups={["zero"]}
+            onTabChange={(key) => setActiveTab(optionalTabs.findIndex((t) => t.key === key))}
             extraProps={{
               name: String(formState.name ?? ""),
               onBrowse: () =>
@@ -3074,26 +3081,8 @@ function OptionalPanel() {
                 ),
             }}
           />
-          <SchemaFieldRenderer
-            config={optionalFieldConfig}
-            groupLabels={optionalGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="body"
-            cols={1}
-          />
-          <SchemaFieldRenderer
-            config={optionalFieldConfig}
-            groupLabels={optionalGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            group="clock"
-            cols={2}
-          />
-          {subtype === "zero-power" && (
-            <>
+          {activeTab === 0 && subtype === "zero-power" && (
+            <Grid container spacing={1} sx={{ mt: 1 }}>
               <Grid size={12}>
                 <Autocomplete
                   options={zeroTriggerOptions}
@@ -3154,14 +3143,16 @@ function OptionalPanel() {
                   }
                 />
               </Grid>
-            </>
+            </Grid>
           )}
-          <Grid size={12}>
-            <Button size="small" variant="outlined" onClick={handleClear}>
-              {t("Clear All Fields")}
-            </Button>
-          </Grid>
-        </Grid>
+          {activeTab === 0 && (
+            <Box sx={{ mt: 1 }}>
+              <Button size="small" variant="outlined" onClick={handleClear}>
+                {t("Clear All Fields")}
+              </Button>
+            </Box>
+          )}
+        </Box>
       }
       previewContent={<SharedOptionalCard item={data} />}
       addButton={
@@ -3454,31 +3445,28 @@ function ItemPanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
-            config={itemFieldConfig}
-            groupLabels={itemGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            cols={2}
-            extraProps={{
-              name: String(formState.name ?? ""),
-              onBrowse: () =>
-                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.item, (item) =>
-                  importIntoSchemaForm(
-                    itemFieldConfig,
-                    setFormState,
-                    item,
-                    null,
-                    {
-                      translate: true,
-                    },
-                  ),
+        <TabbedSchemaFormRenderer
+          tabs={itemTabs}
+          config={itemFieldConfig}
+          groupLabels={itemGroupLabels}
+          state={formState}
+          onChange={setFormState}
+          surface="edit"
+          cols={2}
+          extraProps={{
+            name: String(formState.name ?? ""),
+            onBrowse: () =>
+              openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.item, (item) =>
+                importIntoSchemaForm(
+                  itemFieldConfig,
+                  setFormState,
+                  item,
+                  null,
+                  { translate: true },
                 ),
-            }}
-          />
-        </Grid>
+              ),
+          }}
+        />
       }
       addButton={
         <AddToCompendiumButton itemType={REG.item.addItemType} data={data} />
@@ -3501,29 +3489,28 @@ function ConsumablePanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
-            config={consumableFieldConfig}
-            groupLabels={consumableGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            cols={2}
-            extraProps={{
-              name: String(formState.name ?? ""),
-              onBrowse: () =>
-                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.consumable, (item) =>
-                  importIntoSchemaForm(
-                    consumableFieldConfig,
-                    setFormState,
-                    item,
-                    null,
-                    { translate: true },
-                  ),
+        <TabbedSchemaFormRenderer
+          tabs={consumableTabs}
+          config={consumableFieldConfig}
+          groupLabels={consumableGroupLabels}
+          state={formState}
+          onChange={setFormState}
+          surface="edit"
+          cols={2}
+          extraProps={{
+            name: String(formState.name ?? ""),
+            onBrowse: () =>
+              openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.consumable, (item) =>
+                importIntoSchemaForm(
+                  consumableFieldConfig,
+                  setFormState,
+                  item,
+                  null,
+                  { translate: true },
                 ),
-            }}
-          />
-        </Grid>
+              ),
+          }}
+        />
       }
       addButton={
         <AddToCompendiumButton
@@ -3549,31 +3536,28 @@ function NotePanel() {
   return (
     <PanelLayout
       formContent={
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
-            config={noteFieldConfig}
-            groupLabels={noteGroupLabels}
-            state={formState}
-            onChange={setFormState}
-            surface="edit"
-            cols={2}
-            extraProps={{
-              name: String(formState.name ?? ""),
-              onBrowse: () =>
-                openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.note, (item) =>
-                  importIntoSchemaForm(
-                    noteFieldConfig,
-                    setFormState,
-                    item,
-                    null,
-                    {
-                      translate: true,
-                    },
-                  ),
+        <TabbedSchemaFormRenderer
+          tabs={noteTabs}
+          config={noteFieldConfig}
+          groupLabels={noteGroupLabels}
+          state={formState}
+          onChange={setFormState}
+          surface="edit"
+          cols={2}
+          extraProps={{
+            name: String(formState.name ?? ""),
+            onBrowse: () =>
+              openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.note, (item) =>
+                importIntoSchemaForm(
+                  noteFieldConfig,
+                  setFormState,
+                  item,
+                  null,
+                  { translate: true },
                 ),
-            }}
-          />
-        </Grid>
+              ),
+          }}
+        />
       }
       addButton={
         <AddToCompendiumButton itemType={REG.note.addItemType} data={data} />

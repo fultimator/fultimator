@@ -1,10 +1,17 @@
-import type { ItemFieldConfig, GroupLabels } from "../fieldConfig";
+import type { ItemFieldConfig, GroupLabels, FieldConfig } from "../fieldConfig";
 import type { Note } from "../../../schema/itemSchemas/note";
 import { SHARED_LABEL_KEYS } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
 
 export type NoteFormState = Note;
 
 const G = { core: "core" } as const;
+
+export { DEFAULT_ITEM_TABS as noteTabs };
 
 export const noteGroupLabels: GroupLabels = {
   core: "section.core",
@@ -55,4 +62,6 @@ export const noteFieldConfig: ItemFieldConfig<NoteFormState> = [
     gridSize: 12,
     componentProps: { maxLength: 2000 },
   },
+  makePassivesTabField([]) as unknown as FieldConfig<NoteFormState>,
+  behaviorsTabField as unknown as FieldConfig<NoteFormState>,
 ];

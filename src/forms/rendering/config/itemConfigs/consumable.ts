@@ -1,10 +1,17 @@
-import type { ItemFieldConfig, GroupLabels } from "../fieldConfig";
+import type { ItemFieldConfig, GroupLabels, FieldConfig } from "../fieldConfig";
 import type { Consumable } from "../../../schema/itemSchemas/consumable";
 import { SHARED_LABEL_KEYS } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
 
 export type ConsumableFormState = Consumable;
 
 const G = { core: "core" } as const;
+
+export { DEFAULT_ITEM_TABS as consumableTabs };
 
 export const consumableGroupLabels: GroupLabels = {
   core: "section.core",
@@ -56,4 +63,6 @@ export const consumableFieldConfig: ItemFieldConfig<ConsumableFormState> = [
     gridSize: 12,
     componentProps: { maxLength: 1500 },
   },
+  makePassivesTabField([]) as unknown as FieldConfig<ConsumableFormState>,
+  behaviorsTabField as unknown as FieldConfig<ConsumableFormState>,
 ];

@@ -1,7 +1,12 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import type { OptionalItem } from "../../../schema/itemSchemas/optional";
 import type { CampActivityTargetKey } from "../../../schema/itemSchemas/optional";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
 
 type OptionalFormStateShape = {
   subtype:
@@ -53,6 +58,8 @@ const hasCampTarget = (s: OptionalFormState) => s.subtype === "camp-activities";
 const isOther = (s: OptionalFormState) => s.subtype === "other";
 
 const isZeroPower = (s: OptionalFormState) => s.subtype === "zero-power";
+
+export { DEFAULT_ITEM_TABS as optionalTabs };
 
 export const optionalGroupLabels: GroupLabels = {
   core: "section.core",
@@ -205,4 +212,6 @@ export const optionalFieldConfig: ItemFieldConfig<OptionalFormState> = [
     group: G.zero,
     order: 7,
   },
+  makePassivesTabField([]) as unknown as FieldConfig<OptionalFormState>,
+  behaviorsTabField as unknown as FieldConfig<OptionalFormState>,
 ];

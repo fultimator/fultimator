@@ -7,6 +7,7 @@ export type PlayerSpellUiType =
   | "magichant"
   | "symbol"
   | "invocation"
+  | "wellspring"
   | "arcanist"
   | "arcanist-rework"
   | "tinkerer-alchemy"
@@ -64,6 +65,10 @@ export type PlayerSpellFormState = {
   effect: string;
   // invocation fields (wellspring + type, which is shared with magichant-key)
   wellspring: string;
+  // wellspring spell fields
+  color: string;
+  textColor: string;
+  icon: string;
   // cooking fields - array of { effect: string } objects for object-list renderer
   cookingEffects: Array<{ effect: string }>;
   // magiseed fields

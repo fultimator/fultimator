@@ -136,6 +136,7 @@ export default function PlayerWeaponModal({
             sx: {
               width: "100%",
               maxWidth: "lg",
+              minHeight: "500px",
             },
           },
         }}

@@ -599,7 +599,7 @@ export default function PlayerCustomWeaponModal({
     <Dialog
       open={open}
       onClose={onClose}
-      slotProps={{ paper: { sx: { width: "100%", maxWidth: "lg" } } }}
+      slotProps={{ paper: { sx: { width: "100%", maxWidth: "lg", minHeight: "500px" } } }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
         {editCustomWeaponIndex !== null ? t("Edit") : t("Add Custom Weapon")}

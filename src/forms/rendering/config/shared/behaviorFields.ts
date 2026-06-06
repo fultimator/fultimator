@@ -182,6 +182,16 @@ function makePassiveRowFields(
       validationHints: { required: true },
     },
     {
+      key: "description",
+      kind: "editable",
+      label: "passive.description",
+      component: "textarea",
+      defaultValue: "",
+      order: 1,
+      group: PASSIVE_GROUPS.core,
+      gridSize: 12,
+    },
+    {
       key: "transfer",
       kind: "editable",
       label: "passive.transfer",
@@ -689,6 +699,16 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
     group: BEHAVIOR_GROUPS.selfEffects,
     gridSize: 12,
     validationHints: { required: true },
+  },
+  {
+    key: "description",
+    kind: "editable",
+    label: "behavior.description",
+    component: "textarea",
+    defaultValue: "",
+    order: 1,
+    group: BEHAVIOR_GROUPS.selfEffects,
+    gridSize: 12,
   },
   ...actionTriggerRowFields.map((f) => ({
     ...f,

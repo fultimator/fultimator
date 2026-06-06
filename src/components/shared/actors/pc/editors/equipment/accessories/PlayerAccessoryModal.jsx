@@ -124,7 +124,7 @@ export default function PlayerAccessoryModal({
         onClose={onClose}
         slotProps={{
           paper: {
-            sx: { width: "100%", maxWidth: "lg" },
+            sx: { width: "100%", maxWidth: "lg", minHeight: "500px" },
           },
         }}
       >

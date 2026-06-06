@@ -4,10 +4,10 @@
 // Keys use dot-notation matching the item schema shape.
 
 export const ITEM_SCOPED_KEYS: Record<string, string[]> = {
-  npcAttack: ["accuracy.value", "damage.value"],
-  npcSpell: ["accuracy.value", "damage.value", "cost.amount", "maxTargets"],
-  npcAction: [],
-  npcSpecial: [],
+  npcAttack: ["accuracy.value", "attr1", "attr2", "defense", "damage.value", "damage.type", "range"],
+  npcSpell: ["accuracy.value", "attr1", "attr2", "defense", "damage.value", "damage.type", "damage.hrZero", "range", "cost.amount", "maxTargets"],
+  npcAction: ["spCost"],
+  npcSpecial: ["spCost"],
   heroic: [],
   weapon: ["accuracy.value", "damage.value"],
   customWeapon: ["accuracy.value", "damage.value"],
@@ -55,6 +55,7 @@ export const PLAYER_SPELL_SCOPED_KEYS_BY_TYPE: Record<string, string[]> = {
   therioform: [],
   symbol: [],
   invocation: [],
+  wellspring: [],
   "magichant-key": [],
   magichant: [],
   "tinkerer-alchemy": [],

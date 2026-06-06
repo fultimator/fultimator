@@ -1,10 +1,17 @@
-import type { ItemFieldConfig, GroupLabels } from "../fieldConfig";
+import type { ItemFieldConfig, GroupLabels, FieldConfig } from "../fieldConfig";
 import type { Item } from "../../../schema/itemSchemas/item";
 import { SHARED_LABEL_KEYS } from "./sharedLabelKeys";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
 
 export type ItemFormState = Item;
 
 const G = { core: "core" } as const;
+
+export { DEFAULT_ITEM_TABS as itemTabs };
 
 export const itemGroupLabels: GroupLabels = {
   core: "section.core",
@@ -68,4 +75,6 @@ export const itemFieldConfig: ItemFieldConfig<ItemFormState> = [
     gridSize: 12,
     componentProps: { maxLength: 1500 },
   },
+  makePassivesTabField([]) as unknown as FieldConfig<ItemFormState>,
+  behaviorsTabField as unknown as FieldConfig<ItemFormState>,
 ];
