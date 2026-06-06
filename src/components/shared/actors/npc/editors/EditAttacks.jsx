@@ -44,7 +44,7 @@ import {
 import { TypeName } from "/src/components/types";
 import { MeleeIcon, DistanceIcon } from "/src/components/icons";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 
 const ATTR_SHORT = {
   dexterity: "DEX",

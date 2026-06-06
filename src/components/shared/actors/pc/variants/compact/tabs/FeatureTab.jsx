@@ -22,7 +22,7 @@ import {
   Message,
   RadioButtonChecked,
 } from "@mui/icons-material";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { calculateAttribute } from "/src/libs/playerCalculations";

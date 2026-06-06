@@ -8,7 +8,7 @@ import ClockControls from "/src/components/shared/actors/pc/variants/compact/Clo
 import { highlightMatch } from "/src/components/shared/actors/core-utils";
 import { highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
-import ItemRowCard from "./ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 
 function NoteClockCard({ clock, clockIndex, noteOriginalIndex, setPlayer, searchQuery, compact, primary }) {
   const theme = { primary };

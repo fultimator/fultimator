@@ -21,7 +21,7 @@ import Search from "@mui/icons-material/Search";
 import { useTranslate } from "/src/translation/translate";
 import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import ItemEditModal from "/src/forms/ui/ItemEditModal";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import { useAddChatMessage } from "/src/hooks/useAddChatMessage";

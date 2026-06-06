@@ -22,7 +22,7 @@ import weapons from "/src/libs/weapons";
 import { CloseBracket, OpenBracket } from "/src/components/Bracket";
 import { useTranslate } from "/src/translation/translate";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   npcAttackFieldConfig,

@@ -34,7 +34,7 @@ import {
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import ConfirmConfirmationDialog from "/src/components/common/ConfirmConfirmationDialog";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 
 const INV_TYPES = ["Blast", "Hex", "Utility"];
 

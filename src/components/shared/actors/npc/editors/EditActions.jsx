@@ -31,7 +31,7 @@ import {
   LibraryAdd,
   Menu as MenuIcon,
 } from "@mui/icons-material";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";

@@ -66,7 +66,7 @@ import {
 } from "/src/libs/player/classLevelUtils";
 import useSphereBank from "/src/hooks/useSphereBank";
 import SectionCard from "./SectionCard";
-import ItemRowCard from "./ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 import { SharedSkillCard, SharedHeroicCard } from "/src/components/shared/items/class/SharedClassCards";
 import { SharedPlayerSpellCard } from "/src/components/shared/items/spells/SharedSpellCards";

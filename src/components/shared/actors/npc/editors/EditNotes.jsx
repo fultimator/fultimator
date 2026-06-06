@@ -16,7 +16,7 @@ import { useState } from "react";
 import { useTranslate } from "/src/translation/translate";
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import {
   Add,
   ArrowDownward,

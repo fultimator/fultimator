@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Paper, IconButton, Tooltip, Typography } from "@mui/material";
 import { Edit, ChatOutlined } from "@mui/icons-material";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 import { useTranslate } from "/src/translation/translate";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";

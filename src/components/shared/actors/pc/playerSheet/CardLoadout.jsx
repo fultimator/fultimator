@@ -14,7 +14,7 @@ import { useTranslate } from "/src/translation/translate";
 import { useTheme } from "@mui/material/styles";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,

@@ -73,7 +73,7 @@ import {
 } from "/src/hooks/useRollToChat";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import ItemStatSubtitle from "/src/components/shared/actors/common/ItemStatSubtitle";
-import ItemRowCard from "/src/components/shared/actors/common/ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import ItemEditModal from "/src/forms/ui/ItemEditModal";
 import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";

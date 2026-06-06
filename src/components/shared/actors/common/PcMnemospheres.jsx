@@ -36,7 +36,7 @@ import {
   getMnemosphereHeroicDescription,
 } from "/src/libs/player/mnemosphereClassUtils";
 import { getMnemosphereCost } from "/src/libs/mnemospheres";
-import ItemRowCard from "./ItemRowCard";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import { SharedSkillCard, SharedHeroicCard } from "/src/components/shared/items/class/SharedClassCards";
 
 function DescriptionArea({ children }) {
