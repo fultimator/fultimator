@@ -1,12 +1,10 @@
-import { Grid, Typography, Box } from "@mui/material";
+import { Grid, IconButton, Tooltip, Typography, Box } from "@mui/material";
+import { ChatOutlined } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { resolveWellsprings, affinityIconSrc } from "/src/libs/player/wellsprings";
 import { invocationsByWellspring } from "/src/libs/player/spellOptionData";
-/**
- * InvokerContentSection - Content tab for Invoker spell
- * Manages active wellsprings and displays available invocations
- */
 import { SharedInvocationCard } from "/src/components/shared/items";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 function WellspringChip({ wellspring, isSelected, isInner, isAlways, onClick }) {
   const theme = useTheme();
@@ -187,7 +185,23 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           <Grid container spacing={1}>
             {availableInvocations.map((inv, idx) => (
               <Grid key={idx} size={{ xs: 12, sm: 6, md: 4 }}>
-                <SharedInvocationCard item={inv} wellsprings={allWellsprings} />
+                <SharedInvocationCard
+                  item={inv}
+                  wellsprings={allWellsprings}
+                  actionContent={
+                    <Tooltip title={t("Send to chat")} arrow>
+                      <IconButton
+                        size="small"
+                        onClick={() => sendDisplayMessage("invocation", t(inv.name || inv.customName || ""), {
+                          tags: [inv.wellspring, inv.type].filter(Boolean),
+                          effect: inv.effect ? t(inv.effect) : undefined,
+                        })}
+                      >
+                        <ChatOutlined fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  }
+                />
               </Grid>
             ))}
           </Grid>
