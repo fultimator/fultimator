@@ -1,26 +1,28 @@
-import SpellDefault from "/src/components/shared/actors/pc/variants/compact/spells/SpellDefault";
-import SpellArcanist from "/src/components/shared/actors/pc/variants/compact/spells/SpellArcanist";
-import SpellEntropistGamble from "/src/components/shared/actors/pc/variants/compact/spells/SpellEntropistGamble";
-import { SpellTinkererAlchemy } from "/src/components/shared/actors/pc/spells";
-import { SpellTinkererInfusion } from "/src/components/shared/actors/pc/spells";
-import { SpellTinkererMagitech } from "/src/components/shared/actors/pc/spells";
-import { SpellChanter } from "/src/components/shared/actors/pc/spells";
-import SpellSymbolist from "/src/components/shared/actors/pc/variants/compact/spells/SpellSymbol";
-import SpellDancer from "/src/components/shared/actors/pc/variants/compact/spells/SpellDance";
-import SpellGift from "/src/components/shared/actors/pc/variants/compact/spells/SpellGift";
-import { SpellMutant } from "/src/components/shared/actors/pc/spells";
-import SpellPilot from "/src/components/shared/actors/pc/variants/compact/spells/SpellVehicle";
-import SpellMagiseed from "/src/components/shared/actors/pc/variants/compact/spells/SpellMagiseed";
-import SpellGourmet from "/src/components/shared/actors/pc/variants/compact/spells/SpellGourmet";
-import SpellInvoker from "/src/components/shared/actors/pc/variants/compact/spells/SpellInvoker";
-import SpellDeck from "/src/components/shared/actors/pc/variants/compact/spells/SpellDeck";
+import {
+  SpellDefault,
+  SpellArcanist,
+  SpellChanter,
+  SpellDancer,
+  SpellDeck,
+  SpellEntropistGamble,
+  SpellGift,
+  SpellGourmet,
+  SpellInvoker,
+  SpellMagiseed,
+  SpellMutant,
+  SpellPilot,
+  SpellSymbolist,
+  SpellTinkererAlchemy,
+  SpellTinkererInfusion,
+  SpellTinkererMagitech,
+} from "/src/components/shared/actors/pc/spells";
 
 // Each entry: { Component, buildProps(spell, handlers) }
-// handlers: { onEdit, onEditSubModal, isEditMode }
+// handlers: { onEdit, onEditSubModal, onSpellUpdate, isEditMode }
 const spellDisplayRegistry = {
   default: {
     Component: SpellDefault,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onRoll, onChat, isEditMode }) => ({
       spellName: spell.name,
       mp: spell.cost?.amount,
       perTarget: spell.cost?.perTarget ?? true,
@@ -35,14 +37,19 @@ const spellDisplayRegistry = {
       attr2: spell.accuracy?.attr2,
       showInPlayerSheet: spell.showInPlayerSheet,
       onEdit,
+      onRoll,
+      onChat,
     }),
   },
   gift: {
     Component: SpellGift,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onSpellUpdate, isEditMode }) => ({
       gift: spell,
       isEditMode,
       onEdit,
+      onClockChange: onSpellUpdate
+        ? (clock) => onSpellUpdate((s) => ({ ...s, clock }))
+        : undefined,
     }),
   },
   dance: {
@@ -81,10 +88,22 @@ const spellDisplayRegistry = {
   },
   invocation: {
     Component: SpellInvoker,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onRoll, onSpellUpdate, isEditMode }) => ({
       invoker: spell,
       isEditMode,
       onEdit,
+      onRoll,
+      onWellspringToggle: onSpellUpdate
+        ? (key) =>
+            onSpellUpdate((s) => {
+              const tracker = s.tracker || {};
+              const active = tracker.activeWellsprings || [];
+              const next = active.includes(key)
+                ? active.filter((k) => k !== key)
+                : [...active, key];
+              return { ...s, tracker: { ...tracker, activeWellsprings: next } };
+            })
+        : undefined,
     }),
   },
   arcanist: {
@@ -107,9 +126,10 @@ const spellDisplayRegistry = {
   },
   "tinkerer-alchemy": {
     Component: SpellTinkererAlchemy,
-    buildProps: (spell, { onEdit, onEditSubModal, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onEditSubModal, isEditMode, speaker }) => ({
       alchemy: spell,
       isEditMode,
+      speaker,
       onEditRank: onEdit,
       onEditTargets: () => onEditSubModal?.("alchemyTarget"),
       onEditEffects: () => onEditSubModal?.("alchemyEffects"),
@@ -141,18 +161,31 @@ const spellDisplayRegistry = {
   },
   magiseed: {
     Component: SpellMagiseed,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onRoll, onSpellUpdate, isEditMode }) => ({
       magiseed: spell,
       isEditMode,
       onEdit,
+      onRoll,
+      onGrowthClockChange: onSpellUpdate
+        ? (growthClock) => onSpellUpdate((s) => ({ ...s, growthClock }))
+        : undefined,
     }),
   },
   "pilot-vehicle": {
     Component: SpellPilot,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onSpellUpdate, isEditMode }) => ({
       pilot: spell,
       isEditMode,
       onEdit,
+      onVehicleChange: onSpellUpdate
+        ? (idx, field, value) =>
+            onSpellUpdate((s) => {
+              const vehicles = (s.vehicles || []).map((v, i) =>
+                i === idx ? { ...v, [field]: value } : v,
+              );
+              return { ...s, vehicles };
+            })
+        : undefined,
     }),
   },
   gamble: {
@@ -165,10 +198,13 @@ const spellDisplayRegistry = {
   },
   deck: {
     Component: SpellDeck,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onSpellUpdate, isEditMode }) => ({
       deck: spell,
       isEditMode,
       onEdit,
+      onDeckUpdate: onSpellUpdate
+        ? (updater) => onSpellUpdate(updater)
+        : undefined,
     }),
   },
 };

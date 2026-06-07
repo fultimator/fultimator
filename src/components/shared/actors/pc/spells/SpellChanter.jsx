@@ -5,12 +5,13 @@ import {
   ThemeProvider,
   Tooltip,
   Icon,
+  IconButton,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, Info } from "@mui/icons-material";
+import { VisibilityOff, ExpandMore, Info, Edit } from "@mui/icons-material";
+import { TypeIcon } from "/src/components/types";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -59,16 +60,16 @@ function ThemedSpellChanter({
 
   return (
     <>
-      <Accordion sx={{ marginY: 1 }}>
+      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Info />
           </Icon>
           <Typography variant="h4">{t("Magichant Details")}</Typography>
         </AccordionSummary>
-        <AccordionDetails>
-          <ReactMarkdown>{t("magichant_details_1")}</ReactMarkdown>
-          <ReactMarkdown>
+        <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("magichant_details_1")}</ReactMarkdown>
+          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />, ul: ({ _node, ...props }) => <ul style={{ margin: 0, paddingLeft: "1.2em" }} {...props} /> }}>
             {"- " +
               t("magichant_details_2") +
               `\n` +
@@ -80,41 +81,6 @@ function ThemedSpellChanter({
           </ReactMarkdown>
         </AccordionDetails>
       </Accordion>
-      {isEditMode && (
-        <Grid
-          style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow"
-        >
-          <Button
-            onClick={onEdit}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("magichant_settings_button")}
-          </Button>
-          <Button
-            onClick={onEditKeys}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("magichant_edit_keys_button")}
-          </Button>
-          <Button
-            onClick={onEditTones}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("magichant_edit_tones_button")}
-          </Button>
-          {!showInPlayerSheet && (
-            <Tooltip title={t("Magichant not shown in player sheet")}>
-              <Icon>
-                <VisibilityOff style={{ color: "black" }} />
-              </Icon>
-            </Tooltip>
-          )}
-        </Grid>
-      )}
       <div
         style={{
           backgroundColor: theme.primary,
@@ -125,6 +91,7 @@ function ThemedSpellChanter({
           color: theme.white,
           textTransform: "uppercase",
           display: "flex",
+          alignItems: "center",
           justifyContent: "space-between",
         }}
       >
@@ -183,6 +150,18 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
         </Grid>
+        {isEditMode && (
+          <div style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
+            {!showInPlayerSheet && (
+              <Tooltip title={t("Magichant not shown in player sheet")}>
+                <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+              </Tooltip>
+            )}
+            <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+              <Edit sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </div>
+        )}
       </div>
       {volumes.map((volume, i) => (
         <Grid
@@ -191,7 +170,6 @@ function ThemedSpellChanter({
             justifyContent: "flex-start",
             background: "transparent",
             padding: "3px 17px",
-            marginBottom: "6px",
             borderBottom: `1px solid ${theme.secondary}`,
           }}
           key={i}
@@ -253,8 +231,8 @@ function ThemedSpellChanter({
           color: theme.white,
           textTransform: "uppercase",
           display: "flex",
+          alignItems: "center",
           justifyContent: "space-between",
-          marginTop: "20px",
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -352,6 +330,15 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
         </Grid>
+        <div style={{ width: 28, flexShrink: 0 }}>
+          {isEditMode && (
+            <Tooltip title={t("magichant_edit_keys_button")}>
+              <IconButton size="small" onClick={onEditKeys} sx={{ color: "#fff", p: "3px" }}>
+                <Edit sx={{ fontSize: "1.1rem" }} />
+              </IconButton>
+            </Tooltip>
+          )}
+        </div>
       </div>
       {(magichant.keys ?? []).length === 0 ? (
         <Typography
@@ -373,8 +360,7 @@ function ThemedSpellChanter({
               justifyContent: "flex-start",
               background: "transparent",
               padding: "3px 17px",
-              marginBottom: "6px",
-              borderBottom: `1px solid ${theme.secondary}`,
+                borderBottom: `1px solid ${theme.secondary}`,
             }}
             key={i}
           >
@@ -394,9 +380,9 @@ function ThemedSpellChanter({
                     fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
                   }}
                 >
-                  {chantKey.name === "magichant_custom_name"
+                  {chantKey.key === "magichant_custom_name"
                     ? chantKey.customName
-                    : t(chantKey.name)}
+                    : t(chantKey.key)}
                 </Typography>
               </Grid>
               <Grid
@@ -404,17 +390,19 @@ function ThemedSpellChanter({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  gap: 4,
                 }}
                 size={{
                   xs: 2,
                   sm: 3,
                 }}
               >
-                <ReactMarkdown components={components}>
-                  {chantKey.name === "magichant_custom_name"
+                {chantKey.type && <TypeIcon type={chantKey.type} />}
+                <span style={{ textTransform: "capitalize" }}>
+                  {chantKey.key === "magichant_custom_name"
                     ? chantKey.type
                     : t(chantKey.type)}
-                </ReactMarkdown>
+                </span>
               </Grid>
               <Grid
                 style={{
@@ -425,7 +413,7 @@ function ThemedSpellChanter({
                 size={2}
               >
                 <ReactMarkdown components={components}>
-                  {chantKey.name === "magichant_custom_name"
+                  {chantKey.key === "magichant_custom_name"
                     ? chantKey.status
                     : t(chantKey.status)}
                 </ReactMarkdown>
@@ -442,7 +430,7 @@ function ThemedSpellChanter({
                 }}
               >
                 <ReactMarkdown components={components}>
-                  {chantKey.name === "magichant_custom_name"
+                  {chantKey.key === "magichant_custom_name"
                     ? chantKey.attribute
                     : t(chantKey.attribute)}
                 </ReactMarkdown>
@@ -456,12 +444,13 @@ function ThemedSpellChanter({
                 size={2}
               >
                 <ReactMarkdown components={components}>
-                  {chantKey.name === "magichant_custom_name"
+                  {chantKey.key === "magichant_custom_name"
                     ? chantKey.recovery
                     : t(chantKey.recovery)}
                 </ReactMarkdown>
               </Grid>
             </Grid>
+          <div style={{ width: 28, flexShrink: 0 }} />
           </Grid>
         ))
       )}
@@ -476,8 +465,8 @@ function ThemedSpellChanter({
           color: theme.white,
           textTransform: "uppercase",
           display: "flex",
+          alignItems: "center",
           justifyContent: "space-between",
-          marginTop: "20px",
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -501,6 +490,13 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
         </Grid>
+        {isEditMode && (
+          <Tooltip title={t("magichant_edit_tones_button")}>
+            <IconButton size="small" onClick={onEditTones} sx={{ color: "#fff", p: "3px", flexShrink: 0 }}>
+              <Edit sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </Tooltip>
+        )}
       </div>
       {(magichant.tones ?? []).length === 0 ? (
         <Typography
@@ -529,7 +525,6 @@ function ThemedSpellChanter({
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -543,9 +538,9 @@ function ThemedSpellChanter({
                       fontWeight: "bold",
                     }}
                   >
-                    {tone.name === "magichant_custom_name"
+                    {tone.key === "magichant_custom_name"
                       ? tone.customName
-                      : t(tone.name)}
+                      : t(tone.key)}
                   </Typography>
                 </Grid>
               </Grid>
@@ -567,8 +562,7 @@ function ThemedSpellChanter({
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
-                marginBottom: "6px",
-                borderBottom: `1px solid ${theme.secondary}`,
+                    borderBottom: `1px solid ${theme.secondary}`,
               }}
             >
               <Grid container style={{ flexGrow: 1 }}>
@@ -581,7 +575,7 @@ function ThemedSpellChanter({
                   size={12}
                 >
                   <ReactMarkdown components={components}>
-                    {tone.name === "magichant_custom_name"
+                    {tone.key === "magichant_custom_name"
                       ? tone.effect
                       : t(tone.effect)}
                   </ReactMarkdown>
@@ -592,7 +586,7 @@ function ThemedSpellChanter({
                       fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
                     }}
                   >
-                    {tone.name === "magichant_custom_name"
+                    {tone.key === "magichant_custom_name"
                       ? tone.effect
                       : t(tone.effect)}
                   </Typography>*/}

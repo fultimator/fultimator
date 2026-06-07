@@ -13,7 +13,6 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
-  OutlinedInput,
   ListItemText,
   ListSubheader,
   Menu,
@@ -202,10 +201,13 @@ export function CustomTextareaRenderer({
   disabled,
 }: FieldRendererProps) {
   const { t } = useTranslate();
+  const strValue = (value as string) ?? "";
+  const translated = t(strValue);
   return (
     <CustomTextarea
       label={t(label)}
-      value={(value as string) ?? ""}
+      value={strValue}
+      previewValue={translated !== strValue ? translated : undefined}
       onChange={(e) => onCommit(e.target.value)}
       readOnly={disabled}
     />

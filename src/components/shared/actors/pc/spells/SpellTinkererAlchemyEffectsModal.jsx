@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import CustomTextarea from "/src/components/common/CustomTextarea";
 import {
   Dialog,
   DialogTitle,
@@ -6,7 +7,6 @@ import {
   DialogActions,
   Button,
   Grid,
-  TextField,
   IconButton,
   Select,
   MenuItem,
@@ -148,13 +148,13 @@ export default function SpellTinkererAlchemyEffectsModal({
                 </FormControl>
               </Grid>
               <Grid size={8}>
-                <TextField
+                <CustomTextarea
                   label={t("Effect")}
                   value={effect.effect}
                   onChange={(e) =>
                     handleEffectChange(index, "effect", e.target.value)
                   }
-                  fullWidth
+                  minRows={2}
                 />
               </Grid>
               <Grid size={1}>

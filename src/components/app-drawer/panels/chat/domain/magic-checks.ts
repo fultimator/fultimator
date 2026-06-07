@@ -34,6 +34,7 @@ export function prepareMagicCheck(
     damageType: spell.damageType ?? "physical",
     defense: spell.accuracyDefense ?? "mdef",
     hrZero: spell.damageHrZero ?? false,
+    extraTags: spell.extraTags,
   };
 }
 

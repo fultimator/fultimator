@@ -13,8 +13,6 @@ import {
   MenuItem,
 } from "@mui/material";
 import {
-  KeyboardArrowDown,
-  KeyboardArrowUp,
   Edit,
   Add,
   Search,
@@ -23,6 +21,7 @@ import {
   RadioButtonChecked,
 } from "@mui/icons-material";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { calculateAttribute } from "/src/libs/playerCalculations";
@@ -53,10 +52,8 @@ import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerMo
 import { SharedPlayerSpellCard } from "/src/components/shared/items/spells/SharedSpellCards";
 import { UnifiedSpellModal, DefaultSpellSection, ArcanistGeneralSection, GeneralSection, MagiseedGeneralSection, MagiseedContentSection, GiftContentSection, DancerContentSection, SymbolistContentSection, MagichantKeysContentSection, MagichantTonesContentSection, MutantContentSection, PilotGeneralSection, PilotContentSection, InvokerGeneralSection, InvokerContentSection, GourmetGeneralSection, GourmetContentSection, GourmetInventoryTab, GourmetCookingTab, GambleGeneralSection, SpellTinkererMagitechRankModal } from "/src/components/shared/actors/pc/spells";
 import { getSlottedMnemospheres } from "/src/libs/player/mnemosphereClassUtils";
-import classList, {
-  tinkererAlchemy,
-  tinkererInfusion,
-} from "/src/libs/classes";
+import classList from "/src/libs/classes";
+import { createBlankSpellForType } from "/src/libs/player/createBlankSpell";
 import PcCompactQuirk from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactQuirk";
 import PcCompactCampActivities from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactCampActivities";
 import PcCompactZeroPower from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactZeroPower";
@@ -418,136 +415,6 @@ function getSpellModalSections(spellType) {
     ]
   );
 }
-
-function createBlankSpellForType(spellType) {
-  if (spellType === "default")
-    return {
-      spellType,
-      name: "New Spell",
-      cost: { resource: "mp", amount: 0, perTarget: true },
-      maxTargets: 0,
-      targetDescription: "",
-      duration: "",
-      description: "",
-      isOffensive: false,
-      attr1: "dexterity",
-      attr2: "dexterity",
-      showInPlayerSheet: true,
-    };
-  if (spellType === "arcanist")
-    return {
-      spellType,
-      name: "New Arcana",
-      domain: "",
-      description: "",
-      domainDesc: "",
-      merge: "",
-      mergeDesc: "",
-      dismiss: "",
-      dismissDesc: "",
-      showInPlayerSheet: true,
-    };
-  if (spellType === "arcanist-rework")
-    return {
-      spellType,
-      name: "New Arcana",
-      domain: "",
-      description: "",
-      domainDesc: "",
-      merge: "",
-      mergeDesc: "",
-      pulse: "",
-      pulseDesc: "",
-      dismiss: "",
-      dismissDesc: "",
-      showInPlayerSheet: true,
-    };
-  if (spellType === "tinkerer-alchemy")
-    return { spellType, showInPlayerSheet: true, ...tinkererAlchemy };
-  if (spellType === "tinkerer-infusion")
-    return { spellType, showInPlayerSheet: true, ...tinkererInfusion };
-  if (spellType === "tinkerer-magitech")
-    return { spellType, showInPlayerSheet: true, rank: 1, magispheres: [] };
-  if (spellType === "gamble")
-    return {
-      spellType,
-      showInPlayerSheet: true,
-      spellName: "New Gamble",
-      cost: { resource: "mp", amount: 10, perTarget: true },
-      maxTargets: 2,
-      targetDescription: "Special",
-      duration: "Instantaneous",
-      attr: "will",
-      targets: [
-        {
-          rangeFrom: 1,
-          rangeTo: 6,
-          effect: "First Effect",
-          secondRoll: false,
-          secondEffects: [],
-        },
-        {
-          rangeFrom: 7,
-          rangeTo: 12,
-          effect: "Second Effect",
-          secondRoll: false,
-          secondEffects: [],
-        },
-      ],
-    };
-  if (spellType === "magichant")
-    return { spellType, showInPlayerSheet: true, keys: [], tones: [] };
-  if (spellType === "symbol")
-    return { spellType, showInPlayerSheet: true, symbols: [] };
-  if (spellType === "dance")
-    return { spellType, showInPlayerSheet: true, dances: [] };
-  if (spellType === "gift")
-    return { spellType, showInPlayerSheet: true, gifts: [], clock: 0 };
-  if (spellType === "therioform")
-    return { spellType, showInPlayerSheet: true, therioforms: [] };
-  if (spellType === "pilot-vehicle")
-    return { spellType, showInPlayerSheet: true, vehicles: [] };
-  if (spellType === "magiseed")
-    return {
-      spellType,
-      showInPlayerSheet: true,
-      magiseeds: [],
-      currentMagiseed: null,
-      growthClock: 0,
-      gardenDescription: "",
-    };
-  if (spellType === "cooking")
-    return {
-      spellType,
-      spellName: "Cookbook",
-      cookbookEffects: [],
-      showInPlayerSheet: true,
-    };
-  if (spellType === "invocation")
-    return {
-      spellType,
-      spellName: "Invocation",
-      invocations: [],
-      activeWellsprings: [],
-      showInPlayerSheet: true,
-    };
-  if (spellType === "deck")
-    return {
-      spellType: "deck",
-      spellName: "Ace of Cards Deck",
-      suitConfiguration: {
-        Air: "air",
-        Earth: "earth",
-        Fire: "fire",
-        Ice: "ice",
-      },
-      cardsInDeck: 30,
-      hand: [],
-      discardPile: [],
-      showInPlayerSheet: true,
-    };
-  return { spellType, showInPlayerSheet: true };
-}
 // VehicleCard
 
 function VehicleCard({
@@ -698,16 +565,19 @@ function SpellCard({
   theme,
   t,
 }) {
+  const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(false);
   const spellName = getSpellName(spell, t);
   const isOffensive = spell.isOffensive === true;
+  const inlineContent = renderSpellContent(spell, setPlayer, searchQuery);
 
   return (
     <>
       <ItemRowCard
         compact
         variant="outlined"
-        onCardClick={!isEditMode ? () => setPreview(true) : undefined}
+        onClick={inlineContent ? () => setOpen((v) => !v) : undefined}
+        onCardClick={!inlineContent && !isEditMode ? () => setPreview(true) : undefined}
         paperSx={{
           transition: "border-color 0.15s ease",
           "&:hover": { borderColor: theme.primary },
@@ -741,15 +611,23 @@ function SpellCard({
             )}
           </>
         }
-      />
-      <Dialog open={preview} onClose={() => setPreview(false)} fullWidth maxWidth="sm">
-        <DialogContent sx={{ p: 0 }}>
-          <SharedPlayerSpellCard item={spell} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPreview(false)} variant="contained">{t("Close")}</Button>
-        </DialogActions>
-      </Dialog>
+      >
+        {inlineContent && open && (
+          <Box sx={{ borderTop: "1px solid", borderColor: "divider" }}>
+            {inlineContent}
+          </Box>
+        )}
+      </ItemRowCard>
+      {!inlineContent && (
+        <Dialog open={preview} onClose={() => setPreview(false)} fullWidth maxWidth="sm">
+          <DialogContent sx={{ p: 0 }}>
+            <SharedPlayerSpellCard item={spell} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setPreview(false)} variant="contained">{t("Close")}</Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </>
   );
 }
@@ -769,8 +647,6 @@ function ClassSpellSection({
   theme,
   t,
 }) {
-  const [collapsed, setCollapsed] = useState(false);
-
   const spells = (cls.spells || [])
     .map((s, i) => ({ ...s, _idx: i }))
     .filter((s) => s.showInPlayerSheet || s.showInPlayerSheet === undefined);
@@ -788,144 +664,76 @@ function ClassSpellSection({
   if (!hasSpellTypes && spells.length === 0) return null;
 
   return (
-    <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
-      {/* Header bar */}
-      <Box
-        onClick={() => setCollapsed((v) => !v)}
-        sx={{
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          pl: "46px",
-          pr: "6px",
-          pt: "2.8px",
-          pb: "2.8px",
-          gap: "4px",
-          background: theme.primary,
-          cursor: "pointer",
-          userSelect: "none",
-        }}
-      >
-        <IconButton
-          size="small"
-          sx={{
-            position: "absolute",
-            left: "6px",
-            color: "#fff",
-            p: "2px",
-            pointerEvents: "none",
-          }}
-        >
-          {collapsed ? (
-            <KeyboardArrowDown sx={{ fontSize: "1.15rem" }} />
-          ) : (
-            <KeyboardArrowUp sx={{ fontSize: "1.15rem" }} />
-          )}
-        </IconButton>
-        <Typography
-          sx={{
-            flex: 1,
-            color: "#fff",
-            fontFamily: "Antonio",
-            fontSize: { xs: "0.75rem", sm: "0.875rem" },
-            textTransform: "uppercase",
-          }}
-        >
-          {t("Spells")} - {t(cls.name)}
-        </Typography>
-        {isEditMode && (
-          <Box
-            sx={{ display: "flex", gap: 0.25 }}
-            onClick={(e) => e.stopPropagation()}
-          >
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", mb: "4px" }}>
+      {isEditMode && (
+        <CompactSectionHeader title={`${t("Spells")} - ${t(cls.name)}`}>
+          <Box sx={{ display: "flex", gap: 0.25 }}>
             <Tooltip title={t("Add New Spell")}>
-              <IconButton
-                size="small"
-                sx={{ p: "2px", color: "#fff" }}
-                onClick={(e) => onOpenAddMenu(e, classIndex)}
-              >
+              <IconButton size="small" sx={{ p: "2px", color: "#fff" }} onClick={(e) => onOpenAddMenu(e, classIndex)}>
                 <Add sx={{ fontSize: "1.15rem" }} />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Search Compendium")}>
-              <IconButton
-                size="small"
-                sx={{ p: "2px", color: "#fff" }}
-                onClick={() => onOpenImportModal(classIndex)}
-              >
+              <IconButton size="small" sx={{ p: "2px", color: "#fff" }} onClick={() => onOpenImportModal(classIndex)}>
                 <Search sx={{ fontSize: "1.15rem" }} />
               </IconButton>
             </Tooltip>
             {pilotSpell && (
               <Tooltip title={t("Edit")}>
-                <IconButton
-                  size="small"
-                  sx={{ p: "2px", color: "#fff" }}
-                  onClick={() =>
-                    onEdit(pilotSpell, pilotSpell._idx, classIndex)
-                  }
-                >
+                <IconButton size="small" sx={{ p: "2px", color: "#fff" }} onClick={() => onEdit(pilotSpell, pilotSpell._idx, classIndex)}>
                   <Edit sx={{ fontSize: "1.15rem" }} />
                 </IconButton>
               </Tooltip>
             )}
           </Box>
-        )}
-      </Box>
-
-      {!collapsed && (
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-            gap: "4px",
-            p: "4px",
-          }}
-        >
-          {filtered.flatMap((spell) => {
-            if (spell.spellType === "pilot-vehicle") {
-              const vehicles = spell.vehicles ?? [];
-              if (vehicles.length === 0)
-                return [
-                  <Box
-                    key={`${classIndex}-${spell._idx}-empty`}
-                    sx={{
-                      gridColumn: "1 / -1",
-                      border: "1px solid",
-                      borderColor: "divider",
-                      borderRadius: `${theme.panelRadius}px`,
-                      px: 1.5,
-                      py: 1,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontSize: "0.8rem",
-                        color: "text.secondary",
-                        fontStyle: "italic",
-                      }}
-                    >
-                      {t("No vehicles")}
-                    </Typography>
-                  </Box>,
-                ];
-              return vehicles.map((vehicle, vi) => (
-                <VehicleCard
-                  key={`${classIndex}-${spell._idx}-v${vi}`}
-                  vehicle={vehicle}
-                  vehicleIndex={vi}
-                  spellIndex={spell._idx}
-                  classIndex={classIndex}
-                  searchQuery={searchQuery}
-                  setPlayer={setPlayer}
-                  theme={theme}
-                  t={t}
-                />
-              ));
-            }
-            return [
+        </CompactSectionHeader>
+      )}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+          gap: "4px",
+        }}
+      >
+        {filtered.flatMap((spell) => {
+          const hasInline = !!renderSpellContent(spell, null, "");
+          if (spell.spellType === "pilot-vehicle") {
+            const vehicles = spell.vehicles ?? [];
+            if (vehicles.length === 0)
+              return [
+                <Box
+                  key={`${classIndex}-${spell._idx}-empty`}
+                  sx={{
+                    gridColumn: "1 / -1",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: `${theme.panelRadius}px`,
+                    px: 1.5,
+                    py: 1,
+                  }}
+                >
+                  <Typography sx={{ fontSize: "0.8rem", color: "text.secondary", fontStyle: "italic" }}>
+                    {t("No vehicles")}
+                  </Typography>
+                </Box>,
+              ];
+            return vehicles.map((vehicle, vi) => (
+              <VehicleCard
+                key={`${classIndex}-${spell._idx}-v${vi}`}
+                vehicle={vehicle}
+                vehicleIndex={vi}
+                spellIndex={spell._idx}
+                classIndex={classIndex}
+                searchQuery={searchQuery}
+                setPlayer={setPlayer}
+                theme={theme}
+                t={t}
+              />
+            ));
+          }
+          return [
+            <Box key={`${classIndex}-${spell._idx}`} sx={hasInline ? { gridColumn: "1 / -1" } : undefined}>
               <SpellCard
-                key={`${classIndex}-${spell._idx}`}
                 spell={spell}
                 spellIndex={spell._idx}
                 classIndex={classIndex}
@@ -936,12 +744,12 @@ function ClassSpellSection({
                 onRoll={onRoll}
                 theme={theme}
                 t={t}
-              />,
-            ];
-          })}
-        </Box>
-      )}
-    </Paper>
+              />
+            </Box>,
+          ];
+        })}
+      </Box>
+    </Box>
   );
 }
 // MnemoSpellSection
@@ -964,54 +772,13 @@ function MnemoSpellSection({
 
   return (
     <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
-      <Box
-        onClick={() => setCollapsed((v) => !v)}
-        sx={{
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          pl: "46px",
-          pr: "6px",
-          pt: "2.8px",
-          pb: "2.8px",
-          gap: "4px",
-          background: theme.primary,
-          cursor: "pointer",
-          userSelect: "none",
-        }}
+      <CompactSectionHeader
+        title={t("Mnemosphere Spells")}
+        onToggle={() => setCollapsed((v) => !v)}
+        isCollapsed={collapsed}
       >
-        <IconButton
-          size="small"
-          sx={{
-            position: "absolute",
-            left: "6px",
-            color: "#fff",
-            p: "2px",
-            pointerEvents: "none",
-          }}
-        >
-          {collapsed ? (
-            <KeyboardArrowDown sx={{ fontSize: "1.15rem" }} />
-          ) : (
-            <KeyboardArrowUp sx={{ fontSize: "1.15rem" }} />
-          )}
-        </IconButton>
-        <Typography
-          sx={{
-            flex: 1,
-            color: "#fff",
-            fontFamily: "Antonio",
-            fontSize: { xs: "0.75rem", sm: "0.875rem" },
-            textTransform: "uppercase",
-          }}
-        >
-          {t("Mnemosphere Spells")}
-        </Typography>
         {isEditMode && (
-          <Box
-            sx={{ display: "flex", gap: 0.25 }}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <>
             <Tooltip title={t("Add New Spell")}>
               <span>
                 <IconButton
@@ -1036,9 +803,9 @@ function MnemoSpellSection({
                 </IconButton>
               </span>
             </Tooltip>
-          </Box>
+          </>
         )}
-      </Box>
+      </CompactSectionHeader>
 
       {!collapsed && (
         <Box

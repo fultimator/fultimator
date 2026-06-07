@@ -1,22 +1,26 @@
-import { useState, useEffect } from "react";
+import UnifiedSpellModal from "/src/components/shared/actors/pc/spells/modals/UnifiedSpellModal";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControlLabel,
-  Switch,
-  TextField,
-} from "@mui/material";
-import { useTranslate } from "/src/translation/translate";
-import { Close } from "@mui/icons-material";
-import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
-import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+  playerSpellFieldConfig,
+  playerSpellTabs,
+} from "/src/forms/rendering/config/itemConfigs/spells";
+
+const MAGITECH_EXCLUDED_KEYS = new Set(["spellType", "fuid", "name", "class"]);
+const magitechFieldConfig = playerSpellFieldConfig.filter(
+  (f) => !MAGITECH_EXCLUDED_KEYS.has(f.key),
+);
+
+function MagitechSettingsSection({ formState, setFormState }) {
+  return (
+    <TabbedSchemaFormRenderer
+      tabs={playerSpellTabs}
+      config={magitechFieldConfig}
+      state={{ spellType: "tinkerer-magitech", ...formState }}
+      onChange={setFormState}
+      surface="edit"
+    />
+  );
+}
 
 export default function SpellTinkererMagitechRankModal({
   open,
@@ -25,116 +29,22 @@ export default function SpellTinkererMagitechRankModal({
   onDelete,
   magitech,
 }) {
-  const { t } = useTranslate();
-
-  // Initialize state variables
-  const [selectedRank, setSelectedRank] = useState(magitech?.rank || 1);
-  const [spellName, setSpellName] = useState(magitech?.spellName || "");
-  const [showInPlayerSheet, setShowInPlayerSheet] = useState(
-    magitech?.showInPlayerSheet !== false,
-  );
-  const {
-    isOpen: deleteDialogOpen,
-    closeDialog: setDeleteDialogOpen,
-    handleDelete,
-  } = useDeleteConfirmation({
-    onConfirm: () => {},
-  });
-
-  // Update state if magitech prop changes
-  useEffect(() => {
-    if (magitech) {
-      setSelectedRank(magitech.rank || 1);
-      setSpellName(magitech.spellName || "");
-      setShowInPlayerSheet(!!magitech.showInPlayerSheet);
-    }
-  }, [magitech]);
-
-  const handleSave = () => {
-    onSave(magitech.index, {
-      ...magitech,
-      spellName,
-      rank: selectedRank,
-      showInPlayerSheet: showInPlayerSheet,
-    });
-  };
   return (
-    <Dialog
+    <UnifiedSpellModal
       open={open}
       onClose={onClose}
-      slotProps={{
-        paper: {
-          sx: {
-            width: "80%",
-            maxWidth: "lg",
-          },
+      onSave={onSave}
+      onDelete={onDelete}
+      spellType="tinkerer-magitech"
+      spell={magitech}
+      sections={[
+        {
+          id: "general",
+          title: "esper_settings_modal",
+          component: MagitechSettingsSection,
+          props: {},
         },
-      }}
-    >
-      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
-        {t("Select Rank")}
-      </DialogTitle>
-      <Button
-        aria-label="close"
-        onClick={onClose}
-        sx={{
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: (theme) => theme.palette.grey[500],
-        }}
-      >
-        <Close />
-      </Button>
-      <DialogContent sx={{ minWidth: 400 }}>
-        <TextField
-          fullWidth
-          label={t("Magitech Name")}
-          value={spellName}
-          onChange={(e) => setSpellName(e.target.value)}
-          margin="normal"
-          slotProps={{
-            htmlInput: { maxLength: 50 },
-          }}
-        />
-        <FormControl fullWidth sx={{ mt: 2 }}>
-          <InputLabel>{t("Select Rank")}</InputLabel>
-          <Select
-            value={selectedRank}
-            label={t("Select Rank")}
-            onChange={(e) => setSelectedRank(e.target.value)}
-          >
-            <MenuItem value={1}>{t("Basic")}</MenuItem>
-            <MenuItem value={2}>{t("Advanced")}</MenuItem>
-            <MenuItem value={3}>{t("Superior")}</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showInPlayerSheet}
-              onChange={(e) => setShowInPlayerSheet(e.target.checked)}
-            />
-          }
-          label={t("Show in Character Sheet")}
-          sx={{ mt: 2, display: "block" }}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button variant="contained" color="error" onClick={handleDelete}>
-          {t("Delete Magitech")}
-        </Button>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          {t("Save Changes")}
-        </Button>
-      </DialogActions>
-      <DeleteConfirmationDialog
-        open={deleteDialogOpen}
-        onClose={setDeleteDialogOpen}
-        onConfirm={() => onDelete(magitech.index)}
-        title={t("Delete")}
-        message={t("Are you sure you want to delete this magitech entry?")}
-      />
-    </Dialog>
+      ]}
+    />
   );
 }

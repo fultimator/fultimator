@@ -52,6 +52,8 @@ export type PlayerSpellFormState = {
   // tinkerer fields
   category: string;
   infusionRank: number | null;
+  rank: number;
+  spellName: string;
   // gift fields
   event: string;
   // therioform fields
@@ -71,10 +73,25 @@ export type PlayerSpellFormState = {
   icon: string;
   // cooking fields - array of { effect: string } objects for object-list renderer
   cookingEffects: Array<{ effect: string }>;
-  // magiseed fields
-  seedDescription: string;
-  seedRangeStart: number;
-  seedRangeEnd: number;
+  // magiseed garden fields
+  growthClock: number;
+  gardenDescription: string;
+  currentMagiseed: { name: string; customName?: string } | null;
+  magiseeds: Array<{
+    key: string;
+    customName?: string;
+    description?: string;
+    rangeStart?: number;
+    rangeEnd?: number;
+    effects?: Record<number, string>;
+  }>;
+  // magiseed seed fields (flat, used in Quick Create, packaged into magiseeds[0] by registry)
+  rangeStart: number;
+  rangeEnd: number;
+  "effects.0": string;
+  "effects.1": string;
+  "effects.2": string;
+  "effects.3": string;
   // meta fields
   "meta.book": string;
   "meta.page": number | undefined;

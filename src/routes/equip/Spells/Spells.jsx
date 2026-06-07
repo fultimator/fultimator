@@ -73,10 +73,6 @@ function buildInitialState() {
     wellspring: "",
     // cooking (excluded, zeroed)
     cookingEffects: [],
-    // magiseed (excluded, zeroed)
-    seedDescription: "",
-    seedRangeStart: 1,
-    seedRangeEnd: 6,
     // meta
     "meta.book": "",
     "meta.page": undefined,

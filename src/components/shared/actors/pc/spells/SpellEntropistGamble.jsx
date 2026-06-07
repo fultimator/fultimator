@@ -48,7 +48,6 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            flexGrow
             style={{
               display: "flex",
               alignItems: "center",
@@ -154,7 +153,6 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            flexGrow
             style={{
               display: "flex",
               alignItems: "center",

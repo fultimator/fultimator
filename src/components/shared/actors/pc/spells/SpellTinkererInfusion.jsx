@@ -19,37 +19,28 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const iconColor = isDarkMode ? "#ffffff" : "#000000";
+
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   const showInPlayerSheet =
     infusion.showInPlayerSheet || infusion.showInPlayerSheet === undefined;
 
-  const inlineStyles = {
-    margin: 0,
-    padding: 0,
-  };
-
-  const components = {
-    p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
-  };
-
   return (
     <>
-      <Accordion sx={{ marginY: 1 }}>
+      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Info />
           </Icon>
           <Typography variant="h4">{t("Infusion Details")}</Typography>
         </AccordionSummary>
-        <AccordionDetails>
-          <ReactMarkdown>
+        <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
             {t(
               "When you successfully hit one or more targets with an attack, you may spend 2 Inventory Points to produce a special **infusion** and apply the corresponding effect to that attack (if the attack had the **multi** property, apply the effects of the infusion to each target).",
             )}
           </ReactMarkdown>
-          <ReactMarkdown>
+          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
             {t(
               "You cannot apply more than one infusion to the same attack; producing and using an infusion are both part of the action you used to attack with the weapon.",
             )}
@@ -68,48 +59,25 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            flexGrow
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-            }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "left", minHeight: "40px" }}
             size="grow"
           >
-            <Typography
-              variant="h3"
-              style={{ flexGrow: 1, marginRight: "5px" }}
-            >
+            <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
               {t("Infusion")}
             </Typography>
           </Grid>
           <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "40px" }}
             size={8}
           >
             <Typography variant="h3">{t("Effect")}</Typography>
           </Grid>
         </Grid>
-        {isEditMode && (
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              flexShrink: 0,
-            }}
-            size="grow"
-          >
-            <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
-          </Grid>
-        )}
       </div>
       {/* Row 2 */}
       {infusion.rank >= 1 && (
@@ -125,7 +93,6 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -144,21 +111,16 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
             </Grid>
           </Grid>
           {isEditMode && (
-            <Grid
-              style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-              size="grow"
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
               {!showInPlayerSheet && (
                 <Tooltip title={t("Infusion not shown in player sheet")}>
-                  <Icon>
-                    <VisibilityOff style={{ color: "black" }} />
-                  </Icon>
+                  <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
                 </Tooltip>
               )}
-              <IconButton size="small" onClick={onEdit}>
-                <Edit style={{ color: iconColor }} />
+              <IconButton size="small" onClick={onEdit} sx={{ p: "3px" }}>
+                <Edit sx={{ fontSize: "1.1rem" }} />
               </IconButton>
-            </Grid>
+            </div>
           )}
         </div>
       )}
@@ -173,14 +135,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
-                marginBottom: "6px",
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -201,11 +161,11 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "flex-start",
                   }}
                   size={8}
                 >
-                  <ReactMarkdown components={components}>
+                  <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <span {...props} /> }}>
                     {effect.effect}
                   </ReactMarkdown>
                 </Grid>
@@ -226,7 +186,6 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -244,17 +203,6 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               </Typography>
             </Grid>
           </Grid>
-          {isEditMode && (
-            <Grid
-              style={{
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0,
-                minHeight: 34,
-              }}
-              size="grow"
-            ></Grid>
-          )}
         </div>
       )}
       {/* Row 3 */}
@@ -268,14 +216,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
-                marginBottom: "6px",
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -296,11 +242,11 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "flex-start",
                   }}
                   size={8}
                 >
-                  <ReactMarkdown components={components}>
+                  <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <span {...props} /> }}>
                     {effect.effect}
                   </ReactMarkdown>
                 </Grid>
@@ -321,7 +267,6 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -339,17 +284,6 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               </Typography>
             </Grid>
           </Grid>
-          {isEditMode && (
-            <Grid
-              style={{
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0,
-                minHeight: 34,
-              }}
-              size="grow"
-            ></Grid>
-          )}
         </div>
       )}
       {/* Row 3 */}
@@ -363,14 +297,12 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
-                marginBottom: "6px",
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -391,11 +323,11 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "flex-start",
                   }}
                   size={8}
                 >
-                  <ReactMarkdown components={components}>
+                  <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <span {...props} /> }}>
                     {effect.effect}
                   </ReactMarkdown>
                 </Grid>

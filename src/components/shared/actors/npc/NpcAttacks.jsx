@@ -14,6 +14,7 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { ATTR_SHORT, damageTypeLabels } from "./npcShared";
 import { SpanMarkdown, ClickableName } from "./NpcMarkdown";
 
@@ -30,6 +31,7 @@ function AttackRow({ attack, npc, attackType, showRoll }) {
       primary: npc.attributes?.[attack.accuracy?.attr1]?.base ?? 6,
       secondary: npc.attributes?.[attack.accuracy?.attr2]?.base ?? 6,
     };
+    const effectModifiers = accuracyModifiersFromEffects(npc, { range: attack.range });
     const intent = prepareAccuracyCheck({
       attr1: attr1Short,
       attr2: attr2Short,
@@ -42,7 +44,7 @@ function AttackRow({ attack, npc, attackType, showRoll }) {
       accuracyDefense: "def",
       range: attack.range,
       hrZero: attack.damage?.hrZero === true,
-    });
+    }, effectModifiers);
     const rolls = rollAccuracyCheck(dieSizes);
     const result = processAccuracyCheck(
       intent,

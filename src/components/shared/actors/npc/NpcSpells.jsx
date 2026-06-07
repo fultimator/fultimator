@@ -14,6 +14,7 @@ import {
   processMagicCheck,
   buildMagicCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/magic-checks";
+import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { ATTR_SHORT } from "./npcShared";
 import { StyledMarkdown, ClickableName } from "./NpcMarkdown";
 
@@ -52,6 +53,7 @@ function SpellRow({ spell, npc, showRoll }) {
       primary: npc.attributes?.[spell.accuracy?.attr1]?.base ?? 6,
       secondary: npc.attributes?.[spell.accuracy?.attr2]?.base ?? 6,
     };
+    const effectModifiers = accuracyModifiersFromEffects(npc);
     const intent = prepareMagicCheck({
       attr1: attr1Short,
       attr2: attr2Short,
@@ -62,7 +64,7 @@ function SpellRow({ spell, npc, showRoll }) {
       accuracyDefense: "mdef",
       damageHrZero: spell.damage?.hrZero === true,
       spellType: spell.spellType ?? "npc",
-    });
+    }, effectModifiers);
     const rolls = rollMagicCheck(dieSizes);
     const result = processMagicCheck(
       intent,

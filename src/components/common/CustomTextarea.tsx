@@ -7,6 +7,7 @@ interface CustomTextareaProps {
   id?: string;
   label: string;
   value: string;
+  previewValue?: string;
   helperText?: string;
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
@@ -14,6 +15,7 @@ interface CustomTextareaProps {
   onMouseOver?: (event: React.MouseEvent<HTMLElement>) => void;
   onMouseOut?: (event: React.MouseEvent<HTMLElement>) => void;
   readOnly?: boolean;
+  disabled?: boolean;
   minRows?: number;
   maxRows?: number;
   maxLength?: number;
@@ -24,6 +26,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   id,
   label,
   value,
+  previewValue,
   helperText = "",
   onChange,
   onFocus,
@@ -31,6 +34,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   onMouseOver,
   onMouseOut,
   readOnly = false,
+  disabled = false,
   minRows,
   maxRows,
   maxLength,
@@ -182,6 +186,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
           helperText={helperText}
           variant="outlined"
           fullWidth
+          disabled={disabled}
           sx={textFieldSx}
         />
 
@@ -207,7 +212,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
               },
             }}
           >
-            <ReactMarkdown>{value}</ReactMarkdown>
+            <ReactMarkdown>{previewValue ?? value}</ReactMarkdown>
           </Box>
         ) : null}
       </Box>

@@ -1,18 +1,15 @@
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
+import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 
-/**
- * Standard section header bar used across compact panels.
- * Matches the standardized pl/pr/pt/pb padding from BackpackTab spec.
- *
- * @param {string}    title    - section title text
- * @param {ReactNode} children - optional action buttons rendered after the title
- */
-export default function CompactSectionHeader({ title, children }) {
+export default function CompactSectionHeader({ title, children, onToggle, isCollapsed }) {
   const theme = useCustomTheme();
+  const collapsible = typeof onToggle === "function";
   return (
     <Box
+      onClick={collapsible ? onToggle : undefined}
       sx={{
+        position: "relative",
         display: "flex",
         alignItems: "center",
         pl: "46px",
@@ -20,20 +17,40 @@ export default function CompactSectionHeader({ title, children }) {
         pt: "2.8px",
         pb: "2.8px",
         background: theme.primary,
+        ...(collapsible ? { cursor: "pointer", userSelect: "none" } : {}),
       }}
     >
+      {collapsible && (
+        <IconButton
+          size="small"
+          sx={{ position: "absolute", left: "6px", color: "#fff", p: "2px", pointerEvents: "none" }}
+        >
+          {isCollapsed ? (
+            <KeyboardArrowDown sx={{ fontSize: "1.15rem" }} />
+          ) : (
+            <KeyboardArrowUp sx={{ fontSize: "1.15rem" }} />
+          )}
+        </IconButton>
+      )}
       <Typography
         sx={{
           flex: 1,
           color: "#fff",
           fontFamily: "Antonio",
-          fontSize: { xs: "0.75rem", sm: "0.875rem" },
+          fontSize: "0.9rem",
           textTransform: "uppercase",
         }}
       >
         {title}
       </Typography>
-      {children}
+      {children && (
+        <Box
+          sx={{ display: "flex", gap: 0.25 }}
+          onClick={collapsible ? (e) => e.stopPropagation() : undefined}
+        >
+          {children}
+        </Box>
+      )}
     </Box>
   );
 }

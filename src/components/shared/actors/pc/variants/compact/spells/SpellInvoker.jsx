@@ -24,6 +24,7 @@ export default function SpellInvoker({ spell, setPlayer }) {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  if (!spell) return null;
   const availableInvocations =
     spell.availableInvocations && spell.availableInvocations.length > 0
       ? spell.availableInvocations

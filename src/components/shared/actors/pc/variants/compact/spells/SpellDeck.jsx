@@ -84,10 +84,10 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
   // derived state
 
   const cardsInDeck =
-    spell.fullDeck?.length ??
-    (spell.cardsInDeck !== undefined ? spell.cardsInDeck : 30);
-  const hand = spell.hand || [];
-  const discardPile = spell.discardPile || [];
+    spell?.fullDeck?.length ??
+    (spell?.cardsInDeck !== undefined ? spell.cardsInDeck : 30);
+  const hand = spell?.hand || [];
+  const discardPile = spell?.discardPile || [];
   const totalTracked = cardsInDeck + hand.length + discardPile.length;
 
   // deck actions
@@ -110,7 +110,7 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
         }),
       }));
     },
-    [spell.className, setPlayer],
+    [spell?.className, setPlayer],
   );
 
   const drawCards = (num = 1) => {
@@ -245,6 +245,8 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
       return { type: "Magic Pair", cards: sorted };
     return null;
   }, []);
+
+  if (!spell) return null;
 
   const getSetEffect = (setType, cards) => {
     const totalValue = cards.reduce(

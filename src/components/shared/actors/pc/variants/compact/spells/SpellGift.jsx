@@ -26,6 +26,7 @@ export default function SpellGift({ spell, setPlayer }) {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  if (!spell) return null;
   const clock = spell.clock || 0;
   const getClockProgress = (c) => (c / 4) * 100;
 

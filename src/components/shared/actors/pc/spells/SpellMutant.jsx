@@ -5,12 +5,12 @@ import {
   ThemeProvider,
   Tooltip,
   Icon,
+  IconButton,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, Transform } from "@mui/icons-material";
+import { VisibilityOff, ExpandMore, Transform, Edit } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -35,38 +35,17 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
 
   return (
     <>
-      <Accordion sx={{ marginY: 1 }}>
+      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Transform />
           </Icon>
           <Typography variant="h4">{t("mutant_details")}</Typography>
         </AccordionSummary>
-        <AccordionDetails>
-          <ReactMarkdown>{t("mutant_details_1")}</ReactMarkdown>
+        <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+          <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("mutant_details_1")}</ReactMarkdown>
         </AccordionDetails>
       </Accordion>
-      {isEditMode && (
-        <Grid
-          style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow"
-        >
-          <Button
-            onClick={onEdit}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("mutant_settings_button")}
-          </Button>
-          {!showInPlayerSheet && (
-            <Tooltip title={t("mutant_therioforms_not_shown_tooltip")}>
-              <Icon>
-                <VisibilityOff style={{ color: "black" }} />
-              </Icon>
-            </Tooltip>
-          )}
-        </Grid>
-      )}
       {/* THERIOFORMS */}
       <div
         style={{
@@ -79,7 +58,7 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
-          marginTop: "20px",
+          alignItems: "center",
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -122,6 +101,18 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
             </Typography>
           </Grid>
         </Grid>
+        {isEditMode && (
+          <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+            {!showInPlayerSheet && (
+              <Tooltip title={t("mutant_therioforms_not_shown_tooltip")}>
+                <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+              </Tooltip>
+            )}
+            <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+              <Edit sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </div>
+        )}
       </div>
       {mutant.therioforms && mutant.therioforms.length === 0 ? (
         <Typography
@@ -184,17 +175,6 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                   </ReactMarkdown>
                 </Grid>
               </Grid>
-              {isEditMode && (
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexShrink: 0,
-                    minHeight: 34,
-                  }}
-                  size="grow"
-                ></Grid>
-              )}
             </div>
             <Grid
               container

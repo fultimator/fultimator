@@ -344,6 +344,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
             isOfficial: s["meta.isOfficial"],
           }
         : undefined;
+      const showInPlayerSheet = s.showInPlayerSheet ?? true;
 
       // default spell: flat fields from form state
       if (spellType === "default") {
@@ -353,7 +354,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
           name: s.name.trim(),
           fuid: s.fuid || undefined,
           meta: metaObj,
-          showInPlayerSheet: true,
+          showInPlayerSheet,
           description: s.description.trim(),
           isOffensive: s.isOffensive,
           cost: {
@@ -384,7 +385,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         name: s.name.trim(),
         fuid: s.fuid || undefined,
         meta: metaObj,
-        showInPlayerSheet: true,
+        showInPlayerSheet,
         spellType,
       };
 
@@ -575,22 +576,36 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
       }
 
       if (spellType === "magiseed") {
+        const extra = s as unknown as Record<string, unknown>;
+        const importedSeeds = extra.magiseeds as typeof s.magiseeds | undefined;
+        const effects = {
+          0: s["effects.0"] ?? "",
+          1: s["effects.1"] ?? "",
+          2: s["effects.2"] ?? "",
+          3: s["effects.3"] ?? "",
+        };
+        const hasSeedData =
+          importedSeeds ||
+          s.rangeStart !== 0 ||
+          s.rangeEnd !== 3 ||
+          Object.values(effects).some((v) => v !== "");
+        const seeds: typeof s.magiseeds = importedSeeds ?? (hasSeedData ? [
+          {
+            key: s.name?.trim() || "magiseed_custom",
+            customName: "",
+            description: s.description ?? "",
+            rangeStart: s.rangeStart ?? 0,
+            rangeEnd: s.rangeEnd ?? 3,
+            effects,
+          },
+        ] : []);
         return {
           ...base,
           spellType: "magiseed" as const,
           growthClock: 0,
-          gardenDescription: "",
+          gardenDescription: s.gardenDescription ?? "",
           currentMagiseed: null,
-          magiseeds: [
-            {
-              key: s.name.trim() || "magiseed_custom",
-              customName: "",
-              description: s.seedDescription.trim(),
-              rangeStart: s.seedRangeStart,
-              rangeEnd: s.seedRangeEnd,
-              effects: {},
-            },
-          ],
+          magiseeds: seeds,
         };
       }
 
@@ -606,7 +621,8 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         return {
           ...base,
           spellType: "tinkerer-magitech" as const,
-          rank: 1,
+          spellName: s.spellName?.trim() || "",
+          rank: typeof s.rank === "number" ? s.rank : 1,
           magispheres: [],
         };
       }

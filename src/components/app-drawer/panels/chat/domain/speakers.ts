@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { useDatabase } from "../../../../../hooks/useDatabase";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
+import { applyPostLoadTransforms } from "../../../../../libs/actor/playerTransforms";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
@@ -47,6 +48,7 @@ export type SpellOption = {
   accuracyDefense?: "def" | "mdef" | string;
   damageType?: string;
   damageHrZero?: boolean;
+  extraTags?: string[];
 };
 
 function quoteArg(name: string): string {
@@ -622,7 +624,7 @@ export const useRouteActor = (): {
   const cloudDb = useDatabase("cloud");
 
   const playerIdMatch = location.pathname.match(
-    /^\/(?:player-edit|pc-gallery)\/([^/]+)$/,
+    /^\/(?:player-edit|pc-gallery|character-sheet)\/([^/]+)$/,
   );
   const npcIdMatch = location.pathname.match(/^\/npc-gallery\/([^/]+)$/);
   const playerId = playerIdMatch?.[1] ?? "";
@@ -663,8 +665,19 @@ export const useRouteActor = (): {
     unknown,
   ];
 
+  const rawPlayerDoc = localPlayerDoc ?? cloudPlayerDoc ?? null;
+  const playerDoc = useMemo(
+    () =>
+      rawPlayerDoc
+        ? (applyPostLoadTransforms(
+            rawPlayerDoc as unknown as TypePlayer,
+          ) as unknown as Record<string, unknown>)
+        : null,
+    [rawPlayerDoc],
+  );
+
   return {
-    playerDoc: localPlayerDoc ?? cloudPlayerDoc ?? null,
+    playerDoc,
     npcDoc: localNpcDoc ?? cloudNpcDoc ?? null,
   };
 };

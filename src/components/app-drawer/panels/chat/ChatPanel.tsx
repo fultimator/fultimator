@@ -563,6 +563,49 @@ export const ChatPanel: React.FC = () => {
     ],
   );
 
+  const handleResourceChange = useCallback(
+    (
+      _message: import("./types").DisplayMessage,
+      resource: import("./ChatActionsContext.shared").ResourceKind,
+      amount: number,
+      direction: "loss" | "gain",
+    ) => {
+      if (!activeActorDoc) return;
+      const delta = direction === "loss" ? -amount : amount;
+      let updated: TypePlayer;
+      if (resource === "fp") {
+        const doc = activeActorDoc as unknown as { info?: { fabulapoints?: number } };
+        const current = doc.info?.fabulapoints ?? 0;
+        const next = Math.max(0, current + delta);
+        updated = {
+          ...activeActorDoc,
+          info: { ...doc.info, fabulapoints: next },
+        } as unknown as TypePlayer;
+      } else if (resource === "up") {
+        const doc = activeActorDoc as unknown as { villain?: string; combatStats?: { ultima?: number } };
+        const current = doc.combatStats?.ultima ?? 0;
+        const villainUpMax = doc.villain === "minor" ? 5 : doc.villain === "major" ? 10 : doc.villain === "supreme" ? 15 : 5;
+        const next = Math.max(0, Math.min(current + delta, villainUpMax));
+        updated = {
+          ...activeActorDoc,
+          combatStats: { ...doc.combatStats, ultima: next },
+        } as unknown as TypePlayer;
+      } else {
+        const stats = (activeActorDoc as unknown as { stats?: Record<string, { current?: number; max?: number }> }).stats;
+        const stat = stats?.[resource];
+        const current = stat?.current ?? 0;
+        const max = stat?.max ?? 0;
+        const next = Math.max(0, Math.min(current + delta, max));
+        updated = {
+          ...activeActorDoc,
+          stats: { ...stats, [resource]: { ...stat, current: next } },
+        } as unknown as TypePlayer;
+      }
+      setActiveActorDoc(updated);
+    },
+    [activeActorDoc, setActiveActorDoc],
+  );
+
   useEffect(() => {
     if (!pendingVehicleToggle) return;
     setPendingVehicleToggle(false);
@@ -653,6 +696,8 @@ export const ChatPanel: React.FC = () => {
         value={{
           onOppose: activeActorDoc ? handleOppose : null,
           onRerollOpposed: activeActorDoc ? handleRerollOpposed : null,
+          onLossResource: activeActorDoc ? (msg, resource, amount) => handleResourceChange(msg, resource, amount, "loss") : null,
+          onGainResource: activeActorDoc ? (msg, resource, amount) => handleResourceChange(msg, resource, amount, "gain") : null,
           selectedSpeaker,
         }}
       >

@@ -9,6 +9,8 @@ export const isTinkererAlchemy = (s: PlayerSpellFormState) =>
   s.spellType === "tinkerer-alchemy";
 export const isTinkererInfusion = (s: PlayerSpellFormState) =>
   s.spellType === "tinkerer-infusion";
+export const isTinkererMagitech = (s: PlayerSpellFormState) =>
+  s.spellType === "tinkerer-magitech";
 export const isPilot = (s: PlayerSpellFormState) =>
   s.spellType === "pilot-vehicle";
 export const isGift = (s: PlayerSpellFormState) => s.spellType === "gift";

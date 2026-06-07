@@ -2061,7 +2061,7 @@ export const spellList = [
     range: "ranged",
     itemType: "spell",
     special: [],
-    damage: { value: 20, type: "earth", hrZero: false },
+    damage: { value: 25, type: "earth", hrZero: false },
   },
   {
     fuid: "elemental-shroud",

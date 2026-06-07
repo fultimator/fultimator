@@ -49,6 +49,22 @@ export default function PcCompactCompanion({ player, searchQuery = "" }) {
 
   const sl = faithfulCompanionSkills[0].currentLvl;
 
+  const companionWithBonus = sl > 0
+    ? {
+        ...companion,
+        effects: [
+          ...(companion.effects ?? []),
+          {
+            id: "faithful-companion-sl-bonus",
+            name: "Faithful Companion",
+            changes: [
+              { key: "bonuses.accuracy.all", mode: 2, value: String(sl) },
+            ],
+          },
+        ],
+      }
+    : companion;
+
   return (
     <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
       {/* Header bar */}
@@ -101,7 +117,7 @@ export default function PcCompactCompanion({ player, searchQuery = "" }) {
       </Box>
 
       <Box sx={{ p: "4px" }}>
-        <NpcActorCard npc={companion} collapse={true} />
+        <NpcActorCard npc={companionWithBonus} collapse={true} />
       </Box>
     </Paper>
   );

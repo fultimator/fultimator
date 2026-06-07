@@ -23,6 +23,7 @@ export default function SpellGourmet({ spell }) {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  if (!spell) return null;
 
   const renderEffectWithChoices = (effect, t) => {
     let displayText = effect.effect;

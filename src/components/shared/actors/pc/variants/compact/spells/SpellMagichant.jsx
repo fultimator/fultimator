@@ -132,9 +132,9 @@ export default function SpellMagichant({ spell }) {
         {spell.keys?.map((key, i) => (
           <TableRow key={`key-${i}`}>
             <StyledTableCell sx={{ fontWeight: "bold" }}>
-              {key.name === "magichant_custom_name"
+              {key.key === "magichant_custom_name"
                 ? key.customName
-                : t(key.name)}
+                : t(key.key)}
             </StyledTableCell>
             <StyledTableCell sx={{ textAlign: "center", fontSize: "0.7rem" }}>
               {t(key.type)}
@@ -165,15 +165,15 @@ export default function SpellMagichant({ spell }) {
         {spell.tones?.map((tone, i) => (
           <TableRow key={`tone-${i}`}>
             <StyledTableCell sx={{ fontWeight: "bold" }}>
-              {tone.name === "magichant_custom_name"
+              {tone.key === "magichant_custom_name"
                 ? tone.customName
-                : t(tone.name)}
+                : t(tone.key)}
             </StyledTableCell>
             <StyledTableCell colSpan={3} sx={{ fontSize: "0.75rem" }}>
               <ReactMarkdown
                 components={{ p: ({ _node, ...props }) => <span {...props} /> }}
               >
-                {tone.name === "magichant_custom_name"
+                {tone.key === "magichant_custom_name"
                   ? tone.effect
                   : t(tone.effect)}
               </ReactMarkdown>

@@ -16,18 +16,16 @@ export default function GambleExplain() {
   const primary = theme.palette.primary.main;
 
   return (
-    <div style={{ marginBottom: "8px" }}>
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Icon sx={{ color: primary, marginRight: 1 }}>
-            <Info />
-          </Icon>
-          <Typography variant="h4">{t("Gamble Details")}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <ReactMarkdown>{t("GambleSpell_desc")}</ReactMarkdown>
-        </AccordionDetails>
-      </Accordion>
-    </div>
+    <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <AccordionSummary expandIcon={<ExpandMore />}>
+        <Icon sx={{ color: primary, marginRight: 1 }}>
+          <Info />
+        </Icon>
+        <Typography variant="h4">{t("Gamble Details")}</Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+        <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("GambleSpell_desc")}</ReactMarkdown>
+      </AccordionDetails>
+    </Accordion>
   );
 }

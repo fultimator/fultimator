@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import {
   Typography,
-  Grid,
   ThemeProvider,
   Tooltip,
   Icon,
+  IconButton,
+  Button,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button,
-  LinearProgress,
+  Box,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, CardGiftcard } from "@mui/icons-material";
+import { VisibilityOff, ExpandMore, CardGiftcard, Edit } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -25,7 +25,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
 
   const [localClock, setLocalClock] = useState(gift.clock || 0);
 
-  // Sync local clock when prop changes
   useEffect(() => {
     setLocalClock(gift.clock || 0);
   }, [gift.clock]);
@@ -35,16 +34,11 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
 
   const clock = localClock;
 
-  const inlineStyles = {
-    margin: 0,
-    padding: 0,
-  };
-
+  const inlineStyles = { margin: 0, padding: 0 };
   const components = {
     p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
 
-  // Convert clock value to clock state array for Clock component
   const getClockState = () => {
     const state = [false, false, false, false];
     for (let i = 0; i < clock && i < 4; i++) {
@@ -53,291 +47,197 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
     return state;
   };
 
-  // Clock progress (0-4 sections)
-  const getClockProgress = () => {
-    return (clock / 4) * 100;
-  };
-
-  // Handle clock state changes from Clock component
   const handleClockStateChange = (newState) => {
     const filledSections = newState.reduce(
       (count, section) => count + (section ? 1 : 0),
       0,
     );
     setLocalClock(filledSections);
-    if (onClockChange) {
-      onClockChange(filledSections);
-    }
+    if (onClockChange) onClockChange(filledSections);
   };
 
-  // Handle clock reset from right-click
   const handleClockReset = () => {
     setLocalClock(0);
-    if (onClockChange) {
-      onClockChange(0);
-    }
+    if (onClockChange) onClockChange(0);
   };
 
   const updateClock = (newValue) => {
     const clampedValue = Math.max(0, Math.min(4, newValue));
     setLocalClock(clampedValue);
-    if (onClockChange) {
-      onClockChange(clampedValue);
-    }
+    if (onClockChange) onClockChange(clampedValue);
   };
 
   return (
     <>
-      <Accordion sx={{ marginY: 1 }}>
+      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <CardGiftcard />
           </Icon>
           <Typography variant="h4">{t("esper_details")}</Typography>
         </AccordionSummary>
-        <AccordionDetails>
-          <ReactMarkdown>{t("esper_details_1")}</ReactMarkdown>
+        <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+          <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+            {t("esper_details_1")}
+          </ReactMarkdown>
         </AccordionDetails>
       </Accordion>
-      {isEditMode && (
-        <Grid
-          style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow"
-        >
-          <Button
-            onClick={onEdit}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("esper_settings_button")}
-          </Button>
-          {!showInPlayerSheet && (
-            <Tooltip title={t("Gifts not shown in player sheet")}>
-              <Icon>
-                <VisibilityOff style={{ color: "black" }} />
-              </Icon>
-            </Tooltip>
-          )}
-        </Grid>
-      )}
-      {/* GIFTS AND CLOCK HEADER */}
-      <div
-        style={{
+
+      {/* HEADER */}
+      <Box
+        sx={{
           backgroundColor: theme.primary,
           fontFamily: "Antonio",
           fontWeight: "normal",
           fontSize: "1.1em",
-          padding: "2px 17px",
+          px: "17px",
+          py: "2px",
           color: theme.white,
           textTransform: "uppercase",
           display: "flex",
-          justifyContent: "space-between",
-          marginTop: "20px",
+          alignItems: "center",
+          minHeight: "40px",
+          gap: "12px",
         }}
       >
-        <Grid container style={{ flexGrow: 1 }}>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-              minHeight: "40px",
-            }}
-            size={6}
-          >
-            <Typography
-              variant="h3"
-              style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
-            >
-              {t("esper_psychic_gifts")}
-            </Typography>
-          </Grid>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyPosition: "left",
-              minHeight: "40px",
-            }}
-            size={6}
-          >
-            <Typography
-              variant="h3"
-              style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
-            >
-              {t("esper_brainwave_clock")}
-            </Typography>
-          </Grid>
-        </Grid>
-      </div>
-      {/* CLOCK SECTION */}
-      <div
-        style={{
-          background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-          padding: "10px 17px",
+        <Typography variant="h3" sx={{ flex: 1, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          {t("esper_psychic_gifts")}
+        </Typography>
+        <Typography variant="h3" sx={{ flexShrink: 0, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          {t("esper_brainwave_clock")}
+        </Typography>
+        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          {isEditMode && (
+            <>
+              {!showInPlayerSheet && (
+                <Tooltip title={t("Gifts not shown in player sheet")}>
+                  <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+                </Tooltip>
+              )}
+              <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+                <Edit sx={{ fontSize: "1.1rem" }} />
+              </IconButton>
+            </>
+          )}
+        </Box>
+      </Box>
+
+      {/* BRAINWAVE CLOCK ROW */}
+      <Box
+        sx={{
           display: "flex",
-          justifyContent: "space-between",
+          alignItems: "stretch",
+          minHeight: 80,
           borderTop: `1px solid ${theme.secondary}`,
           borderBottom: `1px solid ${theme.secondary}`,
-          marginBottom: "10px",
+          mb: "10px",
         }}
       >
-        <Grid container style={{ flexGrow: 1 }}>
-          <Grid
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-            size={6}
-          >
-            <Typography variant="body2">
-              {t("esper_brainwave_clock")}
-            </Typography>
-          </Grid>
-          <Grid
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "flex-start",
-            }}
-            size={6}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              {/* Brainwave Clock Visual */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Clock
-                  numSections={4}
-                  size={60}
-                  state={getClockState()}
-                  setState={handleClockStateChange}
-                  isCharacterSheet={false}
-                  onReset={handleClockReset}
-                />
-                <Typography variant="caption" sx={{ mt: 0.5 }}>
-                  {clock}/4
-                </Typography>
-              </div>
+        {/* Left: label */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            px: "17px",
+            background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Typography sx={{ fontWeight: "bold", lineHeight: 1.2 }}>
+            {t("esper_brainwave_clock")}
+          </Typography>
+        </Box>
 
-              {/* Linear Progress Bar */}
-              <div style={{ flex: 1, minWidth: "80px" }}>
-                <LinearProgress
-                  variant="determinate"
-                  value={getClockProgress()}
+        {/* Right: clock strip */}
+        <Box
+          sx={{
+            bgcolor: theme.primary,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: "12px",
+            gap: 1.5,
+          }}
+        >
+          <Box sx={{ borderRadius: "50%", bgcolor: theme.ternary, p: "3px", flexShrink: 0, display: "flex" }}>
+            <Clock
+              numSections={4}
+              size={56}
+              state={getClockState()}
+              setState={handleClockStateChange}
+              isCharacterSheet={false}
+              onReset={handleClockReset}
+            />
+          </Box>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.75 }}>
+            {isEditMode ? (
+              <Box sx={{ display: "flex", alignItems: "baseline", gap: "2px" }}>
+                <Box
+                  component="input"
+                  type="number"
+                  value={clock}
+                  onChange={(e) => updateClock(parseInt(e.target.value) || 0)}
                   sx={{
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: theme.secondary + "40",
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: theme.primary,
-                    },
+                    fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "0.08em",
+                    color: theme.white, background: "transparent", border: "none",
+                    borderBottom: `2px solid ${theme.white}`, outline: "none",
+                    width: 36, textAlign: "center", lineHeight: 1,
+                    "&::-webkit-inner-spin-button": { display: "none" },
                   }}
                 />
-                <div
-                  style={{
-                    marginTop: "8px",
-                    display: "flex",
-                    gap: "4px",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => updateClock(clock - 1)}
-                    disabled={clock === 0}
-                  >
-                    -
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => updateClock(clock + 1)}
-                    disabled={clock === 4}
-                  >
-                    +
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => updateClock(0)}
-                  >
-                    {t("Reset")}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Grid>
-        </Grid>
-      </div>
-      {/* GIFTS HEADER */}
-      <div
-        style={{
+                <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", color: theme.white, lineHeight: 1 }}>
+                  /4
+                </Typography>
+              </Box>
+            ) : (
+              <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "0.08em", color: theme.white, lineHeight: 1 }}>
+                {clock}/4
+              </Typography>
+            )}
+            <Box sx={{ display: "flex", gap: "4px" }}>
+              <Button size="small" onClick={() => updateClock(clock - 1)} disabled={clock === 0}
+                style={{ minWidth: 32, height: 28, padding: 0, border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800 }}>-</Button>
+              <Button size="small" onClick={() => updateClock(clock + 1)} disabled={clock === 4}
+                style={{ minWidth: 32, height: 28, padding: 0, border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800 }}>+</Button>
+              <Button size="small" onClick={() => updateClock(0)}
+                style={{ minWidth: 46, height: 28, padding: "0 4px", border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800, fontSize: "0.7rem" }}>{t("Reset")}</Button>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* GIFTS TABLE HEADER */}
+      <Box
+        sx={{
           backgroundColor: theme.primary,
           fontFamily: "Antonio",
           fontWeight: "normal",
           fontSize: "1.1em",
-          padding: "2px 17px",
+          px: "17px",
+          py: "2px",
           color: theme.white,
           textTransform: "uppercase",
           display: "flex",
-          justifyContent: "space-between",
+          alignItems: "center",
+          minHeight: "40px",
         }}
       >
-        <Grid container style={{ flexGrow: 1 }}>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-              minHeight: "40px",
-            }}
-            size={8}
-          >
-            <Typography
-              variant="h3"
-              style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
-            >
-              {t("esper_psychic_gifts")}
-            </Typography>
-          </Grid>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-              minHeight: "40px",
-            }}
-            size={4}
-          >
-            <Typography
-              variant="h3"
-              style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
-            >
-              {t("esper_events")}
-            </Typography>
-          </Grid>
-        </Grid>
-      </div>
+        <Box sx={{ flex: "0 0 66.67%", display: "flex", alignItems: "center" }}>
+          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+            {t("esper_psychic_gifts")}
+          </Typography>
+        </Box>
+        <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+            {t("esper_events")}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* GIFTS LIST */}
       {gift.gifts && gift.gifts.length === 0 ? (
         <Typography
           sx={{
@@ -354,92 +254,47 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
         gift.gifts &&
         gift.gifts.map((gft, i) => (
           <React.Fragment key={i}>
-            <div
-              style={{
+            {/* Gift name + event row */}
+            <Box
+              sx={{
                 background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                padding: "3px 17px",
+                px: "17px",
+                py: "3px",
                 display: "flex",
-                justifyContent: "space-between",
+                alignItems: "center",
                 borderTop: `1px solid ${theme.secondary}`,
                 borderBottom: `1px solid ${theme.secondary}`,
+                minHeight: "36px",
               }}
             >
-              <Grid container style={{ flexGrow: 1 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={8}
-                >
-                  <Typography
-                    style={{ flexGrow: 1, marginRight: "5px" }}
-                    sx={{
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {gft.name === "esper_gift_custom_name"
-                      ? gft.customName
-                      : t(gft.name)}
-                  </Typography>
-                </Grid>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={4}
-                >
-                  <ReactMarkdown components={components}>
-                    {gft.name === "gift_custom_name"
-                      ? gft.event
-                      : gft.event && gft.event.startsWith("esper_event_")
-                        ? t(gft.event)
-                        : gft.event}
-                  </ReactMarkdown>
-                </Grid>
-              </Grid>
-              {isEditMode && (
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexShrink: 0,
-                    minHeight: 34,
-                  }}
-                  size="grow"
-                ></Grid>
-              )}
-            </div>
-            <Grid
-              container
+              <Box sx={{ flex: "0 0 66.67%", display: "flex", alignItems: "center" }}>
+                <Typography sx={{ fontWeight: "bold" }}>
+                  {gft.name === "esper_gift_custom_name" ? gft.customName : t(gft.name)}
+                </Typography>
+              </Box>
+              <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+                <ReactMarkdown components={components}>
+                  {gft.name === "gift_custom_name"
+                    ? gft.event
+                    : gft.event && gft.event.startsWith("esper_event_")
+                      ? t(gft.event)
+                      : gft.event}
+                </ReactMarkdown>
+              </Box>
+            </Box>
+            {/* Effect row */}
+            <Box
               sx={{
-                justifyContent: "flex-start",
-                background: "transparent",
-                padding: "3px 17px",
-                marginBottom: "6px",
+                px: "17px",
+                py: "3px",
+                mb: "6px",
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
             >
-              <Grid container style={{ flexGrow: 1 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={12}
-                >
-                  <ReactMarkdown components={components}>
-                    {gft.name === "gift_custom_name"
-                      ? gft.effect
-                      : t(gft.effect)}
-                  </ReactMarkdown>
-                </Grid>
-              </Grid>
-            </Grid>
+              <ReactMarkdown components={components}>
+                {gft.name === "gift_custom_name" ? gft.effect : t(gft.effect)}
+              </ReactMarkdown>
+            </Box>
           </React.Fragment>
         ))
       )}

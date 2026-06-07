@@ -82,6 +82,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
   if (check.intent.hands === 2) tags.push("Two-handed");
   else if (check.intent.hands === 1) tags.push("One-handed");
   if (check.intent.defense) tags.push(String(check.intent.defense).toUpperCase());
+  if (check.intent.extraTags) tags.push(...check.intent.extraTags);
   if (check.intent.hrZero) tags.push("HR0");
   if (check.critical) tags.push("Critical");
   if (check.fumble) tags.push("Fumble");

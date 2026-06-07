@@ -11,7 +11,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-
+  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -67,6 +67,15 @@ import {
 import useSphereBank from "/src/hooks/useSphereBank";
 import SectionCard from "./SectionCard";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
+import SelectCompanionModal from "/src/components/shared/actors/pc/editors/classes/SelectCompanionModal";
+import {
+  firestore,
+  query,
+  orderBy,
+  collection,
+  where,
+  getDocs,
+} from "@platform/db";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 import { SharedSkillCard, SharedHeroicCard } from "/src/components/shared/items/class/SharedClassCards";
 import { SharedPlayerSpellCard } from "/src/components/shared/items/spells/SharedSpellCards";
@@ -671,6 +680,53 @@ function SpellTypeAccordion({ spellType, spells, classIdx, onUpdate, searchQuery
 function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, onLevelChange, onRemoveClass, onEditClass, pc, searchQuery, setHeroicPickerClassIdx, compact, defaultExpanded = false, forceExpanded, theme, t }) {
   const [collapsed, setCollapsedState] = useState(compact ? true : !defaultExpanded);
   const [preview, setPreview] = useState(null);
+  const [companionModalOpen, setCompanionModalOpen] = useState(false);
+  const [selectedCompanion, setSelectedCompanion] = useState(cls.companion ?? null);
+  const [companionList, setCompanionList] = useState([]);
+  const [companionLoading, setCompanionLoading] = useState(false);
+  const [companionErr, setCompanionErr] = useState(null);
+
+  const isFaithfulCompanionSkill = (sk) =>
+    sk.specialSkill === "Faithful Companion" ||
+    sk.fuid === "faithful-companion" ||
+    sk.skillName === "Faithful Companion";
+
+  const faithfulCompanionSkill = (cls.skills || []).find(
+    (sk) => isFaithfulCompanionSkill(sk) && sk.currentLvl > 0,
+  );
+  const allFaithfulSkills = (pc?.classes || [])
+    .flatMap((c) => c.skills || [])
+    .filter((sk) => isFaithfulCompanionSkill(sk) && sk.currentLvl > 0);
+  const showCompanionSection = Boolean(faithfulCompanionSkill) && allFaithfulSkills.length >= 1;
+
+  useEffect(() => {
+    if (!showCompanionSection || !isInteractive) return;
+    setCompanionLoading(true);
+    setCompanionErr(null);
+    const companionsQuery = query(
+      collection(firestore, "npc-personal"),
+      where("uid", "==", pc.uid),
+      where("rank", "==", "companion"),
+      orderBy("lvl", "asc"),
+      orderBy("name", "asc"),
+    );
+    getDocs(companionsQuery)
+      .then((snap) => setCompanionList(snap.docs.map((d) => ({ ...d.data(), id: d.id }))))
+      .catch((e) => setCompanionErr(e.message))
+      .finally(() => setCompanionLoading(false));
+  }, [showCompanionSection, isInteractive, pc?.uid]);
+
+  const handleSaveCompanion = () => {
+    if (!onUpdate || selectedCompanion === null) return;
+    onUpdate((prev) => ({
+      ...prev,
+      classes: prev.classes.map((c, i) =>
+        i === classIdx ? { ...c, companion: selectedCompanion } : c,
+      ),
+    }));
+    setCompanionModalOpen(false);
+  };
+
   useEffect(() => {
     if (!compact) return;
     if (searchQuery?.trim()) setCollapsedState(false);
@@ -706,64 +762,71 @@ function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, 
   if (compact) {
     return (
       <>
-      <Accordion
-        disableGutters
-        elevation={0}
-        variant="outlined"
-        expanded={!collapsed}
-        onChange={() => setCollapsedState((v) => !v)}
-        sx={{ mb: 1, overflow: "hidden", "&:before": { display: "none" } }}
-      >
-        <AccordionSummary
-          component="div"
-          sx={{
-            minHeight: 0,
-            pl: "46px",
-            pr: "6px",
-            py: "2.8px",
-            background: theme.primary,
-            "& .MuiAccordionSummary-content": { m: 0, alignItems: "center" },
-            "& .MuiAccordionSummary-expandIconWrapper": { display: "none" },
-          }}
+      <Paper elevation={0} variant="outlined" sx={{ mb: 1, overflow: "hidden" }}>
+        <CompactSectionHeader
+          title={highlightMatch(t(cls.name), searchQuery)}
+          onToggle={() => setCollapsedState((v) => !v)}
+          isCollapsed={collapsed}
         >
-          <Typography sx={{ flex: 1, color: "#fff", fontFamily: "Antonio", fontSize: { xs: "0.75rem", sm: "0.875rem" }, textTransform: "uppercase" }}>
-            {highlightMatch(t(cls.name), searchQuery)}
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: "2px", flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 28, px: "8px", borderRadius: "4px", bgcolor: "rgba(255,255,255,0.18)" }}>
-              <Typography sx={{ color: "#fff", fontFamily: "Antonio", fontSize: "0.85rem", fontWeight: "bold", lineHeight: 1 }}>Lv {cls.lvl}/10</Typography>
-            </Box>
-            {onEditClass && (
-              <Tooltip title={t("Edit Class")} arrow>
-                <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)" }} onClick={(e) => { e.stopPropagation(); onEditClass(classIdx); }}>
-                  <Edit sx={{ fontSize: "1rem" }} />
-                </IconButton>
-              </Tooltip>
-            )}
-            <IconButton size="small" sx={{ p: "3px", color: "#fff" }} onClick={(e) => { e.stopPropagation(); setCollapsedState((v) => !v); }}>
-              {collapsed ? <KeyboardArrowDown sx={{ fontSize: "1.15rem" }} /> : <KeyboardArrowUp sx={{ fontSize: "1.15rem" }} />}
-            </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 28, px: "8px", borderRadius: "4px", bgcolor: "rgba(255,255,255,0.18)" }}>
+            <Typography sx={{ color: "#fff", fontFamily: "Antonio", fontSize: "0.85rem", fontWeight: "bold", lineHeight: 1 }}>Lv {cls.lvl}/10</Typography>
           </Box>
-        </AccordionSummary>
-        <AccordionDetails sx={{ p: 0 }}>
-          {hasBenefits(cls.benefits) && (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, px: "10px", py: "4px", borderBottom: "1px solid", borderColor: "divider", bgcolor: "rgba(0,0,0,0.02)" }}>
-              <BenefitChips benefits={cls.benefits} />
-            </Box>
+          {onEditClass && (
+            <Tooltip title={t("Edit Class")} arrow>
+              <IconButton size="small" sx={{ p: "3px", color: "rgba(255,255,255,0.85)" }} onClick={(e) => { e.stopPropagation(); onEditClass(classIdx); }}>
+                <Edit sx={{ fontSize: "1rem" }} />
+              </IconButton>
+            </Tooltip>
           )}
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: "4px", p: "4px" }}>
-            {filteredSkills.map(({ skill, originalIdx }) => (
-              <SkillCard key={`skill-${classIdx}-${originalIdx}`} skill={skill} originalIdx={originalIdx} classIdx={classIdx} translatedDescription={t(skill.description || "")} pc={pc} isInteractive={isInteractive} onUpdate={onUpdate} updateMaxStats={updateMaxStats} searchQuery={searchQuery} compact={true} theme={theme} t={t} onPreview={setPreview} />
-            ))}
-            {heroicVisible && (
-              <HeroicCard cls={cls} classIdx={classIdx} isInteractive={isInteractive} onUpdate={onUpdate} pc={pc} searchQuery={searchQuery} setHeroicPickerClassIdx={setHeroicPickerClassIdx} compact={true} theme={theme} t={t} onPreview={setPreview} />
+        </CompactSectionHeader>
+        {!collapsed && (
+          <>
+            {hasBenefits(cls.benefits) && (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, px: "10px", py: "4px", borderBottom: "1px solid", borderColor: "divider", bgcolor: "rgba(0,0,0,0.02)" }}>
+                <BenefitChips benefits={cls.benefits} />
+              </Box>
             )}
-            {filteredSpells.map((spell, spellIdx) => (
-              <SpellCard key={`spell-${classIdx}-${spellIdx}`} spell={spell} onUpdate={onUpdate} searchQuery={searchQuery} compact={true} theme={theme} t={t} />
-            ))}
-          </Box>
-        </AccordionDetails>
-      </Accordion>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: "4px", p: "4px" }}>
+              {filteredSkills.map(({ skill, originalIdx }) => (
+                <SkillCard key={`skill-${classIdx}-${originalIdx}`} skill={skill} originalIdx={originalIdx} classIdx={classIdx} translatedDescription={t(skill.description || "")} pc={pc} isInteractive={isInteractive} onUpdate={onUpdate} updateMaxStats={updateMaxStats} searchQuery={searchQuery} compact={true} theme={theme} t={t} onPreview={setPreview} />
+              ))}
+              {heroicVisible && (
+                <HeroicCard cls={cls} classIdx={classIdx} isInteractive={isInteractive} onUpdate={onUpdate} pc={pc} searchQuery={searchQuery} setHeroicPickerClassIdx={setHeroicPickerClassIdx} compact={true} theme={theme} t={t} onPreview={setPreview} />
+              )}
+              {filteredSpells.map((spell, spellIdx) => (
+                <SpellCard key={`spell-${classIdx}-${spellIdx}`} spell={spell} onUpdate={onUpdate} searchQuery={searchQuery} compact={true} theme={theme} t={t} />
+              ))}
+            </Box>
+            {showCompanionSection && (
+              <Box sx={{ px: "10px", pb: "8px" }}>
+                <Divider sx={{ mb: 1 }} />
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <Typography sx={{ fontFamily: "Antonio", fontWeight: "bold", fontSize: "0.95rem", textTransform: "uppercase" }}>
+                    {t("Faithful Companion")}
+                    {cls.companion && ` - ${cls.companion.name} Lv ${cls.companion.lvl}`}
+                  </Typography>
+                  {isInteractive && (
+                    <Button size="small" variant="outlined" onClick={() => setCompanionModalOpen(true)} sx={{ height: 26, fontSize: "0.8em" }}>
+                      {t("Select")}
+                    </Button>
+                  )}
+                </Box>
+                {!cls.companion && <Typography variant="body2" color="text.secondary">{t("No Companion Selected")}</Typography>}
+              </Box>
+            )}
+          </>
+        )}
+      </Paper>
+
+      {showCompanionSection && (
+        <SelectCompanionModal
+          open={companionModalOpen}
+          onClose={() => setCompanionModalOpen(false)}
+          onSave={handleSaveCompanion}
+          companionList={companionList}
+          setSelectedCompanion={setSelectedCompanion}
+        />
+      )}
 
       <Dialog open={Boolean(preview)} onClose={() => setPreview(null)} fullWidth maxWidth="sm">
         <DialogContent sx={{ p: 0 }}>
@@ -783,6 +846,7 @@ function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, 
   }
 
   return (
+    <>
     <Paper elevation={3} sx={{ mb: 1.5, overflow: "hidden", borderRadius: "8px" }}>
       <Box onClick={() => setCollapsedState((v) => !v)}
         sx={{ background: theme.primary, px: 1, py: "6px", display: "flex", alignItems: "center", borderRadius: collapsed ? "8px" : "8px 8px 0 0", cursor: "pointer", userSelect: "none" }}>
@@ -861,10 +925,42 @@ function ClassSection({ cls, classIdx, isInteractive, onUpdate, updateMaxStats, 
             ).map(([spellType, spells]) => (
               <SpellTypeAccordion key={`spellgroup-${classIdx}-${spellType}`} spellType={spellType} spells={spells} classIdx={classIdx} onUpdate={onUpdate} searchQuery={searchQuery} theme={theme} t={t} />
             ))}
+            {showCompanionSection && (
+              <>
+                <SectionSubHeader theme={theme}>
+                  <Typography sx={{ fontFamily: "Antonio", fontWeight: "bold", fontSize: { xs: "1rem", sm: "1.1rem" }, textTransform: "uppercase", color: "text.primary", letterSpacing: "0.04em", lineHeight: 1.2 }}>
+                    {t("Faithful Companion")}
+                  </Typography>
+                  {isInteractive && (
+                    <Button size="small" variant="outlined" onClick={() => setCompanionModalOpen(true)} sx={{ height: 28, fontSize: "0.85em", ml: "auto", mr: 1 }}>
+                      {t("Select")}
+                    </Button>
+                  )}
+                </SectionSubHeader>
+                <Box sx={{ px: 2, py: 1 }}>
+                  {cls.companion
+                    ? <Typography sx={{ fontFamily: "Antonio", fontSize: "1rem" }}>{cls.companion.name} - {t("Lvl")} {cls.companion.lvl}</Typography>
+                    : <Typography color="text.secondary">{t("No Companion Selected")}</Typography>
+                  }
+                  {companionLoading && <Typography variant="body2">{t("Loading...")}</Typography>}
+                  {companionErr && <Typography variant="body2" color="error">{t("Error Loading Companion List")}: {companionErr}</Typography>}
+                </Box>
+              </>
+            )}
           </Box>
         </>
       )}
     </Paper>
+    {showCompanionSection && (
+      <SelectCompanionModal
+        open={companionModalOpen}
+        onClose={() => setCompanionModalOpen(false)}
+        onSave={handleSaveCompanion}
+        companionList={companionList}
+        setSelectedCompanion={setSelectedCompanion}
+      />
+    )}
+    </>
   );
 }
 // Main export

@@ -1,21 +1,23 @@
+import { useState } from "react";
 import {
   Grid,
   TextField,
-  Button,
-  Box,
-  Card,
-  CardContent,
+  Box, // used in expanded section and delete dialog
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Stack,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
 import { TypeIcon } from "/src/components/types";
+import Diamond from "/src/components/Diamond";
 import { availableMagichantKeys } from "/src/libs/player/spellOptionData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 
 export default function MagichantKeyItem({
   item,
@@ -41,6 +43,7 @@ export default function MagichantKeyItem({
   const isCustom =
     item.key === "magichant_custom_name" ||
     !availableMagichantKeys.find((k) => k.name === item.key);
+
   const {
     isOpen: deleteDialogOpen,
     closeDialog: setDeleteDialogOpen,
@@ -67,17 +70,52 @@ export default function MagichantKeyItem({
   const itemDisplayName =
     item.customName || t(item.key || "magichant_custom_name");
 
+  const [expanded, setExpanded] = useState(false);
+
+  const metaParts = [
+    isCustom ? item.type : t(item.type || ""),
+    isCustom ? item.status : t(item.status || ""),
+    isCustom ? item.attribute : t(item.attribute || ""),
+    isCustom ? item.recovery : t(item.recovery || ""),
+  ].filter(Boolean);
+
+  const rowLabel = (
+    <Box sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1rem", textTransform: "uppercase", lineHeight: 1.3, display: "flex", alignItems: "center", flexWrap: "wrap", gap: 0.5 }}>
+      <span>{itemDisplayName}</span>
+      {metaParts.map((part, i) => (
+        <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 2 }}>
+          <Diamond />
+          <span style={{ opacity: 0.75 }}>{part}</span>
+        </span>
+      ))}
+    </Box>
+  );
+
   return (
     <>
-      <Card sx={{ mb: 2 }}>
-        <CardContent>
+      <ItemRowCard
+        label={rowLabel}
+        variant="outlined"
+        onClick={() => setExpanded((v) => !v)}
+        actions={
+          <>
+            <Tooltip title={t("Clone to Custom")}>
+              <IconButton onClick={handleCloneToCustom}>
+                <ContentCopy />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Delete")}>
+              <IconButton onClick={handleDelete}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
+          </>
+        }
+        paperSx={{ mb: 0.5 }}
+      >
+        {expanded && <Box sx={{ p: 2 }}>
           <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 5,
-              }}
-            >
+            <Grid size={{ xs: 12, sm: 5 }}>
               <FormControl fullWidth>
                 <InputLabel>{t("magichant_key")}</InputLabel>
                 <Select
@@ -94,12 +132,7 @@ export default function MagichantKeyItem({
               </FormControl>
             </Grid>
 
-            <Grid
-              size={{
-                xs: 12,
-                sm: 7,
-              }}
-            >
+            <Grid size={{ xs: 12, sm: 7 }}>
               <TextField
                 fullWidth
                 label={t("magichant_name")}
@@ -114,13 +147,7 @@ export default function MagichantKeyItem({
               />
             </Grid>
 
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-                md: 3,
-              }}
-            >
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               {isCustom ? (
                 <TextField
                   fullWidth
@@ -144,13 +171,8 @@ export default function MagichantKeyItem({
                 </Stack>
               )}
             </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-                md: 3,
-              }}
-            >
+
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <TextField
                 fullWidth
                 label={t("magichant_status_effect")}
@@ -163,13 +185,8 @@ export default function MagichantKeyItem({
                 }}
               />
             </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-                md: 3,
-              }}
-            >
+
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <TextField
                 fullWidth
                 label={t("magichant_attribute")}
@@ -185,13 +202,8 @@ export default function MagichantKeyItem({
                 }}
               />
             </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-                md: 3,
-              }}
-            >
+
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <TextField
                 fullWidth
                 label={t("magichant_recovery")}
@@ -205,31 +217,9 @@ export default function MagichantKeyItem({
                 }}
               />
             </Grid>
-
-            <Grid size={12}>
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <Button
-                  fullWidth
-                  onClick={handleDelete}
-                  variant="outlined"
-                  color="error"
-                  startIcon={<Delete />}
-                >
-                  {t("Delete")}
-                </Button>
-                <Button
-                  fullWidth
-                  onClick={handleCloneToCustom}
-                  variant="outlined"
-                  startIcon={<ContentCopy />}
-                >
-                  {t("Clone to Custom")}
-                </Button>
-              </Box>
-            </Grid>
           </Grid>
-        </CardContent>
-      </Card>
+        </Box>}
+      </ItemRowCard>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={setDeleteDialogOpen}

@@ -3,13 +3,13 @@ import {
   Typography,
   ThemeProvider,
   Icon,
+  IconButton,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button,
   Box,
 } from "@mui/material";
-import { ExpandMore, FlashOn } from "@mui/icons-material";
+import { ExpandMore, FlashOn, Edit, Casino } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -20,6 +20,7 @@ function ThemedSpellInvoker({
   invoker,
   isEditMode,
   onEdit,
+  onRoll,
   onWellspringToggle,
 }) {
   const { t } = useTranslate();
@@ -47,31 +48,33 @@ function ThemedSpellInvoker({
 
   return (
     <>
-      <Accordion sx={{ marginY: 1 }}>
+      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <FlashOn />
           </Icon>
           <Typography variant="h4">{t("invoker_details")}</Typography>
         </AccordionSummary>
-        <AccordionDetails>
-          <ReactMarkdown>{t("invoker_details_1")}</ReactMarkdown>
+        <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+          <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+            {t("invoker_details_1")}
+          </ReactMarkdown>
         </AccordionDetails>
       </Accordion>
 
       {/* Wellspring Selection */}
       <Box
         sx={{
-          padding: 2,
+          padding: "8px 12px",
           backgroundColor: theme.ternary,
-          marginBottom: 2,
+          marginBottom: 0,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
         }}
       >
         <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="h6" sx={{ marginBottom: 1 }}>
+          <Typography variant="h6" sx={{ marginBottom: 0.5 }}>
             {t("invoker_invocation_active_wellspring")} (
             {invokerTracker.activeWellsprings?.length || 0}/2)
             {innerWellspringEnabled && (
@@ -187,49 +190,53 @@ function ThemedSpellInvoker({
           )}
         </Box>
 
-        {isEditMode && (
-          <Box sx={{ display: "flex", alignItems: "center", padding: "16px 17px", gap: 2 }}>
-            <Button onClick={onEdit} variant="outlined">
-              {t("invoker_edit_invocation_button")}
-            </Button>
-          </Box>
-        )}
       </Box>
 
       {/* Invocations Table */}
-      <div
-        style={{
+      <Box
+        sx={{
           backgroundColor: theme.primary,
           fontFamily: "Antonio",
           fontWeight: "normal",
           fontSize: "1.1em",
-          padding: "2px 17px",
+          px: "17px",
+          py: "2px",
           borderLeft: "4px solid transparent",
           color: theme.white,
           textTransform: "uppercase",
           display: "flex",
-          justifyContent: "space-between",
-          marginTop: "20px",
+          alignItems: "center",
+          minHeight: "40px",
         }}
       >
-        <Box sx={{ display: "flex", flexGrow: 1 }}>
-          {[
-            { label: "Invocation", flex: "0 0 25%", align: "left" },
-            { label: "Wellspring",  flex: "0 0 16.67%", align: "center" },
-            { label: "Type",        flex: "0 0 16.67%", align: "center" },
-            { label: "Effect",      flex: "0 0 41.66%", align: "left" },
-          ].map(({ label, flex, align }) => (
-            <Box key={label} sx={{ flex, display: "flex", alignItems: "center", minHeight: "40px" }}>
-              <Typography
-                variant="h3"
-                sx={{ width: "100%", textAlign: align, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
-              >
-                {t(label)}
-              </Typography>
-            </Box>
-          ))}
+        <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
+          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+            {t("Invocation")}
+          </Typography>
         </Box>
-      </div>
+        <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+            {t("Wellspring")}
+          </Typography>
+        </Box>
+        <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+            {t("Type")}
+          </Typography>
+        </Box>
+        <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+            {t("Effect")}
+          </Typography>
+        </Box>
+        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          {isEditMode && (
+            <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+              <Edit sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          )}
+        </Box>
+      </Box>
 
       {availableInvocations.length === 0 ? (
         <Typography
@@ -256,53 +263,60 @@ function ThemedSpellInvoker({
             const borderColor = wellspringEntry?.color || theme.primary;
             return (
               <React.Fragment key={i}>
-                <div
-                  style={{
+                <Box
+                  sx={{
                     background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                    padding: "3px 17px",
+                    px: "17px",
+                    py: "3px",
                     display: "flex",
-                    justifyContent: "space-between",
+                    alignItems: "center",
                     borderTop: `1px solid ${theme.secondary}`,
                     borderBottom: `1px solid ${theme.secondary}`,
                     borderLeft: `4px solid ${borderColor}`,
+                    minHeight: "40px",
                   }}
                 >
-                  <Box sx={{ display: "flex", flexGrow: 1 }}>
-                    <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
-                      <Typography sx={{ fontWeight: "bold", flexGrow: 1, marginRight: "5px", fontSize: { xs: "0.8rem", sm: "1rem" } }}>
-                        {t(invocation.name)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
-                      {wellspringEntry && (
-                        <img
-                          src={affinityIconSrc(wellspringEntry.icon)}
-                          width={16}
-                          height={16}
-                          style={{ objectFit: "contain", flexShrink: 0 }}
-                          alt={invocation.wellspring}
-                        />
-                      )}
-                      <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
-                        {t(`invoker_${invocation.wellspring.toLowerCase()}`) !== `invoker_${invocation.wellspring.toLowerCase()}`
-                          ? t(`invoker_${invocation.wellspring.toLowerCase()}`)
-                          : invocation.wellspring}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
-                        {t(invocation.type)}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ flex: "0 0 41.66%", display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
-                      <Typography component="div" sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
-                        <ReactMarkdown components={components}>
-                          {t(invocation.effect)}
-                        </ReactMarkdown>
-                      </Typography>
-                    </Box>
+                  <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
+                    <Typography sx={{ fontWeight: "bold", fontSize: { xs: "0.8rem", sm: "1rem" } }}>
+                      {t(invocation.name)}
+                    </Typography>
                   </Box>
-                </div>
+                  <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+                    {wellspringEntry && (
+                      <img
+                        src={affinityIconSrc(wellspringEntry.icon)}
+                        width={16}
+                        height={16}
+                        style={{ objectFit: "contain", flexShrink: 0 }}
+                        alt={invocation.wellspring}
+                      />
+                    )}
+                    <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
+                      {t(`invoker_${invocation.wellspring.toLowerCase()}`) !== `invoker_${invocation.wellspring.toLowerCase()}`
+                        ? t(`invoker_${invocation.wellspring.toLowerCase()}`)
+                        : invocation.wellspring}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
+                      {t(invocation.type)}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+                    <Typography component="div" sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
+                      <ReactMarkdown components={components}>
+                        {t(invocation.effect)}
+                      </ReactMarkdown>
+                    </Typography>
+                  </Box>
+                  <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                    {onRoll && (
+                      <IconButton size="small" onClick={() => onRoll(invocation)} sx={{ p: "3px" }}>
+                        <Casino sx={{ fontSize: "1.1rem" }} />
+                      </IconButton>
+                    )}
+                  </Box>
+                </Box>
               </React.Fragment>
             );
           })

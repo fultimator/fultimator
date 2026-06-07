@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useSpellModals } from "/src/hooks/useSpellModals";
 import { useTheme } from "@mui/material/styles";
 import {
-  Paper,
   Grid,
   TextField,
   Button,
@@ -15,7 +14,7 @@ import {
 import Autocomplete from "@mui/material/Autocomplete";
 import { useTranslate } from "/src/translation/translate";
 import SearchIcon from "@mui/icons-material/Search";
-import CustomHeader from "/src/components/common/CustomHeader";
+import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import SpellDefault from "/src/components/shared/actors/pc/spells/SpellDefault";
 import SpellArcanistModal from "/src/components/shared/actors/pc/spells/SpellArcanistModal";
 import SpellArcanist from "/src/components/shared/actors/pc/spells/SpellArcanist";
@@ -69,11 +68,80 @@ import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerMo
 import { getActiveMnemospheres } from "/src/libs/player/mnemosphereClassUtils";
 import { getMnemosphereClassDefinition } from "/src/libs/mnemospheres";
 import useSphereBank from "/src/hooks/useSphereBank";
+import { calculateAttribute } from "/src/libs/playerCalculations";
+import {
+  prepareMagicCheck,
+  rollMagicCheck,
+  processMagicCheck,
+  buildMagicCheckMessage,
+} from "/src/components/app-drawer/panels/chat/domain/magic-checks";
+import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
+
+  const normalizeAttr = (raw) => {
+    const k = String(raw ?? "").toLowerCase();
+    if (k === "dex" || k === "dexterity") return "dexterity";
+    if (k === "ins" || k === "insight") return "insight";
+    if (k === "mig" || k === "might") return "might";
+    if (k === "wlp" || k === "will" || k === "willpower") return "willpower";
+    return "dexterity";
+  };
+
+  const getAttrDie = (key) => {
+    const normKey = normalizeAttr(key);
+    const base = player?.attributes?.[normKey]?.base ?? 8;
+    const cfg = {
+      dexterity: [["slow", "enraged"], ["dexUp"]],
+      insight: [["dazed", "enraged"], ["insUp"]],
+      might: [["weak", "poisoned"], ["migUp"]],
+      willpower: [["shaken", "poisoned"], ["wlpUp"]],
+    }[normKey] ?? [[], []];
+    return calculateAttribute(player, base, cfg[0], cfg[1], 6, 12);
+  };
+
+  const buildSpellTags = (spell) => {
+    const tags = [];
+    if (spell.cost?.amount != null) {
+      tags.push(`${spell.cost.amount}${spell.cost.perTarget && spell.maxTargets !== 1 ? " × T" : ""} MP`);
+    }
+    if (spell.targetDescription) tags.push(spell.targetDescription);
+    if (spell.duration) tags.push(spell.duration);
+    return tags;
+  };
+
+  const handleRollSpell = (spell) => {
+    if (!spell.isOffensive) return;
+    const attr1 = normalizeAttr(spell.accuracy?.attr1);
+    const attr2 = normalizeAttr(spell.accuracy?.attr2);
+    const intent = prepareMagicCheck({
+      name: spell.name,
+      spellType: spell.spellType,
+      attr1,
+      attr2,
+      accuracyBonus: spell.accuracy?.value ?? 0,
+      baseDamage: spell.damage?.value ?? 0,
+      damageType: spell.damage?.type ?? "physical",
+      accuracyDefense: spell.accuracy?.defense ?? "mdef",
+      damageHrZero: spell.damage?.hrZero === true,
+      description: spell.description,
+      extraTags: buildSpellTags(spell),
+    });
+    const dieSizes = { primary: getAttrDie(attr1), secondary: getAttrDie(attr2) };
+    const rolls = rollMagicCheck(dieSizes);
+    const result = processMagicCheck(intent, rolls, dieSizes, player?.info?.name || player?.name || "");
+    sendRollMessage(buildMagicCheckMessage(result));
+  };
+
+  const handleChatSpell = (spell) => {
+    sendDisplayMessage("spell", spell.name || "", {
+      tags: buildSpellTags(spell),
+      description: spell.description,
+      speaker: player?.info?.name || player?.name || "",
+    });
+  };
 
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSpell, setSelectedSpell] = useState(null);
@@ -139,6 +207,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
           value: 0,
           defense: "mdef",
         },
+        damage: spell.damage ?? undefined,
         isMagisphere: spell.isMagisphere || false,
         showInPlayerSheet: true,
         fuid: spell.fuid,
@@ -1024,11 +1093,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         fontWeight: "normal",
         fontSize: "1em",
         pl: "17px",
-        pt: "5px",
-        pb: "5px",
+        pt: "4px",
+        pb: "4px",
         color: theme.palette.mode === "dark" ? "white" : "black",
         textAlign: "left",
-        mb: "10px",
         textTransform: "uppercase",
         backgroundColor: theme.palette.ternary.main,
       }}
@@ -1384,30 +1452,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     <>
       {isEditMode ? (
         <>
-          <Paper
-            elevation={3}
-            sx={{
-              p: "15px",
-              borderRadius: "8px",
-              border: "2px solid",
-              borderColor: secondary,
-            }}
-          >
-            <Grid container>
-              <Grid size={12}>
-                <CustomHeader
-                  type="top"
-                  headerText={t("Spells")}
-                  showIconButton={false}
-                />
-              </Grid>
-              <Grid container spacing={2} size={12}>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 8,
-                  }}
-                >
+          <SectionCard title={t("Spells")}>
+            <Box sx={{ p: 2 }}>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 8 }}>
                   <Autocomplete
                     options={spellTypeOptions}
                     value={selectedSpellTypeOption}
@@ -1427,12 +1475,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     )}
                   />
                 </Grid>
-                <Grid
-                  size={{
-                    xs: 12,
-                    sm: 4,
-                  }}
-                >
+                <Grid size={{ xs: 12, sm: 4 }}>
                   <Button
                     variant="contained"
                     sx={{
@@ -1455,8 +1498,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   </Button>
                 </Grid>
               </Grid>
-            </Grid>
-          </Paper>
+            </Box>
+          </SectionCard>
           <Divider sx={{ my: 2 }} />
         </>
       ) : null}
@@ -1489,38 +1532,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
           return (
             <React.Fragment key={cls.name}>
-              <Paper
-                elevation={3}
-                sx={{
-                  p: "15px",
-                  borderRadius: "8px",
-                  border: "2px solid",
-                  borderColor: secondary,
-                }}
-              >
-                <Grid container>
-                  <Grid size={12}>
-                    <CustomHeader
-                      type="top"
-                      headerText={t("Spells") + " - " + t(cls.name)}
-                      showIconButton={false}
-                    />
-                  </Grid>
-                  <Grid size={12}>
-                    {cls.spells
+              <SectionCard title={t("Spells") + " - " + t(cls.name)}>
+                <Box>
+                  {cls.spells
                       .sort((a, b) => a.spellType.localeCompare(b.spellType))
                       .map((spell, index) => (
                         <React.Fragment key={index}>
-                          <div
-                            style={{
-                              marginTop:
-                                index === 0 ||
-                                spell.spellType === "default" ||
-                                spell.spellType === "gamble"
-                                  ? 0
-                                  : 50,
-                            }}
-                          >
+                          <div>
                             {spell.spellType === "default" &&
                               !spellTypeHeaders.default && (
                                 <>
@@ -1533,14 +1551,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                       fontWeight: "normal",
                                       fontSize: "1em",
                                       pl: "17px",
-                                      pt: "5px",
-                                      pb: "5px",
+                                      pt: "4px",
+                                      pb: "4px",
                                       color:
                                         theme.palette.mode === "dark"
                                           ? "white"
                                           : "black",
                                       textAlign: "left",
-                                      mb: "10px",
                                       textTransform: "uppercase",
                                       backgroundColor:
                                         theme.palette.ternary.main,
@@ -1579,14 +1596,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                       fontWeight: "normal",
                                       fontSize: "1em",
                                       pl: "17px",
-                                      pt: "5px",
-                                      pb: "5px",
+                                      pt: "4px",
+                                      pb: "4px",
                                       color:
                                         theme.palette.mode === "dark"
                                           ? "white"
                                           : "black",
                                       textAlign: "left",
-                                      mb: "10px",
                                       textTransform: "uppercase",
                                       backgroundColor:
                                         theme.palette.ternary.main,
@@ -1625,14 +1641,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                       fontWeight: "normal",
                                       fontSize: "1em",
                                       pl: "17px",
-                                      pt: "5px",
-                                      pb: "5px",
+                                      pt: "4px",
+                                      pb: "4px",
                                       color:
                                         theme.palette.mode === "dark"
                                           ? "white"
                                           : "black",
                                       textAlign: "left",
-                                      mb: "10px",
                                       textTransform: "uppercase",
                                       backgroundColor:
                                         theme.palette.ternary.main,
@@ -1831,6 +1846,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               onEdit={() =>
                                 handleEditDefaultSpell(spell, cls.name, index)
                               }
+                              onRoll={spell.isOffensive ? () => handleRollSpell(spell) : undefined}
+                              onChat={() => handleChatSpell(spell)}
                               isEditMode={isEditMode}
                               isOffensive={spell.isOffensive}
                               attr1={spell.accuracy?.attr1}
@@ -2007,6 +2024,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                 )
                               }
                               isEditMode={isEditMode}
+                              player={player}
                             />
                           )}
                           {spell.spellType === "magiseed" && (
@@ -2077,9 +2095,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                           )}
                         </React.Fragment>
                       ))}
-                  </Grid>
-                </Grid>
-              </Paper>
+                </Box>
+              </SectionCard>
               <Divider sx={{ my: 2 }} />
             </React.Fragment>
           );
@@ -2115,87 +2132,57 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             };
             return (
               <React.Fragment key={mnemo.id}>
-                <Paper
-                  elevation={3}
-                  sx={{
-                    p: "15px",
-                    borderRadius: "8px",
-                    border: "2px solid",
-                    borderColor: secondary,
-                  }}
-                >
-                  <Grid container>
-                    <Grid size={12}>
-                      <CustomHeader
-                        type="top"
-                        headerText={
-                          t("Spells") +
-                          " - " +
-                          t(mnemo.class) +
-                          " (" +
-                          t("Mnemosphere") +
-                          ")"
-                        }
-                        showIconButton={false}
-                      />
-                    </Grid>
+                <SectionCard title={`${t("Spells")} - ${t(mnemo.class)} (${t("Mnemosphere")})`}>
+                  <Box>
                     {isEditMode && (
-                      <Grid container spacing={2} size={12}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                          <Autocomplete
-                            options={mnemoSpellClasses}
-                            value={
-                              selectedMnemoTarget === mnemo.id
-                                ? selectedMnemoSpellType
-                                : null
-                            }
-                            onChange={(_, val) =>
-                              handleMnemoTargetChange(mnemo.id, val)
-                            }
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                label={t("Select Spell")}
-                                variant="outlined"
-                                fullWidth
-                              />
-                            )}
-                          />
+                      <Box sx={{ p: 2 }}>
+                        <Grid container spacing={2}>
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <Autocomplete
+                              options={mnemoSpellClasses}
+                              value={
+                                selectedMnemoTarget === mnemo.id
+                                  ? selectedMnemoSpellType
+                                  : null
+                              }
+                              onChange={(_, val) =>
+                                handleMnemoTargetChange(mnemo.id, val)
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label={t("Select Spell")}
+                                  variant="outlined"
+                                  fullWidth
+                                />
+                              )}
+                            />
+                          </Grid>
+                          <Grid size={{ xs: 6, sm: 3 }}>
+                            <Button
+                              variant="contained"
+                              sx={{ width: "100%", height: "100%" }}
+                              disabled={
+                                selectedMnemoTarget !== mnemo.id ||
+                                !selectedMnemoSpellType
+                              }
+                              onClick={() =>
+                                addNewMnemoSpell(mnemo.id, selectedMnemoSpellType)
+                              }
+                            >
+                              {t("Add Blank Spell")}
+                            </Button>
+                          </Grid>
                         </Grid>
-                        <Grid size={{ xs: 6, sm: 3 }}>
-                          <Button
-                            variant="contained"
-                            sx={{ width: "100%", height: "100%" }}
-                            disabled={
-                              selectedMnemoTarget !== mnemo.id ||
-                              !selectedMnemoSpellType
-                            }
-                            onClick={() =>
-                              addNewMnemoSpell(mnemo.id, selectedMnemoSpellType)
-                            }
-                          >
-                            {t("Add Blank Spell")}
-                          </Button>
-                        </Grid>
-                      </Grid>
+                      </Box>
                     )}
-                    <Grid size={12}>
-                      {mnemoSpells
+                    {mnemoSpells
                         .sort((a, b) =>
                           (a.spellType ?? "").localeCompare(b.spellType ?? ""),
                         )
                         .map((spell, index) => (
                           <React.Fragment key={index}>
-                            <div
-                              style={{
-                                marginTop:
-                                  index === 0 ||
-                                  spell.spellType === "default" ||
-                                  spell.spellType === "gamble"
-                                    ? 0
-                                    : 50,
-                              }}
-                            >
+                            <div>
                               {spell.spellType === "default" &&
                                 !mnemoSpellTypeHeaders.default && (
                                   <>
@@ -2426,6 +2413,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                 onEdit={() =>
                                   handleEditDefaultSpell(spell, mnemo.id, index)
                                 }
+                                onRoll={spell.isOffensive ? () => handleRollSpell(spell) : undefined}
+                                onChat={() => handleChatSpell(spell)}
                                 isEditMode={isEditMode}
                                 isOffensive={spell.isOffensive}
                                 attr1={spell.accuracy?.attr1}
@@ -2629,6 +2618,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                   });
                                 }}
                                 isEditMode={isEditMode}
+                                player={player}
                               />
                             )}
                             {spell.spellType === "magiseed" && (
@@ -2731,9 +2721,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             )}
                           </React.Fragment>
                         ))}
-                    </Grid>
-                  </Grid>
-                </Paper>
+                  </Box>
+                </SectionCard>
                 <Divider sx={{ my: 2 }} />
               </React.Fragment>
             );
@@ -3015,7 +3004,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             id: "content",
             title: "pilot_vehicles",
             component: PilotContentSection,
-            props: {},
+            props: { player },
             order: 0,
           },
           {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import type { DisplayMessage } from "../types";
 import Diamond from "../../../../Diamond";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
@@ -7,6 +7,7 @@ import { TagRow } from "./primitives";
 import { formatSpellType } from "./primitives-utils";
 import Clock from "/src/components/shared/actors/pc/playerSheet/optional/Clock.jsx";
 import { ACTION_ICON_SRC_BY_KEY } from "../../../../actionIconSrc";
+import { useChatActions } from "../ChatActionsContext.shared";
 
 interface DisplayMessageTemplateProps {
   message: DisplayMessage;
@@ -15,6 +16,7 @@ interface DisplayMessageTemplateProps {
 export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
   message,
 }) => {
+  const { onLossResource } = useChatActions();
   const tags = message.tags.map((t) =>
     t === "default" ? formatSpellType(t) : t,
   );
@@ -202,6 +204,19 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
               </Box>
             </Box>
           ) : null}
+        </Box>
+      )}
+      {message.cost != null && onLossResource && (
+        <Box sx={{ mt: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            fullWidth
+            onClick={() => onLossResource(message, message.cost!.resource, message.cost!.amount)}
+            sx={{ textTransform: "none", fontWeight: 600 }}
+          >
+            Spend {message.cost.amount} {message.cost.resource.toUpperCase()}
+          </Button>
         </Box>
       )}
     </Box>

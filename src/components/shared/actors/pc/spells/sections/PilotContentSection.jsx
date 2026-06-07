@@ -1,11 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
+import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import {
   Grid,
   Button,
   Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   FormControl,
   InputLabel,
   Select,
@@ -24,6 +22,8 @@ import {
   ErrorOutlined,
   Search,
   ContentCopy,
+  RadioButtonChecked,
+  RadioButtonUnchecked,
 } from "@mui/icons-material";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
@@ -35,11 +35,82 @@ import {
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
 
+function VehicleAccordion({ vehicle, vehicleIndex, defaultExpanded, onVehicleChange, onDelete, onClone, t, children }) {
+  const [open, setOpen] = useState(defaultExpanded ?? false);
+  const theme = useCustomTheme();
+  return (
+    <Box sx={{ border: `1px solid ${theme.secondary}`, borderRadius: 1, overflow: "hidden" }}>
+      <Box
+        onClick={() => setOpen((v) => !v)}
+        sx={{
+          display: "flex",
+          alignItems: "stretch",
+          minHeight: 44,
+          backgroundColor: theme.primary,
+          cursor: "pointer",
+          "&:hover": { filter: "brightness(1.1)" },
+        }}
+      >
+        {/* Label area - entire left side is the accordion trigger */}
+        <Box sx={{ flex: 1, px: "10px", display: "flex", alignItems: "center" }}>
+          <Typography sx={{
+            fontFamily: "Antonio",
+            fontWeight: 800,
+            fontSize: "0.95rem",
+            textTransform: "uppercase",
+            color: vehicle.customName ? theme.white : `${theme.white}66`,
+          }}>
+            {vehicle.customName || `${t("pilot_vehicle")} ${vehicleIndex + 1}`}
+          </Typography>
+        </Box>
+        <Box
+          onClick={(e) => e.stopPropagation()}
+          sx={{ display: "flex", alignItems: "center", gap: 0.25, flexShrink: 0, px: "6px", "& .MuiIconButton-root": { p: "2px", width: 32, height: 32, color: theme.white }, "& .MuiSvgIcon-root": { fontSize: "1.15rem" } }}
+        >
+          <Button
+            size="small"
+            variant="outlined"
+            color="inherit"
+            onClick={() => onVehicleChange(vehicleIndex, "enabled", !vehicle.enabled)}
+            style={{
+              minWidth: 64,
+              height: 32,
+              fontSize: "0.8rem",
+              fontWeight: 800,
+              border: "none",
+              gap: 4,
+              color: theme.primary,
+              backgroundColor: theme.white,
+            }}
+          >
+            {vehicle.enabled
+              ? <><RadioButtonChecked sx={{ fontSize: "1rem" }} />{t("Active")}</>
+              : <><RadioButtonUnchecked sx={{ fontSize: "1rem" }} />{t("Enable")}</>
+            }
+          </Button>
+          <Tooltip title={t("Clone to Custom")}>
+            <IconButton size="small" onClick={onClone}>
+              <ContentCopy />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t("pilot_vehicles_remove")}>
+            <IconButton size="small" onClick={onDelete}>
+              <Delete />
+            </IconButton>
+          </Tooltip>
+          <ExpandMore sx={{ fontSize: "1.15rem", color: theme.white, transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+        </Box>
+      </Box>
+      {open && children}
+    </Box>
+  );
+}
+
 /**
  * PilotContentSection - Content tab for Pilot spell
  * Manages vehicles/modules directly from shared UnifiedSpellModal form state.
  */
-export default function PilotContentSection({ formState, setFormState, t }) {
+export default function PilotContentSection({ formState, setFormState, t, player }) {
   const vehicles = useMemo(
     () => formState?.vehicles || formState?.currentVehicles || [],
     [formState?.vehicles, formState?.currentVehicles],
@@ -93,15 +164,17 @@ export default function PilotContentSection({ formState, setFormState, t }) {
       return s.armor ? 1 : 0;
     }
     if (moduleType === "weapon") {
-      const weaponKeys = new Set([s.main, s.off].filter(Boolean));
-      return weaponKeys.size;
+      if (!s.main && !s.off) return 0;
+      if (s.main && s.main === s.off) return 2;
+      return [s.main, s.off].filter(Boolean).length;
     }
     if (moduleType === "support") {
       return (s.support ?? []).reduce((count, key) => {
         const mod = (vehicle.modules || []).find(
           (m) => (m.key ?? m.name) === key,
         );
-        return count + (mod?.isComplex ? 2 : 1);
+        if (!mod) return count;
+        return count + (mod.isComplex ? 2 : 1);
       }, 0);
     }
     return 0;
@@ -611,42 +684,6 @@ export default function PilotContentSection({ formState, setFormState, t }) {
     [updateVehicles],
   );
 
-  const handleDeleteModuleClick = useCallback(
-    (vehicleIndex, moduleIndex) => {
-      const module = vehicles[vehicleIndex]?.modules?.[moduleIndex];
-      setDeleteConfirmation({
-        open: true,
-        type: "module",
-        vehicleIndex,
-        moduleIndex,
-        name: module?.customName || module?.name || `Module ${moduleIndex + 1}`,
-      });
-    },
-    [vehicles],
-  );
-
-  const handleConfirmDeleteModule = useCallback(() => {
-    updateVehicles((current) => {
-      const updated = [...current];
-      const vehicle = { ...updated[deleteConfirmation.vehicleIndex] };
-      vehicle.modules = (vehicle.modules || []).filter(
-        (_, i) => i !== deleteConfirmation.moduleIndex,
-      );
-      updated[deleteConfirmation.vehicleIndex] = vehicle;
-      return updated;
-    });
-    setDeleteConfirmation({
-      open: false,
-      type: null,
-      vehicleIndex: null,
-      moduleIndex: null,
-      name: "",
-    });
-  }, [
-    deleteConfirmation.vehicleIndex,
-    deleteConfirmation.moduleIndex,
-    updateVehicles,
-  ]);
 
   const handleCloneModule = useCallback(
     (vehicleIndex, moduleIndex) => {
@@ -654,13 +691,31 @@ export default function PilotContentSection({ formState, setFormState, t }) {
         const updated = [...current];
         const vehicle = { ...updated[vehicleIndex] };
         const modules = [...(vehicle.modules || [])];
-        modules.splice(moduleIndex + 1, 0, { ...modules[moduleIndex] });
+        const source = modules[moduleIndex];
+
+        const customNameMap = {
+          pilot_module_armor: "pilot_custom_armor",
+          pilot_module_weapon: "pilot_custom_weapon",
+          pilot_module_support: "pilot_custom_support",
+        };
+        const customName = customNameMap[source.type] ?? source.name;
+        const displayName = source.customName || t(source.name);
+
+        const cloned = {
+          ...source,
+          name: customName,
+          key: customName,
+          customName: displayName,
+          description: source.description ? t(source.description) : "",
+        };
+
+        modules.splice(moduleIndex + 1, 0, cloned);
         vehicle.modules = modules;
         updated[vehicleIndex] = vehicle;
         return updated;
       });
     },
-    [updateVehicles],
+    [updateVehicles, t],
   );
 
   const handleCompendiumVehicleImport = useCallback(() => {
@@ -734,231 +789,119 @@ export default function PilotContentSection({ formState, setFormState, t }) {
       {Array.isArray(vehicles) && vehicles.length > 0 ? (
         vehicles.map((vehicle, vehicleIndex) => (
           <Grid key={vehicleIndex} size={12}>
-            <Accordion defaultExpanded={vehicleIndex === 0}>
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>
-                  {vehicle.customName ||
-                    vehicle.name ||
-                    `${t("pilot_vehicle")} ${vehicleIndex + 1}`}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 8,
-                    }}
-                  >
+            <VehicleAccordion
+              vehicle={vehicle}
+              vehicleIndex={vehicleIndex}
+              defaultExpanded={vehicleIndex === 0}
+              onVehicleChange={handleVehicleChange}
+              onDelete={() => handleDeleteVehicleClick(vehicleIndex)}
+              onClone={() => handleCloneVehicle(vehicleIndex)}
+              t={t}
+            >
+              <Box sx={{ px: 2, pt: 1.5, pb: 2 }}>
+                <Grid container spacing={1}>
+                  {/* Row 1: Name | Frame | Max Modules */}
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField
                       fullWidth
+                      size="small"
                       label={t("pilot_vehicles_name")}
                       value={vehicle.customName || ""}
                       onChange={(e) =>
-                        handleVehicleChange(
-                          vehicleIndex,
-                          "customName",
-                          e.target.value,
-                        )
+                        handleVehicleChange(vehicleIndex, "customName", e.target.value)
                       }
                     />
                   </Grid>
 
-                  <Grid
-                    size={{
-                      xs: 12,
-                      sm: 4,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 1,
-                      }}
-                    >
-                      <Button
-                        onClick={() => handleDeleteVehicleClick(vehicleIndex)}
-                        variant="outlined"
-                        color="error"
-                        startIcon={<Delete />}
-                        sx={{ flexShrink: 0 }}
-                      >
-                        {t("pilot_vehicles_remove")}
-                      </Button>
-                      <Button
-                        onClick={() => handleCloneVehicle(vehicleIndex)}
-                        variant="outlined"
-                        startIcon={<ContentCopy />}
-                        sx={{ flexShrink: 0 }}
-                      >
-                        {t("Clone to Custom")}
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          handleVehicleChange(
-                            vehicleIndex,
-                            "enabled",
-                            !vehicle.enabled,
-                          )
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>{t("pilot_frame_type")}</InputLabel>
+                      <Select
+                        value={vehicle.frame || "pilot_frame_exoskeleton"}
+                        label={t("pilot_frame_type")}
+                        onChange={(e) =>
+                          handleVehicleChange(vehicleIndex, "frame", e.target.value)
                         }
-                        variant={vehicle.enabled ? "contained" : "outlined"}
-                        color={vehicle.enabled ? "success" : "primary"}
-                        sx={{ flexGrow: 1 }}
                       >
-                        {vehicle.enabled ? t("Active") : t("Enable")}
-                      </Button>
-                    </Box>
+                        {availableFrames.map((frame) => (
+                          <MenuItem key={frame.name} value={frame.name}>
+                            {t(frame.name)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
 
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    {(() => {
+                      const totalSlots =
+                        getEquippedCount(vehicle, "armor") +
+                        getEquippedCount(vehicle, "weapon") +
+                        getEquippedCount(vehicle, "support");
+                      const maxLimit = vehicle.maxEnabledModules || 3;
+                      const isOverTotal = totalSlots > maxLimit;
+                      return (
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label={t("pilot_max_enabled_modules")}
+                          type="number"
+                          slotProps={{ htmlInput: { min: 3 } }}
+                          value={vehicle.maxEnabledModules || 3}
+                          error={isOverTotal}
+                          helperText={isOverTotal ? `${totalSlots}/${maxLimit}` : ""}
+                          onChange={(e) =>
+                            handleVehicleChange(
+                              vehicleIndex,
+                              "maxEnabledModules",
+                              parseInt(e.target.value, 10),
+                            )
+                          }
+                        />
+                      );
+                    })()}
+                  </Grid>
+
+                  <Grid size={12}>
+                    {(() => {
+                      const currentFrame = availableFrames.find(
+                        (f) => f.name === (vehicle.frame || "pilot_frame_exoskeleton"),
+                      );
+                      if (!currentFrame) return null;
+                      return (
+                        <Box sx={{ px: 1, py: "6px", border: "1px solid", borderColor: "divider", borderRadius: 1, backgroundColor: "action.hover" }}>
+                          <Typography sx={{ fontSize: "0.85rem", lineHeight: 1.6 }}>
+                            <strong>{t("pilot_passengers")}:</strong> {getPassengersText(currentFrame.passengers)}
+                            {" · "}
+                            <strong>{t("pilot_distance")}:</strong> {getDistanceText(currentFrame.distance)}
+                          </Typography>
+                          <Typography sx={{ fontSize: "0.85rem", color: "text.secondary", lineHeight: 1.6 }}>
+                            <ReactMarkdown components={markdownComponents}>
+                              {t(currentFrame.description)}
+                            </ReactMarkdown>
+                          </Typography>
+                        </Box>
+                      );
+                    })()}
+                  </Grid>
+
+                  {/* Row 2: Description (compact) */}
                   <Grid size={12}>
                     <CustomTextarea
                       label={t("pilot_vehicles_description")}
                       value={vehicle.description || ""}
                       onChange={(e) =>
-                        handleVehicleChange(
-                          vehicleIndex,
-                          "description",
-                          e.target.value,
-                        )
+                        handleVehicleChange(vehicleIndex, "description", e.target.value)
                       }
+                      minRows={2}
                     />
                   </Grid>
 
+                  {/* Row 3: Add module buttons */}
                   <Grid size={12}>
-                    <Typography variant="h6">
-                      {t("pilot_vehicles_frame")}
-                    </Typography>
-                    <Grid container spacing={2} sx={{ mt: 1, mb: 2 }}>
-                      <Grid
-                        size={{
-                          xs: 12,
-                          sm: 6,
-                        }}
-                      >
-                        <FormControl fullWidth>
-                          <InputLabel>{t("pilot_frame_type")}</InputLabel>
-                          <Select
-                            value={vehicle.frame || "pilot_frame_exoskeleton"}
-                            onChange={(e) =>
-                              handleVehicleChange(
-                                vehicleIndex,
-                                "frame",
-                                e.target.value,
-                              )
-                            }
-                          >
-                            {availableFrames.map((frame) => (
-                              <MenuItem key={frame.name} value={frame.name}>
-                                {t(frame.name)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-
-                      <Grid
-                        size={{
-                          xs: 12,
-                          sm: 6,
-                        }}
-                      >
-                        {(() => {
-                          const currentFrame = availableFrames.find(
-                            (f) =>
-                              f.name ===
-                              (vehicle.frame || "pilot_frame_exoskeleton"),
-                          );
-                          if (!currentFrame) return null;
-
-                          return (
-                            <div>
-                              <Typography
-                                variant="body2"
-                                sx={{ color: "text.secondary", mb: 1 }}
-                              >
-                                <strong>{t("pilot_passengers")}:</strong>{" "}
-                                {getPassengersText(currentFrame.passengers)}
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                sx={{ color: "text.secondary", mb: 2 }}
-                              >
-                                <strong>{t("pilot_distance")}:</strong>{" "}
-                                {getDistanceText(currentFrame.distance)}
-                              </Typography>
-                              <div
-                                style={{
-                                  color: "var(--mui-palette-text-secondary)",
-                                }}
-                              >
-                                <ReactMarkdown components={markdownComponents}>
-                                  {t(currentFrame.description)}
-                                </ReactMarkdown>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </Grid>
-
-                      <Grid
-                        size={{
-                          xs: 12,
-                          sm: 6,
-                        }}
-                      >
-                        {(() => {
-                          const totalSlots =
-                            getEquippedCount(vehicle, "armor") +
-                            getEquippedCount(vehicle, "weapon") +
-                            getEquippedCount(vehicle, "support");
-                          const maxLimit = vehicle.maxEnabledModules || 3;
-                          const isOverTotal = totalSlots > maxLimit;
-
-                          return (
-                            <TextField
-                              fullWidth
-                              label={t("pilot_max_enabled_modules")}
-                              type="number"
-                              slotProps={{ htmlInput: { min: 3 } }}
-                              value={vehicle.maxEnabledModules || 3}
-                              error={isOverTotal}
-                              helperText={
-                                isOverTotal
-                                  ? `${t("Total slots used")}: ${totalSlots} / ${maxLimit}`
-                                  : ""
-                              }
-                              onChange={(e) =>
-                                handleVehicleChange(
-                                  vehicleIndex,
-                                  "maxEnabledModules",
-                                  parseInt(e.target.value, 10),
-                                )
-                              }
-                            />
-                          );
-                        })()}
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  <Grid size={12}>
-                    <Typography variant="h6" sx={{ mb: 1 }}>
-                      {t("pilot_modules")}
-                    </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ mt: 1, mb: 1, fontWeight: "bold" }}
-                    >
-                      {t("pilot_module_add")}
-                    </Typography>
-                    <Box
-                      sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}
-                    >
+                    <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
                       {["armor", "weapon", "support"].map((moduleType) => (
-                        <Box
-                          key={moduleType}
-                          sx={{ display: "flex", gap: 0.5 }}
-                        >
+                        <Box key={moduleType} sx={{ display: "flex", gap: 0.5 }}>
                           <Tooltip title={t("Browse Compendium")}>
                             <IconButton
                               size="small"
@@ -970,11 +913,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                                   vehicleIndexForModule: vehicleIndex,
                                 }))
                               }
-                              sx={{
-                                border: "1px solid",
-                                borderColor: "divider",
-                                borderRadius: 2,
-                              }}
+                              sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}
                             >
                               <Search fontSize="small" />
                             </IconButton>
@@ -983,17 +922,10 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                             size="small"
                             variant="outlined"
                             startIcon={<Add />}
-                            color={
-                              isSlotUsageOverLimit(vehicle, moduleType)
-                                ? "error"
-                                : "primary"
-                            }
-                            onClick={() =>
-                              handleAddModule(vehicleIndex, moduleType)
-                            }
+                            color={isSlotUsageOverLimit(vehicle, moduleType) ? "error" : "primary"}
+                            onClick={() => handleAddModule(vehicleIndex, moduleType)}
                           >
-                            {t(`pilot_module_${moduleType}`)}{" "}
-                            {getSlotUsageText(vehicle, moduleType)}
+                            {t(`pilot_module_${moduleType}`)} {getSlotUsageText(vehicle, moduleType)}
                           </Button>
                         </Box>
                       ))}
@@ -1008,15 +940,24 @@ export default function PilotContentSection({ formState, setFormState, t }) {
                         vehicleIndex={vehicleIndex}
                         canEquip={canEquipModule(vehicle, moduleIndex)}
                         onModuleChange={handleModuleChange}
-                        onDeleteModule={handleDeleteModuleClick}
+                        onDeleteModule={(vIdx, mIdx) => {
+                          updateVehicles((current) => {
+                            const updated = [...current];
+                            const v = { ...updated[vIdx] };
+                            v.modules = (v.modules || []).filter((_, i) => i !== mIdx);
+                            updated[vIdx] = v;
+                            return updated;
+                          });
+                        }}
                         onCloneModule={handleCloneModule}
                         vehicle={vehicle}
+                        player={player}
                       />
                     </Grid>
                   ))}
                 </Grid>
-              </AccordionDetails>
-            </Accordion>
+              </Box>
+            </VehicleAccordion>
           </Grid>
         ))
       ) : (
@@ -1075,11 +1016,7 @@ export default function PilotContentSection({ formState, setFormState, t }) {
             name: "",
           })
         }
-        onConfirm={
-          deleteConfirmation.type === "vehicle"
-            ? handleConfirmDeleteVehicle
-            : handleConfirmDeleteModule
-        }
+        onConfirm={handleConfirmDeleteVehicle}
         title={t("Delete")}
         message={`${t("Are you sure you want to delete")} "${deleteConfirmation.name}"?`}
         itemPreview={deleteConfirmation.name}

@@ -52,6 +52,7 @@ export function sendDisplayMessage(
     description?: string;
     effect?: string;
     speaker?: string;
+    cost?: { resource: "hp" | "mp" | "ip" | "fp" | "up"; amount: number; perTarget?: boolean };
   } = {},
 ) {
   const msg: DisplayMessage = {
@@ -64,6 +65,7 @@ export function sendDisplayMessage(
     tags: opts.tags ?? [],
     description: opts.description,
     effect: opts.effect,
+    cost: opts.cost,
   };
   addToChat(msg as ChatMessage);
 }

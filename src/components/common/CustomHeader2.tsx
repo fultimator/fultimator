@@ -33,7 +33,7 @@ const CustomHeader2: React.FC<CustomHeaderProps> = ({
         paddingBottom: "5px",
         color: isDarkMode ? "white" : "black",
         textAlign: "left",
-        marginBottom: "4px",
+        marginBottom: 0,
         textTransform: "uppercase",
         background: isDarkMode
           ? `linear-gradient(90deg, ${theme.ternary}, rgba(24,26,27,0) 100%)`

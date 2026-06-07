@@ -5,12 +5,12 @@ import {
   ThemeProvider,
   Tooltip,
   Icon,
+  IconButton,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, Info } from "@mui/icons-material";
+import { VisibilityOff, ExpandMore, Info, Edit } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -35,38 +35,17 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
 
   return (
     <>
-      <Accordion sx={{ marginY: 1 }}>
+      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Info />
           </Icon>
           <Typography variant="h4">{t("Symbols Details")}</Typography>
         </AccordionSummary>
-        <AccordionDetails>
-          <ReactMarkdown>{t("symbol_details_1")}</ReactMarkdown>
+        <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+          <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("symbol_details_1")}</ReactMarkdown>
         </AccordionDetails>
       </Accordion>
-      {isEditMode && (
-        <Grid
-          style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow"
-        >
-          <Button
-            onClick={onEdit}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("symbol_settings_button")}
-          </Button>
-          {!showInPlayerSheet && (
-            <Tooltip title={t("Symbols not shown in player sheet")}>
-              <Icon>
-                <VisibilityOff style={{ color: "black" }} />
-              </Icon>
-            </Tooltip>
-          )}
-        </Grid>
-      )}
       {/* SYMBOLS */}
       <div
         style={{
@@ -79,7 +58,7 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
           textTransform: "uppercase",
           display: "flex",
           justifyContent: "space-between",
-          marginTop: "20px",
+          alignItems: "center",
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -103,6 +82,18 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
             </Typography>
           </Grid>
         </Grid>
+        {isEditMode && (
+          <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+            {!showInPlayerSheet && (
+              <Tooltip title={t("Symbols not shown in player sheet")}>
+                <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+              </Tooltip>
+            )}
+            <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+              <Edit sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </div>
+        )}
       </div>
       {(symbol.symbols ?? []).length === 0 ? (
         <Typography
@@ -131,7 +122,6 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
             >
               <Grid container style={{ flexGrow: 1 }}>
                 <Grid
-                  flexGrow
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -151,17 +141,6 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
                   </Typography>
                 </Grid>
               </Grid>
-              {isEditMode && (
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexShrink: 0,
-                    minHeight: 34,
-                  }}
-                  size="grow"
-                ></Grid>
-              )}
             </div>
             <Grid
               container

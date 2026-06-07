@@ -12,6 +12,7 @@ export default [
       "node_modules/**",
       "dist-electron/**",
       "build/**",
+      "data/**",
       "*.config.js",
       ".dependency-cruiser.js",
       "DownloadTranslations.js",
@@ -112,6 +113,12 @@ export default [
           varsIgnorePattern: "^_",
         },
       ],
+    },
+  },
+  {
+    files: ["**/*.{ts,tsx}"],
+    rules: {
+      "no-undef": "off",
     },
   },
   eslintConfigPrettier,

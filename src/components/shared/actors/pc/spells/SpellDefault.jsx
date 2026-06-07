@@ -8,7 +8,7 @@ import {
   Tooltip,
   Box,
 } from "@mui/material";
-import { Edit, VisibilityOff, SettingsSuggest } from "@mui/icons-material";
+import { Edit, VisibilityOff, SettingsSuggest, Casino, Message } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { OffensiveSpellIcon } from "/src/components/icons"; // Ensure this path is correct
@@ -30,6 +30,8 @@ function ThemedSpellDefault({
   duration,
   description,
   onEdit,
+  onRoll,
+  onChat,
   isOffensive,
   attr1,
   attr2,
@@ -63,7 +65,6 @@ function ThemedSpellDefault({
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              flexGrow
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -115,7 +116,7 @@ function ThemedSpellDefault({
               <Typography variant="h3">{t("Duration")}</Typography>
             </Grid>
           </Grid>
-          {isEditMode && (
+          {(isEditMode || (isOffensive && onRoll) || (!isOffensive && onChat)) && (
             <Box
               sx={{
                 width: 40,
@@ -143,7 +144,6 @@ function ThemedSpellDefault({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            flexGrow
             style={{
               display: "flex",
               alignItems: "center",
@@ -222,27 +222,39 @@ function ThemedSpellDefault({
             </Typography>
           </Grid>
         </Grid>
-        {isEditMode && (
+        {(isEditMode || (isOffensive && onRoll) || (!isOffensive && onChat)) && (
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-end",
               flexShrink: 0,
-              minWidth: 40,
               ml: 1,
+              gap: "2px",
             }}
           >
-            {!showInPlayerSheet && (
+            {isEditMode && !showInPlayerSheet && (
               <Tooltip title={t("Spell not shown in player sheet")}>
                 <Icon>
                   <VisibilityOff style={{ color: "black" }} />
                 </Icon>
               </Tooltip>
             )}
-            <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color: iconColor }} />
-            </IconButton>
+            {!isOffensive && onChat && (
+              <IconButton size="small" onClick={onChat} sx={{ p: "3px" }}>
+                <Message sx={{ fontSize: "1.1rem", color: iconColor }} />
+              </IconButton>
+            )}
+            {isOffensive && onRoll && (
+              <IconButton size="small" onClick={onRoll} sx={{ p: "3px" }}>
+                <Casino sx={{ fontSize: "1.1rem", color: iconColor }} />
+              </IconButton>
+            )}
+            {isEditMode && (
+              <IconButton size="small" onClick={onEdit} sx={{ p: "3px" }}>
+                <Edit sx={{ fontSize: "1.1rem", color: iconColor }} />
+              </IconButton>
+            )}
           </Box>
         )}
       </div>
@@ -253,7 +265,6 @@ function ThemedSpellDefault({
           justifyContent: "flex-start",
           background: "transparent",
           padding: "3px 17px",
-          marginBottom: "6px",
           borderBottom: `1px solid ${theme.secondary}`,
         }}
       >

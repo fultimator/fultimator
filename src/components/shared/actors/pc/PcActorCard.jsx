@@ -19,6 +19,7 @@ import PcCampActivities from "./panels/optional/PcCampActivities";
 import PcZeroPower from "./panels/optional/PcZeroPower";
 import PcMnemoReceptacle from "./panels/optional/PcMnemoReceptacle";
 import PcControlsPanel from "./panels/PcControlsPanel";
+import PcSpells from "./panels/PcSpells";
 
 const paperSx = (secondary) => ({
   borderRadius: "8px",
@@ -213,11 +214,12 @@ export default function PcActorCard({
           }}
         >
           <PcClasses {...ownerSharedProps} variant="full" updateMaxStats={updateMaxStats} defaultExpanded={!ownerInteractive} />
+          {/* <PcSpells pc={pc} isInteractive={ownerInteractive} onUpdate={onUpdate} isCharacterSheet={true} /> */}
           {optionalRules.technospheres &&
             ["integrated", "mnemospheres"].includes(
               optionalRules.technospheresVariant ?? "standard",
             ) && <PcMnemoReceptacle {...ownerSharedProps} />}
-          <PcVehicle {...sharedProps} />
+          {/* <PcVehicle {...sharedProps} /> */}
           <PcCompanion {...sharedProps} />
         </Box>
       </Box>

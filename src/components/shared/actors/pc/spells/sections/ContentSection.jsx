@@ -94,7 +94,7 @@ export default function ContentSection({
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={1}>
       {/* Add Buttons */}
       <Grid size={12}>
         <Typography variant="h6" gutterBottom>
@@ -105,7 +105,7 @@ export default function ContentSection({
             display: "flex",
             gap: 1,
             flexWrap: "wrap",
-            mb: 2,
+            mb: 1,
             alignItems: "center",
           }}
         >
@@ -151,6 +151,7 @@ export default function ContentSection({
       {items.length === 0 ? (
         <Grid size={12}>
           <Typography
+            component="div"
             sx={{
               padding: "20px",
               textAlign: "center",

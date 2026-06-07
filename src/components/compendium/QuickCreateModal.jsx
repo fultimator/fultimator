@@ -983,14 +983,13 @@ function PlayerSpellPanel() {
         }
         return Array.from({ length: 12 }, () => ({ effect: "" }));
       })(),
-      seedDescription: t(
-        String(
-          imported.magiseeds?.[0]?.description ?? imported.description ?? "",
-        ),
-      ),
-      seedRangeStart:
-        imported.magiseeds?.[0]?.rangeStart ?? imported.rangeStart ?? 1,
-      seedRangeEnd: imported.magiseeds?.[0]?.rangeEnd ?? imported.rangeEnd ?? 4,
+      gardenDescription: imported.gardenDescription ?? "",
+      rangeStart: imported.magiseeds?.[0]?.rangeStart ?? imported.rangeStart ?? 0,
+      rangeEnd: imported.magiseeds?.[0]?.rangeEnd ?? imported.rangeEnd ?? 3,
+      "effects.0": (() => { const v = imported.magiseeds?.[0]?.effects?.[0] ?? imported.magiseeds?.[0]?.effects?.["0"] ?? imported.effects?.[0] ?? imported.effects?.["0"] ?? ""; return t(String(v)); })(),
+      "effects.1": (() => { const v = imported.magiseeds?.[0]?.effects?.[1] ?? imported.magiseeds?.[0]?.effects?.["1"] ?? imported.effects?.[1] ?? imported.effects?.["1"] ?? ""; return t(String(v)); })(),
+      "effects.2": (() => { const v = imported.magiseeds?.[0]?.effects?.[2] ?? imported.magiseeds?.[0]?.effects?.["2"] ?? imported.effects?.[2] ?? imported.effects?.["2"] ?? ""; return t(String(v)); })(),
+      "effects.3": (() => { const v = imported.magiseeds?.[0]?.effects?.[3] ?? imported.magiseeds?.[0]?.effects?.["3"] ?? imported.effects?.[3] ?? imported.effects?.["3"] ?? ""; return t(String(v)); })(),
       "meta.book": imported.meta?.book ?? "",
       "meta.page": imported.meta?.page ?? undefined,
       "meta.bookName": imported.meta?.bookName ?? "",

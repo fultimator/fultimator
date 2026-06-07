@@ -27,7 +27,7 @@ export default function SpellMagiseed({ spell, setPlayer }) {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
-
+  if (!spell) return null;
   const growthClock = spell.growthClock || 0;
   const currentMagiseed = spell.currentMagiseed;
 

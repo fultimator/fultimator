@@ -768,14 +768,14 @@ function ThemedSpellDeck({
 
   return (
     <>
-      <Accordion sx={{ marginY: 1 }}>
+      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Style />
           </Icon>
           <Typography variant="h4">{t("ace_deck_management")}</Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails sx={{ py: "6px", px: "12px" }}>
           <Box sx={{ p: 1 }}>
             <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
               {t("ace_card_set_summary")}

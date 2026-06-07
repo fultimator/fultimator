@@ -1,25 +1,23 @@
 import React, { useState } from "react";
 import {
   Typography,
-  Grid,
   ThemeProvider,
   Tooltip,
   Icon,
+  IconButton,
+  Button,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button,
-  LinearProgress,
   Box,
   Collapse,
-  Divider,
 } from "@mui/material";
 import {
   VisibilityOff,
   ExpandMore,
   LocalFlorist,
-  KeyboardArrowDown,
-  KeyboardArrowUp,
+  Edit,
+  Casino,
 } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
@@ -31,6 +29,7 @@ function ThemedSpellMagiseed({
   magiseed,
   isEditMode,
   onEdit,
+  onRoll,
   onMagiseedChange,
   onGrowthClockChange,
 }) {
@@ -75,11 +74,6 @@ function ThemedSpellMagiseed({
   const currentMagiseed = magiseed.currentMagiseed;
   const growthClock = localClock;
 
-  // Growth clock progress (0-4 sections)
-  const getGrowthClockProgress = () => {
-    return (growthClock / 4) * 100;
-  };
-
   // Convert growth clock value to clock state array for Clock component
   const getClockState = () => {
     const state = [false, false, false, false];
@@ -122,7 +116,7 @@ function ThemedSpellMagiseed({
     if (!currentMagiseed) return null;
 
     const magiseedTemplate = magiseeds.find(
-      (m) => m.name === currentMagiseed.name,
+      (m) => m.name === (currentMagiseed.key ?? currentMagiseed.name),
     );
     if (!magiseedTemplate) return null;
 
@@ -136,38 +130,19 @@ function ThemedSpellMagiseed({
 
   return (
     <>
-      <Accordion>
+      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <LocalFlorist />
           </Icon>
           <Typography variant="h4">{t("magiseed_details")}</Typography>
         </AccordionSummary>
-        <AccordionDetails>
-          <ReactMarkdown>{t("magiseed_details_1")}</ReactMarkdown>
+        <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+            {t("magiseed_details_1")}
+          </ReactMarkdown>
         </AccordionDetails>
       </Accordion>
-      {isEditMode && (
-        <Grid
-          style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-          size="grow"
-        >
-          <Button
-            onClick={onEdit}
-            variant="outlined"
-            sx={{ marginTop: 2, marginBottom: 2, marginRight: 2 }}
-          >
-            {t("magiseed_settings_button")}
-          </Button>
-          {!showInPlayerSheet && (
-            <Tooltip title={t("Garden not shown in player sheet")}>
-              <Icon>
-                <VisibilityOff style={{ color: "black" }} />
-              </Icon>
-            </Tooltip>
-          )}
-        </Grid>
-      )}
       {/* GARDEN */}
       <div
         style={{
@@ -179,204 +154,132 @@ function ThemedSpellMagiseed({
           color: theme.white,
           textTransform: "uppercase",
           display: "flex",
-          justifyContent: "space-between",
+          alignItems: "center",
+          minHeight: "40px",
+          gap: "12px",
         }}
       >
-        <Grid container style={{ flexGrow: 1 }}>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-              minHeight: "40px",
-            }}
-            size={6}
-          >
-            <Typography
-              variant="h3"
-              style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
-            >
-              {t("magiseed_garden")}
-            </Typography>
-          </Grid>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-              minHeight: "40px",
-            }}
-            size={6}
-          >
-            <Typography
-              variant="h3"
-              style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
-            >
-              {t("magiseed_growth_clock")}
-            </Typography>
-          </Grid>
-        </Grid>
+        <Typography variant="h3" sx={{ flex: 1, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          {t("magiseed_garden")}
+        </Typography>
+        <Typography variant="h3" sx={{ flexShrink: 0, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          {t("magiseed_growth_clock")}
+        </Typography>
+        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          {isEditMode && (
+            <>
+              {!showInPlayerSheet && (
+                <Tooltip title={t("Garden not shown in player sheet")}>
+                  <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+                </Tooltip>
+              )}
+              <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+                <Edit sx={{ fontSize: "1.1rem" }} />
+              </IconButton>
+            </>
+          )}
+        </Box>
       </div>
       {/* Garden State and Growth Clock */}
       <div
         style={{
           background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-          padding: "10px 17px",
           display: "flex",
-          justifyContent: "space-between",
+          alignItems: "stretch",
+          minHeight: 80,
           borderTop: `1px solid ${theme.secondary}`,
           borderBottom: `1px solid ${theme.secondary}`,
         }}
       >
-        <Grid container style={{ flexGrow: 1 }}>
-          <Grid
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-            size={6}
-          >
-            {currentMagiseed ? (
-              <div>
-                <Typography
-                  sx={{ fontWeight: "bold" }}
-                  style={{ marginBottom: "4px" }}
-                >
-                  {currentMagiseed.customName || t(currentMagiseed.name)}
+        {/* Garden column */}
+        <Box sx={{ flex: 1, minWidth: 0, px: "17px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          {currentMagiseed ? (
+            <>
+              <Typography sx={{ fontWeight: "bold", lineHeight: 1.2 }}>
+                {currentMagiseed.customName || t(currentMagiseed.key ?? currentMagiseed.name)}
+              </Typography>
+              {getCurrentEffect() && (
+                <Typography variant="caption" sx={{ color: "text.secondary", display: "block" }}>
+                  {t("magiseed_current_effect")} (T = {growthClock})
                 </Typography>
-              </div>
+              )}
+              {getCurrentEffect() && (
+                <div style={{ fontSize: "0.9em", marginTop: "2px" }}>
+                  <ReactMarkdown components={components}>
+                    {getCurrentEffect()}
+                  </ReactMarkdown>
+                </div>
+              )}
+            </>
+          ) : (
+            <Typography sx={{ fontStyle: "italic", color: "text.secondary" }}>
+              {t("magiseed_no_magiseed")}
+            </Typography>
+          )}
+        </Box>
+        {/* Growth clock + actions strip */}
+        <Box
+          sx={{
+            bgcolor: theme.primary,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: "12px",
+            gap: 1.5,
+          }}
+        >
+          <Box sx={{ borderRadius: "50%", bgcolor: theme.ternary, p: "3px", flexShrink: 0, display: "flex" }}>
+            <Clock
+              numSections={4}
+              size={56}
+              state={getClockState()}
+              setState={handleClockStateChange}
+              isCharacterSheet={false}
+              onReset={handleClockReset}
+            />
+          </Box>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.75 }}>
+            {isEditMode ? (
+              <Box sx={{ display: "flex", alignItems: "baseline", gap: "2px" }}>
+                <Box
+                  component="input"
+                  type="number"
+                  value={growthClock}
+                  onChange={(e) => updateClock(parseInt(e.target.value) || 0)}
+                  sx={{
+                    fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "0.08em",
+                    color: theme.white, background: "transparent", border: "none",
+                    borderBottom: `2px solid ${theme.white}`, outline: "none",
+                    width: 36, textAlign: "center", lineHeight: 1,
+                    "&::-webkit-inner-spin-button": { display: "none" },
+                  }}
+                />
+                <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", color: theme.white, lineHeight: 1 }}>
+                  /4
+                </Typography>
+              </Box>
             ) : (
-              <Typography sx={{ fontStyle: "italic", color: "text.secondary" }}>
-                {t("magiseed_no_magiseed")}
+              <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "0.08em", color: theme.white, lineHeight: 1 }}>
+                {growthClock}/4
               </Typography>
             )}
-          </Grid>
-          <Grid
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "flex-start",
-            }}
-            size={6}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              {/* Growth Clock Visual */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Clock
-                  numSections={4}
-                  size={60}
-                  state={getClockState()}
-                  setState={handleClockStateChange}
-                  isCharacterSheet={false}
-                  onReset={handleClockReset}
-                />
-                <Typography variant="caption" sx={{ mt: 0.5 }}>
-                  {growthClock}/4
-                </Typography>
-              </div>
-
-              {/* Linear Progress Bar */}
-              <div style={{ flex: 1, minWidth: "80px" }}>
-                <LinearProgress
-                  variant="determinate"
-                  value={getGrowthClockProgress()}
-                  sx={{
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: theme.secondary + "40",
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: theme.primary,
-                    },
-                  }}
-                />
-                <div
-                  style={{
-                    marginTop: "8px",
-                    display: "flex",
-                    gap: "4px",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => updateClock(growthClock - 1)}
-                    disabled={growthClock === 0}
-                  >
-                    -
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => updateClock(growthClock + 1)}
-                    disabled={growthClock === 4}
-                  >
-                    +
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => updateClock(0)}
-                  >
-                    {t("Reset")}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Grid>
-        </Grid>
+            <Box sx={{ display: "flex", gap: "4px" }}>
+              <Button size="small" onClick={() => updateClock(growthClock - 1)} disabled={growthClock === 0}
+                style={{ minWidth: 32, height: 28, padding: 0, border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800 }}>-</Button>
+              <Button size="small" onClick={() => updateClock(growthClock + 1)} disabled={growthClock === 4}
+                style={{ minWidth: 32, height: 28, padding: 0, border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800 }}>+</Button>
+              <Button size="small" onClick={() => updateClock(0)}
+                style={{ minWidth: 46, height: 28, padding: "0 4px", border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800, fontSize: "0.7rem" }}>{t("Reset")}</Button>
+            </Box>
+          </Box>
+          {onRoll && currentMagiseed && (
+            <IconButton size="small" onClick={() => onRoll(currentMagiseed, growthClock)} sx={{ p: "2px", color: theme.white }}>
+              <Casino sx={{ fontSize: "1.15rem" }} />
+            </IconButton>
+          )}
+        </Box>
       </div>
-      {/* Current Effect */}
-      {currentMagiseed && getCurrentEffect() && (
-        <>
-          <div
-            style={{
-              backgroundColor: theme.secondary,
-              fontFamily: "Antonio",
-              fontWeight: "normal",
-              fontSize: "0.9em",
-              padding: "2px 17px",
-              color: theme.white,
-              textTransform: "uppercase",
-            }}
-          >
-            <Typography variant="h3">
-              {t("magiseed_current_effect")} (T = {growthClock})
-            </Typography>
-          </div>
-          <div
-            style={{
-              padding: "10px 17px",
-              borderBottom: `1px solid ${theme.secondary}`,
-              backgroundColor: theme.ternary + "20",
-              borderLeft: `4px solid ${theme.primary}`,
-            }}
-          >
-            <Typography sx={{ fontWeight: "bold", marginBottom: 1 }}>
-              {currentMagiseed.customName || t(currentMagiseed.name)}
-            </Typography>
-            <div style={{ fontSize: "0.95em" }}>
-              <ReactMarkdown components={components}>
-                {getCurrentEffect() || t("magiseed_no_effect")}
-              </ReactMarkdown>
-            </div>
-          </div>
-        </>
-      )}
       {/* Available Magiseeds */}
       {magiseed.magiseeds && magiseed.magiseeds.length > 0 && (
         <>
@@ -389,7 +292,6 @@ function ThemedSpellMagiseed({
               padding: "2px 17px",
               color: theme.white,
               textTransform: "uppercase",
-              marginTop: "10px",
             }}
           >
             <Typography variant="h3">
@@ -398,175 +300,132 @@ function ThemedSpellMagiseed({
           </div>
           {magiseed.magiseeds.map((seed, index) => {
             const isExpanded = expandedMagiseeds.has(index);
-            const magiseedTemplate = magiseeds.find(
-              (m) => m.name === seed.name,
-            );
+            const seedKey = seed.key ?? seed.name;
+            const magiseedTemplate = magiseeds.find((m) => m.name === seedKey);
+            const isPlanted = currentMagiseed && (currentMagiseed.key ?? currentMagiseed.name) === seedKey;
+            const seedName = seed.customName || t(seedKey);
+            const rangeStart = seed.rangeStart ?? magiseedTemplate?.rangeStart ?? 0;
+            const rangeEnd = seed.rangeEnd ?? magiseedTemplate?.rangeEnd ?? 3;
 
             return (
-              <div key={index}>
-                <div
-                  style={{
-                    padding: "8px 17px",
-                    borderBottom: `1px solid ${theme.secondary}`,
-                    backgroundColor:
-                      currentMagiseed && seed.name === currentMagiseed.name
-                        ? theme.ternary + "20"
-                        : "transparent",
-                    borderLeft:
-                      currentMagiseed && seed.name === currentMagiseed.name
-                        ? `4px solid ${theme.primary}`
-                        : "none",
-                    cursor: "pointer",
-                  }}
+              <Box
+                key={index}
+                sx={{
+                  border: `1px solid ${isPlanted ? theme.primary : theme.secondary}`,
+                  borderRadius: 1,
+                  overflow: "hidden",
+                }}
+              >
+                {/* Row header */}
+                <Box
                   onClick={() => toggleMagiseedExpansion(index)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "stretch",
+                    minHeight: 44,
+                    background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+                    borderBottom: isExpanded ? `1px solid ${theme.secondary}` : "none",
+                    cursor: "pointer",
+                    "&:hover": { filter: "brightness(0.97)" },
+                  }}
                 >
-                  <Grid container sx={{ alignItems: "center" }}>
-                    <Grid size={1}>
-                      {isExpanded ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-                    </Grid>
-                    <Grid size={7}>
-                      <Typography
-                        sx={{
-                          fontWeight:
-                            currentMagiseed &&
-                            seed.name === currentMagiseed.name
-                              ? "bold"
-                              : "normal",
-                        }}
-                      >
-                        {seed.customName || t(seed.name)}
-                      </Typography>
-                    </Grid>
-                    <Grid style={{ textAlign: "right" }} size={4}>
-                      {isEditMode && (
-                        <Button
-                          size="small"
-                          variant={
-                            currentMagiseed &&
-                            seed.name === currentMagiseed.name
-                              ? "contained"
-                              : "outlined"
-                          }
-                          color={
-                            currentMagiseed &&
-                            seed.name === currentMagiseed.name
-                              ? "success"
-                              : "primary"
-                          }
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const isCurrentSeed =
-                              currentMagiseed &&
-                              seed.name === currentMagiseed.name;
-                            if (onMagiseedChange)
-                              onMagiseedChange(isCurrentSeed ? null : seed);
-                          }}
-                        >
-                          {currentMagiseed && seed.name === currentMagiseed.name
-                            ? t("magiseed_remove_from_garden")
-                            : currentMagiseed
-                              ? t("magiseed_graft_in_garden")
-                              : t("magiseed_plant_in_garden")}
-                        </Button>
-                      )}
-                      {!isEditMode &&
-                        currentMagiseed &&
-                        seed.name === currentMagiseed.name && (
-                          <Typography
-                            sx={{
-                              color: "success.main",
-                              fontWeight: "bold",
-                              fontSize: "0.85em",
-                            }}
-                          >
-                            {t("magiseed_plant_in_garden")}
-                          </Typography>
-                        )}
-                    </Grid>
-                  </Grid>
-                </div>
-                <Collapse in={isExpanded}>
-                  <div
-                    style={{
-                      padding: "16px 17px",
-                      backgroundColor: theme.ternary + "10",
-                      borderBottom: `1px solid ${theme.secondary}`,
+                  {/* Label area */}
+                  <Box
+                    sx={{
+                      flex: 1,
+                      minWidth: 0,
+                      px: "10px",
+                      py: "4px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
                     }}
                   >
-                    {/* Description */}
                     <Typography
-                      variant="body2"
-                      sx={{ fontStyle: "italic", mb: 2 }}
+                      noWrap
+                      sx={{
+                        fontFamily: "Antonio",
+                        fontWeight: 800,
+                        fontSize: "0.95rem",
+                        textTransform: "uppercase",
+                        lineHeight: 1.3,
+                      }}
                     >
+                      {seedName}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: "bold" }}>
+                      {`T: ${rangeStart}–${rangeEnd}`}
+                      {isPlanted && <> · <span style={{ color: theme.primary }}>{t("magiseed_plant_in_garden")}</span></>}
+                    </Typography>
+                  </Box>
+                  {/* Actions area */}
+                  {isEditMode && (
+                    <Box
+                      onClick={(e) => e.stopPropagation()}
+                      sx={{
+                        bgcolor: theme.primary,
+                        display: "flex",
+                        alignItems: "center",
+                        px: "6px",
+                        gap: 0.25,
+                        flexShrink: 0,
+                        "& .MuiIconButton-root": { p: "2px", width: 32, height: 32, color: theme.white },
+                        "& .MuiSvgIcon-root": { fontSize: "1.15rem" },
+                      }}
+                    >
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="inherit"
+                        onClick={() => onMagiseedChange && onMagiseedChange(isPlanted ? null : seed)}
+                        style={{
+                          minWidth: 64,
+                          height: 32,
+                          fontSize: "0.75rem",
+                          fontWeight: 800,
+                          border: "none",
+                          color: theme.primary,
+                          backgroundColor: theme.white,
+                        }}
+                      >
+                        {isPlanted
+                          ? t("magiseed_remove_from_garden")
+                          : currentMagiseed
+                            ? t("magiseed_graft_in_garden")
+                            : t("magiseed_plant_in_garden")}
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
+
+                <Collapse in={isExpanded}>
+                  <Box sx={{ px: 2, py: 1.5 }}>
+                    {/* Description */}
+                    <Typography variant="body2" sx={{ fontStyle: "italic", mb: 1.5 }}>
                       {seed.description
                         ? t(seed.description)
-                        : (magiseedTemplate &&
-                            t(magiseedTemplate.description)) ||
-                          t("No description available")}
+                        : (magiseedTemplate && t(magiseedTemplate.description)) || t("No description available")}
                     </Typography>
 
-                    {/* Effect Range */}
-                    {seed.rangeStart !== undefined &&
-                      seed.rangeEnd !== undefined && (
-                        <>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: "bold", mb: 0.5 }}
-                          >
-                            {t("magiseed_effect_range")}:
-                          </Typography>
-                          <Typography variant="body2" sx={{ mb: 2 }}>
-                            T = {seed.rangeStart} to T = {seed.rangeEnd}
-                          </Typography>
-                        </>
-                      )}
-
-                    <Divider sx={{ my: 2 }} />
-
-                    {/* Effects by growth clock section */}
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontWeight: "bold", mb: 1 }}
-                    >
-                      {t("magiseed_effect_by_growth_clock")}
-                    </Typography>
-
-                    {(() => {
-                      const rangeStart =
-                        seed.rangeStart ?? magiseedTemplate?.rangeStart ?? 0;
-                      const rangeEnd =
-                        seed.rangeEnd ?? magiseedTemplate?.rangeEnd ?? 3;
-                      const sections = [];
-                      for (let i = rangeStart; i <= rangeEnd; i++) {
-                        sections.push(i);
-                      }
-                      return sections;
-                    })().map((section) => {
-                      const effect =
-                        seed.effects?.[section] ||
-                        (magiseedTemplate &&
-                          magiseedTemplate.effects?.[section]);
+                    {/* Effects */}
+                    {[...Array(rangeEnd - rangeStart + 1)].map((_, i) => {
+                      const section = rangeStart + i;
+                      const effect = seed.effects?.[section] || magiseedTemplate?.effects?.[section];
                       if (!effect) return null;
-
                       return (
-                        <Box key={section} sx={{ mb: 1.5 }}>
-                          <Typography
-                            variant="caption"
-                            sx={{ fontWeight: "bold", color: theme.primary }}
-                          >
+                        <Box key={section} sx={{ mb: 1 }}>
+                          <Typography variant="caption" sx={{ fontWeight: "bold", color: theme.primary }}>
                             T = {section}:
                           </Typography>
-                          <Box sx={{ ml: 2, mt: 0.5 }}>
-                            <ReactMarkdown components={components}>
-                              {t(effect)}
-                            </ReactMarkdown>
+                          <Box sx={{ ml: 2, mt: 0.25, fontSize: "0.9em" }}>
+                            <ReactMarkdown components={components}>{t(effect)}</ReactMarkdown>
                           </Box>
                         </Box>
                       );
                     })}
-                  </div>
+                  </Box>
                 </Collapse>
-              </div>
+              </Box>
             );
           })}
         </>

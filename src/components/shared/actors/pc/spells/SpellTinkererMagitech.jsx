@@ -3,7 +3,6 @@ import {
   Typography,
   IconButton,
   Grid,
-  useTheme,
   ThemeProvider,
   Tooltip,
   Icon,
@@ -20,7 +19,6 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
-  const iconColor = isDarkMode ? "#ffffff" : "#000000";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   const showInPlayerSheet =
@@ -35,48 +33,27 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
           background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           padding: "3px 17px",
           display: "flex",
-          marginBottom: "5px",
+
           justifyContent: "space-between",
+          alignItems: "center",
           borderBottom: `1px solid ${theme.secondary}`,
           borderTop: `1px solid ${theme.secondary}`,
         }}
       >
-        <Grid container style={{ flexGrow: 1 }}>
-          <Grid
-            flexGrow
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-            }}
-            size="grow"
-          >
-            <Typography
-              style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontWeight: "bold",
-              }}
-            >
-              {t("Current Rank") + ": " + t(ranks[magitech.rank - 1])}
-            </Typography>
-          </Grid>
-        </Grid>
+        <Typography style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontWeight: "bold" }}>
+          {(magitech.spellName || t("Magitech")) + " (" + t(ranks[magitech.rank - 1]) + ")"}
+        </Typography>
         {isEditMode && (
-          <Grid
-            style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
-            size="grow"
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
             {!showInPlayerSheet && (
               <Tooltip title={t("Magitech not shown in player sheet")}>
-                <Icon>
-                  <VisibilityOff style={{ color: "black" }} />
-                </Icon>
+                <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
               </Tooltip>
             )}
-            <IconButton size="small" onClick={onEdit}>
-              <Edit style={{ color: iconColor }} />
+            <IconButton size="small" onClick={onEdit} sx={{ p: "3px" }}>
+              <Edit sx={{ fontSize: "1.1rem" }} />
             </IconButton>
-          </Grid>
+          </div>
         )}
       </div>
       {/* Row 1 Magitech Override */}
@@ -91,52 +68,25 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             color: theme.white,
             textTransform: "uppercase",
             display: "flex",
-            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
-          <Grid container style={{ flexGrow: 1 }}>
-            <Grid
-              flexGrow
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "left",
-              }}
-              size="grow"
-            >
-              <Typography
-                variant="h3"
-                style={{ flexGrow: 1, marginRight: "5px" }}
-              >
-                {t("Magitech Override")}
-              </Typography>
-            </Grid>
-          </Grid>
-          {isEditMode && (
-            <Grid
-              style={{
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0,
-              }}
-              size="grow"
-            >
-              <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
-            </Grid>
-          )}
+          <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+            {t("Magitech Override")}
+          </Typography>
         </div>
       )}
       {/* Row 2 Magitech Override */}
       {magitech.rank >= 1 && (
-        <Accordion sx={{ marginY: 1 }}>
+        <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
             </Icon>
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            <ReactMarkdown>{t("MagitechOverride_desc")}</ReactMarkdown>
+          <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("MagitechOverride_desc")}</ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}
@@ -152,53 +102,26 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             color: theme.white,
             textTransform: "uppercase",
             display: "flex",
-            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
-          <Grid container style={{ flexGrow: 1 }}>
-            <Grid
-              flexGrow
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "left",
-              }}
-              size="grow"
-            >
-              <Typography
-                variant="h3"
-                style={{ flexGrow: 1, marginRight: "5px" }}
-              >
-                {t("Magicannon")}
-              </Typography>
-            </Grid>
-          </Grid>
-          {isEditMode && (
-            <Grid
-              style={{
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0,
-              }}
-              size="grow"
-            >
-              <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
-            </Grid>
-          )}
+          <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+            {t("Magicannon")}
+          </Typography>
         </div>
       )}
       {/* Row 2 Magicannon */}
       {magitech.rank >= 2 && (
-        <Accordion sx={{ marginY: 1 }}>
+        <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
             </Icon>
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            <ReactMarkdown>{t("Magicannon_desc1")}</ReactMarkdown>
-            <ReactMarkdown>{t("Magicannon_desc2")}</ReactMarkdown>
+          <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magicannon_desc1")}</ReactMarkdown>
+            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magicannon_desc2")}</ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}
@@ -214,54 +137,27 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             color: theme.white,
             textTransform: "uppercase",
             display: "flex",
-            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
-          <Grid container style={{ flexGrow: 1 }}>
-            <Grid
-              flexGrow
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "left",
-              }}
-              size="grow"
-            >
-              <Typography
-                variant="h3"
-                style={{ flexGrow: 1, marginRight: "5px" }}
-              >
-                {t("Magispheres")}
-              </Typography>
-            </Grid>
-          </Grid>
-          {isEditMode && (
-            <Grid
-              style={{
-                display: "flex",
-                alignItems: "center",
-                flexShrink: 0,
-              }}
-              size="grow"
-            >
-              <div style={{ width: 40, height: 40 }} /> {/* Retain space */}
-            </Grid>
-          )}
+          <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+            {t("Magispheres")}
+          </Typography>
         </div>
       )}
       {/* Row 2 Magispheres */}
       {magitech.rank >= 3 && (
-        <Accordion sx={{ marginY: 1 }}>
+        <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
             </Icon>
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            <ReactMarkdown>{t("Magispheres_desc1")}</ReactMarkdown>
-            <ReactMarkdown>{t("Magispheres_desc2")}</ReactMarkdown>
-            <ReactMarkdown>{t("Magispheres_desc3")}</ReactMarkdown>
+          <AccordionDetails sx={{ py: "6px", px: "12px" }}>
+            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magispheres_desc1")}</ReactMarkdown>
+            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magispheres_desc2")}</ReactMarkdown>
+            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magispheres_desc3")}</ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}
@@ -270,7 +166,7 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
 }
 
 export default function SpellTinkererMagitech(props) {
-  const theme = useTheme();
+  const theme = useCustomTheme();
   return (
     <ThemeProvider theme={theme}>
       <ThemedSpellTinkererMagitech {...props} />

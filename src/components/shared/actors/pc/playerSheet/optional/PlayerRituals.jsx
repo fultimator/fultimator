@@ -134,7 +134,7 @@ export default function PlayerRituals({
   const calculator = isEditMode && (
     <Box sx={{ px: 1.5, pb: 1.5 }}>
       {/* Two-column: options left, clock right */}
-      <Grid container spacing={2} alignItems="stretch">
+      <Grid container spacing={2} sx={{ alignItems: "stretch" }}>
         {/* Left: Potency + Area + Reductions */}
         <Grid size={{ xs: 12, sm: 7 }}>
           <Grid container spacing={1}>
