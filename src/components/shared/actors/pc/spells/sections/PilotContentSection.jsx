@@ -4,11 +4,6 @@ import {
   Grid,
   Button,
   Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
   Box,
   FormControlLabel,
   Switch,
@@ -29,7 +24,6 @@ import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationD
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import VehicleModule from "/src/components/shared/actors/pc/spells/VehicleModule";
 import { availableFrames, availableModules } from "/src/libs/pilotVehicleData";
-import CustomTextarea from "/src/components/common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
 import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
@@ -861,87 +855,31 @@ export default function PilotContentSection({
             >
               <Box sx={{ px: 2, pt: 1.5, pb: 2 }}>
                 <Grid container spacing={1}>
-                  {/* Row 1: Name | Frame | Max Modules */}
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      label={t("pilot_vehicles_name")}
-                      value={vehicle.customName || ""}
-                      onChange={(e) =>
-                        handleVehicleChange(
-                          vehicleIndex,
-                          "customName",
-                          e.target.value,
-                        )
+                  <Grid size={12}>
+                    <TabbedSchemaFormRenderer
+                      tabs={DEFAULT_SUBITEM_TABS}
+                      config={pilotVehicleItemFields}
+                      state={{
+                        passives: [],
+                        behaviors: [],
+                        ...vehicle,
+                      }}
+                      onChange={(next) =>
+                        handleVehicleChange(vehicleIndex, "_replace", next)
                       }
+                      surface="edit"
                     />
                   </Grid>
 
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel>{t("pilot_frame_type")}</InputLabel>
-                      <Select
-                        value={vehicle.frame || "pilot_frame_exoskeleton"}
-                        label={t("pilot_frame_type")}
-                        onChange={(e) =>
-                          handleVehicleChange(
-                            vehicleIndex,
-                            "frame",
-                            e.target.value,
-                          )
-                        }
-                      >
-                        {availableFrames.map((frame) => (
-                          <MenuItem key={frame.name} value={frame.name}>
-                            {t(frame.name)}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    {(() => {
-                      const totalSlots =
-                        getEquippedCount(vehicle, "armor") +
-                        getEquippedCount(vehicle, "weapon") +
-                        getEquippedCount(vehicle, "support");
-                      const maxLimit = vehicle.maxEnabledModules || 3;
-                      const isOverTotal = totalSlots > maxLimit;
-                      return (
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label={t("pilot_max_enabled_modules")}
-                          type="number"
-                          slotProps={{ htmlInput: { min: 3 } }}
-                          value={vehicle.maxEnabledModules || 3}
-                          error={isOverTotal}
-                          helperText={
-                            isOverTotal ? `${totalSlots}/${maxLimit}` : ""
-                          }
-                          onChange={(e) =>
-                            handleVehicleChange(
-                              vehicleIndex,
-                              "maxEnabledModules",
-                              parseInt(e.target.value, 10),
-                            )
-                          }
-                        />
-                      );
-                    })()}
-                  </Grid>
-
-                  <Grid size={12}>
-                    {(() => {
-                      const currentFrame = availableFrames.find(
-                        (f) =>
-                          f.name ===
-                          (vehicle.frame || "pilot_frame_exoskeleton"),
-                      );
-                      if (!currentFrame) return null;
-                      return (
+                  {/* Frame info (read-only, derived from static data) */}
+                  {(() => {
+                    const currentFrame = availableFrames.find(
+                      (f) =>
+                        f.name === (vehicle.frame || "pilot_frame_exoskeleton"),
+                    );
+                    if (!currentFrame) return null;
+                    return (
+                      <Grid size={12}>
                         <Box
                           sx={{
                             px: 1,
@@ -973,46 +911,11 @@ export default function PilotContentSection({
                             </ReactMarkdown>
                           </Typography>
                         </Box>
-                      );
-                    })()}
-                  </Grid>
+                      </Grid>
+                    );
+                  })()}
 
-                  {/* Row 2: Description (compact) */}
-                  <Grid size={12}>
-                    <CustomTextarea
-                      label={t("pilot_vehicles_description")}
-                      value={vehicle.description || ""}
-                      onChange={(e) =>
-                        handleVehicleChange(
-                          vehicleIndex,
-                          "description",
-                          e.target.value,
-                        )
-                      }
-                      minRows={2}
-                    />
-                  </Grid>
-
-                  {/* Passives / Behaviors tabs */}
-                  <Grid size={12}>
-                    <TabbedSchemaFormRenderer
-                      tabs={DEFAULT_SUBITEM_TABS.filter(
-                        (tab) => tab.key !== "attributes",
-                      )}
-                      config={pilotVehicleItemFields}
-                      state={{
-                        passives: [],
-                        behaviors: [],
-                        ...vehicle,
-                      }}
-                      onChange={(next) =>
-                        handleVehicleChange(vehicleIndex, "_replace", next)
-                      }
-                      surface="edit"
-                    />
-                  </Grid>
-
-                  {/* Row 3: Add module buttons */}
+                  {/* Add module buttons */}
                   <Grid size={12}>
                     <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
                       {["armor", "weapon", "support"].map((moduleType) => (

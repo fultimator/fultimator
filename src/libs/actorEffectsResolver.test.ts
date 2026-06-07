@@ -212,6 +212,82 @@ describe("resolveActorEffects", () => {
     expect(bonuses.accuracy.all).toBe(5);
   });
 
+  it("transfers passives from spell sub-items (gifts, tones, etc.)", () => {
+    const player = {
+      classes: [
+        {
+          name: "Esper",
+          lvl: 1,
+          skills: [],
+          heroic: [],
+          spells: [
+            {
+              name: "Telekinesis",
+              spellType: "gift",
+              passives: [],
+              gifts: [
+                {
+                  key: "esper_gift_atmokinesis",
+                  passives: [transferredAccuracy(3, "bonuses.accuracy.all")],
+                },
+                {
+                  key: "esper_gift_clairvoyance",
+                  passives: [],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      equipment: [],
+    } as unknown as TypePlayer;
+
+    const { bonuses } = resolveActorEffects(player);
+
+    expect(bonuses.accuracy.all).toBe(3);
+  });
+
+  it("transfers passives from pilot vehicle modules", () => {
+    const player = {
+      classes: [
+        {
+          name: "Pilot",
+          lvl: 1,
+          skills: [],
+          heroic: [],
+          spells: [
+            {
+              name: "Mech",
+              spellType: "pilot-vehicle",
+              passives: [],
+              vehicles: [
+                {
+                  customName: "Iron Golem",
+                  passives: [transferredAccuracy(1, "bonuses.accuracy.all")],
+                  modules: [
+                    {
+                      name: "pilot_custom_weapon",
+                      passives: [transferredAccuracy(2, "bonuses.accuracy.all")],
+                    },
+                    {
+                      name: "pilot_module_sword",
+                      passives: [],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      equipment: [],
+    } as unknown as TypePlayer;
+
+    const { bonuses } = resolveActorEffects(player);
+
+    expect(bonuses.accuracy.all).toBe(3);
+  });
+
   it("honors crisis predicates from the resolve context", () => {
     const player = {
       effects: [

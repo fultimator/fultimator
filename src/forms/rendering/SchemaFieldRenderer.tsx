@@ -86,7 +86,7 @@ export function SchemaFieldRenderer<
   const visible = config
     .filter((field) => {
       if (field.surfaces && !field.surfaces.includes(surface)) return false;
-      if (group !== undefined && field.group !== group) return false;
+      if (group !== undefined && (field.group ?? "") !== group) return false;
       if (field.kind === "computed") return false;
       if (!field.component) return false;
       if (field.dependencies && !field.dependencies(state)) return false;

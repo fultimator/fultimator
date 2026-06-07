@@ -95,12 +95,48 @@ function itemPassives(item: ItemWithEffects): Passive[] {
   return [...(item.passives ?? []), ...(item.behavior?.effects ?? [])];
 }
 
+type SubItemContainer = Record<string, unknown>;
+
+function* walkSpellSubItems(
+  spell: SubItemContainer,
+): Generator<ItemWithEffects> {
+  const arrays = [
+    "gifts",
+    "dances",
+    "tones",
+    "keys",
+    "symbols",
+    "therioforms",
+    "magiseeds",
+    "invocations",
+    "effects",
+    "targets",
+  ];
+  for (const key of arrays) {
+    const arr = spell[key];
+    if (Array.isArray(arr)) for (const sub of arr) yield sub as ItemWithEffects;
+  }
+  // Pilot: vehicles[] -> modules[]
+  const vehicles = spell["vehicles"];
+  if (Array.isArray(vehicles)) {
+    for (const vehicle of vehicles) {
+      yield vehicle as ItemWithEffects;
+      const modules = (vehicle as SubItemContainer)["modules"];
+      if (Array.isArray(modules))
+        for (const mod of modules) yield mod as ItemWithEffects;
+    }
+  }
+}
+
 function* walkItems(actor: Actor): Generator<ItemWithEffects> {
   if (isPlayer(actor)) {
     for (const klass of actor.classes ?? []) {
       if (Array.isArray(klass.skills)) for (const s of klass.skills) yield s;
       if (Array.isArray(klass.heroic)) for (const h of klass.heroic) yield h;
-      if (Array.isArray(klass.spells)) for (const sp of klass.spells) yield sp;
+      for (const sp of klass.spells ?? []) {
+        yield sp;
+        yield* walkSpellSubItems(sp as unknown as SubItemContainer);
+      }
     }
 
     for (const eq of actor.equipment ?? []) {
