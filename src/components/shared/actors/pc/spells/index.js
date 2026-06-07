@@ -49,6 +49,7 @@ export { default as PilotGeneralSection } from "./sections/PilotGeneralSection";
 export { default as PilotContentSection } from "./sections/PilotContentSection";
 export { default as InvokerGeneralSection } from "./sections/InvokerGeneralSection";
 export { default as InvokerContentSection } from "./sections/InvokerContentSection";
+export { default as InfusionEffectsContentSection } from "./sections/InfusionEffectsContentSection";
 export { default as GourmetGeneralSection } from "./sections/GourmetGeneralSection";
 export { default as GourmetContentSection } from "./sections/GourmetContentSection";
 export { default as GourmetInventoryTab } from "./sections/GourmetInventoryTab";

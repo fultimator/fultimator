@@ -46,8 +46,6 @@ export default function GiftItem({
     closeDialog: closeDeleteDialog,
   } = useDeleteConfirmation({ onConfirm: () => {} });
 
-  const isCustom = formState.key === "esper_gift_custom_name";
-
   const handleChange = (next) => {
     const nextKey = next.key;
     if (nextKey !== formState.key && nextKey !== "esper_gift_custom_name") {

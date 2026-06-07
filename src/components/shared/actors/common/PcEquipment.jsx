@@ -1939,7 +1939,6 @@ export default function PcEquipment({
           equipToSlot("accessories", invItem.name, idx, "accessory", false);
         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [
       player,
@@ -1948,7 +1947,6 @@ export default function PcEquipment({
       unequipItem,
       checkIfEquippable,
       hasDualShieldBearer,
-      isTwoHandedEquipped,
     ],
   );
 
@@ -2034,15 +2032,8 @@ export default function PcEquipment({
           item,
         }),
       );
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [
-      setPlayer,
-      player?.equippedSlots,
-      hasDualShieldBearer,
-      isTwoHandedEquipped,
-      player,
-    ],
+    [setPlayer, hasDualShieldBearer, player],
   );
 
   const handleEquipToSlot = useCallback(
