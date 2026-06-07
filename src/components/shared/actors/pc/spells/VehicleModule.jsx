@@ -37,11 +37,11 @@ import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
+import { vehicleModuleGroupLabels } from "/src/forms/rendering/config/itemConfigs/vehicleModule";
 import {
-  vehicleModuleFieldConfig,
-  vehicleModuleGroupLabels,
-  vehicleModuleTabs,
-} from "/src/forms/rendering/config/itemConfigs/vehicleModule";
+  pilotModuleItemFields,
+  DEFAULT_SUBITEM_TABS,
+} from "/src/forms/rendering/config/itemConfigs/spells/subitems/pilotModule";
 
 const VehicleModule = memo(
   ({
@@ -556,15 +556,11 @@ const VehicleModule = memo(
                 </Box>
               )}
               <TabbedSchemaFormRenderer
-                tabs={vehicleModuleTabs}
-                config={vehicleModuleFieldConfig}
-                state={module}
+                tabs={DEFAULT_SUBITEM_TABS}
+                config={pilotModuleItemFields}
+                state={{ passives: [], behaviors: [], ...module }}
                 onChange={(next) => {
-                  Object.entries(next).forEach(([key, value]) => {
-                    if (module[key] !== value) {
-                      onModuleChange(vehicleIndex, moduleIndex, key, value);
-                    }
-                  });
+                  onModuleChange(vehicleIndex, moduleIndex, "_replace", next);
                 }}
                 surface="edit"
                 groupLabels={vehicleModuleGroupLabels}

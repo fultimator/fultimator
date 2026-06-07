@@ -31,6 +31,11 @@ import VehicleModule from "/src/components/shared/actors/pc/spells/VehicleModule
 import { availableFrames, availableModules } from "/src/libs/pilotVehicleData";
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
+import {
+  pilotVehicleItemFields,
+  DEFAULT_SUBITEM_TABS,
+} from "/src/forms/rendering/config/itemConfigs/spells/subitems/pilotVehicle";
 
 function VehicleAccordion({
   vehicle,
@@ -453,6 +458,11 @@ export default function PilotContentSection({
           return updated;
         }
 
+        if (field === "_replace") {
+          updated[vehicleIndex] = { ...updated[vehicleIndex], ...value };
+          return updated;
+        }
+
         updated[vehicleIndex] = {
           ...updated[vehicleIndex],
           [field]: value,
@@ -719,6 +729,8 @@ export default function PilotContentSection({
           } else {
             // Non-weapon equippedSlot changes are no-ops in the new schema
           }
+        } else if (field === "_replace") {
+          modules[moduleIndex] = { ...currentModule, ...value };
         } else {
           modules[moduleIndex] = {
             ...currentModule,
@@ -978,6 +990,25 @@ export default function PilotContentSection({
                         )
                       }
                       minRows={2}
+                    />
+                  </Grid>
+
+                  {/* Passives / Behaviors tabs */}
+                  <Grid size={12}>
+                    <TabbedSchemaFormRenderer
+                      tabs={DEFAULT_SUBITEM_TABS.filter(
+                        (tab) => tab.key !== "attributes",
+                      )}
+                      config={pilotVehicleItemFields}
+                      state={{
+                        passives: [],
+                        behaviors: [],
+                        ...vehicle,
+                      }}
+                      onChange={(next) =>
+                        handleVehicleChange(vehicleIndex, "_replace", next)
+                      }
+                      surface="edit"
                     />
                   </Grid>
 
