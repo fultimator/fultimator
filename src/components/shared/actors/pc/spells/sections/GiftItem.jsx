@@ -1,191 +1,122 @@
-import { useState } from "react";
-import {
-  Grid,
-  TextField,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-  IconButton,
-  Collapse,
-} from "@mui/material";
-import {
-  Delete,
-  ContentCopy,
-  ExpandMore,
-  ExpandLess,
-} from "@mui/icons-material";
-import CustomTextarea from "/src/components/common/CustomTextarea";
+import { useState, useEffect } from "react";
+import { Box, IconButton, Typography } from "@mui/material";
+import { Delete, ContentCopy } from "@mui/icons-material";
 import { availableGifts } from "/src/libs/player/spellOptionData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import NotesMarkdown from "/src/components/common/NotesMarkdown";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
+import {
+  giftItemFields,
+  DEFAULT_SUBITEM_TABS,
+} from "/src/forms/rendering/config/itemConfigs/spells/subitems/gift";
+import { useTranslate } from "/src/translation/translate";
+
+function toFormState(src, t) {
+  const resolvedKey = src.key || src.name || "esper_gift_custom_name";
+  const custom = resolvedKey === "esper_gift_custom_name";
+  return {
+    key: resolvedKey,
+    customName: src.customName || "",
+    event: custom ? (src.event || "") : (src.event ? t(src.event) : ""),
+    effect: custom ? (src.effect || "") : (src.effect ? t(src.effect) : ""),
+    passives: src.passives ?? [],
+    behaviors: src.behaviors ?? [],
+  };
+}
 
 export default function GiftItem({
   item,
   itemIndex,
-  onItemChange,
+  onReplaceItem,
   onDeleteItem,
   onCloneItem,
-  t,
 }) {
+  const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
+
+  const [formState, setFormState] = useState(() => toFormState(item, t));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormState(toFormState(item, t)); }, [item]);
+
   const {
     isOpen: deleteDialogOpen,
     openDialog: openDeleteDialog,
     closeDialog: closeDeleteDialog,
   } = useDeleteConfirmation({ onConfirm: () => {} });
 
-  const isCustom = item.key === "esper_gift_custom_name";
+  const isCustom = formState.key === "esper_gift_custom_name";
 
-  const handleNameChange = (value) => {
-    const gift = availableGifts.find((g) => g.name === value);
-    if (!gift) return;
-    onItemChange(itemIndex, "key", value);
-    if (value !== "esper_gift_custom_name") {
-      onItemChange(itemIndex, "event", gift.event);
-      onItemChange(itemIndex, "effect", gift.effect);
-      onItemChange(itemIndex, "customName", "");
+  const handleChange = (next) => {
+    const nextKey = next.key;
+    if (nextKey !== formState.key && nextKey !== "esper_gift_custom_name") {
+      const gift = availableGifts.find((g) => g.name === nextKey);
+      if (gift) {
+        const resolved = {
+          ...next,
+          key: nextKey,
+          customName: "",
+          event: t(gift.event || ""),
+          effect: t(gift.effect || ""),
+        };
+        setFormState(resolved);
+        onReplaceItem(itemIndex, { ...resolved, event: gift.event || "", effect: gift.effect || "" });
+        return;
+      }
     }
+    setFormState(next);
+    onReplaceItem(itemIndex, next);
   };
+
+  const itemDisplayName =
+    formState.customName || t(formState.key || "esper_gift_custom_name");
+
+  const subtitle = formState.event ? (
+    <NotesMarkdown compact>{formState.event}</NotesMarkdown>
+  ) : undefined;
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
     onCloneItem(itemIndex, {
       ...item,
       key: "esper_gift_custom_name",
-      customName: item.customName || (item.key ? t(item.key) : ""),
-      event: typeof item.event === "string" ? t(item.event) : item.event,
-      effect: typeof item.effect === "string" ? t(item.effect) : item.effect,
+      customName: formState.customName || t(formState.key || ""),
+      event: formState.event,
+      effect: formState.effect,
     });
   };
-
-  const itemDisplayName =
-    item.customName || t(item.key || "esper_gift_custom_name");
-
-  const eventText = isCustom
-    ? item.event || ""
-    : item.event?.startsWith("esper_event_")
-      ? t(item.event)
-      : item.event || "";
-
-  const subtitle = eventText ? (
-    <NotesMarkdown compact>{eventText}</NotesMarkdown>
-  ) : undefined;
 
   return (
     <>
       <ItemRowCard
         label={itemDisplayName}
         subtitle={subtitle}
-        onClick={() => setExpanded((prev) => !prev)}
+        onClick={() => setExpanded((v) => !v)}
         actions={
           <>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCloneToCustom();
-              }}
-            >
+            <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
               <ContentCopy />
             </IconButton>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                openDeleteDialog();
-              }}
-            >
+            <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
               <Delete />
-            </IconButton>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpanded((prev) => !prev);
-              }}
-            >
-              {expanded ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
           </>
         }
       >
-        <Collapse in={expanded}>
+        {expanded && (
           <Box sx={{ p: 2 }} onClick={(e) => e.stopPropagation()}>
-            <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <FormControl fullWidth>
-                  <InputLabel>{t("Gift Type")}</InputLabel>
-                  <Select
-                    value={item.key || ""}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    label={t("Gift Type")}
-                  >
-                    {availableGifts
-                      .filter((gift) => gift.name !== "esper_gift_custom_name")
-                      .map((gift) => (
-                        <MenuItem key={gift.name} value={gift.name}>
-                          {t(gift.name)}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 4 }}>
-                <TextField
-                  fullWidth
-                  label={t("Event")}
-                  value={
-                    isCustom
-                      ? item.event || ""
-                      : item.event?.startsWith("esper_event_")
-                        ? t(item.event)
-                        : item.event || ""
-                  }
-                  onChange={(e) =>
-                    onItemChange(itemIndex, "event", e.target.value)
-                  }
-                  disabled={!isCustom}
-                />
-              </Grid>
-
-              {isCustom && (
-                <Grid size={{ xs: 12, sm: 4 }}>
-                  <TextField
-                    fullWidth
-                    label={t("Custom Name")}
-                    value={item.customName || ""}
-                    onChange={(e) =>
-                      onItemChange(itemIndex, "customName", e.target.value)
-                    }
-                  />
-                </Grid>
-              )}
-
-              <Grid size={12}>
-                <CustomTextarea
-                  label={t("Gift Effect")}
-                  value={
-                    isCustom
-                      ? item.effect || ""
-                      : item.effect
-                        ? t(item.effect)
-                        : ""
-                  }
-                  onChange={(e) =>
-                    onItemChange(itemIndex, "effect", e.target.value)
-                  }
-                  disabled={!isCustom}
-                  rows={2}
-                />
-              </Grid>
-            </Grid>
+            <TabbedSchemaFormRenderer
+              tabs={DEFAULT_SUBITEM_TABS}
+              config={giftItemFields}
+              state={formState}
+              onChange={handleChange}
+              surface="edit"
+              cols={2}
+            />
           </Box>
-        </Collapse>
+        )}
       </ItemRowCard>
-
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={closeDeleteDialog}

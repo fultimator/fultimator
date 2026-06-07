@@ -1,212 +1,116 @@
-import { useState } from "react";
-import {
-  Grid,
-  TextField,
-  Button,
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from "@mui/material";
-import { Delete, ContentCopy, ExpandMore } from "@mui/icons-material";
-import CustomTextarea from "/src/components/common/CustomTextarea";
+import { useState, useEffect } from "react";
+import { Box, IconButton, Typography } from "@mui/material";
+import { Delete, ContentCopy } from "@mui/icons-material";
 import { availableTherioforms } from "/src/libs/player/spellOptionData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
+import {
+  therioformItemFields,
+  DEFAULT_SUBITEM_TABS,
+} from "/src/forms/rendering/config/itemConfigs/spells/subitems/therioform";
+import { useTranslate } from "/src/translation/translate";
+
+function toFormState(src, t) {
+  const custom = src.name === "mutant_therioform_custom_name";
+  return {
+    name: src.name || "mutant_therioform_custom_name",
+    customName: src.customName || "",
+    genoclepsis: custom ? (src.genoclepsis || "") : (src.genoclepsis ? t(src.genoclepsis) : ""),
+    description: custom ? (src.description || "") : (src.description ? t(src.description) : ""),
+    passives: src.passives ?? [],
+    behaviors: src.behaviors ?? [],
+  };
+}
 
 export default function MutantItem({
   item,
   itemIndex,
-  onItemChange,
+  onReplaceItem,
   onDeleteItem,
   onCloneItem,
-  t,
 }) {
-  const handleNameChange = (value) => {
-    const therioform = availableTherioforms.find((t) => t.name === value);
-    if (therioform) {
-      onItemChange(itemIndex, "name", value);
-      if (value !== "mutant_therioform_custom_name") {
-        onItemChange(itemIndex, "genoclepsis", therioform.genoclepsis);
-        onItemChange(itemIndex, "description", therioform.description);
-        onItemChange(itemIndex, "customName", "");
+  const { t } = useTranslate();
+  const [expanded, setExpanded] = useState(false);
+
+  const [formState, setFormState] = useState(() => toFormState(item, t));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormState(toFormState(item, t)); }, [item]);
+
+  const {
+    isOpen: deleteDialogOpen,
+    openDialog: openDeleteDialog,
+    closeDialog: closeDeleteDialog,
+  } = useDeleteConfirmation({ onConfirm: () => {} });
+
+  const handleChange = (next) => {
+    const nextName = next.name;
+    if (nextName !== formState.name && nextName !== "mutant_therioform_custom_name") {
+      const therioform = availableTherioforms.find((tf) => tf.name === nextName);
+      if (therioform) {
+        const resolved = {
+          ...next,
+          name: nextName,
+          customName: "",
+          genoclepsis: t(therioform.genoclepsis || ""),
+          description: t(therioform.description || ""),
+        };
+        setFormState(resolved);
+        onReplaceItem(itemIndex, { ...resolved, genoclepsis: therioform.genoclepsis || "", description: therioform.description || "" });
+        return;
       }
     }
-  };
-
-  const isCustom =
-    item.name === "mutant_therioform_custom_name" ||
-    !availableTherioforms.find((t) => t.name === item.name);
-  const [expanded, setExpanded] = useState(false);
-  const { isOpen: deleteDialogOpen, closeDialog: setDeleteDialogOpen } =
-    useDeleteConfirmation({
-      onConfirm: () => {},
-    });
-
-  const handleCloneToCustom = () => {
-    if (!onCloneItem) return;
-
-    const clone = {
-      ...item,
-      name: "mutant_therioform_custom_name",
-      customName: item.customName || (item.name ? t(item.name) : ""),
-      genoclepsis:
-        typeof item.genoclepsis === "string"
-          ? t(item.genoclepsis)
-          : item.genoclepsis,
-      description:
-        typeof item.description === "string"
-          ? t(item.description)
-          : item.description,
-    };
-
-    onCloneItem(itemIndex, clone);
-  };
-
-  const handleDeleteClick = (e) => {
-    e.stopPropagation();
-    setDeleteDialogOpen(true);
-  };
-
-  const handleCloneClick = (e) => {
-    e.stopPropagation();
-    handleCloneToCustom();
+    setFormState(next);
+    onReplaceItem(itemIndex, next);
   };
 
   const itemDisplayName =
-    item.customName || t(item.name || "mutant_therioform_custom_name");
+    formState.customName || t(formState.name || "mutant_therioform_custom_name");
+
+  const handleCloneToCustom = () => {
+    if (!onCloneItem) return;
+    onCloneItem(itemIndex, {
+      ...item,
+      name: "mutant_therioform_custom_name",
+      customName: formState.customName || t(formState.name || ""),
+      genoclepsis: formState.genoclepsis,
+      description: formState.description,
+    });
+  };
 
   return (
     <>
-      <Accordion
-        expanded={expanded}
-        onChange={() => setExpanded((prev) => !prev)}
-        sx={{ mb: 2 }}
+      <ItemRowCard
+        label={itemDisplayName}
+        onClick={() => setExpanded((v) => !v)}
+        actions={
+          <>
+            <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
+              <ContentCopy />
+            </IconButton>
+            <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
+              <Delete />
+            </IconButton>
+          </>
+        }
       >
-        <AccordionSummary expandIcon={<ExpandMore />}>
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            <Typography sx={{ flex: 1, fontWeight: "bold" }}>
-              {itemDisplayName}
-            </Typography>
-            <Button
-              size="small"
-              variant="outlined"
-              color="error"
-              startIcon={<Delete />}
-              onClick={handleDeleteClick}
-            >
-              {t("Delete")}
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<ContentCopy />}
-              onClick={handleCloneClick}
-            >
-              {t("Clone to Custom")}
-            </Button>
+        {expanded && (
+          <Box sx={{ p: 2 }} onClick={(e) => e.stopPropagation()}>
+            <TabbedSchemaFormRenderer
+              tabs={DEFAULT_SUBITEM_TABS}
+              config={therioformItemFields}
+              state={formState}
+              onChange={handleChange}
+              surface="edit"
+              cols={2}
+            />
           </Box>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <FormControl fullWidth>
-                <InputLabel>{t("Therioform")}</InputLabel>
-                <Select
-                  value={item.name || ""}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  label={t("Therioform")}
-                >
-                  {availableTherioforms
-                    .filter(
-                      (therioform) =>
-                        therioform.name !== "mutant_therioform_custom_name",
-                    )
-                    .map((therioform) => (
-                      <MenuItem key={therioform.name} value={therioform.name}>
-                        {t(therioform.name)}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            {isCustom && (
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <TextField
-                  fullWidth
-                  label={t("Custom Name")}
-                  value={item.customName || ""}
-                  onChange={(e) =>
-                    onItemChange(itemIndex, "customName", e.target.value)
-                  }
-                />
-              </Grid>
-            )}
-
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <CustomTextarea
-                label={t("Genoclepsis")}
-                value={
-                  item.genoclepsis?.startsWith("mutant_")
-                    ? t(item.genoclepsis)
-                    : item.genoclepsis || ""
-                }
-                readOnly={!isCustom}
-                rows={2}
-              />
-            </Grid>
-
-            <Grid
-              size={{
-                xs: 12,
-                sm: 6,
-              }}
-            >
-              <CustomTextarea
-                label={t("Description")}
-                value={
-                  item.description?.startsWith("mutant_")
-                    ? t(item.description)
-                    : item.description || ""
-                }
-                readOnly={!isCustom}
-                rows={2}
-              />
-            </Grid>
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
+        )}
+      </ItemRowCard>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
-        onClose={setDeleteDialogOpen}
+        onClose={closeDeleteDialog}
         onConfirm={() => onDeleteItem(itemIndex)}
         title={t("Delete")}
         message={t("Are you sure you want to delete this item?")}

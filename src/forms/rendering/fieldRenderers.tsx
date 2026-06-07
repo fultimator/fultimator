@@ -205,13 +205,15 @@ export function CustomTextareaRenderer({
   const { t } = useTranslate();
   const strValue = (value as string) ?? "";
   const translated = t(strValue);
+  const previewValue = translated !== strValue ? translated : strValue || undefined;
   return (
     <CustomTextarea
       label={t(label)}
       value={strValue}
-      previewValue={translated !== strValue ? translated : undefined}
+      previewValue={previewValue}
       onChange={(e) => onCommit(e.target.value)}
       readOnly={disabled}
+      disabled={disabled}
     />
   );
 }

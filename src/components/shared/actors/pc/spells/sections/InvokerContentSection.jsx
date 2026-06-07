@@ -92,7 +92,6 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
   const chosenWellspring =
     formState.chosenWellspring || tracker.chosenWellspring || "";
   const customWellsprings = formState.customWellsprings || [];
-  const customInvocations = formState.invocations || [];
   const alwaysActiveWellsprings = formState.alwaysActiveWellsprings || [];
 
   const effectiveWellsprings = [
@@ -154,7 +153,7 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
       });
     });
 
-    customInvocations
+    (formState.invocations || [])
       .filter(
         (inv) =>
           inv.wellspring &&
@@ -242,6 +241,7 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           </Grid>
         )}
       </Grid>
+
     </Grid>
   );
 }

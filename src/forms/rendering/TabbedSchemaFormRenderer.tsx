@@ -109,7 +109,7 @@ export function TabbedSchemaFormRenderer<
               state={state}
               onChange={onChange}
               surface={surface}
-              group={group || undefined}
+              group={group}
               groupLabels={groupLabels}
               cols={cols}
               extraProps={extraProps}

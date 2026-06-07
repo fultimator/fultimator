@@ -1,39 +1,53 @@
-import { useState } from "react";
-import {
-  Grid,
-  TextField,
-  Typography,
-  Box,
-  Collapse,
-  IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  FormControl,
-  InputLabel,
-  Select,
-} from "@mui/material";
+import { useState, useEffect } from "react";
+import { Box, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
-import CustomTextarea from "/src/components/common/CustomTextarea";
 import { magiseeds } from "/src/libs/floralistMagiseedData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
+import {
+  magiseedItemFields,
+  DEFAULT_SUBITEM_TABS,
+} from "/src/forms/rendering/config/itemConfigs/spells/subitems/magiseed";
+import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
-import ReactMarkdown from "react-markdown";
+
+function toFormState(src, t) {
+  const custom = (src.key || "magiseed_custom") === "magiseed_custom";
+  const raw = src.effects || {};
+  const effects = { 0: "", 1: "", 2: "", 3: "" };
+  for (const k of [0, 1, 2, 3]) {
+    const v = raw[k] || "";
+    effects[k] = custom ? v : (v ? t(v) : "");
+  }
+  return {
+    key: src.key || "magiseed_custom",
+    customName: src.customName || "",
+    description: custom ? (src.description || "") : (src.description ? t(src.description) : ""),
+    rangeStart: src.rangeStart ?? 0,
+    rangeEnd: src.rangeEnd ?? 3,
+    effects,
+    passives: src.passives ?? [],
+    behaviors: src.behaviors ?? [],
+  };
+}
 
 export default function MagiseedItem({
   item,
   itemIndex,
-  onItemChange,
+  onReplaceItem,
   onDeleteItem,
   onCloneItem,
-  t,
 }) {
+  const { t } = useTranslate();
+  const theme = useCustomTheme();
   const [open, setOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
-  const theme = useCustomTheme();
+  const [formState, setFormState] = useState(() => toFormState(item, t));
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormState(toFormState(item, t)); }, [item]);
 
   const {
     isOpen: deleteDialogOpen,
@@ -41,40 +55,54 @@ export default function MagiseedItem({
     handleDelete,
   } = useDeleteConfirmation({ onConfirm: () => onDeleteItem(itemIndex) });
 
-  const isCustom = item.key === "magiseed_custom";
-  const magiseedName = isCustom
-    ? item.customName || t("Custom Magiseed")
-    : t(item.key);
+  const handleChange = (next) => {
+    const prevKey = formState.key;
+    const nextKey = next.key;
 
-  const handleNameChange = (value) => {
-    const preset = magiseeds.find((m) => m.name === value);
-    if (!preset) return;
-    onItemChange(itemIndex, "key", value);
-    if (value !== "magiseed_custom") {
-      onItemChange(itemIndex, "description", preset.description);
-      onItemChange(itemIndex, "rangeStart", preset.rangeStart || 0);
-      onItemChange(itemIndex, "rangeEnd", preset.rangeEnd || 3);
-      onItemChange(itemIndex, "effects", preset.effects || {});
-      onItemChange(itemIndex, "customName", "");
+    if (nextKey !== prevKey && nextKey !== "magiseed_custom") {
+      const preset = magiseeds.find((m) => m.name === nextKey);
+      if (preset) {
+        const rawEffects = { 0: "", 1: "", 2: "", 3: "", ...(preset.effects || {}) };
+        const displayEffects = { 0: "", 1: "", 2: "", 3: "" };
+        for (const k of [0, 1, 2, 3]) {
+          displayEffects[k] = rawEffects[k] ? t(rawEffects[k]) : "";
+        }
+        const resolved = {
+          ...next,
+          key: nextKey,
+          customName: "",
+          description: t(preset.description || ""),
+          rangeStart: preset.rangeStart ?? 0,
+          rangeEnd: preset.rangeEnd ?? 3,
+          effects: displayEffects,
+        };
+        setFormState(resolved);
+        onReplaceItem(itemIndex, {
+          ...resolved,
+          description: preset.description || "",
+          effects: rawEffects,
+        });
+        return;
+      }
     }
+
+    setFormState(next);
+    onReplaceItem(itemIndex, next);
   };
+
+  const isCustom = formState.key === "magiseed_custom";
+  const magiseedName = isCustom
+    ? formState.customName || t("Custom Magiseed")
+    : t(formState.key);
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
     onCloneItem(itemIndex, {
       ...item,
       key: "magiseed_custom",
-      customName: item.customName || (item.key ? t(item.key) : ""),
-      description:
-        typeof item.description === "string"
-          ? t(item.description)
-          : item.description,
-      effects: Object.fromEntries(
-        Object.entries(item.effects || {}).map(([k, v]) => [
-          k,
-          typeof v === "string" ? t(v) : v,
-        ]),
-      ),
+      customName: formState.customName || (formState.key ? t(formState.key) : ""),
+      description: formState.description,
+      effects: { ...formState.effects },
     });
   };
 
@@ -83,61 +111,10 @@ export default function MagiseedItem({
       variant="caption"
       sx={{ color: "text.secondary", fontWeight: "bold" }}
     >
-      {item.rangeStart !== undefined && item.rangeEnd !== undefined
-        ? `T: ${item.rangeStart}–${item.rangeEnd}`
+      {formState.rangeStart !== undefined && formState.rangeEnd !== undefined
+        ? `T: ${formState.rangeStart}–${formState.rangeEnd}`
         : ""}
     </Typography>
-  );
-
-  const actions = (
-    <>
-      <IconButton
-        size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          setMenuAnchor(e.currentTarget);
-        }}
-      >
-        <MenuIcon />
-      </IconButton>
-      <Menu
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
-        onClose={() => setMenuAnchor(null)}
-        slotProps={{ root: { sx: { zIndex: 1400 } } }}
-      >
-        {onCloneItem && (
-          <MenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuAnchor(null);
-              handleCloneToCustom();
-            }}
-          >
-            <ListItemIcon>
-              <ContentCopy fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>{t("Clone to Custom")}</ListItemText>
-          </MenuItem>
-        )}
-        {onDeleteItem && (
-          <MenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              setMenuAnchor(null);
-              handleDelete(e);
-            }}
-          >
-            <ListItemIcon>
-              <Delete fontSize="small" color="error" />
-            </ListItemIcon>
-            <ListItemText sx={{ color: "error.main" }}>
-              {t("Delete")}
-            </ListItemText>
-          </MenuItem>
-        )}
-      </Menu>
-    </>
   );
 
   const gradientColor = theme.mode === "dark" ? "#1f1f1f" : "#fff";
@@ -164,7 +141,6 @@ export default function MagiseedItem({
             "&:hover": { filter: "brightness(0.97)" },
           }}
         >
-          {/* Label area */}
           <Box
             sx={{
               flex: 1,
@@ -190,7 +166,6 @@ export default function MagiseedItem({
             </Typography>
             {subtitle}
           </Box>
-          {/* Actions area */}
           <Box
             onClick={(e) => e.stopPropagation()}
             sx={{
@@ -209,189 +184,67 @@ export default function MagiseedItem({
               "& .MuiSvgIcon-root": { fontSize: "1.15rem" },
             }}
           >
-            {actions}
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuAnchor(e.currentTarget);
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              anchorEl={menuAnchor}
+              open={Boolean(menuAnchor)}
+              onClose={() => setMenuAnchor(null)}
+              slotProps={{ root: { sx: { zIndex: 1400 } } }}
+            >
+              {onCloneItem && (
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuAnchor(null);
+                    handleCloneToCustom();
+                  }}
+                >
+                  <ListItemIcon>
+                    <ContentCopy fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t("Clone to Custom")}</ListItemText>
+                </MenuItem>
+              )}
+              {onDeleteItem && (
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuAnchor(null);
+                    handleDelete(e);
+                  }}
+                >
+                  <ListItemIcon>
+                    <Delete fontSize="small" color="error" />
+                  </ListItemIcon>
+                  <ListItemText sx={{ color: "error.main" }}>
+                    {t("Delete")}
+                  </ListItemText>
+                </MenuItem>
+              )}
+            </Menu>
           </Box>
         </Box>
 
-        <Collapse in={open}>
-          <Box sx={{ px: 2, py: 1.5 }}>
-            <Grid container spacing={2}>
-              {/* Name selector */}
-              <Grid size={{ xs: 12, sm: isCustom ? 6 : 12 }}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t("Magiseed")}</InputLabel>
-                  <Select
-                    value={item.key || ""}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                    label={t("Magiseed")}
-                  >
-                    {magiseeds.map((preset) => (
-                      <MenuItem key={preset.name} value={preset.name}>
-                        {preset.name === "magiseed_custom"
-                          ? t("Custom Magiseed")
-                          : t(preset.name)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              {isCustom && (
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label={t("Custom Name")}
-                    value={item.customName || ""}
-                    onChange={(e) =>
-                      onItemChange(itemIndex, "customName", e.target.value)
-                    }
-                  />
-                </Grid>
-              )}
-
-              {/* Range */}
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={t("Range Start")}
-                  type="number"
-                  value={item.rangeStart ?? 0}
-                  onChange={(e) =>
-                    onItemChange(
-                      itemIndex,
-                      "rangeStart",
-                      parseInt(e.target.value) || 0,
-                    )
-                  }
-                  slotProps={{ htmlInput: { min: 0, max: 4 } }}
-                />
-              </Grid>
-              <Grid size={{ xs: 6, sm: 3 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={t("Range End")}
-                  type="number"
-                  value={item.rangeEnd ?? 3}
-                  onChange={(e) =>
-                    onItemChange(
-                      itemIndex,
-                      "rangeEnd",
-                      parseInt(e.target.value) || 3,
-                    )
-                  }
-                  slotProps={{ htmlInput: { min: 0, max: 4 } }}
-                />
-              </Grid>
-
-              {/* Description */}
-              <Grid size={12}>
-                {!isCustom && item.description ? (
-                  <Box
-                    sx={{
-                      p: 1,
-                      border: "1px solid",
-                      borderColor: "divider",
-                      borderRadius: 1,
-                      bgcolor: "action.hover",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: "text.secondary",
-                        mb: 0.5,
-                        display: "block",
-                      }}
-                    >
-                      {t("Description")}
-                    </Typography>
-                    <div style={{ fontSize: "0.95em" }}>
-                      <ReactMarkdown
-                        components={{
-                          p: ({ node: _n, ...props }) => (
-                            <p style={{ margin: 0 }} {...props} />
-                          ),
-                        }}
-                      >
-                        {t(item.description)}
-                      </ReactMarkdown>
-                    </div>
-                  </Box>
-                ) : (
-                  <CustomTextarea
-                    label={t("Description")}
-                    value={item.description || ""}
-                    onChange={(e) =>
-                      onItemChange(itemIndex, "description", e.target.value)
-                    }
-                    rows={2}
-                  />
-                )}
-              </Grid>
-
-              {/* Effects - only T values within rangeStart..rangeEnd */}
-              {Array.from(
-                { length: (item.rangeEnd ?? 3) - (item.rangeStart ?? 0) + 1 },
-                (_, i) => (item.rangeStart ?? 0) + i,
-              ).map((tVal) => {
-                const raw = item.effects?.[tVal] ?? "";
-                const display = isCustom ? raw : t(raw);
-                return (
-                  <Grid key={tVal} size={{ xs: 12, sm: 6 }}>
-                    {isCustom ? (
-                      <CustomTextarea
-                        label={`T = ${tVal}`}
-                        value={raw}
-                        onChange={(e) =>
-                          onItemChange(itemIndex, "effects", {
-                            ...item.effects,
-                            [tVal]: e.target.value,
-                          })
-                        }
-                        rows={2}
-                      />
-                    ) : (
-                      <Box
-                        sx={{
-                          p: 1,
-                          border: "1px solid",
-                          borderColor: "divider",
-                          borderRadius: 1,
-                          bgcolor: "action.hover",
-                        }}
-                      >
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: "text.secondary",
-                            mb: 0.5,
-                            display: "block",
-                          }}
-                        >
-                          {`T = ${tVal}`}
-                        </Typography>
-                        <div style={{ fontSize: "0.95em" }}>
-                          <ReactMarkdown
-                            components={{
-                              p: ({ node: _n, ...props }) => (
-                                <p style={{ margin: 0 }} {...props} />
-                              ),
-                            }}
-                          >
-                            {display}
-                          </ReactMarkdown>
-                        </div>
-                      </Box>
-                    )}
-                  </Grid>
-                );
-              })}
-            </Grid>
+        {open && (
+          <Box sx={{ px: 2, py: 1.5 }} onClick={(e) => e.stopPropagation()}>
+            <TabbedSchemaFormRenderer
+              tabs={DEFAULT_SUBITEM_TABS}
+              config={magiseedItemFields}
+              state={formState}
+              onChange={handleChange}
+              surface="edit"
+              cols={2}
+            />
           </Box>
-        </Collapse>
+        )}
       </Box>
 
       <DeleteConfirmationDialog

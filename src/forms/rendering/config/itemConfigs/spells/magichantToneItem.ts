@@ -1,11 +1,21 @@
 import type { ItemFieldConfig } from "../../fieldConfig";
+import {
+  makePassivesTabField,
+  behaviorsTabField,
+  DEFAULT_ITEM_TABS,
+} from "../../shared/behaviorFields";
+import { SPELL_SUBITEM_SCOPED_KEYS } from "../../shared/itemScopedKeys";
 import { availableMagichantTones } from "../../../../../libs/player/spellOptionData";
 
 export type MagichantToneItemState = {
   key: string;
   customName: string;
   effect: string;
+  passives?: unknown[];
+  behaviors?: unknown[];
 };
+
+export const DEFAULT_SUBITEM_TABS = DEFAULT_ITEM_TABS;
 
 const TONE_PRESET_OPTIONS = [
   ...availableMagichantTones.map((t: { name: string }) => ({
@@ -14,6 +24,10 @@ const TONE_PRESET_OPTIONS = [
   })),
   { value: "magichant_custom_name", label: "magichant_custom_name" },
 ];
+
+const isCustom = (s: MagichantToneItemState) =>
+  s.key === "magichant_custom_name" ||
+  !availableMagichantTones.find((t) => t.name === s.key);
 
 export const magichantToneItemFields: ItemFieldConfig<MagichantToneItemState> =
   [
@@ -37,6 +51,7 @@ export const magichantToneItemFields: ItemFieldConfig<MagichantToneItemState> =
       group: "",
       order: 1,
       gridSize: { xs: 12, sm: 6 },
+      dependencies: isCustom,
     },
     {
       key: "effect",
@@ -47,5 +62,8 @@ export const magichantToneItemFields: ItemFieldConfig<MagichantToneItemState> =
       group: "",
       order: 2,
       fullWidth: true,
+      componentProps: (s) => ({ disabled: !isCustom(s as MagichantToneItemState) }),
     },
+    makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.magichantTone),
+    behaviorsTabField,
   ];

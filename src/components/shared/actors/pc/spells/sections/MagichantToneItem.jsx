@@ -1,60 +1,63 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
-import { SchemaFieldRenderer } from "/src/forms/rendering/SchemaFieldRenderer";
-import { magichantToneItemFields } from "/src/forms/rendering/config/itemConfigs/spells/magichantToneItem";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
+import {
+  magichantToneItemFields,
+  DEFAULT_SUBITEM_TABS,
+} from "/src/forms/rendering/config/itemConfigs/spells/magichantToneItem";
 import { availableMagichantTones } from "/src/libs/player/spellOptionData";
 import { useTranslate } from "/src/translation/translate";
+
+function toFormState(src, t) {
+  const resolvedKey = src.key || src.name || "magichant_custom_name";
+  const custom =
+    resolvedKey === "magichant_custom_name" ||
+    !availableMagichantTones.find((e) => e.name === resolvedKey);
+  return {
+    key: resolvedKey,
+    customName: src.customName || "",
+    effect: custom ? (src.effect || "") : (src.effect ? t(src.effect) : ""),
+    passives: src.passives ?? [],
+    behaviors: src.behaviors ?? [],
+  };
+}
 
 export default function MagichantToneItem({
   item,
   itemIndex,
-  onItemChange,
+  onReplaceItem,
   onDeleteItem,
   onCloneItem,
-  _t,
 }) {
   const { t: translate } = useTranslate();
 
-  const toFormState = (src) => ({
-    key: src.key || "magichant_custom_name",
-    customName: src.customName || "",
-    effect: src.effect || "",
-  });
+  const [formState, setFormState] = useState(() => toFormState(item, translate));
 
-  const [formState, setFormState] = useState(() => toFormState(item));
-
-  useEffect(() => {
-    setFormState(toFormState(item));
-  }, [item]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setFormState(toFormState(item, translate)); }, [item]);
 
   const handleChange = (next) => {
-    const prevKey = formState.key;
     const nextKey = next.key;
-
-    if (nextKey !== prevKey) {
+    if (nextKey !== formState.key && nextKey !== "magichant_custom_name") {
       const preset = availableMagichantTones.find((e) => e.name === nextKey);
       if (preset) {
         const resolved = {
+          ...next,
           key: nextKey,
           customName: "",
-          effect: preset.effect || "",
+          effect: translate(preset.effect || ""),
         };
         setFormState(resolved);
-        onItemChange(itemIndex, "key", resolved.key);
-        onItemChange(itemIndex, "customName", resolved.customName);
-        onItemChange(itemIndex, "effect", resolved.effect);
+        onReplaceItem(itemIndex, { ...resolved, effect: preset.effect || "" });
         return;
       }
     }
-
     setFormState(next);
-    onItemChange(itemIndex, "key", next.key);
-    onItemChange(itemIndex, "customName", next.customName);
-    onItemChange(itemIndex, "effect", next.effect);
+    onReplaceItem(itemIndex, next);
   };
 
   const isCustom =
@@ -77,10 +80,7 @@ export default function MagichantToneItem({
       ...item,
       key: "magichant_custom_name",
       customName: formState.customName || translate(formState.key),
-      effect:
-        typeof formState.effect === "string"
-          ? translate(formState.effect)
-          : formState.effect,
+      effect: formState.effect,
     });
   };
 
@@ -95,12 +95,12 @@ export default function MagichantToneItem({
         actions={
           <>
             <Tooltip title={translate("Clone to Custom")}>
-              <IconButton onClick={handleCloneToCustom}>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
                 <ContentCopy />
               </IconButton>
             </Tooltip>
             <Tooltip title={translate("Delete")}>
-              <IconButton onClick={handleDelete}>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleDelete(e); }}>
                 <Delete />
               </IconButton>
             </Tooltip>
@@ -109,16 +109,15 @@ export default function MagichantToneItem({
         paperSx={{ mb: 0.5 }}
       >
         {expanded && (
-          <Box sx={{ p: 2 }}>
-            <Grid container spacing={2}>
-              <SchemaFieldRenderer
-                config={magichantToneItemFields}
-                state={formState}
-                onChange={handleChange}
-                surface="edit"
-                cols={2}
-              />
-            </Grid>
+          <Box sx={{ p: 2 }} onClick={(e) => e.stopPropagation()}>
+            <TabbedSchemaFormRenderer
+              tabs={DEFAULT_SUBITEM_TABS}
+              config={magichantToneItemFields}
+              state={formState}
+              onChange={handleChange}
+              surface="edit"
+              cols={2}
+            />
           </Box>
         )}
       </ItemRowCard>

@@ -64,6 +64,30 @@ export const ITEM_SCOPED_KEYS: Record<string, string[]> = {
   playerSpell: ["accuracy.value", "damage.value", "cost.amount", "maxTargets"],
 };
 
+// Per-sub-item scoped keys
+export const SPELL_SUBITEM_SCOPED_KEYS: Record<string, string[]> = {
+  magichantTone: [],
+  magichantKey: [],
+  gift: [],
+  dance: [],
+  symbol: [],
+  therioform: [],
+  magiseed: [],
+  invocation: [],
+  infusionEffect: [],
+  alchemyEffect: [],
+  alchemyTarget: [],
+  pilotVehicle: ["maxEnabledModules"],
+  pilotModule: [
+    "accuracy.value",
+    "damage.value",
+    "def",
+    "mdef",
+    "cost",
+    "qualityCost",
+  ],
+};
+
 // Per-spellType scoped keys - only fields that exist on that spell type's schema.
 export const PLAYER_SPELL_SCOPED_KEYS_BY_TYPE: Record<string, string[]> = {
   default: [

@@ -233,6 +233,7 @@ export function SchemaFieldRenderer<
               }
               value={displayValue}
               onCommit={handleCommit}
+              disabled={(componentPropsWithNestedRenderer?.disabled as boolean) ?? false}
               componentProps={componentPropsWithNestedRenderer}
             />
           </Grid>

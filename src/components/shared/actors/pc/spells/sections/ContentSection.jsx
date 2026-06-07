@@ -72,6 +72,14 @@ export default function ContentSection({
     }));
   };
 
+  const handleReplaceItem = (index, newItem) => {
+    setFormState((prev) => {
+      const newItems = [...(prev[itemsArrayName] || [])];
+      newItems[index] = { ...newItems[index], ...newItem };
+      return { ...prev, [itemsArrayName]: newItems };
+    });
+  };
+
   const handleCloneItem = (index, clonedItem) => {
     setFormState((prev) => {
       const currentItems = prev[itemsArrayName] || [];
@@ -174,6 +182,7 @@ export default function ContentSection({
               item={item}
               itemIndex={index}
               onItemChange={handleItemChange}
+              onReplaceItem={handleReplaceItem}
               onDeleteItem={handleDeleteItem}
               onCloneItem={handleCloneItem}
               t={t}
