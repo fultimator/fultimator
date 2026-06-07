@@ -21,9 +21,7 @@ import SpellArcanist from "/src/components/shared/actors/pc/spells/SpellArcanist
 import CustomHeader2 from "/src/components/common/CustomHeader2";
 import SpellDefaultModal from "/src/components/shared/actors/pc/spells/SpellDefaultModal";
 import SpellTinkererAlchemy from "/src/components/shared/actors/pc/spells/SpellTinkererAlchemy";
-import SpellTinkererAlchemyRankModal from "/src/components/shared/actors/pc/spells/SpellTinkererAlchemyRankModal";
-import SpellTinkererAlchemyTargetModal from "/src/components/shared/actors/pc/spells/SpellTinkererAlchemyTargetModal";
-import SpellTinkererAlchemyEffectsModal from "/src/components/shared/actors/pc/spells/SpellTinkererAlchemyEffectsModal";
+import SpellTinkererAlchemyModal from "/src/components/shared/actors/pc/spells/SpellTinkererAlchemyModal";
 import { tinkererAlchemy, tinkererInfusion } from "/src/libs/classes";
 import SpellTinkererInfusion from "/src/components/shared/actors/pc/spells/SpellTinkererInfusion";
 import SpellTinkererInfusionModal from "/src/components/shared/actors/pc/spells/SpellTinkererInfusionModal";
@@ -1129,12 +1127,8 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     openModal("spellDefault", spell, spellClass, spellIndex);
   const handleEditArcanistSpell = (spell, spellClass, spellIndex) =>
     openModal("spellArcanist", spell, spellClass, spellIndex);
-  const handleEditAlchemyRank = (spell, spellClass, spellIndex) =>
-    openModal("alchemyRank", spell, spellClass, spellIndex);
-  const handleEditAlchemyTarget = (spell, spellClass, spellIndex) =>
-    openModal("alchemyTarget", spell, spellClass, spellIndex);
-  const handleEditAlchemyEffects = (spell, spellClass, spellIndex) =>
-    openModal("alchemyEffects", spell, spellClass, spellIndex);
+  const handleEditAlchemySpell = (spell, spellClass, spellIndex) =>
+    openModal("alchemy", spell, spellClass, spellIndex);
   const handleEditInfusionSpell = (spell, spellClass, spellIndex) =>
     openModal("infusion", spell, spellClass, spellIndex);
   const handleEditMagitechRank = (spell, spellClass, spellIndex) =>
@@ -1901,13 +1895,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             alchemy={spell}
                             key={index}
                             onEditRank={() => {
-                              handleEditAlchemyRank(spell, cls.name, index);
+                              handleEditAlchemySpell(spell, cls.name, index);
                             }}
                             onEditTargets={() => {
-                              handleEditAlchemyTarget(spell, cls.name, index);
+                              handleEditAlchemySpell(spell, cls.name, index);
                             }}
                             onEditEffects={() => {
-                              handleEditAlchemyEffects(spell, cls.name, index);
+                              handleEditAlchemySpell(spell, cls.name, index);
                             }}
                             isEditMode={isEditMode}
                           />
@@ -2449,13 +2443,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               alchemy={spell}
                               key={index}
                               onEditRank={() =>
-                                handleEditAlchemyRank(spell, mnemo.id, index)
+                                handleEditAlchemySpell(spell, mnemo.id, index)
                               }
                               onEditTargets={() =>
-                                handleEditAlchemyTarget(spell, mnemo.id, index)
+                                handleEditAlchemySpell(spell, mnemo.id, index)
                               }
                               onEditEffects={() =>
-                                handleEditAlchemyEffects(spell, mnemo.id, index)
+                                handleEditAlchemySpell(spell, mnemo.id, index)
                               }
                               isEditMode={isEditMode}
                             />
@@ -2735,23 +2729,11 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
         isRework={spellBeingEdited?.spellType === "arcanist-rework"}
       />
-      <SpellTinkererAlchemyRankModal
-        open={isOpen("alchemyRank")}
+      <SpellTinkererAlchemyModal
+        open={isOpen("alchemy")}
         onClose={closeModal}
         onSave={handleSaveEditedSpell}
         onDelete={handleDeleteSpell}
-        alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellTinkererAlchemyTargetModal
-        open={isOpen("alchemyTarget")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
-        alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
-      />
-      <SpellTinkererAlchemyEffectsModal
-        open={isOpen("alchemyEffects")}
-        onClose={closeModal}
-        onSave={handleSaveEditedSpell}
         alchemy={{ ...spellBeingEdited, index: editingSpellIndex }}
       />
       <SpellTinkererInfusionModal

@@ -2,9 +2,7 @@ import {
   SpellDefaultModal,
   SpellArcanistModal,
   SpellEntropistGambleModal,
-  SpellTinkererAlchemyRankModal,
-  SpellTinkererAlchemyTargetModal,
-  SpellTinkererAlchemyEffectsModal,
+  SpellTinkererAlchemyModal,
   SpellTinkererInfusionModal,
   SpellTinkererMagitechRankModal,
   SpellSymbolistModal,
@@ -85,30 +83,12 @@ const spellModalRegistry = {
     }),
   },
   "tinkerer-alchemy": {
-    Component: SpellTinkererAlchemyRankModal,
+    Component: SpellTinkererAlchemyModal,
     buildProps: (spell, spellIndex, { onSave, onDelete, onClose }) => ({
       open: true,
       onClose,
       onSave,
       onDelete,
-      alchemy: { ...spell, index: spellIndex },
-    }),
-  },
-  alchemyTarget: {
-    Component: SpellTinkererAlchemyTargetModal,
-    buildProps: (spell, spellIndex, { onSave, onClose }) => ({
-      open: true,
-      onClose,
-      onSave,
-      alchemy: { ...spell, index: spellIndex },
-    }),
-  },
-  alchemyEffects: {
-    Component: SpellTinkererAlchemyEffectsModal,
-    buildProps: (spell, spellIndex, { onSave, onClose }) => ({
-      open: true,
-      onClose,
-      onSave,
       alchemy: { ...spell, index: spellIndex },
     }),
   },

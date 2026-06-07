@@ -126,13 +126,13 @@ const spellDisplayRegistry = {
   },
   "tinkerer-alchemy": {
     Component: SpellTinkererAlchemy,
-    buildProps: (spell, { onEdit, onEditSubModal, isEditMode, speaker }) => ({
+    buildProps: (spell, { onEdit, isEditMode, speaker }) => ({
       alchemy: spell,
       isEditMode,
       speaker,
       onEditRank: onEdit,
-      onEditTargets: () => onEditSubModal?.("alchemyTarget"),
-      onEditEffects: () => onEditSubModal?.("alchemyEffects"),
+      onEditTargets: onEdit,
+      onEditEffects: onEdit,
     }),
   },
   "tinkerer-infusion": {
