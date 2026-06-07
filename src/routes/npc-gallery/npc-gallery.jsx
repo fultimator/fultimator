@@ -1441,7 +1441,7 @@ function Npc({
   const [downloadImage] = useDownloadImage(npc.name, ref);
   const [transferAnchor, setTransferAnchor] = useState(null);
   const [actionsAnchor, setActionsAnchor] = useState(null);
-  const [exportAnchor, setExportAnchor] = useState(null);
+  const [_exportAnchor, setExportAnchor] = useState(null);
   const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
   const exportData = canonicalizeForTransfer("npc", npc);
 

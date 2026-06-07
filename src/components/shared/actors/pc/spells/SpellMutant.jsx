@@ -43,7 +43,7 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
           <Typography variant="h4">{t("mutant_details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("mutant_details_1")}</ReactMarkdown>
+          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("mutant_details_1")}</ReactMarkdown>
         </AccordionDetails>
       </Accordion>
       {/* THERIOFORMS */}

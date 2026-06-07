@@ -19,7 +19,7 @@ import { t } from "../../translation/translate";
 
 const NpcEditAppBar = ({
   //isNpcEdit,
-  isPcEdit,
+  _isPcEdit,
   selectedTheme,
   selectedStyleProfile,
   handleSelectTheme,

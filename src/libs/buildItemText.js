@@ -224,6 +224,7 @@ function buildNpcObsidian(npc) {
     for (const key of NPC_AFFINITY_ORDER) {
       const val = npc.affinities[key];
       if (val && AFFINITY_LABEL[val]) {
+        // eslint-disable-next-line no-undef
         const obsKey = OBSIDIAN_AFFINITY_KEY[key] ?? key;
         affinityLines.push(`${obsKey}: ${AFFINITY_LABEL[val]}`);
       }

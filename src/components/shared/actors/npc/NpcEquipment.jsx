@@ -1,6 +1,6 @@
 import React from "react";
 import { Grid, Typography } from "@mui/material";
-import { useTranslate } from "/src/translation/translate";
+
 import { useActorCardSetup } from "/src/components/shared/actors/core-utils";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
 import Diamond from "/src/components/Diamond";

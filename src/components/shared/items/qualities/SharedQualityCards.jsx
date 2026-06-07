@@ -57,7 +57,7 @@ export const SharedQualityCard = React.memo(function SharedQualityCard({
     imageTempInfoTextKey,
   });
 
-  const withImage = isImageMode(imageMode) && imageVisible;
+  const _withImage = isImageMode(imageMode) && imageVisible;
   const cols = { name: 5, category: 3, cost: 4 };
 
   return (

@@ -15,7 +15,7 @@ export default function MagichantToneItem({
   onItemChange,
   onDeleteItem,
   onCloneItem,
-  t,
+  _t,
 }) {
   const { t: translate } = useTranslate();
 

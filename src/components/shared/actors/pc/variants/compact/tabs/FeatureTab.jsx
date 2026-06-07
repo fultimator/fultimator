@@ -59,7 +59,6 @@ import PcCompactCampActivities from "/src/components/shared/actors/pc/variants/c
 import PcCompactZeroPower from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactZeroPower";
 import PcCompactOthers from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactOthers";
 import PcCompactRituals from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactRituals";
-import NotesMarkdown from "/src/components/common/NotesMarkdown";
 // Constants
 
 const SINGLE_INSTANCE_SPELL_TYPES = new Set([

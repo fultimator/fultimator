@@ -71,7 +71,7 @@ export default function PcActorCardCompact({
 
   const player = pc;
   const setPlayer = onUpdate;
-  const isEditMode = isInteractive;
+  const _isEditMode = isInteractive;
   // Owner always has edit access to core data tabs regardless of preview toggle.
   const ownerEditMode = isOwner || isInteractive;
 

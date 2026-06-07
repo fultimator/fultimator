@@ -361,7 +361,7 @@ export default function PilotContentSection({ formState, setFormState, t, player
       const frameLimits = getFrameLimits(
         vehicle.frame || "pilot_frame_exoskeleton",
       );
-      const s = vehicle.slots ?? {};
+      const _s = vehicle.slots ?? {};
       const totalSlots =
         getEquippedCount(vehicle, "armor") +
         getEquippedCount(vehicle, "weapon") +

@@ -11,7 +11,6 @@ import CardLoadout from "./playerSheet/CardLoadout";
 import PlayerEquipment from "./playerSheet/PlayerEquipment";
 import PlayerNotes from "./playerSheet/PlayerNotes";
 import PcOthers from "./panels/optional/PcOthers";
-import PcVehicle from "./panels/optional/PcVehicle";
 import PcCompanion from "./panels/optional/PcCompanion";
 import PcRituals from "./panels/optional/PcRituals";
 import PcQuirk from "./panels/optional/PcQuirk";
@@ -19,7 +18,6 @@ import PcCampActivities from "./panels/optional/PcCampActivities";
 import PcZeroPower from "./panels/optional/PcZeroPower";
 import PcMnemoReceptacle from "./panels/optional/PcMnemoReceptacle";
 import PcControlsPanel from "./panels/PcControlsPanel";
-import PcSpells from "./panels/PcSpells";
 
 const paperSx = (secondary) => ({
   borderRadius: "8px",
@@ -92,7 +90,7 @@ export default function PcActorCard({
 
   const sharedProps = { pc, isInteractive, onUpdate, onQuickCheck };
   const ownerSharedProps = { pc, isInteractive: ownerInteractive, onUpdate, onQuickCheck };
-  const psProps = { player: pc, setPlayer: onUpdate, isEditMode: isInteractive, isCharacterSheet: false };
+  const _psProps = { player: pc, setPlayer: onUpdate, isEditMode: isInteractive, isCharacterSheet: false };
   const ownerPsProps = { player: pc, setPlayer: onUpdate, isEditMode: ownerInteractive, isCharacterSheet: false };
   const portraitCardProps = { sharedProps, characterImage, updateMaxStats, secondary, theme };
 

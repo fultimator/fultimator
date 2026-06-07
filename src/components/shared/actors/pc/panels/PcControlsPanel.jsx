@@ -1,11 +1,10 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
   IconButton,
   InputBase,
   Tooltip,
-  Button,
 } from "@mui/material";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { Remove, Add } from "@mui/icons-material";

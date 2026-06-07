@@ -1,5 +1,5 @@
 import { DICE_OPTIONS } from "../constants";
-import type { DieSides, RollMessage, RollResult, TextMessage } from "../types";
+import type { RollMessage, RollResult, TextMessage } from "../types";
 import type { PendingDice } from "../chatStore";
 
 export const createId = () =>

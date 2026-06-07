@@ -77,7 +77,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           <Typography variant="h4">{t("esper_details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
             {t("esper_details_1")}
           </ReactMarkdown>
         </AccordionDetails>

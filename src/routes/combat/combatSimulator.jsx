@@ -48,6 +48,7 @@ import { useChatChannelStore } from "../../stores/chatChannelStore";
 import { isValidChatMessage } from "../../components/app-drawer/panels/chat/domain/validation";
 import { emitCombatLog } from "../../libs/combatLogEmitter";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function villainUltimaMax(villain) {
   if (villain === "minor") return 5;
   if (villain === "major") return 10;
@@ -272,6 +273,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       clearEncounterChat();
       clearEncounterChannel();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

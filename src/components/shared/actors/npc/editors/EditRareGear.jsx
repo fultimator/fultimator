@@ -10,7 +10,6 @@ import {
   MenuItem,
   TextField,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "/src/translation/translate";

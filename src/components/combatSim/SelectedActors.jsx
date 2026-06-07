@@ -36,10 +36,10 @@ export default function SelectedActors({
   handleMoveDown,
   handleRemoveNPC,
   handleUpdateNpcTurns,
-  handlePopoverOpen,
-  handlePopoverClose,
-  anchorEl,
-  popoverNpcId,
+  _handlePopoverOpen,
+  _handlePopoverClose,
+  _anchorEl,
+  _popoverNpcId,
   getTurnCount,
   handleNpcClick,
   handleHpMpClick,
@@ -397,8 +397,8 @@ export default function SelectedActors({
                         index={index}
                         selectedNpcID={selectedNpcID}
                         handleListItemClick={handleListItemClick}
-                        handlePopoverOpen={handlePopoverOpen}
-                        handlePopoverClose={handlePopoverClose}
+                        handlePopoverOpen={_handlePopoverOpen}
+                        handlePopoverClose={_handlePopoverClose}
                         handleUpdateNpcTurns={handleUpdateNpcTurns}
                         handleMenuOpen={handleMenuOpen}
                         handleMenuClose={handleMenuClose}

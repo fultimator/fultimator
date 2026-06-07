@@ -1,7 +1,6 @@
 import type {
   ChatMessage,
   CombatLogEvent,
-  LogMessage,
 } from "../components/app-drawer/panels/chat/types";
 import type { ExecuteActionResult } from "../pipelines/actionExecutor";
 

@@ -75,7 +75,7 @@ export default function PcTraitsDescription({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const customTheme = useCustomTheme();
+  const _customTheme = useCustomTheme();
   const divider = theme.palette.divider;
   const themeOptions = THEME_KEYS.map(t);
   const description = pc.info?.description?.trim() || "";

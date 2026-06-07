@@ -130,7 +130,7 @@ export default function StatTooltip({
   sx,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const touchRef = useRef(false);
+  const _touchRef = useRef(false);
 
   const isTouch =
     typeof window !== "undefined" &&

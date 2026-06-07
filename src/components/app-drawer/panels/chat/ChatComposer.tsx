@@ -152,6 +152,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     handleInputChange(prefillInput);
     requestAnimationFrame(() => textareaRef.current?.focus());
     onPrefillConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillInput]);
 
   const canSend = Boolean(input.trim()) || store.hasPendingRoll;
@@ -166,7 +167,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     (activeCommand !== null && blockedCommand === null);
 
   const CHECK_KIND_OPTIONS = ["open", "attribute", "opposed"] as const;
-  type CheckKindOption = (typeof CHECK_KIND_OPTIONS)[number];
 
   // -1 = awaiting kind, 0 = awaiting primary, 1 = awaiting secondary, 2 = awaiting modifier, 3 = awaiting DL, null = not a check command
   const checkParamIndex: -1 | 0 | 1 | 2 | 3 | null =

@@ -31,7 +31,6 @@ import {
   ChatOutlined,
   AddToPhotos as AddToPhotosIcon,
 } from "@mui/icons-material";
-import NotesMarkdown from "/src/components/common/NotesMarkdown";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import {
   Martial,
@@ -54,7 +53,6 @@ import { calculateAttribute } from "/src/libs/playerCalculations";
 import {
   deriveVehicleSlots,
   isTwoHandedEquipped,
-  isItemEquipped,
 } from "/src/libs/player/slots/equipmentSlots";
 import {
   clearSlotAction,
@@ -110,14 +108,6 @@ function highlightMatch(text, query) {
       part
     ),
   );
-}
-
-function highlightMarkdownText(markdown, query) {
-  const source = markdown == null ? "" : String(markdown);
-  const trimmed = query?.trim();
-  if (!trimmed) return source;
-  const safe = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return source.replace(new RegExp(`(${safe})`, "ig"), "<mark>$1</mark>");
 }
 
 function asArray(v) {
@@ -267,11 +257,11 @@ function CompactItemRow({
   handleEdit,
   checkIfEquippable,
   equipToSlot,
-  unequipItem,
+  _unequipItem,
   hasDualShieldBearer,
-  theme,
+  _theme,
   t,
-  onPreviewItem,
+  _onPreviewItem,
 }) {
   const slotMatches = (ref, source, name, index, sourceArr) => {
     if (!ref || ref.source !== source) return false;
@@ -357,7 +347,7 @@ function CompactItemRow({
   return (
     <>
       <ItemRowCard
-        onCardClick={() => onPreviewItem?.(item)}
+        onCardClick={() => _onPreviewItem?.(item)}
         label={
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.25, minWidth: 0 }}>
             <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
@@ -558,7 +548,7 @@ function CompactTransformingPair({
   checkIfEquippable,
   theme,
   t,
-  onPreviewItem,
+  _onPreviewItem,
 }) {
   const isPrimaryActive = (item.activeForm ?? "primary") === "primary";
   const cwName = item.originalData?.name;
@@ -1110,6 +1100,7 @@ export default function PcEquipment({
   const currInsight = calculateAttribute(player, player.attributes?.insight?.base, ["dazed", "enraged"], ["insUp"], 6, 12);
   const currMight = calculateAttribute(player, player.attributes?.might?.base, ["weak", "poisoned"], ["migUp"], 6, 12);
   const currWillpower = calculateAttribute(player, player.attributes?.willpower?.base, ["shaken", "poisoned"], ["wlpUp"], 6, 12);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const attributeMap = { dexterity: currDex, insight: currInsight, might: currMight, willpower: currWillpower };
 
   // ---- inv patch helper ----
@@ -1238,6 +1229,7 @@ export default function PcEquipment({
         equipToSlot("accessories", invItem.name, idx, "accessory", false);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player, setPlayer, equipToSlot, unequipItem, checkIfEquippable, hasDualShieldBearer, isTwoHandedEquipped]);
 
   // handleEquip for full mode - pure functional updates matching bak logic
@@ -1285,6 +1277,7 @@ export default function PcEquipment({
     const slots = player?.equippedSlots ?? {};
     const targetSlot = isTwoHand || !slots.mainHand ? "mainHand" : !slots.offHand ? "offHand" : "mainHand";
     setPlayer((prev) => equipItemToSlot(prev, targetSlot, { source, label: item?.name || "", index, item }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setPlayer, player?.equippedSlots, hasDualShieldBearer, isTwoHandedEquipped, player]);
 
   const handleEquipToSlot = useCallback((source, index, item, slot) => {

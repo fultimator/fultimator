@@ -42,7 +42,6 @@ export default function InitiativeDialog({
     const playersFirst = initiative === "players";
     const turns = [];
     const total = pcs + npcs;
-    const minAlternating = Math.min(pcs, npcs) * 2;
 
     for (let i = 0; i < total; i++) {
       const pcTurn = i % 2 === (playersFirst ? 0 : 1);

@@ -224,7 +224,7 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
     />
   );
 
-  const contextMismatch =
+  const _contextMismatch =
     context &&
     (() => {
       const typeContext = ITEM_TYPES.find(

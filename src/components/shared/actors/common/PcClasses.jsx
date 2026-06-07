@@ -544,7 +544,7 @@ function SpellCard({ spell, onUpdate, searchQuery, compact, theme, t }) {
 }
 // HeroicCard
 
-function HeroicCard({ cls, classIdx, isInteractive, onUpdate, pc, searchQuery, setHeroicPickerClassIdx, compact, theme, t, onPreview }) {
+function HeroicCard({ cls, _classIdx, _isInteractive, _onUpdate, pc, searchQuery, _setHeroicPickerClassIdx, compact, theme, t, onPreview }) {
   const [descOpen, setDescOpen] = useState(!compact);
   const hasHeroic = !!cls.heroic?.name;
   const translatedDesc = cls.heroic?.description ? t(cls.heroic.description) : "";

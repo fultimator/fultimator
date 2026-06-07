@@ -108,7 +108,7 @@ function Weapons({ variant = "equip" }) {
   const {
     base,
     name,
-    category,
+    _category,
     type,
     hands,
     att1,
@@ -120,7 +120,7 @@ function Weapons({ variant = "equip" }) {
     precBonus,
     rework,
     quality,
-    qualityName,
+    _qualityName,
     qualityCost,
     totalBonus,
     selectedQuality,

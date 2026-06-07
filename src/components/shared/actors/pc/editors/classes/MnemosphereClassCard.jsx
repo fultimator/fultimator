@@ -46,7 +46,7 @@ function SubHeader({ children, actions = null }) {
   );
 }
 
-function SkillRow({ skill, index, editable, budgetExhausted, onIncrease, onDecrease }) {
+function SkillRow({ skill, _index, editable, budgetExhausted, onIncrease, onDecrease }) {
   const theme = useCustomTheme();
   const { t } = useTranslate();
   return (
@@ -123,7 +123,7 @@ export default function MnemosphereClassCard({
   actions = null,
   isSlotted = false,
   showHeaderMeta = false,
-  showHeader = true,
+  _showHeader = true,
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();

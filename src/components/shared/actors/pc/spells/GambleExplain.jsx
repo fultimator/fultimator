@@ -24,7 +24,7 @@ export default function GambleExplain() {
         <Typography variant="h4">{t("Gamble Details")}</Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-        <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("GambleSpell_desc")}</ReactMarkdown>
+        <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("GambleSpell_desc")}</ReactMarkdown>
       </AccordionDetails>
     </Accordion>
   );

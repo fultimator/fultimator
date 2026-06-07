@@ -89,7 +89,7 @@ const NPCDetail = ({
   const [open, setOpen] = useState(false);
   const [numTargets, setNumTargets] = useState(1);
   const [error, setError] = useState("");
-  const [clickedData, setClickedData] = useState({});
+  const [clickedData, _setClickedData] = useState({});
   const [defenseDialogType, setDefenseDialogType] = useState(null);
 
   const withTargets = (msg) => {
@@ -252,7 +252,7 @@ const NPCDetail = ({
     setNumTargets(1);
   };
 
-  const handleAttack = (attack, attackType) => {
+  const _handleAttack = (attack, attackType) => {
     const attr1Raw =
       attackType === "weapon"
         ? (attack.accuracy?.attr1 ?? attack.weapon?.att1)

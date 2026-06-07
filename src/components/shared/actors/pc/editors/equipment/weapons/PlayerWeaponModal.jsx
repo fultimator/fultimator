@@ -17,9 +17,6 @@ import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import {
   normalizeWeaponLike,
-  calcWeaponCost,
-  calcWeaponDamage,
-  calcWeaponPrec,
   getWeaponRange,
   getWeaponPrec,
 } from "/src/libs/weaponNormalization";
@@ -70,10 +67,6 @@ export default function PlayerWeaponModal({
     rework,
     quality,
     qualityCost,
-    precModifier,
-    damageModifier,
-    defModifier,
-    mDefModifier,
     totalBonus,
   } = formState;
 
@@ -84,7 +77,7 @@ export default function PlayerWeaponModal({
     setFormState((prev) => ({ ...prev, totalBonus: bonus }));
   }, [damageReworkBonus, cost, qualityCost, rework]);
 
-  const set = (key, value) =>
+  const _set = (key, value) =>
     setFormState((prev) => ({ ...prev, [key]: value }));
 
   const {

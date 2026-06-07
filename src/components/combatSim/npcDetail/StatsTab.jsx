@@ -232,7 +232,7 @@ const StatsTab = ({
   selectedNPC,
   calcHP,
   calcMP,
-  calcAttr,
+  _calcAttr,
   handleOpen,
   toggleStatusEffect,
   applyCommand,

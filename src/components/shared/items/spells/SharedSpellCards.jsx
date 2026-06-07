@@ -2856,7 +2856,7 @@ export const SharedWellspringCard = React.memo(function SharedWellspringCard({
     useCardSetup({ variant, showImage, onShowImageChange, defaultImageVisible, imageTempInfoTextKey });
 
   const bgColor = item.color || "#888888";
-  const textColor = item.textColor || "white";
+  const _textColor = item.textColor || "white";
   const icon = item.icon || wellspringIconKey(item.name);
 
   return (

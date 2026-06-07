@@ -63,7 +63,7 @@ export const SharedRitualCard = React.memo(function SharedRitualCard({
     imageTempInfoTextKey,
   });
 
-  const withImage = isImageMode(imageMode) && imageVisible;
+  const _withImage = isImageMode(imageMode) && imageVisible;
   const potency = item.power
     ? t(item.power).charAt(0).toUpperCase() + t(item.power).slice(1)
     : "-";
@@ -335,7 +335,7 @@ export const SharedProjectCard = React.memo(function SharedProjectCard({
     imageTempInfoTextKey,
   });
 
-  const withImage = isImageMode(imageMode) && imageVisible;
+  const _withImage = isImageMode(imageMode) && imageVisible;
   const potency = item.power
     ? t(item.power).charAt(0).toUpperCase() + t(item.power).slice(1)
     : "-";

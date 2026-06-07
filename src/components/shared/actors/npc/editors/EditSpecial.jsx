@@ -200,7 +200,7 @@ function SpecialContextMenu({
 export default function EditSpecial({ npc, setNpc }) {
   const { t } = useTranslate();
   const addMessage = useChatMessagesStore((s) => s.addMessage);
-  const isSmallScreen = useMediaQuery("(max-width: 899px)");
+  const _isSmallScreen = useMediaQuery("(max-width: 899px)");
   const [modalOpen, setModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [pendingSpecialIndex, setPendingSpecialIndex] = useState(null);

@@ -16,7 +16,7 @@ export const ChatActionZone: React.FC<ChatActionZoneProps> = ({
   guardVariant,
   speakerCombatId,
 }) => {
-  const theme = useTheme();
+  const _theme = useTheme();
   const { selectedNPCs, selectedPCs, runtimeActors } = useCombatEncounterStore();
 
   const allActors = [

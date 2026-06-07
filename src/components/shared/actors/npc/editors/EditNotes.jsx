@@ -10,7 +10,6 @@ import {
   MenuItem,
   TextField,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { useTranslate } from "/src/translation/translate";
@@ -132,7 +131,11 @@ export default function EditNotes({ npc, setNpc }) {
   const toggleExpanded = (i) => {
     setExpandedSet((prev) => {
       const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
+      if (next.has(i)) {
+        next.delete(i);
+      } else {
+        next.add(i);
+      }
       return next;
     });
   };

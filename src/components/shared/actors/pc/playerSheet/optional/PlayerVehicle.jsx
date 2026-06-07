@@ -63,12 +63,12 @@ function ModuleRow({ name, onChat, onRoll, t }) {
   );
 }
 
-export default function PlayerVehicle({ player, setPlayer, isCharacterSheet }) {
+export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const custom = useCustomTheme();
-  const primary = theme.palette.primary.main;
-  const secondary = theme.palette.secondary.main;
+  const _custom = useCustomTheme();
+  const _primary = theme.palette.primary.main;
+  const _secondary = theme.palette.secondary.main;
 
   const [openEditModal, setOpenEditModal] = useState(false);
 

@@ -43,7 +43,7 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
           <Typography variant="h4">{t("Symbols Details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("symbol_details_1")}</ReactMarkdown>
+          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("symbol_details_1")}</ReactMarkdown>
         </AccordionDetails>
       </Accordion>
       {/* SYMBOLS */}

@@ -43,7 +43,7 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
           <Typography variant="h4">{t("Dance Details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("dance_details_1")}</ReactMarkdown>
+          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("dance_details_1")}</ReactMarkdown>
         </AccordionDetails>
       </Accordion>
       {/* DANCES */}

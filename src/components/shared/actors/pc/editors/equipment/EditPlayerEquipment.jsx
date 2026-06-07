@@ -5,7 +5,7 @@ import PcEquipment from "/src/components/shared/actors/common/PcEquipment";
 import SphereInventory from "/src/components/shared/actors/pc/editors/equipment/technospheres/SphereInventory";
 
 export default function EditPlayerEquipment({ player, setPlayer, isEditMode }) {
-  const { t } = useTranslate();
+  const _t = useTranslate();
   const isTechnospheres = player?.settings?.optionalRules?.technospheres ?? false;
 
   return (

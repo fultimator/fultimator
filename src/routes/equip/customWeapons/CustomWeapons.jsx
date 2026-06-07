@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   Grid,
@@ -321,7 +321,7 @@ function CustomWeapons({ variant = "equip" }) {
     secondSelectedRange,
     secondSelectedAccuracyCheck,
     secondCustomDamageType,
-    secondOverrideDamageType,
+    _secondOverrideDamageType,
     secondCustomizations,
     secondPrecModifier,
     secondDamageModifier,
@@ -346,7 +346,7 @@ function CustomWeapons({ variant = "equip" }) {
   const pHasElemental = (customizations ?? []).some(
     (c) => c.name === "weapon_customization_elemental",
   );
-  const pType = pHasElemental
+  const _pType = pHasElemental
     ? (formState.damage?.type ?? customDamageType ?? "physical")
     : overrideDamageType
       ? (formState.rareOverrideDamageTypeValue ?? "physical")

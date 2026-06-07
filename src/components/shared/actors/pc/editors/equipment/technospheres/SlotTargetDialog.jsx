@@ -44,6 +44,7 @@ export default function SlotTargetDialog({
 }) {
   const { t } = useTranslate();
   const eq0 = player?.equipment?.[0] ?? {};
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const hoplospheres = eq0.hoplospheres ?? [];
 
   const candidates = useMemo(() => {
