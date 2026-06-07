@@ -221,7 +221,9 @@ const Layout: React.FC<LayoutProps> = ({
         {fullWidth ? (
           <div style={{ marginTop: contentTopOffset }}>{children}</div>
         ) : (
-          <Container style={{ marginTop: contentTopOffset, alignItems: "center" }}>
+          <Container
+            style={{ marginTop: contentTopOffset, alignItems: "center" }}
+          >
             {children}
           </Container>
         )}

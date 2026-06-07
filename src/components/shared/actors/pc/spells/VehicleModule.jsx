@@ -11,7 +11,14 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { Delete, ContentCopy, RadioButtonChecked, RadioButtonUnchecked, Chat, Casino } from "@mui/icons-material";
+import {
+  Delete,
+  ContentCopy,
+  RadioButtonChecked,
+  RadioButtonUnchecked,
+  Chat,
+  Casino,
+} from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { calculateAttribute } from "/src/libs/playerCalculations";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
@@ -58,8 +65,8 @@ const VehicleModule = memo(
       if (!player) return;
       const attrCfg = {
         dexterity: [["slow", "enraged"], ["dexUp"]],
-        insight:   [["dazed", "enraged"], ["insUp"]],
-        might:     [["weak", "poisoned"],  ["migUp"]],
+        insight: [["dazed", "enraged"], ["insUp"]],
+        might: [["weak", "poisoned"], ["migUp"]],
         willpower: [["shaken", "poisoned"], ["wlpUp"]],
       };
       const attrDie = (key) => {
@@ -71,16 +78,24 @@ const VehicleModule = memo(
       const dmg = module.damage || {};
       const attr1 = acc.attr1 || "dexterity";
       const attr2 = acc.attr2 || "might";
-      const name = module.name === "pilot_custom_weapon" ? module.customName : t(module.name);
+      const name =
+        module.name === "pilot_custom_weapon"
+          ? module.customName
+          : t(module.name);
       const rawDescription = module.description
-        ? (module.name === "pilot_custom_weapon" ? module.description : t(module.description))
+        ? module.name === "pilot_custom_weapon"
+          ? module.description
+          : t(module.description)
         : undefined;
       const rawQuality = module.quality || undefined;
-      const description = [rawDescription, rawQuality].filter(Boolean).join("\n\n") || undefined;
+      const description =
+        [rawDescription, rawQuality].filter(Boolean).join("\n\n") || undefined;
 
       const intent = prepareAccuracyCheck({
-        arg: name, name,
-        attr1, attr2,
+        arg: name,
+        name,
+        attr1,
+        attr2,
         accuracyBonus: acc.value ?? 0,
         baseDamage: dmg.value ?? 0,
         damageType: dmg.type ?? "physical",
@@ -88,25 +103,38 @@ const VehicleModule = memo(
         category: module.category,
         isWeaponModule: true,
         damageHrZero: dmg.hrZero === true,
-        range: module.range === "Ranged" || module.range === "ranged" ? "ranged" : "melee",
+        range:
+          module.range === "Ranged" || module.range === "ranged"
+            ? "ranged"
+            : "melee",
         description: description,
       });
       const dieSizes = { primary: attrDie(attr1), secondary: attrDie(attr2) };
       const rolls = rollAccuracyCheck(dieSizes);
-      const result = processAccuracyCheck(intent, rolls, dieSizes, player?.info?.name || "");
+      const result = processAccuracyCheck(
+        intent,
+        rolls,
+        dieSizes,
+        player?.info?.name || "",
+      );
       sendRollMessage(buildAccuracyCheckMessage(result));
     };
 
     const handleSendToChat = (e) => {
       e.stopPropagation();
-      const name = module.name === "pilot_custom_armor" || module.name === "pilot_custom_weapon" || module.name === "pilot_custom_support"
-        ? module.customName
-        : t(module.name);
+      const name =
+        module.name === "pilot_custom_armor" ||
+        module.name === "pilot_custom_weapon" ||
+        module.name === "pilot_custom_support"
+          ? module.customName
+          : t(module.name);
       const tags = [];
       if (module.type === "pilot_module_armor") {
         if (module.martial) tags.push(t("Martial"));
-        if (module.def != null) tags.push(`DEF ${module.def >= 0 ? "+" : ""}${module.def}`);
-        if (module.mdef != null) tags.push(`M.DEF ${module.mdef >= 0 ? "+" : ""}${module.mdef}`);
+        if (module.def != null)
+          tags.push(`DEF ${module.def >= 0 ? "+" : ""}${module.def}`);
+        if (module.mdef != null)
+          tags.push(`M.DEF ${module.mdef >= 0 ? "+" : ""}${module.mdef}`);
       }
       sendDisplayMessage("item", name, {
         description: module.description ? t(module.description) : undefined,
@@ -162,8 +190,8 @@ const VehicleModule = memo(
     const moduleName = module.name ?? module.key;
     const resolvedModuleName =
       isGenericModuleTypeName(moduleName) &&
-        module.key &&
-        !isGenericModuleTypeName(module.key)
+      module.key &&
+      !isGenericModuleTypeName(module.key)
         ? module.key
         : moduleName;
 
@@ -196,7 +224,11 @@ const VehicleModule = memo(
             fontSize: "0.75rem",
             fontWeight: 800,
             border: "none",
-            color: disabled ? `${theme.primary}44` : isActive ? theme.primary : `${theme.primary}88`,
+            color: disabled
+              ? `${theme.primary}44`
+              : isActive
+                ? theme.primary
+                : `${theme.primary}88`,
             backgroundColor: disabled ? "rgba(255,255,255,0.2)" : theme.white,
           }}
         >
@@ -206,27 +238,43 @@ const VehicleModule = memo(
     };
 
     const slotToggle =
-      isEquipped && module.type === "pilot_module_weapon"
-        ? module.cumbersome
-          ? (
-            <Button size="small" variant="outlined" color="inherit" disabled style={{ minWidth: 36, height: 26, padding: 0, fontSize: "0.75rem", fontWeight: 800, border: "none", color: `${theme.primary}55`, backgroundColor: "rgba(255,255,255,0.3)" }}>
-              {t("mo_abbr")}
-            </Button>
-          ) : (
-            <Box sx={{ display: "flex", gap: "2px" }}>
-              {makeSlotBtn("main", t("m_abbr"))}
-              {makeSlotBtn(
-                "off",
-                t("o_abbr"),
-                !module.isShield &&
+      isEquipped && module.type === "pilot_module_weapon" ? (
+        module.cumbersome ? (
+          <Button
+            size="small"
+            variant="outlined"
+            color="inherit"
+            disabled
+            style={{
+              minWidth: 36,
+              height: 26,
+              padding: 0,
+              fontSize: "0.75rem",
+              fontWeight: 800,
+              border: "none",
+              color: `${theme.primary}55`,
+              backgroundColor: "rgba(255,255,255,0.3)",
+            }}
+          >
+            {t("mo_abbr")}
+          </Button>
+        ) : (
+          <Box sx={{ display: "flex", gap: "2px" }}>
+            {makeSlotBtn("main", t("m_abbr"))}
+            {makeSlotBtn(
+              "off",
+              t("o_abbr"),
+              !module.isShield &&
                 vehicle.modules.some((m) => {
                   const mk = m.key ?? m.name;
-                  return m.isShield && vehicleSlots.off === mk && mk !== moduleKey;
+                  return (
+                    m.isShield && vehicleSlots.off === mk && mk !== moduleKey
+                  );
                 }),
-              )}
-            </Box>
-          )
-        : null;
+            )}
+          </Box>
+        )
+      ) : null;
 
     const actions = (
       <>
@@ -244,14 +292,23 @@ const VehicleModule = memo(
             fontWeight: 800,
             border: "none",
             gap: 4,
-            color: (!isEquipped && !canEquip) ? `${theme.primary}55` : theme.primary,
-            backgroundColor: (!isEquipped && !canEquip) ? "rgba(255,255,255,0.3)" : theme.white,
+            color:
+              !isEquipped && !canEquip ? `${theme.primary}55` : theme.primary,
+            backgroundColor:
+              !isEquipped && !canEquip ? "rgba(255,255,255,0.3)" : theme.white,
           }}
         >
-          {isEquipped
-            ? <><RadioButtonChecked sx={{ fontSize: "1rem" }} />{t("Equipped")}</>
-            : <><RadioButtonUnchecked sx={{ fontSize: "1rem" }} />{t("Equip")}</>
-          }
+          {isEquipped ? (
+            <>
+              <RadioButtonChecked sx={{ fontSize: "1rem" }} />
+              {t("Equipped")}
+            </>
+          ) : (
+            <>
+              <RadioButtonUnchecked sx={{ fontSize: "1rem" }} />
+              {t("Equip")}
+            </>
+          )}
         </Button>
         {module.type === "pilot_module_weapon" ? (
           <Tooltip title={t("Roll")}>
@@ -270,7 +327,10 @@ const VehicleModule = memo(
           <>
             <IconButton
               size="small"
-              onClick={(e) => { e.stopPropagation(); setMenuAnchor(e.currentTarget); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuAnchor(e.currentTarget);
+              }}
             >
               <MenuIcon />
             </IconButton>
@@ -281,15 +341,33 @@ const VehicleModule = memo(
               slotProps={{ root: { sx: { zIndex: 1400 } } }}
             >
               {onCloneModule && (
-                <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); handleClone(e); }}>
-                  <ListItemIcon><ContentCopy fontSize="small" /></ListItemIcon>
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuAnchor(null);
+                    handleClone(e);
+                  }}
+                >
+                  <ListItemIcon>
+                    <ContentCopy fontSize="small" />
+                  </ListItemIcon>
                   <ListItemText>{t("Clone to Custom")}</ListItemText>
                 </MenuItem>
               )}
               {onDeleteModule && (
-                <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); handleDelete(e); }}>
-                  <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
-                  <ListItemText sx={{ color: "error.main" }}>{t("Delete")}</ListItemText>
+                <MenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuAnchor(null);
+                    handleDelete(e);
+                  }}
+                >
+                  <ListItemIcon>
+                    <Delete fontSize="small" color="error" />
+                  </ListItemIcon>
+                  <ListItemText sx={{ color: "error.main" }}>
+                    {t("Delete")}
+                  </ListItemText>
                 </MenuItem>
               )}
             </Menu>
@@ -318,11 +396,15 @@ const VehicleModule = memo(
         const dmgType = dmg.type ?? "physical";
         return (
           <span>
-            <OpenBracket />{attributes[attr1]?.shortcaps ?? "DEX"}+{attributes[attr2]?.shortcaps ?? "MIG"}<CloseBracket />
-            {prec !== 0 ? (prec > 0 ? "+" : "") + prec : ""}
-            {" "}
-            <OpenBracket />{t("HR")}{dmgVal >= 0 ? "+" : ""}{dmgVal}<CloseBracket />
-            {" "}{types[dmgType]?.long ?? types.physical.long}
+            <OpenBracket />
+            {attributes[attr1]?.shortcaps ?? "DEX"}+
+            {attributes[attr2]?.shortcaps ?? "MIG"}
+            <CloseBracket />
+            {prec !== 0 ? (prec > 0 ? "+" : "") + prec : ""} <OpenBracket />
+            {t("HR")}
+            {dmgVal >= 0 ? "+" : ""}
+            {dmgVal}
+            <CloseBracket /> {types[dmgType]?.long ?? types.physical.long}
           </span>
         );
       }
@@ -331,22 +413,41 @@ const VehicleModule = memo(
         const mdef = module.mdef ?? 0;
         const signed = (v) => `${v >= 0 ? "+" : ""}${v}`;
         return (
-          <span>{t("DEF")} {signed(def)}{" · "}{t("M.DEF")} {signed(mdef)}</span>
+          <span>
+            {t("DEF")} {signed(def)}
+            {" · "}
+            {t("M.DEF")} {signed(mdef)}
+          </span>
         );
       }
       return null;
     })();
 
     const subtitle = (
-      <Typography variant="caption" sx={{ color: "text.secondary", lineHeight: 1.4, fontWeight: "bold" }}>
+      <Typography
+        variant="caption"
+        sx={{ color: "text.secondary", lineHeight: 1.4, fontWeight: "bold" }}
+      >
         {t(module.type)}
         {isEquipped && module.type === "pilot_module_weapon" && (
-          <>{" | "}{module.cumbersome ? t("both_hand") : moduleSlot === "main" ? t("main_hand") : t("off_hand")}</>
+          <>
+            {" | "}
+            {module.cumbersome
+              ? t("both_hand")
+              : moduleSlot === "main"
+                ? t("main_hand")
+                : t("off_hand")}
+          </>
         )}
         {module.cumbersome && " ⚠"}
         {module.isShield && " 🛡"}
         {module.isComplex && " ⚙⚙"}
-        {statLine && <>{" · "}{statLine}</>}
+        {statLine && (
+          <>
+            {" · "}
+            {statLine}
+          </>
+        )}
       </Typography>
     );
 
@@ -410,7 +511,12 @@ const VehicleModule = memo(
                 px: "6px",
                 gap: 0.25,
                 flexShrink: 0,
-                "& .MuiIconButton-root": { p: "2px", width: 32, height: 32, color: theme.white },
+                "& .MuiIconButton-root": {
+                  p: "2px",
+                  width: 32,
+                  height: 32,
+                  color: theme.white,
+                },
                 "& .MuiSvgIcon-root": { fontSize: "1.15rem" },
               }}
             >
@@ -420,13 +526,29 @@ const VehicleModule = memo(
           <Collapse in={open}>
             <Box sx={{ px: 2, py: 1.5 }}>
               {!isCustomModule && module.description && (
-                <Box sx={{ mb: 1.5, p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1, bgcolor: "action.hover" }}>
-                  <Typography variant="caption" sx={{ color: "text.secondary", mb: 0.5, display: "block" }}>
+                <Box
+                  sx={{
+                    mb: 1.5,
+                    p: 1,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    bgcolor: "action.hover",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "text.secondary", mb: 0.5, display: "block" }}
+                  >
                     {t("Description")}
                   </Typography>
                   <div style={{ fontSize: "0.95em" }}>
                     <ReactMarkdown
-                      components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}
+                      components={{
+                        p: ({ node: _n, ...props }) => (
+                          <p style={{ margin: 0 }} {...props} />
+                        ),
+                      }}
                     >
                       {t(module.description)}
                     </ReactMarkdown>
@@ -457,7 +579,9 @@ const VehicleModule = memo(
           onConfirm={() => onDeleteModule(vehicleIndex, moduleIndex)}
           title={t("Delete")}
           message={t("Are you sure you want to delete this module?")}
-          itemPreview={<Typography variant="h4">{moduleDisplayName}</Typography>}
+          itemPreview={
+            <Typography variant="h4">{moduleDisplayName}</Typography>
+          }
         />
       </>
     );

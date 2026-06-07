@@ -2,8 +2,20 @@ import React from "react";
 import { Box, Chip, darken, Grid, Stack, Typography } from "@mui/material";
 import { affinityIconSrc } from "/src/libs/player/wellsprings";
 
-const WELLSPRING_ICON = { Air: "air", Earth: "earth", Fire: "fire", Lightning: "bolt", Water: "water", Ice: "ice", Dark: "dark", Light: "light", Poison: "poison", Physical: "physical" };
-const wellspringIconKey = (name) => WELLSPRING_ICON[name] || (name ? name.toLowerCase() : "untyped");
+const WELLSPRING_ICON = {
+  Air: "air",
+  Earth: "earth",
+  Fire: "fire",
+  Lightning: "bolt",
+  Water: "water",
+  Ice: "ice",
+  Dark: "dark",
+  Light: "light",
+  Poison: "poison",
+  Physical: "physical",
+};
+const wellspringIconKey = (name) =>
+  WELLSPRING_ICON[name] || (name ? name.toLowerCase() : "untyped");
 
 import EditableImage from "/src/components/EditableImage";
 import { OffensiveSpellIcon, Martial } from "/src/components/icons";
@@ -20,7 +32,10 @@ import {
   CARD_DEFAULTS,
 } from "/src/components/shared/items/core-utils";
 import { StyledMarkdown, md } from "/src/components/shared/items/markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
+import {
+  CardContentWrapper,
+  RowsWithOptionalImage,
+} from "/src/components/shared/items/core";
 
 export const SharedSpellCard = React.memo(function SharedSpellCard({
   item,
@@ -709,7 +724,9 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
               }}
             >
               <Grid size="grow">
-                <Typography sx={{ fontFamily: "Antonio" }}>{t("Gift")}</Typography>
+                <Typography sx={{ fontFamily: "Antonio" }}>
+                  {t("Gift")}
+                </Typography>
               </Grid>
               <Grid size={7}>
                 <Typography sx={{ textAlign: "center", fontFamily: "Antonio" }}>
@@ -828,7 +845,9 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
               }}
             >
               <Grid size="grow">
-                <Typography sx={{ fontFamily: "Antonio" }}>{t("Dance")}</Typography>
+                <Typography sx={{ fontFamily: "Antonio" }}>
+                  {t("Dance")}
+                </Typography>
               </Grid>
               <Grid size={7}>
                 <Typography sx={{ textAlign: "center", fontFamily: "Antonio" }}>
@@ -933,7 +952,9 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
               }}
             >
               <Grid size="grow">
-                <Typography sx={{ fontFamily: "Antonio" }}>{t("Therioform")}</Typography>
+                <Typography sx={{ fontFamily: "Antonio" }}>
+                  {t("Therioform")}
+                </Typography>
               </Grid>
               <Grid size={7}>
                 <Typography sx={{ textAlign: "center", fontFamily: "Antonio" }}>
@@ -1056,7 +1077,9 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
   const labelPillSx = {
     ...(isPrint
       ? { background: customTheme.primary }
-      : { backgroundImage: `linear-gradient(to right, ${customTheme.primary}, ${darken(customTheme.secondary, 0.3)})` }),
+      : {
+          backgroundImage: `linear-gradient(to right, ${customTheme.primary}, ${darken(customTheme.secondary, 0.3)})`,
+        }),
     px: 2,
     py: 0.5,
     color: "#ffffff",
@@ -1096,18 +1119,26 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
           </Box>
           <Box sx={nameBandSx}>
             {name && (
-              <Typography sx={{ fontWeight: "bold", fontSize: sectionNameFontSize }}>
+              <Typography
+                sx={{ fontWeight: "bold", fontSize: sectionNameFontSize }}
+              >
                 {name}
               </Typography>
             )}
           </Box>
         </Box>
         {benefit && (
-          <Box sx={{ px: 2, py: isPrint ? 1 : 0.75, fontSize: benefitFontSize }}>
+          <Box
+            sx={{ px: 2, py: isPrint ? 1 : 0.75, fontSize: benefitFontSize }}
+          >
             <Typography
               variant="body2"
               component="div"
-              sx={{ color: benefitColor, lineHeight: isPrint ? 1.7 : 1.5, fontSize: benefitFontSize }}
+              sx={{
+                color: benefitColor,
+                lineHeight: isPrint ? 1.7 : 1.5,
+                fontSize: benefitFontSize,
+              }}
             >
               {md(benefit)}
             </Typography>
@@ -1229,7 +1260,11 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
               <Typography
                 variant="body2"
                 component="div"
-                sx={{ lineHeight: 1.5, fontSize: descFontSize, fontStyle: descFontStyle }}
+                sx={{
+                  lineHeight: 1.5,
+                  fontSize: descFontSize,
+                  fontStyle: descFontStyle,
+                }}
               >
                 {md(item.description)}
               </Typography>
@@ -1623,8 +1658,9 @@ export const SharedInvocationCard = React.memo(function SharedInvocationCard({
                     <img
                       src={affinityIconSrc(
                         WELLSPRING_ICON[item.wellspring] ||
-                        wellsprings.find((w) => w.key === item.wellspring)?.icon ||
-                        "untyped"
+                          wellsprings.find((w) => w.key === item.wellspring)
+                            ?.icon ||
+                          "untyped",
                       )}
                       width={14}
                       height={14}
@@ -2722,7 +2758,9 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
               }}
             >
               <Grid size="grow">
-                <Typography sx={{ fontFamily: "Antonio" }}>{typeLabel}</Typography>
+                <Typography sx={{ fontFamily: "Antonio" }}>
+                  {typeLabel}
+                </Typography>
               </Grid>
               <Grid size={2}>
                 <Typography sx={{ textAlign: "center" }}>
@@ -2852,8 +2890,20 @@ export const SharedWellspringCard = React.memo(function SharedWellspringCard({
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
   item = item ?? {};
-  const { t, customTheme, scale, imageVisible, setImageVisible, imageTempInfoText } =
-    useCardSetup({ variant, showImage, onShowImageChange, defaultImageVisible, imageTempInfoTextKey });
+  const {
+    t,
+    customTheme,
+    scale,
+    imageVisible,
+    setImageVisible,
+    imageTempInfoText,
+  } = useCardSetup({
+    variant,
+    showImage,
+    onShowImageChange,
+    defaultImageVisible,
+    imageTempInfoTextKey,
+  });
 
   const bgColor = item.color || "#888888";
   const _textColor = item.textColor || "white";
@@ -2883,12 +2933,21 @@ export const SharedWellspringCard = React.memo(function SharedWellspringCard({
                   src={affinityIconSrc(icon)}
                   width={20}
                   height={20}
-                  style={{ objectFit: "contain", filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.4))" }}
+                  style={{
+                    objectFit: "contain",
+                    filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.4))",
+                  }}
                   alt={item.name}
                 />
                 <Typography>{t(item.name)}</Typography>
               </Box>
-              <Typography sx={{ fontSize: "0.7rem !important", textTransform: "uppercase !important", opacity: 0.75 }}>
+              <Typography
+                sx={{
+                  fontSize: "0.7rem !important",
+                  textTransform: "uppercase !important",
+                  opacity: 0.75,
+                }}
+              >
                 {t("Wellspring")}
               </Typography>
             </Box>
@@ -2900,7 +2959,15 @@ export const SharedWellspringCard = React.memo(function SharedWellspringCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
-        <Box sx={{ px: 2, py: 1.5, display: "flex", flexDirection: "column", gap: 0.5 }}>
+        <Box
+          sx={{
+            px: 2,
+            py: 1.5,
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+          }}
+        >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Box
               sx={{
@@ -2924,10 +2991,22 @@ export const SharedWellspringCard = React.memo(function SharedWellspringCard({
               />
             </Box>
             <Box>
-              <Typography sx={{ fontWeight: "bold", fontSize: scale.body, lineHeight: 1.2 }}>
+              <Typography
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: scale.body,
+                  lineHeight: 1.2,
+                }}
+              >
                 {t(item.name)}
               </Typography>
-              <Typography sx={{ fontSize: "0.7rem", color: "text.secondary", lineHeight: 1.2 }}>
+              <Typography
+                sx={{
+                  fontSize: "0.7rem",
+                  color: "text.secondary",
+                  lineHeight: 1.2,
+                }}
+              >
                 {t("Wellspring")}
               </Typography>
             </Box>

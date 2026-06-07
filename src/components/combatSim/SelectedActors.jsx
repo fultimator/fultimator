@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  List,
-  Typography,
-  Divider,
-} from "@mui/material";
+import { Box, List, Typography, Divider } from "@mui/material";
 import { TouchApp } from "@mui/icons-material";
 import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
@@ -317,12 +312,13 @@ export default function SelectedActors({
                               }
                               useDragAndDrop={useDragAndDrop}
                             />
-                            {selectedPcID === pc.combatId &&
+                            {selectedPcID === pc.combatId && (
                               <ActorActionBar
-                              actorDoc={selectedActorDoc}
-                              isNpc={isSelectedNpc}
-                              applyCommand={applyCommand}
-                            />}
+                                actorDoc={selectedActorDoc}
+                                isNpc={isSelectedNpc}
+                                applyCommand={applyCommand}
+                              />
+                            )}
                           </React.Fragment>
                         ))}
                       </List>
@@ -425,12 +421,13 @@ export default function SelectedActors({
                           onEndActorTurn?.(npc.combatId, idx, "npcs", true)
                         }
                       />
-                      {selectedNpcID === npc.combatId &&
+                      {selectedNpcID === npc.combatId && (
                         <ActorActionBar
-                              actorDoc={selectedActorDoc}
-                              isNpc={isSelectedNpc}
-                              applyCommand={applyCommand}
-                            />}
+                          actorDoc={selectedActorDoc}
+                          isNpc={isSelectedNpc}
+                          applyCommand={applyCommand}
+                        />
+                      )}
                     </React.Fragment>
                   ))}
                 </List>
@@ -532,12 +529,13 @@ export default function SelectedActors({
                               }
                               useDragAndDrop={useDragAndDrop}
                             />
-                            {selectedPcID === pc.combatId &&
+                            {selectedPcID === pc.combatId && (
                               <ActorActionBar
-                              actorDoc={selectedActorDoc}
-                              isNpc={isSelectedNpc}
-                              applyCommand={applyCommand}
-                            />}
+                                actorDoc={selectedActorDoc}
+                                isNpc={isSelectedNpc}
+                                applyCommand={applyCommand}
+                              />
+                            )}
                           </React.Fragment>
                         ))}
                       </List>

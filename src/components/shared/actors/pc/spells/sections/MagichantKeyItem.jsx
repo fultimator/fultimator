@@ -80,10 +80,25 @@ export default function MagichantKeyItem({
   ].filter(Boolean);
 
   const rowLabel = (
-    <Box sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1rem", textTransform: "uppercase", lineHeight: 1.3, display: "flex", alignItems: "center", flexWrap: "wrap", gap: 0.5 }}>
+    <Box
+      sx={{
+        fontFamily: "Antonio",
+        fontWeight: 800,
+        fontSize: "1rem",
+        textTransform: "uppercase",
+        lineHeight: 1.3,
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 0.5,
+      }}
+    >
       <span>{itemDisplayName}</span>
       {metaParts.map((part, i) => (
-        <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 2 }}>
+        <span
+          key={i}
+          style={{ display: "inline-flex", alignItems: "center", gap: 2 }}
+        >
           <Diamond />
           <span style={{ opacity: 0.75 }}>{part}</span>
         </span>
@@ -113,112 +128,117 @@ export default function MagichantKeyItem({
         }
         paperSx={{ mb: 0.5 }}
       >
-        {expanded && <Box sx={{ p: 2 }}>
-          <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
-            <Grid size={{ xs: 12, sm: 5 }}>
-              <FormControl fullWidth>
-                <InputLabel>{t("magichant_key")}</InputLabel>
-                <Select
-                  value={item.key || "magichant_custom_name"}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  label={t("magichant_key")}
-                >
-                  {availableMagichantKeys.map((option) => (
-                    <MenuItem key={option.name} value={option.name}>
-                      {t(option.name)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+        {expanded && (
+          <Box sx={{ p: 2 }}>
+            <Grid container spacing={2} sx={{ alignItems: "flex-start" }}>
+              <Grid size={{ xs: 12, sm: 5 }}>
+                <FormControl fullWidth>
+                  <InputLabel>{t("magichant_key")}</InputLabel>
+                  <Select
+                    value={item.key || "magichant_custom_name"}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    label={t("magichant_key")}
+                  >
+                    {availableMagichantKeys.map((option) => (
+                      <MenuItem key={option.name} value={option.name}>
+                        {t(option.name)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-            <Grid size={{ xs: 12, sm: 7 }}>
-              <TextField
-                fullWidth
-                label={t("magichant_name")}
-                value={isCustom ? item.customName || "" : t(item.key || "")}
-                onChange={(e) =>
-                  isCustom &&
-                  onItemChange(itemIndex, "customName", e.target.value)
-                }
-                slotProps={{
-                  input: { readOnly: !isCustom },
-                }}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              {isCustom ? (
+              <Grid size={{ xs: 12, sm: 7 }}>
                 <TextField
                   fullWidth
-                  label={t("magichant_type")}
-                  value={item.type || ""}
+                  label={t("magichant_name")}
+                  value={isCustom ? item.customName || "" : t(item.key || "")}
                   onChange={(e) =>
-                    onItemChange(itemIndex, "type", e.target.value)
+                    isCustom &&
+                    onItemChange(itemIndex, "customName", e.target.value)
                   }
+                  slotProps={{
+                    input: { readOnly: !isCustom },
+                  }}
                 />
-              ) : (
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  sx={{ height: "100%", minHeight: 40 }}
-                >
-                  <TypeIcon type={item.type} />
-                  <span style={{ textTransform: "capitalize" }}>
-                    {item.type || ""}
-                  </span>
-                </Stack>
-              )}
-            </Grid>
+              </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <TextField
-                fullWidth
-                label={t("magichant_status_effect")}
-                value={isCustom ? item.status || "" : t(item.status || "")}
-                onChange={(e) =>
-                  isCustom && onItemChange(itemIndex, "status", e.target.value)
-                }
-                slotProps={{
-                  input: { readOnly: !isCustom },
-                }}
-              />
-            </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                {isCustom ? (
+                  <TextField
+                    fullWidth
+                    label={t("magichant_type")}
+                    value={item.type || ""}
+                    onChange={(e) =>
+                      onItemChange(itemIndex, "type", e.target.value)
+                    }
+                  />
+                ) : (
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={1}
+                    sx={{ height: "100%", minHeight: 40 }}
+                  >
+                    <TypeIcon type={item.type} />
+                    <span style={{ textTransform: "capitalize" }}>
+                      {item.type || ""}
+                    </span>
+                  </Stack>
+                )}
+              </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <TextField
-                fullWidth
-                label={t("magichant_attribute")}
-                value={
-                  isCustom ? item.attribute || "" : t(item.attribute || "")
-                }
-                onChange={(e) =>
-                  isCustom &&
-                  onItemChange(itemIndex, "attribute", e.target.value)
-                }
-                slotProps={{
-                  input: { readOnly: !isCustom },
-                }}
-              />
-            </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <TextField
+                  fullWidth
+                  label={t("magichant_status_effect")}
+                  value={isCustom ? item.status || "" : t(item.status || "")}
+                  onChange={(e) =>
+                    isCustom &&
+                    onItemChange(itemIndex, "status", e.target.value)
+                  }
+                  slotProps={{
+                    input: { readOnly: !isCustom },
+                  }}
+                />
+              </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <TextField
-                fullWidth
-                label={t("magichant_recovery")}
-                value={isCustom ? item.recovery || "" : t(item.recovery || "")}
-                onChange={(e) =>
-                  isCustom &&
-                  onItemChange(itemIndex, "recovery", e.target.value)
-                }
-                slotProps={{
-                  input: { readOnly: !isCustom },
-                }}
-              />
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <TextField
+                  fullWidth
+                  label={t("magichant_attribute")}
+                  value={
+                    isCustom ? item.attribute || "" : t(item.attribute || "")
+                  }
+                  onChange={(e) =>
+                    isCustom &&
+                    onItemChange(itemIndex, "attribute", e.target.value)
+                  }
+                  slotProps={{
+                    input: { readOnly: !isCustom },
+                  }}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <TextField
+                  fullWidth
+                  label={t("magichant_recovery")}
+                  value={
+                    isCustom ? item.recovery || "" : t(item.recovery || "")
+                  }
+                  onChange={(e) =>
+                    isCustom &&
+                    onItemChange(itemIndex, "recovery", e.target.value)
+                  }
+                  slotProps={{
+                    input: { readOnly: !isCustom },
+                  }}
+                />
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>}
+          </Box>
+        )}
       </ItemRowCard>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}

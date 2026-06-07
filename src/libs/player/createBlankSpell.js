@@ -60,8 +60,20 @@ export function createBlankSpellForType(spellType) {
       duration: "Instantaneous",
       attr: "will",
       targets: [
-        { rangeFrom: 1, rangeTo: 6, effect: "First Effect", secondRoll: false, secondEffects: [] },
-        { rangeFrom: 7, rangeTo: 12, effect: "Second Effect", secondRoll: false, secondEffects: [] },
+        {
+          rangeFrom: 1,
+          rangeTo: 6,
+          effect: "First Effect",
+          secondRoll: false,
+          secondEffects: [],
+        },
+        {
+          rangeFrom: 7,
+          rangeTo: 12,
+          effect: "Second Effect",
+          secondRoll: false,
+          secondEffects: [],
+        },
       ],
     };
   if (spellType === "magichant")
@@ -86,7 +98,12 @@ export function createBlankSpellForType(spellType) {
       gardenDescription: "",
     };
   if (spellType === "cooking")
-    return { spellType, spellName: "Cookbook", cookbookEffects: [], showInPlayerSheet: true };
+    return {
+      spellType,
+      spellName: "Cookbook",
+      cookbookEffects: [],
+      showInPlayerSheet: true,
+    };
   if (spellType === "invocation")
     return {
       spellType,
@@ -99,7 +116,12 @@ export function createBlankSpellForType(spellType) {
     return {
       spellType: "deck",
       spellName: "Ace of Cards Deck",
-      suitConfiguration: { Air: "air", Earth: "earth", Fire: "fire", Ice: "ice" },
+      suitConfiguration: {
+        Air: "air",
+        Earth: "earth",
+        Fire: "fire",
+        Ice: "ice",
+      },
       cardsInDeck: 30,
       hand: [],
       discardPile: [],

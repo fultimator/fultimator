@@ -80,8 +80,11 @@ export function resolveDamage(ctx: DamageContext): DamageResult {
   const isUntyped = ctx.damageType === "untyped";
 
   // Step 1: base + incoming damage bonuses (flat increment before affinity)
-  const bonus = incomingBonusForElement(ctx.incomingDamageBonuses, ctx.damageType);
-  const boosted = (ctx.baseDamage + bonus);
+  const bonus = incomingBonusForElement(
+    ctx.incomingDamageBonuses,
+    ctx.damageType,
+  );
+  const boosted = ctx.baseDamage + bonus;
   breakdown.push({ label: "base", value: ctx.baseDamage });
   if (bonus !== 0) breakdown.push({ label: "incoming bonus", value: bonus });
 
@@ -90,7 +93,8 @@ export function resolveDamage(ctx: DamageContext): DamageResult {
     const guardReduced = ctx.isGuarding
       ? Math.max(0, Math.floor(boosted * 0.5))
       : boosted;
-    if (ctx.isGuarding) breakdown.push({ label: "guarding (÷2)", value: guardReduced });
+    if (ctx.isGuarding)
+      breakdown.push({ label: "guarding (÷2)", value: guardReduced });
     return {
       finalDamage: guardReduced,
       effectiveAffinity: null,
@@ -105,7 +109,7 @@ export function resolveDamage(ctx: DamageContext): DamageResult {
   // Step 3: affinity resolution
   const effective = resolveEffectiveAffinity(ctx);
   let multiplier: DamageMultiplier = 1;
-  const affinityResult: AffinityResult = effective as AffinityResult ?? null;
+  const affinityResult: AffinityResult = (effective as AffinityResult) ?? null;
 
   if (effective != null && effective !== Aff.None) {
     if (effective === Aff.Absorpbtion && !ctx.ignoreAbsorption) {
@@ -176,7 +180,8 @@ export function buildDamageContext(opts: {
   const element = opts.damageType;
   const raw = opts.npcAffinities[element] as Affinities | undefined;
   const native: Affinities | null = raw ?? null;
-  const temp = (opts.temporaryAffinities?.[element] as Affinities | undefined) ?? null;
+  const temp =
+    (opts.temporaryAffinities?.[element] as Affinities | undefined) ?? null;
 
   return {
     baseDamage: opts.baseDamage,

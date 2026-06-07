@@ -3,7 +3,6 @@ import { Box, Typography } from "@mui/material";
 import { TypeAffinity } from "./TypeAffinity";
 import { AFFINITY_TYPES } from "/src/components/shared/actors/core-utils";
 
-
 export default function DefenseAffinityRow({
   t,
   defValue,
@@ -104,16 +103,25 @@ export default function DefenseAffinityRow({
             justifyContent: "center",
             alignItems: "center",
             minWidth: 0,
-            "& img, & svg": { width: "1.35em !important", height: "1.35em !important" },
+            "& img, & svg": {
+              width: "1.35em !important",
+              height: "1.35em !important",
+            },
             "& .MuiTypography-root": { fontSize: "0.88rem", letterSpacing: 0 },
             [`@container (max-width: 380px)`]: {
               py: 0.25,
-              "& img, & svg": { width: "1.1em !important", height: "1.1em !important" },
+              "& img, & svg": {
+                width: "1.1em !important",
+                height: "1.1em !important",
+              },
               "& .MuiTypography-root": { fontSize: "0.72rem" },
             },
             [`@container (max-width: 300px)`]: {
               "& .MuiTypography-root": { display: "none" },
-              "& img, & svg": { width: "1.4em !important", height: "1.4em !important" },
+              "& img, & svg": {
+                width: "1.4em !important",
+                height: "1.4em !important",
+              },
             },
           }}
         >

@@ -31,10 +31,7 @@ import {
   processMagicCheck,
   buildMagicCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/magic-checks";
-import {
-  sendRollMessage,
-  sendDisplayMessage,
-} from "/src/hooks/useRollToChat";
+import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import SpellDefault from "/src/components/shared/actors/pc/variants/compact/spells/SpellDefault";
 import SpellArcanist from "/src/components/shared/actors/pc/variants/compact/spells/SpellArcanist";
 import SpellEntropistGamble from "/src/components/shared/actors/pc/variants/compact/spells/SpellEntropistGamble";
@@ -50,7 +47,30 @@ import SpellTherioform from "/src/components/shared/actors/pc/variants/compact/s
 import SpellDeck from "/src/components/shared/actors/pc/variants/compact/spells/SpellDeck";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import { SharedPlayerSpellCard } from "/src/components/shared/items/spells/SharedSpellCards";
-import { UnifiedSpellModal, DefaultSpellSection, ArcanistGeneralSection, GeneralSection, MagiseedGeneralSection, MagiseedContentSection, GiftContentSection, DancerContentSection, SymbolistContentSection, MagichantKeysContentSection, MagichantTonesContentSection, MutantContentSection, PilotGeneralSection, PilotContentSection, InvokerGeneralSection, InvokerContentSection, GourmetGeneralSection, GourmetContentSection, GourmetInventoryTab, GourmetCookingTab, GambleGeneralSection, SpellTinkererMagitechRankModal } from "/src/components/shared/actors/pc/spells";
+import {
+  UnifiedSpellModal,
+  DefaultSpellSection,
+  ArcanistGeneralSection,
+  GeneralSection,
+  MagiseedGeneralSection,
+  MagiseedContentSection,
+  GiftContentSection,
+  DancerContentSection,
+  SymbolistContentSection,
+  MagichantKeysContentSection,
+  MagichantTonesContentSection,
+  MutantContentSection,
+  PilotGeneralSection,
+  PilotContentSection,
+  InvokerGeneralSection,
+  InvokerContentSection,
+  GourmetGeneralSection,
+  GourmetContentSection,
+  GourmetInventoryTab,
+  GourmetCookingTab,
+  GambleGeneralSection,
+  SpellTinkererMagitechRankModal,
+} from "/src/components/shared/actors/pc/spells";
 import { getSlottedMnemospheres } from "/src/libs/player/mnemosphereClassUtils";
 import classList from "/src/libs/classes";
 import { createBlankSpellForType } from "/src/libs/player/createBlankSpell";
@@ -492,7 +512,12 @@ function VehicleCard({
         <Tooltip title={isActive ? t("Active") : t("Activate")} arrow>
           <IconButton
             size="small"
-            sx={{ p: 0, width: 28, height: 28, color: isActive ? "#fff" : "rgba(255,255,255,0.5)" }}
+            sx={{
+              p: 0,
+              width: 28,
+              height: 28,
+              color: isActive ? "#fff" : "rgba(255,255,255,0.5)",
+            }}
             onClick={handleActivate}
           >
             <RadioButtonChecked sx={{ fontSize: "1rem" }} />
@@ -576,13 +601,24 @@ function SpellCard({
         compact
         variant="outlined"
         onClick={inlineContent ? () => setOpen((v) => !v) : undefined}
-        onCardClick={!inlineContent && !isEditMode ? () => setPreview(true) : undefined}
+        onCardClick={
+          !inlineContent && !isEditMode ? () => setPreview(true) : undefined
+        }
         paperSx={{
           transition: "border-color 0.15s ease",
           "&:hover": { borderColor: theme.primary },
         }}
         label={
-          <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
+          <Typography
+            noWrap
+            sx={{
+              fontFamily: "Antonio",
+              fontWeight: 800,
+              fontSize: "0.9rem",
+              textTransform: "uppercase",
+              lineHeight: 1.3,
+            }}
+          >
             {highlightMatch(spellName, searchQuery)}
           </Typography>
         }
@@ -596,14 +632,26 @@ function SpellCard({
               </Tooltip>
             ) : (
               <Tooltip title={t("Send to Chat")} arrow>
-                <IconButton size="small" onClick={() => sendDisplayMessage("spell", spellName, { speaker: "", description: spell.description || spell.spellName || undefined })}>
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    sendDisplayMessage("spell", spellName, {
+                      speaker: "",
+                      description:
+                        spell.description || spell.spellName || undefined,
+                    })
+                  }
+                >
                   <Message />
                 </IconButton>
               </Tooltip>
             )}
             {isEditMode && (
               <Tooltip title={t("Edit")} arrow>
-                <IconButton size="small" onClick={() => onEdit(spell, spellIndex, classIndex)}>
+                <IconButton
+                  size="small"
+                  onClick={() => onEdit(spell, spellIndex, classIndex)}
+                >
                   <Edit />
                 </IconButton>
               </Tooltip>
@@ -618,12 +666,19 @@ function SpellCard({
         )}
       </ItemRowCard>
       {!inlineContent && (
-        <Dialog open={preview} onClose={() => setPreview(false)} fullWidth maxWidth="sm">
+        <Dialog
+          open={preview}
+          onClose={() => setPreview(false)}
+          fullWidth
+          maxWidth="sm"
+        >
           <DialogContent sx={{ p: 0 }}>
             <SharedPlayerSpellCard item={spell} />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setPreview(false)} variant="contained">{t("Close")}</Button>
+            <Button onClick={() => setPreview(false)} variant="contained">
+              {t("Close")}
+            </Button>
           </DialogActions>
         </Dialog>
       )}
@@ -663,23 +718,39 @@ function ClassSpellSection({
   if (!hasSpellTypes && spells.length === 0) return null;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", mb: "4px" }}>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", gap: "4px", mb: "4px" }}
+    >
       {isEditMode && (
         <CompactSectionHeader title={`${t("Spells")} - ${t(cls.name)}`}>
           <Box sx={{ display: "flex", gap: 0.25 }}>
             <Tooltip title={t("Add New Spell")}>
-              <IconButton size="small" sx={{ p: "2px", color: "#fff" }} onClick={(e) => onOpenAddMenu(e, classIndex)}>
+              <IconButton
+                size="small"
+                sx={{ p: "2px", color: "#fff" }}
+                onClick={(e) => onOpenAddMenu(e, classIndex)}
+              >
                 <Add sx={{ fontSize: "1.15rem" }} />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Search Compendium")}>
-              <IconButton size="small" sx={{ p: "2px", color: "#fff" }} onClick={() => onOpenImportModal(classIndex)}>
+              <IconButton
+                size="small"
+                sx={{ p: "2px", color: "#fff" }}
+                onClick={() => onOpenImportModal(classIndex)}
+              >
                 <Search sx={{ fontSize: "1.15rem" }} />
               </IconButton>
             </Tooltip>
             {pilotSpell && (
               <Tooltip title={t("Edit")}>
-                <IconButton size="small" sx={{ p: "2px", color: "#fff" }} onClick={() => onEdit(pilotSpell, pilotSpell._idx, classIndex)}>
+                <IconButton
+                  size="small"
+                  sx={{ p: "2px", color: "#fff" }}
+                  onClick={() =>
+                    onEdit(pilotSpell, pilotSpell._idx, classIndex)
+                  }
+                >
                   <Edit sx={{ fontSize: "1.15rem" }} />
                 </IconButton>
               </Tooltip>
@@ -711,7 +782,13 @@ function ClassSpellSection({
                     py: 1,
                   }}
                 >
-                  <Typography sx={{ fontSize: "0.8rem", color: "text.secondary", fontStyle: "italic" }}>
+                  <Typography
+                    sx={{
+                      fontSize: "0.8rem",
+                      color: "text.secondary",
+                      fontStyle: "italic",
+                    }}
+                  >
                     {t("No vehicles")}
                   </Typography>
                 </Box>,
@@ -731,7 +808,10 @@ function ClassSpellSection({
             ));
           }
           return [
-            <Box key={`${classIndex}-${spell._idx}`} sx={hasInline ? { gridColumn: "1 / -1" } : undefined}>
+            <Box
+              key={`${classIndex}-${spell._idx}`}
+              sx={hasInline ? { gridColumn: "1 / -1" } : undefined}
+            >
               <SpellCard
                 spell={spell}
                 spellIndex={spell._idx}
@@ -857,13 +937,29 @@ function MnemoSpellCard({
           "&:hover": { borderColor: theme.primary },
         }}
         label={
-          <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
+          <Typography
+            noWrap
+            sx={{
+              fontFamily: "Antonio",
+              fontWeight: 800,
+              fontSize: "0.9rem",
+              textTransform: "uppercase",
+              lineHeight: 1.3,
+            }}
+          >
             {highlightMatch(spell.name, searchQuery)}
           </Typography>
         }
         subtitle={
           spell.className ? (
-            <Typography noWrap sx={{ fontSize: "0.68rem", color: "text.secondary", lineHeight: 1.2 }}>
+            <Typography
+              noWrap
+              sx={{
+                fontSize: "0.68rem",
+                color: "text.secondary",
+                lineHeight: 1.2,
+              }}
+            >
               {t(spell.className)}
             </Typography>
           ) : undefined
@@ -887,12 +983,19 @@ function MnemoSpellCard({
           </>
         }
       />
-      <Dialog open={preview} onClose={() => setPreview(false)} fullWidth maxWidth="sm">
+      <Dialog
+        open={preview}
+        onClose={() => setPreview(false)}
+        fullWidth
+        maxWidth="sm"
+      >
         <DialogContent sx={{ p: 0 }}>
           <SharedPlayerSpellCard item={spell} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPreview(false)} variant="contained">{t("Close")}</Button>
+          <Button onClick={() => setPreview(false)} variant="contained">
+            {t("Close")}
+          </Button>
         </DialogActions>
       </Dialog>
     </>
@@ -1512,7 +1615,12 @@ export default function FeatureTab({
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       {/* Optional rule panels */}
       {optionalRules.quirks && (
-        <PcCompactQuirk player={player} setPlayer={setPlayer} searchQuery={searchQuery} compact />
+        <PcCompactQuirk
+          player={player}
+          setPlayer={setPlayer}
+          searchQuery={searchQuery}
+          compact
+        />
       )}
       {optionalRules.campActivities && (
         <PcCompactCampActivities player={player} searchQuery={searchQuery} />

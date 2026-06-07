@@ -1,7 +1,10 @@
 import React, { Fragment } from "react";
 import { Grid, Typography } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import { useActorCardSetup, isInteractive } from "/src/components/shared/actors/core-utils";
+import {
+  useActorCardSetup,
+  isInteractive,
+} from "/src/components/shared/actors/core-utils";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
 import Diamond from "/src/components/Diamond";
 import { SpellIcon, OffensiveSpellIcon } from "/src/components/icons";
@@ -54,17 +57,20 @@ function SpellRow({ spell, npc, showRoll }) {
       secondary: npc.attributes?.[spell.accuracy?.attr2]?.base ?? 6,
     };
     const effectModifiers = accuracyModifiersFromEffects(npc);
-    const intent = prepareMagicCheck({
-      attr1: attr1Short,
-      attr2: attr2Short,
-      accuracyBonus: spellAccuracyBonus,
-      name: spell.name,
-      baseDamage: spell.damage?.value ?? 0,
-      damageType: spell.damage?.type ?? "physical",
-      accuracyDefense: "mdef",
-      damageHrZero: spell.damage?.hrZero === true,
-      spellType: spell.spellType ?? "npc",
-    }, effectModifiers);
+    const intent = prepareMagicCheck(
+      {
+        attr1: attr1Short,
+        attr2: attr2Short,
+        accuracyBonus: spellAccuracyBonus,
+        name: spell.name,
+        baseDamage: spell.damage?.value ?? 0,
+        damageType: spell.damage?.type ?? "physical",
+        accuracyDefense: "mdef",
+        damageHrZero: spell.damage?.hrZero === true,
+        spellType: spell.spellType ?? "npc",
+      },
+      effectModifiers,
+    );
     const rolls = rollMagicCheck(dieSizes);
     const result = processMagicCheck(
       intent,

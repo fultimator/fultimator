@@ -27,7 +27,10 @@ import {
   CARD_DEFAULTS,
 } from "/src/components/shared/items/core-utils";
 import { StyledMarkdown, md } from "/src/components/shared/items/markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
+import {
+  CardContentWrapper,
+  RowsWithOptionalImage,
+} from "/src/components/shared/items/core";
 
 function SpellTypeItemRow({ entry, customTheme, t }) {
   const [open, setOpen] = useState(false);

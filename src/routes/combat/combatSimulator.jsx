@@ -219,7 +219,9 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   // Keep selected detail actors synced with live list updates.
   useEffect(() => {
     if (!selectedPC?.combatId) return;
-    const livePc = selectedPCs.find((pc) => pc.combatId === selectedPC.combatId);
+    const livePc = selectedPCs.find(
+      (pc) => pc.combatId === selectedPC.combatId,
+    );
     if (!livePc) {
       setSelectedPC(null);
       return;
@@ -338,9 +340,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       if (encounterData.activeTurn !== undefined)
         setActiveTurn(encounterData.activeTurn);
 
-      setEncounterChat(id, (encounterData.chatMessages ?? []).filter(
-        (m) => isValidChatMessage(m),
-      ));
+      setEncounterChat(
+        id,
+        (encounterData.chatMessages ?? []).filter((m) => isValidChatMessage(m)),
+      );
       setEncounterChannel(id, encounterData.name || "Unnamed Encounter");
 
       // Seed refs so the change-detection effect doesn't fire dirty on first render
@@ -1047,10 +1050,35 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       setSelectedPCs((prev) =>
         prev.map((pc) => {
           if (pc.combatId !== npcClicked.combatId) return pc;
-          const newHp = Math.min(Math.max(pc.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0), 0), maxHP);
-          const newMp = Math.min(Math.max(pc.combatStats.currentMp + (statType === "MP" ? adjustedValue : 0), 0), maxMP);
-          const newIp = Math.min(Math.max((pc.combatStats.currentIp ?? pc.stats?.ip?.current ?? 0) + (statType === "IP" ? adjustedValue : 0), 0), maxIP);
-          const newFp = Math.max((pc.combatStats.currentFp ?? pc.info?.fabulapoints ?? 0) + (statType === "FP" ? adjustedValue : 0), 0);
+          const newHp = Math.min(
+            Math.max(
+              pc.combatStats.currentHp +
+                (statType === "HP" ? adjustedValue : 0),
+              0,
+            ),
+            maxHP,
+          );
+          const newMp = Math.min(
+            Math.max(
+              pc.combatStats.currentMp +
+                (statType === "MP" ? adjustedValue : 0),
+              0,
+            ),
+            maxMP,
+          );
+          const newIp = Math.min(
+            Math.max(
+              (pc.combatStats.currentIp ?? pc.stats?.ip?.current ?? 0) +
+                (statType === "IP" ? adjustedValue : 0),
+              0,
+            ),
+            maxIP,
+          );
+          const newFp = Math.max(
+            (pc.combatStats.currentFp ?? pc.info?.fabulapoints ?? 0) +
+              (statType === "FP" ? adjustedValue : 0),
+            0,
+          );
           return {
             ...pc,
             combatStats: {
@@ -1065,18 +1093,49 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       );
 
       if (selectedPC && selectedPC.combatId === npcClicked.combatId) {
-        const newHp = Math.min(Math.max(selectedPC.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0), 0), maxHP);
-        const newMp = Math.min(Math.max(selectedPC.combatStats.currentMp + (statType === "MP" ? adjustedValue : 0), 0), maxMP);
-        const newIp = Math.min(Math.max((selectedPC.combatStats.currentIp ?? selectedPC.stats?.ip?.current ?? 0) + (statType === "IP" ? adjustedValue : 0), 0), maxIP);
-        const newFp = Math.max((selectedPC.combatStats.currentFp ?? selectedPC.info?.fabulapoints ?? 0) + (statType === "FP" ? adjustedValue : 0), 0);
+        const newHp = Math.min(
+          Math.max(
+            selectedPC.combatStats.currentHp +
+              (statType === "HP" ? adjustedValue : 0),
+            0,
+          ),
+          maxHP,
+        );
+        const newMp = Math.min(
+          Math.max(
+            selectedPC.combatStats.currentMp +
+              (statType === "MP" ? adjustedValue : 0),
+            0,
+          ),
+          maxMP,
+        );
+        const newIp = Math.min(
+          Math.max(
+            (selectedPC.combatStats.currentIp ??
+              selectedPC.stats?.ip?.current ??
+              0) + (statType === "IP" ? adjustedValue : 0),
+            0,
+          ),
+          maxIP,
+        );
+        const newFp = Math.max(
+          (selectedPC.combatStats.currentFp ??
+            selectedPC.info?.fabulapoints ??
+            0) + (statType === "FP" ? adjustedValue : 0),
+          0,
+        );
         setSelectedPC({
           ...selectedPC,
           combatStats: {
             ...selectedPC.combatStats,
-            currentHp: statType === "HP" ? newHp : selectedPC.combatStats.currentHp,
-            currentMp: statType === "MP" ? newMp : selectedPC.combatStats.currentMp,
-            currentIp: statType === "IP" ? newIp : selectedPC.combatStats.currentIp,
-            currentFp: statType === "FP" ? newFp : selectedPC.combatStats.currentFp,
+            currentHp:
+              statType === "HP" ? newHp : selectedPC.combatStats.currentHp,
+            currentMp:
+              statType === "MP" ? newMp : selectedPC.combatStats.currentMp,
+            currentIp:
+              statType === "IP" ? newIp : selectedPC.combatStats.currentIp,
+            currentFp:
+              statType === "FP" ? newFp : selectedPC.combatStats.currentFp,
           },
         });
       }
@@ -1138,11 +1197,44 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         const maxMP = calcMP(npcClicked);
         const maxIP = npcClicked.stats?.ip?.max ?? 0;
         const maxFP = npcClicked.combatStats?.maxFp ?? 6;
-        const newHp = Math.min(Math.max(npc.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0), 0), maxHP);
-        const newMp = Math.min(Math.max(npc.combatStats.currentMp + (statType === "MP" ? adjustedValue : 0), 0), maxMP);
-        const newIp = Math.min(Math.max((npc.combatStats.currentIp ?? 0) + (statType === "IP" ? adjustedValue : 0), 0), maxIP);
-        const newFp = Math.min(Math.max((npc.combatStats.currentFp ?? 0) + (statType === "FP" ? adjustedValue : 0), 0), maxFP);
-        const newUp = Math.min(Math.max((npc.combatStats.ultima ?? 0) + (statType === "UP" ? adjustedValue : 0), 0), villainUltimaMax(npc.villain));
+        const newHp = Math.min(
+          Math.max(
+            npc.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0),
+            0,
+          ),
+          maxHP,
+        );
+        const newMp = Math.min(
+          Math.max(
+            npc.combatStats.currentMp + (statType === "MP" ? adjustedValue : 0),
+            0,
+          ),
+          maxMP,
+        );
+        const newIp = Math.min(
+          Math.max(
+            (npc.combatStats.currentIp ?? 0) +
+              (statType === "IP" ? adjustedValue : 0),
+            0,
+          ),
+          maxIP,
+        );
+        const newFp = Math.min(
+          Math.max(
+            (npc.combatStats.currentFp ?? 0) +
+              (statType === "FP" ? adjustedValue : 0),
+            0,
+          ),
+          maxFP,
+        );
+        const newUp = Math.min(
+          Math.max(
+            (npc.combatStats.ultima ?? 0) +
+              (statType === "UP" ? adjustedValue : 0),
+            0,
+          ),
+          villainUltimaMax(npc.villain),
+        );
 
         return {
           ...npc,
@@ -1166,20 +1258,59 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       const maxMP = calcMP(npcClicked);
       const maxIP = npcClicked.stats?.ip?.max ?? 0;
       const maxFP = npcClicked.combatStats?.maxFp ?? 6;
-      const newHp = Math.min(Math.max(npcClicked.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0), 0), maxHP);
-      const newMp = Math.min(Math.max(npcClicked.combatStats.currentMp + (statType === "MP" ? adjustedValue : 0), 0), maxMP);
-      const newIp = Math.min(Math.max((npcClicked.combatStats.currentIp ?? 0) + (statType === "IP" ? adjustedValue : 0), 0), maxIP);
-      const newFp = Math.min(Math.max((npcClicked.combatStats.currentFp ?? 0) + (statType === "FP" ? adjustedValue : 0), 0), maxFP);
-      const newUp = Math.min(Math.max((npcClicked.combatStats.ultima ?? 0) + (statType === "UP" ? adjustedValue : 0), 0), villainUltimaMax(npcClicked.villain));
+      const newHp = Math.min(
+        Math.max(
+          npcClicked.combatStats.currentHp +
+            (statType === "HP" ? adjustedValue : 0),
+          0,
+        ),
+        maxHP,
+      );
+      const newMp = Math.min(
+        Math.max(
+          npcClicked.combatStats.currentMp +
+            (statType === "MP" ? adjustedValue : 0),
+          0,
+        ),
+        maxMP,
+      );
+      const newIp = Math.min(
+        Math.max(
+          (npcClicked.combatStats.currentIp ?? 0) +
+            (statType === "IP" ? adjustedValue : 0),
+          0,
+        ),
+        maxIP,
+      );
+      const newFp = Math.min(
+        Math.max(
+          (npcClicked.combatStats.currentFp ?? 0) +
+            (statType === "FP" ? adjustedValue : 0),
+          0,
+        ),
+        maxFP,
+      );
+      const newUp = Math.min(
+        Math.max(
+          (npcClicked.combatStats.ultima ?? 0) +
+            (statType === "UP" ? adjustedValue : 0),
+          0,
+        ),
+        villainUltimaMax(npcClicked.villain),
+      );
 
       setSelectedNPC({
         ...selectedNPC,
         combatStats: {
           ...selectedNPC.combatStats,
-          currentHp: statType === "HP" ? newHp : selectedNPC.combatStats.currentHp,
-          currentMp: statType === "MP" ? newMp : selectedNPC.combatStats.currentMp,
-          currentIp: statType === "IP" ? newIp : selectedNPC.combatStats.currentIp,
-          currentFp: statType === "FP" ? newFp : selectedNPC.combatStats.currentFp,
+          currentHp:
+            statType === "HP" ? newHp : selectedNPC.combatStats.currentHp,
+          currentMp:
+            statType === "MP" ? newMp : selectedNPC.combatStats.currentMp,
+          currentIp:
+            statType === "IP" ? newIp : selectedNPC.combatStats.currentIp,
+          currentFp:
+            statType === "FP" ? newFp : selectedNPC.combatStats.currentFp,
           ultima: statType === "UP" ? newUp : selectedNPC.combatStats.ultima,
         },
       });
@@ -1217,7 +1348,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     // fainted
     if (
       npcClicked.combatStats.currentHp +
-      (statType === "HP" ? adjustedValue : 0) <=
+        (statType === "HP" ? adjustedValue : 0) <=
       0
     ) {
       setTimeout(() => {
@@ -1359,22 +1490,22 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       prev.map((npc) =>
         npc.combatId === selectedNPC.combatId
           ? {
-            ...npc,
-            ...updatedNpc,
-            combatId: npc.combatId,
-            combatStats: npc.combatStats,
-          }
+              ...npc,
+              ...updatedNpc,
+              combatId: npc.combatId,
+              combatStats: npc.combatStats,
+            }
           : npc,
       ),
     );
     setSelectedNPC((prev) =>
       prev
         ? {
-          ...prev,
-          ...updatedNpc,
-          combatId: prev.combatId,
-          combatStats: prev.combatStats,
-        }
+            ...prev,
+            ...updatedNpc,
+            combatId: prev.combatId,
+            combatStats: prev.combatStats,
+          }
         : prev,
     );
   };

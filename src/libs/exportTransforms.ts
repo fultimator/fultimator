@@ -1,7 +1,4 @@
-import {
-  applyPostLoadTransforms,
-  applyPreSaveTransforms,
-} from "../libs/actor";
+import { applyPostLoadTransforms, applyPreSaveTransforms } from "../libs/actor";
 import { TypePlayer } from "../types/Players";
 import {
   applyNpcPostLoadTransforms,

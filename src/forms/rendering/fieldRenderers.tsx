@@ -184,7 +184,9 @@ export function ColorRenderer({
   const color = (value as string) ?? "#888888";
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-      <Typography variant="body2" sx={{ flexShrink: 0 }}>{t(label)}</Typography>
+      <Typography variant="body2" sx={{ flexShrink: 0 }}>
+        {t(label)}
+      </Typography>
       <BevelColorPicker
         value={color}
         onChange={disabled ? () => {} : onCommit}
@@ -353,10 +355,7 @@ export function SelectRenderer({
   const optionForValue = (selected: string | number) =>
     options.find((opt) => opt.value === selected);
   const labelForValue = (selected: string | number) =>
-    translateOrHumanize(
-      t,
-      String(optionForValue(selected)?.label ?? selected),
-    );
+    translateOrHumanize(t, String(optionForValue(selected)?.label ?? selected));
   const iconForValue = (selected: string | number) =>
     optionForValue(selected)?.icon;
 
@@ -380,7 +379,13 @@ export function SelectRenderer({
           if (icon) {
             return (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <img src={icon} width={16} height={16} style={{ objectFit: "contain", flexShrink: 0 }} alt="" />
+                <img
+                  src={icon}
+                  width={16}
+                  height={16}
+                  style={{ objectFit: "contain", flexShrink: 0 }}
+                  alt=""
+                />
                 {lbl}
               </Box>
             );
@@ -418,11 +423,23 @@ export function SelectRenderer({
             )}
             {opt.icon ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <img src={opt.icon} width={16} height={16} style={{ objectFit: "contain", flexShrink: 0 }} alt="" />
-                {multiple ? <ListItemText primary={t(opt.label)} /> : t(opt.label)}
+                <img
+                  src={opt.icon}
+                  width={16}
+                  height={16}
+                  style={{ objectFit: "contain", flexShrink: 0 }}
+                  alt=""
+                />
+                {multiple ? (
+                  <ListItemText primary={t(opt.label)} />
+                ) : (
+                  t(opt.label)
+                )}
               </Box>
+            ) : multiple ? (
+              <ListItemText primary={t(opt.label)} />
             ) : (
-              multiple ? <ListItemText primary={t(opt.label)} /> : t(opt.label)
+              t(opt.label)
             )}
           </MenuItem>
         ))}
@@ -1048,7 +1065,11 @@ export function AutocompleteRenderer({
       "value" in (entry as Record<string, unknown>)
     ) {
       const opt = entry as SelectOption;
-      return { value: opt.value, label: opt.label ?? String(opt.value), icon: opt.icon };
+      return {
+        value: opt.value,
+        label: opt.label ?? String(opt.value),
+        icon: opt.icon,
+      };
     }
     const val = String(entry ?? "");
     return { value: val, label: val };
@@ -1094,12 +1115,17 @@ export function AutocompleteRenderer({
       value={multiple ? selectedMulti : selectedSingle}
       onInputChange={
         freeSolo && !multiple
-          ? (_: unknown, val: string) => { inputRef.current = val; }
+          ? (_: unknown, val: string) => {
+              inputRef.current = val;
+            }
           : undefined
       }
       onBlur={
         freeSolo && !multiple
-          ? () => { if (inputRef.current !== (value ?? "")) onCommit(inputRef.current); }
+          ? () => {
+              if (inputRef.current !== (value ?? ""))
+                onCommit(inputRef.current);
+            }
           : undefined
       }
       onChange={(_: unknown, newValue: string[] | string | null) =>
@@ -1143,8 +1169,10 @@ export function AutocompleteRenderer({
       renderInput={(params: object) => {
         const selectedOpt = options.find((o) => o.value === (value as string));
         const p = params as Record<string, unknown>;
-        const existingSlotProps = (p.slotProps as Record<string, unknown>) ?? {};
-        const existingInput = (existingSlotProps.input as Record<string, unknown>) ?? {};
+        const existingSlotProps =
+          (p.slotProps as Record<string, unknown>) ?? {};
+        const existingInput =
+          (existingSlotProps.input as Record<string, unknown>) ?? {};
         const slotProps = selectedOpt?.icon
           ? {
               ...existingSlotProps,

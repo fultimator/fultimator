@@ -11,7 +11,12 @@ import {
   AccordionDetails,
   Box,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, CardGiftcard, Edit } from "@mui/icons-material";
+import {
+  VisibilityOff,
+  ExpandMore,
+  CardGiftcard,
+  Edit,
+} from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -69,7 +74,16 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
 
   return (
     <>
-      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <Accordion
+        disableGutters
+        elevation={0}
+        square
+        sx={{
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          "&:before": { display: "none" },
+        }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <CardGiftcard />
@@ -77,7 +91,13 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           <Typography variant="h4">{t("esper_details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+          <ReactMarkdown
+            components={{
+              p: ({ _node, ...props }) => (
+                <p style={{ margin: 0 }} {...props} />
+              ),
+            }}
+          >
             {t("esper_details_1")}
           </ReactMarkdown>
         </AccordionDetails>
@@ -100,13 +120,30 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           gap: "12px",
         }}
       >
-        <Typography variant="h3" sx={{ flex: 1, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+        <Typography
+          variant="h3"
+          sx={{ flex: 1, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+        >
           {t("esper_psychic_gifts")}
         </Typography>
-        <Typography variant="h3" sx={{ flexShrink: 0, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+        <Typography
+          variant="h3"
+          sx={{
+            flexShrink: 0,
+            fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
+          }}
+        >
           {t("esper_brainwave_clock")}
         </Typography>
-        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <Box
+          sx={{
+            width: 34,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
           {isEditMode && (
             <>
               {!showInPlayerSheet && (
@@ -114,7 +151,11 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                   <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
                 </Tooltip>
               )}
-              <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+              <IconButton
+                size="small"
+                onClick={onEdit}
+                sx={{ color: "#fff", p: "3px" }}
+              >
                 <Edit sx={{ fontSize: "1.1rem" }} />
               </IconButton>
             </>
@@ -162,7 +203,15 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             gap: 1.5,
           }}
         >
-          <Box sx={{ borderRadius: "50%", bgcolor: theme.ternary, p: "3px", flexShrink: 0, display: "flex" }}>
+          <Box
+            sx={{
+              borderRadius: "50%",
+              bgcolor: theme.ternary,
+              p: "3px",
+              flexShrink: 0,
+              display: "flex",
+            }}
+          >
             <Clock
               numSections={4}
               size={56}
@@ -172,7 +221,14 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
               onReset={handleClockReset}
             />
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.75 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.75,
+            }}
+          >
             {isEditMode ? (
               <Box sx={{ display: "flex", alignItems: "baseline", gap: "2px" }}>
                 <Box
@@ -181,29 +237,96 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                   value={clock}
                   onChange={(e) => updateClock(parseInt(e.target.value) || 0)}
                   sx={{
-                    fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "0.08em",
-                    color: theme.white, background: "transparent", border: "none",
-                    borderBottom: `2px solid ${theme.white}`, outline: "none",
-                    width: 36, textAlign: "center", lineHeight: 1,
+                    fontFamily: "Antonio",
+                    fontWeight: 800,
+                    fontSize: "1.2rem",
+                    letterSpacing: "0.08em",
+                    color: theme.white,
+                    background: "transparent",
+                    border: "none",
+                    borderBottom: `2px solid ${theme.white}`,
+                    outline: "none",
+                    width: 36,
+                    textAlign: "center",
+                    lineHeight: 1,
                     "&::-webkit-inner-spin-button": { display: "none" },
                   }}
                 />
-                <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", color: theme.white, lineHeight: 1 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Antonio",
+                    fontWeight: 800,
+                    fontSize: "1.2rem",
+                    color: theme.white,
+                    lineHeight: 1,
+                  }}
+                >
                   /4
                 </Typography>
               </Box>
             ) : (
-              <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "0.08em", color: theme.white, lineHeight: 1 }}>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontWeight: 800,
+                  fontSize: "1.2rem",
+                  letterSpacing: "0.08em",
+                  color: theme.white,
+                  lineHeight: 1,
+                }}
+              >
                 {clock}/4
               </Typography>
             )}
             <Box sx={{ display: "flex", gap: "4px" }}>
-              <Button size="small" onClick={() => updateClock(clock - 1)} disabled={clock === 0}
-                style={{ minWidth: 32, height: 28, padding: 0, border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800 }}>-</Button>
-              <Button size="small" onClick={() => updateClock(clock + 1)} disabled={clock === 4}
-                style={{ minWidth: 32, height: 28, padding: 0, border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800 }}>+</Button>
-              <Button size="small" onClick={() => updateClock(0)}
-                style={{ minWidth: 46, height: 28, padding: "0 4px", border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800, fontSize: "0.7rem" }}>{t("Reset")}</Button>
+              <Button
+                size="small"
+                onClick={() => updateClock(clock - 1)}
+                disabled={clock === 0}
+                style={{
+                  minWidth: 32,
+                  height: 28,
+                  padding: 0,
+                  border: "none",
+                  color: theme.primary,
+                  backgroundColor: theme.white,
+                  fontWeight: 800,
+                }}
+              >
+                -
+              </Button>
+              <Button
+                size="small"
+                onClick={() => updateClock(clock + 1)}
+                disabled={clock === 4}
+                style={{
+                  minWidth: 32,
+                  height: 28,
+                  padding: 0,
+                  border: "none",
+                  color: theme.primary,
+                  backgroundColor: theme.white,
+                  fontWeight: 800,
+                }}
+              >
+                +
+              </Button>
+              <Button
+                size="small"
+                onClick={() => updateClock(0)}
+                style={{
+                  minWidth: 46,
+                  height: 28,
+                  padding: "0 4px",
+                  border: "none",
+                  color: theme.primary,
+                  backgroundColor: theme.white,
+                  fontWeight: 800,
+                  fontSize: "0.7rem",
+                }}
+              >
+                {t("Reset")}
+              </Button>
             </Box>
           </Box>
         </Box>
@@ -226,12 +349,18 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
         }}
       >
         <Box sx={{ flex: "0 0 66.67%", display: "flex", alignItems: "center" }}>
-          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          <Typography
+            variant="h3"
+            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+          >
             {t("esper_psychic_gifts")}
           </Typography>
         </Box>
         <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
-          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          <Typography
+            variant="h3"
+            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+          >
             {t("esper_events")}
           </Typography>
         </Box>
@@ -267,9 +396,17 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                 minHeight: "36px",
               }}
             >
-              <Box sx={{ flex: "0 0 66.67%", display: "flex", alignItems: "center" }}>
+              <Box
+                sx={{
+                  flex: "0 0 66.67%",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
                 <Typography sx={{ fontWeight: "bold" }}>
-                  {gft.name === "esper_gift_custom_name" ? gft.customName : t(gft.name)}
+                  {gft.name === "esper_gift_custom_name"
+                    ? gft.customName
+                    : t(gft.name)}
                 </Typography>
               </Box>
               <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>

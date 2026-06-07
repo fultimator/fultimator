@@ -78,215 +78,227 @@ export default function EditBasics({ npc, setNpc }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <SectionCard title={t("Basic Information")}>
-          <Grid container spacing={2} sx={{ p: 2 }}>
-            <SchemaFieldRenderer
-              config={identityFields}
-              state={npc}
-              onChange={setNpc}
-              surface="edit"
-              group="basics"
-              cols={2}
-            />
+        <Grid container spacing={2} sx={{ p: 2 }}>
+          <SchemaFieldRenderer
+            config={identityFields}
+            state={npc}
+            onChange={setNpc}
+            surface="edit"
+            group="basics"
+            cols={2}
+          />
 
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <EditLevel npc={npc} setnpc={setNpc} />
+          <Grid size={{ xs: 12, sm: 3 }}>
+            <EditLevel npc={npc} setnpc={setNpc} />
+          </Grid>
+
+          <SchemaFieldRenderer
+            config={detailFields}
+            state={npc}
+            onChange={setNpc}
+            surface="edit"
+            group="basics"
+            cols={2}
+          />
+
+          <Grid
+            size={12}
+            container
+            spacing={2}
+            sx={{ alignItems: "flex-start" }}
+          >
+            <Grid size={{ xs: 12, md: 8 }}>
+              <TextField
+                label={t("Image URL") + ":"}
+                value={imgUrlTemp}
+                onChange={(e) => {
+                  setImgUrlTemp(e.target.value);
+                  setIsImageError(false);
+                  setErrorMessage("");
+                }}
+                fullWidth
+                error={imgUrlTemp.length > 0 && isImageError}
+                helperText={
+                  isImageError && imgUrlTemp.length > 0
+                    ? errorMessage
+                    : t(
+                        "Please ensure to credit the artist in the description or notes section.",
+                      )
+                }
+              />
             </Grid>
-
-            <SchemaFieldRenderer
-              config={detailFields}
-              state={npc}
-              onChange={setNpc}
-              surface="edit"
-              group="basics"
-              cols={2}
-            />
-
-            <Grid size={12} container spacing={2} sx={{ alignItems: "flex-start" }}>
-              <Grid size={{ xs: 12, md: 8 }}>
-                <TextField
-                  label={t("Image URL") + ":"}
-                  value={imgUrlTemp}
-                  onChange={(e) => {
-                    setImgUrlTemp(e.target.value);
-                    setIsImageError(false);
-                    setErrorMessage("");
-                  }}
-                  fullWidth
-                  error={imgUrlTemp.length > 0 && isImageError}
-                  helperText={
-                    isImageError && imgUrlTemp.length > 0
-                      ? errorMessage
-                      : t(
-                          "Please ensure to credit the artist in the description or notes section.",
-                        )
-                  }
-                />
-              </Grid>
-              <Grid size={{ xs: 6, md: 2 }}>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    checkImageSize(imgUrlTemp).then((ok) => {
-                      if (ok) {
-                        setNpc((prev) => ({ ...prev, imgurl: imgUrlTemp }));
-                        setSnackOpen(true);
-                      }
-                    });
-                  }}
-                  sx={{ height: "56px", width: "100%" }}
-                >
-                  {t("Update Image")}
-                </Button>
-                <Snackbar
-                  open={snackOpen}
-                  autoHideDuration={3000}
-                  onClose={() => setSnackOpen(false)}
-                  message={t("Image uploaded successfully!")}
-                />
-              </Grid>
-              <Grid size={{ xs: 6, md: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setImgUrlTemp("");
-                    setIsImageError(false);
-                    setErrorMessage("");
-                    setNpc((prev) => ({ ...prev, imgurl: "" }));
-                  }}
-                  sx={{ height: "56px", width: "100%" }}
-                >
-                  {t("Remove Image")}
-                </Button>
-              </Grid>
+            <Grid size={{ xs: 6, md: 2 }}>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  checkImageSize(imgUrlTemp).then((ok) => {
+                    if (ok) {
+                      setNpc((prev) => ({ ...prev, imgurl: imgUrlTemp }));
+                      setSnackOpen(true);
+                    }
+                  });
+                }}
+                sx={{ height: "56px", width: "100%" }}
+              >
+                {t("Update Image")}
+              </Button>
+              <Snackbar
+                open={snackOpen}
+                autoHideDuration={3000}
+                onClose={() => setSnackOpen(false)}
+                message={t("Image uploaded successfully!")}
+              />
             </Grid>
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <EditAttributes npc={npc} setNpc={setNpc} />
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Card sx={{ p: 1.61, background }}>
-                <Typography>
-                  <strong>{t("Jack of All Trades")}</strong>: d8, d8, d8, d8
-                </Typography>
-                <Typography>
-                  <strong>{t("Standard")}</strong>: d10, d8, d8, d6
-                </Typography>
-                <Typography>
-                  <strong>{t("Specialized")}</strong>: d10, d10, d6, d6
-                </Typography>
-                <Typography>
-                  <strong>{t("Super Specialized")}</strong>: d12, d8, d6, d6
-                </Typography>
-                <Divider sx={{ my: 1 }} />
-                <Typography variant="body2">
-                  <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
-                    {t(
-                      "Upon reaching levels **20**, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
-                      true,
-                    )}
-                  </ReactMarkdown>
-                </Typography>
-              </Card>
+            <Grid size={{ xs: 6, md: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setImgUrlTemp("");
+                  setIsImageError(false);
+                  setErrorMessage("");
+                  setNpc((prev) => ({ ...prev, imgurl: "" }));
+                }}
+                sx={{ height: "56px", width: "100%" }}
+              >
+                {t("Remove Image")}
+              </Button>
             </Grid>
           </Grid>
-        </SectionCard>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <EditAttributes npc={npc} setNpc={setNpc} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Card sx={{ p: 1.61, background }}>
+              <Typography>
+                <strong>{t("Jack of All Trades")}</strong>: d8, d8, d8, d8
+              </Typography>
+              <Typography>
+                <strong>{t("Standard")}</strong>: d10, d8, d8, d6
+              </Typography>
+              <Typography>
+                <strong>{t("Specialized")}</strong>: d10, d10, d6, d6
+              </Typography>
+              <Typography>
+                <strong>{t("Super Specialized")}</strong>: d12, d8, d6, d6
+              </Typography>
+              <Divider sx={{ my: 1 }} />
+              <Typography variant="body2">
+                <ReactMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {t(
+                    "Upon reaching levels **20**, **40**, and **60**, the NPC chooses one of its Attributes and increases it by one die size(to a maximum of d12).",
+                    true,
+                  )}
+                </ReactMarkdown>
+              </Typography>
+            </Card>
+          </Grid>
+        </Grid>
+      </SectionCard>
 
       <SectionCard title={t("Defense Override")}>
-          <Grid container spacing={2} sx={{ p: 2 }}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Card sx={{ p: 2, background }}>
-                <Typography variant="h6" gutterBottom>
-                  {t("DEF Override")}
-                </Typography>
-                <FormControl fullWidth>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={npc.extra?.defOverride || false}
-                        onChange={(e) => {
-                          setNpc((prev) => ({
-                            ...prev,
-                            extra: {
-                              ...prev.extra,
-                              defOverride: e.target.checked,
-                              def: e.target.checked
-                                ? prev.extra?.def || 0
-                                : undefined,
-                            },
-                          }));
-                        }}
-                      />
-                    }
-                    label={t("Override DEF")}
-                  />
-                </FormControl>
-                <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
-                  <TextField
-                    type="number"
-                    label={npc.extra?.defOverride ? t("DEF Value") : t("DEF Bonus")}
-                    value={npc.extra?.def || 0}
-                    onChange={(e) => {
-                      setNpc((prev) => ({
-                        ...prev,
-                        extra: {
-                          ...prev.extra,
-                          def: parseInt(e.target.value) || 0,
-                        },
-                      }));
-                    }}
-                  />
-                </FormControl>
-              </Card>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Card sx={{ p: 2, background }}>
-                <Typography variant="h6" gutterBottom>
-                  {t("M.DEF Override")}
-                </Typography>
-                <FormControl fullWidth>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={npc.extra?.mDefOverride || false}
-                        onChange={(e) => {
-                          setNpc((prev) => ({
-                            ...prev,
-                            extra: {
-                              ...prev.extra,
-                              mDefOverride: e.target.checked,
-                              mDef: e.target.checked
-                                ? prev.extra?.mDef || 0
-                                : undefined,
-                            },
-                          }));
-                        }}
-                      />
-                    }
-                    label={t("Override M.DEF")}
-                  />
-                </FormControl>
-                <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
-                  <TextField
-                    type="number"
-                    label={
-                      npc.extra?.mDefOverride ? t("M.DEF Value") : t("M.DEF Bonus")
-                    }
-                    value={npc.extra?.mDef || 0}
-                    onChange={(e) => {
-                      setNpc((prev) => ({
-                        ...prev,
-                        extra: {
-                          ...prev.extra,
-                          mDef: parseInt(e.target.value) || 0,
-                        },
-                      }));
-                    }}
-                  />
-                </FormControl>
-              </Card>
-            </Grid>
+        <Grid container spacing={2} sx={{ p: 2 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Card sx={{ p: 2, background }}>
+              <Typography variant="h6" gutterBottom>
+                {t("DEF Override")}
+              </Typography>
+              <FormControl fullWidth>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={npc.extra?.defOverride || false}
+                      onChange={(e) => {
+                        setNpc((prev) => ({
+                          ...prev,
+                          extra: {
+                            ...prev.extra,
+                            defOverride: e.target.checked,
+                            def: e.target.checked
+                              ? prev.extra?.def || 0
+                              : undefined,
+                          },
+                        }));
+                      }}
+                    />
+                  }
+                  label={t("Override DEF")}
+                />
+              </FormControl>
+              <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
+                <TextField
+                  type="number"
+                  label={
+                    npc.extra?.defOverride ? t("DEF Value") : t("DEF Bonus")
+                  }
+                  value={npc.extra?.def || 0}
+                  onChange={(e) => {
+                    setNpc((prev) => ({
+                      ...prev,
+                      extra: {
+                        ...prev.extra,
+                        def: parseInt(e.target.value) || 0,
+                      },
+                    }));
+                  }}
+                />
+              </FormControl>
+            </Card>
           </Grid>
-        </SectionCard>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Card sx={{ p: 2, background }}>
+              <Typography variant="h6" gutterBottom>
+                {t("M.DEF Override")}
+              </Typography>
+              <FormControl fullWidth>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={npc.extra?.mDefOverride || false}
+                      onChange={(e) => {
+                        setNpc((prev) => ({
+                          ...prev,
+                          extra: {
+                            ...prev.extra,
+                            mDefOverride: e.target.checked,
+                            mDef: e.target.checked
+                              ? prev.extra?.mDef || 0
+                              : undefined,
+                          },
+                        }));
+                      }}
+                    />
+                  }
+                  label={t("Override M.DEF")}
+                />
+              </FormControl>
+              <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
+                <TextField
+                  type="number"
+                  label={
+                    npc.extra?.mDefOverride
+                      ? t("M.DEF Value")
+                      : t("M.DEF Bonus")
+                  }
+                  value={npc.extra?.mDef || 0}
+                  onChange={(e) => {
+                    setNpc((prev) => ({
+                      ...prev,
+                      extra: {
+                        ...prev.extra,
+                        mDef: parseInt(e.target.value) || 0,
+                      },
+                    }));
+                  }}
+                />
+              </FormControl>
+            </Card>
+          </Grid>
+        </Grid>
+      </SectionCard>
     </Box>
   );
 }

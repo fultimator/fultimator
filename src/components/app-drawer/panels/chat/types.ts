@@ -138,7 +138,11 @@ export type DisplayMessage = {
   tags: string[];
   description?: string;
   effect?: string;
-  cost?: { resource: "hp" | "mp" | "ip" | "fp" | "up"; amount: number; perTarget?: boolean };
+  cost?: {
+    resource: "hp" | "mp" | "ip" | "fp" | "up";
+    amount: number;
+    perTarget?: boolean;
+  };
   clock?: {
     sections: number;
     state?: boolean[];

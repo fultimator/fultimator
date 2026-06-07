@@ -2,7 +2,12 @@ import { Box, IconButton, Typography } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 
-export default function CompactSectionHeader({ title, children, onToggle, isCollapsed }) {
+export default function CompactSectionHeader({
+  title,
+  children,
+  onToggle,
+  isCollapsed,
+}) {
   const theme = useCustomTheme();
   const collapsible = typeof onToggle === "function";
   return (
@@ -23,7 +28,13 @@ export default function CompactSectionHeader({ title, children, onToggle, isColl
       {collapsible && (
         <IconButton
           size="small"
-          sx={{ position: "absolute", left: "6px", color: "#fff", p: "2px", pointerEvents: "none" }}
+          sx={{
+            position: "absolute",
+            left: "6px",
+            color: "#fff",
+            p: "2px",
+            pointerEvents: "none",
+          }}
         >
           {isCollapsed ? (
             <KeyboardArrowDown sx={{ fontSize: "1.15rem" }} />

@@ -66,7 +66,9 @@ export default function BondCard({
             color: "#fff",
             fontFamily: "Antonio",
             fontWeight: 800,
-            fontSize: compact ? { xs: "0.82rem", sm: "0.88rem" } : { xs: "0.9rem", sm: "0.95rem" },
+            fontSize: compact
+              ? { xs: "0.82rem", sm: "0.88rem" }
+              : { xs: "0.9rem", sm: "0.95rem" },
             textTransform: "uppercase",
             letterSpacing: "0.04em",
             flex: 1,
@@ -74,7 +76,7 @@ export default function BondCard({
         >
           {compact
             ? highlightMatch(bond.name || "-", searchQuery)
-            : (bond.name || t("Bond Name"))}
+            : bond.name || t("Bond Name")}
         </Typography>
         {strength > 0 && (
           <Typography
@@ -82,7 +84,9 @@ export default function BondCard({
               color: "#fff",
               fontFamily: "Antonio",
               fontWeight: 800,
-              fontSize: compact ? { xs: "0.82rem", sm: "0.88rem" } : { xs: "0.9rem", sm: "0.95rem" },
+              fontSize: compact
+                ? { xs: "0.82rem", sm: "0.88rem" }
+                : { xs: "0.9rem", sm: "0.95rem" },
               flexShrink: 0,
             }}
           >

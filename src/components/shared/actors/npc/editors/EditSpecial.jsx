@@ -291,17 +291,29 @@ export default function EditSpecial({ npc, setNpc }) {
       actions={
         <>
           <Tooltip title={t("Search Compendium")}>
-            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={() => setModalOpen(true)}
+              sx={{ color: "#fff" }}
+            >
               <Search fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
             <IconButton size="small" onClick={toggleAll} sx={{ color: "#fff" }}>
-              {allExpanded ? <UnfoldLess fontSize="small" /> : <UnfoldMore fontSize="small" />}
+              {allExpanded ? (
+                <UnfoldLess fontSize="small" />
+              ) : (
+                <UnfoldMore fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
           <Tooltip title={t("Add Special Rule")}>
-            <IconButton size="small" onClick={addSpecial} sx={{ color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={addSpecial}
+              sx={{ color: "#fff" }}
+            >
               <Add fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -309,76 +321,79 @@ export default function EditSpecial({ npc, setNpc }) {
       }
     >
       <Box sx={{ p: 1 }}>
-      <Grid container spacing={1}>
-        {npc.special?.map((special, i) => {
-          return (
-            <Grid key={i} size={12}>
-              <ItemRowCard
-                label={special.name || t("(unnamed)")}
-                subtitle={
-                  <Typography variant="body2" sx={{ color: "text.secondary", whiteSpace: "nowrap" }}>
-                    SP: {special.spCost ?? 1}
-                  </Typography>
-                }
-                actions={
-                  <>
-                    <IconButton
-                      component="span"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addMessage({
-                          id: crypto.randomUUID(),
-                          createdAt: Date.now(),
-                          speaker: npc.name || "NPC",
-                          kind: "display",
-                          itemType: "special",
-                          name: special.name,
-                          tags: [`SP: ${special.spCost ?? 1}`],
-                          description: special.effect,
-                        });
-                      }}
+        <Grid container spacing={1}>
+          {npc.special?.map((special, i) => {
+            return (
+              <Grid key={i} size={12}>
+                <ItemRowCard
+                  label={special.name || t("(unnamed)")}
+                  subtitle={
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary", whiteSpace: "nowrap" }}
                     >
-                      <Casino />
-                    </IconButton>
-                    <SpecialContextMenu
-                      special={special}
-                      npcName={npc.name}
-                      onDelete={() => openDeleteDialog(i)}
-                      onMoveUp={() => moveSpecial(i, i - 1)}
-                      onMoveDown={() => moveSpecial(i, i + 1)}
-                      showMoveUp={i > 0}
-                      showMoveDown={i < (npc.special?.length ?? 0) - 1}
-                    />
-                  </>
-                }
-                onClick={() => toggleExpanded(i)}
-                paperSx={{ mb: 0.5 }}
-              >
-                {expandedSet.has(i) && (
-                  <Box sx={{ p: 1 }}>
-                    <TabbedSchemaFormRenderer
-                      tabs={npcSpecialTabs}
-                      config={npcSpecialFieldConfig}
-                      groupLabels={npcSpecialGroupLabels}
-                      state={special}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const special = [...(prev.special || [])];
-                          special[i] = next;
-                          return { ...prev, special };
-                        });
-                      }}
-                      surface="edit"
-                      cols={2}
-                      extraProps={{ name: String(special.name ?? "") }}
-                    />
-                  </Box>
-                )}
-              </ItemRowCard>
-            </Grid>
-          );
-        })}
-      </Grid>
+                      SP: {special.spCost ?? 1}
+                    </Typography>
+                  }
+                  actions={
+                    <>
+                      <IconButton
+                        component="span"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addMessage({
+                            id: crypto.randomUUID(),
+                            createdAt: Date.now(),
+                            speaker: npc.name || "NPC",
+                            kind: "display",
+                            itemType: "special",
+                            name: special.name,
+                            tags: [`SP: ${special.spCost ?? 1}`],
+                            description: special.effect,
+                          });
+                        }}
+                      >
+                        <Casino />
+                      </IconButton>
+                      <SpecialContextMenu
+                        special={special}
+                        npcName={npc.name}
+                        onDelete={() => openDeleteDialog(i)}
+                        onMoveUp={() => moveSpecial(i, i - 1)}
+                        onMoveDown={() => moveSpecial(i, i + 1)}
+                        showMoveUp={i > 0}
+                        showMoveDown={i < (npc.special?.length ?? 0) - 1}
+                      />
+                    </>
+                  }
+                  onClick={() => toggleExpanded(i)}
+                  paperSx={{ mb: 0.5 }}
+                >
+                  {expandedSet.has(i) && (
+                    <Box sx={{ p: 1 }}>
+                      <TabbedSchemaFormRenderer
+                        tabs={npcSpecialTabs}
+                        config={npcSpecialFieldConfig}
+                        groupLabels={npcSpecialGroupLabels}
+                        state={special}
+                        onChange={(next) => {
+                          setNpc((prev) => {
+                            const special = [...(prev.special || [])];
+                            special[i] = next;
+                            return { ...prev, special };
+                          });
+                        }}
+                        surface="edit"
+                        cols={2}
+                        extraProps={{ name: String(special.name ?? "") }}
+                      />
+                    </Box>
+                  )}
+                </ItemRowCard>
+              </Grid>
+            );
+          })}
+        </Grid>
       </Box>
       <CompendiumViewerModal
         open={modalOpen}

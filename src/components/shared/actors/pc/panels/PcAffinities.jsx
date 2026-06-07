@@ -1,10 +1,19 @@
 import { Box } from "@mui/material";
 import StatTooltip from "/src/components/common/StatTooltip";
 import { TypeAffinity } from "/src/components/shared/actors/common/TypeAffinity";
-import { AffinityStrip, AffinityCell } from "/src/components/shared/actors/pc/shared";
+import {
+  AffinityStrip,
+  AffinityCell,
+} from "/src/components/shared/actors/pc/shared";
 import { AFFINITY_TYPES } from "/src/components/shared/actors/core-utils";
 
-function AffinityIconOnly({ type, affinity, iconSize, editable, onChangeAffinity }) {
+function AffinityIconOnly({
+  type,
+  affinity,
+  iconSize,
+  editable,
+  onChangeAffinity,
+}) {
   return (
     <Box
       sx={{
@@ -16,15 +25,24 @@ function AffinityIconOnly({ type, affinity, iconSize, editable, onChangeAffinity
         minWidth: 0,
         "& > .MuiBox-root": { minWidth: 0, gap: 0.3 },
         "& .MuiTypography-root": { fontSize: "0.88rem", letterSpacing: 0 },
-        "& img, & svg": { width: "1.35em !important", height: "1.35em !important" },
+        "& img, & svg": {
+          width: "1.35em !important",
+          height: "1.35em !important",
+        },
         "@container affinity-strip (max-width: 380px)": {
           "& .MuiTypography-root": { fontSize: "0.72rem" },
-          "& img, & svg": { width: "1.1em !important", height: "1.1em !important" },
+          "& img, & svg": {
+            width: "1.1em !important",
+            height: "1.1em !important",
+          },
           "& > .MuiBox-root": { gap: 0.2 },
         },
         "@container affinity-strip (max-width: 300px)": {
           "& .MuiTypography-root": { display: "none" },
-          "& img, & svg": { width: "1.4em !important", height: "1.4em !important" },
+          "& img, & svg": {
+            width: "1.4em !important",
+            height: "1.4em !important",
+          },
         },
       }}
     >
@@ -50,7 +68,13 @@ export default function PcAffinities({ pc, isInteractive = false, onUpdate }) {
   };
 
   return (
-    <Box sx={{ containerType: "inline-size", containerName: "affinity-strip", width: "100%" }}>
+    <Box
+      sx={{
+        containerType: "inline-size",
+        containerName: "affinity-strip",
+        width: "100%",
+      }}
+    >
       <AffinityStrip
         sx={{
           gridTemplateColumns: "repeat(9, minmax(0, 1fr))",
@@ -59,10 +83,7 @@ export default function PcAffinities({ pc, isInteractive = false, onUpdate }) {
         }}
       >
         {AFFINITY_TYPES.map((type) => (
-          <AffinityCell
-            key={type}
-            sx={{ minWidth: 0, px: 0.3, py: 0.3 }}
-          >
+          <AffinityCell key={type} sx={{ minWidth: 0, px: 0.3, py: 0.3 }}>
             <StatTooltip
               title={type.charAt(0).toUpperCase() + type.slice(1)}
               base={pc.affinities?.[type] || ""}
@@ -73,7 +94,9 @@ export default function PcAffinities({ pc, isInteractive = false, onUpdate }) {
                 affinity={pc.affinities?.[type] || ""}
                 iconSize="1.35em"
                 editable={isInteractive}
-                onChangeAffinity={isInteractive ? handleChange(type) : undefined}
+                onChangeAffinity={
+                  isInteractive ? handleChange(type) : undefined
+                }
               />
             </StatTooltip>
           </AffinityCell>

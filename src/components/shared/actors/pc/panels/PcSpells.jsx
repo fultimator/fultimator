@@ -89,7 +89,9 @@ export default function PcSpells({
               ...cls,
               spells: cls.spells.map((s, idx) =>
                 idx === spellIdx
-                  ? typeof updater === "function" ? updater(s) : { ...s, ...updater }
+                  ? typeof updater === "function"
+                    ? updater(s)
+                    : { ...s, ...updater }
                   : s,
               ),
             }
@@ -134,7 +136,9 @@ export default function PcSpells({
   const buildSpellTags = (spell) => {
     const tags = [];
     if (spell.cost?.amount != null) {
-      tags.push(`${spell.cost.amount}${spell.cost.perTarget && spell.maxTargets !== 1 ? " × T" : ""} MP`);
+      tags.push(
+        `${spell.cost.amount}${spell.cost.perTarget && spell.maxTargets !== 1 ? " × T" : ""} MP`,
+      );
     }
     if (spell.targetDescription) tags.push(spell.targetDescription);
     if (spell.duration) tags.push(spell.duration);
@@ -205,7 +209,10 @@ export default function PcSpells({
   const handleRollMagiseed = (currentMagiseed, growthClock) => {
     const seedKey = currentMagiseed.key ?? currentMagiseed.name ?? "";
     const seedName = currentMagiseed.customName || t(seedKey);
-    const effectRaw = currentMagiseed.effects?.[growthClock] ?? currentMagiseed.effects?.[String(growthClock)] ?? "";
+    const effectRaw =
+      currentMagiseed.effects?.[growthClock] ??
+      currentMagiseed.effects?.[String(growthClock)] ??
+      "";
     const effectText = t(effectRaw);
     sendDisplayMessage("spell", seedName, {
       tags: [`T = ${growthClock}`],
@@ -279,7 +286,12 @@ export default function PcSpells({
           : c,
       ),
     }));
-    openModal(spellTypeToModalName(spellType), newSpell, realClassIdx, newSpellIndex);
+    openModal(
+      spellTypeToModalName(spellType),
+      newSpell,
+      realClassIdx,
+      newSpellIndex,
+    );
   };
 
   // Build the list of classes to show, augmenting with virtual singleton spells
@@ -288,7 +300,6 @@ export default function PcSpells({
   const classesWithSpells = useMemo(() => {
     return classesList
       .map((c, idx) => {
-        // Mnemosphere entries are appended past pc.classes length — no real index
         const realClassIdx = idx < (pc.classes ?? []).length ? idx : null;
         const existingSpells = c.spells ?? [];
         const indexedSpells = existingSpells.map((spell, spellIndex) => ({
@@ -330,63 +341,85 @@ export default function PcSpells({
               noShadow={isCharacterSheet}
               sx={{ mb: "1em" }}
             >
-
-              {c.spells
-                .map((spell, spellIndex) => {
-                  const entry = spellDisplayRegistry[spell.spellType];
-                  if (!entry) return null;
-                  const isVirtual = spell._virtual === true;
-                  const { realClassIdx } = c;
-                  const realSpellIndex = spell._spellIndex ?? spellIndex;
-                  const displaySpell = isVirtual
-                    ? spell
-                    : stripTransientSpellFields(spell);
-                  const { Component, buildProps } = entry;
-                  const props = buildProps(displaySpell, {
-                    isEditMode: isInteractive && !isVirtual,
-                    speaker: pc?.info?.name || pc?.name || "",
-                    onEdit: canEdit
-                      ? isVirtual
-                        ? realClassIdx !== null
-                          ? () => handleEditVirtualSpell(realClassIdx, spell.spellType)
-                          : undefined
-                        : () => handleEditSpell(realClassIdx ?? classIndex, realSpellIndex, displaySpell)
-                      : undefined,
-                    onRoll: spell.spellType === "default" && spell.isOffensive
+              {c.spells.map((spell, spellIndex) => {
+                const entry = spellDisplayRegistry[spell.spellType];
+                if (!entry) return null;
+                const isVirtual = spell._virtual === true;
+                const { realClassIdx } = c;
+                const realSpellIndex = spell._spellIndex ?? spellIndex;
+                const displaySpell = isVirtual
+                  ? spell
+                  : stripTransientSpellFields(spell);
+                const { Component, buildProps } = entry;
+                const props = buildProps(displaySpell, {
+                  isEditMode: isInteractive && !isVirtual,
+                  speaker: pc?.info?.name || pc?.name || "",
+                  onEdit: canEdit
+                    ? isVirtual
+                      ? realClassIdx !== null
+                        ? () =>
+                            handleEditVirtualSpell(
+                              realClassIdx,
+                              spell.spellType,
+                            )
+                        : undefined
+                      : () =>
+                          handleEditSpell(
+                            realClassIdx ?? classIndex,
+                            realSpellIndex,
+                            displaySpell,
+                          )
+                    : undefined,
+                  onRoll:
+                    spell.spellType === "default" && spell.isOffensive
                       ? () => handleRollSpell(displaySpell)
                       : spell.spellType === "invocation"
-                        ? (invocation) => handleRollInvocation(displaySpell, invocation)
+                        ? (invocation) =>
+                            handleRollInvocation(displaySpell, invocation)
                         : spell.spellType === "magiseed"
-                          ? (currentMagiseed, growthClock) => handleRollMagiseed(currentMagiseed, growthClock)
+                          ? (currentMagiseed, growthClock) =>
+                              handleRollMagiseed(currentMagiseed, growthClock)
                           : undefined,
-                    onChat: spell.spellType === "default"
+                  onChat:
+                    spell.spellType === "default"
                       ? () => handleChatSpell(displaySpell)
                       : undefined,
-                    onEditSubModal: canEdit && !isVirtual
+                  onEditSubModal:
+                    canEdit && !isVirtual
                       ? (modalName) =>
-                          handleOpenSubModal(modalName, realClassIdx ?? classIndex, realSpellIndex, displaySpell)
+                          handleOpenSubModal(
+                            modalName,
+                            realClassIdx ?? classIndex,
+                            realSpellIndex,
+                            displaySpell,
+                          )
                       : undefined,
-                    onSpellUpdate: !isVirtual
-                      ? (updater) => handleUpdateSpell(realClassIdx ?? classIndex, realSpellIndex, updater)
-                      : undefined,
-                  });
-                  const needsWrapper =
-                    spell.spellType === "arcanist" ||
-                    spell.spellType === "arcanist-rework";
-                  return (
-                    <React.Fragment key={spellIndex}>
-                      <Box sx={{ position: "relative" }}>
-                        {needsWrapper ? (
-                          <div style={{ marginTop: "0.5em", padding: "0.5em" }}>
-                            <Component {...props} />
-                          </div>
-                        ) : (
+                  onSpellUpdate: !isVirtual
+                    ? (updater) =>
+                        handleUpdateSpell(
+                          realClassIdx ?? classIndex,
+                          realSpellIndex,
+                          updater,
+                        )
+                    : undefined,
+                });
+                const needsWrapper =
+                  spell.spellType === "arcanist" ||
+                  spell.spellType === "arcanist-rework";
+                return (
+                  <React.Fragment key={spellIndex}>
+                    <Box sx={{ position: "relative" }}>
+                      {needsWrapper ? (
+                        <div style={{ marginTop: "0.5em", padding: "0.5em" }}>
                           <Component {...props} />
-                        )}
-                      </Box>
-                    </React.Fragment>
-                  );
-                })}
+                        </div>
+                      ) : (
+                        <Component {...props} />
+                      )}
+                    </Box>
+                  </React.Fragment>
+                );
+              })}
             </SectionCard>
           </Grid>
         ))}

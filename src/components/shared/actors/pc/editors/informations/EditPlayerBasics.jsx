@@ -94,298 +94,300 @@ export default function EditPlayerBasics({
   return (
     <SectionCard title={t("Basic Information")}>
       <Box sx={{ p: "15px" }}>
-      <Grid container spacing={2}>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 4,
-          }}
-        >
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="name"
-              label={t("Name") + ":"}
-              value={player.name}
-              onChange={onChange("name")}
-              slotProps={{
-                input: {
-                  readOnly: !isEditMode,
-                },
-
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 4,
-          }}
-        >
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="pronouns"
-              label={t("Pronouns") + ":"}
-              value={player.info.pronouns}
-              onChange={(e) => onChangeInfo("pronouns")(e.target.value)}
-              slotProps={{
-                input: {
-                  readOnly: !isEditMode,
-                },
-
-                htmlInput: { maxLength: 15 },
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 4,
-          }}
-        >
-          <EditPlayerLevel
-            player={player}
-            setPlayer={setPlayer}
-            isEditMode={isEditMode}
-            updateMaxStats={updateMaxStats}
-            advancement={advancement}
-          />
-        </Grid>
-        <Grid size={12}>
-          <FormControl variant="standard" fullWidth>
-            <CustomTextarea
-              id="description"
-              label={t("Description") + ":"}
-              value={player.info.description}
-              onChange={(e) => onChangeInfo("description")(e.target.value)}
-              readOnly={!isEditMode}
-              maxRows={10}
-              maxLength={5000}
-            />
-          </FormControl>
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 4,
-          }}
-        >
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="fabulapoints"
-              label={t("Fabula Points") + ":"}
-              value={player.info.fabulapoints.toString()}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (
-                  value === "" ||
-                  (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)
-                ) {
-                  onChangeInfo("fabulapoints")(
-                    value === "" ? 0 : parseInt(value, 10),
-                  );
-                }
-              }}
-              onBlur={(e) => {
-                let value = parseInt(e.target.value, 10);
-                if (isNaN(value) || value < 0) {
-                  value = 0;
-                } else if (value > 9999) {
-                  value = 9999;
-                }
-                onChangeInfo("fabulapoints")(value);
-              }}
-              type="number"
-              slotProps={{
-                input: {
-                  readOnly: !isEditMode,
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton>
-                        <img
-                          src={fpBorderlessIcon}
-                          alt="FP"
-                          style={{
-                            width: "36px",
-                            height: "26px",
-                            objectFit: "contain",
-                          }}
-                        />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 4,
-          }}
-        >
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="exp"
-              label={t("Exp") + ":"}
-              value={player.info.exp.toString()}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (
-                  value === "" ||
-                  (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)
-                ) {
-                  onChangeInfo("exp")(value === "" ? 0 : parseInt(value, 10));
-                }
-              }}
-              onBlur={(e) => {
-                let value = parseInt(e.target.value, 10);
-                if (isNaN(value) || value < 0) {
-                  value = 0;
-                }
-                onChangeInfo("exp")(value);
-              }}
-              type="number"
-              slotProps={{
-                input: {
-                  readOnly: !isEditMode,
-                  endAdornment: (
-                    <ExpAdornment
-                      exp={player.info.exp}
-                      onLevelUpRequest={onLevelUpRequest}
-                    />
-                  ),
-                },
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 4,
-          }}
-        >
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="zenit"
-              label={t("Zenit") + ":"}
-              value={player.info.zenit.toString()}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (
-                  value === "" ||
-                  (/^\d+$/.test(value) && +value >= 0 && +value <= 99999999)
-                ) {
-                  onChangeInfo("zenit")(value === "" ? 0 : parseInt(value, 10));
-                }
-              }}
-              type="number"
-              slotProps={{
-                input: {
-                  readOnly: !isEditMode,
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton>
-                        <img
-                          src={zenitIcon}
-                          alt="Zenit"
-                          style={{ width: "28px", height: "28px" }}
-                        />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-          </FormControl>
-        </Grid>
-        {isEditMode ? (
-          <>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 8,
-              }}
-            >
+        <Grid container spacing={2}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4,
+            }}
+          >
+            <FormControl variant="standard" fullWidth>
               <TextField
-                id="imgurl"
-                label={t("Image URL") + ":"}
-                value={imgUrlTemp}
+                id="name"
+                label={t("Name") + ":"}
+                value={player.name}
+                onChange={onChange("name")}
+                slotProps={{
+                  input: {
+                    readOnly: !isEditMode,
+                  },
+
+                  htmlInput: { maxLength: 50 },
+                }}
+              />
+            </FormControl>
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4,
+            }}
+          >
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="pronouns"
+                label={t("Pronouns") + ":"}
+                value={player.info.pronouns}
+                onChange={(e) => onChangeInfo("pronouns")(e.target.value)}
+                slotProps={{
+                  input: {
+                    readOnly: !isEditMode,
+                  },
+
+                  htmlInput: { maxLength: 15 },
+                }}
+              />
+            </FormControl>
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4,
+            }}
+          >
+            <EditPlayerLevel
+              player={player}
+              setPlayer={setPlayer}
+              isEditMode={isEditMode}
+              updateMaxStats={updateMaxStats}
+              advancement={advancement}
+            />
+          </Grid>
+          <Grid size={12}>
+            <FormControl variant="standard" fullWidth>
+              <CustomTextarea
+                id="description"
+                label={t("Description") + ":"}
+                value={player.info.description}
+                onChange={(e) => onChangeInfo("description")(e.target.value)}
+                readOnly={!isEditMode}
+                maxRows={10}
+                maxLength={5000}
+              />
+            </FormControl>
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4,
+            }}
+          >
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="fabulapoints"
+                label={t("Fabula Points") + ":"}
+                value={player.info.fabulapoints.toString()}
                 onChange={(e) => {
-                  setImgUrlTemp(e.target.value);
-                  setIsImageError(false);
-                  setErrorMessage("");
+                  const value = e.target.value;
+                  if (
+                    value === "" ||
+                    (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)
+                  ) {
+                    onChangeInfo("fabulapoints")(
+                      value === "" ? 0 : parseInt(value, 10),
+                    );
+                  }
                 }}
-                fullWidth
-                error={imgUrlTemp.length > 0 && isImageError}
-                helperText={
-                  isImageError && imgUrlTemp.length > 0 ? errorMessage : null
-                }
+                onBlur={(e) => {
+                  let value = parseInt(e.target.value, 10);
+                  if (isNaN(value) || value < 0) {
+                    value = 0;
+                  } else if (value > 9999) {
+                    value = 9999;
+                  }
+                  onChangeInfo("fabulapoints")(value);
+                }}
+                type="number"
+                slotProps={{
+                  input: {
+                    readOnly: !isEditMode,
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton>
+                          <img
+                            src={fpBorderlessIcon}
+                            alt="FP"
+                            style={{
+                              width: "36px",
+                              height: "26px",
+                              objectFit: "contain",
+                            }}
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                sm: 2,
-              }}
-            >
-              <Button
-                variant="contained"
-                onClick={() => {
-                  checkImageSize(imgUrlTemp).then((result) => {
-                    if (result) {
-                      setPlayer((prevState) => {
-                        const newState = { ...prevState };
-                        newState.info.imgurl = imgUrlTemp;
-                        return newState;
-                      });
-                      setOpen(true);
-                    } else {
-                      console.log("Error on uploading image");
-                    }
-                  });
+            </FormControl>
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4,
+            }}
+          >
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="exp"
+                label={t("Exp") + ":"}
+                value={player.info.exp.toString()}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (
+                    value === "" ||
+                    (/^\d+$/.test(value) && +value >= 0 && +value <= 9999)
+                  ) {
+                    onChangeInfo("exp")(value === "" ? 0 : parseInt(value, 10));
+                  }
                 }}
-                sx={{ height: "56px", width: "100%" }}
-              >
-                {t("Update Image")}
-              </Button>
-              <Snackbar
-                open={open}
-                autoHideDuration={3000}
-                onClose={handleClose}
-                message={t("Image uploaded successfully!")}
+                onBlur={(e) => {
+                  let value = parseInt(e.target.value, 10);
+                  if (isNaN(value) || value < 0) {
+                    value = 0;
+                  }
+                  onChangeInfo("exp")(value);
+                }}
+                type="number"
+                slotProps={{
+                  input: {
+                    readOnly: !isEditMode,
+                    endAdornment: (
+                      <ExpAdornment
+                        exp={player.info.exp}
+                        onLevelUpRequest={onLevelUpRequest}
+                      />
+                    ),
+                  },
+                }}
               />
-            </Grid>
-            <Grid
-              size={{
-                xs: 6,
-                sm: 2,
-              }}
-            >
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  setImgUrlTemp("");
-                  setIsImageError(false);
-                  setErrorMessage("");
-                  setPlayer((prevState) => {
-                    const newState = { ...prevState };
-                    newState.info.imgurl = "";
-                    return newState;
-                  });
+            </FormControl>
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4,
+            }}
+          >
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="zenit"
+                label={t("Zenit") + ":"}
+                value={player.info.zenit.toString()}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (
+                    value === "" ||
+                    (/^\d+$/.test(value) && +value >= 0 && +value <= 99999999)
+                  ) {
+                    onChangeInfo("zenit")(
+                      value === "" ? 0 : parseInt(value, 10),
+                    );
+                  }
                 }}
-                sx={{ height: "56px", width: "100%" }}
+                type="number"
+                slotProps={{
+                  input: {
+                    readOnly: !isEditMode,
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton>
+                          <img
+                            src={zenitIcon}
+                            alt="Zenit"
+                            style={{ width: "28px", height: "28px" }}
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </FormControl>
+          </Grid>
+          {isEditMode ? (
+            <>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 8,
+                }}
               >
-                {t("Remove Image")}
-              </Button>
-            </Grid>
-          </>
-        ) : null}
-      </Grid>
+                <TextField
+                  id="imgurl"
+                  label={t("Image URL") + ":"}
+                  value={imgUrlTemp}
+                  onChange={(e) => {
+                    setImgUrlTemp(e.target.value);
+                    setIsImageError(false);
+                    setErrorMessage("");
+                  }}
+                  fullWidth
+                  error={imgUrlTemp.length > 0 && isImageError}
+                  helperText={
+                    isImageError && imgUrlTemp.length > 0 ? errorMessage : null
+                  }
+                />
+              </Grid>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 2,
+                }}
+              >
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    checkImageSize(imgUrlTemp).then((result) => {
+                      if (result) {
+                        setPlayer((prevState) => {
+                          const newState = { ...prevState };
+                          newState.info.imgurl = imgUrlTemp;
+                          return newState;
+                        });
+                        setOpen(true);
+                      } else {
+                        console.log("Error on uploading image");
+                      }
+                    });
+                  }}
+                  sx={{ height: "56px", width: "100%" }}
+                >
+                  {t("Update Image")}
+                </Button>
+                <Snackbar
+                  open={open}
+                  autoHideDuration={3000}
+                  onClose={handleClose}
+                  message={t("Image uploaded successfully!")}
+                />
+              </Grid>
+              <Grid
+                size={{
+                  xs: 6,
+                  sm: 2,
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    setImgUrlTemp("");
+                    setIsImageError(false);
+                    setErrorMessage("");
+                    setPlayer((prevState) => {
+                      const newState = { ...prevState };
+                      newState.info.imgurl = "";
+                      return newState;
+                    });
+                  }}
+                  sx={{ height: "56px", width: "100%" }}
+                >
+                  {t("Remove Image")}
+                </Button>
+              </Grid>
+            </>
+          ) : null}
+        </Grid>
       </Box>
     </SectionCard>
   );

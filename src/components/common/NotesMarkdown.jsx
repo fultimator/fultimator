@@ -99,20 +99,24 @@ const NotesMarkdown = ({
           <Typography
             variant="body1"
             component="div"
-            sx={compact || uniform ? {
-              margin: 0,
-              lineHeight: 1.5,
-              fontSize: fontSize ?? "0.85rem",
-              color: theme.palette.text.secondary,
-            } : {
-              fontFamily: "'PT Sans Narrow', sans-serif",
-              mt: 0.75,
-              mb: 0.75,
-              marginLeft: 2,
-              lineHeight: 1.6,
-              fontSize: fontSize ?? "1rem",
-              color: theme.palette.text.primary,
-            }}
+            sx={
+              compact || uniform
+                ? {
+                    margin: 0,
+                    lineHeight: 1.5,
+                    fontSize: fontSize ?? "0.85rem",
+                    color: theme.palette.text.secondary,
+                  }
+                : {
+                    fontFamily: "'PT Sans Narrow', sans-serif",
+                    mt: 0.75,
+                    mb: 0.75,
+                    marginLeft: 2,
+                    lineHeight: 1.6,
+                    fontSize: fontSize ?? "1rem",
+                    color: theme.palette.text.primary,
+                  }
+            }
             {...props}
           />
         ),

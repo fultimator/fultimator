@@ -26,12 +26,42 @@ export default function InformationTab({
         advancement={advancement}
         onLevelUpRequest={onLevelUpRequest}
       />
-      <EditPlayerTraits player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-      <EditPlayerBonds player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-      <EditPlayerOther player={player} setPlayer={setPlayer} isEditMode={isOwner} />
-      {optionalRules.quirks && <EditPlayerQuirk player={player} setPlayer={setPlayer} isEditMode={isOwner} />}
-      {optionalRules.campActivities && <EditPlayerCampActivities player={player} setPlayer={setPlayer} isEditMode={isOwner} />}
-      {optionalRules.zeroPower && <EditPlayerZeroPower player={player} setPlayer={setPlayer} isEditMode={isOwner} />}
+      <EditPlayerTraits
+        player={player}
+        setPlayer={setPlayer}
+        isEditMode={isOwner}
+      />
+      <EditPlayerBonds
+        player={player}
+        setPlayer={setPlayer}
+        isEditMode={isOwner}
+      />
+      <EditPlayerOther
+        player={player}
+        setPlayer={setPlayer}
+        isEditMode={isOwner}
+      />
+      {optionalRules.quirks && (
+        <EditPlayerQuirk
+          player={player}
+          setPlayer={setPlayer}
+          isEditMode={isOwner}
+        />
+      )}
+      {optionalRules.campActivities && (
+        <EditPlayerCampActivities
+          player={player}
+          setPlayer={setPlayer}
+          isEditMode={isOwner}
+        />
+      )}
+      {optionalRules.zeroPower && (
+        <EditPlayerZeroPower
+          player={player}
+          setPlayer={setPlayer}
+          isEditMode={isOwner}
+        />
+      )}
     </Box>
   );
 }

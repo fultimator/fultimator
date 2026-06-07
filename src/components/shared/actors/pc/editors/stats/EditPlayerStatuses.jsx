@@ -44,47 +44,47 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
   return (
     <SectionCard title={t("Statuses")}>
       <Box sx={{ p: 2 }}>
-      <Grid container spacing={1}>
-        {Object.keys(statusDescriptions).map((status) => {
-          // Check if the immunity for the current status is true
-          const isImmune =
-            player.immunities && player.immunities[status] === true;
+        <Grid container spacing={1}>
+          {Object.keys(statusDescriptions).map((status) => {
+            // Check if the immunity for the current status is true
+            const isImmune =
+              player.immunities && player.immunities[status] === true;
 
-          return (
-            <Grid
-              key={status}
-              size={{
-                xs: 12,
-                md: 6,
-              }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={player.statuses[status]}
-                    onChange={() => handleStatusChange(status)}
-                    disabled={!isEditMode || isImmune}
-                  />
-                }
-                label={t(status.charAt(0).toUpperCase() + status.slice(1))}
-                sx={{ marginRight: 2 }}
-              />
-              <Typography
-                variant="body2"
-                component="span"
-                sx={{ fontSize: "0.8em" }}
+            return (
+              <Grid
+                key={status}
+                size={{
+                  xs: 12,
+                  md: 6,
+                }}
               >
-                <ReactMarkdown
-                  allowedElements={["strong"]}
-                  unwrapDisallowed={true}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={player.statuses[status]}
+                      onChange={() => handleStatusChange(status)}
+                      disabled={!isEditMode || isImmune}
+                    />
+                  }
+                  label={t(status.charAt(0).toUpperCase() + status.slice(1))}
+                  sx={{ marginRight: 2 }}
+                />
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{ fontSize: "0.8em" }}
                 >
-                  {t(statusDescriptions[status])}
-                </ReactMarkdown>
-              </Typography>
-            </Grid>
-          );
-        })}
-      </Grid>
+                  <ReactMarkdown
+                    allowedElements={["strong"]}
+                    unwrapDisallowed={true}
+                  >
+                    {t(statusDescriptions[status])}
+                  </ReactMarkdown>
+                </Typography>
+              </Grid>
+            );
+          })}
+        </Grid>
       </Box>
     </SectionCard>
   );

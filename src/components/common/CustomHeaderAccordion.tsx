@@ -19,7 +19,10 @@ function normalizeNestedButtons(node: React.ReactNode): React.ReactNode {
     component?: React.ElementType;
   }>;
 
-  const elementType = element.type as { muiName?: string; displayName?: string };
+  const elementType = element.type as {
+    muiName?: string;
+    displayName?: string;
+  };
   const isIconButton =
     elementType?.muiName === "IconButton" ||
     elementType?.displayName === "IconButton";

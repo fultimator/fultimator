@@ -99,7 +99,9 @@ export default function ExplainSkillsSimplified({ npc }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ width: "100%", maxWidth: isSmallScreen ? 300 : 360, minWidth: 0 }}>
+      <Box
+        sx={{ width: "100%", maxWidth: isSmallScreen ? 300 : 360, minWidth: 0 }}
+      >
         <Button
           aria-describedby={id}
           onClick={handleClick}

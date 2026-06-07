@@ -5,9 +5,7 @@ export const QuirkOptionalSchema = z.object({
   name: z.string().default(""),
   description: z.string().default(""),
   effect: z.string().default(""),
-  clock: z
-    .object({ sections: z.number().int().min(2).max(12) })
-    .optional(),
+  clock: z.object({ sections: z.number().int().min(2).max(12) }).optional(),
 });
 
 export type QuirkOptional = z.infer<typeof QuirkOptionalSchema>;

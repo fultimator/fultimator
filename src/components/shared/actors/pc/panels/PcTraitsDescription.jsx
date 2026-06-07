@@ -1,10 +1,4 @@
-import {
-  Autocomplete,
-  Box,
-  Grid,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, Box, Grid, TextField, Typography } from "@mui/material";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { useTheme } from "@mui/material/styles";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -92,7 +86,6 @@ export default function PcTraitsDescription({
 
   return (
     <SectionCard title={t("Traits")}>
-
       <Box sx={{ p: 1, width: "100%" }}>
         <Box sx={{ display: "grid", gap: isInteractive ? 0.75 : 0.45 }}>
           {isInteractive ? (

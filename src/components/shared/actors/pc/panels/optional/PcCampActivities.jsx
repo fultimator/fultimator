@@ -6,7 +6,11 @@ import PlayerCampActivities from "/src/components/shared/actors/pc/playerSheet/o
 import { EditPlayerCampActivities } from "/src/components/shared/actors/pc/editors";
 import { useTranslate } from "/src/translation/translate";
 
-export default function PcCampActivities({ pc, isInteractive = false, onUpdate }) {
+export default function PcCampActivities({
+  pc,
+  isInteractive = false,
+  onUpdate,
+}) {
   const { t } = useTranslate();
   const [editIndex, setEditIndex] = useState(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -15,12 +19,20 @@ export default function PcCampActivities({ pc, isInteractive = false, onUpdate }
   const headerActions = isInteractive ? (
     <Box sx={{ display: "flex", gap: 0.5 }}>
       <Tooltip title={t("Add")} arrow>
-        <IconButton size="small" onClick={() => setAddOpen(true)} sx={{ color: "#fff" }}>
+        <IconButton
+          size="small"
+          onClick={() => setAddOpen(true)}
+          sx={{ color: "#fff" }}
+        >
           <AddIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       <Tooltip title={t("Open Compendium")} arrow>
-        <IconButton size="small" onClick={() => setCompendiumOpen(true)} sx={{ color: "#fff" }}>
+        <IconButton
+          size="small"
+          onClick={() => setCompendiumOpen(true)}
+          sx={{ color: "#fff" }}
+        >
           <SearchIcon fontSize="small" />
         </IconButton>
       </Tooltip>

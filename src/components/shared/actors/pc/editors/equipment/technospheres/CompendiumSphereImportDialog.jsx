@@ -16,10 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import {
-  getMnemosphereCost,
-  MNEMOSPHERE_LEVELS,
-} from "/src/libs/mnemospheres";
+import { getMnemosphereCost, MNEMOSPHERE_LEVELS } from "/src/libs/mnemospheres";
 
 export default function CompendiumSphereImportDialog({
   open,

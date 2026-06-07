@@ -45,7 +45,9 @@ function fromFormState(form) {
     name: form.name ?? "",
     description: form.description ?? "",
     effect: form.effect ?? "",
-    clock: form.clockEnabled ? { sections: Number(form.clockSections) || 6 } : undefined,
+    clock: form.clockEnabled
+      ? { sections: Number(form.clockSections) || 6 }
+      : undefined,
   };
 }
 
@@ -54,87 +56,174 @@ function OtherRow({ other, index, isEditMode, onEdit, onDelete, onRoll }) {
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [expanded, setExpanded] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const hasDetails = other.description || other.effect;
 
   const handleAddToCompendium = async (e) => {
     e.stopPropagation();
     setMenuAnchor(null);
     try {
-      const personalPack = packs.find((p) => p.isPersonal) ?? await ensurePersonalPack();
-      await addItem(personalPack.id, "optional", { ...other, subtype: "other" });
-      setSnackbar({ open: true, message: t("Added to compendium"), severity: "success" });
+      const personalPack =
+        packs.find((p) => p.isPersonal) ?? (await ensurePersonalPack());
+      await addItem(personalPack.id, "optional", {
+        ...other,
+        subtype: "other",
+      });
+      setSnackbar({
+        open: true,
+        message: t("Added to compendium"),
+        severity: "success",
+      });
     } catch (err) {
-      setSnackbar({ open: true, message: err?.message ?? t("Failed to add"), severity: "error" });
+      setSnackbar({
+        open: true,
+        message: err?.message ?? t("Failed to add"),
+        severity: "error",
+      });
     }
   };
 
   return (
     <>
-    <ItemRowCard
-      variant="outlined"
-      onCardClick={hasDetails ? () => setExpanded((v) => !v) : undefined}
-      label={other.name || t("Unnamed Optional")}
-      actions={
-        <>
-          <Tooltip title={t("Roll")}>
-            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onRoll(other); }}>
-              <Casino />
-            </IconButton>
-          </Tooltip>
-          {isEditMode && (
-            <Tooltip title={t("Edit")}>
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit(index); }}>
-                <EditIcon />
+      <ItemRowCard
+        variant="outlined"
+        onCardClick={hasDetails ? () => setExpanded((v) => !v) : undefined}
+        label={other.name || t("Unnamed Optional")}
+        actions={
+          <>
+            <Tooltip title={t("Roll")}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRoll(other);
+                }}
+              >
+                <Casino />
               </IconButton>
             </Tooltip>
-          )}
-          {isEditMode && (
-            <>
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchor(e.currentTarget); }}>
-                <MenuIcon fontSize="small" />
-              </IconButton>
-              <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
-                <MenuItem onClick={handleAddToCompendium}>
-                  <ListItemIcon><LibraryAdd fontSize="small" /></ListItemIcon>
-                  <ListItemText>{t("Add to Compendium")}</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); onDelete(index); }}>
-                  <ListItemIcon><DeleteForever fontSize="small" /></ListItemIcon>
-                  <ListItemText>{t("Delete")}</ListItemText>
-                </MenuItem>
-              </Menu>
-            </>
-          )}
-        </>
-      }
-    >
-      {expanded && hasDetails && (
-        <Box sx={{ px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.03)", borderTop: "1px solid", borderColor: "divider" }}>
-          <SharedOptionalCard item={{ ...other, subtype: "other" }} />
-        </Box>
-      )}
-    </ItemRowCard>
-    <Snackbar open={snackbar.open} autoHideDuration={2500} onClose={() => setSnackbar((s) => ({ ...s, open: false }))} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
-      <Alert severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>{snackbar.message}</Alert>
-    </Snackbar>
+            {isEditMode && (
+              <Tooltip title={t("Edit")}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(index);
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {isEditMode && (
+              <>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuAnchor(e.currentTarget);
+                  }}
+                >
+                  <MenuIcon fontSize="small" />
+                </IconButton>
+                <Menu
+                  anchorEl={menuAnchor}
+                  open={Boolean(menuAnchor)}
+                  onClose={() => setMenuAnchor(null)}
+                >
+                  <MenuItem onClick={handleAddToCompendium}>
+                    <ListItemIcon>
+                      <LibraryAdd fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>{t("Add to Compendium")}</ListItemText>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuAnchor(null);
+                      onDelete(index);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <DeleteForever fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>{t("Delete")}</ListItemText>
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+          </>
+        }
+      >
+        {expanded && hasDetails && (
+          <Box
+            sx={{
+              px: 1.5,
+              py: 0.75,
+              bgcolor: "rgba(0,0,0,0.03)",
+              borderTop: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <SharedOptionalCard item={{ ...other, subtype: "other" }} />
+          </Box>
+        )}
+      </ItemRowCard>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2500}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
 
-export default function EditPlayerOthers({ player, setPlayer, isEditMode, externalEditIndex = null, onExternalClose, externalCreateOpen = false, onExternalCreateClose, externalCompendiumOpen = false, onExternalCompendiumClose, modalOnly = false }) {
+export default function EditPlayerOthers({
+  player,
+  setPlayer,
+  isEditMode,
+  externalEditIndex = null,
+  onExternalClose,
+  externalCreateOpen = false,
+  onExternalCreateClose,
+  externalCompendiumOpen = false,
+  onExternalCompendiumClose,
+  modalOnly = false,
+}) {
   const { t } = useTranslate();
   const addMessage = useAddChatMessage();
 
   const [internalEditIndex, setInternalEditIndex] = useState(null);
   const [internalCreateOpen, setInternalCreateOpen] = useState(false);
   const createOpen = externalCreateOpen || internalCreateOpen;
-  const setCreateOpen = (v) => { setInternalCreateOpen(v); if (!v) onExternalCreateClose?.(); };
+  const setCreateOpen = (v) => {
+    setInternalCreateOpen(v);
+    if (!v) onExternalCreateClose?.();
+  };
   const editIndex = externalEditIndex ?? internalEditIndex;
-  const setEditIndex = (v) => { setInternalEditIndex(v); if (v === null) onExternalClose?.(); };
+  const setEditIndex = (v) => {
+    setInternalEditIndex(v);
+    if (v === null) onExternalClose?.();
+  };
   const [internalCompendiumOpen, setInternalCompendiumOpen] = useState(false);
   const compendiumOpen = externalCompendiumOpen || internalCompendiumOpen;
-  const setCompendiumOpen = (v) => { setInternalCompendiumOpen(v); if (!v) onExternalCompendiumClose?.(); };
+  const setCompendiumOpen = (v) => {
+    setInternalCompendiumOpen(v);
+    if (!v) onExternalCompendiumClose?.();
+  };
 
   const others = useMemo(() => player.others ?? [], [player.others]);
 
@@ -160,7 +249,8 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
             clock: {
               sections: entry.clock.sections,
               state:
-                Array.isArray(entry.clockState) && entry.clockState.length === entry.clock.sections
+                Array.isArray(entry.clockState) &&
+                entry.clockState.length === entry.clock.sections
                   ? entry.clockState
                   : new Array(entry.clock.sections).fill(false),
               name: entry.name || t("Optional"),
@@ -181,7 +271,10 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
         {(createOpen || editIndex !== null) && editingItem && (
           <ItemEditModal
             open
-            onClose={() => { setCreateOpen(false); setEditIndex(null); }}
+            onClose={() => {
+              setCreateOpen(false);
+              setEditIndex(null);
+            }}
             itemType="otherOptional"
             item={editingItem}
             editIndex={createOpen ? null : editIndex}
@@ -190,7 +283,8 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
               setPlayer((prev) => {
                 const next = [...(prev.others ?? [])];
                 if (createOpen) next.push(nextEntry);
-                else if (editIndex !== null && next[editIndex]) next[editIndex] = nextEntry;
+                else if (editIndex !== null && next[editIndex])
+                  next[editIndex] = nextEntry;
                 return { ...prev, others: next };
               });
               setCreateOpen(false);
@@ -217,7 +311,9 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
                 name: item.name ?? "",
                 description: item.description ?? "",
                 effect: item.effect ?? "",
-                ...(item.clock?.sections ? { clock: { sections: item.clock.sections } } : {}),
+                ...(item.clock?.sections
+                  ? { clock: { sections: item.clock.sections } }
+                  : {}),
               };
               setPlayer((prev) => ({
                 ...prev,
@@ -241,12 +337,20 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
         isEditMode && (
           <Box sx={{ display: "flex", gap: 0.5 }}>
             <Tooltip title={t("Add Optional")}>
-              <IconButton size="small" onClick={() => setCreateOpen(true)} sx={{ color: "#fff" }}>
+              <IconButton
+                size="small"
+                onClick={() => setCreateOpen(true)}
+                sx={{ color: "#fff" }}
+              >
                 <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Open Compendium")}>
-              <IconButton size="small" onClick={() => setCompendiumOpen(true)} sx={{ color: "#fff" }}>
+              <IconButton
+                size="small"
+                onClick={() => setCompendiumOpen(true)}
+                sx={{ color: "#fff" }}
+              >
                 <Search fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -254,9 +358,17 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
         )
       }
     >
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 0.75 }}>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 0.75 }}
+      >
         {others.length === 0 ? (
-          <Typography color="text.secondary" variant="body2" sx={{ px: 0.5, py: 0.25 }}>{t("No optional entries yet.")}</Typography>
+          <Typography
+            color="text.secondary"
+            variant="body2"
+            sx={{ px: 0.5, py: 0.25 }}
+          >
+            {t("No optional entries yet.")}
+          </Typography>
         ) : (
           others.map((other, index) => (
             <OtherRow
@@ -275,7 +387,10 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
       {(createOpen || editIndex !== null) && editingItem && (
         <ItemEditModal
           open
-          onClose={() => { setCreateOpen(false); setEditIndex(null); }}
+          onClose={() => {
+            setCreateOpen(false);
+            setEditIndex(null);
+          }}
           itemType="otherOptional"
           item={editingItem}
           editIndex={createOpen ? null : editIndex}
@@ -284,7 +399,8 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
             setPlayer((prev) => {
               const next = [...(prev.others ?? [])];
               if (createOpen) next.push(nextEntry);
-              else if (editIndex !== null && next[editIndex]) next[editIndex] = nextEntry;
+              else if (editIndex !== null && next[editIndex])
+                next[editIndex] = nextEntry;
               return { ...prev, others: next };
             });
             setCreateOpen(false);
@@ -312,7 +428,9 @@ export default function EditPlayerOthers({ player, setPlayer, isEditMode, extern
               name: item.name ?? "",
               description: item.description ?? "",
               effect: item.effect ?? "",
-              ...(item.clock?.sections ? { clock: { sections: item.clock.sections } } : {}),
+              ...(item.clock?.sections
+                ? { clock: { sections: item.clock.sections } }
+                : {}),
             };
             setPlayer((prev) => ({
               ...prev,

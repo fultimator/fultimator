@@ -1,6 +1,9 @@
 import { invocationsByWellspring } from "./spellOptionData";
 
-export function buildInvokerAvailableInvocations(skillLevel, customInvocations = []) {
+export function buildInvokerAvailableInvocations(
+  skillLevel,
+  customInvocations = [],
+) {
   const availableTypes = [];
   switch (Number(skillLevel) || 1) {
     case 1:
@@ -26,8 +29,14 @@ export function buildInvokerAvailableInvocations(skillLevel, customInvocations =
   });
 
   const custom = (customInvocations || [])
-    .filter((inv) => inv.wellspring && inv.key && availableTypes.includes(inv.type))
-    .map((inv) => ({ ...inv, name: inv.customName || inv.key, isCustom: true }));
+    .filter(
+      (inv) => inv.wellspring && inv.key && availableTypes.includes(inv.type),
+    )
+    .map((inv) => ({
+      ...inv,
+      name: inv.customName || inv.key,
+      isCustom: true,
+    }));
 
   return [...hardcoded, ...custom];
 }

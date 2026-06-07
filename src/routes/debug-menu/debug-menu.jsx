@@ -642,7 +642,17 @@ function TabPanel({ value, index, children }) {
     <div
       role="tabpanel"
       hidden={!active}
-      style={active ? { flex: 1, overflowY: "auto", minHeight: 0, display: "flex", flexDirection: "column" } : undefined}
+      style={
+        active
+          ? {
+              flex: 1,
+              overflowY: "auto",
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+            }
+          : undefined
+      }
     >
       {active && <Box sx={{ flex: 1 }}>{children}</Box>}
     </div>
@@ -1109,7 +1119,15 @@ function ItemsTab({ s, viewport, itemVariant }) {
 
   return (
     <ResponsivePreviewFrame ref={setFrameNode} viewport={viewport}>
-      <Stack spacing={4} sx={{ p: viewport === "desktop" ? 0 : 1, flex: 1, overflowY: "auto", minHeight: 0 }}>
+      <Stack
+        spacing={4}
+        sx={{
+          p: viewport === "desktop" ? 0 : 1,
+          flex: 1,
+          overflowY: "auto",
+          minHeight: 0,
+        }}
+      >
         <Section
           label="Equipment"
           sectionRef={(node) => {

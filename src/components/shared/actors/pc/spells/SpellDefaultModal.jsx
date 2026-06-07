@@ -46,7 +46,12 @@ export default function SpellDefaultModal({
         : null;
       setFormState({
         damage: { value: 0, type: "physical", hrZero: false },
-        accuracy: { attr1: "insight", attr2: "will", value: 0, defense: "mdef" },
+        accuracy: {
+          attr1: "insight",
+          attr2: "will",
+          value: 0,
+          defense: "mdef",
+        },
         cost: { resource: "mp", amount: 0, perTarget: true },
         ...(compendiumEntry ?? {}),
         ...spell,

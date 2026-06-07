@@ -603,7 +603,9 @@ const CompendiumViewerModal = ({
         lockedToViewerType={selectedType}
         initialSubtype={
           selectedType === "player-spells"
-            ? (CLASS_NAME_TO_SPELL_TYPE[filters.selectedSpellClass] ?? filters.selectedSpellClass ?? undefined)
+            ? (CLASS_NAME_TO_SPELL_TYPE[filters.selectedSpellClass] ??
+              filters.selectedSpellClass ??
+              undefined)
             : selectedType === "optionals" &&
                 filters.selectedOptionalSubtypes?.length === 1
               ? filters.selectedOptionalSubtypes[0]

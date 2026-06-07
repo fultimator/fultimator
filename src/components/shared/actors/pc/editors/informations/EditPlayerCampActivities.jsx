@@ -48,92 +48,192 @@ function fromFormState(form) {
   };
 }
 
-function ActivityRow({ activity, index, isEditMode, onEdit, onDelete, onRoll }) {
+function ActivityRow({
+  activity,
+  index,
+  isEditMode,
+  onEdit,
+  onDelete,
+  onRoll,
+}) {
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [expanded, setExpanded] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const hasDetails = activity.description || activity.targetDescription || activity.effect;
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const hasDetails =
+    activity.description || activity.targetDescription || activity.effect;
 
   const handleAddToCompendium = async (e) => {
     e.stopPropagation();
     setMenuAnchor(null);
     try {
-      const personalPack = packs.find((p) => p.isPersonal) ?? await ensurePersonalPack();
-      await addItem(personalPack.id, "optional", { ...activity, subtype: "camp-activities" });
-      setSnackbar({ open: true, message: t("Added to compendium"), severity: "success" });
+      const personalPack =
+        packs.find((p) => p.isPersonal) ?? (await ensurePersonalPack());
+      await addItem(personalPack.id, "optional", {
+        ...activity,
+        subtype: "camp-activities",
+      });
+      setSnackbar({
+        open: true,
+        message: t("Added to compendium"),
+        severity: "success",
+      });
     } catch (err) {
-      setSnackbar({ open: true, message: err?.message ?? t("Failed to add"), severity: "error" });
+      setSnackbar({
+        open: true,
+        message: err?.message ?? t("Failed to add"),
+        severity: "error",
+      });
     }
   };
 
   return (
     <>
-    <ItemRowCard
-      variant="outlined"
-      onCardClick={hasDetails ? () => setExpanded((v) => !v) : undefined}
-      label={activity.name || t("Unnamed Camp Activity")}
-      actions={
-        <>
-          <Tooltip title={t("Roll")}>
-            <IconButton size="small" onClick={(e) => { e.stopPropagation(); onRoll(activity); }}>
-              <Casino />
-            </IconButton>
-          </Tooltip>
-          {isEditMode && (
-            <Tooltip title={t("Edit")}>
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit(index); }}>
-                <EditIcon />
+      <ItemRowCard
+        variant="outlined"
+        onCardClick={hasDetails ? () => setExpanded((v) => !v) : undefined}
+        label={activity.name || t("Unnamed Camp Activity")}
+        actions={
+          <>
+            <Tooltip title={t("Roll")}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRoll(activity);
+                }}
+              >
+                <Casino />
               </IconButton>
             </Tooltip>
-          )}
-          {isEditMode && (
-            <>
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchor(e.currentTarget); }}>
-                <MenuIcon fontSize="small" />
-              </IconButton>
-              <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
-                <MenuItem onClick={handleAddToCompendium}>
-                  <ListItemIcon><LibraryAdd fontSize="small" /></ListItemIcon>
-                  <ListItemText>{t("Add to Compendium")}</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); onDelete(index); }}>
-                  <ListItemIcon><DeleteForever fontSize="small" /></ListItemIcon>
-                  <ListItemText>{t("Delete")}</ListItemText>
-                </MenuItem>
-              </Menu>
-            </>
-          )}
-        </>
-      }
-    >
-      {expanded && hasDetails && (
-        <Box sx={{ px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.03)", borderTop: "1px solid", borderColor: "divider" }}>
-          <SharedOptionalCard item={{ ...activity, subtype: "camp-activities" }} />
-        </Box>
-      )}
-    </ItemRowCard>
-    <Snackbar open={snackbar.open} autoHideDuration={2500} onClose={() => setSnackbar((s) => ({ ...s, open: false }))} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
-      <Alert severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>{snackbar.message}</Alert>
-    </Snackbar>
+            {isEditMode && (
+              <Tooltip title={t("Edit")}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(index);
+                  }}
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {isEditMode && (
+              <>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuAnchor(e.currentTarget);
+                  }}
+                >
+                  <MenuIcon fontSize="small" />
+                </IconButton>
+                <Menu
+                  anchorEl={menuAnchor}
+                  open={Boolean(menuAnchor)}
+                  onClose={() => setMenuAnchor(null)}
+                >
+                  <MenuItem onClick={handleAddToCompendium}>
+                    <ListItemIcon>
+                      <LibraryAdd fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>{t("Add to Compendium")}</ListItemText>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuAnchor(null);
+                      onDelete(index);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <DeleteForever fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>{t("Delete")}</ListItemText>
+                  </MenuItem>
+                </Menu>
+              </>
+            )}
+          </>
+        }
+      >
+        {expanded && hasDetails && (
+          <Box
+            sx={{
+              px: 1.5,
+              py: 0.75,
+              bgcolor: "rgba(0,0,0,0.03)",
+              borderTop: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <SharedOptionalCard
+              item={{ ...activity, subtype: "camp-activities" }}
+            />
+          </Box>
+        )}
+      </ItemRowCard>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2500}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
 
-export default function EditPlayerCampActivities({ player, setPlayer, isEditMode, externalEditIndex = null, onExternalClose, externalCreateOpen = false, onExternalCreateClose, externalCompendiumOpen = false, onExternalCompendiumClose, modalOnly = false }) {
+export default function EditPlayerCampActivities({
+  player,
+  setPlayer,
+  isEditMode,
+  externalEditIndex = null,
+  onExternalClose,
+  externalCreateOpen = false,
+  onExternalCreateClose,
+  externalCompendiumOpen = false,
+  onExternalCompendiumClose,
+  modalOnly = false,
+}) {
   const { t } = useTranslate();
   const addMessage = useAddChatMessage();
   const [internalEditIndex, setInternalEditIndex] = useState(null);
   const [internalCreateOpen, setInternalCreateOpen] = useState(false);
   const createOpen = externalCreateOpen || internalCreateOpen;
-  const setCreateOpen = (v) => { setInternalCreateOpen(v); if (!v) onExternalCreateClose?.(); };
+  const setCreateOpen = (v) => {
+    setInternalCreateOpen(v);
+    if (!v) onExternalCreateClose?.();
+  };
   const editIndex = externalEditIndex ?? internalEditIndex;
-  const setEditIndex = (v) => { setInternalEditIndex(v); if (v === null) onExternalClose?.(); };
+  const setEditIndex = (v) => {
+    setInternalEditIndex(v);
+    if (v === null) onExternalClose?.();
+  };
   const [internalCompendiumOpen, setInternalCompendiumOpen] = useState(false);
   const compendiumOpen = externalCompendiumOpen || internalCompendiumOpen;
-  const setCompendiumOpen = (v) => { setInternalCompendiumOpen(v); if (!v) onExternalCompendiumClose?.(); };
-  const activities = useMemo(() => player.campActivities ?? [], [player.campActivities]);
+  const setCompendiumOpen = (v) => {
+    setInternalCompendiumOpen(v);
+    if (!v) onExternalCompendiumClose?.();
+  };
+  const activities = useMemo(
+    () => player.campActivities ?? [],
+    [player.campActivities],
+  );
 
   const editingItem = createOpen
     ? toFormState(null)
@@ -151,7 +251,9 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
       name: entry.name || t("Camp Activity"),
       tags: [t("Camp Activities")],
       description: entry.description,
-      ...(entry.targetDescription ? { targetDescription: entry.targetDescription } : {}),
+      ...(entry.targetDescription
+        ? { targetDescription: entry.targetDescription }
+        : {}),
       effect: entry.effect || "",
     });
 
@@ -167,7 +269,10 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         {(createOpen || editIndex !== null) && editingItem && (
           <ItemEditModal
             open
-            onClose={() => { setCreateOpen(false); setEditIndex(null); }}
+            onClose={() => {
+              setCreateOpen(false);
+              setEditIndex(null);
+            }}
             itemType="campActivity"
             item={editingItem}
             editIndex={createOpen ? null : editIndex}
@@ -176,7 +281,8 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
               setPlayer((prev) => {
                 const next = [...(prev.campActivities ?? [])];
                 if (createOpen) next.push(nextEntry);
-                else if (editIndex !== null && next[editIndex]) next[editIndex] = nextEntry;
+                else if (editIndex !== null && next[editIndex])
+                  next[editIndex] = nextEntry;
                 return { ...prev, campActivities: next };
               });
               setCreateOpen(false);
@@ -227,12 +333,20 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         isEditMode && (
           <Box sx={{ display: "flex", gap: 0.5 }}>
             <Tooltip title={t("Add Camp Activity")}>
-              <IconButton size="small" onClick={() => setCreateOpen(true)} sx={{ color: "#fff" }}>
+              <IconButton
+                size="small"
+                onClick={() => setCreateOpen(true)}
+                sx={{ color: "#fff" }}
+              >
                 <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Open Compendium")}>
-              <IconButton size="small" onClick={() => setCompendiumOpen(true)} sx={{ color: "#fff" }}>
+              <IconButton
+                size="small"
+                onClick={() => setCompendiumOpen(true)}
+                sx={{ color: "#fff" }}
+              >
                 <Search fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -240,9 +354,17 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
         )
       }
     >
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 0.75 }}>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 0.75 }}
+      >
         {activities.length === 0 ? (
-          <Typography color="text.secondary" variant="body2" sx={{ px: 0.5, py: 0.25 }}>{t("No camp activities yet.")}</Typography>
+          <Typography
+            color="text.secondary"
+            variant="body2"
+            sx={{ px: 0.5, py: 0.25 }}
+          >
+            {t("No camp activities yet.")}
+          </Typography>
         ) : (
           activities.map((activity, index) => (
             <ActivityRow
@@ -261,7 +383,10 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
       {(createOpen || editIndex !== null) && editingItem && (
         <ItemEditModal
           open
-          onClose={() => { setCreateOpen(false); setEditIndex(null); }}
+          onClose={() => {
+            setCreateOpen(false);
+            setEditIndex(null);
+          }}
           itemType="campActivity"
           item={editingItem}
           editIndex={createOpen ? null : editIndex}
@@ -270,7 +395,8 @@ export default function EditPlayerCampActivities({ player, setPlayer, isEditMode
             setPlayer((prev) => {
               const next = [...(prev.campActivities ?? [])];
               if (createOpen) next.push(nextEntry);
-              else if (editIndex !== null && next[editIndex]) next[editIndex] = nextEntry;
+              else if (editIndex !== null && next[editIndex])
+                next[editIndex] = nextEntry;
               return { ...prev, campActivities: next };
             });
             setCreateOpen(false);

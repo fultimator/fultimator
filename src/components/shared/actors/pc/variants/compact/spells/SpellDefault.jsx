@@ -5,7 +5,10 @@ import attributes from "/src/libs/attributes";
 import { CloseBracket, OpenBracket } from "/src/components/Bracket";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
-import { StyledTableCell, StyledMarkdown } from "/src/components/shared/actors/pc/variants/compact/spells/StyledSpellComponents";
+import {
+  StyledTableCell,
+  StyledMarkdown,
+} from "/src/components/shared/actors/pc/variants/compact/spells/StyledSpellComponents";
 
 export default function SpellDefault({
   spellName,

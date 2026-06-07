@@ -12,7 +12,10 @@ export function useAddChatMessage(): (message: ChatMessage) => void {
   return (message: ChatMessage) => {
     const hydrated = hydrateTargets(message);
     if (encounterId) {
-      addEncounter({ ...hydrated, channelId: `encounter:${encounterId}` } as ChatMessage);
+      addEncounter({
+        ...hydrated,
+        channelId: `encounter:${encounterId}`,
+      } as ChatMessage);
     } else {
       const channelId = useChatChannelStore.getState().activeChannelId;
       addGlobal({ ...hydrated, channelId } as ChatMessage);

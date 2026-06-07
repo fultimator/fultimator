@@ -212,7 +212,13 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
             variant="outlined"
             size="small"
             fullWidth
-            onClick={() => onLossResource(message, message.cost!.resource, message.cost!.amount)}
+            onClick={() =>
+              onLossResource(
+                message,
+                message.cost!.resource,
+                message.cost!.amount,
+              )
+            }
             sx={{ textTransform: "none", fontWeight: 600 }}
           >
             Spend {message.cost.amount} {message.cost.resource.toUpperCase()}

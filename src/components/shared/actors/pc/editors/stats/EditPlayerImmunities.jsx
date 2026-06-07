@@ -60,41 +60,41 @@ export default function EditPlayerImmunities({
   return (
     <SectionCard title={t("Status Effect Immunities")}>
       <Box sx={{ p: 2 }}>
-      <Grid container spacing={1}>
-        {Object.keys(statusDescriptions).map((status) => (
-          <Grid
-            key={status}
-            size={{
-              xs: 12,
-              md: 6,
-            }}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={!!player.immunities[status]}
-                  onChange={() => handleStatusChange(status)}
-                  disabled={!isEditMode}
-                />
-              }
-              label={t(status.charAt(0).toUpperCase() + status.slice(1))}
-              sx={{ marginRight: 2 }}
-            />
-            <Typography
-              variant="body2"
-              component="span"
-              sx={{ fontSize: "0.8em" }}
+        <Grid container spacing={1}>
+          {Object.keys(statusDescriptions).map((status) => (
+            <Grid
+              key={status}
+              size={{
+                xs: 12,
+                md: 6,
+              }}
             >
-              <ReactMarkdown
-                allowedElements={["strong"]}
-                unwrapDisallowed={true}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={!!player.immunities[status]}
+                    onChange={() => handleStatusChange(status)}
+                    disabled={!isEditMode}
+                  />
+                }
+                label={t(status.charAt(0).toUpperCase() + status.slice(1))}
+                sx={{ marginRight: 2 }}
+              />
+              <Typography
+                variant="body2"
+                component="span"
+                sx={{ fontSize: "0.8em" }}
               >
-                {t(statusDescriptions[status])}
-              </ReactMarkdown>
-            </Typography>
-          </Grid>
-        ))}
-      </Grid>
+                <ReactMarkdown
+                  allowedElements={["strong"]}
+                  unwrapDisallowed={true}
+                >
+                  {t(statusDescriptions[status])}
+                </ReactMarkdown>
+              </Typography>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
     </SectionCard>
   );

@@ -475,12 +475,14 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
       ...createDefaultStateFromFields(playerSpellFieldConfig),
       ...(editData ?? {}),
       spellType:
-        editData?.spellType === "magichant" && editData?.magichantSubtype === "key"
+        editData?.spellType === "magichant" &&
+        editData?.magichantSubtype === "key"
           ? "magichant-key"
           : (editData?.spellType ?? "default"),
       "cost.amount": editData?.cost?.amount ?? 0,
       "cost.perTarget": editData?.cost?.perTarget ?? true,
-      "accuracy.attr1": editData?.accuracy?.attr1 ?? editData?.attr1 ?? "insight",
+      "accuracy.attr1":
+        editData?.accuracy?.attr1 ?? editData?.attr1 ?? "insight",
       "accuracy.attr2": editData?.accuracy?.attr2 ?? editData?.attr2 ?? "will",
       "accuracy.value": editData?.accuracy?.value ?? 0,
       "accuracy.defense": editData?.accuracy?.defense ?? "mdef",
@@ -492,30 +494,63 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
   const [saving, setSaving] = useState(false);
   const isEditing = Boolean(editItemId);
 
-  const [pilotSubtype, setPilotSubtype] = useState(editData?.pilotSubtype ?? "frame");
-  const [vehicleFrame, setVehicleFrame] = useState(editData?.frame ?? availableFrames[0]?.name ?? "");
-  const [moduleDef, setModuleDef] = useState(editData?.def != null ? String(editData.def) : "");
-  const [moduleMdef, setModuleMdef] = useState(editData?.mdef != null ? String(editData.mdef) : "");
-  const [moduleMartial, setModuleMartial] = useState(Boolean(editData?.martial));
-  const [moduleDamage, setModuleDamage] = useState(editData?.damage?.value != null ? String(editData.damage.value) : "");
+  const [pilotSubtype, setPilotSubtype] = useState(
+    editData?.pilotSubtype ?? "frame",
+  );
+  const [vehicleFrame, setVehicleFrame] = useState(
+    editData?.frame ?? availableFrames[0]?.name ?? "",
+  );
+  const [moduleDef, setModuleDef] = useState(
+    editData?.def != null ? String(editData.def) : "",
+  );
+  const [moduleMdef, setModuleMdef] = useState(
+    editData?.mdef != null ? String(editData.mdef) : "",
+  );
+  const [moduleMartial, setModuleMartial] = useState(
+    Boolean(editData?.martial),
+  );
+  const [moduleDamage, setModuleDamage] = useState(
+    editData?.damage?.value != null ? String(editData.damage.value) : "",
+  );
   const [moduleRange, setModuleRange] = useState(editData?.range ?? "Melee");
   const [modulePrec, setModulePrec] = useState(
-    editData?.accuracy?.value != null ? String(editData.accuracy.value) : editData?.prec != null ? String(editData.prec) : "0",
+    editData?.accuracy?.value != null
+      ? String(editData.accuracy.value)
+      : editData?.prec != null
+        ? String(editData.prec)
+        : "0",
   );
-  const [moduleCost, setModuleCost] = useState(editData?.cost != null ? String(editData.cost) : "0");
-  const [moduleDescription, setModuleDescription] = useState(editData?.description ?? "");
-  const [weaponCategory, setWeaponCategory] = useState(editData?.category ?? "Heavy");
+  const [moduleCost, setModuleCost] = useState(
+    editData?.cost != null ? String(editData.cost) : "0",
+  );
+  const [moduleDescription, setModuleDescription] = useState(
+    editData?.description ?? "",
+  );
+  const [weaponCategory, setWeaponCategory] = useState(
+    editData?.category ?? "Heavy",
+  );
   const [damageType, setDamageType] = useState(
     editData?.damage?.type
-      ? String(editData.damage.type).replace(/^./, String(editData.damage.type).charAt(0).toUpperCase())
+      ? String(editData.damage.type).replace(
+          /^./,
+          String(editData.damage.type).charAt(0).toUpperCase(),
+        )
       : (editData?.damageType ?? "Physical"),
   );
-  const [pilotAtt1, setPilotAtt1] = useState(editData?.accuracy?.attr1 ?? editData?.att1 ?? "might");
-  const [pilotAtt2, setPilotAtt2] = useState(editData?.accuracy?.attr2 ?? editData?.att2 ?? "dexterity");
+  const [pilotAtt1, setPilotAtt1] = useState(
+    editData?.accuracy?.attr1 ?? editData?.att1 ?? "might",
+  );
+  const [pilotAtt2, setPilotAtt2] = useState(
+    editData?.accuracy?.attr2 ?? editData?.att2 ?? "dexterity",
+  );
   const [pilotQuality, setPilotQuality] = useState(editData?.quality ?? "");
-  const [pilotQualityCost, setPilotQualityCost] = useState(editData?.qualityCost != null ? String(editData.qualityCost) : "0");
+  const [pilotQualityCost, setPilotQualityCost] = useState(
+    editData?.qualityCost != null ? String(editData.qualityCost) : "0",
+  );
   const [isShield, setIsShield] = useState(Boolean(editData?.isShield));
-  const [moduleCumbersome, setModuleCumbersome] = useState(Boolean(editData?.cumbersome));
+  const [moduleCumbersome, setModuleCumbersome] = useState(
+    Boolean(editData?.cumbersome),
+  );
 
   useEffect(() => {
     setFormState(buildState());
@@ -524,7 +559,9 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     setModuleDef(editData?.def != null ? String(editData.def) : "");
     setModuleMdef(editData?.mdef != null ? String(editData.mdef) : "");
     setModuleMartial(Boolean(editData?.martial));
-    setModuleDamage(editData?.damage?.value != null ? String(editData.damage.value) : "");
+    setModuleDamage(
+      editData?.damage?.value != null ? String(editData.damage.value) : "",
+    );
     setModuleRange(editData?.range ?? "Melee");
     setModulePrec(
       editData?.accuracy?.value != null
@@ -538,13 +575,18 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
     setWeaponCategory(editData?.category ?? "Heavy");
     setDamageType(
       editData?.damage?.type
-        ? String(editData.damage.type).replace(/^./, String(editData.damage.type).charAt(0).toUpperCase())
+        ? String(editData.damage.type).replace(
+            /^./,
+            String(editData.damage.type).charAt(0).toUpperCase(),
+          )
         : (editData?.damageType ?? "Physical"),
     );
     setPilotAtt1(editData?.accuracy?.attr1 ?? editData?.att1 ?? "might");
     setPilotAtt2(editData?.accuracy?.attr2 ?? editData?.att2 ?? "dexterity");
     setPilotQuality(editData?.quality ?? "");
-    setPilotQualityCost(editData?.qualityCost != null ? String(editData.qualityCost) : "0");
+    setPilotQualityCost(
+      editData?.qualityCost != null ? String(editData.qualityCost) : "0",
+    );
     setIsShield(Boolean(editData?.isShield));
     setModuleCumbersome(Boolean(editData?.cumbersome));
   }, [buildState, editData]);
@@ -624,14 +666,19 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
         };
       }
     } else {
-      const spellTypeSaved = spellType === "magichant-key" ? "magichant" : spellType;
+      const spellTypeSaved =
+        spellType === "magichant-key" ? "magichant" : spellType;
       payload = {
         ...formState,
         name,
         fuid: slugify(name),
         spellType: spellTypeSaved,
         magichantSubtype:
-          spellType === "magichant-key" ? "key" : spellType === "magichant" ? "tone" : undefined,
+          spellType === "magichant-key"
+            ? "key"
+            : spellType === "magichant"
+              ? "tone"
+              : undefined,
         cost: {
           resource: "mp",
           amount: Number(formState["cost.amount"]) || 0,
@@ -737,7 +784,8 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                   >
                     {availableFrames.map((f) => (
                       <MenuItem key={f.name} value={f.name}>
-                        {t(f.name)} - {t("Passengers")}: {f.passengers} · {t("Distance")}: {f.distance}
+                        {t(f.name)} - {t("Passengers")}: {f.passengers} ·{" "}
+                        {t("Distance")}: {f.distance}
                       </MenuItem>
                     ))}
                   </Select>
@@ -760,18 +808,43 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
             {pilotSubtype === "armor" && (
               <>
                 <Grid size={4}>
-                  <TextField label="DEF" value={moduleDef} type="number" fullWidth size="small" onChange={(e) => setModuleDef(e.target.value)} />
+                  <TextField
+                    label="DEF"
+                    value={moduleDef}
+                    type="number"
+                    fullWidth
+                    size="small"
+                    onChange={(e) => setModuleDef(e.target.value)}
+                  />
                 </Grid>
                 <Grid size={4}>
-                  <TextField label="MDEF" value={moduleMdef} type="number" fullWidth size="small" onChange={(e) => setModuleMdef(e.target.value)} />
+                  <TextField
+                    label="MDEF"
+                    value={moduleMdef}
+                    type="number"
+                    fullWidth
+                    size="small"
+                    onChange={(e) => setModuleMdef(e.target.value)}
+                  />
                 </Grid>
                 <Grid sx={{ display: "flex", alignItems: "center" }} size={4}>
-                  <ToggleButton value="martial" selected={moduleMartial} onChange={() => setModuleMartial((v) => !v)} size="small" sx={{ width: "100%" }}>
+                  <ToggleButton
+                    value="martial"
+                    selected={moduleMartial}
+                    onChange={() => setModuleMartial((v) => !v)}
+                    size="small"
+                    sx={{ width: "100%" }}
+                  >
                     {t("Martial")}
                   </ToggleButton>
                 </Grid>
                 <Grid size={12}>
-                  <CustomTextarea label={t("Description (optional)")} value={moduleDescription} onChange={(e) => setModuleDescription(e.target.value)} helperText="" />
+                  <CustomTextarea
+                    label={t("Description (optional)")}
+                    value={moduleDescription}
+                    onChange={(e) => setModuleDescription(e.target.value)}
+                    helperText=""
+                  />
                 </Grid>
               </>
             )}
@@ -780,62 +853,140 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
                 <Grid size={{ xs: 6, sm: 4 }}>
                   <FormControl fullWidth size="small">
                     <InputLabel>{t("Category")}</InputLabel>
-                    <Select value={weaponCategory} label={t("Category")} onChange={(e) => setWeaponCategory(e.target.value)}>
-                      {PILOT_WEAPON_CATEGORIES.map((c) => (<MenuItem key={c} value={c}>{c}</MenuItem>))}
+                    <Select
+                      value={weaponCategory}
+                      label={t("Category")}
+                      onChange={(e) => setWeaponCategory(e.target.value)}
+                    >
+                      {PILOT_WEAPON_CATEGORIES.map((c) => (
+                        <MenuItem key={c} value={c}>
+                          {c}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 4 }}>
                   <FormControl fullWidth size="small">
                     <InputLabel>{t("Damage Type")}</InputLabel>
-                    <Select value={damageType} label={t("Damage Type")} onChange={(e) => setDamageType(e.target.value)}>
-                      {PILOT_DAMAGE_TYPES.map((d) => (<MenuItem key={d} value={d}>{d}</MenuItem>))}
+                    <Select
+                      value={damageType}
+                      label={t("Damage Type")}
+                      onChange={(e) => setDamageType(e.target.value)}
+                    >
+                      {PILOT_DAMAGE_TYPES.map((d) => (
+                        <MenuItem key={d} value={d}>
+                          {d}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 4 }}>
                   <FormControl fullWidth size="small">
                     <InputLabel>{t("Range")}</InputLabel>
-                    <Select value={moduleRange || "Melee"} label={t("Range")} onChange={(e) => setModuleRange(e.target.value)}>
-                      {PILOT_RANGES.map((r) => (<MenuItem key={r} value={r}>{r}</MenuItem>))}
+                    <Select
+                      value={moduleRange || "Melee"}
+                      label={t("Range")}
+                      onChange={(e) => setModuleRange(e.target.value)}
+                    >
+                      {PILOT_RANGES.map((r) => (
+                        <MenuItem key={r} value={r}>
+                          {r}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
                   <FormControl fullWidth size="small">
                     <InputLabel>{t("Att 1")}</InputLabel>
-                    <Select value={pilotAtt1} label={t("Att 1")} onChange={(e) => setPilotAtt1(e.target.value)}>
-                      {PILOT_ATTRS.map((a) => (<MenuItem key={a} value={a}>{t(a)}</MenuItem>))}
+                    <Select
+                      value={pilotAtt1}
+                      label={t("Att 1")}
+                      onChange={(e) => setPilotAtt1(e.target.value)}
+                    >
+                      {PILOT_ATTRS.map((a) => (
+                        <MenuItem key={a} value={a}>
+                          {t(a)}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 6, sm: 3 }}>
                   <FormControl fullWidth size="small">
                     <InputLabel>{t("Att 2")}</InputLabel>
-                    <Select value={pilotAtt2} label={t("Att 2")} onChange={(e) => setPilotAtt2(e.target.value)}>
-                      {PILOT_ATTRS.map((a) => (<MenuItem key={a} value={a}>{t(a)}</MenuItem>))}
+                    <Select
+                      value={pilotAtt2}
+                      label={t("Att 2")}
+                      onChange={(e) => setPilotAtt2(e.target.value)}
+                    >
+                      {PILOT_ATTRS.map((a) => (
+                        <MenuItem key={a} value={a}>
+                          {t(a)}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 4, sm: 2 }}>
-                  <TextField label="HR+" value={moduleDamage} type="number" fullWidth size="small" onChange={(e) => setModuleDamage(e.target.value)} />
+                  <TextField
+                    label="HR+"
+                    value={moduleDamage}
+                    type="number"
+                    fullWidth
+                    size="small"
+                    onChange={(e) => setModuleDamage(e.target.value)}
+                  />
                 </Grid>
                 <Grid size={{ xs: 4, sm: 2 }}>
-                  <TextField label={t("+Acc")} value={modulePrec} type="number" fullWidth size="small" onChange={(e) => setModulePrec(e.target.value)} />
+                  <TextField
+                    label={t("+Acc")}
+                    value={modulePrec}
+                    type="number"
+                    fullWidth
+                    size="small"
+                    onChange={(e) => setModulePrec(e.target.value)}
+                  />
                 </Grid>
                 <Grid size={{ xs: 4, sm: 2 }}>
-                  <TextField label={t("Quality Cost")} value={pilotQualityCost} type="number" fullWidth size="small" onChange={(e) => setPilotQualityCost(e.target.value)} />
+                  <TextField
+                    label={t("Quality Cost")}
+                    value={pilotQualityCost}
+                    type="number"
+                    fullWidth
+                    size="small"
+                    onChange={(e) => setPilotQualityCost(e.target.value)}
+                  />
                 </Grid>
                 <Grid size={12}>
-                  <CustomTextarea label={t("Quality")} value={pilotQuality} onChange={(e) => setPilotQuality(e.target.value)} helperText="" />
+                  <CustomTextarea
+                    label={t("Quality")}
+                    value={pilotQuality}
+                    onChange={(e) => setPilotQuality(e.target.value)}
+                    helperText=""
+                  />
                 </Grid>
                 <Grid sx={{ display: "flex", alignItems: "center" }} size={6}>
-                  <ToggleButton value="cumbersome" selected={moduleCumbersome} onChange={() => setModuleCumbersome((v) => !v)} size="small" sx={{ width: "100%" }}>
+                  <ToggleButton
+                    value="cumbersome"
+                    selected={moduleCumbersome}
+                    onChange={() => setModuleCumbersome((v) => !v)}
+                    size="small"
+                    sx={{ width: "100%" }}
+                  >
                     {t("Cumbersome")}
                   </ToggleButton>
                 </Grid>
                 <Grid sx={{ display: "flex", alignItems: "center" }} size={6}>
-                  <ToggleButton value="isShield" selected={isShield} onChange={() => setIsShield((v) => !v)} size="small" sx={{ width: "100%" }}>
+                  <ToggleButton
+                    value="isShield"
+                    selected={isShield}
+                    onChange={() => setIsShield((v) => !v)}
+                    size="small"
+                    sx={{ width: "100%" }}
+                  >
                     {t("Shield")}
                   </ToggleButton>
                 </Grid>
@@ -843,12 +994,22 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
             )}
             {pilotSubtype === "support" && (
               <Grid size={12}>
-                <CustomTextarea label={t("Description")} value={moduleDescription} onChange={(e) => setModuleDescription(e.target.value)} helperText="" />
+                <CustomTextarea
+                  label={t("Description")}
+                  value={moduleDescription}
+                  onChange={(e) => setModuleDescription(e.target.value)}
+                  helperText=""
+                />
               </Grid>
             )}
             {pilotSubtype === "frame" && (
               <Grid size={12}>
-                <CustomTextarea label={t("Description")} value={moduleDescription} onChange={(e) => setModuleDescription(e.target.value)} helperText="" />
+                <CustomTextarea
+                  label={t("Description")}
+                  value={moduleDescription}
+                  onChange={(e) => setModuleDescription(e.target.value)}
+                  helperText=""
+                />
               </Grid>
             )}
           </Grid>
@@ -1167,7 +1328,13 @@ export function ClassForm({
   const isEditing = Boolean(editItemId);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth slotProps={{ paper: { sx: { minHeight: "500px" } } }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      slotProps={{ paper: { sx: { minHeight: "500px" } } }}
+    >
       <DialogTitle
         sx={{
           background: customTheme.primary,
@@ -1563,8 +1730,14 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
       subtype: editData?.subtype ?? "quirk",
       showClock: Boolean(editData?.clock),
       clockSections: editData?.clock?.sections ?? 6,
-      target: editData?.subtype === "camp-activities" ? (editData?.description ?? "") : "",
-      description: editData?.subtype === "camp-activities" ? "" : (editData?.description ?? ""),
+      target:
+        editData?.subtype === "camp-activities"
+          ? (editData?.description ?? "")
+          : "",
+      description:
+        editData?.subtype === "camp-activities"
+          ? ""
+          : (editData?.description ?? ""),
     }),
     [editData],
   );
@@ -1619,14 +1792,16 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
         ? editData.zeroEffect
         : (editData.zeroEffect?.name ?? "");
     setZeroTrigger(
-      zeroTriggerOptions.find((o) => o._sourceRef === editData.zeroTriggerRef) ??
-      zeroTriggerOptions.find((o) => o.name === triggerName) ??
-      null,
+      zeroTriggerOptions.find(
+        (o) => o._sourceRef === editData.zeroTriggerRef,
+      ) ??
+        zeroTriggerOptions.find((o) => o.name === triggerName) ??
+        null,
     );
     setZeroEffect(
       zeroEffectOptions.find((o) => o._sourceRef === editData.zeroEffectRef) ??
-      zeroEffectOptions.find((o) => o.name === effectName) ??
-      null,
+        zeroEffectOptions.find((o) => o.name === effectName) ??
+        null,
     );
   }, [editData, zeroTriggerOptions, zeroEffectOptions]);
 
@@ -1634,13 +1809,23 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
 
   const buildPayload = () => {
     const name = String(formState.name ?? "").trim();
-    const base = { subtype, name, fuid: formState.fuid || undefined, meta: editData?.meta ?? createMetaFromBook("homebrew") };
+    const base = {
+      subtype,
+      name,
+      fuid: formState.fuid || undefined,
+      meta: editData?.meta ?? createMetaFromBook("homebrew"),
+    };
     if (subtype === "zero-power")
       return {
         ...base,
         zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
         zeroEffectRef: zeroEffect?._sourceRef ?? "",
-        zeroTrigger: zeroTrigger ? { name: zeroTrigger.name ?? "", description: zeroTrigger.description ?? "" } : "",
+        zeroTrigger: zeroTrigger
+          ? {
+              name: zeroTrigger.name ?? "",
+              description: zeroTrigger.description ?? "",
+            }
+          : "",
         zeroEffect: zeroEffect
           ? {
               name: zeroEffect.name ?? "",
@@ -1651,9 +1836,10 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
       };
     const description = String(formState.description ?? "").trim();
     const effect = String(formState.effect ?? "").trim();
-    const clock = formState.showClock && formState.clockSections
-      ? { clock: { sections: Number(formState.clockSections) } }
-      : {};
+    const clock =
+      formState.showClock && formState.clockSections
+        ? { clock: { sections: Number(formState.clockSections) } }
+        : {};
     return {
       ...base,
       ...(description ? { description } : {}),
@@ -1732,7 +1918,9 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                 isOptionEqualToValue={(a, b) =>
                   Boolean(
                     b &&
-                    ((a._sourceRef && b._sourceRef && a._sourceRef === b._sourceRef) ||
+                    ((a._sourceRef &&
+                      b._sourceRef &&
+                      a._sourceRef === b._sourceRef) ||
                       a.name === b.name),
                   )
                 }
@@ -1760,7 +1948,9 @@ function OptionalForm({ packId, onClose, editData, editItemId }) {
                 isOptionEqualToValue={(a, b) =>
                   Boolean(
                     b &&
-                    ((a._sourceRef && b._sourceRef && a._sourceRef === b._sourceRef) ||
+                    ((a._sourceRef &&
+                      b._sourceRef &&
+                      a._sourceRef === b._sourceRef) ||
                       a.name === b.name),
                   )
                 }
@@ -2151,7 +2341,13 @@ export default function CompendiumItemCreateDialog({
 
   // Remaining types use a simple Dialog
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { minHeight: "500px" } } }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      slotProps={{ paper: { sx: { minHeight: "500px" } } }}
+    >
       {itemType === "npc-attack" && (
         <NpcAttackForm
           packId={packId}

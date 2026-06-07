@@ -112,7 +112,11 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
       actions={
         isEditMode && (
           <Tooltip title={t("Add Bond")}>
-            <IconButton size="small" onClick={addNewBond} sx={{ color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={addNewBond}
+              sx={{ color: "#fff" }}
+            >
               <Add fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -120,160 +124,160 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
       }
     >
       <Box sx={{ p: "15px" }}>
-      <Grid container spacing={2}>
-        {player.info.bonds.map((bond, index) => (
-          <Grid key={index} size={12}>
-            <Grid container spacing={2} sx={{ alignItems: "center" }}>
-              <Grid
-                size={{
-                  xs: 12,
-                  md: 4,
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
+        <Grid container spacing={2}>
+          {player.info.bonds.map((bond, index) => (
+            <Grid key={index} size={12}>
+              <Grid container spacing={2} sx={{ alignItems: "center" }}>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 4,
                   }}
                 >
-                  {isEditMode ? (
-                    <IconButton
-                      aria-label="delete"
-                      onClick={() => openDeleteDialog(index)}
-                      sx={{ ml: 1 }}
-                    >
-                      <RemoveCircleOutlined />
-                    </IconButton>
-                  ) : null}
-                  <TextField
-                    fullWidth
-                    label={t("Bond Name")}
-                    value={bond.name}
-                    onChange={handleBondNameChange(index)}
-                    slotProps={{
-                      input: {
-                        readOnly: !isEditMode,
-                      },
-
-                      htmlInput: { maxLength: 50 },
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
                     }}
-                  />
-                </Box>
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  md: 8,
-                }}
-              >
-                <Grid container spacing={1}>
-                  <Grid size={4}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={bond.admiration}
-                          onChange={handleBondChange(index, "admiration")}
-                          disabled={!isEditMode}
-                        />
-                      }
-                      label={
-                        <Typography sx={{ fontSize: "14px" }}>
-                          {t("Admiration")}
-                        </Typography>
-                      }
+                  >
+                    {isEditMode ? (
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => openDeleteDialog(index)}
+                        sx={{ ml: 1 }}
+                      >
+                        <RemoveCircleOutlined />
+                      </IconButton>
+                    ) : null}
+                    <TextField
+                      fullWidth
+                      label={t("Bond Name")}
+                      value={bond.name}
+                      onChange={handleBondNameChange(index)}
+                      slotProps={{
+                        input: {
+                          readOnly: !isEditMode,
+                        },
+
+                        htmlInput: { maxLength: 50 },
+                      }}
                     />
-                  </Grid>
-                  <Grid size={4}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={bond.loyality}
-                          onChange={handleBondChange(index, "loyality")}
-                          disabled={!isEditMode}
-                        />
-                      }
-                      label={
-                        <Typography sx={{ fontSize: "14px" }}>
-                          {t("Loyality")}
-                        </Typography>
-                      }
-                    />
-                  </Grid>
-                  <Grid size={4}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={bond.affection}
-                          onChange={handleBondChange(index, "affection")}
-                          disabled={!isEditMode}
-                        />
-                      }
-                      label={
-                        <Typography sx={{ fontSize: "14px" }}>
-                          {t("Affection")}
-                        </Typography>
-                      }
-                    />
-                  </Grid>
-                  <Grid size={4}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={bond.inferiority}
-                          onChange={handleBondChange(index, "inferiority")}
-                          disabled={!isEditMode}
-                        />
-                      }
-                      label={
-                        <Typography sx={{ fontSize: "14px" }}>
-                          {t("Inferiority")}
-                        </Typography>
-                      }
-                    />
-                  </Grid>
-                  <Grid size={4}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={bond.mistrust}
-                          onChange={handleBondChange(index, "mistrust")}
-                          disabled={!isEditMode}
-                        />
-                      }
-                      label={
-                        <Typography sx={{ fontSize: "14px" }}>
-                          {t("Mistrust")}
-                        </Typography>
-                      }
-                    />
-                  </Grid>
-                  <Grid size={4}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={bond.hatred}
-                          onChange={handleBondChange(index, "hatred")}
-                          disabled={!isEditMode}
-                        />
-                      }
-                      label={
-                        <Typography sx={{ fontSize: "14px" }}>
-                          {t("Hatred")}
-                        </Typography>
-                      }
-                    />
+                  </Box>
+                </Grid>
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 8,
+                  }}
+                >
+                  <Grid container spacing={1}>
+                    <Grid size={4}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={bond.admiration}
+                            onChange={handleBondChange(index, "admiration")}
+                            disabled={!isEditMode}
+                          />
+                        }
+                        label={
+                          <Typography sx={{ fontSize: "14px" }}>
+                            {t("Admiration")}
+                          </Typography>
+                        }
+                      />
+                    </Grid>
+                    <Grid size={4}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={bond.loyality}
+                            onChange={handleBondChange(index, "loyality")}
+                            disabled={!isEditMode}
+                          />
+                        }
+                        label={
+                          <Typography sx={{ fontSize: "14px" }}>
+                            {t("Loyality")}
+                          </Typography>
+                        }
+                      />
+                    </Grid>
+                    <Grid size={4}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={bond.affection}
+                            onChange={handleBondChange(index, "affection")}
+                            disabled={!isEditMode}
+                          />
+                        }
+                        label={
+                          <Typography sx={{ fontSize: "14px" }}>
+                            {t("Affection")}
+                          </Typography>
+                        }
+                      />
+                    </Grid>
+                    <Grid size={4}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={bond.inferiority}
+                            onChange={handleBondChange(index, "inferiority")}
+                            disabled={!isEditMode}
+                          />
+                        }
+                        label={
+                          <Typography sx={{ fontSize: "14px" }}>
+                            {t("Inferiority")}
+                          </Typography>
+                        }
+                      />
+                    </Grid>
+                    <Grid size={4}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={bond.mistrust}
+                            onChange={handleBondChange(index, "mistrust")}
+                            disabled={!isEditMode}
+                          />
+                        }
+                        label={
+                          <Typography sx={{ fontSize: "14px" }}>
+                            {t("Mistrust")}
+                          </Typography>
+                        }
+                      />
+                    </Grid>
+                    <Grid size={4}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={bond.hatred}
+                            onChange={handleBondChange(index, "hatred")}
+                            disabled={!isEditMode}
+                          />
+                        }
+                        label={
+                          <Typography sx={{ fontSize: "14px" }}>
+                            {t("Hatred")}
+                          </Typography>
+                        }
+                      />
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
+              {index < player.info.bonds.length - 1 && (
+                <Grid size={12}>
+                  <Divider />
+                </Grid>
+              )}
             </Grid>
-            {index < player.info.bonds.length - 1 && (
-              <Grid size={12}>
-                <Divider />
-              </Grid>
-            )}
-          </Grid>
-        ))}
-      </Grid>
+          ))}
+        </Grid>
       </Box>
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}

@@ -11,7 +11,12 @@ import {
   IconButton,
   Collapse,
 } from "@mui/material";
-import { Delete, ContentCopy, ExpandMore, ExpandLess } from "@mui/icons-material";
+import {
+  Delete,
+  ContentCopy,
+  ExpandMore,
+  ExpandLess,
+} from "@mui/icons-material";
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import { availableGifts } from "/src/libs/player/spellOptionData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
@@ -28,8 +33,11 @@ export default function GiftItem({
   t,
 }) {
   const [expanded, setExpanded] = useState(false);
-  const { isOpen: deleteDialogOpen, openDialog: openDeleteDialog, closeDialog: closeDeleteDialog } =
-    useDeleteConfirmation({ onConfirm: () => {} });
+  const {
+    isOpen: deleteDialogOpen,
+    openDialog: openDeleteDialog,
+    closeDialog: closeDeleteDialog,
+  } = useDeleteConfirmation({ onConfirm: () => {} });
 
   const isCustom = item.key === "esper_gift_custom_name";
 
@@ -55,7 +63,8 @@ export default function GiftItem({
     });
   };
 
-  const itemDisplayName = item.customName || t(item.key || "esper_gift_custom_name");
+  const itemDisplayName =
+    item.customName || t(item.key || "esper_gift_custom_name");
 
   const eventText = isCustom
     ? item.event || ""
@@ -75,13 +84,28 @@ export default function GiftItem({
         onClick={() => setExpanded((prev) => !prev)}
         actions={
           <>
-            <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCloneToCustom();
+              }}
+            >
               <ContentCopy />
             </IconButton>
-            <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                openDeleteDialog();
+              }}
+            >
               <Delete />
             </IconButton>
-            <IconButton onClick={(e) => { e.stopPropagation(); setExpanded((prev) => !prev); }}>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded((prev) => !prev);
+              }}
+            >
               {expanded ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
           </>

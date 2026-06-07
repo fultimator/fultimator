@@ -55,21 +55,33 @@ export default function PlayerRituals({
     return v;
   };
 
-  const hasRitualism = (player?.classes ?? []).some((c) => c?.benefits?.rituals?.ritualism);
+  const hasRitualism = (player?.classes ?? []).some(
+    (c) => c?.benefits?.rituals?.ritualism,
+  );
   const hasSpiritism = (player?.classes ?? []).some((c) =>
-    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Spiritism"),
+    (c?.skills ?? []).some(
+      (s) => s.currentLvl > 0 && s.specialSkill === "Ritual Spiritism",
+    ),
   );
   const hasArcanism = (player?.classes ?? []).some((c) =>
-    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Arcanism"),
+    (c?.skills ?? []).some(
+      (s) => s.currentLvl > 0 && s.specialSkill === "Ritual Arcanism",
+    ),
   );
   const hasElementalism = (player?.classes ?? []).some((c) =>
-    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Elementalism"),
+    (c?.skills ?? []).some(
+      (s) => s.currentLvl > 0 && s.specialSkill === "Ritual Elementalism",
+    ),
   );
   const hasEntropism = (player?.classes ?? []).some((c) =>
-    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Entropism"),
+    (c?.skills ?? []).some(
+      (s) => s.currentLvl > 0 && s.specialSkill === "Ritual Entropism",
+    ),
   );
   const hasChimerism = (player?.classes ?? []).some((c) =>
-    (c?.skills ?? []).some((s) => s.currentLvl > 0 && s.specialSkill === "Ritual Chimerism"),
+    (c?.skills ?? []).some(
+      (s) => s.currentLvl > 0 && s.specialSkill === "Ritual Chimerism",
+    ),
   );
 
   const ritualTypes = [
@@ -84,7 +96,10 @@ export default function PlayerRituals({
   const hasAny = ritualTypes.some((r) => r.checked);
 
   const resetClock = () => setClockState(new Array(clockSections).fill(false));
-  const setNewClock = () => { setClockSections(calcClock()); resetClock(); };
+  const setNewClock = () => {
+    setClockSections(calcClock());
+    resetClock();
+  };
   const incrementClock = () => {
     const filled = clockState.filter(Boolean).length;
     if (filled < clockSections) {
@@ -105,7 +120,14 @@ export default function PlayerRituals({
   if (!hasAny) {
     if (compact) {
       return (
-        <Typography sx={{ fontStyle: "italic", color: "text.secondary", fontSize: "0.9rem", py: 1 }}>
+        <Typography
+          sx={{
+            fontStyle: "italic",
+            color: "text.secondary",
+            fontSize: "0.9rem",
+            py: 1,
+          }}
+        >
           {t("No rituals")}
         </Typography>
       );
@@ -139,15 +161,30 @@ export default function PlayerRituals({
           <Grid container spacing={1}>
             {/* Potency */}
             <Grid size={6}>
-              <Typography variant="caption" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "text.secondary",
+                }}
+              >
                 {t("Potency")}
               </Typography>
-              <RadioGroup value={power} onChange={(e) => setPower(e.target.value)} sx={{ mt: 0.25 }}>
+              <RadioGroup
+                value={power}
+                onChange={(e) => setPower(e.target.value)}
+                sx={{ mt: 0.25 }}
+              >
                 {["minor", "medium", "major", "extreme"].map((val) => (
                   <FormControlLabel
                     key={val}
                     value={val}
-                    sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+                    sx={{
+                      m: 0,
+                      "& .MuiFormControlLabel-label": { fontSize: "1rem" },
+                    }}
                     control={<Radio size="small" sx={{ p: "3px" }} />}
                     label={t(val.charAt(0).toUpperCase() + val.slice(1))}
                   />
@@ -156,15 +193,30 @@ export default function PlayerRituals({
             </Grid>
             {/* Area */}
             <Grid size={6}>
-              <Typography variant="caption" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "text.secondary",
+                }}
+              >
                 {t("Area")}
               </Typography>
-              <RadioGroup value={area} onChange={(e) => setArea(e.target.value)} sx={{ mt: 0.25 }}>
+              <RadioGroup
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                sx={{ mt: 0.25 }}
+              >
                 {["individual", "small", "large", "huge"].map((val) => (
                   <FormControlLabel
                     key={val}
                     value={val}
-                    sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
+                    sx={{
+                      m: 0,
+                      "& .MuiFormControlLabel-label": { fontSize: "1rem" },
+                    }}
                     control={<Radio size="small" sx={{ p: "3px" }} />}
                     label={t(val.charAt(0).toUpperCase() + val.slice(1))}
                   />
@@ -173,23 +225,57 @@ export default function PlayerRituals({
             </Grid>
             {/* Reductions */}
             <Grid size={12}>
-              <Typography variant="caption" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "text.secondary",
+                }}
+              >
                 {t("Reductions")}
               </Typography>
               <Stack sx={{ mt: 0.25 }}>
                 <FormControlLabel
-                  sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
-                  control={<Checkbox checked={ingredient} size="small" sx={{ p: "3px" }} onChange={(e) => setIngredient(e.target.checked)} />}
+                  sx={{
+                    m: 0,
+                    "& .MuiFormControlLabel-label": { fontSize: "1rem" },
+                  }}
+                  control={
+                    <Checkbox
+                      checked={ingredient}
+                      size="small"
+                      sx={{ p: "3px" }}
+                      onChange={(e) => setIngredient(e.target.checked)}
+                    />
+                  }
                   label={t("Using special ingredient")}
                 />
                 <FormControlLabel
-                  sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
-                  control={<Checkbox checked={itemHeld} size="small" sx={{ p: "3px" }} onChange={(e) => setItemHeld(e.target.checked)} />}
+                  sx={{
+                    m: 0,
+                    "& .MuiFormControlLabel-label": { fontSize: "1rem" },
+                  }}
+                  control={
+                    <Checkbox
+                      checked={itemHeld}
+                      size="small"
+                      sx={{ p: "3px" }}
+                      onChange={(e) => setItemHeld(e.target.checked)}
+                    />
+                  }
                   label={t("Relevant item held")}
                 />
                 {itemHeld && (
-                  <FormControl variant="standard" sx={{ maxWidth: 120, ml: 3.5, mt: 0.5 }}>
-                    <InputLabel htmlFor="dlReduction" sx={{ fontSize: "0.85rem" }}>
+                  <FormControl
+                    variant="standard"
+                    sx={{ maxWidth: 120, ml: 3.5, mt: 0.5 }}
+                  >
+                    <InputLabel
+                      htmlFor="dlReduction"
+                      sx={{ fontSize: "0.85rem" }}
+                    >
                       {t("DL Reduction")}
                     </InputLabel>
                     <Input
@@ -202,8 +288,18 @@ export default function PlayerRituals({
                   </FormControl>
                 )}
                 <FormControlLabel
-                  sx={{ m: 0, "& .MuiFormControlLabel-label": { fontSize: "1rem" } }}
-                  control={<Checkbox checked={fastRitual} size="small" sx={{ p: "3px" }} onChange={(e) => setFastRitual(e.target.checked)} />}
+                  sx={{
+                    m: 0,
+                    "& .MuiFormControlLabel-label": { fontSize: "1rem" },
+                  }}
+                  control={
+                    <Checkbox
+                      checked={fastRitual}
+                      size="small"
+                      sx={{ p: "3px" }}
+                      onChange={(e) => setFastRitual(e.target.checked)}
+                    />
+                  }
                   label={t("Fast Ritual")}
                 />
               </Stack>
@@ -274,12 +370,30 @@ export default function PlayerRituals({
             { value: calcClock(), label: t("Clock") },
           ].map(({ value, label }) => (
             <Box key={label} sx={{ textAlign: "center" }}>
-              <Typography sx={{ fontWeight: 700, fontSize: "1.5rem", lineHeight: 1 }}>{value}</Typography>
-              <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</Typography>
+              <Typography
+                sx={{ fontWeight: 700, fontSize: "1.5rem", lineHeight: 1 }}
+              >
+                {value}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {label}
+              </Typography>
             </Box>
           ))}
         </Box>
-        <Button variant="contained" size="small" onClick={setNewClock} sx={{ flexShrink: 0 }}>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={setNewClock}
+          sx={{ flexShrink: 0 }}
+        >
           {t("Set New Clock")}
         </Button>
       </Box>
@@ -288,7 +402,11 @@ export default function PlayerRituals({
 
   if (compact) {
     return (
-      <Paper elevation={0} variant="outlined" sx={{ mb: 1, overflow: "hidden" }}>
+      <Paper
+        elevation={0}
+        variant="outlined"
+        sx={{ mb: 1, overflow: "hidden" }}
+      >
         <CompactSectionHeader title={t("Rituals")} />
         {typesRow}
         {calculator}
@@ -297,7 +415,11 @@ export default function PlayerRituals({
   }
 
   return (
-    <SectionCard title={t("Rituals")} noShadow={isCharacterSheet} sx={{ mb: 1 }}>
+    <SectionCard
+      title={t("Rituals")}
+      noShadow={isCharacterSheet}
+      sx={{ mb: 1 }}
+    >
       {typesRow}
       {calculator}
     </SectionCard>

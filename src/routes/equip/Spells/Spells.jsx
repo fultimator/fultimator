@@ -1,4 +1,11 @@
-import { Grid, Paper, Button, useTheme, IconButton, Tooltip } from "@mui/material";
+import {
+  Grid,
+  Paper,
+  Button,
+  useTheme,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { AutoFixHigh, Download, Search } from "@mui/icons-material";
 import { useState, useRef } from "react";
 import {
@@ -122,28 +129,114 @@ function buildSpellData(s) {
   };
 }
 
-function SpellCardRouter({ item, variant, imageMode, showImageToggle, actionContent }) {
+function SpellCardRouter({
+  item,
+  variant,
+  imageMode,
+  showImageToggle,
+  actionContent,
+}) {
   switch (item.spellType) {
     case "gift":
-      return <SharedGiftCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedGiftCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     case "dance":
-      return <SharedDanceCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedDanceCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     case "therioform":
-      return <SharedTherioformCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedTherioformCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     case "symbol":
-      return <SharedSymbolCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedSymbolCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     case "invocation":
-      return <SharedInvocationCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedInvocationCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     case "magichant":
-      return <SharedMagichantCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedMagichantCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     case "tinkerer-alchemy":
-      return <SharedAlchemyCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedAlchemyCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     case "tinkerer-infusion":
-      return <SharedInfusionCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedInfusionCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     case "tinkerer-magitech":
-      return <SharedMagitechCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedMagitechCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
     default:
-      return <SharedPlayerSpellCard item={item} variant={variant} imageMode={imageMode} showImageToggle={showImageToggle} actionContent={actionContent} />;
+      return (
+        <SharedPlayerSpellCard
+          item={item}
+          variant={variant}
+          imageMode={imageMode}
+          showImageToggle={showImageToggle}
+          actionContent={actionContent}
+        />
+      );
   }
 }
 
@@ -158,7 +251,10 @@ function Spells({ variant = "equip" }) {
 
   const fileInputRef = useRef(null);
   const cardRef = useRef(null);
-  const [downloadImage, downloadSnackbar] = useDownloadImage(formState.name, cardRef);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
+    formState.name,
+    cardRef,
+  );
 
   const { handleFileUpload } = useUploadJSON((data) => {
     if (!data) return;
@@ -354,7 +450,9 @@ function Spells({ variant = "equip" }) {
               imageMode="slot"
               showImageToggle
               actionContent={
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
                   <Tooltip title={t("Download as Image")}>
                     <IconButton onClick={downloadImage}>
                       <Download />

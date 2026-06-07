@@ -39,5 +39,6 @@ export const useEncounterChatStore = create<EncounterChatState>((set) => ({
 
   clearMessages: () => set({ messages: [], isDirty: true }),
 
-  clear: () => set({ encounterId: null, messages: [], isDirty: false, isHydrated: false }),
+  clear: () =>
+    set({ encounterId: null, messages: [], isDirty: false, isHydrated: false }),
 }));

@@ -45,7 +45,9 @@ const NpcEditAppBar = ({
           container
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
-          <Grid sx={{ textAlign: "left", display: "flex", alignItems: "center" }}>
+          <Grid
+            sx={{ textAlign: "left", display: "flex", alignItems: "center" }}
+          >
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
@@ -120,7 +122,9 @@ const PcEditAppBar = ({
           container
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
-          <Grid sx={{ textAlign: "left", display: "flex", alignItems: "center" }}>
+          <Grid
+            sx={{ textAlign: "left", display: "flex", alignItems: "center" }}
+          >
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />

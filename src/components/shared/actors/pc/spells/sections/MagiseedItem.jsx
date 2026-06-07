@@ -35,8 +35,11 @@ export default function MagiseedItem({
   const [menuAnchor, setMenuAnchor] = useState(null);
   const theme = useCustomTheme();
 
-  const { isOpen: deleteDialogOpen, closeDialog: closeDeleteDialog, handleDelete } =
-    useDeleteConfirmation({ onConfirm: () => onDeleteItem(itemIndex) });
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: closeDeleteDialog,
+    handleDelete,
+  } = useDeleteConfirmation({ onConfirm: () => onDeleteItem(itemIndex) });
 
   const isCustom = item.key === "magiseed_custom";
   const magiseedName = isCustom
@@ -62,15 +65,24 @@ export default function MagiseedItem({
       ...item,
       key: "magiseed_custom",
       customName: item.customName || (item.key ? t(item.key) : ""),
-      description: typeof item.description === "string" ? t(item.description) : item.description,
+      description:
+        typeof item.description === "string"
+          ? t(item.description)
+          : item.description,
       effects: Object.fromEntries(
-        Object.entries(item.effects || {}).map(([k, v]) => [k, typeof v === "string" ? t(v) : v]),
+        Object.entries(item.effects || {}).map(([k, v]) => [
+          k,
+          typeof v === "string" ? t(v) : v,
+        ]),
       ),
     });
   };
 
   const subtitle = (
-    <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: "bold" }}>
+    <Typography
+      variant="caption"
+      sx={{ color: "text.secondary", fontWeight: "bold" }}
+    >
       {item.rangeStart !== undefined && item.rangeEnd !== undefined
         ? `T: ${item.rangeStart}–${item.rangeEnd}`
         : ""}
@@ -79,7 +91,13 @@ export default function MagiseedItem({
 
   const actions = (
     <>
-      <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchor(e.currentTarget); }}>
+      <IconButton
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          setMenuAnchor(e.currentTarget);
+        }}
+      >
         <MenuIcon />
       </IconButton>
       <Menu
@@ -89,15 +107,33 @@ export default function MagiseedItem({
         slotProps={{ root: { sx: { zIndex: 1400 } } }}
       >
         {onCloneItem && (
-          <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); handleCloneToCustom(); }}>
-            <ListItemIcon><ContentCopy fontSize="small" /></ListItemIcon>
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuAnchor(null);
+              handleCloneToCustom();
+            }}
+          >
+            <ListItemIcon>
+              <ContentCopy fontSize="small" />
+            </ListItemIcon>
             <ListItemText>{t("Clone to Custom")}</ListItemText>
           </MenuItem>
         )}
         {onDeleteItem && (
-          <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); handleDelete(e); }}>
-            <ListItemIcon><Delete fontSize="small" color="error" /></ListItemIcon>
-            <ListItemText sx={{ color: "error.main" }}>{t("Delete")}</ListItemText>
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuAnchor(null);
+              handleDelete(e);
+            }}
+          >
+            <ListItemIcon>
+              <Delete fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText sx={{ color: "error.main" }}>
+              {t("Delete")}
+            </ListItemText>
           </MenuItem>
         )}
       </Menu>
@@ -108,7 +144,13 @@ export default function MagiseedItem({
 
   return (
     <>
-      <Box sx={{ border: `1px solid ${theme.secondary}`, borderRadius: 1, overflow: "hidden" }}>
+      <Box
+        sx={{
+          border: `1px solid ${theme.secondary}`,
+          borderRadius: 1,
+          overflow: "hidden",
+        }}
+      >
         {/* Row header */}
         <Box
           onClick={() => setOpen((v) => !v)}
@@ -158,7 +200,12 @@ export default function MagiseedItem({
               px: "6px",
               gap: 0.25,
               flexShrink: 0,
-              "& .MuiIconButton-root": { p: "2px", width: 32, height: 32, color: theme.white },
+              "& .MuiIconButton-root": {
+                p: "2px",
+                width: 32,
+                height: 32,
+                color: theme.white,
+              },
               "& .MuiSvgIcon-root": { fontSize: "1.15rem" },
             }}
           >
@@ -180,7 +227,9 @@ export default function MagiseedItem({
                   >
                     {magiseeds.map((preset) => (
                       <MenuItem key={preset.name} value={preset.name}>
-                        {preset.name === "magiseed_custom" ? t("Custom Magiseed") : t(preset.name)}
+                        {preset.name === "magiseed_custom"
+                          ? t("Custom Magiseed")
+                          : t(preset.name)}
                       </MenuItem>
                     ))}
                   </Select>
@@ -194,7 +243,9 @@ export default function MagiseedItem({
                     size="small"
                     label={t("Custom Name")}
                     value={item.customName || ""}
-                    onChange={(e) => onItemChange(itemIndex, "customName", e.target.value)}
+                    onChange={(e) =>
+                      onItemChange(itemIndex, "customName", e.target.value)
+                    }
                   />
                 </Grid>
               )}
@@ -207,7 +258,13 @@ export default function MagiseedItem({
                   label={t("Range Start")}
                   type="number"
                   value={item.rangeStart ?? 0}
-                  onChange={(e) => onItemChange(itemIndex, "rangeStart", parseInt(e.target.value) || 0)}
+                  onChange={(e) =>
+                    onItemChange(
+                      itemIndex,
+                      "rangeStart",
+                      parseInt(e.target.value) || 0,
+                    )
+                  }
                   slotProps={{ htmlInput: { min: 0, max: 4 } }}
                 />
               </Grid>
@@ -218,7 +275,13 @@ export default function MagiseedItem({
                   label={t("Range End")}
                   type="number"
                   value={item.rangeEnd ?? 3}
-                  onChange={(e) => onItemChange(itemIndex, "rangeEnd", parseInt(e.target.value) || 3)}
+                  onChange={(e) =>
+                    onItemChange(
+                      itemIndex,
+                      "rangeEnd",
+                      parseInt(e.target.value) || 3,
+                    )
+                  }
                   slotProps={{ htmlInput: { min: 0, max: 4 } }}
                 />
               </Grid>
@@ -226,12 +289,33 @@ export default function MagiseedItem({
               {/* Description */}
               <Grid size={12}>
                 {!isCustom && item.description ? (
-                  <Box sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1, bgcolor: "action.hover" }}>
-                    <Typography variant="caption" sx={{ color: "text.secondary", mb: 0.5, display: "block" }}>
+                  <Box
+                    sx={{
+                      p: 1,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: 1,
+                      bgcolor: "action.hover",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        mb: 0.5,
+                        display: "block",
+                      }}
+                    >
                       {t("Description")}
                     </Typography>
                     <div style={{ fontSize: "0.95em" }}>
-                      <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+                      <ReactMarkdown
+                        components={{
+                          p: ({ node: _n, ...props }) => (
+                            <p style={{ margin: 0 }} {...props} />
+                          ),
+                        }}
+                      >
                         {t(item.description)}
                       </ReactMarkdown>
                     </div>
@@ -240,7 +324,9 @@ export default function MagiseedItem({
                   <CustomTextarea
                     label={t("Description")}
                     value={item.description || ""}
-                    onChange={(e) => onItemChange(itemIndex, "description", e.target.value)}
+                    onChange={(e) =>
+                      onItemChange(itemIndex, "description", e.target.value)
+                    }
                     rows={2}
                   />
                 )}
@@ -259,16 +345,42 @@ export default function MagiseedItem({
                       <CustomTextarea
                         label={`T = ${tVal}`}
                         value={raw}
-                        onChange={(e) => onItemChange(itemIndex, "effects", { ...item.effects, [tVal]: e.target.value })}
+                        onChange={(e) =>
+                          onItemChange(itemIndex, "effects", {
+                            ...item.effects,
+                            [tVal]: e.target.value,
+                          })
+                        }
                         rows={2}
                       />
                     ) : (
-                      <Box sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1, bgcolor: "action.hover" }}>
-                        <Typography variant="caption" sx={{ color: "text.secondary", mb: 0.5, display: "block" }}>
+                      <Box
+                        sx={{
+                          p: 1,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 1,
+                          bgcolor: "action.hover",
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "text.secondary",
+                            mb: 0.5,
+                            display: "block",
+                          }}
+                        >
                           {`T = ${tVal}`}
                         </Typography>
                         <div style={{ fontSize: "0.95em" }}>
-                          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+                          <ReactMarkdown
+                            components={{
+                              p: ({ node: _n, ...props }) => (
+                                <p style={{ margin: 0 }} {...props} />
+                              ),
+                            }}
+                          >
                             {display}
                           </ReactMarkdown>
                         </div>

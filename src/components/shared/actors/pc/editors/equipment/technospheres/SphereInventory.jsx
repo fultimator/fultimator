@@ -382,12 +382,20 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
             actions={
               <Box sx={{ display: "flex", gap: "2px" }}>
                 <Tooltip title={t("Search Compendium")} arrow>
-                  <IconButton size="small" sx={{ color: "#fff", p: "4px" }} onClick={() => setCompendiumType("mnemospheres")}>
+                  <IconButton
+                    size="small"
+                    sx={{ color: "#fff", p: "4px" }}
+                    onClick={() => setCompendiumType("mnemospheres")}
+                  >
                     <Search sx={{ fontSize: "1.3rem" }} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t("Add Mnemosphere")} arrow>
-                  <IconButton size="small" sx={{ color: "#fff", p: "4px" }} onClick={() => setCreateMnemoOpen(true)}>
+                  <IconButton
+                    size="small"
+                    sx={{ color: "#fff", p: "4px" }}
+                    onClick={() => setCreateMnemoOpen(true)}
+                  >
                     <Add sx={{ fontSize: "1.3rem" }} />
                   </IconButton>
                 </Tooltip>
@@ -399,7 +407,9 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                 {t("No mnemospheres added yet")}
               </Typography>
             ) : (
-              <Box sx={{ p: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+              <Box
+                sx={{ p: 1, display: "flex", flexDirection: "column", gap: 1 }}
+              >
                 {mnemospheres.map((m) => (
                   <MnemosphereClassCard
                     key={m.id}
@@ -420,7 +430,9 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                         slotted={isSphereSlotted(player, m.id)}
                         onDelete={handleSellMnemoWithSnackbar}
                         onUnslot={handleUnslot}
-                        onSlotOpen={isIntegrated ? null : () => setSlotTarget(m)}
+                        onSlotOpen={
+                          isIntegrated ? null : () => setSlotTarget(m)
+                        }
                         deleteLabel={`${t(m.class)} Lv.${m.lvl ?? 1}`}
                         deleteMessage={`${t("You will receive")} ${getMnemosphereCost(m.lvl ?? 1)}z. ${t("Invested levels are permanently lost.")}`}
                       />
@@ -456,12 +468,20 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
             actions={
               <Box sx={{ display: "flex", gap: "2px" }}>
                 <Tooltip title={t("Search Compendium")} arrow>
-                  <IconButton size="small" sx={{ color: "#fff", p: "4px" }} onClick={() => setCompendiumType("hoplospheres")}>
+                  <IconButton
+                    size="small"
+                    sx={{ color: "#fff", p: "4px" }}
+                    onClick={() => setCompendiumType("hoplospheres")}
+                  >
                     <Search sx={{ fontSize: "1.3rem" }} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t("Add Hoplosphere")} arrow>
-                  <IconButton size="small" sx={{ color: "#fff", p: "4px" }} onClick={() => setCreateHoploOpen(true)}>
+                  <IconButton
+                    size="small"
+                    sx={{ color: "#fff", p: "4px" }}
+                    onClick={() => setCreateHoploOpen(true)}
+                  >
                     <Add sx={{ fontSize: "1.3rem" }} />
                   </IconButton>
                 </Tooltip>
@@ -473,7 +493,9 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                 {t("No hoplospheres added yet")}
               </Typography>
             ) : (
-              <Box sx={{ p: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+              <Box
+                sx={{ p: 1, display: "flex", flexDirection: "column", gap: 1 }}
+              >
                 {hoplospheres.map((h) => {
                   const slotted = isSphereSlotted(player, h.id);
                   const coagCount = getCoagCount(player, h, hoplospheres);
@@ -483,9 +505,17 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                     <SectionCard
                       key={h.id}
                       title={label}
-                      onHeaderClick={() => setHoploExpanded((c) => (c === h.id ? null : h.id))}
+                      onHeaderClick={() =>
+                        setHoploExpanded((c) => (c === h.id ? null : h.id))
+                      }
                       actions={
-                        <Box sx={{ display: "flex", alignItems: "center", gap: "2px" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "2px",
+                          }}
+                        >
                           <SphereMenu
                             id={h.id}
                             slotted={slotted}
@@ -494,15 +524,32 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                             onSlotOpen={() => setSlotTarget(h)}
                             deleteLabel={h.name}
                           />
-                          <IconButton size="small" sx={{ color: "#fff", p: "2px" }} onClick={() => setHoploExpanded((c) => (c === h.id ? null : h.id))}>
-                            {isExpanded ? <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} /> : <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />}
+                          <IconButton
+                            size="small"
+                            sx={{ color: "#fff", p: "2px" }}
+                            onClick={() =>
+                              setHoploExpanded((c) =>
+                                c === h.id ? null : h.id,
+                              )
+                            }
+                          >
+                            {isExpanded ? (
+                              <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} />
+                            ) : (
+                              <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />
+                            )}
                           </IconButton>
                         </Box>
                       }
                     >
                       <Collapse in={isExpanded}>
                         <Box sx={{ p: 1 }}>
-                          <SharedHoplosphereCard item={h} showCard variant="sheet" coagCount={coagCount} />
+                          <SharedHoplosphereCard
+                            item={h}
+                            showCard
+                            variant="sheet"
+                            coagCount={coagCount}
+                          />
                         </Box>
                       </Collapse>
                     </SectionCard>

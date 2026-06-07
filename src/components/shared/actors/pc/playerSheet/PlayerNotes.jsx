@@ -42,7 +42,11 @@ export default function PlayerNotes({
   };
   const toggleRow = (noteKey) => {
     if (useStore) storeToggleRow("notes", noteKey);
-    else if (showAll) setLocalOpenRows((prev) => ({ ...prev, [noteKey]: prev[noteKey] === false }));
+    else if (showAll)
+      setLocalOpenRows((prev) => ({
+        ...prev,
+        [noteKey]: prev[noteKey] === false,
+      }));
     else setLocalOpenRows((prev) => ({ ...prev, [noteKey]: !prev[noteKey] }));
   };
 
@@ -50,17 +54,21 @@ export default function PlayerNotes({
   const [editNoteIndex, setEditNoteIndex] = useState(null);
   const [noteBeingEdited, setNoteBeingEdited] = useState(null);
 
-  const handleAddNote = onAddNote ?? (() => {
-    setNoteBeingEdited(null);
-    setEditNoteIndex(null);
-    setOpenNoteModal(true);
-  });
+  const handleAddNote =
+    onAddNote ??
+    (() => {
+      setNoteBeingEdited(null);
+      setEditNoteIndex(null);
+      setOpenNoteModal(true);
+    });
 
-  const handleEditNote = onEditNote ?? ((index) => {
-    setNoteBeingEdited(player.notes[index]);
-    setEditNoteIndex(index);
-    setOpenNoteModal(true);
-  });
+  const handleEditNote =
+    onEditNote ??
+    ((index) => {
+      setNoteBeingEdited(player.notes[index]);
+      setEditNoteIndex(index);
+      setOpenNoteModal(true);
+    });
 
   const handleSaveNote = (note) => {
     if (editNoteIndex !== null) {
@@ -85,11 +93,14 @@ export default function PlayerNotes({
   const visibleNotes = (player.notes || [])
     .map((note, index) => ({ ...note, originalIndex: index }))
     .filter((note) => showAll || note.showInPlayerSheet !== false)
-    .filter((note) =>
-      !normalizedQuery ||
-      note.name?.toLowerCase().includes(normalizedQuery) ||
-      note.description?.toLowerCase().includes(normalizedQuery) ||
-      note.clocks?.some((clock) => clock?.name?.toLowerCase().includes(normalizedQuery)),
+    .filter(
+      (note) =>
+        !normalizedQuery ||
+        note.name?.toLowerCase().includes(normalizedQuery) ||
+        note.description?.toLowerCase().includes(normalizedQuery) ||
+        note.clocks?.some((clock) =>
+          clock?.name?.toLowerCase().includes(normalizedQuery),
+        ),
     );
 
   if (visibleNotes.length === 0 && !isEditMode) return null;
@@ -97,11 +108,19 @@ export default function PlayerNotes({
   const noteList = (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
       {visibleNotes.length === 0 && (
-        <Typography color="text.secondary" variant="body2" sx={{ px: 0.5, py: 0.25 }}>{t("No notes.")}</Typography>
+        <Typography
+          color="text.secondary"
+          variant="body2"
+          sx={{ px: 0.5, py: 0.25 }}
+        >
+          {t("No notes.")}
+        </Typography>
       )}
       {visibleNotes.map((note, noteIndex) => {
         const noteKey = `note-${noteIndex}`;
-        const descriptionMatch = !!normalizedQuery && !!note.description?.toLowerCase().includes(normalizedQuery);
+        const descriptionMatch =
+          !!normalizedQuery &&
+          !!note.description?.toLowerCase().includes(normalizedQuery);
         return (
           <NoteCard
             key={noteIndex}
@@ -139,11 +158,19 @@ export default function PlayerNotes({
   if (compact) {
     return (
       <>
-        <Paper elevation={0} variant="outlined" sx={{ mb: 1, overflow: "hidden" }}>
+        <Paper
+          elevation={0}
+          variant="outlined"
+          sx={{ mb: 1, overflow: "hidden" }}
+        >
           <CompactSectionHeader title={t("Notes")}>
             {isEditMode && (
               <Tooltip title={t("Add Note")}>
-                <IconButton size="small" onClick={handleAddNote} sx={{ color: "#fff", p: "2px" }}>
+                <IconButton
+                  size="small"
+                  onClick={handleAddNote}
+                  sx={{ color: "#fff", p: "2px" }}
+                >
                   <Add sx={{ fontSize: "1.15rem" }} />
                 </IconButton>
               </Tooltip>
@@ -162,7 +189,11 @@ export default function PlayerNotes({
         title={t("Notes")}
         actions={
           isEditMode && (
-            <IconButton size="small" onClick={handleAddNote} sx={{ p: 0.5, color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={handleAddNote}
+              sx={{ p: 0.5, color: "#fff" }}
+            >
               <Add fontSize="small" />
             </IconButton>
           )

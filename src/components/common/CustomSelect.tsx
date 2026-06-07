@@ -11,7 +11,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   ...props
 }) => {
   const readOnlySx = readOnly
-    ? { pointerEvents: "none", "& .MuiSelect-icon": { display: "none" }, ...(sx as object ?? {}) }
+    ? {
+        pointerEvents: "none",
+        "& .MuiSelect-icon": { display: "none" },
+        ...((sx as object) ?? {}),
+      }
     : sx;
 
   return (

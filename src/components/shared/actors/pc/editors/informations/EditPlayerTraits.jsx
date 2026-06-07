@@ -1,10 +1,4 @@
-import {
-  Box,
-  FormControl,
-  Grid,
-  TextField,
-  Autocomplete,
-} from "@mui/material";
+import { Box, FormControl, Grid, TextField, Autocomplete } from "@mui/material";
 import React, { useState, useMemo } from "react";
 import { useTranslate } from "/src/translation/translate";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
@@ -65,73 +59,73 @@ export default function EditPlayerTraits({ player, setPlayer, isEditMode }) {
   return (
     <SectionCard title={t("Traits")}>
       <Box sx={{ p: "15px" }}>
-      <Grid container spacing={2}>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 12,
-          }}
-        >
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="identity"
-              label={t("Identity") + ":"}
-              value={player.info.identity}
-              onChange={onChangeInfo("identity")}
-              slotProps={{
-                input: {
-                  readOnly: !isEditMode,
-                },
+        <Grid container spacing={2}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+            }}
+          >
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="identity"
+                label={t("Identity") + ":"}
+                value={player.info.identity}
+                onChange={onChangeInfo("identity")}
+                slotProps={{
+                  input: {
+                    readOnly: !isEditMode,
+                  },
 
-                htmlInput: { maxLength: 300 },
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-          }}
-        >
-          <FormControl variant="standard" fullWidth>
-            <Autocomplete
-              id="theme-autocomplete"
-              options={themes}
-              value={inputTheme}
-              onChange={handleThemeChange}
-              onInputChange={handleThemeInputChange}
-              freeSolo
-              disabled={!isEditMode}
-              renderInput={(params) => (
-                <TextField {...params} label={t("Theme") + ":"} fullWidth />
-              )}
-            />
-          </FormControl>
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-          }}
-        >
-          <FormControl variant="standard" fullWidth>
-            <TextField
-              id="origin"
-              label={t("Origin") + ":"}
-              value={player.info.origin}
-              onChange={onChangeInfo("origin")}
-              slotProps={{
-                input: {
-                  readOnly: !isEditMode,
-                },
+                  htmlInput: { maxLength: 300 },
+                }}
+              />
+            </FormControl>
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+            }}
+          >
+            <FormControl variant="standard" fullWidth>
+              <Autocomplete
+                id="theme-autocomplete"
+                options={themes}
+                value={inputTheme}
+                onChange={handleThemeChange}
+                onInputChange={handleThemeInputChange}
+                freeSolo
+                disabled={!isEditMode}
+                renderInput={(params) => (
+                  <TextField {...params} label={t("Theme") + ":"} fullWidth />
+                )}
+              />
+            </FormControl>
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+            }}
+          >
+            <FormControl variant="standard" fullWidth>
+              <TextField
+                id="origin"
+                label={t("Origin") + ":"}
+                value={player.info.origin}
+                onChange={onChangeInfo("origin")}
+                slotProps={{
+                  input: {
+                    readOnly: !isEditMode,
+                  },
 
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </FormControl>
+                  htmlInput: { maxLength: 50 },
+                }}
+              />
+            </FormControl>
+          </Grid>
         </Grid>
-      </Grid>
       </Box>
     </SectionCard>
   );

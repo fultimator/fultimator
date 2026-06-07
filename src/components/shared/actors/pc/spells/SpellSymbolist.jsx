@@ -35,7 +35,16 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
 
   return (
     <>
-      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <Accordion
+        disableGutters
+        elevation={0}
+        square
+        sx={{
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          "&:before": { display: "none" },
+        }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Info />
@@ -43,7 +52,15 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
           <Typography variant="h4">{t("Symbols Details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("symbol_details_1")}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              p: ({ _node, ...props }) => (
+                <p style={{ margin: 0 }} {...props} />
+              ),
+            }}
+          >
+            {t("symbol_details_1")}
+          </ReactMarkdown>
         </AccordionDetails>
       </Accordion>
       {/* SYMBOLS */}
@@ -83,13 +100,24 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
           </Grid>
         </Grid>
         {isEditMode && (
-          <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              flexShrink: 0,
+            }}
+          >
             {!showInPlayerSheet && (
               <Tooltip title={t("Symbols not shown in player sheet")}>
                 <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
               </Tooltip>
             )}
-            <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+            <IconButton
+              size="small"
+              onClick={onEdit}
+              sx={{ color: "#fff", p: "3px" }}
+            >
               <Edit sx={{ fontSize: "1.1rem" }} />
             </IconButton>
           </div>

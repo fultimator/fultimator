@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Tooltip,
-  IconButton,
-  Paper,
-} from "@mui/material";
+import { Box, Typography, Tooltip, IconButton, Paper } from "@mui/material";
 import CasinoIcon from "@mui/icons-material/Casino";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import LockIcon from "@mui/icons-material/Lock";
@@ -164,7 +158,14 @@ export default function CardLoadout({
       might: [["weak", "poisoned"], ["migUp"]],
       willpower: [["shaken", "poisoned"], ["wlpUp"]],
     }[attrKey] ?? [[], []];
-    return calculateAttribute(player, base, statusConfig[0], statusConfig[1], 6, 12);
+    return calculateAttribute(
+      player,
+      base,
+      statusConfig[0],
+      statusConfig[1],
+      6,
+      12,
+    );
   };
 
   const handleRollSlot = (slot) => {
@@ -201,7 +202,9 @@ export default function CardLoadout({
       const accuracy = isSecondary
         ? (item.secondAccuracy ?? item.accuracy)
         : item.accuracy;
-      const damage = isSecondary ? (item.secondDamage ?? item.damage) : item.damage;
+      const damage = isSecondary
+        ? (item.secondDamage ?? item.damage)
+        : item.damage;
       if (!accuracy?.attr1 || !accuracy?.attr2) return;
       weaponOption = {
         name: item.name || slot,
@@ -240,7 +243,8 @@ export default function CardLoadout({
 
   const sendSlotToChat = (slot, resolved) => {
     if (!resolved) return;
-    const item = resolved.kind === "vehicleModule" ? resolved.module : resolved.item;
+    const item =
+      resolved.kind === "vehicleModule" ? resolved.module : resolved.item;
     const name = resolvedName(resolved, false, t);
     const section =
       slot === "armor"
@@ -333,8 +337,11 @@ export default function CardLoadout({
     const isRollable =
       !locked &&
       (resolved?.kind === "vehicleModule"
-        ? resolved.module?.type === "pilot_module_weapon" && !resolved.module?.isShield
-        : Boolean(resolved?.item?.accuracy?.attr1 && resolved?.item?.accuracy?.attr2));
+        ? resolved.module?.type === "pilot_module_weapon" &&
+          !resolved.module?.isShield
+        : Boolean(
+            resolved?.item?.accuracy?.attr1 && resolved?.item?.accuracy?.attr2,
+          ));
     const canSendToChat = !locked && Boolean(resolved);
 
     const inner = (
@@ -365,7 +372,15 @@ export default function CardLoadout({
         >
           {t(SLOT_LABEL_KEY[key])}
         </Typography>
-        <Box sx={{ width: "1px", alignSelf: "stretch", my: "6px", bgcolor: theme.palette.divider, flexShrink: 0 }} />
+        <Box
+          sx={{
+            width: "1px",
+            alignSelf: "stretch",
+            my: "6px",
+            bgcolor: theme.palette.divider,
+            flexShrink: 0,
+          }}
+        />
 
         {/* Lock / vehicle icon */}
         {locked && (
@@ -447,31 +462,54 @@ export default function CardLoadout({
 
     const slotActions = isRollable ? (
       <Tooltip title={t("Roll")}>
-        <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleRollSlot(key); }}>
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRollSlot(key);
+          }}
+        >
           <CasinoIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     ) : canSendToChat ? (
       <Tooltip title={t("Send to chat")}>
-        <IconButton size="small" onClick={(e) => { e.stopPropagation(); sendSlotToChat(key, resolved); }}>
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            sendSlotToChat(key, resolved);
+          }}
+        >
           <ChatOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     ) : locked ? (
-      <Box sx={{ width: compact ? 28 : 32, height: compact ? 28 : 32, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <LockIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.75)" }} />
-      </Box>
-    ) : null;
-
-    const slotActionsWithSpacer = hideActions ? null : slotActions ?? (
       <Box
         sx={{
           width: compact ? 28 : 32,
           height: compact ? 28 : 32,
           flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-      />
-    );
+      >
+        <LockIcon sx={{ fontSize: "1rem", color: "rgba(255,255,255,0.75)" }} />
+      </Box>
+    ) : null;
+
+    const slotActionsWithSpacer = hideActions
+      ? null
+      : (slotActions ?? (
+          <Box
+            sx={{
+              width: compact ? 28 : 32,
+              height: compact ? 28 : 32,
+              flexShrink: 0,
+            }}
+          />
+        ));
 
     return (
       <ItemRowCard
@@ -482,7 +520,10 @@ export default function CardLoadout({
         variant="outlined"
         compact={compact}
         paperSx={{
-          bgcolor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "background.paper",
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? "rgba(255,255,255,0.03)"
+              : "background.paper",
         }}
       />
     );
@@ -606,7 +647,14 @@ export default function CardLoadout({
         width: "100%",
       }}
     >
-      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1, width: "100%" }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+          gap: 1,
+          width: "100%",
+        }}
+      >
         {SLOTS.map(renderSlotRow)}
       </Box>
       <Box
@@ -682,7 +730,15 @@ export default function CardLoadout({
       </Box>
     </Box>
   ) : (
-    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1, flex: 1, width: "100%" }}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+        gap: 1,
+        flex: 1,
+        width: "100%",
+      }}
+    >
       {SLOTS.map(renderSlotRow)}
     </Box>
   );
@@ -691,7 +747,11 @@ export default function CardLoadout({
     if (compact) {
       return (
         <>
-          <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
+          <Paper
+            sx={{ mb: 1, overflow: "hidden" }}
+            elevation={0}
+            variant="outlined"
+          >
             <CompactSectionHeader title={t("Loadout")} />
             <Box sx={{ p: "4px" }}>{slotContent}</Box>
           </Paper>

@@ -12,7 +12,14 @@ import { useTheme } from "@mui/material/styles";
  * @param {boolean}   noShadow     - Suppress elevation shadow (e.g. when embedded in a character sheet)
  * @param {object}    sx           - Extra sx forwarded to the outer Paper
  */
-export default function SectionCard({ title, actions, children, noShadow = false, onHeaderClick, sx }) {
+export default function SectionCard({
+  title,
+  actions,
+  children,
+  noShadow = false,
+  onHeaderClick,
+  sx,
+}) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
@@ -27,7 +34,9 @@ export default function SectionCard({ title, actions, children, noShadow = false
         borderColor: secondary,
         overflow: "hidden",
         bgcolor: "background.paper",
-        boxShadow: noShadow ? "none" : "0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12)",
+        boxShadow: noShadow
+          ? "none"
+          : "0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12)",
         ...sx,
       }}
     >

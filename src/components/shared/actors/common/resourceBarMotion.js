@@ -5,7 +5,7 @@ const DEFAULT_MOVE_MS = 980;
 const DEFAULT_DELTA_MS = 2200;
 const MIN_DELTA_WIDTH_PCT = 1.25;
 const easeInOutCubic = (t) =>
-  t < 0.5 ? 4 * t * t * t : 1 - ((-2 * t + 2) ** 3) / 2;
+  t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 const now = () =>
   typeof globalThis.performance?.now === "function"
     ? globalThis.performance.now()
@@ -190,4 +190,3 @@ export const PIP_STRIPES = {
   subtle: PIP_STRIPE_24,
   strong: PIP_STRIPE_28,
 };
-

@@ -1,7 +1,10 @@
 import React, { Fragment } from "react";
 import { Grid, Typography } from "@mui/material";
 
-import { useActorCardSetup, isInteractive } from "/src/components/shared/actors/core-utils";
+import {
+  useActorCardSetup,
+  isInteractive,
+} from "/src/components/shared/actors/core-utils";
 import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import Diamond from "/src/components/Diamond";
 import { RareItemIcon } from "/src/components/icons";

@@ -1,6 +1,11 @@
 import { Box } from "@mui/material";
 
-export default function BarShell({ shellBg, shellBorder, minHeight, children }) {
+export default function BarShell({
+  shellBg,
+  shellBorder,
+  minHeight,
+  children,
+}) {
   return (
     <Box
       sx={{

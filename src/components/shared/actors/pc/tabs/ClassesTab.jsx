@@ -1,6 +1,11 @@
 import PcClasses from "/src/components/shared/actors/common/PcClasses";
 
-export default function ClassesTab({ player, setPlayer, isOwner, updateMaxStats }) {
+export default function ClassesTab({
+  player,
+  setPlayer,
+  isOwner,
+  updateMaxStats,
+}) {
   return (
     <PcClasses
       pc={player}

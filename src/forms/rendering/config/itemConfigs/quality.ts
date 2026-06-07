@@ -18,7 +18,13 @@ const QUALITY_LABEL_PREFIX = "quality";
 const baseGroups: SelectGroup[] = Object.entries(
   groupBy(allQualities, "category") as Record<
     string,
-    { name: string; cost: number; quality: string; category: string; filter?: string[] }[]
+    {
+      name: string;
+      cost: number;
+      quality: string;
+      category: string;
+      filter?: string[];
+    }[]
   >,
 ).map(([category, qs]) => ({
   header: category,
@@ -60,24 +66,33 @@ export const qualityFieldConfig: ItemFieldConfig<QualityFormState> = [
     componentProps: { groups: baseGroups, allowClear: true },
     onChangeEffects: {
       name: (s) => {
-        const q = allQualities.find((el: { name: string }) => el.name === s.selectedBase);
+        const q = allQualities.find(
+          (el: { name: string }) => el.name === s.selectedBase,
+        );
         return q ? q.name : s.name;
       },
       category: (s) => {
-        const q = allQualities.find((el: { name: string }) => el.name === s.selectedBase);
+        const q = allQualities.find(
+          (el: { name: string }) => el.name === s.selectedBase,
+        );
         return q ? q.category : s.category;
       },
       quality: (s) => {
-        const q = allQualities.find((el: { name: string }) => el.name === s.selectedBase);
+        const q = allQualities.find(
+          (el: { name: string }) => el.name === s.selectedBase,
+        );
         return q ? q.quality : s.quality;
       },
       cost: (s) => {
-        const q = allQualities.find((el: { name: string }) => el.name === s.selectedBase);
+        const q = allQualities.find(
+          (el: { name: string }) => el.name === s.selectedBase,
+        );
         return q ? q.cost : s.cost;
       },
       filter: (s) => {
         const q = allQualities.find(
-          (el: { name: string; filter?: string[] }) => el.name === s.selectedBase,
+          (el: { name: string; filter?: string[] }) =>
+            el.name === s.selectedBase,
         );
         return Array.isArray(q?.filter) ? q.filter : s.filter;
       },

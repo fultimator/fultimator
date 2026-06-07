@@ -315,7 +315,6 @@ export function PcNameBar({
   );
 }
 
-
 export default function PcHeader({
   pc,
   isInteractive = false,
@@ -368,7 +367,11 @@ export default function PcHeader({
             height: "100%",
             cursor: "pointer",
           }}
-          onClick={() => isInteractive && onUpdate ? setPortraitModalOpen(true) : setImageDialogOpen(true)}
+          onClick={() =>
+            isInteractive && onUpdate
+              ? setPortraitModalOpen(true)
+              : setImageDialogOpen(true)
+          }
         >
           <img
             src={avatarSrc}
@@ -395,10 +398,11 @@ export default function PcHeader({
               "&:hover": { opacity: 1 },
             }}
           >
-            {isInteractive && onUpdate
-              ? <EditIcon sx={{ color: "#fff", fontSize: "2rem" }} />
-              : <CropFreeIcon sx={{ color: "#fff", fontSize: "2rem" }} />
-            }
+            {isInteractive && onUpdate ? (
+              <EditIcon sx={{ color: "#fff", fontSize: "2rem" }} />
+            ) : (
+              <CropFreeIcon sx={{ color: "#fff", fontSize: "2rem" }} />
+            )}
           </Box>
           {onUpdate && (
             <Tooltip
@@ -443,11 +447,21 @@ export default function PcHeader({
             onUpdate={onUpdate}
           />
         )}
-        <Dialog open={imageDialogOpen} onClose={() => setImageDialogOpen(false)} maxWidth="md" fullWidth>
+        <Dialog
+          open={imageDialogOpen}
+          onClose={() => setImageDialogOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
           <img
             src={avatarSrc}
             alt="Player Avatar"
-            style={{ width: "100%", height: "auto", display: "block", cursor: "pointer" }}
+            style={{
+              width: "100%",
+              height: "auto",
+              display: "block",
+              cursor: "pointer",
+            }}
             onClick={() => setImageDialogOpen(false)}
           />
         </Dialog>
@@ -476,7 +490,11 @@ export default function PcHeader({
           backgroundColor: theme.palette.background.paper,
           cursor: "pointer",
         }}
-        onClick={() => isInteractive && onUpdate ? setPortraitModalOpen(true) : setImageDialogOpen(true)}
+        onClick={() =>
+          isInteractive && onUpdate
+            ? setPortraitModalOpen(true)
+            : setImageDialogOpen(true)
+        }
       >
         <img
           src={avatarSrc}
@@ -504,10 +522,11 @@ export default function PcHeader({
             "&:hover": { opacity: 1 },
           }}
         >
-          {isInteractive && onUpdate
-            ? <EditIcon sx={{ color: "#fff", fontSize: "2rem" }} />
-            : <CropFreeIcon sx={{ color: "#fff", fontSize: "2rem" }} />
-          }
+          {isInteractive && onUpdate ? (
+            <EditIcon sx={{ color: "#fff", fontSize: "2rem" }} />
+          ) : (
+            <CropFreeIcon sx={{ color: "#fff", fontSize: "2rem" }} />
+          )}
         </Box>
         {inCrisis && (
           <Box
@@ -537,11 +556,21 @@ export default function PcHeader({
           onUpdate={onUpdate}
         />
       )}
-      <Dialog open={imageDialogOpen} onClose={() => setImageDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={imageDialogOpen}
+        onClose={() => setImageDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <img
           src={avatarSrc}
           alt="Player Avatar"
-          style={{ width: "100%", height: "auto", display: "block", cursor: "pointer" }}
+          style={{
+            width: "100%",
+            height: "auto",
+            display: "block",
+            cursor: "pointer",
+          }}
           onClick={() => setImageDialogOpen(false)}
         />
       </Dialog>

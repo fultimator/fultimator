@@ -62,248 +62,260 @@ export default function EditManualStats({
   return (
     <SectionCard title={t("Edit Stats Manually")}>
       <Box sx={{ p: "15px" }}>
-      <Grid container spacing={2}>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Max HP Modifier")}
-            type="number"
-            fullWidth
-            value={hpModifier}
-            onChange={(e) => setHPModifier(e.target.value)}
-            color={
-              hpModifier > 0 ? "success" : hpModifier < 0 ? "error" : "primary"
-            }
-            focused={hpModifier > 0 || hpModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+        <Grid container spacing={2}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Max MP Modifier")}
-            type="number"
-            fullWidth
-            value={mpModifier}
-            onChange={(e) => setMPModifier(e.target.value)}
-            color={
-              mpModifier > 0 ? "success" : mpModifier < 0 ? "error" : "primary"
-            }
-            focused={mpModifier > 0 || mpModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+          >
+            <TextField
+              label={t("Max HP Modifier")}
+              type="number"
+              fullWidth
+              value={hpModifier}
+              onChange={(e) => setHPModifier(e.target.value)}
+              color={
+                hpModifier > 0
+                  ? "success"
+                  : hpModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={hpModifier > 0 || hpModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Max IP Modifier")}
-            type="number"
-            fullWidth
-            value={ipModifier}
-            onChange={(e) => setIPModifier(e.target.value)}
-            color={
-              ipModifier > 0 ? "success" : ipModifier < 0 ? "error" : "primary"
-            }
-            focused={ipModifier > 0 || ipModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+          >
+            <TextField
+              label={t("Max MP Modifier")}
+              type="number"
+              fullWidth
+              value={mpModifier}
+              onChange={(e) => setMPModifier(e.target.value)}
+              color={
+                mpModifier > 0
+                  ? "success"
+                  : mpModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={mpModifier > 0 || mpModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Max DEF Modifier")}
-            type="number"
-            fullWidth
-            value={defModifier}
-            onChange={(e) => setDefModifier(e.target.value)}
-            color={
-              defModifier > 0
-                ? "success"
-                : defModifier < 0
-                  ? "error"
-                  : "primary"
-            }
-            focused={defModifier > 0 || defModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+          >
+            <TextField
+              label={t("Max IP Modifier")}
+              type="number"
+              fullWidth
+              value={ipModifier}
+              onChange={(e) => setIPModifier(e.target.value)}
+              color={
+                ipModifier > 0
+                  ? "success"
+                  : ipModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={ipModifier > 0 || ipModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Max MDEF Modifier")}
-            type="number"
-            fullWidth
-            value={mdefModifier}
-            onChange={(e) => setMdefModifier(e.target.value)}
-            color={
-              mdefModifier > 0
-                ? "success"
-                : mdefModifier < 0
-                  ? "error"
-                  : "primary"
-            }
-            focused={mdefModifier > 0 || mdefModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+          >
+            <TextField
+              label={t("Max DEF Modifier")}
+              type="number"
+              fullWidth
+              value={defModifier}
+              onChange={(e) => setDefModifier(e.target.value)}
+              color={
+                defModifier > 0
+                  ? "success"
+                  : defModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={defModifier > 0 || defModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Max INIT Modifier")}
-            type="number"
-            fullWidth
-            value={initModifier}
-            onChange={(e) => setInitModifier(e.target.value)}
-            color={
-              initModifier > 0
-                ? "success"
-                : initModifier < 0
-                  ? "error"
-                  : "primary"
-            }
-            focused={initModifier > 0 || initModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+          >
+            <TextField
+              label={t("Max MDEF Modifier")}
+              type="number"
+              fullWidth
+              value={mdefModifier}
+              onChange={(e) => setMdefModifier(e.target.value)}
+              color={
+                mdefModifier > 0
+                  ? "success"
+                  : mdefModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={mdefModifier > 0 || mdefModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Melee Accuracy Modifier")}
-            type="number"
-            fullWidth
-            value={meleePrecModifier}
-            onChange={(e) => setMeleePrecModifier(e.target.value)}
-            color={
-              meleePrecModifier > 0
-                ? "success"
-                : meleePrecModifier < 0
-                  ? "error"
-                  : "primary"
-            }
-            focused={meleePrecModifier > 0 || meleePrecModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+          >
+            <TextField
+              label={t("Max INIT Modifier")}
+              type="number"
+              fullWidth
+              value={initModifier}
+              onChange={(e) => setInitModifier(e.target.value)}
+              color={
+                initModifier > 0
+                  ? "success"
+                  : initModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={initModifier > 0 || initModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Ranged Accuracy Modifier")}
-            type="number"
-            fullWidth
-            value={rangedPrecModifier}
-            onChange={(e) => setRangedPrecModifier(e.target.value)}
-            color={
-              rangedPrecModifier > 0
-                ? "success"
-                : rangedPrecModifier < 0
-                  ? "error"
-                  : "primary"
-            }
-            focused={rangedPrecModifier > 0 || rangedPrecModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+          >
+            <TextField
+              label={t("Melee Accuracy Modifier")}
+              type="number"
+              fullWidth
+              value={meleePrecModifier}
+              onChange={(e) => setMeleePrecModifier(e.target.value)}
+              color={
+                meleePrecModifier > 0
+                  ? "success"
+                  : meleePrecModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={meleePrecModifier > 0 || meleePrecModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-          }}
-        >
-          <TextField
-            label={t("Magic Precision Modifier")}
-            type="number"
-            fullWidth
-            value={magicPrecModifier}
-            onChange={(e) => setMagicPrecModifier(e.target.value)}
-            color={
-              magicPrecModifier > 0
-                ? "success"
-                : magicPrecModifier < 0
-                  ? "error"
-                  : "primary"
-            }
-            focused={magicPrecModifier > 0 || magicPrecModifier < 0}
-            slotProps={{
-              input: {
-                readOnly: !isEditMode,
-              },
+          >
+            <TextField
+              label={t("Ranged Accuracy Modifier")}
+              type="number"
+              fullWidth
+              value={rangedPrecModifier}
+              onChange={(e) => setRangedPrecModifier(e.target.value)}
+              color={
+                rangedPrecModifier > 0
+                  ? "success"
+                  : rangedPrecModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={rangedPrecModifier > 0 || rangedPrecModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
             }}
-          />
+          >
+            <TextField
+              label={t("Magic Precision Modifier")}
+              type="number"
+              fullWidth
+              value={magicPrecModifier}
+              onChange={(e) => setMagicPrecModifier(e.target.value)}
+              color={
+                magicPrecModifier > 0
+                  ? "success"
+                  : magicPrecModifier < 0
+                    ? "error"
+                    : "primary"
+              }
+              focused={magicPrecModifier > 0 || magicPrecModifier < 0}
+              slotProps={{
+                input: {
+                  readOnly: !isEditMode,
+                },
+              }}
+            />
+          </Grid>
         </Grid>
-      </Grid>
       </Box>
     </SectionCard>
   );

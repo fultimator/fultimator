@@ -1,4 +1,26 @@
-import { SpellDefaultModal, SpellArcanistModal, SpellEntropistGambleModal, SpellTinkererAlchemyRankModal, SpellTinkererAlchemyTargetModal, SpellTinkererAlchemyEffectsModal, SpellTinkererInfusionModal, SpellTinkererMagitechRankModal, SpellSymbolistModal, SpellDancerModal, SpellGiftModal, SpellMutantModal, SpellPilotModal, SpellMagiseedModal, SpellGourmetModal, SpellInvokerModal, SpellDeckModal, UnifiedSpellModal, GeneralSection, MagichantKeysContentSection, MagichantTonesContentSection } from "/src/components/shared/actors/pc/spells";
+import {
+  SpellDefaultModal,
+  SpellArcanistModal,
+  SpellEntropistGambleModal,
+  SpellTinkererAlchemyRankModal,
+  SpellTinkererAlchemyTargetModal,
+  SpellTinkererAlchemyEffectsModal,
+  SpellTinkererInfusionModal,
+  SpellTinkererMagitechRankModal,
+  SpellSymbolistModal,
+  SpellDancerModal,
+  SpellGiftModal,
+  SpellMutantModal,
+  SpellPilotModal,
+  SpellMagiseedModal,
+  SpellGourmetModal,
+  SpellInvokerModal,
+  SpellDeckModal,
+  UnifiedSpellModal,
+  GeneralSection,
+  MagichantKeysContentSection,
+  MagichantTonesContentSection,
+} from "/src/components/shared/actors/pc/spells";
 
 const MAGICHANT_SECTIONS = [
   {

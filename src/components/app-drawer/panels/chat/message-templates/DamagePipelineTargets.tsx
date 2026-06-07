@@ -164,7 +164,6 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
                 {target.name}
               </Typography>
 
-              {/* Hit / Miss pill — clickable to toggle */}
               <Tooltip
                 title={isApplied ? "" : isHit ? "Mark as Miss" : "Mark as Hit"}
               >

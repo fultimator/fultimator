@@ -45,7 +45,8 @@ export const magiseedFields: ItemFieldConfig<PlayerSpellFormState> = [
     group: "effect",
     order: 20,
     fullWidth: true,
-    dependencies: (s: PlayerSpellFormState) => isMagiseed(s) && (s.rangeStart ?? 0) <= 0 && (s.rangeEnd ?? 3) >= 0,
+    dependencies: (s: PlayerSpellFormState) =>
+      isMagiseed(s) && (s.rangeStart ?? 0) <= 0 && (s.rangeEnd ?? 3) >= 0,
   },
   {
     key: "effects.1",
@@ -56,7 +57,8 @@ export const magiseedFields: ItemFieldConfig<PlayerSpellFormState> = [
     group: "effect",
     order: 21,
     fullWidth: true,
-    dependencies: (s: PlayerSpellFormState) => isMagiseed(s) && (s.rangeStart ?? 0) <= 1 && (s.rangeEnd ?? 3) >= 1,
+    dependencies: (s: PlayerSpellFormState) =>
+      isMagiseed(s) && (s.rangeStart ?? 0) <= 1 && (s.rangeEnd ?? 3) >= 1,
   },
   {
     key: "effects.2",
@@ -67,7 +69,8 @@ export const magiseedFields: ItemFieldConfig<PlayerSpellFormState> = [
     group: "effect",
     order: 22,
     fullWidth: true,
-    dependencies: (s: PlayerSpellFormState) => isMagiseed(s) && (s.rangeStart ?? 0) <= 2 && (s.rangeEnd ?? 3) >= 2,
+    dependencies: (s: PlayerSpellFormState) =>
+      isMagiseed(s) && (s.rangeStart ?? 0) <= 2 && (s.rangeEnd ?? 3) >= 2,
   },
   {
     key: "effects.3",
@@ -78,7 +81,8 @@ export const magiseedFields: ItemFieldConfig<PlayerSpellFormState> = [
     group: "effect",
     order: 23,
     fullWidth: true,
-    dependencies: (s: PlayerSpellFormState) => isMagiseed(s) && (s.rangeStart ?? 0) <= 3 && (s.rangeEnd ?? 3) >= 3,
+    dependencies: (s: PlayerSpellFormState) =>
+      isMagiseed(s) && (s.rangeStart ?? 0) <= 3 && (s.rangeEnd ?? 3) >= 3,
   },
   {
     key: "showInPlayerSheet",

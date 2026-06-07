@@ -10,7 +10,12 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, Transform, Edit } from "@mui/icons-material";
+import {
+  VisibilityOff,
+  ExpandMore,
+  Transform,
+  Edit,
+} from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -35,7 +40,16 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
 
   return (
     <>
-      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <Accordion
+        disableGutters
+        elevation={0}
+        square
+        sx={{
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          "&:before": { display: "none" },
+        }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Transform />
@@ -43,7 +57,15 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
           <Typography variant="h4">{t("mutant_details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("mutant_details_1")}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              p: ({ _node, ...props }) => (
+                <p style={{ margin: 0 }} {...props} />
+              ),
+            }}
+          >
+            {t("mutant_details_1")}
+          </ReactMarkdown>
         </AccordionDetails>
       </Accordion>
       {/* THERIOFORMS */}
@@ -102,13 +124,24 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
           </Grid>
         </Grid>
         {isEditMode && (
-          <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              flexShrink: 0,
+            }}
+          >
             {!showInPlayerSheet && (
               <Tooltip title={t("mutant_therioforms_not_shown_tooltip")}>
                 <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
               </Tooltip>
             )}
-            <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+            <IconButton
+              size="small"
+              onClick={onEdit}
+              sx={{ color: "#fff", p: "3px" }}
+            >
               <Edit sx={{ fontSize: "1.1rem" }} />
             </IconButton>
           </div>

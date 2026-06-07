@@ -528,13 +528,19 @@ export function disableModuleForSlot(
       if (slot === "mainHand") {
         return (
           m.type === "pilot_module_weapon" &&
-          (s === "main" || s === "mainHand" || s === "both" || slots.main === (m.key ?? m.name))
+          (s === "main" ||
+            s === "mainHand" ||
+            s === "both" ||
+            slots.main === (m.key ?? m.name))
         );
       }
       if (slot === "offHand") {
         return (
           m.type === "pilot_module_weapon" &&
-          (s === "off" || s === "offHand" || s === "both" || slots.off === (m.key ?? m.name))
+          (s === "off" ||
+            s === "offHand" ||
+            s === "both" ||
+            slots.off === (m.key ?? m.name))
         );
       }
       return false;
@@ -694,14 +700,8 @@ export function saveVehiclesAction(
         return {
           ...module,
           name: nextName,
-          customName:
-            module?.customName ??
-            prevModule?.customName ??
-            "",
-          description:
-            module?.description ??
-            prevModule?.description ??
-            "",
+          customName: module?.customName ?? prevModule?.customName ?? "",
+          description: module?.description ?? prevModule?.description ?? "",
         };
       });
       return { ...vehicle, modules };

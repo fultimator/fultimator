@@ -113,9 +113,12 @@ export function getEquippedModuleForSlot(
   if (!result) return null;
   const { mods, s } = result;
 
-  if (slot === "armor") return mods.find((m) => (m.key ?? m.name) === s.armor) ?? null;
-  if (slot === "mainHand") return mods.find((m) => (m.key ?? m.name) === s.main) ?? null;
-  if (slot === "offHand") return mods.find((m) => (m.key ?? m.name) === s.off) ?? null;
+  if (slot === "armor")
+    return mods.find((m) => (m.key ?? m.name) === s.armor) ?? null;
+  if (slot === "mainHand")
+    return mods.find((m) => (m.key ?? m.name) === s.main) ?? null;
+  if (slot === "offHand")
+    return mods.find((m) => (m.key ?? m.name) === s.off) ?? null;
   return null;
 }
 

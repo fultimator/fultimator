@@ -27,7 +27,16 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
 
   return (
     <>
-      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <Accordion
+        disableGutters
+        elevation={0}
+        square
+        sx={{
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          "&:before": { display: "none" },
+        }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Info />
@@ -35,12 +44,24 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
           <Typography variant="h4">{t("Infusion Details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+          <ReactMarkdown
+            components={{
+              p: ({ node: _n, ...props }) => (
+                <p style={{ margin: 0 }} {...props} />
+              ),
+            }}
+          >
             {t(
               "When you successfully hit one or more targets with an attack, you may spend 2 Inventory Points to produce a special **infusion** and apply the corresponding effect to that attack (if the attack had the **multi** property, apply the effects of the infusion to each target).",
             )}
           </ReactMarkdown>
-          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+          <ReactMarkdown
+            components={{
+              p: ({ node: _n, ...props }) => (
+                <p style={{ margin: 0 }} {...props} />
+              ),
+            }}
+          >
             {t(
               "You cannot apply more than one infusion to the same attack; producing and using an infusion are both part of the action you used to attack with the weapon.",
             )}
@@ -64,15 +85,28 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "left", minHeight: "40px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+              minHeight: "40px",
+            }}
             size="grow"
           >
-            <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+            <Typography
+              variant="h3"
+              style={{ flexGrow: 1, marginRight: "5px" }}
+            >
               {t("Infusion")}
             </Typography>
           </Grid>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "40px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "40px",
+            }}
             size={8}
           >
             <Typography variant="h3">{t("Effect")}</Typography>
@@ -111,7 +145,14 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
             </Grid>
           </Grid>
           {isEditMode && (
-            <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                flexShrink: 0,
+              }}
+            >
               {!showInPlayerSheet && (
                 <Tooltip title={t("Infusion not shown in player sheet")}>
                   <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
@@ -165,7 +206,11 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   }}
                   size={8}
                 >
-                  <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <span {...props} /> }}>
+                  <ReactMarkdown
+                    components={{
+                      p: ({ node: _n, ...props }) => <span {...props} />,
+                    }}
+                  >
                     {effect.effect}
                   </ReactMarkdown>
                 </Grid>
@@ -246,7 +291,11 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   }}
                   size={8}
                 >
-                  <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <span {...props} /> }}>
+                  <ReactMarkdown
+                    components={{
+                      p: ({ node: _n, ...props }) => <span {...props} />,
+                    }}
+                  >
                     {effect.effect}
                   </ReactMarkdown>
                 </Grid>
@@ -327,7 +376,11 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   }}
                   size={8}
                 >
-                  <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <span {...props} /> }}>
+                  <ReactMarkdown
+                    components={{
+                      p: ({ node: _n, ...props }) => <span {...props} />,
+                    }}
+                  >
                     {effect.effect}
                   </ReactMarkdown>
                 </Grid>

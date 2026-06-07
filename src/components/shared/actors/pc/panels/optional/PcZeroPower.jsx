@@ -15,12 +15,23 @@ export default function PcZeroPower({ pc, isInteractive = false, onUpdate }) {
   const headerActions = isInteractive ? (
     <Box sx={{ display: "flex", gap: 0.5 }}>
       <Tooltip title={t("Add")} arrow>
-        <IconButton size="small" onClick={() => { setAddOpen(true); setEditorOpen(true); }} sx={{ color: "#fff" }}>
+        <IconButton
+          size="small"
+          onClick={() => {
+            setAddOpen(true);
+            setEditorOpen(true);
+          }}
+          sx={{ color: "#fff" }}
+        >
           <AddIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       <Tooltip title={t("Open Compendium")} arrow>
-        <IconButton size="small" onClick={() => setCompendiumOpen(true)} sx={{ color: "#fff" }}>
+        <IconButton
+          size="small"
+          onClick={() => setCompendiumOpen(true)}
+          sx={{ color: "#fff" }}
+        >
           <SearchIcon fontSize="small" />
         </IconButton>
       </Tooltip>
@@ -43,7 +54,10 @@ export default function PcZeroPower({ pc, isInteractive = false, onUpdate }) {
           setPlayer={onUpdate}
           isEditMode={isInteractive}
           externalOpen={editorOpen}
-          onExternalClose={() => { setEditorOpen(false); setAddOpen(false); }}
+          onExternalClose={() => {
+            setEditorOpen(false);
+            setAddOpen(false);
+          }}
           externalCreating={addOpen}
           externalCompendiumOpen={compendiumOpen}
           onExternalCompendiumClose={() => setCompendiumOpen(false)}

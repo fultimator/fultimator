@@ -1,4 +1,13 @@
-import { Grid, Paper, Button, useTheme, Tabs, Tab, IconButton, Tooltip } from "@mui/material";
+import {
+  Grid,
+  Paper,
+  Button,
+  useTheme,
+  Tabs,
+  Tab,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { AutoAwesome, Download } from "@mui/icons-material";
 import { useState, useRef } from "react";
 import { SharedQualityCard } from "../../../components/shared/items";
@@ -38,7 +47,10 @@ function Qualities({ variant = "equip" }) {
 
   const fileInputRef = useRef(null);
   const cardRef = useRef(null);
-  const [downloadImage, downloadSnackbar] = useDownloadImage(formState.name, cardRef);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
+    formState.name,
+    cardRef,
+  );
 
   const { handleFileUpload } = useUploadJSON((data) => {
     if (!data) return;
@@ -89,7 +101,10 @@ function Qualities({ variant = "equip" }) {
             sx={{
               mb: 2,
               "& .MuiTab-root": {
-                color: theme.palette.mode === "dark" ? "rgba(255,255,255,0.7)" : undefined,
+                color:
+                  theme.palette.mode === "dark"
+                    ? "rgba(255,255,255,0.7)"
+                    : undefined,
               },
               "& .MuiTab-root.Mui-selected": {
                 color: theme.palette.mode === "dark" ? "#ffffff" : undefined,
@@ -136,7 +151,11 @@ function Qualities({ variant = "equip" }) {
                   </Button>
                 </Grid>
                 <Grid size={6}>
-                  <Button variant="outlined" fullWidth onClick={handleClearFields}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    onClick={handleClearFields}
+                  >
                     {t("Clear All Fields")}
                   </Button>
                 </Grid>
@@ -152,7 +171,11 @@ function Qualities({ variant = "equip" }) {
           )}
 
           {tab === 1 && (
-            <QualitiesGenerator onGenerate={(text) => setFormState((prev) => ({ ...prev, quality: text }))} />
+            <QualitiesGenerator
+              onGenerate={(text) =>
+                setFormState((prev) => ({ ...prev, quality: text }))
+              }
+            />
           )}
         </Paper>
       </Grid>
@@ -169,13 +192,19 @@ function Qualities({ variant = "equip" }) {
             imageMode="slot"
             showImageToggle
             actionContent={
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <Tooltip title={t("Download as Image")}>
                   <IconButton onClick={downloadImage}>
                     <Download />
                   </IconButton>
                 </Tooltip>
-                <Export name={formState.name} dataType="qualities" data={qualityData} />
+                <Export
+                  name={formState.name}
+                  dataType="qualities"
+                  data={qualityData}
+                />
                 <AddToCompendiumButton itemType="quality" data={qualityData} />
               </div>
             }

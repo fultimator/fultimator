@@ -27,7 +27,17 @@ function ModuleRow({ name, onChat, onRoll, t }) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   return (
-    <Box sx={{ overflow: "hidden", display: "flex", alignItems: "stretch", minHeight: 44, borderRadius: "4px", border: "1px solid", borderColor: "divider" }}>
+    <Box
+      sx={{
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "stretch",
+        minHeight: 44,
+        borderRadius: "4px",
+        border: "1px solid",
+        borderColor: "divider",
+      }}
+    >
       <Typography
         noWrap
         sx={{
@@ -44,16 +54,33 @@ function ModuleRow({ name, onChat, onRoll, t }) {
       >
         {name}
       </Typography>
-      <Box sx={{ bgcolor: primary, display: "flex", alignItems: "center", alignSelf: "stretch", px: 1, gap: 0.25 }}>
+      <Box
+        sx={{
+          bgcolor: primary,
+          display: "flex",
+          alignItems: "center",
+          alignSelf: "stretch",
+          px: 1,
+          gap: 0.25,
+        }}
+      >
         {onRoll ? (
           <Tooltip title={t("Roll")}>
-            <IconButton size="small" onClick={onRoll} sx={{ p: 0.5, color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={onRoll}
+              sx={{ p: 0.5, color: "#fff" }}
+            >
               <Casino fontSize="small" />
             </IconButton>
           </Tooltip>
         ) : (
           <Tooltip title={t("Send to Chat")}>
-            <IconButton size="small" onClick={onChat} sx={{ p: 0.5, color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={onChat}
+              sx={{ p: 0.5, color: "#fff" }}
+            >
               <Message fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -63,7 +90,11 @@ function ModuleRow({ name, onChat, onRoll, t }) {
   );
 }
 
-export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) {
+export default function PlayerVehicle({
+  player,
+  setPlayer,
+  _isCharacterSheet,
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const _custom = useCustomTheme();
@@ -168,7 +199,10 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
     const dmg = module.damage || {};
     const attr1 = acc.attr1 || "dexterity";
     const attr2 = acc.attr2 || "might";
-    const name = module.name === "pilot_custom_weapon" ? module.customName : t(module.name);
+    const name =
+      module.name === "pilot_custom_weapon"
+        ? module.customName
+        : t(module.name);
     const intent = prepareAccuracyCheck({
       arg: name,
       name,
@@ -181,14 +215,22 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
       category: module.category,
       isWeaponModule: true,
       damageHrZero: dmg.hrZero === true,
-      range: module.range === "Ranged" || module.range === "ranged" ? "ranged" : "melee",
+      range:
+        module.range === "Ranged" || module.range === "ranged"
+          ? "ranged"
+          : "melee",
     });
     const dieSizes = {
       primary: attrDieMap[attr1] ?? 8,
       secondary: attrDieMap[attr2] ?? 8,
     };
     const rolls = rollAccuracyCheck(dieSizes);
-    const result = processAccuracyCheck(intent, rolls, dieSizes, player?.info?.name || "");
+    const result = processAccuracyCheck(
+      intent,
+      rolls,
+      dieSizes,
+      player?.info?.name || "",
+    );
     sendRollMessage(buildAccuracyCheckMessage(result));
   };
 
@@ -216,28 +258,35 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
     <>
       <Divider sx={{ my: 1 }} />
       <SectionCard title={t("pilot_vehicle")} noShadow>
-        <Grid
-          container
-          spacing={1}
-          sx={{ p: 0.75, flex: 1, width: "100%" }}
-        >
+        <Grid container spacing={1} sx={{ p: 0.75, flex: 1, width: "100%" }}>
           {frame && (
             <Grid size={{ xs: 12, md: 6 }}>
               <ModuleRow
                 name={t(frame.name)}
-                onChat={() => sendDisplayMessage("item", t(frame.name), { speaker: player?.info?.name || "" })}
+                onChat={() =>
+                  sendDisplayMessage("item", t(frame.name), {
+                    speaker: player?.info?.name || "",
+                  })
+                }
                 t={t}
               />
             </Grid>
           )}
 
           {armorModules.map((module, index) => {
-            const name = module.name === "pilot_custom_armor" ? module.customName : t(module.name);
+            const name =
+              module.name === "pilot_custom_armor"
+                ? module.customName
+                : t(module.name);
             return (
               <Grid key={`armor-${index}`} size={{ xs: 12, md: 6 }}>
                 <ModuleRow
                   name={name}
-                  onChat={() => sendDisplayMessage("item", name, { speaker: player?.info?.name || "" })}
+                  onChat={() =>
+                    sendDisplayMessage("item", name, {
+                      speaker: player?.info?.name || "",
+                    })
+                  }
                   t={t}
                 />
               </Grid>
@@ -245,12 +294,19 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
           })}
 
           {weaponModules.map((module, index) => {
-            const name = module.name === "pilot_custom_weapon" ? module.customName : t(module.name);
+            const name =
+              module.name === "pilot_custom_weapon"
+                ? module.customName
+                : t(module.name);
             return (
               <Grid key={`weapon-${index}`} size={{ xs: 12, md: 6 }}>
                 <ModuleRow
                   name={name}
-                  onChat={() => sendDisplayMessage("item", name, { speaker: player?.info?.name || "" })}
+                  onChat={() =>
+                    sendDisplayMessage("item", name, {
+                      speaker: player?.info?.name || "",
+                    })
+                  }
                   onRoll={() => handleDiceRoll(module)}
                   t={t}
                 />
@@ -259,12 +315,19 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
           })}
 
           {supportModules.map((module, index) => {
-            const name = module.name === "pilot_custom_support" ? module.customName : t(module.name);
+            const name =
+              module.name === "pilot_custom_support"
+                ? module.customName
+                : t(module.name);
             return (
               <Grid key={`support-${index}`} size={{ xs: 12, md: 6 }}>
                 <ModuleRow
                   name={name}
-                  onChat={() => sendDisplayMessage("item", name, { speaker: player?.info?.name || "" })}
+                  onChat={() =>
+                    sendDisplayMessage("item", name, {
+                      speaker: player?.info?.name || "",
+                    })
+                  }
                   t={t}
                 />
               </Grid>

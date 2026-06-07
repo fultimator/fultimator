@@ -9,7 +9,14 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { Delete, TouchApp, DragIndicator, MoreVert, ArrowUpward, ArrowDownward } from "@mui/icons-material";
+import {
+  Delete,
+  TouchApp,
+  DragIndicator,
+  MoreVert,
+  ArrowUpward,
+  ArrowDownward,
+} from "@mui/icons-material";
 import TurnTokens from "./TurnTokens";
 import ResourceInlineBars from "./ResourceInlineBars";
 import ResourceInlineReadout from "./ResourceInlineReadout";
@@ -90,8 +97,16 @@ export default function PcListItem({
   const maxFp = pc.combatStats?.maxFp ?? 6;
   const currentHp = pc.combatStats?.currentHp ?? runtime?.currentHp ?? maxHp;
   const currentMp = pc.combatStats?.currentMp ?? runtime?.currentMp ?? maxMp;
-  const currentIp = pc.combatStats?.currentIp ?? runtime?.currentIp ?? pc.stats?.ip?.current ?? 0;
-  const currentFp = pc.combatStats?.currentFp ?? runtime?.currentFp ?? pc.info?.fabulapoints ?? 0;
+  const currentIp =
+    pc.combatStats?.currentIp ??
+    runtime?.currentIp ??
+    pc.stats?.ip?.current ??
+    0;
+  const currentFp =
+    pc.combatStats?.currentFp ??
+    runtime?.currentFp ??
+    pc.info?.fabulapoints ??
+    0;
 
   return (
     <ListItem
@@ -106,9 +121,10 @@ export default function PcListItem({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       sx={{
-        border: selectedPcID === pc.combatId
-          ? `2px solid ${theme.palette.success.main}`
-          : `1px solid ${alpha(theme.palette.success.main, 0.28)}`,
+        border:
+          selectedPcID === pc.combatId
+            ? `2px solid ${theme.palette.success.main}`
+            : `1px solid ${alpha(theme.palette.success.main, 0.28)}`,
         marginY: 0.35,
         borderRadius: 1.2,
         position: "relative",
@@ -229,7 +245,11 @@ export default function PcListItem({
       >
         <Typography
           variant="h6"
-          sx={{ fontWeight: "bold", color: isDarkMode ? "#fff" : "#333", fontSize: "0.92rem" }}
+          sx={{
+            fontWeight: "bold",
+            color: isDarkMode ? "#fff" : "#333",
+            fontSize: "0.92rem",
+          }}
         >
           {index + 1}
         </Typography>

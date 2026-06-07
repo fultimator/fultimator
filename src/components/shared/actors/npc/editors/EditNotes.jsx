@@ -189,7 +189,11 @@ export default function EditNotes({ npc, setNpc }) {
       actions={
         <>
           <Tooltip title={t("Search Compendium")}>
-            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={() => setModalOpen(true)}
+              sx={{ color: "#fff" }}
+            >
               <Search fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -202,79 +206,81 @@ export default function EditNotes({ npc, setNpc }) {
       }
     >
       <Box sx={{ p: 1 }}>
-      {npc.notes?.map((note, i) => (
-        <ItemRowCard
-          key={i}
-          label={note.name || t("(unnamed)")}
-          actions={
-            <>
-              <IconButton
-                component="span"
-                onClick={() =>
-                  addMessage({
-                    id: crypto.randomUUID(),
-                    createdAt: Date.now(),
-                    speaker: npc.name || "NPC",
-                    kind: "display",
-                    itemType: "note",
-                    name: note.name,
-                    tags: [],
-                    description: note.effect || note.description,
-                  })
-                }
-              >
-                <Casino />
-              </IconButton>
-              <NoteContextMenu
-                note={note}
-                npcName={npc.name}
-                onDelete={() => openDeleteDialog(i)}
-                onMoveUp={() => moveNote(i, i - 1)}
-                onMoveDown={() => moveNote(i, i + 1)}
-                showMoveUp={i > 0}
-                showMoveDown={i < (npc.notes?.length ?? 0) - 1}
-              />
-            </>
-          }
-          onClick={() => toggleExpanded(i)}
-          paperSx={{ mb: 0.5 }}
-        >
-          {expandedSet.has(i) && (
-            <Box sx={{ p: 1 }}>
-              <Grid container spacing={1}>
-                <Grid size={12}>
-                  <FormControl fullWidth>
-                    <TextField
-                      label={t("Name:")}
-                      value={note.name}
-                      onChange={(e) => onChange(i, "name", e.target.value)}
-                      size="small"
-                    />
-                  </FormControl>
+        {npc.notes?.map((note, i) => (
+          <ItemRowCard
+            key={i}
+            label={note.name || t("(unnamed)")}
+            actions={
+              <>
+                <IconButton
+                  component="span"
+                  onClick={() =>
+                    addMessage({
+                      id: crypto.randomUUID(),
+                      createdAt: Date.now(),
+                      speaker: npc.name || "NPC",
+                      kind: "display",
+                      itemType: "note",
+                      name: note.name,
+                      tags: [],
+                      description: note.effect || note.description,
+                    })
+                  }
+                >
+                  <Casino />
+                </IconButton>
+                <NoteContextMenu
+                  note={note}
+                  npcName={npc.name}
+                  onDelete={() => openDeleteDialog(i)}
+                  onMoveUp={() => moveNote(i, i - 1)}
+                  onMoveDown={() => moveNote(i, i + 1)}
+                  showMoveUp={i > 0}
+                  showMoveDown={i < (npc.notes?.length ?? 0) - 1}
+                />
+              </>
+            }
+            onClick={() => toggleExpanded(i)}
+            paperSx={{ mb: 0.5 }}
+          >
+            {expandedSet.has(i) && (
+              <Box sx={{ p: 1 }}>
+                <Grid container spacing={1}>
+                  <Grid size={12}>
+                    <FormControl fullWidth>
+                      <TextField
+                        label={t("Name:")}
+                        value={note.name}
+                        onChange={(e) => onChange(i, "name", e.target.value)}
+                        size="small"
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid size={12}>
+                    <FormControl fullWidth>
+                      <CustomTextarea
+                        label={t("Description:")}
+                        value={note.description ?? ""}
+                        onChange={(e) =>
+                          onChange(i, "description", e.target.value)
+                        }
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid size={12}>
+                    <FormControl fullWidth>
+                      <CustomTextarea
+                        label={t("Effect:")}
+                        value={note.effect ?? ""}
+                        onChange={(e) => onChange(i, "effect", e.target.value)}
+                      />
+                    </FormControl>
+                  </Grid>
                 </Grid>
-                <Grid size={12}>
-                  <FormControl fullWidth>
-                    <CustomTextarea
-                      label={t("Description:")}
-                      value={note.description ?? ""}
-                      onChange={(e) => onChange(i, "description", e.target.value)}
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid size={12}>
-                  <FormControl fullWidth>
-                    <CustomTextarea
-                      label={t("Effect:")}
-                      value={note.effect ?? ""}
-                      onChange={(e) => onChange(i, "effect", e.target.value)}
-                    />
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Box>
-          )}
-        </ItemRowCard>
-      ))}
+              </Box>
+            )}
+          </ItemRowCard>
+        ))}
       </Box>
       <CompendiumViewerModal
         open={modalOpen}

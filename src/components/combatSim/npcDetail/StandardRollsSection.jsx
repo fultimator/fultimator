@@ -108,10 +108,34 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
   };
 
   const quickCheckButtons = [
-    { key: "group", title: "Group Check", icon: <CheckGroupIcon size="1.8em" />, l1: "Group", l2: "Check" },
-    { key: "attribute", title: "Attribute Check", icon: <CheckAttributeIcon size="1.8em" />, l1: "Attribute", l2: "Check" },
-    { key: "open", title: "Open Check", icon: <CheckOpenIcon size="1.8em" />, l1: "Open", l2: "Check" },
-    { key: "opposed", title: "Opposed Check", icon: <CheckOpposedIcon size="1.8em" />, l1: "Opposed", l2: "Check" },
+    {
+      key: "group",
+      title: "Group Check",
+      icon: <CheckGroupIcon size="1.8em" />,
+      l1: "Group",
+      l2: "Check",
+    },
+    {
+      key: "attribute",
+      title: "Attribute Check",
+      icon: <CheckAttributeIcon size="1.8em" />,
+      l1: "Attribute",
+      l2: "Check",
+    },
+    {
+      key: "open",
+      title: "Open Check",
+      icon: <CheckOpenIcon size="1.8em" />,
+      l1: "Open",
+      l2: "Check",
+    },
+    {
+      key: "opposed",
+      title: "Opposed Check",
+      icon: <CheckOpposedIcon size="1.8em" />,
+      l1: "Opposed",
+      l2: "Check",
+    },
   ];
 
   return (
@@ -120,7 +144,10 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, minmax(0,1fr))" },
+            gridTemplateColumns: {
+              xs: "1fr 1fr",
+              sm: "repeat(4, minmax(0,1fr))",
+            },
             gap: 1,
           }}
         >
@@ -140,12 +167,16 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
                     gap: 0.6,
                   }}
                 >
-                  <Box sx={{ display: "inline-flex", flexShrink: 0 }}>{item.icon}</Box>
+                  <Box sx={{ display: "inline-flex", flexShrink: 0 }}>
+                    {item.icon}
+                  </Box>
                   <Typography
                     variant="caption"
                     sx={{ lineHeight: 1.1, fontWeight: 700, textAlign: "left" }}
                   >
-                    {t(item.l1)}<br />{t(item.l2)}
+                    {t(item.l1)}
+                    <br />
+                    {t(item.l2)}
                   </Typography>
                 </Box>
               </IconButton>
@@ -191,7 +222,9 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
           <Stack spacing={1}>
             <Stack direction="row" spacing={1}>
               <FormControl fullWidth size="small">
-                <InputLabel id="npc-quick-check-primary-label">{t("Attr 1")}</InputLabel>
+                <InputLabel id="npc-quick-check-primary-label">
+                  {t("Attr 1")}
+                </InputLabel>
                 <Select
                   labelId="npc-quick-check-primary-label"
                   label={t("Attr 1")}
@@ -199,14 +232,19 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
                   onChange={(e) => setSelectedAttr1(e.target.value)}
                 >
                   {attributes.map((attr) => (
-                    <MenuItem key={`npc-qc-primary-${attr.label}`} value={attr.label}>
+                    <MenuItem
+                      key={`npc-qc-primary-${attr.label}`}
+                      value={attr.label}
+                    >
                       {t(attr.label)}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
               <FormControl fullWidth size="small">
-                <InputLabel id="npc-quick-check-secondary-label">{t("Attr 2")}</InputLabel>
+                <InputLabel id="npc-quick-check-secondary-label">
+                  {t("Attr 2")}
+                </InputLabel>
                 <Select
                   labelId="npc-quick-check-secondary-label"
                   label={t("Attr 2")}
@@ -214,7 +252,10 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
                   onChange={(e) => setSelectedAttr2(e.target.value)}
                 >
                   {attributes.map((attr) => (
-                    <MenuItem key={`npc-qc-secondary-${attr.label}`} value={attr.label}>
+                    <MenuItem
+                      key={`npc-qc-secondary-${attr.label}`}
+                      value={attr.label}
+                    >
                       {t(attr.label)}
                     </MenuItem>
                   ))}
@@ -240,7 +281,9 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
                     labelId="npc-quick-check-difficulty-mode-label"
                     label={t("Difficulty")}
                     value={quickCheckDifficultyMode}
-                    onChange={(e) => setQuickCheckDifficultyMode(e.target.value)}
+                    onChange={(e) =>
+                      setQuickCheckDifficultyMode(e.target.value)
+                    }
                   >
                     <MenuItem value="preset">{t("Preset")}</MenuItem>
                     <MenuItem value="custom">{t("Custom DL")}</MenuItem>
@@ -271,7 +314,9 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
                     type="number"
                     label={t("Custom DL")}
                     value={quickCheckCustomDifficulty}
-                    onChange={(e) => setQuickCheckCustomDifficulty(e.target.value)}
+                    onChange={(e) =>
+                      setQuickCheckCustomDifficulty(e.target.value)
+                    }
                   />
                 )}
               </>

@@ -38,7 +38,10 @@ function ModifierControls({ value, onChange, font, theme }) {
       <IconButton
         size="small"
         sx={{ p: 0, color: "#fff" }}
-        onPointerDown={(e) => { e.preventDefault(); onChange((value ?? 0) - 1); }}
+        onPointerDown={(e) => {
+          e.preventDefault();
+          onChange((value ?? 0) - 1);
+        }}
       >
         <Remove sx={{ fontSize: "0.85rem" }} />
       </IconButton>
@@ -65,15 +68,26 @@ function ModifierControls({ value, onChange, font, theme }) {
         sx={{
           width: "28px",
           "& .MuiInputBase-root": { display: "flex", alignItems: "center" },
-          "& .MuiInputBase-input": { color: "#fff", WebkitTextFillColor: "#fff", p: 0 },
-          "& .MuiInput-underline:before": { borderBottomColor: `${theme.palette.secondary.main} !important` },
-          "& .MuiInput-underline:after": { borderBottomColor: `${theme.palette.secondary.main} !important` },
+          "& .MuiInputBase-input": {
+            color: "#fff",
+            WebkitTextFillColor: "#fff",
+            p: 0,
+          },
+          "& .MuiInput-underline:before": {
+            borderBottomColor: `${theme.palette.secondary.main} !important`,
+          },
+          "& .MuiInput-underline:after": {
+            borderBottomColor: `${theme.palette.secondary.main} !important`,
+          },
         }}
       />
       <IconButton
         size="small"
         sx={{ p: 0, color: "#fff" }}
-        onPointerDown={(e) => { e.preventDefault(); onChange((value ?? 0) + 1); }}
+        onPointerDown={(e) => {
+          e.preventDefault();
+          onChange((value ?? 0) + 1);
+        }}
       >
         <Add sx={{ fontSize: "0.85rem" }} />
       </IconButton>
@@ -84,10 +98,25 @@ function ModifierControls({ value, onChange, font, theme }) {
 // -- Quick checks --
 
 const QUICK_CHECK_ATTRIBUTES = ["dex", "ins", "mig", "wlp"];
-const QUICK_CHECK_ATTRIBUTE_LABELS = { dex: "DEX", ins: "INS", mig: "MIG", wlp: "WLP" };
-const QUICK_CHECK_ATTR_KEY = { dex: "dexterity", ins: "insight", mig: "might", wlp: "willpower" };
+const QUICK_CHECK_ATTRIBUTE_LABELS = {
+  dex: "DEX",
+  ins: "INS",
+  mig: "MIG",
+  wlp: "WLP",
+};
+const QUICK_CHECK_ATTR_KEY = {
+  dex: "dexterity",
+  ins: "insight",
+  mig: "might",
+  wlp: "willpower",
+};
 const QUICK_CHECK_DIFFICULTIES = [7, 10, 13, 16];
-const QUICK_CHECK_DIFFICULTY_LABELS = { 7: "Easy", 10: "Normal", 13: "Hard", 16: "Very Hard" };
+const QUICK_CHECK_DIFFICULTY_LABELS = {
+  7: "Easy",
+  10: "Normal",
+  13: "Hard",
+  16: "Very Hard",
+};
 
 function QuickChecks({ onQuickCheck, pc, scale = "lg" }) {
   const { t } = useTranslate();
@@ -114,9 +143,14 @@ function QuickChecks({ onQuickCheck, pc, scale = "lg" }) {
 
   const submit = () => {
     const parsedCustomDl = parseInt(customDl, 10);
-    const dl = kind === "attribute"
-      ? (diffMode === "custom" && Number.isFinite(parsedCustomDl) && parsedCustomDl > 0 ? parsedCustomDl : difficulty)
-      : undefined;
+    const dl =
+      kind === "attribute"
+        ? diffMode === "custom" &&
+          Number.isFinite(parsedCustomDl) &&
+          parsedCustomDl > 0
+          ? parsedCustomDl
+          : difficulty
+        : undefined;
     onQuickCheck?.({
       kind: kind === "attribute" ? "attribute" : "open",
       primary: primary1,
@@ -128,10 +162,25 @@ function QuickChecks({ onQuickCheck, pc, scale = "lg" }) {
   };
 
   const checks = [
-    { checkKind: "group", Icon: CheckGroupIcon, line1: "Group", line2: "Check" },
-    { checkKind: "attribute", Icon: CheckAttributeIcon, line1: "Attribute", line2: "Check" },
+    {
+      checkKind: "group",
+      Icon: CheckGroupIcon,
+      line1: "Group",
+      line2: "Check",
+    },
+    {
+      checkKind: "attribute",
+      Icon: CheckAttributeIcon,
+      line1: "Attribute",
+      line2: "Check",
+    },
     { checkKind: "open", Icon: CheckOpenIcon, line1: "Open", line2: "Check" },
-    { checkKind: "opposed", Icon: CheckOpposedIcon, line1: "Opposed", line2: "Check" },
+    {
+      checkKind: "opposed",
+      Icon: CheckOpposedIcon,
+      line1: "Opposed",
+      line2: "Check",
+    },
   ];
 
   return (
@@ -142,12 +191,22 @@ function QuickChecks({ onQuickCheck, pc, scale = "lg" }) {
             key={checkKind}
             onClick={(e) => openPopover(e, checkKind)}
             sx={{
-              flex: 1, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center",
-              gap: "4px", px: "6px", py: "4px", borderRadius: 1, cursor: "pointer",
+              flex: 1,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "4px",
+              px: "6px",
+              py: "4px",
+              borderRadius: 1,
+              cursor: "pointer",
               color: "text.primary",
               "&:hover": {
                 bgcolor: alpha(primary, 0.1),
-                "& .check-icon": { animation: "quickCheckBob 0.9s ease-in-out infinite" },
+                "& .check-icon": {
+                  animation: "quickCheckBob 0.9s ease-in-out infinite",
+                },
               },
               "@keyframes quickCheckBob": {
                 "0%": { transform: "translateY(0px)" },
@@ -159,8 +218,19 @@ function QuickChecks({ onQuickCheck, pc, scale = "lg" }) {
             <Box className="check-icon" sx={{ display: "inline-flex" }}>
               <Icon size={iconSize} />
             </Box>
-            <Typography sx={{ fontFamily: "Antonio", fontWeight: 700, fontSize: labelSize, textTransform: "uppercase", lineHeight: 1.1, letterSpacing: "0.03em" }}>
-              {t(line1)}<br />{t(line2)}
+            <Typography
+              sx={{
+                fontFamily: "Antonio",
+                fontWeight: 700,
+                fontSize: labelSize,
+                textTransform: "uppercase",
+                lineHeight: 1.1,
+                letterSpacing: "0.03em",
+              }}
+            >
+              {t(line1)}
+              <br />
+              {t(line2)}
             </Typography>
           </Box>
         ))}
@@ -174,45 +244,78 @@ function QuickChecks({ onQuickCheck, pc, scale = "lg" }) {
         slotProps={{
           paper: {
             sx: {
-              overflow: "visible", mt: 1,
+              overflow: "visible",
+              mt: 1,
               "&::before": {
-                content: '""', display: "block", position: "absolute",
-                top: 0, left: "50%", width: 12, height: 12,
+                content: '""',
+                display: "block",
+                position: "absolute",
+                top: 0,
+                left: "50%",
+                width: 12,
+                height: 12,
                 backgroundColor: "background.paper",
                 transform: "translate(-50%, -50%) rotate(45deg)",
-                borderTop: "1px solid", borderLeft: "1px solid", borderColor: "divider", zIndex: 0,
+                borderTop: "1px solid",
+                borderLeft: "1px solid",
+                borderColor: "divider",
+                zIndex: 0,
               },
             },
           },
         }}
       >
         <Box sx={{ p: 1.5, minWidth: 280, maxWidth: 340 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>{t("Roll Check")}</Typography>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+            {t("Roll Check")}
+          </Typography>
           <Stack spacing={1}>
             <Stack direction="row" spacing={1}>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("Attr 1")}</InputLabel>
-                <Select label={t("Attr 1")} value={primary1} onChange={(e) => setPrimary1(e.target.value)}>
+                <Select
+                  label={t("Attr 1")}
+                  value={primary1}
+                  onChange={(e) => setPrimary1(e.target.value)}
+                >
                   {QUICK_CHECK_ATTRIBUTES.map((a) => (
-                    <MenuItem key={a} value={a}>{t(QUICK_CHECK_ATTRIBUTE_LABELS[a])} (d{dieSize(a)})</MenuItem>
+                    <MenuItem key={a} value={a}>
+                      {t(QUICK_CHECK_ATTRIBUTE_LABELS[a])} (d{dieSize(a)})
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
               <FormControl fullWidth size="small">
                 <InputLabel>{t("Attr 2")}</InputLabel>
-                <Select label={t("Attr 2")} value={secondary} onChange={(e) => setSecondary(e.target.value)}>
+                <Select
+                  label={t("Attr 2")}
+                  value={secondary}
+                  onChange={(e) => setSecondary(e.target.value)}
+                >
                   {QUICK_CHECK_ATTRIBUTES.map((a) => (
-                    <MenuItem key={a} value={a}>{t(QUICK_CHECK_ATTRIBUTE_LABELS[a])} (d{dieSize(a)})</MenuItem>
+                    <MenuItem key={a} value={a}>
+                      {t(QUICK_CHECK_ATTRIBUTE_LABELS[a])} (d{dieSize(a)})
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Stack>
-            <TextField size="small" type="number" label={t("Modifier")} value={modifier} onChange={(e) => setModifier(e.target.value)} />
+            <TextField
+              size="small"
+              type="number"
+              label={t("Modifier")}
+              value={modifier}
+              onChange={(e) => setModifier(e.target.value)}
+            />
             {kind === "attribute" && (
               <>
                 <FormControl fullWidth size="small">
                   <InputLabel>{t("Difficulty")}</InputLabel>
-                  <Select label={t("Difficulty")} value={diffMode} onChange={(e) => setDiffMode(e.target.value)}>
+                  <Select
+                    label={t("Difficulty")}
+                    value={diffMode}
+                    onChange={(e) => setDiffMode(e.target.value)}
+                  >
                     <MenuItem value="preset">{t("Preset")}</MenuItem>
                     <MenuItem value="custom">{t("Custom DL")}</MenuItem>
                   </Select>
@@ -220,18 +323,32 @@ function QuickChecks({ onQuickCheck, pc, scale = "lg" }) {
                 {diffMode === "preset" ? (
                   <FormControl fullWidth size="small">
                     <InputLabel>{t("DL")}</InputLabel>
-                    <Select label={t("DL")} value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                    <Select
+                      label={t("DL")}
+                      value={difficulty}
+                      onChange={(e) => setDifficulty(e.target.value)}
+                    >
                       {QUICK_CHECK_DIFFICULTIES.map((dl) => (
-                        <MenuItem key={dl} value={dl}>{`${dl} ${t(QUICK_CHECK_DIFFICULTY_LABELS[dl] || "")}`.trim()}</MenuItem>
+                        <MenuItem key={dl} value={dl}>
+                          {`${dl} ${t(QUICK_CHECK_DIFFICULTY_LABELS[dl] || "")}`.trim()}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 ) : (
-                  <TextField size="small" type="number" label={t("Custom DL")} value={customDl} onChange={(e) => setCustomDl(e.target.value)} />
+                  <TextField
+                    size="small"
+                    type="number"
+                    label={t("Custom DL")}
+                    value={customDl}
+                    onChange={(e) => setCustomDl(e.target.value)}
+                  />
                 )}
               </>
             )}
-            <Button variant="contained" onClick={submit}>{t("Roll Check")}</Button>
+            <Button variant="contained" onClick={submit}>
+              {t("Roll Check")}
+            </Button>
           </Stack>
         </Box>
       </Popover>
@@ -594,18 +711,60 @@ export default function PcStatsSummary({
           sx={{ width: "100%" }}
         >
           <CombatStatCard sx={{ px: s.cardPx, py: s.cardPy, width: "100%" }}>
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "2px",
+              }}
+            >
               <Box sx={layout}>
-                <Box sx={{ width: s.iconBox, height: s.iconBox, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Box component="img" src="/assets/icons/stats/icon_def.png" alt={t("DEF")} sx={{ width: s.iconBox, height: s.iconBox, objectFit: "contain", display: "block" }} />
+                <Box
+                  sx={{
+                    width: s.iconBox,
+                    height: s.iconBox,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src="/assets/icons/stats/icon_def.png"
+                    alt={t("DEF")}
+                    sx={{
+                      width: s.iconBox,
+                      height: s.iconBox,
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
                 </Box>
-                <Typography sx={{ ...defFont, color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase" }}>{t("DEF")}</Typography>
-                <Typography sx={{ ...defFont, color: "#fff" }}>{currDef}</Typography>
+                <Typography
+                  sx={{
+                    ...defFont,
+                    color: "#fff",
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {t("DEF")}
+                </Typography>
+                <Typography sx={{ ...defFont, color: "#fff" }}>
+                  {currDef}
+                </Typography>
               </Box>
               {isInteractive && (
                 <ModifierControls
                   value={pc.modifiers?.def ?? 0}
-                  onChange={(v) => onUpdate?.((p) => ({ ...p, modifiers: { ...p.modifiers, def: v } }))}
+                  onChange={(v) =>
+                    onUpdate?.((p) => ({
+                      ...p,
+                      modifiers: { ...p.modifiers, def: v },
+                    }))
+                  }
                   font={s.font}
                   theme={theme}
                 />
@@ -664,18 +823,60 @@ export default function PcStatsSummary({
           sx={{ width: "100%" }}
         >
           <CombatStatCard sx={{ px: s.cardPx, py: s.cardPy, width: "100%" }}>
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "2px",
+              }}
+            >
               <Box sx={layout}>
-                <Box sx={{ width: s.iconBox, height: s.iconBox, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Box component="img" src="/assets/icons/stats/icon_mdef.png" alt={t("M.DEF")} sx={{ width: s.iconBox, height: s.iconBox, objectFit: "contain", display: "block" }} />
+                <Box
+                  sx={{
+                    width: s.iconBox,
+                    height: s.iconBox,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src="/assets/icons/stats/icon_mdef.png"
+                    alt={t("M.DEF")}
+                    sx={{
+                      width: s.iconBox,
+                      height: s.iconBox,
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
                 </Box>
-                <Typography sx={{ ...defFont, color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase" }}>{t("M.DEF")}</Typography>
-                <Typography sx={{ ...defFont, color: "#fff" }}>{currMDef}</Typography>
+                <Typography
+                  sx={{
+                    ...defFont,
+                    color: "#fff",
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {t("M.DEF")}
+                </Typography>
+                <Typography sx={{ ...defFont, color: "#fff" }}>
+                  {currMDef}
+                </Typography>
               </Box>
               {isInteractive && (
                 <ModifierControls
                   value={pc.modifiers?.mdef ?? 0}
-                  onChange={(v) => onUpdate?.((p) => ({ ...p, modifiers: { ...p.modifiers, mdef: v } }))}
+                  onChange={(v) =>
+                    onUpdate?.((p) => ({
+                      ...p,
+                      modifiers: { ...p.modifiers, mdef: v },
+                    }))
+                  }
                   font={s.font}
                   theme={theme}
                 />
@@ -731,18 +932,60 @@ export default function PcStatsSummary({
           sx={{ width: "100%" }}
         >
           <CombatStatCard sx={{ px: s.cardPx, py: s.cardPy, width: "100%" }}>
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "2px",
+              }}
+            >
               <Box sx={layout}>
-                <Box sx={{ width: s.iconBox, height: s.iconBox, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Box component="img" src="/assets/icons/stats/icon_clock.png" alt={t("INIT")} sx={{ width: s.iconBox, height: s.iconBox, objectFit: "contain", display: "block" }} />
+                <Box
+                  sx={{
+                    width: s.iconBox,
+                    height: s.iconBox,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src="/assets/icons/stats/icon_clock.png"
+                    alt={t("INIT")}
+                    sx={{
+                      width: s.iconBox,
+                      height: s.iconBox,
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
                 </Box>
-                <Typography sx={{ ...defFont, color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase" }}>{t("INIT")}</Typography>
-                <Typography sx={{ ...defFont, color: "#fff" }}>{(currInit > 0 ? "+" : "") + currInit}</Typography>
+                <Typography
+                  sx={{
+                    ...defFont,
+                    color: "#fff",
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {t("INIT")}
+                </Typography>
+                <Typography sx={{ ...defFont, color: "#fff" }}>
+                  {(currInit > 0 ? "+" : "") + currInit}
+                </Typography>
               </Box>
               {isInteractive && (
                 <ModifierControls
                   value={pc.modifiers?.init ?? 0}
-                  onChange={(v) => onUpdate?.((p) => ({ ...p, modifiers: { ...p.modifiers, init: v } }))}
+                  onChange={(v) =>
+                    onUpdate?.((p) => ({
+                      ...p,
+                      modifiers: { ...p.modifiers, init: v },
+                    }))
+                  }
                   font={s.font}
                   theme={theme}
                 />

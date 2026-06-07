@@ -733,8 +733,28 @@ export function getThemePanelRadius({
   profile = "default",
   panelRadiusOverride,
   styleCustomization,
-}: Pick<ThemeComponentFactoryOptions, "mode" | "primary" | "secondary" | "ternary" | "quaternary" | "paper" | "profile" | "panelRadiusOverride" | "styleCustomization">): number {
-  const tokens = buildProfileTokens(profile, mode, primary, secondary, ternary, quaternary, paper, styleCustomization);
+}: Pick<
+  ThemeComponentFactoryOptions,
+  | "mode"
+  | "primary"
+  | "secondary"
+  | "ternary"
+  | "quaternary"
+  | "paper"
+  | "profile"
+  | "panelRadiusOverride"
+  | "styleCustomization"
+>): number {
+  const tokens = buildProfileTokens(
+    profile,
+    mode,
+    primary,
+    secondary,
+    ternary,
+    quaternary,
+    paper,
+    styleCustomization,
+  );
   if (panelRadiusOverride !== null && panelRadiusOverride !== undefined)
     return panelRadiusOverride;
   return tokens.panelRadius;
@@ -958,9 +978,10 @@ export function createThemeComponents({
           "&.Mui-disabled": {
             color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
           },
-          ".MuiFormControl-root:has(input[readonly]) &, .MuiFormControl-root:has(textarea[readonly]) &": {
-            color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
-          },
+          ".MuiFormControl-root:has(input[readonly]) &, .MuiFormControl-root:has(textarea[readonly]) &":
+            {
+              color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
+            },
         },
       },
     },
@@ -1092,7 +1113,9 @@ export function createThemeComponents({
           "&:hover": { color: isDark ? "#edf2f8" : "#243446" },
           "&.Mui-focused": { color: isDark ? "#edf2f8" : "#243446" },
           "&.Mui-disabled": {
-            backgroundColor: isDark ? alpha(ternary, 0.65) : alpha(ternary, 0.7),
+            backgroundColor: isDark
+              ? alpha(ternary, 0.65)
+              : alpha(ternary, 0.7),
             color: isDark ? "#edf2f8" : "#243446",
             WebkitTextFillColor: isDark ? "#edf2f8" : "#243446",
             opacity: 1,

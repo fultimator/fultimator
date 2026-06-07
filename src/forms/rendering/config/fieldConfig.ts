@@ -68,7 +68,9 @@ export interface FieldConfig<TFormState extends Record<string, unknown>> {
   tab?: string; // omit to place in the first tab
   group?: string;
   order: number;
-  componentProps?: Record<string, unknown> | ((state: TFormState) => Record<string, unknown>);
+  componentProps?:
+    | Record<string, unknown>
+    | ((state: TFormState) => Record<string, unknown>);
   parse?: (raw: unknown) => unknown;
   format?: (value: unknown) => unknown;
   dependencies?: DependencyPredicate<TFormState>;

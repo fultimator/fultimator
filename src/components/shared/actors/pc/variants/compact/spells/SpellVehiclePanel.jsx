@@ -32,10 +32,7 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
-import {
-  sendRollMessage,
-  sendDisplayMessage,
-} from "/src/hooks/useRollToChat";
+import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { SharedPilotVehicleCard } from "/src/components/shared/items";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 

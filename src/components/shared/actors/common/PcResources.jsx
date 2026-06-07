@@ -14,7 +14,11 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { alpha } from "@mui/material/styles";
 import { useTranslate } from "/src/translation/translate";
-import { HpResourceIcon, MpResourceIcon, IpResourceIcon } from "/src/components/icons";
+import {
+  HpResourceIcon,
+  MpResourceIcon,
+  IpResourceIcon,
+} from "/src/components/icons";
 import StatTooltip from "/src/components/common/StatTooltip";
 import { newShade } from "/src/libs/playerCalculations";
 import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
@@ -193,7 +197,10 @@ function CompactResourceBar({
   crisisLine = false,
 }) {
   const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
-  const { animatedPct, delta } = useAnimatedDeltaPercent(pct, { moveMs: 760, deltaMs: 1800 });
+  const { animatedPct, delta } = useAnimatedDeltaPercent(pct, {
+    moveMs: 760,
+    deltaMs: 1800,
+  });
 
   return (
     <ResourceBarShell
@@ -230,7 +237,10 @@ function CompactResourceBar({
           }}
         />
         {delta && Math.abs(delta.to - delta.from) > 0.0001 && (
-          <Box key={delta.seq} sx={getDeltaOverlaySx(delta, "pcResourcesDeltaFade")} />
+          <Box
+            key={delta.seq}
+            sx={getDeltaOverlaySx(delta, "pcResourcesDeltaFade")}
+          />
         )}
         {crisisLine && (
           <Box
@@ -300,8 +310,11 @@ export function SegmentedResourceBar({
       >
         {Array.from({ length: max }).map((_, i) => {
           const animFill = Math.max(0, Math.min(1, animatedValue - i));
-          const pipChanged = pipDelta ? (i < pipDelta.from) !== (i < pipDelta.to) : false;
-          const changed = pipChanged && pipDelta && i >= Math.min(pipDelta.from, pipDelta.to);
+          const pipChanged = pipDelta
+            ? i < pipDelta.from !== i < pipDelta.to
+            : false;
+          const changed =
+            pipChanged && pipDelta && i >= Math.min(pipDelta.from, pipDelta.to);
           return (
             <Box
               key={i}

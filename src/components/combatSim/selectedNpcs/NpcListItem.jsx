@@ -124,9 +124,10 @@ export default function NpcListItem({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       sx={{
-        border: selectedNpcID && selectedNpcID === npc.combatId
-          ? `2px solid ${theme.palette.error.main}`
-          : `1px solid ${alpha(theme.palette.error.main, 0.28)}`,
+        border:
+          selectedNpcID && selectedNpcID === npc.combatId
+            ? `2px solid ${theme.palette.error.main}`
+            : `1px solid ${alpha(theme.palette.error.main, 0.28)}`,
         marginY: 0.35,
         borderRadius: 1.2,
         position: "relative",
@@ -144,12 +145,12 @@ export default function NpcListItem({
         "&:hover": {
           backgroundColor:
             currentHp === 0
-            ? isDarkMode
-              ? "rgba(211,47,47,0.3)"
-              : "#ffdede"
-            : isDarkMode
-              ? "rgba(255,255,255,0.07)"
-              : "rgba(255,248,250,0.98)",
+              ? isDarkMode
+                ? "rgba(211,47,47,0.3)"
+                : "#ffdede"
+              : isDarkMode
+                ? "rgba(255,255,255,0.07)"
+                : "rgba(255,248,250,0.98)",
         },
         paddingY: 0.5,
         flexDirection: "row",

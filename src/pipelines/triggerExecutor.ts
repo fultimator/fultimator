@@ -1,6 +1,6 @@
 import type { TriggerMatch } from "./triggerScanner";
 
-// Structured output from firing a trigger — pure data, no store access.
+// Structured output from firing a trigger - pure data, no store access.
 export interface TriggerChatOutput {
   speaker: string;
   itemName: string;
@@ -30,7 +30,6 @@ function resolveChatOutput(match: TriggerMatch): TriggerChatOutput | null {
 }
 
 // Fire a set of trigger matches and return structured results.
-// Pure — callers are responsible for side effects (addMessage, cooldowns, etc).
 export function fireTriggers(matches: TriggerMatch[]): FireTriggerResult[] {
   return matches.map((match) => ({
     match,

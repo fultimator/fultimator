@@ -221,7 +221,11 @@ export default function NpcEdit() {
     const element = prettyRef.current;
     if (!element) return null;
 
-    const bgColor = printMode ? "#ffffff" : (theme.palette.mode === "dark" ? "#1f1f1f" : "#ffffff");
+    const bgColor = printMode
+      ? "#ffffff"
+      : theme.palette.mode === "dark"
+        ? "#1f1f1f"
+        : "#ffffff";
 
     try {
       const canvas = await html2canvas(element, {
@@ -502,9 +506,7 @@ export default function NpcEdit() {
                     isUpdated={isUpdated}
                   />
                 )}
-                {isOwner && (
-                  <TagList npc={npcTemp} setNpc={setNpcTemp} />
-                )}
+                {isOwner && <TagList npc={npcTemp} setNpc={setNpcTemp} />}
               </Grid>
             </Grid>
           </>
@@ -523,7 +525,10 @@ export default function NpcEdit() {
               }}
             >
               {(!isSmallScreen || mobileTab === 1) && (
-                <Box id="edit-section-basics" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box
+                  id="edit-section-basics"
+                  sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                >
                   <EditBasics npc={npcTemp} setNpc={setNpcTemp} />
                 </Box>
               )}
@@ -549,7 +554,10 @@ export default function NpcEdit() {
               )}
 
               {(!isSmallScreen || mobileTab === 3) && (
-                <Box id="edit-section-attacks" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box
+                  id="edit-section-attacks"
+                  sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                >
                   <EditAttacks npc={npcTemp} setNpc={setNpcTemp} />
                   <EditWeaponAttacks npc={npcTemp} setNpc={setNpcTemp} />
                 </Box>
@@ -743,15 +751,17 @@ export default function NpcEdit() {
             </Box>
           </Paper>
         )}
-      <ExportDialog
-        open={exportDialogOpen}
-        onClose={() => setExportDialogOpen(false)}
-        onDownload={handleExport}
-        isLoading={isExporting}
-        title={t("Export NPC Sheet")}
-        officialPdfDescription={t("Fill the official Fabula Ultima NPC sheet")}
-      />
-    </Layout>
+        <ExportDialog
+          open={exportDialogOpen}
+          onClose={() => setExportDialogOpen(false)}
+          onDownload={handleExport}
+          isLoading={isExporting}
+          title={t("Export NPC Sheet")}
+          officialPdfDescription={t(
+            "Fill the official Fabula Ultima NPC sheet",
+          )}
+        />
+      </Layout>
     </NpcProvider>
   );
 }

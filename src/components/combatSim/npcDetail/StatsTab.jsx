@@ -9,9 +9,7 @@ import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import { useBarShell } from "/src/components/shared/actors/common/barShellUtils";
 import ActorActionBar from "../ActorActionBar";
-import {
-  GradientLinearProgress,
-} from "/src/components/shared/actors/pc/shared";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
 import {
   FpResourceIcon,
   HpResourceIcon,
@@ -20,7 +18,10 @@ import {
 } from "/src/components/icons";
 import { newShade } from "/src/libs/playerCalculations";
 import { villainUltimaMax } from "/src/routes/combat/combatSimulator";
-import { useAnimatedDeltaPercent, getDeltaOverlaySx } from "/src/components/shared/actors/common/resourceBarMotion";
+import {
+  useAnimatedDeltaPercent,
+  getDeltaOverlaySx,
+} from "/src/components/shared/actors/common/resourceBarMotion";
 
 const BAR_SIDE_WIDTH = 62;
 const BAR_TEXT_SIZE = "0.9rem";
@@ -41,7 +42,10 @@ function ResourceStrip({
   trackBg,
 }) {
   const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
-  const { animatedPct, delta } = useAnimatedDeltaPercent(pct, { moveMs: 760, deltaMs: 1800 });
+  const { animatedPct, delta } = useAnimatedDeltaPercent(pct, {
+    moveMs: 760,
+    deltaMs: 1800,
+  });
   return (
     <Box
       onClick={onClick}
@@ -93,7 +97,10 @@ function ResourceStrip({
           }}
         />
         {delta && Math.abs(delta.to - delta.from) > 0.0001 && (
-          <Box key={delta.seq} sx={getDeltaOverlaySx(delta, "npcStatsDeltaFade")} />
+          <Box
+            key={delta.seq}
+            sx={getDeltaOverlaySx(delta, "npcStatsDeltaFade")}
+          />
         )}
         {crisisLine && (
           <Box
@@ -131,7 +138,19 @@ function ResourceStrip({
   );
 }
 
-function PipStrip({ label, value, max, Icon, onClick, shellBg, shellBorder, labelBg, labelBorder, trackBg, inlineLabel = false }) {
+function PipStrip({
+  label,
+  value,
+  max,
+  Icon,
+  onClick,
+  shellBg,
+  shellBorder,
+  labelBg,
+  labelBorder,
+  trackBg,
+  inlineLabel = false,
+}) {
   const pips = Math.max(1, Math.min(max, 30));
   return (
     <Box
@@ -167,18 +186,20 @@ function PipStrip({ label, value, max, Icon, onClick, shellBg, shellBorder, labe
         {Icon ? <Icon size="1.2em" /> : null}
         {label}
       </Box>
-      <Box sx={{
-        flex: 1,
-        display: "grid",
-        gridTemplateColumns: "repeat(5, 1fr)",
-        alignItems: "center",
-        justifyItems: "center",
-        columnGap: "4px",
-        rowGap: "6px",
-        px: "6px",
-        py: "6px",
-        bgcolor: trackBg,
-      }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: "repeat(5, 1fr)",
+          alignItems: "center",
+          justifyItems: "center",
+          columnGap: "4px",
+          rowGap: "6px",
+          px: "6px",
+          py: "6px",
+          bgcolor: trackBg,
+        }}
+      >
         {Array.from({ length: pips }).map((_, i) => {
           const filled = i < value;
           return (
@@ -189,10 +210,13 @@ function PipStrip({ label, value, max, Icon, onClick, shellBg, shellBorder, labe
                 alignItems: "center",
                 justifyContent: "center",
                 opacity: filled ? 1 : 0.2,
-                filter: filled ? "drop-shadow(0 0 2px rgba(255,255,255,0.45))" : "none",
-                transition: (t) => t.transitions.create(["opacity", "filter"], {
-                  duration: t.transitions.duration.standard,
-                }),
+                filter: filled
+                  ? "drop-shadow(0 0 2px rgba(255,255,255,0.45))"
+                  : "none",
+                transition: (t) =>
+                  t.transitions.create(["opacity", "filter"], {
+                    duration: t.transitions.duration.standard,
+                  }),
               }}
             >
               {Icon && <Icon size="1.1em" />}
@@ -200,7 +224,15 @@ function PipStrip({ label, value, max, Icon, onClick, shellBg, shellBorder, labe
           );
         })}
         {value > max && (
-          <Typography sx={{ fontFamily: "Antonio", fontWeight: "bold", fontSize: "0.75rem", color: "#fff", lineHeight: 1 }}>
+          <Typography
+            sx={{
+              fontFamily: "Antonio",
+              fontWeight: "bold",
+              fontSize: "0.75rem",
+              color: "#fff",
+              lineHeight: 1,
+            }}
+          >
             +{value - max}
           </Typography>
         )}
@@ -226,7 +258,6 @@ function PipStrip({ label, value, max, Icon, onClick, shellBg, shellBorder, labe
     </Box>
   );
 }
-
 
 const StatsTab = ({
   selectedNPC,
@@ -310,21 +341,22 @@ const StatsTab = ({
             trackBg={trackBg}
           />
         )}
-        {selectedNPC?.villain && selectedNPC?.combatStats?.ultima !== undefined && (
-          <PipStrip
-            label={t("UP")}
-            value={selectedNPC.combatStats.ultima ?? 0}
-            max={villainUltimaMax(selectedNPC?.villain)}
-            Icon={UpResourceIcon}
-            inlineLabel
-            onClick={() => handleOpen("UP", selectedNPC)}
-            shellBg={shellBg}
-            shellBorder={shellBorder}
-            labelBg={labelBg}
-            labelBorder={labelBorder}
-            trackBg={trackBg}
-          />
-        )}
+        {selectedNPC?.villain &&
+          selectedNPC?.combatStats?.ultima !== undefined && (
+            <PipStrip
+              label={t("UP")}
+              value={selectedNPC.combatStats.ultima ?? 0}
+              max={villainUltimaMax(selectedNPC?.villain)}
+              Icon={UpResourceIcon}
+              inlineLabel
+              onClick={() => handleOpen("UP", selectedNPC)}
+              shellBg={shellBg}
+              shellBorder={shellBorder}
+              labelBg={labelBg}
+              labelBorder={labelBorder}
+              trackBg={trackBg}
+            />
+          )}
       </Box>
 
       <Box sx={{ mt: 0.9, display: "flex", alignItems: "center", gap: 0.8 }}>
@@ -348,18 +380,19 @@ const StatsTab = ({
         >
           {t("Edit MP")}
         </Button>
-        {selectedNPC?.villain && selectedNPC?.combatStats?.ultima !== undefined && (
-          <Button
-            variant="contained"
-            onClick={() => handleOpen("UP", selectedNPC)}
-            size="small"
-            fullWidth
-            startIcon={<UpResourceIcon />}
-            sx={{ fontSize: "0.93rem" }}
-          >
-            {t("Edit UP")}
-          </Button>
-        )}
+        {selectedNPC?.villain &&
+          selectedNPC?.combatStats?.ultima !== undefined && (
+            <Button
+              variant="contained"
+              onClick={() => handleOpen("UP", selectedNPC)}
+              size="small"
+              fullWidth
+              startIcon={<UpResourceIcon />}
+              sx={{ fontSize: "0.93rem" }}
+            >
+              {t("Edit UP")}
+            </Button>
+          )}
       </Box>
 
       {/* Actions */}
@@ -407,10 +440,12 @@ const StatsTab = ({
                     backgroundColor: statusEffectColors[label],
                     color: "white !important",
                     "& .MuiTypography-root": {
-                      textShadow: "-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000",
+                      textShadow:
+                        "-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000",
                     },
                     "&:hover": {
-                      backgroundColor: statusEffectColors[label] + " !important",
+                      backgroundColor:
+                        statusEffectColors[label] + " !important",
                       color: "white !important",
                     },
                   },

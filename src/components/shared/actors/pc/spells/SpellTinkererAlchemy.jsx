@@ -17,7 +17,14 @@ import {
   Box,
   ToggleButton,
 } from "@mui/material";
-import { Edit, VisibilityOff, ExpandMore, Info, Casino, Close } from "@mui/icons-material";
+import {
+  Edit,
+  VisibilityOff,
+  ExpandMore,
+  Info,
+  Casino,
+  Close,
+} from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 
@@ -25,9 +32,11 @@ import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 function rollD20s(count) {
-  return Array.from({ length: count }, () => Math.floor(Math.random() * 20) + 1);
+  return Array.from(
+    { length: count },
+    () => Math.floor(Math.random() * 20) + 1,
+  );
 }
-
 
 function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
   const diceCount = rank + 1;
@@ -65,7 +74,8 @@ function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
   // Returns die indices that fall in target's range, excluding the one used by the other selection
   const targetMatchingDice = (target, excludeDieIdx = null) =>
     rolls.reduce((acc, v, i) => {
-      if (i !== excludeDieIdx && v >= target.rangeFrom && v <= target.rangeTo) acc.push(i);
+      if (i !== excludeDieIdx && v >= target.rangeFrom && v <= target.rangeTo)
+        acc.push(i);
       return acc;
     }, []);
 
@@ -79,29 +89,46 @@ function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
   };
 
   const handleSelectTarget = (tableIdx, target) => {
-    if (selectedTarget?.tableIdx === tableIdx) { setSelectedTarget(null); return; }
+    if (selectedTarget?.tableIdx === tableIdx) {
+      setSelectedTarget(null);
+      return;
+    }
     const excludeDieIdx = selectedEffect?.dieIdx ?? null;
-    const matching = targetMatchingDice(target, excludeDieIdx === -1 ? null : excludeDieIdx);
+    const matching = targetMatchingDice(
+      target,
+      excludeDieIdx === -1 ? null : excludeDieIdx,
+    );
     if (matching.length === 0) return;
     setSelectedTarget({ tableIdx, dieIdx: matching[0] });
     // clear effect if it was using the same die
-    if (selectedEffect && selectedEffect.dieIdx === matching[0]) setSelectedEffect(null);
+    if (selectedEffect && selectedEffect.dieIdx === matching[0])
+      setSelectedEffect(null);
   };
 
   const handleSelectEffect = (tableIdx, effect) => {
-    if (selectedEffect?.tableIdx === tableIdx) { setSelectedEffect(null); return; }
+    if (selectedEffect?.tableIdx === tableIdx) {
+      setSelectedEffect(null);
+      return;
+    }
     const excludeDieIdx = selectedTarget?.dieIdx ?? null;
     const matching = effectMatchingDice(effect, excludeDieIdx);
     if (matching.length === 0) return;
     setSelectedEffect({ tableIdx, dieIdx: matching[0] });
     // clear target if it was using the same die
-    if (selectedTarget && matching[0] !== -1 && selectedTarget.dieIdx === matching[0]) setSelectedTarget(null);
+    if (
+      selectedTarget &&
+      matching[0] !== -1 &&
+      selectedTarget.dieIdx === matching[0]
+    )
+      setSelectedTarget(null);
   };
 
   // A target row is visible if it has at least one matching die (ignoring exclusions for display)
-  const dieMatchesTarget = (target) => rolls.some((v) => v >= target.rangeFrom && v <= target.rangeTo);
+  const dieMatchesTarget = (target) =>
+    rolls.some((v) => v >= target.rangeFrom && v <= target.rangeTo);
   // An effect row is visible if it matches any die or is Any
-  const dieMatchesEffect = (effect) => effect.dieValue === 0 || rolls.some((v) => v === effect.dieValue);
+  const dieMatchesEffect = (effect) =>
+    effect.dieValue === 0 || rolls.some((v) => v === effect.dieValue);
 
   const canSend = selectedTarget !== null && selectedEffect !== null;
 
@@ -113,8 +140,12 @@ function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
     sendDisplayMessage("inventory", t("Alchemy Mix") + ` - ${rankName}`, {
       speaker,
       tags: [`${t("IP Cost")}: ${rank + 2}`],
-      description: targetEntry ? `**${t("Target")}:** ${targetEntry.effect}` : `**${t("Target")}:** -`,
-      effect: effectEntry ? `**${t("Effect")}:** ${effectEntry.effect}` : `**${t("Effect")}:** -`,
+      description: targetEntry
+        ? `**${t("Target")}:** ${targetEntry.effect}`
+        : `**${t("Target")}:** -`,
+      effect: effectEntry
+        ? `**${t("Effect")}:** ${effectEntry.effect}`
+        : `**${t("Effect")}:** -`,
       cost: { resource: "ip", amount: rank + 2 },
     });
     onClose();
@@ -130,58 +161,156 @@ function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
     py: 1,
     borderRadius: 1,
     cursor: "pointer",
-    backgroundColor: selected ? "action.selected" : highlighted ? "action.hover" : "transparent",
-    "&:hover": { backgroundColor: selected ? "action.selected" : "action.hover" },
+    backgroundColor: selected
+      ? "action.selected"
+      : highlighted
+        ? "action.hover"
+        : "transparent",
+    "&:hover": {
+      backgroundColor: selected ? "action.selected" : "action.hover",
+    },
   });
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold", pr: 6 }}>
         {t("Roll Mix")} - {rankLabels[rank - 1]}
-        <IconButton onClick={onClose} sx={{ position: "absolute", right: 8, top: 8 }}>
+        <IconButton
+          onClick={onClose}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
           <Close />
         </IconButton>
       </DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
-
           <Typography variant="body2" color="text.secondary">
             {rankDescriptions[rank - 1]}
           </Typography>
 
           {/* Dice roll bar */}
-          <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-            <Typography variant="body2" color="text.secondary">{t("Rolled")}:</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              {t("Rolled")}:
+            </Typography>
             {rolls.map((v, i) => {
               const isTarget = selectedTarget?.dieIdx === i;
               const isEffect = selectedEffect?.dieIdx === i;
               return (
-                <Box key={i} sx={{ fontWeight: 700, fontSize: "0.9rem", px: 1, py: 0.25, borderRadius: 1, border: "2px solid", borderColor: isTarget || isEffect ? "primary.main" : "divider", backgroundColor: isTarget || isEffect ? "primary.main" : "background.default", color: isTarget || isEffect ? "primary.contrastText" : "text.primary" }}>
-                  {v}{isTarget ? " T" : isEffect ? " E" : ""}
+                <Box
+                  key={i}
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: "0.9rem",
+                    px: 1,
+                    py: 0.25,
+                    borderRadius: 1,
+                    border: "2px solid",
+                    borderColor:
+                      isTarget || isEffect ? "primary.main" : "divider",
+                    backgroundColor:
+                      isTarget || isEffect
+                        ? "primary.main"
+                        : "background.default",
+                    color:
+                      isTarget || isEffect
+                        ? "primary.contrastText"
+                        : "text.primary",
+                  }}
+                >
+                  {v}
+                  {isTarget ? " T" : isEffect ? " E" : ""}
                 </Box>
               );
             })}
-            <Button size="small" startIcon={<Casino />} onClick={handleRoll}>{t("Reroll")}</Button>
+            <Button size="small" startIcon={<Casino />} onClick={handleRoll}>
+              {t("Reroll")}
+            </Button>
           </Box>
 
           {/* Target table */}
           <Box>
-            <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>{t("Target")}</Typography>
-            <Box sx={{ display: "flex", flexDirection: "column", border: "1px solid", borderColor: "divider", borderRadius: 1, overflow: "hidden" }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>
+              {t("Target")}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 1,
+                overflow: "hidden",
+              }}
+            >
               {targets.filter(dieMatchesTarget).map((target, i, arr) => {
                 const origIdx = targets.indexOf(target);
                 const selected = selectedTarget?.tableIdx === origIdx;
-                const available = targetMatchingDice(target, selectedEffect?.dieIdx === -1 ? null : selectedEffect?.dieIdx).length > 0;
+                const available =
+                  targetMatchingDice(
+                    target,
+                    selectedEffect?.dieIdx === -1
+                      ? null
+                      : selectedEffect?.dieIdx,
+                  ).length > 0;
                 return (
-                  <Box key={origIdx} sx={{ ...rowSx(selected, available), borderBottom: i < arr.length - 1 ? "1px solid" : "none", borderColor: "divider", opacity: available || selected ? 1 : 0.4 }} onClick={() => handleSelectTarget(origIdx, target)}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, minWidth: 48, color: "primary.main", flexShrink: 0 }}>
-                      {target.rangeFrom === target.rangeTo ? target.rangeFrom : `${target.rangeFrom}-${target.rangeTo}`}
+                  <Box
+                    key={origIdx}
+                    sx={{
+                      ...rowSx(selected, available),
+                      borderBottom: i < arr.length - 1 ? "1px solid" : "none",
+                      borderColor: "divider",
+                      opacity: available || selected ? 1 : 0.4,
+                    }}
+                    onClick={() => handleSelectTarget(origIdx, target)}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        minWidth: 48,
+                        color: "primary.main",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {target.rangeFrom === target.rangeTo
+                        ? target.rangeFrom
+                        : `${target.rangeFrom}-${target.rangeTo}`}
                     </Typography>
-                    <Typography variant="body2" component="span" sx={{ flex: 1 }}>
-                      <ReactMarkdown components={mdInline}>{target.effect}</ReactMarkdown>
+                    <Typography
+                      variant="body2"
+                      component="span"
+                      sx={{ flex: 1 }}
+                    >
+                      <ReactMarkdown components={mdInline}>
+                        {target.effect}
+                      </ReactMarkdown>
                     </Typography>
-                    <ToggleButton value="t" selected={selected} size="small" sx={{ p: "6px", minWidth: 36, minHeight: 36, flexShrink: 0 }} onChange={() => handleSelectTarget(origIdx, target)}>
-                      <Typography variant="caption" sx={{ fontWeight: 700, lineHeight: 1 }}>T</Typography>
+                    <ToggleButton
+                      value="t"
+                      selected={selected}
+                      size="small"
+                      sx={{
+                        p: "6px",
+                        minWidth: 36,
+                        minHeight: 36,
+                        flexShrink: 0,
+                      }}
+                      onChange={() => handleSelectTarget(origIdx, target)}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{ fontWeight: 700, lineHeight: 1 }}
+                      >
+                        T
+                      </Typography>
                     </ToggleButton>
                   </Box>
                 );
@@ -191,29 +320,83 @@ function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
 
           {/* Effect table */}
           <Box>
-            <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>{t("Effect")}</Typography>
-            <Box sx={{ display: "flex", flexDirection: "column", border: "1px solid", borderColor: "divider", borderRadius: 1, overflow: "hidden" }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>
+              {t("Effect")}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                border: "1px solid",
+                borderColor: "divider",
+                borderRadius: 1,
+                overflow: "hidden",
+              }}
+            >
               {effects.filter(dieMatchesEffect).map((effect, i, arr) => {
                 const origIdx = effects.indexOf(effect);
                 const selected = selectedEffect?.tableIdx === origIdx;
-                const available = effectMatchingDice(effect, selectedTarget?.dieIdx).length > 0;
+                const available =
+                  effectMatchingDice(effect, selectedTarget?.dieIdx).length > 0;
                 return (
-                  <Box key={origIdx} sx={{ ...rowSx(selected, available), borderBottom: i < arr.length - 1 ? "1px solid" : "none", borderColor: "divider", opacity: available || selected ? 1 : 0.4 }} onClick={() => handleSelectEffect(origIdx, effect)}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, minWidth: 48, color: effect.dieValue === 0 ? "text.secondary" : "primary.main", fontStyle: effect.dieValue === 0 ? "italic" : "normal", flexShrink: 0 }}>
+                  <Box
+                    key={origIdx}
+                    sx={{
+                      ...rowSx(selected, available),
+                      borderBottom: i < arr.length - 1 ? "1px solid" : "none",
+                      borderColor: "divider",
+                      opacity: available || selected ? 1 : 0.4,
+                    }}
+                    onClick={() => handleSelectEffect(origIdx, effect)}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        minWidth: 48,
+                        color:
+                          effect.dieValue === 0
+                            ? "text.secondary"
+                            : "primary.main",
+                        fontStyle: effect.dieValue === 0 ? "italic" : "normal",
+                        flexShrink: 0,
+                      }}
+                    >
                       {effect.dieValue === 0 ? t("Any") : effect.dieValue}
                     </Typography>
-                    <Typography variant="body2" component="span" sx={{ flex: 1 }}>
-                      <ReactMarkdown components={mdInline}>{effect.effect}</ReactMarkdown>
+                    <Typography
+                      variant="body2"
+                      component="span"
+                      sx={{ flex: 1 }}
+                    >
+                      <ReactMarkdown components={mdInline}>
+                        {effect.effect}
+                      </ReactMarkdown>
                     </Typography>
-                    <ToggleButton value="e" selected={selected} size="small" sx={{ p: "6px", minWidth: 36, minHeight: 36, flexShrink: 0 }} onChange={() => handleSelectEffect(origIdx, effect)}>
-                      <Typography variant="caption" sx={{ fontWeight: 700, lineHeight: 1 }}>E</Typography>
+                    <ToggleButton
+                      value="e"
+                      selected={selected}
+                      size="small"
+                      sx={{
+                        p: "6px",
+                        minWidth: 36,
+                        minHeight: 36,
+                        flexShrink: 0,
+                      }}
+                      onChange={() => handleSelectEffect(origIdx, effect)}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{ fontWeight: 700, lineHeight: 1 }}
+                      >
+                        E
+                      </Typography>
                     </ToggleButton>
                   </Box>
                 );
               })}
             </Box>
           </Box>
-
         </Box>
       </DialogContent>
       <DialogActions>
@@ -256,7 +439,16 @@ function ThemedSpellTinkererAlchemy({
 
   return (
     <>
-      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <Accordion
+        disableGutters
+        elevation={0}
+        square
+        sx={{
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          "&:before": { display: "none" },
+        }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <Info />
@@ -297,26 +489,49 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container style={{ flexGrow: 1 }}>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "left" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+            }}
             size="grow"
           >
-            <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+            <Typography
+              variant="h3"
+              style={{ flexGrow: 1, marginRight: "5px" }}
+            >
               {t("Mix")}
             </Typography>
           </Grid>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
             size={2}
           >
             <Typography variant="h3">{t("IP Cost")}</Typography>
           </Grid>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
             size={6}
           >
             <Typography variant="h3">{t("Description")}</Typography>
           </Grid>
-          <Grid size="auto" style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 34 }}>
+          <Grid
+            size="auto"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              minWidth: 34,
+            }}
+          >
             {isEditMode && (
               <>
                 {!showInPlayerSheet && (
@@ -324,7 +539,11 @@ function ThemedSpellTinkererAlchemy({
                     <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
                   </Tooltip>
                 )}
-                <IconButton size="small" onClick={onEditRank} sx={{ color: "#fff", p: "3px" }}>
+                <IconButton
+                  size="small"
+                  onClick={onEditRank}
+                  sx={{ color: "#fff", p: "3px" }}
+                >
                   <Edit sx={{ fontSize: "1.1rem" }} />
                 </IconButton>
               </>
@@ -342,33 +561,58 @@ function ThemedSpellTinkererAlchemy({
             display: "flex",
             justifyContent: "space-between",
             borderTop: `1px solid ${theme.secondary}`,
-            borderBottom: i === visibleRanks.length - 1 ? `1px solid ${theme.secondary}` : "none",
+            borderBottom:
+              i === visibleRanks.length - 1
+                ? `1px solid ${theme.secondary}`
+                : "none",
           }}
         >
           <Grid container style={{ flexGrow: 1 }}>
             <Grid
-              style={{ display: "flex", alignItems: "center", justifyContent: "left" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "left",
+              }}
               size="grow"
             >
-              <Typography style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontWeight: "bold" }}>
+              <Typography
+                style={{ flexGrow: 1, marginRight: "5px" }}
+                sx={{ fontWeight: "bold" }}
+              >
                 {rankLabels[rank - 1]}
               </Typography>
             </Grid>
             <Grid
-              style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
               size={2}
             >
               <Typography>{rank + 2}</Typography>
             </Grid>
             <Grid
-              style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
               size={6}
             >
               <Typography>{rankDescriptions[rank - 1]}</Typography>
             </Grid>
-            <Grid size="auto" style={{ display: "flex", alignItems: "center", minWidth: 34 }}>
+            <Grid
+              size="auto"
+              style={{ display: "flex", alignItems: "center", minWidth: 34 }}
+            >
               <Tooltip title={t("Roll Mix")}>
-                <IconButton size="small" sx={{ p: "3px" }} onClick={() => setRollRank(rank)}>
+                <IconButton
+                  size="small"
+                  sx={{ p: "3px" }}
+                  onClick={() => setRollRank(rank)}
+                >
                   <Casino sx={{ fontSize: "1.1rem" }} />
                 </IconButton>
               </Tooltip>
@@ -390,22 +634,42 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "left", minHeight: "40px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+              minHeight: "40px",
+            }}
             size="grow"
           >
-            <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+            <Typography
+              variant="h3"
+              style={{ flexGrow: 1, marginRight: "5px" }}
+            >
               {t("Die")}
             </Typography>
           </Grid>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "40px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "40px",
+            }}
             size={8}
           >
             <Typography variant="h3">{t("Target")}</Typography>
           </Grid>
           {isEditMode && (
-            <Grid size="auto" style={{ display: "flex", alignItems: "center", minWidth: 34 }}>
-              <IconButton size="small" onClick={onEditTargets} sx={{ color: "#fff", p: "3px" }}>
+            <Grid
+              size="auto"
+              style={{ display: "flex", alignItems: "center", minWidth: 34 }}
+            >
+              <IconButton
+                size="small"
+                onClick={onEditTargets}
+                sx={{ color: "#fff", p: "3px" }}
+              >
                 <Edit sx={{ fontSize: "1.1rem" }} />
               </IconButton>
             </Grid>
@@ -423,10 +687,21 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "left" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+            }}
             size="grow"
           >
-            <Typography style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontWeight: "bold", color: theme.primary, fontStyle: "italic" }}>
+            <Typography
+              style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold",
+                color: theme.primary,
+                fontStyle: "italic",
+              }}
+            >
               {t("The potions affects...")}
             </Typography>
           </Grid>
@@ -445,18 +720,35 @@ function ThemedSpellTinkererAlchemy({
           key={i}
         >
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "left" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+            }}
             size="grow"
           >
-            <Typography style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontWeight: "bold" }}>
+            <Typography
+              style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{ fontWeight: "bold" }}
+            >
               {target.rangeFrom + " - " + target.rangeTo}
             </Typography>
           </Grid>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+            }}
             size={8}
           >
-            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <span {...props} /> }}>{target.effect}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node: _n, ...props }) => <span {...props} />,
+              }}
+            >
+              {target.effect}
+            </ReactMarkdown>
           </Grid>
           {isEditMode && <Grid size="auto" style={{ minWidth: 34 }} />}
         </Grid>
@@ -475,22 +767,42 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "left", minHeight: "40px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+              minHeight: "40px",
+            }}
             size="grow"
           >
-            <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
+            <Typography
+              variant="h3"
+              style={{ flexGrow: 1, marginRight: "5px" }}
+            >
               {t("Die")}
             </Typography>
           </Grid>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "40px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "40px",
+            }}
             size={8}
           >
             <Typography variant="h3">{t("Effect")}</Typography>
           </Grid>
           {isEditMode && (
-            <Grid size="auto" style={{ display: "flex", alignItems: "center", minWidth: 34 }}>
-              <IconButton size="small" onClick={onEditEffects} sx={{ color: "#fff", p: "3px" }}>
+            <Grid
+              size="auto"
+              style={{ display: "flex", alignItems: "center", minWidth: 34 }}
+            >
+              <IconButton
+                size="small"
+                onClick={onEditEffects}
+                sx={{ color: "#fff", p: "3px" }}
+              >
                 <Edit sx={{ fontSize: "1.1rem" }} />
               </IconButton>
             </Grid>
@@ -508,10 +820,21 @@ function ThemedSpellTinkererAlchemy({
       >
         <Grid container>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "left" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+            }}
             size="grow"
           >
-            <Typography style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontWeight: "bold", color: theme.primary, fontStyle: "italic" }}>
+            <Typography
+              style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontWeight: "bold",
+                color: theme.primary,
+                fontStyle: "italic",
+              }}
+            >
               {t("Each creature affected by the potion...")}
             </Typography>
           </Grid>
@@ -530,18 +853,35 @@ function ThemedSpellTinkererAlchemy({
           key={i}
         >
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "left" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+            }}
             size="grow"
           >
-            <Typography style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontWeight: "bold" }}>
+            <Typography
+              style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{ fontWeight: "bold" }}
+            >
               {effect.dieValue === 0 ? t("Any") : effect.dieValue}
             </Typography>
           </Grid>
           <Grid
-            style={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+            }}
             size={8}
           >
-            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <span {...props} /> }}>{effect.effect}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node: _n, ...props }) => <span {...props} />,
+              }}
+            >
+              {effect.effect}
+            </ReactMarkdown>
           </Grid>
           {isEditMode && <Grid size="auto" style={{ minWidth: 34 }} />}
         </Grid>

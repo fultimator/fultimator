@@ -4,13 +4,7 @@ import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import Diamond from "/src/components/Diamond";
 import DefenseAffinityRow from "/src/components/shared/actors/common/DefenseAffinityRow";
-import {
-  calcHP,
-  calcMP,
-  calcInit,
-  calcDef,
-  calcMDef,
-} from "/src/libs/npcs";
+import { calcHP, calcMP, calcInit, calcDef, calcMDef } from "/src/libs/npcs";
 
 export function NpcStudyStats({ npc }) {
   const { t } = useTranslate();

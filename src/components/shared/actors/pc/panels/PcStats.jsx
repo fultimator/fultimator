@@ -24,7 +24,8 @@ import { deriveCombatStats } from "/src/components/shared/actors/core-utils";
 import { CombatStatCard } from "/src/components/shared/actors/pc/shared";
 import PcResources from "/src/components/shared/actors/common/PcResources";
 
-const STAT_LABEL_SHADOW = "-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000";
+const STAT_LABEL_SHADOW =
+  "-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000";
 
 function CombatStatDisplay({ icon, label, value, tooltip }) {
   const card = (
@@ -246,7 +247,9 @@ export default function PcStats({
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: isInteractive ? "repeat(4, 1fr)" : "auto auto auto auto",
+          gridTemplateColumns: isInteractive
+            ? "repeat(4, 1fr)"
+            : "auto auto auto auto",
           gridTemplateRows: "repeat(4, auto)",
           alignItems: "center",
           rowGap: { xs: "2px", md: "4px", lg: "5px" },
@@ -344,7 +347,11 @@ export default function PcStats({
                     >
                       <Box
                         component="span"
-                        sx={{ display: "inline-flex", alignItems: "center", gap: 0.35 }}
+                        sx={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 0.35,
+                        }}
                       >
                         <Icon size="1.2em" />
                         {label}:
@@ -378,7 +385,10 @@ export default function PcStats({
                               lg: "1.14rem",
                             },
                             fontWeight: "bold",
-                            color: getAttributeColor(pc.attributes[key]?.base, curr),
+                            color: getAttributeColor(
+                              pc.attributes[key]?.base,
+                              curr,
+                            ),
                             lineHeight: 1,
                             cursor: "help",
                           }}
@@ -392,7 +402,10 @@ export default function PcStats({
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <FormControlLabel
                     control={statusCheckbox(leftStatus.key)}
-                    label={statusLabel(leftStatus.label, pc.statuses?.[leftStatus.key])}
+                    label={statusLabel(
+                      leftStatus.label,
+                      pc.statuses?.[leftStatus.key],
+                    )}
                     sx={{ margin: 0 }}
                   />
                 </Box>
@@ -407,7 +420,10 @@ export default function PcStats({
                   {rightStatus && (
                     <FormControlLabel
                       control={statusCheckbox(rightStatus.key)}
-                      label={statusLabel(rightStatus.label, pc.statuses?.[rightStatus.key])}
+                      label={statusLabel(
+                        rightStatus.label,
+                        pc.statuses?.[rightStatus.key],
+                      )}
                       sx={{ margin: 0 }}
                     />
                   )}

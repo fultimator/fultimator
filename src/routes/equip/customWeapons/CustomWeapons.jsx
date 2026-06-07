@@ -28,8 +28,7 @@ import {
 
 const qualities = allQualities
   .filter(
-    (q) =>
-      q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+    (q) => q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
   )
   .filter(
     (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
@@ -408,7 +407,9 @@ function CustomWeapons({ variant = "equip" }) {
           (c) => c.name === "weapon_customization_elemental",
         );
         const s2Type = s2HasElemental
-          ? (formState.secondDamage?.type ?? secondCustomDamageType ?? "physical")
+          ? (formState.secondDamage?.type ??
+            secondCustomDamageType ??
+            "physical")
           : overrideDamageType
             ? (formState.rareOverrideDamageTypeValue ?? "physical")
             : "physical";

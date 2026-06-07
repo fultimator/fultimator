@@ -1,5 +1,9 @@
 import type { Elements } from "../types/Misc";
-import type { AccuracyCheckResult, MagicCheckResult, CheckResult } from "../components/app-drawer/panels/chat/types";
+import type {
+  AccuracyCheckResult,
+  MagicCheckResult,
+  CheckResult,
+} from "../components/app-drawer/panels/chat/types";
 import type { PrimaryOutcomeResult } from "./afterEffectPipeline";
 
 export type ResourceKind = "hp" | "mp" | "ip";
@@ -8,11 +12,24 @@ export type ResourceKind = "hp" | "mp" | "ip";
 // instead of inspecting pipeline internals.
 export type ResourceEvent =
   | { kind: "damage"; resource: "hp"; amount: number; damageType: Elements }
-  | { kind: "loss"; resource: "hp" | "mp" | "ip"; amount: number; voluntary: false }
+  | {
+      kind: "loss";
+      resource: "hp" | "mp" | "ip";
+      amount: number;
+      voluntary: false;
+    }
   | { kind: "recovery"; resource: "hp" | "mp" | "ip"; amount: number }
-  | { kind: "expenditure"; resource: "hp" | "mp" | "ip" | "fp"; amount: number; voluntary: true };
+  | {
+      kind: "expenditure";
+      resource: "hp" | "mp" | "ip" | "fp";
+      amount: number;
+      voluntary: true;
+    };
 
-export type CheckResult_Any = AccuracyCheckResult | MagicCheckResult | CheckResult;
+export type CheckResult_Any =
+  | AccuracyCheckResult
+  | MagicCheckResult
+  | CheckResult;
 
 export interface WeaponRef {
   source: "weapons" | "customWeapons";

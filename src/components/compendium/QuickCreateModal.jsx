@@ -34,7 +34,10 @@ import AddToCompendiumButton from "./AddToCompendiumButton";
 import Export from "../Export";
 import { useTranslate, t as staticT } from "../../translation/translate";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
-import { STANDARD_WELLSPRINGS, affinityIconSrc } from "../../libs/player/wellsprings";
+import {
+  STANDARD_WELLSPRINGS,
+  affinityIconSrc,
+} from "../../libs/player/wellsprings";
 import { calculateCustomWeaponStats } from "../../libs/playerCalculations";
 import weapons from "../../libs/weapons";
 import armor from "../../libs/armor";
@@ -331,12 +334,12 @@ function localizeImportedClassItem(item) {
     next.skills = next.skills.map((skill) =>
       skill && typeof skill === "object"
         ? {
-          ...skill,
-          description:
-            typeof skill.description === "string"
-              ? staticT(skill.description, null, true)
-              : skill.description,
-        }
+            ...skill,
+            description:
+              typeof skill.description === "string"
+                ? staticT(skill.description, null, true)
+                : skill.description,
+          }
         : skill,
     );
   }
@@ -811,7 +814,6 @@ function PlayerSpellPanel() {
   });
 
   useEffect(() => {
-     
     if (initialSubtype) {
       // eslint-disable-next-line no-undef
       setFormState((_prev) => ({ ...prev, spellType: initialSubtype }));
@@ -849,7 +851,11 @@ function PlayerSpellPanel() {
     const map = new Map(STANDARD_WELLSPRINGS.map((w) => [w.key, w.icon]));
     for (const pack of spellPacks) {
       for (const item of pack.items) {
-        if (item.type === "player-spell" && item.data?.spellType === "wellspring" && item.data?.name) {
+        if (
+          item.type === "player-spell" &&
+          item.data?.spellType === "wellspring" &&
+          item.data?.name
+        ) {
           map.set(String(item.data.name), String(item.data.icon || "untyped"));
         }
       }
@@ -918,13 +924,13 @@ function PlayerSpellPanel() {
       effect: t(
         String(
           imported.effect ??
-          imported.invocations?.[0]?.effect ??
-          imported.tones?.[0]?.effect ??
-          imported.symbols?.[0]?.effect ??
-          imported.dances?.[0]?.effect ??
-          imported.gifts?.[0]?.effect ??
-          imported.description ??
-          "",
+            imported.invocations?.[0]?.effect ??
+            imported.tones?.[0]?.effect ??
+            imported.symbols?.[0]?.effect ??
+            imported.dances?.[0]?.effect ??
+            imported.gifts?.[0]?.effect ??
+            imported.description ??
+            "",
         ),
       ),
       event: t(String(imported.event ?? "")),
@@ -945,7 +951,7 @@ function PlayerSpellPanel() {
       type: String(
         importedType === "magichant" && imported.magichantSubtype === "key"
           ? (imported.type ?? "")
-          : (imported.type ?? imported.invocations?.[0]?.type ?? "")
+          : (imported.type ?? imported.invocations?.[0]?.type ?? ""),
       ),
       category: String(imported.category ?? ""),
       infusionRank:
@@ -975,12 +981,45 @@ function PlayerSpellPanel() {
         return Array.from({ length: 12 }, () => ({ effect: "" }));
       })(),
       gardenDescription: imported.gardenDescription ?? "",
-      rangeStart: imported.magiseeds?.[0]?.rangeStart ?? imported.rangeStart ?? 0,
+      rangeStart:
+        imported.magiseeds?.[0]?.rangeStart ?? imported.rangeStart ?? 0,
       rangeEnd: imported.magiseeds?.[0]?.rangeEnd ?? imported.rangeEnd ?? 3,
-      "effects.0": (() => { const v = imported.magiseeds?.[0]?.effects?.[0] ?? imported.magiseeds?.[0]?.effects?.["0"] ?? imported.effects?.[0] ?? imported.effects?.["0"] ?? ""; return t(String(v)); })(),
-      "effects.1": (() => { const v = imported.magiseeds?.[0]?.effects?.[1] ?? imported.magiseeds?.[0]?.effects?.["1"] ?? imported.effects?.[1] ?? imported.effects?.["1"] ?? ""; return t(String(v)); })(),
-      "effects.2": (() => { const v = imported.magiseeds?.[0]?.effects?.[2] ?? imported.magiseeds?.[0]?.effects?.["2"] ?? imported.effects?.[2] ?? imported.effects?.["2"] ?? ""; return t(String(v)); })(),
-      "effects.3": (() => { const v = imported.magiseeds?.[0]?.effects?.[3] ?? imported.magiseeds?.[0]?.effects?.["3"] ?? imported.effects?.[3] ?? imported.effects?.["3"] ?? ""; return t(String(v)); })(),
+      "effects.0": (() => {
+        const v =
+          imported.magiseeds?.[0]?.effects?.[0] ??
+          imported.magiseeds?.[0]?.effects?.["0"] ??
+          imported.effects?.[0] ??
+          imported.effects?.["0"] ??
+          "";
+        return t(String(v));
+      })(),
+      "effects.1": (() => {
+        const v =
+          imported.magiseeds?.[0]?.effects?.[1] ??
+          imported.magiseeds?.[0]?.effects?.["1"] ??
+          imported.effects?.[1] ??
+          imported.effects?.["1"] ??
+          "";
+        return t(String(v));
+      })(),
+      "effects.2": (() => {
+        const v =
+          imported.magiseeds?.[0]?.effects?.[2] ??
+          imported.magiseeds?.[0]?.effects?.["2"] ??
+          imported.effects?.[2] ??
+          imported.effects?.["2"] ??
+          "";
+        return t(String(v));
+      })(),
+      "effects.3": (() => {
+        const v =
+          imported.magiseeds?.[0]?.effects?.[3] ??
+          imported.magiseeds?.[0]?.effects?.["3"] ??
+          imported.effects?.[3] ??
+          imported.effects?.["3"] ??
+          "";
+        return t(String(v));
+      })(),
       "meta.book": imported.meta?.book ?? "",
       "meta.page": imported.meta?.page ?? undefined,
       "meta.bookName": imported.meta?.bookName ?? "",
@@ -1130,7 +1169,9 @@ function PlayerSpellPanel() {
                       : {}),
                   },
                 ),
-              ...(spellType === "invocation" ? { options: wellspringOptions } : {}),
+              ...(spellType === "invocation"
+                ? { options: wellspringOptions }
+                : {}),
             }}
           />
 
@@ -1684,7 +1725,6 @@ function QualityPanel() {
                   getOptionLabel={(q) => q.name}
                   onChange={(_, q) => {
                     if (q) {
-                       
                       setFormState((_prev) => ({
                         // eslint-disable-next-line no-undef
                         ...prev,
@@ -1707,7 +1747,9 @@ function QualityPanel() {
                 />
               </Grid>
               <SchemaFieldRenderer
-                config={qualityFieldConfig.filter((f) => f.key !== "selectedBase")}
+                config={qualityFieldConfig.filter(
+                  (f) => f.key !== "selectedBase",
+                )}
                 state={formState}
                 onChange={setFormState}
                 surface="edit"
@@ -1749,7 +1791,6 @@ function QualityPanel() {
             </Grid>
           ) : (
             <QualitiesGenerator
-               
               onGenerate={(text) =>
                 // eslint-disable-next-line no-undef
                 setFormState((_prev) => ({ ...prev, quality: text }))
@@ -1849,15 +1890,15 @@ function ClassPanel() {
 
   const normalizedCustomBenefits = Array.isArray(formState.benefits?.custom)
     ? formState.benefits.custom
-      .map((entry) => {
-        if (typeof entry === "string") return entry;
-        if (entry && typeof entry === "object") {
-          const value = entry.value;
-          return typeof value === "string" ? value : "";
-        }
-        return "";
-      })
-      .filter((entry) => entry.trim())
+        .map((entry) => {
+          if (typeof entry === "string") return entry;
+          if (entry && typeof entry === "object") {
+            const value = entry.value;
+            return typeof value === "string" ? value : "";
+          }
+          return "";
+        })
+        .filter((entry) => entry.trim())
     : [];
 
   const classData = {
@@ -2081,7 +2122,6 @@ function WeaponPanel() {
   const prec = calcWeaponPrec({ base, rework, precBonus, precModifier });
 
   useEffect(() => {
-     
     setFormState((_prev) => ({
       // eslint-disable-next-line no-undef
       ...prev,
@@ -2147,7 +2187,6 @@ function WeaponPanel() {
               extraProps={{
                 name: String(name ?? ""),
                 onBrowse: () =>
-                   
                   openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.weapon, (item) =>
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     setFormState((prev) =>
@@ -2186,7 +2225,6 @@ function WeaponPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="weapon"
         onSelect={(q) =>
-           
           setFormState((_prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
@@ -2294,7 +2332,6 @@ function ArmorPanel() {
               extraProps={{
                 name: String(name ?? ""),
                 onBrowse: () =>
-                   
                   openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.armor, (item) =>
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     setFormState((prev) =>
@@ -2330,7 +2367,6 @@ function ArmorPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="armor"
         onSelect={(q) =>
-           
           setFormState((_prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
@@ -2435,7 +2471,6 @@ function ShieldPanel() {
               extraProps={{
                 name: String(name ?? ""),
                 onBrowse: () =>
-                   
                   openImport(QUICK_CREATE_TAB_TO_VIEWER_TYPE.shield, (item) =>
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     setFormState((prev) =>
@@ -2471,7 +2506,6 @@ function ShieldPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="shield"
         onSelect={(q) =>
-           
           setFormState((_prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
@@ -2577,7 +2611,7 @@ function CustomWeaponPanel() {
     selectedAccuracyCheck,
     overrideAccuracyAttributes,
     rareAccuracyBonus,
-     
+
     hasTransforming,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     secondSelectedCategory,
@@ -2625,16 +2659,16 @@ function CustomWeaponPanel() {
 
   const { precision: secondPrecision, damage: secondDamage } = hasTransforming
     ? calculateCustomWeaponStats(
-      {
-        secondSelectedCategory: formState.secondSelectedCategory,
-        secondCurrentCustomizations: secondCustomizations,
-        rareAccuracyBonus,
-        rareDamageBonus: formState.rareDamageBonus,
-        secondDamageModifier: parseInt(secondDamageModifier) || 0,
-        secondPrecModifier: parseInt(secondPrecModifier) || 0,
-      },
-      true,
-    )
+        {
+          secondSelectedCategory: formState.secondSelectedCategory,
+          secondCurrentCustomizations: secondCustomizations,
+          rareAccuracyBonus,
+          rareDamageBonus: formState.rareDamageBonus,
+          secondDamageModifier: parseInt(secondDamageModifier) || 0,
+          secondPrecModifier: parseInt(secondPrecModifier) || 0,
+        },
+        true,
+      )
     : { precision: 0, damage: 0 };
 
   const s2HasElemental = (secondCustomizations ?? []).some(
@@ -2648,7 +2682,7 @@ function CustomWeaponPanel() {
 
   const singleAttributeAccuracyCost =
     overrideAccuracyAttributes &&
-      selectedAccuracyCheck.attr1 === selectedAccuracyCheck.attr2
+    selectedAccuracyCheck.attr1 === selectedAccuracyCheck.attr2
       ? 50
       : 0;
   const totalCost =
@@ -2750,7 +2784,7 @@ function CustomWeaponPanel() {
                 onBrowse: () =>
                   openImport(
                     QUICK_CREATE_TAB_TO_VIEWER_TYPE["custom-weapon"],
-                     
+
                     (item) =>
                       // eslint-disable-next-line @typescript-eslint/no-unused-vars
                       setFormState((prev) =>
@@ -2787,7 +2821,6 @@ function CustomWeaponPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="customWeapon"
         onSelect={(q) =>
-           
           setFormState((_prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
@@ -2881,7 +2914,7 @@ function AccessoryPanel() {
                 onBrowse: () =>
                   openImport(
                     QUICK_CREATE_TAB_TO_VIEWER_TYPE.accessory,
-                     
+
                     (item) =>
                       // eslint-disable-next-line @typescript-eslint/no-unused-vars
                       setFormState((prev) =>
@@ -2917,7 +2950,6 @@ function AccessoryPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="accessory"
         onSelect={(q) =>
-           
           setFormState((_prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
@@ -2988,51 +3020,51 @@ function OptionalPanel() {
   const data = String(formState.name ?? "").trim()
     ? subtype === "zero-power"
       ? {
-        subtype,
-        name: String(formState.name).trim(),
-        fuid: formState.fuid || undefined,
-        zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
-        zeroEffectRef: zeroEffect?._sourceRef ?? "",
-        zeroTrigger: zeroTrigger
-          ? {
-            name: zeroTrigger.name ?? "",
-            description: zeroTrigger.description ?? "",
-          }
-          : "",
-        zeroEffect: zeroEffect
-          ? {
-            name: zeroEffect.name ?? "",
-            description: zeroEffect.description ?? "",
-          }
-          : "",
-        ...(formState.description
-          ? { description: String(formState.description).trim() }
-          : {}),
-        clock: { sections: Number(formState.clockSections) || 6 },
-        meta: createMetaFromBook("homebrew"),
-      }
-      : {
-        subtype,
-        name: String(formState.name).trim(),
-        fuid: formState.fuid || undefined,
-        ...(subtype === "camp-activities"
-          ? {
-            description: String(formState.target || "").trim(),
-          }
-          : formState.description != null
+          subtype,
+          name: String(formState.name).trim(),
+          fuid: formState.fuid || undefined,
+          zeroTriggerRef: zeroTrigger?._sourceRef ?? "",
+          zeroEffectRef: zeroEffect?._sourceRef ?? "",
+          zeroTrigger: zeroTrigger
+            ? {
+                name: zeroTrigger.name ?? "",
+                description: zeroTrigger.description ?? "",
+              }
+            : "",
+          zeroEffect: zeroEffect
+            ? {
+                name: zeroEffect.name ?? "",
+                description: zeroEffect.description ?? "",
+              }
+            : "",
+          ...(formState.description
             ? { description: String(formState.description).trim() }
             : {}),
-        ...(formState.targetDescription != null
-          ? { targetDescription: String(formState.targetDescription).trim() }
-          : {}),
-        ...(formState.effect != null
-          ? { effect: String(formState.effect).trim() }
-          : {}),
-        ...(formState.showClock && formState.clockSections
-          ? { clock: { sections: Number(formState.clockSections) } }
-          : {}),
-        meta: createMetaFromBook("homebrew"),
-      }
+          clock: { sections: Number(formState.clockSections) || 6 },
+          meta: createMetaFromBook("homebrew"),
+        }
+      : {
+          subtype,
+          name: String(formState.name).trim(),
+          fuid: formState.fuid || undefined,
+          ...(subtype === "camp-activities"
+            ? {
+                description: String(formState.target || "").trim(),
+              }
+            : formState.description != null
+              ? { description: String(formState.description).trim() }
+              : {}),
+          ...(formState.targetDescription != null
+            ? { targetDescription: String(formState.targetDescription).trim() }
+            : {}),
+          ...(formState.effect != null
+            ? { effect: String(formState.effect).trim() }
+            : {}),
+          ...(formState.showClock && formState.clockSections
+            ? { clock: { sections: Number(formState.clockSections) } }
+            : {}),
+          meta: createMetaFromBook("homebrew"),
+        }
     : { subtype, name: "", meta: createMetaFromBook("homebrew") };
 
   const handleClear = () => {
@@ -3089,7 +3121,9 @@ function OptionalPanel() {
             surface="edit"
             cols={2}
             excludeGroups={["zero"]}
-            onTabChange={(key) => setActiveTab(optionalTabs.findIndex((t) => t.key === key))}
+            onTabChange={(key) =>
+              setActiveTab(optionalTabs.findIndex((t) => t.key === key))
+            }
             extraProps={{
               name: String(formState.name ?? ""),
               onBrowse: () =>
@@ -3195,9 +3229,9 @@ function MnemospherePanel() {
 
   const data = selectedClass
     ? {
-      ...buildMnemosphere(selectedClass, Number(selectedLvl)),
-      meta: createMetaFromBook("homebrew"),
-    }
+        ...buildMnemosphere(selectedClass, Number(selectedLvl)),
+        meta: createMetaFromBook("homebrew"),
+      }
     : null;
 
   return (
@@ -3292,24 +3326,24 @@ function HoplospherePanel() {
 
   const data = String(formState.name ?? "").trim()
     ? {
-      name: String(formState.name ?? "").trim(),
-      fuid: formState.fuid || undefined,
-      description: formState.description,
-      requiredSlots: Number(formState.requiredSlots),
-      socketable: formState.socketable,
-      cost: Number(formState.cost) || 0,
-      coagEffects: coagEffects.reduce((acc, row) => {
-        const threshold = Number(row.threshold);
-        const effect = String(row.effect ?? "").trim();
+        name: String(formState.name ?? "").trim(),
+        fuid: formState.fuid || undefined,
+        description: formState.description,
+        requiredSlots: Number(formState.requiredSlots),
+        socketable: formState.socketable,
+        cost: Number(formState.cost) || 0,
+        coagEffects: coagEffects.reduce((acc, row) => {
+          const threshold = Number(row.threshold);
+          const effect = String(row.effect ?? "").trim();
 
-        if (threshold > 1 && effect) {
-          acc[threshold] = effect;
-        }
+          if (threshold > 1 && effect) {
+            acc[threshold] = effect;
+          }
 
-        return acc;
-      }, {}),
-      meta: deriveIsOfficial(formState) ?? createMetaFromBook("homebrew"),
-    }
+          return acc;
+        }, {}),
+        meta: deriveIsOfficial(formState) ?? createMetaFromBook("homebrew"),
+      }
     : null;
 
   return (
@@ -3724,7 +3758,6 @@ export default function QuickCreateModal({
           onChange={(_, v) => setTab(v)}
           variant="scrollable"
           scrollButtons="auto"
-         
         >
           {TABS.map((item, _idx) => (
             <Tab key={item.key} label={t(item.label)} disabled={false} />

@@ -76,7 +76,9 @@ export default function ResourceInlineBars({
     >
       <MiniBar value={hpPct} color={hpColor} track={alpha(hpColor, 0.2)} />
       <MiniBar value={mpPct} color={mpColor} track={alpha(mpColor, 0.2)} />
-      {hasIp && <MiniBar value={ipPct} color={ipColor} track={alpha(ipColor, 0.2)} />}
+      {hasIp && (
+        <MiniBar value={ipPct} color={ipColor} track={alpha(ipColor, 0.2)} />
+      )}
     </Box>
   );
 }

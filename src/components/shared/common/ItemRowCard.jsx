@@ -43,7 +43,13 @@ export default function ItemRowCard({
         label
       )}
       {subtitle && (
-        <Box sx={{ fontSize: compact ? "0.82rem" : "0.9rem", lineHeight: 1.3, minWidth: 0 }}>
+        <Box
+          sx={{
+            fontSize: compact ? "0.82rem" : "0.9rem",
+            lineHeight: 1.3,
+            minWidth: 0,
+          }}
+        >
           {subtitle}
         </Box>
       )}
@@ -76,7 +82,9 @@ export default function ItemRowCard({
         ...paperSx,
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "stretch", minHeight: rowMinHeight }}>
+      <Box
+        sx={{ display: "flex", alignItems: "stretch", minHeight: rowMinHeight }}
+      >
         {onClick ? (
           <ButtonBase
             onClick={onClick}

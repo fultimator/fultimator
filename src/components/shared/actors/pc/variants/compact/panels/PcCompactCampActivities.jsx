@@ -5,15 +5,12 @@ import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import NotesMarkdown from "/src/components/common/NotesMarkdown";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
-import { highlightMatch, highlightMarkdownText } from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
+import {
+  highlightMatch,
+  highlightMarkdownText,
+} from "/src/components/shared/actors/pc/variants/compact/highlightUtils";
 
-function ActivityCard({
-  activity,
-  searchQuery,
-  normalizedQuery,
-  theme,
-  t,
-}) {
+function ActivityCard({ activity, searchQuery, normalizedQuery, theme, t }) {
   const [descOpen, setDescOpen] = useState(false);
   const hasDetails = activity.description || activity.effect;
   const forceOpen =

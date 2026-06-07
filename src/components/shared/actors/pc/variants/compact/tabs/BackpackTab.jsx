@@ -12,7 +12,8 @@ export default function BackpackTab({
   isMainTab = false,
   searchQuery = "",
 }) {
-  const isTechnospheres = player?.settings?.optionalRules?.technospheres ?? false;
+  const isTechnospheres =
+    player?.settings?.optionalRules?.technospheres ?? false;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>

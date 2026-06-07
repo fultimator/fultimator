@@ -1,7 +1,10 @@
 import React, { Fragment } from "react";
 import { Grid, Typography } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import { useActorCardSetup, isInteractive } from "/src/components/shared/actors/core-utils";
+import {
+  useActorCardSetup,
+  isInteractive,
+} from "/src/components/shared/actors/core-utils";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
 import Diamond from "/src/components/Diamond";
 import { MeleeIcon, DistanceIcon } from "/src/components/icons";
@@ -31,20 +34,25 @@ function AttackRow({ attack, npc, attackType, showRoll }) {
       primary: npc.attributes?.[attack.accuracy?.attr1]?.base ?? 6,
       secondary: npc.attributes?.[attack.accuracy?.attr2]?.base ?? 6,
     };
-    const effectModifiers = accuracyModifiersFromEffects(npc, { range: attack.range });
-    const intent = prepareAccuracyCheck({
-      attr1: attr1Short,
-      attr2: attr2Short,
-      accuracyBonus: attack.accuracy?.value ?? 0,
-      name: attack.name,
-      baseDamage: isWeapon
-        ? (attack.damage?.value ?? 0)
-        : calcDamage(attack, npc),
-      damageType: attack.damage?.type ?? "physical",
-      accuracyDefense: "def",
+    const effectModifiers = accuracyModifiersFromEffects(npc, {
       range: attack.range,
-      hrZero: attack.damage?.hrZero === true,
-    }, effectModifiers);
+    });
+    const intent = prepareAccuracyCheck(
+      {
+        attr1: attr1Short,
+        attr2: attr2Short,
+        accuracyBonus: attack.accuracy?.value ?? 0,
+        name: attack.name,
+        baseDamage: isWeapon
+          ? (attack.damage?.value ?? 0)
+          : calcDamage(attack, npc),
+        damageType: attack.damage?.type ?? "physical",
+        accuracyDefense: "def",
+        range: attack.range,
+        hrZero: attack.damage?.hrZero === true,
+      },
+      effectModifiers,
+    );
     const rolls = rollAccuracyCheck(dieSizes);
     const result = processAccuracyCheck(
       intent,

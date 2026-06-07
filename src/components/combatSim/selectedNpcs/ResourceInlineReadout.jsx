@@ -3,9 +3,21 @@ import { Box, Tooltip, Typography } from "@mui/material";
 import { IoIosWarning } from "react-icons/io";
 import { t } from "../../../translation/translate";
 
-function StatLink({ label, current, max, color, hoverColor, onClick, warn = false }) {
+function StatLink({
+  label,
+  current,
+  max,
+  color,
+  hoverColor,
+  onClick,
+  warn = false,
+}) {
   return (
-    <Tooltip title={t(`combat_sim_edit_${label.toLowerCase()}`)} enterDelay={500} enterNextDelay={500}>
+    <Tooltip
+      title={t(`combat_sim_edit_${label.toLowerCase()}`)}
+      enterDelay={500}
+      enterNextDelay={500}
+    >
       <Typography
         component="button"
         type="button"
@@ -27,7 +39,11 @@ function StatLink({ label, current, max, color, hoverColor, onClick, warn = fals
         }}
       >
         {current}/{max} {label}
-        {warn && <IoIosWarning style={{ fontSize: "1.05em", verticalAlign: "middle" }} />}
+        {warn && (
+          <IoIosWarning
+            style={{ fontSize: "1.05em", verticalAlign: "middle" }}
+          />
+        )}
       </Typography>
     </Tooltip>
   );
@@ -61,12 +77,23 @@ export default function ResourceInlineReadout({
   onUpClick,
 }) {
   const lowHp = currentHp <= Math.floor(maxHp / 2);
-  const hasIp = Number.isFinite(currentIp) && Number.isFinite(maxIp) && maxIp > 0;
-  const hasFp = Number.isFinite(currentFp) && Number.isFinite(maxFp) && maxFp > 0;
-  const hasUp = Number.isFinite(currentUp) && Number.isFinite(maxUp) && maxUp > 0;
+  const hasIp =
+    Number.isFinite(currentIp) && Number.isFinite(maxIp) && maxIp > 0;
+  const hasFp =
+    Number.isFinite(currentFp) && Number.isFinite(maxFp) && maxFp > 0;
+  const hasUp =
+    Number.isFinite(currentUp) && Number.isFinite(maxUp) && maxUp > 0;
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 0.8, flexWrap: "wrap", mt: 0.15 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 0.8,
+        flexWrap: "wrap",
+        mt: 0.15,
+      }}
+    >
       <StatLink
         label="HP"
         current={currentHp}
@@ -76,7 +103,11 @@ export default function ResourceInlineReadout({
         onClick={onHpClick}
         warn={lowHp}
       />
-      <Typography sx={{ color: "text.disabled", fontSize: "0.78rem", lineHeight: 1 }}>|</Typography>
+      <Typography
+        sx={{ color: "text.disabled", fontSize: "0.78rem", lineHeight: 1 }}
+      >
+        |
+      </Typography>
       <StatLink
         label="MP"
         current={currentMp}
@@ -87,7 +118,11 @@ export default function ResourceInlineReadout({
       />
       {hasIp && (
         <>
-          <Typography sx={{ color: "text.disabled", fontSize: "0.78rem", lineHeight: 1 }}>|</Typography>
+          <Typography
+            sx={{ color: "text.disabled", fontSize: "0.78rem", lineHeight: 1 }}
+          >
+            |
+          </Typography>
           <StatLink
             label="IP"
             current={currentIp}
@@ -100,7 +135,11 @@ export default function ResourceInlineReadout({
       )}
       {hasFp && (
         <>
-          <Typography sx={{ color: "text.disabled", fontSize: "0.78rem", lineHeight: 1 }}>|</Typography>
+          <Typography
+            sx={{ color: "text.disabled", fontSize: "0.78rem", lineHeight: 1 }}
+          >
+            |
+          </Typography>
           <StatLink
             label="FP"
             current={currentFp}
@@ -113,7 +152,11 @@ export default function ResourceInlineReadout({
       )}
       {hasUp && (
         <>
-          <Typography sx={{ color: "text.disabled", fontSize: "0.78rem", lineHeight: 1 }}>|</Typography>
+          <Typography
+            sx={{ color: "text.disabled", fontSize: "0.78rem", lineHeight: 1 }}
+          >
+            |
+          </Typography>
           <StatLink
             label="UP"
             current={currentUp}

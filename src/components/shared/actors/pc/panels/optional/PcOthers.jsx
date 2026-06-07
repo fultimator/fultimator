@@ -15,12 +15,20 @@ export default function PcOthers({ pc, isInteractive = false, onUpdate }) {
   const headerActions = isInteractive ? (
     <Box sx={{ display: "flex", gap: 0.5 }}>
       <Tooltip title={t("Add")} arrow>
-        <IconButton size="small" onClick={() => setAddOpen(true)} sx={{ color: "#fff" }}>
+        <IconButton
+          size="small"
+          onClick={() => setAddOpen(true)}
+          sx={{ color: "#fff" }}
+        >
           <AddIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       <Tooltip title={t("Open Compendium")} arrow>
-        <IconButton size="small" onClick={() => setCompendiumOpen(true)} sx={{ color: "#fff" }}>
+        <IconButton
+          size="small"
+          onClick={() => setCompendiumOpen(true)}
+          sx={{ color: "#fff" }}
+        >
           <SearchIcon fontSize="small" />
         </IconButton>
       </Tooltip>

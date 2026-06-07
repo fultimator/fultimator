@@ -10,13 +10,38 @@ import {
   WlpAttributeIcon,
 } from "/src/components/icons";
 
-const STAT_LABEL_SHADOW = "-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000";
+const STAT_LABEL_SHADOW =
+  "-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000";
 
 const ATTRS = [
-  { label: "DEX", Icon: DexAttributeIcon, calcArgs: ["Slow", "Enraged", "dexterity"], baseKey: "dexterity", colorKey: "info" },
-  { label: "INS", Icon: InsAttributeIcon, calcArgs: ["Dazed", "Enraged", "insight"],   baseKey: "insight",   colorKey: "secondary" },
-  { label: "MIG", Icon: MigAttributeIcon, calcArgs: ["Weak", "Poisoned", "might"],      baseKey: "might",     colorKey: "error" },
-  { label: "WLP", Icon: WlpAttributeIcon, calcArgs: ["Shaken", "Poisoned", "will"],     baseKey: "will",      colorKey: "warning" },
+  {
+    label: "DEX",
+    Icon: DexAttributeIcon,
+    calcArgs: ["Slow", "Enraged", "dexterity"],
+    baseKey: "dexterity",
+    colorKey: "info",
+  },
+  {
+    label: "INS",
+    Icon: InsAttributeIcon,
+    calcArgs: ["Dazed", "Enraged", "insight"],
+    baseKey: "insight",
+    colorKey: "secondary",
+  },
+  {
+    label: "MIG",
+    Icon: MigAttributeIcon,
+    calcArgs: ["Weak", "Poisoned", "might"],
+    baseKey: "might",
+    colorKey: "error",
+  },
+  {
+    label: "WLP",
+    Icon: WlpAttributeIcon,
+    calcArgs: ["Shaken", "Poisoned", "will"],
+    baseKey: "will",
+    colorKey: "warning",
+  },
 ];
 
 export function DefStatsRow({ defValue, mdefValue, onDefClick, onMdefClick }) {
@@ -26,8 +51,18 @@ export function DefStatsRow({ defValue, mdefValue, onDefClick, onMdefClick }) {
   const color = theme.palette.primary.main;
 
   const stats = [
-    { label: "DEF",   iconSrc: "/assets/icons/stats/icon_def.png",  value: defValue,  onClick: onDefClick },
-    { label: "M.DEF", iconSrc: "/assets/icons/stats/icon_mdef.png", value: mdefValue, onClick: onMdefClick },
+    {
+      label: "DEF",
+      iconSrc: "/assets/icons/stats/icon_def.png",
+      value: defValue,
+      onClick: onDefClick,
+    },
+    {
+      label: "M.DEF",
+      iconSrc: "/assets/icons/stats/icon_mdef.png",
+      value: mdefValue,
+      onClick: onMdefClick,
+    },
   ];
 
   return (
@@ -58,22 +93,27 @@ export function DefStatsRow({ defValue, mdefValue, onDefClick, onMdefClick }) {
           }}
         >
           <Box
-              sx={{
-                bgcolor: color,
-                color: "#fff",
-                px: 0.75,
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                fontFamily: "Antonio",
-                fontWeight: 700,
-                fontSize: "0.95rem",
-                letterSpacing: "0.04em",
-                whiteSpace: "nowrap",
-                textShadow: STAT_LABEL_SHADOW,
-              }}
-            >
-            <Box component="img" src={iconSrc} alt={label} sx={{ width: "1.25em", height: "1.25em", objectFit: "contain" }} />
+            sx={{
+              bgcolor: color,
+              color: "#fff",
+              px: 0.75,
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              fontFamily: "Antonio",
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              letterSpacing: "0.04em",
+              whiteSpace: "nowrap",
+              textShadow: STAT_LABEL_SHADOW,
+            }}
+          >
+            <Box
+              component="img"
+              src={iconSrc}
+              alt={label}
+              sx={{ width: "1.25em", height: "1.25em", objectFit: "contain" }}
+            />
             {label}
           </Box>
           <Box
@@ -164,16 +204,31 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
                 fontWeight: 700,
                 fontSize: "1rem",
                 flex: 1,
-                color: diff > 0
-                  ? theme.palette.success.main
-                  : diff < 0
-                    ? theme.palette.error.main
-                    : "inherit",
+                color:
+                  diff > 0
+                    ? theme.palette.success.main
+                    : diff < 0
+                      ? theme.palette.error.main
+                      : "inherit",
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {diff > 0 && <ArrowDropUp sx={{ fontSize: "1.2em", mr: "-4px", display: "block" }} />}
-                {diff < 0 && <ArrowDropDown sx={{ fontSize: "1.2em", mr: "-4px", display: "block" }} />}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {diff > 0 && (
+                  <ArrowDropUp
+                    sx={{ fontSize: "1.2em", mr: "-4px", display: "block" }}
+                  />
+                )}
+                {diff < 0 && (
+                  <ArrowDropDown
+                    sx={{ fontSize: "1.2em", mr: "-4px", display: "block" }}
+                  />
+                )}
                 {value}
               </Box>
             </Box>

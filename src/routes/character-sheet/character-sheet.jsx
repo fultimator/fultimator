@@ -21,7 +21,10 @@ import {
 } from "@mui/material";
 import html2canvas from "html2canvas";
 import Confetti from "react-confetti";
-import { PlayerSheetFull, PlayerSheetCompact } from "../../components/shared/actors";
+import {
+  PlayerSheetFull,
+  PlayerSheetCompact,
+} from "../../components/shared/actors";
 import powered_by_fu from "/images/routes/powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
@@ -302,9 +305,15 @@ export default function CharacterSheet() {
   const captureCanvas = async (settings = {}) => {
     if (!imagesLoaded) return null;
 
-    const { theme: themeOption = "current", scale = 2, printMode = false } = settings;
+    const {
+      theme: themeOption = "current",
+      scale = 2,
+      printMode = false,
+    } = settings;
 
-    const elementId = fullCharacterSheet ? "character-sheet" : "character-sheet-short";
+    const elementId = fullCharacterSheet
+      ? "character-sheet"
+      : "character-sheet-short";
     const element = document.getElementById(elementId);
     if (!element) return null;
 
@@ -381,8 +390,12 @@ export default function CharacterSheet() {
         await printPDF(player);
       } else if (settings.format === "app-pdf") {
         // Expand all class and mnemosphere accordions before capture
-        const expandClassBtn = document.querySelector("[data-expand-all-classes='collapsed']");
-        const expandMnemoBtn = document.querySelector("[data-expand-all-mnemo='collapsed']");
+        const expandClassBtn = document.querySelector(
+          "[data-expand-all-classes='collapsed']",
+        );
+        const expandMnemoBtn = document.querySelector(
+          "[data-expand-all-mnemo='collapsed']",
+        );
         if (expandClassBtn) expandClassBtn.click();
         if (expandMnemoBtn) expandMnemoBtn.click();
         if (expandClassBtn || expandMnemoBtn) {
@@ -390,12 +403,20 @@ export default function CharacterSheet() {
         }
         const result = await captureCanvas({ ...settings, scale: 1 });
         if (result) {
-          await buildAppPDF(result.canvas, result.element, result.scale, `${player.name ?? "character"}_sheet.pdf`);
+          await buildAppPDF(
+            result.canvas,
+            result.element,
+            result.scale,
+            `${player.name ?? "character"}_sheet.pdf`,
+          );
         }
       } else {
         const result = await captureCanvas(settings);
         if (result) {
-          await download(result.canvas.toDataURL("image/png"), `${player.name ?? "character"}_sheet.png`);
+          await download(
+            result.canvas.toDataURL("image/png"),
+            `${player.name ?? "character"}_sheet.png`,
+          );
         }
       }
       setExportDialogOpen(false);
@@ -541,7 +562,8 @@ export default function CharacterSheet() {
     campActivities: settings.optionalRules?.campActivities ?? false,
     zeroPower: settings.optionalRules?.zeroPower ?? false,
     technospheres: settings.optionalRules?.technospheres ?? false,
-    technospheresVariant: settings.optionalRules?.technospheresVariant ?? "standard",
+    technospheresVariant:
+      settings.optionalRules?.technospheresVariant ?? "standard",
     innateClasses: settings.optionalRules?.innateClasses ?? [],
   };
 
@@ -667,7 +689,9 @@ export default function CharacterSheet() {
               canLevelUpFromExp={canLevelUpFromExp}
               onLevelUpRequest={openLevelUpDialog}
               updateMaxStats={updateMaxStats}
-              onToggleEditMode={isOwner ? () => setIsSheetEditMode((v) => !v) : undefined}
+              onToggleEditMode={
+                isOwner ? () => setIsSheetEditMode((v) => !v) : undefined
+              }
               clockSections={ritualClockSections}
               setClockSections={setRitualClockSections}
               clockState={ritualClockState}

@@ -11,7 +11,10 @@ import {
   Chip,
   Tooltip,
 } from "@mui/material";
-import { resolveWellsprings, affinityIconSrc } from "/src/libs/player/wellsprings";
+import {
+  resolveWellsprings,
+  affinityIconSrc,
+} from "/src/libs/player/wellsprings";
 
 /**
  * InvokerGeneralSection - Settings tab for Invoker spell
@@ -163,42 +166,61 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
                   const isOrphaned = !w;
                   const removeVal = (e) => {
                     e.stopPropagation();
-                    handleAlwaysActiveChange(alwaysActiveWellsprings.filter((v) => v !== val));
+                    handleAlwaysActiveChange(
+                      alwaysActiveWellsprings.filter((v) => v !== val),
+                    );
                   };
                   return (
-                    <Tooltip key={val} title={isOrphaned ? t("invoker_missing_wellspring") : ""} arrow disableHoverListener={!isOrphaned}>
-                    <Chip
-                      size="small"
-                      label={
-                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          {w && (
-                            <img
-                              src={affinityIconSrc(w.icon)}
-                              width={14}
-                              height={14}
-                              style={{ objectFit: "contain", flexShrink: 0 }}
-                              alt={val}
-                            />
-                          )}
-                          <span style={isOrphaned ? { textDecoration: "line-through" } : undefined}>
-                            {val}
+                    <Tooltip
+                      key={val}
+                      title={isOrphaned ? t("invoker_missing_wellspring") : ""}
+                      arrow
+                      disableHoverListener={!isOrphaned}
+                    >
+                      <Chip
+                        size="small"
+                        label={
+                          <span
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            {w && (
+                              <img
+                                src={affinityIconSrc(w.icon)}
+                                width={14}
+                                height={14}
+                                style={{ objectFit: "contain", flexShrink: 0 }}
+                                alt={val}
+                              />
+                            )}
+                            <span
+                              style={
+                                isOrphaned
+                                  ? { textDecoration: "line-through" }
+                                  : undefined
+                              }
+                            >
+                              {val}
+                            </span>
                           </span>
-                        </span>
-                      }
-                      onClick={isOrphaned ? removeVal : undefined}
-                      onDelete={removeVal}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      sx={{
-                        height: 24,
-                        ...(isOrphaned && {
-                          borderColor: "error.main",
-                          color: "error.main",
-                          bgcolor: "transparent",
-                          border: "1px solid",
-                          cursor: "pointer",
-                        }),
-                      }}
-                    />
+                        }
+                        onClick={isOrphaned ? removeVal : undefined}
+                        onDelete={removeVal}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        sx={{
+                          height: 24,
+                          ...(isOrphaned && {
+                            borderColor: "error.main",
+                            color: "error.main",
+                            bgcolor: "transparent",
+                            border: "1px solid",
+                            cursor: "pointer",
+                          }),
+                        }}
+                      />
                     </Tooltip>
                   );
                 })}
@@ -206,7 +228,11 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
             )}
           >
             {allWellsprings.map((w) => (
-              <MenuItem key={w.key} value={w.key} disabled={alwaysActiveWellsprings.includes(w.key)}>
+              <MenuItem
+                key={w.key}
+                value={w.key}
+                disabled={alwaysActiveWellsprings.includes(w.key)}
+              >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <img
                     src={affinityIconSrc(w.icon)}
@@ -228,9 +254,19 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
         </Typography>
         <Box sx={{ p: 2, bgcolor: "action.hover", borderRadius: 1 }}>
           {skillLevel === 1 && <Typography>{t("Blast")}</Typography>}
-          {skillLevel === 2 && <Typography>{t("Blast")}, {t("Hex")}</Typography>}
-          {skillLevel === 3 && <Typography>{t("Blast")}, {t("Hex")}, {t("Utility")}</Typography>}
-          {skillLevel !== 1 && skillLevel !== 2 && skillLevel !== 3 && <Typography>{t("None")}</Typography>}
+          {skillLevel === 2 && (
+            <Typography>
+              {t("Blast")}, {t("Hex")}
+            </Typography>
+          )}
+          {skillLevel === 3 && (
+            <Typography>
+              {t("Blast")}, {t("Hex")}, {t("Utility")}
+            </Typography>
+          )}
+          {skillLevel !== 1 && skillLevel !== 2 && skillLevel !== 3 && (
+            <Typography>{t("None")}</Typography>
+          )}
         </Box>
       </Grid>
     </Grid>

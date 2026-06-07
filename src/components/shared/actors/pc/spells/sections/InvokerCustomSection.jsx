@@ -62,7 +62,10 @@ export function IconPicker({ value, onChange }) {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: (theme) => theme.typography.fontFamily,
-                "&:hover": { borderColor: "primary.main", backgroundColor: "action.hover" },
+                "&:hover": {
+                  borderColor: "primary.main",
+                  backgroundColor: "action.hover",
+                },
               }}
             >
               <img
@@ -95,7 +98,12 @@ function WellspringSelectOption({ wellspring }) {
   );
 }
 
-function ItemActionMenu({ onAddToCompendium, onAddMissingInvocations, onDelete, t }) {
+function ItemActionMenu({
+  onAddToCompendium,
+  onAddMissingInvocations,
+  onDelete,
+  t,
+}) {
   const [anchor, setAnchor] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   return (
@@ -103,19 +111,45 @@ function ItemActionMenu({ onAddToCompendium, onAddMissingInvocations, onDelete, 
       <IconButton size="small" onClick={(e) => setAnchor(e.currentTarget)}>
         <MenuIcon fontSize="small" />
       </IconButton>
-      <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
+      <Menu
+        anchorEl={anchor}
+        open={Boolean(anchor)}
+        onClose={() => setAnchor(null)}
+      >
         {onAddMissingInvocations && (
-          <MenuItem onClick={() => { onAddMissingInvocations(); setAnchor(null); }}>
-            <ListItemIcon><PlaylistAddIcon fontSize="small" /></ListItemIcon>
+          <MenuItem
+            onClick={() => {
+              onAddMissingInvocations();
+              setAnchor(null);
+            }}
+          >
+            <ListItemIcon>
+              <PlaylistAddIcon fontSize="small" />
+            </ListItemIcon>
             <ListItemText>{t("Add Missing Invocations")}</ListItemText>
           </MenuItem>
         )}
-        <MenuItem onClick={() => { onAddToCompendium(); setAnchor(null); }}>
-          <ListItemIcon><LibraryAddIcon fontSize="small" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            onAddToCompendium();
+            setAnchor(null);
+          }}
+        >
+          <ListItemIcon>
+            <LibraryAddIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t("Add to Compendium")}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { setAnchor(null); setConfirmOpen(true); }} sx={{ color: "error.main" }}>
-          <ListItemIcon><DeleteForever fontSize="small" color="error" /></ListItemIcon>
+        <MenuItem
+          onClick={() => {
+            setAnchor(null);
+            setConfirmOpen(true);
+          }}
+          sx={{ color: "error.main" }}
+        >
+          <ListItemIcon>
+            <DeleteForever fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t("Delete")}</ListItemText>
         </MenuItem>
       </Menu>
@@ -129,13 +163,45 @@ function ItemActionMenu({ onAddToCompendium, onAddMissingInvocations, onDelete, 
   );
 }
 
-function WellspringRow({ wellspring: w, index: i, onUpdate, onAddMissingInvocations, onAddToCompendium, onDelete, t }) {
+function WellspringRow({
+  wellspring: w,
+  index: i,
+  onUpdate,
+  onAddMissingInvocations,
+  onAddToCompendium,
+  onDelete,
+  t,
+}) {
   const [open, setOpen] = useState(false);
-  const handleSendToChat = () => sendDisplayMessage("wellspring", w.name || t("Unnamed"));
+  const handleSendToChat = () =>
+    sendDisplayMessage("wellspring", w.name || t("Unnamed"));
   const label = (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0, px: "2px" }}>
-      <img src={affinityIconSrc(w.icon || "untyped")} width={20} height={20} style={{ objectFit: "contain", flexShrink: 0 }} alt={w.name} />
-      <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1rem", textTransform: "uppercase", flex: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        minWidth: 0,
+        px: "2px",
+      }}
+    >
+      <img
+        src={affinityIconSrc(w.icon || "untyped")}
+        width={20}
+        height={20}
+        style={{ objectFit: "contain", flexShrink: 0 }}
+        alt={w.name}
+      />
+      <Typography
+        noWrap
+        sx={{
+          fontFamily: "Antonio",
+          fontWeight: 800,
+          fontSize: "1rem",
+          textTransform: "uppercase",
+          flex: 1,
+        }}
+      >
         {w.name || <em style={{ opacity: 0.5 }}>{t("Unnamed")}</em>}
       </Typography>
       <Box
@@ -158,7 +224,9 @@ function WellspringRow({ wellspring: w, index: i, onUpdate, onAddMissingInvocati
       actions={
         <>
           <Tooltip title={t("Send to chat")} arrow>
-            <IconButton size="small" onClick={handleSendToChat}><ChatOutlined /></IconButton>
+            <IconButton size="small" onClick={handleSendToChat}>
+              <ChatOutlined />
+            </IconButton>
           </Tooltip>
           <ItemActionMenu
             onAddMissingInvocations={onAddMissingInvocations}
@@ -170,7 +238,16 @@ function WellspringRow({ wellspring: w, index: i, onUpdate, onAddMissingInvocati
       }
     >
       {open && (
-        <Box sx={{ p: 1.5, display: "flex", flexDirection: "column", gap: 1.5, borderTop: "1px solid", borderColor: "divider" }}>
+        <Box
+          sx={{
+            p: 1.5,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.5,
+            borderTop: "1px solid",
+            borderColor: "divider",
+          }}
+        >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <TextField
               label={t("Name")}
@@ -186,7 +263,11 @@ function WellspringRow({ wellspring: w, index: i, onUpdate, onAddMissingInvocati
               onChange={(e) => onUpdate(i, "color", e.target.value)}
               size="small"
               sx={{ width: 80 }}
-              slotProps={{ htmlInput: { style: { padding: 4, height: 32, cursor: "pointer" } } }}
+              slotProps={{
+                htmlInput: {
+                  style: { padding: 4, height: 32, cursor: "pointer" },
+                },
+              }}
             />
             <FormControl size="small" sx={{ minWidth: 100 }}>
               <InputLabel>{t("Text")}</InputLabel>
@@ -201,10 +282,17 @@ function WellspringRow({ wellspring: w, index: i, onUpdate, onAddMissingInvocati
             </FormControl>
           </Box>
           <Box>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block" }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mb: 0.5, display: "block" }}
+            >
               {t("Icon")}
             </Typography>
-            <IconPicker value={w.icon || "untyped"} onChange={(val) => onUpdate(i, "icon", val)} />
+            <IconPicker
+              value={w.icon || "untyped"}
+              onChange={(val) => onUpdate(i, "icon", val)}
+            />
           </Box>
         </Box>
       )}
@@ -212,16 +300,42 @@ function WellspringRow({ wellspring: w, index: i, onUpdate, onAddMissingInvocati
   );
 }
 
-function InvocationRow({ inv, allWellsprings, isOrphaned, open, onToggle, onUpdate, onAddToCompendium, onDelete, t }) {
+function InvocationRow({
+  inv,
+  allWellsprings,
+  isOrphaned,
+  open,
+  onToggle,
+  onUpdate,
+  onAddToCompendium,
+  onDelete,
+  t,
+}) {
   const wsEntry = allWellsprings.find((w) => w.key === inv.wellspring);
-  const handleSendToChat = () => sendDisplayMessage("invocation", inv.customName || t("Unnamed"), {
-    tags: [inv.wellspring, inv.type].filter(Boolean),
-    effect: inv.effect || undefined,
-  });
+  const handleSendToChat = () =>
+    sendDisplayMessage("invocation", inv.customName || t("Unnamed"), {
+      tags: [inv.wellspring, inv.type].filter(Boolean),
+      effect: inv.effect || undefined,
+    });
   const label = (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0, px: "2px", opacity: isOrphaned ? 0.6 : 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        minWidth: 0,
+        px: "2px",
+        opacity: isOrphaned ? 0.6 : 1,
+      }}
+    >
       {wsEntry && (
-        <img src={affinityIconSrc(wsEntry.icon)} width={20} height={20} style={{ objectFit: "contain", flexShrink: 0 }} alt={wsEntry.key} />
+        <img
+          src={affinityIconSrc(wsEntry.icon)}
+          width={20}
+          height={20}
+          style={{ objectFit: "contain", flexShrink: 0 }}
+          alt={wsEntry.key}
+        />
       )}
       <Typography
         noWrap
@@ -238,7 +352,11 @@ function InvocationRow({ inv, allWellsprings, isOrphaned, open, onToggle, onUpda
         {inv.customName || <em style={{ opacity: 0.5 }}>{t("Unnamed")}</em>}
       </Typography>
       {inv.type && (
-        <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0, lineHeight: 1, alignSelf: "center" }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ flexShrink: 0, lineHeight: 1, alignSelf: "center" }}
+        >
           {inv.type}
         </Typography>
       )}
@@ -253,7 +371,9 @@ function InvocationRow({ inv, allWellsprings, isOrphaned, open, onToggle, onUpda
       actions={
         <>
           <Tooltip title={t("Send to chat")} arrow>
-            <IconButton size="small" onClick={handleSendToChat}><ChatOutlined /></IconButton>
+            <IconButton size="small" onClick={handleSendToChat}>
+              <ChatOutlined />
+            </IconButton>
           </Tooltip>
           <ItemActionMenu
             onAddToCompendium={onAddToCompendium}
@@ -264,16 +384,35 @@ function InvocationRow({ inv, allWellsprings, isOrphaned, open, onToggle, onUpda
       }
     >
       {open && (
-        <Box sx={{ p: 1.5, borderTop: "1px solid", borderColor: isOrphaned ? "error.main" : "divider" }}>
+        <Box
+          sx={{
+            p: 1.5,
+            borderTop: "1px solid",
+            borderColor: isOrphaned ? "error.main" : "divider",
+          }}
+        >
           <Grid container spacing={1.5} sx={{ alignItems: "flex-start" }}>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
                 label={t("Name")}
                 value={inv.customName || ""}
-                onChange={(e) => onUpdate(inv.key, "customName", e.target.value)}
+                onChange={(e) =>
+                  onUpdate(inv.key, "customName", e.target.value)
+                }
                 size="small"
                 fullWidth
-                slotProps={isOrphaned ? { input: { sx: { textDecoration: "line-through", color: "error.main" } } } : undefined}
+                slotProps={
+                  isOrphaned
+                    ? {
+                        input: {
+                          sx: {
+                            textDecoration: "line-through",
+                            color: "error.main",
+                          },
+                        },
+                      }
+                    : undefined
+                }
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
@@ -281,17 +420,29 @@ function InvocationRow({ inv, allWellsprings, isOrphaned, open, onToggle, onUpda
                 <InputLabel>{t("Wellspring")}</InputLabel>
                 <Select
                   value={inv.wellspring || ""}
-                  onChange={(e) => onUpdate(inv.key, "wellspring", e.target.value)}
+                  onChange={(e) =>
+                    onUpdate(inv.key, "wellspring", e.target.value)
+                  }
                   label={t("Wellspring")}
                   renderValue={(val) => {
-                    const w = allWellsprings.find((x) => x.key === val) ?? (val ? { key: val, icon: "untyped" } : null);
+                    const w =
+                      allWellsprings.find((x) => x.key === val) ??
+                      (val ? { key: val, icon: "untyped" } : null);
                     return w ? <WellspringSelectOption wellspring={w} /> : val;
                   }}
                 >
                   {[
                     ...allWellsprings,
-                    ...(inv.wellspring && !allWellsprings.find((w) => w.key === inv.wellspring)
-                      ? [{ key: inv.wellspring, icon: "untyped", color: "#888", textColor: "white" }]
+                    ...(inv.wellspring &&
+                    !allWellsprings.find((w) => w.key === inv.wellspring)
+                      ? [
+                          {
+                            key: inv.wellspring,
+                            icon: "untyped",
+                            color: "#888",
+                            textColor: "white",
+                          },
+                        ]
                       : []),
                   ].map((w) => (
                     <MenuItem key={w.key} value={w.key}>
@@ -310,7 +461,9 @@ function InvocationRow({ inv, allWellsprings, isOrphaned, open, onToggle, onUpda
                   label={t("Type")}
                 >
                   {INV_TYPES.map((type) => (
-                    <MenuItem key={type} value={type}>{t(type)}</MenuItem>
+                    <MenuItem key={type} value={type}>
+                      {t(type)}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -333,9 +486,19 @@ function InvocationRow({ inv, allWellsprings, isOrphaned, open, onToggle, onUpda
   );
 }
 
-function InvocationGroup({ wsKey, group, allWellsprings, isOrphaned, onUpdate, addInvocationToCompendium, removeInvocation, t }) {
+function InvocationGroup({
+  wsKey,
+  group,
+  allWellsprings,
+  isOrphaned,
+  onUpdate,
+  addInvocationToCompendium,
+  removeInvocation,
+  t,
+}) {
   const [expandedKeys, setExpandedKeys] = useState(() => new Set());
-  const allExpanded = group.length > 0 && group.every((inv) => expandedKeys.has(inv.key));
+  const allExpanded =
+    group.length > 0 && group.every((inv) => expandedKeys.has(inv.key));
 
   const toggle = (key) =>
     setExpandedKeys((prev) => {
@@ -346,40 +509,88 @@ function InvocationGroup({ wsKey, group, allWellsprings, isOrphaned, onUpdate, a
     });
 
   const toggleAll = () =>
-    setExpandedKeys(allExpanded ? new Set() : new Set(group.map((inv) => inv.key)));
+    setExpandedKeys(
+      allExpanded ? new Set() : new Set(group.map((inv) => inv.key)),
+    );
 
   const wellspringEntry = allWellsprings.find((w) => w.key === wsKey);
 
   return (
     <Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1, pb: 0.5, borderBottom: "1px solid", borderColor: isOrphaned ? "error.main" : "divider" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          mb: 1,
+          pb: 0.5,
+          borderBottom: "1px solid",
+          borderColor: isOrphaned ? "error.main" : "divider",
+        }}
+      >
         {wellspringEntry ? (
           <>
-            <img src={affinityIconSrc(wellspringEntry.icon)} width={16} height={16} style={{ objectFit: "contain" }} alt={wsKey} />
-            <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>{wsKey}</Typography>
+            <img
+              src={affinityIconSrc(wellspringEntry.icon)}
+              width={16}
+              height={16}
+              style={{ objectFit: "contain" }}
+              alt={wsKey}
+            />
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+              {wsKey}
+            </Typography>
           </>
         ) : (
-          <Typography variant="subtitle2" sx={{ fontWeight: "bold", color: isOrphaned ? "error.main" : "text.secondary", fontStyle: wsKey ? "normal" : "italic", textDecoration: isOrphaned ? "line-through" : "none" }}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              fontWeight: "bold",
+              color: isOrphaned ? "error.main" : "text.secondary",
+              fontStyle: wsKey ? "normal" : "italic",
+              textDecoration: isOrphaned ? "line-through" : "none",
+            }}
+          >
             {wsKey || t("No Wellspring")}
           </Typography>
         )}
         {isOrphaned && (
           <>
             <Tooltip title={t("invoker_missing_wellspring")} arrow>
-              <Typography variant="caption" sx={{ ml: "auto", color: "error.main", fontStyle: "italic" }}>
+              <Typography
+                variant="caption"
+                sx={{ ml: "auto", color: "error.main", fontStyle: "italic" }}
+              >
                 {t("invoker_missing_wellspring")}
               </Typography>
             </Tooltip>
             <Tooltip title={t("Delete All")} arrow>
-              <IconButton size="small" color="error" onClick={() => group.forEach((inv) => removeInvocation(inv.key))}>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() =>
+                  group.forEach((inv) => removeInvocation(inv.key))
+                }
+              >
                 <DeleteForever fontSize="small" />
               </IconButton>
             </Tooltip>
           </>
         )}
-        <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")} arrow>
-          <IconButton size="small" sx={{ ml: isOrphaned ? 0 : "auto" }} onClick={toggleAll}>
-            {allExpanded ? <UnfoldLessIcon fontSize="small" /> : <UnfoldMoreIcon fontSize="small" />}
+        <Tooltip
+          title={allExpanded ? t("Collapse All") : t("Expand All")}
+          arrow
+        >
+          <IconButton
+            size="small"
+            sx={{ ml: isOrphaned ? 0 : "auto" }}
+            onClick={toggleAll}
+          >
+            {allExpanded ? (
+              <UnfoldLessIcon fontSize="small" />
+            ) : (
+              <UnfoldMoreIcon fontSize="small" />
+            )}
           </IconButton>
         </Tooltip>
       </Box>
@@ -408,24 +619,35 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
   const [invocationPickerOpen, setInvocationPickerOpen] = useState(false);
   const { packs, addItem } = useCompendiumPacks();
 
-  const customWellsprings = useMemo(() => formState.customWellsprings || [], [formState.customWellsprings]);
-  const invocations = useMemo(() => formState.invocations || [], [formState.invocations]);
-  const allWellsprings = useMemo(() => resolveWellsprings(customWellsprings), [customWellsprings]);
+  const customWellsprings = useMemo(
+    () => formState.customWellsprings || [],
+    [formState.customWellsprings],
+  );
+  const invocations = useMemo(
+    () => formState.invocations || [],
+    [formState.invocations],
+  );
+  const allWellsprings = useMemo(
+    () => resolveWellsprings(customWellsprings),
+    [customWellsprings],
+  );
 
   const setCustomWellsprings = (updater) =>
     setFormState((prev) => ({
       ...prev,
-      customWellsprings: typeof updater === "function"
-        ? updater(prev.customWellsprings || [])
-        : updater,
+      customWellsprings:
+        typeof updater === "function"
+          ? updater(prev.customWellsprings || [])
+          : updater,
     }));
 
   const setInvocations = (updater) =>
     setFormState((prev) => ({
       ...prev,
-      invocations: typeof updater === "function"
-        ? updater(prev.invocations || [])
-        : updater,
+      invocations:
+        typeof updater === "function"
+          ? updater(prev.invocations || [])
+          : updater,
     }));
 
   const addWellspring = () =>
@@ -445,7 +667,13 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
   const addInvocation = () =>
     setInvocations((prev) => [
       ...prev,
-      { key: crypto.randomUUID(), customName: "", wellspring: "", type: "Blast", effect: "" },
+      {
+        key: crypto.randomUUID(),
+        customName: "",
+        wellspring: "",
+        type: "Blast",
+        effect: "",
+      },
     ]);
 
   const updateInvocation = (key, field, val) =>
@@ -491,9 +719,13 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
     }
     if (matching.length === 0) return;
     setInvocations((prev) => {
-      const existingNames = new Set(prev.map((i) => (i.customName || i.key || "").toLowerCase()));
+      const existingNames = new Set(
+        prev.map((i) => (i.customName || i.key || "").toLowerCase()),
+      );
       const toAdd = matching
-        .filter((inv) => !existingNames.has(String(inv.name || "").toLowerCase()))
+        .filter(
+          (inv) => !existingNames.has(String(inv.name || "").toLowerCase()),
+        )
         .map((inv) => ({
           key: crypto.randomUUID(),
           customName: String(inv.name || ""),
@@ -508,8 +740,17 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
   const handleImportWellspring = (item) => {
     if (item.spellType !== "wellspring" || !item.name) return;
     setCustomWellsprings((prev) => {
-      if (prev.some((w) => w.name.toLowerCase() === item.name.toLowerCase())) return prev;
-      return [...prev, { name: item.name, color: item.color || "#888888", textColor: item.textColor || "white", icon: item.icon || "untyped" }];
+      if (prev.some((w) => w.name.toLowerCase() === item.name.toLowerCase()))
+        return prev;
+      return [
+        ...prev,
+        {
+          name: item.name,
+          color: item.color || "#888888",
+          textColor: item.textColor || "white",
+          icon: item.icon || "untyped",
+        },
+      ];
     });
 
     const nameLower = item.name.toLowerCase();
@@ -529,9 +770,13 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
 
     if (matchingInvocations.length > 0) {
       setInvocations((prev) => {
-        const existingNames = new Set(prev.map((i) => (i.customName || i.key || "").toLowerCase()));
+        const existingNames = new Set(
+          prev.map((i) => (i.customName || i.key || "").toLowerCase()),
+        );
         const toAdd = matchingInvocations
-          .filter((inv) => !existingNames.has(String(inv.name || "").toLowerCase()))
+          .filter(
+            (inv) => !existingNames.has(String(inv.name || "").toLowerCase()),
+          )
           .map((inv) => ({
             key: crypto.randomUUID(),
             customName: String(inv.name || ""),
@@ -550,7 +795,13 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
     if (item.spellType !== "invocation" || !item.name) return;
     setInvocations((prev) => [
       ...prev,
-      { key: crypto.randomUUID(), customName: item.name, wellspring: item.wellspring || "", type: item.type || "Blast", effect: item.effect || "" },
+      {
+        key: crypto.randomUUID(),
+        customName: item.name,
+        wellspring: item.wellspring || "",
+        type: item.type || "Blast",
+        effect: item.effect || "",
+      },
     ]);
     setInvocationPickerOpen(false);
   };
@@ -570,7 +821,10 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
     const order = [];
     invocations.forEach((inv) => {
       const ws = inv.wellspring || "";
-      if (!seen.has(ws)) { seen.add(ws); order.push(ws); }
+      if (!seen.has(ws)) {
+        seen.add(ws);
+        order.push(ws);
+      }
     });
     return order;
   }, [invocations]);
@@ -579,21 +833,40 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       {/* Custom Wellsprings */}
       <Box>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 1.5,
+          }}
+        >
           <Typography variant="h6">{t("Custom Wellsprings")}</Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
             <Tooltip title={t("Import from Compendium")}>
-              <IconButton size="small" onClick={() => setWellspringPickerOpen(true)}>
+              <IconButton
+                size="small"
+                onClick={() => setWellspringPickerOpen(true)}
+              >
                 <SearchIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Button size="small" startIcon={<AddIcon />} onClick={addWellspring} variant="outlined">
+            <Button
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={addWellspring}
+              variant="outlined"
+            >
               {t("Add")}
             </Button>
           </Box>
         </Box>
         {customWellsprings.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontStyle: "italic" }}
+          >
             {t("No custom wellsprings. Add one to extend the standard 5.")}
           </Typography>
         ) : (
@@ -604,7 +877,9 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
                 wellspring={w}
                 index={i}
                 onUpdate={updateWellspring}
-                onAddMissingInvocations={w.name ? () => addMissingInvocations(w.name) : undefined}
+                onAddMissingInvocations={
+                  w.name ? () => addMissingInvocations(w.name) : undefined
+                }
                 onAddToCompendium={() => addWellspringToCompendium(w)}
                 onDelete={() => removeWellspring(i)}
                 t={t}
@@ -618,22 +893,43 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
 
       {/* Custom Invocations */}
       <Box>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 1.5,
+          }}
+        >
           <Typography variant="h6">{t("Custom Invocations")}</Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
             <Tooltip title={t("Import from Compendium")}>
-              <IconButton size="small" onClick={() => setInvocationPickerOpen(true)}>
+              <IconButton
+                size="small"
+                onClick={() => setInvocationPickerOpen(true)}
+              >
                 <SearchIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Button size="small" startIcon={<AddIcon />} onClick={addInvocation} variant="outlined">
+            <Button
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={addInvocation}
+              variant="outlined"
+            >
               {t("Add")}
             </Button>
           </Box>
         </Box>
         {invocations.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
-            {t("No custom invocations. Add one to supplement the standard list.")}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontStyle: "italic" }}
+          >
+            {t(
+              "No custom invocations. Add one to supplement the standard list.",
+            )}
           </Typography>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
@@ -643,7 +939,9 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
                 wsKey={wsKey}
                 group={invocationsByWellspring[wsKey] || []}
                 allWellsprings={allWellsprings}
-                isOrphaned={!!(wsKey && !allWellsprings.find((w) => w.key === wsKey))}
+                isOrphaned={
+                  !!(wsKey && !allWellsprings.find((w) => w.key === wsKey))
+                }
                 onUpdate={updateInvocation}
                 addInvocationToCompendium={addInvocationToCompendium}
                 removeInvocation={removeInvocation}

@@ -77,13 +77,17 @@ export const expandCompactHeaderForExport = (originalRoot, clonedDoc) => {
     body.style.setProperty("align-items", "stretch", "important");
   }
 
-  const wrap = clonedRoot.querySelector('[data-pc-compact-description-wrap="true"]');
+  const wrap = clonedRoot.querySelector(
+    '[data-pc-compact-description-wrap="true"]',
+  );
   if (wrap) {
     wrap.style.setProperty("overflow", "visible", "important");
     wrap.style.setProperty("flex", "1 1 auto", "important");
   }
 
-  const text = clonedRoot.querySelector('[data-pc-compact-description-text="true"]');
+  const text = clonedRoot.querySelector(
+    '[data-pc-compact-description-text="true"]',
+  );
   if (text) {
     // Allow enough description, but preserve space for traits.
     text.style.setProperty("overflow", "hidden", "important");
@@ -92,7 +96,9 @@ export const expandCompactHeaderForExport = (originalRoot, clonedDoc) => {
     text.style.setProperty("-webkit-line-clamp", "6", "important");
   }
 
-  const paragraphs = clonedRoot.querySelectorAll('[data-pc-compact-description-text="true"] p');
+  const paragraphs = clonedRoot.querySelectorAll(
+    '[data-pc-compact-description-text="true"] p',
+  );
   paragraphs.forEach((p) => {
     p.style.setProperty("display", "block", "important");
     p.style.setProperty("overflow", "visible", "important");
@@ -100,7 +106,9 @@ export const expandCompactHeaderForExport = (originalRoot, clonedDoc) => {
     p.style.removeProperty("-webkit-box-orient");
   });
 
-  const traits = clonedRoot.querySelector('[data-pc-compact-traits-wrap="true"]');
+  const traits = clonedRoot.querySelector(
+    '[data-pc-compact-traits-wrap="true"]',
+  );
   if (traits) {
     traits.style.setProperty("display", "flex", "important");
     traits.style.setProperty("align-items", "center", "important");
@@ -122,19 +130,23 @@ export const expandAccordionsForExport = (originalRoot, clonedDoc) => {
   if (!clonedRoot) return;
 
   // MUI emotion sets height/visibility as inline styles; !important overrides beat them.
-  clonedRoot.querySelectorAll(".MuiCollapse-root, .MuiCollapse-hidden").forEach((el) => {
-    el.style.setProperty("height", "auto", "important");
-    el.style.setProperty("min-height", "0", "important");
-    el.style.setProperty("overflow", "visible", "important");
-    el.style.setProperty("visibility", "visible", "important");
-    el.style.setProperty("display", "block", "important");
-  });
+  clonedRoot
+    .querySelectorAll(".MuiCollapse-root, .MuiCollapse-hidden")
+    .forEach((el) => {
+      el.style.setProperty("height", "auto", "important");
+      el.style.setProperty("min-height", "0", "important");
+      el.style.setProperty("overflow", "visible", "important");
+      el.style.setProperty("visibility", "visible", "important");
+      el.style.setProperty("display", "block", "important");
+    });
 
-  clonedRoot.querySelectorAll(".MuiCollapse-wrapper, .MuiCollapse-wrapperInner").forEach((el) => {
-    el.style.setProperty("height", "auto", "important");
-    el.style.setProperty("overflow", "visible", "important");
-    el.style.setProperty("visibility", "visible", "important");
-  });
+  clonedRoot
+    .querySelectorAll(".MuiCollapse-wrapper, .MuiCollapse-wrapperInner")
+    .forEach((el) => {
+      el.style.setProperty("height", "auto", "important");
+      el.style.setProperty("overflow", "visible", "important");
+      el.style.setProperty("visibility", "visible", "important");
+    });
 };
 
 /**

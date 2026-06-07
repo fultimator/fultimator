@@ -589,16 +589,20 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
           s.rangeStart !== 0 ||
           s.rangeEnd !== 3 ||
           Object.values(effects).some((v) => v !== "");
-        const seeds: typeof s.magiseeds = importedSeeds ?? (hasSeedData ? [
-          {
-            key: s.name?.trim() || "magiseed_custom",
-            customName: "",
-            description: s.description ?? "",
-            rangeStart: s.rangeStart ?? 0,
-            rangeEnd: s.rangeEnd ?? 3,
-            effects,
-          },
-        ] : []);
+        const seeds: typeof s.magiseeds =
+          importedSeeds ??
+          (hasSeedData
+            ? [
+                {
+                  key: s.name?.trim() || "magiseed_custom",
+                  customName: "",
+                  description: s.description ?? "",
+                  rangeStart: s.rangeStart ?? 0,
+                  rangeEnd: s.rangeEnd ?? 3,
+                  effects,
+                },
+              ]
+            : []);
         return {
           ...base,
           spellType: "magiseed" as const,

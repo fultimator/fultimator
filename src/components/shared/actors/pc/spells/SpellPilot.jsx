@@ -12,7 +12,14 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { Edit, VisibilityOff, ExpandMore, DirectionsCar, RadioButtonChecked, RadioButtonUnchecked } from "@mui/icons-material";
+import {
+  Edit,
+  VisibilityOff,
+  ExpandMore,
+  DirectionsCar,
+  RadioButtonChecked,
+  RadioButtonUnchecked,
+} from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -175,7 +182,16 @@ function ThemedSpellPilot({
 
   return (
     <>
-      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <Accordion
+        disableGutters
+        elevation={0}
+        square
+        sx={{
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          "&:before": { display: "none" },
+        }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <DirectionsCar />
@@ -183,7 +199,15 @@ function ThemedSpellPilot({
           <Typography variant="h4">{t("pilot_details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("pilot_details_1")}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              p: ({ node: _n, ...props }) => (
+                <p style={{ margin: 0 }} {...props} />
+              ),
+            }}
+          >
+            {t("pilot_details_1")}
+          </ReactMarkdown>
         </AccordionDetails>
       </Accordion>
       {/* VEHICLES */}
@@ -201,12 +225,26 @@ function ThemedSpellPilot({
         }}
       >
         <Grid container style={{ flexGrow: 1 }} sx={{ alignItems: "center" }}>
-          <Grid style={{ display: "flex", alignItems: "center", minHeight: "40px" }} size={11}>
-            <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          <Grid
+            style={{ display: "flex", alignItems: "center", minHeight: "40px" }}
+            size={11}
+          >
+            <Typography
+              variant="h3"
+              sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+            >
               {t("pilot_vehicle")}
             </Typography>
           </Grid>
-          <Grid style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", minHeight: "40px" }} size={1}>
+          <Grid
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              minHeight: "40px",
+            }}
+            size={1}
+          >
             {isEditMode && (
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 {!showInPlayerSheet && (
@@ -214,7 +252,11 @@ function ThemedSpellPilot({
                     <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
                   </Tooltip>
                 )}
-                <IconButton size="small" onClick={onEdit} sx={{ p: "3px", color: theme.white }}>
+                <IconButton
+                  size="small"
+                  onClick={onEdit}
+                  sx={{ p: "3px", color: theme.white }}
+                >
                   <Edit sx={{ fontSize: "1.1rem" }} />
                 </IconButton>
               </div>
@@ -237,143 +279,166 @@ function ThemedSpellPilot({
       ) : (
         pilot.vehicles &&
         pilot.vehicles.map((vehicle, i) => {
-            const frame = availableFrames.find(
-              (f) => f.name === (vehicle.frame || "pilot_frame_exoskeleton"),
-            );
-            const getPassengersText = (p) => {
-              if (p === 0) return t("None");
-              if (p === 1) return t("pilot_passengers_up_1");
-              if (p === 2) return t("pilot_passengers_up_2");
-              if (p === 3) return t("pilot_passengers_up_3");
-              return t("None");
-            };
-            const getDistanceText = (d) =>
-              d === 1 ? t("pilot_distance_no_mod") : `×${d}`;
+          const frame = availableFrames.find(
+            (f) => f.name === (vehicle.frame || "pilot_frame_exoskeleton"),
+          );
+          const getPassengersText = (p) => {
+            if (p === 0) return t("None");
+            if (p === 1) return t("pilot_passengers_up_1");
+            if (p === 2) return t("pilot_passengers_up_2");
+            if (p === 3) return t("pilot_passengers_up_3");
+            return t("None");
+          };
+          const getDistanceText = (d) =>
+            d === 1 ? t("pilot_distance_no_mod") : `×${d}`;
 
-            const equippedWeapons = getEquippedCount(vehicle, "weapon");
-            const equippedArmor = getEquippedCount(vehicle, "armor");
-            const equippedSupport = getEquippedCount(vehicle, "support");
-            const total = equippedWeapons + equippedArmor + equippedSupport;
-            const maxDisplay = vehicle.maxEnabledModules || 3;
-            const isOverLimit = total > maxDisplay;
+          const equippedWeapons = getEquippedCount(vehicle, "weapon");
+          const equippedArmor = getEquippedCount(vehicle, "armor");
+          const equippedSupport = getEquippedCount(vehicle, "support");
+          const total = equippedWeapons + equippedArmor + equippedSupport;
+          const maxDisplay = vehicle.maxEnabledModules || 3;
+          const isOverLimit = total > maxDisplay;
 
-            return (
-          <React.Fragment key={i}>
-            <Box
-              sx={{
-                border: `1px solid ${theme.secondary}`,
-                borderRadius: 1,
-                overflow: "hidden",
-              }}
-            >
+          return (
+            <React.Fragment key={i}>
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "stretch",
-                  minHeight: 44,
-                  background: `linear-gradient(to right, ${theme.ternary}, ${theme.mode === "dark" ? "#1f1f1f" : "#fff"})`,
+                  border: `1px solid ${theme.secondary}`,
+                  borderRadius: 1,
+                  overflow: "hidden",
                 }}
               >
-                {/* Label area */}
                 <Box
                   sx={{
-                    flex: 1,
-                    minWidth: 0,
-                    px: "10px",
-                    py: "4px",
                     display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
+                    alignItems: "stretch",
+                    minHeight: 44,
+                    background: `linear-gradient(to right, ${theme.ternary}, ${theme.mode === "dark" ? "#1f1f1f" : "#fff"})`,
                   }}
                 >
-                  <Typography
-                    noWrap
-                    sx={{
-                      fontFamily: "Antonio",
-                      fontWeight: 800,
-                      fontSize: "0.95rem",
-                      textTransform: "uppercase",
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {vehicle.customName || t("Vehicle")}
-                  </Typography>
-                  {frame && (
-                    <Typography variant="caption" sx={{ fontSize: "0.75em", color: isOverLimit ? "error.main" : "text.secondary" }}>
-                      {`${t(vehicle.frame || "pilot_frame_exoskeleton")} | ${t("pilot_passengers")}: ${getPassengersText(frame.passengers)} | ${t("pilot_distance")}: ${getDistanceText(frame.distance)} | ${t("pilot_max_enabled_modules")}: ${total}/${maxDisplay}`}
-                    </Typography>
-                  )}
-                </Box>
-                {/* Actions area */}
-                {isEditMode && (
+                  {/* Label area */}
                   <Box
                     sx={{
-                      bgcolor: theme.primary,
+                      flex: 1,
+                      minWidth: 0,
+                      px: "10px",
+                      py: "4px",
                       display: "flex",
-                      alignItems: "center",
-                      px: "6px",
-                      gap: 0.25,
-                      flexShrink: 0,
+                      flexDirection: "column",
+                      justifyContent: "center",
                     }}
                   >
-                    <Button
-                      variant="outlined"
-                      color="inherit"
-                      size="small"
-                      onClick={() => onVehicleChange && onVehicleChange(i, "enabled", !vehicle.enabled)}
-                      style={{
-                        minWidth: 72,
-                        height: 32,
-                        fontSize: "0.8rem",
+                    <Typography
+                      noWrap
+                      sx={{
+                        fontFamily: "Antonio",
                         fontWeight: 800,
-                        border: "none",
-                        gap: 4,
-                        color: theme.primary,
-                        backgroundColor: theme.white,
+                        fontSize: "0.95rem",
+                        textTransform: "uppercase",
+                        lineHeight: 1.3,
                       }}
                     >
-                      {vehicle.enabled
-                        ? <><RadioButtonChecked sx={{ fontSize: "1rem" }} />{t("Active")}</>
-                        : <><RadioButtonUnchecked sx={{ fontSize: "1rem" }} />{t("Enable")}</>
-                      }
-                    </Button>
+                      {vehicle.customName || t("Vehicle")}
+                    </Typography>
+                    {frame && (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontSize: "0.75em",
+                          color: isOverLimit ? "error.main" : "text.secondary",
+                        }}
+                      >
+                        {`${t(vehicle.frame || "pilot_frame_exoskeleton")} | ${t("pilot_passengers")}: ${getPassengersText(frame.passengers)} | ${t("pilot_distance")}: ${getDistanceText(frame.distance)} | ${t("pilot_max_enabled_modules")}: ${total}/${maxDisplay}`}
+                      </Typography>
+                    )}
                   </Box>
-                )}
+                  {/* Actions area */}
+                  {isEditMode && (
+                    <Box
+                      sx={{
+                        bgcolor: theme.primary,
+                        display: "flex",
+                        alignItems: "center",
+                        px: "6px",
+                        gap: 0.25,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Button
+                        variant="outlined"
+                        color="inherit"
+                        size="small"
+                        onClick={() =>
+                          onVehicleChange &&
+                          onVehicleChange(i, "enabled", !vehicle.enabled)
+                        }
+                        style={{
+                          minWidth: 72,
+                          height: 32,
+                          fontSize: "0.8rem",
+                          fontWeight: 800,
+                          border: "none",
+                          gap: 4,
+                          color: theme.primary,
+                          backgroundColor: theme.white,
+                        }}
+                      >
+                        {vehicle.enabled ? (
+                          <>
+                            <RadioButtonChecked sx={{ fontSize: "1rem" }} />
+                            {t("Active")}
+                          </>
+                        ) : (
+                          <>
+                            <RadioButtonUnchecked sx={{ fontSize: "1rem" }} />
+                            {t("Enable")}
+                          </>
+                        )}
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
               </Box>
-            </Box>
 
-            {/* Vehicle Modules */}
-            {vehicle.modules && vehicle.modules.length > 0 ? (
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, p: 1 }}>
-                {vehicle.modules.map((module, moduleIndex) => (
-                  <VehicleModule
-                    key={moduleIndex}
-                    module={module}
-                    moduleIndex={moduleIndex}
-                    vehicleIndex={i}
-                    vehicle={vehicle}
-                    canEquip={canEquipModule(vehicle, moduleIndex)}
-                    onModuleChange={isEditMode ? onModuleChange : null}
-                    onDeleteModule={null}
-                    onCloneModule={null}
-                    player={player}
-                  />
-                ))}
-              </Box>
-            ) : (
-              <Typography
-                sx={{
-                  padding: "10px 17px",
-                  textAlign: "center",
-                  color: theme.secondary,
-                  fontStyle: "italic",
-                }}
-              >
-                {t("No modules available")}
-              </Typography>
-            )}
-          </React.Fragment>
-        );
+              {/* Vehicle Modules */}
+              {vehicle.modules && vehicle.modules.length > 0 ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0.5,
+                    p: 1,
+                  }}
+                >
+                  {vehicle.modules.map((module, moduleIndex) => (
+                    <VehicleModule
+                      key={moduleIndex}
+                      module={module}
+                      moduleIndex={moduleIndex}
+                      vehicleIndex={i}
+                      vehicle={vehicle}
+                      canEquip={canEquipModule(vehicle, moduleIndex)}
+                      onModuleChange={isEditMode ? onModuleChange : null}
+                      onDeleteModule={null}
+                      onCloneModule={null}
+                      player={player}
+                    />
+                  ))}
+                </Box>
+              ) : (
+                <Typography
+                  sx={{
+                    padding: "10px 17px",
+                    textAlign: "center",
+                    color: theme.secondary,
+                    fontStyle: "italic",
+                  }}
+                >
+                  {t("No modules available")}
+                </Typography>
+              )}
+            </React.Fragment>
+          );
         })
       )}
     </>

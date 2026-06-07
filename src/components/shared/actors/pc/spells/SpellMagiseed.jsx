@@ -130,7 +130,16 @@ function ThemedSpellMagiseed({
 
   return (
     <>
-      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <Accordion
+        disableGutters
+        elevation={0}
+        square
+        sx={{
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          "&:before": { display: "none" },
+        }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <LocalFlorist />
@@ -138,7 +147,13 @@ function ThemedSpellMagiseed({
           <Typography variant="h4">{t("magiseed_details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+          <ReactMarkdown
+            components={{
+              p: ({ node: _n, ...props }) => (
+                <p style={{ margin: 0 }} {...props} />
+              ),
+            }}
+          >
             {t("magiseed_details_1")}
           </ReactMarkdown>
         </AccordionDetails>
@@ -159,13 +174,30 @@ function ThemedSpellMagiseed({
           gap: "12px",
         }}
       >
-        <Typography variant="h3" sx={{ flex: 1, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+        <Typography
+          variant="h3"
+          sx={{ flex: 1, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+        >
           {t("magiseed_garden")}
         </Typography>
-        <Typography variant="h3" sx={{ flexShrink: 0, fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+        <Typography
+          variant="h3"
+          sx={{
+            flexShrink: 0,
+            fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
+          }}
+        >
           {t("magiseed_growth_clock")}
         </Typography>
-        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <Box
+          sx={{
+            width: 34,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
           {isEditMode && (
             <>
               {!showInPlayerSheet && (
@@ -173,7 +205,11 @@ function ThemedSpellMagiseed({
                   <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
                 </Tooltip>
               )}
-              <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+              <IconButton
+                size="small"
+                onClick={onEdit}
+                sx={{ color: "#fff", p: "3px" }}
+              >
                 <Edit sx={{ fontSize: "1.1rem" }} />
               </IconButton>
             </>
@@ -192,14 +228,27 @@ function ThemedSpellMagiseed({
         }}
       >
         {/* Garden column */}
-        <Box sx={{ flex: 1, minWidth: 0, px: "17px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            px: "17px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
           {currentMagiseed ? (
             <>
               <Typography sx={{ fontWeight: "bold", lineHeight: 1.2 }}>
-                {currentMagiseed.customName || t(currentMagiseed.key ?? currentMagiseed.name)}
+                {currentMagiseed.customName ||
+                  t(currentMagiseed.key ?? currentMagiseed.name)}
               </Typography>
               {getCurrentEffect() && (
-                <Typography variant="caption" sx={{ color: "text.secondary", display: "block" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", display: "block" }}
+                >
                   {t("magiseed_current_effect")} (T = {growthClock})
                 </Typography>
               )}
@@ -229,7 +278,15 @@ function ThemedSpellMagiseed({
             gap: 1.5,
           }}
         >
-          <Box sx={{ borderRadius: "50%", bgcolor: theme.ternary, p: "3px", flexShrink: 0, display: "flex" }}>
+          <Box
+            sx={{
+              borderRadius: "50%",
+              bgcolor: theme.ternary,
+              p: "3px",
+              flexShrink: 0,
+              display: "flex",
+            }}
+          >
             <Clock
               numSections={4}
               size={56}
@@ -239,7 +296,14 @@ function ThemedSpellMagiseed({
               onReset={handleClockReset}
             />
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.75 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.75,
+            }}
+          >
             {isEditMode ? (
               <Box sx={{ display: "flex", alignItems: "baseline", gap: "2px" }}>
                 <Box
@@ -248,33 +312,104 @@ function ThemedSpellMagiseed({
                   value={growthClock}
                   onChange={(e) => updateClock(parseInt(e.target.value) || 0)}
                   sx={{
-                    fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "0.08em",
-                    color: theme.white, background: "transparent", border: "none",
-                    borderBottom: `2px solid ${theme.white}`, outline: "none",
-                    width: 36, textAlign: "center", lineHeight: 1,
+                    fontFamily: "Antonio",
+                    fontWeight: 800,
+                    fontSize: "1.2rem",
+                    letterSpacing: "0.08em",
+                    color: theme.white,
+                    background: "transparent",
+                    border: "none",
+                    borderBottom: `2px solid ${theme.white}`,
+                    outline: "none",
+                    width: 36,
+                    textAlign: "center",
+                    lineHeight: 1,
                     "&::-webkit-inner-spin-button": { display: "none" },
                   }}
                 />
-                <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", color: theme.white, lineHeight: 1 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Antonio",
+                    fontWeight: 800,
+                    fontSize: "1.2rem",
+                    color: theme.white,
+                    lineHeight: 1,
+                  }}
+                >
                   /4
                 </Typography>
               </Box>
             ) : (
-              <Typography sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "0.08em", color: theme.white, lineHeight: 1 }}>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontWeight: 800,
+                  fontSize: "1.2rem",
+                  letterSpacing: "0.08em",
+                  color: theme.white,
+                  lineHeight: 1,
+                }}
+              >
                 {growthClock}/4
               </Typography>
             )}
             <Box sx={{ display: "flex", gap: "4px" }}>
-              <Button size="small" onClick={() => updateClock(growthClock - 1)} disabled={growthClock === 0}
-                style={{ minWidth: 32, height: 28, padding: 0, border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800 }}>-</Button>
-              <Button size="small" onClick={() => updateClock(growthClock + 1)} disabled={growthClock === 4}
-                style={{ minWidth: 32, height: 28, padding: 0, border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800 }}>+</Button>
-              <Button size="small" onClick={() => updateClock(0)}
-                style={{ minWidth: 46, height: 28, padding: "0 4px", border: "none", color: theme.primary, backgroundColor: theme.white, fontWeight: 800, fontSize: "0.7rem" }}>{t("Reset")}</Button>
+              <Button
+                size="small"
+                onClick={() => updateClock(growthClock - 1)}
+                disabled={growthClock === 0}
+                style={{
+                  minWidth: 32,
+                  height: 28,
+                  padding: 0,
+                  border: "none",
+                  color: theme.primary,
+                  backgroundColor: theme.white,
+                  fontWeight: 800,
+                }}
+              >
+                -
+              </Button>
+              <Button
+                size="small"
+                onClick={() => updateClock(growthClock + 1)}
+                disabled={growthClock === 4}
+                style={{
+                  minWidth: 32,
+                  height: 28,
+                  padding: 0,
+                  border: "none",
+                  color: theme.primary,
+                  backgroundColor: theme.white,
+                  fontWeight: 800,
+                }}
+              >
+                +
+              </Button>
+              <Button
+                size="small"
+                onClick={() => updateClock(0)}
+                style={{
+                  minWidth: 46,
+                  height: 28,
+                  padding: "0 4px",
+                  border: "none",
+                  color: theme.primary,
+                  backgroundColor: theme.white,
+                  fontWeight: 800,
+                  fontSize: "0.7rem",
+                }}
+              >
+                {t("Reset")}
+              </Button>
             </Box>
           </Box>
           {onRoll && currentMagiseed && (
-            <IconButton size="small" onClick={() => onRoll(currentMagiseed, growthClock)} sx={{ p: "2px", color: theme.white }}>
+            <IconButton
+              size="small"
+              onClick={() => onRoll(currentMagiseed, growthClock)}
+              sx={{ p: "2px", color: theme.white }}
+            >
               <Casino sx={{ fontSize: "1.15rem" }} />
             </IconButton>
           )}
@@ -302,9 +437,12 @@ function ThemedSpellMagiseed({
             const isExpanded = expandedMagiseeds.has(index);
             const seedKey = seed.key ?? seed.name;
             const magiseedTemplate = magiseeds.find((m) => m.name === seedKey);
-            const isPlanted = currentMagiseed && (currentMagiseed.key ?? currentMagiseed.name) === seedKey;
+            const isPlanted =
+              currentMagiseed &&
+              (currentMagiseed.key ?? currentMagiseed.name) === seedKey;
             const seedName = seed.customName || t(seedKey);
-            const rangeStart = seed.rangeStart ?? magiseedTemplate?.rangeStart ?? 0;
+            const rangeStart =
+              seed.rangeStart ?? magiseedTemplate?.rangeStart ?? 0;
             const rangeEnd = seed.rangeEnd ?? magiseedTemplate?.rangeEnd ?? 3;
 
             return (
@@ -324,7 +462,9 @@ function ThemedSpellMagiseed({
                     alignItems: "stretch",
                     minHeight: 44,
                     background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                    borderBottom: isExpanded ? `1px solid ${theme.secondary}` : "none",
+                    borderBottom: isExpanded
+                      ? `1px solid ${theme.secondary}`
+                      : "none",
                     cursor: "pointer",
                     "&:hover": { filter: "brightness(0.97)" },
                   }}
@@ -353,9 +493,20 @@ function ThemedSpellMagiseed({
                     >
                       {seedName}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: "bold" }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "text.secondary", fontWeight: "bold" }}
+                    >
                       {`T: ${rangeStart}–${rangeEnd}`}
-                      {isPlanted && <> · <span style={{ color: theme.primary }}>{t("magiseed_plant_in_garden")}</span></>}
+                      {isPlanted && (
+                        <>
+                          {" "}
+                          ·{" "}
+                          <span style={{ color: theme.primary }}>
+                            {t("magiseed_plant_in_garden")}
+                          </span>
+                        </>
+                      )}
                     </Typography>
                   </Box>
                   {/* Actions area */}
@@ -369,7 +520,12 @@ function ThemedSpellMagiseed({
                         px: "6px",
                         gap: 0.25,
                         flexShrink: 0,
-                        "& .MuiIconButton-root": { p: "2px", width: 32, height: 32, color: theme.white },
+                        "& .MuiIconButton-root": {
+                          p: "2px",
+                          width: 32,
+                          height: 32,
+                          color: theme.white,
+                        },
                         "& .MuiSvgIcon-root": { fontSize: "1.15rem" },
                       }}
                     >
@@ -377,7 +533,10 @@ function ThemedSpellMagiseed({
                         size="small"
                         variant="outlined"
                         color="inherit"
-                        onClick={() => onMagiseedChange && onMagiseedChange(isPlanted ? null : seed)}
+                        onClick={() =>
+                          onMagiseedChange &&
+                          onMagiseedChange(isPlanted ? null : seed)
+                        }
                         style={{
                           minWidth: 64,
                           height: 32,
@@ -401,24 +560,36 @@ function ThemedSpellMagiseed({
                 <Collapse in={isExpanded}>
                   <Box sx={{ px: 2, py: 1.5 }}>
                     {/* Description */}
-                    <Typography variant="body2" sx={{ fontStyle: "italic", mb: 1.5 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontStyle: "italic", mb: 1.5 }}
+                    >
                       {seed.description
                         ? t(seed.description)
-                        : (magiseedTemplate && t(magiseedTemplate.description)) || t("No description available")}
+                        : (magiseedTemplate &&
+                            t(magiseedTemplate.description)) ||
+                          t("No description available")}
                     </Typography>
 
                     {/* Effects */}
                     {[...Array(rangeEnd - rangeStart + 1)].map((_, i) => {
                       const section = rangeStart + i;
-                      const effect = seed.effects?.[section] || magiseedTemplate?.effects?.[section];
+                      const effect =
+                        seed.effects?.[section] ||
+                        magiseedTemplate?.effects?.[section];
                       if (!effect) return null;
                       return (
                         <Box key={section} sx={{ mb: 1 }}>
-                          <Typography variant="caption" sx={{ fontWeight: "bold", color: theme.primary }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: "bold", color: theme.primary }}
+                          >
                             T = {section}:
                           </Typography>
                           <Box sx={{ ml: 2, mt: 0.25, fontSize: "0.9em" }}>
-                            <ReactMarkdown components={components}>{t(effect)}</ReactMarkdown>
+                            <ReactMarkdown components={components}>
+                              {t(effect)}
+                            </ReactMarkdown>
                           </Box>
                         </Box>
                       );

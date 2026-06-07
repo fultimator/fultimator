@@ -111,20 +111,27 @@ const NPCDetail = ({
   if (!selectedNPC) return null;
 
   const getDefenseValue = (defenseType) => {
-    const baseValue = defenseType === "DEF" ? calcDef(selectedNPC) : calcMDef(selectedNPC);
-    const modifier = defenseType === "DEF"
-      ? selectedNPC?.combatStats?.defenseModifier
-      : selectedNPC?.combatStats?.mdefenseModifier;
+    const baseValue =
+      defenseType === "DEF" ? calcDef(selectedNPC) : calcMDef(selectedNPC);
+    const modifier =
+      defenseType === "DEF"
+        ? selectedNPC?.combatStats?.defenseModifier
+        : selectedNPC?.combatStats?.mdefenseModifier;
     const overrideMap = selectedNPC?.combatStats?.defenseOverride || {};
-    const overrideValue = defenseType === "MDEF" && overrideMap.MDEF === undefined
-      ? overrideMap["M.DEF"]
-      : overrideMap[defenseType];
-    const hasOverride = overrideValue !== "" && overrideValue !== null && overrideValue !== undefined;
+    const overrideValue =
+      defenseType === "MDEF" && overrideMap.MDEF === undefined
+        ? overrideMap["M.DEF"]
+        : overrideMap[defenseType];
+    const hasOverride =
+      overrideValue !== "" &&
+      overrideValue !== null &&
+      overrideValue !== undefined;
     if (hasOverride) return Number.parseInt(overrideValue, 10) || 0;
     const calculatedValue = modifier == null ? baseValue : baseValue + modifier;
-    const attrValue = defenseType === "DEF"
-      ? calcAttr("Slow", "Enraged", "dexterity", selectedNPC)
-      : calcAttr("Dazed", "Enraged", "insight", selectedNPC);
+    const attrValue =
+      defenseType === "DEF"
+        ? calcAttr("Slow", "Enraged", "dexterity", selectedNPC)
+        : calcAttr("Dazed", "Enraged", "insight", selectedNPC);
     return (calculatedValue || 0) + (attrValue || 0);
   };
 
@@ -512,9 +519,15 @@ const NPCDetail = ({
             handleOpen={handleOpen}
             toggleStatusEffect={toggleStatusEffect}
             applyCommand={(command) => {
-              window.dispatchEvent(new window.CustomEvent("chat:run-command", {
-                detail: { command, speaker: npcSpeaker, actorDoc: selectedNPC },
-              }));
+              window.dispatchEvent(
+                new window.CustomEvent("chat:run-command", {
+                  detail: {
+                    command,
+                    speaker: npcSpeaker,
+                    actorDoc: selectedNPC,
+                  },
+                }),
+              );
             }}
           />
         )}
@@ -588,8 +601,14 @@ const NPCDetail = ({
         </Box>
       )}
       {tabIndex === 1 && !isMobile && (
-        <Box sx={{ borderTop: `1px solid rgba(255,255,255,0.08)`, px: 0, pt: 0.5 }}>
-          <StandardRollsSection selectedNPC={selectedNPC} calcAttr={calcAttr} handleRoll={handleRoll} />
+        <Box
+          sx={{ borderTop: `1px solid rgba(255,255,255,0.08)`, px: 0, pt: 0.5 }}
+        >
+          <StandardRollsSection
+            selectedNPC={selectedNPC}
+            calcAttr={calcAttr}
+            handleRoll={handleRoll}
+          />
         </Box>
       )}
       {!isMobile && (
@@ -597,7 +616,6 @@ const NPCDetail = ({
           <DefStatsRow
             defValue={defValue}
             mdefValue={mdefValue}
-
             onDefClick={() => setDefenseDialogType("DEF")}
             onMdefClick={() => setDefenseDialogType("MDEF")}
           />
@@ -787,7 +805,11 @@ const NPCDetail = ({
           {tabIndex === 1 && (
             <Grid size={12}>
               <Box sx={{ borderTop: `1px solid rgba(255,255,255,0.08)` }}>
-                <StandardRollsSection selectedNPC={selectedNPC} calcAttr={calcAttr} handleRoll={handleRoll} />
+                <StandardRollsSection
+                  selectedNPC={selectedNPC}
+                  calcAttr={calcAttr}
+                  handleRoll={handleRoll}
+                />
               </Box>
             </Grid>
           )}
@@ -795,7 +817,6 @@ const NPCDetail = ({
             <DefStatsRow
               defValue={getDefenseValue("DEF")}
               mdefValue={getDefenseValue("MDEF")}
-  
               onDefClick={() => setDefenseDialogType("DEF")}
               onMdefClick={() => setDefenseDialogType("MDEF")}
             />

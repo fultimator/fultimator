@@ -28,18 +28,30 @@ import {
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import VehicleModule from "/src/components/shared/actors/pc/spells/VehicleModule";
-import {
-  availableFrames,
-  availableModules,
-} from "/src/libs/pilotVehicleData";
+import { availableFrames, availableModules } from "/src/libs/pilotVehicleData";
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import ReactMarkdown from "react-markdown";
 
-function VehicleAccordion({ vehicle, vehicleIndex, defaultExpanded, onVehicleChange, onDelete, onClone, t, children }) {
+function VehicleAccordion({
+  vehicle,
+  vehicleIndex,
+  defaultExpanded,
+  onVehicleChange,
+  onDelete,
+  onClone,
+  t,
+  children,
+}) {
   const [open, setOpen] = useState(defaultExpanded ?? false);
   const theme = useCustomTheme();
   return (
-    <Box sx={{ border: `1px solid ${theme.secondary}`, borderRadius: 1, overflow: "hidden" }}>
+    <Box
+      sx={{
+        border: `1px solid ${theme.secondary}`,
+        borderRadius: 1,
+        overflow: "hidden",
+      }}
+    >
       <Box
         onClick={() => setOpen((v) => !v)}
         sx={{
@@ -52,26 +64,45 @@ function VehicleAccordion({ vehicle, vehicleIndex, defaultExpanded, onVehicleCha
         }}
       >
         {/* Label area - entire left side is the accordion trigger */}
-        <Box sx={{ flex: 1, px: "10px", display: "flex", alignItems: "center" }}>
-          <Typography sx={{
-            fontFamily: "Antonio",
-            fontWeight: 800,
-            fontSize: "0.95rem",
-            textTransform: "uppercase",
-            color: vehicle.customName ? theme.white : `${theme.white}66`,
-          }}>
+        <Box
+          sx={{ flex: 1, px: "10px", display: "flex", alignItems: "center" }}
+        >
+          <Typography
+            sx={{
+              fontFamily: "Antonio",
+              fontWeight: 800,
+              fontSize: "0.95rem",
+              textTransform: "uppercase",
+              color: vehicle.customName ? theme.white : `${theme.white}66`,
+            }}
+          >
             {vehicle.customName || `${t("pilot_vehicle")} ${vehicleIndex + 1}`}
           </Typography>
         </Box>
         <Box
           onClick={(e) => e.stopPropagation()}
-          sx={{ display: "flex", alignItems: "center", gap: 0.25, flexShrink: 0, px: "6px", "& .MuiIconButton-root": { p: "2px", width: 32, height: 32, color: theme.white }, "& .MuiSvgIcon-root": { fontSize: "1.15rem" } }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.25,
+            flexShrink: 0,
+            px: "6px",
+            "& .MuiIconButton-root": {
+              p: "2px",
+              width: 32,
+              height: 32,
+              color: theme.white,
+            },
+            "& .MuiSvgIcon-root": { fontSize: "1.15rem" },
+          }}
         >
           <Button
             size="small"
             variant="outlined"
             color="inherit"
-            onClick={() => onVehicleChange(vehicleIndex, "enabled", !vehicle.enabled)}
+            onClick={() =>
+              onVehicleChange(vehicleIndex, "enabled", !vehicle.enabled)
+            }
             style={{
               minWidth: 64,
               height: 32,
@@ -83,10 +114,17 @@ function VehicleAccordion({ vehicle, vehicleIndex, defaultExpanded, onVehicleCha
               backgroundColor: theme.white,
             }}
           >
-            {vehicle.enabled
-              ? <><RadioButtonChecked sx={{ fontSize: "1rem" }} />{t("Active")}</>
-              : <><RadioButtonUnchecked sx={{ fontSize: "1rem" }} />{t("Enable")}</>
-            }
+            {vehicle.enabled ? (
+              <>
+                <RadioButtonChecked sx={{ fontSize: "1rem" }} />
+                {t("Active")}
+              </>
+            ) : (
+              <>
+                <RadioButtonUnchecked sx={{ fontSize: "1rem" }} />
+                {t("Enable")}
+              </>
+            )}
           </Button>
           <Tooltip title={t("Clone to Custom")}>
             <IconButton size="small" onClick={onClone}>
@@ -98,7 +136,14 @@ function VehicleAccordion({ vehicle, vehicleIndex, defaultExpanded, onVehicleCha
               <Delete />
             </IconButton>
           </Tooltip>
-          <ExpandMore sx={{ fontSize: "1.15rem", color: theme.white, transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+          <ExpandMore
+            sx={{
+              fontSize: "1.15rem",
+              color: theme.white,
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.2s",
+            }}
+          />
         </Box>
       </Box>
       {open && children}
@@ -110,7 +155,12 @@ function VehicleAccordion({ vehicle, vehicleIndex, defaultExpanded, onVehicleCha
  * PilotContentSection - Content tab for Pilot spell
  * Manages vehicles/modules directly from shared UnifiedSpellModal form state.
  */
-export default function PilotContentSection({ formState, setFormState, t, player }) {
+export default function PilotContentSection({
+  formState,
+  setFormState,
+  t,
+  player,
+}) {
   const vehicles = useMemo(
     () => formState?.vehicles || formState?.currentVehicles || [],
     [formState?.vehicles, formState?.currentVehicles],
@@ -684,7 +734,6 @@ export default function PilotContentSection({ formState, setFormState, t, player
     [updateVehicles],
   );
 
-
   const handleCloneModule = useCallback(
     (vehicleIndex, moduleIndex) => {
       updateVehicles((current) => {
@@ -808,7 +857,11 @@ export default function PilotContentSection({ formState, setFormState, t, player
                       label={t("pilot_vehicles_name")}
                       value={vehicle.customName || ""}
                       onChange={(e) =>
-                        handleVehicleChange(vehicleIndex, "customName", e.target.value)
+                        handleVehicleChange(
+                          vehicleIndex,
+                          "customName",
+                          e.target.value,
+                        )
                       }
                     />
                   </Grid>
@@ -820,7 +873,11 @@ export default function PilotContentSection({ formState, setFormState, t, player
                         value={vehicle.frame || "pilot_frame_exoskeleton"}
                         label={t("pilot_frame_type")}
                         onChange={(e) =>
-                          handleVehicleChange(vehicleIndex, "frame", e.target.value)
+                          handleVehicleChange(
+                            vehicleIndex,
+                            "frame",
+                            e.target.value,
+                          )
                         }
                       >
                         {availableFrames.map((frame) => (
@@ -849,7 +906,9 @@ export default function PilotContentSection({ formState, setFormState, t, player
                           slotProps={{ htmlInput: { min: 3 } }}
                           value={vehicle.maxEnabledModules || 3}
                           error={isOverTotal}
-                          helperText={isOverTotal ? `${totalSlots}/${maxLimit}` : ""}
+                          helperText={
+                            isOverTotal ? `${totalSlots}/${maxLimit}` : ""
+                          }
                           onChange={(e) =>
                             handleVehicleChange(
                               vehicleIndex,
@@ -865,17 +924,38 @@ export default function PilotContentSection({ formState, setFormState, t, player
                   <Grid size={12}>
                     {(() => {
                       const currentFrame = availableFrames.find(
-                        (f) => f.name === (vehicle.frame || "pilot_frame_exoskeleton"),
+                        (f) =>
+                          f.name ===
+                          (vehicle.frame || "pilot_frame_exoskeleton"),
                       );
                       if (!currentFrame) return null;
                       return (
-                        <Box sx={{ px: 1, py: "6px", border: "1px solid", borderColor: "divider", borderRadius: 1, backgroundColor: "action.hover" }}>
-                          <Typography sx={{ fontSize: "0.85rem", lineHeight: 1.6 }}>
-                            <strong>{t("pilot_passengers")}:</strong> {getPassengersText(currentFrame.passengers)}
+                        <Box
+                          sx={{
+                            px: 1,
+                            py: "6px",
+                            border: "1px solid",
+                            borderColor: "divider",
+                            borderRadius: 1,
+                            backgroundColor: "action.hover",
+                          }}
+                        >
+                          <Typography
+                            sx={{ fontSize: "0.85rem", lineHeight: 1.6 }}
+                          >
+                            <strong>{t("pilot_passengers")}:</strong>{" "}
+                            {getPassengersText(currentFrame.passengers)}
                             {" · "}
-                            <strong>{t("pilot_distance")}:</strong> {getDistanceText(currentFrame.distance)}
+                            <strong>{t("pilot_distance")}:</strong>{" "}
+                            {getDistanceText(currentFrame.distance)}
                           </Typography>
-                          <Typography sx={{ fontSize: "0.85rem", color: "text.secondary", lineHeight: 1.6 }}>
+                          <Typography
+                            sx={{
+                              fontSize: "0.85rem",
+                              color: "text.secondary",
+                              lineHeight: 1.6,
+                            }}
+                          >
                             <ReactMarkdown components={markdownComponents}>
                               {t(currentFrame.description)}
                             </ReactMarkdown>
@@ -891,7 +971,11 @@ export default function PilotContentSection({ formState, setFormState, t, player
                       label={t("pilot_vehicles_description")}
                       value={vehicle.description || ""}
                       onChange={(e) =>
-                        handleVehicleChange(vehicleIndex, "description", e.target.value)
+                        handleVehicleChange(
+                          vehicleIndex,
+                          "description",
+                          e.target.value,
+                        )
                       }
                       minRows={2}
                     />
@@ -901,7 +985,10 @@ export default function PilotContentSection({ formState, setFormState, t, player
                   <Grid size={12}>
                     <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
                       {["armor", "weapon", "support"].map((moduleType) => (
-                        <Box key={moduleType} sx={{ display: "flex", gap: 0.5 }}>
+                        <Box
+                          key={moduleType}
+                          sx={{ display: "flex", gap: 0.5 }}
+                        >
                           <Tooltip title={t("Browse Compendium")}>
                             <IconButton
                               size="small"
@@ -913,7 +1000,11 @@ export default function PilotContentSection({ formState, setFormState, t, player
                                   vehicleIndexForModule: vehicleIndex,
                                 }))
                               }
-                              sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}
+                              sx={{
+                                border: "1px solid",
+                                borderColor: "divider",
+                                borderRadius: 2,
+                              }}
                             >
                               <Search fontSize="small" />
                             </IconButton>
@@ -922,10 +1013,17 @@ export default function PilotContentSection({ formState, setFormState, t, player
                             size="small"
                             variant="outlined"
                             startIcon={<Add />}
-                            color={isSlotUsageOverLimit(vehicle, moduleType) ? "error" : "primary"}
-                            onClick={() => handleAddModule(vehicleIndex, moduleType)}
+                            color={
+                              isSlotUsageOverLimit(vehicle, moduleType)
+                                ? "error"
+                                : "primary"
+                            }
+                            onClick={() =>
+                              handleAddModule(vehicleIndex, moduleType)
+                            }
                           >
-                            {t(`pilot_module_${moduleType}`)} {getSlotUsageText(vehicle, moduleType)}
+                            {t(`pilot_module_${moduleType}`)}{" "}
+                            {getSlotUsageText(vehicle, moduleType)}
                           </Button>
                         </Box>
                       ))}
@@ -944,7 +1042,9 @@ export default function PilotContentSection({ formState, setFormState, t, player
                           updateVehicles((current) => {
                             const updated = [...current];
                             const v = { ...updated[vIdx] };
-                            v.modules = (v.modules || []).filter((_, i) => i !== mIdx);
+                            v.modules = (v.modules || []).filter(
+                              (_, i) => i !== mIdx,
+                            );
                             updated[vIdx] = v;
                             return updated;
                           });

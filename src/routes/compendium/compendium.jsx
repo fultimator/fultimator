@@ -110,7 +110,18 @@ import {
   toSlug,
 } from "../../libs/compendium";
 
-const INVOKER_WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water", "Ice", "Dark", "Light", "Poison", "Physical"];
+const INVOKER_WELLSPRINGS = [
+  "Air",
+  "Earth",
+  "Fire",
+  "Lightning",
+  "Water",
+  "Ice",
+  "Dark",
+  "Light",
+  "Poison",
+  "Physical",
+];
 
 function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
@@ -558,14 +569,23 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 const extra = [];
                 for (const pack of packs ?? []) {
                   for (const item of pack.items ?? []) {
-                    if (item.type === "player-spell" && item.data?.spellType === "wellspring" && item.data?.name) {
+                    if (
+                      item.type === "player-spell" &&
+                      item.data?.spellType === "wellspring" &&
+                      item.data?.name
+                    ) {
                       const name = String(item.data.name);
-                      if (!seen.has(name)) { seen.add(name); extra.push(name); }
+                      if (!seen.has(name)) {
+                        seen.add(name);
+                        extra.push(name);
+                      }
                     }
                   }
                 }
                 return [...INVOKER_WELLSPRINGS, ...extra].map((w) => (
-                  <MenuItem key={w} value={w}>{t(w)}</MenuItem>
+                  <MenuItem key={w} value={w}>
+                    {t(w)}
+                  </MenuItem>
                 ));
               })()}
             </Select>

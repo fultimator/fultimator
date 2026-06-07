@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import EditResourcesModal from "../shared/actors/common/EditResourcesModal";
-import { buildDamageContext, resolveDamage } from "../../pipelines/damagePipeline";
+import {
+  buildDamageContext,
+  resolveDamage,
+} from "../../pipelines/damagePipeline";
 import { useTheme } from "@mui/material/styles";
 import { newShade } from "../../libs/playerCalculations";
 import { villainUltimaMax } from "../../routes/combat/combatSimulator";
@@ -50,27 +53,40 @@ const DamageHealDialog = ({
       );
     }
     if (key === "up") {
-      return npcClicked?.combatStats?.ultima ?? npcClicked?.ultima ?? npcClicked?.up ?? 0;
+      return (
+        npcClicked?.combatStats?.ultima ??
+        npcClicked?.ultima ??
+        npcClicked?.up ??
+        0
+      );
     }
     return (
-      npcClicked?.combatStats?.currentMp ??
-      npcClicked?.stats?.mp?.current ??
-      0
+      npcClicked?.combatStats?.currentMp ?? npcClicked?.stats?.mp?.current ?? 0
     );
   };
   const resolveMax = (key) => {
     if (key === "hp") {
       const calc = calcHP(npcClicked);
-      return calc > 0 ? calc : (npcClicked?.combatStats?.maxHp ?? npcClicked?.stats?.hp?.max ?? resolveCurrent("hp"));
+      return calc > 0
+        ? calc
+        : (npcClicked?.combatStats?.maxHp ??
+            npcClicked?.stats?.hp?.max ??
+            resolveCurrent("hp"));
     }
     if (key === "mp") {
-      const storedMax = npcClicked?.combatStats?.maxMp ?? npcClicked?.stats?.mp?.max;
+      const storedMax =
+        npcClicked?.combatStats?.maxMp ?? npcClicked?.stats?.mp?.max;
       if (Number.isFinite(storedMax) && storedMax > 0) return storedMax;
       const calc = calcMP(npcClicked);
       return calc > 0 ? calc : resolveCurrent("mp");
     }
     if (key === "ip") {
-      return npcClicked?.combatStats?.maxIp ?? npcClicked?.stats?.ip?.max ?? npcClicked?.ip ?? resolveCurrent("ip");
+      return (
+        npcClicked?.combatStats?.maxIp ??
+        npcClicked?.stats?.ip?.max ??
+        npcClicked?.ip ??
+        resolveCurrent("ip")
+      );
     }
     if (key === "fp") {
       if (clickedEntityType === "pc") return Infinity;
@@ -91,14 +107,26 @@ const DamageHealDialog = ({
     const modeSettled = (isHealing ? "heal" : "damage") === pending.mode;
     const amountSettled = String(value ?? "") === String(pending.amount);
     const damageTypeSettled =
-      String(damageType || "physical") === String(pending.damageType || "physical");
+      String(damageType || "physical") ===
+      String(pending.damageType || "physical");
     const guardingSettled = Boolean(isGuarding) === Boolean(pending.isGuarding);
-    if (!modeSettled || !amountSettled || !damageTypeSettled || !guardingSettled) return;
+    if (
+      !modeSettled ||
+      !amountSettled ||
+      !damageTypeSettled ||
+      !guardingSettled
+    )
+      return;
     pendingSubmitRef.current = null;
     handleSubmit?.({ preventDefault: () => {} });
   }, [value, isHealing, damageType, isGuarding, handleSubmit]);
 
-  const onApply = ({ amount, mode, damageType: nextDamageType, isGuarding: nextGuarding }) => {
+  const onApply = ({
+    amount,
+    mode,
+    damageType: nextDamageType,
+    isGuarding: nextGuarding,
+  }) => {
     const payload = {
       amount: Math.max(0, parseInt(amount, 10) || 0),
       mode: mode === "heal" ? "heal" : "damage",
@@ -118,7 +146,12 @@ const DamageHealDialog = ({
   };
 
   const onSetCurrent = (nextCurrent) => {
-    const boundedTarget = Math.max(0, Number.isFinite(max) ? Math.min(Number(nextCurrent) || 0, max) : (Number(nextCurrent) || 0));
+    const boundedTarget = Math.max(
+      0,
+      Number.isFinite(max)
+        ? Math.min(Number(nextCurrent) || 0, max)
+        : Number(nextCurrent) || 0,
+    );
     const delta = boundedTarget - current;
     if (delta === 0) {
       handleClose?.();
@@ -149,7 +182,9 @@ const DamageHealDialog = ({
       resourceKey={resourceKey}
       current={current}
       max={max}
-      damageTypes={filteredDamageTypes.length > 0 ? filteredDamageTypes : ["physical"]}
+      damageTypes={
+        filteredDamageTypes.length > 0 ? filteredDamageTypes : ["physical"]
+      }
       amount={String(value ?? "")}
       onAmountChange={setValue}
       mode={isHealing ? "heal" : "damage"}
@@ -160,27 +195,43 @@ const DamageHealDialog = ({
       onGuardingChange={setIsGuarding}
       resourcePalette={{
         hp: {
-          color1: isDark ? newShade(theme.palette.error.main, 10) : newShade(theme.palette.error.main, 80),
+          color1: isDark
+            ? newShade(theme.palette.error.main, 10)
+            : newShade(theme.palette.error.main, 80),
           color2: theme.palette.error.main,
         },
         mp: {
-          color1: isDark ? newShade(theme.palette.info.main, 10) : newShade(theme.palette.info.main, 80),
+          color1: isDark
+            ? newShade(theme.palette.info.main, 10)
+            : newShade(theme.palette.info.main, 80),
           color2: theme.palette.info.main,
         },
         ip: {
-          color1: isDark ? newShade(theme.palette.success.main, 10) : newShade(theme.palette.success.main, 80),
+          color1: isDark
+            ? newShade(theme.palette.success.main, 10)
+            : newShade(theme.palette.success.main, 80),
           color2: theme.palette.success.main,
         },
         fp: {
-          color1: isDark ? newShade(theme.palette.warning.main, 10) : newShade(theme.palette.warning.main, 80),
+          color1: isDark
+            ? newShade(theme.palette.warning.main, 10)
+            : newShade(theme.palette.warning.main, 80),
           color2: theme.palette.warning.main,
         },
         up: {
-          color1: isDark ? newShade(theme.palette.secondary.main, 10) : newShade(theme.palette.secondary.main, 80),
+          color1: isDark
+            ? newShade(theme.palette.secondary.main, 10)
+            : newShade(theme.palette.secondary.main, 80),
           color2: theme.palette.secondary.main,
         },
       }}
-      resolvePreviewDelta={({ amount, mode, damageType: previewType, isGuarding: previewGuarding, resourceKey: previewResource }) => {
+      resolvePreviewDelta={({
+        amount,
+        mode,
+        damageType: previewType,
+        isGuarding: previewGuarding,
+        resourceKey: previewResource,
+      }) => {
         if (mode === "heal") return amount;
         if (previewResource !== "hp") return -amount;
         const ctx = buildDamageContext({

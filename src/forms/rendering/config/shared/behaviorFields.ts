@@ -776,10 +776,14 @@ export const passiveGroupLabels: Record<string, string> = {
 // Passives tab field (shared by all item types)
 
 export function makePassivesTabField(
-  itemScopedKeys: string[] | ((outerState: Record<string, unknown>) => string[]),
+  itemScopedKeys:
+    | string[]
+    | ((outerState: Record<string, unknown>) => string[]),
 ): FieldConfig<Record<string, unknown>> {
   const staticFields =
-    typeof itemScopedKeys === "function" ? null : makePassiveRowFields(itemScopedKeys);
+    typeof itemScopedKeys === "function"
+      ? null
+      : makePassiveRowFields(itemScopedKeys);
   const shared = {
     itemDefaults: BLANK_PASSIVE,
     addLabel: "passive.add",

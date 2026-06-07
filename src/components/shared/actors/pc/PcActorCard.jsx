@@ -37,24 +37,75 @@ function PortraitStatsCard({
   return (
     <>
       {/* Mobile: portrait card stacked above stats card */}
-      <Paper elevation={3} sx={{ ...paperSx(secondary), "@container (min-width: 521px)": { display: "none" } }}>
-        <Box sx={{ height: 220, borderBottom: `1px solid ${theme.palette.divider}` }}>
-          <PcHeader {...sharedProps} characterImage={characterImage} hideNameBar compactPortraitOnly />
+      <Paper
+        elevation={3}
+        sx={{
+          ...paperSx(secondary),
+          "@container (min-width: 521px)": { display: "none" },
+        }}
+      >
+        <Box
+          sx={{
+            height: 220,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <PcHeader
+            {...sharedProps}
+            characterImage={characterImage}
+            hideNameBar
+            compactPortraitOnly
+          />
         </Box>
       </Paper>
-      <Paper elevation={3} sx={{ ...paperSx(secondary), mt: 1.5, "@container (min-width: 521px)": { display: "none" } }}>
-        <PcStatsSummary {...sharedProps} updateMaxStats={updateMaxStats} scale="sm" />
+      <Paper
+        elevation={3}
+        sx={{
+          ...paperSx(secondary),
+          mt: 1.5,
+          "@container (min-width: 521px)": { display: "none" },
+        }}
+      >
+        <PcStatsSummary
+          {...sharedProps}
+          updateMaxStats={updateMaxStats}
+          scale="sm"
+        />
         <PcAffinities {...sharedProps} />
       </Paper>
 
       {/* Desktop: portrait + stats side by side in one card */}
-      <Paper elevation={3} sx={{ ...paperSx(secondary), "@container (max-width: 520px)": { display: "none" } }}>
+      <Paper
+        elevation={3}
+        sx={{
+          ...paperSx(secondary),
+          "@container (max-width: 520px)": { display: "none" },
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "stretch" }}>
-          <Box sx={{ flexShrink: 0, width: { xs: 120, sm: 150, md: 170 }, maxWidth: "25%", overflow: "hidden", alignSelf: "stretch", borderRight: `1px solid ${theme.palette.divider}` }}>
-            <PcHeader {...sharedProps} characterImage={characterImage} hideNameBar compactPortraitOnly />
+          <Box
+            sx={{
+              flexShrink: 0,
+              width: { xs: 120, sm: 150, md: 170 },
+              maxWidth: "25%",
+              overflow: "hidden",
+              alignSelf: "stretch",
+              borderRight: `1px solid ${theme.palette.divider}`,
+            }}
+          >
+            <PcHeader
+              {...sharedProps}
+              characterImage={characterImage}
+              hideNameBar
+              compactPortraitOnly
+            />
           </Box>
           <Box sx={{ flex: 1, minWidth: 0, containerType: "inline-size" }}>
-            <PcStatsSummary {...sharedProps} updateMaxStats={updateMaxStats} scale="lg" />
+            <PcStatsSummary
+              {...sharedProps}
+              updateMaxStats={updateMaxStats}
+              scale="lg"
+            />
           </Box>
         </Box>
         <PcAffinities {...sharedProps} />
@@ -89,10 +140,31 @@ export default function PcActorCard({
   const ownerInteractive = isOwner || isInteractive;
 
   const sharedProps = { pc, isInteractive, onUpdate, onQuickCheck };
-  const ownerSharedProps = { pc, isInteractive: ownerInteractive, onUpdate, onQuickCheck };
-  const _psProps = { player: pc, setPlayer: onUpdate, isEditMode: isInteractive, isCharacterSheet: false };
-  const ownerPsProps = { player: pc, setPlayer: onUpdate, isEditMode: ownerInteractive, isCharacterSheet: false };
-  const portraitCardProps = { sharedProps, characterImage, updateMaxStats, secondary, theme };
+  const ownerSharedProps = {
+    pc,
+    isInteractive: ownerInteractive,
+    onUpdate,
+    onQuickCheck,
+  };
+  const _psProps = {
+    player: pc,
+    setPlayer: onUpdate,
+    isEditMode: isInteractive,
+    isCharacterSheet: false,
+  };
+  const ownerPsProps = {
+    player: pc,
+    setPlayer: onUpdate,
+    isEditMode: ownerInteractive,
+    isCharacterSheet: false,
+  };
+  const portraitCardProps = {
+    sharedProps,
+    characterImage,
+    updateMaxStats,
+    secondary,
+    theme,
+  };
 
   const noEffects = actorSheetEffectsEnabled === false;
 
@@ -108,10 +180,10 @@ export default function PcActorCard({
           mb: 1.5,
           ...(noEffects
             ? {
-              background: theme.palette.background.paper,
-              boxShadow: "none",
-              border: "none",
-            }
+                background: theme.palette.background.paper,
+                boxShadow: "none",
+                border: "none",
+              }
             : {}),
         }}
       >
@@ -183,9 +255,19 @@ export default function PcActorCard({
           </Box>
 
           <PlayerBonds {...ownerPsProps} />
-          <CardLoadout {...ownerPsProps} isOwner={ownerInteractive} showHeader showSideDivider showSupportColumn={false} />
+          <CardLoadout
+            {...ownerPsProps}
+            isOwner={ownerInteractive}
+            showHeader
+            showSideDivider
+            showSupportColumn={false}
+          />
           <PlayerEquipment {...ownerPsProps} />
-          <PlayerNotes {...ownerPsProps} defaultExpanded={!ownerInteractive} speaker={pc?.name ?? ""} />
+          <PlayerNotes
+            {...ownerPsProps}
+            defaultExpanded={!ownerInteractive}
+            speaker={pc?.name ?? ""}
+          />
           <PcRituals
             {...sharedProps}
             clockSections={clockSections}
@@ -211,7 +293,12 @@ export default function PcActorCard({
             overflow: "hidden",
           }}
         >
-          <PcClasses {...ownerSharedProps} variant="full" updateMaxStats={updateMaxStats} defaultExpanded={!ownerInteractive} />
+          <PcClasses
+            {...ownerSharedProps}
+            variant="full"
+            updateMaxStats={updateMaxStats}
+            defaultExpanded={!ownerInteractive}
+          />
           {/* <PcSpells pc={pc} isInteractive={ownerInteractive} onUpdate={onUpdate} isCharacterSheet={true} /> */}
           {optionalRules.technospheres &&
             ["integrated", "mnemospheres"].includes(

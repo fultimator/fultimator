@@ -536,133 +536,138 @@ export default function PcCompactHeader({
         >
           {/* Portrait */}
           <Box
+            sx={{
+              minWidth: imageColumnWidth,
+              width: imageColumnWidth,
+              height: "100%",
+              background:
+                custom.mode === "dark"
+                  ? theme.palette.background.paper
+                  : "white",
+              border: "1px solid #684268",
+              borderTop: "none",
+              overflow: "hidden",
+              cursor: "pointer",
+              position: "relative",
+            }}
+            onClick={() =>
+              isInteractive
+                ? setPortraitModalOpen(true)
+                : setImageDialogOpen(true)
+            }
+          >
+            <Box
               sx={{
-                minWidth: imageColumnWidth,
-                width: imageColumnWidth,
-                height: "100%",
+                position: "absolute",
+                inset: 0,
                 background:
                   custom.mode === "dark"
-                    ? theme.palette.background.paper
-                    : "white",
-                border: "1px solid #684268",
-                borderTop: "none",
-                overflow: "hidden",
-                cursor: "pointer",
-                position: "relative",
+                    ? `linear-gradient(165deg, ${custom.primary}33 0%, ${custom.ternary}66 100%)`
+                    : `linear-gradient(165deg, ${custom.primary}22 0%, ${custom.secondary}44 100%)`,
               }}
-              onClick={() => isInteractive ? setPortraitModalOpen(true) : setImageDialogOpen(true)}
-            >
-              <Box
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  background:
-                    custom.mode === "dark"
-                      ? `linear-gradient(165deg, ${custom.primary}33 0%, ${custom.ternary}66 100%)`
-                      : `linear-gradient(165deg, ${custom.primary}22 0%, ${custom.secondary}44 100%)`,
-                }}
-              />
-              <img
-                src={imgSrc}
-                alt="Player Avatar"
-                onLoad={(e) => {
-                  const { naturalWidth, naturalHeight } = e.currentTarget;
-                  setIsPortraitImage(naturalHeight > naturalWidth);
-                }}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: imageFitMode === "contain" ? 0 : "50%",
-                  transform:
-                    imageFitMode === "contain"
-                      ? "translateX(-50%)"
-                      : "translate(-50%, -50%)",
-                  width:
-                    imageFitMode === "contain"
-                      ? isPortraitImage
-                        ? "auto"
-                        : "100%"
-                      : "100%",
-                  height:
-                    imageFitMode === "contain"
-                      ? isPortraitImage
-                        ? "100%"
-                        : "auto"
-                      : "100%",
-                  objectFit: imageFitMode === "contain" ? undefined : "cover",
-                  objectPosition: "center",
-                  display: "block",
-                }}
-              />
-              <Box
-                data-html2canvas-ignore="true"
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  opacity: 0,
-                  transition: "opacity 0.15s",
-                  background: "rgba(0,0,0,0.35)",
-                  "&:hover": { opacity: 1 },
-                  zIndex: 1,
-                }}
-              >
-                {isInteractive
-                  ? <EditIcon sx={{ color: "#fff", fontSize: "1.5rem" }} />
-                  : <CropFreeIcon sx={{ color: "#fff", fontSize: "1.5rem" }} />
-                }
-              </Box>
-              <Tooltip
-                title={
+            />
+            <img
+              src={imgSrc}
+              alt="Player Avatar"
+              onLoad={(e) => {
+                const { naturalWidth, naturalHeight } = e.currentTarget;
+                setIsPortraitImage(naturalHeight > naturalWidth);
+              }}
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: imageFitMode === "contain" ? 0 : "50%",
+                transform:
                   imageFitMode === "contain"
-                    ? t("Switch to Cover")
-                    : t("Switch to Contain")
-                }
-              >
-                <IconButton
-                  size="small"
-                  data-html2canvas-ignore="true"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const nextMode =
-                      imageFitMode === "contain" ? "cover" : "contain";
-                    if (onUpdate) {
-                      onUpdate((prev) => ({
-                        ...prev,
-                        info: { ...prev.info, portraitFitMode: nextMode },
-                      }));
-                    } else {
-                      setImageFitFallback(nextMode);
-                    }
-                  }}
-                  sx={{
-                    position: "absolute",
-                    right: 4,
-                    bottom: 4,
-                    p: 0.25,
-                    zIndex: 2,
-                    color: "rgba(255,255,255,0.72)",
-                    backgroundColor: "rgba(0,0,0,0.25)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    "@media print": {
-                      display: "none",
-                    },
-                    "&:hover": {
-                      backgroundColor: "rgba(0,0,0,0.4)",
-                      color: "#fff",
-                    },
-                  }}
-                >
-                  {imageFitMode === "contain" ? (
-                    <CropFreeIcon sx={{ fontSize: "0.8rem" }} />
-                  ) : (
-                    <FitScreenIcon sx={{ fontSize: "0.8rem" }} />
-                  )}
-                </IconButton>
-              </Tooltip>
+                    ? "translateX(-50%)"
+                    : "translate(-50%, -50%)",
+                width:
+                  imageFitMode === "contain"
+                    ? isPortraitImage
+                      ? "auto"
+                      : "100%"
+                    : "100%",
+                height:
+                  imageFitMode === "contain"
+                    ? isPortraitImage
+                      ? "100%"
+                      : "auto"
+                    : "100%",
+                objectFit: imageFitMode === "contain" ? undefined : "cover",
+                objectPosition: "center",
+                display: "block",
+              }}
+            />
+            <Box
+              data-html2canvas-ignore="true"
+              sx={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: 0,
+                transition: "opacity 0.15s",
+                background: "rgba(0,0,0,0.35)",
+                "&:hover": { opacity: 1 },
+                zIndex: 1,
+              }}
+            >
+              {isInteractive ? (
+                <EditIcon sx={{ color: "#fff", fontSize: "1.5rem" }} />
+              ) : (
+                <CropFreeIcon sx={{ color: "#fff", fontSize: "1.5rem" }} />
+              )}
             </Box>
+            <Tooltip
+              title={
+                imageFitMode === "contain"
+                  ? t("Switch to Cover")
+                  : t("Switch to Contain")
+              }
+            >
+              <IconButton
+                size="small"
+                data-html2canvas-ignore="true"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const nextMode =
+                    imageFitMode === "contain" ? "cover" : "contain";
+                  if (onUpdate) {
+                    onUpdate((prev) => ({
+                      ...prev,
+                      info: { ...prev.info, portraitFitMode: nextMode },
+                    }));
+                  } else {
+                    setImageFitFallback(nextMode);
+                  }
+                }}
+                sx={{
+                  position: "absolute",
+                  right: 4,
+                  bottom: 4,
+                  p: 0.25,
+                  zIndex: 2,
+                  color: "rgba(255,255,255,0.72)",
+                  backgroundColor: "rgba(0,0,0,0.25)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  "@media print": {
+                    display: "none",
+                  },
+                  "&:hover": {
+                    backgroundColor: "rgba(0,0,0,0.4)",
+                    color: "#fff",
+                  },
+                }}
+              >
+                {imageFitMode === "contain" ? (
+                  <CropFreeIcon sx={{ fontSize: "0.8rem" }} />
+                ) : (
+                  <FitScreenIcon sx={{ fontSize: "0.8rem" }} />
+                )}
+              </IconButton>
+            </Tooltip>
+          </Box>
 
           <Box
             data-pc-compact-traits-wrap="true"

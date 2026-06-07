@@ -14,7 +14,10 @@ import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { buildInvokerAvailableInvocations } from "/src/libs/player/invokerUtils";
-import { resolveWellsprings, affinityIconSrc } from "/src/libs/player/wellsprings";
+import {
+  resolveWellsprings,
+  affinityIconSrc,
+} from "/src/libs/player/wellsprings";
 
 function ThemedSpellInvoker({
   invoker,
@@ -37,8 +40,10 @@ function ThemedSpellInvoker({
   const customWellsprings = invoker.customWellsprings || [];
   const customInvocations = invoker.invocations || [];
   const alwaysActiveWellsprings = invoker.alwaysActiveWellsprings || [];
-  const innerWellspringEnabled = invoker.innerWellspring || invokerTracker.innerWellspring || false;
-  const chosenWellspring = invoker.chosenWellspring || invokerTracker.chosenWellspring || "";
+  const innerWellspringEnabled =
+    invoker.innerWellspring || invokerTracker.innerWellspring || false;
+  const chosenWellspring =
+    invoker.chosenWellspring || invokerTracker.chosenWellspring || "";
   const allWellsprings = resolveWellsprings(customWellsprings);
 
   const availableInvocations =
@@ -48,7 +53,16 @@ function ThemedSpellInvoker({
 
   return (
     <>
-      <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+      <Accordion
+        disableGutters
+        elevation={0}
+        square
+        sx={{
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          "&:before": { display: "none" },
+        }}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Icon sx={{ color: theme.primary, marginRight: 1 }}>
             <FlashOn />
@@ -56,7 +70,13 @@ function ThemedSpellInvoker({
           <Typography variant="h4">{t("invoker_details")}</Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-          <ReactMarkdown components={{ p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>
+          <ReactMarkdown
+            components={{
+              p: ({ _node, ...props }) => (
+                <p style={{ margin: 0 }} {...props} />
+              ),
+            }}
+          >
             {t("invoker_details_1")}
           </ReactMarkdown>
         </AccordionDetails>
@@ -80,7 +100,12 @@ function ThemedSpellInvoker({
             {innerWellspringEnabled && (
               <Typography
                 component="span"
-                sx={{ fontSize: "0.8rem", fontStyle: "italic", marginLeft: 1, color: "#4CAF50" }}
+                sx={{
+                  fontSize: "0.8rem",
+                  fontStyle: "italic",
+                  marginLeft: 1,
+                  color: "#4CAF50",
+                }}
               >
                 + {t("invoker_invocation_inner")}: {chosenWellspring}
               </Typography>
@@ -88,9 +113,15 @@ function ThemedSpellInvoker({
             {alwaysActiveWellsprings.length > 0 && (
               <Typography
                 component="span"
-                sx={{ fontSize: "0.8rem", fontStyle: "italic", marginLeft: 1, color: "#4CAF50" }}
+                sx={{
+                  fontSize: "0.8rem",
+                  fontStyle: "italic",
+                  marginLeft: 1,
+                  color: "#4CAF50",
+                }}
               >
-                + {t("invoker_always_active")}: {alwaysActiveWellsprings.join(", ")}
+                + {t("invoker_always_active")}:{" "}
+                {alwaysActiveWellsprings.join(", ")}
               </Typography>
             )}
             <Typography
@@ -111,9 +142,14 @@ function ThemedSpellInvoker({
 
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
             {allWellsprings.map((wellspring) => {
-              const isActive = invokerTracker.activeWellsprings?.includes(wellspring.key) || false;
-              const isInnerWellspring = innerWellspringEnabled && chosenWellspring === wellspring.key;
-              const isAlwaysActive = alwaysActiveWellsprings.includes(wellspring.key);
+              const isActive =
+                invokerTracker.activeWellsprings?.includes(wellspring.key) ||
+                false;
+              const isInnerWellspring =
+                innerWellspringEnabled && chosenWellspring === wellspring.key;
+              const isAlwaysActive = alwaysActiveWellsprings.includes(
+                wellspring.key,
+              );
               const isLocked = isInnerWellspring || isAlwaysActive;
               const isSelected = isActive || isLocked;
               const lockColor = isInnerWellspring ? "#4CAF50" : "#FF9800";
@@ -141,16 +177,16 @@ function ThemedSpellInvoker({
                     border: "2px solid",
                     borderColor: isLocked ? lockColor : wellspring.color,
                     borderWidth: isSelected ? "2px" : "1px",
-                    backgroundColor: isSelected ? wellspring.color : "transparent",
+                    backgroundColor: isSelected
+                      ? wellspring.color
+                      : "transparent",
                     fontWeight: isSelected ? "bold" : "normal",
                     fontSize: "0.8125rem",
                     fontFamily: (theme) => theme.typography.fontFamily,
                     cursor: isEditMode && !isLocked ? "pointer" : "default",
                     transition: "background-color 0.15s, border-color 0.15s",
                     ...(isLocked && { boxShadow: lockGlow }),
-                    "&:hover": isEditMode && !isLocked
-                      ? { opacity: 0.85 }
-                      : {},
+                    "&:hover": isEditMode && !isLocked ? { opacity: 0.85 } : {},
                   }}
                 >
                   <img
@@ -160,8 +196,13 @@ function ThemedSpellInvoker({
                     style={{ objectFit: "contain" }}
                     alt={wellspring.key}
                   />
-                  <span style={{ color: isSelected ? wellspring.textColor : "inherit" }}>
-                    {t(`invoker_${wellspring.key.toLowerCase()}`) !== `invoker_${wellspring.key.toLowerCase()}`
+                  <span
+                    style={{
+                      color: isSelected ? wellspring.textColor : "inherit",
+                    }}
+                  >
+                    {t(`invoker_${wellspring.key.toLowerCase()}`) !==
+                    `invoker_${wellspring.key.toLowerCase()}`
                       ? t(`invoker_${wellspring.key.toLowerCase()}`)
                       : wellspring.key}
                   </span>
@@ -175,21 +216,32 @@ function ThemedSpellInvoker({
               variant="body2"
               sx={{ color: theme.primary, fontStyle: "italic", marginTop: 1 }}
             >
-              {t("Select exactly 2 wellsprings to determine available invocations")}
+              {t(
+                "Select exactly 2 wellsprings to determine available invocations",
+              )}
               {innerWellspringEnabled && (
-                <Typography component="span" sx={{ display: "block", color: "#4CAF50" }}>
-                  {t("invoker_inner_wellspring_always_available").replace("{wellspring}", chosenWellspring)}
+                <Typography
+                  component="span"
+                  sx={{ display: "block", color: "#4CAF50" }}
+                >
+                  {t("invoker_inner_wellspring_always_available").replace(
+                    "{wellspring}",
+                    chosenWellspring,
+                  )}
                 </Typography>
               )}
               {alwaysActiveWellsprings.length > 0 && (
-                <Typography component="span" sx={{ display: "block", color: "#4CAF50" }}>
-                  + {t("invoker_always_active")}: {alwaysActiveWellsprings.join(", ")}
+                <Typography
+                  component="span"
+                  sx={{ display: "block", color: "#4CAF50" }}
+                >
+                  + {t("invoker_always_active")}:{" "}
+                  {alwaysActiveWellsprings.join(", ")}
                 </Typography>
               )}
             </Typography>
           )}
         </Box>
-
       </Box>
 
       {/* Invocations Table */}
@@ -210,28 +262,66 @@ function ThemedSpellInvoker({
         }}
       >
         <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
-          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          <Typography
+            variant="h3"
+            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+          >
             {t("Invocation")}
           </Typography>
         </Box>
-        <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+        <Box
+          sx={{
+            flex: "0 0 16.67%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography
+            variant="h3"
+            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+          >
             {t("Wellspring")}
           </Typography>
         </Box>
-        <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+        <Box
+          sx={{
+            flex: "0 0 16.67%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography
+            variant="h3"
+            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+          >
             {t("Type")}
           </Typography>
         </Box>
         <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
-          <Typography variant="h3" sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}>
+          <Typography
+            variant="h3"
+            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+          >
             {t("Effect")}
           </Typography>
         </Box>
-        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <Box
+          sx={{
+            width: 34,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
           {isEditMode && (
-            <IconButton size="small" onClick={onEdit} sx={{ color: "#fff", p: "3px" }}>
+            <IconButton
+              size="small"
+              onClick={onEdit}
+              sx={{ color: "#fff", p: "3px" }}
+            >
               <Edit sx={{ fontSize: "1.1rem" }} />
             </IconButton>
           )}
@@ -253,13 +343,23 @@ function ThemedSpellInvoker({
       ) : (
         availableInvocations
           .filter((invocation) => {
-            if (invokerTracker.activeWellsprings?.includes(invocation.wellspring)) return true;
-            if (innerWellspringEnabled && chosenWellspring === invocation.wellspring) return true;
-            if (alwaysActiveWellsprings.includes(invocation.wellspring)) return true;
+            if (
+              invokerTracker.activeWellsprings?.includes(invocation.wellspring)
+            )
+              return true;
+            if (
+              innerWellspringEnabled &&
+              chosenWellspring === invocation.wellspring
+            )
+              return true;
+            if (alwaysActiveWellsprings.includes(invocation.wellspring))
+              return true;
             return false;
           })
           .map((invocation, i) => {
-            const wellspringEntry = allWellsprings.find((w) => w.key === invocation.wellspring);
+            const wellspringEntry = allWellsprings.find(
+              (w) => w.key === invocation.wellspring,
+            );
             const borderColor = wellspringEntry?.color || theme.primary;
             return (
               <React.Fragment key={i}>
@@ -276,12 +376,31 @@ function ThemedSpellInvoker({
                     minHeight: "40px",
                   }}
                 >
-                  <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
-                    <Typography sx={{ fontWeight: "bold", fontSize: { xs: "0.8rem", sm: "1rem" } }}>
+                  <Box
+                    sx={{
+                      flex: "0 0 25%",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                        fontSize: { xs: "0.8rem", sm: "1rem" },
+                      }}
+                    >
                       {t(invocation.name)}
                     </Typography>
                   </Box>
-                  <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+                  <Box
+                    sx={{
+                      flex: "0 0 16.67%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 0.5,
+                    }}
+                  >
                     {wellspringEntry && (
                       <img
                         src={affinityIconSrc(wellspringEntry.icon)}
@@ -292,26 +411,49 @@ function ThemedSpellInvoker({
                       />
                     )}
                     <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
-                      {t(`invoker_${invocation.wellspring.toLowerCase()}`) !== `invoker_${invocation.wellspring.toLowerCase()}`
+                      {t(`invoker_${invocation.wellspring.toLowerCase()}`) !==
+                      `invoker_${invocation.wellspring.toLowerCase()}`
                         ? t(`invoker_${invocation.wellspring.toLowerCase()}`)
                         : invocation.wellspring}
                     </Typography>
                   </Box>
-                  <Box sx={{ flex: "0 0 16.67%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Box
+                    sx={{
+                      flex: "0 0 16.67%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
                       {t(invocation.type)}
                     </Typography>
                   </Box>
                   <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
-                    <Typography component="div" sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
+                    <Typography
+                      component="div"
+                      sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}
+                    >
                       <ReactMarkdown components={components}>
                         {t(invocation.effect)}
                       </ReactMarkdown>
                     </Typography>
                   </Box>
-                  <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                  <Box
+                    sx={{
+                      width: 34,
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                    }}
+                  >
                     {onRoll && (
-                      <IconButton size="small" onClick={() => onRoll(invocation)} sx={{ p: "3px" }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => onRoll(invocation)}
+                        sx={{ p: "3px" }}
+                      >
                         <Casino sx={{ fontSize: "1.1rem" }} />
                       </IconButton>
                     )}

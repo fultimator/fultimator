@@ -20,7 +20,13 @@ import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationD
 // Map player class object → schema form state
 function playerClassToFormState(cls) {
   const defaults = createDefaultStateFromFields(classFieldConfig);
-  const BLANK_SKILL = { name: "", fuid: undefined, maxLvl: 1, description: "", specialSkill: "" };
+  const BLANK_SKILL = {
+    name: "",
+    fuid: undefined,
+    maxLvl: 1,
+    description: "",
+    specialSkill: "",
+  };
   const skills = Array.from({ length: 5 }, (_, i) => {
     const s = cls.skills?.[i];
     if (!s) return { ...BLANK_SKILL };
@@ -40,9 +46,16 @@ function playerClassToFormState(cls) {
       hpplus: cls.benefits?.hpplus ?? 0,
       mpplus: cls.benefits?.mpplus ?? 0,
       ipplus: cls.benefits?.ipplus ?? 0,
-      martials: cls.benefits?.martials ?? { armor: false, shields: false, melee: false, ranged: false },
+      martials: cls.benefits?.martials ?? {
+        armor: false,
+        shields: false,
+        melee: false,
+        ranged: false,
+      },
       rituals: cls.benefits?.rituals ?? { ritualism: false },
-      custom: (cls.benefits?.custom ?? []).map((v) => (typeof v === "string" ? { value: v } : v)),
+      custom: (cls.benefits?.custom ?? []).map((v) =>
+        typeof v === "string" ? { value: v } : v,
+      ),
       spellClasses: cls.benefits?.spellClasses ?? [],
     },
     skills,
@@ -53,7 +66,7 @@ function playerClassToFormState(cls) {
 function formStateToClassPatch(formState) {
   const normalizedCustom = Array.isArray(formState.benefits?.custom)
     ? formState.benefits.custom
-        .map((e) => (typeof e === "string" ? e : e?.value ?? ""))
+        .map((e) => (typeof e === "string" ? e : (e?.value ?? "")))
         .filter((e) => e.trim())
     : [];
 
@@ -85,9 +98,17 @@ function formStateToClassPatch(formState) {
   };
 }
 
-export default function EditPlayerClassModal({ open, onClose, cls, onSave, onDelete }) {
+export default function EditPlayerClassModal({
+  open,
+  onClose,
+  cls,
+  onSave,
+  onDelete,
+}) {
   const { t } = useTranslate();
-  const [formState, setFormState] = useState(() => createDefaultStateFromFields(classFieldConfig));
+  const [formState, setFormState] = useState(() =>
+    createDefaultStateFromFields(classFieldConfig),
+  );
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
@@ -98,7 +119,7 @@ export default function EditPlayerClassModal({ open, onClose, cls, onSave, onDel
 
   const normalizedCustomBenefits = Array.isArray(formState.benefits?.custom)
     ? formState.benefits.custom
-        .map((e) => (typeof e === "string" ? e : e?.value ?? ""))
+        .map((e) => (typeof e === "string" ? e : (e?.value ?? "")))
         .filter((e) => e.trim())
     : [];
 
@@ -182,12 +203,19 @@ export default function EditPlayerClassModal({ open, onClose, cls, onSave, onDel
       </DialogContent>
       <DialogActions>
         {onDelete && (
-          <Button variant="outlined" color="error" onClick={() => setDeleteConfirmOpen(true)} sx={{ mr: "auto" }}>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => setDeleteConfirmOpen(true)}
+            sx={{ mr: "auto" }}
+          >
             {t("Delete")}
           </Button>
         )}
         <Button onClick={onClose}>{t("Cancel")}</Button>
-        <Button variant="contained" onClick={handleSave}>{t("Save Changes")}</Button>
+        <Button variant="contained" onClick={handleSave}>
+          {t("Save Changes")}
+        </Button>
       </DialogActions>
       <DeleteConfirmationDialog
         open={deleteConfirmOpen}

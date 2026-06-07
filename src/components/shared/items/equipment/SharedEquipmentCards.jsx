@@ -121,7 +121,8 @@ function headerSx(customTheme, scale, onHeaderClick, imageMode) {
     "& .MuiTypography-root": {
       color: "inherit",
       textTransform: "uppercase",
-      fontWeight: Number.parseFloat(scale?.header ?? "0.95") >= 1.05 ? 700 : 600,
+      fontWeight:
+        Number.parseFloat(scale?.header ?? "0.95") >= 1.05 ? 700 : 600,
       fontSize: scale.header,
       fontFamily: "Antonio",
       letterSpacing: "0.5px",
@@ -286,7 +287,10 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
               onClick={onHeaderClick}
               sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
             >
-              <Grid container sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}>
+              <Grid
+                container
+                sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}
+              >
                 <Grid size={cols.name}>
                   <Typography>{t("Weapon")}</Typography>
                 </Grid>
@@ -479,7 +483,10 @@ function SharedArmorLikeCard({
               onClick={onHeaderClick}
               sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
             >
-              <Grid container sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}>
+              <Grid
+                container
+                sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}
+              >
                 <Grid size={cols.name}>
                   <Typography>{t(category)}</Typography>
                 </Grid>
@@ -964,7 +971,10 @@ export const SharedCustomWeaponCard = React.memo(
               imageSize={imageSize}
               imageVisible={imageVisible}
             />
-            <Grid container sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}>
+            <Grid
+              container
+              sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}
+            >
               <Grid size={cols.name}>
                 <Typography>{t("Custom Weapon")}</Typography>
               </Grid>
@@ -1134,7 +1144,10 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
               onClick={onHeaderClick}
               sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
             >
-              <Grid container sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}>
+              <Grid
+                container
+                sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}
+              >
                 <Grid size={cols.name}>
                   <Typography>{t("Accessory")}</Typography>
                 </Grid>

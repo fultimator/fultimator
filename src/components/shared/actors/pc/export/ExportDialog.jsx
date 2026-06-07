@@ -26,7 +26,14 @@ const DEFAULT_SETTINGS = {
   printMode: false,
 };
 
-export default function ExportDialog({ open, onClose, onDownload, isLoading, title, officialPdfDescription }) {
+export default function ExportDialog({
+  open,
+  onClose,
+  onDownload,
+  isLoading,
+  title,
+  officialPdfDescription,
+}) {
   const { t } = useTranslate();
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
@@ -54,11 +61,17 @@ export default function ExportDialog({ open, onClose, onDownload, isLoading, tit
     await onDownload(settings);
   };
 
-  const showCaptureOptions = settings.format === "png" || settings.format === "app-pdf";
+  const showCaptureOptions =
+    settings.format === "png" || settings.format === "app-pdf";
   const showScaleOption = settings.format === "png";
 
   return (
-    <Dialog open={open} onClose={isLoading ? undefined : onClose} maxWidth="xs" fullWidth>
+    <Dialog
+      open={open}
+      onClose={isLoading ? undefined : onClose}
+      maxWidth="xs"
+      fullWidth
+    >
       <DialogTitle>{title ?? t("Export Character Sheet")}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ pt: 1 }}>
@@ -78,7 +91,9 @@ export default function ExportDialog({ open, onClose, onDownload, isLoading, tit
                 control={<Radio />}
                 label={
                   <Stack>
-                    <Typography variant="body2">{t("App Layout PDF")}</Typography>
+                    <Typography variant="body2">
+                      {t("App Layout PDF")}
+                    </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {t("Sheet as-is, sliced into A4 pages")}
                     </Typography>
@@ -92,7 +107,8 @@ export default function ExportDialog({ open, onClose, onDownload, isLoading, tit
                   <Stack>
                     <Typography variant="body2">{t("Official PDF")}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {officialPdfDescription ?? t("Fill the official Fabula Ultima character sheet")}
+                      {officialPdfDescription ??
+                        t("Fill the official Fabula Ultima character sheet")}
                     </Typography>
                   </Stack>
                 }
@@ -111,13 +127,25 @@ export default function ExportDialog({ open, onClose, onDownload, isLoading, tit
                     value={String(settings.scale)}
                     onChange={(e) => set("scale", Number(e.target.value))}
                   >
-                    <FormControlLabel value="1" control={<Radio />} label="1x" />
-                    <FormControlLabel value="2" control={<Radio />} label="2x" />
+                    <FormControlLabel
+                      value="1"
+                      control={<Radio />}
+                      label="1x"
+                    />
+                    <FormControlLabel
+                      value="2"
+                      control={<Radio />}
+                      label="2x"
+                    />
                     <FormControlLabel
                       value="3"
                       control={<Radio />}
                       label={
-                        <Stack direction="row" spacing={0.5} alignItems="center">
+                        <Stack
+                          direction="row"
+                          spacing={0.5}
+                          alignItems="center"
+                        >
                           <span>3x</span>
                           <Typography variant="caption" color="text.secondary">
                             {t("(large file)")}

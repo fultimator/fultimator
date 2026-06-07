@@ -73,7 +73,15 @@ export default function PlayerBonds({
     if (bonds.length >= 6) return;
     setIsCreatingBond(true);
     setEditBondIndex(null);
-    setDraftBond({ name: "", admiration: false, loyality: false, affection: false, inferiority: false, mistrust: false, hatred: false });
+    setDraftBond({
+      name: "",
+      admiration: false,
+      loyality: false,
+      affection: false,
+      inferiority: false,
+      mistrust: false,
+      hatred: false,
+    });
   };
 
   const handlePairToggle = (positiveKey, negativeKey) => (_event, value) => {
@@ -88,12 +96,17 @@ export default function PlayerBonds({
     if (isCreatingBond) {
       setPlayer((prev) => ({
         ...prev,
-        info: { ...prev.info, bonds: [...(prev.info?.bonds ?? []), { ...draftBond }] },
+        info: {
+          ...prev.info,
+          bonds: [...(prev.info?.bonds ?? []), { ...draftBond }],
+        },
       }));
       closeModal();
       return;
     }
-    const updated = bonds.map((b, i) => (i === editBondIndex ? { ...draftBond } : b));
+    const updated = bonds.map((b, i) =>
+      i === editBondIndex ? { ...draftBond } : b,
+    );
     setPlayer((prev) => ({ ...prev, info: { ...prev.info, bonds: updated } }));
     closeModal();
   };
@@ -112,7 +125,10 @@ export default function PlayerBonds({
         .filter((s) => bond[s])
         .map((s) => t(s.charAt(0).toUpperCase() + s.slice(1)))
         .join(" ");
-      return bond.name?.toLowerCase().includes(normalizedQuery) || sentiments.toLowerCase().includes(normalizedQuery);
+      return (
+        bond.name?.toLowerCase().includes(normalizedQuery) ||
+        sentiments.toLowerCase().includes(normalizedQuery)
+      );
     });
 
   if (visibleBonds.length === 0 && !isEditMode) return null;
@@ -126,7 +142,10 @@ export default function PlayerBonds({
           disabled={bonds.length >= 6}
           sx={{ p: compact ? "2px" : 0.5, color: "#fff" }}
         >
-          <AddIcon sx={{ fontSize: compact ? "1.15rem" : undefined }} fontSize={compact ? undefined : "small"} />
+          <AddIcon
+            sx={{ fontSize: compact ? "1.15rem" : undefined }}
+            fontSize={compact ? undefined : "small"}
+          />
         </IconButton>
       </span>
     </Tooltip>
@@ -138,16 +157,22 @@ export default function PlayerBonds({
       onClose={closeModal}
       onConfirm={saveBond}
       title={isCreatingBond ? t("Add Bond") : t("Edit Bond")}
-      subtitle={t("Set the bond name and sentiments. Opposed sentiments auto-exclude each other.")}
+      subtitle={t(
+        "Set the bond name and sentiments. Opposed sentiments auto-exclude each other.",
+      )}
       maxWidth="sm"
       actions={
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           {!isCreatingBond && (
-            <Button variant="contained" color="error" onClick={handleDelete}>{t("Delete")}</Button>
+            <Button variant="contained" color="error" onClick={handleDelete}>
+              {t("Delete")}
+            </Button>
           )}
           <Box sx={{ flexGrow: 1 }} />
           <Button onClick={closeModal}>{t("Cancel")}</Button>
-          <Button variant="contained" color="primary" onClick={saveBond}>{t("Save")}</Button>
+          <Button variant="contained" color="primary" onClick={saveBond}>
+            {t("Save")}
+          </Button>
         </Box>
       }
     >
@@ -158,27 +183,86 @@ export default function PlayerBonds({
               fullWidth
               label={t("Bond Name")}
               value={draftBond.name}
-              onChange={(e) => setDraftBond((prev) => ({ ...prev, name: e.target.value }))}
+              onChange={(e) =>
+                setDraftBond((prev) => ({ ...prev, name: e.target.value }))
+              }
               slotProps={{ htmlInput: { maxLength: 50 } }}
             />
           </Grid>
           {BOND_PAIRS.map(([posKey, negKey]) => (
             <Grid key={posKey} size={12}>
-              <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 1, alignItems: "center", justifyContent: "space-between", p: 0.75, borderRadius: 1, border: "1px solid", borderColor: "divider", bgcolor: "background.paper" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: 1,
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  p: 0.75,
+                  borderRadius: 1,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                }}
+              >
                 <ToggleButtonGroup
                   exclusive
-                  value={draftBond[posKey] ? posKey : draftBond[negKey] ? negKey : null}
+                  value={
+                    draftBond[posKey]
+                      ? posKey
+                      : draftBond[negKey]
+                        ? negKey
+                        : null
+                  }
                   onChange={handlePairToggle(posKey, negKey)}
-                  sx={{ width: "100%", "& .MuiToggleButtonGroup-grouped": { flex: 1, minHeight: 34, borderColor: "divider", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.02em", fontSize: "0.78rem", px: 1 } }}
+                  sx={{
+                    width: "100%",
+                    "& .MuiToggleButtonGroup-grouped": {
+                      flex: 1,
+                      minHeight: 34,
+                      borderColor: "divider",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      letterSpacing: "0.02em",
+                      fontSize: "0.78rem",
+                      px: 1,
+                    },
+                  }}
                 >
-                  <ToggleButton value={posKey} sx={{ color: positiveColor, "&.Mui-selected": { color: positiveColor, bgcolor: "rgba(76, 175, 80, 0.11)" } }}>
+                  <ToggleButton
+                    value={posKey}
+                    sx={{
+                      color: positiveColor,
+                      "&.Mui-selected": {
+                        color: positiveColor,
+                        bgcolor: "rgba(76, 175, 80, 0.11)",
+                      },
+                    }}
+                  >
                     {t(posKey.charAt(0).toUpperCase() + posKey.slice(1))}
                   </ToggleButton>
-                  <ToggleButton value={negKey} sx={{ color: negativeColor, "&.Mui-selected": { color: negativeColor, bgcolor: "rgba(244, 67, 54, 0.1)" } }}>
+                  <ToggleButton
+                    value={negKey}
+                    sx={{
+                      color: negativeColor,
+                      "&.Mui-selected": {
+                        color: negativeColor,
+                        bgcolor: "rgba(244, 67, 54, 0.1)",
+                      },
+                    }}
+                  >
                     {t(negKey.charAt(0).toUpperCase() + negKey.slice(1))}
                   </ToggleButton>
                 </ToggleButtonGroup>
-                <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600, px: 0.75, letterSpacing: "0.04em" }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                    fontWeight: 600,
+                    px: 0.75,
+                    letterSpacing: "0.04em",
+                  }}
+                >
                   {t("OR")}
                 </Typography>
               </Box>
@@ -199,12 +283,25 @@ export default function PlayerBonds({
       itemPreview={
         draftBond && (
           <Box>
-            <Typography variant="h4" sx={{ textTransform: "uppercase", fontWeight: "bold" }}>{draftBond.name}</Typography>
-            {[...POSITIVE, ...NEGATIVE].filter((s) => draftBond[s]).map((s) => (
-              <Typography key={s} variant="body2" sx={{ color: POSITIVE.includes(s) ? positiveColor : negativeColor }}>
-                {t(s.charAt(0).toUpperCase() + s.slice(1))}
-              </Typography>
-            ))}
+            <Typography
+              variant="h4"
+              sx={{ textTransform: "uppercase", fontWeight: "bold" }}
+            >
+              {draftBond.name}
+            </Typography>
+            {[...POSITIVE, ...NEGATIVE]
+              .filter((s) => draftBond[s])
+              .map((s) => (
+                <Typography
+                  key={s}
+                  variant="body2"
+                  sx={{
+                    color: POSITIVE.includes(s) ? positiveColor : negativeColor,
+                  }}
+                >
+                  {t(s.charAt(0).toUpperCase() + s.slice(1))}
+                </Typography>
+              ))}
           </Box>
         )
       }
@@ -214,16 +311,32 @@ export default function PlayerBonds({
   if (compact) {
     return (
       <>
-        <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
-          <CompactSectionHeader title={t("Bonds")}>{addButton}</CompactSectionHeader>
-          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", p: "6px" }}>
+        <Paper
+          sx={{ mb: 1, overflow: "hidden" }}
+          elevation={0}
+          variant="outlined"
+        >
+          <CompactSectionHeader title={t("Bonds")}>
+            {addButton}
+          </CompactSectionHeader>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "6px",
+              p: "6px",
+            }}
+          >
             {visibleBonds.map((bond) => (
               <BondCard
                 key={bond.originalIndex}
                 bond={bond}
                 isEditMode={isEditMode}
                 searchQuery={searchQuery}
-                onEdit={() => { setIsCreatingBond(false); setEditBondIndex(bond.originalIndex); }}
+                onEdit={() => {
+                  setIsCreatingBond(false);
+                  setEditBondIndex(bond.originalIndex);
+                }}
                 compact
               />
             ))}
@@ -231,10 +344,18 @@ export default function PlayerBonds({
               <Box
                 onClick={openAddBond}
                 sx={{
-                  border: "2px dashed", borderColor: "divider", borderRadius: "4px",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  minHeight: 56, cursor: "pointer",
-                  "&:hover": { bgcolor: "action.hover", borderColor: theme.palette.primary.main },
+                  border: "2px dashed",
+                  borderColor: "divider",
+                  borderRadius: "4px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: 56,
+                  cursor: "pointer",
+                  "&:hover": {
+                    bgcolor: "action.hover",
+                    borderColor: theme.palette.primary.main,
+                  },
                   transition: "border-color 0.15s ease",
                 }}
               >
@@ -256,13 +377,20 @@ export default function PlayerBonds({
         noShadow={isCharacterSheet}
         actions={addButton}
       >
-        <Grid container spacing={0.75} sx={{ p: 0.75, flex: 1, minWidth: 0, width: "100%" }}>
+        <Grid
+          container
+          spacing={0.75}
+          sx={{ p: 0.75, flex: 1, minWidth: 0, width: "100%" }}
+        >
           {visibleBonds.map((bond) => (
             <Grid key={bond.originalIndex} size={{ xs: 12, sm: 6, md: 4 }}>
               <BondCard
                 bond={bond}
                 isEditMode={isEditMode}
-                onEdit={() => { setIsCreatingBond(false); setEditBondIndex(bond.originalIndex); }}
+                onEdit={() => {
+                  setIsCreatingBond(false);
+                  setEditBondIndex(bond.originalIndex);
+                }}
               />
             </Grid>
           ))}
@@ -271,10 +399,18 @@ export default function PlayerBonds({
               <Card
                 onClick={openAddBond}
                 sx={{
-                  height: "100%", minHeight: 48, px: 1, py: 0.5,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  cursor: "pointer", border: "2px dashed", borderColor: "divider",
-                  bgcolor: "transparent", boxShadow: "none",
+                  height: "100%",
+                  minHeight: 48,
+                  px: 1,
+                  py: 0.5,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  border: "2px dashed",
+                  borderColor: "divider",
+                  bgcolor: "transparent",
+                  boxShadow: "none",
                   "&:hover": { bgcolor: "action.hover" },
                 }}
               >

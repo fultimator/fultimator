@@ -51,7 +51,9 @@ export default function PlayerCompanion({ player, isEditMode }) {
       <Box sx={{ p: "0.7em" }}>
         <NpcActorCard npc={companionWithBonus} collapse={true} />
         {isEditMode && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mt: 1.5 }}>
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 1.5, mt: 1.5 }}
+          >
             <Button
               variant="contained"
               color="primary"
@@ -66,7 +68,9 @@ export default function PlayerCompanion({ player, isEditMode }) {
               {t("View Companion")}
             </Button>
             <Typography variant="caption" color="text.secondary">
-              {t("If you edit the Companion, remember to select it again in the corrisponding class page.")}
+              {t(
+                "If you edit the Companion, remember to select it again in the corrisponding class page.",
+              )}
             </Typography>
           </Box>
         )}

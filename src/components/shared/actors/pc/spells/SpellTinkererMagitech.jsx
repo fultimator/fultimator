@@ -39,11 +39,24 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
           borderTop: `1px solid ${theme.secondary}`,
         }}
       >
-        <Typography style={{ flexGrow: 1, marginRight: "5px" }} sx={{ fontWeight: "bold" }}>
-          {(magitech.spellName || t("Magitech")) + " (" + t(ranks[magitech.rank - 1]) + ")"}
+        <Typography
+          style={{ flexGrow: 1, marginRight: "5px" }}
+          sx={{ fontWeight: "bold" }}
+        >
+          {(magitech.spellName || t("Magitech")) +
+            " (" +
+            t(ranks[magitech.rank - 1]) +
+            ")"}
         </Typography>
         {isEditMode && (
-          <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              flexShrink: 0,
+            }}
+          >
             {!showInPlayerSheet && (
               <Tooltip title={t("Magitech not shown in player sheet")}>
                 <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
@@ -77,7 +90,16 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       )}
       {/* Row 2 Magitech Override */}
       {magitech.rank >= 1 && (
-        <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+        <Accordion
+          disableGutters
+          elevation={0}
+          square
+          sx={{
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            "&:before": { display: "none" },
+          }}
+        >
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
@@ -85,7 +107,15 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("MagitechOverride_desc")}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node: _n, ...props }) => (
+                  <p style={{ margin: 0 }} {...props} />
+                ),
+              }}
+            >
+              {t("MagitechOverride_desc")}
+            </ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}
@@ -111,7 +141,16 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       )}
       {/* Row 2 Magicannon */}
       {magitech.rank >= 2 && (
-        <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+        <Accordion
+          disableGutters
+          elevation={0}
+          square
+          sx={{
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            "&:before": { display: "none" },
+          }}
+        >
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
@@ -119,8 +158,24 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magicannon_desc1")}</ReactMarkdown>
-            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magicannon_desc2")}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node: _n, ...props }) => (
+                  <p style={{ margin: 0 }} {...props} />
+                ),
+              }}
+            >
+              {t("Magicannon_desc1")}
+            </ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node: _n, ...props }) => (
+                  <p style={{ margin: 0 }} {...props} />
+                ),
+              }}
+            >
+              {t("Magicannon_desc2")}
+            </ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}
@@ -146,7 +201,16 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
       )}
       {/* Row 2 Magispheres */}
       {magitech.rank >= 3 && (
-        <Accordion disableGutters elevation={0} square sx={{ borderBottom: "1px solid", borderColor: "divider", "&:before": { display: "none" } }}>
+        <Accordion
+          disableGutters
+          elevation={0}
+          square
+          sx={{
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            "&:before": { display: "none" },
+          }}
+        >
           <AccordionSummary expandIcon={<ExpandMore />}>
             <Icon sx={{ color: theme.primary, marginRight: 1 }}>
               <Info />
@@ -154,9 +218,33 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             <Typography variant="h4">{t("Details")}</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ py: "6px", px: "12px" }}>
-            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magispheres_desc1")}</ReactMarkdown>
-            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magispheres_desc2")}</ReactMarkdown>
-            <ReactMarkdown components={{ p: ({ node: _n, ...props }) => <p style={{ margin: 0 }} {...props} /> }}>{t("Magispheres_desc3")}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node: _n, ...props }) => (
+                  <p style={{ margin: 0 }} {...props} />
+                ),
+              }}
+            >
+              {t("Magispheres_desc1")}
+            </ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node: _n, ...props }) => (
+                  <p style={{ margin: 0 }} {...props} />
+                ),
+              }}
+            >
+              {t("Magispheres_desc2")}
+            </ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node: _n, ...props }) => (
+                  <p style={{ margin: 0 }} {...props} />
+                ),
+              }}
+            >
+              {t("Magispheres_desc3")}
+            </ReactMarkdown>
           </AccordionDetails>
         </Accordion>
       )}

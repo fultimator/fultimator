@@ -24,14 +24,18 @@ export const SAMPLE_NPC = {
       range: "melee",
       accuracy: { attr1: "might", attr2: "might", value: 0 },
       damage: { value: 10, type: "physical", hrZero: false },
-      special: ["Interdum phasellus proin facilisis amet placerat suspendisse ipsum nulla varius urna vivamus ut quam facilisis varius ex et proin **placerat** ipsum **maximus** quisque sit lorem."],
+      special: [
+        "Interdum phasellus proin facilisis amet placerat suspendisse ipsum nulla varius urna vivamus ut quam facilisis varius ex et proin **placerat** ipsum **maximus** quisque sit lorem.",
+      ],
     },
     {
       name: "Camera Flash",
       range: "melee",
       accuracy: { attr1: "might", attr2: "dexterity", value: 0 },
       damage: { value: 5, type: "physical", hrZero: false },
-      special: ["Interdum phasellus proin facilisis amet placerat suspendisse ipsum nulla varius urna vivamus ut quam facilisis varius ex et proin **placerat** ipsum **maximus** quisque sit lorem."],
+      special: [
+        "Interdum phasellus proin facilisis amet placerat suspendisse ipsum nulla varius urna vivamus ut quam facilisis varius ex et proin **placerat** ipsum **maximus** quisque sit lorem.",
+      ],
     },
   ],
   spells: [],

@@ -1,7 +1,10 @@
 import type { ItemFieldConfig } from "../../fieldConfig";
 import type { PlayerSpellFormState } from "./types";
 import { isWellspring } from "./predicates";
-import { AFFINITY_ICON_OPTIONS, affinityIconSrc } from "/src/libs/player/wellsprings";
+import {
+  AFFINITY_ICON_OPTIONS,
+  affinityIconSrc,
+} from "/src/libs/player/wellsprings";
 
 const ICON_OPTIONS = AFFINITY_ICON_OPTIONS.map((o) => ({
   value: o.value,

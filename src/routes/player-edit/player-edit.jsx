@@ -45,7 +45,10 @@ import {
   Alert,
 } from "@mui/material";
 import Layout from "../../components/Layout";
-import { PlayerSheetFull, PlayerSheetCompact } from "../../components/shared/actors";
+import {
+  PlayerSheetFull,
+  PlayerSheetCompact,
+} from "../../components/shared/actors";
 import InformationTab from "../../components/shared/actors/pc/tabs/InformationTab";
 import StatsTab from "../../components/shared/actors/pc/tabs/StatsTab";
 import ClassesTab from "../../components/shared/actors/pc/tabs/ClassesTab";
@@ -84,7 +87,13 @@ import {
   NotesIcon2 as NotesIcon,
 } from "../../components/icons";
 
-import { fixVerticalLabels, expandCompactHeaderForExport, expandAccordionsForExport, applyPrintModeToClone, hideEditControlsInClone } from "../../utility/screenshotFix";
+import {
+  fixVerticalLabels,
+  expandCompactHeaderForExport,
+  expandAccordionsForExport,
+  applyPrintModeToClone,
+  hideEditControlsInClone,
+} from "../../utility/screenshotFix";
 import usePrintPDF, { buildAppPDF } from "../../hooks/usePrintPDF";
 import ExportDialog from "../../components/shared/actors/pc/export/ExportDialog";
 import {
@@ -312,16 +321,28 @@ export default function PlayerEdit() {
     const promises = [];
     images.forEach((image) => {
       if (!image.complete) {
-        promises.push(new Promise((resolve) => { image.onload = resolve; }));
+        promises.push(
+          new Promise((resolve) => {
+            image.onload = resolve;
+          }),
+        );
       }
     });
     Promise.all(promises).then(() => setImagesLoaded(true));
-    return () => { images.forEach((image) => { image.onload = null; }); };
+    return () => {
+      images.forEach((image) => {
+        image.onload = null;
+      });
+    };
   }, [playerTemp]);
 
   const captureCanvas = async (settings = {}) => {
     if (!imagesLoaded) return null;
-    const { theme: themeOption = "current", scale = 2, printMode = false } = settings;
+    const {
+      theme: themeOption = "current",
+      scale = 2,
+      printMode = false,
+    } = settings;
     const elementId = compactView ? "character-sheet-short" : "character-sheet";
     const element = document.getElementById(elementId);
     if (!element) return null;
@@ -335,7 +356,10 @@ export default function PlayerEdit() {
     } else if (themeOption === "dark") {
       bgColor = "#121212";
     } else {
-      bgColor = theme.palette.mode === "dark" ? theme.palette.background.default : "#ffffff";
+      bgColor =
+        theme.palette.mode === "dark"
+          ? theme.palette.background.default
+          : "#ffffff";
     }
     try {
       element.style.width = captureWidth;
@@ -386,8 +410,12 @@ export default function PlayerEdit() {
       if (settings.format === "pdf") {
         await printPDF(playerTemp);
       } else if (settings.format === "app-pdf") {
-        const expandClassBtn = document.querySelector("[data-expand-all-classes='collapsed']");
-        const expandMnemoBtn = document.querySelector("[data-expand-all-mnemo='collapsed']");
+        const expandClassBtn = document.querySelector(
+          "[data-expand-all-classes='collapsed']",
+        );
+        const expandMnemoBtn = document.querySelector(
+          "[data-expand-all-mnemo='collapsed']",
+        );
         if (expandClassBtn) expandClassBtn.click();
         if (expandMnemoBtn) expandMnemoBtn.click();
         if (expandClassBtn || expandMnemoBtn) {
@@ -395,12 +423,20 @@ export default function PlayerEdit() {
         }
         const result = await captureCanvas({ ...settings, scale: 1 });
         if (result) {
-          await buildAppPDF(result.canvas, result.element, result.scale, `${playerTemp.name ?? "character"}_sheet.pdf`);
+          await buildAppPDF(
+            result.canvas,
+            result.element,
+            result.scale,
+            `${playerTemp.name ?? "character"}_sheet.pdf`,
+          );
         }
       } else {
         const result = await captureCanvas(settings);
         if (result) {
-          await download(result.canvas.toDataURL("image/png"), `${playerTemp.name ?? "character"}_sheet.png`);
+          await download(
+            result.canvas.toDataURL("image/png"),
+            `${playerTemp.name ?? "character"}_sheet.png`,
+          );
         }
       }
       setExportDialogOpen(false);

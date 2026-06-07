@@ -10,17 +10,29 @@ import { highlightMarkdownText } from "/src/components/shared/actors/pc/variants
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 
-function NoteClockCard({ clock, clockIndex, noteOriginalIndex, setPlayer, searchQuery, compact, primary }) {
+function NoteClockCard({
+  clock,
+  clockIndex,
+  noteOriginalIndex,
+  setPlayer,
+  searchQuery,
+  compact,
+  primary,
+}) {
   const theme = { primary };
   const persistState = (newState) => {
     if (!setPlayer) return;
     setPlayer((prev) => ({
       ...prev,
       notes: prev.notes.map((note, ni) =>
-        ni !== noteOriginalIndex ? note : {
-          ...note,
-          clocks: note.clocks.map((c, ci) => ci !== clockIndex ? c : { ...c, state: newState }),
-        },
+        ni !== noteOriginalIndex
+          ? note
+          : {
+              ...note,
+              clocks: note.clocks.map((c, ci) =>
+                ci !== clockIndex ? c : { ...c, state: newState },
+              ),
+            },
       ),
     }));
   };
@@ -34,7 +46,11 @@ function NoteClockCard({ clock, clockIndex, noteOriginalIndex, setPlayer, search
       compact={compact}
       label={
         <Typography
-          sx={{ fontWeight: "bold", fontSize: compact ? "0.85rem" : "0.9rem", lineHeight: 1.3 }}
+          sx={{
+            fontWeight: "bold",
+            fontSize: compact ? "0.85rem" : "0.9rem",
+            lineHeight: 1.3,
+          }}
           noWrap
         >
           {highlightMatch(clock.name, searchQuery)}
@@ -63,13 +79,20 @@ export default function NoteCard({
 
   const handleSendToChat = (e) => {
     e.stopPropagation();
-    sendDisplayMessage("note", note.name, { description: note.description ?? "", speaker });
+    sendDisplayMessage("note", note.name, {
+      description: note.description ?? "",
+      speaker,
+    });
   };
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const visibleClocks = (note.clocks || [])
     .map((clock, originalIdx) => ({ clock, originalIdx }))
-    .filter(({ clock }) => !normalizedQuery || clock?.name?.toLowerCase().includes(normalizedQuery));
+    .filter(
+      ({ clock }) =>
+        !normalizedQuery ||
+        clock?.name?.toLowerCase().includes(normalizedQuery),
+    );
 
   const clockGridCols = compact
     ? "1fr"
@@ -95,16 +118,33 @@ export default function NoteCard({
     </>
   );
 
-  const body = hasDescription && isOpen ? (
-    <Box sx={{ px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.03)", borderTop: "1px solid", borderColor: "divider" }}>
-      <NotesMarkdown uniform fontSize="1rem">
-        {highlightMarkdownText(note.description, searchQuery)}
-      </NotesMarkdown>
-    </Box>
-  ) : null;
+  const body =
+    hasDescription && isOpen ? (
+      <Box
+        sx={{
+          px: 1.5,
+          py: 0.75,
+          bgcolor: "rgba(0,0,0,0.03)",
+          borderTop: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <NotesMarkdown uniform fontSize="1rem">
+          {highlightMarkdownText(note.description, searchQuery)}
+        </NotesMarkdown>
+      </Box>
+    ) : null;
 
   const clocks = hasClocks ? (
-    <Box sx={{ display: "grid", gridTemplateColumns: clockGridCols, gap: "4px", mt: "4px", mb: compact ? 0 : 1.5 }}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: clockGridCols,
+        gap: "4px",
+        mt: "4px",
+        mb: compact ? 0 : 1.5,
+      }}
+    >
       {visibleClocks.map(({ clock, originalIdx }) => (
         <NoteClockCard
           key={`clock-${noteIndex}-${originalIdx}`}
@@ -128,7 +168,16 @@ export default function NoteCard({
           onCardClick={hasDescription ? onToggle : undefined}
           variant="outlined"
           label={
-            <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Antonio",
+                fontWeight: 800,
+                fontSize: "0.9rem",
+                textTransform: "uppercase",
+                lineHeight: 1.3,
+              }}
+            >
               {highlightMatch(note.name, searchQuery)}
             </Typography>
           }
@@ -148,7 +197,16 @@ export default function NoteCard({
         elevation={3}
         paperSx={{ mb: 1.5, borderRadius: "8px" }}
         label={
-          <Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: { xs: "1.0rem", sm: "1.1rem" }, textTransform: "uppercase", lineHeight: 1.3 }}>
+          <Typography
+            noWrap
+            sx={{
+              fontFamily: "Antonio",
+              fontWeight: 800,
+              fontSize: { xs: "1.0rem", sm: "1.1rem" },
+              textTransform: "uppercase",
+              lineHeight: 1.3,
+            }}
+          >
             {highlightMatch(note.name, searchQuery)}
           </Typography>
         }

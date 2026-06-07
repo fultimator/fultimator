@@ -10,12 +10,10 @@ import type {
 function addToChat(message: ChatMessage) {
   const encId = useEncounterChatStore.getState().encounterId;
   if (encId) {
-    useEncounterChatStore
-      .getState()
-      .addMessage({
-        ...message,
-        channelId: `encounter:${encId}`,
-      } as ChatMessage);
+    useEncounterChatStore.getState().addMessage({
+      ...message,
+      channelId: `encounter:${encId}`,
+    } as ChatMessage);
   } else {
     const channelId = useChatChannelStore.getState().activeChannelId;
     useChatMessagesStore
@@ -52,7 +50,11 @@ export function sendDisplayMessage(
     description?: string;
     effect?: string;
     speaker?: string;
-    cost?: { resource: "hp" | "mp" | "ip" | "fp" | "up"; amount: number; perTarget?: boolean };
+    cost?: {
+      resource: "hp" | "mp" | "ip" | "fp" | "up";
+      amount: number;
+      perTarget?: boolean;
+    };
   } = {},
 ) {
   const msg: DisplayMessage = {

@@ -288,17 +288,29 @@ export default function EditActions({ npc, setNpc }) {
       actions={
         <>
           <Tooltip title={t("Search Compendium")}>
-            <IconButton size="small" onClick={() => setModalOpen(true)} sx={{ color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={() => setModalOpen(true)}
+              sx={{ color: "#fff" }}
+            >
               <Search fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={allExpanded ? t("Collapse All") : t("Expand All")}>
             <IconButton size="small" onClick={toggleAll} sx={{ color: "#fff" }}>
-              {allExpanded ? <UnfoldLess fontSize="small" /> : <UnfoldMore fontSize="small" />}
+              {allExpanded ? (
+                <UnfoldLess fontSize="small" />
+              ) : (
+                <UnfoldMore fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
           <Tooltip title={t("Add Action")}>
-            <IconButton size="small" onClick={addActions} sx={{ color: "#fff" }}>
+            <IconButton
+              size="small"
+              onClick={addActions}
+              sx={{ color: "#fff" }}
+            >
               <Add fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -306,78 +318,78 @@ export default function EditActions({ npc, setNpc }) {
       }
     >
       <Box sx={{ p: 1 }}>
-      <Grid container spacing={1}>
-        {npc.actions?.map((action, i) => {
-          return (
-            <Grid key={i} size={12}>
-              <ItemRowCard
-                label={action.name || t("(unnamed)")}
-                subtitle={
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "text.secondary", whiteSpace: "nowrap" }}
-                  >
-                    SP: {action.spCost ?? 1}
-                  </Typography>
-                }
-                actions={
-                  <>
-                    <IconButton
-                      component="span"
-                      onClick={() =>
-                        addMessage({
-                          id: crypto.randomUUID(),
-                          createdAt: Date.now(),
-                          speaker: npc.name || "NPC",
-                          kind: "display",
-                          itemType: "action",
-                          name: action.name,
-                          tags: [`SP: ${action.spCost ?? 1}`],
-                          description: action.effect,
-                        })
-                      }
+        <Grid container spacing={1}>
+          {npc.actions?.map((action, i) => {
+            return (
+              <Grid key={i} size={12}>
+                <ItemRowCard
+                  label={action.name || t("(unnamed)")}
+                  subtitle={
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary", whiteSpace: "nowrap" }}
                     >
-                      <Casino />
-                    </IconButton>
-                    <ActionContextMenu
-                      action={action}
-                      npcName={npc.name}
-                      onDelete={() => openDeleteDialog(i)}
-                      onMoveUp={() => moveAction(i, i - 1)}
-                      onMoveDown={() => moveAction(i, i + 1)}
-                      showMoveUp={i > 0}
-                      showMoveDown={i < (npc.actions?.length ?? 0) - 1}
-                    />
-                  </>
-                }
-                onClick={() => toggleExpanded(i)}
-                paperSx={{ mb: 0.5 }}
-              >
-                {expandedSet.has(i) && (
-                  <Box sx={{ p: 1 }}>
-                    <TabbedSchemaFormRenderer
-                      tabs={npcActionTabs}
-                      config={npcActionFieldConfig}
-                      groupLabels={npcActionGroupLabels}
-                      state={action}
-                      onChange={(next) => {
-                        setNpc((prev) => {
-                          const actions = [...(prev.actions || [])];
-                          actions[i] = next;
-                          return { ...prev, actions };
-                        });
-                      }}
-                      surface="edit"
-                      cols={2}
-                      extraProps={{ name: String(action.name ?? "") }}
-                    />
-                  </Box>
-                )}
-              </ItemRowCard>
-            </Grid>
-          );
-        })}
-      </Grid>
+                      SP: {action.spCost ?? 1}
+                    </Typography>
+                  }
+                  actions={
+                    <>
+                      <IconButton
+                        component="span"
+                        onClick={() =>
+                          addMessage({
+                            id: crypto.randomUUID(),
+                            createdAt: Date.now(),
+                            speaker: npc.name || "NPC",
+                            kind: "display",
+                            itemType: "action",
+                            name: action.name,
+                            tags: [`SP: ${action.spCost ?? 1}`],
+                            description: action.effect,
+                          })
+                        }
+                      >
+                        <Casino />
+                      </IconButton>
+                      <ActionContextMenu
+                        action={action}
+                        npcName={npc.name}
+                        onDelete={() => openDeleteDialog(i)}
+                        onMoveUp={() => moveAction(i, i - 1)}
+                        onMoveDown={() => moveAction(i, i + 1)}
+                        showMoveUp={i > 0}
+                        showMoveDown={i < (npc.actions?.length ?? 0) - 1}
+                      />
+                    </>
+                  }
+                  onClick={() => toggleExpanded(i)}
+                  paperSx={{ mb: 0.5 }}
+                >
+                  {expandedSet.has(i) && (
+                    <Box sx={{ p: 1 }}>
+                      <TabbedSchemaFormRenderer
+                        tabs={npcActionTabs}
+                        config={npcActionFieldConfig}
+                        groupLabels={npcActionGroupLabels}
+                        state={action}
+                        onChange={(next) => {
+                          setNpc((prev) => {
+                            const actions = [...(prev.actions || [])];
+                            actions[i] = next;
+                            return { ...prev, actions };
+                          });
+                        }}
+                        surface="edit"
+                        cols={2}
+                        extraProps={{ name: String(action.name ?? "") }}
+                      />
+                    </Box>
+                  )}
+                </ItemRowCard>
+              </Grid>
+            );
+          })}
+        </Grid>
       </Box>
       <CompendiumViewerModal
         open={modalOpen}

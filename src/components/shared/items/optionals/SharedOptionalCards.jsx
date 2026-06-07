@@ -13,7 +13,10 @@ import {
   isImageMode,
 } from "/src/components/shared/items/core-utils";
 import { StyledMarkdown, md } from "/src/components/shared/items/markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
+import {
+  CardContentWrapper,
+  RowsWithOptionalImage,
+} from "/src/components/shared/items/core";
 
 function dataRowSx(customTheme, background, extraSx = {}) {
   return {
@@ -720,62 +723,65 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
     >
       <RowsWithOptionalImage
         header={
-          showHeader && (
-            isCampActivities && hasClockSections ? (
-              <Grid
-                container
-                onClick={onHeaderClick}
-                sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
-              >
-                <Grid size={6}>
-                  <Typography>{subtypeLabel}</Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>{t("Target")}</Typography>
-                </Grid>
-                <Grid size={3}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Clock Sections")}
-                  </Typography>
-                </Grid>
-              </Grid>
-            ) : isCampActivities ? (
-              <Grid
-                container
-                onClick={onHeaderClick}
-                sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
-              >
-                <Grid size={8}>
-                  <Typography>{subtypeLabel}</Typography>
-                </Grid>
-                <Grid size={4}>
-                  <Typography sx={{ textAlign: "center" }}>{t("Target")}</Typography>
-                </Grid>
-              </Grid>
-            ) : hasClockSections ? (
-              <Grid
-                container
-                onClick={onHeaderClick}
-                sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
-              >
-                <Grid size={8}>
-                  <Typography>{subtypeLabel}</Typography>
-                </Grid>
-                <Grid size={4}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {t("Clock Sections")}
-                  </Typography>
-                </Grid>
-              </Grid>
-            ) : (
-              <Box
-                onClick={onHeaderClick}
-                sx={headerBoxSx(customTheme, scale, onHeaderClick)}
-              >
+          showHeader &&
+          (isCampActivities && hasClockSections ? (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid size={6}>
                 <Typography>{subtypeLabel}</Typography>
-              </Box>
-            )
-          )
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Target")}
+                </Typography>
+              </Grid>
+              <Grid size={3}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Clock Sections")}
+                </Typography>
+              </Grid>
+            </Grid>
+          ) : isCampActivities ? (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid size={8}>
+                <Typography>{subtypeLabel}</Typography>
+              </Grid>
+              <Grid size={4}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Target")}
+                </Typography>
+              </Grid>
+            </Grid>
+          ) : hasClockSections ? (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerGridSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid size={8}>
+                <Typography>{subtypeLabel}</Typography>
+              </Grid>
+              <Grid size={4}>
+                <Typography sx={{ textAlign: "center" }}>
+                  {t("Clock Sections")}
+                </Typography>
+              </Grid>
+            </Grid>
+          ) : (
+            <Box
+              onClick={onHeaderClick}
+              sx={headerBoxSx(customTheme, scale, onHeaderClick)}
+            >
+              <Typography>{subtypeLabel}</Typography>
+            </Box>
+          ))
         }
         imageMode={imageMode}
         imageSize={imageSize}
@@ -792,7 +798,11 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
             </Grid>
             <Grid size={3}>
               <Typography
-                sx={{ textAlign: "center", fontSize: scale.body, fontWeight: "bold" }}
+                sx={{
+                  textAlign: "center",
+                  fontSize: scale.body,
+                  fontWeight: "bold",
+                }}
               >
                 {campTargetValue}
               </Typography>
@@ -818,7 +828,11 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
             </Grid>
             <Grid size={4}>
               <Typography
-                sx={{ textAlign: "center", fontSize: scale.body, fontWeight: "bold" }}
+                sx={{
+                  textAlign: "center",
+                  fontSize: scale.body,
+                  fontWeight: "bold",
+                }}
               >
                 {campTargetValue}
               </Typography>
@@ -861,19 +875,37 @@ export const SharedOptionalCard = React.memo(function SharedOptionalCard({
                   borderBottom: `1px solid ${customTheme.secondary}`,
                 }}
               >
-                <Typography variant="body2" component="div" sx={{ color: "text.secondary" }}>
+                <Typography
+                  variant="body2"
+                  component="div"
+                  sx={{ color: "text.secondary" }}
+                >
                   <StyledMarkdown
-                    allowedElements={["strong", "em", "p", "ul", "ol", "li", "br"]}
+                    allowedElements={[
+                      "strong",
+                      "em",
+                      "p",
+                      "ul",
+                      "ol",
+                      "li",
+                      "br",
+                    ]}
                     unwrapDisallowed
                     components={{
                       p: ({ node: _node, ...props }) => (
                         <p style={{ margin: 0 }} {...props} />
                       ),
                       ul: ({ node: _node, ...props }) => (
-                        <ul style={{ margin: 0, paddingLeft: "1.25em" }} {...props} />
+                        <ul
+                          style={{ margin: 0, paddingLeft: "1.25em" }}
+                          {...props}
+                        />
                       ),
                       ol: ({ node: _node, ...props }) => (
-                        <ol style={{ margin: 0, paddingLeft: "1.25em" }} {...props} />
+                        <ol
+                          style={{ margin: 0, paddingLeft: "1.25em" }}
+                          {...props}
+                        />
                       ),
                     }}
                   >

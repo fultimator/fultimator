@@ -11,7 +11,16 @@ import { highlightMatch } from "/src/components/shared/actors/pc/variants/compac
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { SharedZeroPowerCard } from "/src/components/shared/items";
 
-export default function PlayerZeroPower({ player, setPlayer, isEditMode = false, onEdit, speaker = "", compact = false, searchQuery = "", headerActions }) {
+export default function PlayerZeroPower({
+  player,
+  setPlayer,
+  isEditMode = false,
+  onEdit,
+  speaker = "",
+  compact = false,
+  searchQuery = "",
+  headerActions,
+}) {
   const { t } = useTranslate();
   const muiTheme = useTheme();
   const primary = muiTheme.palette.primary.main;
@@ -23,32 +32,48 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode = false,
 
   const persistState = (newState) => {
     if (!setPlayer) return;
-    setPlayer((prev) => ({ ...prev, zeroPower: { ...prev.zeroPower, clockState: newState } }));
+    setPlayer((prev) => ({
+      ...prev,
+      zeroPower: { ...prev.zeroPower, clockState: newState },
+    }));
   };
 
   if (!zeroPower?.name) return null;
 
-  const triggerName = typeof zeroPower.zeroTrigger === "string" ? zeroPower.zeroTrigger : (zeroPower.zeroTrigger?.name ?? "");
-  const triggerDesc = typeof zeroPower.zeroTrigger === "object" ? (zeroPower.zeroTrigger?.description ?? "") : "";
-  const effectName = typeof zeroPower.zeroEffect === "string" ? zeroPower.zeroEffect : (zeroPower.zeroEffect?.name ?? "");
-  const effectDesc = typeof zeroPower.zeroEffect === "object" ? (zeroPower.zeroEffect?.description ?? "") : "";
+  const triggerName =
+    typeof zeroPower.zeroTrigger === "string"
+      ? zeroPower.zeroTrigger
+      : (zeroPower.zeroTrigger?.name ?? "");
+  const triggerDesc =
+    typeof zeroPower.zeroTrigger === "object"
+      ? (zeroPower.zeroTrigger?.description ?? "")
+      : "";
+  const effectName =
+    typeof zeroPower.zeroEffect === "string"
+      ? zeroPower.zeroEffect
+      : (zeroPower.zeroEffect?.name ?? "");
+  const effectDesc =
+    typeof zeroPower.zeroEffect === "object"
+      ? (zeroPower.zeroEffect?.description ?? "")
+      : "";
 
   const hasDetails = !!(triggerName || triggerDesc || effectName || effectDesc);
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
-  const forceOpen = !!normalizedQuery && (
-    triggerName?.toLowerCase().includes(normalizedQuery) ||
-    triggerDesc?.toLowerCase().includes(normalizedQuery) ||
-    effectName?.toLowerCase().includes(normalizedQuery) ||
-    effectDesc?.toLowerCase().includes(normalizedQuery)
-  );
+  const forceOpen =
+    !!normalizedQuery &&
+    (triggerName?.toLowerCase().includes(normalizedQuery) ||
+      triggerDesc?.toLowerCase().includes(normalizedQuery) ||
+      effectName?.toLowerCase().includes(normalizedQuery) ||
+      effectDesc?.toLowerCase().includes(normalizedQuery));
   const open = isOpen || forceOpen;
 
   const handleSendToChat = (e) => {
     e.stopPropagation();
     sendDisplayMessage("zeroPower", zeroPower.name, {
-      description: [triggerName, triggerDesc].filter(Boolean).join(" — ") || undefined,
-      effect: [effectName, effectDesc].filter(Boolean).join(" — ") || undefined,
+      description:
+        [triggerName, triggerDesc].filter(Boolean).join(" - ") || undefined,
+      effect: [effectName, effectDesc].filter(Boolean).join(" - ") || undefined,
       speaker,
     });
   };
@@ -56,26 +81,59 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode = false,
   const actions = (
     <>
       <Tooltip title={t("Send to chat")} arrow>
-        <IconButton size="small" onClick={handleSendToChat}><ChatOutlined /></IconButton>
+        <IconButton size="small" onClick={handleSendToChat}>
+          <ChatOutlined />
+        </IconButton>
       </Tooltip>
       {isEditMode && (
         <Tooltip title={t("Edit")} arrow>
-          <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit?.(); }}><Edit /></IconButton>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit?.();
+            }}
+          >
+            <Edit />
+          </IconButton>
         </Tooltip>
       )}
     </>
   );
 
   const body = open ? (
-    <Box sx={{ px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.03)", borderTop: "1px solid", borderColor: "divider" }}>
-      <SharedZeroPowerCard item={{ ...zeroPower, clock: zeroPower.clock?.sections || 6 }} />
+    <Box
+      sx={{
+        px: 1.5,
+        py: 0.75,
+        bgcolor: "rgba(0,0,0,0.03)",
+        borderTop: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <SharedZeroPowerCard
+        item={{ ...zeroPower, clock: zeroPower.clock?.sections || 6 }}
+      />
     </Box>
   ) : null;
 
   const clock = (
     <ClockControls
-      sections={sections} state={clockState} setState={persistState}
-      label={<Typography sx={{ fontWeight: "bold", fontSize: compact ? "0.85rem" : "0.9rem", lineHeight: 1.3 }} noWrap>{t("Clock")}</Typography>}
+      sections={sections}
+      state={clockState}
+      setState={persistState}
+      label={
+        <Typography
+          sx={{
+            fontWeight: "bold",
+            fontSize: compact ? "0.85rem" : "0.9rem",
+            lineHeight: 1.3,
+          }}
+          noWrap
+        >
+          {t("Clock")}
+        </Typography>
+      }
       clockSize={compact ? 36 : 60}
       compact={compact}
       theme={{ primary }}
@@ -83,7 +141,8 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode = false,
   );
 
   if (compact) {
-    const matches = !normalizedQuery ||
+    const matches =
+      !normalizedQuery ||
       zeroPower.name?.toLowerCase().includes(normalizedQuery) ||
       triggerName?.toLowerCase().includes(normalizedQuery) ||
       triggerDesc?.toLowerCase().includes(normalizedQuery) ||
@@ -92,11 +151,40 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode = false,
     if (!matches) return null;
 
     return (
-      <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
-        <CompactSectionHeader title={t("Zero Power")}>{headerActions}</CompactSectionHeader>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: "4px" }}>
-          <ItemRowCard compact onCardClick={hasDetails ? () => setIsOpen((v) => !v) : undefined} variant="outlined"
-            label={<Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", lineHeight: 1.3 }}>{highlightMatch(zeroPower.name, searchQuery)}</Typography>}
+      <Paper
+        sx={{ mb: 1, overflow: "hidden" }}
+        elevation={0}
+        variant="outlined"
+      >
+        <CompactSectionHeader title={t("Zero Power")}>
+          {headerActions}
+        </CompactSectionHeader>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px",
+            p: "4px",
+          }}
+        >
+          <ItemRowCard
+            compact
+            onCardClick={hasDetails ? () => setIsOpen((v) => !v) : undefined}
+            variant="outlined"
+            label={
+              <Typography
+                noWrap
+                sx={{
+                  fontFamily: "Antonio",
+                  fontWeight: 800,
+                  fontSize: "0.9rem",
+                  textTransform: "uppercase",
+                  lineHeight: 1.3,
+                }}
+              >
+                {highlightMatch(zeroPower.name, searchQuery)}
+              </Typography>
+            }
             actions={actions}
           >
             {body}
@@ -108,10 +196,31 @@ export default function PlayerZeroPower({ player, setPlayer, isEditMode = false,
   }
 
   return (
-    <SectionCard title={t("Zero Power")} noShadow sx={{ mb: 1 }} actions={headerActions}>
+    <SectionCard
+      title={t("Zero Power")}
+      noShadow
+      sx={{ mb: 1 }}
+      actions={headerActions}
+    >
       <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
-        <ItemRowCard onCardClick={hasDetails ? () => setIsOpen((v) => !v) : undefined} elevation={3} paperSx={{ borderRadius: "8px" }}
-          label={<Typography noWrap sx={{ fontFamily: "Antonio", fontWeight: 800, fontSize: { xs: "1.0rem", sm: "1.1rem" }, textTransform: "uppercase", lineHeight: 1.3 }}>{zeroPower.name}</Typography>}
+        <ItemRowCard
+          onCardClick={hasDetails ? () => setIsOpen((v) => !v) : undefined}
+          elevation={3}
+          paperSx={{ borderRadius: "8px" }}
+          label={
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Antonio",
+                fontWeight: 800,
+                fontSize: { xs: "1.0rem", sm: "1.1rem" },
+                textTransform: "uppercase",
+                lineHeight: 1.3,
+              }}
+            >
+              {zeroPower.name}
+            </Typography>
+          }
           actions={actions}
         >
           {body}

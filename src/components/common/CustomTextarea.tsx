@@ -179,8 +179,22 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
           minRows={effectiveMinRows}
           maxRows={maxRows}
           slotProps={{
-            htmlInput: { maxLength, tabIndex: showPreview ? -1 : 0, style: inputHideStyle, readOnly },
-            inputLabel: readOnly ? { style: { color: theme.mode === "dark" ? "rgba(255,255,255,0.4)" : "rgba(36,52,70,0.45)" } } : undefined,
+            htmlInput: {
+              maxLength,
+              tabIndex: showPreview ? -1 : 0,
+              style: inputHideStyle,
+              readOnly,
+            },
+            inputLabel: readOnly
+              ? {
+                  style: {
+                    color:
+                      theme.mode === "dark"
+                        ? "rgba(255,255,255,0.4)"
+                        : "rgba(36,52,70,0.45)",
+                  },
+                }
+              : undefined,
           }}
           placeholder={placeholder}
           helperText={helperText}

@@ -10,7 +10,8 @@ function normalizeAttrKey(raw) {
   if (key === "dex" || key === "dexterity") return "dexterity";
   if (key === "ins" || key === "insight") return "insight";
   if (key === "mig" || key === "might") return "might";
-  if (key === "wlp" || key === "will" || key === "willpower") return "willpower";
+  if (key === "wlp" || key === "will" || key === "willpower")
+    return "willpower";
   return "dexterity";
 }
 
@@ -26,7 +27,14 @@ export default function ItemStatSubtitle({ item }) {
     const dmgVal = damage.value ?? 0;
     const dmgType = damage.type ?? "physical";
     return (
-      <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.3, fontWeight: "bold" }}>
+      <Typography
+        sx={{
+          fontSize: "0.9rem",
+          color: "text.secondary",
+          lineHeight: 1.3,
+          fontWeight: "bold",
+        }}
+      >
         <OpenBracket />
         {`${attributes[attr1]?.shortcaps ?? "DEX"}+${attributes[attr2]?.shortcaps ?? "MIG"}`}
         <CloseBracket />
@@ -36,8 +44,7 @@ export default function ItemStatSubtitle({ item }) {
         {t("HR")}
         {dmgVal >= 0 ? "+" : ""}
         {dmgVal}
-        <CloseBracket />{" "}
-        {types[dmgType]?.long ?? types.physical.long}
+        <CloseBracket /> {types[dmgType]?.long ?? types.physical.long}
       </Typography>
     );
   }
@@ -52,7 +59,14 @@ export default function ItemStatSubtitle({ item }) {
         : `${t("DEX die")} +${def}`;
     const mdefStr = mdef === 0 ? t("INS die") : `${t("INS die")} +${mdef}`;
     return (
-      <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.3, fontWeight: "bold" }}>
+      <Typography
+        sx={{
+          fontSize: "0.9rem",
+          color: "text.secondary",
+          lineHeight: 1.3,
+          fontWeight: "bold",
+        }}
+      >
         {t("DEF")} {defStr}
         {" - "}
         {t("M.DEF")} {mdefStr}
@@ -64,7 +78,14 @@ export default function ItemStatSubtitle({ item }) {
     const def = (item.def || 0) + (item.defModifier || 0);
     const mdef = (item.mdef || 0) + (item.mDefModifier || 0);
     return (
-      <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.3, fontWeight: "bold" }}>
+      <Typography
+        sx={{
+          fontSize: "0.9rem",
+          color: "text.secondary",
+          lineHeight: 1.3,
+          fontWeight: "bold",
+        }}
+      >
         {t("DEF")} +{def}
         {" - "}
         {t("M.DEF")} +{mdef}
@@ -74,7 +95,14 @@ export default function ItemStatSubtitle({ item }) {
 
   if (item.equipType === "accessory") {
     return (
-      <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.3, fontWeight: "bold" }}>
+      <Typography
+        sx={{
+          fontSize: "0.9rem",
+          color: "text.secondary",
+          lineHeight: 1.3,
+          fontWeight: "bold",
+        }}
+      >
         {item.cost}z
       </Typography>
     );

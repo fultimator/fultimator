@@ -20,8 +20,28 @@ import {
   resolveEquipmentSlots,
 } from "../app-drawer/panels/chat/domain/speakers";
 
-const NPC_ACTIONS = ["attack", "guard", "hinder", "objective", "spell", "skill", "study", "other"];
-const PC_ACTIONS = ["attack", "equipment", "guard", "hinder", "inventory", "objective", "spell", "skill", "study", "other"];
+const NPC_ACTIONS = [
+  "attack",
+  "guard",
+  "hinder",
+  "objective",
+  "spell",
+  "skill",
+  "study",
+  "other",
+];
+const PC_ACTIONS = [
+  "attack",
+  "equipment",
+  "guard",
+  "hinder",
+  "inventory",
+  "objective",
+  "spell",
+  "skill",
+  "study",
+  "other",
+];
 
 const ACTION_ICONS = {
   attack: "/assets/icons/actions/action_c_attack.png",
@@ -37,7 +57,6 @@ const ACTION_ICONS = {
 
 const ATTRS = ["dex", "ins", "mig", "wlp"];
 
-
 /**
  * ActorActionBar - standalone action bar used in SelectedActors list,
  * NPC StatsTab, and PC StatsTab.
@@ -47,7 +66,12 @@ const ATTRS = ["dex", "ins", "mig", "wlp"];
  *   isNpc       - boolean, true for NPC, false for PC
  *   applyCommand - function(command: string) called when an action is confirmed
  */
-export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand = false }) {
+export default function ActorActionBar({
+  actorDoc,
+  isNpc,
+  applyCommand,
+  expand = false,
+}) {
   const actionBarRef = useRef(null);
   const menuCloseTimer = useRef(null);
   const menuOpenTimer = useRef(null);
@@ -55,7 +79,11 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
 
   const [activeActionKey, setActiveActionKey] = useState(null);
   const [openUpward, setOpenUpward] = useState(false);
-  const [menuAnchorPos, setMenuAnchorPos] = useState({ top: 0, bottom: 0, left: 0 });
+  const [menuAnchorPos, setMenuAnchorPos] = useState({
+    top: 0,
+    bottom: 0,
+    left: 0,
+  });
 
   const [customizerTarget, setCustomizerTarget] = useState(null);
   const [customizerDraft, setCustomizerDraft] = useState(null);
@@ -63,12 +91,22 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
   const [spellCustomizerDraft, setSpellCustomizerDraft] = useState(null);
 
   const [studyDialogOpen, setStudyDialogOpen] = useState(false);
-  const [studyDraft, setStudyDraft] = useState({ attr1: "ins", attr2: "ins", modifier: 0 });
+  const [studyDraft, setStudyDraft] = useState({
+    attr1: "ins",
+    attr2: "ins",
+    modifier: 0,
+  });
   const [hinderDialogOpen, setHinderDialogOpen] = useState(false);
-  const [hinderDraft, setHinderDraft] = useState({ attr1: "ins", attr2: "wlp", modifier: 0 });
+  const [hinderDraft, setHinderDraft] = useState({
+    attr1: "ins",
+    attr2: "wlp",
+    modifier: 0,
+  });
 
   const allActions = isNpc ? NPC_ACTIONS : PC_ACTIONS;
-  const actionOptions = expand ? allActions.filter((a) => a !== "other") : allActions;
+  const actionOptions = expand
+    ? allActions.filter((a) => a !== "other")
+    : allActions;
 
   const getActionMenuItems = (actionKey) => {
     if (!actorDoc) return [];
@@ -295,7 +333,9 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
     applyCommand(cmd);
   };
 
-  const activeActionItems = activeActionKey ? getActionMenuItems(activeActionKey) : [];
+  const activeActionItems = activeActionKey
+    ? getActionMenuItems(activeActionKey)
+    : [];
 
   return (
     <Box
@@ -303,10 +343,17 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
       onMouseLeave={scheduleClose}
       sx={{ px: 0.5, pb: 0.25 }}
     >
-      <Box sx={expand
-        ? { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0.6 }
-        : { display: "flex", flexWrap: "wrap", gap: 0.6 }
-      }>
+      <Box
+        sx={
+          expand
+            ? {
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: 0.6,
+              }
+            : { display: "flex", flexWrap: "wrap", gap: 0.6 }
+        }
+      >
         {actionOptions.map((action) => (
           <Button
             key={action}
@@ -343,7 +390,12 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
                 component="img"
                 src={ACTION_ICONS[action]}
                 alt=""
-                sx={{ width: expand ? 22 : 18, height: expand ? 22 : 18, mr: expand ? 0.75 : 0.5, display: "block" }}
+                sx={{
+                  width: expand ? 22 : 18,
+                  height: expand ? 22 : 18,
+                  mr: expand ? 0.75 : 0.5,
+                  display: "block",
+                }}
               />
             )}
             {action[0].toUpperCase() + action.slice(1)}
@@ -383,7 +435,12 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
                 {activeActionItems.map((item) => (
                   <Box
                     key={item.key ?? item.label}
-                    sx={{ display: "flex", alignItems: "stretch", gap: 0.45, minHeight: 32 }}
+                    sx={{
+                      display: "flex",
+                      alignItems: "stretch",
+                      gap: 0.45,
+                      minHeight: 32,
+                    }}
                   >
                     <Button
                       size="small"
@@ -436,14 +493,32 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
                         }
                       }}
                     >
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.75,
+                        }}
+                      >
                         {activeActionKey === "attack" && (
-                          <Box sx={{ display: "flex", alignItems: "center", fontSize: "0.95em" }}>
-                            {item.attackRange === "ranged" ? <DistanceIcon /> : <MeleeIcon />}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              fontSize: "0.95em",
+                            }}
+                          >
+                            {item.attackRange === "ranged" ? (
+                              <DistanceIcon />
+                            ) : (
+                              <MeleeIcon />
+                            )}
                           </Box>
                         )}
 
-                        <Box sx={{ fontWeight: 700, lineHeight: 1.15 }}>{item.label}</Box>
+                        <Box sx={{ fontWeight: 700, lineHeight: 1.15 }}>
+                          {item.label}
+                        </Box>
                       </Box>
                     </Button>
                     {item.customizable && (
@@ -461,7 +536,9 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
                           color: "text.primary",
                           "&:hover": { backgroundColor: "action.hover" },
                         }}
-                        onClick={(e) => openCustomizer(item.customizable, e.currentTarget)}
+                        onClick={(e) =>
+                          openCustomizer(item.customizable, e.currentTarget)
+                        }
                       >
                         <EditIcon fontSize="small" />
                       </IconButton>
@@ -481,7 +558,12 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
                           color: "text.primary",
                           "&:hover": { backgroundColor: "action.hover" },
                         }}
-                        onClick={(e) => openSpellCustomizer(item.spellCustomizable, e.currentTarget)}
+                        onClick={(e) =>
+                          openSpellCustomizer(
+                            item.spellCustomizable,
+                            e.currentTarget,
+                          )
+                        }
                       >
                         <EditIcon fontSize="small" />
                       </IconButton>
@@ -566,7 +648,8 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
                   : ""}
               </span>
               <span>
-                {customizerDraft.range} · {customizerDraft.defense.toUpperCase()}
+                {customizerDraft.range} ·{" "}
+                {customizerDraft.defense.toUpperCase()}
               </span>
             </Box>
             <TextField
@@ -757,7 +840,10 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
               label="Attr1"
               value={spellCustomizerDraft.attr1}
               onChange={(e) =>
-                setSpellCustomizerDraft((p) => ({ ...p, attr1: e.target.value }))
+                setSpellCustomizerDraft((p) => ({
+                  ...p,
+                  attr1: e.target.value,
+                }))
               }
             >
               {ATTRS.map((a) => (
@@ -772,7 +858,10 @@ export default function ActorActionBar({ actorDoc, isNpc, applyCommand, expand =
               label="Attr2"
               value={spellCustomizerDraft.attr2}
               onChange={(e) =>
-                setSpellCustomizerDraft((p) => ({ ...p, attr2: e.target.value }))
+                setSpellCustomizerDraft((p) => ({
+                  ...p,
+                  attr2: e.target.value,
+                }))
               }
             >
               {ATTRS.map((a) => (

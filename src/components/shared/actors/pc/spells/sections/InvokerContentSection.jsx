@@ -1,12 +1,21 @@
 import { Grid, IconButton, Tooltip, Typography, Box } from "@mui/material";
 import { ChatOutlined } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { resolveWellsprings, affinityIconSrc } from "/src/libs/player/wellsprings";
+import {
+  resolveWellsprings,
+  affinityIconSrc,
+} from "/src/libs/player/wellsprings";
 import { invocationsByWellspring } from "/src/libs/player/spellOptionData";
 import { SharedInvocationCard } from "/src/components/shared/items";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
-function WellspringChip({ wellspring, isSelected, isInner, isAlways, onClick }) {
+function WellspringChip({
+  wellspring,
+  isSelected,
+  isInner,
+  isAlways,
+  onClick,
+}) {
   const theme = useTheme();
   const isLocked = isInner || isAlways;
   const lockColor = isInner ? "#4CAF50" : "#FF9800";
@@ -48,7 +57,9 @@ function WellspringChip({ wellspring, isSelected, isInner, isAlways, onClick }) 
         opacity: isLocked ? 0.9 : 1,
         transition: "border-color 0.15s, background-color 0.15s",
         ...(isLocked && { boxShadow: lockGlow }),
-        "&:hover": !isLocked ? { borderColor: wellspring.color, opacity: 0.85 } : {},
+        "&:hover": !isLocked
+          ? { borderColor: wellspring.color, opacity: 0.85 }
+          : {},
       }}
     >
       <img
@@ -76,13 +87,17 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
   const tracker = formState.tracker || {};
   const activeWellsprings = tracker.activeWellsprings || [];
   const skillLevel = formState.skillLevel || 1;
-  const innerWellspring = formState.innerWellspring || tracker.innerWellspring || false;
-  const chosenWellspring = formState.chosenWellspring || tracker.chosenWellspring || "";
+  const innerWellspring =
+    formState.innerWellspring || tracker.innerWellspring || false;
+  const chosenWellspring =
+    formState.chosenWellspring || tracker.chosenWellspring || "";
   const customWellsprings = formState.customWellsprings || [];
   const customInvocations = formState.invocations || [];
   const alwaysActiveWellsprings = formState.alwaysActiveWellsprings || [];
 
-  const effectiveWellsprings = [...new Set([...activeWellsprings, ...alwaysActiveWellsprings])];
+  const effectiveWellsprings = [
+    ...new Set([...activeWellsprings, ...alwaysActiveWellsprings]),
+  ];
 
   const allWellsprings = resolveWellsprings(customWellsprings);
 
@@ -92,8 +107,10 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
       const current = prevTracker.activeWellsprings || [];
       const isActive = current.includes(wellspringKey);
 
-      if ((innerWellspring && chosenWellspring === wellspringKey && isActive) ||
-        alwaysActiveWellsprings.includes(wellspringKey)) {
+      if (
+        (innerWellspring && chosenWellspring === wellspringKey && isActive) ||
+        alwaysActiveWellsprings.includes(wellspringKey)
+      ) {
         return prev;
       }
 
@@ -113,10 +130,17 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
   const getAvailableInvocations = () => {
     const availableTypes = [];
     switch (skillLevel) {
-      case 1: availableTypes.push("Blast"); break;
-      case 2: availableTypes.push("Blast", "Hex"); break;
-      case 3: availableTypes.push("Blast", "Hex", "Utility"); break;
-      default: return [];
+      case 1:
+        availableTypes.push("Blast");
+        break;
+      case 2:
+        availableTypes.push("Blast", "Hex");
+        break;
+      case 3:
+        availableTypes.push("Blast", "Hex", "Utility");
+        break;
+      default:
+        return [];
     }
 
     const results = [];
@@ -139,7 +163,11 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           effectiveWellsprings.includes(inv.wellspring),
       )
       .forEach((inv) => {
-        results.push({ ...inv, name: inv.customName || inv.key, isCustom: true });
+        results.push({
+          ...inv,
+          name: inv.customName || inv.key,
+          isCustom: true,
+        });
       });
 
     return results;
@@ -157,7 +185,8 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
           {allWellsprings.map((wellspring) => {
             const isActive = activeWellsprings.includes(wellspring.key);
-            const isInner = innerWellspring && chosenWellspring === wellspring.key;
+            const isInner =
+              innerWellspring && chosenWellspring === wellspring.key;
             const isAlways = alwaysActiveWellsprings.includes(wellspring.key);
             return (
               <WellspringChip
@@ -192,10 +221,16 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
                     <Tooltip title={t("Send to chat")} arrow>
                       <IconButton
                         size="small"
-                        onClick={() => sendDisplayMessage("invocation", t(inv.name || inv.customName || ""), {
-                          tags: [inv.wellspring, inv.type].filter(Boolean),
-                          effect: inv.effect ? t(inv.effect) : undefined,
-                        })}
+                        onClick={() =>
+                          sendDisplayMessage(
+                            "invocation",
+                            t(inv.name || inv.customName || ""),
+                            {
+                              tags: [inv.wellspring, inv.type].filter(Boolean),
+                              effect: inv.effect ? t(inv.effect) : undefined,
+                            },
+                          )
+                        }
                       >
                         <ChatOutlined fontSize="small" />
                       </IconButton>

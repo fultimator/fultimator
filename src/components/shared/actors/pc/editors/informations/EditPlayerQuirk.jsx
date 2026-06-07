@@ -49,27 +49,50 @@ function fromFormState(form) {
   };
 }
 
-export default function EditPlayerQuirk({ player, setPlayer, isEditMode, externalOpen = false, onExternalClose, externalCompendiumOpen = false, onExternalCompendiumClose, externalCreating = false, modalOnly = false }) {
+export default function EditPlayerQuirk({
+  player,
+  setPlayer,
+  isEditMode,
+  externalOpen = false,
+  onExternalClose,
+  externalCompendiumOpen = false,
+  onExternalCompendiumClose,
+  externalCreating = false,
+  modalOnly = false,
+}) {
   const { t } = useTranslate();
   const addMessage = useAddChatMessage();
 
   const [internalOpen, setInternalOpen] = useState(false);
   const editorOpen = externalOpen || internalOpen;
-  const setEditorOpen = (v) => { setInternalOpen(v); if (!v) onExternalClose?.(); };
+  const setEditorOpen = (v) => {
+    setInternalOpen(v);
+    if (!v) onExternalClose?.();
+  };
   const [internalCompendiumOpen, setInternalCompendiumOpen] = useState(false);
   const compendiumOpen = externalCompendiumOpen || internalCompendiumOpen;
-  const setCompendiumOpen = (v) => { setInternalCompendiumOpen(v); if (!v) onExternalCompendiumClose?.(); };
+  const setCompendiumOpen = (v) => {
+    setInternalCompendiumOpen(v);
+    if (!v) onExternalCompendiumClose?.();
+  };
   const [creating, setCreating] = useState(false);
   const effectiveCreating = externalCreating || creating;
   const [expanded, setExpanded] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
 
   const quirk = useMemo(() => player.quirk, [player.quirk]);
   const hasQuirk = Boolean(
     quirk &&
-    (quirk.name?.trim() || quirk.description?.trim() || quirk.effect?.trim() || quirk.clock),
+    (quirk.name?.trim() ||
+      quirk.description?.trim() ||
+      quirk.effect?.trim() ||
+      quirk.clock),
   );
 
   const handleRoll = () =>
@@ -91,7 +114,11 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode, externa
         {editorOpen && (
           <ItemEditModal
             open
-            onClose={() => { setEditorOpen(false); setCreating(false); onExternalClose?.(); }}
+            onClose={() => {
+              setEditorOpen(false);
+              setCreating(false);
+              onExternalClose?.();
+            }}
             itemType="quirkOptional"
             item={toFormState(effectiveCreating ? null : quirk)}
             editIndex={effectiveCreating || !hasQuirk ? null : 0}
@@ -116,7 +143,11 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode, externa
               onExternalClose?.();
             }}
             onDelete={() => {
-              setPlayer((prev) => { const next = { ...prev }; delete next.quirk; return next; });
+              setPlayer((prev) => {
+                const next = { ...prev };
+                delete next.quirk;
+                return next;
+              });
               setEditorOpen(false);
               setCreating(false);
               onExternalClose?.();
@@ -131,7 +162,12 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode, externa
             onAddItem={(item) => {
               setPlayer((prev) => ({
                 ...prev,
-                quirk: { name: item.name ?? "", description: item.description ?? "", effect: item.effect ?? "", clock: item.clock },
+                quirk: {
+                  name: item.name ?? "",
+                  description: item.description ?? "",
+                  effect: item.effect ?? "",
+                  clock: item.clock,
+                },
               }));
               setCompendiumOpen(false);
             }}
@@ -146,131 +182,245 @@ export default function EditPlayerQuirk({ player, setPlayer, isEditMode, externa
 
   return (
     <>
-    <SectionCard
-      title={t("Quirk")}
-      actions={
-        isEditMode && (
-          <Box sx={{ display: "flex", gap: 0.5 }}>
-            <Tooltip title={t("Add Quirk")}>
-              <IconButton size="small" onClick={() => { setCreating(true); setEditorOpen(true); }} sx={{ color: "#fff" }}>
-                <AddIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t("Open Compendium")}>
-              <IconButton size="small" onClick={() => setCompendiumOpen(true)} sx={{ color: "#fff" }}>
-                <Search fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        )
-      }
-    >
-      <Box sx={{ p: 0.75 }}>
-        {!hasQuirk ? (
-          <Typography color="text.secondary" variant="body2" sx={{ px: 0.5, py: 0.25 }}>{t("No quirk yet.")}</Typography>
-        ) : (
-          <ItemRowCard
-            variant="outlined"
-            onCardClick={quirk.description || quirk.effect ? () => setExpanded((v) => !v) : undefined}
-            label={quirk.name || t("Unnamed Quirk")}
-            actions={
-              <>
-                <Tooltip title={t("Roll")}>
-                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleRoll(); }}>
-                    <Casino />
-                  </IconButton>
-                </Tooltip>
-                {isEditMode && (
-                  <Tooltip title={t("Edit")}>
-                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); setCreating(false); setEditorOpen(true); }}>
-                      <EditIcon />
+      <SectionCard
+        title={t("Quirk")}
+        actions={
+          isEditMode && (
+            <Box sx={{ display: "flex", gap: 0.5 }}>
+              <Tooltip title={t("Add Quirk")}>
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setCreating(true);
+                    setEditorOpen(true);
+                  }}
+                  sx={{ color: "#fff" }}
+                >
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={t("Open Compendium")}>
+                <IconButton
+                  size="small"
+                  onClick={() => setCompendiumOpen(true)}
+                  sx={{ color: "#fff" }}
+                >
+                  <Search fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )
+        }
+      >
+        <Box sx={{ p: 0.75 }}>
+          {!hasQuirk ? (
+            <Typography
+              color="text.secondary"
+              variant="body2"
+              sx={{ px: 0.5, py: 0.25 }}
+            >
+              {t("No quirk yet.")}
+            </Typography>
+          ) : (
+            <ItemRowCard
+              variant="outlined"
+              onCardClick={
+                quirk.description || quirk.effect
+                  ? () => setExpanded((v) => !v)
+                  : undefined
+              }
+              label={quirk.name || t("Unnamed Quirk")}
+              actions={
+                <>
+                  <Tooltip title={t("Roll")}>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRoll();
+                      }}
+                    >
+                      <Casino />
                     </IconButton>
                   </Tooltip>
-                )}
-                {isEditMode && (
-                  <>
-                    <IconButton size="small" onClick={(e) => { e.stopPropagation(); setMenuAnchor(e.currentTarget); }}>
-                      <MenuIcon fontSize="small" />
-                    </IconButton>
-                    <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
-                      <MenuItem onClick={async (e) => { e.stopPropagation(); setMenuAnchor(null); try { const p = packs.find((x) => x.isPersonal) ?? await ensurePersonalPack(); await addItem(p.id, "optional", { ...quirk, subtype: "quirk" }); setSnackbar({ open: true, message: t("Added to compendium"), severity: "success" }); } catch (err) { setSnackbar({ open: true, message: err?.message ?? t("Failed to add"), severity: "error" }); } }}>
-                        <ListItemIcon><LibraryAdd fontSize="small" /></ListItemIcon>
-                        <ListItemText>{t("Add to Compendium")}</ListItemText>
-                      </MenuItem>
-                      <MenuItem onClick={(e) => { e.stopPropagation(); setMenuAnchor(null); setPlayer((prev) => { const next = { ...prev }; delete next.quirk; return next; }); }}>
-                        <ListItemIcon><DeleteForever fontSize="small" /></ListItemIcon>
-                        <ListItemText>{t("Delete")}</ListItemText>
-                      </MenuItem>
-                    </Menu>
-                  </>
-                )}
-              </>
-            }
-          >
-            {expanded && (
-              <Box sx={{ px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.03)", borderTop: "1px solid", borderColor: "divider" }}>
-                <SharedOptionalCard item={{ ...quirk, subtype: "quirk" }} />
-              </Box>
-            )}
-          </ItemRowCard>
-        )}
-      </Box>
+                  {isEditMode && (
+                    <Tooltip title={t("Edit")}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCreating(false);
+                          setEditorOpen(true);
+                        }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {isEditMode && (
+                    <>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuAnchor(e.currentTarget);
+                        }}
+                      >
+                        <MenuIcon fontSize="small" />
+                      </IconButton>
+                      <Menu
+                        anchorEl={menuAnchor}
+                        open={Boolean(menuAnchor)}
+                        onClose={() => setMenuAnchor(null)}
+                      >
+                        <MenuItem
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setMenuAnchor(null);
+                            try {
+                              const p =
+                                packs.find((x) => x.isPersonal) ??
+                                (await ensurePersonalPack());
+                              await addItem(p.id, "optional", {
+                                ...quirk,
+                                subtype: "quirk",
+                              });
+                              setSnackbar({
+                                open: true,
+                                message: t("Added to compendium"),
+                                severity: "success",
+                              });
+                            } catch (err) {
+                              setSnackbar({
+                                open: true,
+                                message: err?.message ?? t("Failed to add"),
+                                severity: "error",
+                              });
+                            }
+                          }}
+                        >
+                          <ListItemIcon>
+                            <LibraryAdd fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText>{t("Add to Compendium")}</ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuAnchor(null);
+                            setPlayer((prev) => {
+                              const next = { ...prev };
+                              delete next.quirk;
+                              return next;
+                            });
+                          }}
+                        >
+                          <ListItemIcon>
+                            <DeleteForever fontSize="small" />
+                          </ListItemIcon>
+                          <ListItemText>{t("Delete")}</ListItemText>
+                        </MenuItem>
+                      </Menu>
+                    </>
+                  )}
+                </>
+              }
+            >
+              {expanded && (
+                <Box
+                  sx={{
+                    px: 1.5,
+                    py: 0.75,
+                    bgcolor: "rgba(0,0,0,0.03)",
+                    borderTop: "1px solid",
+                    borderColor: "divider",
+                  }}
+                >
+                  <SharedOptionalCard item={{ ...quirk, subtype: "quirk" }} />
+                </Box>
+              )}
+            </ItemRowCard>
+          )}
+        </Box>
 
-      {editorOpen && (
-        <ItemEditModal
-          open
-          onClose={() => { setEditorOpen(false); setCreating(false); }}
-          itemType="quirkOptional"
-          item={toFormState(creating ? null : quirk)}
-          editIndex={creating || !hasQuirk ? null : 0}
-          onSave={(payload) => {
-            const next = fromFormState(payload);
-            setPlayer((prev) => {
-              const prevSections = prev.quirk?.clock?.sections;
-              const nextSections = next.clock?.sections;
-              const resetClock = next.clock && prevSections !== nextSections;
-              return {
+        {editorOpen && (
+          <ItemEditModal
+            open
+            onClose={() => {
+              setEditorOpen(false);
+              setCreating(false);
+            }}
+            itemType="quirkOptional"
+            item={toFormState(creating ? null : quirk)}
+            editIndex={creating || !hasQuirk ? null : 0}
+            onSave={(payload) => {
+              const next = fromFormState(payload);
+              setPlayer((prev) => {
+                const prevSections = prev.quirk?.clock?.sections;
+                const nextSections = next.clock?.sections;
+                const resetClock = next.clock && prevSections !== nextSections;
+                return {
+                  ...prev,
+                  quirk: {
+                    ...next,
+                    clockState: resetClock
+                      ? new Array(nextSections).fill(false)
+                      : (prev.quirk?.clockState ?? undefined),
+                  },
+                };
+              });
+              setEditorOpen(false);
+              setCreating(false);
+            }}
+            onDelete={() => {
+              setPlayer((prev) => {
+                const next = { ...prev };
+                delete next.quirk;
+                return next;
+              });
+              setEditorOpen(false);
+              setCreating(false);
+            }}
+            ctx={{ player, setPlayer }}
+          />
+        )}
+
+        {isEditMode && (
+          <CompendiumViewerModal
+            open={compendiumOpen}
+            onClose={() => setCompendiumOpen(false)}
+            onAddItem={(item) => {
+              setPlayer((prev) => ({
                 ...prev,
                 quirk: {
-                  ...next,
-                  clockState: resetClock
-                    ? new Array(nextSections).fill(false)
-                    : (prev.quirk?.clockState ?? undefined),
+                  name: item.name ?? "",
+                  description: item.description ?? "",
+                  effect: item.effect ?? "",
+                  clock: item.clock,
                 },
-              };
-            });
-            setEditorOpen(false);
-            setCreating(false);
-          }}
-          onDelete={() => {
-            setPlayer((prev) => { const next = { ...prev }; delete next.quirk; return next; });
-            setEditorOpen(false);
-            setCreating(false);
-          }}
-          ctx={{ player, setPlayer }}
-        />
-      )}
-
-      {isEditMode && (
-        <CompendiumViewerModal
-          open={compendiumOpen}
-          onClose={() => setCompendiumOpen(false)}
-          onAddItem={(item) => {
-            setPlayer((prev) => ({
-              ...prev,
-              quirk: { name: item.name ?? "", description: item.description ?? "", effect: item.effect ?? "", clock: item.clock },
-            }));
-            setCompendiumOpen(false);
-          }}
-          initialType="optionals"
-          restrictToTypes={["optionals"]}
-          initialOptionalSubtypes={QUIRK_SUBTYPES}
-        />
-      )}
-    </SectionCard>
-    <Snackbar open={snackbar.open} autoHideDuration={2500} onClose={() => setSnackbar((s) => ({ ...s, open: false }))} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
-      <Alert severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>{snackbar.message}</Alert>
-    </Snackbar>
+              }));
+              setCompendiumOpen(false);
+            }}
+            initialType="optionals"
+            restrictToTypes={["optionals"]}
+            initialOptionalSubtypes={QUIRK_SUBTYPES}
+          />
+        )}
+      </SectionCard>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2500}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

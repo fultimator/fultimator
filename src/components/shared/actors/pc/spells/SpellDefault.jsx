@@ -8,7 +8,13 @@ import {
   Tooltip,
   Box,
 } from "@mui/material";
-import { Edit, VisibilityOff, SettingsSuggest, Casino, Message } from "@mui/icons-material";
+import {
+  Edit,
+  VisibilityOff,
+  SettingsSuggest,
+  Casino,
+  Message,
+} from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
 import { OffensiveSpellIcon } from "/src/components/icons"; // Ensure this path is correct
@@ -116,7 +122,9 @@ function ThemedSpellDefault({
               <Typography variant="h3">{t("Duration")}</Typography>
             </Grid>
           </Grid>
-          {(isEditMode || (isOffensive && onRoll) || (!isOffensive && onChat)) && (
+          {(isEditMode ||
+            (isOffensive && onRoll) ||
+            (!isOffensive && onChat)) && (
             <Box
               sx={{
                 width: 40,
@@ -222,7 +230,9 @@ function ThemedSpellDefault({
             </Typography>
           </Grid>
         </Grid>
-        {(isEditMode || (isOffensive && onRoll) || (!isOffensive && onChat)) && (
+        {(isEditMode ||
+          (isOffensive && onRoll) ||
+          (!isOffensive && onChat)) && (
           <Box
             sx={{
               display: "flex",

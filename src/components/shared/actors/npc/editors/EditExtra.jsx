@@ -131,9 +131,18 @@ export default function EditExtra({ npc, setNpc }) {
                     <TextField
                       type="number"
                       slotProps={{
-                        htmlInput: { inputMode: "numeric", pattern: "[0-9]*", min: 0 },
+                        htmlInput: {
+                          inputMode: "numeric",
+                          pattern: "[0-9]*",
+                          min: 0,
+                        },
                         formHelperText: {
-                          sx: { color: totalPicked > totalAllotted ? "red !important" : "inherit" },
+                          sx: {
+                            color:
+                              totalPicked > totalAllotted
+                                ? "red !important"
+                                : "inherit",
+                          },
                         },
                       }}
                       label={t("Status Effect Immunity")}

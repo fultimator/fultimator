@@ -13,8 +13,20 @@ export type ResourceKind = "hp" | "mp" | "ip" | "fp" | "up";
 export interface ChatActionsContextValue {
   onOppose: ((message: OpposeTarget) => void) | null;
   onRerollOpposed: ((message: OpposedCheckMessage) => void) | null;
-  onLossResource: ((message: DisplayMessage, resource: ResourceKind, amount: number) => void) | null;
-  onGainResource: ((message: DisplayMessage, resource: ResourceKind, amount: number) => void) | null;
+  onLossResource:
+    | ((
+        message: DisplayMessage,
+        resource: ResourceKind,
+        amount: number,
+      ) => void)
+    | null;
+  onGainResource:
+    | ((
+        message: DisplayMessage,
+        resource: ResourceKind,
+        amount: number,
+      ) => void)
+    | null;
   selectedSpeaker: string;
 }
 

@@ -8,7 +8,10 @@ import {
   isImageMode,
 } from "/src/components/shared/items/core-utils";
 import { StyledMarkdown } from "/src/components/shared/items/markdown";
-import { CardContentWrapper, RowsWithOptionalImage } from "/src/components/shared/items/core";
+import {
+  CardContentWrapper,
+  RowsWithOptionalImage,
+} from "/src/components/shared/items/core";
 
 function dataRowSx(customTheme, background, extraSx = {}) {
   return {
