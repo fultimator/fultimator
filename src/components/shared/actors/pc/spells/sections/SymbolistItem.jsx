@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
 import { availableSymbols } from "/src/libs/player/spellOptionData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
@@ -84,12 +84,16 @@ export default function SymbolistItem({
         onClick={() => setExpanded((v) => !v)}
         actions={
           <>
-            <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
-              <ContentCopy />
-            </IconButton>
-            <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
-              <Delete />
-            </IconButton>
+            <Tooltip title={t("Clone to Custom")}>
+              <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
+                <ContentCopy />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Delete")}>
+              <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
           </>
         }
       >

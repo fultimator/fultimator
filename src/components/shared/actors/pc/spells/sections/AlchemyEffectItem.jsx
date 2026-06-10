@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { ContentCopy, Delete } from "@mui/icons-material";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
@@ -61,22 +61,26 @@ export default function AlchemyEffectItem({
         onClick={() => setExpanded((v) => !v)}
         actions={
           <>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                onCloneItem?.(itemIndex);
-              }}
-            >
-              <ContentCopy />
-            </IconButton>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                openDeleteDialog();
-              }}
-            >
-              <Delete />
-            </IconButton>
+            <Tooltip title={t("Clone to Custom")}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCloneItem?.(itemIndex);
+                }}
+              >
+                <ContentCopy />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Delete")}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteDialog();
+                }}
+              >
+                <Delete />
+              </IconButton>
+            </Tooltip>
           </>
         }
       >
