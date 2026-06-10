@@ -1,21 +1,66 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  Grid,
-  TextField,
   IconButton,
-  Switch,
-  FormControlLabel,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import CustomTextarea from "/src/components/common/CustomTextarea";
 import { Close } from "@mui/icons-material";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
+import { arcanistFields } from "/src/forms/rendering/config/itemConfigs/spells/arcanist";
+import { playerSpellTabs } from "/src/forms/rendering/config/itemConfigs/spells";
+import { metaFieldConfig } from "/src/forms/rendering/config/metaFieldConfig";
+import {
+  behaviorsTabField,
+  makePassivesTabField,
+} from "/src/forms/rendering/config/shared/behaviorFields";
+
+const arcanaCoreFields = [
+  {
+    key: "name",
+    kind: "editable",
+    label: "Arcana Name",
+    component: "text",
+    defaultValue: "",
+    group: "core",
+    order: 4,
+    gridSize: { xs: 12, sm: 6 },
+    validationHints: { required: true },
+  },
+  {
+    key: "description",
+    kind: "editable",
+    label: "Arcana Description",
+    component: "textarea",
+    defaultValue: "",
+    group: "description",
+    order: 60,
+    fullWidth: true,
+  },
+  {
+    key: "showInPlayerSheet",
+    kind: "editable",
+    label: "Show in Character Sheet",
+    component: "checkbox",
+    defaultValue: true,
+    group: "visibility",
+    order: 70,
+    gridSize: { xs: 12 },
+  },
+];
+
+const arcanaFieldConfig = [
+  ...arcanaCoreFields,
+  ...arcanistFields,
+  ...metaFieldConfig,
+  makePassivesTabField([]),
+  behaviorsTabField,
+];
 
 export default function SpellArcanistModal({
   open,
@@ -36,12 +81,12 @@ export default function SpellArcanistModal({
   });
 
   useEffect(() => {
-    setEditedSpell(spell || {});
-  }, [spell]);
-
-  const handleChange = (field, value) => {
-    setEditedSpell((prev) => ({ ...prev, [field]: value }));
-  };
+    setEditedSpell({
+      showInPlayerSheet: true,
+      spellType: isRework ? "arcanist-rework" : "arcanist",
+      ...(spell || {}),
+    });
+  }, [spell, isRework]);
 
   const handleSave = () => {
     onSave(spell.index, editedSpell);
@@ -75,196 +120,13 @@ export default function SpellArcanistModal({
         <Close />
       </IconButton>
       <DialogContent>
-        <Grid container spacing={2}>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <TextField
-              label={t("Arcana Name")}
-              variant="outlined"
-              fullWidth
-              value={editedSpell.name || ""}
-              onChange={(e) => handleChange("name", e.target.value)}
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 6,
-            }}
-          >
-            <TextField
-              label={t("Domain")}
-              variant="outlined"
-              fullWidth
-              value={editedSpell.domain || ""}
-              onChange={(e) => handleChange("domain", e.target.value)}
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <TextField
-              label={t("Arcana Description")}
-              variant="outlined"
-              fullWidth
-              value={editedSpell.description || ""}
-              onChange={(e) => handleChange("description", e.target.value)}
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <CustomTextarea
-              label={t("Domain Description")}
-              fullWidth
-              value={editedSpell.domainDesc || ""}
-              onChange={(e) => handleChange("domainDesc", e.target.value)}
-              maxRows={10}
-              maxLength={1500}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <TextField
-              label={t("Merge Name")}
-              variant="outlined"
-              fullWidth
-              value={editedSpell.merge || ""}
-              onChange={(e) => handleChange("merge", e.target.value)}
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <CustomTextarea
-              label={t("Merge Description")}
-              fullWidth
-              value={editedSpell.mergeDesc || ""}
-              onChange={(e) => handleChange("mergeDesc", e.target.value)}
-              maxRows={10}
-              maxLength={1500}
-            />
-          </Grid>
-          {isRework && (
-            <>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 12,
-                }}
-              >
-                <TextField
-                  label={t("Pulse Name")}
-                  variant="outlined"
-                  fullWidth
-                  value={editedSpell.pulse || ""}
-                  onChange={(e) => handleChange("pulse", e.target.value)}
-                  slotProps={{
-                    htmlInput: { maxLength: 50 },
-                  }}
-                />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 12,
-                }}
-              >
-                <CustomTextarea
-                  label={t("Merge Description")}
-                  fullWidth
-                  value={editedSpell.pulseDesc || ""}
-                  onChange={(e) => handleChange("pulseDesc", e.target.value)}
-                  maxRows={10}
-                  maxLength={1500}
-                />
-              </Grid>
-            </>
-          )}
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <TextField
-              label={t("Dismiss Name")}
-              variant="outlined"
-              fullWidth
-              value={editedSpell.dismiss || ""}
-              onChange={(e) => handleChange("dismiss", e.target.value)}
-              slotProps={{
-                htmlInput: { maxLength: 50 },
-              }}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <CustomTextarea
-              label={t("Dismiss Description")}
-              fullWidth
-              value={editedSpell.dismissDesc || ""}
-              onChange={(e) => handleChange("dismissDesc", e.target.value)}
-              maxRows={10}
-              maxLength={1500}
-            />
-          </Grid>
-          <Grid
-            size={{
-              xs: 12,
-              sm: 12,
-            }}
-          >
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={
-                    editedSpell.showInPlayerSheet === undefined ||
-                    editedSpell.showInPlayerSheet ||
-                    false
-                  }
-                  onChange={(e) =>
-                    handleChange("showInPlayerSheet", e.target.checked)
-                  }
-                />
-              }
-              label={t("Show in Character Sheet")}
-            />
-          </Grid>
-        </Grid>
+        <TabbedSchemaFormRenderer
+          tabs={playerSpellTabs}
+          config={arcanaFieldConfig}
+          state={editedSpell}
+          onChange={setEditedSpell}
+          surface="edit"
+        />
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="error" onClick={handleDelete}>

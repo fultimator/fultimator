@@ -98,6 +98,10 @@ import {
   setNestedActivation,
   setSpellListActivation,
 } from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
+import {
+  ARCANA_POLICY_KEY,
+  getArcanaStageDetails,
+} from "/src/components/shared/actors/pc/spells/arcanaActions";
 // Constants
 
 const SINGLE_INSTANCE_SPELL_TYPES = new Set([
@@ -819,16 +823,18 @@ function SpellCard({
   });
 
   const sendArcanaStageToChat = (stage) => {
-    const isDismiss = stage === "dismiss";
-    const label = isDismiss
-      ? spell.dismiss || t("DISMISS")
-      : spell.merge || t("MERGE");
-    sendDisplayMessage("spell", `${spellName} - ${label}`, {
+    const {
+      label,
+      tag,
+      itemType = "spell",
+      description,
+      cost,
+    } = getArcanaStageDetails(spell, stage, t);
+    sendDisplayMessage(itemType, `${spellName} - ${label}`, {
       speaker: "",
-      tags: [isDismiss ? t("DISMISS") : t("MERGE")],
-      description: isDismiss
-        ? spell.dismissDesc || t("No Dismiss Benefit")
-        : spell.mergeDesc || t("No Merge Benefit"),
+      tags: [tag],
+      description,
+      cost,
     });
   };
 
@@ -845,7 +851,7 @@ function SpellCard({
               spells: setSpellListActivation(
                 cls.spells || [],
                 spellIndex,
-                spell.spellType,
+                ARCANA_POLICY_KEY,
                 active,
               ),
             }
@@ -936,7 +942,9 @@ function SpellCard({
               <Tooltip title={spell.enabled ? t("Active") : t("Activate")} arrow>
                 <IconButton
                   size="small"
-                  onClick={(event) => handleActivateArcana(event, true)}
+                  onClick={(event) =>
+                    handleActivateArcana(event, !spell.enabled)
+                  }
                   sx={{
                     color: spell.enabled ? theme.primary : "text.secondary",
                   }}
@@ -1306,16 +1314,18 @@ function MnemoSpellCard({
     spell.spellType === "arcanist" || spell.spellType === "arcanist-rework";
 
   const sendArcanaStageToChat = (stage) => {
-    const isDismiss = stage === "dismiss";
-    const label = isDismiss
-      ? spell.dismiss || t("DISMISS")
-      : spell.merge || t("MERGE");
-    sendDisplayMessage("spell", `${spell.name} - ${label}`, {
+    const {
+      label,
+      tag,
+      itemType = "spell",
+      description,
+      cost,
+    } = getArcanaStageDetails(spell, stage, t);
+    sendDisplayMessage(itemType, `${spell.name} - ${label}`, {
       speaker: "",
-      tags: [isDismiss ? t("DISMISS") : t("MERGE")],
-      description: isDismiss
-        ? spell.dismissDesc || t("No Dismiss Benefit")
-        : spell.mergeDesc || t("No Merge Benefit"),
+      tags: [tag],
+      description,
+      cost,
     });
   };
 
@@ -1342,7 +1352,7 @@ function MnemoSpellCard({
           spells: setSpellListActivation(
             spells,
             spellIndex,
-            spell.spellType,
+            ARCANA_POLICY_KEY,
             active,
           ),
         };
@@ -1406,7 +1416,9 @@ function MnemoSpellCard({
               <Tooltip title={spell.enabled ? t("Active") : t("Activate")} arrow>
                 <IconButton
                   size="small"
-                  onClick={(event) => handleActivateArcana(event, true)}
+                  onClick={(event) =>
+                    handleActivateArcana(event, !spell.enabled)
+                  }
                   sx={{
                     color: spell.enabled ? theme.primary : "text.secondary",
                   }}
@@ -1705,7 +1717,7 @@ export default function FeatureTab({
                     ...baseSpell,
                     enabled: !hasActiveSpellInList(
                       cls.spells || [],
-                      spellType,
+                      ARCANA_POLICY_KEY,
                     ),
                   }
                 : baseSpell;
@@ -1882,7 +1894,7 @@ export default function FeatureTab({
             ...imported,
             enabled: !hasActiveSpellInList(
               classRef.spells || [],
-              imported.spellType,
+              ARCANA_POLICY_KEY,
             ),
           }
         : imported;
@@ -1932,7 +1944,7 @@ export default function FeatureTab({
                   ...spell,
                   enabled: !hasActiveSpellInList(
                     m.spells ?? [],
-                    spell.spellType,
+                    ARCANA_POLICY_KEY,
                   ),
                 }
               : spell;

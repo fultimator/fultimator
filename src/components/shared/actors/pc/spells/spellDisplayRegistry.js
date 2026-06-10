@@ -20,6 +20,7 @@ import {
   setNestedActivation,
   setSpellListActivation,
 } from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
+import { ARCANA_POLICY_KEY } from "/src/components/shared/actors/pc/spells/arcanaActions";
 
 // Each entry: { Component, buildProps(spell, handlers) }
 // handlers: { onEdit, onEditSubModal, onSpellUpdate, isEditMode }
@@ -128,7 +129,7 @@ const spellDisplayRegistry = {
               setSpellListActivation(
                 spells,
                 spellIndex,
-                "arcanist",
+                ARCANA_POLICY_KEY,
                 active,
               ),
             )
@@ -152,7 +153,7 @@ const spellDisplayRegistry = {
               setSpellListActivation(
                 spells,
                 spellIndex,
-                "arcanist-rework",
+                ARCANA_POLICY_KEY,
                 active,
               ),
             )

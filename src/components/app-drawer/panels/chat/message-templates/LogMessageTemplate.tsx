@@ -48,6 +48,7 @@ function EventIcon({ event }: { event: CombatLogEvent }) {
       return <FavoriteIcon sx={{ ...sx, color: "success.main" }} />;
     case "resource-loss":
     case "expenditure":
+    case "resource-application":
       return <ResourceIcon sx={sx} />;
     case "ultima-used":
       return <AutoAwesomeIcon sx={sx} />;
@@ -208,6 +209,17 @@ function EventText({ event }: { event: CombatLogEvent }) {
         </>
       );
 
+    case "resource-application":
+      return (
+        <>
+          {actor(event.actorName)}
+          {muted(event.direction === "loss" ? " spent " : " gained ")}
+          {val(event.amount)}
+          {muted(` ${event.resource.toUpperCase()}`)}
+          {event.status === "unavailable" && muted(" was not applied")}
+        </>
+      );
+
     case "ultima-used":
       return (
         <>
@@ -347,10 +359,12 @@ function EventText({ event }: { event: CombatLogEvent }) {
 
 interface LogMessageTemplateProps {
   event: CombatLogEvent;
+  undone?: boolean;
 }
 
 export const LogMessageTemplate: React.FC<LogMessageTemplateProps> = ({
   event,
+  undone = false,
 }) => {
   return (
     <Box
@@ -363,7 +377,14 @@ export const LogMessageTemplate: React.FC<LogMessageTemplateProps> = ({
       }}
     >
       <EventIcon event={event} />
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          textDecoration: undone ? "line-through" : "none",
+          opacity: undone ? 0.62 : 1,
+        }}
+      >
         <EventText event={event} />
       </Box>
     </Box>

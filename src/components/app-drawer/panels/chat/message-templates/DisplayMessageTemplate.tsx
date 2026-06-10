@@ -206,19 +206,22 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
           ) : null}
         </Box>
       )}
-      {message.cost != null && onLossResource && (
+      {message.cost != null && (
         <Box sx={{ mt: 1 }}>
           <Button
             variant="outlined"
             size="small"
             fullWidth
-            onClick={() =>
-              onLossResource(
-                message,
-                message.cost!.resource,
-                message.cost!.amount,
-              )
-            }
+            onClick={() => {
+              if (onLossResource) {
+                onLossResource(
+                  message,
+                  message.cost!.resource,
+                  message.cost!.amount,
+                );
+                return;
+              }
+            }}
             sx={{ textTransform: "none", fontWeight: 600 }}
           >
             Spend {message.cost.amount} {message.cost.resource.toUpperCase()}

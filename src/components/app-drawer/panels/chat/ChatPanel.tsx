@@ -179,6 +179,101 @@ const buildEquipmentChangeMessage = ({
   };
 };
 
+type ResourceKind = import("./ChatActionsContext.shared").ResourceKind;
+type ResourceDirection = "loss" | "gain";
+
+function getResourceDelta(amount: number, direction: ResourceDirection) {
+  return direction === "loss" ? -amount : amount;
+}
+
+function getOppositeResourceDirection(
+  direction: ResourceDirection,
+): ResourceDirection {
+  return direction === "loss" ? "gain" : "loss";
+}
+
+function applyResourceDelta(
+  actorDoc: Record<string, unknown>,
+  resource: ResourceKind,
+  delta: number,
+): TypePlayer {
+  if (resource === "fp") {
+    const doc = actorDoc as unknown as {
+      info?: { fabulapoints?: number };
+    };
+    const current = doc.info?.fabulapoints ?? 0;
+    const next = Math.max(0, current + delta);
+    return {
+      ...actorDoc,
+      info: { ...doc.info, fabulapoints: next },
+    } as unknown as TypePlayer;
+  }
+
+  if (resource === "up") {
+    const doc = actorDoc as unknown as {
+      villain?: string;
+      combatStats?: { ultima?: number };
+    };
+    const current = doc.combatStats?.ultima ?? 0;
+    const villainUpMax =
+      doc.villain === "minor"
+        ? 5
+        : doc.villain === "major"
+          ? 10
+          : doc.villain === "supreme"
+            ? 15
+            : 5;
+    const next = Math.max(0, Math.min(current + delta, villainUpMax));
+    return {
+      ...actorDoc,
+      combatStats: { ...doc.combatStats, ultima: next },
+    } as unknown as TypePlayer;
+  }
+
+  const stats = (
+    actorDoc as unknown as {
+      stats?: Record<string, { current?: number; max?: number }>;
+    }
+  ).stats;
+  const stat = stats?.[resource];
+  const current = stat?.current ?? 0;
+  const max = stat?.max ?? 0;
+  const next = Math.max(0, Math.min(current + delta, max));
+  return {
+    ...actorDoc,
+    stats: { ...stats, [resource]: { ...stat, current: next } },
+  } as unknown as TypePlayer;
+}
+
+function buildResourceApplicationLog({
+  actorName,
+  direction,
+  status,
+  amount,
+  resource,
+}: {
+  actorName: string;
+  direction: ResourceDirection;
+  status: "applied" | "unavailable";
+  amount: number;
+  resource: ResourceKind;
+}): ChatMessage {
+  return {
+    id: crypto.randomUUID(),
+    createdAt: Date.now(),
+    kind: "log",
+    channelId: "",
+    event: {
+      type: "resource-application",
+      actorName,
+      direction,
+      status,
+      amount,
+      resource,
+    },
+  };
+}
+
 export const ChatPanel: React.FC = () => {
   const { t } = useTranslate();
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>(
@@ -191,6 +286,9 @@ export const ChatPanel: React.FC = () => {
   const [equipmentSlotPickerOpen, setEquipmentSlotPickerOpen] = useState<
     "mainHand" | "offHand" | "armor" | "accessory" | null
   >(null);
+  const [undoneResourceLogIds, setUndoneResourceLogIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
   const previousMessageCountRef = useRef(0);
 
@@ -565,61 +663,87 @@ export const ChatPanel: React.FC = () => {
 
   const handleResourceChange = useCallback(
     (
-      _message: import("./types").DisplayMessage,
+      message: import("./types").DisplayMessage,
       resource: import("./ChatActionsContext.shared").ResourceKind,
       amount: number,
       direction: "loss" | "gain",
     ) => {
-      if (!activeActorDoc) return;
-      const delta = direction === "loss" ? -amount : amount;
-      let updated: TypePlayer;
-      if (resource === "fp") {
-        const doc = activeActorDoc as unknown as {
-          info?: { fabulapoints?: number };
-        };
-        const current = doc.info?.fabulapoints ?? 0;
-        const next = Math.max(0, current + delta);
-        updated = {
-          ...activeActorDoc,
-          info: { ...doc.info, fabulapoints: next },
-        } as unknown as TypePlayer;
-      } else if (resource === "up") {
-        const doc = activeActorDoc as unknown as {
-          villain?: string;
-          combatStats?: { ultima?: number };
-        };
-        const current = doc.combatStats?.ultima ?? 0;
-        const villainUpMax =
-          doc.villain === "minor"
-            ? 5
-            : doc.villain === "major"
-              ? 10
-              : doc.villain === "supreme"
-                ? 15
-                : 5;
-        const next = Math.max(0, Math.min(current + delta, villainUpMax));
-        updated = {
-          ...activeActorDoc,
-          combatStats: { ...doc.combatStats, ultima: next },
-        } as unknown as TypePlayer;
-      } else {
-        const stats = (
-          activeActorDoc as unknown as {
-            stats?: Record<string, { current?: number; max?: number }>;
-          }
-        ).stats;
-        const stat = stats?.[resource];
-        const current = stat?.current ?? 0;
-        const max = stat?.max ?? 0;
-        const next = Math.max(0, Math.min(current + delta, max));
-        updated = {
-          ...activeActorDoc,
-          stats: { ...stats, [resource]: { ...stat, current: next } },
-        } as unknown as TypePlayer;
+      const actorName =
+        message.speaker || selectedSpeaker || contextActorName || "No actor";
+      if (!activeActorDoc) {
+        addMessage(
+          buildResourceApplicationLog({
+            actorName,
+            direction,
+            status: "unavailable",
+            amount,
+            resource,
+          }),
+        );
+        return;
       }
+      const updated = applyResourceDelta(
+        activeActorDoc as Record<string, unknown>,
+        resource,
+        getResourceDelta(amount, direction),
+      );
       setActiveActorDoc(updated);
+      addMessage(
+        buildResourceApplicationLog({
+          actorName,
+          direction,
+          status: "applied",
+          amount,
+          resource,
+        }),
+      );
     },
-    [activeActorDoc, setActiveActorDoc],
+    [
+      activeActorDoc,
+      addMessage,
+      contextActorName,
+      selectedSpeaker,
+      setActiveActorDoc,
+    ],
+  );
+
+  const handleToggleResourceApplication = useCallback(
+    (logMsg: LogMessage) => {
+      const event = logMsg.event;
+      if (event.type !== "resource-application") return;
+      if (event.status !== "applied") return;
+
+      const isUndone = undoneResourceLogIds.has(logMsg.id);
+      const nextDirection = isUndone
+        ? event.direction
+        : getOppositeResourceDirection(event.direction);
+      if (!activeActorDoc) {
+        addMessage(
+          buildResourceApplicationLog({
+            actorName: event.actorName,
+            direction: nextDirection,
+            status: "unavailable",
+            amount: event.amount,
+            resource: event.resource,
+          }),
+        );
+        return;
+      }
+
+      const updated = applyResourceDelta(
+        activeActorDoc as Record<string, unknown>,
+        event.resource,
+        getResourceDelta(event.amount, nextDirection),
+      );
+      setActiveActorDoc(updated);
+      setUndoneResourceLogIds((prev) => {
+        const next = new Set(prev);
+        if (isUndone) next.delete(logMsg.id);
+        else next.add(logMsg.id);
+        return next;
+      });
+    },
+    [activeActorDoc, addMessage, setActiveActorDoc, undoneResourceLogIds],
   );
 
   useEffect(() => {
@@ -712,14 +836,10 @@ export const ChatPanel: React.FC = () => {
         value={{
           onOppose: activeActorDoc ? handleOppose : null,
           onRerollOpposed: activeActorDoc ? handleRerollOpposed : null,
-          onLossResource: activeActorDoc
-            ? (msg, resource, amount) =>
-                handleResourceChange(msg, resource, amount, "loss")
-            : null,
-          onGainResource: activeActorDoc
-            ? (msg, resource, amount) =>
-                handleResourceChange(msg, resource, amount, "gain")
-            : null,
+          onLossResource: (msg, resource, amount) =>
+            handleResourceChange(msg, resource, amount, "loss"),
+          onGainResource: (msg, resource, amount) =>
+            handleResourceChange(msg, resource, amount, "gain"),
           selectedSpeaker,
         }}
       >
@@ -750,6 +870,10 @@ export const ChatPanel: React.FC = () => {
               {activeMessages.map((message) => {
                 if (message.kind === "log") {
                   const logMsg = message as LogMessage;
+                  const canUndoResource =
+                    logMsg.event.type === "resource-application" &&
+                    logMsg.event.status === "applied";
+                  const isResourceUndone = undoneResourceLogIds.has(logMsg.id);
                   return (
                     <Box
                       key={logMsg.id}
@@ -770,8 +894,28 @@ export const ChatPanel: React.FC = () => {
                       }}
                     >
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <LogMessageTemplate event={logMsg.event} />
+                        <LogMessageTemplate
+                          event={logMsg.event}
+                          undone={isResourceUndone}
+                        />
                       </Box>
+                      {canUndoResource && (
+                        <Button
+                          size="small"
+                          variant="text"
+                          onClick={() => handleToggleResourceApplication(logMsg)}
+                          sx={{
+                            minWidth: 52,
+                            px: 0.75,
+                            py: 0.25,
+                            fontSize: "0.72rem",
+                            textTransform: "none",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {isResourceUndone ? t("Redo") : t("Undo")}
+                        </Button>
+                      )}
                       <Typography
                         variant="caption"
                         color="text.secondary"

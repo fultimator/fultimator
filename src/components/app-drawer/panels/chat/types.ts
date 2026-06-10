@@ -306,6 +306,14 @@ export type CombatLogEvent =
     }
   | { type: "spell-use"; actorName: string; spellName: string }
   | { type: "generic-roll"; actorName: string; label: string }
+  | {
+      type: "resource-application";
+      actorName: string;
+      direction: "loss" | "gain";
+      status: "applied" | "unavailable";
+      amount: number;
+      resource: "hp" | "mp" | "ip" | "fp" | "up";
+    }
   | { type: "crit-success"; actorName: string }
   | { type: "crit-failure"; actorName: string }
   // fallback

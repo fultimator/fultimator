@@ -43,6 +43,7 @@ import {
   setNestedActivation,
   setSpellListActivation,
 } from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
+import { ARCANA_POLICY_KEY } from "/src/components/shared/actors/pc/spells/arcanaActions";
 import MagiseedGeneralSection from "/src/components/shared/actors/pc/spells/sections/MagiseedGeneralSection";
 import MagiseedContentSection from "/src/components/shared/actors/pc/spells/sections/MagiseedContentSection";
 import GiftContentSection from "/src/components/shared/actors/pc/spells/sections/GiftContentSection";
@@ -204,7 +205,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       spellType === "arcanist" || spellType === "arcanist-rework"
         ? {
             ...baseSpell,
-            enabled: !hasActiveSpellInList(mnemo?.spells || [], spellType),
+            enabled: !hasActiveSpellInList(
+              mnemo?.spells || [],
+              ARCANA_POLICY_KEY,
+            ),
           }
         : baseSpell;
     if (!newSpell) return;
@@ -271,7 +275,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               ...baseSpell,
               enabled: !hasActiveSpellInList(
                 mnemo?.spells || [],
-                spell.spellType,
+                ARCANA_POLICY_KEY,
               ),
             }
           : baseSpell,
@@ -494,7 +498,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   mergeDesc: "",
                   dismiss: "",
                   dismissDesc: "",
-                  enabled: !hasActiveSpellInList(cls.spells, spell),
+                  enabled: !hasActiveSpellInList(
+                    cls.spells,
+                    ARCANA_POLICY_KEY,
+                  ),
                   showInPlayerSheet: true,
                 },
               ],
@@ -516,7 +523,10 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   pulseDesc: "",
                   dismiss: "",
                   dismissDesc: "",
-                  enabled: !hasActiveSpellInList(cls.spells, spell),
+                  enabled: !hasActiveSpellInList(
+                    cls.spells,
+                    ARCANA_POLICY_KEY,
+                  ),
                   showInPlayerSheet: true,
                 },
               ],
@@ -1008,7 +1018,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               mergeDesc: t(spell.mergeDesc || ""),
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
-              enabled: !hasActiveSpellInList(cls.spells, "arcanist"),
+              enabled: !hasActiveSpellInList(cls.spells, ARCANA_POLICY_KEY),
               showInPlayerSheet: true,
               fuid: spell.fuid,
               _packItemId: spell._packItemId,
@@ -1048,7 +1058,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               pulseDesc: t(spell.pulseDesc || ""),
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
-              enabled: !hasActiveSpellInList(cls.spells, "arcanist-rework"),
+              enabled: !hasActiveSpellInList(cls.spells, ARCANA_POLICY_KEY),
               showInPlayerSheet: true,
               fuid: spell.fuid,
               _packItemId: spell._packItemId,
@@ -1237,7 +1247,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 spells: setSpellListActivation(
                   mnemo.spells || [],
                   spellIndex,
-                  spellType,
+                  ARCANA_POLICY_KEY,
                   active,
                 ),
               }
@@ -1259,7 +1269,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 spells: setSpellListActivation(
                   cls.spells || [],
                   spellIndex,
-                  spellType,
+                  ARCANA_POLICY_KEY,
                   active,
                 ),
               }

@@ -22,6 +22,10 @@ import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
+import {
+  getArcanaStageDetails,
+  getArcanaStepperStage,
+} from "/src/components/shared/actors/pc/spells/arcanaActions";
 
 const StyledMarkdown = styled(ReactMarkdown)({
   whiteSpace: "pre-line",
@@ -108,34 +112,62 @@ export default function SpellArcanist({
   const showInPlayerSheet =
     arcana.showInPlayerSheet || arcana.showInPlayerSheet === undefined;
   const mergeLabel = arcana.merge || t("MERGE");
+  const pulseLabel = arcana.pulse || t("PULSE");
   const dismissLabel = arcana.dismiss || t("DISMISS");
+  const [arcanaStage, setArcanaStage] = React.useState(
+    arcana.enabled ? "merge" : null,
+  );
+
+  React.useEffect(() => {
+    setArcanaStage(arcana.enabled ? "merge" : null);
+  }, [arcana.enabled, arcana.name]);
 
   const sendArcanaStageToChat = (stage) => {
-    const isDismiss = stage === "dismiss";
-    const label = isDismiss ? dismissLabel : mergeLabel;
-    const description = isDismiss
-      ? arcana.dismissDesc || t("No Dismiss Benefit")
-      : arcana.mergeDesc || t("No Merge Benefit");
-
-    sendDisplayMessage("spell", `${arcana.name} - ${label}`, {
-      speaker: "",
-      tags: [isDismiss ? t("DISMISS") : t("MERGE")],
+    const {
+      label,
+      tag,
+      itemType = "spell",
       description,
+      cost,
+    } = getArcanaStageDetails(arcana, stage, t);
+
+    sendDisplayMessage(itemType, `${arcana.name} - ${label}`, {
+      speaker: "",
+      tags: [tag],
+      description,
+      cost,
     });
   };
 
   const handleActivate = () => {
-    if (!arcana.enabled) {
-      sendArcanaStageToChat("merge");
-      onActivate?.(true);
+    if (arcana.enabled) {
+      setArcanaStage(null);
+      onActivate?.(false);
       return;
     }
     sendArcanaStageToChat("merge");
+    setArcanaStage("merge");
+    onActivate?.(true);
   };
 
-  const handleAdvanceToDismiss = () => {
+  const handlePulse = () => {
+    if (!arcana.enabled) return;
+    sendArcanaStageToChat("pulse");
+    setArcanaStage("pulse");
+  };
+
+  const handleDismiss = () => {
     sendArcanaStageToChat("dismiss");
+    setArcanaStage(null);
     onActivate?.(false);
+  };
+
+  const handleAdvance = () => {
+    if (rework && arcanaStage !== "pulse") {
+      handlePulse();
+      return;
+    }
+    handleDismiss();
   };
 
   const domainText = arcana.domain || (arcana.domainDesc ? t(arcana.domainDesc) : "");
@@ -251,28 +283,49 @@ export default function SpellArcanist({
             >
               <Stepper
                 nonLinear
-                activeStep={arcana.enabled ? 0 : -1}
+                activeStep={getArcanaStepperStage(
+                  arcanaStage,
+                  arcana.enabled,
+                  rework,
+                )}
                 sx={{ flex: 1, minWidth: 0 }}
               >
                 <Step completed={false}>
-                  <StepButton onClick={() => sendArcanaStageToChat("merge")}>
+                  <StepButton
+                    onClick={() => {
+                      sendArcanaStageToChat("merge");
+                      setArcanaStage("merge");
+                    }}
+                    disabled={!arcana.enabled}
+                  >
                     {mergeLabel}
                   </StepButton>
                 </Step>
+                {rework && (
+                  <Step completed={false}>
+                    <StepButton onClick={handlePulse} disabled={!arcana.enabled}>
+                      {pulseLabel}
+                    </StepButton>
+                  </Step>
+                )}
                 <Step completed={false}>
-                  <StepButton onClick={() => sendArcanaStageToChat("dismiss")}>
+                  <StepButton onClick={handleDismiss} disabled={!arcana.enabled}>
                     {dismissLabel}
                   </StepButton>
                 </Step>
               </Stepper>
-              <Tooltip title={t("DISMISS")}>
+              <Tooltip
+                title={
+                  rework && arcanaStage !== "pulse" ? t("PULSE") : t("DISMISS")
+                }
+              >
                 <span>
                   <Button
                     size="small"
                     variant="outlined"
                     endIcon={<ArrowForward />}
                     disabled={!arcana.enabled}
-                    onClick={handleAdvanceToDismiss}
+                    onClick={handleAdvance}
                     sx={{ flexShrink: 0, minWidth: 92 }}
                   >
                     {t("Advance")}
