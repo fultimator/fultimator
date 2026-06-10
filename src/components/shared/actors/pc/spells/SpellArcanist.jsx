@@ -1,418 +1,314 @@
+import React from "react";
 import {
-  Card,
-  Grid,
-  Stack,
-  Typography,
-  darken,
+  Box,
+  Button,
   IconButton,
+  Step,
+  StepButton,
+  Stepper,
   Tooltip,
-  Icon,
+  Typography,
 } from "@mui/material";
+import Edit from "@mui/icons-material/Edit";
+import {
+  ArrowForward,
+  RadioButtonChecked,
+  RadioButtonUnchecked,
+  VisibilityOff,
+} from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import { styled } from "@mui/system";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import { useTranslate } from "/src/translation/translate";
-import Edit from "@mui/icons-material/Edit";
-import { VisibilityOff } from "@mui/icons-material";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
-export default function SpellArcanist({ arcana, rework, onEdit, isEditMode }) {
+const StyledMarkdown = styled(ReactMarkdown)({
+  whiteSpace: "pre-line",
+});
+
+const inlineMarkdownComponents = {
+  p: ({ node: _n, ...props }) => <span {...props} />,
+};
+
+function MarkdownText({ children, fallback }) {
+  if (!children) return fallback;
+  return (
+    <StyledMarkdown
+      allowedElements={["strong", "em"]}
+      unwrapDisallowed
+      components={inlineMarkdownComponents}
+    >
+      {children}
+    </StyledMarkdown>
+  );
+}
+
+function ArcanaSection({ label, title, description, fallback, theme }) {
+  return (
+    <Box sx={{ borderTop: `1px solid ${theme.primary}` }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "88px 1fr", sm: "112px 1fr" },
+          minHeight: 28,
+        }}
+      >
+        <Box
+          sx={{
+            bgcolor: theme.primary,
+            color: theme.white,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: 1,
+            "& *": { color: `${theme.white} !important` },
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold", lineHeight: 1.2 }}
+          >
+            {label}
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            bgcolor: theme.ternary,
+            display: "flex",
+            alignItems: "center",
+            px: 1.5,
+            py: 0.5,
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: "bold", lineHeight: 1.25 }}>
+            {title || ""}
+          </Typography>
+        </Box>
+      </Box>
+      <Box sx={{ px: 2, py: 1, fontSize: "0.9rem", lineHeight: 1.35 }}>
+        <MarkdownText fallback={fallback}>{description}</MarkdownText>
+      </Box>
+    </Box>
+  );
+}
+
+export default function SpellArcanist({
+  arcana,
+  rework,
+  onEdit,
+  isEditMode,
+  onActivate,
+  alwaysExpanded = false,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
-  const isDarkMode = theme.mode === "dark";
-  const backgroundColor = isDarkMode ? "#1f1f1f" : "#fff";
-  const iconColor = isDarkMode ? "#ffffff" : "#000000";
-  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
-  const StyledMarkdown = styled(ReactMarkdown)({
-    whiteSpace: "pre-line",
-  });
+  const [open, setOpen] = React.useState(alwaysExpanded);
 
   const showInPlayerSheet =
     arcana.showInPlayerSheet || arcana.showInPlayerSheet === undefined;
+  const mergeLabel = arcana.merge || t("MERGE");
+  const dismissLabel = arcana.dismiss || t("DISMISS");
+
+  const sendArcanaStageToChat = (stage) => {
+    const isDismiss = stage === "dismiss";
+    const label = isDismiss ? dismissLabel : mergeLabel;
+    const description = isDismiss
+      ? arcana.dismissDesc || t("No Dismiss Benefit")
+      : arcana.mergeDesc || t("No Merge Benefit");
+
+    sendDisplayMessage("spell", `${arcana.name} - ${label}`, {
+      speaker: "",
+      tags: [isDismiss ? t("DISMISS") : t("MERGE")],
+      description,
+    });
+  };
+
+  const handleActivate = () => {
+    if (!arcana.enabled) {
+      sendArcanaStageToChat("merge");
+      onActivate?.(true);
+      return;
+    }
+    sendArcanaStageToChat("merge");
+  };
+
+  const handleAdvanceToDismiss = () => {
+    sendArcanaStageToChat("dismiss");
+    onActivate?.(false);
+  };
+
+  const domainText = arcana.domain || (arcana.domainDesc ? t(arcana.domainDesc) : "");
+  const domainSubtitle = domainText ? (
+    <Typography component="div" sx={{ fontSize: "0.85rem", lineHeight: 1.3 }}>
+      <strong>{t("Domains: ")}</strong>
+      <span>{domainText}</span>
+    </Typography>
+  ) : (
+    <Typography sx={{ fontSize: "0.85rem", lineHeight: 1.3 }}>
+      {t("No Domain")}
+    </Typography>
+  );
 
   return (
-    <>
-      <Card sx={{ marginBottom: 2 }}>
-        <div style={{ background: `${backgroundColor}` }}>
-          <Stack>
-            <Grid container>
-              <Grid container direction="column" size="grow">
-                <Grid
-                  container
-                  sx={{
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    px: 2,
-                    py: 1,
-                    background: `${theme.primary}`,
-                    color: "#ffffff",
-                    "& .MuiTypography-root": {
-                      textTransform: "uppercase",
-                    },
-                  }}
-                >
-                  <Grid size="grow">
-                    <Typography
-                      variant="h1"
-                      sx={{
-                        textAlign: "left",
-                        lineHeight: 1.2,
-                      }}
-                    >
-                      {arcana.name}
-                    </Typography>
-                  </Grid>
-                </Grid>
-
-                {/* First Row */}
-                <Grid
-                  container
-                  sx={{
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                    px: "10px",
-                    py: "5px",
-                    flexGrow: 1,
-                  }}
-                >
-                  <Grid size="grow">
-                    <Typography
-                      component="div"
-                      sx={{
-                        fontStyle: "italic",
-                      }}
-                    >
-                      {!arcana.description ? (
-                        t("No Description")
-                      ) : (
-                        <div style={{ display: "inline" }}>
-                          <ReactMarkdown
-                            allowedElements={["strong", "em"]}
-                            unwrapDisallowed={true}
-                            style={{ display: "inline" }}
-                          >
-                            {arcana.description}
-                          </ReactMarkdown>
-                        </div>
-                      )}
-                    </Typography>
-                  </Grid>
-                  {isEditMode && (
-                    <Grid
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {!showInPlayerSheet && (
-                        <Tooltip title={t("Arcana not shown in player sheet")}>
-                          <Icon>
-                            <VisibilityOff style={{ color: "black" }} />
-                          </Icon>
-                        </Tooltip>
-                      )}
-                      <IconButton size="small" onClick={onEdit}>
-                        <Edit style={{ color: iconColor }} />
-                      </IconButton>
-                    </Grid>
+    <Box
+      sx={{
+        display: "inline-block",
+        verticalAlign: "top",
+        width: { xs: "100%", lg: "50%" },
+        boxSizing: "border-box",
+        p: 0.5,
+      }}
+    >
+      <ItemRowCard
+        variant="outlined"
+        onClick={
+          alwaysExpanded ? undefined : () => setOpen((value) => !value)
+        }
+        paperSx={{
+          transition: "border-color 0.15s ease",
+          borderColor: arcana.enabled ? theme.primary : undefined,
+          "&:hover": { borderColor: theme.primary },
+        }}
+        label={
+          <Typography
+            noWrap
+            sx={{
+              fontFamily: "Antonio",
+              fontWeight: 800,
+              fontSize: "1.05rem",
+              textTransform: "uppercase",
+              lineHeight: 1.25,
+            }}
+          >
+            {arcana.name}
+          </Typography>
+        }
+        subtitle={domainSubtitle}
+        actions={
+          <>
+            {onActivate && (
+              <Tooltip title={arcana.enabled ? t("Active") : t("Activate")}>
+                <IconButton size="small" onClick={handleActivate}>
+                  {arcana.enabled ? (
+                    <RadioButtonChecked />
+                  ) : (
+                    <RadioButtonUnchecked />
                   )}
-                </Grid>
-                {/* Second Row */}
-                <Grid
-                  container
-                  sx={{
-                    justifyContent: "flex-start",
-                    background: "transparent",
-                    px: "10px",
-                    py: "8px",
-                  }}
-                >
-                  <Typography component="div">
-                    {!arcana.domain ? (
-                      t("No Domain")
-                    ) : (
-                      <div style={{ display: "inline" }}>
-                        <Typography
-                          variant="inherit"
-                          style={{ fontWeight: "bold", display: "inline" }}
-                        >
-                          {t("Domains: ")}
-                        </Typography>
-                        <ReactMarkdown
-                          allowedElements={["strong", "em"]}
-                          unwrapDisallowed={true}
-                          style={{ display: "inline" }}
-                        >
-                          {arcana.domain}
-                        </ReactMarkdown>
-                      </div>
-                    )}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Grid>
+                </IconButton>
+              </Tooltip>
+            )}
+            {isEditMode && (
+              <>
+                {!showInPlayerSheet && (
+                  <Tooltip title={t("Arcana not shown in player sheet")}>
+                    <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+                  </Tooltip>
+                )}
+                <Tooltip title={t("Edit")}>
+                  <IconButton size="small" onClick={onEdit}>
+                    <Edit />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
+          </>
+        }
+      >
+        {(alwaysExpanded || open) && (
+          <Box
+            sx={{
+              borderTop: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+            }}
+          >
+            <Box
+              sx={{
+                px: 2,
+                py: 1,
+                bgcolor: theme.ternary,
+                fontStyle: "italic",
+                fontSize: "0.9rem",
+                lineHeight: 1.35,
+              }}
+            >
+              <MarkdownText fallback={t("No Description")}>
+                {arcana.description}
+              </MarkdownText>
+            </Box>
 
-            <Grid container direction="column">
-              {/* Merge Benefit */}
-              <Grid
-                container
-                sx={{
-                  justifyContent: "space-between",
-                  borderTop: `1px solid ${theme.primary}`,
-                  width: "100%",
-                }}
+            <Box
+              sx={{
+                borderTop: "1px solid",
+                borderColor: "divider",
+                px: 1.5,
+                py: 1,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Stepper
+                nonLinear
+                activeStep={arcana.enabled ? 0 : -1}
+                sx={{ flex: 1, minWidth: 0 }}
               >
-                {/* Merge Label */}
-                <Grid
-                  sx={{
-                    textAlign: "center",
-                    backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
-                      theme.secondary,
-                      0.3,
-                    )})`,
-                    padding: "1px",
-                    color: `${theme.white}`,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  size={2}
-                >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: "bold",
-                      margin: "auto",
-                    }}
+                <Step completed={false}>
+                  <StepButton onClick={() => sendArcanaStageToChat("merge")}>
+                    {mergeLabel}
+                  </StepButton>
+                </Step>
+                <Step completed={false}>
+                  <StepButton onClick={() => sendArcanaStageToChat("dismiss")}>
+                    {dismissLabel}
+                  </StepButton>
+                </Step>
+              </Stepper>
+              <Tooltip title={t("DISMISS")}>
+                <span>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    endIcon={<ArrowForward />}
+                    disabled={!arcana.enabled}
+                    onClick={handleAdvanceToDismiss}
+                    sx={{ flexShrink: 0, minWidth: 92 }}
                   >
-                    {t("MERGE")}
-                  </Typography>
-                </Grid>
+                    {t("Advance")}
+                  </Button>
+                </span>
+              </Tooltip>
+            </Box>
 
-                {/* Arcana Merge Name */}
-                <Grid
-                  sx={{
-                    backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                    px: 3,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  size={10}
-                >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      margin: "auto 0",
-                    }}
-                  >
-                    {arcana.merge}
-                  </Typography>
-                </Grid>
+            <ArcanaSection
+              label={t("MERGE")}
+              title={arcana.merge}
+              description={arcana.mergeDesc}
+              fallback={t("No Merge Benefit")}
+              theme={theme}
+            />
 
-                {/* Merge Benefit */}
-                <Grid
-                  sx={{
-                    mx: 4,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  size={12}
-                >
-                  <Typography component="div">
-                    {!arcana.mergeDesc ? (
-                      t("No Merge Benefit")
-                    ) : (
-                      <div style={{ display: "inline" }}>
-                        <StyledMarkdown
-                          allowedElements={["strong", "em"]}
-                          unwrapDisallowed={true}
-                          style={{ display: "inline" }}
-                        >
-                          {arcana.mergeDesc}
-                        </StyledMarkdown>
-                      </div>
-                    )}
-                  </Typography>
-                </Grid>
-              </Grid>
+            {rework && (
+              <ArcanaSection
+                label={t("PULSE")}
+                title={arcana.pulse}
+                description={arcana.pulseDesc}
+                fallback={t("No Pulse Benefit")}
+                theme={theme}
+              />
+            )}
 
-              {rework && (
-                <>
-                  {/* Pulse Benefit */}
-                  <Grid
-                    container
-                    sx={{
-                      justifyContent: "space-between",
-                      borderTop: `1px solid ${theme.primary}`,
-                      width: "100%",
-                    }}
-                  >
-                    {/* Pulse Grid Item */}
-                    <Grid
-                      sx={{
-                        textAlign: "center",
-                        backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
-                          theme.secondary,
-                          0.3,
-                        )})`,
-                        padding: "1px",
-                        color: `${theme.white}`,
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                      size={2}
-                    >
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: "bold",
-                          margin: "auto",
-                        }}
-                      >
-                        {t("PULSE")}
-                      </Typography>
-                    </Grid>
-
-                    {/* Arcana Pulse Name */}
-                    <Grid
-                      sx={{
-                        backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                        px: 3,
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                      size={10}
-                    >
-                      <Typography
-                        variant="h5"
-                        sx={{
-                          fontWeight: "bold",
-                          textAlign: "center",
-                          margin: "auto 0",
-                        }}
-                      >
-                        {arcana.pulse}
-                      </Typography>
-                    </Grid>
-
-                    {/* Pulse Benefit */}
-                    <Grid
-                      sx={{
-                        mx: 4,
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                      size={12}
-                    >
-                      <Typography component="div">
-                        {!arcana.pulseDesc ? (
-                          t("No Pulse Benefit")
-                        ) : (
-                          <div style={{ display: "inline" }}>
-                            <StyledMarkdown
-                              allowedElements={["strong", "em"]}
-                              unwrapDisallowed={true}
-                              style={{ display: "inline" }}
-                            >
-                              {arcana.pulseDesc}
-                            </StyledMarkdown>
-                          </div>
-                        )}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </>
-              )}
-
-              {/* Dismiss Benefit */}
-              <Grid
-                container
-                sx={{
-                  justifyContent: "space-between",
-                  borderTop: `1px solid ${theme.primary}`,
-                  width: "100%",
-                }}
-              >
-                {/* Dismiss Label */}
-                <Grid
-                  sx={{
-                    textAlign: "center",
-                    backgroundImage: `linear-gradient(to right, ${theme.primary}, ${darken(
-                      theme.secondary,
-                      0.3,
-                    )})`,
-                    padding: "1px",
-                    color: `${theme.white}`,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  size={2}
-                >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: "bold",
-                      margin: "auto",
-                    }}
-                  >
-                    {t("DISMISS")}
-                  </Typography>
-                </Grid>
-
-                {/* Dismiss Name */}
-                <Grid
-                  sx={{
-                    backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                    px: 3,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  size={10}
-                >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      margin: "auto 0",
-                    }}
-                  >
-                    {arcana.dismiss}
-                  </Typography>
-                </Grid>
-
-                {/* Dismiss Benefit */}
-                <Grid
-                  sx={{
-                    mx: 4,
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  size={12}
-                >
-                  <Typography component="div">
-                    {!arcana.dismissDesc ? (
-                      t("No Dismiss Benefit")
-                    ) : (
-                      <div style={{ display: "inline" }}>
-                        <StyledMarkdown
-                          allowedElements={["strong", "em"]}
-                          unwrapDisallowed={true}
-                          style={{ display: "inline" }}
-                        >
-                          {arcana.dismissDesc}
-                        </StyledMarkdown>
-                      </div>
-                    )}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Stack>
-        </div>
-      </Card>
-    </>
+            <ArcanaSection
+              label={t("DISMISS")}
+              title={arcana.dismiss}
+              description={arcana.dismissDesc}
+              fallback={t("No Dismiss Benefit")}
+              theme={theme}
+            />
+          </Box>
+        )}
+      </ItemRowCard>
+    </Box>
   );
 }

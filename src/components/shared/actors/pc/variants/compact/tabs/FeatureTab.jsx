@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Paper,
   Typography,
@@ -18,8 +18,12 @@ import {
   Search,
   Casino,
   Message,
+  MusicNote,
   RadioButtonChecked,
+  RadioButtonUnchecked,
+  LocalFlorist,
 } from "@mui/icons-material";
+import OutdoorGrillIcon from "@mui/icons-material/OutdoorGrill";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 import { useTranslate } from "/src/translation/translate";
@@ -40,6 +44,8 @@ import SpellGourmet from "/src/components/shared/actors/pc/variants/compact/spel
 import SpellMagiseed from "/src/components/shared/actors/pc/variants/compact/spells/SpellMagiseed";
 import SpellGadget from "/src/components/shared/actors/pc/variants/compact/spells/SpellGadget";
 import SpellMagichant from "/src/components/shared/actors/pc/variants/compact/spells/SpellMagichant";
+import ChanterVerseDialog from "/src/components/shared/actors/pc/spells/ChanterVerseDialog";
+import GourmetStartCookingDialog from "/src/components/shared/actors/pc/spells/GourmetStartCookingDialog";
 import SpellSymbol from "/src/components/shared/actors/pc/variants/compact/spells/SpellSymbol";
 import SpellDance from "/src/components/shared/actors/pc/variants/compact/spells/SpellDance";
 import SpellGift from "/src/components/shared/actors/pc/variants/compact/spells/SpellGift";
@@ -72,13 +78,26 @@ import {
   SpellTinkererMagitechRankModal,
 } from "/src/components/shared/actors/pc/spells";
 import { getSlottedMnemospheres } from "/src/libs/player/mnemosphereClassUtils";
+import { magiseeds } from "/src/libs/floralistMagiseedData";
 import classList from "/src/libs/classes";
 import { createBlankSpellForType } from "/src/libs/player/createBlankSpell";
+import { availableModules } from "/src/libs/pilotVehicleData";
+import {
+  prepareAccuracyCheck,
+  rollAccuracyCheck,
+  processAccuracyCheck,
+  buildAccuracyCheckMessage,
+} from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
 import PcCompactQuirk from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactQuirk";
 import PcCompactCampActivities from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactCampActivities";
 import PcCompactZeroPower from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactZeroPower";
 import PcCompactOthers from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactOthers";
 import PcCompactRituals from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactRituals";
+import {
+  hasActiveSpellInList,
+  setNestedActivation,
+  setSpellListActivation,
+} from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
 // Constants
 
 const SINGLE_INSTANCE_SPELL_TYPES = new Set([
@@ -171,7 +190,41 @@ function getSpellName(spell, t) {
   }
 }
 
-function renderSpellContent(spell, setPlayer, searchQuery) {
+function resolveGourmetEffectText(effect, t) {
+  if (!effect?.effect || typeof effect.effect !== "string") return "";
+  let text = effect.effect;
+  const replacements = [
+    {
+      type: "statusEffect",
+      placeholder: t("gourmet_delicacy_effect_choose_all_statuses"),
+    },
+    {
+      type: "statusEffect",
+      placeholder: t("gourmet_delicacy_effect_choose_some_statuses"),
+    },
+    {
+      type: "damageType",
+      placeholder: t("gourmet_delicacy_effect_choose_damage_type"),
+    },
+    {
+      type: "attribute",
+      placeholder: t("gourmet_delicacy_effect_choose_attributte"),
+    },
+  ];
+
+  replacements.forEach(({ type, placeholder }) => {
+    const value = effect.customChoices?.[type];
+    if (!value) return;
+    text = text.replace(
+      new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"),
+      value,
+    );
+  });
+
+  return text;
+}
+
+function renderSpellContent(spell, setPlayer, searchQuery, context = {}) {
   switch (spell.spellType) {
     case "default":
       return (
@@ -192,11 +245,26 @@ function renderSpellContent(spell, setPlayer, searchQuery) {
     case "gamble":
       return <SpellEntropistGamble gamble={spell} isEditMode={false} />;
     case "invocation":
-      return <SpellInvoker spell={spell} setPlayer={setPlayer} open={true} />;
+      return (
+        <SpellInvoker
+          spell={spell}
+          setPlayer={setPlayer}
+          classIndex={context.classIndex}
+          open={true}
+        />
+      );
     case "cooking":
       return <SpellGourmet spell={spell} open={true} />;
     case "magiseed":
-      return <SpellMagiseed spell={spell} setPlayer={setPlayer} open={true} />;
+      return (
+        <SpellMagiseed
+          spell={spell}
+          setPlayer={setPlayer}
+          classIndex={context.classIndex}
+          spellIndex={context.spellIndex}
+          open={true}
+        />
+      );
     case "magichant":
       return <SpellMagichant spell={spell} />;
     case "symbol":
@@ -204,7 +272,15 @@ function renderSpellContent(spell, setPlayer, searchQuery) {
     case "dance":
       return <SpellDance spell={spell} />;
     case "gift":
-      return <SpellGift spell={spell} setPlayer={setPlayer} open={true} />;
+      return (
+        <SpellGift
+          spell={spell}
+          setPlayer={setPlayer}
+          classIndex={context.classIndex}
+          spellIndex={context.spellIndex}
+          open={true}
+        />
+      );
     case "therioform":
       return <SpellTherioform spell={spell} />;
     case "pilot-vehicle":
@@ -218,6 +294,9 @@ function renderSpellContent(spell, setPlayer, searchQuery) {
           arcana={spell}
           isEditMode={false}
           rework={spell.spellType === "arcanist-rework"}
+          setPlayer={setPlayer}
+          classIndex={context.classIndex}
+          spellIndex={context.spellIndex}
         />
       );
     default:
@@ -225,6 +304,26 @@ function renderSpellContent(spell, setPlayer, searchQuery) {
         return <SpellGadget spell={spell} />;
       return null;
   }
+}
+
+function hasInlineSpellContent(spell) {
+  return (
+    spell.spellType !== "pilot-vehicle" &&
+    (spell.spellType === "default" ||
+      spell.spellType === "gamble" ||
+      spell.spellType === "invocation" ||
+      spell.spellType === "cooking" ||
+      spell.spellType === "magiseed" ||
+      spell.spellType === "magichant" ||
+      spell.spellType === "symbol" ||
+      spell.spellType === "dance" ||
+      spell.spellType === "gift" ||
+      spell.spellType === "therioform" ||
+      spell.spellType === "deck" ||
+      spell.spellType === "arcanist" ||
+      spell.spellType === "arcanist-rework" ||
+      spell.spellType?.startsWith("tinkerer-"))
+  );
 }
 
 function getSpellModalSections(spellType) {
@@ -344,7 +443,7 @@ function getSpellModalSections(spellType) {
       },
       {
         id: "content",
-        title: "content",
+        title: "Combinations",
         component: GourmetContentSection,
         props: {},
       },
@@ -355,10 +454,16 @@ function getSpellModalSections(spellType) {
         props: {},
       },
       {
+        id: "shop",
+        title: "Shop",
+        component: GourmetCookingTab,
+        props: { mode: "shop" },
+      },
+      {
         id: "cooking",
         title: "cooking",
         component: GourmetCookingTab,
-        props: {},
+        props: { mode: "cooking" },
       },
     ],
     gamble: [
@@ -443,6 +548,7 @@ function VehicleCard({
   classIndex,
   searchQuery,
   setPlayer,
+  player,
   theme,
   t,
 }) {
@@ -457,14 +563,86 @@ function VehicleCard({
       const cls = { ...classes[classIndex] };
       const spells = cls.spells ? [...cls.spells] : [];
       const spell = { ...spells[spellIndex] };
-      spell.vehicles = (spell.vehicles ?? []).map((v, i) => ({
-        ...v,
-        enabled: i === vehicleIndex,
-      }));
-      spells[spellIndex] = spell;
+      spells[spellIndex] = setNestedActivation(
+        spell,
+        vehicleIndex,
+        "pilot-vehicle",
+        true,
+      );
       cls.spells = spells;
       classes[classIndex] = cls;
       return { ...prev, classes };
+    });
+  };
+
+  const handleModuleRoll = (e, mod) => {
+    e.stopPropagation();
+    if (!player) return;
+    const attrCfg = {
+      dexterity: [["slow", "enraged"], ["dexUp"]],
+      insight: [["dazed", "enraged"], ["insUp"]],
+      might: [["weak", "poisoned"], ["migUp"]],
+      willpower: [["shaken", "poisoned"], ["wlpUp"]],
+    };
+    const attrDie = (key) => {
+      const base = player.attributes?.[key]?.base ?? 8;
+      const cfg = attrCfg[key] ?? [[], []];
+      return calculateAttribute(player, base, cfg[0], cfg[1], 6, 12);
+    };
+    const acc = mod.accuracy || {};
+    const dmg = mod.damage || {};
+    const attr1 = acc.attr1 || "dexterity";
+    const attr2 = acc.attr2 || "might";
+    const modName =
+      mod.name === "pilot_custom_weapon" ? mod.customName : t(mod.name);
+    const intent = prepareAccuracyCheck({
+      arg: modName,
+      name: modName,
+      attr1,
+      attr2,
+      accuracyBonus: acc.value ?? 0,
+      baseDamage: dmg.value ?? 0,
+      damageType: dmg.type ?? "physical",
+      accuracyDefense: acc.defense ?? "def",
+      category: mod.category,
+      isWeaponModule: true,
+      damageHrZero: dmg.hrZero === true,
+      range:
+        mod.range === "Ranged" || mod.range === "ranged" ? "ranged" : "melee",
+      description: mod.description ? t(mod.description) : undefined,
+    });
+    const dieSizes = { primary: attrDie(attr1), secondary: attrDie(attr2) };
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(
+      intent,
+      rolls,
+      dieSizes,
+      player?.info?.name || "",
+    );
+    sendRollMessage(buildAccuracyCheckMessage(result));
+  };
+
+  const handleModuleSendToChat = (e, mod) => {
+    e.stopPropagation();
+    const CUSTOM = new Set([
+      "pilot_custom_weapon",
+      "pilot_custom_armor",
+      "pilot_custom_support",
+    ]);
+    const modName = CUSTOM.has(mod.name ?? mod.key ?? "")
+      ? mod.customName || t("pilot_custom")
+      : t(mod.name ?? mod.key ?? "");
+    const tags = [];
+    if (mod.type === "pilot_module_armor") {
+      if (mod.martial) tags.push(t("Martial"));
+      if (mod.def != null) tags.push(`DEF ${mod.def >= 0 ? "+" : ""}${mod.def}`);
+      if (mod.mdef != null)
+        tags.push(`M.DEF ${mod.mdef >= 0 ? "+" : ""}${mod.mdef}`);
+    }
+    sendDisplayMessage("item", modName, {
+      description: mod.description ? t(mod.description) : undefined,
+      speaker: player?.info?.name || "",
+      tags: tags.length > 0 ? tags : undefined,
     });
   };
 
@@ -479,10 +657,22 @@ function VehicleCard({
       Boolean,
     ),
   );
-  const modules = (vehicle.modules ?? []).filter((m) => {
-    const k = m.key ?? m.name;
-    return k && equippedKeys.has(k);
-  });
+
+  const allModuleTemplates = [
+    ...(availableModules.weapon ?? []),
+    ...(availableModules.armor ?? []),
+    ...(availableModules.support ?? []),
+  ];
+
+  const modules = (vehicle.modules ?? [])
+    .map((m) => {
+      const k = m.key ?? m.name;
+      if (!k || !equippedKeys.has(k)) return null;
+      const template = allModuleTemplates.find((t) => t.name === k);
+      return template ? { ...template, ...m } : m;
+    })
+    .filter(Boolean);
+
   const hasModules = modules.length > 0;
 
   return (
@@ -520,7 +710,11 @@ function VehicleCard({
             }}
             onClick={handleActivate}
           >
-            <RadioButtonChecked sx={{ fontSize: "1rem" }} />
+            {isActive ? (
+              <RadioButtonChecked sx={{ fontSize: "1rem" }} />
+            ) : (
+              <RadioButtonUnchecked sx={{ fontSize: "1rem" }} />
+            )}
           </IconButton>
         </Tooltip>
       }
@@ -546,28 +740,48 @@ function VehicleCard({
             const modName = CUSTOM.has(m.name ?? m.key ?? "")
               ? m.customName || t("pilot_custom")
               : t(m.name ?? m.key ?? "");
+            const isWeapon = m.type === "pilot_module_weapon";
             return (
-              <Box
+              <ItemRowCard
                 key={i}
-                sx={{
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: `${theme.panelRadius}px`,
-                  px: "6px",
-                  py: "4px",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: "0.72rem",
-                    lineHeight: 1.3,
-                  }}
-                  noWrap
-                >
-                  {highlightMatch(modName, searchQuery)}
-                </Typography>
-              </Box>
+                compact
+                variant="outlined"
+                label={
+                  <Typography
+                    noWrap
+                    sx={{
+                      fontFamily: "Antonio",
+                      fontWeight: 800,
+                      fontSize: "0.72rem",
+                      textTransform: "uppercase",
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {modName}
+                  </Typography>
+                }
+                actions={
+                  isWeapon ? (
+                    <Tooltip title={t("Roll")} arrow>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleModuleRoll(e, m)}
+                      >
+                        <Casino />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={t("Send to Chat")} arrow>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleModuleSendToChat(e, m)}
+                      >
+                        <Message />
+                      </IconButton>
+                    </Tooltip>
+                  )
+                }
+              />
             );
           })}
         </Box>
@@ -589,11 +803,56 @@ function SpellCard({
   theme,
   t,
 }) {
-  const [open, setOpen] = useState(false);
-  const [preview, setPreview] = useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [preview, setPreview] = React.useState(false);
+  const [verseOpen, setVerseOpen] = React.useState(false);
+  const [cookingOpen, setCookingOpen] = React.useState(false);
   const spellName = getSpellName(spell, t);
   const isOffensive = spell.isOffensive === true;
-  const inlineContent = renderSpellContent(spell, setPlayer, searchQuery);
+  const isMagichant = spell.spellType === "magichant";
+  const isCooking = spell.spellType === "cooking";
+  const isArcana =
+    spell.spellType === "arcanist" || spell.spellType === "arcanist-rework";
+  const inlineContent = renderSpellContent(spell, setPlayer, searchQuery, {
+    classIndex,
+    spellIndex,
+  });
+
+  const sendArcanaStageToChat = (stage) => {
+    const isDismiss = stage === "dismiss";
+    const label = isDismiss
+      ? spell.dismiss || t("DISMISS")
+      : spell.merge || t("MERGE");
+    sendDisplayMessage("spell", `${spellName} - ${label}`, {
+      speaker: "",
+      tags: [isDismiss ? t("DISMISS") : t("MERGE")],
+      description: isDismiss
+        ? spell.dismissDesc || t("No Dismiss Benefit")
+        : spell.mergeDesc || t("No Merge Benefit"),
+    });
+  };
+
+  const handleActivateArcana = (event, active = true) => {
+    event.stopPropagation();
+    if (!setPlayer || !isArcana) return;
+    if (active) sendArcanaStageToChat("merge");
+    setPlayer((prev) => ({
+      ...prev,
+      classes: (prev.classes || []).map((cls, clsIndex) =>
+        clsIndex === classIndex
+          ? {
+              ...cls,
+              spells: setSpellListActivation(
+                cls.spells || [],
+                spellIndex,
+                spell.spellType,
+                active,
+              ),
+            }
+          : cls,
+      ),
+    }));
+  };
 
   return (
     <>
@@ -630,6 +889,65 @@ function SpellCard({
                   <Casino />
                 </IconButton>
               </Tooltip>
+            ) : isMagichant ? (
+              <Tooltip title={t("Sing a Verse")} arrow>
+                <IconButton size="small" onClick={() => setVerseOpen(true)}>
+                  <MusicNote />
+                </IconButton>
+              </Tooltip>
+            ) : isCooking ? (
+              <Tooltip title={t("gourmet_cooking")} arrow>
+                <IconButton size="small" onClick={() => setCookingOpen(true)}>
+                  <OutdoorGrillIcon />
+                </IconButton>
+              </Tooltip>
+            ) : spell.spellType === "magiseed" ? (
+              <Tooltip title={t("magiseed_garden")} arrow>
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    const growthClock = spell.growthClock || 0;
+                    const currentSeed = spell.currentMagiseed;
+                    const seedName = currentSeed
+                      ? currentSeed.customName || t(currentSeed.key ?? currentSeed.name)
+                      : t("magiseed_no_magiseed");
+                    let effectText = "";
+                    if (currentSeed) {
+                      const template = magiseeds.find(
+                        (m) => m.name === (currentSeed.key ?? currentSeed.name),
+                      );
+                      const effectKey = Math.min(growthClock, 3);
+                      const raw =
+                        currentSeed.effects?.[effectKey] ??
+                        template?.effects?.[effectKey];
+                      if (raw) effectText = t(raw);
+                    }
+                    sendDisplayMessage("spell", seedName, {
+                      speaker: "",
+                      tags: [`${t("magiseed_growth_clock")}: ${growthClock}/4`],
+                      description: effectText || undefined,
+                    });
+                  }}
+                >
+                  <LocalFlorist />
+                </IconButton>
+              </Tooltip>
+            ) : isArcana ? (
+              <Tooltip title={spell.enabled ? t("Active") : t("Activate")} arrow>
+                <IconButton
+                  size="small"
+                  onClick={(event) => handleActivateArcana(event, true)}
+                  sx={{
+                    color: spell.enabled ? theme.primary : "text.secondary",
+                  }}
+                >
+                  {spell.enabled ? (
+                    <RadioButtonChecked />
+                  ) : (
+                    <RadioButtonUnchecked />
+                  )}
+                </IconButton>
+              </Tooltip>
             ) : (
               <Tooltip title={t("Send to Chat")} arrow>
                 <IconButton
@@ -642,11 +960,21 @@ function SpellCard({
                     })
                   }
                 >
-                  <Message />
+                <Message />
+              </IconButton>
+            </Tooltip>
+            )}
+            {isCooking && isEditMode && (
+              <Tooltip title={t("Edit")} arrow>
+                <IconButton
+                  size="small"
+                  onClick={() => onEdit(spell, spellIndex, classIndex)}
+                >
+                  <Edit />
                 </IconButton>
               </Tooltip>
             )}
-            {isEditMode && (
+            {!isCooking && isEditMode && (
               <Tooltip title={t("Edit")} arrow>
                 <IconButton
                   size="small"
@@ -682,6 +1010,46 @@ function SpellCard({
           </DialogActions>
         </Dialog>
       )}
+      {isMagichant && (
+        <ChanterVerseDialog
+          open={verseOpen}
+          onClose={() => setVerseOpen(false)}
+          magichant={spell}
+          speaker=""
+          t={t}
+        />
+      )}
+      {isCooking && (
+        <GourmetStartCookingDialog
+          open={cookingOpen}
+          onClose={() => setCookingOpen(false)}
+          spell={spell}
+          resolveEffectText={(effect) => resolveGourmetEffectText(effect, t)}
+          onRegisterRecipes={(recipes) => {
+            if (!setPlayer) return;
+            setPlayer((prev) => ({
+              ...prev,
+              classes: (prev.classes || []).map((cls, clsIndex) => {
+                if (clsIndex !== classIndex) return cls;
+                return {
+                  ...cls,
+                  spells: (cls.spells || []).map((entry, entryIndex) => {
+                    if (entryIndex !== spellIndex) return entry;
+                    const cookbook = entry.cookbook || {};
+                    return {
+                      ...entry,
+                      cookbook: {
+                        ...cookbook,
+                        effects: [...(cookbook.effects || []), ...recipes],
+                      },
+                    };
+                  }),
+                };
+              }),
+            }));
+          }}
+        />
+      )}
     </>
   );
 }
@@ -694,6 +1062,7 @@ function ClassSpellSection({
   isEditMode,
   searchQuery,
   setPlayer,
+  player,
   onEdit,
   onRoll,
   onOpenAddMenu,
@@ -766,7 +1135,7 @@ function ClassSpellSection({
         }}
       >
         {filtered.flatMap((spell) => {
-          const hasInline = !!renderSpellContent(spell, null, "");
+          const hasInline = hasInlineSpellContent(spell);
           if (spell.spellType === "pilot-vehicle") {
             const vehicles = spell.vehicles ?? [];
             if (vehicles.length === 0)
@@ -802,6 +1171,7 @@ function ClassSpellSection({
                 classIndex={classIndex}
                 searchQuery={searchQuery}
                 setPlayer={setPlayer}
+                player={player}
                 theme={theme}
                 t={t}
               />
@@ -810,7 +1180,13 @@ function ClassSpellSection({
           return [
             <Box
               key={`${classIndex}-${spell._idx}`}
-              sx={hasInline ? { gridColumn: "1 / -1" } : undefined}
+              sx={
+                hasInline &&
+                spell.spellType !== "arcanist" &&
+                spell.spellType !== "arcanist-rework"
+                  ? { gridColumn: "1 / -1" }
+                  : undefined
+              }
             >
               <SpellCard
                 spell={spell}
@@ -846,7 +1222,7 @@ function MnemoSpellSection({
   theme,
   t,
 }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = React.useState(false);
   if (spells.length === 0 && !isEditMode) return null;
 
   return (
@@ -918,13 +1294,66 @@ function MnemoSpellCard({
   spell,
   searchQuery,
   isEditMode,
+  setPlayer,
   onEdit,
   onRoll,
   theme,
   t,
 }) {
-  const [preview, setPreview] = useState(false);
+  const [preview, setPreview] = React.useState(false);
   const isOffensive = spell.isOffensive === true;
+  const isArcana =
+    spell.spellType === "arcanist" || spell.spellType === "arcanist-rework";
+
+  const sendArcanaStageToChat = (stage) => {
+    const isDismiss = stage === "dismiss";
+    const label = isDismiss
+      ? spell.dismiss || t("DISMISS")
+      : spell.merge || t("MERGE");
+    sendDisplayMessage("spell", `${spell.name} - ${label}`, {
+      speaker: "",
+      tags: [isDismiss ? t("DISMISS") : t("MERGE")],
+      description: isDismiss
+        ? spell.dismissDesc || t("No Dismiss Benefit")
+        : spell.mergeDesc || t("No Merge Benefit"),
+    });
+  };
+
+  const handleActivateArcana = (event, active = true) => {
+    event.stopPropagation();
+    if (!setPlayer || !isArcana) return;
+    if (active) sendArcanaStageToChat("merge");
+    setPlayer((prev) => {
+      const eq0 = prev?.equipment?.[0] ?? {};
+      const mnemospheres = (eq0.mnemospheres ?? []).map((mnemo) => {
+        if (mnemo.id !== spell.mnemoId) return mnemo;
+        const spells = mnemo.spells ?? [];
+        const byId =
+          spell.sourceSpellId != null
+            ? spells.findIndex(
+                (s) =>
+                  (s?._compactId ?? s?.id ?? s?._id ?? null) ===
+                  spell.sourceSpellId,
+              )
+            : -1;
+        const spellIndex = byId >= 0 ? byId : spell.spellIndex;
+        return {
+          ...mnemo,
+          spells: setSpellListActivation(
+            spells,
+            spellIndex,
+            spell.spellType,
+            active,
+          ),
+        };
+      });
+      const nextEq0 = { ...eq0, mnemospheres };
+      return {
+        ...prev,
+        equipment: prev?.equipment ? [nextEq0, ...prev.equipment.slice(1)] : [nextEq0],
+      };
+    });
+  };
 
   return (
     <>
@@ -973,6 +1402,23 @@ function MnemoSpellCard({
                 </IconButton>
               </Tooltip>
             )}
+            {isArcana && (
+              <Tooltip title={spell.enabled ? t("Active") : t("Activate")} arrow>
+                <IconButton
+                  size="small"
+                  onClick={(event) => handleActivateArcana(event, true)}
+                  sx={{
+                    color: spell.enabled ? theme.primary : "text.secondary",
+                  }}
+                >
+                  {spell.enabled ? (
+                    <RadioButtonChecked />
+                  ) : (
+                    <RadioButtonUnchecked />
+                  )}
+                </IconButton>
+              </Tooltip>
+            )}
             {isEditMode && (
               <Tooltip title={t("Edit")} arrow>
                 <IconButton size="small" onClick={() => onEdit(spell)}>
@@ -1018,23 +1464,28 @@ export default function FeatureTab({
   const theme = useCustomTheme();
 
   // Spell edit state
-  const [editingSpell, setEditingSpell] = useState(null);
-  const [, setEditingSpellIndex] = useState(null);
-  const [editingSpellClassIndex, setEditingSpellClassIndex] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [magitechModalOpen, setMagitechModalOpen] = useState(false);
-  const [importModalOpen, setImportModalOpen] = useState(false);
-  const [importTargetClassIndex, setImportTargetClassIndex] = useState(null);
-  const [addMenuAnchor, setAddMenuAnchor] = useState(null);
-  const [addMenuClassIndex, setAddMenuClassIndex] = useState(null);
+  const [editingSpell, setEditingSpell] = React.useState(null);
+  const [, setEditingSpellIndex] = React.useState(null);
+  const [editingSpellClassIndex, setEditingSpellClassIndex] =
+    React.useState(null);
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [magitechModalOpen, setMagitechModalOpen] = React.useState(false);
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
+  const [importTargetClassIndex, setImportTargetClassIndex] =
+    React.useState(null);
+  const [addMenuAnchor, setAddMenuAnchor] = React.useState(null);
+  const [addMenuClassIndex, setAddMenuClassIndex] = React.useState(null);
 
   // Mnemosphere spell state
-  const [mnemoAddMenuAnchor, setMnemoAddMenuAnchor] = useState(null);
-  const [mnemoImportMenuAnchor, setMnemoImportMenuAnchor] = useState(null);
-  const [mnemoImportModalOpen, setMnemoImportModalOpen] = useState(false);
-  const [importTargetMnemoId, setImportTargetMnemoId] = useState(null);
-  const [mnemoSpellModalOpen, setMnemoSpellModalOpen] = useState(false);
-  const [editingMnemoSpell, setEditingMnemoSpell] = useState(null);
+  const [mnemoAddMenuAnchor, setMnemoAddMenuAnchor] = React.useState(null);
+  const [mnemoImportMenuAnchor, setMnemoImportMenuAnchor] =
+    React.useState(null);
+  const [mnemoImportModalOpen, setMnemoImportModalOpen] =
+    React.useState(false);
+  const [importTargetMnemoId, setImportTargetMnemoId] = React.useState(null);
+  const [mnemoSpellModalOpen, setMnemoSpellModalOpen] =
+    React.useState(false);
+  const [editingMnemoSpell, setEditingMnemoSpell] = React.useState(null);
 
   // ---- spell roll ----
   const getAttrDie = (attr) => {
@@ -1179,7 +1630,7 @@ export default function FeatureTab({
         ...spell,
         dances: [
           ...(spell.dances || []),
-          { name: "dance_custom", effect: "", duration: "", customName: "" },
+          { name: "dance_custom_name", effect: "", duration: "", customName: "" },
         ],
       }),
       gift: (spell) => ({
@@ -1199,7 +1650,7 @@ export default function FeatureTab({
         therioforms: [
           ...(spell.therioforms || []),
           {
-            name: "mutant_therioform_custom",
+            name: "mutant_therioform_custom_name",
             genoclepsis: "",
             description: "",
             customName: "",
@@ -1247,7 +1698,17 @@ export default function FeatureTab({
           id: `new-${spellType}`,
           label: `${t("Add")} ${getSpellTypeDisplayName(spellType)}`,
           onClick: () => {
-            const newSpell = createBlankSpellForType(spellType);
+            const baseSpell = createBlankSpellForType(spellType);
+            const newSpell =
+              spellType === "arcanist" || spellType === "arcanist-rework"
+                ? {
+                    ...baseSpell,
+                    enabled: !hasActiveSpellInList(
+                      cls.spells || [],
+                      spellType,
+                    ),
+                  }
+                : baseSpell;
             const updated = [...player.classes];
             updated[classIndex].spells.push(newSpell);
             setPlayer({ ...player, classes: updated });
@@ -1378,6 +1839,7 @@ export default function FeatureTab({
         mergeDesc: t(spell.mergeDesc || ""),
         dismiss: t(spell.dismiss || ""),
         dismissDesc: t(spell.dismissDesc || ""),
+        enabled: false,
         showInPlayerSheet: true,
       };
     if (spell.spellType === "arcanist-rework")
@@ -1393,6 +1855,7 @@ export default function FeatureTab({
         pulseDesc: t(spell.pulseDesc || ""),
         dismiss: t(spell.dismiss || ""),
         dismissDesc: t(spell.dismissDesc || ""),
+        enabled: false,
         showInPlayerSheet: true,
       };
     const cloned = JSON.parse(JSON.stringify(spell));
@@ -1412,11 +1875,22 @@ export default function FeatureTab({
     if (!classRef || !canAddSpellTypeToClass(classRef, item?.spellType)) return;
     const imported = normalizeImportedSpell(item);
     if (!imported) return;
+    const finalImported =
+      imported.spellType === "arcanist" ||
+      imported.spellType === "arcanist-rework"
+        ? {
+            ...imported,
+            enabled: !hasActiveSpellInList(
+              classRef.spells || [],
+              imported.spellType,
+            ),
+          }
+        : imported;
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((cls, i) =>
         i === importTargetClassIndex
-          ? { ...cls, spells: [...(cls.spells || []), imported] }
+          ? { ...cls, spells: [...(cls.spells || []), finalImported] }
           : cls,
       ),
     }));
@@ -1449,9 +1923,21 @@ export default function FeatureTab({
     setPlayer((prev) => {
       const eq0 = {
         ...(prev?.equipment?.[0] ?? {}),
-        mnemospheres: (prev?.equipment?.[0]?.mnemospheres ?? []).map((m) =>
-          m.id === mnemoId ? { ...m, spells: [...(m.spells ?? []), spell] } : m,
-        ),
+        mnemospheres: (prev?.equipment?.[0]?.mnemospheres ?? []).map((m) => {
+          if (m.id !== mnemoId) return m;
+          const finalSpell =
+            spell.spellType === "arcanist" ||
+            spell.spellType === "arcanist-rework"
+              ? {
+                  ...spell,
+                  enabled: !hasActiveSpellInList(
+                    m.spells ?? [],
+                    spell.spellType,
+                  ),
+                }
+              : spell;
+          return { ...m, spells: [...(m.spells ?? []), finalSpell] };
+        }),
       };
       return {
         ...prev,
@@ -1659,6 +2145,7 @@ export default function FeatureTab({
           isEditMode={isEditMode}
           searchQuery={searchQuery}
           setPlayer={setPlayer}
+          player={player}
           onEdit={handleEditSpell}
           onRoll={handleRollSpell}
           onOpenAddMenu={(e, ci) => {

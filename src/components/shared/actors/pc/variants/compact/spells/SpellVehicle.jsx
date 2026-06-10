@@ -21,6 +21,8 @@ import types from "/src/libs/types";
 const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
+  lineHeight: 1.35,
+  verticalAlign: "middle",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
@@ -40,7 +42,7 @@ const StyledMarkdown = ({ children, ...props }) => {
         components={{
           p: (props) => (
             <p
-              style={{ margin: 0, padding: 0, fontSize: "0.75rem" }}
+              style={{ margin: 0, padding: 0, fontSize: "0.85rem" }}
               {...props}
             />
           ),
@@ -167,7 +169,6 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
                   color: "white",
                   fontWeight: "bold",
                   fontSize: "0.75rem",
-                  py: 0,
                 }}
               >
                 {t("Armor")}
@@ -217,7 +218,6 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
                   color: "white",
                   fontWeight: "bold",
                   fontSize: "0.75rem",
-                  py: 0,
                 }}
               >
                 {t("Weapons")}
@@ -267,7 +267,7 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
                       <CloseBracket />
                       {types[damageType?.toLowerCase()]?.long || t(damageType)}
                     </StyledTableCell>
-                    <StyledTableCell sx={{ fontSize: "0.7rem" }}>
+                    <StyledTableCell sx={{ fontSize: "0.85rem" }}>
                       {highlightMatch(t(m.category), searchQuery)}
                     </StyledTableCell>
                   </TableRow>
@@ -299,7 +299,6 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
                   color: "white",
                   fontWeight: "bold",
                   fontSize: "0.75rem",
-                  py: 0,
                 }}
               >
                 {t("Support")}
@@ -315,7 +314,7 @@ export default function SpellVehicle({ spell, searchQuery = "" }) {
                     searchQuery,
                   )}
                 </StyledTableCell>
-                <StyledTableCell colSpan={3} sx={{ fontSize: "0.75rem" }}>
+                <StyledTableCell colSpan={3} sx={{ fontSize: "0.85rem" }}>
                   <StyledMarkdown>
                     {highlightMarkdownText(
                       m.name === "pilot_custom_support"

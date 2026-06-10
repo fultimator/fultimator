@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Box, IconButton, Typography } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
 import { availableTherioforms } from "/src/libs/player/spellOptionData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
 import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   therioformItemFields,
@@ -12,8 +13,13 @@ import {
 } from "/src/forms/rendering/config/itemConfigs/spells/subitems/therioform";
 import { useTranslate } from "/src/translation/translate";
 
+const CUSTOM_THERIOFORM_NAMES = new Set([
+  "mutant_therioform_custom",
+  "mutant_therioform_custom_name",
+]);
+
 function toFormState(src, t) {
-  const custom = src.name === "mutant_therioform_custom_name";
+  const custom = CUSTOM_THERIOFORM_NAMES.has(src.name);
   return {
     name: src.name || "mutant_therioform_custom_name",
     customName: src.customName || "",
@@ -46,7 +52,10 @@ export default function MutantItem({
 
   const handleChange = (next) => {
     const nextName = next.name;
-    if (nextName !== formState.name && nextName !== "mutant_therioform_custom_name") {
+    if (
+      nextName !== formState.name &&
+      !CUSTOM_THERIOFORM_NAMES.has(nextName)
+    ) {
       const therioform = availableTherioforms.find((tf) => tf.name === nextName);
       if (therioform) {
         const resolved = {
@@ -67,6 +76,14 @@ export default function MutantItem({
 
   const itemDisplayName =
     formState.customName || t(formState.name || "mutant_therioform_custom_name");
+  const isCustomTherioform = CUSTOM_THERIOFORM_NAMES.has(formState.name);
+  const formFields = useMemo(
+    () =>
+      isCustomTherioform
+        ? therioformItemFields
+        : therioformItemFields.filter((field) => field.key !== "description"),
+    [isCustomTherioform],
+  );
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
@@ -99,12 +116,38 @@ export default function MutantItem({
           <Box sx={{ p: 2 }} onClick={(e) => e.stopPropagation()}>
             <TabbedSchemaFormRenderer
               tabs={DEFAULT_SUBITEM_TABS}
-              config={therioformItemFields}
+              config={formFields}
               state={formState}
               onChange={handleChange}
               surface="edit"
               cols={2}
             />
+            {!isCustomTherioform && formState.description && (
+              <Box sx={{ mt: 2 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: "block",
+                    color: "text.secondary",
+                    mb: 0.5,
+                  }}
+                >
+                  {t("Description")}
+                </Typography>
+                <Box
+                  sx={{
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "action.hover",
+                    px: 1.5,
+                    py: 1.25,
+                    minHeight: 96,
+                  }}
+                >
+                  <NotesMarkdown compact>{formState.description}</NotesMarkdown>
+                </Box>
+              </Box>
+            )}
           </Box>
         )}
       </ItemRowCard>

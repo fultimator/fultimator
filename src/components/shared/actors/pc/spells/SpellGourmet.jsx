@@ -3,11 +3,13 @@ import {
   Typography,
   IconButton,
   Box,
+  Chip,
   Paper,
   Stack,
   Tooltip,
 } from "@mui/material";
 import { Edit, VisibilityOff } from "@mui/icons-material";
+import OutdoorGrillIcon from "@mui/icons-material/OutdoorGrill";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -16,10 +18,18 @@ import {
   getDamageTypes,
   getAttributes,
 } from "/src/libs/gourmetCookingData";
+import GourmetStartCookingDialog from "./GourmetStartCookingDialog";
+import { combineIngredientInventory } from "./gourmetCookingUtils";
 
-export default function SpellGourmet({ spell, onEdit, isEditMode }) {
+export default function SpellGourmet({
+  spell,
+  onEdit,
+  isEditMode,
+  onSpellUpdate,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const [cookingOpen, setCookingOpen] = React.useState(false);
 
   // ReactMarkdown component configuration for consistent styling
   const MarkdownComponents = {
@@ -57,6 +67,27 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
     }
 
     return choices;
+  };
+
+  // Resolve effect text with custom choices as plain string (for chat)
+  const resolveEffectText = (effect) => {
+    if (!effect.effect || typeof effect.effect !== "string") return "";
+    let text = effect.effect;
+    const choices = getEffectChoices(text, t);
+    choices.forEach((choice) => {
+      const val = effect.customChoices?.[choice.type];
+      if (!val) return;
+      if (choice.type === "statusEffect") {
+        text = text
+          .replace(new RegExp(t("gourmet_delicacy_effect_choose_all_statuses").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), val)
+          .replace(new RegExp(t("gourmet_delicacy_effect_choose_some_statuses").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), val);
+      } else if (choice.type === "damageType") {
+        text = text.replace(new RegExp(t("gourmet_delicacy_effect_choose_damage_type").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), val);
+      } else if (choice.type === "attribute") {
+        text = text.replace(new RegExp(t("gourmet_delicacy_effect_choose_attributte").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), val);
+      }
+    });
+    return text;
   };
 
   // Helper function to render effect with custom choices
@@ -144,9 +175,15 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
     return {
       name: spell.spellName || "Unnamed Cooking Spell",
       cookbookEffects: cookbookEffectsArray,
+      ingredientInventory: combineIngredientInventory(
+        spell.cookbook?.ingredientInventory ||
+          spell.ingredientInventory ||
+          [],
+        t,
+      ),
       showInPlayerSheet: spell.showInPlayerSheet !== false,
     };
-  }, [spell]);
+  }, [spell, t]);
 
   // Early return if no spell data
   if (!spell || !spellData) {
@@ -196,13 +233,41 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
               textTransform: "inherit",
             }}
           >
-            {t("gourmet_delicacy")}
+            {t("gourmet_cookbook")}
           </Typography>
         </Box>
-        {isEditMode && <Box sx={{ width: 40, height: 40 }} />}
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+          {isEditMode && !spellData.showInPlayerSheet && (
+            <Tooltip title={t("Spell not shown in player sheet")}>
+              <VisibilityOff
+                sx={{ fontSize: "1rem", color: theme.white, opacity: 0.75 }}
+              />
+            </Tooltip>
+          )}
+          {isEditMode && (
+            <Tooltip title={t("Edit")} arrow>
+              <IconButton
+                size="small"
+                onClick={handleEdit}
+                sx={{ color: theme.white, p: "3px" }}
+              >
+                <Edit sx={{ fontSize: "1rem" }} />
+              </IconButton>
+            </Tooltip>
+          )}
+          <Tooltip title={t("gourmet_cooking")} arrow>
+            <IconButton
+              size="small"
+              onClick={() => setCookingOpen(true)}
+              sx={{ color: theme.white, p: "3px" }}
+            >
+              <OutdoorGrillIcon sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </Tooltip>
+        </Stack>
       </Box>
 
-      {/* Spell Info */}
+      {/* Delicacy */}
       <Box
         sx={{
           background: `linear-gradient(to right, ${theme.ternary}, ${
@@ -228,33 +293,10 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
                 gap: 0.5,
               }}
             >
-              {spellData.name}
+              {t("gourmet_delicacy")}
             </Typography>
           </Box>
         </Box>
-        {isEditMode && (
-          <Box
-            sx={{
-              width: 40,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
-              {!spellData.showInPlayerSheet && (
-                <Tooltip title={t("Spell not shown in player sheet")}>
-                  <VisibilityOff
-                    sx={{ fontSize: "1rem", color: "text.secondary" }}
-                  />
-                </Tooltip>
-              )}
-              <IconButton size="small" onClick={handleEdit}>
-                <Edit sx={{ fontSize: "1rem" }} />
-              </IconButton>
-            </Stack>
-          </Box>
-        )}
       </Box>
 
       {/* Cookbook Effects */}
@@ -270,7 +312,7 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
                 px: 2,
                 py: 0.5,
                 display: "flex",
-                // gap: 2,
+                alignItems: "center",
               }}
             >
               <Box sx={{ width: { xs: "30%", md: "25%" } }}>
@@ -316,6 +358,67 @@ export default function SpellGourmet({ spell, onEdit, isEditMode }) {
           </Box>
         )}
       </Box>
+
+      {spellData.ingredientInventory.length > 0 && (
+        <Box
+          sx={{
+            background: theme.ternary,
+            borderTop: `1px solid ${theme.secondary}`,
+            px: 2,
+            py: 1,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: { xs: "0.75rem", sm: "0.9rem" },
+              fontWeight: 700,
+              mb: 0.75,
+            }}
+          >
+            {t("gourmet_ingredient_inventory")}:
+          </Typography>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+            {spellData.ingredientInventory.map((item, index) => (
+              <Chip
+                key={item.id || `${item.name}-${index}`}
+                size="small"
+                label={`${Number(item.quantity) || 0}x ${item.name}`}
+                sx={{
+                  minHeight: 30,
+                  borderRadius: 1,
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  "& .MuiChip-label": {
+                    px: 1,
+                    py: 0.25,
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        </Box>
+      )}
+      <GourmetStartCookingDialog
+        open={cookingOpen}
+        onClose={() => setCookingOpen(false)}
+        spell={spell}
+        resolveEffectText={resolveEffectText}
+        onRegisterRecipes={
+          onSpellUpdate
+            ? (recipes) =>
+                onSpellUpdate((currentSpell) => {
+                  const cookbook = currentSpell.cookbook || {};
+                  return {
+                    ...currentSpell,
+                    cookbook: {
+                      ...cookbook,
+                      effects: [...(cookbook.effects || []), ...recipes],
+                    },
+                  };
+                })
+            : undefined
+        }
+      />
     </Paper>
   );
 }

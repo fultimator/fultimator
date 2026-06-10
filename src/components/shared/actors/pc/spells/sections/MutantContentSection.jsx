@@ -13,7 +13,7 @@ export default function MutantContentSection({ formState, setFormState, t }) {
 
   const createBlankTherioform = useCallback(() => {
     return {
-      name: "mutant_therioform_custom",
+      name: "mutant_therioform_custom_name",
       genoclepsis: "",
       description: "",
       customName: "",
@@ -23,10 +23,15 @@ export default function MutantContentSection({ formState, setFormState, t }) {
   const getAvailablePresets = useCallback(() => {
     const addedNames = currentTherioforms
       .map((t) => t.name)
-      .filter((name) => name !== "mutant_therioform_custom");
+      .filter(
+        (name) =>
+          name !== "mutant_therioform_custom" &&
+          name !== "mutant_therioform_custom_name",
+      );
     return availableTherioforms.filter(
       (preset) =>
         preset.name !== "mutant_therioform_custom" &&
+        preset.name !== "mutant_therioform_custom_name" &&
         !addedNames.includes(preset.name),
     );
   }, [currentTherioforms]);

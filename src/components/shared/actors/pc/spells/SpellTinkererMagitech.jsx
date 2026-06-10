@@ -9,10 +9,17 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from "@mui/material";
-import { Edit, VisibilityOff, ExpandMore, Info } from "@mui/icons-material";
+import {
+  Casino,
+  Edit,
+  VisibilityOff,
+  ExpandMore,
+  Info,
+} from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
   const { t } = useTranslate();
@@ -24,6 +31,14 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
     magitech.showInPlayerSheet || magitech.showInPlayerSheet === undefined;
 
   const ranks = ["Basic", "Advanced", "Superior"];
+
+  const handleMagitechOverride = () => {
+    sendDisplayMessage("spell", t("Magitech Override"), {
+      speaker: "",
+      description: t("MagitechOverride_desc"),
+      cost: { resource: "mp", amount: 10 },
+    });
+  };
 
   return (
     <>
@@ -81,11 +96,21 @@ function ThemedSpellTinkererMagitech({ magitech, onEdit, isEditMode }) {
             textTransform: "uppercase",
             display: "flex",
             alignItems: "center",
+            gap: 4,
           }}
         >
           <Typography variant="h3" style={{ flexGrow: 1, marginRight: "5px" }}>
             {t("Magitech Override")}
           </Typography>
+          <Tooltip title={t("Send to Chat")}>
+            <IconButton
+              size="small"
+              onClick={handleMagitechOverride}
+              sx={{ color: "#fff", p: "3px" }}
+            >
+              <Casino sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </Tooltip>
         </div>
       )}
       {/* Row 2 Magitech Override */}

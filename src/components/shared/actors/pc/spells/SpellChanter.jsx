@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Typography,
   Grid,
@@ -9,12 +9,21 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Box,
 } from "@mui/material";
-import { VisibilityOff, ExpandMore, Info, Edit } from "@mui/icons-material";
+import {
+  VisibilityOff,
+  ExpandMore,
+  Info,
+  Edit,
+  MusicNote,
+} from "@mui/icons-material";
 import { TypeIcon } from "/src/components/types";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import ChanterVerseDialog from "./ChanterVerseDialog";
+import { volumes } from "./magichantVerseUtils";
 
 function ThemedSpellChanter({
   magichant,
@@ -22,29 +31,14 @@ function ThemedSpellChanter({
   onEditTones,
   isEditMode,
   onEdit,
+  speaker,
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
-
-  const volumes = [
-    {
-      name: "magichant_volume_low",
-      mp: 10,
-      target: "magichant_volume_low_target",
-    },
-    {
-      name: "magichant_volume_medium",
-      mp: 20,
-      target: "magichant_volume_medium_target",
-    },
-    {
-      name: "magichant_volume_high",
-      mp: 30,
-      target: "magichant_volume_high_target",
-    },
-  ];
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
+  const [verseOpen, setVerseOpen] = useState(false);
 
   const showInPlayerSheet =
     magichant.showInPlayerSheet || magichant.showInPlayerSheet === undefined;
@@ -176,20 +170,13 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
         </Grid>
-        {isEditMode && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              flexShrink: 0,
-            }}
-          >
-            {!showInPlayerSheet && (
-              <Tooltip title={t("Magichant not shown in player sheet")}>
-                <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
-              </Tooltip>
-            )}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexShrink: 0 }}>
+          {isEditMode && !showInPlayerSheet && (
+            <Tooltip title={t("Magichant not shown in player sheet")}>
+              <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+            </Tooltip>
+          )}
+          {isEditMode && (
             <IconButton
               size="small"
               onClick={onEdit}
@@ -197,16 +184,30 @@ function ThemedSpellChanter({
             >
               <Edit sx={{ fontSize: "1.1rem" }} />
             </IconButton>
-          </div>
-        )}
+          )}
+          <Tooltip title={t("Sing a Verse")}>
+            <IconButton
+              size="small"
+              onClick={() => setVerseOpen(true)}
+              sx={{ color: "#fff", p: "3px", ml: isEditMode ? 0.75 : 0 }}
+            >
+              <MusicNote sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </div>
       {volumes.map((volume, i) => (
         <Grid
           container
           sx={{
             justifyContent: "flex-start",
-            background: "transparent",
+            background:
+              i % 2 === 0
+                ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                : "transparent",
             padding: "3px 17px",
+            minHeight: 44,
+            fontSize: "0.9rem",
             borderBottom: `1px solid ${theme.secondary}`,
           }}
           key={i}
@@ -223,8 +224,8 @@ function ThemedSpellChanter({
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
+                  ...bodyTextSx,
                   fontWeight: "bold",
-                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
                 }}
               >
                 {t(volume.name)}
@@ -399,8 +400,13 @@ function ThemedSpellChanter({
             container
             sx={{
               justifyContent: "flex-start",
-              background: "transparent",
+              background:
+                i % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : "transparent",
               padding: "3px 17px",
+              minHeight: 44,
+              fontSize: "0.9rem",
               borderBottom: `1px solid ${theme.secondary}`,
             }}
             key={i}
@@ -417,8 +423,8 @@ function ThemedSpellChanter({
                 <Typography
                   style={{ flexGrow: 1, marginRight: "5px" }}
                   sx={{
+                    ...bodyTextSx,
                     fontWeight: "bold",
-                    fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
                   }}
                 >
                   {chantKey.key === "magichant_custom_name"
@@ -560,10 +566,15 @@ function ThemedSpellChanter({
           <React.Fragment key={i}>
             <div
               style={{
-                background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+                background:
+                  i % 2 === 0
+                    ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                    : "transparent",
                 padding: "3px 17px",
                 display: "flex",
                 justifyContent: "space-between",
+                minHeight: 44,
+                fontSize: "0.9rem",
                 borderTop: `1px solid ${theme.secondary}`,
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
@@ -580,6 +591,7 @@ function ThemedSpellChanter({
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
+                      ...bodyTextSx,
                       fontWeight: "bold",
                     }}
                   >
@@ -624,23 +636,19 @@ function ThemedSpellChanter({
                       ? tone.effect
                       : t(tone.effect)}
                   </ReactMarkdown>
-                  {/*<Typography
-                    fontWeight="bold"
-                    style={{ flexGrow: 1, marginRight: "5px" }}
-                    sx={{
-                      fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                    }}
-                  >
-                    {tone.key === "magichant_custom_name"
-                      ? tone.effect
-                      : t(tone.effect)}
-                  </Typography>*/}
                 </Grid>
               </Grid>
             </Grid>
           </React.Fragment>
         ))
       )}
+      <ChanterVerseDialog
+        open={verseOpen}
+        onClose={() => setVerseOpen(false)}
+        magichant={magichant}
+        speaker={speaker}
+        t={t}
+      />
     </>
   );
 }

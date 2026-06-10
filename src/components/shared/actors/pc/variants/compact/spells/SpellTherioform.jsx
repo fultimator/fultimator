@@ -14,20 +14,35 @@ import ReactMarkdown from "react-markdown";
 const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
+  lineHeight: 1.35,
+  verticalAlign: "middle",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
+
+const isCustomTherioform = (form) =>
+  form.name === "mutant_therioform_custom" ||
+  form.name === "mutant_therioform_custom_name";
 
 export default function SpellTherioform({ spell }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const visibleTherioforms = (spell.therioforms || []).filter((form) => {
+    if (!form) return false;
+    const isCustom = isCustomTherioform(form);
+    const name = isCustom ? form.customName : form.name;
+    const description = isCustom ? form.description : form.description;
+    return [name, form.genoclepsis, description].some((value) =>
+      String(value || "").trim(),
+    );
+  });
 
   return (
     <Table size="small" sx={{ border: `1px solid ${theme.primary}40` }}>
       <TableBody>
         {/* Therioforms List */}
-        {spell.therioforms?.map((form, index) => (
+        {visibleTherioforms.map((form, index) => (
           <TableRow
             key={index}
             sx={{
@@ -38,7 +53,7 @@ export default function SpellTherioform({ spell }) {
             }}
           >
             <StyledTableCell sx={{ width: "30%", fontWeight: "bold" }}>
-              {form.name === "mutant_therioform_custom_name"
+              {isCustomTherioform(form)
                 ? form.customName
                 : t(form.name)}
               {form.genoclepsis && (
@@ -50,17 +65,17 @@ export default function SpellTherioform({ spell }) {
                     color: "text.secondary",
                   }}
                 >
-                  {form.name === "mutant_therioform_custom_name"
+                  {isCustomTherioform(form)
                     ? form.genoclepsis
                     : t(form.genoclepsis)}
                 </Typography>
               )}
             </StyledTableCell>
-            <StyledTableCell sx={{ width: "70%", fontSize: "0.75rem" }}>
+            <StyledTableCell sx={{ width: "70%", fontSize: "0.85rem" }}>
               <ReactMarkdown
                 components={{ p: ({ _node, ...props }) => <span {...props} /> }}
               >
-                {form.name === "mutant_therioform_custom_name"
+                {isCustomTherioform(form)
                   ? form.description
                   : t(form.description)}
               </ReactMarkdown>

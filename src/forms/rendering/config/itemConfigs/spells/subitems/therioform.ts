@@ -22,6 +22,7 @@ const THERIOFORM_OPTIONS = availableTherioforms.map((t: { name: string }) => ({
 }));
 
 const isCustom = (s: TherioformItemState) =>
+  s.name === "mutant_therioform_custom" ||
   s.name === "mutant_therioform_custom_name";
 
 export const DEFAULT_SUBITEM_TABS = DEFAULT_ITEM_TABS;

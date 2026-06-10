@@ -1,19 +1,29 @@
 import {
+  Box,
+  Button,
+  Step,
+  StepButton,
+  Stepper,
   Typography,
   Table,
   TableBody,
   TableRow,
   TableCell,
 } from "@mui/material";
+import { ArrowForward } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
+import { setSpellListActivation } from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
 
 const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
+  lineHeight: 1.35,
+  verticalAlign: "middle",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
@@ -33,7 +43,7 @@ const StyledMarkdown = ({ children, ...props }) => {
         components={{
           p: (props) => (
             <p
-              style={{ margin: 0, padding: 0, fontSize: "0.75rem" }}
+              style={{ margin: 0, padding: 0, fontSize: "0.85rem" }}
               {...props}
             />
           ),
@@ -57,11 +67,53 @@ const StyledMarkdown = ({ children, ...props }) => {
   );
 };
 
-export default function SpellArcanist({ arcana, rework }) {
+export default function SpellArcanist({
+  arcana,
+  rework,
+  setPlayer,
+  classIndex,
+  spellIndex,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const mergeLabel = arcana.merge || t("MERGE");
+  const dismissLabel = arcana.dismiss || t("DISMISS");
+  const canUpdate = setPlayer && classIndex != null && spellIndex != null;
+
+  const sendArcanaStageToChat = (stage) => {
+    const isDismiss = stage === "dismiss";
+    const label = isDismiss ? dismissLabel : mergeLabel;
+    sendDisplayMessage("spell", `${arcana.name} - ${label}`, {
+      speaker: "",
+      tags: [isDismiss ? t("DISMISS") : t("MERGE")],
+      description: isDismiss
+        ? arcana.dismissDesc || t("No Dismiss Benefit")
+        : arcana.mergeDesc || t("No Merge Benefit"),
+    });
+  };
+
+  const handleAdvanceToDismiss = () => {
+    sendArcanaStageToChat("dismiss");
+    if (!canUpdate) return;
+    setPlayer((prev) => ({
+      ...prev,
+      classes: (prev.classes || []).map((cls, clsIndex) =>
+        clsIndex === classIndex
+          ? {
+              ...cls,
+              spells: setSpellListActivation(
+                cls.spells || [],
+                spellIndex,
+                arcana.spellType,
+                false,
+              ),
+            }
+          : cls,
+      ),
+    }));
+  };
 
   return (
     <Table size="small" sx={{ border: `1px solid ${theme.primary}40` }}>
@@ -69,7 +121,12 @@ export default function SpellArcanist({ arcana, rework }) {
         {/* Header Row */}
         <TableRow sx={{ backgroundColor: theme.primary }}>
           <StyledTableCell
-            sx={{ color: "white", fontWeight: "bold", fontSize: "0.85rem" }}
+            sx={{
+              color: theme.white,
+              fontWeight: "bold",
+              fontSize: "0.85rem",
+              "& *": { color: `${theme.white} !important` },
+            }}
           >
             {arcana.name}
           </StyledTableCell>
@@ -114,6 +171,49 @@ export default function SpellArcanist({ arcana, rework }) {
           </StyledTableCell>
         </TableRow>
 
+        <TableRow>
+          <StyledTableCell>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                py: 0.5,
+              }}
+            >
+              <Stepper
+                nonLinear
+                activeStep={arcana.enabled ? 0 : -1}
+                sx={{ flex: 1, minWidth: 0 }}
+              >
+                <Step completed={false}>
+                  <StepButton
+                    onClick={() => sendArcanaStageToChat("merge")}
+                    disabled={!arcana.enabled}
+                  >
+                    {mergeLabel}
+                  </StepButton>
+                </Step>
+                <Step completed={false}>
+                  <StepButton disabled={!arcana.enabled}>
+                    {dismissLabel}
+                  </StepButton>
+                </Step>
+              </Stepper>
+              <Button
+                size="small"
+                variant="outlined"
+                endIcon={<ArrowForward />}
+                disabled={!arcana.enabled || !canUpdate}
+                onClick={handleAdvanceToDismiss}
+                sx={{ flexShrink: 0, minWidth: 82 }}
+              >
+                {t("Advance")}
+              </Button>
+            </Box>
+          </StyledTableCell>
+        </TableRow>
+
         {/* Domain Row */}
         {arcana.domain && (
           <TableRow>
@@ -146,7 +246,7 @@ export default function SpellArcanist({ arcana, rework }) {
         </TableRow>
         <TableRow>
           <StyledTableCell>
-            <Typography sx={{ fontSize: "0.75rem" }}>
+            <Typography sx={{ fontSize: "0.85rem" }}>
               {!arcana.mergeDesc ? (
                 t("No Merge Benefit")
               ) : (
@@ -173,7 +273,7 @@ export default function SpellArcanist({ arcana, rework }) {
             </TableRow>
             <TableRow>
               <StyledTableCell>
-                <Typography sx={{ fontSize: "0.75rem" }}>
+                <Typography sx={{ fontSize: "0.85rem" }}>
                   {!arcana.pulseDesc ? (
                     t("No Pulse Benefit")
                   ) : (
@@ -200,7 +300,7 @@ export default function SpellArcanist({ arcana, rework }) {
         </TableRow>
         <TableRow>
           <StyledTableCell>
-            <Typography sx={{ fontSize: "0.75rem" }}>
+            <Typography sx={{ fontSize: "0.85rem" }}>
               {!arcana.dismissDesc ? (
                 t("No Dismiss Benefit")
               ) : (

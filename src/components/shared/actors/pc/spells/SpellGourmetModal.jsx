@@ -10,6 +10,8 @@ export default function SpellGourmetModal({
   onClose,
   onSave,
   onDelete,
+  player,
+  setPlayer,
   spell,
 }) {
   const { t } = useTranslate();
@@ -20,13 +22,15 @@ export default function SpellGourmetModal({
       onClose={onClose}
       onSave={onSave}
       onDelete={onDelete}
+      player={player}
+      setPlayer={setPlayer}
       spellType="gourmet"
       spell={spell}
       title={t("gourmet_edit_cooking_button")}
       sections={[
         {
           id: "cookbook",
-          title: "gourmet_cookbook",
+          title: "Combinations",
           component: GourmetContentSection,
           props: {},
         },
@@ -37,10 +41,16 @@ export default function SpellGourmetModal({
           props: {},
         },
         {
+          id: "shop",
+          title: "Shop",
+          component: GourmetCookingTab,
+          props: { mode: "shop" },
+        },
+        {
           id: "cooking",
           title: "gourmet_cooking",
           component: GourmetCookingTab,
-          props: {},
+          props: { mode: "cooking" },
         },
         {
           id: "general",

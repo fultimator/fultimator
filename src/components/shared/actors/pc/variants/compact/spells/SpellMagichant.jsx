@@ -8,12 +8,16 @@ import ReactMarkdown from "react-markdown";
 const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
+  lineHeight: 1.35,
+  verticalAlign: "middle",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
 export default function SpellMagichant({ spell }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const isDarkMode = theme.mode === "dark";
+  const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
 
   const volumes = [
     {
@@ -43,7 +47,6 @@ export default function SpellMagichant({ spell }) {
               color: "white",
               fontWeight: "bold",
               fontSize: "0.75rem",
-              py: 0,
             }}
           >
             {t("magichant_volume")}
@@ -53,7 +56,6 @@ export default function SpellMagichant({ spell }) {
               color: "white",
               fontWeight: "bold",
               fontSize: "0.75rem",
-              py: 0,
               textAlign: "center",
             }}
           >
@@ -65,14 +67,21 @@ export default function SpellMagichant({ spell }) {
               color: "white",
               fontWeight: "bold",
               fontSize: "0.75rem",
-              py: 0,
             }}
           >
             {t("Target")}
           </StyledTableCell>
         </TableRow>
         {volumes.map((vol, i) => (
-          <TableRow key={`vol-${i}`}>
+          <TableRow
+            key={`vol-${i}`}
+            sx={{
+              backgroundImage:
+                i % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : `linear-gradient(to right, ${gradientColor}, ${gradientColor})`,
+            }}
+          >
             <StyledTableCell sx={{ fontWeight: "bold" }}>
               {t(vol.name)}
             </StyledTableCell>
@@ -90,7 +99,6 @@ export default function SpellMagichant({ spell }) {
               color: "white",
               fontWeight: "bold",
               fontSize: "0.75rem",
-              py: 0,
             }}
           >
             {t("magichant_key")}
@@ -100,7 +108,6 @@ export default function SpellMagichant({ spell }) {
               color: "white",
               fontWeight: "bold",
               fontSize: "0.75rem",
-              py: 0,
               textAlign: "center",
             }}
           >
@@ -111,7 +118,6 @@ export default function SpellMagichant({ spell }) {
               color: "white",
               fontWeight: "bold",
               fontSize: "0.75rem",
-              py: 0,
               textAlign: "center",
             }}
           >
@@ -122,7 +128,6 @@ export default function SpellMagichant({ spell }) {
               color: "white",
               fontWeight: "bold",
               fontSize: "0.75rem",
-              py: 0,
               textAlign: "center",
             }}
           >
@@ -130,19 +135,27 @@ export default function SpellMagichant({ spell }) {
           </StyledTableCell>
         </TableRow>
         {spell.keys?.map((key, i) => (
-          <TableRow key={`key-${i}`}>
+          <TableRow
+            key={`key-${i}`}
+            sx={{
+              backgroundImage:
+                i % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : `linear-gradient(to right, ${gradientColor}, ${gradientColor})`,
+            }}
+          >
             <StyledTableCell sx={{ fontWeight: "bold" }}>
               {key.key === "magichant_custom_name"
                 ? key.customName
                 : t(key.key)}
             </StyledTableCell>
-            <StyledTableCell sx={{ textAlign: "center", fontSize: "0.7rem" }}>
+            <StyledTableCell sx={{ textAlign: "center", fontSize: "0.85rem" }}>
               {t(key.type)}
             </StyledTableCell>
-            <StyledTableCell sx={{ textAlign: "center", fontSize: "0.7rem" }}>
+            <StyledTableCell sx={{ textAlign: "center", fontSize: "0.85rem" }}>
               {t(key.status)}
             </StyledTableCell>
-            <StyledTableCell sx={{ textAlign: "center", fontSize: "0.7rem" }}>
+            <StyledTableCell sx={{ textAlign: "center", fontSize: "0.85rem" }}>
               {t(key.attribute)} / {t(key.recovery)}
             </StyledTableCell>
           </TableRow>
@@ -156,20 +169,27 @@ export default function SpellMagichant({ spell }) {
               color: "white",
               fontWeight: "bold",
               fontSize: "0.75rem",
-              py: 0,
             }}
           >
             {t("magichant_tone")}
           </StyledTableCell>
         </TableRow>
         {spell.tones?.map((tone, i) => (
-          <TableRow key={`tone-${i}`}>
+          <TableRow
+            key={`tone-${i}`}
+            sx={{
+              backgroundImage:
+                i % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : `linear-gradient(to right, ${gradientColor}, ${gradientColor})`,
+            }}
+          >
             <StyledTableCell sx={{ fontWeight: "bold" }}>
               {tone.key === "magichant_custom_name"
                 ? tone.customName
                 : t(tone.key)}
             </StyledTableCell>
-            <StyledTableCell colSpan={3} sx={{ fontSize: "0.75rem" }}>
+            <StyledTableCell colSpan={3} sx={{ fontSize: "0.85rem" }}>
               <ReactMarkdown
                 components={{ p: ({ _node, ...props }) => <span {...props} /> }}
               >

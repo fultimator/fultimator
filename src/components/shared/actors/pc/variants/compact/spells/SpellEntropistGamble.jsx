@@ -16,6 +16,8 @@ import ReactMarkdown from "react-markdown";
 const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
+  lineHeight: 1.35,
+  verticalAlign: "middle",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
@@ -93,7 +95,7 @@ export default function SpellEntropistGamble({ gamble }) {
             }}
           >
             <StyledTableCell sx={{ width: "15%" }}>
-              <Typography sx={{ fontSize: "0.75rem", fontWeight: "bold" }}>
+              <Typography sx={{ fontSize: "0.85rem", fontWeight: "bold" }}>
                 {target.rangeFrom === target.rangeTo
                   ? target.rangeFrom
                   : `${target.rangeFrom}-${target.rangeTo}`}
@@ -103,7 +105,7 @@ export default function SpellEntropistGamble({ gamble }) {
               <Box>
                 <Typography
                   component="div"
-                  sx={{ fontSize: "0.75rem", marginBottom: 0.5 }}
+                  sx={{ fontSize: "0.85rem", marginBottom: 0.5 }}
                 >
                   <StyledMarkdown
                     allowedElements={["strong", "em"]}
@@ -116,7 +118,7 @@ export default function SpellEntropistGamble({ gamble }) {
                   <Box sx={{ marginTop: 0.25, paddingLeft: 0.5 }}>
                     <Typography
                       sx={{
-                        fontSize: "0.7rem",
+                        fontSize: "0.85rem",
                         fontStyle: "italic",
                         fontWeight: "bold",
                       }}
@@ -126,7 +128,7 @@ export default function SpellEntropistGamble({ gamble }) {
                     {target.secondEffects.map((secondEffect, secondIndex) => (
                       <Typography
                         key={secondIndex}
-                        sx={{ fontSize: "0.7rem", paddingLeft: 0.5 }}
+                        sx={{ fontSize: "0.85rem", paddingLeft: 0.5 }}
                       >
                         {secondEffect.rangeFrom === secondEffect.rangeTo
                           ? secondEffect.rangeFrom

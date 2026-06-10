@@ -13,7 +13,7 @@ export default function DancerContentSection({ formState, setFormState, t }) {
 
   const createBlankDance = useCallback(() => {
     return {
-      key: "dance_custom",
+      key: "dance_custom_name",
       effect: "",
       duration: "",
       customName: "",
@@ -23,7 +23,7 @@ export default function DancerContentSection({ formState, setFormState, t }) {
   const getAvailablePresets = useCallback(() => {
     const addedKeys = currentDances
       .map((d) => d.key)
-      .filter((key) => key !== "dance_custom");
+      .filter((key) => key !== "dance_custom" && key !== "dance_custom_name");
     return availableDances.filter((preset) => !addedKeys.includes(preset.name));
   }, [currentDances]);
 

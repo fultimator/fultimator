@@ -38,7 +38,7 @@ function rollD20s(count) {
   );
 }
 
-function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
+export function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
   const diceCount = rank + 1;
   const rankLabels = [t("Basic"), t("Advanced"), t("Superior")];
   const rankDescriptions = [
@@ -423,6 +423,7 @@ function ThemedSpellTinkererAlchemy({
   const [rollRank, setRollRank] = useState(null);
 
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const rankLabels = [t("Basic"), t("Advanced"), t("Superior")];
   const rankDescriptions = [
@@ -556,10 +557,15 @@ function ThemedSpellTinkererAlchemy({
         <div
           key={rank}
           style={{
-            background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+            background:
+              i % 2 === 0
+                ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                : "transparent",
             padding: "3px 17px",
             display: "flex",
             justifyContent: "space-between",
+            minHeight: 44,
+            fontSize: "0.9rem",
             borderTop: `1px solid ${theme.secondary}`,
             borderBottom:
               i === visibleRanks.length - 1
@@ -578,7 +584,7 @@ function ThemedSpellTinkererAlchemy({
             >
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
-                sx={{ fontWeight: "bold" }}
+                sx={{ ...bodyTextSx, fontWeight: "bold" }}
               >
                 {rankLabels[rank - 1]}
               </Typography>
@@ -591,7 +597,7 @@ function ThemedSpellTinkererAlchemy({
               }}
               size={2}
             >
-              <Typography>{rank + 2}</Typography>
+              <Typography sx={bodyTextSx}>{rank + 2}</Typography>
             </Grid>
             <Grid
               style={{
@@ -601,7 +607,9 @@ function ThemedSpellTinkererAlchemy({
               }}
               size={6}
             >
-              <Typography>{rankDescriptions[rank - 1]}</Typography>
+              <Typography sx={bodyTextSx}>
+                {rankDescriptions[rank - 1]}
+              </Typography>
             </Grid>
             <Grid
               size="auto"
@@ -713,8 +721,13 @@ function ThemedSpellTinkererAlchemy({
         <Grid
           container
           sx={{
-            background: "transparent",
+            background:
+              i % 2 === 0
+                ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                : "transparent",
             padding: "3px 17px",
+            minHeight: 44,
+            fontSize: "0.9rem",
             borderBottom: `1px solid ${theme.secondary}`,
           }}
           key={i}
@@ -729,7 +742,7 @@ function ThemedSpellTinkererAlchemy({
           >
             <Typography
               style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{ fontWeight: "bold" }}
+              sx={{ ...bodyTextSx, fontWeight: "bold" }}
             >
               {target.rangeFrom + " - " + target.rangeTo}
             </Typography>
@@ -741,6 +754,7 @@ function ThemedSpellTinkererAlchemy({
               justifyContent: "flex-start",
             }}
             size={8}
+            sx={bodyTextSx}
           >
             <ReactMarkdown
               components={{
@@ -846,8 +860,13 @@ function ThemedSpellTinkererAlchemy({
         <Grid
           container
           sx={{
-            background: "transparent",
+            background:
+              i % 2 === 0
+                ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                : "transparent",
             padding: "3px 17px",
+            minHeight: 44,
+            fontSize: "0.9rem",
             borderBottom: `1px solid ${theme.secondary}`,
           }}
           key={i}
@@ -862,7 +881,7 @@ function ThemedSpellTinkererAlchemy({
           >
             <Typography
               style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{ fontWeight: "bold" }}
+              sx={{ ...bodyTextSx, fontWeight: "bold" }}
             >
               {effect.dieValue === 0 ? t("Any") : effect.dieValue}
             </Typography>
@@ -874,6 +893,7 @@ function ThemedSpellTinkererAlchemy({
               justifyContent: "flex-start",
             }}
             size={8}
+            sx={bodyTextSx}
           >
             <ReactMarkdown
               components={{

@@ -38,7 +38,12 @@ export default function GourmetInventoryTab({ formState, setFormState, t }) {
     taste: "",
   });
 
-  const ingredientInventory = formState.ingredientInventory || [];
+  const cookbook = formState.cookbook || {
+    effects: [],
+    ingredientInventory: [],
+  };
+  const ingredientInventory =
+    cookbook.ingredientInventory || formState.ingredientInventory || [];
 
   const handleOpenAddDialog = () => {
     setEditingIndex(null);
@@ -64,30 +69,58 @@ export default function GourmetInventoryTab({ formState, setFormState, t }) {
     }
 
     setFormState((prev) => {
-      const newInventory = [...(prev.ingredientInventory || [])];
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
+      const newInventory = [
+        ...(prevCookbook.ingredientInventory || prev.ingredientInventory || []),
+      ];
       if (editingIndex !== null) {
         newInventory[editingIndex] = formData;
       } else {
         newInventory.push(formData);
       }
-      return { ...prev, ingredientInventory: newInventory };
+      return {
+        ...prev,
+        cookbook: {
+          ...prevCookbook,
+          ingredientInventory: newInventory,
+        },
+      };
     });
 
     setAddDialogOpen(false);
   };
 
   const handleDeleteIngredient = (index) => {
-    setFormState((prev) => ({
-      ...prev,
-      ingredientInventory: prev.ingredientInventory.filter(
-        (_, i) => i !== index,
-      ),
-    }));
+    setFormState((prev) => {
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
+      const current =
+        prevCookbook.ingredientInventory || prev.ingredientInventory || [];
+
+      return {
+        ...prev,
+        cookbook: {
+          ...prevCookbook,
+          ingredientInventory: current.filter((_, i) => i !== index),
+        },
+      };
+    });
   };
 
   const handleAdjustQuantity = (index, delta) => {
     setFormState((prev) => {
-      const current = [...(prev.ingredientInventory || [])];
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
+      const current = [
+        ...(prevCookbook.ingredientInventory || prev.ingredientInventory || []),
+      ];
       const source = current[index];
       if (!source) return prev;
 
@@ -96,14 +129,22 @@ export default function GourmetInventoryTab({ formState, setFormState, t }) {
 
       return {
         ...prev,
-        ingredientInventory: current,
+        cookbook: {
+          ...prevCookbook,
+          ingredientInventory: current,
+        },
       };
     });
   };
 
   const handleCombineIngredients = () => {
     setFormState((prev) => {
-      const current = prev.ingredientInventory || [];
+      const prevCookbook = prev.cookbook || {
+        effects: [],
+        ingredientInventory: [],
+      };
+      const current =
+        prevCookbook.ingredientInventory || prev.ingredientInventory || [];
       if (current.length <= 1) return prev;
 
       const combinedMap = new Map();
@@ -135,7 +176,10 @@ export default function GourmetInventoryTab({ formState, setFormState, t }) {
 
       return {
         ...prev,
-        ingredientInventory: combined,
+        cookbook: {
+          ...prevCookbook,
+          ingredientInventory: combined,
+        },
       };
     });
   };

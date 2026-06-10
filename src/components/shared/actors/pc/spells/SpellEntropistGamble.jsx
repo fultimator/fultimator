@@ -20,6 +20,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
   const isDarkMode = theme.mode === "dark";
   const iconColor = isDarkMode ? "#ffffff" : "#000000";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const inlineStyles = {
     margin: 0,
@@ -149,6 +150,8 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
           justifyContent: "space-between",
           borderTop: `1px solid ${theme.secondary}`,
           borderBottom: `1px solid ${theme.secondary}`,
+          minHeight: 44,
+          fontSize: "0.9rem",
         }}
       >
         <Grid container style={{ flexGrow: 1 }}>
@@ -164,7 +167,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               style={{ flexGrow: 1, marginRight: "5px" }}
               sx={{
                 fontWeight: "bold",
-                fontSize: { xs: "0.8rem", sm: "1rem" },
+                ...bodyTextSx,
               }}
             >
               {gamble.isMagisphere && (
@@ -185,7 +188,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
           >
             <Typography
               sx={{
-                fontSize: { xs: "0.7rem", sm: "1rem" },
+                ...bodyTextSx,
               }}
             >
               {gamble.mp}
@@ -204,7 +207,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
           >
             <Typography
               sx={{
-                fontSize: { xs: "0.7rem", sm: "1rem" },
+                ...bodyTextSx,
               }}
             >
               {gamble.maxTargets}
@@ -223,7 +226,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
           >
             <Typography
               sx={{
-                fontSize: { xs: "0.7rem", sm: "1rem" },
+                ...bodyTextSx,
               }}
             >
               {attributes[gamble.attr].shortcaps}
@@ -270,10 +273,15 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
             key={index}
             size={12}
             sx={{
-              background: theme.ternary,
+              background:
+                index % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : "transparent",
               borderTop: `1px solid white`,
               borderBottom: `1px solid white`,
               padding: "3px 17px",
+              minHeight: 44,
+              fontSize: "0.9rem",
             }}
           >
             {/* Primary Effect */}
@@ -281,7 +289,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
               <Typography
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontSize: { xs: "0.8rem", sm: "1rem" },
+                  ...bodyTextSx,
                   fontWeight: "bold",
                 }}
               >
@@ -295,7 +303,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                 component="div"
                 style={{ flexGrow: 1, marginRight: "5px" }}
                 sx={{
-                  fontSize: { xs: "0.8rem", sm: "1rem" },
+                  ...bodyTextSx,
                 }}
               >
                 <ReactMarkdown components={components}>
@@ -321,7 +329,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                                 <Typography
                                   style={{ flexGrow: 1, marginRight: "5px" }}
                                   sx={{
-                                    fontSize: { xs: "0.8rem", sm: "1rem" },
+                                    ...bodyTextSx,
                                     fontWeight: "bold",
                                   }}
                                 >
@@ -334,7 +342,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                                   component="div"
                                   style={{ flexGrow: 1, marginRight: "5px" }}
                                   sx={{
-                                    fontSize: { xs: "0.8rem", sm: "1rem" },
+                                    ...bodyTextSx,
                                   }}
                                 >
                                   <ReactMarkdown components={components}>
@@ -358,7 +366,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                         <Typography
                           style={{ flexGrow: 1, marginRight: "5px" }}
                           sx={{
-                            fontSize: { xs: "0.8rem", sm: "1rem" },
+                            ...bodyTextSx,
                             fontWeight: "bold",
                           }}
                         >
@@ -371,7 +379,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                           component="div"
                           style={{ flexGrow: 1, marginRight: "5px" }}
                           sx={{
-                            fontSize: { xs: "0.8rem", sm: "1rem" },
+                            ...bodyTextSx,
                           }}
                         >
                           <ReactMarkdown components={components}>

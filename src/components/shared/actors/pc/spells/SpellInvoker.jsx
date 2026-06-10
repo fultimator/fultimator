@@ -9,10 +9,11 @@ import {
   AccordionDetails,
   Box,
 } from "@mui/material";
-import { ExpandMore, FlashOn, Edit, Casino } from "@mui/icons-material";
+import { ExpandMore, FlashOn, Edit, Casino, Message } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { buildInvokerAvailableInvocations } from "/src/libs/player/invokerUtils";
 import {
   resolveWellsprings,
@@ -30,6 +31,7 @@ function ThemedSpellInvoker({
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const inlineStyles = { margin: 0, padding: 0 };
   const components = {
@@ -365,7 +367,10 @@ function ThemedSpellInvoker({
               <React.Fragment key={i}>
                 <Box
                   sx={{
-                    background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+                    background:
+                      i % 2 === 0
+                        ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                        : "transparent",
                     px: "17px",
                     py: "3px",
                     display: "flex",
@@ -373,7 +378,8 @@ function ThemedSpellInvoker({
                     borderTop: `1px solid ${theme.secondary}`,
                     borderBottom: `1px solid ${theme.secondary}`,
                     borderLeft: `4px solid ${borderColor}`,
-                    minHeight: "40px",
+                    minHeight: 44,
+                    fontSize: "0.9rem",
                   }}
                 >
                   <Box
@@ -385,8 +391,8 @@ function ThemedSpellInvoker({
                   >
                     <Typography
                       sx={{
+                        ...bodyTextSx,
                         fontWeight: "bold",
-                        fontSize: { xs: "0.8rem", sm: "1rem" },
                       }}
                     >
                       {t(invocation.name)}
@@ -410,7 +416,7 @@ function ThemedSpellInvoker({
                         alt={invocation.wellspring}
                       />
                     )}
-                    <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
+                    <Typography sx={bodyTextSx}>
                       {t(`invoker_${invocation.wellspring.toLowerCase()}`) !==
                       `invoker_${invocation.wellspring.toLowerCase()}`
                         ? t(`invoker_${invocation.wellspring.toLowerCase()}`)
@@ -425,14 +431,14 @@ function ThemedSpellInvoker({
                       justifyContent: "center",
                     }}
                   >
-                    <Typography sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}>
+                    <Typography sx={bodyTextSx}>
                       {t(invocation.type)}
                     </Typography>
                   </Box>
                   <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
                     <Typography
                       component="div"
-                      sx={{ fontSize: { xs: "0.7rem", sm: "1rem" } }}
+                      sx={bodyTextSx}
                     >
                       <ReactMarkdown components={components}>
                         {t(invocation.effect)}
@@ -441,13 +447,26 @@ function ThemedSpellInvoker({
                   </Box>
                   <Box
                     sx={{
-                      width: 34,
                       flexShrink: 0,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "flex-end",
+                      gap: "2px",
                     }}
                   >
+                    <IconButton
+                      size="small"
+                      sx={{ p: "3px" }}
+                      onClick={() =>
+                        sendDisplayMessage("spell", t(invocation.name), {
+                          speaker: "",
+                          description: t(invocation.effect),
+                          cost: { resource: "mp", amount: 5 },
+                        })
+                      }
+                    >
+                      <Message sx={{ fontSize: "1.1rem" }} />
+                    </IconButton>
                     {onRoll && (
                       <IconButton
                         size="small"

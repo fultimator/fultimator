@@ -38,6 +38,11 @@ import SpellPilot from "/src/components/shared/actors/pc/spells/SpellPilot";
 import SpellMagiseed from "/src/components/shared/actors/pc/spells/SpellMagiseed";
 import UnifiedSpellModal from "/src/components/shared/actors/pc/spells/modals/UnifiedSpellModal";
 import GeneralSection from "/src/components/shared/actors/pc/spells/sections/GeneralSection";
+import {
+  hasActiveSpellInList,
+  setNestedActivation,
+  setSpellListActivation,
+} from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
 import MagiseedGeneralSection from "/src/components/shared/actors/pc/spells/sections/MagiseedGeneralSection";
 import MagiseedContentSection from "/src/components/shared/actors/pc/spells/sections/MagiseedContentSection";
 import GiftContentSection from "/src/components/shared/actors/pc/spells/sections/GiftContentSection";
@@ -193,7 +198,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
 
   const addNewMnemoSpell = (mnemoId, spellType) => {
     if (!mnemoId || !spellType) return;
-    const newSpell = buildBlankSpell(spellType);
+    const baseSpell = buildBlankSpell(spellType);
+    const mnemo = activeMnemospheres.find((entry) => entry.id === mnemoId);
+    const newSpell =
+      spellType === "arcanist" || spellType === "arcanist-rework"
+        ? {
+            ...baseSpell,
+            enabled: !hasActiveSpellInList(mnemo?.spells || [], spellType),
+          }
+        : baseSpell;
     if (!newSpell) return;
     addMnemoSpell(mnemoId, newSpell);
     setSelectedMnemoTarget(null);
@@ -241,14 +254,28 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
       });
     } else {
       const clonedSpell = JSON.parse(JSON.stringify(spell));
-      addMnemoSpell(mnemoId, {
+      const baseSpell = {
         ...clonedSpell,
         _packItemId: spell._packItemId,
         showInPlayerSheet:
           clonedSpell.showInPlayerSheet === undefined
             ? true
             : clonedSpell.showInPlayerSheet,
-      });
+      };
+      const mnemo = activeMnemospheres.find((entry) => entry.id === mnemoId);
+      addMnemoSpell(
+        mnemoId,
+        spell.spellType === "arcanist" ||
+          spell.spellType === "arcanist-rework"
+          ? {
+              ...baseSpell,
+              enabled: !hasActiveSpellInList(
+                mnemo?.spells || [],
+                spell.spellType,
+              ),
+            }
+          : baseSpell,
+      );
     }
     setSelectedMnemoTarget(null);
     setSelectedMnemoSpellType(null);
@@ -284,6 +311,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     setSelectedClass(newValue ? newValue.className : null);
     setSelectedSpell(newValue ? newValue.spellType : null);
   };
+
+  const isTinkererClass = (cls) =>
+    cls?.fuid === "tinkerer" || cls?.name === "Tinkerer";
 
   const buildBlankSpell = (spellType) => {
     if (spellType === "default")
@@ -444,6 +474,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     value: 0,
                     defense: "mdef",
                   },
+                  isMagisphere: isTinkererClass(cls),
                   showInPlayerSheet: true,
                 },
               ],
@@ -463,6 +494,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   mergeDesc: "",
                   dismiss: "",
                   dismissDesc: "",
+                  enabled: !hasActiveSpellInList(cls.spells, spell),
                   showInPlayerSheet: true,
                 },
               ],
@@ -484,6 +516,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   pulseDesc: "",
                   dismiss: "",
                   dismissDesc: "",
+                  enabled: !hasActiveSpellInList(cls.spells, spell),
                   showInPlayerSheet: true,
                 },
               ],
@@ -935,7 +968,9 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                 value: 0,
                 defense: "mdef",
               },
-              isMagisphere: spell.isMagisphere || false,
+              isMagisphere: isTinkererClass(cls)
+                ? true
+                : spell.isMagisphere || false,
               showInPlayerSheet: true,
               fuid: spell.fuid,
               _packItemId: spell._packItemId,
@@ -973,6 +1008,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               mergeDesc: t(spell.mergeDesc || ""),
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
+              enabled: !hasActiveSpellInList(cls.spells, "arcanist"),
               showInPlayerSheet: true,
               fuid: spell.fuid,
               _packItemId: spell._packItemId,
@@ -1012,6 +1048,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
               pulseDesc: t(spell.pulseDesc || ""),
               dismiss: t(spell.dismiss || ""),
               dismissDesc: t(spell.dismissDesc || ""),
+              enabled: !hasActiveSpellInList(cls.spells, "arcanist-rework"),
               showInPlayerSheet: true,
               fuid: spell.fuid,
               _packItemId: spell._packItemId,
@@ -1047,6 +1084,59 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         window.electron.alert(`Please select a ${label} spell.`);
       else alert(`Please select a ${label} spell.`);
       return false;
+    }
+    if (spellType === "dance" || spellType === "symbol") {
+      const subItem =
+        spellType === "dance"
+          ? {
+              key: spell.key || spell.name,
+              name: spell.name,
+              effect: spell.effect || "",
+              duration: spell.duration || "",
+              customName: "",
+              _packItemId: spell._packItemId,
+            }
+          : {
+              key: spell.key || spell.name,
+              name: spell.name,
+              effect: spell.effect || "",
+              customName: "",
+              _packItemId: spell._packItemId,
+            };
+      const itemsKey = spellType === "dance" ? "dances" : "symbols";
+      setPlayer((prev) => ({
+        ...prev,
+        classes: prev.classes.map((cls) => {
+          if (cls.name !== className) return cls;
+          const existingIndex = (cls.spells || []).findIndex(
+            (sp) => sp.spellType === spellType,
+          );
+          if (existingIndex >= 0) {
+            return {
+              ...cls,
+              spells: cls.spells.map((sp, index) =>
+                index === existingIndex
+                  ? {
+                      ...sp,
+                      [itemsKey]: [...(sp[itemsKey] || []), subItem],
+                    }
+                  : sp,
+              ),
+            };
+          }
+          return {
+            ...cls,
+            spells: [
+              ...(cls.spells || []),
+              {
+                ...buildBlankSpell(spellType),
+                [itemsKey]: [subItem],
+              },
+            ],
+          };
+        }),
+      }));
+      return true;
     }
     if (singletonSpellTypes.has(spellType)) {
       const already = (
@@ -1127,6 +1217,57 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     openModal("spellDefault", spell, spellClass, spellIndex);
   const handleEditArcanistSpell = (spell, spellClass, spellIndex) =>
     openModal("spellArcanist", spell, spellClass, spellIndex);
+  const handleActivateArcana = (
+    spellClass,
+    spellIndex,
+    spellType,
+    active = true,
+  ) => {
+    setPlayer((prev) => {
+      const equipment = prev.equipment ? [...prev.equipment] : [];
+      const eq0 = equipment[0];
+      const mnemospheres = eq0?.mnemospheres || [];
+      const mnemoIndex = mnemospheres.findIndex((m) => m.id === spellClass);
+
+      if (mnemoIndex >= 0) {
+        const nextMnemospheres = mnemospheres.map((mnemo, index) =>
+          index === mnemoIndex
+            ? {
+                ...mnemo,
+                spells: setSpellListActivation(
+                  mnemo.spells || [],
+                  spellIndex,
+                  spellType,
+                  active,
+                ),
+              }
+            : mnemo,
+        );
+        const nextEq0 = { ...eq0, mnemospheres: nextMnemospheres };
+        return {
+          ...prev,
+          equipment: [nextEq0, ...equipment.slice(1)],
+        };
+      }
+
+      return {
+        ...prev,
+        classes: (prev.classes || []).map((cls) =>
+          cls.name === spellClass
+            ? {
+                ...cls,
+                spells: setSpellListActivation(
+                  cls.spells || [],
+                  spellIndex,
+                  spellType,
+                  active,
+                ),
+              }
+            : cls,
+        ),
+      };
+    });
+  };
   const handleEditAlchemySpell = (spell, spellClass, spellIndex) =>
     openModal("alchemy", spell, spellClass, spellIndex);
   const handleEditInfusionSpell = (spell, spellClass, spellIndex) =>
@@ -1236,7 +1377,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     }));
   };
 
-  const handleMagiseedChange = (spellClass, spellIndex, newMagiseed) => {
+  const handleMagiseedChange = (
+    spellClass,
+    spellIndex,
+    newMagiseed,
+    seedIndex,
+  ) => {
     setPlayer((prev) => ({
       ...prev,
       classes: prev.classes.map((cls) => {
@@ -1245,10 +1391,12 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             ...cls,
             spells: cls.spells.map((spell, spellIdx) => {
               if (spellIdx === spellIndex && spell.spellType === "magiseed") {
-                return {
-                  ...spell,
-                  currentMagiseed: newMagiseed,
-                };
+                return setNestedActivation(
+                  spell,
+                  seedIndex,
+                  "magiseed",
+                  Boolean(newMagiseed),
+                );
               }
               return spell;
             }),
@@ -1375,19 +1523,20 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                   spellIdx === spellIndex &&
                   spell.spellType === "pilot-vehicle"
                 ) {
-                  const updatedVehicles = [...spell.vehicles];
-
                   if (field === "enabled") {
-                    // Only one vehicle can be enabled at a time
-                    updatedVehicles.forEach((vehicle, idx) => {
-                      vehicle.enabled = idx === vehicleIndex ? value : false;
-                    });
-                  } else {
-                    updatedVehicles[vehicleIndex] = {
-                      ...updatedVehicles[vehicleIndex],
-                      [field]: value,
-                    };
+                    return setNestedActivation(
+                      spell,
+                      vehicleIndex,
+                      "pilot-vehicle",
+                      value,
+                    );
                   }
+
+                  const updatedVehicles = [...spell.vehicles];
+                  updatedVehicles[vehicleIndex] = {
+                    ...updatedVehicles[vehicleIndex],
+                    [field]: value,
+                  };
 
                   return {
                     ...spell,
@@ -1412,18 +1561,46 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
     activeMnemospheres.some((m) => m.id === id);
 
   const handleSaveEditedSpell = (spellIndex, editedSpell) => {
+    const pendingZenitSpent = Math.max(
+      0,
+      Number(editedSpell?._pendingZenitSpent) || 0,
+    );
+    const { _pendingZenitSpent, ...spellToSave } = editedSpell || {};
+
     if (isMnemoEditingTarget(editingSpellClass)) {
-      updateMnemoSpell(editingSpellClass, spellIndex, editedSpell);
+      updateMnemoSpell(editingSpellClass, spellIndex, spellToSave);
+      if (pendingZenitSpent > 0) {
+        setPlayer((prev) => ({
+          ...prev,
+          info: {
+            ...prev.info,
+            zenit: Math.max(
+              0,
+              (Number(prev.info?.zenit) || 0) - pendingZenitSpent,
+            ),
+          },
+        }));
+      }
     } else {
       setPlayer((prev) => ({
         ...prev,
+        info:
+          pendingZenitSpent > 0
+            ? {
+                ...prev.info,
+                zenit: Math.max(
+                  0,
+                  (Number(prev.info?.zenit) || 0) - pendingZenitSpent,
+                ),
+              }
+            : prev.info,
         classes: prev.classes.map((cls) => {
           if (cls.name === editingSpellClass) {
             return {
               ...cls,
               spells: cls.spells.map((spell, index) => {
                 if (index === spellIndex) {
-                  return editedSpell;
+                  return spellToSave;
                 }
                 return spell;
               }),
@@ -1548,7 +1725,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                     .sort((a, b) => a.spellType.localeCompare(b.spellType))
                     .map((spell, index) => (
                       <React.Fragment key={index}>
-                        <div>
+                        <React.Fragment>
                           {spell.spellType === "default" &&
                             !spellTypeHeaders.default && (
                               <>
@@ -1836,7 +2013,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                 {(spellTypeHeaders.deck = true)}
                               </>
                             )}
-                        </div>
+                        </React.Fragment>
                         {spell.spellType === "default" && (
                           <SpellDefault
                             spellName={spell.name}
@@ -1876,6 +2053,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             onEdit={() =>
                               handleEditArcanistSpell(spell, cls.name, index)
                             }
+                            onActivate={(active) =>
+                              handleActivateArcana(
+                                cls.name,
+                                index,
+                                spell.spellType,
+                                active,
+                              )
+                            }
+                            alwaysExpanded
                             isEditMode={isEditMode}
                           />
                         )}
@@ -1887,6 +2073,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             onEdit={() =>
                               handleEditArcanistSpell(spell, cls.name, index)
                             }
+                            onActivate={(active) =>
+                              handleActivateArcana(
+                                cls.name,
+                                index,
+                                spell.spellType,
+                                active,
+                              )
+                            }
+                            alwaysExpanded
                             isEditMode={isEditMode}
                           />
                         )}
@@ -2037,8 +2232,13 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                             onEdit={() =>
                               handleEditMagiseed(spell, cls.name, index)
                             }
-                            onMagiseedChange={(newMagiseed) =>
-                              handleMagiseedChange(cls.name, index, newMagiseed)
+                            onMagiseedChange={(newMagiseed, seedIndex) =>
+                              handleMagiseedChange(
+                                cls.name,
+                                index,
+                                newMagiseed,
+                                seedIndex,
+                              )
                             }
                             onGrowthClockChange={(newValue) =>
                               handleGrowthClockChange(cls.name, index, newValue)
@@ -2182,7 +2382,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                       )
                       .map((spell, index) => (
                         <React.Fragment key={index}>
-                          <div>
+                          <React.Fragment>
                             {spell.spellType === "default" &&
                               !mnemoSpellTypeHeaders.default && (
                                 <>
@@ -2394,7 +2594,7 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                   {(mnemoSpellTypeHeaders.deck = true)}
                                 </>
                               )}
-                          </div>
+                          </React.Fragment>
                           {spell.spellType === "default" && (
                             <SpellDefault
                               spellName={spell.name}
@@ -2435,6 +2635,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               onEdit={() =>
                                 handleEditArcanistSpell(spell, mnemo.id, index)
                               }
+                              onActivate={(active) =>
+                                handleActivateArcana(
+                                  mnemo.id,
+                                  index,
+                                  spell.spellType,
+                                  active,
+                                )
+                              }
+                              alwaysExpanded
                               isEditMode={isEditMode}
                             />
                           )}
@@ -2579,17 +2788,24 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                                 });
                               }}
                               onVehicleChange={(vehicleIndex, field, value) => {
+                                if (field === "enabled") {
+                                  updateMnemoSpell(
+                                    mnemo.id,
+                                    index,
+                                    setNestedActivation(
+                                      spell,
+                                      vehicleIndex,
+                                      "pilot-vehicle",
+                                      value,
+                                    ),
+                                  );
+                                  return;
+                                }
                                 const updatedVehicles = [...spell.vehicles];
-                                if (field === "enabled")
-                                  updatedVehicles.forEach((v, i) => {
-                                    v.enabled =
-                                      i === vehicleIndex ? value : false;
-                                  });
-                                else
-                                  updatedVehicles[vehicleIndex] = {
+                                updatedVehicles[vehicleIndex] = {
                                     ...updatedVehicles[vehicleIndex],
                                     [field]: value,
-                                  };
+                                };
                                 updateMnemoSpell(mnemo.id, index, {
                                   ...spell,
                                   vehicles: updatedVehicles,
@@ -2606,10 +2822,14 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
                               onEdit={() =>
                                 handleEditMagiseed(spell, mnemo.id, index)
                               }
-                              onMagiseedChange={(newMagiseed) =>
+                              onMagiseedChange={(newMagiseed, seedIndex) =>
                                 updateMnemoSpell(mnemo.id, index, {
-                                  ...spell,
-                                  currentMagiseed: newMagiseed,
+                                  ...setNestedActivation(
+                                    spell,
+                                    seedIndex,
+                                    "magiseed",
+                                    Boolean(newMagiseed),
+                                  ),
                                 })
                               }
                               onGrowthClockChange={(newValue) =>
@@ -3022,13 +3242,15 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
         onDelete={(spellIndex) =>
           handleDeleteSpell(spellIndex, editingSpellClass)
         }
+        player={player}
+        setPlayer={setPlayer}
         spellType="gourmet"
         spell={{ ...spellBeingEdited, index: editingSpellIndex }}
         title={spellBeingEdited?.spellName}
         sections={[
           {
             id: "cookbook",
-            title: "gourmet_cookbook",
+            title: "Combinations",
             component: GourmetContentSection,
             props: {},
             order: 0,
@@ -3041,18 +3263,25 @@ export default function EditPlayerSpells({ player, setPlayer, isEditMode }) {
             order: 1,
           },
           {
+            id: "shop",
+            title: "Shop",
+            component: GourmetCookingTab,
+            props: { mode: "shop" },
+            order: 2,
+          },
+          {
             id: "cooking",
             title: "gourmet_cooking",
             component: GourmetCookingTab,
-            props: {},
-            order: 2,
+            props: { mode: "cooking" },
+            order: 3,
           },
           {
             id: "general",
             title: "gourmet_edit_cooking_button",
             component: GourmetGeneralSection,
             props: {},
-            order: 3,
+            order: 4,
           },
         ]}
       />

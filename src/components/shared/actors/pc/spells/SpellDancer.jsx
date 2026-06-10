@@ -20,6 +20,7 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const showInPlayerSheet =
     dance.showInPlayerSheet || dance.showInPlayerSheet === undefined;
@@ -31,6 +32,21 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
 
   const components = {
     p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
+  };
+
+  const customDanceKeys = new Set(["dance_custom", "dance_custom_name"]);
+  const getDanceName = (dan) => {
+    const key = dan.key || dan.name;
+    if (customDanceKeys.has(key)) return dan.customName || t("dance_custom_name");
+    return dan.customName || t(key || dan.name || "");
+  };
+  const getDanceDuration = (dan) => {
+    const key = dan.key || dan.name;
+    return customDanceKeys.has(key) ? dan.duration : t(dan.duration || "");
+  };
+  const getDanceEffect = (dan) => {
+    const key = dan.key || dan.name;
+    return customDanceKeys.has(key) ? dan.effect : t(dan.effect || "");
   };
 
   return (
@@ -86,7 +102,7 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={8}
+            size={4}
           >
             <Typography
               variant="h3"
@@ -105,7 +121,7 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={4}
+            size={8}
           >
             <Typography
               variant="h3"
@@ -114,7 +130,7 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
                 fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
               }}
             >
-              {t("dance_duration")}
+              {t("Effect")}
             </Typography>
           </Grid>
         </Grid>
@@ -156,86 +172,60 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
         </Typography>
       ) : (
         (dance.dances ?? []).map((dan, i) => (
-          <React.Fragment key={i}>
-            <div
-              style={{
-                background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                padding: "3px 17px",
-                display: "flex",
-                justifyContent: "space-between",
-                borderTop: `1px solid ${theme.secondary}`,
-                borderBottom: `1px solid ${theme.secondary}`,
-              }}
-            >
-              <Grid container style={{ flexGrow: 1 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={8}
-                >
+          <div
+            key={i}
+            style={{
+              background:
+                i % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : "transparent",
+              padding: "6px 17px",
+              display: "flex",
+              justifyContent: "space-between",
+              minHeight: 44,
+              fontSize: "0.9rem",
+              borderTop: `1px solid ${theme.secondary}`,
+              borderBottom: `1px solid ${theme.secondary}`,
+            }}
+          >
+            <Grid container spacing={1.5} style={{ flexGrow: 1 }}>
+              <Grid
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
+                }}
+                size={4}
+              >
+                <div>
                   <Typography
-                    style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
+                      ...bodyTextSx,
                       fontWeight: "bold",
                     }}
                   >
-                    {dan.name === "dance_custom_name"
-                      ? dan.customName
-                      : t(dan.name)}
+                    {getDanceName(dan)}
                   </Typography>
-                </Grid>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={4}
-                >
-                  <Typography
-                    style={{ flexGrow: 1, marginRight: "5px" }}
-                    sx={{
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {dan.name === "dance_custom_name"
-                      ? dan.duration
-                      : t(dan.duration)}
+                  <Typography sx={{ fontSize: "0.82rem", lineHeight: 1.3, opacity: 0.85 }}>
+                    {getDanceDuration(dan)}
                   </Typography>
-                </Grid>
+                </div>
               </Grid>
-            </div>
-            <Grid
-              container
-              sx={{
-                justifyContent: "flex-start",
-                background: "transparent",
-                padding: "3px 17px",
-                marginBottom: "6px",
-                borderBottom: `1px solid ${theme.secondary}`,
-              }}
-            >
-              <Grid container style={{ flexGrow: 1 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={12}
-                >
-                  <ReactMarkdown components={components}>
-                    {dan.name === "dance_custom_name"
-                      ? dan.effect
-                      : t(dan.effect)}
-                  </ReactMarkdown>
-                </Grid>
+              <Grid
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
+                }}
+                size={8}
+                sx={bodyTextSx}
+              >
+                <ReactMarkdown components={components}>
+                  {getDanceEffect(dan)}
+                </ReactMarkdown>
               </Grid>
             </Grid>
-          </React.Fragment>
+          </div>
         ))
       )}
     </>

@@ -8,20 +8,24 @@ import {
   Box,
   LinearProgress,
   IconButton,
+  Tooltip,
 } from "@mui/material";
-import { Add, Remove, RestartAlt } from "@mui/icons-material";
+import { Add, Message, Remove, RestartAlt } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
+  lineHeight: 1.35,
+  verticalAlign: "middle",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
-export default function SpellGift({ spell, setPlayer }) {
+export default function SpellGift({ spell, setPlayer, classIndex, spellIndex }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -30,15 +34,52 @@ export default function SpellGift({ spell, setPlayer }) {
   const clock = spell.clock || 0;
   const getClockProgress = (c) => (c / 4) * 100;
 
+  const getGiftName = (gift, giftKey, isCustom) =>
+    isCustom ? gift.customName : t(giftKey);
+
+  const getGiftEvent = (gift) =>
+    gift.event && gift.event.startsWith("esper_event_")
+      ? t(gift.event)
+      : gift.event || "";
+
+  const getGiftEffect = (gift, isCustom) =>
+    isCustom ? gift.effect : t(gift.effect);
+
+  const handleGiftSendToChat = (event, gift, giftKey, isCustom) => {
+    event.stopPropagation();
+    const giftEvent = getGiftEvent(gift);
+    const giftEffect = getGiftEffect(gift, isCustom);
+    sendDisplayMessage("spell", getGiftName(gift, giftKey, isCustom), {
+      speaker: "",
+      description: [
+        giftEvent && `**${t("esper_events")}:** ${giftEvent}`,
+        giftEffect,
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
+    });
+  };
+
   const handleClockChange = (newClock) => {
     if (!setPlayer) return;
     const clampedClock = Math.max(0, Math.min(4, newClock));
     setPlayer((prevPlayer) => {
-      const newClasses = prevPlayer.classes.map((cls) => {
-        if (cls.name !== spell.className) return cls;
-        const newSpells = cls.spells.map((s) =>
-          s.spellType === "gift" ? { ...s, clock: clampedClock } : s,
-        );
+      const newClasses = (prevPlayer.classes || []).map((cls, clsIndex) => {
+        const isTargetClass =
+          clsIndex === classIndex ||
+          (spell.className && cls.name === spell.className);
+        if (!isTargetClass) return cls;
+
+        const newSpells = (cls.spells || []).map((s, sIndex) => {
+          const isTargetSpell =
+            sIndex === spellIndex ||
+            (spell.fuid && s.fuid === spell.fuid) ||
+            (s.spellType === "gift" &&
+              spellIndex === undefined &&
+              !spell.fuid);
+          return isTargetSpell ? { ...s, clock: clampedClock } : s;
+        });
+
         return { ...cls, spells: newSpells };
       });
       return { ...prevPlayer, classes: newClasses };
@@ -110,43 +151,60 @@ export default function SpellGift({ spell, setPlayer }) {
         </TableRow>
 
         {/* Gifts List */}
-        {spell.gifts?.map((gift, index) => (
-          <TableRow
-            key={index}
-            sx={{
-              backgroundImage:
-                index % 2 === 0
-                  ? `linear-gradient(to right, ${theme.ternary}20, ${gradientColor})`
-                  : `linear-gradient(to right, ${theme.ternary}40, ${gradientColor})`,
-            }}
-          >
-            <StyledTableCell sx={{ width: "30%", fontWeight: "bold" }}>
-              {gift.name === "esper_gift_custom_name"
-                ? gift.customName
-                : t(gift.name)}
-            </StyledTableCell>
-            <StyledTableCell sx={{ width: "20%", fontSize: "0.7rem" }}>
-              {gift.event ? (
+        {spell.gifts?.map((gift, index) => {
+          const giftKey = gift.key ?? gift.name;
+          const isCustom = giftKey === "esper_gift_custom_name";
+          return (
+            <TableRow
+              key={index}
+              sx={{
+                backgroundImage:
+                  index % 2 === 0
+                    ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                    : `linear-gradient(to right, ${gradientColor}, ${gradientColor})`,
+              }}
+            >
+              <StyledTableCell sx={{ width: "30%", verticalAlign: "top" }}>
+                <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
+                  {getGiftName(gift, giftKey, isCustom)}
+                </Typography>
+                <Box sx={{ mt: 0.5, fontSize: "0.85rem", lineHeight: 1.25 }}>
+                  {gift.event ? (
+                    <ReactMarkdown
+                      components={{ p: (props) => <span {...props} /> }}
+                    >
+                      {getGiftEvent(gift)}
+                    </ReactMarkdown>
+                  ) : (
+                    "-"
+                  )}
+                </Box>
+              </StyledTableCell>
+              <StyledTableCell
+                sx={{ width: "70%", fontSize: "0.85rem", verticalAlign: "top" }}
+              >
                 <ReactMarkdown
                   components={{ p: (props) => <span {...props} /> }}
                 >
-                  {gift.event.startsWith("esper_event_")
-                    ? t(gift.event)
-                    : gift.event}
+                  {getGiftEffect(gift, isCustom)}
                 </ReactMarkdown>
-              ) : (
-                "-"
-              )}
-            </StyledTableCell>
-            <StyledTableCell sx={{ width: "50%", fontSize: "0.75rem" }}>
-              <ReactMarkdown components={{ p: (props) => <span {...props} /> }}>
-                {gift.name === "esper_gift_custom_name"
-                  ? gift.effect
-                  : t(gift.effect)}
-              </ReactMarkdown>
-            </StyledTableCell>
-          </TableRow>
-        ))}
+              </StyledTableCell>
+              <StyledTableCell sx={{ width: 32, px: 0.5 }}>
+                <Tooltip title={t("Send to Chat")} arrow>
+                  <IconButton
+                    size="small"
+                    sx={{ p: "2px" }}
+                    onClick={(event) =>
+                      handleGiftSendToChat(event, gift, giftKey, isCustom)
+                    }
+                  >
+                    <Message sx={{ fontSize: "0.9rem" }} />
+                  </IconButton>
+                </Tooltip>
+              </StyledTableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

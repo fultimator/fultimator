@@ -27,6 +27,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const [localClock, setLocalClock] = useState(gift.clock || 0);
 
@@ -43,6 +44,19 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   const components = {
     p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
   };
+
+  const getGiftKey = (gft) => gft.key || gft.name || "esper_gift_custom_name";
+  const isCustomGift = (gft) => getGiftKey(gft) === "esper_gift_custom_name";
+  const getGiftName = (gft) =>
+    isCustomGift(gft) ? gft.customName || t("Custom") : t(getGiftKey(gft));
+  const getGiftEvent = (gft) => {
+    if (isCustomGift(gft)) return gft.event || "-";
+    return gft.event && gft.event.startsWith("esper_event_")
+      ? t(gft.event)
+      : gft.event || "-";
+  };
+  const getGiftEffect = (gft) =>
+    isCustomGift(gft) ? gft.effect || "" : t(gft.effect);
 
   const getClockState = () => {
     const state = [false, false, false, false];
@@ -348,7 +362,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           minHeight: "40px",
         }}
       >
-        <Box sx={{ flex: "0 0 66.67%", display: "flex", alignItems: "center" }}>
+        <Box sx={{ flex: "0 0 24%", display: "flex", alignItems: "center" }}>
           <Typography
             variant="h3"
             sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
@@ -356,12 +370,20 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             {t("esper_psychic_gifts")}
           </Typography>
         </Box>
-        <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+        <Box sx={{ flex: "0 0 32%", display: "flex", alignItems: "center" }}>
           <Typography
             variant="h3"
             sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
           >
             {t("esper_events")}
+          </Typography>
+        </Box>
+        <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+          <Typography
+            variant="h3"
+            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
+          >
+            {t("Effect")}
           </Typography>
         </Box>
       </Box>
@@ -382,57 +404,47 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
       ) : (
         gift.gifts &&
         gift.gifts.map((gft, i) => (
-          <React.Fragment key={i}>
-            {/* Gift name + event row */}
+          <Box
+            key={`${getGiftKey(gft)}-${i}`}
+            sx={{
+              background:
+                i % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : "transparent",
+              px: "17px",
+              py: "8px",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "18px",
+              borderTop: `1px solid ${theme.secondary}`,
+              borderBottom: `1px solid ${theme.secondary}`,
+              minHeight: 44,
+              fontSize: "0.9rem",
+            }}
+          >
             <Box
               sx={{
-                background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                px: "17px",
-                py: "3px",
-                display: "flex",
-                alignItems: "center",
-                borderTop: `1px solid ${theme.secondary}`,
-                borderBottom: `1px solid ${theme.secondary}`,
-                minHeight: "36px",
+                flex: "0 0 24%",
+                minWidth: 0,
               }}
             >
-              <Box
-                sx={{
-                  flex: "0 0 66.67%",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Typography sx={{ fontWeight: "bold" }}>
-                  {gft.name === "esper_gift_custom_name"
-                    ? gft.customName
-                    : t(gft.name)}
-                </Typography>
-              </Box>
-              <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+              <Typography sx={{ ...bodyTextSx, fontWeight: "bold" }}>
+                {getGiftName(gft)}
+              </Typography>
+            </Box>
+            <Box sx={{ flex: "0 0 32%", minWidth: 0 }}>
+              <Box sx={bodyTextSx}>
                 <ReactMarkdown components={components}>
-                  {gft.name === "gift_custom_name"
-                    ? gft.event
-                    : gft.event && gft.event.startsWith("esper_event_")
-                      ? t(gft.event)
-                      : gft.event}
+                  {getGiftEvent(gft)}
                 </ReactMarkdown>
               </Box>
             </Box>
-            {/* Effect row */}
-            <Box
-              sx={{
-                px: "17px",
-                py: "3px",
-                mb: "6px",
-                borderBottom: `1px solid ${theme.secondary}`,
-              }}
-            >
+            <Box sx={{ flex: 1, minWidth: 0, ...bodyTextSx }}>
               <ReactMarkdown components={components}>
-                {gft.name === "gift_custom_name" ? gft.effect : t(gft.effect)}
+                {getGiftEffect(gft)}
               </ReactMarkdown>
             </Box>
-          </React.Fragment>
+          </Box>
         ))
       )}
     </>

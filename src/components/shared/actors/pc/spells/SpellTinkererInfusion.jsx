@@ -21,6 +21,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
   const isDarkMode = theme.mode === "dark";
 
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const showInPlayerSheet =
     infusion.showInPlayerSheet || infusion.showInPlayerSheet === undefined;
@@ -174,8 +175,13 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               container
               sx={{
                 justifyContent: "flex-start",
-                background: "transparent",
+                background:
+                  i % 2 === 0
+                    ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                    : "transparent",
                 padding: "3px 17px",
+                minHeight: 44,
+                fontSize: "0.9rem",
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
@@ -192,6 +198,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
+                      ...bodyTextSx,
                       fontWeight: "bold",
                     }}
                   >
@@ -205,6 +212,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     justifyContent: "flex-start",
                   }}
                   size={8}
+                  sx={bodyTextSx}
                 >
                   <ReactMarkdown
                     components={{
@@ -259,8 +267,13 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               container
               sx={{
                 justifyContent: "flex-start",
-                background: "transparent",
+                background:
+                  i % 2 === 0
+                    ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                    : "transparent",
                 padding: "3px 17px",
+                minHeight: 44,
+                fontSize: "0.9rem",
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
@@ -277,6 +290,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
+                      ...bodyTextSx,
                       fontWeight: "bold",
                     }}
                   >
@@ -290,6 +304,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     justifyContent: "flex-start",
                   }}
                   size={8}
+                  sx={bodyTextSx}
                 >
                   <ReactMarkdown
                     components={{
@@ -344,8 +359,13 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
               container
               sx={{
                 justifyContent: "flex-start",
-                background: "transparent",
+                background:
+                  i % 2 === 0
+                    ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                    : "transparent",
                 padding: "3px 17px",
+                minHeight: 44,
+                fontSize: "0.9rem",
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
               key={i}
@@ -362,6 +382,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
+                      ...bodyTextSx,
                       fontWeight: "bold",
                     }}
                   >
@@ -375,6 +396,7 @@ function ThemedSpellTinkererInfusion({ infusion, onEdit, isEditMode }) {
                     justifyContent: "flex-start",
                   }}
                   size={8}
+                  sx={bodyTextSx}
                 >
                   <ReactMarkdown
                     components={{

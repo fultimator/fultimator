@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Grid, Box } from "@mui/material";
+import { Grid } from "@mui/material";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { useTranslate } from "/src/translation/translate";
 import { useSpellModals } from "/src/hooks/useSpellModals";
@@ -94,6 +94,25 @@ export default function PcSpells({
                     : { ...s, ...updater }
                   : s,
               ),
+            }
+          : cls,
+      ),
+    }));
+  };
+
+  const handleUpdateSpellList = (classIdx, updater) => {
+    if (!onUpdate) return;
+    if (classIdx >= (pc.classes ?? []).length) return;
+    onUpdate((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls, i) =>
+        i === classIdx
+          ? {
+              ...cls,
+              spells:
+                typeof updater === "function"
+                  ? updater(cls.spells || [])
+                  : updater,
             }
           : cls,
       ),
@@ -402,21 +421,18 @@ export default function PcSpells({
                           updater,
                         )
                     : undefined,
+                  onSpellListUpdate: canEdit && !isVirtual
+                    ? (updater) =>
+                        handleUpdateSpellList(
+                          realClassIdx ?? classIndex,
+                          updater,
+                        )
+                    : undefined,
+                  spellIndex: realSpellIndex,
                 });
-                const needsWrapper =
-                  spell.spellType === "arcanist" ||
-                  spell.spellType === "arcanist-rework";
                 return (
                   <React.Fragment key={spellIndex}>
-                    <Box sx={{ position: "relative" }}>
-                      {needsWrapper ? (
-                        <div style={{ marginTop: "0.5em", padding: "0.5em" }}>
-                          <Component {...props} />
-                        </div>
-                      ) : (
-                        <Component {...props} />
-                      )}
-                    </Box>
+                    <Component {...props} />
                   </React.Fragment>
                 );
               })}

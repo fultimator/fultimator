@@ -24,6 +24,7 @@ import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { magiseeds } from "/src/libs/floralistMagiseedData";
 import Clock from "/src/components/shared/actors/pc/playerSheet/optional/Clock";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 function ThemedSpellMagiseed({
   magiseed,
@@ -37,6 +38,7 @@ function ThemedSpellMagiseed({
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const [expandedMagiseeds, setExpandedMagiseeds] = useState(new Set());
   const [localClock, setLocalClock] = useState(magiseed.growthClock || 0);
@@ -191,11 +193,11 @@ function ThemedSpellMagiseed({
         </Typography>
         <Box
           sx={{
-            width: 34,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
+            gap: "2px",
           }}
         >
           {isEditMode && (
@@ -214,6 +216,24 @@ function ThemedSpellMagiseed({
               </IconButton>
             </>
           )}
+          <IconButton
+            size="small"
+            sx={{ color: "#fff", p: "3px" }}
+            onClick={() => {
+              const seedName = currentMagiseed
+                ? currentMagiseed.customName ||
+                  t(currentMagiseed.key ?? currentMagiseed.name)
+                : t("magiseed_no_magiseed");
+              const effect = getCurrentEffect();
+              sendDisplayMessage("spell", seedName, {
+                speaker: "",
+                tags: [`${t("magiseed_growth_clock")}: ${growthClock}/4`],
+                description: effect || undefined,
+              });
+            }}
+          >
+            <LocalFlorist sx={{ fontSize: "1.1rem" }} />
+          </IconButton>
         </Box>
       </div>
       {/* Garden State and Growth Clock */}
@@ -461,7 +481,11 @@ function ThemedSpellMagiseed({
                     display: "flex",
                     alignItems: "stretch",
                     minHeight: 44,
-                    background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+                    fontSize: "0.9rem",
+                    background:
+                      index % 2 === 0
+                        ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                        : "transparent",
                     borderBottom: isExpanded
                       ? `1px solid ${theme.secondary}`
                       : "none",
@@ -486,7 +510,7 @@ function ThemedSpellMagiseed({
                       sx={{
                         fontFamily: "Antonio",
                         fontWeight: 800,
-                        fontSize: "0.95rem",
+                        fontSize: "0.9rem",
                         textTransform: "uppercase",
                         lineHeight: 1.3,
                       }}
@@ -495,7 +519,7 @@ function ThemedSpellMagiseed({
                     </Typography>
                     <Typography
                       variant="caption"
-                      sx={{ color: "text.secondary", fontWeight: "bold" }}
+                      sx={{ ...bodyTextSx, color: "text.secondary", fontWeight: "bold" }}
                     >
                       {`T: ${rangeStart}–${rangeEnd}`}
                       {isPlanted && (
@@ -535,7 +559,7 @@ function ThemedSpellMagiseed({
                         color="inherit"
                         onClick={() =>
                           onMagiseedChange &&
-                          onMagiseedChange(isPlanted ? null : seed)
+                          onMagiseedChange(isPlanted ? null : seed, index)
                         }
                         style={{
                           minWidth: 64,
@@ -586,7 +610,7 @@ function ThemedSpellMagiseed({
                           >
                             T = {section}:
                           </Typography>
-                          <Box sx={{ ml: 2, mt: 0.25, fontSize: "0.9em" }}>
+                          <Box sx={{ ml: 2, mt: 0.25, ...bodyTextSx }}>
                             <ReactMarkdown components={components}>
                               {t(effect)}
                             </ReactMarkdown>

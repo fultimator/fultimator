@@ -84,6 +84,8 @@ export default function UnifiedSpellModal({
   onClose,
   onSave,
   onDelete,
+  player,
+  setPlayer,
   spellType,
   spell,
   sections,
@@ -269,6 +271,8 @@ export default function UnifiedSpellModal({
               {...activeSection.props}
               formState={formState}
               setFormState={setFormState}
+              player={player}
+              setPlayer={setPlayer}
               t={t}
             />
           )}

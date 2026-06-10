@@ -16,6 +16,10 @@ import {
   SpellTinkererInfusion,
   SpellTinkererMagitech,
 } from "/src/components/shared/actors/pc/spells";
+import {
+  setNestedActivation,
+  setSpellListActivation,
+} from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
 
 // Each entry: { Component, buildProps(spell, handlers) }
 // handlers: { onEdit, onEditSubModal, onSpellUpdate, isEditMode }
@@ -70,9 +74,10 @@ const spellDisplayRegistry = {
   },
   magichant: {
     Component: SpellChanter,
-    buildProps: (spell, { onEdit, onEditSubModal, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onEditSubModal, isEditMode, speaker }) => ({
       magichant: spell,
       isEditMode,
+      speaker,
       onEdit,
       onEditKeys: () => onEditSubModal?.("chantKey"),
       onEditTones: () => onEditSubModal?.("chantTone"),
@@ -108,20 +113,50 @@ const spellDisplayRegistry = {
   },
   arcanist: {
     Component: SpellArcanist,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (
+      spell,
+      { onEdit, onSpellListUpdate, spellIndex, isEditMode },
+    ) => ({
       arcana: spell,
       isEditMode,
       rework: false,
       onEdit,
+      alwaysExpanded: true,
+      onActivate: onSpellListUpdate
+        ? (active = true) =>
+            onSpellListUpdate((spells) =>
+              setSpellListActivation(
+                spells,
+                spellIndex,
+                "arcanist",
+                active,
+              ),
+            )
+        : undefined,
     }),
   },
   "arcanist-rework": {
     Component: SpellArcanist,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (
+      spell,
+      { onEdit, onSpellListUpdate, spellIndex, isEditMode },
+    ) => ({
       arcana: spell,
       isEditMode,
       rework: true,
       onEdit,
+      alwaysExpanded: true,
+      onActivate: onSpellListUpdate
+        ? (active = true) =>
+            onSpellListUpdate((spells) =>
+              setSpellListActivation(
+                spells,
+                spellIndex,
+                "arcanist-rework",
+                active,
+              ),
+            )
+        : undefined,
     }),
   },
   "tinkerer-alchemy": {
@@ -153,10 +188,11 @@ const spellDisplayRegistry = {
   },
   cooking: {
     Component: SpellGourmet,
-    buildProps: (spell, { onEdit, isEditMode }) => ({
+    buildProps: (spell, { onEdit, onSpellUpdate, isEditMode }) => ({
       spell,
       isEditMode,
       onEdit,
+      onSpellUpdate,
     }),
   },
   magiseed: {
@@ -169,6 +205,12 @@ const spellDisplayRegistry = {
       onGrowthClockChange: onSpellUpdate
         ? (growthClock) => onSpellUpdate((s) => ({ ...s, growthClock }))
         : undefined,
+      onMagiseedChange: onSpellUpdate
+        ? (nextSeed, seedIndex) =>
+            onSpellUpdate((s) =>
+              setNestedActivation(s, seedIndex, "magiseed", Boolean(nextSeed)),
+            )
+        : undefined,
     }),
   },
   "pilot-vehicle": {
@@ -180,6 +222,9 @@ const spellDisplayRegistry = {
       onVehicleChange: onSpellUpdate
         ? (idx, field, value) =>
             onSpellUpdate((s) => {
+              if (field === "enabled" && value === true) {
+                return setNestedActivation(s, idx, "pilot-vehicle", true);
+              }
               const vehicles = (s.vehicles || []).map((v, i) =>
                 i === idx ? { ...v, [field]: value } : v,
               );

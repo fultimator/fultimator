@@ -36,6 +36,8 @@ import { useCustomTheme } from "/src/hooks/useCustomTheme";
 const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
+  lineHeight: 1.35,
+  verticalAlign: "middle",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
@@ -663,6 +665,7 @@ export default function SpellDeck({ spell, setPlayer, _isEditMode }) {
                       lineHeight: 1.4,
                       flex: 1,
                       minWidth: 0,
+                      fontSize: "0.85rem",
                     }}
                   >
                     {getSetEffect(potentialSet.type, selectedCards)}

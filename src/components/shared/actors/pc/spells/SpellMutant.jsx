@@ -20,11 +20,16 @@ import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 
+const isCustomTherioform = (therioform) =>
+  therioform.name === "mutant_therioform_custom" ||
+  therioform.name === "mutant_therioform_custom_name";
+
 function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const showInPlayerSheet =
     mutant.showInPlayerSheet || mutant.showInPlayerSheet === undefined;
@@ -165,10 +170,15 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
           <React.Fragment key={i}>
             <div
               style={{
-                background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+                background:
+                  i % 2 === 0
+                    ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                    : "transparent",
                 padding: "3px 17px",
                 display: "flex",
                 justifyContent: "space-between",
+                minHeight: 44,
+                fontSize: "0.9rem",
                 borderTop: `1px solid ${theme.secondary}`,
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
@@ -185,10 +195,11 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
+                      ...bodyTextSx,
                       fontWeight: "bold",
                     }}
                   >
-                    {therioform.name === "mutant_therioform_custom_name"
+                    {isCustomTherioform(therioform)
                       ? therioform.customName
                       : t(therioform.name)}
                   </Typography>
@@ -202,7 +213,7 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                   size={6}
                 >
                   <ReactMarkdown components={components}>
-                    {therioform.name === "mutant_therioform_custom_name"
+                    {isCustomTherioform(therioform)
                       ? therioform.genoclepsis
                       : t(therioform.genoclepsis)}
                   </ReactMarkdown>
@@ -215,6 +226,8 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                 justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
+                minHeight: 44,
+                fontSize: "0.9rem",
                 marginBottom: "6px",
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
@@ -229,7 +242,7 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                   size={12}
                 >
                   <ReactMarkdown components={components}>
-                    {therioform.name === "mutant_therioform_custom_name"
+                    {isCustomTherioform(therioform)
                       ? therioform.description
                       : t(therioform.description)}
                   </ReactMarkdown>

@@ -30,6 +30,7 @@ import {
   pilotVehicleItemFields,
   DEFAULT_SUBITEM_TABS,
 } from "/src/forms/rendering/config/itemConfigs/spells/subitems/pilotVehicle";
+import { setNestedActivation } from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
 
 function VehicleAccordion({
   vehicle,
@@ -443,14 +444,18 @@ export default function PilotContentSection({
   const handleVehicleChange = useCallback(
     (vehicleIndex, field, value) => {
       updateVehicles((current) => {
-        const updated = [...current];
-
         if (field === "enabled" && value === true) {
-          for (let i = 0; i < updated.length; i++) {
-            updated[i] = { ...updated[i], enabled: i === vehicleIndex };
-          }
-          return updated;
+          return (
+            setNestedActivation(
+              { vehicles: current },
+              vehicleIndex,
+              "pilot-vehicle",
+              true,
+            ).vehicles || []
+          );
         }
+
+        const updated = [...current];
 
         if (field === "_replace") {
           updated[vehicleIndex] = { ...updated[vehicleIndex], ...value };

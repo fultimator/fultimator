@@ -6,20 +6,26 @@ import {
   TableRow,
   TableCell,
   Box,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import { Message } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
 import { buildInvokerAvailableInvocations } from "/src/libs/player/invokerUtils";
+import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 const StyledTableCell = styled(TableCell)({
   padding: "4px 8px",
   fontSize: "0.85rem",
+  lineHeight: 1.35,
+  verticalAlign: "middle",
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
-export default function SpellInvoker({ spell, setPlayer }) {
+export default function SpellInvoker({ spell, setPlayer, classIndex }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -50,33 +56,29 @@ export default function SpellInvoker({ spell, setPlayer }) {
   };
 
   const handleWellspringToggle = (wellspring) => {
-    if (!setPlayer) return;
+    if (!setPlayer || classIndex == null) return;
     setPlayer((prevPlayer) => {
-      const newClasses = prevPlayer.classes.map((cls) => {
-        if (cls.name === spell.className) {
-          const newSpells = cls.spells.map((s) => {
-            if (s.spellType === "invocation") {
-              const prevTracker = s.tracker || {};
-              let activeWellsprings = [
-                ...(prevTracker.activeWellsprings || []),
-              ];
-              if (activeWellsprings.includes(wellspring)) {
-                activeWellsprings = activeWellsprings.filter(
-                  (w) => w !== wellspring,
-                );
-              } else {
-                if (activeWellsprings.length >= 2) {
-                  activeWellsprings.shift();
-                }
-                activeWellsprings.push(wellspring);
+      const newClasses = prevPlayer.classes.map((cls, idx) => {
+        if (idx !== classIndex) return cls;
+        const newSpells = cls.spells.map((s) => {
+          if (s.spellType === "invocation") {
+            const prevTracker = s.tracker || {};
+            let activeWellsprings = [...(prevTracker.activeWellsprings || [])];
+            if (activeWellsprings.includes(wellspring)) {
+              activeWellsprings = activeWellsprings.filter(
+                (w) => w !== wellspring,
+              );
+            } else {
+              if (activeWellsprings.length >= 2) {
+                activeWellsprings.shift();
               }
-              return { ...s, tracker: { ...prevTracker, activeWellsprings } };
+              activeWellsprings.push(wellspring);
             }
-            return s;
-          });
-          return { ...cls, spells: newSpells };
-        }
-        return cls;
+            return { ...s, tracker: { ...prevTracker, activeWellsprings } };
+          }
+          return s;
+        });
+        return { ...cls, spells: newSpells };
       });
       return { ...prevPlayer, classes: newClasses };
     });
@@ -91,7 +93,7 @@ export default function SpellInvoker({ spell, setPlayer }) {
             backgroundImage: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
           }}
         >
-          <StyledTableCell colSpan={4}>
+          <StyledTableCell colSpan={5}>
             <Typography variant="caption" sx={{ fontWeight: "bold" }}>
               {t("invoker_invocation_active_wellspring")}:
             </Typography>
@@ -154,7 +156,14 @@ export default function SpellInvoker({ spell, setPlayer }) {
           })
           .map((invocation, index) => (
             <React.Fragment key={index}>
-              <TableRow>
+              <TableRow
+                sx={{
+                  backgroundImage:
+                    index % 2 === 0
+                      ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                      : `linear-gradient(to right, ${gradientColor}, ${gradientColor})`,
+                }}
+              >
                 <StyledTableCell
                   sx={{
                     width: "30%",
@@ -164,13 +173,13 @@ export default function SpellInvoker({ spell, setPlayer }) {
                 >
                   {t(invocation.name)}
                 </StyledTableCell>
-                <StyledTableCell sx={{ width: "20%", fontSize: "0.75rem" }}>
+                <StyledTableCell sx={{ width: "20%", fontSize: "0.85rem" }}>
                   {t(`invoker_${invocation.wellspring.toLowerCase()}`)}
                 </StyledTableCell>
-                <StyledTableCell sx={{ width: "15%", fontSize: "0.75rem" }}>
+                <StyledTableCell sx={{ width: "15%", fontSize: "0.85rem" }}>
                   {t(invocation.type)}
                 </StyledTableCell>
-                <StyledTableCell sx={{ width: "35%", fontSize: "0.75rem" }}>
+                <StyledTableCell sx={{ width: "35%", fontSize: "0.85rem" }}>
                   <ReactMarkdown
                     components={{
                       p: ({ _node, ...props }) => <span {...props} />,
@@ -178,6 +187,24 @@ export default function SpellInvoker({ spell, setPlayer }) {
                   >
                     {t(invocation.effect)}
                   </ReactMarkdown>
+                </StyledTableCell>
+                <StyledTableCell sx={{ width: 32, px: 0.5 }}>
+                  <Tooltip title={t("Send to Chat")} arrow>
+                    <IconButton
+                      size="small"
+                      sx={{ p: "2px" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        sendDisplayMessage("spell", t(invocation.name), {
+                          speaker: "",
+                          description: t(invocation.effect),
+                          cost: { resource: "mp", amount: 5 },
+                        });
+                      }}
+                    >
+                      <Message sx={{ fontSize: "0.9rem" }} />
+                    </IconButton>
+                  </Tooltip>
                 </StyledTableCell>
               </TableRow>
             </React.Fragment>

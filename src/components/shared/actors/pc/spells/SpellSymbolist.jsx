@@ -20,6 +20,7 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const gradientColor = isDarkMode ? "#1f1f1f" : "#fff";
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const showInPlayerSheet =
     symbol.showInPlayerSheet || symbol.showInPlayerSheet === undefined;
@@ -31,6 +32,16 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
 
   const components = {
     p: ({ _node, ...props }) => <p style={inlineStyles} {...props} />,
+  };
+
+  const getSymbolName = (sym) => {
+    const key = sym.key || sym.name;
+    if (key === "symbol_custom_name") return sym.customName || t("symbol_custom_name");
+    return sym.customName || t(key || sym.name || "");
+  };
+  const getSymbolEffect = (sym) => {
+    const key = sym.key || sym.name;
+    return key === "symbol_custom_name" ? sym.effect : t(sym.effect || "");
   };
 
   return (
@@ -86,7 +97,7 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
               justifyContent: "left",
               minHeight: "40px",
             }}
-            size={3}
+            size={4}
           >
             <Typography
               variant="h3"
@@ -96,6 +107,25 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
               }}
             >
               {t("symbol_symbol")}
+            </Typography>
+          </Grid>
+          <Grid
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "left",
+              minHeight: "40px",
+            }}
+            size={8}
+          >
+            <Typography
+              variant="h3"
+              style={{ flexGrow: 1, marginRight: "5px" }}
+              sx={{
+                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
+              }}
+            >
+              {t("Effect")}
             </Typography>
           </Grid>
         </Grid>
@@ -137,67 +167,56 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
         </Typography>
       ) : (
         (symbol.symbols ?? []).map((sym, i) => (
-          <React.Fragment key={i}>
-            <div
-              style={{
-                background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-                padding: "3px 17px",
-                display: "flex",
-                justifyContent: "space-between",
-                borderTop: `1px solid ${theme.secondary}`,
-                borderBottom: `1px solid ${theme.secondary}`,
-              }}
-            >
-              <Grid container style={{ flexGrow: 1 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
+          <div
+            key={i}
+            style={{
+              background:
+                i % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : "transparent",
+              padding: "6px 17px",
+              display: "flex",
+              justifyContent: "space-between",
+              minHeight: 44,
+              fontSize: "0.9rem",
+              borderTop: `1px solid ${theme.secondary}`,
+              borderBottom: `1px solid ${theme.secondary}`,
+            }}
+          >
+            <Grid container spacing={1.5} style={{ flexGrow: 1 }}>
+              <Grid
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
+                }}
+                size={4}
+              >
+                <Typography
+                  style={{ flexGrow: 1, marginRight: "5px" }}
+                  sx={{
+                    ...bodyTextSx,
+                    fontWeight: "bold",
                   }}
-                  size="grow"
                 >
-                  <Typography
-                    style={{ flexGrow: 1, marginRight: "5px" }}
-                    sx={{
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {sym.name === "symbol_custom_name"
-                      ? sym.customName
-                      : t(sym.name)}
-                  </Typography>
-                </Grid>
+                  {getSymbolName(sym)}
+                </Typography>
               </Grid>
-            </div>
-            <Grid
-              container
-              sx={{
-                justifyContent: "flex-start",
-                background: "transparent",
-                padding: "3px 17px",
-                marginBottom: "6px",
-                borderBottom: `1px solid ${theme.secondary}`,
-              }}
-            >
-              <Grid container style={{ flexGrow: 1 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={12}
-                >
-                  <ReactMarkdown components={components}>
-                    {sym.name === "symbol_custom_name"
-                      ? sym.effect
-                      : t(sym.effect)}
-                  </ReactMarkdown>
-                </Grid>
+              <Grid
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
+                }}
+                size={8}
+                sx={bodyTextSx}
+              >
+                <ReactMarkdown components={components}>
+                  {getSymbolEffect(sym)}
+                </ReactMarkdown>
               </Grid>
             </Grid>
-          </React.Fragment>
+          </div>
         ))
       )}
     </>

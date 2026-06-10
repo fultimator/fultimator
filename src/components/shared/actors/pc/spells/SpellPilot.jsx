@@ -36,6 +36,7 @@ function ThemedSpellPilot({
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
 
   const showInPlayerSheet =
     pilot.showInPlayerSheet || pilot.showInPlayerSheet === undefined;
@@ -313,7 +314,11 @@ function ThemedSpellPilot({
                     display: "flex",
                     alignItems: "stretch",
                     minHeight: 44,
-                    background: `linear-gradient(to right, ${theme.ternary}, ${theme.mode === "dark" ? "#1f1f1f" : "#fff"})`,
+                    fontSize: "0.9rem",
+                    background:
+                      i % 2 === 0
+                        ? `linear-gradient(to right, ${theme.ternary}, ${theme.mode === "dark" ? "#1f1f1f" : "#fff"})`
+                        : "transparent",
                   }}
                 >
                   {/* Label area */}
@@ -333,7 +338,7 @@ function ThemedSpellPilot({
                       sx={{
                         fontFamily: "Antonio",
                         fontWeight: 800,
-                        fontSize: "0.95rem",
+                        fontSize: "0.9rem",
                         textTransform: "uppercase",
                         lineHeight: 1.3,
                       }}
@@ -344,7 +349,7 @@ function ThemedSpellPilot({
                       <Typography
                         variant="caption"
                         sx={{
-                          fontSize: "0.75em",
+                          ...bodyTextSx,
                           color: isOverLimit ? "error.main" : "text.secondary",
                         }}
                       >

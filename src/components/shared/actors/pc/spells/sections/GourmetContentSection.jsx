@@ -4,9 +4,8 @@ import {
   Typography,
   Button,
   Box,
-  Card,
-  CardContent,
   Chip,
+  Alert,
   Table,
   TableBody,
   TableCell,
@@ -31,6 +30,7 @@ import {
   getDamageTypes,
   getAttributes,
 } from "/src/libs/gourmetCookingData";
+import { combineIngredientInventory } from "../gourmetCookingUtils";
 
 /**
  * GourmetContentSection - Content tab for Gourmet spell
@@ -68,7 +68,12 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
     customChoices: data.customChoices || {},
     ...data,
   }));
-  const ingredientInventory = cookbook.ingredientInventory || [];
+  const rawIngredientInventory =
+    cookbook.ingredientInventory || formState.ingredientInventory || [];
+  const ingredientInventory = combineIngredientInventory(
+    rawIngredientInventory,
+    t,
+  );
 
   const handleDeleteEffect = (_tasteKey, effectIndex) => {
     setFormState((prev) => {
@@ -86,19 +91,31 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
     });
   };
 
-  const handleDeleteIngredient = (index) => {
+  const handleDeleteIngredient = (ingredient) => {
     setFormState((prev) => {
       const prevCookbook = prev.cookbook || {
         effects: [],
         ingredientInventory: [],
       };
+      const current =
+        prevCookbook.ingredientInventory || prev.ingredientInventory || [];
+      const nextInventory = current.filter((item) => {
+        const itemTaste = (item.taste || "").trim().toLowerCase();
+        const ingredientTaste = (ingredient.taste || "").trim().toLowerCase();
+
+        if (ingredientTaste) return itemTaste !== ingredientTaste;
+
+        return (
+          (item.name || "").trim().toLowerCase() !==
+          (ingredient.name || "").trim().toLowerCase()
+        );
+      });
+
       return {
         ...prev,
         cookbook: {
           ...prevCookbook,
-          ingredientInventory: (prevCookbook.ingredientInventory || []).filter(
-            (_, i) => i !== index,
-          ),
+          ingredientInventory: nextInventory,
         },
       };
     });
@@ -301,7 +318,7 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
               <Grid key={idx}>
                 <Chip
                   label={`${ingredient.name} (x${ingredient.quantity || 1})`}
-                  onDelete={() => handleDeleteIngredient(idx)}
+                  onDelete={() => handleDeleteIngredient(ingredient)}
                   variant="outlined"
                 />
               </Grid>
@@ -311,15 +328,11 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
       </Grid>
       {/* Info Box */}
       <Grid size={12}>
-        <Card sx={{ backgroundColor: "info.lighter", border: "1px solid" }}>
-          <CardContent>
-            <Typography variant="body2">
-              {t(
-                "Note: Full cooking mechanics with ingredient selection, taste combinations, and effect rolling are managed separately. This view shows your current cookbook and inventory.",
-              )}
-            </Typography>
-          </CardContent>
-        </Card>
+        <Alert variant="outlined" severity="info">
+          {t(
+            "Full cooking mechanics with ingredient selection, taste combinations, and effect rolling are managed in the Shop and Cooking tabs. This view shows your current cookbook and inventory.",
+          )}
+        </Alert>
       </Grid>
       <Dialog
         open={editDialogOpen}

@@ -57,6 +57,7 @@ const VehicleModule = memo(
   }) => {
     const { t } = useTranslate();
     const theme = useCustomTheme();
+    const bodyTextSx = { fontSize: "0.9rem", lineHeight: 1.35 };
     const [open, setOpen] = useState(false);
     const [menuAnchor, setMenuAnchor] = useState(null);
 
@@ -469,7 +470,11 @@ const VehicleModule = memo(
               display: "flex",
               alignItems: "stretch",
               minHeight: 44,
-              background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+              fontSize: "0.9rem",
+              background:
+                moduleIndex % 2 === 0
+                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
+                  : "transparent",
               borderBottom: open ? `1px solid ${theme.secondary}` : "none",
               cursor: "pointer",
               "&:hover": { filter: "brightness(0.97)" },
@@ -492,7 +497,7 @@ const VehicleModule = memo(
                 sx={{
                   fontFamily: "Antonio",
                   fontWeight: 800,
-                  fontSize: "0.95rem",
+                  fontSize: "0.9rem",
                   textTransform: "uppercase",
                   lineHeight: 1.3,
                 }}
@@ -542,7 +547,7 @@ const VehicleModule = memo(
                   >
                     {t("Description")}
                   </Typography>
-                  <div style={{ fontSize: "0.95em" }}>
+                  <Box sx={bodyTextSx}>
                     <ReactMarkdown
                       components={{
                         p: ({ node: _n, ...props }) => (
@@ -552,7 +557,7 @@ const VehicleModule = memo(
                     >
                       {t(module.description)}
                     </ReactMarkdown>
-                  </div>
+                  </Box>
                 </Box>
               )}
               <TabbedSchemaFormRenderer

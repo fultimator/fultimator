@@ -8,7 +8,7 @@ import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormR
 import {
   magichantToneItemFields,
   DEFAULT_SUBITEM_TABS,
-} from "/src/forms/rendering/config/itemConfigs/spells/magichantToneItem";
+} from "/src/forms/rendering/config/itemConfigs/spells/subitems/magichantTone";
 import { availableMagichantTones } from "/src/libs/player/spellOptionData";
 import { useTranslate } from "/src/translation/translate";
 
