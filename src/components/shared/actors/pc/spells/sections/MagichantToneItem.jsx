@@ -36,6 +36,7 @@ export default function MagichantToneItem({
   const { t: translate } = useTranslate();
 
   const [formState, setFormState] = useState(() => toFormState(item, translate));
+  const [expanded, setExpanded] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { setFormState(toFormState(item, translate)); }, [item]);
@@ -83,8 +84,6 @@ export default function MagichantToneItem({
       effect: formState.effect,
     });
   };
-
-  const [expanded, setExpanded] = useState(false);
 
   return (
     <>

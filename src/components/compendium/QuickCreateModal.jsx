@@ -816,7 +816,7 @@ function PlayerSpellPanel() {
   useEffect(() => {
     if (initialSubtype) {
       // eslint-disable-next-line no-undef
-      setFormState((_prev) => ({ ...prev, spellType: initialSubtype }));
+      setFormState((prev) => ({ ...prev, spellType: initialSubtype }));
     }
   }, [initialSubtype]);
 
@@ -1725,7 +1725,7 @@ function QualityPanel() {
                   getOptionLabel={(q) => q.name}
                   onChange={(_, q) => {
                     if (q) {
-                      setFormState((_prev) => ({
+                      setFormState((prev) => ({
                         // eslint-disable-next-line no-undef
                         ...prev,
                         name: q.name,
@@ -1793,7 +1793,7 @@ function QualityPanel() {
             <QualitiesGenerator
               onGenerate={(text) =>
                 // eslint-disable-next-line no-undef
-                setFormState((_prev) => ({ ...prev, quality: text }))
+                setFormState((prev) => ({ ...prev, quality: text }))
               }
             />
           )}
@@ -2122,7 +2122,7 @@ function WeaponPanel() {
   const prec = calcWeaponPrec({ base, rework, precBonus, precModifier });
 
   useEffect(() => {
-    setFormState((_prev) => ({
+    setFormState((prev) => ({
       // eslint-disable-next-line no-undef
       ...prev,
       totalBonus: Math.floor(cost / 1000) * 2,
@@ -2225,7 +2225,7 @@ function WeaponPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="weapon"
         onSelect={(q) =>
-          setFormState((_prev) => ({
+          setFormState((prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
@@ -2367,7 +2367,7 @@ function ArmorPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="armor"
         onSelect={(q) =>
-          setFormState((_prev) => ({
+          setFormState((prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
@@ -2506,7 +2506,7 @@ function ShieldPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="shield"
         onSelect={(q) =>
-          setFormState((_prev) => ({
+          setFormState((prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
@@ -2821,7 +2821,7 @@ function CustomWeaponPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="customWeapon"
         onSelect={(q) =>
-          setFormState((_prev) => ({
+          setFormState((prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
@@ -2950,7 +2950,7 @@ function AccessoryPanel() {
         onClose={() => setQualityPickerOpen(false)}
         filterType="accessory"
         onSelect={(q) =>
-          setFormState((_prev) => ({
+          setFormState((prev) => ({
             // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
