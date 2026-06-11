@@ -5,7 +5,7 @@ import Diamond from "../../../../Diamond";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
 import { TagRow } from "./primitives";
 import { formatSpellType } from "./primitives-utils";
-import Clock from "/src/components/shared/actors/pc/playerSheet/optional/Clock.jsx";
+import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
 import { ACTION_ICON_SRC_BY_KEY } from "../../../../actionIconSrc";
 import { useChatActions } from "../ChatActionsContext.shared";
 

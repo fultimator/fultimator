@@ -20,7 +20,8 @@ import {
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
-import Clock from "/src/components/shared/actors/pc/playerSheet/optional/Clock";
+import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
+import { useNumericClock } from "/src/hooks/useClock";
 
 function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   const { t } = useTranslate();
@@ -38,7 +39,11 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   const showInPlayerSheet =
     gift.showInPlayerSheet || gift.showInPlayerSheet === undefined;
 
-  const clock = localClock;
+  const { state: clockState, filledCount: clock, increment, decrement, reset: resetClock } =
+    useNumericClock(4, localClock, (val) => {
+      setLocalClock(val);
+      if (onClockChange) onClockChange(val);
+    });
 
   const inlineStyles = { margin: 0, padding: 0 };
   const components = {
@@ -58,33 +63,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   const getGiftEffect = (gft) =>
     isCustomGift(gft) ? gft.effect || "" : t(gft.effect);
 
-  const getClockState = () => {
-    const state = [false, false, false, false];
-    for (let i = 0; i < clock && i < 4; i++) {
-      state[i] = true;
-    }
-    return state;
-  };
-
-  const handleClockStateChange = (newState) => {
-    const filledSections = newState.reduce(
-      (count, section) => count + (section ? 1 : 0),
-      0,
-    );
-    setLocalClock(filledSections);
-    if (onClockChange) onClockChange(filledSections);
-  };
-
-  const handleClockReset = () => {
-    setLocalClock(0);
-    if (onClockChange) onClockChange(0);
-  };
-
-  const updateClock = (newValue) => {
-    const clampedValue = Math.max(0, Math.min(4, newValue));
-    setLocalClock(clampedValue);
-    if (onClockChange) onClockChange(clampedValue);
-  };
 
   return (
     <>
@@ -229,10 +207,14 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             <Clock
               numSections={4}
               size={56}
-              state={getClockState()}
-              setState={handleClockStateChange}
+              state={clockState}
+              setState={(newState) => {
+                const val = newState.filter(Boolean).length;
+                setLocalClock(val);
+                if (onClockChange) onClockChange(val);
+              }}
               isCharacterSheet={false}
-              onReset={handleClockReset}
+              onReset={resetClock}
             />
           </Box>
           <Box
@@ -249,7 +231,11 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                   component="input"
                   type="number"
                   value={clock}
-                  onChange={(e) => updateClock(parseInt(e.target.value) || 0)}
+                  onChange={(e) => {
+                    const val = Math.max(0, Math.min(4, parseInt(e.target.value) || 0));
+                    setLocalClock(val);
+                    if (onClockChange) onClockChange(val);
+                  }}
                   sx={{
                     fontFamily: "Antonio",
                     fontWeight: 800,
@@ -295,7 +281,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             <Box sx={{ display: "flex", gap: "4px" }}>
               <Button
                 size="small"
-                onClick={() => updateClock(clock - 1)}
+                onClick={decrement}
                 disabled={clock === 0}
                 style={{
                   minWidth: 32,
@@ -311,7 +297,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
               </Button>
               <Button
                 size="small"
-                onClick={() => updateClock(clock + 1)}
+                onClick={increment}
                 disabled={clock === 4}
                 style={{
                   minWidth: 32,
@@ -327,7 +313,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
               </Button>
               <Button
                 size="small"
-                onClick={() => updateClock(0)}
+                onClick={resetClock}
                 style={{
                   minWidth: 46,
                   height: 28,

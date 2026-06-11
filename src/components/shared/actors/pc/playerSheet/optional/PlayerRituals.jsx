@@ -18,7 +18,7 @@ import {
   Stack,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import Clock from "./Clock";
+import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";

@@ -23,7 +23,8 @@ import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { magiseeds } from "/src/libs/floralistMagiseedData";
-import Clock from "/src/components/shared/actors/pc/playerSheet/optional/Clock";
+import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
+import { useNumericClock } from "/src/hooks/useClock";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 function ThemedSpellMagiseed({
@@ -43,10 +44,15 @@ function ThemedSpellMagiseed({
   const [expandedMagiseeds, setExpandedMagiseeds] = useState(new Set());
   const [localClock, setLocalClock] = useState(magiseed.growthClock || 0);
 
-  // Sync local clock when prop changes
   React.useEffect(() => {
     setLocalClock(magiseed.growthClock || 0);
   }, [magiseed.growthClock]);
+
+  const { state: clockState, filledCount: growthClock, increment, decrement, reset: resetClock } =
+    useNumericClock(4, localClock, (val) => {
+      setLocalClock(val);
+      if (onGrowthClockChange) onGrowthClockChange(val);
+    });
 
   const toggleMagiseedExpansion = (index) => {
     setExpandedMagiseeds((prev) => {
@@ -72,46 +78,7 @@ function ThemedSpellMagiseed({
     p: ({ ...props }) => <p style={inlineStyles} {...props} />,
   };
 
-  // Get current magiseed in garden
   const currentMagiseed = magiseed.currentMagiseed;
-  const growthClock = localClock;
-
-  // Convert growth clock value to clock state array for Clock component
-  const getClockState = () => {
-    const state = [false, false, false, false];
-    for (let i = 0; i < growthClock && i < 4; i++) {
-      state[i] = true;
-    }
-    return state;
-  };
-
-  // Handle clock state changes from Clock component
-  const handleClockStateChange = (newState) => {
-    const filledSections = newState.reduce(
-      (count, section) => count + (section ? 1 : 0),
-      0,
-    );
-    setLocalClock(filledSections);
-    if (onGrowthClockChange) {
-      onGrowthClockChange(filledSections);
-    }
-  };
-
-  // Handle clock reset from right-click
-  const handleClockReset = () => {
-    setLocalClock(0);
-    if (onGrowthClockChange) {
-      onGrowthClockChange(0);
-    }
-  };
-
-  const updateClock = (newValue) => {
-    const clampedValue = Math.max(0, Math.min(4, newValue));
-    setLocalClock(clampedValue);
-    if (onGrowthClockChange) {
-      onGrowthClockChange(clampedValue);
-    }
-  };
 
   // Get current effect based on growth clock sections
   const getCurrentEffect = () => {
@@ -310,10 +277,14 @@ function ThemedSpellMagiseed({
             <Clock
               numSections={4}
               size={56}
-              state={getClockState()}
-              setState={handleClockStateChange}
+              state={clockState}
+              setState={(newState) => {
+                const val = newState.filter(Boolean).length;
+                setLocalClock(val);
+                if (onGrowthClockChange) onGrowthClockChange(val);
+              }}
               isCharacterSheet={false}
-              onReset={handleClockReset}
+              onReset={resetClock}
             />
           </Box>
           <Box
@@ -330,7 +301,11 @@ function ThemedSpellMagiseed({
                   component="input"
                   type="number"
                   value={growthClock}
-                  onChange={(e) => updateClock(parseInt(e.target.value) || 0)}
+                  onChange={(e) => {
+                    const val = Math.max(0, Math.min(4, parseInt(e.target.value) || 0));
+                    setLocalClock(val);
+                    if (onGrowthClockChange) onGrowthClockChange(val);
+                  }}
                   sx={{
                     fontFamily: "Antonio",
                     fontWeight: 800,
@@ -376,7 +351,7 @@ function ThemedSpellMagiseed({
             <Box sx={{ display: "flex", gap: "4px" }}>
               <Button
                 size="small"
-                onClick={() => updateClock(growthClock - 1)}
+                onClick={decrement}
                 disabled={growthClock === 0}
                 style={{
                   minWidth: 32,
@@ -392,7 +367,7 @@ function ThemedSpellMagiseed({
               </Button>
               <Button
                 size="small"
-                onClick={() => updateClock(growthClock + 1)}
+                onClick={increment}
                 disabled={growthClock === 4}
                 style={{
                   minWidth: 32,
@@ -408,7 +383,7 @@ function ThemedSpellMagiseed({
               </Button>
               <Button
                 size="small"
-                onClick={() => updateClock(0)}
+                onClick={resetClock}
                 style={{
                   minWidth: 46,
                   height: 28,

@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { ClockDefinitionSchema } from "./clock";
 
 export const QuirkOptionalSchema = z.object({
   itemType: z.literal("quirkOptional").default("quirkOptional"),
   name: z.string().default(""),
   description: z.string().default(""),
   effect: z.string().default(""),
-  clock: z.object({ sections: z.number().int().min(2).max(12) }).optional(),
+  clock: ClockDefinitionSchema.optional(),
 });
 
 export type QuirkOptional = z.infer<typeof QuirkOptionalSchema>;

@@ -21,7 +21,7 @@ import RemoveCircleOutlined from "@mui/icons-material/RemoveCircleOutlined";
 import { Add } from "@mui/icons-material";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
-import Clock from "/src/components/shared/actors/pc/playerSheet/optional/Clock";
+import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";

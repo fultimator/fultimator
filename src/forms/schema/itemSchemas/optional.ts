@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
+import { ClockDefinitionSchema } from "./clock";
 
 export const OptionalSubtypeSchema = z.enum([
   "quirk",
@@ -26,7 +27,6 @@ const OptionalSharedSchema = z.object({
   meta: MetaSchema.optional(),
 });
 
-const ClockSchema = z.object({ sections: z.number().int().min(2) });
 const ZeroRefSchema = z.object({
   name: z.string(),
   description: z.string(),
@@ -36,7 +36,7 @@ export const OptionalQuirkSchema = OptionalSharedSchema.extend({
   subtype: z.literal("quirk"),
   description: z.string(),
   effect: z.string(),
-  clock: ClockSchema.optional(),
+  clock: ClockDefinitionSchema.optional(),
 });
 
 export const OptionalCampActivitiesSchema = OptionalSharedSchema.extend({
@@ -44,7 +44,7 @@ export const OptionalCampActivitiesSchema = OptionalSharedSchema.extend({
   description: CampActivityTargetSchema,
   targetDescription: z.string().optional(),
   effect: z.string(),
-  clock: ClockSchema.optional(),
+  clock: ClockDefinitionSchema.optional(),
 });
 
 export const OptionalZeroTriggerSchema = OptionalSharedSchema.extend({
@@ -64,14 +64,14 @@ export const OptionalZeroPowerSchema = OptionalSharedSchema.extend({
   zeroEffectRef: z.string(),
   zeroTrigger: z.union([ZeroRefSchema, z.literal("")]),
   zeroEffect: z.union([ZeroRefSchema, z.literal("")]),
-  clock: ClockSchema,
+  clock: ClockDefinitionSchema,
 });
 
 export const OptionalOtherSchema = OptionalSharedSchema.extend({
   subtype: z.literal("other"),
   description: z.string(),
   effect: z.string(),
-  clock: ClockSchema.optional(),
+  clock: ClockDefinitionSchema.optional(),
 });
 
 export const OptionalSubtypeSchemas = {
