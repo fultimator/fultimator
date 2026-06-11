@@ -97,9 +97,107 @@ function itemPassives(item: ItemWithEffects): Passive[] {
 
 type SubItemContainer = Record<string, unknown>;
 
+function hasOwnEnabled(value: unknown): boolean {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    Object.prototype.hasOwnProperty.call(value, "enabled")
+  );
+}
+
+function isEnabledWhenPresent(value: unknown): boolean {
+  if (!hasOwnEnabled(value)) return true;
+  return (value as { enabled?: unknown }).enabled === true;
+}
+
+function isSpellEnabledForTransfer(spell: SubItemContainer): boolean {
+  if (spell.spellType === "pilot-vehicle") return true;
+  return isEnabledWhenPresent(spell);
+}
+
+function getStableKey(value: Record<string, unknown>): string | undefined {
+  const keys = [
+    value.id,
+    value.key,
+    value.fuid,
+    value._packItemId,
+    value.name,
+    value.customName,
+  ];
+  return keys.find((key): key is string => typeof key === "string" && !!key);
+}
+
+function matchesStableKey(
+  a: Record<string, unknown>,
+  b: Record<string, unknown>,
+): boolean {
+  const aKey = getStableKey(a);
+  const bKey = getStableKey(b);
+  if (aKey && bKey && aKey === bKey) return true;
+  return false;
+}
+
+function vehicleSlotKeys(vehicle: SubItemContainer): Set<string> {
+  const out = new Set<string>();
+  const slots = vehicle.slots;
+  if (!slots || typeof slots !== "object") return out;
+
+  for (const key of ["main", "off", "armor", "support"]) {
+    const value = (slots as Record<string, unknown>)[key];
+    if (typeof value === "string" && value) out.add(value);
+    else if (Array.isArray(value)) {
+      for (const entry of value) {
+        if (typeof entry === "string" && entry) out.add(entry);
+      }
+    }
+  }
+
+  return out;
+}
+
+function isVehicleActive(vehicle: SubItemContainer): boolean {
+  return vehicle.enabled === true;
+}
+
+function isVehicleModuleEquipped(
+  vehicle: SubItemContainer,
+  module: SubItemContainer,
+): boolean {
+  if (module.equipped === true || module.enabled === true) return true;
+  const key = getStableKey(module);
+  return !!key && vehicleSlotKeys(vehicle).has(key);
+}
+
+function isNestedSpellItemActive(
+  spell: SubItemContainer,
+  key: string,
+  item: SubItemContainer,
+  _itemIndex: number,
+): boolean {
+  if (key === "magiseeds") {
+    const current = spell.currentMagiseed;
+    if (typeof current === "string" && current) {
+      const itemKey = getStableKey(item);
+      return itemKey === current;
+    }
+    if (current && typeof current === "object") {
+      return matchesStableKey(item, current as Record<string, unknown>);
+    }
+    return isEnabledWhenPresent(item);
+  }
+
+  if (key === "therioforms" || key === "symbols") {
+    return isEnabledWhenPresent(item);
+  }
+
+  return true;
+}
+
 function* walkSpellSubItems(
   spell: SubItemContainer,
 ): Generator<ItemWithEffects> {
+  if (!isSpellEnabledForTransfer(spell)) return;
+
   const arrays = [
     "gifts",
     "dances",
@@ -114,16 +212,31 @@ function* walkSpellSubItems(
   ];
   for (const key of arrays) {
     const arr = spell[key];
-    if (Array.isArray(arr)) for (const sub of arr) yield sub as ItemWithEffects;
+    if (!Array.isArray(arr)) continue;
+    for (let index = 0; index < arr.length; index++) {
+      const sub = arr[index] as SubItemContainer;
+      if (isNestedSpellItemActive(spell, key, sub, index)) {
+        yield sub as ItemWithEffects;
+      }
+    }
   }
   // Pilot: vehicles[] -> modules[]
-  const vehicles = spell["vehicles"];
+  const vehicles = Array.isArray(spell["vehicles"])
+    ? spell["vehicles"]
+    : spell["currentVehicles"];
   if (Array.isArray(vehicles)) {
     for (const vehicle of vehicles) {
+      const vehicleRecord = vehicle as SubItemContainer;
+      if (!isVehicleActive(vehicleRecord)) continue;
       yield vehicle as ItemWithEffects;
       const modules = (vehicle as SubItemContainer)["modules"];
       if (Array.isArray(modules))
-        for (const mod of modules) yield mod as ItemWithEffects;
+        for (const mod of modules) {
+          const moduleRecord = mod as SubItemContainer;
+          if (isVehicleModuleEquipped(vehicleRecord, moduleRecord)) {
+            yield mod as ItemWithEffects;
+          }
+        }
     }
   }
 }
@@ -134,8 +247,10 @@ function* walkItems(actor: Actor): Generator<ItemWithEffects> {
       if (Array.isArray(klass.skills)) for (const s of klass.skills) yield s;
       if (Array.isArray(klass.heroic)) for (const h of klass.heroic) yield h;
       for (const sp of klass.spells ?? []) {
-        yield sp;
-        yield* walkSpellSubItems(sp as unknown as SubItemContainer);
+        const spell = sp as unknown as SubItemContainer;
+        if (!isSpellEnabledForTransfer(spell)) continue;
+        if (isEnabledWhenPresent(spell)) yield sp;
+        yield* walkSpellSubItems(spell);
       }
     }
 
@@ -157,8 +272,14 @@ function* walkItems(actor: Actor): Generator<ItemWithEffects> {
             for (const s of mnemo.skills) yield s;
           if (Array.isArray(mnemo.heroic))
             for (const h of mnemo.heroic) yield h;
-          if (Array.isArray(mnemo.spells))
-            for (const sp of mnemo.spells) yield sp;
+          if (Array.isArray(mnemo.spells)) {
+            for (const sp of mnemo.spells) {
+              const spell = sp as unknown as SubItemContainer;
+              if (!isSpellEnabledForTransfer(spell)) continue;
+              if (isEnabledWhenPresent(spell)) yield sp;
+              yield* walkSpellSubItems(spell);
+            }
+          }
         }
       }
     }

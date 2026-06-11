@@ -788,10 +788,12 @@ function resolveActiveBehaviorOutputs(
   }
 
   if (subAction === "spell") {
+    const { spellArg } = parseActionSpellArgs(rawArg);
+    if (!spellArg) return [];
     const options = resolveSpellOptions(context.playerDoc);
     const spell = options.find((o) => {
       const unquoted = o.spellType ? `${o.name} ${o.spellType}` : o.name;
-      return unquoted === rawArg;
+      return unquoted === spellArg;
     }) as ((typeof options)[number] & { behaviors?: Behavior[] }) | undefined;
     if (!spell) return [];
     return collectActiveBehaviorOutputs(

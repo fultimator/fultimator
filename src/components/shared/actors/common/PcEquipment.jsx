@@ -65,6 +65,7 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import ItemStatSubtitle from "/src/components/shared/actors/common/ItemStatSubtitle";
@@ -2117,7 +2118,15 @@ export default function PcEquipment({
       const damageModifier = isRanged
         ? damageRangedModifier
         : damageMeleeModifier;
-      const intent = prepareAccuracyCheck({
+      const range = isRanged ? "ranged" : "melee";
+      const effectModifiers = player
+        ? accuracyModifiersFromEffects(player, {
+            range,
+            category: weapon.category,
+          })
+        : [];
+      const intent = prepareAccuracyCheck(
+        {
         arg: weapon.name || "",
         name: weapon.name || "",
         attr1,
@@ -2129,8 +2138,10 @@ export default function PcEquipment({
         accuracyDefense: weapon.accuracy?.defense ?? "def",
         hands: weapon.hands,
         category: weapon.category,
-        range: isRanged ? "ranged" : "melee",
-      });
+          range,
+        },
+        effectModifiers,
+      );
       const dieSizes = {
         primary: attributeMap[attr1] ?? currDex,
         secondary: attributeMap[attr2] ?? currMight,

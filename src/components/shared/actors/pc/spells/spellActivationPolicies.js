@@ -30,7 +30,7 @@ export const spellActivationPolicies = {
   magiseed: {
     scope: "nested",
     collection: "magiseeds",
-    field: "planted",
+    field: "enabled",
     mode: "single",
     allowNone: true,
     currentField: "currentMagiseed",

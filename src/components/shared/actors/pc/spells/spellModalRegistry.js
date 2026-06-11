@@ -213,11 +213,17 @@ const spellModalRegistry = {
   },
   gourmet: {
     Component: SpellGourmetModal,
-    buildProps: (spell, spellIndex, { onSave, onDelete, onClose }) => ({
+    buildProps: (
+      spell,
+      spellIndex,
+      { onSave, onDelete, onClose, player, setPlayer },
+    ) => ({
       open: true,
       onClose,
       onSave,
       onDelete,
+      player,
+      setPlayer,
       spell: { ...spell, index: spellIndex },
     }),
   },

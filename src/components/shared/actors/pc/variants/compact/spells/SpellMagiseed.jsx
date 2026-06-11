@@ -47,7 +47,7 @@ export default function SpellMagiseed({
   const getSeedKey = (seed) => seed?.key ?? seed?.name;
   const canUpdateSpell = setPlayer && classIndex != null && spellIndex != null;
 
-  const isSeedPlanted = (seed) =>
+  const isSeedActive = (seed) =>
     currentMagiseed && getSeedKey(currentMagiseed) === getSeedKey(seed);
 
   const getSeedEffect = (seed, clock) => {
@@ -84,7 +84,7 @@ export default function SpellMagiseed({
       (entry) => getSeedKey(entry) === getSeedKey(seed),
     );
     updateSpell((s) =>
-      setNestedActivation(s, seedIndex, "magiseed", !isSeedPlanted(seed)),
+      setNestedActivation(s, seedIndex, "magiseed", !isSeedActive(seed)),
     );
   };
 
@@ -229,7 +229,7 @@ export default function SpellMagiseed({
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                   <Tooltip
                     title={
-                      isSeedPlanted(seed)
+                      isSeedActive(seed)
                         ? t("magiseed_remove_from_garden")
                         : currentMagiseed
                           ? t("magiseed_graft_in_garden")
@@ -246,12 +246,12 @@ export default function SpellMagiseed({
                         disabled={!canUpdateSpell}
                         sx={{
                           p: 0,
-                          color: isSeedPlanted(seed)
+                          color: isSeedActive(seed)
                             ? theme.primary
                             : "text.secondary",
                         }}
                       >
-                        {isSeedPlanted(seed) ? (
+                        {isSeedActive(seed) ? (
                           <LocalFloristIcon fontSize="small" />
                         ) : (
                           <RadioButtonUncheckedIcon fontSize="small" />

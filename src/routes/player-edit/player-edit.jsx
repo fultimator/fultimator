@@ -55,6 +55,7 @@ import ClassesTab from "../../components/shared/actors/pc/tabs/ClassesTab";
 import SpellsTab from "../../components/shared/actors/pc/tabs/SpellsTab";
 import BackpackTab from "../../components/shared/actors/pc/tabs/BackpackTab";
 import NotesTab from "../../components/shared/actors/pc/tabs/NotesTab";
+import EffectsTab from "../../components/shared/actors/pc/tabs/EffectsTab";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import {
@@ -70,6 +71,7 @@ import {
   LockOpen,
   ExpandMore,
   ExpandLess,
+  AutoAwesome,
 } from "@mui/icons-material";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
@@ -877,6 +879,10 @@ export default function PlayerEdit() {
                   <ListItemText primary={t("Notes")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 7)}>
+                  <AutoAwesome />
+                  <ListItemText primary={t("Effects")} sx={{ ml: 1 }} />
+                </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 8)}>
                   <Settings />
                   <ListItemText primary={t("Settings")} sx={{ ml: 1 }} />
                 </ListItem>
@@ -931,6 +937,12 @@ export default function PlayerEdit() {
               <Tab
                 onClick={(e) => handleTabChange(e, 7)}
                 isActive={openTab === 7}
+              >
+                {t("Effects")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 8)}
+                isActive={openTab === 8}
                 sx={{ minWidth: 48 }}
               >
                 <Settings />
@@ -1210,6 +1222,13 @@ export default function PlayerEdit() {
           />
         </TabPanel>
         <TabPanel value={7} currentValue={openTab}>
+          <EffectsTab
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
+        </TabPanel>
+        <TabPanel value={8} currentValue={openTab}>
           <Paper
             elevation={3}
             sx={{

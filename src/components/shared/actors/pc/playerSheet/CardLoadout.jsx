@@ -37,6 +37,7 @@ import {
   processAccuracyCheck,
   rollAccuracyCheck,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 
 const SLOT_LABEL_KEY = {
   mainHand: "MAIN",
@@ -225,7 +226,11 @@ export default function CardLoadout({
       };
     }
 
-    const intent = prepareAccuracyCheck(weaponOption);
+    const effectModifiers = accuracyModifiersFromEffects(player, {
+      range: weaponOption.range,
+      category: weaponOption.category,
+    });
+    const intent = prepareAccuracyCheck(weaponOption, effectModifiers);
     const dieSizes = {
       primary: getAttrDie(intent.primary),
       secondary: getAttrDie(intent.secondary),

@@ -30,6 +30,7 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
@@ -91,25 +92,33 @@ const VehicleModule = memo(
       const rawQuality = module.quality || undefined;
       const description =
         [rawDescription, rawQuality].filter(Boolean).join("\n\n") || undefined;
-
-      const intent = prepareAccuracyCheck({
-        arg: name,
-        name,
-        attr1,
-        attr2,
-        accuracyBonus: acc.value ?? 0,
-        baseDamage: dmg.value ?? 0,
-        damageType: dmg.type ?? "physical",
-        accuracyDefense: acc.defense ?? "def",
+      const range =
+        module.range === "Ranged" || module.range === "ranged"
+          ? "ranged"
+          : "melee";
+      const effectModifiers = accuracyModifiersFromEffects(player, {
+        range,
         category: module.category,
-        isWeaponModule: true,
-        damageHrZero: dmg.hrZero === true,
-        range:
-          module.range === "Ranged" || module.range === "ranged"
-            ? "ranged"
-            : "melee",
-        description: description,
       });
+
+      const intent = prepareAccuracyCheck(
+        {
+          arg: name,
+          name,
+          attr1,
+          attr2,
+          accuracyBonus: acc.value ?? 0,
+          baseDamage: dmg.value ?? 0,
+          damageType: dmg.type ?? "physical",
+          accuracyDefense: acc.defense ?? "def",
+          category: module.category,
+          isWeaponModule: true,
+          damageHrZero: dmg.hrZero === true,
+          range,
+          description: description,
+        },
+        effectModifiers,
+      );
       const dieSizes = { primary: attrDie(attr1), secondary: attrDie(attr2) };
       const rolls = rollAccuracyCheck(dieSizes);
       const result = processAccuracyCheck(

@@ -18,13 +18,251 @@ export interface TriggerMatch {
 }
 
 type ItemWithBehaviors = {
-  name: string;
+  name?: string;
+  customName?: string;
+  key?: string;
+  id?: string;
+  _packItemId?: string;
   fuid?: string;
   behaviors?: Behavior[];
   effect?: string;
   description?: string;
 };
 type ActorDoc = Record<string, unknown>;
+type BehaviorContainer = ItemWithBehaviors & Record<string, unknown>;
+type SubItemContainer = Record<string, unknown>;
+
+function hasOwnEnabled(value: unknown): boolean {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    Object.prototype.hasOwnProperty.call(value, "enabled")
+  );
+}
+
+function isEnabledWhenPresent(value: unknown): boolean {
+  if (!hasOwnEnabled(value)) return true;
+  return (value as { enabled?: unknown }).enabled === true;
+}
+
+function isSpellEnabledForBehavior(spell: SubItemContainer): boolean {
+  if (spell.spellType === "pilot-vehicle") return true;
+  return isEnabledWhenPresent(spell);
+}
+
+function getStableKey(value: Record<string, unknown>): string | undefined {
+  const keys = [
+    value.id,
+    value.key,
+    value.fuid,
+    value._packItemId,
+    value.name,
+    value.customName,
+  ];
+  return keys.find((key): key is string => typeof key === "string" && !!key);
+}
+
+function matchesStableKey(
+  a: Record<string, unknown>,
+  b: Record<string, unknown>,
+): boolean {
+  const aKey = getStableKey(a);
+  const bKey = getStableKey(b);
+  return !!aKey && !!bKey && aKey === bKey;
+}
+
+function itemDisplayName(item: ItemWithBehaviors): string {
+  return (
+    item.customName ||
+    item.name ||
+    item.key ||
+    item.fuid ||
+    item.id ||
+    item._packItemId ||
+    "Unnamed"
+  );
+}
+
+function vehicleSlotKeys(vehicle: SubItemContainer): Set<string> {
+  const out = new Set<string>();
+  const slots = vehicle.slots;
+  if (!slots || typeof slots !== "object") return out;
+
+  for (const key of ["main", "off", "armor", "support"]) {
+    const value = (slots as Record<string, unknown>)[key];
+    if (typeof value === "string" && value) out.add(value);
+    else if (Array.isArray(value)) {
+      for (const entry of value) {
+        if (typeof entry === "string" && entry) out.add(entry);
+      }
+    }
+  }
+
+  return out;
+}
+
+function isVehicleModuleEquipped(
+  vehicle: SubItemContainer,
+  module: SubItemContainer,
+): boolean {
+  if (module.equipped === true || module.enabled === true) return true;
+  const key = getStableKey(module);
+  return !!key && vehicleSlotKeys(vehicle).has(key);
+}
+
+function isNestedSpellItemActive(
+  spell: SubItemContainer,
+  key: string,
+  item: SubItemContainer,
+): boolean {
+  if (key === "magiseeds") {
+    const current = spell.currentMagiseed;
+    if (typeof current === "string" && current) {
+      return getStableKey(item) === current;
+    }
+    if (current && typeof current === "object") {
+      return matchesStableKey(item, current as Record<string, unknown>);
+    }
+    return isEnabledWhenPresent(item);
+  }
+
+  if (key === "therioforms" || key === "symbols") {
+    return isEnabledWhenPresent(item);
+  }
+
+  return true;
+}
+
+function* walkSpellBehaviorItems(
+  spell: SubItemContainer,
+): Generator<BehaviorContainer> {
+  if (!isSpellEnabledForBehavior(spell)) return;
+  if (isEnabledWhenPresent(spell)) yield spell as BehaviorContainer;
+
+  for (const key of [
+    "gifts",
+    "dances",
+    "tones",
+    "keys",
+    "symbols",
+    "therioforms",
+    "magiseeds",
+    "invocations",
+    "effects",
+    "targets",
+  ]) {
+    const arr = spell[key];
+    if (!Array.isArray(arr)) continue;
+    for (const sub of arr) {
+      if (!sub || typeof sub !== "object") continue;
+      const subItem = sub as SubItemContainer;
+      if (isNestedSpellItemActive(spell, key, subItem)) {
+        yield subItem as BehaviorContainer;
+      }
+    }
+  }
+
+  const vehicles = Array.isArray(spell.vehicles)
+    ? spell.vehicles
+    : spell.currentVehicles;
+  if (!Array.isArray(vehicles)) return;
+  for (const vehicle of vehicles) {
+    if (!vehicle || typeof vehicle !== "object") continue;
+    const vehicleRecord = vehicle as SubItemContainer;
+    if (vehicleRecord.enabled !== true) continue;
+    yield vehicleRecord as BehaviorContainer;
+
+    const modules = vehicleRecord.modules;
+    if (!Array.isArray(modules)) continue;
+    for (const mod of modules) {
+      if (!mod || typeof mod !== "object") continue;
+      const moduleRecord = mod as SubItemContainer;
+      if (isVehicleModuleEquipped(vehicleRecord, moduleRecord)) {
+        yield moduleRecord as BehaviorContainer;
+      }
+    }
+  }
+}
+
+function resolveSlotItem(
+  equipment: ActorDoc,
+  ref: Record<string, unknown> | null | undefined,
+): BehaviorContainer | undefined {
+  if (!ref) return undefined;
+  const source = typeof ref.source === "string" ? ref.source : undefined;
+  if (!source) return undefined;
+  const collection = equipment[source];
+  if (!Array.isArray(collection)) return undefined;
+
+  if (typeof ref.index === "number") {
+    const byIndex = collection[ref.index];
+    if (byIndex && typeof byIndex === "object") {
+      return byIndex as BehaviorContainer;
+    }
+  }
+
+  const name = typeof ref.name === "string" ? ref.name : undefined;
+  if (!name) return undefined;
+  return collection.find(
+    (item): item is BehaviorContainer =>
+      !!item &&
+      typeof item === "object" &&
+      (item as Record<string, unknown>).name === name,
+  );
+}
+
+function equippedPlayerItems(
+  doc: ActorDoc,
+  equipment: ActorDoc,
+): BehaviorContainer[] {
+  const out: BehaviorContainer[] = [];
+  const seen = new Set<BehaviorContainer>();
+  const push = (item: BehaviorContainer | undefined) => {
+    if (!item || seen.has(item)) return;
+    seen.add(item);
+    out.push(item);
+  };
+
+  const slots =
+    doc.equippedSlots && typeof doc.equippedSlots === "object"
+      ? (doc.equippedSlots as Record<string, unknown>)
+      : null;
+  if (slots) {
+    push(resolveSlotItem(equipment, slots.mainHand as Record<string, unknown>));
+    push(resolveSlotItem(equipment, slots.offHand as Record<string, unknown>));
+    push(resolveSlotItem(equipment, slots.armor as Record<string, unknown>));
+    push(
+      resolveSlotItem(equipment, slots.accessory as Record<string, unknown>),
+    );
+    return out;
+  }
+
+  for (const key of [
+    "weapons",
+    "customWeapons",
+    "shields",
+    "armor",
+    "accessories",
+  ]) {
+    const arr = equipment[key];
+    if (!Array.isArray(arr)) continue;
+    for (const item of arr) {
+      if (
+        item &&
+        typeof item === "object" &&
+        (item as Record<string, unknown>).isEquipped === true
+      ) {
+        push(item as BehaviorContainer);
+      }
+    }
+  }
+
+  return out;
+}
+
+function isWeaponItem(item: BehaviorContainer): boolean {
+  return item.itemType === "weapon" || item.itemType === "customWeapon";
+}
 
 function itemsFromActor(
   doc: ActorDoc,
@@ -46,9 +284,67 @@ function itemsFromActor(
   } else {
     const classes = doc.classes as ActorDoc[] | undefined;
     for (const klass of classes ?? []) {
-      for (const key of ["skills", "heroic", "spells"] as const) {
+      for (const key of ["skills", "heroic"] as const) {
         const arr = klass[key];
         if (Array.isArray(arr)) items.push(...(arr as ItemWithBehaviors[]));
+      }
+      const spells = klass.spells;
+      if (Array.isArray(spells)) {
+        for (const spell of spells) {
+          if (spell && typeof spell === "object") {
+            items.push(...walkSpellBehaviorItems(spell as SubItemContainer));
+          }
+        }
+      }
+    }
+
+    const equipmentSets = Array.isArray(doc.equipment) ? doc.equipment : [];
+    for (const eq of equipmentSets) {
+      if (!eq || typeof eq !== "object") continue;
+      const equipment = eq as ActorDoc;
+      for (const item of equippedPlayerItems(doc, equipment)) {
+        items.push(item);
+        if (!isWeaponItem(item) || !Array.isArray(item.slotted)) continue;
+        for (const sphereId of item.slotted) {
+          if (typeof sphereId !== "string" || !sphereId) continue;
+          const hoplo = Array.isArray(equipment.hoplospheres)
+            ? equipment.hoplospheres.find(
+                (sphere) =>
+                  sphere &&
+                  typeof sphere === "object" &&
+                  (sphere as Record<string, unknown>).id === sphereId,
+              )
+            : undefined;
+          if (hoplo && typeof hoplo === "object") {
+            items.push(hoplo as BehaviorContainer);
+            continue;
+          }
+
+          const mnemo = Array.isArray(equipment.mnemospheres)
+            ? equipment.mnemospheres.find(
+                (sphere) =>
+                  sphere &&
+                  typeof sphere === "object" &&
+                  (sphere as Record<string, unknown>).id === sphereId,
+              )
+            : undefined;
+          if (!mnemo || typeof mnemo !== "object") continue;
+          const mnemoRecord = mnemo as ActorDoc;
+          for (const key of ["skills", "heroic"] as const) {
+            const arr = mnemoRecord[key];
+            if (Array.isArray(arr)) items.push(...(arr as ItemWithBehaviors[]));
+          }
+          const spells = mnemoRecord.spells;
+          if (Array.isArray(spells)) {
+            for (const spell of spells) {
+              if (spell && typeof spell === "object") {
+                items.push(
+                  ...walkSpellBehaviorItems(spell as SubItemContainer),
+                );
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -130,7 +426,7 @@ export function scanForTrigger(
           combatId: runtime.combatId,
           actorName,
           source,
-          itemName: item.name,
+          itemName: itemDisplayName(item),
           fuid: item.fuid,
           behaviorId: beh.id,
           trigger: beh.trigger,

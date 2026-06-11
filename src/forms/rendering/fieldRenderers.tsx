@@ -47,6 +47,7 @@ import type { FieldRendererProps } from "./fieldRendererProps";
 import type { GroupLabels } from "./config/fieldConfig";
 import { affinityStrToNum, affinityNumToStr } from "./npcAffinityUtils";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
+import ItemRowCard from "../../components/shared/common/ItemRowCard";
 
 // Typed wrapper for untyped JSX components.
 interface ChangeAccuracyCheckProps {
@@ -1405,98 +1406,113 @@ export function ObjectListRenderer({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 1, width: "100%" }}
     >
-      {rows.map((row, i) => (
-        <Box
-          key={i}
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 1,
-            p: 1.5,
-          }}
-        >
-          {isBehaviorCard ? (
-            <>
-              <Box
-                onClick={() => toggleExpanded(i)}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  cursor: "pointer",
-                  minHeight: 40,
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 500, flexGrow: 1, overflow: "hidden" }}
-                  noWrap
-                >
-                  {rowLabel ? rowLabel(row, i) : `Item ${i + 1}`}
-                </Typography>
+      {rows.map((row, i) =>
+        isBehaviorCard ? (
+          <ItemRowCard
+            key={i}
+            label={rowLabel ? rowLabel(row, i) : `Item ${i + 1}`}
+            subtitle={undefined}
+            onClick={() => toggleExpanded(i)}
+            onCardClick={undefined}
+            compact
+            minHeight={40}
+            paperSx={{ width: "100%" }}
+            actions={
+              <>
                 <Box
-                  onClick={(e) => e.stopPropagation()}
-                  sx={{ display: "flex", alignItems: "center" }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.25,
+                    pr: 0.25,
+                  }}
                 >
-                  <Typography variant="caption" sx={{ mr: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "common.white", lineHeight: 1 }}
+                  >
                     {t("Enabled")}
                   </Typography>
                   <Checkbox
                     size="small"
                     checked={row.disabled !== true}
                     onChange={(e) => toggleEnabled(i, e.target.checked)}
-                  />
-                </Box>
-                <IconButton size="small" onClick={(e) => openMenu(e, i)}>
-                  <MenuIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleExpanded(i);
-                  }}
-                >
-                  <ExpandMoreIcon
-                    fontSize="small"
                     sx={{
-                      transform: expandedRows[i]
-                        ? "rotate(180deg)"
-                        : "rotate(0deg)",
-                      transition: "transform 0.15s ease",
+                      color: "common.white",
+                      "&.Mui-checked": { color: "common.white" },
                     }}
                   />
-                </IconButton>
-              </Box>
-              {expandedRows[i] && (
-                <Grid container spacing={1} sx={{ mt: 0.5 }}>
-                  {renderNestedFields && visibleGroupedFields
-                    ? visibleGroupedFields.map((groupKey) => (
-                        <React.Fragment key={`${i}-${groupKey || "default"}`}>
-                          {renderNestedFields({
-                            config: fields,
-                            state: row,
-                            onChange: (next) => updateRow(i, next),
-                            surface: "edit",
-                            cols:
-                              fields.filter(
-                                (f) =>
-                                  f.kind !== "form-state" &&
-                                  f.kind !== "computed" &&
-                                  f.component,
-                              ).length > 3
-                                ? 2
-                                : 1,
-                            group: groupKey || undefined,
-                            groupLabels: nestedGroupLabels,
-                          })}
-                        </React.Fragment>
-                      ))
-                    : null}
-                </Grid>
-              )}
-            </>
-          ) : (
+                </Box>
+                <Tooltip title={t("Actions")}>
+                  <IconButton
+                    size="small"
+                    aria-label={t("Actions")}
+                    onClick={(e) => openMenu(e, i)}
+                  >
+                    <MenuIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={expandedRows[i] ? t("Collapse") : t("Expand")}>
+                  <IconButton
+                    size="small"
+                    aria-label={expandedRows[i] ? t("Collapse") : t("Expand")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpanded(i);
+                    }}
+                  >
+                    <ExpandMoreIcon
+                      fontSize="small"
+                      sx={{
+                        transform: expandedRows[i]
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                        transition: "transform 0.15s ease",
+                      }}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </>
+            }
+          >
+            {expandedRows[i] && (
+              <Grid container spacing={1} sx={{ p: 1, pt: 0.75 }}>
+                {renderNestedFields && visibleGroupedFields
+                  ? visibleGroupedFields.map((groupKey) => (
+                      <React.Fragment key={`${i}-${groupKey || "default"}`}>
+                        {renderNestedFields({
+                          config: fields,
+                          state: row,
+                          onChange: (next) => updateRow(i, next),
+                          surface: "edit",
+                          cols:
+                            fields.filter(
+                              (f) =>
+                                f.kind !== "form-state" &&
+                                f.kind !== "computed" &&
+                                f.component,
+                            ).length > 3
+                              ? 2
+                              : 1,
+                          group: groupKey || undefined,
+                          groupLabels: nestedGroupLabels,
+                        })}
+                      </React.Fragment>
+                    ))
+                  : null}
+              </Grid>
+            )}
+          </ItemRowCard>
+        ) : (
+          <Box
+            key={i}
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+              p: 1.5,
+            }}
+          >
             <>
               <Box
                 sx={{
@@ -1545,9 +1561,9 @@ export function ObjectListRenderer({
                   : null}
               </Grid>
             </>
-          )}
-        </Box>
-      ))}
+          </Box>
+        ),
+      )}
       <Menu
         anchorEl={menuAnchorEl}
         open={Boolean(menuAnchorEl)}

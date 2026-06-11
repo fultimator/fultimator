@@ -32,6 +32,7 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { SharedPilotVehicleCard } from "/src/components/shared/items";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
@@ -194,20 +195,29 @@ function ModuleCard({ m, searchQuery, theme, t, player, onPreview }) {
     const dmg = m.damage ?? {};
     const attr1 = normalizeAttr(acc.attr1);
     const attr2 = normalizeAttr(acc.attr2);
-    const intent = prepareAccuracyCheck({
-      arg: name,
-      name,
-      attr1,
-      attr2,
-      accuracyBonus: acc.value ?? 0,
-      baseDamage: dmg.value ?? 0,
-      damageType: dmg.type ?? "physical",
-      accuracyDefense: acc.defense ?? "def",
+    const range =
+      m.range === "Ranged" || m.range === "ranged" ? "ranged" : "melee";
+    const effectModifiers = accuracyModifiersFromEffects(player, {
+      range,
       category: m.category,
-      isWeaponModule: true,
-      damageHrZero: dmg.hrZero === true,
-      range: m.range === "Ranged" || m.range === "ranged" ? "ranged" : "melee",
     });
+    const intent = prepareAccuracyCheck(
+      {
+        arg: name,
+        name,
+        attr1,
+        attr2,
+        accuracyBonus: acc.value ?? 0,
+        baseDamage: dmg.value ?? 0,
+        damageType: dmg.type ?? "physical",
+        accuracyDefense: acc.defense ?? "def",
+        category: m.category,
+        isWeaponModule: true,
+        damageHrZero: dmg.hrZero === true,
+        range,
+      },
+      effectModifiers,
+    );
     const dieSizes = {
       primary: getAttrDie(attr1),
       secondary: getAttrDie(attr2),

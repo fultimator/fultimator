@@ -88,6 +88,7 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import PcCompactQuirk from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactQuirk";
 import PcCompactCampActivities from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactCampActivities";
 import PcCompactZeroPower from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactZeroPower";
@@ -599,22 +600,30 @@ function VehicleCard({
     const attr2 = acc.attr2 || "might";
     const modName =
       mod.name === "pilot_custom_weapon" ? mod.customName : t(mod.name);
-    const intent = prepareAccuracyCheck({
-      arg: modName,
-      name: modName,
-      attr1,
-      attr2,
-      accuracyBonus: acc.value ?? 0,
-      baseDamage: dmg.value ?? 0,
-      damageType: dmg.type ?? "physical",
-      accuracyDefense: acc.defense ?? "def",
+    const range =
+      mod.range === "Ranged" || mod.range === "ranged" ? "ranged" : "melee";
+    const effectModifiers = accuracyModifiersFromEffects(player, {
+      range,
       category: mod.category,
-      isWeaponModule: true,
-      damageHrZero: dmg.hrZero === true,
-      range:
-        mod.range === "Ranged" || mod.range === "ranged" ? "ranged" : "melee",
-      description: mod.description ? t(mod.description) : undefined,
     });
+    const intent = prepareAccuracyCheck(
+      {
+        arg: modName,
+        name: modName,
+        attr1,
+        attr2,
+        accuracyBonus: acc.value ?? 0,
+        baseDamage: dmg.value ?? 0,
+        damageType: dmg.type ?? "physical",
+        accuracyDefense: acc.defense ?? "def",
+        category: mod.category,
+        isWeaponModule: true,
+        damageHrZero: dmg.hrZero === true,
+        range,
+        description: mod.description ? t(mod.description) : undefined,
+      },
+      effectModifiers,
+    );
     const dieSizes = { primary: attrDie(attr1), secondary: attrDie(attr2) };
     const rolls = rollAccuracyCheck(dieSizes);
     const result = processAccuracyCheck(

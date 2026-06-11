@@ -21,6 +21,7 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 function ModuleRow({ name, onChat, onRoll, t }) {
@@ -203,23 +204,31 @@ export default function PlayerVehicle({
       module.name === "pilot_custom_weapon"
         ? module.customName
         : t(module.name);
-    const intent = prepareAccuracyCheck({
-      arg: name,
-      name,
-      attr1,
-      attr2,
-      accuracyBonus: acc.value ?? 0,
-      baseDamage: dmg.value ?? 0,
-      damageType: dmg.type ?? "physical",
-      accuracyDefense: acc.defense ?? "def",
+    const range =
+      module.range === "Ranged" || module.range === "ranged"
+        ? "ranged"
+        : "melee";
+    const effectModifiers = accuracyModifiersFromEffects(player, {
+      range,
       category: module.category,
-      isWeaponModule: true,
-      damageHrZero: dmg.hrZero === true,
-      range:
-        module.range === "Ranged" || module.range === "ranged"
-          ? "ranged"
-          : "melee",
     });
+    const intent = prepareAccuracyCheck(
+      {
+        arg: name,
+        name,
+        attr1,
+        attr2,
+        accuracyBonus: acc.value ?? 0,
+        baseDamage: dmg.value ?? 0,
+        damageType: dmg.type ?? "physical",
+        accuracyDefense: acc.defense ?? "def",
+        category: module.category,
+        isWeaponModule: true,
+        damageHrZero: dmg.hrZero === true,
+        range,
+      },
+      effectModifiers,
+    );
     const dieSizes = {
       primary: attrDieMap[attr1] ?? 8,
       secondary: attrDieMap[attr2] ?? 8,
