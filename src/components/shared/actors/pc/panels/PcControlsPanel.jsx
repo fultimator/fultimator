@@ -324,7 +324,7 @@ function ResourceCell({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip {...(tooltip ?? {})} display="block">
+      <StatTooltip {...(tooltip ?? {})} display="block" disabled={isInteractive}>
         <StatBar
           label={label}
           Icon={Icon}
@@ -346,7 +346,7 @@ function ResourceCell({
 
 const MAX_FP_PIPS = 6;
 
-function FpCell({ value, onApply, tooltip, isInteractive = false }) {
+function FpCell({ value, onApply, onBarClick, tooltip, isInteractive = false }) {
   const { t } = useTranslate();
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
   const filled = Math.min(value, MAX_FP_PIPS);
@@ -369,7 +369,7 @@ function FpCell({ value, onApply, tooltip, isInteractive = false }) {
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip {...(tooltip ?? {})} display="block">
+      <StatTooltip {...(tooltip ?? {})} display="block" disabled={isInteractive}>
         <BarShell shellBg={shellBg} shellBorder={shellBorder}>
           <Box
             sx={{
@@ -459,10 +459,12 @@ function FpCell({ value, onApply, tooltip, isInteractive = false }) {
             )}
           </Box>
           <Box
+            onClick={isInteractive ? onBarClick : undefined}
             sx={{
               ...VALUE_SX,
               bgcolor: labelBg,
               borderLeft: `1px solid ${labelBorder}`,
+              cursor: isInteractive ? "pointer" : "default",
             }}
           >
             {value}
@@ -474,7 +476,7 @@ function FpCell({ value, onApply, tooltip, isInteractive = false }) {
   );
 }
 
-function IpCell({ value, max, onApply, tooltip, isInteractive = false }) {
+function IpCell({ value, max, onApply, onBarClick, tooltip, isInteractive = false }) {
   const { t } = useTranslate();
   const { isDark, shellBg, shellBorder, labelBg, labelBorder, trackBg, theme } =
     useBarShell();
@@ -499,7 +501,7 @@ function IpCell({ value, max, onApply, tooltip, isInteractive = false }) {
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip {...(tooltip ?? {})} display="block">
+      <StatTooltip {...(tooltip ?? {})} display="block" disabled={isInteractive}>
         <BarShell shellBg={shellBg} shellBorder={shellBorder}>
           <Box
             sx={{
@@ -571,10 +573,12 @@ function IpCell({ value, max, onApply, tooltip, isInteractive = false }) {
             )}
           </Box>
           <Box
+            onClick={isInteractive ? onBarClick : undefined}
             sx={{
               ...VALUE_SX,
               bgcolor: labelBg,
               borderLeft: `1px solid ${labelBorder}`,
+              cursor: isInteractive ? "pointer" : "default",
             }}
           >
             {value}/{max}
@@ -711,6 +715,7 @@ export default function PcControlsPanel({
     }));
   };
   const [resourceDialog, setResourceDialog] = useState(null);
+  const [fpDialogOpen, setFpDialogOpen] = useState(false);
 
   const openResourceDialog = (resource) => {
     if (!isInteractive) return;
@@ -718,6 +723,38 @@ export default function PcControlsPanel({
   };
 
   const closeResourceDialog = () => setResourceDialog(null);
+
+  const openFpDialog = () => {
+    if (!isInteractive) return;
+    setFpDialogOpen(true);
+  };
+
+  const closeFpDialog = () => setFpDialogOpen(false);
+
+  const applyFpDialogChange = (payload) => {
+    if (!isInteractive || !onUpdate) return;
+    const amount = Math.max(0, parseInt(payload?.amount, 10) || 0);
+    if (amount <= 0) return;
+    const delta = payload.mode === "heal" ? amount : -amount;
+    onUpdate((prev) => ({
+      ...prev,
+      info: {
+        ...prev.info,
+        fabulapoints: Math.max(0, Math.min(9999, (prev.info.fabulapoints ?? 0) + delta)),
+      },
+    }));
+  };
+
+  const setFpCurrent = (nextCurrent) => {
+    if (!isInteractive || !onUpdate) return;
+    onUpdate((prev) => ({
+      ...prev,
+      info: {
+        ...prev.info,
+        fabulapoints: Math.max(0, Math.min(9999, nextCurrent ?? 0)),
+      },
+    }));
+  };
 
   const setResourceCurrent = (resourceKey) => (nextCurrent) => {
     if (!isInteractive || !onUpdate) return;
@@ -953,6 +990,7 @@ export default function PcControlsPanel({
           <FpCell
             value={pc.info.fabulapoints ?? 0}
             onApply={applyFp}
+            onBarClick={openFpDialog}
             tooltip={fpTooltip}
             isInteractive={isInteractive}
           />
@@ -1001,6 +1039,21 @@ export default function PcControlsPanel({
           }}
           onApply={applyResourceDialogChange(resourceDialog)}
           onSetCurrent={setResourceCurrent(resourceDialog)}
+        />
+      )}
+      {fpDialogOpen && (
+        <EditResourcesModal
+          open
+          onClose={closeFpDialog}
+          title="FP"
+          resourceKey="fp"
+          current={pc.info.fabulapoints ?? 0}
+          max={9999}
+          resolvePreviewDelta={({ amount, mode }) =>
+            mode === "heal" ? amount : -amount
+          }
+          onApply={applyFpDialogChange}
+          onSetCurrent={setFpCurrent}
         />
       )}
     </SectionCard>

@@ -128,9 +128,12 @@ export default function StatTooltip({
   children,
   display = "block",
   sx,
+  disabled = false,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const _touchRef = useRef(false);
+
+  if (disabled) return <>{children}</>;
 
   const isTouch =
     typeof window !== "undefined" &&

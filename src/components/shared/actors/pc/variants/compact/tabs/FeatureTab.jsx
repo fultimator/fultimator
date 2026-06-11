@@ -35,6 +35,10 @@ import {
   processMagicCheck,
   buildMagicCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/magic-checks";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageBonusFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import SpellDefault from "/src/components/shared/actors/pc/variants/compact/spells/SpellDefault";
 import SpellArcanist from "/src/components/shared/actors/pc/variants/compact/spells/SpellArcanist";
@@ -88,7 +92,6 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
-import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import PcCompactQuirk from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactQuirk";
 import PcCompactCampActivities from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactCampActivities";
 import PcCompactZeroPower from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactZeroPower";
@@ -1540,18 +1543,29 @@ export default function FeatureTab({
     const dmg = spell.damage ?? {};
     const attr1 = acc.attr1 ?? "ins";
     const attr2 = acc.attr2 ?? "wlp";
-    const intent = prepareMagicCheck({
-      arg: spell.name || "",
-      name: spell.name || "",
-      attr1,
-      attr2,
-      accuracyBonus: acc.value ?? 0,
-      baseDamage: dmg.value ?? 0,
-      damageType: dmg.type ?? "physical",
-      accuracyDefense: acc.defense ?? "mdef",
-      damageHrZero: dmg.hrZero === true,
-      spellType: spell.spellType,
-    });
+    const damageType = dmg.type ?? "physical";
+    const magicModifiers = player
+      ? accuracyModifiersFromEffects(player, { checkType: "magic" })
+      : [];
+    const damageOutgoingBonus = player
+      ? outgoingDamageBonusFromEffects(player, { range: "spell", damageType })
+      : 0;
+    const intent = prepareMagicCheck(
+      {
+        arg: spell.name || "",
+        name: spell.name || "",
+        attr1,
+        attr2,
+        accuracyBonus: acc.value ?? 0,
+        baseDamage: dmg.value ?? 0,
+        damageType,
+        accuracyDefense: acc.defense ?? "mdef",
+        damageHrZero: dmg.hrZero === true,
+        spellType: spell.spellType,
+      },
+      magicModifiers,
+      { damageOutgoingBonus },
+    );
     const dieSizes = {
       primary: getAttrDie(attr1),
       secondary: getAttrDie(attr2),

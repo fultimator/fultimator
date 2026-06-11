@@ -746,7 +746,7 @@ export default function EditResourcesModal({
             </>
           )}
         </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", px: 0, pb: 0 }}>
+        <DialogActions sx={{ justifyContent: "center" }}>
           {isPipResource || isFpResource || isUpResource ? (
             <>
               <Tooltip title={t("Subtract Amount")} placement="top">

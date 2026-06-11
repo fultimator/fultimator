@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import {
-  Grid,
+  Box,
   Typography,
   IconButton,
   Tooltip,
-  Divider,
-  Box,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  Grid,
 } from "@mui/material";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
-import { useTheme } from "@mui/material/styles";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import { useTranslate } from "/src/translation/translate";
-import { Casino, Message } from "@mui/icons-material";
+import { Casino, Message, Edit } from "@mui/icons-material";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { availableFrames } from "/src/libs/pilotVehicleData";
 import { SpellPilotVehiclesModal } from "/src/components/shared/actors/pc/editors";
@@ -21,90 +24,237 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
-import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageBonusFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
+import { Martial } from "/src/components/icons";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
+import { SharedPilotVehicleCard } from "/src/components/shared/items";
+import ItemStatSubtitle from "/src/components/shared/actors/common/ItemStatSubtitle";
 
-function ModuleRow({ name, onChat, onRoll, t }) {
-  const theme = useTheme();
-  const primary = theme.palette.primary.main;
-  return (
-    <Box
-      sx={{
-        overflow: "hidden",
-        display: "flex",
-        alignItems: "stretch",
-        minHeight: 44,
-        borderRadius: "4px",
-        border: "1px solid",
-        borderColor: "divider",
-      }}
-    >
+const CUSTOM_MODULE_NAMES = new Set([
+  "pilot_custom_weapon",
+  "pilot_custom_armor",
+  "pilot_custom_support",
+]);
+
+function getModuleName(m, t) {
+  const name = m.name ?? m.key ?? "";
+  if (CUSTOM_MODULE_NAMES.has(name)) return m.customName || t("pilot_custom");
+  return t(name);
+}
+
+function getModuleDescription(m, t) {
+  const name = m.name ?? m.key ?? "";
+  if (CUSTOM_MODULE_NAMES.has(name)) return m.description || "";
+  return t(m.description || "");
+}
+
+function normalizeAttr(raw) {
+  const k = String(raw ?? "").toLowerCase();
+  if (k === "dex" || k === "dexterity") return "dexterity";
+  if (k === "ins" || k === "insight") return "insight";
+  if (k === "mig" || k === "might") return "might";
+  if (k === "wlp" || k === "will" || k === "willpower") return "willpower";
+  return "dexterity";
+}
+
+function moduleToSubtitleItem(m) {
+  if (m.type === "pilot_module_weapon") {
+    return {
+      equipType: "weapon",
+      accuracy: m.accuracy ?? {},
+      damage: m.damage ?? {},
+      martial: m.martial,
+    };
+  }
+  if (m.type === "pilot_module_armor") {
+    return {
+      equipType: "armor",
+      def: m.def ?? 0,
+      mdef: m.mdef ?? 0,
+      martial: m.martial,
+    };
+  }
+  return null;
+}
+
+function ModuleCard({ m, t, player, onPreview }) {
+  const [descOpen, setDescOpen] = useState(false);
+  const name = getModuleName(m, t);
+  const desc = getModuleDescription(m, t);
+  const isWeapon = m.type === "pilot_module_weapon" && !m.isShield;
+
+  const getAttrDie = (key) => {
+    const normKey = normalizeAttr(key);
+    const base = player?.attributes?.[normKey]?.base ?? 8;
+    const cfg = {
+      dexterity: [["slow", "enraged"], ["dexUp"]],
+      insight: [["dazed", "enraged"], ["insUp"]],
+      might: [["weak", "poisoned"], ["migUp"]],
+      willpower: [["shaken", "poisoned"], ["wlpUp"]],
+    }[normKey] ?? [[], []];
+    return calculateAttribute(player, base, cfg[0], cfg[1], 6, 12);
+  };
+
+  const handleRoll = () => {
+    const acc = m.accuracy ?? {};
+    const dmg = m.damage ?? {};
+    const attr1 = normalizeAttr(acc.attr1);
+    const attr2 = normalizeAttr(acc.attr2);
+    const range =
+      m.range === "Ranged" || m.range === "ranged" ? "ranged" : "melee";
+    const damageType = dmg.type ?? "physical";
+    const effectModifiers = accuracyModifiersFromEffects(player, {
+      range,
+      category: m.category,
+    });
+    const damageOutgoingBonus = outgoingDamageBonusFromEffects(player, {
+      range,
+      category: m.category,
+      damageType,
+    });
+    const intent = prepareAccuracyCheck(
+      {
+        arg: name,
+        name,
+        attr1,
+        attr2,
+        accuracyBonus: acc.value ?? 0,
+        baseDamage: dmg.value ?? 0,
+        damageType,
+        accuracyDefense: acc.defense ?? "def",
+        category: m.category,
+        isWeaponModule: true,
+        damageHrZero: dmg.hrZero === true,
+        range,
+      },
+      effectModifiers,
+      { damageOutgoingBonus },
+    );
+    const dieSizes = {
+      primary: getAttrDie(attr1),
+      secondary: getAttrDie(attr2),
+    };
+    const rolls = rollAccuracyCheck(dieSizes);
+    const result = processAccuracyCheck(
+      intent,
+      rolls,
+      dieSizes,
+      player?.info?.name || player?.name || "",
+    );
+    sendRollMessage(buildAccuracyCheckMessage(result));
+  };
+
+  const handleChat = () => {
+    const tags = [];
+    if (m.type === "pilot_module_armor") {
+      tags.push(
+        `${t("DEF")}: ${m.martial ? m.def : m.def === 0 ? t("DEX die") : `${t("DEX die")} +${m.def}`}`,
+      );
+      tags.push(
+        `${t("M.DEF")}: ${(m.mdef ?? 0) === 0 ? t("INS die") : `${t("INS die")} +${m.mdef}`}`,
+      );
+    } else {
+      tags.push(t("Support Module"));
+    }
+    sendDisplayMessage("item", name, {
+      speaker: player?.info?.name || player?.name || "",
+      tags,
+      description: desc || undefined,
+    });
+  };
+
+  const labelNode = (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
       <Typography
         noWrap
         sx={{
           fontFamily: "Antonio",
           fontWeight: 800,
-          fontSize: { xs: "0.9rem", sm: "0.95rem" },
+          fontSize: "1rem",
           textTransform: "uppercase",
-          flex: 1,
-          px: 1,
-          display: "flex",
-          alignItems: "center",
-          color: "text.primary",
+          lineHeight: 1.3,
         }}
       >
         {name}
       </Typography>
-      <Box
-        sx={{
-          bgcolor: primary,
-          display: "flex",
-          alignItems: "center",
-          alignSelf: "stretch",
-          px: 1,
-          gap: 0.25,
-        }}
-      >
-        {onRoll ? (
-          <Tooltip title={t("Roll")}>
-            <IconButton
-              size="small"
-              onClick={onRoll}
-              sx={{ p: 0.5, color: "#fff" }}
-            >
-              <Casino fontSize="small" />
+      {m.martial && <Martial />}
+      {isWeapon && m.category && (
+        <Typography
+          sx={{
+            fontSize: "0.7rem",
+            color: "text.secondary",
+            ml: "auto",
+            pl: 1,
+            flexShrink: 0,
+          }}
+        >
+          {t(m.category)}
+        </Typography>
+      )}
+    </Box>
+  );
+
+  return (
+    <ItemRowCard
+      label={labelNode}
+      onCardClick={() => (desc ? setDescOpen((v) => !v) : onPreview(m))}
+      subtitle={
+        moduleToSubtitleItem(m) ? (
+          <ItemStatSubtitle item={moduleToSubtitleItem(m)} />
+        ) : m.type === "pilot_module_support" ? (
+          <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.3, fontWeight: "bold" }}>
+            {m.isComplex ? t("Complex") : t("Support")}
+          </Typography>
+        ) : null
+      }
+      actions={
+        isWeapon ? (
+          <Tooltip title={t("Roll")} arrow>
+            <IconButton size="small" onClick={handleRoll}>
+              <Casino />
             </IconButton>
           </Tooltip>
         ) : (
-          <Tooltip title={t("Send to Chat")}>
-            <IconButton
-              size="small"
-              onClick={onChat}
-              sx={{ p: 0.5, color: "#fff" }}
-            >
-              <Message fontSize="small" />
+          <Tooltip title={t("Send to Chat")} arrow>
+            <IconButton size="small" onClick={handleChat}>
+              <Message />
             </IconButton>
           </Tooltip>
-        )}
-      </Box>
-    </Box>
+        )
+      }
+    >
+      {desc && descOpen && (
+        <Box
+          sx={{
+            px: "10px",
+            py: "5px",
+            fontSize: "0.72rem",
+            color: "text.secondary",
+            lineHeight: 1.5,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            bgcolor: "action.hover",
+          }}
+        >
+          <NotesMarkdown compact fontSize="0.72rem">
+            {desc}
+          </NotesMarkdown>
+        </Box>
+      )}
+    </ItemRowCard>
   );
 }
 
-export default function PlayerVehicle({
-  player,
-  setPlayer,
-  _isCharacterSheet,
-}) {
+export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const _custom = useCustomTheme();
-  const _primary = theme.palette.primary.main;
-  const _secondary = theme.palette.secondary.main;
-
+  const custom = useCustomTheme();
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [previewModule, setPreviewModule] = useState(null);
 
-  // Find all pilot-vehicle spells
   const pilotSpells = (player.classes || [])
     .flatMap((c, classIndex) =>
       (c.spells || []).map((s, spellIndex) => ({
@@ -120,229 +270,49 @@ export default function PlayerVehicle({
         (spell.showInPlayerSheet || spell.showInPlayerSheet === undefined),
     );
 
-  // Find the spell with enabled vehicle (for display), or use first pilot spell (for editing)
   const activePilotSpell =
     pilotSpells.find((s) => (s.vehicles || []).some((v) => v.enabled)) ||
     pilotSpells[0];
 
-  if (!activePilotSpell) {
-    return null;
-  }
-
-  const activeVehicle =
-    activePilotSpell.vehicles.find((v) => v.enabled) ||
-    activePilotSpell.vehicles?.[0];
-
-  if (!activeVehicle) {
-    return null;
-  }
-
-  const frame = availableFrames.find(
-    (f) => f.name === (activeVehicle.frame || "pilot_frame_exoskeleton"),
-  );
-
-  const equippedModules = activeVehicle.modules
-    ? activeVehicle.modules.filter((m) => m.equipped)
-    : [];
-
-  const armorModules = equippedModules.filter(
-    (m) => m.type === "pilot_module_armor",
-  );
-  const weaponModules = equippedModules.filter(
-    (m) => m.type === "pilot_module_weapon",
-  );
-  const supportModules = equippedModules.filter(
-    (m) => m.type === "pilot_module_support",
-  );
-
-  const currDex = calculateAttribute(
-    player,
-    player.attributes.dexterity?.base,
-    ["slow", "enraged"],
-    ["dexUp"],
-    6,
-    12,
-  );
-  const currInsight = calculateAttribute(
-    player,
-    player.attributes.insight?.base,
-    ["dazed", "enraged"],
-    ["insUp"],
-    6,
-    12,
-  );
-  const currMight = calculateAttribute(
-    player,
-    player.attributes.might?.base,
-    ["weak", "poisoned"],
-    ["migUp"],
-    6,
-    12,
-  );
-  const currWillpower = calculateAttribute(
-    player,
-    player.attributes.willpower?.base,
-    ["shaken", "poisoned"],
-    ["wlpUp"],
-    6,
-    12,
-  );
-
-  const attrDieMap = {
-    dexterity: currDex,
-    insight: currInsight,
-    might: currMight,
-    willpower: currWillpower,
-  };
-
-  const handleDiceRoll = (module) => {
-    const acc = module.accuracy || {};
-    const dmg = module.damage || {};
-    const attr1 = acc.attr1 || "dexterity";
-    const attr2 = acc.attr2 || "might";
-    const name =
-      module.name === "pilot_custom_weapon"
-        ? module.customName
-        : t(module.name);
-    const range =
-      module.range === "Ranged" || module.range === "ranged"
-        ? "ranged"
-        : "melee";
-    const effectModifiers = accuracyModifiersFromEffects(player, {
-      range,
-      category: module.category,
-    });
-    const intent = prepareAccuracyCheck(
-      {
-        arg: name,
-        name,
-        attr1,
-        attr2,
-        accuracyBonus: acc.value ?? 0,
-        baseDamage: dmg.value ?? 0,
-        damageType: dmg.type ?? "physical",
-        accuracyDefense: acc.defense ?? "def",
-        category: module.category,
-        isWeaponModule: true,
-        damageHrZero: dmg.hrZero === true,
-        range,
-      },
-      effectModifiers,
-    );
-    const dieSizes = {
-      primary: attrDieMap[attr1] ?? 8,
-      secondary: attrDieMap[attr2] ?? 8,
-    };
-    const rolls = rollAccuracyCheck(dieSizes);
-    const result = processAccuracyCheck(
-      intent,
-      rolls,
-      dieSizes,
-      player?.info?.name || "",
-    );
-    sendRollMessage(buildAccuracyCheckMessage(result));
-  };
+  if (!activePilotSpell) return null;
 
   const handleSaveVehicles = (spellIndex, updatedPilot) => {
-    setPlayer((prevPlayer) => {
-      const updatedClasses = [...prevPlayer.classes];
-      const classIndex = activePilotSpell.classIndex;
-      const spellInClassIndex = activePilotSpell.spellIndex;
-
-      updatedClasses[classIndex].spells[spellInClassIndex] = {
-        ...updatedClasses[classIndex].spells[spellInClassIndex],
+    setPlayer?.((prev) => {
+      const updatedClasses = [...prev.classes];
+      updatedClasses[activePilotSpell.classIndex].spells[activePilotSpell.spellIndex] = {
+        ...updatedClasses[activePilotSpell.classIndex].spells[activePilotSpell.spellIndex],
         vehicles: updatedPilot.vehicles,
         showInPlayerSheet: updatedPilot.showInPlayerSheet,
       };
-
-      return {
-        ...prevPlayer,
-        classes: updatedClasses,
-      };
+      return { ...prev, classes: updatedClasses };
     });
     setOpenEditModal(false);
   };
 
-  return (
-    <>
-      <Divider sx={{ my: 1 }} />
-      <SectionCard title={t("pilot_vehicle")} noShadow>
-        <Grid container spacing={1} sx={{ p: 0.75, flex: 1, width: "100%" }}>
-          {frame && (
-            <Grid size={{ xs: 12, md: 6 }}>
-              <ModuleRow
-                name={t(frame.name)}
-                onChat={() =>
-                  sendDisplayMessage("item", t(frame.name), {
-                    speaker: player?.info?.name || "",
-                  })
-                }
-                t={t}
-              />
-            </Grid>
-          )}
+  const activeVehicle = activePilotSpell.vehicles?.find((v) => v.enabled) ?? null;
 
-          {armorModules.map((module, index) => {
-            const name =
-              module.name === "pilot_custom_armor"
-                ? module.customName
-                : t(module.name);
-            return (
-              <Grid key={`armor-${index}`} size={{ xs: 12, md: 6 }}>
-                <ModuleRow
-                  name={name}
-                  onChat={() =>
-                    sendDisplayMessage("item", name, {
-                      speaker: player?.info?.name || "",
-                    })
-                  }
-                  t={t}
-                />
-              </Grid>
-            );
-          })}
-
-          {weaponModules.map((module, index) => {
-            const name =
-              module.name === "pilot_custom_weapon"
-                ? module.customName
-                : t(module.name);
-            return (
-              <Grid key={`weapon-${index}`} size={{ xs: 12, md: 6 }}>
-                <ModuleRow
-                  name={name}
-                  onChat={() =>
-                    sendDisplayMessage("item", name, {
-                      speaker: player?.info?.name || "",
-                    })
-                  }
-                  onRoll={() => handleDiceRoll(module)}
-                  t={t}
-                />
-              </Grid>
-            );
-          })}
-
-          {supportModules.map((module, index) => {
-            const name =
-              module.name === "pilot_custom_support"
-                ? module.customName
-                : t(module.name);
-            return (
-              <Grid key={`support-${index}`} size={{ xs: 12, md: 6 }}>
-                <ModuleRow
-                  name={name}
-                  onChat={() =>
-                    sendDisplayMessage("item", name, {
-                      speaker: player?.info?.name || "",
-                    })
-                  }
-                  t={t}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
+  if (!activeVehicle) {
+    return (
+      <SectionCard
+        title={t("pilot_vehicle")}
+        actions={
+          setPlayer ? (
+            <Tooltip title={t("Edit Vehicle")}>
+              <IconButton size="small" onClick={() => setOpenEditModal(true)} sx={{ color: "#fff" }}>
+                <Edit fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          ) : null
+        }
+        noShadow
+        sx={{ mb: "1em" }}
+      >
+        <Typography
+          variant="caption"
+          sx={{ display: "block", p: 1.5, color: "text.disabled", fontStyle: "italic" }}
+        >
+          {t("No vehicle active")}
+        </Typography>
         <SpellPilotVehiclesModal
           open={openEditModal}
           onClose={() => setOpenEditModal(false)}
@@ -350,6 +320,134 @@ export default function PlayerVehicle({
           pilot={activePilotSpell}
         />
       </SectionCard>
+    );
+  }
+
+  const slots = activeVehicle.slots ?? {
+    main: null,
+    off: null,
+    armor: null,
+    support: [],
+  };
+  const equippedKeys = new Set(
+    [slots.main, slots.off, slots.armor, ...(slots.support ?? [])].filter(Boolean),
+  );
+
+  const modules = (activeVehicle.modules ?? []).filter((m) => {
+    const key = m.key ?? m.name;
+    return key && equippedKeys.has(key);
+  });
+
+  const armorModules = modules.filter((m) => m.type === "pilot_module_armor");
+  const weaponModules = modules.filter((m) => m.type === "pilot_module_weapon");
+  const supportModules = modules.filter((m) => m.type === "pilot_module_support");
+
+  const frame = availableFrames.find(
+    (f) => f.name === (activeVehicle.frame || "pilot_frame_exoskeleton"),
+  );
+
+  const titleActions = setPlayer ? (
+    <Tooltip title={t("Edit Vehicle")}>
+      <IconButton size="small" onClick={() => setOpenEditModal(true)} sx={{ color: "#fff" }}>
+        <Edit fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  ) : null;
+
+  return (
+    <>
+      <SectionCard title={t("pilot_vehicle")} actions={titleActions} noShadow sx={{ mb: "1em" }}>
+        {/* Frame info bar */}
+        <Box
+          sx={{
+            backgroundImage: `linear-gradient(to right, ${custom.ternary}, transparent)`,
+            px: "10px",
+            py: "4px",
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          {frame ? (
+            <>
+              <Typography variant="caption">
+                <strong>{t("pilot_vehicles_frame")}:</strong> {t(frame.name)}
+              </Typography>
+              <Typography variant="caption">
+                <strong>{t("pilot_passengers")}:</strong>{" "}
+                {frame.passengers || t("None")}
+              </Typography>
+              <Typography variant="caption">
+                <strong>{t("pilot_distance")}:</strong>{" "}
+                {frame.distance > 1
+                  ? `×${frame.distance}`
+                  : t("pilot_distance_no_mod")}
+              </Typography>
+            </>
+          ) : (
+            <Typography
+              variant="caption"
+              sx={{ color: "text.secondary", fontStyle: "italic" }}
+            >
+              {activeVehicle.customName || t("Vehicle")}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Module grid */}
+        {(armorModules.length > 0 || weaponModules.length > 0 || supportModules.length > 0) ? (
+          <Grid container spacing={1} sx={{ p: 1 }}>
+            {[...armorModules, ...weaponModules, ...supportModules].map((m, i) => (
+              <Grid key={i} size={{ xs: 12, sm: 6 }}>
+                <ModuleCard
+                  m={m}
+                  t={t}
+                  player={player}
+                  onPreview={setPreviewModule}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Typography
+            variant="caption"
+            sx={{ display: "block", p: 1.5, color: "text.disabled", fontStyle: "italic" }}
+          >
+            {t("No modules equipped")}
+          </Typography>
+        )}
+      </SectionCard>
+
+      {/* Module preview dialog */}
+      <Dialog
+        open={Boolean(previewModule)}
+        onClose={() => setPreviewModule(null)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogContent sx={{ p: 0 }}>
+          {previewModule && (
+            <SharedPilotVehicleCard
+              item={{
+                ...previewModule,
+                name: getModuleName(previewModule, t),
+              }}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPreviewModule(null)} variant="contained" color="primary">
+            {t("Close")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <SpellPilotVehiclesModal
+        open={openEditModal}
+        onClose={() => setOpenEditModal(false)}
+        onSave={handleSaveVehicles}
+        pilot={activePilotSpell}
+      />
     </>
   );
 }

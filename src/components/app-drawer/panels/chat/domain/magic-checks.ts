@@ -16,6 +16,7 @@ function rollDie(sides: number): number {
 export function prepareMagicCheck(
   spell: SpellOption,
   extraModifiers: CheckModifier[] = [],
+  options?: { damageOutgoingBonus?: number },
 ): MagicCheckIntent {
   const modifiers: CheckModifier[] = [...extraModifiers];
   if (spell.accuracyBonus && spell.accuracyBonus !== 0) {
@@ -31,6 +32,7 @@ export function prepareMagicCheck(
     spellType: spell.spellType,
     description: spell.description,
     baseDamage: spell.baseDamage ?? 0,
+    damageOutgoingBonus: options?.damageOutgoingBonus ?? 0,
     damageType: spell.damageType ?? "physical",
     defense: spell.accuracyDefense ?? "mdef",
     hrZero: spell.damageHrZero ?? false,
@@ -72,7 +74,7 @@ export function processMagicCheck(
   };
 
   const accuracyTotal = highRoll + lowRoll + modifierTotal;
-  const damage = damageHighRoll + intent.baseDamage;
+  const damage = damageHighRoll + intent.baseDamage + (intent.damageOutgoingBonus ?? 0);
   const critical =
     rolls.primaryDie === rolls.secondaryDie &&
     rolls.primaryDie >= Math.max(2, intent.critThreshold);

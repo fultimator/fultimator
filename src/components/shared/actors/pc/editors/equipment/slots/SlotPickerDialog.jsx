@@ -33,6 +33,7 @@ import {
   clearSlotAction,
   getEquipConflicts,
 } from "/src/libs/player/slots/loadoutActions";
+import { getEquippedModuleForSlot } from "/src/libs/player/slots/loadoutSelectors";
 import attributes from "/src/libs/attributes";
 
 function moduleStatLine(module, t) {
@@ -515,15 +516,13 @@ export default function SlotPickerDialog({
   const previewCandidate = hoveredCandidate ?? selectedCandidate ?? null;
 
   // Module preview: hovered module wins, falls back to the currently active one
+  const equippedModule = getEquippedModuleForSlot(player, slot);
+  const equippedModuleKey = equippedModule
+    ? (equippedModule.key ?? equippedModule.name)
+    : null;
   const activeModule =
     vehicleModules.find(
-      (m) =>
-        m.enabled &&
-        ((slot === "mainHand" &&
-          (m.equippedSlot === "main" || m.equippedSlot === "both")) ||
-          (slot === "offHand" &&
-            (m.equippedSlot === "off" || m.equippedSlot === "both")) ||
-          (slot === "armor" && m.equippedSlot === "armor")),
+      (m) => equippedModuleKey && (m.key ?? m.name) === equippedModuleKey,
     ) ?? null;
   const previewModule = hoveredModule ?? pendingModule ?? activeModule ?? null;
 
@@ -631,14 +630,8 @@ export default function SlotPickerDialog({
               <List dense disablePadding>
                 {vehicleModules.map((m) => {
                   const isActive =
-                    m.enabled &&
-                    ((slot === "mainHand" &&
-                      (m.equippedSlot === "main" ||
-                        m.equippedSlot === "both")) ||
-                      (slot === "offHand" &&
-                        (m.equippedSlot === "off" ||
-                          m.equippedSlot === "both")) ||
-                      (slot === "armor" && m.equippedSlot === "armor"));
+                    equippedModuleKey !== null &&
+                    (m.key ?? m.name) === equippedModuleKey;
                   const isPending =
                     pendingModule?.originalIndex === m.originalIndex;
                   const isChecked = isPending || (!pendingModule && isActive);

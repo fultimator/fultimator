@@ -30,7 +30,10 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
-import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageBonusFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
@@ -96,9 +99,15 @@ const VehicleModule = memo(
         module.range === "Ranged" || module.range === "ranged"
           ? "ranged"
           : "melee";
+      const damageType = dmg.type ?? "physical";
       const effectModifiers = accuracyModifiersFromEffects(player, {
         range,
         category: module.category,
+      });
+      const damageOutgoingBonus = outgoingDamageBonusFromEffects(player, {
+        range,
+        category: module.category,
+        damageType,
       });
 
       const intent = prepareAccuracyCheck(
@@ -109,7 +118,7 @@ const VehicleModule = memo(
           attr2,
           accuracyBonus: acc.value ?? 0,
           baseDamage: dmg.value ?? 0,
-          damageType: dmg.type ?? "physical",
+          damageType,
           accuracyDefense: acc.defense ?? "def",
           category: module.category,
           isWeaponModule: true,
@@ -118,6 +127,7 @@ const VehicleModule = memo(
           description: description,
         },
         effectModifiers,
+        { damageOutgoingBonus },
       );
       const dieSizes = { primary: attrDie(attr1), secondary: attrDie(attr2) };
       const rolls = rollAccuracyCheck(dieSizes);

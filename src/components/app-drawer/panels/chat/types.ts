@@ -48,6 +48,7 @@ export type AccuracyCheckIntent = {
   description?: string;
   baseDamage: number;
   damageSituationalBonus?: number;
+  damageOutgoingBonus?: number;
   damageType: string;
   defense?: "def" | "mdef" | string;
   hands?: 1 | 2;
@@ -92,6 +93,7 @@ export type MagicCheckIntent = {
   spellType?: string;
   description?: string;
   baseDamage: number;
+  damageOutgoingBonus?: number;
   damageType: string;
   defense?: "def" | "mdef" | string;
   hrZero?: boolean;

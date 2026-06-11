@@ -17,6 +17,10 @@ import {
   processMagicCheck,
   buildMagicCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/magic-checks";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageBonusFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 
 const SINGLETON_SPELL_TYPES = new Set([
@@ -168,19 +172,30 @@ export default function PcSpells({
     if (!spell.isOffensive) return;
     const attr1 = normalizeAttr(spell.accuracy?.attr1);
     const attr2 = normalizeAttr(spell.accuracy?.attr2);
-    const intent = prepareMagicCheck({
-      name: spell.name,
-      spellType: spell.spellType,
-      attr1,
-      attr2,
-      accuracyBonus: spell.accuracy?.value ?? 0,
-      baseDamage: spell.damage?.value ?? 0,
-      damageType: spell.damage?.type ?? "physical",
-      accuracyDefense: spell.accuracy?.defense ?? "mdef",
-      damageHrZero: spell.damage?.hrZero === true,
-      description: spell.description,
-      extraTags: buildSpellTags(spell),
-    });
+    const damageType = spell.damage?.type ?? "physical";
+    const magicModifiers = pc
+      ? accuracyModifiersFromEffects(pc, { checkType: "magic" })
+      : [];
+    const damageOutgoingBonus = pc
+      ? outgoingDamageBonusFromEffects(pc, { range: "spell", damageType })
+      : 0;
+    const intent = prepareMagicCheck(
+      {
+        name: spell.name,
+        spellType: spell.spellType,
+        attr1,
+        attr2,
+        accuracyBonus: spell.accuracy?.value ?? 0,
+        baseDamage: spell.damage?.value ?? 0,
+        damageType,
+        accuracyDefense: spell.accuracy?.defense ?? "mdef",
+        damageHrZero: spell.damage?.hrZero === true,
+        description: spell.description,
+        extraTags: buildSpellTags(spell),
+      },
+      magicModifiers,
+      { damageOutgoingBonus },
+    );
     const dieSizes = {
       primary: getAttrDie(attr1),
       secondary: getAttrDie(attr2),

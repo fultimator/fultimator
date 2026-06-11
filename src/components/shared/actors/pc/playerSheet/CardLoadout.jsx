@@ -37,7 +37,10 @@ import {
   processAccuracyCheck,
   rollAccuracyCheck,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
-import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageBonusFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 
 const SLOT_LABEL_KEY = {
   mainHand: "MAIN",
@@ -230,7 +233,14 @@ export default function CardLoadout({
       range: weaponOption.range,
       category: weaponOption.category,
     });
-    const intent = prepareAccuracyCheck(weaponOption, effectModifiers);
+    const damageOutgoingBonus = outgoingDamageBonusFromEffects(player, {
+      range: weaponOption.range,
+      category: weaponOption.category,
+      damageType: weaponOption.damageType,
+    });
+    const intent = prepareAccuracyCheck(weaponOption, effectModifiers, {
+      damageOutgoingBonus,
+    });
     const dieSizes = {
       primary: getAttrDie(intent.primary),
       secondary: getAttrDie(intent.secondary),

@@ -65,7 +65,10 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
-import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageBonusFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import ItemStatSubtitle from "/src/components/shared/actors/common/ItemStatSubtitle";
@@ -2119,28 +2122,37 @@ export default function PcEquipment({
         ? damageRangedModifier
         : damageMeleeModifier;
       const range = isRanged ? "ranged" : "melee";
+      const damageType = weapon.damage?.type ?? weapon.type ?? "physical";
       const effectModifiers = player
         ? accuracyModifiersFromEffects(player, {
             range,
             category: weapon.category,
           })
         : [];
+      const damageOutgoingBonus = player
+        ? outgoingDamageBonusFromEffects(player, {
+            range,
+            category: weapon.category,
+            damageType,
+          })
+        : 0;
       const intent = prepareAccuracyCheck(
         {
-        arg: weapon.name || "",
-        name: weapon.name || "",
-        attr1,
-        attr2,
-        accuracyBonus: (weapon.accuracy?.value ?? 0) + precModifier,
-        baseDamage:
-          (weapon.damage?.value ?? weapon.damage ?? 0) + damageModifier,
-        damageType: weapon.damage?.type ?? weapon.type ?? "physical",
-        accuracyDefense: weapon.accuracy?.defense ?? "def",
-        hands: weapon.hands,
-        category: weapon.category,
+          arg: weapon.name || "",
+          name: weapon.name || "",
+          attr1,
+          attr2,
+          accuracyBonus: (weapon.accuracy?.value ?? 0) + precModifier,
+          baseDamage:
+            (weapon.damage?.value ?? weapon.damage ?? 0) + damageModifier,
+          damageType,
+          accuracyDefense: weapon.accuracy?.defense ?? "def",
+          hands: weapon.hands,
+          category: weapon.category,
           range,
         },
         effectModifiers,
+        { damageOutgoingBonus },
       );
       const dieSizes = {
         primary: attributeMap[attr1] ?? currDex,

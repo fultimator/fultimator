@@ -25,6 +25,7 @@ import {
 } from "./speakers";
 import {
   accuracyModifiersFromEffects,
+  outgoingDamageBonusFromEffects,
   isActorInCrisis,
 } from "./effect-modifiers";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
@@ -536,6 +537,16 @@ const actionCommand: Command = {
             },
           )
         : [];
+      const weaponDamageOutgoing = context.playerDoc
+        ? outgoingDamageBonusFromEffects(
+            context.playerDoc as unknown as TypePlayer | TypeNpc,
+            {
+              range: effectiveWeapon.range as "melee" | "ranged" | undefined,
+              category: effectiveWeapon.category,
+              damageType: effectiveWeapon.damageType,
+            },
+          )
+        : 0;
       const situational =
         appliedAccuracyDelta !== 0
           ? [{ label: "Situational Bonus", value: appliedAccuracyDelta }]
@@ -545,6 +556,7 @@ const actionCommand: Command = {
         [...effectModifiers, ...situational],
         {
           damageSituationalBonus: appliedDamageDelta,
+          damageOutgoingBonus: weaponDamageOutgoing,
           hrZero: overrides.hrZero ?? effectiveWeapon.damageHrZero ?? false,
         },
       );
@@ -602,15 +614,32 @@ const actionCommand: Command = {
         primary: resolveAttributeDie(context.playerDoc, primary),
         secondary: resolveAttributeDie(context.playerDoc, secondary),
       };
-      const intent = prepareMagicCheck({
-        ...spell,
-        attr1: primary,
-        attr2: secondary,
-        accuracyBonus:
-          (spell.accuracyBonus ?? 0) + (spellOverrides.accuracyDelta ?? 0),
-        baseDamage: (spell.baseDamage ?? 0) + (spellOverrides.damageDelta ?? 0),
-        damageHrZero: spellOverrides.hrZero ?? spell.damageHrZero,
-      });
+      const magicModifiers = context.playerDoc
+        ? accuracyModifiersFromEffects(
+            context.playerDoc as unknown as TypePlayer,
+            { checkType: "magic" },
+          )
+        : [];
+      const spellDamageOutgoing = context.playerDoc
+        ? outgoingDamageBonusFromEffects(
+            context.playerDoc as unknown as TypePlayer,
+            { range: "spell", damageType: spell.damageType },
+          )
+        : 0;
+      const intent = prepareMagicCheck(
+        {
+          ...spell,
+          attr1: primary,
+          attr2: secondary,
+          accuracyBonus:
+            (spell.accuracyBonus ?? 0) + (spellOverrides.accuracyDelta ?? 0),
+          baseDamage:
+            (spell.baseDamage ?? 0) + (spellOverrides.damageDelta ?? 0),
+          damageHrZero: spellOverrides.hrZero ?? spell.damageHrZero,
+        },
+        magicModifiers,
+        { damageOutgoingBonus: spellDamageOutgoing },
+      );
       const rolls = rollMagicCheck(dieSizes);
       const result = processMagicCheck(
         intent,

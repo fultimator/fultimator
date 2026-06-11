@@ -31,14 +31,15 @@ import {
   useAnimatedDeltaNumber,
 } from "/src/components/shared/actors/common/resourceBarMotion";
 
-function StatChangeDialog({ open, onClose, stat, value, max, onApply, t }) {
+function StatChangeDialog({ open, onClose, stat, value, max, onApply, pip, t }) {
   const [amount, setAmount] = useState("");
   const [isHealing, setIsHealing] = useState(true);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const val = parseInt(amount, 10) || 0;
-    onApply(isHealing ? val : -val);
+    if (val <= 0) return;
+    onApply(pip ? (isHealing ? val : -val) : (isHealing ? val : -val));
     setAmount("");
     onClose();
   };
@@ -47,13 +48,7 @@ function StatChangeDialog({ open, onClose, stat, value, max, onApply, t }) {
     <Dialog open={open} onClose={onClose}>
       <form onSubmit={handleSubmit}>
         <DialogTitle
-          variant="h4"
-          sx={{
-            fontWeight: "bold",
-            textAlign: "center",
-            borderBottom: "1px solid #ddd",
-            pb: 1,
-          }}
+          sx={{ fontWeight: "bold", textAlign: "center", pb: 1 }}
         >
           {t("Update")} {stat}
         </DialogTitle>
@@ -62,24 +57,25 @@ function StatChangeDialog({ open, onClose, stat, value, max, onApply, t }) {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            mt: 2,
+            pt: "16px !important",
             minWidth: 250,
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
-            {stat}: {value} / {max}
+            {stat}: {value}{max != null ? ` / ${max}` : ""}
           </Typography>
           <ToggleButtonGroup
-            value={isHealing ? "heal" : "damage"}
+            value={isHealing ? "gain" : "lose"}
             exclusive
-            onChange={(_, v) => v !== null && setIsHealing(v === "heal")}
+            onChange={(_, v) => v !== null && setIsHealing(v === "gain")}
             sx={{ mb: 2 }}
+            fullWidth
           >
-            <ToggleButton value="heal" color="success" sx={{ px: 3 }}>
-              {t("Heal")}
+            <ToggleButton value="lose" color="error">
+              {t("Lose")}
             </ToggleButton>
-            <ToggleButton value="damage" color="error" sx={{ px: 3 }}>
-              {t("Damage")}
+            <ToggleButton value="gain" color="success">
+              {t("Gain")}
             </ToggleButton>
           </ToggleButtonGroup>
           <TextField
@@ -89,6 +85,7 @@ function StatChangeDialog({ open, onClose, stat, value, max, onApply, t }) {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             autoFocus
+            slotProps={{ htmlInput: { min: 1 } }}
           />
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
@@ -411,6 +408,7 @@ export default function PcResources({
     <Box sx={{ display: "grid", gap: rs.gap, p: rs.p, pb: 0 }}>
       <StatTooltip
         title={t("Hit Points")}
+        disabled={isInteractive}
         formula={`${t("MIG")} x 5 + ${t("Level")}`}
         total={pc.stats.hp.max}
         breakdown={[
@@ -459,6 +457,7 @@ export default function PcResources({
 
       <StatTooltip
         title={t("Mind Points")}
+        disabled={isInteractive}
         formula={`${t("WLP")} x 5 + ${t("Level")}`}
         total={pc.stats.mp.max}
         breakdown={[
@@ -506,6 +505,7 @@ export default function PcResources({
 
       <StatTooltip
         title={t("Inventory Points")}
+        disabled={isInteractive}
         formula={t("6 + Class bonuses")}
         total={pc.stats.ip.max}
         breakdown={[
@@ -545,6 +545,7 @@ export default function PcResources({
               label: t("IP"),
               value: pc.stats.ip.current,
               max: pc.stats.ip.max,
+              pip: true,
             })
           }
         />
@@ -557,6 +558,7 @@ export default function PcResources({
           stat={statDialog.label}
           value={statDialog.value}
           max={statDialog.max}
+          pip={statDialog.pip}
           onApply={applyStatChange}
           t={t}
         />

@@ -17,6 +17,7 @@ import PcQuirk from "./panels/optional/PcQuirk";
 import PcCampActivities from "./panels/optional/PcCampActivities";
 import PcZeroPower from "./panels/optional/PcZeroPower";
 import PcMnemoReceptacle from "./panels/optional/PcMnemoReceptacle";
+import PcVehicle from "./panels/optional/PcVehicle";
 import PcControlsPanel from "./panels/PcControlsPanel";
 
 const paperSx = (secondary) => ({
@@ -262,6 +263,7 @@ export default function PcActorCard({
             showSideDivider
             showSupportColumn={false}
           />
+          <PcVehicle {...sharedProps} />
           <PlayerEquipment {...ownerPsProps} />
           <PlayerNotes
             {...ownerPsProps}
@@ -304,7 +306,6 @@ export default function PcActorCard({
             ["integrated", "mnemospheres"].includes(
               optionalRules.technospheresVariant ?? "standard",
             ) && <PcMnemoReceptacle {...ownerSharedProps} />}
-          {/* <PcVehicle {...sharedProps} /> */}
           <PcCompanion {...sharedProps} />
         </Box>
       </Box>
