@@ -20,7 +20,6 @@ function toFormState(src, t) {
     customName: src.customName || "",
     duration: custom ? (src.duration || "") : (src.duration ? t(src.duration) : ""),
     effect: custom ? (src.effect || "") : (src.effect ? t(src.effect) : ""),
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

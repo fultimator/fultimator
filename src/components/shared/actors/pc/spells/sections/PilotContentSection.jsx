@@ -865,7 +865,6 @@ export default function PilotContentSection({
                       tabs={DEFAULT_SUBITEM_TABS}
                       config={pilotVehicleItemFields}
                       state={{
-                        passives: [],
                         behaviors: [],
                         ...vehicle,
                       }}

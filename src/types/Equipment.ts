@@ -1,5 +1,5 @@
 import type { Accuracy, Damage, Attributes, Elements } from "./Misc";
-import type { Passive, Behavior } from "./Effects";
+import type { Behavior } from "./Effects";
 import type { Meta } from "../forms/schema/meta";
 
 export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
@@ -49,7 +49,6 @@ export interface Weapon {
   cost?: number;
   special?: string[];
   meta?: Meta;
-  passives?: Passive[];
 }
 
 export interface CustomWeapon {
@@ -81,7 +80,6 @@ export interface CustomWeapon {
   secondModifiers?: WeaponModifiers;
   secondCustomizations?: CustomWeaponCustomization[];
   meta?: Meta;
-  passives?: Passive[];
 }
 
 export interface NpcAttack {
@@ -94,7 +92,6 @@ export interface NpcAttack {
   damage: Damage;
   effect?: string;
   extraDamage?: boolean;
-  passives?: Passive[];
   behaviors?: Behavior[];
 }
 
@@ -108,7 +105,6 @@ export interface NpcWeaponAttack {
   damage: Damage;
   effect?: string;
   extraDamage?: boolean;
-  passives?: Passive[];
   behaviors?: Behavior[];
 }
 
@@ -162,7 +158,6 @@ export interface EquipmentArmor {
   isEquipped?: boolean;
   slots?: SlotTier;
   slotted?: string[];
-  passives?: Passive[];
 }
 
 export interface EquipmentShield extends Omit<EquipmentArmor, "itemType"> {
@@ -193,7 +188,6 @@ export interface EquipmentAccessory {
   damageMeleeModifier?: number;
   damageRangedModifier?: number;
   isEquipped?: boolean;
-  passives?: Passive[];
 }
 
 export type NpcArmor = EquipmentArmor;

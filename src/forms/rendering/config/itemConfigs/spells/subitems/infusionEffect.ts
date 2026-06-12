@@ -1,16 +1,13 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 
 export type InfusionEffectItemState = {
   name: string;
   effect: string;
   infusionRank: number;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -56,6 +53,5 @@ export const infusionEffectItemFields: ItemFieldConfig<InfusionEffectItemState> 
       order: 2,
       fullWidth: true,
     },
-    makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.infusionEffect),
     behaviorsTabField,
   ];

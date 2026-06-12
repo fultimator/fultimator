@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
 import allShields from "../../../libs/shields";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const ShieldModifiersSchema = z.object({
   def: z.number().int().default(0),
@@ -33,7 +33,6 @@ export type Shield = z.infer<typeof ShieldSchema>;
 export const ShieldFormStateSchema = z.object({
   base: z.unknown().optional(),
   fuid: z.string().optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
   qualityCost: z.coerce.number().int().nonnegative().default(0),
   selectedQuality: z.string().optional(),

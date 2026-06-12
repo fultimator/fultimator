@@ -8,12 +8,10 @@ import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   PASSIVE_ITEM_TABS,
   BEHAVIOR_GROUPS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 interface ShieldBase {
   name: string;
@@ -319,8 +317,5 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<ShieldFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.shield,
-  ) as unknown as FieldConfig<ShieldFormState>,
   behaviorsTabField as unknown as FieldConfig<ShieldFormState>,
 ];

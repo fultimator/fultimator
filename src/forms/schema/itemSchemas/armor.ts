@@ -2,7 +2,7 @@ import { z } from "zod";
 import { MetaSchema } from "../meta";
 import allArmor from "../../../libs/armor";
 import { SLOT_TIERS } from "../../../libs/player/slotTiers";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 const SlotTierValues = ["alpha", "beta", "gamma", "delta"] as const;
 
@@ -38,7 +38,6 @@ export type Armor = z.infer<typeof ArmorSchema>;
 export const ArmorFormStateSchema = z.object({
   base: z.unknown().optional(),
   fuid: z.string().optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
   qualityCost: z.coerce.number().int().nonnegative().default(0),
   selectedQuality: z.string().optional(),

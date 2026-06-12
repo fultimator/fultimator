@@ -1,10 +1,8 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 import { magiseeds } from "../../../../../../libs/floralistMagiseedData";
 
 export type MagiseedItemState = {
@@ -14,7 +12,6 @@ export type MagiseedItemState = {
   rangeStart: number;
   rangeEnd: number;
   effects: Record<number, string>;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -133,6 +130,5 @@ export const magiseedItemFields: ItemFieldConfig<MagiseedItemState> = [
       (s.rangeStart as number) <= 3 && (s.rangeEnd as number) >= 3,
     componentProps: (s) => ({ disabled: s.key !== "magiseed_custom" }),
   },
-  makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.magiseed),
   behaviorsTabField,
 ];

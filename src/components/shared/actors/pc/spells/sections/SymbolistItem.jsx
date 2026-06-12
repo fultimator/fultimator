@@ -19,7 +19,6 @@ function toFormState(src, t) {
     key: resolvedKey,
     customName: src.customName || "",
     effect: custom ? (src.effect || "") : (src.effect ? t(src.effect) : ""),
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

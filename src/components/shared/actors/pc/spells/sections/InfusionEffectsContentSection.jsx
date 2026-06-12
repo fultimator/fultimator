@@ -12,7 +12,6 @@ export default function InfusionEffectsContentSection({
       name: "",
       effect: "",
       infusionRank: formState.rank || 1,
-      passives: [],
       behaviors: [],
     }),
     [formState.rank],

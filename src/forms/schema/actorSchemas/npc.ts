@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema, EffectChangeSchema, GrantDataSchema, EffectDurationSchema, EffectPredicateSchema } from "../shared/behaviorSchemas";
 
 const AffinityValueSchema = z.enum(["vu", "rs", "im", "ab", "no"]);
 
@@ -160,8 +160,12 @@ const NpcMultipliersSchema = z.object({
   outgoingRecovery: ResourceMultiplierSchema,
 });
 
-const ActorEffectSchema = PassiveSchema.omit({ transfer: true }).extend({
+const ActorEffectSchema = z.object({
+  id: z.string(),
+  name: z.string().default(""),
+  disabled: z.boolean().optional(),
   origin: z.string().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 export const NpcArmorSchema = z
@@ -201,7 +205,6 @@ export const NpcAttackSchema = z
     special: z.array(z.string()).optional(),
     extraDamage: z.boolean().optional(),
     itemType: z.string().optional(),
-    passives: z.array(PassiveSchema).optional(),
     behaviors: z.array(BehaviorSchema).optional(),
   })
   .loose();
@@ -230,7 +233,6 @@ export const NpcSpellSchema = z
     special: z.array(z.string()).optional(),
     itemType: z.string().optional(),
     spellType: z.string().optional(),
-    passives: z.array(PassiveSchema).optional(),
     behaviors: z.array(BehaviorSchema).optional(),
   })
   .loose();
@@ -239,7 +241,6 @@ export const NpcActionSchema = z.object({
   name: z.string(),
   effect: z.string().optional(),
   spCost: z.number().optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 
@@ -248,7 +249,6 @@ export const NpcSpecialSchema = NpcActionSchema;
 export const NpcRareGearSchema = z.object({
   name: z.string(),
   effect: z.string().optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 

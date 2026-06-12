@@ -1,5 +1,18 @@
 import { useState } from "react";
-import { Box, Breadcrumbs, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
@@ -14,6 +27,12 @@ import {
   PlayerShieldModal,
   PlayerWeaponModal,
 } from "/src/components/shared/actors/pc/editors";
+import { SchemaFieldRenderer } from "/src/forms/rendering/SchemaFieldRenderer";
+import { Grid } from "@mui/material";
+import {
+  actorEffectRowFields,
+  BLANK_ACTOR_EFFECT,
+} from "/src/forms/rendering/config/shared/behaviorFields";
 
 function asArray(value) {
   return Array.isArray(value) ? value : [];
@@ -171,6 +190,7 @@ const EQUIPMENT_MODAL_CONFIG = {
 
 function isEditableSource(sourceRef) {
   if (sourceRef?.kind === "spell") return true;
+  if (sourceRef?.kind === "actorEffect") return true;
   if (sourceRef?.kind === "equipment") {
     return Boolean(EQUIPMENT_MODAL_CONFIG[sourceRef.group]);
   }
@@ -201,11 +221,84 @@ function findEquipmentItem(player, sourceRef) {
   return asArray(equipment?.[sourceRef?.group])[sourceRef?.itemIndex] ?? null;
 }
 
-function EffectSection({ title, rows, getDuration, canEdit, onEditSource }) {
+
+function ActorEffectDialogInner({ effect, onClose, onSave, onDelete }) {
+  const { t } = useTranslate();
+  const [draft, setDraft] = useState(() => effect ?? BLANK_ACTOR_EFFECT());
+  const isNew = !onDelete;
+
+  return (
+    <>
+      <DialogTitle>
+        {isNew ? t("Add Actor Effect") : t("Edit Actor Effect")}
+      </DialogTitle>
+      <DialogContent>
+        <Grid container spacing={2} sx={{ pt: 1 }}>
+          <SchemaFieldRenderer
+            config={actorEffectRowFields}
+            state={draft}
+            onChange={setDraft}
+            surface="modal"
+            cols={2}
+          />
+        </Grid>
+      </DialogContent>
+      <DialogActions sx={{ justifyContent: "space-between" }}>
+        <Box>
+          {onDelete && (
+            <IconButton color="error" onClick={onDelete} size="small">
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button onClick={onClose}>{t("Cancel")}</Button>
+          <Button
+            variant="contained"
+            onClick={() => onSave(draft)}
+            disabled={!draft.name?.trim()}
+          >
+            {t("Save")}
+          </Button>
+        </Box>
+      </DialogActions>
+    </>
+  );
+}
+
+function ActorEffectDialog({ open, effect, onClose, onSave, onDelete }) {
+  return (
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+      {open && (
+        <ActorEffectDialogInner
+          key={effect?.id ?? "new"}
+          effect={effect}
+          onClose={onClose}
+          onSave={onSave}
+          onDelete={onDelete}
+        />
+      )}
+    </Dialog>
+  );
+}
+
+function EffectSection({ title, rows, getDuration, canEdit, onEditSource, onAdd }) {
   const { t } = useTranslate();
 
   return (
-    <SectionCard title={title} noShadow>
+    <SectionCard
+      title={title}
+      noShadow
+      actions={
+        canEdit && onAdd ? (
+          <Tooltip title={t("Add Actor Effect")}>
+            <IconButton size="small" onClick={onAdd} sx={{ color: "#fff" }}>
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ) : undefined
+      }
+    >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75, p: 1 }}>
         {rows.length === 0 ? (
           <Typography color="text.secondary" variant="body2" sx={{ px: 0.5 }}>
@@ -258,8 +351,7 @@ function EffectSection({ title, rows, getDuration, canEdit, onEditSource }) {
 
 function effectFocusProps(sourceRef) {
   if (!sourceRef?.effectKind) return {};
-  const initialTab = sourceRef.effectKind === "passive" ? "passives" : "behaviors";
-  return { initialTab, initialExpandedIndex: sourceRef.effectIndex ?? 0 };
+  return { initialTab: "behaviors", initialExpandedIndex: sourceRef.effectIndex ?? 0 };
 }
 
 function SourceEditModalLayer({ player, setPlayer, sourceRef, onClose }) {
@@ -452,25 +544,61 @@ function SourceEditModalLayer({ player, setPlayer, sourceRef, onClose }) {
 export default function EffectsTab({ player, setPlayer, isEditMode = false }) {
   const { t } = useTranslate();
   const [editingSourceRef, setEditingSourceRef] = useState(null);
+  const [actorEffectDialog, setActorEffectDialog] = useState(null); // { effect, bucket } | null
   const effects = collectPlayerEffects(player);
   const canEdit = isEditMode && typeof setPlayer === "function";
+
+  function handleEditSource(sourceRef) {
+    if (sourceRef?.kind === "actorEffect") {
+      const effect = (player?.effects ?? [])[sourceRef.index];
+      const bucket = sourceRef.bucket ?? "behaviors";
+      setActorEffectDialog({ effect: effect ? { ...effect } : BLANK_ACTOR_EFFECT(), bucket });
+    } else {
+      setEditingSourceRef(sourceRef);
+    }
+  }
+
+  function openAddActorEffect(bucket) {
+    setActorEffectDialog({ effect: BLANK_ACTOR_EFFECT(), bucket });
+  }
+
+  function saveActorEffect(draft) {
+    setPlayer((prev) => {
+      const existing = prev?.effects ?? [];
+      const idx = existing.findIndex((e) => e.id === draft.id);
+      const next = idx >= 0
+        ? existing.map((e, i) => (i === idx ? draft : e))
+        : [...existing, draft];
+      return { ...prev, effects: next };
+    });
+    setActorEffectDialog(null);
+  }
+
+  function deleteActorEffect() {
+    const id = actorEffectDialog?.effect?.id;
+    if (!id) return;
+    setPlayer((prev) => ({
+      ...prev,
+      effects: (prev?.effects ?? []).filter((e) => e.id !== id),
+    }));
+    setActorEffectDialog(null);
+  }
+
+  // Determine if the dialog is editing an existing (saved) effect
+  const isExistingActorEffect =
+    actorEffectDialog != null &&
+    (player?.effects ?? []).some((e) => e.id === actorEffectDialog.effect?.id);
 
   return (
     <>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <EffectSection
-          title={t("Passives")}
-          rows={effects.passives}
-          getDuration={(passive) => durationLabel(passive?.duration, t)}
-          canEdit={canEdit}
-          onEditSource={setEditingSourceRef}
-        />
-        <EffectSection
-          title={t("Behaviors")}
+          title={t("Effects")}
           rows={effects.behaviors}
-          getDuration={(behavior) => behaviorDurationLabel(behavior, t)}
+          getDuration={(effect) => behaviorDurationLabel(effect, t)}
           canEdit={canEdit}
-          onEditSource={setEditingSourceRef}
+          onEditSource={handleEditSource}
+          onAdd={canEdit ? () => openAddActorEffect("behaviors") : undefined}
         />
       </Box>
       <SourceEditModalLayer
@@ -478,6 +606,13 @@ export default function EffectsTab({ player, setPlayer, isEditMode = false }) {
         setPlayer={setPlayer}
         sourceRef={editingSourceRef}
         onClose={() => setEditingSourceRef(null)}
+      />
+      <ActorEffectDialog
+        open={actorEffectDialog != null}
+        effect={actorEffectDialog?.effect}
+        onClose={() => setActorEffectDialog(null)}
+        onSave={saveActorEffect}
+        onDelete={isExistingActorEffect ? deleteActorEffect : undefined}
       />
     </>
   );

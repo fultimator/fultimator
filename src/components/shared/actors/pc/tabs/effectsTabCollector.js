@@ -58,9 +58,6 @@ function spellSubitemModalName(spell, key) {
 }
 
 function addEffectsFromItem(item, source, out, sourceRef) {
-  asArray(item?.passives).forEach((passive, index) => {
-    out.passives.push({ effect: passive, source, sourceRef: { ...sourceRef, effectKind: "passive", effectIndex: index } });
-  });
   asArray(item?.behaviors).forEach((behavior, index) => {
     out.behaviors.push({ effect: behavior, source, sourceRef: { ...sourceRef, effectKind: "behavior", effectIndex: index } });
   });
@@ -116,7 +113,15 @@ function collectSpellEffects(spell, source, out, sourceRef) {
 }
 
 export function collectPlayerEffects(player) {
-  const out = { passives: [], behaviors: [] };
+  const out = { behaviors: [] };
+
+  for (const [index, effect] of asArray(player?.effects).entries()) {
+    out.behaviors.push({
+      effect,
+      source: "Actor",
+      sourceRef: { kind: "actorEffect", index },
+    });
+  }
 
   for (const klass of asArray(player?.classes)) {
     const className = itemName(klass, "Class");

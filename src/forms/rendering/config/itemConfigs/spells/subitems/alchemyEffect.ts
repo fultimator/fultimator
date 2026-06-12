@@ -1,15 +1,12 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 
 export type AlchemyEffectItemState = {
   dieValue: number;
   effect: string;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -47,6 +44,5 @@ export const alchemyEffectItemFields: ItemFieldConfig<AlchemyEffectItemState> =
       order: 1,
       fullWidth: true,
     },
-    makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.alchemyEffect),
     behaviorsTabField,
   ];

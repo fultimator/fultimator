@@ -25,7 +25,6 @@ function toFormState(src, t) {
     customName: src.customName || "",
     genoclepsis: custom ? (src.genoclepsis || "") : (src.genoclepsis ? t(src.genoclepsis) : ""),
     description: custom ? (src.description || "") : (src.description ? t(src.description) : ""),
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

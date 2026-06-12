@@ -17,7 +17,6 @@ function toFormState(src) {
     rangeFrom: src.rangeFrom || 1,
     rangeTo: src.rangeTo || 20,
     effect: src.effect || "",
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

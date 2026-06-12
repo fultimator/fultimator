@@ -3,12 +3,10 @@ import type { NpcSpecial } from "../../../schema/itemSchemas/npcSpecial";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   behaviorGroupLabels,
   DEFAULT_ITEM_TABS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export type NpcSpecialFormState = NpcSpecial & Record<string, unknown>;
 const NPC_SPECIAL_LABEL_PREFIX = "npc.special";
@@ -71,8 +69,5 @@ export const npcSpecialFieldConfig: ItemFieldConfig<NpcSpecialFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcSpecialFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.npcSpecial,
-  ) as unknown as FieldConfig<NpcSpecialFormState>,
   behaviorsTabField as unknown as FieldConfig<NpcSpecialFormState>,
 ];

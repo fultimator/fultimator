@@ -44,7 +44,6 @@ export default function AlchemyTargetsContentSection({
       rangeFrom: 1,
       rangeTo: 20,
       effect: "",
-      passives: [],
       behaviors: [],
     }),
     [],

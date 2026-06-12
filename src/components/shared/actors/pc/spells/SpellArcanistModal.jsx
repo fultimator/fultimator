@@ -17,7 +17,6 @@ import { playerSpellTabs } from "/src/forms/rendering/config/itemConfigs/spells"
 import { metaFieldConfig } from "/src/forms/rendering/config/metaFieldConfig";
 import {
   behaviorsTabField,
-  makePassivesTabField,
 } from "/src/forms/rendering/config/shared/behaviorFields";
 
 const arcanaCoreFields = [
@@ -58,7 +57,6 @@ const arcanaFieldConfig = [
   ...arcanaCoreFields,
   ...arcanistFields,
   ...metaFieldConfig,
-  makePassivesTabField([]),
   behaviorsTabField,
 ];
 

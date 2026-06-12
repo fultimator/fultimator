@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 import { PlayerSpellSchema } from "./spells";
 
 export const SkillSchema = z.looseObject({
@@ -10,7 +10,6 @@ export const SkillSchema = z.looseObject({
   currentLvl: z.number().int().default(0),
   description: z.string().default(""),
   specialSkill: z.string().default(""),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 
@@ -21,7 +20,6 @@ export const HeroicSkillSchema = z.object({
   description: z.string().default(""),
   specialSkill: z.string().optional(),
   meta: MetaSchema.optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 

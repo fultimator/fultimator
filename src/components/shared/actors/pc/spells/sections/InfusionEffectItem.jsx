@@ -17,7 +17,6 @@ function toFormState(src) {
     name: src.name || "",
     effect: src.effect || "",
     infusionRank: src.infusionRank || 1,
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

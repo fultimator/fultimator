@@ -2,12 +2,10 @@ import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { WeaponPersisted } from "../../../schema/itemSchemas/weapon";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   PASSIVE_ITEM_TABS,
   BEHAVIOR_GROUPS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 import {
   calcWeaponCost,
   calcWeaponDamage,
@@ -646,8 +644,5 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<WeaponFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.weapon,
-  ) as unknown as FieldConfig<WeaponFormState>,
   behaviorsTabField as unknown as FieldConfig<WeaponFormState>,
 ];

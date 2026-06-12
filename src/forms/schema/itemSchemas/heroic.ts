@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const HeroicSchema = z.object({
   itemType: z.literal("heroic").default("heroic"),
@@ -10,7 +10,6 @@ export const HeroicSchema = z.object({
   description: z.string().default(""),
   applicableTo: z.array(z.string()).default([]),
   meta: MetaSchema.optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 

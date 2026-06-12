@@ -3,12 +3,10 @@ import type { NpcAction } from "../../../schema/itemSchemas/npcAction";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   behaviorGroupLabels,
   DEFAULT_ITEM_TABS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export type NpcActionFormState = NpcAction & Record<string, unknown>;
 const NPC_ACTION_LABEL_PREFIX = "npc.action";
@@ -71,8 +69,5 @@ export const npcActionFieldConfig: ItemFieldConfig<NpcActionFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcActionFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.npcAction,
-  ) as unknown as FieldConfig<NpcActionFormState>,
   behaviorsTabField as unknown as FieldConfig<NpcActionFormState>,
 ];

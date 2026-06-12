@@ -1,10 +1,8 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 import { availableMagichantKeys } from "../../../../../../libs/player/spellOptionData";
 
 export type MagichantKeyItemState = {
@@ -14,7 +12,6 @@ export type MagichantKeyItemState = {
   status: string;
   attribute: string;
   recovery: string;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -95,6 +92,5 @@ export const magichantKeyItemFields: ItemFieldConfig<MagichantKeyItemState> = [
     gridSize: { xs: 12, sm: 6, md: 3 },
     componentProps: (s) => ({ disabled: !isCustom(s as MagichantKeyItemState) }),
   },
-  makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.magichantKey),
   behaviorsTabField,
 ];

@@ -2,12 +2,10 @@ import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { CustomWeaponPersisted } from "../../../schema/itemSchemas/customWeapon";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   PASSIVE_ITEM_TABS,
   BEHAVIOR_GROUPS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 import { calculateCustomWeaponStats } from "../../../../libs/playerCalculations";
 import { Attributes, Elements } from "../../../../types/Misc";
 import { categories } from "../../../../routes/equip/customWeapons/libs";
@@ -844,8 +842,5 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<CustomWeaponFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.customWeapon,
-  ) as unknown as FieldConfig<CustomWeaponFormState>,
   behaviorsTabField as unknown as FieldConfig<CustomWeaponFormState>,
 ];

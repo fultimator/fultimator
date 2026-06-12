@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const HoplosphereSchema = z.object({
   itemType: z.literal("hoplosphere").default("hoplosphere"),
@@ -13,7 +13,6 @@ export const HoplosphereSchema = z.object({
   cost: z.number().int().nonnegative(),
   coagEffects: z.record(z.string(), z.string()).default({}),
   meta: MetaSchema.optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 

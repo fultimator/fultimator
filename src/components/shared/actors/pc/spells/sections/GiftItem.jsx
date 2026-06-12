@@ -21,7 +21,6 @@ function toFormState(src, t) {
     customName: src.customName || "",
     event: custom ? (src.event || "") : (src.event ? t(src.event) : ""),
     effect: custom ? (src.effect || "") : (src.effect ? t(src.effect) : ""),
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

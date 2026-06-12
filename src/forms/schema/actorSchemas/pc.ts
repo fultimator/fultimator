@@ -21,7 +21,7 @@ import {
 } from "../itemSchemas/armor";
 import { HoplosphereSchema } from "../itemSchemas/hoplosphere";
 import { MnemosphereSchema } from "../itemSchemas/mnemosphere";
-import { PassiveSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema, EffectChangeSchema, GrantDataSchema, EffectDurationSchema, EffectPredicateSchema } from "../shared/behaviorSchemas";
 import {
   PlayerSkillSchema,
   HeroicSkillSchema,
@@ -282,8 +282,12 @@ const ActorMultipliersSchema = z.object({
   outgoingRecovery: ResourceMultiplierSchema,
 });
 
-const ActorEffectSchema = PassiveSchema.omit({ transfer: true }).extend({
+const ActorEffectSchema = z.object({
+  id: z.string(),
+  name: z.string().default(""),
+  disabled: z.boolean().optional(),
   origin: z.string().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 const PlayerEquipmentSchema = z.object({

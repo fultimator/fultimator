@@ -1,10 +1,8 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 
 export type InvocationItemState = {
   key: string;
@@ -12,7 +10,6 @@ export type InvocationItemState = {
   type: string;
   customName: string;
   effect: string;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -66,6 +63,5 @@ export const invocationItemFields: ItemFieldConfig<InvocationItemState> = [
     order: 3,
     fullWidth: true,
   },
-  makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.invocation),
   behaviorsTabField,
 ];

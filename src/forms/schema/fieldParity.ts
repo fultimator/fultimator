@@ -24,7 +24,6 @@ const WEAPON_FIELDS = [
   "meta",
   "base",
   "fuid",
-  "passives",
   "behaviors",
   "att1",
   "att2",
@@ -76,7 +75,6 @@ const CUSTOM_WEAPON_FIELDS = [
   "selectedQuality",
   "isEquipped",
   "dataType",
-  "passives",
   "behaviors",
 ] as const;
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const AccessoryModifiersSchema = z.object({
   def: z.number().int().default(0),
@@ -25,7 +25,6 @@ export type Accessory = z.infer<typeof AccessorySchema>;
 
 export const AccessoryFormStateSchema = z.object({
   fuid: z.string().optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
   qualityCost: z.coerce.number().int().nonnegative().default(0),
   selectedQuality: z.string().optional(),

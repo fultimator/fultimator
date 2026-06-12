@@ -5,12 +5,10 @@ import { typeOptions } from "../typeOptions";
 import { DURATION_OPTIONS, TARGET_OPTIONS } from "./spells/options";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   behaviorGroupLabels,
   DEFAULT_ITEM_TABS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export type NpcSpellFormState = NpcSpell & Record<string, unknown>;
 const NPC_SPELL_LABEL_PREFIX = "npc.spell";
@@ -269,8 +267,5 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcSpellFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.npcSpell,
-  ) as unknown as FieldConfig<NpcSpellFormState>,
   behaviorsTabField as unknown as FieldConfig<NpcSpellFormState>,
 ];

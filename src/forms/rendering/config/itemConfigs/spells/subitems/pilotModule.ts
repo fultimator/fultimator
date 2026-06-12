@@ -1,17 +1,14 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 import {
   vehicleModuleFieldConfig,
   type VehicleModuleFormState,
 } from "../../vehicleModule";
 
 export type PilotModuleItemState = VehicleModuleFormState & {
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -24,10 +21,5 @@ export const isCustomModule = (s: PilotModuleItemState) =>
 
 export const pilotModuleItemFields: ItemFieldConfig<PilotModuleItemState> = [
   ...(vehicleModuleFieldConfig as ItemFieldConfig<PilotModuleItemState>),
-  makePassivesTabField((outerState) =>
-    isCustomModule(outerState as PilotModuleItemState)
-      ? SPELL_SUBITEM_SCOPED_KEYS.pilotModule
-      : [],
-  ),
   behaviorsTabField,
 ];

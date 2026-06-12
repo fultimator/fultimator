@@ -582,7 +582,7 @@ const VehicleModule = memo(
               <TabbedSchemaFormRenderer
                 tabs={DEFAULT_SUBITEM_TABS}
                 config={pilotModuleItemFields}
-                state={{ passives: [], behaviors: [], ...module }}
+                state={{ behaviors: [], ...module }}
                 onChange={(next) => {
                   onModuleChange(vehicleIndex, moduleIndex, "_replace", next);
                 }}

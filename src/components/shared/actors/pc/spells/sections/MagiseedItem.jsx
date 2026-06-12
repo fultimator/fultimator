@@ -28,7 +28,6 @@ function toFormState(src, t) {
     rangeStart: src.rangeStart ?? 0,
     rangeEnd: src.rangeEnd ?? 3,
     effects,
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

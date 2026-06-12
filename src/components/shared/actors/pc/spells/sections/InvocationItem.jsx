@@ -18,7 +18,6 @@ function toFormState(src) {
     type: src.type || "Blast",
     customName: src.customName || "",
     effect: src.effect || "",
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

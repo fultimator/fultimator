@@ -3,7 +3,6 @@ import type { OptionalItem } from "../../../schema/itemSchemas/optional";
 import type { CampActivityTargetKey } from "../../../schema/itemSchemas/optional";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../shared/behaviorFields";
@@ -212,6 +211,5 @@ export const optionalFieldConfig: ItemFieldConfig<OptionalFormState> = [
     group: G.zero,
     order: 7,
   },
-  makePassivesTabField([]) as unknown as FieldConfig<OptionalFormState>,
   behaviorsTabField as unknown as FieldConfig<OptionalFormState>,
 ];

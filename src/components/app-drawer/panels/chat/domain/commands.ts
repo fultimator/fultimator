@@ -778,11 +778,10 @@ export function executeCommand(
   const args = spaceIdx === -1 ? "" : input.slice(spaceIdx + 1);
   const result = cmd.execute(args, context);
   if ("error" in result) return { ok: false, error: result.error };
-  const activeBehaviorOutputs = resolveActiveBehaviorOutputs(
-    name,
-    args,
-    context,
-  );
+  const activeBehaviorOutputs = [
+    ...resolveActiveBehaviorOutputs(name, args, context),
+    ...collectActorEffectBehaviorOutputs(context.playerDoc, context.speaker),
+  ];
   return { ok: true, messages: result, activeBehaviorOutputs };
 }
 
@@ -834,4 +833,29 @@ function resolveActiveBehaviorOutputs(
   }
 
   return [];
+}
+
+export function collectActorEffectBehaviorOutputs(
+  playerDoc: Record<string, unknown> | null,
+  speaker: string,
+): ActiveBehaviorOutput[] {
+  if (!playerDoc) return [];
+  const effects = Array.isArray(playerDoc.effects) ? playerDoc.effects : [];
+  const out: ActiveBehaviorOutput[] = [];
+  for (const effect of effects) {
+    if (!effect || typeof effect !== "object") continue;
+    const e = effect as Record<string, unknown>;
+    if (e.disabled === true) continue;
+    const name = typeof e.name === "string" ? e.name : "Effect";
+    const allBehs: Behavior[] = Array.isArray(e.behaviors)
+      ? (e.behaviors as Behavior[])
+      : [];
+    for (const beh of allBehs) {
+      if (beh.trigger && beh.trigger.kind !== "active") continue;
+      const text = beh.chatOutput?.text?.trim();
+      if (!text) continue;
+      out.push({ speaker, itemName: name, itemType: "actor-effect", text });
+    }
+  }
+  return out;
 }

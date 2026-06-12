@@ -7,12 +7,10 @@ import groupBy from "../../../../libs/groupby";
 import type { SelectGroup } from "../../fieldRenderers";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   PASSIVE_ITEM_TABS,
   BEHAVIOR_GROUPS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export type AccessoryFormState = AccessoryPersisted & {
   qualityApplicableTo: string[];
@@ -248,8 +246,5 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<AccessoryFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.accessory,
-  ) as unknown as FieldConfig<AccessoryFormState>,
   behaviorsTabField as unknown as FieldConfig<AccessoryFormState>,
 ];

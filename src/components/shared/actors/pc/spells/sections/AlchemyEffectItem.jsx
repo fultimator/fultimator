@@ -16,7 +16,6 @@ function toFormState(src) {
   return {
     dieValue: src.dieValue ?? 0,
     effect: src.effect || "",
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

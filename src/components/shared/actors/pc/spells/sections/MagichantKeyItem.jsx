@@ -21,7 +21,6 @@ function toFormState(src) {
     status: src.status || "",
     attribute: src.attribute || "",
     recovery: src.recovery || "",
-    passives: src.passives ?? [],
     behaviors: src.behaviors ?? [],
   };
 }

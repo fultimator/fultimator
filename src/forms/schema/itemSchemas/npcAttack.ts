@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 const AccuracySchema = z.object({
   attr1: z.string(),
@@ -26,7 +26,6 @@ export const NpcAttackSchema = z.object({
   category: z.string().default("Melee Attack"),
   effect: z.string().default(""),
   meta: MetaSchema.optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 

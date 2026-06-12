@@ -4,7 +4,6 @@ import type {
   EffectDuration,
   EffectPredicate,
   ExprValue,
-  Passive,
   AfterEffect,
   AppliesEffect,
   ActionTrigger,
@@ -19,7 +18,6 @@ export type {
   EffectDuration,
   EffectPredicate,
   ExprValue,
-  Passive,
   AfterEffect,
   AppliesEffect,
   ActionTrigger,
@@ -35,10 +33,7 @@ export interface ActorEffect {
   name: string;
   disabled?: boolean;
   origin?: string;
-  changes?: EffectChange[];
-  grants?: GrantData[];
-  duration?: EffectDuration;
-  predicate?: EffectPredicate;
+  behaviors?: Behavior[];
 }
 
 export interface AppliedEffect {

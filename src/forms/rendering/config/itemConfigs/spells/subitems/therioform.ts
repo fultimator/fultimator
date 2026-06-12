@@ -1,10 +1,8 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 import { availableTherioforms } from "../../../../../../libs/player/spellOptionData";
 
 export type TherioformItemState = {
@@ -12,7 +10,6 @@ export type TherioformItemState = {
   customName: string;
   genoclepsis: string;
   description: string;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -72,6 +69,5 @@ export const therioformItemFields: ItemFieldConfig<TherioformItemState> = [
     fullWidth: true,
     componentProps: (s) => ({ disabled: !isCustom(s as TherioformItemState) }),
   },
-  makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.therioform),
   behaviorsTabField,
 ];

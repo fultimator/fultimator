@@ -5,12 +5,10 @@ import type { SelectOption } from "../../fieldRenderers";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   behaviorGroupLabels,
   DEFAULT_ITEM_TABS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export type HeroicFormState = Heroic & Record<string, unknown>;
 const HEROIC_LABEL_PREFIX = "heroic";
@@ -86,8 +84,5 @@ export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<HeroicFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.heroic,
-  ) as unknown as FieldConfig<HeroicFormState>,
   behaviorsTabField as unknown as FieldConfig<HeroicFormState>,
 ];

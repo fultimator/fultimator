@@ -1,10 +1,8 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 import { availableDances } from "../../../../../../libs/player/spellOptionData";
 
 export type DanceItemState = {
@@ -12,7 +10,6 @@ export type DanceItemState = {
   customName: string;
   duration: string;
   effect: string;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -70,6 +67,5 @@ export const danceItemFields: ItemFieldConfig<DanceItemState> = [
     fullWidth: true,
     componentProps: (s) => ({ disabled: !isCustom(s as DanceItemState) }),
   },
-  makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.dance),
   behaviorsTabField,
 ];

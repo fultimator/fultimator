@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Attributes, Elements } from "../../../types/Misc";
 import { MetaSchema } from "../meta";
 import allWeapons from "../../../libs/weapons";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 import {
   getWeaponAttr1,
   getWeaponAttr2,
@@ -68,7 +68,6 @@ export type Weapon = z.infer<typeof WeaponSchema>;
 export const WeaponFormStateSchema = z.object({
   base: z.unknown().optional(),
   fuid: z.string().optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
   att1: z.string().optional(),
   att2: z.string().optional(),

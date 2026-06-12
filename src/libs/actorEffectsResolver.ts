@@ -5,8 +5,7 @@ import {
   type ActorMultipliers,
 } from "../types/Bonuses";
 import type {
-  ActorEffect,
-  Passive,
+  Behavior,
   EffectChange,
   EffectMode,
   GrantData,
@@ -54,8 +53,8 @@ export function resolveActorEffects(
   const baseAffinities = (actor.affinities ?? {}) as Partial<Record<Elements, Affinities>>;
   const affinityGrants: Partial<Record<Elements, Affinities>> = {};
 
-  const effects = collectEffectiveEffects(actor, ctx);
-  const changes = effects.flatMap((e) => e.changes ?? []);
+  const passiveBehaviors = collectPassiveBehaviors(actor, ctx);
+  const changes = passiveBehaviors.flatMap((b) => b.changes ?? []);
   const sorted = changes.slice().sort(byPriority);
 
   const overlay = { bonuses, multipliers };
@@ -67,28 +66,34 @@ export function resolveActorEffects(
     }
   }
 
-  for (const effect of effects) {
-    if (effect.grants) grants.push(...effect.grants);
+  for (const beh of passiveBehaviors) {
+    if (beh.grants) grants.push(...beh.grants);
   }
 
   return { bonuses, multipliers, grants, affinityGrants };
 }
 
-function collectEffectiveEffects(
+function collectPassiveBehaviors(
   actor: Actor,
   ctx: ResolveContext,
-): ActorEffect[] {
-  const out: ActorEffect[] = [];
+): Behavior[] {
+  const out: Behavior[] = [];
 
   for (const e of actor.effects ?? []) {
-    if (isActive(e, ctx)) out.push(e);
+    if (e.disabled === true) continue;
+    for (const beh of e.behaviors ?? []) {
+      if (beh.trigger?.kind !== "passive") continue;
+      if (!isActive(beh, ctx)) continue;
+      out.push(beh);
+    }
   }
 
   for (const item of walkItems(actor)) {
-    for (const e of itemPassives(item)) {
-      if (e.transfer !== true) continue;
-      if (!isActive(e, ctx)) continue;
-      out.push(passiveAsActorEffect(e));
+    for (const beh of itemBehaviors(item)) {
+      if (beh.transfer !== true) continue;
+      if (beh.trigger?.kind !== "passive") continue;
+      if (!isActive(beh, ctx)) continue;
+      out.push(beh);
     }
   }
 
@@ -96,12 +101,11 @@ function collectEffectiveEffects(
 }
 
 type ItemWithEffects = {
-  passives?: Passive[];
-  behavior?: { effects?: Passive[] };
+  behaviors?: Behavior[];
 };
 
-function itemPassives(item: ItemWithEffects): Passive[] {
-  return [...(item.passives ?? []), ...(item.behavior?.effects ?? [])];
+function itemBehaviors(item: ItemWithEffects): Behavior[] {
+  return item.behaviors ?? [];
 }
 
 type SubItemContainer = Record<string, unknown>;
@@ -318,18 +322,6 @@ function resolveSlotItem(
 
 function isWeaponItem(item: PlayerEquipmentItem): item is SlottedEquipmentItem {
   return item.itemType === "weapon" || item.itemType === "customWeapon";
-}
-
-function passiveAsActorEffect(e: Passive): ActorEffect {
-  return {
-    id: e.id,
-    name: e.name,
-    disabled: e.disabled,
-    changes: e.changes,
-    grants: e.grants,
-    duration: e.duration,
-    predicate: e.predicate,
-  };
 }
 
 function isActive(

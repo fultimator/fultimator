@@ -435,6 +435,36 @@ export function scanForTrigger(
         });
       }
     }
+
+    // Scan actor.effects[].behavior and actor.effects[].behaviors[]
+    const actorEffects = Array.isArray(doc.effects) ? doc.effects : [];
+    for (const effect of actorEffects) {
+      if (!effect || typeof effect !== "object") continue;
+      const e = effect as Record<string, unknown>;
+      if (e.disabled === true) continue;
+      const effectId = typeof e.id === "string" ? e.id : undefined;
+      if (effectId && runtime.cooldowns[effectId]) continue;
+      const effectName = typeof e.name === "string" ? e.name : "Effect";
+
+      const allBehs: Behavior[] = Array.isArray(e.behaviors)
+        ? (e.behaviors as Behavior[])
+        : [];
+
+      for (const beh of allBehs) {
+        if (!beh?.trigger) continue;
+        if (!matchesTrigger(beh.trigger, kind, opts)) continue;
+        matches.push({
+          combatId: runtime.combatId,
+          actorName,
+          source,
+          itemName: effectName,
+          fuid: effectId,
+          behaviorId: beh.id,
+          trigger: beh.trigger,
+          behavior: beh,
+        });
+      }
+    }
   }
 
   return matches;

@@ -5,18 +5,15 @@ import type {
 } from "../fieldConfig";
 
 export const BEHAVIOR_TAB_KEY = "behavior";
-export const PASSIVES_TAB_KEY = "passives";
 export const BEHAVIORS_TAB_KEY = "behaviors";
 
 export const DEFAULT_ITEM_TABS: TabDefinition[] = [
   { key: "attributes", label: "tab.attributes" },
-  { key: "passives", label: "tab.passives" },
   { key: "behaviors", label: "tab.behaviors" },
 ];
 
 export const PASSIVE_ITEM_TABS: TabDefinition[] = [
   { key: "attributes", label: "tab.attributes" },
-  { key: "passives", label: "tab.passives" },
   { key: "behaviors", label: "tab.behaviors" },
 ];
 // EffectChange key autocomplete options
@@ -91,7 +88,7 @@ const AFFINITY_VALUE_OPTIONS = [
   { value: "im", label: "effect.affinity.immunity" },
   { value: "no", label: "effect.affinity.none" },
 ];
-// EffectChange row fields (used inside Passive.changes object-list)
+// EffectChange row fields (used inside changes object-list)
 
 function isAffinityKey(state: Record<string, unknown>): boolean {
   return typeof state.key === "string" && state.key.startsWith("affinities.");
@@ -166,7 +163,7 @@ export const PASSIVE_GROUPS = {
   duration: "passive-duration",
   changes: "passive-changes",
 } as const;
-// Passive row fields (used inside the top-level passives object-list)
+
 
 const EFFECT_DURATION_EVENT_OPTIONS = [
   { value: "none", label: "effect.duration.none" },
@@ -188,162 +185,14 @@ const CRISIS_INTERACTION_OPTIONS = [
   { value: "inactive", label: "effect.crisis.inactive" },
 ];
 
-function makePassiveRowFields(
-  itemScopedKeys: string[],
-): ItemFieldConfig<Record<string, unknown>> {
-  const actorChangeFields = makeEffectChangeRowFields(
-    EFFECT_CHANGE_KEY_OPTIONS,
-  );
-  const itemChangeFields = makeEffectChangeRowFields(itemScopedKeys);
-  return [
-    {
-      key: "id",
-      kind: "form-state",
-      label: "passive.id",
-      defaultValue: "",
-      order: -1,
-    },
-    {
-      key: "name",
-      kind: "editable",
-      label: "passive.name",
-      component: "text",
-      defaultValue: "",
-      order: 0,
-      group: PASSIVE_GROUPS.core,
-      gridSize: 12,
-      validationHints: { required: true },
-    },
-    {
-      key: "description",
-      kind: "editable",
-      label: "passive.description",
-      component: "textarea",
-      defaultValue: "",
-      order: 1,
-      group: PASSIVE_GROUPS.core,
-      gridSize: 12,
-    },
-    {
-      key: "transfer",
-      kind: "editable",
-      label: "passive.transfer",
-      component: "checkbox",
-      defaultValue: false,
-      order: 1,
-      group: PASSIVE_GROUPS.core,
-      gridSize: 4,
-    },
-    {
-      key: "disabled",
-      kind: "editable",
-      label: "passive.disabled",
-      component: "checkbox",
-      defaultValue: false,
-      order: 2,
-      group: PASSIVE_GROUPS.core,
-      gridSize: 4,
-    },
-    {
-      key: "duration.event",
-      kind: "editable",
-      label: "passive.duration",
-      component: "select",
-      defaultValue: "none",
-      order: 3,
-      group: PASSIVE_GROUPS.duration,
-      gridSize: 6,
-      componentProps: { options: EFFECT_DURATION_EVENT_OPTIONS },
-    },
-    {
-      key: "duration.tracking",
-      kind: "editable",
-      label: "passive.tracking",
-      component: "select",
-      defaultValue: "self",
-      order: 4,
-      group: PASSIVE_GROUPS.duration,
-      gridSize: 6,
-      componentProps: { options: EFFECT_TRACKING_OPTIONS },
-      dependencies: (s) => {
-        const event = (s as { duration?: { event?: string } }).duration?.event;
-        return (
-          event === "start-of-turn" ||
-          event === "end-of-turn" ||
-          event === "end-of-round"
-        );
-      },
-    },
-    {
-      key: "predicate.crisisInteraction",
-      kind: "editable",
-      label: "passive.crisisInteraction",
-      component: "select",
-      defaultValue: "none",
-      order: 5,
-      group: PASSIVE_GROUPS.duration,
-      gridSize: 6,
-      componentProps: { options: CRISIS_INTERACTION_OPTIONS },
-    },
-    // transfer=true: suggest actor-level stat keys
-    {
-      key: "changes",
-      kind: "editable",
-      label: "passive.changes",
-      component: "object-list",
-      defaultValue: [],
-      order: 6,
-      group: PASSIVE_GROUPS.changes,
-      gridSize: 12,
-      dependencies: (s) => s.transfer === true,
-      componentProps: {
-        fields: actorChangeFields,
-        itemDefaults: { ...BLANK_EFFECT_CHANGE },
-        addLabel: "passive.addChange",
-        rowLabel: (_row: Record<string, unknown>, i: number) =>
-          `Change ${i + 1}`,
-      },
-    },
-    // transfer=false: suggest item-scoped keys
-    {
-      key: "changes",
-      kind: "editable",
-      label: "passive.changes",
-      component: "object-list",
-      defaultValue: [],
-      order: 6,
-      group: PASSIVE_GROUPS.changes,
-      gridSize: 12,
-      dependencies: (s) => s.transfer !== true,
-      componentProps: {
-        fields: itemChangeFields,
-        itemDefaults: { ...BLANK_EFFECT_CHANGE },
-        addLabel: "passive.addChange",
-        rowLabel: (_row: Record<string, unknown>, i: number) =>
-          `Change ${i + 1}`,
-      },
-    },
-  ];
-}
 
-// Backwards-compat export: actor-scoped keys only (no item scope)
-export const passiveRowFields = makePassiveRowFields([]);
-
-/** @deprecated Use passiveRowFields */
-export const itemEffectRowFields = passiveRowFields;
-
-export const BLANK_PASSIVE = () => ({
+export const BLANK_ACTOR_EFFECT = () => ({
   id: crypto.randomUUID(),
   name: "",
-  transfer: false,
   disabled: false,
-  changes: [],
-  duration: { event: "none" },
-  predicate: { crisisInteraction: "none" },
+  behaviors: [],
 });
 
-/** @deprecated Use BLANK_PASSIVE */
-export const BLANK_ITEM_EFFECT = BLANK_PASSIVE;
 // AfterEffect row fields
 
 const AFTER_EFFECT_RESOURCE_OPTIONS = [
@@ -581,11 +430,12 @@ export const appliesEffectFields = appliesEffectRowFields;
 // ActionTrigger row fields (relative keys - used inside a behavior row)
 
 const TRIGGER_KIND_OPTIONS = [
-  { value: "none", label: "trigger.kind.none" },
+  { value: "passive", label: "trigger.kind.passive" },
   { value: "active", label: "trigger.kind.active" },
-  { value: "chat-action", label: "trigger.kind.chat-action" },
   { value: "reactive", label: "trigger.kind.reactive" },
+  { value: "chat-action", label: "trigger.kind.chat-action" },
   { value: "combat-start", label: "trigger.kind.combat-start" },
+  { value: "combat-end", label: "trigger.kind.combat-end" },
   { value: "on-hit", label: "trigger.kind.on-hit" },
   { value: "on-damage-taken", label: "trigger.kind.on-damage-taken" },
 ];
@@ -616,28 +466,28 @@ const COOLDOWN_OPTIONS = [
 export const actionTriggerRowFields: ItemFieldConfig<Record<string, unknown>> =
   [
     {
-      // "none" means trigger is undefined in payload
       key: "_triggerKind",
       kind: "editable",
       label: "behavior.trigger.kind",
       component: "select",
-      defaultValue: "none",
+      defaultValue: "passive",
       order: 0,
       gridSize: 6,
       componentProps: { options: TRIGGER_KIND_OPTIONS },
       onChangeEffects: {
         trigger: (s) => {
           const kind = s._triggerKind as string;
-          if (kind === "none") return undefined;
+          if (kind === "passive") return { kind: "passive" };
           if (kind === "active") return { kind: "active" };
           if (kind === "combat-start") return { kind: "combat-start" };
+          if (kind === "combat-end") return { kind: "combat-end" };
           if (kind === "on-damage-taken") return { kind: "on-damage-taken" };
           if (kind === "chat-action")
             return { kind: "chat-action", action: "attack" };
           if (kind === "reactive")
             return { kind: "reactive", event: "ally-targeted" };
           if (kind === "on-hit") return { kind: "on-hit" };
-          return undefined;
+          return { kind: "passive" };
         },
       },
     },
@@ -743,6 +593,19 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
     group: BEHAVIOR_GROUPS.selfEffects,
     gridSize: 12,
   },
+  {
+    key: "transfer",
+    kind: "editable",
+    label: "passive.transfer",
+    component: "checkbox",
+    defaultValue: false,
+    order: 2,
+    group: BEHAVIOR_GROUPS.selfEffects,
+    gridSize: 4,
+    dependencies: (s) =>
+      (s._triggerKind as string | undefined) === "passive" ||
+      (s._triggerKind as string | undefined) == null,
+  },
   ...actionTriggerRowFields.map((f) => ({
     ...f,
     order: (f.order ?? 0) + 10,
@@ -758,13 +621,38 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
     group: BEHAVIOR_GROUPS.selfEffects,
     gridSize: 12,
     dependencies: (s) =>
-      (s._triggerKind as string | undefined) !== "none" &&
+      (s._triggerKind as string | undefined) !== "passive" &&
       (s._triggerKind as string | undefined) != null,
+  },
+  {
+    key: "changes",
+    kind: "editable",
+    label: "passive.changes",
+    component: "object-list",
+    defaultValue: [],
+    order: 95,
+    group: BEHAVIOR_GROUPS.selfEffects,
+    gridSize: 12,
+    dependencies: (s) =>
+      (s._triggerKind as string | undefined) === "passive" ||
+      (s._triggerKind as string | undefined) == null,
+    componentProps: {
+      fields: makeEffectChangeRowFields(EFFECT_CHANGE_KEY_OPTIONS),
+      itemDefaults: { ...BLANK_EFFECT_CHANGE },
+      addLabel: "passive.addChange",
+      rowLabel: (_row: Record<string, unknown>, i: number) =>
+        `Change ${i + 1}`,
+    },
   },
   ...appliesEffectRowFields.map((f) => ({
     ...f,
     order: (f.order ?? 0) + 100,
     group: BEHAVIOR_GROUPS.appliesEffect,
+    dependencies: (s: Record<string, unknown>) => {
+      const kind = s._triggerKind as string | undefined;
+      if (!kind || kind === "passive") return false;
+      return f.dependencies ? (f.dependencies as (s: Record<string, unknown>) => boolean)(s) : true;
+    },
   })),
   {
     key: "afterEffects",
@@ -774,6 +662,9 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
     defaultValue: [],
     order: 200,
     group: BEHAVIOR_GROUPS.afterEffects,
+    dependencies: (s) =>
+      (s._triggerKind as string | undefined) !== "passive" &&
+      (s._triggerKind as string | undefined) != null,
     gridSize: 12,
     componentProps: {
       fields: afterEffectRowFields,
@@ -791,7 +682,7 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
 export const BLANK_BEHAVIOR = () => ({
   id: crypto.randomUUID(),
   name: "",
-  _triggerKind: "none",
+  _triggerKind: "passive",
 });
 
 export const behaviorGroupLabels: Record<string, string> = {
@@ -806,45 +697,72 @@ export const passiveGroupLabels: Record<string, string> = {
   [PASSIVE_GROUPS.duration]: "passive.duration",
   [PASSIVE_GROUPS.changes]: "passive.changes",
 };
-// Passives tab field (shared by all item types)
 
-export function makePassivesTabField(
-  itemScopedKeys:
-    | string[]
-    | ((outerState: Record<string, unknown>) => string[]),
-): FieldConfig<Record<string, unknown>> {
-  const staticFields =
-    typeof itemScopedKeys === "function"
-      ? null
-      : makePassiveRowFields(itemScopedKeys);
-  const shared = {
-    itemDefaults: BLANK_PASSIVE,
-    addLabel: "passive.add",
-    variant: "behavior-card",
-    groupLabels: passiveGroupLabels,
-    rowLabel: (row: Record<string, unknown>) =>
-      typeof row.name === "string" && row.name ? row.name : "Passive",
-  };
-  return {
-    key: "passives",
-    kind: "editable",
-    label: "passive.list",
-    component: "object-list",
-    tab: PASSIVES_TAB_KEY,
-    defaultValue: [],
-    order: 0,
-    gridSize: 12,
-    componentProps:
-      typeof itemScopedKeys === "function"
-        ? (outerState: Record<string, unknown>) => ({
-            ...shared,
-            fields: makePassiveRowFields(itemScopedKeys(outerState)),
-          })
-        : { ...shared, fields: staticFields! },
-  };
+// Actor effect row fields - no transfer toggle, actor-scoped stat keys + behaviors[]
+export function makeActorEffectRowFields(): ItemFieldConfig<Record<string, unknown>> {
+  return [
+    {
+      key: "id",
+      kind: "form-state",
+      label: "passive.id",
+      defaultValue: "",
+      order: -1,
+    },
+    {
+      key: "name",
+      kind: "editable",
+      label: "passive.name",
+      component: "text",
+      defaultValue: "",
+      order: 0,
+      group: PASSIVE_GROUPS.core,
+      gridSize: 12,
+      validationHints: { required: true },
+    },
+    {
+      key: "description",
+      kind: "editable",
+      label: "passive.description",
+      component: "textarea",
+      defaultValue: "",
+      order: 1,
+      group: PASSIVE_GROUPS.core,
+      gridSize: 12,
+    },
+    {
+      key: "disabled",
+      kind: "editable",
+      label: "passive.disabled",
+      component: "checkbox",
+      defaultValue: false,
+      order: 2,
+      group: PASSIVE_GROUPS.core,
+      gridSize: 4,
+    },
+    {
+      key: "behaviors",
+      kind: "editable",
+      label: "behavior.list",
+      component: "object-list",
+      defaultValue: [],
+      order: 3,
+      group: PASSIVE_GROUPS.core,
+      gridSize: 12,
+      componentProps: {
+        fields: behaviorRowFields,
+        itemDefaults: BLANK_BEHAVIOR,
+        addLabel: "behavior.add",
+        variant: "behavior-card",
+        groupLabels: behaviorGroupLabels,
+        rowLabel: (row: Record<string, unknown>) =>
+          typeof row.name === "string" && row.name ? row.name : "Behavior",
+      },
+    },
+  ];
 }
 
-export const passivesTabField = makePassivesTabField([]);
+export const actorEffectRowFields = makeActorEffectRowFields();
+
 // Behaviors tab field (shared by all item types)
 
 export const behaviorsTabField: FieldConfig<Record<string, unknown>> = {
@@ -866,17 +784,3 @@ export const behaviorsTabField: FieldConfig<Record<string, unknown>> = {
       typeof row.name === "string" && row.name ? row.name : "Behavior",
   },
 };
-// Legacy exports - kept for existing item configs during migration
-
-/** @deprecated Item configs now use passivesTabField + behaviorsTabField directly */
-export const behaviorGroupFields: FieldConfig<Record<string, unknown>>[] = [
-  { ...passivesTabField, tab: BEHAVIOR_TAB_KEY },
-  { ...behaviorsTabField, tab: BEHAVIOR_TAB_KEY },
-];
-
-/** @deprecated Item configs now use passivesTabField + behaviorsTabField directly */
-export const passiveEffectsGroupFields: FieldConfig<Record<string, unknown>>[] =
-  [
-    { ...passivesTabField, tab: BEHAVIOR_TAB_KEY },
-    { ...behaviorsTabField, tab: BEHAVIOR_TAB_KEY },
-  ];

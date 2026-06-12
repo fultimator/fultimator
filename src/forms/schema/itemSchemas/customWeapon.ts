@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Attributes, Elements } from "../../../types/Misc";
 import { MetaSchema } from "../meta";
-import { PassiveSchema, BehaviorSchema } from "../shared/behaviorSchemas";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 import {
   categories,
   accuracyChecks,
@@ -74,7 +74,6 @@ export const CustomWeaponFormStateSchema = z.object({
   selectedQuality: z.string().optional(),
   isEquipped: z.boolean().optional(),
   dataType: z.string().optional(),
-  passives: z.array(PassiveSchema).optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 

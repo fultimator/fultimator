@@ -53,19 +53,6 @@ export const ExprValueSchema = z.object({
   expr: z.string(),
 });
 
-// Passive (formerly ItemEffect)
-
-export const PassiveSchema = z.object({
-  id: z.string(),
-  name: z.string().default(""),
-  disabled: z.boolean().optional(),
-  transfer: z.boolean().optional(),
-  changes: z.array(EffectChangeSchema).optional(),
-  grants: z.array(GrantDataSchema).optional(),
-  duration: EffectDurationSchema.optional(),
-  predicate: EffectPredicateSchema.optional(),
-});
-
 // AfterEffect
 
 export const AfterEffectAmountSchema = z.union([
@@ -106,6 +93,7 @@ export const AppliesEffectSchema = z.object({
 // ActionTrigger
 
 export const ActionTriggerSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("passive") }),
   z.object({ kind: z.literal("active") }),
   z.object({
     kind: z.literal("chat-action"),
@@ -131,6 +119,7 @@ export const ActionTriggerSchema = z.discriminatedUnion("kind", [
       .optional(),
   }),
   z.object({ kind: z.literal("combat-start") }),
+  z.object({ kind: z.literal("combat-end") }),
   z.object({
     kind: z.literal("on-hit"),
     condition: z
@@ -170,8 +159,11 @@ export const ManualBehaviorSchema = z.object({
 export const BehaviorSchema = z.object({
   id: z.string(),
   name: z.string().default(""),
-  trigger: ActionTriggerSchema.optional(),
+  trigger: ActionTriggerSchema.default({ kind: "passive" }),
   predicate: EffectPredicateSchema.optional(),
+  transfer: z.boolean().optional(),
+  changes: z.array(EffectChangeSchema).optional(),
+  grants: z.array(GrantDataSchema).optional(),
   voluntaryNoDamage: z.boolean().optional(),
   appliesEffect: AppliesEffectSchema.optional(),
   afterEffects: z.array(AfterEffectSchema).optional(),
@@ -185,7 +177,6 @@ export type GrantData = z.infer<typeof GrantDataSchema>;
 export type EffectDuration = z.infer<typeof EffectDurationSchema>;
 export type EffectPredicate = z.infer<typeof EffectPredicateSchema>;
 export type ExprValue = z.infer<typeof ExprValueSchema>;
-export type Passive = z.infer<typeof PassiveSchema>;
 export type AfterEffect = z.infer<typeof AfterEffectSchema>;
 export type AppliesEffect = z.infer<typeof AppliesEffectSchema>;
 export type ActionTrigger = z.infer<typeof ActionTriggerSchema>;

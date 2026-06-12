@@ -1,17 +1,14 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 import { availableSymbols } from "../../../../../../libs/player/spellOptionData";
 
 export type SymbolItemState = {
   key: string;
   customName: string;
   effect: string;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -58,6 +55,5 @@ export const symbolItemFields: ItemFieldConfig<SymbolItemState> = [
     fullWidth: true,
     componentProps: (s) => ({ disabled: !isCustom(s as SymbolItemState) }),
   },
-  makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.symbol),
   behaviorsTabField,
 ];

@@ -4,12 +4,10 @@ import { metaFieldConfig } from "../metaFieldConfig";
 import { typeOptions } from "../typeOptions";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   behaviorGroupLabels,
   DEFAULT_ITEM_TABS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export type NpcAttackFormState = NpcAttack & Record<string, unknown>;
 const NPC_ATTACK_LABEL_PREFIX = "npc.attack";
@@ -196,8 +194,5 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcAttackFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.npcAttack,
-  ) as unknown as FieldConfig<NpcAttackFormState>,
   behaviorsTabField as unknown as FieldConfig<NpcAttackFormState>,
 ];

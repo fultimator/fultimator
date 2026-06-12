@@ -1356,6 +1356,12 @@ export function ObjectListRenderer({
     });
   }, [rows]);
 
+  const enrichRow = (row: Record<string, unknown>): Record<string, unknown> => {
+    if (!isBehaviorCard || "_triggerKind" in row) return row;
+    const trigger = row.trigger as Record<string, unknown> | undefined;
+    return { ...row, _triggerKind: trigger?.kind ?? "passive" };
+  };
+
   const updateRow = (i: number, next: Record<string, unknown>) => {
     const updated = rows.map((r, idx) => (idx === i ? next : r));
     onCommit(updated);
@@ -1429,6 +1435,7 @@ export function ObjectListRenderer({
                     gap: 0.25,
                     pr: 0.25,
                   }}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <Typography
                     variant="caption"
@@ -1485,7 +1492,7 @@ export function ObjectListRenderer({
                       <React.Fragment key={`${i}-${groupKey || "default"}`}>
                         {renderNestedFields({
                           config: fields,
-                          state: row,
+                          state: enrichRow(row),
                           onChange: (next) => updateRow(i, next),
                           surface: "edit",
                           cols:

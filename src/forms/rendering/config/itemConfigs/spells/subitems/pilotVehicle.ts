@@ -1,10 +1,8 @@
 import type { ItemFieldConfig } from "../../../fieldConfig";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   DEFAULT_ITEM_TABS,
 } from "../../../shared/behaviorFields";
-import { SPELL_SUBITEM_SCOPED_KEYS } from "../../../shared/itemScopedKeys";
 import { availableFrames } from "../../../../../../libs/pilotVehicleData";
 
 export type PilotVehicleItemState = {
@@ -13,7 +11,6 @@ export type PilotVehicleItemState = {
   description?: string;
   enabled?: boolean;
   maxEnabledModules?: number;
-  passives?: unknown[];
   behaviors?: unknown[];
 };
 
@@ -67,6 +64,5 @@ export const pilotVehicleItemFields: ItemFieldConfig<PilotVehicleItemState> = [
     order: 3,
     fullWidth: true,
   },
-  makePassivesTabField(SPELL_SUBITEM_SCOPED_KEYS.pilotVehicle),
   behaviorsTabField,
 ];

@@ -10,7 +10,7 @@ import {
   ActorDerived,
 } from "./Misc";
 import type { ActorBonuses, ActorMultipliers } from "./Bonuses";
-import type { Passive, Behavior, ActorEffect } from "./Effects";
+import type { Behavior, ActorEffect } from "./Effects";
 import type { Hoplosphere } from "../forms/schema/itemSchemas/hoplosphere";
 import type { Mnemosphere } from "../forms/schema/itemSchemas/mnemosphere";
 import type { PlayerPersisted as PlayerPersistedSchemaType } from "../forms/schema/actorSchemas/pc";
@@ -106,7 +106,6 @@ export interface Skills {
   currentLvl: number;
   maxLvl: number;
   specialSkill?: string;
-  passives?: Passive[];
   behaviors?: Behavior[];
 }
 
@@ -128,7 +127,6 @@ export interface HeroicSkills {
   quote: string;
   description: string;
   book?: string;
-  passives?: Passive[];
   behaviors?: Behavior[];
 }
 
@@ -208,7 +206,6 @@ export interface Spells {
   spellType?: string;
   vehicles?: Vehicle[];
   currentVehicles?: Vehicle[];
-  passives?: Passive[];
   behaviors?: Behavior[];
 }
 

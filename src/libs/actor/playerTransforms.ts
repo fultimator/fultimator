@@ -1366,7 +1366,6 @@ const MODULE_INSTANCE_FIELDS = new Set([
   "customName",
   "quality",
   "qualityCost",
-  "passives",
   "behaviors",
 ]);
 

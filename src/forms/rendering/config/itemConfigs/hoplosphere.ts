@@ -3,12 +3,10 @@ import type { Hoplosphere } from "../../../schema/itemSchemas/hoplosphere";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   PASSIVE_ITEM_TABS,
   BEHAVIOR_GROUPS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export type HoplosphereFormState = Hoplosphere & Record<string, unknown>;
 const HOPLOSPHERE_LABEL_PREFIX = "hoplosphere";
@@ -128,8 +126,5 @@ export const hoplosphereFieldConfig: ItemFieldConfig<HoplosphereFormState> = [
     },
   },
   ...metaFieldConfig.map((f) => ({ ...f, group: G.meta })),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.hoplosphere,
-  ) as unknown as FieldConfig<HoplosphereFormState>,
   behaviorsTabField as unknown as FieldConfig<HoplosphereFormState>,
 ];

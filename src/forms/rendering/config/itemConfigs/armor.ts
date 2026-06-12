@@ -8,12 +8,10 @@ import groupBy from "../../../../libs/groupby";
 import type { SelectOption, SelectGroup } from "../../fieldRenderers";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
 import {
-  makePassivesTabField,
   behaviorsTabField,
   PASSIVE_ITEM_TABS,
   BEHAVIOR_GROUPS,
 } from "../shared/behaviorFields";
-import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 interface ArmorBase {
   name: string;
@@ -358,8 +356,5 @@ export const armorFieldConfig: ItemFieldConfig<ArmorFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<ArmorFormState>),
-  makePassivesTabField(
-    ITEM_SCOPED_KEYS.armor,
-  ) as unknown as FieldConfig<ArmorFormState>,
   behaviorsTabField as unknown as FieldConfig<ArmorFormState>,
 ];

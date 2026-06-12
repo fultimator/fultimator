@@ -27,7 +27,6 @@ export default function AlchemyEffectsContentSection({
     () => ({
       dieValue: 0,
       effect: "",
-      passives: [],
       behaviors: [],
     }),
     [],
