@@ -40,6 +40,8 @@ export default function PlayerWeaponModal({
   weapon,
   onAddWeapon,
   onDeleteWeapon,
+  initialTab,
+  initialExpandedIndex,
 }) {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(() =>
@@ -161,10 +163,12 @@ export default function PlayerWeaponModal({
                 onChange={setFormState}
                 surface="edit"
                 cols={2}
+                initialTab={initialTab}
                 extraProps={{
                   rework,
                   totalBonus,
                   basePrec: getWeaponPrec(base),
+                  ...(initialExpandedIndex !== undefined ? { initialExpandedIndex } : {}),
                 }}
               />
 

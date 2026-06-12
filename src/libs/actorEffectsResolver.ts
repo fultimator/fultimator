@@ -11,6 +11,8 @@ import type {
   EffectMode,
   GrantData,
 } from "../types/Effects";
+import { type Affinities, type Elements } from "../types/Misc";
+import { combineAffinities } from "../pipelines/damagePipeline";
 import type {
   Accessories,
   Armor,
@@ -39,6 +41,7 @@ export interface ResolvedEffects {
   bonuses: ActorBonuses;
   multipliers: ActorMultipliers;
   grants: GrantData[];
+  affinityGrants: Partial<Record<Elements, Affinities>>;
 }
 
 export function resolveActorEffects(
@@ -48,6 +51,8 @@ export function resolveActorEffects(
   const bonuses = clone(actor.bonuses ?? zeroActorBonuses());
   const multipliers = clone(actor.multipliers ?? oneActorMultipliers());
   const grants: GrantData[] = [];
+  const baseAffinities = (actor.affinities ?? {}) as Partial<Record<Elements, Affinities>>;
+  const affinityGrants: Partial<Record<Elements, Affinities>> = {};
 
   const effects = collectEffectiveEffects(actor, ctx);
   const changes = effects.flatMap((e) => e.changes ?? []);
@@ -55,14 +60,18 @@ export function resolveActorEffects(
 
   const overlay = { bonuses, multipliers };
   for (const change of sorted) {
-    applyChange(overlay, change);
+    if (change.key.startsWith("affinities.")) {
+      applyAffinityChange(affinityGrants, baseAffinities, change);
+    } else {
+      applyChange(overlay, change);
+    }
   }
 
   for (const effect of effects) {
     if (effect.grants) grants.push(...effect.grants);
   }
 
-  return { bonuses, multipliers, grants };
+  return { bonuses, multipliers, grants, affinityGrants };
 }
 
 function collectEffectiveEffects(
@@ -137,36 +146,13 @@ function matchesStableKey(
   return false;
 }
 
-function vehicleSlotKeys(vehicle: SubItemContainer): Set<string> {
-  const out = new Set<string>();
-  const slots = vehicle.slots;
-  if (!slots || typeof slots !== "object") return out;
-
-  for (const key of ["main", "off", "armor", "support"]) {
-    const value = (slots as Record<string, unknown>)[key];
-    if (typeof value === "string" && value) out.add(value);
-    else if (Array.isArray(value)) {
-      for (const entry of value) {
-        if (typeof entry === "string" && entry) out.add(entry);
-      }
-    }
-  }
-
-  return out;
+function activeVehicle(
+  vehicles: SubItemContainer[],
+): SubItemContainer | null {
+  if (vehicles.length === 0) return null;
+  return vehicles.find((v) => v.enabled === true) ?? vehicles[0];
 }
 
-function isVehicleActive(vehicle: SubItemContainer): boolean {
-  return vehicle.enabled === true;
-}
-
-function isVehicleModuleEquipped(
-  vehicle: SubItemContainer,
-  module: SubItemContainer,
-): boolean {
-  if (module.equipped === true || module.enabled === true) return true;
-  const key = getStableKey(module);
-  return !!key && vehicleSlotKeys(vehicle).has(key);
-}
 
 function isNestedSpellItemActive(
   spell: SubItemContainer,
@@ -220,24 +206,17 @@ function* walkSpellSubItems(
       }
     }
   }
-  // Pilot: vehicles[] -> modules[]
-  const vehicles = Array.isArray(spell["vehicles"])
-    ? spell["vehicles"]
-    : spell["currentVehicles"];
-  if (Array.isArray(vehicles)) {
-    for (const vehicle of vehicles) {
-      const vehicleRecord = vehicle as SubItemContainer;
-      if (!isVehicleActive(vehicleRecord)) continue;
-      yield vehicle as ItemWithEffects;
-      const modules = (vehicle as SubItemContainer)["modules"];
-      if (Array.isArray(modules))
-        for (const mod of modules) {
-          const moduleRecord = mod as SubItemContainer;
-          if (isVehicleModuleEquipped(vehicleRecord, moduleRecord)) {
-            yield mod as ItemWithEffects;
-          }
-        }
-    }
+  const rawVehicles = Array.isArray(spell["vehicles"])
+    ? (spell["vehicles"] as SubItemContainer[])
+    : Array.isArray(spell["currentVehicles"])
+      ? (spell["currentVehicles"] as SubItemContainer[])
+      : [];
+  const vehicle = activeVehicle(rawVehicles);
+  if (vehicle) {
+    yield vehicle as ItemWithEffects;
+    const modules = vehicle["modules"];
+    if (Array.isArray(modules))
+      for (const mod of modules) yield mod as ItemWithEffects;
   }
 }
 
@@ -366,6 +345,22 @@ function isActive(
 
 function byPriority(a: EffectChange, b: EffectChange): number {
   return (a.priority ?? 0) - (b.priority ?? 0);
+}
+
+function applyAffinityChange(
+  grants: Partial<Record<Elements, Affinities>>,
+  baseAffinities: Partial<Record<Elements, Affinities>>,
+  change: EffectChange,
+): void {
+  const element = change.key.split(".")[1] as Elements;
+  const incoming = change.value as Affinities;
+
+  if (change.mode === 0) {
+    grants[element] = incoming;
+  } else {
+    const existing = grants[element] ?? baseAffinities[element] ?? null;
+    grants[element] = existing ? combineAffinities(existing, incoming) : incoming;
+  }
 }
 
 function applyChange(

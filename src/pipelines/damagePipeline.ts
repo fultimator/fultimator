@@ -183,6 +183,7 @@ export function buildDamageContext(opts: {
   damageType: DamageElement;
   npcAffinities: Record<string, string>;
   temporaryAffinities?: Partial<Record<string, Affinities>>;
+  affinityGrants?: Partial<Record<string, Affinities>>;
   affinityLocks?: string[];
   isGuarding?: boolean;
   ignoreResistance?: boolean;
@@ -198,8 +199,16 @@ export function buildDamageContext(opts: {
   const element = opts.damageType;
   const raw = opts.npcAffinities[element] as Affinities | undefined;
   const native: Affinities | null = raw ?? null;
-  const temp =
+
+  const runtimeTemp =
     (opts.temporaryAffinities?.[element] as Affinities | undefined) ?? null;
+  const granted =
+    (opts.affinityGrants?.[element] as Affinities | undefined) ?? null;
+  const allTemporary =
+    runtimeTemp && granted
+      ? combineAffinities(runtimeTemp, granted)
+      : runtimeTemp ?? granted;
+  const temp = allTemporary;
 
   return {
     baseDamage: opts.baseDamage,

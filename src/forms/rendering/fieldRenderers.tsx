@@ -1338,7 +1338,10 @@ export function ObjectListRenderer({
     [value],
   );
   const isBehaviorCard = variant === "behavior-card";
-  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
+  const initialExpandedIndex = componentProps?.initialExpandedIndex as number | undefined;
+  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>(() =>
+    initialExpandedIndex !== undefined ? { [initialExpandedIndex]: true } : {},
+  );
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [menuRowIndex, setMenuRowIndex] = useState<number | null>(null);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);

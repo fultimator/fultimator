@@ -26,6 +26,9 @@ export interface RuntimeActorSnapshot {
   temporaryAffinities?: Partial<
     Record<string, import("../types/Misc").Affinities>
   >;
+  affinityGrants?: Partial<
+    Record<string, import("../types/Misc").Affinities>
+  >;
   isGuarding: boolean;
   incomingLossBonuses: ResourceDelta;
   incomingLossMultipliers: ResourceMultiplier;
@@ -167,6 +170,7 @@ export function resolveAfterEffects(
             damageType: "untyped" as DamageElement,
             npcAffinities: actor.affinities,
             temporaryAffinities: actor.temporaryAffinities,
+            affinityGrants: actor.affinityGrants,
             isGuarding: actor.isGuarding,
             incomingDamageBonuses: actor.incomingDamageBonuses,
           });

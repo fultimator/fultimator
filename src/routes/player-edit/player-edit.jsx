@@ -456,7 +456,7 @@ export default function PlayerEdit() {
     setDrawerIsOpen(false);
   };
 
-  const toggleDrawer = (open) => (event) => {
+const toggleDrawer = (open) => (event) => {
     if (
       event.type === "keydown" &&
       (event.key === "Tab" || event.key === "Shift")

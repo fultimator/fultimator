@@ -5,6 +5,7 @@ import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import Diamond from "/src/components/Diamond";
 import DefenseAffinityRow from "/src/components/shared/actors/common/DefenseAffinityRow";
 import { calcHP, calcMP, calcInit, calcDef, calcMDef } from "/src/libs/npcs";
+import { resolveActorEffects } from "/src/libs/actorEffectsResolver";
 
 export function NpcStudyStats({ npc }) {
   const { t } = useTranslate();
@@ -53,6 +54,12 @@ export function NpcStudyStats({ npc }) {
 export function NpcStats({ npc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+
+  const { affinityGrants } = resolveActorEffects(npc);
+  const allKeys = new Set([...Object.keys(npc.affinities ?? {}), ...Object.keys(affinityGrants)]);
+  const effectiveAffinities = Object.fromEntries(
+    [...allKeys].map((el) => [el, affinityGrants[el] ?? npc.affinities?.[el] ?? ""]),
+  );
   const borderImage = `linear-gradient(45deg, #b9a9be, ${theme.transparent}) 1`;
   const panelBg = theme.mode === "dark" ? "#1B1D1E" : "#efecf5";
   const panelBorder = theme.mode === "dark" ? "#42484B" : "#ffffff";
@@ -249,6 +256,7 @@ export function NpcStats({ npc }) {
         defValue={`${npc.armor?.def > 0 || npc.extra?.defOverride ? "" : "+"}${calcDef(npc)}`}
         mDefValue={`${npc.extra?.mDefOverride ? "" : "+"}${calcMDef(npc)}`}
         affinities={npc.affinities}
+        effectiveAffinities={effectiveAffinities}
         panelBg={panelBg}
         panelBorder={panelBorder}
         dividerColor={panelBorder}

@@ -34,6 +34,8 @@ export default function PlayerShieldModal({
   shield,
   onAddShield,
   onDeleteShield,
+  initialTab,
+  initialExpandedIndex,
 }) {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(() =>
@@ -135,6 +137,8 @@ export default function PlayerShieldModal({
                 onChange={setFormState}
                 surface="edit"
                 cols={2}
+                initialTab={initialTab}
+                extraProps={initialExpandedIndex !== undefined ? { initialExpandedIndex } : undefined}
               />
 
               <Grid container spacing={1} sx={{ alignItems: "center", mt: 2 }}>

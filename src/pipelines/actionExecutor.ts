@@ -6,7 +6,7 @@ import type {
   ResourceMultiplier,
   DamageBonuses,
 } from "../types/Bonuses";
-import type { Elements } from "../types/Misc";
+import type { Elements, Affinities } from "../types/Misc";
 import {
   createActionContext,
   emitDamageEvent,
@@ -39,6 +39,7 @@ export interface ActorPipelineData {
   maxMp: number;
   maxIp?: number;
   affinities: Record<string, string>;
+  affinityGrants?: Partial<Record<Elements, Affinities>>;
   incomingDamageBonuses: DamageBonuses;
   incomingLossBonuses: ResourceDelta;
   incomingLossMultipliers: ResourceMultiplier;
@@ -163,6 +164,7 @@ export function executePrimaryOutcome(
         damageType: spec.damageType,
         npcAffinities: targetData.affinities,
         temporaryAffinities: targetData.runtime.temporaryAffinities,
+        affinityGrants: targetData.affinityGrants,
         isGuarding: targetData.runtime.isGuarding,
         incomingDamageBonuses: targetData.incomingDamageBonuses,
       });

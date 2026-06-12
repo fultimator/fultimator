@@ -58,6 +58,15 @@ export const EFFECT_CHANGE_KEY_OPTIONS: string[] = [
   "multipliers.outgoingRecovery.hp",
   "multipliers.outgoingRecovery.mp",
   "multipliers.outgoingRecovery.ip",
+  "affinities.physical",
+  "affinities.air",
+  "affinities.bolt",
+  "affinities.dark",
+  "affinities.earth",
+  "affinities.fire",
+  "affinities.ice",
+  "affinities.light",
+  "affinities.poison",
 ];
 
 const EFFECT_MODE_OPTIONS = [
@@ -68,7 +77,25 @@ const EFFECT_MODE_OPTIONS = [
   { value: 4, label: "effect.mode.upgrade" },
   { value: 5, label: "effect.mode.custom" },
 ];
+
+const AFFINITY_MODE_OPTIONS = [
+  { value: 0, label: "effect.mode.override" },
+  { value: 4, label: "effect.mode.upgrade" },
+  { value: 3, label: "effect.mode.downgrade" },
+];
+
+const AFFINITY_VALUE_OPTIONS = [
+  { value: "rs", label: "effect.affinity.resistance" },
+  { value: "vu", label: "effect.affinity.vulnerability" },
+  { value: "ab", label: "effect.affinity.absorption" },
+  { value: "im", label: "effect.affinity.immunity" },
+  { value: "no", label: "effect.affinity.none" },
+];
 // EffectChange row fields (used inside Passive.changes object-list)
+
+function isAffinityKey(state: Record<string, unknown>): boolean {
+  return typeof state.key === "string" && state.key.startsWith("affinities.");
+}
 
 function makeEffectChangeRowFields(
   keyOptions: string[],
@@ -98,17 +125,23 @@ function makeEffectChangeRowFields(
       defaultValue: 2,
       order: 1,
       gridSize: 4,
-      componentProps: { options: EFFECT_MODE_OPTIONS },
+      componentProps: (state) => ({
+        options: isAffinityKey(state) ? AFFINITY_MODE_OPTIONS : EFFECT_MODE_OPTIONS,
+      }),
       parse: (v) => Number(v),
     },
     {
       key: "value",
       kind: "editable",
       label: "behavior.change.value",
-      component: "text",
+      component: "autocomplete",
       defaultValue: "0",
       order: 2,
       gridSize: 4,
+      componentProps: (state) =>
+        isAffinityKey(state)
+          ? { options: AFFINITY_VALUE_OPTIONS, freeSolo: false }
+          : { options: [], freeSolo: true },
     },
   ];
 }

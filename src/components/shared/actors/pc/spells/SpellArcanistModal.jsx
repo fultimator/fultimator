@@ -69,6 +69,8 @@ export default function SpellArcanistModal({
   onDelete,
   spell,
   isRework,
+  initialTab,
+  initialExpandedIndex,
 }) {
   const { t } = useTranslate();
   const [editedSpell, setEditedSpell] = useState(spell || {});
@@ -126,6 +128,8 @@ export default function SpellArcanistModal({
           state={editedSpell}
           onChange={setEditedSpell}
           surface="edit"
+          initialTab={initialTab}
+          extraProps={initialExpandedIndex !== undefined ? { initialExpandedIndex } : undefined}
         />
       </DialogContent>
       <DialogActions>

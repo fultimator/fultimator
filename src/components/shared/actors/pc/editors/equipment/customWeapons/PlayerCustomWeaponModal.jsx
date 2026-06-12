@@ -290,6 +290,8 @@ export default function PlayerCustomWeaponModal({
   onDeleteCustomWeapon,
   player,
   setPlayer,
+  initialTab,
+  initialExpandedIndex,
 }) {
   const { t } = useTranslate();
   const isTechnospheres =
@@ -652,10 +654,12 @@ export default function PlayerCustomWeaponModal({
               }}
               surface="edit"
               cols={2}
+              initialTab={initialTab}
               extraProps={{
                 ...coreExtraProps,
                 ...slotsExtraProps,
                 ...qualityExtraProps,
+                ...(initialExpandedIndex !== undefined ? { initialExpandedIndex } : {}),
               }}
             />
 

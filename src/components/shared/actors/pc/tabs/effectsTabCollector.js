@@ -58,12 +58,12 @@ function spellSubitemModalName(spell, key) {
 }
 
 function addEffectsFromItem(item, source, out, sourceRef) {
-  for (const passive of asArray(item?.passives)) {
-    out.passives.push({ effect: passive, source, sourceRef });
-  }
-  for (const behavior of asArray(item?.behaviors)) {
-    out.behaviors.push({ effect: behavior, source, sourceRef });
-  }
+  asArray(item?.passives).forEach((passive, index) => {
+    out.passives.push({ effect: passive, source, sourceRef: { ...sourceRef, effectKind: "passive", effectIndex: index } });
+  });
+  asArray(item?.behaviors).forEach((behavior, index) => {
+    out.behaviors.push({ effect: behavior, source, sourceRef: { ...sourceRef, effectKind: "behavior", effectIndex: index } });
+  });
 }
 
 function collectSpellEffects(spell, source, out, sourceRef) {

@@ -1,11 +1,11 @@
 import { Box } from "@mui/material";
-import StatTooltip from "/src/components/common/StatTooltip";
 import { TypeAffinity } from "/src/components/shared/actors/common/TypeAffinity";
 import {
   AffinityStrip,
   AffinityCell,
 } from "/src/components/shared/actors/pc/shared";
 import { AFFINITY_TYPES } from "/src/components/shared/actors/core-utils";
+import { resolveActorEffects } from "/src/libs/actorEffectsResolver";
 
 export default function PcCompactAffinities({
   pc,
@@ -19,6 +19,12 @@ export default function PcCompactAffinities({
       affinities: { ...(prev.affinities ?? {}), [type]: nextAffinity || "" },
     }));
   };
+
+  const { affinityGrants } = resolveActorEffects(pc);
+  const allKeys = new Set([...Object.keys(pc.affinities ?? {}), ...Object.keys(affinityGrants)]);
+  const effectiveAffinities = Object.fromEntries(
+    [...allKeys].map((el) => [el, affinityGrants[el] ?? pc.affinities?.[el] ?? ""]),
+  );
 
   return (
     <Box
@@ -99,17 +105,12 @@ export default function PcCompactAffinities({
                 onChangeAffinity={handleChange(type)}
               />
             ) : (
-              <StatTooltip
-                title={type.charAt(0).toUpperCase() + type.slice(1)}
-                base={pc.affinities?.[type] || ""}
-                display="flex"
-              >
-                <TypeAffinity
-                  type={type}
-                  affinity={pc.affinities?.[type] || ""}
-                  iconSize="1.35em"
-                />
-              </StatTooltip>
+              <TypeAffinity
+                type={type}
+                affinity={pc.affinities?.[type] || ""}
+                currentAffinity={effectiveAffinities[type]}
+                iconSize="1.35em"
+              />
             )}
           </AffinityCell>
         ))}

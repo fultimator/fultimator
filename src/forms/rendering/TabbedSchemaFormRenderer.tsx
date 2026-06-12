@@ -20,6 +20,7 @@ interface TabbedSchemaFormRendererProps<
   extraProps?: Record<string, unknown>;
   onTabChange?: (tabKey: string) => void;
   excludeGroups?: string[];
+  initialTab?: string;
 }
 
 // Fields with no tab property fall into the first tab.
@@ -46,9 +47,14 @@ export function TabbedSchemaFormRenderer<
   extraProps,
   onTabChange,
   excludeGroups,
+  initialTab,
 }: TabbedSchemaFormRendererProps<TFormState>) {
   const { t } = useTranslate();
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(() => {
+    if (!initialTab) return 0;
+    const idx = tabs.findIndex((tab) => tab.key === initialTab);
+    return idx >= 0 ? idx : 0;
+  });
 
   if (tabs.length === 0) {
     return (

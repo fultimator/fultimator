@@ -10,6 +10,7 @@ import {
   type DamageElement,
 } from "../pipelines/damagePipeline";
 import { getActorBonuses } from "../libs/actorBonuses";
+import { resolveActorEffects } from "../libs/actorEffectsResolver";
 import { devLog } from "../utils/devLog";
 
 type ActorDoc = Record<string, unknown>;
@@ -205,12 +206,14 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
           if (!allowed.includes(normalized as DamageElement)) return baseAmount;
 
           try {
+            const { affinityGrants } = resolveActorEffects(doc as never);
             const dmgCtx = buildDamageContext({
               baseDamage: baseAmount,
               damageType: normalized as DamageElement,
               npcAffinities:
                 (doc.affinities as Record<string, string> | undefined) ?? {},
               temporaryAffinities: actor?.temporaryAffinities,
+              affinityGrants,
               isGuarding: false,
               incomingDamageBonuses: getActorBonuses(doc).incomingDamage,
             });
@@ -345,12 +348,14 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
           ];
           if (!allowed.includes(normalized as DamageElement)) return baseAmount;
           try {
+            const { affinityGrants } = resolveActorEffects(doc as never);
             const dmgCtx = buildDamageContext({
               baseDamage: baseAmount,
               damageType: normalized as DamageElement,
               npcAffinities:
                 (doc.affinities as Record<string, string> | undefined) ?? {},
               temporaryAffinities: actor?.temporaryAffinities,
+              affinityGrants,
               isGuarding: false,
               incomingDamageBonuses: getActorBonuses(doc).incomingDamage,
             });

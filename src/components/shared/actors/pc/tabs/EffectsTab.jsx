@@ -256,6 +256,12 @@ function EffectSection({ title, rows, getDuration, canEdit, onEditSource }) {
   );
 }
 
+function effectFocusProps(sourceRef) {
+  if (!sourceRef?.effectKind) return {};
+  const initialTab = sourceRef.effectKind === "passive" ? "passives" : "behaviors";
+  return { initialTab, initialExpandedIndex: sourceRef.effectIndex ?? 0 };
+}
+
 function SourceEditModalLayer({ player, setPlayer, sourceRef, onClose }) {
   if (!sourceRef || !setPlayer) return null;
 
@@ -377,6 +383,7 @@ function SourceEditModalLayer({ player, setPlayer, sourceRef, onClose }) {
           player,
           setPlayer,
         })}
+        {...effectFocusProps(sourceRef)}
       />
     );
   }
@@ -434,6 +441,7 @@ function SourceEditModalLayer({ player, setPlayer, sourceRef, onClose }) {
           [config.deleteProp]: deleteEquipmentItem,
           ...(config.needsPlayer ? { player, setPlayer } : {}),
         }}
+        {...effectFocusProps(sourceRef)}
       />
     );
   }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Box, ButtonBase, Menu, MenuItem, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import StatTooltip from "/src/components/common/StatTooltip";
@@ -59,6 +59,7 @@ export function TypeIcon({ type, disabled, size }) {
 export function TypeAffinity({
   type,
   affinity,
+  currentAffinity,
   iconSize,
   editable = false,
   onChangeAffinity,
@@ -67,73 +68,74 @@ export function TypeAffinity({
   const { t } = useTranslate();
   const rawAffinity = String(affinity ?? "").toLowerCase();
   const normalizedAffinity = rawAffinity === "no" ? "" : rawAffinity;
-  const disabled = normalizedAffinity === "";
-  const value = ["", "rs", "im", "ab", "vu"].includes(normalizedAffinity)
-    ? normalizedAffinity
+  const rawCurrent = currentAffinity !== undefined ? String(currentAffinity).toLowerCase() : normalizedAffinity;
+  const normalizedCurrent = rawCurrent === "no" ? "" : rawCurrent;
+  const disabled = normalizedCurrent === "";
+  const value = ["", "rs", "im", "ab", "vu"].includes(normalizedCurrent)
+    ? normalizedCurrent
     : "";
-  const [anchorEl, setAnchorEl] = useState(null);
-  const menuOpen = Boolean(anchorEl);
+  const buttonRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const iconNode = (
-    <StatTooltip
-      title={type.charAt(0).toUpperCase() + type.slice(1)}
-      base={value}
-      current={value}
-      display="flex"
-    >
-      <Box
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <TypeIcon type={type} disabled={disabled} size={iconSize} />
-      </Box>
-    </StatTooltip>
-  );
+  const iconNode = <TypeIcon type={type} disabled={disabled} size={iconSize} />;
 
   if (!editable) {
     return (
+      <StatTooltip
+        title={type.charAt(0).toUpperCase() + type.slice(1)}
+        base={normalizedAffinity}
+        current={normalizedCurrent}
+        display="flex"
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 0.5,
+          }}
+        >
+          {iconNode}
+          {normalizedAffinity && (
+            <Typography
+              sx={{
+                color: "red.main",
+                fontWeight: "bold",
+                fontFamily: "Antonio",
+                textTransform: "uppercase",
+                fontSize: "1.1rem",
+                lineHeight: 1,
+                letterSpacing: "0.03em",
+              }}
+            >
+              {normalizedAffinity}
+            </Typography>
+          )}
+        </Box>
+      </StatTooltip>
+    );
+  }
+
+  return (
+    <StatTooltip
+      title={type.charAt(0).toUpperCase() + type.slice(1)}
+      base={normalizedAffinity}
+      current={normalizedCurrent}
+      display="flex"
+      sx={{ width: "100%" }}
+      disabled={menuOpen}
+    >
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: 0.5,
+          width: "100%",
         }}
       >
-        {iconNode}
-        {normalizedAffinity && (
-          <Typography
-            sx={{
-              color: "red.main",
-              fontWeight: "bold",
-              fontFamily: "Antonio",
-              textTransform: "uppercase",
-              fontSize: "1.1rem",
-              lineHeight: 1,
-              letterSpacing: "0.03em",
-            }}
-          >
-            {normalizedAffinity}
-          </Typography>
-        )}
-      </Box>
-    );
-  }
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-      }}
-    >
       <ButtonBase
-        onClick={(e) => setAnchorEl(e.currentTarget)}
+        ref={buttonRef}
+        onClick={() => setMenuOpen(true)}
         sx={{
           px: 0.55,
           py: 0.15,
@@ -184,19 +186,19 @@ export function TypeAffinity({
         )}
       </ButtonBase>
       <Menu
-        anchorEl={anchorEl}
+        anchorEl={buttonRef.current}
         open={menuOpen}
-        onClose={() => setAnchorEl(null)}
+        onClose={() => setMenuOpen(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
         {AFFINITY_OPTIONS.map((opt) => (
           <MenuItem
             key={opt.value || "none"}
-            selected={value === opt.value}
+            selected={normalizedAffinity === opt.value}
             onClick={() => {
               onChangeAffinity?.(opt.value);
-              setAnchorEl(null);
+              setMenuOpen(false);
             }}
           >
             {t(opt.labelKey) === opt.labelKey ? opt.fallback : t(opt.labelKey)}
@@ -204,5 +206,6 @@ export function TypeAffinity({
         ))}
       </Menu>
     </Box>
+    </StatTooltip>
   );
 }

@@ -40,6 +40,8 @@ export default function PlayerArmorModal({
   onDeleteArmor,
   player,
   setPlayer,
+  initialTab,
+  initialExpandedIndex,
 }) {
   const { t } = useTranslate();
 
@@ -175,7 +177,8 @@ export default function PlayerArmorModal({
                 }}
                 surface="edit"
                 cols={2}
-                extraProps={{ player, isWeapon: false }}
+                initialTab={initialTab}
+                extraProps={{ player, isWeapon: false, ...(initialExpandedIndex !== undefined ? { initialExpandedIndex } : {}) }}
               />
 
               <Grid container spacing={1} sx={{ alignItems: "center", mt: 2 }}>

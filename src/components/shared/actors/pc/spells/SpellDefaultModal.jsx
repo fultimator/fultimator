@@ -29,6 +29,8 @@ export default function SpellDefaultModal({
   onSave,
   onDelete,
   spell,
+  initialTab,
+  initialExpandedIndex,
 }) {
   const { t } = useTranslate();
   const [formState, setFormState] = useState(spell || {});
@@ -96,6 +98,8 @@ export default function SpellDefaultModal({
           state={formState}
           onChange={setFormState}
           surface="edit"
+          initialTab={initialTab}
+          extraProps={initialExpandedIndex !== undefined ? { initialExpandedIndex } : undefined}
         />
       </DialogContent>
       <DialogActions>

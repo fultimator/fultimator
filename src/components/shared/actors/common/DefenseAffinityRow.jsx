@@ -8,6 +8,7 @@ export default function DefenseAffinityRow({
   defValue,
   mDefValue,
   affinities,
+  effectiveAffinities,
   panelBg,
   panelBorder,
   dividerColor,
@@ -127,7 +128,8 @@ export default function DefenseAffinityRow({
         >
           <TypeAffinity
             type={type}
-            affinity={affinities?.[type] || ""}
+            affinity={editable ? (affinities?.[type] || "") : (effectiveAffinities?.[type] || affinities?.[type] || "")}
+            currentAffinity={effectiveAffinities?.[type]}
             editable={editable}
             onChangeAffinity={onChangeAffinity?.(type)}
           />
