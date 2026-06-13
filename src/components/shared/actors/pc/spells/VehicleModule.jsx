@@ -58,6 +58,7 @@ const VehicleModule = memo(
     onCloneModule,
     vehicle,
     player,
+    paperSx,
   }) => {
     const { t } = useTranslate();
     const theme = useCustomTheme();
@@ -480,6 +481,7 @@ const VehicleModule = memo(
             border: `1px solid ${theme.secondary}`,
             borderRadius: 1,
             overflow: "hidden",
+            ...paperSx,
           }}
         >
           {/* Row header */}

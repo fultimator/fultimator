@@ -31,6 +31,7 @@ export default function MagichantToneItem({
   onReplaceItem,
   onDeleteItem,
   onCloneItem,
+  paperSx,
 }) {
   const { t: translate } = useTranslate();
 
@@ -104,7 +105,7 @@ export default function MagichantToneItem({
             </Tooltip>
           </>
         }
-        paperSx={{ mb: 0.5 }}
+        paperSx={{ mb: 0.5, ...paperSx }}
       >
         {expanded && (
           <Box sx={{ p: 2 }} onClick={(e) => e.stopPropagation()}>

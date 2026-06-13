@@ -26,6 +26,7 @@ export default function AlchemyEffectItem({
   onReplaceItem,
   onDeleteItem,
   onCloneItem,
+  paperSx,
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
@@ -58,6 +59,7 @@ export default function AlchemyEffectItem({
         label={itemDisplayName}
         subtitle={subtitle}
         onClick={() => setExpanded((v) => !v)}
+        paperSx={paperSx}
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>

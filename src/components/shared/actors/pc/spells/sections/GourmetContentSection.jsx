@@ -6,13 +6,6 @@ import {
   Box,
   Chip,
   Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -23,8 +16,10 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
+import { IconButton, Tooltip } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import CustomTextarea from "/src/components/common/CustomTextarea";
+import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import {
   getStatusEffects,
   getDamageTypes,
@@ -232,70 +227,40 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
           {t("Cookbook Effects")} ({cookbookEffects.length})
         </Typography>
         {cookbookEffects.length === 0 ? (
-          <Typography
-            sx={{
-              color: "text.secondary",
-              fontStyle: "italic",
-            }}
-          >
+          <Typography sx={{ color: "text.secondary", fontStyle: "italic" }}>
             {t("No cookbook effects yet")}
           </Typography>
         ) : (
-          <TableContainer component={Paper}>
-            <Table size="small">
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "action.hover" }}>
-                  <TableCell>{t("Effect")}</TableCell>
-                  <TableCell align="right">{t("Action")}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {cookbookEffects.map((effect, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {effect.name || `Effect ${idx + 1}`}
-                      </Typography>
-                      <Box
-                        sx={{
-                          typography: "caption",
-                          color: "text.secondary",
-                          "& p": { m: 0 },
-                        }}
-                      >
-                        <ReactMarkdown>
-                          {applyCustomChoices(
-                            effect.description || "",
-                            effect.customChoices,
-                          )}
-                        </ReactMarkdown>
-                      </Box>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Button
-                        size="small"
-                        startIcon={<Edit />}
-                        onClick={() => handleOpenEditEffect(effect)}
-                        sx={{ mr: 1 }}
-                      >
-                        {t("Edit")}
-                      </Button>
-                      <Button
-                        size="small"
-                        color="error"
-                        startIcon={<Delete />}
-                        onClick={() =>
-                          handleDeleteEffect(effect.tasteKey, effect._index)
-                        }
-                      >
-                        {t("Delete")}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+            {cookbookEffects.map((effect, idx) => (
+              <ItemRowCard
+                key={idx}
+                label={effect.name || `Effect ${idx + 1}`}
+                subtitle={
+                  <Box sx={{ typography: "caption", color: "text.secondary", "& p": { m: 0 } }}>
+                    <ReactMarkdown>
+                      {applyCustomChoices(effect.description || "", effect.customChoices)}
+                    </ReactMarkdown>
+                  </Box>
+                }
+                paperSx={idx % 2 === 0 ? { bgcolor: "action.hover" } : undefined}
+                actions={
+                  <>
+                    <Tooltip title={t("Edit")}>
+                      <IconButton onClick={() => handleOpenEditEffect(effect)}>
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t("Delete")}>
+                      <IconButton onClick={() => handleDeleteEffect(effect.tasteKey, effect._index)}>
+                        <Delete />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                }
+              />
+            ))}
+          </Box>
         )}
       </Grid>
       {/* Ingredient Inventory */}

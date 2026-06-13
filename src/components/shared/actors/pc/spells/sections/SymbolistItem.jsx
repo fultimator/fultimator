@@ -29,6 +29,7 @@ export default function SymbolistItem({
   onReplaceItem,
   onDeleteItem,
   onCloneItem,
+  paperSx,
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
@@ -81,6 +82,7 @@ export default function SymbolistItem({
       <ItemRowCard
         label={itemDisplayName}
         onClick={() => setExpanded((v) => !v)}
+        paperSx={paperSx}
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>

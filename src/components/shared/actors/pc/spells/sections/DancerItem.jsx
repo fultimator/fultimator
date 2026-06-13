@@ -5,6 +5,7 @@ import { availableDances } from "/src/libs/player/spellOptionData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
+import NotesMarkdown from "/src/components/common/NotesMarkdown";
 import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   danceItemFields,
@@ -30,6 +31,7 @@ export default function DancerItem({
   onReplaceItem,
   onDeleteItem,
   onCloneItem,
+  paperSx,
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
@@ -83,8 +85,9 @@ export default function DancerItem({
     <>
       <ItemRowCard
         label={itemDisplayName}
-        subtitle={formState.duration || undefined}
+        subtitle={formState.duration ? <NotesMarkdown compact>{formState.duration}</NotesMarkdown> : undefined}
         onClick={() => setExpanded((v) => !v)}
+        paperSx={paperSx}
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>

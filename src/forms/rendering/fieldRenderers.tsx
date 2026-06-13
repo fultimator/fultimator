@@ -48,6 +48,7 @@ import type { GroupLabels } from "./config/fieldConfig";
 import { affinityStrToNum, affinityNumToStr } from "./npcAffinityUtils";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import ItemRowCard from "../../components/shared/common/ItemRowCard";
+import NotesMarkdown from "../../components/common/NotesMarkdown";
 
 // Typed wrapper for untyped JSX components.
 interface ChangeAccuracyCheckProps {
@@ -650,6 +651,40 @@ export function AccuracyCheckRenderer({
       }
       disabled={(componentProps?.disabled as boolean) ?? false}
     />
+  );
+}
+
+export function ReadonlyMarkdownRenderer({ label, value }: FieldRendererProps) {
+  const { t } = useTranslate();
+  const strValue = (value as string) ?? "";
+  return (
+    <Box sx={{ my: "5px", position: "relative", width: "100%" }}>
+      <TextField
+        label={t(label)}
+        value={strValue}
+        multiline
+        minRows={4}
+        fullWidth
+        variant="outlined"
+        slotProps={{ htmlInput: { readOnly: true, style: { opacity: 0, userSelect: "none" } } }}
+        disabled
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          top: "14px",
+          left: "14px",
+          right: "14px",
+          bottom: "14px",
+          overflow: "auto",
+          cursor: "text",
+          userSelect: "text",
+          "& p": { margin: 0 },
+        }}
+      >
+        <NotesMarkdown compact>{strValue}</NotesMarkdown>
+      </Box>
+    </Box>
   );
 }
 

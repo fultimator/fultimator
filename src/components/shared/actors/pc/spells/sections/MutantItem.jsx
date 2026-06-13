@@ -1,11 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
 import { availableTherioforms } from "/src/libs/player/spellOptionData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
-import NotesMarkdown from "/src/components/common/NotesMarkdown";
 import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   therioformItemFields,
@@ -35,6 +34,7 @@ export default function MutantItem({
   onReplaceItem,
   onDeleteItem,
   onCloneItem,
+  paperSx,
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
@@ -76,13 +76,7 @@ export default function MutantItem({
   const itemDisplayName =
     formState.customName || t(formState.name || "mutant_therioform_custom_name");
   const isCustomTherioform = CUSTOM_THERIOFORM_NAMES.has(formState.name);
-  const formFields = useMemo(
-    () =>
-      isCustomTherioform
-        ? therioformItemFields
-        : therioformItemFields.filter((field) => field.key !== "description"),
-    [isCustomTherioform],
-  );
+  const formFields = therioformItemFields;
 
   const handleCloneToCustom = () => {
     if (!onCloneItem) return;
@@ -100,6 +94,7 @@ export default function MutantItem({
       <ItemRowCard
         label={itemDisplayName}
         onClick={() => setExpanded((v) => !v)}
+        paperSx={paperSx}
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>
@@ -125,32 +120,6 @@ export default function MutantItem({
               surface="edit"
               cols={2}
             />
-            {!isCustomTherioform && formState.description && (
-              <Box sx={{ mt: 2 }}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: "block",
-                    color: "text.secondary",
-                    mb: 0.5,
-                  }}
-                >
-                  {t("Description")}
-                </Typography>
-                <Box
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                    bgcolor: "action.hover",
-                    px: 1.5,
-                    py: 1.25,
-                    minHeight: 96,
-                  }}
-                >
-                  <NotesMarkdown compact>{formState.description}</NotesMarkdown>
-                </Box>
-              </Box>
-            )}
           </Box>
         )}
       </ItemRowCard>

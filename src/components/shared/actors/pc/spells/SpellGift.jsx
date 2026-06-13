@@ -163,7 +163,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           minHeight: 80,
           borderTop: `1px solid ${theme.secondary}`,
           borderBottom: `1px solid ${theme.secondary}`,
-          mb: "10px",
         }}
       >
         {/* Left: label */}
@@ -348,7 +347,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           minHeight: "40px",
         }}
       >
-        <Box sx={{ flex: "0 0 24%", display: "flex", alignItems: "center" }}>
+        <Box sx={{ flex: "0 0 40%", display: "flex", alignItems: "center" }}>
           <Typography
             variant="h3"
             sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
@@ -356,20 +355,12 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
             {t("esper_psychic_gifts")}
           </Typography>
         </Box>
-        <Box sx={{ flex: "0 0 32%", display: "flex", alignItems: "center" }}>
-          <Typography
-            variant="h3"
-            sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
-          >
-            {t("esper_events")}
-          </Typography>
-        </Box>
         <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
           <Typography
             variant="h3"
             sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
           >
-            {t("Effect")}
+            {t("esper_events")}
           </Typography>
         </Box>
       </Box>
@@ -390,47 +381,50 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
       ) : (
         gift.gifts &&
         gift.gifts.map((gft, i) => (
-          <Box
-            key={`${getGiftKey(gft)}-${i}`}
-            sx={{
-              background:
-                i % 2 === 0
-                  ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
-                  : "transparent",
-              px: "17px",
-              py: "8px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "18px",
-              borderTop: `1px solid ${theme.secondary}`,
-              borderBottom: `1px solid ${theme.secondary}`,
-              minHeight: 44,
-              fontSize: "0.9rem",
-            }}
-          >
+          <React.Fragment key={`${getGiftKey(gft)}-${i}`}>
+            {/* Name + Event row — colored */}
             <Box
               sx={{
-                flex: "0 0 24%",
-                minWidth: 0,
+                background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
+                px: "17px",
+                py: "3px",
+                display: "flex",
+                alignItems: "center",
+                borderTop: `1px solid ${theme.secondary}`,
+                borderBottom: `1px solid ${theme.secondary}`,
+                minHeight: 44,
+                fontSize: "0.9rem",
               }}
             >
-              <Typography sx={{ ...bodyTextSx, fontWeight: "bold" }}>
-                {getGiftName(gft)}
-              </Typography>
-            </Box>
-            <Box sx={{ flex: "0 0 32%", minWidth: 0 }}>
-              <Box sx={bodyTextSx}>
+              <Box sx={{ flex: "0 0 40%", minWidth: 0 }}>
+                <Typography sx={{ ...bodyTextSx, fontWeight: "bold" }}>
+                  {getGiftName(gft)}
+                </Typography>
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0, ...bodyTextSx }}>
                 <ReactMarkdown components={components}>
                   {getGiftEvent(gft)}
                 </ReactMarkdown>
               </Box>
             </Box>
-            <Box sx={{ flex: 1, minWidth: 0, ...bodyTextSx }}>
-              <ReactMarkdown components={components}>
-                {getGiftEffect(gft)}
-              </ReactMarkdown>
+            {/* Effect row — transparent */}
+            <Box
+              sx={{
+                background: "transparent",
+                px: "17px",
+                py: "3px",
+                minHeight: 44,
+                fontSize: "0.9rem",
+                borderBottom: `1px solid ${theme.secondary}`,
+              }}
+            >
+              <Box sx={bodyTextSx}>
+                <ReactMarkdown components={components}>
+                  {getGiftEffect(gft)}
+                </ReactMarkdown>
+              </Box>
             </Box>
-          </Box>
+          </React.Fragment>
         ))
       )}
     </>

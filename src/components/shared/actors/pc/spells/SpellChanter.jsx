@@ -566,10 +566,7 @@ function ThemedSpellChanter({
           <React.Fragment key={i}>
             <div
               style={{
-                background:
-                  i % 2 === 0
-                    ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
-                    : "transparent",
+                background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                 padding: "3px 17px",
                 display: "flex",
                 justifyContent: "space-between",

@@ -126,31 +126,31 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
             >
               {t("mutant_genoclepsis_suggestions")}
             </Typography>
+            {isEditMode && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  flexShrink: 0,
+                }}
+              >
+                {!showInPlayerSheet && (
+                  <Tooltip title={t("mutant_therioforms_not_shown_tooltip")}>
+                    <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+                  </Tooltip>
+                )}
+                <IconButton
+                  size="small"
+                  onClick={onEdit}
+                  sx={{ color: "#fff", p: "3px" }}
+                >
+                  <Edit sx={{ fontSize: "1.1rem" }} />
+                </IconButton>
+              </div>
+            )}
           </Grid>
         </Grid>
-        {isEditMode && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              flexShrink: 0,
-            }}
-          >
-            {!showInPlayerSheet && (
-              <Tooltip title={t("mutant_therioforms_not_shown_tooltip")}>
-                <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
-              </Tooltip>
-            )}
-            <IconButton
-              size="small"
-              onClick={onEdit}
-              sx={{ color: "#fff", p: "3px" }}
-            >
-              <Edit sx={{ fontSize: "1.1rem" }} />
-            </IconButton>
-          </div>
-        )}
       </div>
       {mutant.therioforms && mutant.therioforms.length === 0 ? (
         <Typography
@@ -170,10 +170,7 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
           <React.Fragment key={i}>
             <div
               style={{
-                background:
-                  i % 2 === 0
-                    ? `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`
-                    : "transparent",
+                background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
                 padding: "3px 17px",
                 display: "flex",
                 justifyContent: "space-between",

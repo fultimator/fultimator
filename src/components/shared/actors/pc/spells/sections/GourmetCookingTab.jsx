@@ -737,14 +737,16 @@ export default function GourmetCookingTab({
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* Delicacy Effects Table */}
           <Grid size={12}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-              {t("gourmet_delicacy_effect_label")}
-            </Typography>
-            <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", flex: 1 }}>
+                {t("gourmet_delicacy_effect_label")}
+              </Typography>
               <Button
                 variant="contained"
                 startIcon={<Casino />}
                 onClick={handleRollDelicacyEffect}
+                size="small"
+                sx={{ flexShrink: 0 }}
               >
                 {t("gourmet_roll_d12")}
               </Button>
@@ -782,29 +784,19 @@ export default function GourmetCookingTab({
 
           {/* Ingredient Taste Rolling */}
           <Grid size={12}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-              {t("gourmet_details")}
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                color: "text.secondary",
-                mb: 2,
-              }}
-            >
-              {t("gourmet_details_1")}
-            </Typography>
-
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 3 }}>
-              <Button
-                variant="outlined"
-                startIcon={<Casino />}
-                onClick={handleRollIngredientTaste}
-              >
-                {t("gourmet_roll_d6")}
-              </Button>
-
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: "bold", flex: 1 }}>
+                {t("gourmet_details")}
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexShrink: 0 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<Casino />}
+                  onClick={handleRollIngredientTaste}
+                  size="small"
+                >
+                  {t("gourmet_roll_d6")}
+                </Button>
                 <TextField
                   size="small"
                   type="number"
@@ -814,7 +806,7 @@ export default function GourmetCookingTab({
                       Math.min(10, Math.max(1, parseInt(e.target.value) || 1)),
                     )
                   }
-                  sx={{ width: "80px" }}
+                  sx={{ width: "70px" }}
                   slotProps={{
                     htmlInput: { min: 1, max: 10 },
                   }}
@@ -823,6 +815,7 @@ export default function GourmetCookingTab({
                   variant="outlined"
                   startIcon={<Casino />}
                   onClick={handleBulkRollIngredientTaste}
+                  size="small"
                 >
                   {t("gourmet_bulk_roll_d6")}
                 </Button>

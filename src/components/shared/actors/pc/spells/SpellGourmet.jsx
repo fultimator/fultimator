@@ -306,7 +306,7 @@ export default function SpellGourmet({
             <Box
               key={effect.key || `effect-${index}`}
               sx={{
-                background: theme.ternary,
+                background: index % 2 === 0 ? theme.ternary : "transparent",
                 borderTop: `1px solid white`,
                 borderBottom: `1px solid white`,
                 px: 2,

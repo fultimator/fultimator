@@ -27,6 +27,7 @@ export default function InvocationItem({
   itemIndex,
   onReplaceItem,
   onDeleteItem,
+  paperSx,
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
@@ -64,7 +65,7 @@ export default function InvocationItem({
             </Tooltip>
           </>
         }
-        paperSx={{ mb: 0.5 }}
+        paperSx={{ mb: 0.5, ...paperSx }}
       >
         {expanded && (
           <Box sx={{ p: 2 }} onClick={(e) => e.stopPropagation()}>

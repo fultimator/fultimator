@@ -18,6 +18,7 @@ import {
   SlotTierPickerRenderer,
   SlotEditorRenderer,
   ReadonlyNumberRenderer,
+  ReadonlyMarkdownRenderer,
   RareBonusBlockRenderer,
   NpcAttrSliderRenderer,
   NpcAffinitySliderRenderer,
@@ -48,6 +49,7 @@ export const componentMap: Record<ComponentToken, RendererComponent> = {
   "slot-tier-picker": SlotTierPickerRenderer,
   "slot-editor": SlotEditorRenderer,
   "readonly-number": ReadonlyNumberRenderer,
+  "readonly-markdown": ReadonlyMarkdownRenderer,
   // Legacy tokens kept for compatibility during migration.
   "weapon-base-select": GroupedSelectRenderer,
   "accuracy-check": AccuracyCheckRenderer,

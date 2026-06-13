@@ -17,6 +17,7 @@ export type ComponentToken =
   | "accuracy-check"
   | "accuracy-attr-pair"
   | "readonly-number"
+  | "readonly-markdown"
   | "rare-bonus-block"
   | "martial-toggle"
   | "offensive-toggle"

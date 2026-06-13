@@ -20,7 +20,45 @@ const MAGISEED_OPTIONS = (magiseeds as Array<{ name: string }>).map((m) => ({
   label: m.name,
 }));
 
+const isCustom = (s: MagiseedItemState) => s.key === "magiseed_custom";
+
 export const DEFAULT_SUBITEM_TABS = DEFAULT_ITEM_TABS;
+
+const effectField = (
+  dotKey: `effects.${number}`,
+  label: string,
+  order: number,
+  rangeIndex: number,
+): ItemFieldConfig<MagiseedItemState> => [
+  {
+    key: dotKey,
+    kind: "editable",
+    label,
+    component: "textarea",
+    defaultValue: "",
+    group: "effects",
+    order,
+    gridSize: { xs: 12, sm: 6 },
+    dependencies: (s) =>
+      isCustom(s as MagiseedItemState) &&
+      (s.rangeStart as number) <= rangeIndex &&
+      (s.rangeEnd as number) >= rangeIndex,
+  },
+  {
+    key: dotKey,
+    kind: "editable",
+    label,
+    component: "readonly-markdown",
+    defaultValue: "",
+    group: "effects",
+    order,
+    gridSize: { xs: 12, sm: 6 },
+    dependencies: (s) =>
+      !isCustom(s as MagiseedItemState) &&
+      (s.rangeStart as number) <= rangeIndex &&
+      (s.rangeEnd as number) >= rangeIndex,
+  },
+];
 
 export const magiseedItemFields: ItemFieldConfig<MagiseedItemState> = [
   {
@@ -43,7 +81,7 @@ export const magiseedItemFields: ItemFieldConfig<MagiseedItemState> = [
     group: "",
     order: 1,
     gridSize: { xs: 12, sm: 6 },
-    dependencies: (s) => s.key === "magiseed_custom",
+    dependencies: isCustom,
   },
   {
     key: "rangeStart",
@@ -76,59 +114,22 @@ export const magiseedItemFields: ItemFieldConfig<MagiseedItemState> = [
     group: "",
     order: 4,
     fullWidth: true,
-    componentProps: (s) => ({ disabled: s.key !== "magiseed_custom" }),
+    dependencies: isCustom,
   },
   {
-    key: "effects.0",
+    key: "description",
     kind: "editable",
-    label: "spell.magiseed.effect0",
-    component: "textarea",
+    label: "spell.magiseed.description",
+    component: "readonly-markdown",
     defaultValue: "",
-    group: "effects",
-    order: 10,
-    gridSize: { xs: 12, sm: 6 },
-    dependencies: (s) =>
-      (s.rangeStart as number) <= 0 && (s.rangeEnd as number) >= 0,
-    componentProps: (s) => ({ disabled: s.key !== "magiseed_custom" }),
+    group: "",
+    order: 4,
+    fullWidth: true,
+    dependencies: (s) => !isCustom(s as MagiseedItemState),
   },
-  {
-    key: "effects.1",
-    kind: "editable",
-    label: "spell.magiseed.effect1",
-    component: "textarea",
-    defaultValue: "",
-    group: "effects",
-    order: 11,
-    gridSize: { xs: 12, sm: 6 },
-    dependencies: (s) =>
-      (s.rangeStart as number) <= 1 && (s.rangeEnd as number) >= 1,
-    componentProps: (s) => ({ disabled: s.key !== "magiseed_custom" }),
-  },
-  {
-    key: "effects.2",
-    kind: "editable",
-    label: "spell.magiseed.effect2",
-    component: "textarea",
-    defaultValue: "",
-    group: "effects",
-    order: 12,
-    gridSize: { xs: 12, sm: 6 },
-    dependencies: (s) =>
-      (s.rangeStart as number) <= 2 && (s.rangeEnd as number) >= 2,
-    componentProps: (s) => ({ disabled: s.key !== "magiseed_custom" }),
-  },
-  {
-    key: "effects.3",
-    kind: "editable",
-    label: "spell.magiseed.effect3",
-    component: "textarea",
-    defaultValue: "",
-    group: "effects",
-    order: 13,
-    gridSize: { xs: 12, sm: 6 },
-    dependencies: (s) =>
-      (s.rangeStart as number) <= 3 && (s.rangeEnd as number) >= 3,
-    componentProps: (s) => ({ disabled: s.key !== "magiseed_custom" }),
-  },
+  ...effectField("effects.0", "spell.magiseed.effect0", 10, 0),
+  ...effectField("effects.1", "spell.magiseed.effect1", 11, 1),
+  ...effectField("effects.2", "spell.magiseed.effect2", 12, 2),
+  ...effectField("effects.3", "spell.magiseed.effect3", 13, 3),
   behaviorsTabField,
 ];

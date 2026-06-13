@@ -31,6 +31,7 @@ export default function GiftItem({
   onReplaceItem,
   onDeleteItem,
   onCloneItem,
+  paperSx,
 }) {
   const { t } = useTranslate();
   const [expanded, setExpanded] = useState(false);
@@ -90,6 +91,7 @@ export default function GiftItem({
         label={itemDisplayName}
         subtitle={subtitle}
         onClick={() => setExpanded((v) => !v)}
+        paperSx={paperSx}
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>
