@@ -56,9 +56,15 @@ export function NpcStats({ npc }) {
   const theme = useCustomTheme();
 
   const { affinityGrants } = resolveActorEffects(npc);
-  const allKeys = new Set([...Object.keys(npc.affinities ?? {}), ...Object.keys(affinityGrants)]);
+  const allKeys = new Set([
+    ...Object.keys(npc.affinities ?? {}),
+    ...Object.keys(affinityGrants),
+  ]);
   const effectiveAffinities = Object.fromEntries(
-    [...allKeys].map((el) => [el, affinityGrants[el] ?? npc.affinities?.[el] ?? ""]),
+    [...allKeys].map((el) => [
+      el,
+      affinityGrants[el] ?? npc.affinities?.[el] ?? "",
+    ]),
   );
   const borderImage = `linear-gradient(45deg, #b9a9be, ${theme.transparent}) 1`;
   const panelBg = theme.mode === "dark" ? "#1B1D1E" : "#efecf5";

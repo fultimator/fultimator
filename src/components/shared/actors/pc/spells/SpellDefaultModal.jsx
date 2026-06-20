@@ -99,7 +99,11 @@ export default function SpellDefaultModal({
           onChange={setFormState}
           surface="edit"
           initialTab={initialTab}
-          extraProps={initialExpandedIndex !== undefined ? { initialExpandedIndex } : undefined}
+          extraProps={
+            initialExpandedIndex !== undefined
+              ? { initialExpandedIndex }
+              : undefined
+          }
         />
       </DialogContent>
       <DialogActions>

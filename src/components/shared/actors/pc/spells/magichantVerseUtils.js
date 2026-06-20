@@ -1,7 +1,19 @@
 export const volumes = [
-  { name: "magichant_volume_low", mp: 10, target: "magichant_volume_low_target" },
-  { name: "magichant_volume_medium", mp: 20, target: "magichant_volume_medium_target" },
-  { name: "magichant_volume_high", mp: 30, target: "magichant_volume_high_target" },
+  {
+    name: "magichant_volume_low",
+    mp: 10,
+    target: "magichant_volume_low_target",
+  },
+  {
+    name: "magichant_volume_medium",
+    mp: 20,
+    target: "magichant_volume_medium_target",
+  },
+  {
+    name: "magichant_volume_high",
+    mp: 30,
+    target: "magichant_volume_high_target",
+  },
 ];
 
 export function substituteKeyValues(text, chantKey, t) {

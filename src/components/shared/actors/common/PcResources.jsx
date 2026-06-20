@@ -31,7 +31,16 @@ import {
   useAnimatedDeltaNumber,
 } from "/src/components/shared/actors/common/resourceBarMotion";
 
-function StatChangeDialog({ open, onClose, stat, value, max, onApply, pip, t }) {
+function StatChangeDialog({
+  open,
+  onClose,
+  stat,
+  value,
+  max,
+  onApply,
+  pip,
+  t,
+}) {
   const [amount, setAmount] = useState("");
   const [isHealing, setIsHealing] = useState(true);
 
@@ -39,7 +48,7 @@ function StatChangeDialog({ open, onClose, stat, value, max, onApply, pip, t }) 
     e.preventDefault();
     const val = parseInt(amount, 10) || 0;
     if (val <= 0) return;
-    onApply(pip ? (isHealing ? val : -val) : (isHealing ? val : -val));
+    onApply(pip ? (isHealing ? val : -val) : isHealing ? val : -val);
     setAmount("");
     onClose();
   };
@@ -47,9 +56,7 @@ function StatChangeDialog({ open, onClose, stat, value, max, onApply, pip, t }) 
   return (
     <Dialog open={open} onClose={onClose}>
       <form onSubmit={handleSubmit}>
-        <DialogTitle
-          sx={{ fontWeight: "bold", textAlign: "center", pb: 1 }}
-        >
+        <DialogTitle sx={{ fontWeight: "bold", textAlign: "center", pb: 1 }}>
           {t("Update")} {stat}
         </DialogTitle>
         <DialogContent
@@ -62,7 +69,8 @@ function StatChangeDialog({ open, onClose, stat, value, max, onApply, pip, t }) 
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
-            {stat}: {value}{max != null ? ` / ${max}` : ""}
+            {stat}: {value}
+            {max != null ? ` / ${max}` : ""}
           </Typography>
           <ToggleButtonGroup
             value={isHealing ? "gain" : "lose"}

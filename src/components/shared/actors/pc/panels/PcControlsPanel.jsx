@@ -324,7 +324,11 @@ function ResourceCell({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip {...(tooltip ?? {})} display="block" disabled={isInteractive}>
+      <StatTooltip
+        {...(tooltip ?? {})}
+        display="block"
+        disabled={isInteractive}
+      >
         <StatBar
           label={label}
           Icon={Icon}
@@ -346,7 +350,13 @@ function ResourceCell({
 
 const MAX_FP_PIPS = 6;
 
-function FpCell({ value, onApply, onBarClick, tooltip, isInteractive = false }) {
+function FpCell({
+  value,
+  onApply,
+  onBarClick,
+  tooltip,
+  isInteractive = false,
+}) {
   const { t } = useTranslate();
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
   const filled = Math.min(value, MAX_FP_PIPS);
@@ -369,7 +379,11 @@ function FpCell({ value, onApply, onBarClick, tooltip, isInteractive = false }) 
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip {...(tooltip ?? {})} display="block" disabled={isInteractive}>
+      <StatTooltip
+        {...(tooltip ?? {})}
+        display="block"
+        disabled={isInteractive}
+      >
         <BarShell shellBg={shellBg} shellBorder={shellBorder}>
           <Box
             sx={{
@@ -476,7 +490,14 @@ function FpCell({ value, onApply, onBarClick, tooltip, isInteractive = false }) 
   );
 }
 
-function IpCell({ value, max, onApply, onBarClick, tooltip, isInteractive = false }) {
+function IpCell({
+  value,
+  max,
+  onApply,
+  onBarClick,
+  tooltip,
+  isInteractive = false,
+}) {
   const { t } = useTranslate();
   const { isDark, shellBg, shellBorder, labelBg, labelBorder, trackBg, theme } =
     useBarShell();
@@ -501,7 +522,11 @@ function IpCell({ value, max, onApply, onBarClick, tooltip, isInteractive = fals
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip {...(tooltip ?? {})} display="block" disabled={isInteractive}>
+      <StatTooltip
+        {...(tooltip ?? {})}
+        display="block"
+        disabled={isInteractive}
+      >
         <BarShell shellBg={shellBg} shellBorder={shellBorder}>
           <Box
             sx={{
@@ -740,7 +765,10 @@ export default function PcControlsPanel({
       ...prev,
       info: {
         ...prev.info,
-        fabulapoints: Math.max(0, Math.min(9999, (prev.info.fabulapoints ?? 0) + delta)),
+        fabulapoints: Math.max(
+          0,
+          Math.min(9999, (prev.info.fabulapoints ?? 0) + delta),
+        ),
       },
     }));
   };

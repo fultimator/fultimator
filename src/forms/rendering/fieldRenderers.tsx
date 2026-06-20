@@ -207,7 +207,8 @@ export function CustomTextareaRenderer({
   const { t } = useTranslate();
   const strValue = (value as string) ?? "";
   const translated = t(strValue);
-  const previewValue = translated !== strValue ? translated : strValue || undefined;
+  const previewValue =
+    translated !== strValue ? translated : strValue || undefined;
   return (
     <CustomTextarea
       label={t(label)}
@@ -666,7 +667,12 @@ export function ReadonlyMarkdownRenderer({ label, value }: FieldRendererProps) {
         minRows={4}
         fullWidth
         variant="outlined"
-        slotProps={{ htmlInput: { readOnly: true, style: { opacity: 0, userSelect: "none" } } }}
+        slotProps={{
+          htmlInput: {
+            readOnly: true,
+            style: { opacity: 0, userSelect: "none" },
+          },
+        }}
         disabled
       />
       <Box
@@ -1373,9 +1379,14 @@ export function ObjectListRenderer({
     [value],
   );
   const isBehaviorCard = variant === "behavior-card";
-  const initialExpandedIndex = componentProps?.initialExpandedIndex as number | undefined;
-  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>(() =>
-    initialExpandedIndex !== undefined ? { [initialExpandedIndex]: true } : {},
+  const initialExpandedIndex = componentProps?.initialExpandedIndex as
+    | number
+    | undefined;
+  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>(
+    () =>
+      initialExpandedIndex !== undefined
+        ? { [initialExpandedIndex]: true }
+        : {},
   );
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [menuRowIndex, setMenuRowIndex] = useState<number | null>(null);

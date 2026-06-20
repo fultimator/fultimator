@@ -436,13 +436,14 @@ export default function PcSpells({
                           updater,
                         )
                     : undefined,
-                  onSpellListUpdate: canEdit && !isVirtual
-                    ? (updater) =>
-                        handleUpdateSpellList(
-                          realClassIdx ?? classIndex,
-                          updater,
-                        )
-                    : undefined,
+                  onSpellListUpdate:
+                    canEdit && !isVirtual
+                      ? (updater) =>
+                          handleUpdateSpellList(
+                            realClassIdx ?? classIndex,
+                            updater,
+                          )
+                      : undefined,
                   spellIndex: realSpellIndex,
                 });
                 return (

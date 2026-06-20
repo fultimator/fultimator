@@ -74,7 +74,8 @@ export function processMagicCheck(
   };
 
   const accuracyTotal = highRoll + lowRoll + modifierTotal;
-  const damage = damageHighRoll + intent.baseDamage + (intent.damageOutgoingBonus ?? 0);
+  const damage =
+    damageHighRoll + intent.baseDamage + (intent.damageOutgoingBonus ?? 0);
   const critical =
     rolls.primaryDie === rolls.secondaryDie &&
     rolls.primaryDie >= Math.max(2, intent.critThreshold);

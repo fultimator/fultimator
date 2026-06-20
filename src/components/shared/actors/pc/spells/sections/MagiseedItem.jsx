@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Box, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { Delete, ContentCopy } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { magiseeds } from "/src/libs/floralistMagiseedData";
@@ -19,12 +27,16 @@ function toFormState(src, t) {
   const effects = { 0: "", 1: "", 2: "", 3: "" };
   for (const k of [0, 1, 2, 3]) {
     const v = raw[k] || "";
-    effects[k] = custom ? v : (v ? t(v) : "");
+    effects[k] = custom ? v : v ? t(v) : "";
   }
   return {
     key: src.key || "magiseed_custom",
     customName: src.customName || "",
-    description: custom ? (src.description || "") : (src.description ? t(src.description) : ""),
+    description: custom
+      ? src.description || ""
+      : src.description
+        ? t(src.description)
+        : "",
     rangeStart: src.rangeStart ?? 0,
     rangeEnd: src.rangeEnd ?? 3,
     effects,
@@ -46,7 +58,9 @@ export default function MagiseedItem({
   const [formState, setFormState] = useState(() => toFormState(item, t));
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { setFormState(toFormState(item, t)); }, [item]);
+  useEffect(() => {
+    setFormState(toFormState(item, t));
+  }, [item]);
 
   const {
     isOpen: deleteDialogOpen,
@@ -61,7 +75,13 @@ export default function MagiseedItem({
     if (nextKey !== prevKey && nextKey !== "magiseed_custom") {
       const preset = magiseeds.find((m) => m.name === nextKey);
       if (preset) {
-        const rawEffects = { 0: "", 1: "", 2: "", 3: "", ...(preset.effects || {}) };
+        const rawEffects = {
+          0: "",
+          1: "",
+          2: "",
+          3: "",
+          ...(preset.effects || {}),
+        };
         const displayEffects = { 0: "", 1: "", 2: "", 3: "" };
         for (const k of [0, 1, 2, 3]) {
           displayEffects[k] = rawEffects[k] ? t(rawEffects[k]) : "";
@@ -99,7 +119,8 @@ export default function MagiseedItem({
     onCloneItem(itemIndex, {
       ...item,
       key: "magiseed_custom",
-      customName: formState.customName || (formState.key ? t(formState.key) : ""),
+      customName:
+        formState.customName || (formState.key ? t(formState.key) : ""),
       description: formState.description,
       effects: { ...formState.effects },
     });

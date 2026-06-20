@@ -1,10 +1,7 @@
 import type { ItemFieldConfig, GroupLabels, FieldConfig } from "../fieldConfig";
 import type { Note } from "../../../schema/itemSchemas/note";
 import { SHARED_LABEL_KEYS } from "./sharedLabelKeys";
-import {
-  behaviorsTabField,
-  DEFAULT_ITEM_TABS,
-} from "../shared/behaviorFields";
+import { behaviorsTabField, DEFAULT_ITEM_TABS } from "../shared/behaviorFields";
 
 export type NoteFormState = Note;
 

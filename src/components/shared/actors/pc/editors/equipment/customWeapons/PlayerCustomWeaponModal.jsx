@@ -659,7 +659,9 @@ export default function PlayerCustomWeaponModal({
                 ...coreExtraProps,
                 ...slotsExtraProps,
                 ...qualityExtraProps,
-                ...(initialExpandedIndex !== undefined ? { initialExpandedIndex } : {}),
+                ...(initialExpandedIndex !== undefined
+                  ? { initialExpandedIndex }
+                  : {}),
               }}
             />
 

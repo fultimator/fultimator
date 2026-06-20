@@ -57,7 +57,9 @@ export const magichantKeyItemFields: ItemFieldConfig<MagichantKeyItemState> = [
     group: "",
     order: 2,
     gridSize: { xs: 12, sm: 6, md: 3 },
-    componentProps: (s) => ({ disabled: !isCustom(s as MagichantKeyItemState) }),
+    componentProps: (s) => ({
+      disabled: !isCustom(s as MagichantKeyItemState),
+    }),
   },
   {
     key: "status",
@@ -68,7 +70,9 @@ export const magichantKeyItemFields: ItemFieldConfig<MagichantKeyItemState> = [
     group: "",
     order: 3,
     gridSize: { xs: 12, sm: 6, md: 3 },
-    componentProps: (s) => ({ disabled: !isCustom(s as MagichantKeyItemState) }),
+    componentProps: (s) => ({
+      disabled: !isCustom(s as MagichantKeyItemState),
+    }),
   },
   {
     key: "attribute",
@@ -79,7 +83,9 @@ export const magichantKeyItemFields: ItemFieldConfig<MagichantKeyItemState> = [
     group: "",
     order: 4,
     gridSize: { xs: 12, sm: 6, md: 3 },
-    componentProps: (s) => ({ disabled: !isCustom(s as MagichantKeyItemState) }),
+    componentProps: (s) => ({
+      disabled: !isCustom(s as MagichantKeyItemState),
+    }),
   },
   {
     key: "recovery",
@@ -90,7 +96,9 @@ export const magichantKeyItemFields: ItemFieldConfig<MagichantKeyItemState> = [
     group: "",
     order: 5,
     gridSize: { xs: 12, sm: 6, md: 3 },
-    componentProps: (s) => ({ disabled: !isCustom(s as MagichantKeyItemState) }),
+    componentProps: (s) => ({
+      disabled: !isCustom(s as MagichantKeyItemState),
+    }),
   },
   behaviorsTabField,
 ];

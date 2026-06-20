@@ -178,7 +178,13 @@ export default function PlayerArmorModal({
                 surface="edit"
                 cols={2}
                 initialTab={initialTab}
-                extraProps={{ player, isWeapon: false, ...(initialExpandedIndex !== undefined ? { initialExpandedIndex } : {}) }}
+                extraProps={{
+                  player,
+                  isWeapon: false,
+                  ...(initialExpandedIndex !== undefined
+                    ? { initialExpandedIndex }
+                    : {}),
+                }}
               />
 
               <Grid container spacing={1} sx={{ alignItems: "center", mt: 2 }}>

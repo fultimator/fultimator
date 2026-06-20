@@ -22,8 +22,16 @@ function toFormState(src, t) {
   return {
     name: src.name || "mutant_therioform_custom_name",
     customName: src.customName || "",
-    genoclepsis: custom ? (src.genoclepsis || "") : (src.genoclepsis ? t(src.genoclepsis) : ""),
-    description: custom ? (src.description || "") : (src.description ? t(src.description) : ""),
+    genoclepsis: custom
+      ? src.genoclepsis || ""
+      : src.genoclepsis
+        ? t(src.genoclepsis)
+        : "",
+    description: custom
+      ? src.description || ""
+      : src.description
+        ? t(src.description)
+        : "",
     behaviors: src.behaviors ?? [],
   };
 }
@@ -41,7 +49,9 @@ export default function MutantItem({
 
   const [formState, setFormState] = useState(() => toFormState(item, t));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { setFormState(toFormState(item, t)); }, [item]);
+  useEffect(() => {
+    setFormState(toFormState(item, t));
+  }, [item]);
 
   const {
     isOpen: deleteDialogOpen,
@@ -51,11 +61,10 @@ export default function MutantItem({
 
   const handleChange = (next) => {
     const nextName = next.name;
-    if (
-      nextName !== formState.name &&
-      !CUSTOM_THERIOFORM_NAMES.has(nextName)
-    ) {
-      const therioform = availableTherioforms.find((tf) => tf.name === nextName);
+    if (nextName !== formState.name && !CUSTOM_THERIOFORM_NAMES.has(nextName)) {
+      const therioform = availableTherioforms.find(
+        (tf) => tf.name === nextName,
+      );
       if (therioform) {
         const resolved = {
           ...next,
@@ -65,7 +74,11 @@ export default function MutantItem({
           description: t(therioform.description || ""),
         };
         setFormState(resolved);
-        onReplaceItem(itemIndex, { ...resolved, genoclepsis: therioform.genoclepsis || "", description: therioform.description || "" });
+        onReplaceItem(itemIndex, {
+          ...resolved,
+          genoclepsis: therioform.genoclepsis || "",
+          description: therioform.description || "",
+        });
         return;
       }
     }
@@ -74,7 +87,8 @@ export default function MutantItem({
   };
 
   const itemDisplayName =
-    formState.customName || t(formState.name || "mutant_therioform_custom_name");
+    formState.customName ||
+    t(formState.name || "mutant_therioform_custom_name");
   const isCustomTherioform = CUSTOM_THERIOFORM_NAMES.has(formState.name);
   const formFields = therioformItemFields;
 
@@ -98,12 +112,22 @@ export default function MutantItem({
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCloneToCustom();
+                }}
+              >
                 <ContentCopy />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Delete")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteDialog();
+                }}
+              >
                 <Delete />
               </IconButton>
             </Tooltip>

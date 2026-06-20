@@ -95,12 +95,17 @@ export function resolveDamage(ctx: DamageContext): DamageResult {
 
   // Step 1: base + outgoing bonus (attacker) + incoming bonus (target), flat before affinity
   const outBonus = outgoingBonusFor(ctx);
-  const inBonus = incomingBonusForElement(ctx.incomingDamageBonuses, ctx.damageType);
+  const inBonus = incomingBonusForElement(
+    ctx.incomingDamageBonuses,
+    ctx.damageType,
+  );
   const bonus = outBonus + inBonus;
   const boosted = ctx.baseDamage + bonus;
   breakdown.push({ label: "base", value: ctx.baseDamage });
-  if (outBonus !== 0) breakdown.push({ label: "outgoing bonus", value: outBonus });
-  if (inBonus !== 0) breakdown.push({ label: "incoming bonus", value: inBonus });
+  if (outBonus !== 0)
+    breakdown.push({ label: "outgoing bonus", value: outBonus });
+  if (inBonus !== 0)
+    breakdown.push({ label: "incoming bonus", value: inBonus });
 
   // Step 2: untyped damage bypasses all affinity resolution
   if (isUntyped) {
@@ -207,7 +212,7 @@ export function buildDamageContext(opts: {
   const allTemporary =
     runtimeTemp && granted
       ? combineAffinities(runtimeTemp, granted)
-      : runtimeTemp ?? granted;
+      : (runtimeTemp ?? granted);
   const temp = allTemporary;
 
   return {

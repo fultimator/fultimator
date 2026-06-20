@@ -170,7 +170,14 @@ function ThemedSpellChanter({
             </Typography>
           </Grid>
         </Grid>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexShrink: 0 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            flexShrink: 0,
+          }}
+        >
           {isEditMode && !showInPlayerSheet && (
             <Tooltip title={t("Magichant not shown in player sheet")}>
               <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />

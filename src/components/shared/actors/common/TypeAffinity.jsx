@@ -68,7 +68,10 @@ export function TypeAffinity({
   const { t } = useTranslate();
   const rawAffinity = String(affinity ?? "").toLowerCase();
   const normalizedAffinity = rawAffinity === "no" ? "" : rawAffinity;
-  const rawCurrent = currentAffinity !== undefined ? String(currentAffinity).toLowerCase() : normalizedAffinity;
+  const rawCurrent =
+    currentAffinity !== undefined
+      ? String(currentAffinity).toLowerCase()
+      : normalizedAffinity;
   const normalizedCurrent = rawCurrent === "no" ? "" : rawCurrent;
   const disabled = normalizedCurrent === "";
   const value = ["", "rs", "im", "ab", "vu"].includes(normalizedCurrent)
@@ -133,79 +136,81 @@ export function TypeAffinity({
           width: "100%",
         }}
       >
-      <ButtonBase
-        ref={buttonRef}
-        onClick={() => setMenuOpen(true)}
-        sx={{
-          px: 0.55,
-          py: 0.15,
-          width: "100%",
-          minWidth: 0,
-          minHeight: 28,
-          borderRadius: 0.75,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 0.45,
-          fontFamily: "Antonio",
-          fontWeight: "bold",
-          textTransform: "uppercase",
-          fontSize: "1.05rem",
-          lineHeight: 1,
-          color: "red.main",
-          opacity: value ? 1 : 0.72,
-          "&:hover": {
-            backgroundColor: "transparent",
-          },
-        }}
-      >
-        {iconNode}
-        <Typography
-          component="span"
+        <ButtonBase
+          ref={buttonRef}
+          onClick={() => setMenuOpen(true)}
           sx={{
-            color: "red.main",
-            fontWeight: "bold",
+            px: 0.55,
+            py: 0.15,
+            width: "100%",
+            minWidth: 0,
+            minHeight: 28,
+            borderRadius: 0.75,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 0.45,
             fontFamily: "Antonio",
+            fontWeight: "bold",
             textTransform: "uppercase",
             fontSize: "1.05rem",
             lineHeight: 1,
-            letterSpacing: "0.03em",
+            color: "red.main",
+            opacity: value ? 1 : 0.72,
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
           }}
         >
-          {value ? value.toUpperCase() : ""}
-        </Typography>
-        {showDropdownArrow && (
-          <KeyboardArrowDownIcon
+          {iconNode}
+          <Typography
+            component="span"
             sx={{
-              fontSize: "0.95rem",
-              color: "text.secondary",
-              opacity: 0.9,
-              ml: 0.1,
-            }}
-          />
-        )}
-      </ButtonBase>
-      <Menu
-        anchorEl={buttonRef.current}
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        transformOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        {AFFINITY_OPTIONS.map((opt) => (
-          <MenuItem
-            key={opt.value || "none"}
-            selected={normalizedAffinity === opt.value}
-            onClick={() => {
-              onChangeAffinity?.(opt.value);
-              setMenuOpen(false);
+              color: "red.main",
+              fontWeight: "bold",
+              fontFamily: "Antonio",
+              textTransform: "uppercase",
+              fontSize: "1.05rem",
+              lineHeight: 1,
+              letterSpacing: "0.03em",
             }}
           >
-            {t(opt.labelKey) === opt.labelKey ? opt.fallback : t(opt.labelKey)}
-          </MenuItem>
-        ))}
-      </Menu>
-    </Box>
+            {value ? value.toUpperCase() : ""}
+          </Typography>
+          {showDropdownArrow && (
+            <KeyboardArrowDownIcon
+              sx={{
+                fontSize: "0.95rem",
+                color: "text.secondary",
+                opacity: 0.9,
+                ml: 0.1,
+              }}
+            />
+          )}
+        </ButtonBase>
+        <Menu
+          anchorEl={buttonRef.current}
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          {AFFINITY_OPTIONS.map((opt) => (
+            <MenuItem
+              key={opt.value || "none"}
+              selected={normalizedAffinity === opt.value}
+              onClick={() => {
+                onChangeAffinity?.(opt.value);
+                setMenuOpen(false);
+              }}
+            >
+              {t(opt.labelKey) === opt.labelKey
+                ? opt.fallback
+                : t(opt.labelKey)}
+            </MenuItem>
+          ))}
+        </Menu>
+      </Box>
     </StatTooltip>
   );
 }

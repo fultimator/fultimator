@@ -79,12 +79,48 @@ export default function SpellGourmet({
       if (!val) return;
       if (choice.type === "statusEffect") {
         text = text
-          .replace(new RegExp(t("gourmet_delicacy_effect_choose_all_statuses").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), val)
-          .replace(new RegExp(t("gourmet_delicacy_effect_choose_some_statuses").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), val);
+          .replace(
+            new RegExp(
+              t("gourmet_delicacy_effect_choose_all_statuses").replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&",
+              ),
+              "g",
+            ),
+            val,
+          )
+          .replace(
+            new RegExp(
+              t("gourmet_delicacy_effect_choose_some_statuses").replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&",
+              ),
+              "g",
+            ),
+            val,
+          );
       } else if (choice.type === "damageType") {
-        text = text.replace(new RegExp(t("gourmet_delicacy_effect_choose_damage_type").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), val);
+        text = text.replace(
+          new RegExp(
+            t("gourmet_delicacy_effect_choose_damage_type").replace(
+              /[.*+?^${}()|[\]\\]/g,
+              "\\$&",
+            ),
+            "g",
+          ),
+          val,
+        );
       } else if (choice.type === "attribute") {
-        text = text.replace(new RegExp(t("gourmet_delicacy_effect_choose_attributte").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), val);
+        text = text.replace(
+          new RegExp(
+            t("gourmet_delicacy_effect_choose_attributte").replace(
+              /[.*+?^${}()|[\]\\]/g,
+              "\\$&",
+            ),
+            "g",
+          ),
+          val,
+        );
       }
     });
     return text;
@@ -176,9 +212,7 @@ export default function SpellGourmet({
       name: spell.spellName || "Unnamed Cooking Spell",
       cookbookEffects: cookbookEffectsArray,
       ingredientInventory: combineIngredientInventory(
-        spell.cookbook?.ingredientInventory ||
-          spell.ingredientInventory ||
-          [],
+        spell.cookbook?.ingredientInventory || spell.ingredientInventory || [],
         t,
       ),
       showInPlayerSheet: spell.showInPlayerSheet !== false,

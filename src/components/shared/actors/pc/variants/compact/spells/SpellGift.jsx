@@ -25,7 +25,12 @@ const StyledTableCell = styled(TableCell)({
   borderBottom: "1px solid rgba(224, 224, 224, 1)",
 });
 
-export default function SpellGift({ spell, setPlayer, classIndex, spellIndex }) {
+export default function SpellGift({
+  spell,
+  setPlayer,
+  classIndex,
+  spellIndex,
+}) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
@@ -74,9 +79,7 @@ export default function SpellGift({ spell, setPlayer, classIndex, spellIndex }) 
           const isTargetSpell =
             sIndex === spellIndex ||
             (spell.fuid && s.fuid === spell.fuid) ||
-            (s.spellType === "gift" &&
-              spellIndex === undefined &&
-              !spell.fuid);
+            (s.spellType === "gift" && spellIndex === undefined && !spell.fuid);
           return isTargetSpell ? { ...s, clock: clampedClock } : s;
         });
 

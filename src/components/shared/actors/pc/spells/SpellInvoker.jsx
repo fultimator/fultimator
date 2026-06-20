@@ -9,7 +9,13 @@ import {
   AccordionDetails,
   Box,
 } from "@mui/material";
-import { ExpandMore, FlashOn, Edit, Casino, Message } from "@mui/icons-material";
+import {
+  ExpandMore,
+  FlashOn,
+  Edit,
+  Casino,
+  Message,
+} from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -436,10 +442,7 @@ function ThemedSpellInvoker({
                     </Typography>
                   </Box>
                   <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
-                    <Typography
-                      component="div"
-                      sx={bodyTextSx}
-                    >
+                    <Typography component="div" sx={bodyTextSx}>
                       <ReactMarkdown components={components}>
                         {t(invocation.effect)}
                       </ReactMarkdown>

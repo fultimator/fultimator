@@ -2,10 +2,7 @@ import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import type { OptionalItem } from "../../../schema/itemSchemas/optional";
 import type { CampActivityTargetKey } from "../../../schema/itemSchemas/optional";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
-import {
-  behaviorsTabField,
-  DEFAULT_ITEM_TABS,
-} from "../shared/behaviorFields";
+import { behaviorsTabField, DEFAULT_ITEM_TABS } from "../shared/behaviorFields";
 
 type OptionalFormStateShape = {
   subtype:

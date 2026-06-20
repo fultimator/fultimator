@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Table, TableBody, TableRow, TableCell, Typography } from "@mui/material";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -23,13 +30,16 @@ export default function SpellDance({ spell }) {
 
   const getDanceName = (dance) => {
     const key = dance.key || dance.name;
-    if (CUSTOM_DANCE_KEYS.has(key)) return dance.customName || t("dance_custom_name");
+    if (CUSTOM_DANCE_KEYS.has(key))
+      return dance.customName || t("dance_custom_name");
     return dance.customName || t(key || dance.name || "");
   };
 
   const getDanceDuration = (dance) => {
     const key = dance.key || dance.name;
-    return CUSTOM_DANCE_KEYS.has(key) ? dance.duration : t(dance.duration || "");
+    return CUSTOM_DANCE_KEYS.has(key)
+      ? dance.duration
+      : t(dance.duration || "");
   };
 
   const getDanceEffect = (dance) => {
@@ -54,10 +64,18 @@ export default function SpellDance({ spell }) {
           >
             <StyledTableCell sx={{ width: "34%" }}>
               <Box sx={{ display: "grid", gap: 0.25 }}>
-                <Typography sx={{ fontSize: "0.85rem", fontWeight: "bold", lineHeight: 1.25 }}>
+                <Typography
+                  sx={{
+                    fontSize: "0.85rem",
+                    fontWeight: "bold",
+                    lineHeight: 1.25,
+                  }}
+                >
                   {getDanceName(dance)}
                 </Typography>
-                <Typography sx={{ fontSize: "0.78rem", lineHeight: 1.25, opacity: 0.85 }}>
+                <Typography
+                  sx={{ fontSize: "0.78rem", lineHeight: 1.25, opacity: 0.85 }}
+                >
                   {getDanceDuration(dance)}
                 </Typography>
               </Box>

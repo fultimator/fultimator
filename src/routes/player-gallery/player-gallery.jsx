@@ -1414,7 +1414,9 @@ function Personal() {
 
             <SettingRow
               label={t("Expand All Sections")}
-              hint={t("When enabled, all spell and class sections start expanded on load.")}
+              hint={t(
+                "When enabled, all spell and class sections start expanded on load.",
+              )}
               compactControl
             >
               <Checkbox

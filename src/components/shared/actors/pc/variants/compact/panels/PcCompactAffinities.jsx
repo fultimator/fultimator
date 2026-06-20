@@ -21,9 +21,15 @@ export default function PcCompactAffinities({
   };
 
   const { affinityGrants } = resolveActorEffects(pc);
-  const allKeys = new Set([...Object.keys(pc.affinities ?? {}), ...Object.keys(affinityGrants)]);
+  const allKeys = new Set([
+    ...Object.keys(pc.affinities ?? {}),
+    ...Object.keys(affinityGrants),
+  ]);
   const effectiveAffinities = Object.fromEntries(
-    [...allKeys].map((el) => [el, affinityGrants[el] ?? pc.affinities?.[el] ?? ""]),
+    [...allKeys].map((el) => [
+      el,
+      affinityGrants[el] ?? pc.affinities?.[el] ?? "",
+    ]),
   );
 
   return (

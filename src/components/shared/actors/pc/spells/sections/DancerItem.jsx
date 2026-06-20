@@ -19,8 +19,8 @@ function toFormState(src, t) {
   return {
     key: resolvedKey,
     customName: src.customName || "",
-    duration: custom ? (src.duration || "") : (src.duration ? t(src.duration) : ""),
-    effect: custom ? (src.effect || "") : (src.effect ? t(src.effect) : ""),
+    duration: custom ? src.duration || "" : src.duration ? t(src.duration) : "",
+    effect: custom ? src.effect || "" : src.effect ? t(src.effect) : "",
     behaviors: src.behaviors ?? [],
   };
 }
@@ -38,7 +38,9 @@ export default function DancerItem({
 
   const [formState, setFormState] = useState(() => toFormState(item, t));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { setFormState(toFormState(item, t)); }, [item]);
+  useEffect(() => {
+    setFormState(toFormState(item, t));
+  }, [item]);
 
   const {
     isOpen: deleteDialogOpen,
@@ -59,7 +61,11 @@ export default function DancerItem({
           effect: t(dance.effect || ""),
         };
         setFormState(resolved);
-        onReplaceItem(itemIndex, { ...resolved, duration: dance.duration || "", effect: dance.effect || "" });
+        onReplaceItem(itemIndex, {
+          ...resolved,
+          duration: dance.duration || "",
+          effect: dance.effect || "",
+        });
         return;
       }
     }
@@ -85,18 +91,32 @@ export default function DancerItem({
     <>
       <ItemRowCard
         label={itemDisplayName}
-        subtitle={formState.duration ? <NotesMarkdown compact>{formState.duration}</NotesMarkdown> : undefined}
+        subtitle={
+          formState.duration ? (
+            <NotesMarkdown compact>{formState.duration}</NotesMarkdown>
+          ) : undefined
+        }
         onClick={() => setExpanded((v) => !v)}
         paperSx={paperSx}
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCloneToCustom();
+                }}
+              >
                 <ContentCopy />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Delete")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteDialog();
+                }}
+              >
                 <Delete />
               </IconButton>
             </Tooltip>

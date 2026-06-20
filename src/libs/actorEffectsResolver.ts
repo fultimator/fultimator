@@ -50,7 +50,9 @@ export function resolveActorEffects(
   const bonuses = clone(actor.bonuses ?? zeroActorBonuses());
   const multipliers = clone(actor.multipliers ?? oneActorMultipliers());
   const grants: GrantData[] = [];
-  const baseAffinities = (actor.affinities ?? {}) as Partial<Record<Elements, Affinities>>;
+  const baseAffinities = (actor.affinities ?? {}) as Partial<
+    Record<Elements, Affinities>
+  >;
   const affinityGrants: Partial<Record<Elements, Affinities>> = {};
 
   const passiveBehaviors = collectPassiveBehaviors(actor, ctx);
@@ -150,13 +152,10 @@ function matchesStableKey(
   return false;
 }
 
-function activeVehicle(
-  vehicles: SubItemContainer[],
-): SubItemContainer | null {
+function activeVehicle(vehicles: SubItemContainer[]): SubItemContainer | null {
   if (vehicles.length === 0) return null;
   return vehicles.find((v) => v.enabled === true) ?? vehicles[0];
 }
-
 
 function isNestedSpellItemActive(
   spell: SubItemContainer,
@@ -351,7 +350,9 @@ function applyAffinityChange(
     grants[element] = incoming;
   } else {
     const existing = grants[element] ?? baseAffinities[element] ?? null;
-    grants[element] = existing ? combineAffinities(existing, incoming) : incoming;
+    grants[element] = existing
+      ? combineAffinities(existing, incoming)
+      : incoming;
   }
 }
 

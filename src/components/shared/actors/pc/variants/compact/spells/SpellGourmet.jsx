@@ -88,9 +88,7 @@ export default function SpellGourmet({ spell }) {
     }),
   );
   const ingredientInventory = combineIngredientInventory(
-    spell.cookbook?.ingredientInventory ||
-      spell.ingredientInventory ||
-      [],
+    spell.cookbook?.ingredientInventory || spell.ingredientInventory || [],
     t,
   );
 

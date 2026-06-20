@@ -903,7 +903,9 @@ export const ChatPanel: React.FC = () => {
                         <Button
                           size="small"
                           variant="text"
-                          onClick={() => handleToggleResourceApplication(logMsg)}
+                          onClick={() =>
+                            handleToggleResourceApplication(logMsg)
+                          }
                           sx={{
                             minWidth: 52,
                             px: 0.75,

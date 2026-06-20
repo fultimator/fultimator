@@ -107,7 +107,14 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
               {t("mutant_therioform")}
             </Typography>
           </Box>
-          <Box sx={{ flex: 1, display: "flex", alignItems: "center", minHeight: "40px" }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              minHeight: "40px",
+            }}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -117,7 +124,15 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <Box
+          sx={{
+            width: 34,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
           {isEditMode && (
             <>
               {!showInPlayerSheet && (
@@ -165,7 +180,13 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
               }}
             >
               <Box sx={{ display: "flex", flexGrow: 1 }}>
-                <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    flex: "0 0 25%",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{

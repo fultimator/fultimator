@@ -69,10 +69,7 @@ function ArcanaSection({ label, title, description, fallback, theme }) {
             "& *": { color: `${theme.white} !important` },
           }}
         >
-          <Typography
-            variant="h5"
-            sx={{ fontWeight: "bold", lineHeight: 1.2 }}
-          >
+          <Typography variant="h5" sx={{ fontWeight: "bold", lineHeight: 1.2 }}>
             {label}
           </Typography>
         </Box>
@@ -85,7 +82,10 @@ function ArcanaSection({ label, title, description, fallback, theme }) {
             py: 0.5,
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: "bold", lineHeight: 1.25 }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold", lineHeight: 1.25 }}
+          >
             {title || ""}
           </Typography>
         </Box>
@@ -170,7 +170,8 @@ export default function SpellArcanist({
     handleDismiss();
   };
 
-  const domainText = arcana.domain || (arcana.domainDesc ? t(arcana.domainDesc) : "");
+  const domainText =
+    arcana.domain || (arcana.domainDesc ? t(arcana.domainDesc) : "");
   const domainSubtitle = domainText ? (
     <Typography component="div" sx={{ fontSize: "0.85rem", lineHeight: 1.3 }}>
       <strong>{t("Domains: ")}</strong>
@@ -194,9 +195,7 @@ export default function SpellArcanist({
     >
       <ItemRowCard
         variant="outlined"
-        onClick={
-          alwaysExpanded ? undefined : () => setOpen((value) => !value)
-        }
+        onClick={alwaysExpanded ? undefined : () => setOpen((value) => !value)}
         paperSx={{
           transition: "border-color 0.15s ease",
           borderColor: arcana.enabled ? theme.primary : undefined,
@@ -303,13 +302,19 @@ export default function SpellArcanist({
                 </Step>
                 {rework && (
                   <Step completed={false}>
-                    <StepButton onClick={handlePulse} disabled={!arcana.enabled}>
+                    <StepButton
+                      onClick={handlePulse}
+                      disabled={!arcana.enabled}
+                    >
                       {pulseLabel}
                     </StepButton>
                   </Step>
                 )}
                 <Step completed={false}>
-                  <StepButton onClick={handleDismiss} disabled={!arcana.enabled}>
+                  <StepButton
+                    onClick={handleDismiss}
+                    disabled={!arcana.enabled}
+                  >
                     {dismissLabel}
                   </StepButton>
                 </Step>

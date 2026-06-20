@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { BehaviorSchema, EffectChangeSchema, GrantDataSchema, EffectDurationSchema, EffectPredicateSchema } from "../shared/behaviorSchemas";
+import {
+  BehaviorSchema,
+  EffectChangeSchema,
+  GrantDataSchema,
+  EffectDurationSchema,
+  EffectPredicateSchema,
+} from "../shared/behaviorSchemas";
 
 const AffinityValueSchema = z.enum(["vu", "rs", "im", "ab", "no"]);
 

@@ -1,5 +1,12 @@
 import React from "react";
-import { Box, Table, TableBody, TableRow, TableCell, Typography } from "@mui/material";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Typography,
+} from "@mui/material";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -21,7 +28,8 @@ export default function SpellSymbol({ spell }) {
 
   const getSymbolName = (sym) => {
     const key = sym.key || sym.name;
-    if (key === "symbol_custom_name") return sym.customName || t("symbol_custom_name");
+    if (key === "symbol_custom_name")
+      return sym.customName || t("symbol_custom_name");
     return sym.customName || t(key || sym.name || "");
   };
 
@@ -47,7 +55,13 @@ export default function SpellSymbol({ spell }) {
           >
             <StyledTableCell sx={{ width: "34%" }}>
               <Box sx={{ display: "grid", gap: 0.25 }}>
-                <Typography sx={{ fontSize: "0.85rem", fontWeight: "bold", lineHeight: 1.25 }}>
+                <Typography
+                  sx={{
+                    fontSize: "0.85rem",
+                    fontWeight: "bold",
+                    lineHeight: 1.25,
+                  }}
+                >
                   {getSymbolName(sym)}
                 </Typography>
               </Box>

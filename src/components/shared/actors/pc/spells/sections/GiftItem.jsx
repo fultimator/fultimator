@@ -19,8 +19,8 @@ function toFormState(src, t) {
   return {
     key: resolvedKey,
     customName: src.customName || "",
-    event: custom ? (src.event || "") : (src.event ? t(src.event) : ""),
-    effect: custom ? (src.effect || "") : (src.effect ? t(src.effect) : ""),
+    event: custom ? src.event || "" : src.event ? t(src.event) : "",
+    effect: custom ? src.effect || "" : src.effect ? t(src.effect) : "",
     behaviors: src.behaviors ?? [],
   };
 }
@@ -38,7 +38,9 @@ export default function GiftItem({
 
   const [formState, setFormState] = useState(() => toFormState(item, t));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { setFormState(toFormState(item, t)); }, [item]);
+  useEffect(() => {
+    setFormState(toFormState(item, t));
+  }, [item]);
 
   const {
     isOpen: deleteDialogOpen,
@@ -59,7 +61,11 @@ export default function GiftItem({
           effect: t(gift.effect || ""),
         };
         setFormState(resolved);
-        onReplaceItem(itemIndex, { ...resolved, event: gift.event || "", effect: gift.effect || "" });
+        onReplaceItem(itemIndex, {
+          ...resolved,
+          event: gift.event || "",
+          effect: gift.effect || "",
+        });
         return;
       }
     }
@@ -95,12 +101,22 @@ export default function GiftItem({
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCloneToCustom();
+                }}
+              >
                 <ContentCopy />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Delete")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteDialog();
+                }}
+              >
                 <Delete />
               </IconButton>
             </Tooltip>

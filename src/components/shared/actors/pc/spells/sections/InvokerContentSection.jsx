@@ -241,7 +241,6 @@ export default function InvokerContentSection({ formState, setFormState, t }) {
           </Grid>
         )}
       </Grid>
-
     </Grid>
   );
 }

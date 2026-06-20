@@ -70,9 +70,15 @@ export default function PcAffinities({ pc, isInteractive = false, onUpdate }) {
   };
 
   const { affinityGrants } = resolveActorEffects(pc);
-  const allKeys = new Set([...Object.keys(pc.affinities ?? {}), ...Object.keys(affinityGrants)]);
+  const allKeys = new Set([
+    ...Object.keys(pc.affinities ?? {}),
+    ...Object.keys(affinityGrants),
+  ]);
   const effectiveAffinities = Object.fromEntries(
-    [...allKeys].map((el) => [el, affinityGrants[el] ?? pc.affinities?.[el] ?? ""]),
+    [...allKeys].map((el) => [
+      el,
+      affinityGrants[el] ?? pc.affinities?.[el] ?? "",
+    ]),
   );
 
   return (
@@ -98,9 +104,7 @@ export default function PcAffinities({ pc, isInteractive = false, onUpdate }) {
               currentAffinity={effectiveAffinities[type]}
               iconSize="1.35em"
               editable={isInteractive}
-              onChangeAffinity={
-                isInteractive ? handleChange(type) : undefined
-              }
+              onChangeAffinity={isInteractive ? handleChange(type) : undefined}
             />
           </AffinityCell>
         ))}

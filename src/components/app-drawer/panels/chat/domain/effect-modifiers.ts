@@ -48,11 +48,15 @@ export function outgoingDamageBonusFromEffects(
   const { bonuses } = resolveActorEffects(actor, {
     inCrisis: ctx.inCrisis ?? isActorInCrisis(actor),
   });
-  const dmg = (bonuses.damage ?? zeroDamageBonuses()) as unknown as Record<string, number>;
+  const dmg = (bonuses.damage ?? zeroDamageBonuses()) as unknown as Record<
+    string,
+    number
+  >;
   let total = dmg.all ?? 0;
   if (ctx.range) total += dmg[ctx.range] ?? 0;
   if (ctx.category) total += dmg[ctx.category] ?? 0;
-  if (ctx.damageType && ctx.damageType !== "untyped") total += dmg[ctx.damageType] ?? 0;
+  if (ctx.damageType && ctx.damageType !== "untyped")
+    total += dmg[ctx.damageType] ?? 0;
   return total;
 }
 

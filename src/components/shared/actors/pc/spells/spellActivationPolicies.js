@@ -77,7 +77,7 @@ export function isNestedItemActive(spell, itemIndex, policyKey) {
     const current = spell?.[policy.currentField];
     return Boolean(
       current &&
-        getActivationKey(current, -1) === getActivationKey(item, itemIndex),
+      getActivationKey(current, -1) === getActivationKey(item, itemIndex),
     );
   }
 
@@ -136,7 +136,8 @@ export function toggleSpellListActivation(spells, spellIndex, policyKey) {
   if (!policy || policy.scope !== "spellList") return spells;
 
   const target = spells?.[spellIndex];
-  if (!target || !isSpellInPolicyGroup(target, policy, policyKey)) return spells;
+  if (!target || !isSpellInPolicyGroup(target, policy, policyKey))
+    return spells;
 
   const wasActive = Boolean(target[policy.field]);
   const shouldActivate = policy.allowNone ? !wasActive : true;
@@ -157,7 +158,8 @@ export function setSpellListActivation(spells, spellIndex, policyKey, active) {
   if (!policy || policy.scope !== "spellList") return spells;
 
   const target = spells?.[spellIndex];
-  if (!target || !isSpellInPolicyGroup(target, policy, policyKey)) return spells;
+  if (!target || !isSpellInPolicyGroup(target, policy, policyKey))
+    return spells;
 
   if (policy.mode !== "single") return spells;
 

@@ -161,7 +161,9 @@ export default function GourmetStartCookingDialog({
 
   function getMissingChoiceTypes(rolledEffect) {
     const choices = rolledEffect?.customChoices || {};
-    return getChoiceTypes(rolledEffect?.effect).filter((type) => !choices[type]);
+    return getChoiceTypes(rolledEffect?.effect).filter(
+      (type) => !choices[type],
+    );
   }
 
   const rollCombinationEffect = (comboKey) => {
@@ -238,9 +240,7 @@ export default function GourmetStartCookingDialog({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle sx={{ fontWeight: 700 }}>
-        {t("gourmet_cooking")}
-      </DialogTitle>
+      <DialogTitle sx={{ fontWeight: 700 }}>{t("gourmet_cooking")}</DialogTitle>
       <DialogContent dividers>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {/* Cookbook quick reference */}
@@ -276,7 +276,9 @@ export default function GourmetStartCookingDialog({
                         const prefix = entry.id ? `#${entry.id} - ` : "";
                         return (
                           <TableRow key={i} hover>
-                            <TableCell sx={{ fontWeight: 700, verticalAlign: "top" }}>
+                            <TableCell
+                              sx={{ fontWeight: 700, verticalAlign: "top" }}
+                            >
                               {combo}
                             </TableCell>
                             <TableCell>
@@ -493,7 +495,13 @@ export default function GourmetStartCookingDialog({
                       </Box>
 
                       {rolledEffects[combo.key] ? (
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 1,
+                          }}
+                        >
                           <ReactMarkdown
                             components={{
                               p: ({ node: _n, ...props }) => (

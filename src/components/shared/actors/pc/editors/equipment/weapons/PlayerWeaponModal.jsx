@@ -168,7 +168,9 @@ export default function PlayerWeaponModal({
                   rework,
                   totalBonus,
                   basePrec: getWeaponPrec(base),
-                  ...(initialExpandedIndex !== undefined ? { initialExpandedIndex } : {}),
+                  ...(initialExpandedIndex !== undefined
+                    ? { initialExpandedIndex }
+                    : {}),
                 }}
               />
 

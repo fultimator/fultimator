@@ -456,7 +456,7 @@ export default function PlayerEdit() {
     setDrawerIsOpen(false);
   };
 
-const toggleDrawer = (open) => (event) => {
+  const toggleDrawer = (open) => (event) => {
     if (
       event.type === "keydown" &&
       (event.key === "Tab" || event.key === "Shift")
@@ -1282,7 +1282,9 @@ const toggleDrawer = (open) => (event) => {
 
                   <SettingRow
                     label={t("Expand All Sections")}
-                    hint={t("When enabled, all spell and class sections start expanded on load.")}
+                    hint={t(
+                      "When enabled, all spell and class sections start expanded on load.",
+                    )}
                     compactControl
                   >
                     <Checkbox

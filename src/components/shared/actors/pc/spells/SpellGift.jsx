@@ -39,11 +39,16 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   const showInPlayerSheet =
     gift.showInPlayerSheet || gift.showInPlayerSheet === undefined;
 
-  const { state: clockState, filledCount: clock, increment, decrement, reset: resetClock } =
-    useNumericClock(4, localClock, (val) => {
-      setLocalClock(val);
-      if (onClockChange) onClockChange(val);
-    });
+  const {
+    state: clockState,
+    filledCount: clock,
+    increment,
+    decrement,
+    reset: resetClock,
+  } = useNumericClock(4, localClock, (val) => {
+    setLocalClock(val);
+    if (onClockChange) onClockChange(val);
+  });
 
   const inlineStyles = { margin: 0, padding: 0 };
   const components = {
@@ -62,7 +67,6 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
   };
   const getGiftEffect = (gft) =>
     isCustomGift(gft) ? gft.effect || "" : t(gft.effect);
-
 
   return (
     <>
@@ -231,7 +235,10 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                   type="number"
                   value={clock}
                   onChange={(e) => {
-                    const val = Math.max(0, Math.min(4, parseInt(e.target.value) || 0));
+                    const val = Math.max(
+                      0,
+                      Math.min(4, parseInt(e.target.value) || 0),
+                    );
                     setLocalClock(val);
                     if (onClockChange) onClockChange(val);
                   }}

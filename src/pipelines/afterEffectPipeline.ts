@@ -26,9 +26,7 @@ export interface RuntimeActorSnapshot {
   temporaryAffinities?: Partial<
     Record<string, import("../types/Misc").Affinities>
   >;
-  affinityGrants?: Partial<
-    Record<string, import("../types/Misc").Affinities>
-  >;
+  affinityGrants?: Partial<Record<string, import("../types/Misc").Affinities>>;
   isGuarding: boolean;
   incomingLossBonuses: ResourceDelta;
   incomingLossMultipliers: ResourceMultiplier;

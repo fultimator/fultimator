@@ -186,7 +186,9 @@ export default function ContentSection({
               onDeleteItem={handleDeleteItem}
               onCloneItem={handleCloneItem}
               t={t}
-              paperSx={index % 2 === 0 ? { bgcolor: "action.hover" } : undefined}
+              paperSx={
+                index % 2 === 0 ? { bgcolor: "action.hover" } : undefined
+              }
             />
           </Grid>
         ))

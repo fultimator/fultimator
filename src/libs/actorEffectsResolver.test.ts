@@ -331,7 +331,9 @@ describe("resolveActorEffects - affinityGrants", () => {
               name: "Affinity Grant",
               transfer: true,
               trigger: { kind: "passive" },
-              changes: [{ key: `affinities.${element}`, mode, value: affinity }],
+              changes: [
+                { key: `affinities.${element}`, mode, value: affinity },
+              ],
             },
           ],
         },
@@ -361,14 +363,26 @@ describe("resolveActorEffects - affinityGrants", () => {
               name: "Vuln",
               transfer: true,
               trigger: { kind: "passive" },
-              changes: [{ key: "affinities.fire", mode: 4, value: Affinities.Vulnerability }],
+              changes: [
+                {
+                  key: "affinities.fire",
+                  mode: 4,
+                  value: Affinities.Vulnerability,
+                },
+              ],
             },
             {
               id: "aff-rs",
               name: "Resist",
               transfer: true,
               trigger: { kind: "passive" },
-              changes: [{ key: "affinities.fire", mode: 4, value: Affinities.Resistance }],
+              changes: [
+                {
+                  key: "affinities.fire",
+                  mode: 4,
+                  value: Affinities.Resistance,
+                },
+              ],
             },
           ],
         },
@@ -388,14 +402,22 @@ describe("resolveActorEffects - affinityGrants", () => {
               name: "Resist",
               transfer: true,
               trigger: { kind: "passive" },
-              changes: [{ key: "affinities.fire", mode: 4, value: Affinities.Resistance }],
+              changes: [
+                {
+                  key: "affinities.fire",
+                  mode: 4,
+                  value: Affinities.Resistance,
+                },
+              ],
             },
             {
               id: "aff-im",
               name: "Immune",
               transfer: true,
               trigger: { kind: "passive" },
-              changes: [{ key: "affinities.fire", mode: 4, value: Affinities.Immunity }],
+              changes: [
+                { key: "affinities.fire", mode: 4, value: Affinities.Immunity },
+              ],
             },
           ],
         },
@@ -415,14 +437,22 @@ describe("resolveActorEffects - affinityGrants", () => {
               name: "Immune",
               transfer: true,
               trigger: { kind: "passive" },
-              changes: [{ key: "affinities.fire", mode: 4, value: Affinities.Immunity }],
+              changes: [
+                { key: "affinities.fire", mode: 4, value: Affinities.Immunity },
+              ],
             },
             {
               id: "aff-ab",
               name: "Absorb",
               transfer: true,
               trigger: { kind: "passive" },
-              changes: [{ key: "affinities.fire", mode: 4, value: Affinities.Absorpbtion }],
+              changes: [
+                {
+                  key: "affinities.fire",
+                  mode: 4,
+                  value: Affinities.Absorpbtion,
+                },
+              ],
             },
           ],
         },
@@ -443,8 +473,18 @@ describe("resolveActorEffects - affinityGrants", () => {
               transfer: true,
               trigger: { kind: "passive" },
               changes: [
-                { key: "affinities.fire", mode: 4, value: Affinities.Immunity, priority: 0 },
-                { key: "affinities.fire", mode: 0, value: Affinities.Resistance, priority: 1 },
+                {
+                  key: "affinities.fire",
+                  mode: 4,
+                  value: Affinities.Immunity,
+                  priority: 0,
+                },
+                {
+                  key: "affinities.fire",
+                  mode: 0,
+                  value: Affinities.Resistance,
+                  priority: 1,
+                },
               ],
             },
           ],
@@ -466,8 +506,18 @@ describe("resolveActorEffects - affinityGrants", () => {
               transfer: true,
               trigger: { kind: "passive" },
               changes: [
-                { key: "affinities.fire", mode: 4, value: Affinities.Resistance, priority: 0 },
-                { key: "affinities.fire", mode: 3, value: Affinities.Vulnerability, priority: 1 },
+                {
+                  key: "affinities.fire",
+                  mode: 4,
+                  value: Affinities.Resistance,
+                  priority: 0,
+                },
+                {
+                  key: "affinities.fire",
+                  mode: 3,
+                  value: Affinities.Vulnerability,
+                  priority: 1,
+                },
               ],
             },
           ],

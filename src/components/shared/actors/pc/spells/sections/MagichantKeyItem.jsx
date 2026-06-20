@@ -37,7 +37,9 @@ export default function MagichantKeyItem({
   const [expanded, setExpanded] = useState(false);
 
   const [formState, setFormState] = useState(() => toFormState(item));
-  useEffect(() => { setFormState(toFormState(item)); }, [item]);
+  useEffect(() => {
+    setFormState(toFormState(item));
+  }, [item]);
 
   const {
     isOpen: deleteDialogOpen,
@@ -84,7 +86,12 @@ export default function MagichantKeyItem({
     });
   };
 
-  const metaSummary = [formState.type, formState.status, formState.attribute, formState.recovery]
+  const metaSummary = [
+    formState.type,
+    formState.status,
+    formState.attribute,
+    formState.recovery,
+  ]
     .filter(Boolean)
     .join(" · ");
 
@@ -98,12 +105,22 @@ export default function MagichantKeyItem({
         actions={
           <>
             <Tooltip title={t("Clone to Custom")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCloneToCustom();
+                }}
+              >
                 <ContentCopy />
               </IconButton>
             </Tooltip>
             <Tooltip title={t("Delete")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); openDeleteDialog(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteDialog();
+                }}
+              >
                 <Delete />
               </IconButton>
             </Tooltip>

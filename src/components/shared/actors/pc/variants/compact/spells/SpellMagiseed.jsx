@@ -210,9 +210,7 @@ export default function SpellMagiseed({
         {spell.magiseeds
           ?.filter((seed) => {
             const seedKey = getSeedKey(seed);
-            const magiseedTemplate = magiseeds.find(
-              (m) => m.name === seedKey,
-            );
+            const magiseedTemplate = magiseeds.find((m) => m.name === seedKey);
             return seed.description || magiseedTemplate?.description;
           })
           .map((seed, index) => (
@@ -285,7 +283,10 @@ export default function SpellMagiseed({
                         >
                           T={clockVal}:
                         </Typography>
-                        <Typography variant="caption" sx={{ fontSize: "0.85rem" }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ fontSize: "0.85rem" }}
+                        >
                           <ReactMarkdown
                             components={{
                               p: ({ _node, ...props }) => <span {...props} />,

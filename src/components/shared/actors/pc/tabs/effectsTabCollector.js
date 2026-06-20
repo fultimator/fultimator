@@ -59,7 +59,11 @@ function spellSubitemModalName(spell, key) {
 
 function addEffectsFromItem(item, source, out, sourceRef) {
   asArray(item?.behaviors).forEach((behavior, index) => {
-    out.behaviors.push({ effect: behavior, source, sourceRef: { ...sourceRef, effectKind: "behavior", effectIndex: index } });
+    out.behaviors.push({
+      effect: behavior,
+      source,
+      sourceRef: { ...sourceRef, effectKind: "behavior", effectIndex: index },
+    });
   });
 }
 
@@ -157,7 +161,9 @@ export function collectPlayerEffects(player) {
     }
   }
 
-  for (const [equipmentIndex, equipment] of asArray(player?.equipment).entries()) {
+  for (const [equipmentIndex, equipment] of asArray(
+    player?.equipment,
+  ).entries()) {
     for (const [key, label] of EQUIPMENT_GROUPS) {
       asArray(equipment?.[key]).forEach((item, index) => {
         addEffectsFromItem(

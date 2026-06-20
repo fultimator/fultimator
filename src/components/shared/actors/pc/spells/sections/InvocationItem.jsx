@@ -48,18 +48,28 @@ export default function InvocationItem({
     onReplaceItem(itemIndex, next);
   };
 
-  const itemDisplayName = formState.customName || formState.key || t("spell.invocation.custom");
+  const itemDisplayName =
+    formState.customName || formState.key || t("spell.invocation.custom");
 
   return (
     <>
       <ItemRowCard
         label={itemDisplayName}
-        subtitle={formState.wellspring ? `${formState.wellspring} · ${formState.type}` : formState.type}
+        subtitle={
+          formState.wellspring
+            ? `${formState.wellspring} · ${formState.type}`
+            : formState.type
+        }
         onClick={() => setExpanded((v) => !v)}
         actions={
           <>
             <Tooltip title={t("Delete")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleDelete(e); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(e);
+                }}
+              >
                 <Delete />
               </IconButton>
             </Tooltip>

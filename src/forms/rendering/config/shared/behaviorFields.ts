@@ -123,7 +123,9 @@ function makeEffectChangeRowFields(
       order: 1,
       gridSize: 4,
       componentProps: (state) => ({
-        options: isAffinityKey(state) ? AFFINITY_MODE_OPTIONS : EFFECT_MODE_OPTIONS,
+        options: isAffinityKey(state)
+          ? AFFINITY_MODE_OPTIONS
+          : EFFECT_MODE_OPTIONS,
       }),
       parse: (v) => Number(v),
     },
@@ -164,7 +166,6 @@ export const PASSIVE_GROUPS = {
   changes: "passive-changes",
 } as const;
 
-
 const EFFECT_DURATION_EVENT_OPTIONS = [
   { value: "none", label: "effect.duration.none" },
   { value: "rest", label: "effect.duration.rest" },
@@ -184,7 +185,6 @@ const CRISIS_INTERACTION_OPTIONS = [
   { value: "active", label: "effect.crisis.active" },
   { value: "inactive", label: "effect.crisis.inactive" },
 ];
-
 
 export const BLANK_ACTOR_EFFECT = () => ({
   id: crypto.randomUUID(),
@@ -640,8 +640,7 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
       fields: makeEffectChangeRowFields(EFFECT_CHANGE_KEY_OPTIONS),
       itemDefaults: { ...BLANK_EFFECT_CHANGE },
       addLabel: "passive.addChange",
-      rowLabel: (_row: Record<string, unknown>, i: number) =>
-        `Change ${i + 1}`,
+      rowLabel: (_row: Record<string, unknown>, i: number) => `Change ${i + 1}`,
     },
   },
   ...appliesEffectRowFields.map((f) => ({
@@ -651,7 +650,9 @@ export const behaviorRowFields: ItemFieldConfig<Record<string, unknown>> = [
     dependencies: (s: Record<string, unknown>) => {
       const kind = s._triggerKind as string | undefined;
       if (!kind || kind === "passive") return false;
-      return f.dependencies ? (f.dependencies as (s: Record<string, unknown>) => boolean)(s) : true;
+      return f.dependencies
+        ? (f.dependencies as (s: Record<string, unknown>) => boolean)(s)
+        : true;
     },
   })),
   {
@@ -699,7 +700,9 @@ export const passiveGroupLabels: Record<string, string> = {
 };
 
 // Actor effect row fields - no transfer toggle, actor-scoped stat keys + behaviors[]
-export function makeActorEffectRowFields(): ItemFieldConfig<Record<string, unknown>> {
+export function makeActorEffectRowFields(): ItemFieldConfig<
+  Record<string, unknown>
+> {
   return [
     {
       key: "id",

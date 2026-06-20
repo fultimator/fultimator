@@ -240,13 +240,19 @@ export default function SpellArcanist({
                 </Step>
                 {rework && (
                   <Step completed={false}>
-                    <StepButton onClick={handlePulse} disabled={!arcana.enabled}>
+                    <StepButton
+                      onClick={handlePulse}
+                      disabled={!arcana.enabled}
+                    >
                       {pulseLabel}
                     </StepButton>
                   </Step>
                 )}
                 <Step completed={false}>
-                  <StepButton onClick={handleDismiss} disabled={!arcana.enabled}>
+                  <StepButton
+                    onClick={handleDismiss}
+                    disabled={!arcana.enabled}
+                  >
                     {dismissLabel}
                   </StepButton>
                 </Step>

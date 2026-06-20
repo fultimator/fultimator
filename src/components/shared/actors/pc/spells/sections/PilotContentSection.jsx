@@ -990,7 +990,11 @@ export default function PilotContentSection({
                         onCloneModule={handleCloneModule}
                         vehicle={vehicle}
                         player={player}
-                        paperSx={moduleIndex % 2 === 0 ? { bgcolor: "action.hover" } : undefined}
+                        paperSx={
+                          moduleIndex % 2 === 0
+                            ? { bgcolor: "action.hover" }
+                            : undefined
+                        }
                       />
                     </Grid>
                   ))}

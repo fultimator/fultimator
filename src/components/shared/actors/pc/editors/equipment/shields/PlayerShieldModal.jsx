@@ -138,7 +138,11 @@ export default function PlayerShieldModal({
                 surface="edit"
                 cols={2}
                 initialTab={initialTab}
-                extraProps={initialExpandedIndex !== undefined ? { initialExpandedIndex } : undefined}
+                extraProps={
+                  initialExpandedIndex !== undefined
+                    ? { initialExpandedIndex }
+                    : undefined
+                }
               />
 
               <Grid container spacing={1} sx={{ alignItems: "center", mt: 2 }}>

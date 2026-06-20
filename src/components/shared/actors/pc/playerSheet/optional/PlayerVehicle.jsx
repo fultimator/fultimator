@@ -206,7 +206,14 @@ function ModuleCard({ m, t, player, onPreview }) {
         moduleToSubtitleItem(m) ? (
           <ItemStatSubtitle item={moduleToSubtitleItem(m)} />
         ) : m.type === "pilot_module_support" ? (
-          <Typography sx={{ fontSize: "0.9rem", color: "text.secondary", lineHeight: 1.3, fontWeight: "bold" }}>
+          <Typography
+            sx={{
+              fontSize: "0.9rem",
+              color: "text.secondary",
+              lineHeight: 1.3,
+              fontWeight: "bold",
+            }}
+          >
             {m.isComplex ? t("Complex") : t("Support")}
           </Typography>
         ) : null
@@ -249,7 +256,11 @@ function ModuleCard({ m, t, player, onPreview }) {
   );
 }
 
-export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) {
+export default function PlayerVehicle({
+  player,
+  setPlayer,
+  _isCharacterSheet,
+}) {
   const { t } = useTranslate();
   const custom = useCustomTheme();
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -279,8 +290,12 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
   const handleSaveVehicles = (spellIndex, updatedPilot) => {
     setPlayer?.((prev) => {
       const updatedClasses = [...prev.classes];
-      updatedClasses[activePilotSpell.classIndex].spells[activePilotSpell.spellIndex] = {
-        ...updatedClasses[activePilotSpell.classIndex].spells[activePilotSpell.spellIndex],
+      updatedClasses[activePilotSpell.classIndex].spells[
+        activePilotSpell.spellIndex
+      ] = {
+        ...updatedClasses[activePilotSpell.classIndex].spells[
+          activePilotSpell.spellIndex
+        ],
         vehicles: updatedPilot.vehicles,
         showInPlayerSheet: updatedPilot.showInPlayerSheet,
       };
@@ -289,7 +304,8 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
     setOpenEditModal(false);
   };
 
-  const activeVehicle = activePilotSpell.vehicles?.find((v) => v.enabled) ?? null;
+  const activeVehicle =
+    activePilotSpell.vehicles?.find((v) => v.enabled) ?? null;
 
   if (!activeVehicle) {
     return (
@@ -298,7 +314,11 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
         actions={
           setPlayer ? (
             <Tooltip title={t("Edit Vehicle")}>
-              <IconButton size="small" onClick={() => setOpenEditModal(true)} sx={{ color: "#fff" }}>
+              <IconButton
+                size="small"
+                onClick={() => setOpenEditModal(true)}
+                sx={{ color: "#fff" }}
+              >
                 <Edit fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -309,7 +329,12 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
       >
         <Typography
           variant="caption"
-          sx={{ display: "block", p: 1.5, color: "text.disabled", fontStyle: "italic" }}
+          sx={{
+            display: "block",
+            p: 1.5,
+            color: "text.disabled",
+            fontStyle: "italic",
+          }}
         >
           {t("No vehicle active")}
         </Typography>
@@ -330,7 +355,9 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
     support: [],
   };
   const equippedKeys = new Set(
-    [slots.main, slots.off, slots.armor, ...(slots.support ?? [])].filter(Boolean),
+    [slots.main, slots.off, slots.armor, ...(slots.support ?? [])].filter(
+      Boolean,
+    ),
   );
 
   const modules = (activeVehicle.modules ?? []).filter((m) => {
@@ -340,7 +367,9 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
 
   const armorModules = modules.filter((m) => m.type === "pilot_module_armor");
   const weaponModules = modules.filter((m) => m.type === "pilot_module_weapon");
-  const supportModules = modules.filter((m) => m.type === "pilot_module_support");
+  const supportModules = modules.filter(
+    (m) => m.type === "pilot_module_support",
+  );
 
   const frame = availableFrames.find(
     (f) => f.name === (activeVehicle.frame || "pilot_frame_exoskeleton"),
@@ -348,7 +377,11 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
 
   const titleActions = setPlayer ? (
     <Tooltip title={t("Edit Vehicle")}>
-      <IconButton size="small" onClick={() => setOpenEditModal(true)} sx={{ color: "#fff" }}>
+      <IconButton
+        size="small"
+        onClick={() => setOpenEditModal(true)}
+        sx={{ color: "#fff" }}
+      >
         <Edit fontSize="small" />
       </IconButton>
     </Tooltip>
@@ -356,7 +389,12 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
 
   return (
     <>
-      <SectionCard title={t("pilot_vehicle")} actions={titleActions} noShadow sx={{ mb: "1em" }}>
+      <SectionCard
+        title={t("pilot_vehicle")}
+        actions={titleActions}
+        noShadow
+        sx={{ mb: "1em" }}
+      >
         {/* Frame info bar */}
         <Box
           sx={{
@@ -395,23 +433,32 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
         </Box>
 
         {/* Module grid */}
-        {(armorModules.length > 0 || weaponModules.length > 0 || supportModules.length > 0) ? (
+        {armorModules.length > 0 ||
+        weaponModules.length > 0 ||
+        supportModules.length > 0 ? (
           <Grid container spacing={1} sx={{ p: 1 }}>
-            {[...armorModules, ...weaponModules, ...supportModules].map((m, i) => (
-              <Grid key={i} size={{ xs: 12, sm: 6 }}>
-                <ModuleCard
-                  m={m}
-                  t={t}
-                  player={player}
-                  onPreview={setPreviewModule}
-                />
-              </Grid>
-            ))}
+            {[...armorModules, ...weaponModules, ...supportModules].map(
+              (m, i) => (
+                <Grid key={i} size={{ xs: 12, sm: 6 }}>
+                  <ModuleCard
+                    m={m}
+                    t={t}
+                    player={player}
+                    onPreview={setPreviewModule}
+                  />
+                </Grid>
+              ),
+            )}
           </Grid>
         ) : (
           <Typography
             variant="caption"
-            sx={{ display: "block", p: 1.5, color: "text.disabled", fontStyle: "italic" }}
+            sx={{
+              display: "block",
+              p: 1.5,
+              color: "text.disabled",
+              fontStyle: "italic",
+            }}
           >
             {t("No modules equipped")}
           </Typography>
@@ -436,7 +483,11 @@ export default function PlayerVehicle({ player, setPlayer, _isCharacterSheet }) 
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPreviewModule(null)} variant="contained" color="primary">
+          <Button
+            onClick={() => setPreviewModule(null)}
+            variant="contained"
+            color="primary"
+          >
             {t("Close")}
           </Button>
         </DialogActions>

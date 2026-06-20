@@ -15,7 +15,13 @@ import ReactMarkdown from "react-markdown";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { substituteKeyValues, volumes } from "./magichantVerseUtils";
 
-export default function ChanterVerseDialog({ open, onClose, magichant, speaker, t }) {
+export default function ChanterVerseDialog({
+  open,
+  onClose,
+  magichant,
+  speaker,
+  t,
+}) {
   const [selectedVolume, setSelectedVolume] = useState(null);
   const [selectedKeyIdx, setSelectedKeyIdx] = useState(null);
   const [selectedToneIdx, setSelectedToneIdx] = useState(null);
@@ -31,29 +37,34 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
   const keys = magichant.keys ?? [];
   const tones = magichant.tones ?? [];
 
-  const selectedKey = selectedKeyIdx !== null ? (keys[selectedKeyIdx] ?? null) : null;
-  const selectedTone = selectedToneIdx !== null ? (tones[selectedToneIdx] ?? null) : null;
+  const selectedKey =
+    selectedKeyIdx !== null ? (keys[selectedKeyIdx] ?? null) : null;
+  const selectedTone =
+    selectedToneIdx !== null ? (tones[selectedToneIdx] ?? null) : null;
   const vol = selectedVolume !== null ? volumes[selectedVolume] : null;
 
   const canSend = vol !== null && selectedKey !== null && selectedTone !== null;
 
   const resolvedToneEffect = selectedTone
-    ? (selectedTone.key === "magichant_custom_name"
-        ? selectedTone.effect
-        : t(selectedTone.effect))
+    ? selectedTone.key === "magichant_custom_name"
+      ? selectedTone.effect
+      : t(selectedTone.effect)
     : null;
 
-  const effectWithKeys = resolvedToneEffect && selectedKey
-    ? substituteKeyValues(resolvedToneEffect, selectedKey, t)
-    : resolvedToneEffect;
+  const effectWithKeys =
+    resolvedToneEffect && selectedKey
+      ? substituteKeyValues(resolvedToneEffect, selectedKey, t)
+      : resolvedToneEffect;
 
   const handleSend = () => {
-    const keyName = selectedKey.key === "magichant_custom_name"
-      ? selectedKey.customName
-      : t(selectedKey.key);
-    const toneName = selectedTone.key === "magichant_custom_name"
-      ? selectedTone.customName
-      : t(selectedTone.key);
+    const keyName =
+      selectedKey.key === "magichant_custom_name"
+        ? selectedKey.customName
+        : t(selectedKey.key);
+    const toneName =
+      selectedTone.key === "magichant_custom_name"
+        ? selectedTone.customName
+        : t(selectedTone.key);
     const volName = t(vol.name);
 
     sendDisplayMessage("spell", t("Sing a Verse"), {
@@ -101,7 +112,10 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold", pr: 6, pb: 1 }}>
         {t("Sing a Verse")}
-        <IconButton onClick={onClose} sx={{ position: "absolute", right: 8, top: 8 }}>
+        <IconButton
+          onClick={onClose}
+          sx={{ position: "absolute", right: 8, top: 8 }}
+        >
           <Close />
         </IconButton>
       </DialogTitle>
@@ -115,10 +129,15 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
                 <Box
                   key={i}
                   sx={rowSx(selectedVolume === i)}
-                  onClick={() => setSelectedVolume(i === selectedVolume ? null : i)}
+                  onClick={() =>
+                    setSelectedVolume(i === selectedVolume ? null : i)
+                  }
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 700, minWidth: 70 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 700, minWidth: 70 }}
+                    >
                       {t(v.name)}
                     </Typography>
                     <Box
@@ -136,7 +155,11 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
                     >
                       {v.mp} MP
                     </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ flex: 1, fontSize: "0.8rem" }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ flex: 1, fontSize: "0.8rem" }}
+                    >
                       {t(v.target)}
                     </Typography>
                   </Box>
@@ -149,7 +172,11 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
           <Box>
             <Typography sx={sectionLabelSx}>{t("magichant_key")}</Typography>
             {keys.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontStyle: "italic" }}
+              >
                 {t("magichant_empty_keys")}
               </Typography>
             ) : (
@@ -163,22 +190,49 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
                     <Box
                       key={i}
                       sx={rowSx(selectedKeyIdx === i)}
-                      onClick={() => setSelectedKeyIdx(i === selectedKeyIdx ? null : i)}
+                      onClick={() =>
+                        setSelectedKeyIdx(i === selectedKeyIdx ? null : i)
+                      }
                     >
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-                        <Typography variant="body2" sx={{ fontWeight: 700, minWidth: 72 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1.5,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 700, minWidth: 72 }}
+                        >
                           {name}
                         </Typography>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexShrink: 0 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                            flexShrink: 0,
+                          }}
+                        >
                           {k.type && <TypeIcon type={k.type} />}
-                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.8rem" }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ fontSize: "0.8rem" }}
+                          >
                             {type}
                           </Typography>
                         </Box>
                         <Typography
                           variant="caption"
                           color="text.disabled"
-                          sx={{ ml: "auto", fontSize: "0.72rem", whiteSpace: "nowrap" }}
+                          sx={{
+                            ml: "auto",
+                            fontSize: "0.72rem",
+                            whiteSpace: "nowrap",
+                          }}
                         >
                           {status}
                           {k.attribute ? ` · ${k.attribute}` : ""}
@@ -196,7 +250,11 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
           <Box>
             <Typography sx={sectionLabelSx}>{t("magichant_tone")}</Typography>
             {tones.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontStyle: "italic" }}
+              >
                 {t("magichant_empty_tones")}
               </Typography>
             ) : (
@@ -212,9 +270,14 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
                     <Box
                       key={i}
                       sx={rowSx(selectedToneIdx === i)}
-                      onClick={() => setSelectedToneIdx(i === selectedToneIdx ? null : i)}
+                      onClick={() =>
+                        setSelectedToneIdx(i === selectedToneIdx ? null : i)
+                      }
                     >
-                      <Typography variant="body2" sx={{ fontWeight: 700, mb: preview ? 0.25 : 0 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 700, mb: preview ? 0.25 : 0 }}
+                      >
                         {name}
                       </Typography>
                       {preview && (
@@ -224,7 +287,9 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
                           color="text.secondary"
                           sx={{ lineHeight: 1.4 }}
                         >
-                          <ReactMarkdown components={mdInline}>{preview}</ReactMarkdown>
+                          <ReactMarkdown components={mdInline}>
+                            {preview}
+                          </ReactMarkdown>
                         </Typography>
                       )}
                     </Box>
@@ -252,16 +317,33 @@ export default function ChanterVerseDialog({ open, onClose, magichant, speaker, 
                   color: "primary.contrastText",
                 }}
               >
-                <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 700,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                  }}
+                >
                   {t("Verse")}
                 </Typography>
               </Box>
-              <Box sx={{ px: 1.5, py: 1, display: "flex", flexDirection: "column", gap: 0.5 }}>
+              <Box
+                sx={{
+                  px: 1.5,
+                  py: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0.5,
+                }}
+              >
                 <Typography variant="body2">
-                  <strong>{t("Target")}:</strong>{" "}{t(vol.target)}
+                  <strong>{t("Target")}:</strong> {t(vol.target)}
                 </Typography>
                 <Typography variant="body2" component="div">
-                  <ReactMarkdown components={mdInline}>{effectWithKeys}</ReactMarkdown>
+                  <ReactMarkdown components={mdInline}>
+                    {effectWithKeys}
+                  </ReactMarkdown>
                 </Typography>
               </Box>
             </Box>

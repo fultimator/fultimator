@@ -237,13 +237,24 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
                 key={idx}
                 label={effect.name || `Effect ${idx + 1}`}
                 subtitle={
-                  <Box sx={{ typography: "caption", color: "text.secondary", "& p": { m: 0 } }}>
+                  <Box
+                    sx={{
+                      typography: "caption",
+                      color: "text.secondary",
+                      "& p": { m: 0 },
+                    }}
+                  >
                     <ReactMarkdown>
-                      {applyCustomChoices(effect.description || "", effect.customChoices)}
+                      {applyCustomChoices(
+                        effect.description || "",
+                        effect.customChoices,
+                      )}
                     </ReactMarkdown>
                   </Box>
                 }
-                paperSx={idx % 2 === 0 ? { bgcolor: "action.hover" } : undefined}
+                paperSx={
+                  idx % 2 === 0 ? { bgcolor: "action.hover" } : undefined
+                }
                 actions={
                   <>
                     <Tooltip title={t("Edit")}>
@@ -252,7 +263,11 @@ export default function GourmetContentSection({ formState, setFormState, t }) {
                       </IconButton>
                     </Tooltip>
                     <Tooltip title={t("Delete")}>
-                      <IconButton onClick={() => handleDeleteEffect(effect.tasteKey, effect._index)}>
+                      <IconButton
+                        onClick={() =>
+                          handleDeleteEffect(effect.tasteKey, effect._index)
+                        }
+                      >
                         <Delete />
                       </IconButton>
                     </Tooltip>

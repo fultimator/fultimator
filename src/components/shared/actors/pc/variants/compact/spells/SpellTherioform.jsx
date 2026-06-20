@@ -53,9 +53,7 @@ export default function SpellTherioform({ spell }) {
             }}
           >
             <StyledTableCell sx={{ width: "30%", fontWeight: "bold" }}>
-              {isCustomTherioform(form)
-                ? form.customName
-                : t(form.name)}
+              {isCustomTherioform(form) ? form.customName : t(form.name)}
               {form.genoclepsis && (
                 <Typography
                   variant="caption"

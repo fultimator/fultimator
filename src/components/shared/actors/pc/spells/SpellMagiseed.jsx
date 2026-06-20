@@ -48,11 +48,16 @@ function ThemedSpellMagiseed({
     setLocalClock(magiseed.growthClock || 0);
   }, [magiseed.growthClock]);
 
-  const { state: clockState, filledCount: growthClock, increment, decrement, reset: resetClock } =
-    useNumericClock(4, localClock, (val) => {
-      setLocalClock(val);
-      if (onGrowthClockChange) onGrowthClockChange(val);
-    });
+  const {
+    state: clockState,
+    filledCount: growthClock,
+    increment,
+    decrement,
+    reset: resetClock,
+  } = useNumericClock(4, localClock, (val) => {
+    setLocalClock(val);
+    if (onGrowthClockChange) onGrowthClockChange(val);
+  });
 
   const toggleMagiseedExpansion = (index) => {
     setExpandedMagiseeds((prev) => {
@@ -302,7 +307,10 @@ function ThemedSpellMagiseed({
                   type="number"
                   value={growthClock}
                   onChange={(e) => {
-                    const val = Math.max(0, Math.min(4, parseInt(e.target.value) || 0));
+                    const val = Math.max(
+                      0,
+                      Math.min(4, parseInt(e.target.value) || 0),
+                    );
                     setLocalClock(val);
                     if (onGrowthClockChange) onGrowthClockChange(val);
                   }}
@@ -494,7 +502,11 @@ function ThemedSpellMagiseed({
                     </Typography>
                     <Typography
                       variant="caption"
-                      sx={{ ...bodyTextSx, color: "text.secondary", fontWeight: "bold" }}
+                      sx={{
+                        ...bodyTextSx,
+                        color: "text.secondary",
+                        fontWeight: "bold",
+                      }}
                     >
                       {`T: ${rangeStart}–${rangeEnd}`}
                       {isPlanted && (

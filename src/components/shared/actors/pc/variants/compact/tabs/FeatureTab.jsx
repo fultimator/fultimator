@@ -651,7 +651,8 @@ function VehicleCard({
     const tags = [];
     if (mod.type === "pilot_module_armor") {
       if (mod.martial) tags.push(t("Martial"));
-      if (mod.def != null) tags.push(`DEF ${mod.def >= 0 ? "+" : ""}${mod.def}`);
+      if (mod.def != null)
+        tags.push(`DEF ${mod.def >= 0 ? "+" : ""}${mod.def}`);
       if (mod.mdef != null)
         tags.push(`M.DEF ${mod.mdef >= 0 ? "+" : ""}${mod.mdef}`);
     }
@@ -927,7 +928,8 @@ function SpellCard({
                     const growthClock = spell.growthClock || 0;
                     const currentSeed = spell.currentMagiseed;
                     const seedName = currentSeed
-                      ? currentSeed.customName || t(currentSeed.key ?? currentSeed.name)
+                      ? currentSeed.customName ||
+                        t(currentSeed.key ?? currentSeed.name)
                       : t("magiseed_no_magiseed");
                     let effectText = "";
                     if (currentSeed) {
@@ -951,7 +953,10 @@ function SpellCard({
                 </IconButton>
               </Tooltip>
             ) : isArcana ? (
-              <Tooltip title={spell.enabled ? t("Active") : t("Activate")} arrow>
+              <Tooltip
+                title={spell.enabled ? t("Active") : t("Activate")}
+                arrow
+              >
                 <IconButton
                   size="small"
                   onClick={(event) =>
@@ -980,9 +985,9 @@ function SpellCard({
                     })
                   }
                 >
-                <Message />
-              </IconButton>
-            </Tooltip>
+                  <Message />
+                </IconButton>
+              </Tooltip>
             )}
             {isCooking && isEditMode && (
               <Tooltip title={t("Edit")} arrow>
@@ -1372,7 +1377,9 @@ function MnemoSpellCard({
       const nextEq0 = { ...eq0, mnemospheres };
       return {
         ...prev,
-        equipment: prev?.equipment ? [nextEq0, ...prev.equipment.slice(1)] : [nextEq0],
+        equipment: prev?.equipment
+          ? [nextEq0, ...prev.equipment.slice(1)]
+          : [nextEq0],
       };
     });
   };
@@ -1425,7 +1432,10 @@ function MnemoSpellCard({
               </Tooltip>
             )}
             {isArcana && (
-              <Tooltip title={spell.enabled ? t("Active") : t("Activate")} arrow>
+              <Tooltip
+                title={spell.enabled ? t("Active") : t("Activate")}
+                arrow
+              >
                 <IconButton
                   size="small"
                   onClick={(event) =>
@@ -1504,11 +1514,9 @@ export default function FeatureTab({
   const [mnemoAddMenuAnchor, setMnemoAddMenuAnchor] = React.useState(null);
   const [mnemoImportMenuAnchor, setMnemoImportMenuAnchor] =
     React.useState(null);
-  const [mnemoImportModalOpen, setMnemoImportModalOpen] =
-    React.useState(false);
+  const [mnemoImportModalOpen, setMnemoImportModalOpen] = React.useState(false);
   const [importTargetMnemoId, setImportTargetMnemoId] = React.useState(null);
-  const [mnemoSpellModalOpen, setMnemoSpellModalOpen] =
-    React.useState(false);
+  const [mnemoSpellModalOpen, setMnemoSpellModalOpen] = React.useState(false);
   const [editingMnemoSpell, setEditingMnemoSpell] = React.useState(null);
 
   // ---- spell roll ----
@@ -1665,7 +1673,12 @@ export default function FeatureTab({
         ...spell,
         dances: [
           ...(spell.dances || []),
-          { name: "dance_custom_name", effect: "", duration: "", customName: "" },
+          {
+            name: "dance_custom_name",
+            effect: "",
+            duration: "",
+            customName: "",
+          },
         ],
       }),
       gift: (spell) => ({

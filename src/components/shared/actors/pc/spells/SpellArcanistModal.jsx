@@ -15,9 +15,7 @@ import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormR
 import { arcanistFields } from "/src/forms/rendering/config/itemConfigs/spells/arcanist";
 import { playerSpellTabs } from "/src/forms/rendering/config/itemConfigs/spells";
 import { metaFieldConfig } from "/src/forms/rendering/config/metaFieldConfig";
-import {
-  behaviorsTabField,
-} from "/src/forms/rendering/config/shared/behaviorFields";
+import { behaviorsTabField } from "/src/forms/rendering/config/shared/behaviorFields";
 
 const arcanaCoreFields = [
   {
@@ -127,7 +125,11 @@ export default function SpellArcanistModal({
           onChange={setEditedSpell}
           surface="edit"
           initialTab={initialTab}
-          extraProps={initialExpandedIndex !== undefined ? { initialExpandedIndex } : undefined}
+          extraProps={
+            initialExpandedIndex !== undefined
+              ? { initialExpandedIndex }
+              : undefined
+          }
         />
       </DialogContent>
       <DialogActions>

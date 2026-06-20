@@ -20,7 +20,7 @@ function toFormState(src, t) {
   return {
     key: resolvedKey,
     customName: src.customName || "",
-    effect: custom ? (src.effect || "") : (src.effect ? t(src.effect) : ""),
+    effect: custom ? src.effect || "" : src.effect ? t(src.effect) : "",
     behaviors: src.behaviors ?? [],
   };
 }
@@ -35,11 +35,15 @@ export default function MagichantToneItem({
 }) {
   const { t: translate } = useTranslate();
 
-  const [formState, setFormState] = useState(() => toFormState(item, translate));
+  const [formState, setFormState] = useState(() =>
+    toFormState(item, translate),
+  );
   const [expanded, setExpanded] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { setFormState(toFormState(item, translate)); }, [item]);
+  useEffect(() => {
+    setFormState(toFormState(item, translate));
+  }, [item]);
 
   const handleChange = (next) => {
     const nextKey = next.key;
@@ -94,12 +98,22 @@ export default function MagichantToneItem({
         actions={
           <>
             <Tooltip title={translate("Clone to Custom")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleCloneToCustom(); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCloneToCustom();
+                }}
+              >
                 <ContentCopy />
               </IconButton>
             </Tooltip>
             <Tooltip title={translate("Delete")}>
-              <IconButton onClick={(e) => { e.stopPropagation(); handleDelete(e); }}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(e);
+                }}
+              >
                 <Delete />
               </IconButton>
             </Tooltip>

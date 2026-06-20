@@ -38,7 +38,14 @@ function rollD20s(count) {
   );
 }
 
-export function AlchemyRollDialog({ open, onClose, rank, alchemy, speaker, t }) {
+export function AlchemyRollDialog({
+  open,
+  onClose,
+  rank,
+  alchemy,
+  speaker,
+  t,
+}) {
   const diceCount = rank + 1;
   const rankLabels = [t("Basic"), t("Advanced"), t("Superior")];
   const rankDescriptions = [

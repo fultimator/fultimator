@@ -1,4 +1,7 @@
-import { generateTasteKey, getTasteCombinations } from "/src/libs/gourmetCookingData";
+import {
+  generateTasteKey,
+  getTasteCombinations,
+} from "/src/libs/gourmetCookingData";
 
 export function getTasteLabel(taste, t) {
   const translate =
@@ -69,7 +72,10 @@ export function buildCookbookEffectMap(effects = []) {
   return Object.fromEntries(
     effects
       .filter((effect) => effect.taste1 && effect.taste2)
-      .map((effect) => [generateTasteKey(effect.taste1, effect.taste2), effect]),
+      .map((effect) => [
+        generateTasteKey(effect.taste1, effect.taste2),
+        effect,
+      ]),
   );
 }
 

@@ -221,7 +221,6 @@ function findEquipmentItem(player, sourceRef) {
   return asArray(equipment?.[sourceRef?.group])[sourceRef?.itemIndex] ?? null;
 }
 
-
 function ActorEffectDialogInner({ effect, onClose, onSave, onDelete }) {
   const { t } = useTranslate();
   const [draft, setDraft] = useState(() => effect ?? BLANK_ACTOR_EFFECT());
@@ -282,7 +281,14 @@ function ActorEffectDialog({ open, effect, onClose, onSave, onDelete }) {
   );
 }
 
-function EffectSection({ title, rows, getDuration, canEdit, onEditSource, onAdd }) {
+function EffectSection({
+  title,
+  rows,
+  getDuration,
+  canEdit,
+  onEditSource,
+  onAdd,
+}) {
   const { t } = useTranslate();
 
   return (
@@ -351,7 +357,10 @@ function EffectSection({ title, rows, getDuration, canEdit, onEditSource, onAdd 
 
 function effectFocusProps(sourceRef) {
   if (!sourceRef?.effectKind) return {};
-  return { initialTab: "behaviors", initialExpandedIndex: sourceRef.effectIndex ?? 0 };
+  return {
+    initialTab: "behaviors",
+    initialExpandedIndex: sourceRef.effectIndex ?? 0,
+  };
 }
 
 function SourceEditModalLayer({ player, setPlayer, sourceRef, onClose }) {
@@ -552,7 +561,10 @@ export default function EffectsTab({ player, setPlayer, isEditMode = false }) {
     if (sourceRef?.kind === "actorEffect") {
       const effect = (player?.effects ?? [])[sourceRef.index];
       const bucket = sourceRef.bucket ?? "behaviors";
-      setActorEffectDialog({ effect: effect ? { ...effect } : BLANK_ACTOR_EFFECT(), bucket });
+      setActorEffectDialog({
+        effect: effect ? { ...effect } : BLANK_ACTOR_EFFECT(),
+        bucket,
+      });
     } else {
       setEditingSourceRef(sourceRef);
     }
@@ -566,9 +578,10 @@ export default function EffectsTab({ player, setPlayer, isEditMode = false }) {
     setPlayer((prev) => {
       const existing = prev?.effects ?? [];
       const idx = existing.findIndex((e) => e.id === draft.id);
-      const next = idx >= 0
-        ? existing.map((e, i) => (i === idx ? draft : e))
-        : [...existing, draft];
+      const next =
+        idx >= 0
+          ? existing.map((e, i) => (i === idx ? draft : e))
+          : [...existing, draft];
       return { ...prev, effects: next };
     });
     setActorEffectDialog(null);

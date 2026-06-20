@@ -306,7 +306,9 @@ export default function GourmetCookingTab({
 
   function getMissingChoiceTypes(rolledEffect) {
     const choices = rolledEffect?.customChoices || {};
-    return getChoiceTypes(rolledEffect?.effect).filter((type) => !choices[type]);
+    return getChoiceTypes(rolledEffect?.effect).filter(
+      (type) => !choices[type],
+    );
   }
 
   const resolveEffectText = (effect) => {
@@ -410,7 +412,10 @@ export default function GourmetCookingTab({
           ...prev,
           cookbook: {
             ...prevCookbook,
-            effects: [...(prevCookbook.effects || []), ...newlyRegisteredRecipes],
+            effects: [
+              ...(prevCookbook.effects || []),
+              ...newlyRegisteredRecipes,
+            ],
           },
         };
       });
@@ -483,9 +488,7 @@ export default function GourmetCookingTab({
   const getRawIngredientInventory = (spellDraft) => {
     const draftCookbook = spellDraft.cookbook || {};
     return (
-      draftCookbook.ingredientInventory ||
-      spellDraft.ingredientInventory ||
-      []
+      draftCookbook.ingredientInventory || spellDraft.ingredientInventory || []
     );
   };
 
@@ -670,8 +673,7 @@ export default function GourmetCookingTab({
     const selectedTaste = getIngredientTastes(t)
       .filter((taste) => taste.id !== 6)
       .find(
-        (taste) =>
-          taste.name.toLowerCase().replace(/\s+/g, "") === tasteKey,
+        (taste) => taste.name.toLowerCase().replace(/\s+/g, "") === tasteKey,
       );
     if (selectedTaste) {
       setShopIngredientName(selectedTaste.name);
@@ -682,8 +684,7 @@ export default function GourmetCookingTab({
     const selectedTaste = getIngredientTastes(t)
       .filter((taste) => taste.id !== 6)
       .find(
-        (taste) =>
-          taste.name.toLowerCase().replace(/\s+/g, "") === tasteKey,
+        (taste) => taste.name.toLowerCase().replace(/\s+/g, "") === tasteKey,
       );
 
     setChoiceDialogRolls((prev) =>
@@ -788,7 +789,14 @@ export default function GourmetCookingTab({
               <Typography variant="h6" sx={{ fontWeight: "bold", flex: 1 }}>
                 {t("gourmet_details")}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexShrink: 0 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  alignItems: "center",
+                  flexShrink: 0,
+                }}
+              >
                 <Button
                   variant="outlined"
                   startIcon={<Casino />}
@@ -1252,15 +1260,29 @@ export default function GourmetCookingTab({
                   </Typography>
 
                   {possibleCombinations.length > 0 && (
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 2 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1,
+                        mt: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: "bold" }}
+                      >
                         {t("Possible Taste Combinations")}:
                       </Typography>
                       {knownCombinations.map((combo) => {
                         const effect = cookbookEffects[combo.key];
                         const prefix = effect.id ? `#${effect.id} - ` : "";
                         return (
-                          <Paper key={combo.key} variant="outlined" sx={{ p: 1 }}>
+                          <Paper
+                            key={combo.key}
+                            variant="outlined"
+                            sx={{ p: 1 }}
+                          >
                             <Typography sx={{ fontWeight: 700 }}>
                               {combo.combination}
                             </Typography>
@@ -1289,7 +1311,10 @@ export default function GourmetCookingTab({
                               <Typography sx={{ fontWeight: 700 }}>
                                 {combo.combination}
                               </Typography>
-                              <Typography variant="caption" color="warning.main">
+                              <Typography
+                                variant="caption"
+                                color="warning.main"
+                              >
                                 {t("gourmet_combination_not_in_cookbook")}
                               </Typography>
                             </Box>
@@ -1317,51 +1342,54 @@ export default function GourmetCookingTab({
                                 {`#${rolledEffects[combo.key].id} - ${resolveEffectText(rolledEffects[combo.key])}`}
                               </ReactMarkdown>
 
-                              {getChoiceTypes(rolledEffects[combo.key].effect).map(
-                                (type) => {
-                                  const optionMap = {
-                                    statusEffect: {
-                                      label: t("Status Effect"),
-                                      options: getStatusEffects(t),
-                                    },
-                                    damageType: {
-                                      label: t("Damage Type"),
-                                      options: getDamageTypes(t),
-                                    },
-                                    attribute: {
-                                      label: t("Attribute"),
-                                      options: getAttributes(t),
-                                    },
-                                  };
-                                  const config = optionMap[type];
-                                  return (
-                                    <FormControl key={type} size="small" fullWidth>
-                                      <InputLabel>{config.label}</InputLabel>
-                                      <Select
-                                        value={
-                                          rolledEffects[combo.key].customChoices?.[
-                                            type
-                                          ] || ""
-                                        }
-                                        label={config.label}
-                                        onChange={(event) =>
-                                          updateRolledChoice(
-                                            combo.key,
-                                            type,
-                                            event.target.value,
-                                          )
-                                        }
-                                      >
-                                        {config.options.map((option) => (
-                                          <MenuItem key={option} value={option}>
-                                            {option}
-                                          </MenuItem>
-                                        ))}
-                                      </Select>
-                                    </FormControl>
-                                  );
-                                },
-                              )}
+                              {getChoiceTypes(
+                                rolledEffects[combo.key].effect,
+                              ).map((type) => {
+                                const optionMap = {
+                                  statusEffect: {
+                                    label: t("Status Effect"),
+                                    options: getStatusEffects(t),
+                                  },
+                                  damageType: {
+                                    label: t("Damage Type"),
+                                    options: getDamageTypes(t),
+                                  },
+                                  attribute: {
+                                    label: t("Attribute"),
+                                    options: getAttributes(t),
+                                  },
+                                };
+                                const config = optionMap[type];
+                                return (
+                                  <FormControl
+                                    key={type}
+                                    size="small"
+                                    fullWidth
+                                  >
+                                    <InputLabel>{config.label}</InputLabel>
+                                    <Select
+                                      value={
+                                        rolledEffects[combo.key]
+                                          .customChoices?.[type] || ""
+                                      }
+                                      label={config.label}
+                                      onChange={(event) =>
+                                        updateRolledChoice(
+                                          combo.key,
+                                          type,
+                                          event.target.value,
+                                        )
+                                      }
+                                    >
+                                      {config.options.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                          {option}
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
+                                  </FormControl>
+                                );
+                              })}
                             </Box>
                           ) : (
                             <Alert severity="warning">
@@ -1526,7 +1554,6 @@ export default function GourmetCookingTab({
               )}
             </Box>
           )}
-
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: "space-between" }}>

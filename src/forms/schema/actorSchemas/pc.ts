@@ -21,7 +21,13 @@ import {
 } from "../itemSchemas/armor";
 import { HoplosphereSchema } from "../itemSchemas/hoplosphere";
 import { MnemosphereSchema } from "../itemSchemas/mnemosphere";
-import { BehaviorSchema, EffectChangeSchema, GrantDataSchema, EffectDurationSchema, EffectPredicateSchema } from "../shared/behaviorSchemas";
+import {
+  BehaviorSchema,
+  EffectChangeSchema,
+  GrantDataSchema,
+  EffectDurationSchema,
+  EffectPredicateSchema,
+} from "../shared/behaviorSchemas";
 import {
   PlayerSkillSchema,
   HeroicSkillSchema,

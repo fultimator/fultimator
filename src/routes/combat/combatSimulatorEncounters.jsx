@@ -317,10 +317,14 @@ const CombatSimEncounters = () => {
       : [];
     const stripUndefined = (obj) => JSON.parse(JSON.stringify(obj));
     const nextNpcs = npcs.map((npc) =>
-      npcNeedsMigration(npc) ? stripUndefined(applyNpcPostLoadTransforms(npc)) : npc,
+      npcNeedsMigration(npc)
+        ? stripUndefined(applyNpcPostLoadTransforms(npc))
+        : npc,
     );
     const nextPcs = pcs.map((pc) =>
-      playerNeedsMigration(pc) ? stripUndefined(applyPostLoadTransforms(pc)) : pc,
+      playerNeedsMigration(pc)
+        ? stripUndefined(applyPostLoadTransforms(pc))
+        : pc,
     );
 
     const changed =

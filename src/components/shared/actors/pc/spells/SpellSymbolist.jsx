@@ -36,7 +36,8 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
 
   const getSymbolName = (sym) => {
     const key = sym.key || sym.name;
-    if (key === "symbol_custom_name") return sym.customName || t("symbol_custom_name");
+    if (key === "symbol_custom_name")
+      return sym.customName || t("symbol_custom_name");
     return sym.customName || t(key || sym.name || "");
   };
   const getSymbolEffect = (sym) => {
@@ -90,7 +91,14 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
         }}
       >
         <Box sx={{ display: "flex", flexGrow: 1 }}>
-          <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center", minHeight: "40px" }}>
+          <Box
+            sx={{
+              flex: "0 0 25%",
+              display: "flex",
+              alignItems: "center",
+              minHeight: "40px",
+            }}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -99,7 +107,14 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
               {t("symbol_symbol")}
             </Typography>
           </Box>
-          <Box sx={{ flex: 1, display: "flex", alignItems: "center", minHeight: "40px" }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              minHeight: "40px",
+            }}
+          >
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
@@ -109,7 +124,15 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
             </Typography>
           </Box>
         </Box>
-        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+        <Box
+          sx={{
+            width: 34,
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+        >
           {isEditMode && (
             <>
               {!showInPlayerSheet && (
@@ -159,7 +182,9 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
             }}
           >
             <Box sx={{ display: "flex", flexGrow: 1 }}>
-              <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
+              <Box
+                sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}
+              >
                 <Typography
                   style={{ flexGrow: 1, marginRight: "5px" }}
                   sx={{ ...bodyTextSx, fontWeight: "bold" }}
@@ -167,7 +192,14 @@ function ThemedSpellSymbolist({ symbol, isEditMode, onEdit }) {
                   {getSymbolName(sym)}
                 </Typography>
               </Box>
-              <Box sx={{ flex: 1, display: "flex", alignItems: "center", ...bodyTextSx }}>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  ...bodyTextSx,
+                }}
+              >
                 <ReactMarkdown components={components}>
                   {getSymbolEffect(sym)}
                 </ReactMarkdown>
