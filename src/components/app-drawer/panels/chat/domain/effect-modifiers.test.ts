@@ -22,11 +22,18 @@ function npc(currentHp: number): TypeNpc {
       {
         id: "crisis-aim",
         name: "Crisis Aim",
-        predicate: { crisisInteraction: "active" },
-        changes: [{ key: "bonuses.accuracy.all", mode: 2, value: "2" }],
+        behaviors: [
+          {
+            id: "crisis-aim-beh",
+            name: "Crisis Aim",
+            trigger: { kind: "passive" },
+            predicate: { crisisInteraction: "active" },
+            changes: [{ key: "bonuses.accuracy.all", mode: 2, value: "2" }],
+          },
+        ],
       },
     ],
-  } as TypeNpc;
+  } as unknown as TypeNpc;
 }
 
 describe("accuracyModifiersFromEffects", () => {

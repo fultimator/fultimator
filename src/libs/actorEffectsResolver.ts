@@ -240,7 +240,7 @@ function* walkItems(actor: Actor): Generator<ItemWithEffects> {
     for (const eq of actor.equipment ?? []) {
       const equippedItems = equippedPlayerItems(actor, eq);
       for (const item of equippedItems) {
-        yield item;
+        yield item as ItemWithEffects;
         if (!isWeaponItem(item) || !item.slotted?.length) continue;
         for (const sphereId of item.slotted) {
           const hoplo = (eq.hoplospheres ?? []).find((h) => h.id === sphereId);

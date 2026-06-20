@@ -40,6 +40,7 @@ export type PlayerSpellFormState = {
   "damage.type": string;
   "damage.hrZero": boolean;
   description: string;
+  showInPlayerSheet: boolean;
   // arcanist fields
   domain: string;
   domainDesc: string;
