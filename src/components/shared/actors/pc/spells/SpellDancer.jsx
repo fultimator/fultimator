@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Typography,
-  Grid,
+  Box,
   ThemeProvider,
   Tooltip,
   Icon,
@@ -94,69 +94,44 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
           alignItems: "center",
         }}
       >
-        <Grid container style={{ flexGrow: 1 }}>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-              minHeight: "40px",
-            }}
-            size={4}
-          >
+        <Box sx={{ display: "flex", flexGrow: 1 }}>
+          <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center", minHeight: "40px" }}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
+              sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
             >
               {t("dance_dance")}
             </Typography>
-          </Grid>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-              minHeight: "40px",
-            }}
-            size={8}
-          >
+          </Box>
+          <Box sx={{ flex: 1, display: "flex", alignItems: "center", minHeight: "40px" }}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
+              sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
             >
               {t("Effect")}
             </Typography>
-          </Grid>
-        </Grid>
-        {isEditMode && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              flexShrink: 0,
-            }}
-          >
-            {!showInPlayerSheet && (
-              <Tooltip title={t("Dance not shown in player sheet")}>
-                <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
-              </Tooltip>
-            )}
-            <IconButton
-              size="small"
-              onClick={onEdit}
-              sx={{ color: "#fff", p: "3px" }}
-            >
-              <Edit sx={{ fontSize: "1.1rem" }} />
-            </IconButton>
-          </div>
-        )}
+          </Box>
+        </Box>
+        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          {isEditMode && (
+            <>
+              {!showInPlayerSheet && (
+                <Tooltip title={t("Dance not shown in player sheet")}>
+                  <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+                </Tooltip>
+              )}
+              <IconButton
+                size="small"
+                onClick={onEdit}
+                sx={{ color: "#fff", p: "3px" }}
+              >
+                <Edit sx={{ fontSize: "1.1rem" }} />
+              </IconButton>
+            </>
+          )}
+        </Box>
       </div>
       {(dance.dances ?? []).length === 0 ? (
         <Typography
@@ -188,43 +163,24 @@ function ThemedSpellDancer({ dance, isEditMode, onEdit }) {
               borderBottom: `1px solid ${theme.secondary}`,
             }}
           >
-            <Grid container spacing={1.5} style={{ flexGrow: 1 }}>
-              <Grid
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "left",
-                }}
-                size={4}
-              >
+            <Box sx={{ display: "flex", flexGrow: 1 }}>
+              <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
                 <div>
-                  <Typography
-                    sx={{
-                      ...bodyTextSx,
-                      fontWeight: "bold",
-                    }}
-                  >
+                  <Typography sx={{ ...bodyTextSx, fontWeight: "bold" }}>
                     {getDanceName(dan)}
                   </Typography>
                   <Typography sx={{ fontSize: "0.82rem", lineHeight: 1.3, opacity: 0.85 }}>
                     {getDanceDuration(dan)}
                   </Typography>
                 </div>
-              </Grid>
-              <Grid
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "left",
-                }}
-                size={8}
-                sx={bodyTextSx}
-              >
+              </Box>
+              <Box sx={{ flex: 1, display: "flex", alignItems: "center", ...bodyTextSx }}>
                 <ReactMarkdown components={components}>
                   {getDanceEffect(dan)}
                 </ReactMarkdown>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
+            <Box sx={{ width: 34, flexShrink: 0 }} />
           </div>
         ))
       )}

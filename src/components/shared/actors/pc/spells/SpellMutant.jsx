@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Typography,
-  Grid,
+  Box,
   ThemeProvider,
   Tooltip,
   Icon,
@@ -88,15 +88,14 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
           alignItems: "center",
         }}
       >
-        <Grid container style={{ flexGrow: 1 }}>
-          <Grid
-            style={{
+        <Box sx={{ display: "flex", flexGrow: 1 }}>
+          <Box
+            sx={{
+              flex: "0 0 25%",
               display: "flex",
               alignItems: "center",
-              justifyContent: "left",
               minHeight: "40px",
             }}
-            size={6}
           >
             <Typography
               variant="h3"
@@ -107,50 +106,35 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
             >
               {t("mutant_therioform")}
             </Typography>
-          </Grid>
-          <Grid
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "left",
-              minHeight: "40px",
-            }}
-            size={6}
-          >
+          </Box>
+          <Box sx={{ flex: 1, display: "flex", alignItems: "center", minHeight: "40px" }}>
             <Typography
               variant="h3"
               style={{ flexGrow: 1, marginRight: "5px" }}
-              sx={{
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
+              sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
             >
               {t("mutant_genoclepsis_suggestions")}
             </Typography>
-            {isEditMode && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  flexShrink: 0,
-                }}
+          </Box>
+        </Box>
+        <Box sx={{ width: 34, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          {isEditMode && (
+            <>
+              {!showInPlayerSheet && (
+                <Tooltip title={t("mutant_therioforms_not_shown_tooltip")}>
+                  <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
+                </Tooltip>
+              )}
+              <IconButton
+                size="small"
+                onClick={onEdit}
+                sx={{ color: "#fff", p: "3px" }}
               >
-                {!showInPlayerSheet && (
-                  <Tooltip title={t("mutant_therioforms_not_shown_tooltip")}>
-                    <VisibilityOff sx={{ fontSize: "1.1rem", opacity: 0.7 }} />
-                  </Tooltip>
-                )}
-                <IconButton
-                  size="small"
-                  onClick={onEdit}
-                  sx={{ color: "#fff", p: "3px" }}
-                >
-                  <Edit sx={{ fontSize: "1.1rem" }} />
-                </IconButton>
-              </div>
-            )}
-          </Grid>
-        </Grid>
+                <Edit sx={{ fontSize: "1.1rem" }} />
+              </IconButton>
+            </>
+          )}
+        </Box>
       </div>
       {mutant.therioforms && mutant.therioforms.length === 0 ? (
         <Typography
@@ -180,15 +164,8 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                 borderBottom: `1px solid ${theme.secondary}`,
               }}
             >
-              <Grid container style={{ flexGrow: 1 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={6}
-                >
+              <Box sx={{ display: "flex", flexGrow: 1 }}>
+                <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
                   <Typography
                     style={{ flexGrow: 1, marginRight: "5px" }}
                     sx={{
@@ -200,52 +177,35 @@ function ThemedSpellMutant({ mutant, isEditMode, onEdit }) {
                       ? therioform.customName
                       : t(therioform.name)}
                   </Typography>
-                </Grid>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={6}
-                >
+                </Box>
+                <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
                   <ReactMarkdown components={components}>
                     {isCustomTherioform(therioform)
                       ? therioform.genoclepsis
                       : t(therioform.genoclepsis)}
                   </ReactMarkdown>
-                </Grid>
-              </Grid>
+                </Box>
+              </Box>
+              <Box sx={{ width: 34, flexShrink: 0 }} />
             </div>
-            <Grid
-              container
+            <Box
               sx={{
-                justifyContent: "flex-start",
                 background: "transparent",
                 padding: "3px 17px",
                 minHeight: 44,
                 fontSize: "0.9rem",
                 marginBottom: "6px",
                 borderBottom: `1px solid ${theme.secondary}`,
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              <Grid container style={{ flexGrow: 1 }}>
-                <Grid
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "left",
-                  }}
-                  size={12}
-                >
-                  <ReactMarkdown components={components}>
-                    {isCustomTherioform(therioform)
-                      ? therioform.description
-                      : t(therioform.description)}
-                  </ReactMarkdown>
-                </Grid>
-              </Grid>
-            </Grid>
+              <ReactMarkdown components={components}>
+                {isCustomTherioform(therioform)
+                  ? therioform.description
+                  : t(therioform.description)}
+              </ReactMarkdown>
+            </Box>
           </React.Fragment>
         ))
       )}

@@ -392,7 +392,7 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
   }
 
   // 2. Migrate attribute flat numbers to { base } shape
-  const rawAttrs = npc.attributes as unknown as Record<string, unknown>;
+  const rawAttrs = (npc.attributes ?? {}) as unknown as Record<string, unknown>;
   const attributes: NpcAttributes = {
     might: {
       base:
@@ -548,6 +548,7 @@ function normalizeLegacyNumericNpcFields(npc: TypeNpc): TypeNpc {
 
   return {
     ...npc,
+    lvl: (toNumber(npc.lvl) || 1) as TypeNpc["lvl"],
     phases: toNumberIfNumericString(npc.phases) as TypeNpc["phases"],
     companionlvl: toNumberIfNumericString(
       npc.companionlvl,

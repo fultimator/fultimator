@@ -5,6 +5,7 @@ export default function ClassTab({
   setPlayer,
   isEditMode = false,
   searchQuery = "",
+  defaultExpandAll = false,
 }) {
   return (
     <PcClasses
@@ -13,7 +14,7 @@ export default function ClassTab({
       isInteractive={isEditMode}
       onUpdate={setPlayer}
       searchQuery={searchQuery}
-      defaultExpanded={false}
+      defaultExpanded={defaultExpandAll}
     />
   );
 }

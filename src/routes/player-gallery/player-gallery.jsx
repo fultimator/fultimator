@@ -112,6 +112,7 @@ function Personal() {
     advancement: false,
     automaticClassLevel: true,
     defaultView: "normal",
+    expandAllSections: true,
     autoEquipUnarmed: true,
     optionalRules: {
       quirks: false,
@@ -387,6 +388,7 @@ function Personal() {
       },
       settings: {
         defaultView: options.defaultView,
+        expandAllSections: options.expandAllSections ?? true,
         advancement: options.advancement,
         automaticClassLevel:
           options.optionalRules?.technospheres ||
@@ -1408,6 +1410,22 @@ function Personal() {
                   <MenuItem value="compact">{t("Compact View")}</MenuItem>
                 </Select>
               </FormControl>
+            </SettingRow>
+
+            <SettingRow
+              label={t("Expand All Sections")}
+              hint={t("When enabled, all spell and class sections start expanded on load.")}
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.expandAllSections ?? true}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "expandAllSections",
+                    evt.target.checked,
+                  )
+                }
+              />
             </SettingRow>
 
             <SettingRow

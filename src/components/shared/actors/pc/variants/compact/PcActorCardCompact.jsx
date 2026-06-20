@@ -74,6 +74,7 @@ export default function PcActorCardCompact({
   const _isEditMode = isInteractive;
   // Owner always has edit access to core data tabs regardless of preview toggle.
   const ownerEditMode = isOwner || isInteractive;
+  const expandAllSections = pc?.settings?.expandAllSections ?? true;
 
   const sharedProps = { pc, isInteractive, onUpdate, onQuickCheck };
 
@@ -303,6 +304,7 @@ export default function PcActorCardCompact({
             setPlayer={setPlayer}
             isEditMode={ownerEditMode}
             searchQuery={searchQuery}
+            defaultExpandAll={expandAllSections}
           />
         </TabPanel>
         <TabPanel value={tab} index={2}>

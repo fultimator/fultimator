@@ -143,9 +143,10 @@ function ThemedSpellDefault({
       <div
         style={{
           background: `linear-gradient(to right, ${theme.ternary}, ${gradientColor})`,
-          padding: "3px 17px",
+          padding: "6px 17px",
           display: "flex",
           justifyContent: "space-between",
+          minHeight: 44,
           borderTop: `1px solid ${theme.secondary}`,
           borderBottom: `1px solid ${theme.secondary}`,
         }}

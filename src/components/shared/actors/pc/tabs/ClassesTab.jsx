@@ -5,6 +5,7 @@ export default function ClassesTab({
   setPlayer,
   isOwner,
   updateMaxStats,
+  defaultExpandAll = false,
 }) {
   return (
     <PcClasses
@@ -13,7 +14,7 @@ export default function ClassesTab({
       isInteractive={isOwner}
       onUpdate={setPlayer}
       updateMaxStats={updateMaxStats}
-      defaultExpanded={!isOwner}
+      defaultExpanded={defaultExpandAll || !isOwner}
     />
   );
 }

@@ -347,7 +347,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
           minHeight: "40px",
         }}
       >
-        <Box sx={{ flex: "0 0 40%", display: "flex", alignItems: "center" }}>
+        <Box sx={{ flex: "0 0 25%", display: "flex", alignItems: "center" }}>
           <Typography
             variant="h3"
             sx={{ fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" } }}
@@ -396,7 +396,7 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                 fontSize: "0.9rem",
               }}
             >
-              <Box sx={{ flex: "0 0 40%", minWidth: 0 }}>
+              <Box sx={{ flex: "0 0 25%", minWidth: 0 }}>
                 <Typography sx={{ ...bodyTextSx, fontWeight: "bold" }}>
                   {getGiftName(gft)}
                 </Typography>

@@ -616,6 +616,7 @@ const toggleDrawer = (open) => (event) => {
 
   const settings = playerTemp?.settings ?? {};
   const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
+  const expandAllSections = settings.expandAllSections ?? true;
   const advancement = settings.advancement ?? false;
   const automaticClassLevel =
     (settings.optionalRules?.technospheres ?? false) ||
@@ -768,6 +769,13 @@ const toggleDrawer = (open) => (event) => {
       defaultView: value,
     }));
     setCompactView(value === "compact");
+  };
+
+  const handleExpandAllSectionsChange = (checked) => {
+    updatePlayerSettings((prevSettings) => ({
+      ...prevSettings,
+      expandAllSections: checked,
+    }));
   };
 
   const handleAdvancementChange = (checked) => {
@@ -1198,6 +1206,7 @@ const toggleDrawer = (open) => (event) => {
             setPlayer={setPlayerTemp}
             isOwner={isOwner}
             updateMaxStats={updateMaxStats}
+            defaultExpandAll={expandAllSections}
           />
         </TabPanel>
         <TabPanel value={4} currentValue={openTab}>
@@ -1205,6 +1214,7 @@ const toggleDrawer = (open) => (event) => {
             player={playerTemp}
             setPlayer={setPlayerTemp}
             isOwner={isOwner}
+            defaultExpandAll={expandAllSections}
           />
         </TabPanel>
         <TabPanel value={5} currentValue={openTab}>
@@ -1268,6 +1278,19 @@ const toggleDrawer = (open) => (event) => {
                         <MenuItem value="compact">{t("Compact View")}</MenuItem>
                       </Select>
                     </FormControl>
+                  </SettingRow>
+
+                  <SettingRow
+                    label={t("Expand All Sections")}
+                    hint={t("When enabled, all spell and class sections start expanded on load.")}
+                    compactControl
+                  >
+                    <Checkbox
+                      checked={expandAllSections}
+                      onChange={(e) =>
+                        handleExpandAllSectionsChange(e.target.checked)
+                      }
+                    />
                   </SettingRow>
 
                   <SettingRow
