@@ -22,6 +22,8 @@ export function useCompendiumFilters({
   initialQualityCategories = [],
   initialHeroicClasses = [],
   initialOptionalSubtypes = [],
+  initialEffectTransfer = "",
+  initialEffectApplicableTypes = [],
   initialCompendium = "official",
   // When open transitions false→true, reset all state to initial values
   open,
@@ -57,6 +59,11 @@ export function useCompendiumFilters({
   const [selectedOptionalSubtypes, setSelectedOptionalSubtypes] = useState(
     initialOptionalSubtypes,
   );
+  const [selectedEffectTransfer, setSelectedEffectTransfer] = useState(
+    initialEffectTransfer,
+  );
+  const [selectedEffectApplicableTypes, setSelectedEffectApplicableTypes] =
+    useState(initialEffectApplicableTypes);
   const [selectedCompendium, setSelectedCompendium] =
     useState(initialCompendium);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
@@ -90,6 +97,8 @@ export function useCompendiumFilters({
       setSelectedQualityCategories(initialQualityCategories);
       setSelectedHeroicClasses(initialHeroicClasses);
       setSelectedOptionalSubtypes(initialOptionalSubtypes);
+      setSelectedEffectTransfer(initialEffectTransfer);
+      setSelectedEffectApplicableTypes(initialEffectApplicableTypes);
     } else if (!open) {
       resetDone.current = false;
     }
@@ -213,6 +222,26 @@ export function useCompendiumFilters({
     [],
   );
 
+  const handleEffectTransferChange = useCallback(
+    (value, { scrollRef } = {}) => {
+      setSelectedEffectTransfer(value);
+      setSearchQuery("");
+      setSelectedIdx(null);
+      if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+    },
+    [],
+  );
+
+  const handleEffectApplicableTypesChange = useCallback(
+    (types, { scrollRef } = {}) => {
+      setSelectedEffectApplicableTypes(types);
+      setSearchQuery("");
+      setSelectedIdx(null);
+      if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+    },
+    [],
+  );
+
   const handleCompendiumChange = useCallback(
     (compendium, { onManageModules, scrollRef } = {}) => {
       if (compendium === "__manage_modules__") {
@@ -247,6 +276,8 @@ export function useCompendiumFilters({
       selectedQualityCategories,
       selectedHeroicClasses,
       selectedOptionalSubtypes,
+      selectedEffectTransfer,
+      selectedEffectApplicableTypes,
       selectedCompendium,
       searchQuery,
       isPilotClassSelected,
@@ -264,6 +295,8 @@ export function useCompendiumFilters({
       handleQualityCategoriesChange,
       handleHeroicClassesChange,
       handleOptionalSubtypesChange,
+      handleEffectTransferChange,
+      handleEffectApplicableTypesChange,
       handleCompendiumChange,
       handleItemClick,
     },

@@ -14,6 +14,7 @@ import classList, {
 import { availableFrames, availableModules } from "./pilotVehicleData";
 import { mnemospheres } from "./mnemospheres";
 import { magiseeds } from "./floralistMagiseedData";
+import { officialEffects } from "./effects";
 // import { getDelicacyEffects } from "./gourmetCookingData";
 import {
   availableGifts,
@@ -85,6 +86,7 @@ export const ITEM_TYPES = [
     context: "player",
   },
   { key: "optionals", label: staticT("Optionals", true), context: "player" },
+  { key: "effects", label: staticT("Effects", true), context: "both" },
 ];
 
 export const PACK_ITEM_TYPES = [
@@ -120,6 +122,7 @@ export const PACK_ITEM_TYPES = [
     context: "player",
   },
   { key: "optionals", label: staticT("Optionals", true), context: "player" },
+  { key: "effects", label: staticT("Effects", true), context: "both" },
 ];
 
 export const VIEWER_TO_PACK_TYPE = {
@@ -139,6 +142,7 @@ export const VIEWER_TO_PACK_TYPE = {
   mnemospheres: "mnemosphere",
   hoplospheres: "hoplosphere",
   optionals: "optional",
+  effects: "effect",
 };
 
 export function getItems(type) {
@@ -169,7 +173,8 @@ export function getItems(type) {
     case "accessories":
     case "optionals":
     case "hoplospheres":
-      return []; // pack-only, no official data
+    case "effects":
+      return officialEffects;
     default:
       return [];
   }

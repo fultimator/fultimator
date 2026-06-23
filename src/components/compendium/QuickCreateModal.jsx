@@ -205,6 +205,13 @@ import {
   noteGroupLabels,
   noteTabs,
 } from "../../forms/rendering/config/itemConfigs/note";
+import {
+  effectFieldConfig,
+  effectGroupLabels,
+  effectTabs,
+  makeEffectFieldConfig,
+} from "../../forms/rendering/config/itemConfigs/effect";
+import { BLANK_BEHAVIOR } from "../../forms/rendering/config/shared/behaviorFields";
 import { createDefaultStateFromFields } from "../../forms/registry/helpers";
 import { deriveIsOfficial } from "../../forms/rendering/config/metaFieldConfig";
 
@@ -3622,6 +3629,44 @@ function NotePanel() {
   );
 }
 
+function EffectPanel() {
+  const [formState, setFormState] = useState(() => ({
+    ...createDefaultStateFromFields(effectFieldConfig),
+    behaviors: [BLANK_BEHAVIOR()],
+  }));
+
+  const firstBehavior = formState.behaviors?.[0];
+
+  const activeConfig = useMemo(
+    () => makeEffectFieldConfig(firstBehavior?.applicableTypes ?? []),
+    [firstBehavior?.applicableTypes],
+  );
+
+  const data = firstBehavior ?? {};
+
+  return (
+    <PanelLayout
+      formContent={
+        <TabbedSchemaFormRenderer
+          tabs={effectTabs}
+          config={activeConfig}
+          groupLabels={effectGroupLabels}
+          state={formState}
+          onChange={setFormState}
+          surface="edit"
+          cols={2}
+        />
+      }
+      addButton={
+        <AddToCompendiumButton itemType={REG.effect.addItemType} data={data} />
+      }
+      data={data}
+      itemName={String(firstBehavior?.name ?? "")}
+      exportDataType={REG.effect.exportDataType}
+    />
+  );
+}
+
 const TAB_CONFIG = {
   "npc-attack": { Panel: NpcAttackPanel },
   "npc-spell": { Panel: NpcSpellPanel },
@@ -3642,6 +3687,7 @@ const TAB_CONFIG = {
   item: { Panel: ItemPanel },
   consumable: { Panel: ConsumablePanel },
   note: { Panel: NotePanel },
+  effect: { Panel: EffectPanel },
 };
 
 const TABS = QUICK_CREATE_TAB_KEYS.map((key) => ({

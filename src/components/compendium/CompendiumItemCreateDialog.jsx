@@ -76,6 +76,13 @@ import {
   optionalTabs,
 } from "../../forms/rendering/config/itemConfigs/optional";
 import {
+  effectFieldConfig,
+  effectGroupLabels,
+  effectTabs,
+  makeEffectFieldConfig,
+} from "../../forms/rendering/config/itemConfigs/effect";
+import { BLANK_BEHAVIOR } from "../../forms/rendering/config/shared/behaviorFields";
+import {
   playerSpellFieldConfig,
   playerSpellTabs,
 } from "../../forms/rendering/config/itemConfigs/playerSpell";
@@ -2230,6 +2237,100 @@ function HoplosphereForm({ packId, onClose, editData, editItemId }) {
   );
 }
 
+function EffectForm({ packId, onClose, editData, editItemId }) {
+  const { t } = useTranslate();
+  const { addItem, updateItem } = useCompendiumPacks();
+  const customTheme = useCustomTheme();
+
+  const buildState = useCallback(
+    () => ({
+      ...createDefaultStateFromFields(effectFieldConfig),
+      behaviors: editData ? [editData] : [BLANK_BEHAVIOR()],
+    }),
+    [editData],
+  );
+
+  const [formState, setFormState] = useState(buildState);
+  const [saving, setSaving] = useState(false);
+  const isEditing = Boolean(editItemId);
+
+  useEffect(() => {
+    setFormState(buildState());
+  }, [buildState]);
+
+  const firstBehavior = formState.behaviors?.[0];
+
+  const activeConfig = useMemo(
+    () => makeEffectFieldConfig(firstBehavior?.applicableTypes ?? []),
+    [firstBehavior?.applicableTypes],
+  );
+
+  const canSave = Boolean(String(firstBehavior?.name ?? "").trim());
+
+  const handleSave = async () => {
+    if (!canSave) return;
+    setSaving(true);
+    const behavior = {
+      ...firstBehavior,
+      id: firstBehavior?.id || crypto.randomUUID(),
+    };
+    if (isEditing) await updateItem(packId, editItemId, behavior);
+    else await addItem(packId, "effect", behavior);
+    setSaving(false);
+    onClose();
+  };
+
+  return (
+    <>
+      <DialogTitle
+        sx={{
+          background: customTheme.primary,
+          color: "#fff",
+          fontWeight: "bold",
+          textTransform: "uppercase",
+          fontSize: "0.95rem",
+          py: 1.25,
+        }}
+      >
+        {t(isEditing ? "Edit Effect" : "New Effect")}
+        <IconButton
+          size="small"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: "rgba(255,255,255,0.8)",
+          }}
+        >
+          <Close fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={{ pt: "16px !important" }}>
+        <TabbedSchemaFormRenderer
+          tabs={effectTabs}
+          config={activeConfig}
+          groupLabels={effectGroupLabels}
+          state={formState}
+          onChange={setFormState}
+          surface="edit"
+          cols={2}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t("Cancel")}</Button>
+        <Button
+          variant="contained"
+          onClick={handleSave}
+          disabled={!canSave || saving}
+        >
+          {t(isEditing ? "Save" : "Add")}
+        </Button>
+      </DialogActions>
+    </>
+  );
+}
+
 export default function CompendiumItemCreateDialog({
   open,
   onClose,
@@ -2422,6 +2523,14 @@ export default function CompendiumItemCreateDialog({
       )}
       {itemType === "optional" && (
         <OptionalForm
+          packId={packId}
+          onClose={onClose}
+          editData={editData}
+          editItemId={editItemId}
+        />
+      )}
+      {itemType === "effect" && (
+        <EffectForm
           packId={packId}
           onClose={onClose}
           editData={editData}

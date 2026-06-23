@@ -205,6 +205,14 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
       onOptionalSubtypesChange={(s) =>
         handlers.handleOptionalSubtypesChange(s, { scrollRef: mainRef })
       }
+      selectedEffectTransfer={filters.selectedEffectTransfer}
+      onEffectTransferChange={(v) =>
+        handlers.handleEffectTransferChange(v, { scrollRef: mainRef })
+      }
+      selectedEffectApplicableTypes={filters.selectedEffectApplicableTypes}
+      onEffectApplicableTypesChange={(v) =>
+        handlers.handleEffectApplicableTypesChange(v, { scrollRef: mainRef })
+      }
       packs={packs}
       selectedCompendium={selectedCompendium}
       onCompendiumChange={(c) =>

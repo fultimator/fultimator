@@ -113,6 +113,7 @@ const labelByKey: Record<CompendiumItemType, string> = {
   item: "Item",
   consumable: "Consumable",
   note: "Note",
+  effect: "Effect",
 };
 
 const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
@@ -724,6 +725,7 @@ const exportDataTypeByKey: Record<CompendiumItemType, string> = {
   item: "items",
   consumable: "consumables",
   note: "notes",
+  effect: "effects",
 };
 
 export const itemFormRegistry: Record<CompendiumItemType, ItemFormDefinition> =

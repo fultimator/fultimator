@@ -30,7 +30,8 @@ export type CompendiumItemType =
   | "optional"
   | "item"
   | "consumable"
-  | "note";
+  | "note"
+  | "effect";
 
 export interface CompendiumItem {
   id: string; // crypto.randomUUID() - stable across edits

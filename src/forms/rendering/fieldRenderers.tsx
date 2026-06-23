@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Autocomplete,
   Box,
@@ -43,6 +50,12 @@ import SlotTierPicker from "/src/libs/player/SlotTierPicker.jsx";
 import SlotEditor from "/src/libs/player/SlotEditor.jsx";
 import { TypeIcon, TypeName } from "../../components/types";
 import { useTranslate } from "../../translation/translate";
+
+// Lazy-loaded to break a circular import: CompendiumViewerModal -> create dialog
+// -> TabbedSchemaFormRenderer -> fieldRenderers (this module).
+const CompendiumViewerModal = lazy(
+  () => import("../../components/compendium/CompendiumViewerModal"),
+);
 import type { FieldRendererProps } from "./fieldRendererProps";
 import type { GroupLabels } from "./config/fieldConfig";
 import { affinityStrToNum, affinityNumToStr } from "./npcAffinityUtils";
@@ -1349,9 +1362,18 @@ export function ObjectListRenderer({
       >) ?? [],
     [componentProps?.fields],
   );
-  const itemDefaults =
-    (componentProps?.itemDefaults as Record<string, unknown>) ?? {};
+  const itemDefaultsProp = componentProps?.itemDefaults as
+    | Record<string, unknown>
+    | (() => Record<string, unknown>)
+    | undefined;
+  const makeItemDefaults = (): Record<string, unknown> =>
+    typeof itemDefaultsProp === "function"
+      ? itemDefaultsProp()
+      : { ...(itemDefaultsProp ?? {}) };
   const fixedCount = componentProps?.fixedCount as number | undefined;
+  const maxItems = componentProps?.maxItems as number | undefined;
+  const enableCompendiumPicker =
+    componentProps?.enableCompendiumPicker === true;
   const addLabel = (componentProps?.addLabel as string) ?? "Add";
   const variant = (componentProps?.variant as string | undefined) ?? "";
   const rowLabel = componentProps?.rowLabel as
@@ -1391,6 +1413,7 @@ export function ObjectListRenderer({
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [menuRowIndex, setMenuRowIndex] = useState<number | null>(null);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
     setExpandedRows((prev) => {
@@ -1418,7 +1441,17 @@ export function ObjectListRenderer({
     if (isBehaviorCard) {
       setExpandedRows((prev) => ({ ...prev, [nextIndex]: true }));
     }
-    onCommit([...rows, { ...itemDefaults }]);
+    onCommit([...rows, makeItemDefaults()]);
+  };
+
+  const addFromCompendium = (effectItem: Record<string, unknown>) => {
+    const { _packItemId, ...behavior } = effectItem;
+    void _packItemId;
+    const nextIndex = rows.length;
+    if (isBehaviorCard) {
+      setExpandedRows((prev) => ({ ...prev, [nextIndex]: true }));
+    }
+    onCommit([...rows, { ...behavior, id: crypto.randomUUID() }]);
   };
 
   const removeRow = (i: number) => onCommit(rows.filter((_, idx) => idx !== i));
@@ -1648,17 +1681,40 @@ export function ObjectListRenderer({
             : ""
         }
       />
-      {fixedCount === undefined && (
-        <Box>
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<Add />}
-            onClick={addRow}
-          >
-            {t(addLabel)}
-          </Button>
-        </Box>
+      {fixedCount === undefined &&
+        (maxItems === undefined || rows.length < maxItems) && (
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<Add />}
+              onClick={addRow}
+            >
+              {t(addLabel)}
+            </Button>
+            {enableCompendiumPicker && (
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={() => setPickerOpen(true)}
+              >
+                {t("behavior.addFromCompendium")}
+              </Button>
+            )}
+          </Box>
+        )}
+      {enableCompendiumPicker && pickerOpen && (
+        <Suspense fallback={null}>
+          <CompendiumViewerModal
+            open={pickerOpen}
+            onClose={() => setPickerOpen(false)}
+            restrictToTypes={["effects"]}
+            initialType="effects"
+            context={undefined}
+            onAddItem={(item) => addFromCompendium(item)}
+          />
+        </Suspense>
       )}
     </Box>
   );

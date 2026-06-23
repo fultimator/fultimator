@@ -27,12 +27,15 @@ import {
   PlayerShieldModal,
   PlayerWeaponModal,
 } from "/src/components/shared/actors/pc/editors";
-import { SchemaFieldRenderer } from "/src/forms/rendering/SchemaFieldRenderer";
 import { Grid } from "@mui/material";
+import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   actorEffectRowFields,
   BLANK_ACTOR_EFFECT,
+  passiveGroupLabels,
 } from "/src/forms/rendering/config/shared/behaviorFields";
+
+const ACTOR_EFFECT_TABS = [];
 
 function asArray(value) {
   return Array.isArray(value) ? value : [];
@@ -232,15 +235,15 @@ function ActorEffectDialogInner({ effect, onClose, onSave, onDelete }) {
         {isNew ? t("Add Actor Effect") : t("Edit Actor Effect")}
       </DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} sx={{ pt: 1 }}>
-          <SchemaFieldRenderer
-            config={actorEffectRowFields}
-            state={draft}
-            onChange={setDraft}
-            surface="modal"
-            cols={2}
-          />
-        </Grid>
+        <TabbedSchemaFormRenderer
+          tabs={ACTOR_EFFECT_TABS}
+          config={actorEffectRowFields}
+          groupLabels={passiveGroupLabels}
+          state={draft}
+          onChange={setDraft}
+          surface="modal"
+          cols={2}
+        />
       </DialogContent>
       <DialogActions sx={{ justifyContent: "space-between" }}>
         <Box>

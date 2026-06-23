@@ -31,7 +31,7 @@ export const EFFECT_CHANGE_KEY_OPTIONS: string[] = [
   "bonuses.incomingDamage.physical",
   "bonuses.incomingDamage.fire",
   "bonuses.incomingDamage.ice",
-  "bonuses.incomingDamage.wind",
+  "bonuses.incomingDamage.air",
   "bonuses.incomingDamage.earth",
   "bonuses.incomingDamage.lightning",
   "bonuses.incomingDamage.dark",
@@ -94,7 +94,7 @@ function isAffinityKey(state: Record<string, unknown>): boolean {
   return typeof state.key === "string" && state.key.startsWith("affinities.");
 }
 
-function makeEffectChangeRowFields(
+export function makeEffectChangeRowFields(
   keyOptions: string[],
 ): ItemFieldConfig<Record<string, unknown>> {
   return [
@@ -757,6 +757,7 @@ export function makeActorEffectRowFields(): ItemFieldConfig<
         addLabel: "behavior.add",
         variant: "behavior-card",
         groupLabels: behaviorGroupLabels,
+        enableCompendiumPicker: true,
         rowLabel: (row: Record<string, unknown>) =>
           typeof row.name === "string" && row.name ? row.name : "Behavior",
       },
@@ -783,6 +784,7 @@ export const behaviorsTabField: FieldConfig<Record<string, unknown>> = {
     addLabel: "behavior.add",
     variant: "behavior-card",
     groupLabels: behaviorGroupLabels,
+    enableCompendiumPicker: true,
     rowLabel: (row: Record<string, unknown>) =>
       typeof row.name === "string" && row.name ? row.name : "Behavior",
   },

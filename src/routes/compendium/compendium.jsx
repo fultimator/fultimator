@@ -99,6 +99,8 @@ import {
   SharedMnemosphereCard,
   SharedHoplosphereCard,
 } from "../../components/shared/items";
+import { SharedEffectCard } from "../../components/shared/items/effects/SharedEffectCard";
+import { EFFECT_APPLICABLE_TYPE_OPTIONS } from "../../forms/rendering/config/itemConfigs/effect";
 
 import classList from "../../libs/classes";
 import {
@@ -250,6 +252,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onHeroicClassesChange,
   selectedOptionalSubtypes,
   onOptionalSubtypesChange,
+  selectedEffectTransfer = "",
+  onEffectTransferChange,
+  selectedEffectApplicableTypes = [],
+  onEffectApplicableTypesChange,
   // pack props
   packs,
   selectedCompendium,
@@ -742,6 +748,54 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           />
         )}
 
+        {selectedType === "effects" && (
+          <>
+            <FormControl size="small" fullWidth>
+              <InputLabel>{t("behavior.transfer.label")}</InputLabel>
+              <Select
+                label={t("behavior.transfer.label")}
+                value={selectedEffectTransfer}
+                onChange={(e) => onEffectTransferChange?.(e.target.value)}
+              >
+                <MenuItem value="">{t("All")}</MenuItem>
+                <MenuItem value="true">{t("behavior.transfer.true")}</MenuItem>
+                <MenuItem value="false">{t("behavior.transfer.false")}</MenuItem>
+              </Select>
+            </FormControl>
+            <Autocomplete
+              {...(isMobile ? autocompleteOverlayProps : {})}
+              multiple
+              limitTags={1}
+              size="small"
+              fullWidth
+              sx={compactMultiAutocompleteSx}
+              options={EFFECT_APPLICABLE_TYPE_OPTIONS}
+              getOptionLabel={(o) => t(o.label)}
+              value={EFFECT_APPLICABLE_TYPE_OPTIONS.filter((o) =>
+                selectedEffectApplicableTypes.includes(o.value),
+              )}
+              onChange={(e, newValue) =>
+                onEffectApplicableTypesChange?.(newValue.map((v) => v.value))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("effect.applicableTypes")}
+                  placeholder={t("All types")}
+                />
+              )}
+              renderValue={(value, getTagProps) =>
+                value.map((option, index) => {
+                  const { key, ...tagProps } = getTagProps({ index });
+                  return (
+                    <Chip key={key} label={t(option.label)} size="small" {...tagProps} />
+                  );
+                })
+              }
+            />
+          </>
+        )}
+
         {selectedType === "qualities" && (
           <>
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
@@ -868,6 +922,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
 });
 // Card dispatcher
 
+
 export const ItemCard = React.memo(function ItemCard({
   type,
   item,
@@ -954,6 +1009,8 @@ export const ItemCard = React.memo(function ItemCard({
       return <SharedActionCard {...sharedProps} />;
     case "optionals":
       return <SharedOptionalCard {...sharedProps} />;
+    case "effects":
+      return <SharedEffectCard {...sharedProps} />;
     default:
       return null;
   }
@@ -1098,6 +1155,11 @@ function CompendiumViewer() {
     const subtypes = searchParams.get("optionalSubtypes");
     return subtypes ? subtypes.split(",") : [];
   }, [searchParams]);
+  const selectedEffectTransfer = searchParams.get("effectTransfer") ?? "";
+  const selectedEffectApplicableTypes = useMemo(() => {
+    const types = searchParams.get("effectApplicableTypes");
+    return types ? types.split(",") : [];
+  }, [searchParams]);
 
   // Cleanup stale magichantSubtype URL param
   useEffect(() => {
@@ -1148,6 +1210,8 @@ function CompendiumViewer() {
     selectedQualityCategories,
     selectedHeroicClasses,
     selectedOptionalSubtypes,
+    selectedEffectTransfer,
+    selectedEffectApplicableTypes,
     selectedCompendium,
     searchQuery,
     isPilotClassSelected,
@@ -1278,6 +1342,25 @@ function CompendiumViewer() {
         setSearchParams(newParams);
         if (scrollRef?.current) scrollRef.current.scrollTop = 0;
       },
+      handleEffectTransferChange: (value, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const newParams = { ...urlBase(), type: selectedType };
+        if (value) newParams.effectTransfer = value;
+        if (selectedEffectApplicableTypes.length > 0)
+          newParams.effectApplicableTypes = selectedEffectApplicableTypes.join(",");
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleEffectApplicableTypesChange: (types, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const newParams = { ...urlBase(), type: selectedType };
+        if (selectedEffectTransfer) newParams.effectTransfer = selectedEffectTransfer;
+        if (types.length > 0) newParams.effectApplicableTypes = types.join(",");
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
       handleCompendiumChange: (compendium, { scrollRef } = {}) => {
         if (compendium === "__manage_modules__") {
           setManageModulesOpen(true);
@@ -1335,6 +1418,8 @@ function CompendiumViewer() {
       selectedQualityCategories,
       selectedHeroicClasses,
       selectedOptionalSubtypes,
+      selectedEffectTransfer,
+      selectedEffectApplicableTypes,
     ],
   );
 

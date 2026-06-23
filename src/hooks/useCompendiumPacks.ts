@@ -674,6 +674,7 @@ export function useCompendiumPacks() {
       "mnemosphere",
       "hoplosphere",
       "optional",
+      "effect",
     ];
     const now = Date.now();
     const packId = crypto.randomUUID();
