@@ -1,8 +1,12 @@
-import type { ActionBehavior, AfterEffect, AppliedEffect } from "../types/Effects";
+import type { Behavior, AfterEffect, AppliedEffect } from "../types/Effects";
 import type { ExprBindings } from "./exprResolver";
 import type { RuntimeActor } from "../types/RuntimeActor";
-import type { ResourceDelta, ResourceMultiplier, DamageBonuses } from "../types/Bonuses";
-import type { Elements } from "../types/Misc";
+import type {
+  ResourceDelta,
+  ResourceMultiplier,
+  DamageBonuses,
+} from "../types/Bonuses";
+import type { Elements, Affinities } from "../types/Misc";
 import {
   createActionContext,
   emitDamageEvent,
@@ -12,7 +16,11 @@ import {
   type ActionContext,
   type ResourceKind,
 } from "./actionContext";
-import { resolveDamage, buildDamageContext, type DamageElement } from "./damagePipeline";
+import {
+  resolveDamage,
+  buildDamageContext,
+  type DamageElement,
+} from "./damagePipeline";
 import { resolveResource, buildResourceContext } from "./resourcePipeline";
 import {
   resolveAfterEffects,
@@ -31,6 +39,7 @@ export interface ActorPipelineData {
   maxMp: number;
   maxIp?: number;
   affinities: Record<string, string>;
+  affinityGrants?: Partial<Record<Elements, Affinities>>;
   incomingDamageBonuses: DamageBonuses;
   incomingLossBonuses: ResourceDelta;
   incomingLossMultipliers: ResourceMultiplier;
@@ -89,7 +98,7 @@ export function executeActionCost(
       ? actorData.runtime.currentHp
       : cost.resource === "mp"
         ? actorData.runtime.currentMp
-        : actorData.currentIp ?? 0;
+        : (actorData.currentIp ?? 0);
 
   if (current < cost.amount) {
     return { paid: false, deficit: cost.amount - current };
@@ -101,24 +110,24 @@ export function executeActionCost(
 
 export type PrimaryOutcomeSpec =
   | {
-    kind: "damage";
-    baseDamage: number;
-    damageType: DamageElement;
-    targetIds: string[];
-  }
+      kind: "damage";
+      baseDamage: number;
+      damageType: DamageElement;
+      targetIds: string[];
+    }
   | {
-    kind: "resource-loss";
-    resource: ResourceKind;
-    amount: number;
-    targetIds: string[];
-    voluntary?: boolean;
-  }
+      kind: "resource-loss";
+      resource: ResourceKind;
+      amount: number;
+      targetIds: string[];
+      voluntary?: boolean;
+    }
   | {
-    kind: "resource-recovery";
-    resource: ResourceKind;
-    amount: number;
-    targetIds: string[];
-  }
+      kind: "resource-recovery";
+      resource: ResourceKind;
+      amount: number;
+      targetIds: string[];
+    }
   | { kind: "none" };
 
 export interface PrimaryOutcomeOutcome {
@@ -132,7 +141,11 @@ export function executePrimaryOutcome(
   actors: Record<string, ActorPipelineData>,
 ): PrimaryOutcomeOutcome {
   const perTarget = new Map<string, PrimaryOutcomeResult>();
-  let lastResolved: PrimaryOutcomeResult = { kind: "none", resolvedAmount: 0, resource: null };
+  let lastResolved: PrimaryOutcomeResult = {
+    kind: "none",
+    resolvedAmount: 0,
+    resource: null,
+  };
 
   if (spec.kind === "none") {
     ctx.primaryOutcome = lastResolved;
@@ -151,11 +164,16 @@ export function executePrimaryOutcome(
         damageType: spec.damageType,
         npcAffinities: targetData.affinities,
         temporaryAffinities: targetData.runtime.temporaryAffinities,
+        affinityGrants: targetData.affinityGrants,
         isGuarding: targetData.runtime.isGuarding,
         incomingDamageBonuses: targetData.incomingDamageBonuses,
       });
       const dmgResult = resolveDamage(dmgCtx);
-      emitDamageEvent(ctx, Math.abs(dmgResult.finalDamage), spec.damageType as Elements);
+      emitDamageEvent(
+        ctx,
+        Math.abs(dmgResult.finalDamage),
+        spec.damageType as Elements,
+      );
       result = {
         kind: "damage",
         resolvedAmount: Math.abs(dmgResult.finalDamage),
@@ -172,13 +190,13 @@ export function executePrimaryOutcome(
             ? targetData.runtime.currentHp
             : spec.resource === "mp"
               ? targetData.runtime.currentMp
-              : targetData.currentIp ?? 0,
+              : (targetData.currentIp ?? 0),
         maxValue:
           spec.resource === "hp"
             ? targetData.maxHp
             : spec.resource === "mp"
               ? targetData.maxMp
-              : targetData.maxIp ?? 0,
+              : (targetData.maxIp ?? 0),
         incomingLossBonuses: targetData.incomingLossBonuses,
         incomingLossMultipliers: targetData.incomingLossMultipliers,
         incomingRecoveryBonuses: targetData.incomingRecoveryBonuses,
@@ -206,19 +224,20 @@ export function executePrimaryOutcome(
             ? targetData.runtime.currentHp
             : spec.resource === "mp"
               ? targetData.runtime.currentMp
-              : targetData.currentIp ?? 0,
+              : (targetData.currentIp ?? 0),
         maxValue:
           spec.resource === "hp"
             ? targetData.maxHp
             : spec.resource === "mp"
               ? targetData.maxMp
-              : targetData.maxIp ?? 0,
+              : (targetData.maxIp ?? 0),
         incomingLossBonuses: targetData.incomingLossBonuses,
         incomingLossMultipliers: targetData.incomingLossMultipliers,
         incomingRecoveryBonuses: targetData.incomingRecoveryBonuses,
         incomingRecoveryMultipliers: targetData.incomingRecoveryMultipliers,
         outgoingRecoveryBonuses: actors[ctx.actorId]?.outgoingRecoveryBonuses,
-        outgoingRecoveryMultipliers: actors[ctx.actorId]?.outgoingRecoveryMultipliers,
+        outgoingRecoveryMultipliers:
+          actors[ctx.actorId]?.outgoingRecoveryMultipliers,
       });
       const rResult = resolveResource(rCtx);
       emitRecoveryEvent(ctx, spec.resource, rResult.resolvedAmount);
@@ -254,7 +273,11 @@ export function executeAfterEffects(
 
   const aeCtx: AfterEffectContext = {
     afterEffects,
-    primaryOutcome: ctx.primaryOutcome ?? { kind: "none", resolvedAmount: 0, resource: null },
+    primaryOutcome: ctx.primaryOutcome ?? {
+      kind: "none",
+      resolvedAmount: 0,
+      resource: null,
+    },
     selfId: ctx.actorId,
     targetIds,
     coverTargetId,
@@ -317,7 +340,7 @@ export interface ExecuteActionOpts {
   actorId: string;
   resolvedBy: "pc" | "npc";
   sl: number;
-  behavior: ActionBehavior;
+  behavior: Behavior;
   cost?: CostSpec;
   primaryOutcome?: PrimaryOutcomeSpec;
   targetIds?: string[];
@@ -352,13 +375,22 @@ export function executeAction(opts: ExecuteActionOpts): ExecuteActionResult {
     }
     costResult = executeActionCost(ctx, opts.cost, actorData);
     if (!costResult.paid) {
-      return { ctx, costResult, aborted: true, abortReason: "cost-insufficient" };
+      return {
+        ctx,
+        costResult,
+        aborted: true,
+        abortReason: "cost-insufficient",
+      };
     }
   }
 
   let primaryOutcomes: PrimaryOutcomeOutcome | undefined;
   if (opts.primaryOutcome) {
-    primaryOutcomes = executePrimaryOutcome(ctx, opts.primaryOutcome, opts.actors);
+    primaryOutcomes = executePrimaryOutcome(
+      ctx,
+      opts.primaryOutcome,
+      opts.actors,
+    );
   }
 
   let afterEffectsResult: ReturnType<typeof executeAfterEffects> | undefined;
@@ -374,5 +406,11 @@ export function executeAction(opts: ExecuteActionOpts): ExecuteActionResult {
     );
   }
 
-  return { ctx, costResult, primaryOutcomes, afterEffectsResult, aborted: false };
+  return {
+    ctx,
+    costResult,
+    primaryOutcomes,
+    afterEffectsResult,
+    aborted: false,
+  };
 }

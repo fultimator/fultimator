@@ -1,15 +1,8 @@
 import {
   Grid,
   Paper,
-  useTheme,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  OutlinedInput,
-  Box,
-  Chip,
+  useTheme,
   Tabs,
   Tab,
   IconButton,
@@ -17,107 +10,74 @@ import {
 } from "@mui/material";
 import { AutoAwesome, Download } from "@mui/icons-material";
 import { useState, useRef } from "react";
-import { SharedQualityCard } from "../../../components/shared/itemCards";
-import ChangeName from "../common/ChangeName";
-import ChangeQuality from "../common/ChangeQuality";
+import { SharedQualityCard } from "../../../components/shared/items";
 import { useTranslate } from "../../../translation/translate";
 import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import useUploadJSON from "../../../hooks/useUploadJSON";
 import QualitiesGenerator from "./QualitiesGenerator";
-import SelectBase from "./SelectBase";
-import qualities from "../../../libs/qualities";
 import Export from "../../../components/Export";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import useDownloadImage from "../../../hooks/useDownloadImage";
+import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
+import {
+  qualityFieldConfig,
+  qualityGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/quality";
 
-const CATEGORIES = ["Offensive", "Defensive", "Enhancement"];
-const FILTER_OPTIONS = [
-  { label: "Weapons", value: "weapon" },
-  { label: "Custom Weapons", value: "customWeapon" },
-  { label: "Armor", value: "armor" },
-  { label: "Shields", value: "shield" },
-  { label: "Accessories", value: "accessory" },
-];
+function buildInitialState() {
+  return {
+    name: "",
+    category: "Offensive",
+    quality: "",
+    cost: 0,
+    filter: [],
+    selectedBase: "",
+  };
+}
 
-function Qualities() {
+function Qualities({ variant = "equip" }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const stickyTop = useStickyTop();
   const secondary = theme.palette.secondary.main;
 
   const [tab, setTab] = useState(0);
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [quality, setQuality] = useState("");
-  const [cost, setCost] = useState(0);
-  const [filter, setFilter] = useState([]);
-  const [selectedBase, setSelectedBase] = useState("");
+  const [formState, setFormState] = useState(buildInitialState);
 
   const fileInputRef = useRef(null);
   const cardRef = useRef(null);
-  const [downloadImage, downloadSnackbar] = useDownloadImage(name, cardRef);
-
-  const qualityData = {
-    name,
-    category,
-    quality,
-    cost,
-    filter,
-  };
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
+    formState.name,
+    cardRef,
+  );
 
   const { handleFileUpload } = useUploadJSON((data) => {
-    if (data) {
-      if (data.name) setName(data.name);
-      if (data.category) setCategory(data.category);
-      if (data.quality) setQuality(data.quality);
-      if (data.cost !== undefined) setCost(data.cost);
-      if (data.filter) setFilter(data.filter);
-    }
+    if (!data) return;
+    setFormState((prev) => ({
+      ...prev,
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.category !== undefined && { category: data.category }),
+      ...(data.quality !== undefined && { quality: data.quality }),
+      ...(data.cost !== undefined && { cost: data.cost }),
+      ...(data.filter !== undefined && { filter: data.filter }),
+    }));
   });
 
-  const handleClearFields = () => {
-    setName("");
-    setCategory(CATEGORIES[0]);
-    setQuality("");
-    setCost(0);
-    setFilter([]);
-    setSelectedBase("");
-  };
+  const handleClearFields = () => setFormState(buildInitialState());
 
-  const handleFilterChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setFilter(typeof value === "string" ? value.split(",") : value);
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setTab(newValue);
-  };
-
-  const handleBaseChange = (e) => {
-    const baseName = e.target.value;
-    const base = qualities.find((q) => q.name === baseName);
-    if (base) {
-      setSelectedBase(baseName);
-      setName(t(base.name));
-      setCategory(base.category);
-      setQuality(t(base.quality));
-      setCost(base.cost);
-      setFilter(base.filter || []);
-    }
+  const qualityData = {
+    name: formState.name,
+    category: formState.category,
+    quality: formState.quality,
+    cost: formState.cost,
+    filter: formState.filter,
   };
 
   return (
     <Grid container spacing={2}>
       {/* Form */}
-      <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
-      >
+      <Grid size={{ xs: 12, sm: 6 }}>
         <Paper
           elevation={3}
           sx={{
@@ -127,7 +87,6 @@ function Qualities() {
             borderColor: secondary,
           }}
         >
-          {/* Header */}
           <CustomHeaderAlt
             headerText={t("Qualities")}
             icon={<AutoAwesome fontSize="large" />}
@@ -135,7 +94,7 @@ function Qualities() {
 
           <Tabs
             value={tab}
-            onChange={handleTabChange}
+            onChange={(_, v) => setTab(v)}
             indicatorColor="primary"
             textColor="primary"
             variant="fullWidth"
@@ -158,130 +117,78 @@ function Qualities() {
           </Tabs>
 
           {tab === 0 && (
-            <Grid container spacing={2} sx={{ alignItems: "center" }}>
-              <Grid size={12}>
-                <SelectBase value={selectedBase} onChange={handleBaseChange} />
-              </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <ChangeName
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+            <>
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={qualityFieldConfig}
+                  groupLabels={qualityGroupLabels}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="core"
+                  cols={2}
                 />
               </Grid>
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                }}
-              >
-                <FormControl fullWidth variant="standard">
-                  <InputLabel id="category-label">{t("Category")}</InputLabel>
-                  <Select
-                    labelId="category-label"
-                    id="category-select"
-                    value={category}
-                    label={t("Category")}
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    {CATEGORIES.map((cat) => (
-                      <MenuItem key={cat} value={cat}>
-                        {t(cat)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={12}>
-                <ChangeQuality
-                  quality={quality}
-                  setQuality={(e) => setQuality(e.target.value)}
-                  qualityCost={cost}
-                  setQualityCost={(e) => setCost(e.target.value)}
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <SchemaFieldRenderer
+                  config={qualityFieldConfig}
+                  groupLabels={qualityGroupLabels}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="quality"
+                  cols={2}
                 />
               </Grid>
-              <Grid size={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="filter-label">
-                    {t("Applicable to")}
-                  </InputLabel>
-                  <Select
-                    labelId="filter-label"
-                    id="filter-select"
-                    multiple
-                    value={filter}
-                    onChange={handleFilterChange}
-                    input={<OutlinedInput label={t("Applicable to")} />}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip
-                            key={value}
-                            label={t(
-                              FILTER_OPTIONS.find((o) => o.value === value)
-                                ?.label || value,
-                            )}
-                          />
-                        ))}
-                      </Box>
-                    )}
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    onClick={() => fileInputRef.current.click()}
                   >
-                    {FILTER_OPTIONS.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {t(option.label)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={12}>
-                <Grid container spacing={2} sx={{ alignItems: "center" }}>
-                  <Grid>
-                    <Button
-                      variant="outlined"
-                      onClick={() => fileInputRef.current.click()}
-                    >
-                      {t("Upload JSON")}
-                    </Button>
-                  </Grid>
-                  <Grid>
-                    <Button variant="outlined" onClick={handleClearFields}>
-                      {t("Clear All Fields")}
-                    </Button>
-                  </Grid>
+                    {t("Upload JSON")}
+                  </Button>
                 </Grid>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileUpload}
-                  style={{ display: "none" }}
-                />
+                <Grid size={6}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    onClick={handleClearFields}
+                  >
+                    {t("Clear All Fields")}
+                  </Button>
+                </Grid>
               </Grid>
-            </Grid>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+              />
+            </>
           )}
 
           {tab === 1 && (
-            <QualitiesGenerator onGenerate={(text) => setQuality(text)} />
+            <QualitiesGenerator
+              onGenerate={(text) =>
+                setFormState((prev) => ({ ...prev, quality: text }))
+              }
+            />
           )}
         </Paper>
       </Grid>
-      {/* Pretty */}
+
+      {/* Card preview */}
       <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
+        size={{ xs: 12, sm: 6 }}
         sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
       >
         <div ref={cardRef}>
           <SharedQualityCard
             item={qualityData}
-            variant="equip"
+            variant={variant}
             imageMode="slot"
             showImageToggle
             actionContent={
@@ -293,7 +200,11 @@ function Qualities() {
                     <Download />
                   </IconButton>
                 </Tooltip>
-                <Export name={name} dataType="qualities" data={qualityData} />
+                <Export
+                  name={formState.name}
+                  dataType="qualities"
+                  data={qualityData}
+                />
                 <AddToCompendiumButton itemType="quality" data={qualityData} />
               </div>
             }

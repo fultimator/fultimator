@@ -43,25 +43,22 @@ import {
   resolveEquipmentSlots,
 } from "./domain/speakers";
 import type { Command } from "./domain/commands";
-import type { Attribute, AttackOverrideDraft } from "./types";
+import type {
+  Attribute,
+  AttackOverrideDraft,
+  SpellOverrideDraft,
+} from "./types";
 import { DIFFICULTY_PRESETS } from "./types";
 import type { useChatStore } from "./chatStore";
 import { t } from "../../../../translation/translate";
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import {
-  ActionAttackIcon,
-  ActionEquipmentIcon,
-  ActionGuardIcon,
-  ActionHinderIcon,
-  ActionInventoryIcon,
-  ActionObjectiveIcon,
-  ActionSkillIcon,
-  ActionSpellIcon,
-  ActionStudyIcon,
+  ActionCommandIcon,
   CheckAttributeIcon,
   CheckOpenIcon,
   CheckOpposedIcon,
 } from "../../../icons";
+import { ACTION_ICON_SRC_BY_KEY } from "../../../actionIconSrc";
 
 const ATTRIBUTES: { id: Attribute; label: string }[] = [
   { id: "dex", label: "DEX" },
@@ -69,19 +66,6 @@ const ATTRIBUTES: { id: Attribute; label: string }[] = [
   { id: "mig", label: "MIG" },
   { id: "wlp", label: "WLP" },
 ];
-
-const ACTION_ICON_BY_KEY: Record<string, React.ReactNode> = {
-  attack: <ActionAttackIcon size="1em" />,
-  equipment: <ActionEquipmentIcon size="1em" />,
-  guard: <ActionGuardIcon size="1em" />,
-  hinder: <ActionHinderIcon size="1em" />,
-  inventory: <ActionInventoryIcon size="1em" />,
-  objective: <ActionObjectiveIcon size="1em" />,
-  spell: <ActionSpellIcon size="1em" />,
-  skill: <ActionSkillIcon size="1em" />,
-  study: <ActionStudyIcon size="1em" />,
-  check: <CheckOpenIcon size="1em" />,
-};
 
 const ACTION_PICKER_CHECK_OPTIONS: Array<{
   key: "attribute" | "open" | "opposed";
@@ -102,6 +86,8 @@ interface ChatComposerProps {
   speakerOptions: string[];
   selectedSpeaker: string;
   playerDoc: Record<string, unknown> | null;
+  isNpc?: boolean;
+  totalMessageCount?: number;
   onSpeakerChange: (speaker: string) => void;
   onExport: () => void;
   onClearRequest: () => void;
@@ -120,6 +106,8 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   speakerOptions,
   selectedSpeaker,
   playerDoc,
+  isNpc = false,
+  totalMessageCount,
   onSpeakerChange,
   onExport,
   onClearRequest,
@@ -146,6 +134,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   >(null);
   const [attackOverrideDraft, setAttackOverrideDraft] =
     useState<AttackOverrideDraft | null>(null);
+  const [spellCustomizeTarget, setSpellCustomizeTarget] = useState<
+    string | null
+  >(null);
+  const [spellOverrideDraft, setSpellOverrideDraft] =
+    useState<SpellOverrideDraft | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const textFieldRef = useRef<HTMLDivElement>(null);
@@ -159,10 +152,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     handleInputChange(prefillInput);
     requestAnimationFrame(() => textareaRef.current?.focus());
     onPrefillConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillInput]);
 
   const canSend = Boolean(input.trim()) || store.hasPendingRoll;
-  const hasMessages = store.messages.length > 0;
+  const hasMessages =
+    totalMessageCount != null
+      ? totalMessageCount > 0
+      : store.messages.length > 0;
   const blockedCommand =
     activeCommand?.name === "check" && !playerDoc ? activeCommand : null;
   const showPopup =
@@ -170,7 +167,6 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     (activeCommand !== null && blockedCommand === null);
 
   const CHECK_KIND_OPTIONS = ["open", "attribute", "opposed"] as const;
-  type CheckKindOption = (typeof CHECK_KIND_OPTIONS)[number];
 
   // -1 = awaiting kind, 0 = awaiting primary, 1 = awaiting secondary, 2 = awaiting modifier, 3 = awaiting DL, null = not a check command
   const checkParamIndex: -1 | 0 | 1 | 2 | 3 | null =
@@ -284,8 +280,32 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     ? resolveEquipmentSlots(playerDoc)
     : [];
 
-  const applySpell = (arg: string) => {
-    sendAndRecord(`/action spell ${arg}`);
+  const applySpell = (arg: string, overrides?: SpellOverrideDraft) => {
+    if (!overrides) {
+      sendAndRecord(`/action spell ${arg}`);
+      return;
+    }
+    const cmd =
+      `/action spell ${arg}` +
+      ` --attr1 ${overrides.attr1}` +
+      ` --attr2 ${overrides.attr2}` +
+      ` --acc ${overrides.accuracyDelta}` +
+      ` --dmg ${overrides.damageDelta}` +
+      (overrides.hrZero ? " HR0" : "");
+    sendAndRecord(cmd);
+  };
+
+  const openSpellCustomizer = (
+    opt: (typeof offensiveSpellOptions)[number],
+  ): void => {
+    setSpellCustomizeTarget(opt.arg);
+    setSpellOverrideDraft({
+      attr1: (opt.attr1 ?? "ins") as Attribute,
+      attr2: (opt.attr2 ?? "wlp") as Attribute,
+      accuracyDelta: 0,
+      damageDelta: 0,
+      hrZero: false,
+    });
   };
 
   const formatSpellTypeLabel = (spellType?: string) => {
@@ -463,6 +483,8 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
     setActiveCommand(null);
     setAttackCustomizeTarget(null);
     setAttackOverrideDraft(null);
+    setSpellCustomizeTarget(null);
+    setSpellOverrideDraft(null);
     setActionRuleHint(null);
   };
 
@@ -918,12 +940,23 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                           width: "100%",
                         }}
                       >
-                        {ACTION_OPTIONS.filter(
-                          (action) => action.toLowerCase() !== "check",
-                        ).map((action) => {
+                        {ACTION_OPTIONS.filter((action) => {
+                          const key = action.toLowerCase();
+                          if (key === "check") return false;
+                          if (
+                            isNpc &&
+                            (key === "equipment" || key === "inventory")
+                          )
+                            return false;
+                          return true;
+                        }).map((action) => {
                           const actionKey = action.toLowerCase();
                           const ruleText = getActionRuleDescription(actionKey);
-                          const actionIcon = ACTION_ICON_BY_KEY[actionKey];
+                          const hasActionIcon = Boolean(
+                            ACTION_ICON_SRC_BY_KEY[
+                              actionKey as keyof typeof ACTION_ICON_SRC_BY_KEY
+                            ],
+                          );
                           return (
                             <Box
                               key={action}
@@ -949,7 +982,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                               >
                                 {action}
                               </Button>
-                              {(ruleText || actionIcon) && (
+                              {(ruleText || hasActionIcon) && (
                                 <IconButton
                                   size="small"
                                   onPointerDown={(e) => e.preventDefault()}
@@ -969,7 +1002,12 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     p: 0.25,
                                   }}
                                 >
-                                  {actionIcon ?? (
+                                  <ActionCommandIcon
+                                    action={actionKey}
+                                    size="1em"
+                                    alt=""
+                                  />
+                                  {!hasActionIcon && (
                                     <DescriptionIcon sx={{ fontSize: 16 }} />
                                   )}
                                 </IconButton>
@@ -1424,35 +1462,319 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     >
                                       {spellType}
                                     </Typography>
-                                    {items.map((opt) => (
-                                      <Button
-                                        key={opt.arg}
-                                        size="small"
-                                        variant="outlined"
-                                        fullWidth
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => applySpell(opt.arg)}
-                                        sx={{
-                                          justifyContent: "space-between",
-                                          fontFamily: "monospace",
-                                          fontSize: "0.75rem",
-                                          py: 0.25,
-                                          px: 1,
-                                          textTransform: "none",
-                                        }}
-                                      >
-                                        <span>{opt.name}</span>
-                                        <Typography
-                                          component="span"
-                                          variant="caption"
-                                          color="text.secondary"
-                                          sx={{ fontFamily: "monospace" }}
+                                    {items.map((opt) =>
+                                      section.label === "Offensive Spells" ? (
+                                        <Box
+                                          key={opt.arg}
+                                          sx={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            gap: 0.25,
+                                          }}
                                         >
-                                          {(opt.attr1 ?? "ins").toUpperCase()}+
-                                          {(opt.attr2 ?? "wlp").toUpperCase()}
-                                        </Typography>
-                                      </Button>
-                                    ))}
+                                          <Box
+                                            sx={{ display: "flex", gap: 0.5 }}
+                                          >
+                                            <Button
+                                              size="small"
+                                              variant="outlined"
+                                              fullWidth
+                                              onMouseDown={(e) =>
+                                                e.preventDefault()
+                                              }
+                                              onClick={() =>
+                                                applySpell(opt.arg)
+                                              }
+                                              sx={{
+                                                justifyContent: "space-between",
+                                                fontFamily: "monospace",
+                                                fontSize: "0.75rem",
+                                                py: 0.25,
+                                                px: 1,
+                                                textTransform: "none",
+                                              }}
+                                            >
+                                              <span>{opt.name}</span>
+                                              <Typography
+                                                component="span"
+                                                variant="caption"
+                                                color="text.secondary"
+                                                sx={{ fontFamily: "monospace" }}
+                                              >
+                                                {(
+                                                  opt.attr1 ?? "ins"
+                                                ).toUpperCase()}
+                                                +
+                                                {(
+                                                  opt.attr2 ?? "wlp"
+                                                ).toUpperCase()}
+                                              </Typography>
+                                            </Button>
+                                            <IconButton
+                                              size="small"
+                                              onMouseDown={(e) =>
+                                                e.preventDefault()
+                                              }
+                                              onClick={() => {
+                                                if (
+                                                  spellCustomizeTarget ===
+                                                  opt.arg
+                                                ) {
+                                                  setSpellCustomizeTarget(null);
+                                                  setSpellOverrideDraft(null);
+                                                } else {
+                                                  openSpellCustomizer(opt);
+                                                }
+                                              }}
+                                              sx={{
+                                                border: "1px solid",
+                                                borderColor: "divider",
+                                                borderRadius: 1,
+                                                p: 0.35,
+                                              }}
+                                            >
+                                              <EditIcon fontSize="small" />
+                                            </IconButton>
+                                          </Box>
+                                          {spellCustomizeTarget === opt.arg &&
+                                            spellOverrideDraft && (
+                                              <Box
+                                                sx={{
+                                                  p: 0.75,
+                                                  borderRadius: 1,
+                                                  border: "1px solid",
+                                                  borderColor: "divider",
+                                                  backgroundColor:
+                                                    "background.default",
+                                                  display: "grid",
+                                                  gridTemplateColumns:
+                                                    "1fr 1fr",
+                                                  gap: 0.5,
+                                                }}
+                                              >
+                                                <TextField
+                                                  select
+                                                  size="small"
+                                                  label="Attr1"
+                                                  value={
+                                                    spellOverrideDraft.attr1
+                                                  }
+                                                  onChange={(e) =>
+                                                    setSpellOverrideDraft(
+                                                      (prev) =>
+                                                        prev
+                                                          ? {
+                                                              ...prev,
+                                                              attr1: e.target
+                                                                .value as Attribute,
+                                                            }
+                                                          : prev,
+                                                    )
+                                                  }
+                                                >
+                                                  {ATTRIBUTES.map((attr) => (
+                                                    <MenuItem
+                                                      key={attr.id}
+                                                      value={attr.id}
+                                                    >
+                                                      {attr.label}
+                                                    </MenuItem>
+                                                  ))}
+                                                </TextField>
+                                                <TextField
+                                                  select
+                                                  size="small"
+                                                  label="Attr2"
+                                                  value={
+                                                    spellOverrideDraft.attr2
+                                                  }
+                                                  onChange={(e) =>
+                                                    setSpellOverrideDraft(
+                                                      (prev) =>
+                                                        prev
+                                                          ? {
+                                                              ...prev,
+                                                              attr2: e.target
+                                                                .value as Attribute,
+                                                            }
+                                                          : prev,
+                                                    )
+                                                  }
+                                                >
+                                                  {ATTRIBUTES.map((attr) => (
+                                                    <MenuItem
+                                                      key={attr.id}
+                                                      value={attr.id}
+                                                    >
+                                                      {attr.label}
+                                                    </MenuItem>
+                                                  ))}
+                                                </TextField>
+                                                <TextField
+                                                  size="small"
+                                                  type="number"
+                                                  label="Acc Δ"
+                                                  value={
+                                                    spellOverrideDraft.accuracyDelta
+                                                  }
+                                                  onChange={(e) =>
+                                                    setSpellOverrideDraft(
+                                                      (prev) =>
+                                                        prev
+                                                          ? {
+                                                              ...prev,
+                                                              accuracyDelta:
+                                                                parseInt(
+                                                                  e.target
+                                                                    .value ||
+                                                                    "0",
+                                                                  10,
+                                                                ) || 0,
+                                                            }
+                                                          : prev,
+                                                    )
+                                                  }
+                                                />
+                                                <TextField
+                                                  size="small"
+                                                  type="number"
+                                                  label="Dmg Δ"
+                                                  value={
+                                                    spellOverrideDraft.damageDelta
+                                                  }
+                                                  onChange={(e) =>
+                                                    setSpellOverrideDraft(
+                                                      (prev) =>
+                                                        prev
+                                                          ? {
+                                                              ...prev,
+                                                              damageDelta:
+                                                                parseInt(
+                                                                  e.target
+                                                                    .value ||
+                                                                    "0",
+                                                                  10,
+                                                                ) || 0,
+                                                            }
+                                                          : prev,
+                                                    )
+                                                  }
+                                                />
+                                                <Button
+                                                  size="small"
+                                                  variant={
+                                                    spellOverrideDraft.hrZero
+                                                      ? "contained"
+                                                      : "outlined"
+                                                  }
+                                                  onMouseDown={(e) =>
+                                                    e.preventDefault()
+                                                  }
+                                                  onClick={() =>
+                                                    setSpellOverrideDraft(
+                                                      (prev) =>
+                                                        prev
+                                                          ? {
+                                                              ...prev,
+                                                              hrZero:
+                                                                !prev.hrZero,
+                                                            }
+                                                          : prev,
+                                                    )
+                                                  }
+                                                  sx={{
+                                                    gridColumn: "1 / -1",
+                                                    textTransform: "none",
+                                                  }}
+                                                >
+                                                  HR0{" "}
+                                                  {spellOverrideDraft.hrZero
+                                                    ? "On"
+                                                    : "Off"}
+                                                </Button>
+                                                <Box
+                                                  sx={{
+                                                    gridColumn: "1 / -1",
+                                                    display: "flex",
+                                                    gap: 0.5,
+                                                  }}
+                                                >
+                                                  <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    onMouseDown={(e) =>
+                                                      e.preventDefault()
+                                                    }
+                                                    onClick={() => {
+                                                      applySpell(
+                                                        opt.arg,
+                                                        spellOverrideDraft,
+                                                      );
+                                                    }}
+                                                    sx={{
+                                                      flex: 1,
+                                                      textTransform: "none",
+                                                    }}
+                                                  >
+                                                    Apply
+                                                  </Button>
+                                                  <Button
+                                                    size="small"
+                                                    variant="text"
+                                                    onMouseDown={(e) =>
+                                                      e.preventDefault()
+                                                    }
+                                                    onClick={() => {
+                                                      setSpellCustomizeTarget(
+                                                        null,
+                                                      );
+                                                      setSpellOverrideDraft(
+                                                        null,
+                                                      );
+                                                    }}
+                                                    sx={{
+                                                      textTransform: "none",
+                                                    }}
+                                                  >
+                                                    Cancel
+                                                  </Button>
+                                                </Box>
+                                              </Box>
+                                            )}
+                                        </Box>
+                                      ) : (
+                                        <Button
+                                          key={opt.arg}
+                                          size="small"
+                                          variant="outlined"
+                                          fullWidth
+                                          onMouseDown={(e) =>
+                                            e.preventDefault()
+                                          }
+                                          onClick={() => applySpell(opt.arg)}
+                                          sx={{
+                                            justifyContent: "space-between",
+                                            fontFamily: "monospace",
+                                            fontSize: "0.75rem",
+                                            py: 0.25,
+                                            px: 1,
+                                            textTransform: "none",
+                                          }}
+                                        >
+                                          <span>{opt.name}</span>
+                                          <Typography
+                                            component="span"
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{ fontFamily: "monospace" }}
+                                          >
+                                            {(opt.attr1 ?? "ins").toUpperCase()}
+                                            +
+                                            {(opt.attr2 ?? "wlp").toUpperCase()}
+                                          </Typography>
+                                        </Button>
+                                      ),
+                                    )}
                                   </Box>
                                 ))}
                               </Box>

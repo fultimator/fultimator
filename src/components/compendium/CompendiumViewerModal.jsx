@@ -46,6 +46,20 @@ import QuickCreateModal from "./QuickCreateModal";
 import { ManageModulesModal } from "../manage-modules";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
+// Maps compendium class display names to their spellType values for QuickCreate
+const CLASS_NAME_TO_SPELL_TYPE = {
+  Invoker: "invocation",
+  Esper: "gift",
+  Dancer: "dance",
+  Mutant: "therioform",
+  Chanter: "magichant",
+  Symbolist: "symbol",
+  Arcanist: "arcanist",
+  Gourmet: "cooking",
+  Floralist: "magiseed",
+  Pilot: "pilot-vehicle",
+};
+
 const CompendiumViewerModal = ({
   open,
   onClose,
@@ -65,10 +79,7 @@ const CompendiumViewerModal = ({
   const customTheme = useCustomTheme();
   const muiTheme = useTheme();
   const isDesktop = useMediaQuery(muiTheme.breakpoints.up("md"));
-
-  // ---------------------------------------------------------------------------
   // Filter state (via hook)
-  // ---------------------------------------------------------------------------
   const {
     filters,
     handlers,
@@ -89,10 +100,7 @@ const CompendiumViewerModal = ({
   });
 
   const { selectedType, selectedCompendium } = filters;
-
-  // ---------------------------------------------------------------------------
   // Pack state
-  // ---------------------------------------------------------------------------
   const {
     packs,
     createPack,
@@ -174,10 +182,7 @@ const CompendiumViewerModal = ({
       ),
     [editingRequires, editingAutoRequires],
   );
-
-  // ---------------------------------------------------------------------------
   // Pack handlers (wrap filter handleCompendiumChange to also support manage modules)
-  // ---------------------------------------------------------------------------
   const handleCompendiumChange = useCallback(
     (compendium) => {
       handlers.handleCompendiumChange(compendium, {
@@ -255,10 +260,7 @@ const CompendiumViewerModal = ({
       setImporting(false);
     }
   }, [importing, importUrl, importFromManifestUrl]);
-
-  // ---------------------------------------------------------------------------
   // Context mismatch validation
-  // ---------------------------------------------------------------------------
   const selectedTypeContext = ITEM_TYPES.find(
     (x) => x.key === selectedType,
   )?.context;
@@ -267,11 +269,8 @@ const CompendiumViewerModal = ({
     selectedTypeContext &&
     selectedTypeContext !== "both" &&
     selectedTypeContext !== context;
-
-  // ---------------------------------------------------------------------------
   // Item to add (uses selectedIdx resolved in CompendiumBrowser via useCompendiumItems)
   // We re-derive the selected item here for the footer "Add Item" button
-  // ---------------------------------------------------------------------------
   const [resolvedSelectedItem, setResolvedSelectedItem] = useState(null);
 
   const handleSelectedItemChange = useCallback((item) => {
@@ -604,7 +603,9 @@ const CompendiumViewerModal = ({
         lockedToViewerType={selectedType}
         initialSubtype={
           selectedType === "player-spells"
-            ? (filters.selectedSpellClass ?? undefined)
+            ? (CLASS_NAME_TO_SPELL_TYPE[filters.selectedSpellClass] ??
+              filters.selectedSpellClass ??
+              undefined)
             : selectedType === "optionals" &&
                 filters.selectedOptionalSubtypes?.length === 1
               ? filters.selectedOptionalSubtypes[0]

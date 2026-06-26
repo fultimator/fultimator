@@ -27,7 +27,11 @@ export type CompendiumItemType =
   | "heroic"
   | "mnemosphere"
   | "hoplosphere"
-  | "optional";
+  | "optional"
+  | "item"
+  | "consumable"
+  | "note"
+  | "effect";
 
 export interface CompendiumItem {
   id: string; // crypto.randomUUID() - stable across edits

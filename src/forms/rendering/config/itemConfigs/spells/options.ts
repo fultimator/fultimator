@@ -1,4 +1,4 @@
-import { availableMagichantKeys } from "../../../../../components/player/spells/spellOptionData";
+import { availableMagichantKeys } from "../../../../../libs/player/spellOptionData";
 
 export const SPELL_TYPE_OPTIONS = [
   { value: "default", label: "Standard Spell" },
@@ -9,6 +9,7 @@ export const SPELL_TYPE_OPTIONS = [
   { value: "magichant", label: "Tone (Chanter)" },
   { value: "symbol", label: "Symbol" },
   { value: "invocation", label: "Invocation" },
+  { value: "wellspring", label: "Wellspring" },
   { value: "arcanist", label: "Arcanum" },
   { value: "arcanist-rework", label: "Arcanum (Rework)" },
   { value: "tinkerer-alchemy", label: "Alchemy" },
@@ -61,6 +62,11 @@ export const WELLSPRING_OPTIONS = [
   "Fire",
   "Lightning",
   "Water",
+  "Ice",
+  "Dark",
+  "Light",
+  "Poison",
+  "Physical",
 ].map((w) => ({ value: w, label: w }));
 
 export const INV_TYPE_OPTIONS = ["Blast", "Hex", "Utility"].map((t) => ({

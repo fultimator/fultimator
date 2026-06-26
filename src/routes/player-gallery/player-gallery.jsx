@@ -9,7 +9,7 @@ import {
   PLAYER_CURRENT_SCHEMA_VERSION,
   applyPreSaveTransforms,
   applyPostLoadTransforms,
-} from "../../components/player/playerTransforms";
+} from "../../libs/actor";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router";
 
@@ -73,7 +73,7 @@ import {
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
 import { useTranslate } from "../../translation/translate";
-import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGallery";
+import PlayerCardGallery from "/src/libs/player/PlayerCardGallery";
 import Export from "../../components/Export";
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -88,7 +88,7 @@ import useDownloadImage from "../../hooks/useDownloadImage";
 import SettingRow from "../../components/common/SettingRow";
 import classList from "../../libs/classes";
 import { buildItemText } from "../../libs/buildItemText";
-import MnemosphereCreateDialog from "../../components/player/equipment/technospheres/MnemosphereCreateDialog";
+import MnemosphereCreateDialog from "/src/libs/player/MnemosphereCreateDialog";
 import {
   canonicalizeForTransfer,
   normalizeOwnershipForTarget,
@@ -112,6 +112,7 @@ function Personal() {
     advancement: false,
     automaticClassLevel: true,
     defaultView: "normal",
+    expandAllSections: true,
     autoEquipUnarmed: true,
     optionalRules: {
       quirks: false,
@@ -387,6 +388,7 @@ function Personal() {
       },
       settings: {
         defaultView: options.defaultView,
+        expandAllSections: options.expandAllSections ?? true,
         advancement: options.advancement,
         automaticClassLevel:
           options.optionalRules?.technospheres ||
@@ -1408,6 +1410,24 @@ function Personal() {
                   <MenuItem value="compact">{t("Compact View")}</MenuItem>
                 </Select>
               </FormControl>
+            </SettingRow>
+
+            <SettingRow
+              label={t("Expand All Sections")}
+              hint={t(
+                "When enabled, all spell and class sections start expanded on load.",
+              )}
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.expandAllSections ?? true}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "expandAllSections",
+                    evt.target.checked,
+                  )
+                }
+              />
             </SettingRow>
 
             <SettingRow

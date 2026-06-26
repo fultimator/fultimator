@@ -1,0 +1,20 @@
+import PcClasses from "/src/components/shared/actors/common/PcClasses";
+
+export default function ClassesTab({
+  player,
+  setPlayer,
+  isOwner,
+  updateMaxStats,
+  defaultExpandAll = false,
+}) {
+  return (
+    <PcClasses
+      pc={player}
+      variant="full"
+      isInteractive={isOwner}
+      onUpdate={setPlayer}
+      updateMaxStats={updateMaxStats}
+      defaultExpanded={defaultExpandAll || !isOwner}
+    />
+  );
+}

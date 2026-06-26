@@ -11,8 +11,8 @@ import {
   saveVehiclesAction,
   swapTransformingWeaponForm,
   type PickerCandidate,
-} from "../components/player/equipment/slots/loadoutActions";
-import { getPilotSpellInfo } from "../components/player/equipment/slots/loadoutSelectors";
+} from "../libs/player/slots/loadoutActions";
+import { getPilotSpellInfo } from "../libs/player/slots/loadoutSelectors";
 
 // Types
 

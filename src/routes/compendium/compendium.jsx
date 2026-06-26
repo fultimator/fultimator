@@ -22,7 +22,6 @@ import {
   TableRow,
   Paper,
   Chip,
-  Drawer,
   Fab,
   IconButton,
   Tooltip,
@@ -31,9 +30,9 @@ import {
   ThemeProvider,
   Snackbar,
   Autocomplete,
+  useMediaQuery,
 } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
 import AddIcon from "@mui/icons-material/Add";
@@ -79,6 +78,7 @@ import {
   SharedInfusionCard,
   SharedMagitechCard,
   SharedInvocationCard,
+  SharedWellspringCard,
   SharedCookingCard,
   SharedMagiseedCard,
   SharedPilotVehicleCard,
@@ -98,7 +98,9 @@ import {
   SharedQualityCard,
   SharedMnemosphereCard,
   SharedHoplosphereCard,
-} from "../../components/shared/itemCards";
+} from "../../components/shared/items";
+import { SharedEffectCard } from "../../components/shared/items/effects/SharedEffectCard";
+import { EFFECT_APPLICABLE_TYPE_OPTIONS } from "../../forms/rendering/config/itemConfigs/effect";
 
 import classList from "../../libs/classes";
 import {
@@ -107,15 +109,21 @@ import {
   QUALITY_CATEGORY_OPTIONS,
   ITEM_TYPES,
   PACK_ITEM_TYPES,
-  VIEWER_TO_PACK_TYPE,
-  getItems,
   toSlug,
 } from "../../libs/compendium";
 
-const INVOKER_WELLSPRINGS = ["Air", "Earth", "Fire", "Lightning", "Water"];
-const normalizeWellspring = (value = "") => String(value).trim().toLowerCase();
-const getItemWellspring = (item) =>
-  item?.wellspring ?? item?.Wellspring ?? item?.category ?? "";
+const INVOKER_WELLSPRINGS = [
+  "Air",
+  "Earth",
+  "Fire",
+  "Lightning",
+  "Water",
+  "Ice",
+  "Dark",
+  "Light",
+  "Poison",
+  "Physical",
+];
 
 function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
@@ -151,10 +159,7 @@ function SidebarSecondaryLabel(type, t) {
   if (type === "optionals") return t("Subtype");
   return t("Cost");
 }
-
-// ---------------------------------------------------------------------------
 // Sidebar
-// ---------------------------------------------------------------------------
 
 const SidebarRow = React.memo(function SidebarRow({
   item,
@@ -247,13 +252,16 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onHeroicClassesChange,
   selectedOptionalSubtypes,
   onOptionalSubtypesChange,
+  selectedEffectTransfer = "",
+  onEffectTransferChange,
+  selectedEffectApplicableTypes = [],
+  onEffectApplicableTypesChange,
   // pack props
   packs,
   selectedCompendium,
   onCompendiumChange,
   onNewPack,
   onManagePack,
-  onImportPack,
   activePack,
   onToggleLock,
   onOpenQuickCreate,
@@ -296,12 +304,12 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     slotProps: {
       root: {
         sx: {
-          zIndex: (theme) => theme.zIndex.drawer + 3,
+          zIndex: (theme) => theme.zIndex.modal + 3,
         },
       },
       paper: {
         sx: {
-          zIndex: (theme) => theme.zIndex.drawer + 3,
+          zIndex: (theme) => theme.zIndex.modal + 3,
         },
       },
     },
@@ -311,12 +319,12 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     slotProps: {
       popper: {
         sx: {
-          zIndex: (theme) => theme.zIndex.drawer + 3,
+          zIndex: (theme) => theme.zIndex.modal + 3,
         },
       },
       paper: {
         sx: {
-          zIndex: (theme) => theme.zIndex.drawer + 3,
+          zIndex: (theme) => theme.zIndex.modal + 3,
         },
       },
     },
@@ -562,11 +570,30 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               MenuProps={selectMenuProps}
             >
               <MenuItem value="">{t("All")}</MenuItem>
-              {INVOKER_WELLSPRINGS.map((wellspring) => (
-                <MenuItem key={wellspring} value={wellspring}>
-                  {t(wellspring)}
-                </MenuItem>
-              ))}
+              {(() => {
+                const seen = new Set(INVOKER_WELLSPRINGS);
+                const extra = [];
+                for (const pack of packs ?? []) {
+                  for (const item of pack.items ?? []) {
+                    if (
+                      item.type === "player-spell" &&
+                      item.data?.spellType === "wellspring" &&
+                      item.data?.name
+                    ) {
+                      const name = String(item.data.name);
+                      if (!seen.has(name)) {
+                        seen.add(name);
+                        extra.push(name);
+                      }
+                    }
+                  }
+                }
+                return [...INVOKER_WELLSPRINGS, ...extra].map((w) => (
+                  <MenuItem key={w} value={w}>
+                    {t(w)}
+                  </MenuItem>
+                ));
+              })()}
             </Select>
           </FormControl>
         )}
@@ -721,6 +748,54 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           />
         )}
 
+        {selectedType === "effects" && (
+          <>
+            <FormControl size="small" fullWidth>
+              <InputLabel>{t("behavior.transfer.label")}</InputLabel>
+              <Select
+                label={t("behavior.transfer.label")}
+                value={selectedEffectTransfer}
+                onChange={(e) => onEffectTransferChange?.(e.target.value)}
+              >
+                <MenuItem value="">{t("All")}</MenuItem>
+                <MenuItem value="true">{t("behavior.transfer.true")}</MenuItem>
+                <MenuItem value="false">{t("behavior.transfer.false")}</MenuItem>
+              </Select>
+            </FormControl>
+            <Autocomplete
+              {...(isMobile ? autocompleteOverlayProps : {})}
+              multiple
+              limitTags={1}
+              size="small"
+              fullWidth
+              sx={compactMultiAutocompleteSx}
+              options={EFFECT_APPLICABLE_TYPE_OPTIONS}
+              getOptionLabel={(o) => t(o.label)}
+              value={EFFECT_APPLICABLE_TYPE_OPTIONS.filter((o) =>
+                selectedEffectApplicableTypes.includes(o.value),
+              )}
+              onChange={(e, newValue) =>
+                onEffectApplicableTypesChange?.(newValue.map((v) => v.value))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t("effect.applicableTypes")}
+                  placeholder={t("All types")}
+                />
+              )}
+              renderValue={(value, getTagProps) =>
+                value.map((option, index) => {
+                  const { key, ...tagProps } = getTagProps({ index });
+                  return (
+                    <Chip key={key} label={t(option.label)} size="small" {...tagProps} />
+                  );
+                })
+              }
+            />
+          </>
+        )}
+
         {selectedType === "qualities" && (
           <>
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
@@ -845,10 +920,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     </Box>
   );
 });
-
-// ---------------------------------------------------------------------------
 // Card dispatcher
-// ---------------------------------------------------------------------------
+
 
 export const ItemCard = React.memo(function ItemCard({
   type,
@@ -893,6 +966,8 @@ export const ItemCard = React.memo(function ItemCard({
         return <SharedSymbolCard {...sharedProps} />;
       } else if (item.spellType === "invocation") {
         return <SharedInvocationCard {...sharedProps} />;
+      } else if (item.spellType === "wellspring") {
+        return <SharedWellspringCard {...sharedProps} />;
       } else if (item.spellType === "magiseed") {
         return <SharedMagiseedCard {...sharedProps} />;
       } else if (item.spellType === "tinkerer-alchemy") {
@@ -934,16 +1009,13 @@ export const ItemCard = React.memo(function ItemCard({
       return <SharedActionCard {...sharedProps} />;
     case "optionals":
       return <SharedOptionalCard {...sharedProps} />;
+    case "effects":
+      return <SharedEffectCard {...sharedProps} />;
     default:
       return null;
   }
 });
-
-// ---------------------------------------------------------------------------
 // Main CompendiumViewer (full-page route)
-// ---------------------------------------------------------------------------
-
-const SIDEBAR_WIDTH = 300;
 
 function CompendiumViewer() {
   const { t } = useTranslate();
@@ -1083,6 +1155,11 @@ function CompendiumViewer() {
     const subtypes = searchParams.get("optionalSubtypes");
     return subtypes ? subtypes.split(",") : [];
   }, [searchParams]);
+  const selectedEffectTransfer = searchParams.get("effectTransfer") ?? "";
+  const selectedEffectApplicableTypes = useMemo(() => {
+    const types = searchParams.get("effectApplicableTypes");
+    return types ? types.split(",") : [];
+  }, [searchParams]);
 
   // Cleanup stale magichantSubtype URL param
   useEffect(() => {
@@ -1133,6 +1210,8 @@ function CompendiumViewer() {
     selectedQualityCategories,
     selectedHeroicClasses,
     selectedOptionalSubtypes,
+    selectedEffectTransfer,
+    selectedEffectApplicableTypes,
     selectedCompendium,
     searchQuery,
     isPilotClassSelected,
@@ -1263,10 +1342,26 @@ function CompendiumViewer() {
         setSearchParams(newParams);
         if (scrollRef?.current) scrollRef.current.scrollTop = 0;
       },
-      handleCompendiumChange: (
-        compendium,
-        { onManageModules, scrollRef } = {},
-      ) => {
+      handleEffectTransferChange: (value, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const newParams = { ...urlBase(), type: selectedType };
+        if (value) newParams.effectTransfer = value;
+        if (selectedEffectApplicableTypes.length > 0)
+          newParams.effectApplicableTypes = selectedEffectApplicableTypes.join(",");
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleEffectApplicableTypesChange: (types, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const newParams = { ...urlBase(), type: selectedType };
+        if (selectedEffectTransfer) newParams.effectTransfer = selectedEffectTransfer;
+        if (types.length > 0) newParams.effectApplicableTypes = types.join(",");
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
+      handleCompendiumChange: (compendium, { scrollRef } = {}) => {
         if (compendium === "__manage_modules__") {
           setManageModulesOpen(true);
           return;
@@ -1323,6 +1418,8 @@ function CompendiumViewer() {
       selectedQualityCategories,
       selectedHeroicClasses,
       selectedOptionalSubtypes,
+      selectedEffectTransfer,
+      selectedEffectApplicableTypes,
     ],
   );
 

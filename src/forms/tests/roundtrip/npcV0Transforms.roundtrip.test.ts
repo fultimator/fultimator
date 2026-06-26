@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyNpcPostLoadTransforms } from "../../../components/npc/npcTransforms";
+import { applyNpcPostLoadTransforms } from "../../../libs/actor";
 import { validateNpcPersisted } from "../../../forms/schema/actorSchemas/npc";
 
 describe("NPC v0 transform compatibility", () => {

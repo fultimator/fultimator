@@ -7,6 +7,7 @@ export type PlayerSpellUiType =
   | "magichant"
   | "symbol"
   | "invocation"
+  | "wellspring"
   | "arcanist"
   | "arcanist-rework"
   | "tinkerer-alchemy"
@@ -39,6 +40,7 @@ export type PlayerSpellFormState = {
   "damage.type": string;
   "damage.hrZero": boolean;
   description: string;
+  showInPlayerSheet: boolean;
   // arcanist fields
   domain: string;
   domainDesc: string;
@@ -51,26 +53,46 @@ export type PlayerSpellFormState = {
   // tinkerer fields
   category: string;
   infusionRank: number | null;
+  rank: number;
+  spellName: string;
   // gift fields
   event: string;
   // therioform fields
   genoclepsis: string;
-  // magichant-key fields
-  keyType: string;
-  keyStatus: string;
-  keyAttribute: string;
-  keyRecovery: string;
+  // magichant-key fields (renamed from keyType/keyStatus/keyAttribute/keyRecovery)
+  type: string;
+  status: string;
+  attribute: string;
+  recovery: string;
   // magichant tone / dance / symbol / gift effect
   effect: string;
-  // invocation fields
+  // invocation fields (wellspring + type, which is shared with magichant-key)
   wellspring: string;
-  invType: string;
+  // wellspring spell fields
+  color: string;
+  textColor: string;
+  icon: string;
   // cooking fields - array of { effect: string } objects for object-list renderer
   cookingEffects: Array<{ effect: string }>;
-  // magiseed fields
-  seedDescription: string;
-  seedRangeStart: number;
-  seedRangeEnd: number;
+  // magiseed garden fields
+  growthClock: number;
+  gardenDescription: string;
+  currentMagiseed: { name: string; customName?: string } | null;
+  magiseeds: Array<{
+    key: string;
+    customName?: string;
+    description?: string;
+    rangeStart?: number;
+    rangeEnd?: number;
+    effects?: Record<number, string>;
+  }>;
+  // magiseed seed fields (flat, used in Quick Create, packaged into magiseeds[0] by registry)
+  rangeStart: number;
+  rangeEnd: number;
+  "effects.0": string;
+  "effects.1": string;
+  "effects.2": string;
+  "effects.3": string;
   // meta fields
   "meta.book": string;
   "meta.page": number | undefined;

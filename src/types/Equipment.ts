@@ -1,5 +1,5 @@
 import type { Accuracy, Damage, Attributes, Elements } from "./Misc";
-import type { ItemEffect, ActionBehavior } from "./Effects";
+import type { Behavior } from "./Effects";
 import type { Meta } from "../forms/schema/meta";
 
 export type SlotTier = "alpha" | "beta" | "gamma" | "delta";
@@ -49,7 +49,6 @@ export interface Weapon {
   cost?: number;
   special?: string[];
   meta?: Meta;
-  effects?: ItemEffect[];
 }
 
 export interface CustomWeapon {
@@ -81,7 +80,6 @@ export interface CustomWeapon {
   secondModifiers?: WeaponModifiers;
   secondCustomizations?: CustomWeaponCustomization[];
   meta?: Meta;
-  effects?: ItemEffect[];
 }
 
 export interface NpcAttack {
@@ -94,7 +92,7 @@ export interface NpcAttack {
   damage: Damage;
   effect?: string;
   extraDamage?: boolean;
-  behavior?: ActionBehavior;
+  behaviors?: Behavior[];
 }
 
 export interface NpcWeaponAttack {
@@ -107,7 +105,7 @@ export interface NpcWeaponAttack {
   damage: Damage;
   effect?: string;
   extraDamage?: boolean;
-  behavior?: ActionBehavior;
+  behaviors?: Behavior[];
 }
 
 export interface DefensiveModifiers {
@@ -160,7 +158,6 @@ export interface EquipmentArmor {
   isEquipped?: boolean;
   slots?: SlotTier;
   slotted?: string[];
-  effects?: ItemEffect[];
 }
 
 export interface EquipmentShield extends Omit<EquipmentArmor, "itemType"> {
@@ -191,7 +188,6 @@ export interface EquipmentAccessory {
   damageMeleeModifier?: number;
   damageRangedModifier?: number;
   isEquipped?: boolean;
-  effects?: ItemEffect[];
 }
 
 export type NpcArmor = EquipmentArmor;

@@ -2,7 +2,10 @@ import React from "react";
 import { Box, Button, Divider, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
-import { scanForTrigger, type TriggerMatch } from "../../../../../pipelines/triggerScanner";
+import {
+  scanForTrigger,
+  type TriggerMatch,
+} from "../../../../../pipelines/triggerScanner";
 
 // Guard zone: surfaces chat-action trigger items on the guard message.
 // guardVariant "cover" -> Bodyguard-style; "no-cover" -> Withstand-style.
@@ -16,12 +19,19 @@ export const ChatActionZone: React.FC<ChatActionZoneProps> = ({
   guardVariant,
   speakerCombatId,
 }) => {
-  const theme = useTheme();
-  const { selectedNPCs, selectedPCs, runtimeActors } = useCombatEncounterStore();
+  const _theme = useTheme();
+  const { selectedNPCs, selectedPCs, runtimeActors } =
+    useCombatEncounterStore();
 
   const allActors = [
-    ...selectedNPCs.map((doc) => ({ doc: doc as Record<string, unknown>, runtime: runtimeActors[doc.combatId as string] })),
-    ...selectedPCs.map((doc) => ({ doc: doc as Record<string, unknown>, runtime: runtimeActors[doc.combatId as string] })),
+    ...selectedNPCs.map((doc) => ({
+      doc: doc as Record<string, unknown>,
+      runtime: runtimeActors[doc.combatId as string],
+    })),
+    ...selectedPCs.map((doc) => ({
+      doc: doc as Record<string, unknown>,
+      runtime: runtimeActors[doc.combatId as string],
+    })),
   ].filter((a) => a.runtime != null);
 
   const matches = scanForTrigger("chat-action", allActors, {
@@ -87,10 +97,17 @@ const ChatActionRow: React.FC<{ match: TriggerMatch }> = ({ match }) => {
       }}
     >
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography variant="body2" sx={{ fontWeight: 700, fontSize: "0.8rem" }} noWrap>
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: 700, fontSize: "0.8rem" }}
+          noWrap
+        >
           {match.itemName}
         </Typography>
-        <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.72rem" }}>
+        <Typography
+          variant="caption"
+          sx={{ color: "text.secondary", fontSize: "0.72rem" }}
+        >
           {match.actorName}
         </Typography>
       </Box>
@@ -127,11 +144,18 @@ export const ReactiveInterruptZone: React.FC<ReactiveInterruptZoneProps> = ({
   attackerCombatId,
   onSubstituteTarget,
 }) => {
-  const { selectedNPCs, selectedPCs, runtimeActors } = useCombatEncounterStore();
+  const { selectedNPCs, selectedPCs, runtimeActors } =
+    useCombatEncounterStore();
 
   const allActors = [
-    ...selectedNPCs.map((doc) => ({ doc: doc as Record<string, unknown>, runtime: runtimeActors[doc.combatId as string] })),
-    ...selectedPCs.map((doc) => ({ doc: doc as Record<string, unknown>, runtime: runtimeActors[doc.combatId as string] })),
+    ...selectedNPCs.map((doc) => ({
+      doc: doc as Record<string, unknown>,
+      runtime: runtimeActors[doc.combatId as string],
+    })),
+    ...selectedPCs.map((doc) => ({
+      doc: doc as Record<string, unknown>,
+      runtime: runtimeActors[doc.combatId as string],
+    })),
   ].filter((a) => a.runtime != null);
 
   const matches = scanForTrigger("reactive", allActors, {
@@ -188,10 +212,17 @@ export const ReactiveInterruptZone: React.FC<ReactiveInterruptZoneProps> = ({
             }}
           >
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography variant="body2" sx={{ fontWeight: 700, fontSize: "0.8rem" }} noWrap>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, fontSize: "0.8rem" }}
+                noWrap
+              >
                 {match.itemName}
               </Typography>
-              <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.72rem" }}>
+              <Typography
+                variant="caption"
+                sx={{ color: "text.secondary", fontSize: "0.72rem" }}
+              >
                 {match.actorName}
               </Typography>
             </Box>
@@ -236,13 +267,20 @@ export const OnHitZone: React.FC<OnHitZoneProps> = ({
   anyTargetHasStatusEffects,
   isFumble,
 }) => {
-  const { selectedNPCs, selectedPCs, runtimeActors } = useCombatEncounterStore();
+  const { selectedNPCs, selectedPCs, runtimeActors } =
+    useCombatEncounterStore();
 
   if (isFumble) return null;
 
   const allActors = [
-    ...selectedNPCs.map((doc) => ({ doc: doc as Record<string, unknown>, runtime: runtimeActors[doc.combatId as string] })),
-    ...selectedPCs.map((doc) => ({ doc: doc as Record<string, unknown>, runtime: runtimeActors[doc.combatId as string] })),
+    ...selectedNPCs.map((doc) => ({
+      doc: doc as Record<string, unknown>,
+      runtime: runtimeActors[doc.combatId as string],
+    })),
+    ...selectedPCs.map((doc) => ({
+      doc: doc as Record<string, unknown>,
+      runtime: runtimeActors[doc.combatId as string],
+    })),
   ].filter((a) => a.runtime != null);
 
   // Only scan the attacker's items for on-hit triggers
@@ -255,8 +293,12 @@ export const OnHitZone: React.FC<OnHitZoneProps> = ({
       singleTarget: isSingleTarget,
     },
   }).filter((match) => {
-    const trigger = match.trigger as Extract<typeof match.trigger, { kind: "on-hit" }>;
-    if (trigger.condition?.targetHasStatusEffects && !anyTargetHasStatusEffects) return false;
+    const trigger = match.trigger as Extract<
+      typeof match.trigger,
+      { kind: "on-hit" }
+    >;
+    if (trigger.condition?.targetHasStatusEffects && !anyTargetHasStatusEffects)
+      return false;
     return true;
   });
 

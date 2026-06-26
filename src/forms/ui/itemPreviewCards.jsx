@@ -8,11 +8,11 @@ import {
   SharedShieldCard,
   SharedWeaponCard,
   SharedZeroPowerCard,
-} from "../../components/shared/itemCards";
+} from "../../components/shared/items";
 import { calcWeaponPreview } from "../schema/itemSchemas/weapon";
 import { normalizeWeaponLike } from "../../libs/weaponNormalization";
 import { buildSphereData } from "../../libs/technospheres";
-import { calculateCustomWeaponStats } from "../../components/player/common/playerCalculations";
+import { calculateCustomWeaponStats } from "../../libs/playerCalculations";
 
 export function AccessoryPreviewCard({ formState }) {
   return (

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Box, Divider, Popover, Tooltip, Typography } from "@mui/material";
 
-function BreakdownRow({ label, value, signed, bold, dim }) {
+function BreakdownRow({ label, value, signed, bold, dim, delta }) {
   const display =
     typeof value === "number" && signed && value > 0
       ? `+${value}`
@@ -9,9 +9,13 @@ function BreakdownRow({ label, value, signed, bold, dim }) {
 
   const color = dim
     ? "text.disabled"
-    : bold
-      ? "text.primary"
-      : "text.secondary";
+    : delta !== undefined && delta > 0
+      ? "success.main"
+      : delta !== undefined && delta < 0
+        ? "error.main"
+        : bold
+          ? "text.primary"
+          : "text.secondary";
 
   return (
     <Box
@@ -43,6 +47,14 @@ function affinityLabel(value) {
     "": "None",
   };
   return labels[value] ?? value ?? "None";
+}
+
+const AFFINITY_RANK = { vu: 0, "": 1, no: 1, rs: 2, im: 3, ab: 4 };
+
+function affinityDelta(base, current) {
+  const b = AFFINITY_RANK[base ?? ""] ?? 1;
+  const c = AFFINITY_RANK[current ?? ""] ?? 1;
+  return c - b;
 }
 
 function TooltipContent({ title, formula, breakdown, total, base, current }) {
@@ -84,6 +96,7 @@ function TooltipContent({ title, formula, breakdown, total, base, current }) {
               label="Current"
               value={affinityLabel(current ?? base)}
               bold
+              delta={affinityDelta(base, current ?? base)}
             />
             {breakdown?.filter((e) => e.value !== undefined).length > 0 && (
               <>
@@ -128,16 +141,17 @@ export default function StatTooltip({
   children,
   display = "block",
   sx,
+  disabled = false,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const touchRef = useRef(false);
+  const _touchRef = useRef(false);
 
   const isTouch =
     typeof window !== "undefined" &&
     window.matchMedia("(pointer: coarse)").matches;
 
   const handleClick = (e) => {
-    if (!isTouch) return;
+    if (!isTouch || disabled) return;
     setAnchorEl(e.currentTarget);
   };
 
@@ -159,7 +173,7 @@ export default function StatTooltip({
           {children}
         </Box>
         <Popover
-          open={Boolean(anchorEl)}
+          open={!disabled && Boolean(anchorEl)}
           anchorEl={anchorEl}
           onClose={() => setAnchorEl(null)}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
@@ -183,7 +197,7 @@ export default function StatTooltip({
 
   return (
     <Tooltip
-      title={content}
+      title={disabled ? "" : content}
       placement="bottom"
       arrow
       slotProps={{

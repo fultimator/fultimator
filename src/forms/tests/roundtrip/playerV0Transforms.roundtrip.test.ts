@@ -3,7 +3,7 @@ import {
   applyPostLoadTransforms,
   applyPreSaveTransforms,
   PLAYER_CURRENT_SCHEMA_VERSION,
-} from "../../../components/player/playerTransforms";
+} from "../../../libs/actor";
 
 describe("Player v0 transform compatibility", () => {
   it("migrates a legacy v0-style player with broad class/item coverage", () => {

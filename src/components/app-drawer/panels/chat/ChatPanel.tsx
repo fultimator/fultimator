@@ -42,15 +42,18 @@ import type { OpposeTarget } from "./ChatActionsContext.shared";
 import type { OpposedCheckMessage } from "./types";
 import { MessageListErrorBoundary } from "./MessageListErrorBoundary";
 import { ChatComposer } from "./ChatComposer";
-import SlotPickerDialog from "../../../player/equipment/slots/SlotPickerDialog";
-import VehicleEnterDialog from "../../../player/equipment/slots/VehicleEnterDialog";
+import SlotPickerDialog from "/src/components/shared/actors/pc/editors/equipment/slots/SlotPickerDialog.jsx";
+import VehicleEnterDialog from "/src/components/shared/actors/pc/editors/equipment/slots/VehicleEnterDialog.jsx";
 import NotesMarkdown from "../../../common/NotesMarkdown";
 import { useDatabase } from "../../../../hooks/useDatabase";
 import type { TypePlayer } from "../../../../types/Players";
-import { applyPostLoadTransforms } from "../../../../components/player/playerTransforms";
-import { applyNpcPostLoadTransforms } from "../../../../components/npc/npcTransforms";
+import { applyPostLoadTransforms } from "../../../../libs/actor";
+import { applyNpcPostLoadTransforms } from "../../../../libs/actor";
 import type { TypeNpc } from "../../../../types/Npcs";
-import type { ChatMessage } from "./types";
+import type { ChatMessage, LogMessage } from "./types";
+import { LogMessageTemplate } from "./message-templates/LogMessageTemplate";
+import { useEncounterChatStore } from "../../../../stores/encounterChatStore";
+import { useChatChannelStore } from "../../../../stores/chatChannelStore";
 import {
   prepareCheck,
   rollCheck,
@@ -63,7 +66,7 @@ import {
   getEquippedModuleForSlot,
   getEquippedModulesForSlot,
   getPilotSpellInfo,
-} from "../../../player/equipment/slots/loadoutSelectors";
+} from "../../../../libs/player/slots/loadoutSelectors";
 import {
   disableModuleForSlot,
   enterVehicleAction,
@@ -71,8 +74,8 @@ import {
   selectModuleForSlot,
   toggleSupportModuleAction,
   toggleActiveVehicle,
-} from "../../../player/equipment/slots/loadoutActions";
-import { getActiveVehicle } from "../../../player/equipment/slots/equipmentSlots";
+} from "../../../../libs/player/slots/loadoutActions";
+import { getActiveVehicle } from "../../../../libs/player/slots/equipmentSlots";
 import { useTranslate } from "../../../../translation/translate";
 
 const isRetargetableMessage = (
@@ -82,6 +85,14 @@ const isRetargetableMessage = (
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const CHECK_KINDS = new Set([
+  "accuracy",
+  "magic",
+  "attribute",
+  "open",
+  "opposed",
+]);
 
 const SLOT_LABELS: Record<
   "mainHand" | "offHand" | "armor" | "accessory",
@@ -168,6 +179,101 @@ const buildEquipmentChangeMessage = ({
   };
 };
 
+type ResourceKind = import("./ChatActionsContext.shared").ResourceKind;
+type ResourceDirection = "loss" | "gain";
+
+function getResourceDelta(amount: number, direction: ResourceDirection) {
+  return direction === "loss" ? -amount : amount;
+}
+
+function getOppositeResourceDirection(
+  direction: ResourceDirection,
+): ResourceDirection {
+  return direction === "loss" ? "gain" : "loss";
+}
+
+function applyResourceDelta(
+  actorDoc: Record<string, unknown>,
+  resource: ResourceKind,
+  delta: number,
+): TypePlayer {
+  if (resource === "fp") {
+    const doc = actorDoc as unknown as {
+      info?: { fabulapoints?: number };
+    };
+    const current = doc.info?.fabulapoints ?? 0;
+    const next = Math.max(0, current + delta);
+    return {
+      ...actorDoc,
+      info: { ...doc.info, fabulapoints: next },
+    } as unknown as TypePlayer;
+  }
+
+  if (resource === "up") {
+    const doc = actorDoc as unknown as {
+      villain?: string;
+      combatStats?: { ultima?: number };
+    };
+    const current = doc.combatStats?.ultima ?? 0;
+    const villainUpMax =
+      doc.villain === "minor"
+        ? 5
+        : doc.villain === "major"
+          ? 10
+          : doc.villain === "supreme"
+            ? 15
+            : 5;
+    const next = Math.max(0, Math.min(current + delta, villainUpMax));
+    return {
+      ...actorDoc,
+      combatStats: { ...doc.combatStats, ultima: next },
+    } as unknown as TypePlayer;
+  }
+
+  const stats = (
+    actorDoc as unknown as {
+      stats?: Record<string, { current?: number; max?: number }>;
+    }
+  ).stats;
+  const stat = stats?.[resource];
+  const current = stat?.current ?? 0;
+  const max = stat?.max ?? 0;
+  const next = Math.max(0, Math.min(current + delta, max));
+  return {
+    ...actorDoc,
+    stats: { ...stats, [resource]: { ...stat, current: next } },
+  } as unknown as TypePlayer;
+}
+
+function buildResourceApplicationLog({
+  actorName,
+  direction,
+  status,
+  amount,
+  resource,
+}: {
+  actorName: string;
+  direction: ResourceDirection;
+  status: "applied" | "unavailable";
+  amount: number;
+  resource: ResourceKind;
+}): ChatMessage {
+  return {
+    id: crypto.randomUUID(),
+    createdAt: Date.now(),
+    kind: "log",
+    channelId: "",
+    event: {
+      type: "resource-application",
+      actorName,
+      direction,
+      status,
+      amount,
+      resource,
+    },
+  };
+}
+
 export const ChatPanel: React.FC = () => {
   const { t } = useTranslate();
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>(
@@ -176,9 +282,13 @@ export const ChatPanel: React.FC = () => {
   const [clearLogsDialogOpen, setClearLogsDialogOpen] = useState(false);
   const [supportPickerOpen, setSupportPickerOpen] = useState(false);
   const [vehiclePickerOpen, setVehiclePickerOpen] = useState(false);
+  const [pendingVehicleToggle, setPendingVehicleToggle] = useState(false);
   const [equipmentSlotPickerOpen, setEquipmentSlotPickerOpen] = useState<
     "mainHand" | "offHand" | "armor" | "accessory" | null
   >(null);
+  const [undoneResourceLogIds, setUndoneResourceLogIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const endOfMessagesRef = useRef<HTMLDivElement | null>(null);
   const previousMessageCountRef = useRef(0);
 
@@ -209,6 +319,9 @@ export const ChatPanel: React.FC = () => {
     [combatSimActors],
   );
   const selectedCombatSimActor = combatSimActorsByName.get(selectedSpeaker);
+  const isNpcSpeaker = isCombatSim
+    ? selectedCombatSimActor?.source === "npc"
+    : false;
 
   const baseActiveActorDoc = isCombatSim
     ? selectedSpeaker === DEFAULT_SPEAKER
@@ -219,6 +332,11 @@ export const ChatPanel: React.FC = () => {
     string,
     unknown
   > | null>(null);
+  const [pendingExternalCommand, setPendingExternalCommand] = useState<{
+    command: string;
+    speaker?: string;
+    actorDoc?: Record<string, unknown> | null;
+  } | null>(null);
   const activeActorDoc = activeActorDocOverride ?? baseActiveActorDoc;
   const activeActorDocRef = useRef(activeActorDoc);
   activeActorDocRef.current = activeActorDoc;
@@ -255,99 +373,170 @@ export const ChatPanel: React.FC = () => {
 
   const store = useChatStore(selectedSpeaker, activeActorDoc);
   const { addMessage } = store;
+
+  const activeChannelId = useChatChannelStore((s) => s.activeChannelId);
+  const visibleKinds = useChatChannelStore((s) => s.visibleKinds);
+  const encounterMessages = useEncounterChatStore((s) => s.messages);
+  const deleteEncounterMessage = useEncounterChatStore((s) => s.deleteMessage);
+  const clearEncounterMessages = useEncounterChatStore((s) => s.clearMessages);
+  const setEncounterMessages = useEncounterChatStore((s) => s.setMessages);
+  const encounterId = useEncounterChatStore((s) => s.encounterId);
+
+  const activeMessages = useMemo(() => {
+    let merged: ChatMessage[];
+    if (activeChannelId.startsWith("encounter:")) {
+      const tagged = store.messages.filter(
+        (m) => m.channelId === activeChannelId,
+      );
+      merged = [...tagged, ...(encounterMessages as ChatMessage[])];
+    } else {
+      merged = [...store.messages];
+    }
+    merged.sort((a, b) => a.createdAt - b.createdAt);
+
+    return merged.filter((m) => {
+      if (m.kind === "log") return visibleKinds.includes("logs");
+      if (CHECK_KINDS.has(m.kind)) return visibleKinds.includes("checks");
+      return visibleKinds.includes("chat");
+    });
+  }, [activeChannelId, store.messages, encounterMessages, visibleKinds]);
+
+  const deleteActiveMessage = useCallback(
+    (id: string) => {
+      if (store.messages.some((m) => m.id === id)) {
+        store.deleteMessage(id);
+      } else {
+        deleteEncounterMessage(id);
+      }
+    },
+    [store, deleteEncounterMessage],
+  );
   const liveTargets = useCombatEncounterStore((s) => s.targets);
 
   useEffect(() => {
-    if (liveTargets.length === 0) return;
+    const handler = (event: Event) => {
+      const detail =
+        typeof (event as { detail?: unknown }).detail === "object" &&
+        (event as { detail?: unknown }).detail !== null
+          ? ((event as { detail?: unknown }).detail as {
+              command?: string;
+              speaker?: string;
+              actorDoc?: Record<string, unknown> | null;
+            })
+          : undefined;
+      const cmd = detail?.command;
+      if (!cmd) return;
+      const speaker = detail?.speaker;
+      const actorDoc = detail?.actorDoc;
+      setPendingExternalCommand({ command: cmd, speaker, actorDoc });
+    };
+    window.addEventListener("chat:run-command", handler);
+    return () => {
+      window.removeEventListener("chat:run-command", handler);
+    };
+  }, []);
 
-    let changed = false;
-    const hydrated: ChatMessage[] = store.messages.map((m) => {
-      if (m.kind === "accuracy") {
-        const existing = m.check.targetsSnapshot;
-        if (Array.isArray(existing) && existing.length > 0) return m;
-        changed = true;
-        return {
-          ...m,
-          check: {
-            ...m.check,
-            targetsSnapshot: [...liveTargets],
-          },
-        };
-      }
-      if (m.kind === "magic") {
-        const existing = m.check.targetsSnapshot;
-        if (Array.isArray(existing) && existing.length > 0) return m;
-        changed = true;
-        return {
-          ...m,
-          check: {
-            ...m.check,
-            targetsSnapshot: [...liveTargets],
-          },
-        };
-      }
-      return m;
-    });
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          slot?: string;
+          actorDoc?: Record<string, unknown> | null;
+        }>
+      ).detail;
+      if (!detail?.slot) return;
+      if (detail.actorDoc) setActiveActorDocOverride(detail.actorDoc);
+      setEquipmentSlotPickerOpen(
+        detail.slot as "mainHand" | "offHand" | "armor" | "accessory",
+      );
+    };
+    window.addEventListener("chat:open-equipment-slot", handler);
+    return () =>
+      window.removeEventListener("chat:open-equipment-slot", handler);
+  }, []);
 
-    if (changed) {
-      store.setMessages(hydrated);
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{ actorDoc?: Record<string, unknown> | null }>
+      ).detail;
+      if (detail?.actorDoc) setActiveActorDocOverride(detail.actorDoc);
+      setPendingVehicleToggle(true);
+    };
+    window.addEventListener("chat:toggle-vehicle", handler);
+    return () => window.removeEventListener("chat:toggle-vehicle", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{ actorDoc?: Record<string, unknown> | null }>
+      ).detail;
+      if (detail?.actorDoc) setActiveActorDocOverride(detail.actorDoc);
+      setSupportPickerOpen(true);
+    };
+    window.addEventListener("chat:open-support-modules", handler);
+    return () =>
+      window.removeEventListener("chat:open-support-modules", handler);
+  }, []);
+
+  useEffect(() => {
+    if (!pendingExternalCommand) return;
+    const { command, speaker, actorDoc } = pendingExternalCommand;
+
+    if (speaker && selectedSpeaker !== speaker) {
+      setSelectedSpeaker(speaker);
+      localStorage.setItem(LOCAL_SPEAKER_KEY, speaker);
+      return;
     }
-  }, [liveTargets, store]);
+
+    if (actorDoc) {
+      setActiveActorDocOverride(actorDoc);
+    }
+
+    store.send(command);
+    setPendingExternalCommand(null);
+  }, [pendingExternalCommand, selectedSpeaker, setSelectedSpeaker, store]);
+
+  // Intentionally do not auto-hydrate historical messages with live targets.
+  // Target snapshots should only change through explicit actions (e.g. Retarget Actors)
+  // to avoid mutating older chat entries when selection changes later.
 
   const handleRetargetMessage = useCallback(
     (messageId: string) => {
-      const source = store.messages.find((m) => m.id === messageId);
+      const inEncounter = encounterMessages.some((m) => m.id === messageId);
+      const pool = inEncounter ? encounterMessages : store.messages;
+      const source = pool.find((m) => m.id === messageId);
       if (!source || !isRetargetableMessage(source)) return;
 
-      const markedMessages: ChatMessage[] = store.messages.map((m) => {
+      const updateTargets = (m: ChatMessage): ChatMessage => {
         if (m.id !== messageId) return m;
         if (m.kind === "accuracy") {
           return {
             ...m,
-            check: {
-              ...m.check,
-              retargetSuperseded: true,
-            },
+            check: { ...m.check, targetsSnapshot: [...liveTargets] },
           };
         }
         if (m.kind === "magic") {
           return {
             ...m,
-            check: {
-              ...m.check,
-              retargetSuperseded: true,
-            },
+            check: { ...m.check, targetsSnapshot: [...liveTargets] },
           };
         }
         return m;
-      });
+      };
 
-      const regenerated: ChatMessage =
-        source.kind === "accuracy"
-          ? {
-              ...source,
-              id: crypto.randomUUID(),
-              createdAt: Date.now(),
-              check: {
-                ...source.check,
-                targetsSnapshot: [...liveTargets],
-                retargetSuperseded: false,
-              },
-            }
-          : {
-              ...source,
-              id: crypto.randomUUID(),
-              createdAt: Date.now(),
-              check: {
-                ...source.check,
-                targetsSnapshot: [...liveTargets],
-                retargetSuperseded: false,
-              },
-            };
-
-      store.setMessages([...markedMessages, regenerated]);
+      if (inEncounter) {
+        if (!encounterId) return;
+        setEncounterMessages(
+          encounterId,
+          (encounterMessages as ChatMessage[]).map(updateTargets),
+        );
+      } else {
+        store.setMessages(store.messages.map(updateTargets));
+      }
     },
-    [liveTargets, store],
+    [liveTargets, store, encounterMessages, encounterId, setEncounterMessages],
   );
 
   const handleOppose = useCallback(
@@ -407,9 +596,14 @@ export const ChatPanel: React.FC = () => {
 
       const docId = activeActorDoc.id as string;
       const db = UUID_RE.test(docId) ? localDb : cloudDb;
-      const isNpc = isCombatSim
-        ? selectedCombatSimActor?.source === "npc"
-        : !playerDoc || selectedSpeaker !== contextActorName;
+      const sourceCollection = activeActorDoc.sourceCollection as
+        | string
+        | undefined;
+      const isNpc = sourceCollection
+        ? sourceCollection === "npc-personal"
+        : isCombatSim
+          ? selectedCombatSimActor?.source === "npc"
+          : !playerDoc || selectedSpeaker !== contextActorName;
       const collection = isNpc ? "npc-personal" : "player-personal";
       const docRef = db.doc(collection, docId);
 
@@ -467,6 +661,115 @@ export const ChatPanel: React.FC = () => {
     ],
   );
 
+  const handleResourceChange = useCallback(
+    (
+      message: import("./types").DisplayMessage,
+      resource: import("./ChatActionsContext.shared").ResourceKind,
+      amount: number,
+      direction: "loss" | "gain",
+    ) => {
+      const actorName =
+        message.speaker || selectedSpeaker || contextActorName || "No actor";
+      if (!activeActorDoc) {
+        addMessage(
+          buildResourceApplicationLog({
+            actorName,
+            direction,
+            status: "unavailable",
+            amount,
+            resource,
+          }),
+        );
+        return;
+      }
+      const updated = applyResourceDelta(
+        activeActorDoc as Record<string, unknown>,
+        resource,
+        getResourceDelta(amount, direction),
+      );
+      setActiveActorDoc(updated);
+      addMessage(
+        buildResourceApplicationLog({
+          actorName,
+          direction,
+          status: "applied",
+          amount,
+          resource,
+        }),
+      );
+    },
+    [
+      activeActorDoc,
+      addMessage,
+      contextActorName,
+      selectedSpeaker,
+      setActiveActorDoc,
+    ],
+  );
+
+  const handleToggleResourceApplication = useCallback(
+    (logMsg: LogMessage) => {
+      const event = logMsg.event;
+      if (event.type !== "resource-application") return;
+      if (event.status !== "applied") return;
+
+      const isUndone = undoneResourceLogIds.has(logMsg.id);
+      const nextDirection = isUndone
+        ? event.direction
+        : getOppositeResourceDirection(event.direction);
+      if (!activeActorDoc) {
+        addMessage(
+          buildResourceApplicationLog({
+            actorName: event.actorName,
+            direction: nextDirection,
+            status: "unavailable",
+            amount: event.amount,
+            resource: event.resource,
+          }),
+        );
+        return;
+      }
+
+      const updated = applyResourceDelta(
+        activeActorDoc as Record<string, unknown>,
+        event.resource,
+        getResourceDelta(event.amount, nextDirection),
+      );
+      setActiveActorDoc(updated);
+      setUndoneResourceLogIds((prev) => {
+        const next = new Set(prev);
+        if (isUndone) next.delete(logMsg.id);
+        else next.add(logMsg.id);
+        return next;
+      });
+    },
+    [activeActorDoc, addMessage, setActiveActorDoc, undoneResourceLogIds],
+  );
+
+  useEffect(() => {
+    if (!pendingVehicleToggle) return;
+    setPendingVehicleToggle(false);
+    const doc = activeActorDocRef.current as unknown as TypePlayer | null;
+    if (!doc) return;
+    const pilotInfo = getPilotSpellInfo(doc);
+    if (!pilotInfo) return;
+    const vehicles = Array.isArray(pilotInfo.spell.currentVehicles)
+      ? pilotInfo.spell.currentVehicles
+      : Array.isArray(pilotInfo.spell.vehicles)
+        ? pilotInfo.spell.vehicles
+        : [];
+    const isActive = vehicles.some((v: { enabled?: boolean }) => v.enabled);
+    if (!isActive) {
+      setVehiclePickerOpen(true);
+      return;
+    }
+    setActiveActorDoc((prev) => {
+      const pi = getPilotSpellInfo(prev);
+      if (!pi) return prev;
+      return toggleActiveVehicle(prev, pi);
+    });
+  }, [pendingVehicleToggle, setActiveActorDoc]);
+
   useEffect(() => {
     if (!speakerOptions.includes(selectedSpeaker)) {
       setSelectedSpeaker(DEFAULT_SPEAKER);
@@ -491,18 +794,23 @@ export const ChatPanel: React.FC = () => {
 
   useEffect(() => {
     const prev = previousMessageCountRef.current;
-    if (store.messages.length > prev) {
+    const total = activeMessages.length;
+    if (total > prev) {
       endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-    previousMessageCountRef.current = store.messages.length;
-  }, [store.messages.length]);
+    previousMessageCountRef.current = total;
+  }, [activeMessages.length]);
 
   const handleExport = () => {
     try {
+      const allMessages = [
+        ...store.messages,
+        ...(encounterMessages as ChatMessage[]),
+      ].sort((a, b) => a.createdAt - b.createdAt);
       const blob = new Blob(
         [
           JSON.stringify(
-            { exportedAt: new Date().toISOString(), messages: store.messages },
+            { exportedAt: new Date().toISOString(), messages: allMessages },
             null,
             2,
           ),
@@ -528,6 +836,10 @@ export const ChatPanel: React.FC = () => {
         value={{
           onOppose: activeActorDoc ? handleOppose : null,
           onRerollOpposed: activeActorDoc ? handleRerollOpposed : null,
+          onLossResource: (msg, resource, amount) =>
+            handleResourceChange(msg, resource, amount, "loss"),
+          onGainResource: (msg, resource, amount) =>
+            handleResourceChange(msg, resource, amount, "gain"),
           selectedSpeaker,
         }}
       >
@@ -550,31 +862,96 @@ export const ChatPanel: React.FC = () => {
                 gap: 1,
               }}
             >
-              {store.messages.length === 0 && (
+              {activeMessages.length === 0 && (
                 <Typography variant="body2" color="text.secondary">
                   Start chatting or roll from the dice tray below.
                 </Typography>
               )}
-              {store.messages.map((message) => (
-                <BaseMessageTemplate
-                  key={message.id}
-                  speaker={message.speaker || AUTHOR_NAME}
-                  timeAgo={formatTimeAgo(message.createdAt)}
-                  onDelete={() => store.deleteMessage(message.id)}
-                  onRetarget={
-                    isRetargetableMessage(message)
-                      ? () => handleRetargetMessage(message.id)
-                      : undefined
-                  }
-                  dimmed={
-                    isRetargetableMessage(message)
-                      ? message.check.retargetSuperseded === true
-                      : false
-                  }
-                >
-                  <MessageContent message={message} />
-                </BaseMessageTemplate>
-              ))}
+              {activeMessages.map((message) => {
+                if (message.kind === "log") {
+                  const logMsg = message as LogMessage;
+                  const canUndoResource =
+                    logMsg.event.type === "resource-application" &&
+                    logMsg.event.status === "applied";
+                  const isResourceUndone = undoneResourceLogIds.has(logMsg.id);
+                  return (
+                    <Box
+                      key={logMsg.id}
+                      sx={{
+                        alignSelf: "flex-start",
+                        width: "100%",
+                        px: 1.25,
+                        py: 0.5,
+                        borderRadius: 1.5,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        backgroundColor: "background.paper",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 1,
+                        opacity: 0.85,
+                      }}
+                    >
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <LogMessageTemplate
+                          event={logMsg.event}
+                          undone={isResourceUndone}
+                        />
+                      </Box>
+                      {canUndoResource && (
+                        <Button
+                          size="small"
+                          variant="text"
+                          onClick={() =>
+                            handleToggleResourceApplication(logMsg)
+                          }
+                          sx={{
+                            minWidth: 52,
+                            px: 0.75,
+                            py: 0.25,
+                            fontSize: "0.72rem",
+                            textTransform: "none",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {isResourceUndone ? t("Redo") : t("Undo")}
+                        </Button>
+                      )}
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ flexShrink: 0 }}
+                      >
+                        {formatTimeAgo(logMsg.createdAt)}
+                      </Typography>
+                    </Box>
+                  );
+                }
+                return (
+                  <BaseMessageTemplate
+                    key={message.id}
+                    speaker={
+                      (message as ChatMessage & { speaker?: string }).speaker ||
+                      AUTHOR_NAME
+                    }
+                    timeAgo={formatTimeAgo(message.createdAt)}
+                    onDelete={() => deleteActiveMessage(message.id)}
+                    onRetarget={
+                      isRetargetableMessage(message)
+                        ? () => handleRetargetMessage(message.id)
+                        : undefined
+                    }
+                    dimmed={
+                      isRetargetableMessage(message)
+                        ? message.check.retargetSuperseded === true
+                        : false
+                    }
+                  >
+                    <MessageContent message={message} />
+                  </BaseMessageTemplate>
+                );
+              })}
               <Box ref={endOfMessagesRef} />
             </Box>
           </Box>
@@ -588,11 +965,13 @@ export const ChatPanel: React.FC = () => {
         speakerOptions={speakerOptions}
         selectedSpeaker={selectedSpeaker}
         playerDoc={activeActorDoc}
+        isNpc={isNpcSpeaker}
         onSpeakerChange={(s) => {
           localStorage.setItem(LOCAL_SPEAKER_KEY, s);
           setSelectedSpeaker(s);
         }}
         onExport={handleExport}
+        totalMessageCount={activeMessages.length}
         onClearRequest={() => setClearLogsDialogOpen(true)}
         onOpenEquipmentSlot={setEquipmentSlotPickerOpen}
         onToggleVehicle={() => {
@@ -651,7 +1030,10 @@ export const ChatPanel: React.FC = () => {
       <DeleteConfirmationDialog
         open={clearLogsDialogOpen}
         onClose={() => setClearLogsDialogOpen(false)}
-        onConfirm={() => store.clearAll()}
+        onConfirm={() => {
+          store.clearAll();
+          clearEncounterMessages();
+        }}
         title="Clear Chat Logs"
         message="Are you sure you want to delete all chat messages and roll history?"
         enableCtrlBypass={false}
@@ -687,6 +1069,8 @@ export const ChatPanel: React.FC = () => {
               return disableModuleForSlot(prev, pilotInfo, activeSlotForDialog);
             });
           }}
+          onImportFromCompendium={() => {}}
+          onCreateNewItem={() => {}}
           onClearOtherHandModule={() => {}}
         />
       )}

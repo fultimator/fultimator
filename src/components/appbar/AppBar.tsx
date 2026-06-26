@@ -20,8 +20,8 @@ import MenuOption from "./MenuOption";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import type { ThemeValue, StyleProfileValue } from "../../store/themeStore";
 
-import logo929 from "/assets/branding/logo_929.webp";
-import logo1400 from "/assets/branding/logo_1400.webp";
+const logo929 = "/assets/branding/logo_929.webp";
+const logo1400 = "/assets/branding/logo_1400.webp";
 
 interface AppBarProps {
   isNpcEdit: boolean;

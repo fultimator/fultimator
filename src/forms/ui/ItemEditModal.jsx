@@ -69,7 +69,7 @@ export default function ItemEditModal({
     const gs =
       typeof reg.groups === "function" ? reg.groups(formState) : reg.groups;
     const next = {};
-    (gs ?? []).forEach(({ key, accordionGroup, accordionDefaultExpanded }) => {
+    (gs ?? []).forEach(({ _key, accordionGroup, accordionDefaultExpanded }) => {
       if (accordionGroup && !(accordionGroup in next)) {
         next[accordionGroup] = accordionDefaultExpanded
           ? accordionDefaultExpanded(formState)

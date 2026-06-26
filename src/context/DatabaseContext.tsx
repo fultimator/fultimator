@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, type ReactNode } from "react";
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth } from "../firebase";
-import { IS_ELECTRON } from "../platform";
 import { CloudAdapter } from "../adapters/CloudAdapter";
 import { LocalAdapter } from "../adapters/LocalAdapter";
 import {
@@ -20,7 +19,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
     } catch {
       // localStorage not available
     }
-    return IS_ELECTRON ? "local" : "cloud";
+    return "local";
   });
 
   const [cloudUser, setCloudUser] = useState<FirebaseUser | null>(null);

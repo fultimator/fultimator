@@ -12,14 +12,14 @@ import {
   ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
 } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
-import { useNpc } from "../npc/useNpcContext";
-import ExplainSkillsSimplified from "../npc/ExplainSkillsSimplified";
+import { useNpc } from "/src/components/shared/actors/npc/context";
+import ExplainSkillsSimplified from "/src/components/shared/actors/npc/editors/ExplainSkillsSimplified";
 import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
 import { t } from "../../translation/translate";
 
 const NpcEditAppBar = ({
   //isNpcEdit,
-  isPcEdit,
+  _isPcEdit,
   selectedTheme,
   selectedStyleProfile,
   handleSelectTheme,
@@ -45,7 +45,9 @@ const NpcEditAppBar = ({
           container
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
-          <Grid sx={{ textAlign: "left", display: "flex", alignItems: "center" }}>
+          <Grid
+            sx={{ textAlign: "left", display: "flex", alignItems: "center" }}
+          >
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />
@@ -120,7 +122,9 @@ const PcEditAppBar = ({
           container
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
-          <Grid sx={{ textAlign: "left", display: "flex", alignItems: "center" }}>
+          <Grid
+            sx={{ textAlign: "left", display: "flex", alignItems: "center" }}
+          >
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
                 <ArrowBack />

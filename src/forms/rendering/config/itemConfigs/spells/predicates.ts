@@ -9,6 +9,8 @@ export const isTinkererAlchemy = (s: PlayerSpellFormState) =>
   s.spellType === "tinkerer-alchemy";
 export const isTinkererInfusion = (s: PlayerSpellFormState) =>
   s.spellType === "tinkerer-infusion";
+export const isTinkererMagitech = (s: PlayerSpellFormState) =>
+  s.spellType === "tinkerer-magitech";
 export const isPilot = (s: PlayerSpellFormState) =>
   s.spellType === "pilot-vehicle";
 export const isGift = (s: PlayerSpellFormState) => s.spellType === "gift";
@@ -25,5 +27,7 @@ export const isInvocation = (s: PlayerSpellFormState) =>
 export const isCooking = (s: PlayerSpellFormState) => s.spellType === "cooking";
 export const isMagiseed = (s: PlayerSpellFormState) =>
   s.spellType === "magiseed";
+export const isWellspring = (s: PlayerSpellFormState) =>
+  s.spellType === "wellspring";
 
 export const showDuration = (s: PlayerSpellFormState) => isDefault(s);

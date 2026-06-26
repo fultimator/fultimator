@@ -48,6 +48,7 @@ export type AccuracyCheckIntent = {
   description?: string;
   baseDamage: number;
   damageSituationalBonus?: number;
+  damageOutgoingBonus?: number;
   damageType: string;
   defense?: "def" | "mdef" | string;
   hands?: 1 | 2;
@@ -55,6 +56,7 @@ export type AccuracyCheckIntent = {
   range?: "melee" | "ranged" | string;
   isWeaponModule?: boolean;
   hrZero?: boolean;
+  extraTags?: string[];
 };
 
 export type AccuracyCheckResult = {
@@ -91,9 +93,11 @@ export type MagicCheckIntent = {
   spellType?: string;
   description?: string;
   baseDamage: number;
+  damageOutgoingBonus?: number;
   damageType: string;
   defense?: "def" | "mdef" | string;
   hrZero?: boolean;
+  extraTags?: string[];
 };
 
 export type MagicCheckResult = {
@@ -136,6 +140,11 @@ export type DisplayMessage = {
   tags: string[];
   description?: string;
   effect?: string;
+  cost?: {
+    resource: "hp" | "mp" | "ip" | "fp" | "up";
+    amount: number;
+    perTarget?: boolean;
+  };
   clock?: {
     sections: number;
     state?: boolean[];
@@ -156,6 +165,14 @@ export type AttackOverrideDraft = {
 };
 
 export type AttackOverrides = Partial<AttackOverrideDraft>;
+
+export type SpellOverrideDraft = {
+  attr1: Attribute;
+  attr2: Attribute;
+  accuracyDelta: number;
+  damageDelta: number;
+  hrZero: boolean;
+};
 
 export type CheckModifier = { label: string; value: number };
 
@@ -228,7 +245,93 @@ export type OpposedCheckMessage = {
   check: OpposedCheckResult;
 };
 
-export type ChatMessage =
+export type CombatLogEvent =
+  // system events (no actor)
+  | { type: "round-change"; round: number; direction: "up" | "down" | "new" }
+  | { type: "clock-added"; clockName: string }
+  | { type: "clock-updated"; clockName: string; progress: number; max: number }
+  | { type: "clock-state"; clockName: string; progress: number; max: number }
+  | { type: "clock-reset"; clockName: string }
+  | { type: "clock-removed"; clockName: string }
+  | { type: "encounter-renamed"; newName: string }
+  // actor events
+  | { type: "actor-added"; name: string }
+  | { type: "actor-removed"; name: string }
+  | { type: "fainted"; targetName: string }
+  | { type: "turn-checked"; actorName: string }
+  | { type: "status-added"; targetName: string; status: string }
+  | { type: "status-removed"; targetName: string; status: string }
+  // pipeline-sourced resource events
+  | {
+      type: "damage";
+      actorName: string;
+      targetName: string;
+      amount: number;
+      damageType: string;
+      affinity?: "vu" | "rs" | "ab" | "im" | null;
+    }
+  | {
+      type: "heal";
+      actorName: string;
+      targetName: string;
+      amount: number;
+      resource: "hp" | "mp" | "ip";
+    }
+  | {
+      type: "resource-loss";
+      actorName: string;
+      targetName: string;
+      amount: number;
+      resource: "mp" | "ip";
+    }
+  | {
+      type: "expenditure";
+      actorName: string;
+      amount: number;
+      resource: "hp" | "mp" | "ip" | "fp";
+    }
+  | { type: "ultima-used"; actorName: string }
+  // pipeline-sourced check events
+  | {
+      type: "accuracy-check";
+      actorName: string;
+      weaponName: string;
+      isCrit: boolean;
+      isFumble: boolean;
+    }
+  | {
+      type: "magic-check";
+      actorName: string;
+      spellName: string;
+      isCrit: boolean;
+      isFumble: boolean;
+    }
+  | { type: "spell-use"; actorName: string; spellName: string }
+  | { type: "generic-roll"; actorName: string; label: string }
+  | {
+      type: "resource-application";
+      actorName: string;
+      direction: "loss" | "gain";
+      status: "applied" | "unavailable";
+      amount: number;
+      resource: "hp" | "mp" | "ip" | "fp" | "up";
+    }
+  | { type: "crit-success"; actorName: string }
+  | { type: "crit-failure"; actorName: string }
+  // fallback
+  | { type: "text"; text: string };
+
+export type LogMessage = {
+  id: string;
+  createdAt: number;
+  kind: "log";
+  channelId: string;
+  event: CombatLogEvent;
+};
+
+type WithChannel = { channelId?: string };
+
+export type ChatMessage = (
   | TextMessage
   | RollMessage
   | AttributeCheckMessage
@@ -237,4 +340,7 @@ export type ChatMessage =
   | ActionMessage
   | AccuracyCheckMessage
   | MagicCheckMessage
-  | DisplayMessage;
+  | DisplayMessage
+  | LogMessage
+) &
+  WithChannel;

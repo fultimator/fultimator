@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Autocomplete,
   Box,
@@ -13,9 +20,9 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
-  OutlinedInput,
   ListItemText,
   ListSubheader,
+  Menu,
   MenuItem,
   Radio,
   RadioGroup,
@@ -26,7 +33,10 @@ import {
   Typography,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
+import { BevelColorPicker } from "../../components/app-drawer/pickers/ColorPicker";
 import { Clear, Search } from "@mui/icons-material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   Martial,
   MartialOutline,
@@ -36,12 +46,22 @@ import FuidField from "../../components/common/FuidField";
 import CustomTextarea from "../../components/common/CustomTextarea";
 import ChangeCustomizations from "../../routes/equip/customWeapons/ChangeCustomizations";
 import ChangeAccuracyCheck from "../../routes/equip/customWeapons/ChangeAccuracyCheck";
-import SlotTierPicker from "../../components/player/equipment/technospheres/SlotTierPicker";
-import SlotEditor from "../../components/player/equipment/technospheres/SlotEditor";
+import SlotTierPicker from "/src/libs/player/SlotTierPicker.jsx";
+import SlotEditor from "/src/libs/player/SlotEditor.jsx";
 import { TypeIcon, TypeName } from "../../components/types";
 import { useTranslate } from "../../translation/translate";
+
+// Lazy-loaded to break a circular import: CompendiumViewerModal -> create dialog
+// -> TabbedSchemaFormRenderer -> fieldRenderers (this module).
+const CompendiumViewerModal = lazy(
+  () => import("../../components/compendium/CompendiumViewerModal"),
+);
 import type { FieldRendererProps } from "./fieldRendererProps";
+import type { GroupLabels } from "./config/fieldConfig";
 import { affinityStrToNum, affinityNumToStr } from "./npcAffinityUtils";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
+import ItemRowCard from "../../components/shared/common/ItemRowCard";
+import NotesMarkdown from "../../components/common/NotesMarkdown";
 
 // Typed wrapper for untyped JSX components.
 interface ChangeAccuracyCheckProps {
@@ -87,6 +107,7 @@ const TypedSlotEditor = SlotEditor as React.ComponentType<SlotEditorProps>;
 export interface SelectOption {
   value: string | number;
   label: string;
+  icon?: string;
 }
 export interface SelectGroup {
   header: string;
@@ -107,7 +128,10 @@ const UNIFORM_SELECT_SX = {
 function humanizeToken(value: unknown): string {
   const text = String(value ?? "").trim();
   if (!text) return "";
-  return text.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return text
+    .replace(/[.\-_]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function translateOrHumanize(
@@ -165,6 +189,28 @@ export function TextRenderer({
   );
 }
 
+export function ColorRenderer({
+  label,
+  value,
+  onCommit,
+  disabled,
+}: FieldRendererProps) {
+  const { t } = useTranslate();
+  const color = (value as string) ?? "#888888";
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Typography variant="body2" sx={{ flexShrink: 0 }}>
+        {t(label)}
+      </Typography>
+      <BevelColorPicker
+        value={color}
+        onChange={disabled ? () => {} : onCommit}
+        onReset={() => onCommit("#888888")}
+      />
+    </Box>
+  );
+}
+
 export function CustomTextareaRenderer({
   label,
   value,
@@ -172,12 +218,18 @@ export function CustomTextareaRenderer({
   disabled,
 }: FieldRendererProps) {
   const { t } = useTranslate();
+  const strValue = (value as string) ?? "";
+  const translated = t(strValue);
+  const previewValue =
+    translated !== strValue ? translated : strValue || undefined;
   return (
     <CustomTextarea
       label={t(label)}
-      value={(value as string) ?? ""}
+      value={strValue}
+      previewValue={previewValue}
       onChange={(e) => onCommit(e.target.value)}
       readOnly={disabled}
+      disabled={disabled}
     />
   );
 }
@@ -318,11 +370,12 @@ export function SelectRenderer({
   const normalizedValue = multiple
     ? ((value as string[]) ?? [])
     : ((value as string | number) ?? "");
+  const optionForValue = (selected: string | number) =>
+    options.find((opt) => opt.value === selected);
   const labelForValue = (selected: string | number) =>
-    translateOrHumanize(
-      t,
-      String(options.find((opt) => opt.value === selected)?.label ?? selected),
-    );
+    translateOrHumanize(t, String(optionForValue(selected)?.label ?? selected));
+  const iconForValue = (selected: string | number) =>
+    optionForValue(selected)?.icon;
 
   return (
     <FormControl variant="outlined" fullWidth size="small">
@@ -339,7 +392,23 @@ export function SelectRenderer({
           if (Array.isArray(selected)) {
             return selected.map((entry) => labelForValue(entry)).join(", ");
           }
-          return labelForValue(selected as string | number);
+          const icon = iconForValue(selected as string | number);
+          const lbl = labelForValue(selected as string | number);
+          if (icon) {
+            return (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <img
+                  src={icon}
+                  width={16}
+                  height={16}
+                  style={{ objectFit: "contain", flexShrink: 0 }}
+                  alt=""
+                />
+                {lbl}
+              </Box>
+            );
+          }
+          return lbl;
         }}
         startAdornment={
           onBrowse ? (
@@ -370,7 +439,26 @@ export function SelectRenderer({
                 sx={{ p: 0, mr: 1 }}
               />
             )}
-            {multiple ? <ListItemText primary={t(opt.label)} /> : t(opt.label)}
+            {opt.icon ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <img
+                  src={opt.icon}
+                  width={16}
+                  height={16}
+                  style={{ objectFit: "contain", flexShrink: 0 }}
+                  alt=""
+                />
+                {multiple ? (
+                  <ListItemText primary={t(opt.label)} />
+                ) : (
+                  t(opt.label)
+                )}
+              </Box>
+            ) : multiple ? (
+              <ListItemText primary={t(opt.label)} />
+            ) : (
+              t(opt.label)
+            )}
           </MenuItem>
         ))}
       </Select>
@@ -580,6 +668,45 @@ export function AccuracyCheckRenderer({
   );
 }
 
+export function ReadonlyMarkdownRenderer({ label, value }: FieldRendererProps) {
+  const { t } = useTranslate();
+  const strValue = (value as string) ?? "";
+  return (
+    <Box sx={{ my: "5px", position: "relative", width: "100%" }}>
+      <TextField
+        label={t(label)}
+        value={strValue}
+        multiline
+        minRows={4}
+        fullWidth
+        variant="outlined"
+        slotProps={{
+          htmlInput: {
+            readOnly: true,
+            style: { opacity: 0, userSelect: "none" },
+          },
+        }}
+        disabled
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          top: "14px",
+          left: "14px",
+          right: "14px",
+          bottom: "14px",
+          overflow: "auto",
+          cursor: "text",
+          userSelect: "text",
+          "& p": { margin: 0 },
+        }}
+      >
+        <NotesMarkdown compact>{strValue}</NotesMarkdown>
+      </Box>
+    </Box>
+  );
+}
+
 export function ReadonlyNumberRenderer({ label, value }: FieldRendererProps) {
   const { t } = useTranslate();
   return (
@@ -674,7 +801,7 @@ export function RareBonusBlockRenderer({
           <FormControlLabel
             control={
               <Checkbox
-                checked={v.precBonus}
+                checked={!!v.precBonus}
                 onChange={(e) => emit({ precBonus: e.target.checked })}
                 disabled={
                   (rework && basePrec >= 2) || (!rework && basePrec >= 1)
@@ -689,7 +816,7 @@ export function RareBonusBlockRenderer({
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={v.damageBonus}
+                  checked={!!v.damageBonus}
                   onChange={(e) => emit({ damageBonus: e.target.checked })}
                 />
               }
@@ -702,7 +829,7 @@ export function RareBonusBlockRenderer({
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={v.damageReworkBonus}
+                  checked={!!v.damageReworkBonus}
                   onChange={(e) =>
                     emit({ damageReworkBonus: e.target.checked })
                   }
@@ -995,12 +1122,17 @@ export function AutocompleteRenderer({
       "value" in (entry as Record<string, unknown>)
     ) {
       const opt = entry as SelectOption;
-      return { value: opt.value, label: opt.label ?? String(opt.value) };
+      return {
+        value: opt.value,
+        label: opt.label ?? String(opt.value),
+        icon: opt.icon,
+      };
     }
     const val = String(entry ?? "");
     return { value: val, label: val };
   });
   const freeSolo = (componentProps?.freeSolo as boolean) ?? false;
+  const noOptionsText = componentProps?.noOptionsText as string | undefined;
   const multiple =
     (componentProps?.multiple as boolean | undefined) ?? Array.isArray(value);
   const optionLabels = options.map((o) => o.value as string);
@@ -1008,6 +1140,25 @@ export function AutocompleteRenderer({
   const selectedSingle =
     typeof value === "string" && value.trim().length > 0 ? value : null;
 
+  const inputRef = React.useRef<string>(typeof value === "string" ? value : "");
+  React.useEffect(() => {
+    if (freeSolo && !multiple && typeof value === "string") {
+      inputRef.current = value;
+    }
+  }, [value, freeSolo, multiple]);
+
+  if (noOptionsText !== undefined && options.length === 0) {
+    return (
+      <TextField
+        label={t(label)}
+        value=""
+        disabled
+        size="small"
+        fullWidth
+        helperText={noOptionsText}
+      />
+    );
+  }
 
   // Cast needed: MUI Autocomplete freeSolo generic can't be satisfied with a
   // runtime boolean; the FreeSolo type param must be a literal true/false.
@@ -1019,6 +1170,21 @@ export function AutocompleteRenderer({
       freeSolo={freeSolo}
       options={optionLabels}
       value={multiple ? selectedMulti : selectedSingle}
+      onInputChange={
+        freeSolo && !multiple
+          ? (_: unknown, val: string) => {
+              inputRef.current = val;
+            }
+          : undefined
+      }
+      onBlur={
+        freeSolo && !multiple
+          ? () => {
+              if (inputRef.current !== (value ?? ""))
+                onCommit(inputRef.current);
+            }
+          : undefined
+      }
       onChange={(_: unknown, newValue: string[] | string | null) =>
         onCommit(
           multiple
@@ -1030,11 +1196,71 @@ export function AutocompleteRenderer({
       }
       getOptionLabel={(opt: string) => {
         const found = options.find((o) => o.value === opt);
-        return found ? translateOrHumanize(t, found.label) : String(opt);
+        if (!found) return String(opt);
+        // Raw-key options (label === value): show the key as-is in the input
+        if (found.label === found.value) return found.value as string;
+        return translateOrHumanize(t, found.label);
       }}
-      renderInput={(params: object) => (
-        <TextField {...(params as object)} label={t(label)} size="small" />
-      )}
+      renderOption={(props: object, opt: string) => {
+        const found = options.find((o) => o.value === opt);
+        const human = found ? translateOrHumanize(t, found.label) : String(opt);
+        const { key, ...liProps } =
+          props as React.HTMLAttributes<HTMLLIElement> & { key?: React.Key };
+        return (
+          <li key={key} {...liProps}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {found?.icon && (
+                <img
+                  src={found.icon}
+                  width={16}
+                  height={16}
+                  style={{ objectFit: "contain", flexShrink: 0 }}
+                  alt=""
+                />
+              )}
+              <span>{human}</span>
+            </Box>
+          </li>
+        );
+      }}
+      renderInput={(params: object) => {
+        const selectedOpt = options.find((o) => o.value === (value as string));
+        const p = params as Record<string, unknown>;
+        const existingSlotProps =
+          (p.slotProps as Record<string, unknown>) ?? {};
+        const existingInput =
+          (existingSlotProps.input as Record<string, unknown>) ?? {};
+        const slotProps = selectedOpt?.icon
+          ? {
+              ...existingSlotProps,
+              input: {
+                ...existingInput,
+                startAdornment: (
+                  <>
+                    <InputAdornment position="start" sx={{ ml: 0.5, mr: -0.5 }}>
+                      <img
+                        src={selectedOpt.icon}
+                        width={16}
+                        height={16}
+                        style={{ objectFit: "contain" }}
+                        alt=""
+                      />
+                    </InputAdornment>
+                    {existingInput.startAdornment as React.ReactNode}
+                  </>
+                ),
+              },
+            }
+          : existingSlotProps;
+        return (
+          <TextField
+            {...(params as object)}
+            slotProps={slotProps}
+            label={t(label)}
+            size="small"
+          />
+        );
+      }}
       size="small"
     />
   );
@@ -1129,14 +1355,27 @@ export function ObjectListRenderer({
   componentProps,
 }: FieldRendererProps) {
   const { t } = useTranslate();
-  const fields =
-    (componentProps?.fields as import("./config/fieldConfig").ItemFieldConfig<
-      Record<string, unknown>
-    >) ?? [];
-  const itemDefaults =
-    (componentProps?.itemDefaults as Record<string, unknown>) ?? {};
+  const fields = useMemo(
+    () =>
+      (componentProps?.fields as import("./config/fieldConfig").ItemFieldConfig<
+        Record<string, unknown>
+      >) ?? [],
+    [componentProps?.fields],
+  );
+  const itemDefaultsProp = componentProps?.itemDefaults as
+    | Record<string, unknown>
+    | (() => Record<string, unknown>)
+    | undefined;
+  const makeItemDefaults = (): Record<string, unknown> =>
+    typeof itemDefaultsProp === "function"
+      ? itemDefaultsProp()
+      : { ...(itemDefaultsProp ?? {}) };
   const fixedCount = componentProps?.fixedCount as number | undefined;
+  const maxItems = componentProps?.maxItems as number | undefined;
+  const enableCompendiumPicker =
+    componentProps?.enableCompendiumPicker === true;
   const addLabel = (componentProps?.addLabel as string) ?? "Add";
+  const variant = (componentProps?.variant as string | undefined) ?? "";
   const rowLabel = componentProps?.rowLabel as
     | ((row: Record<string, unknown>, i: number) => string)
     | undefined;
@@ -1149,85 +1388,333 @@ export function ObjectListRenderer({
         onChange: (next: Record<string, unknown>) => void;
         surface?: "quickCreate" | "create" | "edit";
         cols?: 1 | 2 | 3 | 4;
+        group?: string;
+        groupLabels?: GroupLabels;
       }) => React.ReactNode)
     | undefined;
+  const nestedGroupLabels = componentProps?.groupLabels as
+    | GroupLabels
+    | undefined;
 
-  const rows = (value as Record<string, unknown>[]) ?? [];
+  const rows = useMemo(
+    () => (value as Record<string, unknown>[]) ?? [],
+    [value],
+  );
+  const isBehaviorCard = variant === "behavior-card";
+  const initialExpandedIndex = componentProps?.initialExpandedIndex as
+    | number
+    | undefined;
+  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>(
+    () =>
+      initialExpandedIndex !== undefined
+        ? { [initialExpandedIndex]: true }
+        : {},
+  );
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const [menuRowIndex, setMenuRowIndex] = useState<number | null>(null);
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  useEffect(() => {
+    setExpandedRows((prev) => {
+      const next: Record<number, boolean> = {};
+      rows.forEach((_, i) => {
+        next[i] = prev[i] ?? false;
+      });
+      return next;
+    });
+  }, [rows]);
+
+  const enrichRow = (row: Record<string, unknown>): Record<string, unknown> => {
+    if (!isBehaviorCard || "_triggerKind" in row) return row;
+    const trigger = row.trigger as Record<string, unknown> | undefined;
+    return { ...row, _triggerKind: trigger?.kind ?? "passive" };
+  };
 
   const updateRow = (i: number, next: Record<string, unknown>) => {
     const updated = rows.map((r, idx) => (idx === i ? next : r));
     onCommit(updated);
   };
 
-  const addRow = () => onCommit([...rows, { ...itemDefaults }]);
+  const addRow = () => {
+    const nextIndex = rows.length;
+    if (isBehaviorCard) {
+      setExpandedRows((prev) => ({ ...prev, [nextIndex]: true }));
+    }
+    onCommit([...rows, makeItemDefaults()]);
+  };
+
+  const addFromCompendium = (effectItem: Record<string, unknown>) => {
+    const { _packItemId, ...behavior } = effectItem;
+    void _packItemId;
+    const nextIndex = rows.length;
+    if (isBehaviorCard) {
+      setExpandedRows((prev) => ({ ...prev, [nextIndex]: true }));
+    }
+    onCommit([...rows, { ...behavior, id: crypto.randomUUID() }]);
+  };
 
   const removeRow = (i: number) => onCommit(rows.filter((_, idx) => idx !== i));
+  const requestDeleteRow = (i: number) => setDeleteIndex(i);
+  const confirmDeleteRow = () => {
+    if (deleteIndex == null) return;
+    removeRow(deleteIndex);
+    setDeleteIndex(null);
+  };
+  const visibleGroupedFields = useMemo(() => {
+    if (!isBehaviorCard) return null;
+    const withoutFormState = fields.filter((f) => f.kind !== "form-state");
+    const keys: string[] = [];
+    for (const f of withoutFormState) {
+      const g = f.group ?? "";
+      if (!keys.includes(g)) keys.push(g);
+    }
+    return keys;
+  }, [fields, isBehaviorCard]);
+  const toggleExpanded = (i: number) =>
+    setExpandedRows((prev) => ({ ...prev, [i]: !prev[i] }));
+  const openMenu = (event: React.MouseEvent<HTMLElement>, rowIndex: number) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+    setMenuRowIndex(rowIndex);
+  };
+  const closeMenu = () => {
+    setMenuAnchorEl(null);
+    setMenuRowIndex(null);
+  };
+  const toggleEnabled = (i: number, checked: boolean) => {
+    const row = rows[i] ?? {};
+    updateRow(i, {
+      ...row,
+      disabled: !checked,
+    });
+  };
 
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 1, width: "100%" }}
     >
-      {rows.map((row, i) => (
-        <Box
-          key={i}
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 1,
-            p: 1.5,
-          }}
-        >
+      {rows.map((row, i) =>
+        isBehaviorCard ? (
+          <ItemRowCard
+            key={i}
+            label={rowLabel ? rowLabel(row, i) : `Item ${i + 1}`}
+            subtitle={undefined}
+            onClick={() => toggleExpanded(i)}
+            onCardClick={undefined}
+            compact
+            minHeight={40}
+            paperSx={{ width: "100%" }}
+            actions={
+              <>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.25,
+                    pr: 0.25,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "common.white", lineHeight: 1 }}
+                  >
+                    {t("Enabled")}
+                  </Typography>
+                  <Checkbox
+                    size="small"
+                    checked={row.disabled !== true}
+                    onChange={(e) => toggleEnabled(i, e.target.checked)}
+                    sx={{
+                      color: "common.white",
+                      "&.Mui-checked": { color: "common.white" },
+                    }}
+                  />
+                </Box>
+                <Tooltip title={t("Actions")}>
+                  <IconButton
+                    size="small"
+                    aria-label={t("Actions")}
+                    onClick={(e) => openMenu(e, i)}
+                  >
+                    <MenuIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={expandedRows[i] ? t("Collapse") : t("Expand")}>
+                  <IconButton
+                    size="small"
+                    aria-label={expandedRows[i] ? t("Collapse") : t("Expand")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpanded(i);
+                    }}
+                  >
+                    <ExpandMoreIcon
+                      fontSize="small"
+                      sx={{
+                        transform: expandedRows[i]
+                          ? "rotate(180deg)"
+                          : "rotate(0deg)",
+                        transition: "transform 0.15s ease",
+                      }}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </>
+            }
+          >
+            {expandedRows[i] && (
+              <Grid container spacing={1} sx={{ p: 1, pt: 0.75 }}>
+                {renderNestedFields && visibleGroupedFields
+                  ? visibleGroupedFields.map((groupKey) => (
+                      <React.Fragment key={`${i}-${groupKey || "default"}`}>
+                        {renderNestedFields({
+                          config: fields,
+                          state: enrichRow(row),
+                          onChange: (next) => updateRow(i, next),
+                          surface: "edit",
+                          cols:
+                            fields.filter(
+                              (f) =>
+                                f.kind !== "form-state" &&
+                                f.kind !== "computed" &&
+                                f.component,
+                            ).length > 3
+                              ? 2
+                              : 1,
+                          group: groupKey || undefined,
+                          groupLabels: nestedGroupLabels,
+                        })}
+                      </React.Fragment>
+                    ))
+                  : null}
+              </Grid>
+            )}
+          </ItemRowCard>
+        ) : (
           <Box
+            key={i}
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 1,
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+              p: 1.5,
             }}
           >
-            {rowLabel && (
-              <Typography
-                variant="caption"
-                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
               >
-                {rowLabel(row, i)}
-              </Typography>
-            )}
-            {fixedCount === undefined && (
-              <IconButton
+                {rowLabel && (
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                  >
+                    {rowLabel(row, i)}
+                  </Typography>
+                )}
+                {fixedCount === undefined && (
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => requestDeleteRow(i)}
+                    sx={{ ml: "auto" }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                )}
+              </Box>
+              <Grid container spacing={1}>
+                {renderNestedFields
+                  ? renderNestedFields({
+                      config: fields,
+                      state: row,
+                      onChange: (next) => updateRow(i, next),
+                      surface: "edit",
+                      cols:
+                        fields.filter(
+                          (f) =>
+                            f.kind !== "form-state" &&
+                            f.kind !== "computed" &&
+                            f.component,
+                        ).length > 3
+                          ? 2
+                          : 1,
+                    })
+                  : null}
+              </Grid>
+            </>
+          </Box>
+        ),
+      )}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={closeMenu}
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuRowIndex != null) requestDeleteRow(menuRowIndex);
+            closeMenu();
+          }}
+          sx={{ color: "error.main" }}
+          disabled={fixedCount !== undefined || menuRowIndex == null}
+        >
+          {t("Delete")}
+        </MenuItem>
+      </Menu>
+      <DeleteConfirmationDialog
+        open={deleteIndex !== null}
+        onClose={() => setDeleteIndex(null)}
+        onConfirm={confirmDeleteRow}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete?")}
+        itemPreview={
+          deleteIndex !== null
+            ? (rowLabel?.(rows[deleteIndex] ?? {}, deleteIndex) ?? "")
+            : ""
+        }
+      />
+      {fixedCount === undefined &&
+        (maxItems === undefined || rows.length < maxItems) && (
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<Add />}
+              onClick={addRow}
+            >
+              {t(addLabel)}
+            </Button>
+            {enableCompendiumPicker && (
+              <Button
                 size="small"
-                color="error"
-                onClick={() => removeRow(i)}
-                sx={{ ml: "auto" }}
+                variant="outlined"
+                startIcon={<Add />}
+                onClick={() => setPickerOpen(true)}
               >
-                <Delete fontSize="small" />
-              </IconButton>
+                {t("behavior.addFromCompendium")}
+              </Button>
             )}
           </Box>
-          <Grid container spacing={1}>
-            {renderNestedFields
-              ? renderNestedFields({
-                  config: fields,
-                  state: row,
-                  onChange: (next) => updateRow(i, next),
-                  surface: "edit",
-                  cols: 2,
-                })
-              : null}
-          </Grid>
-        </Box>
-      ))}
-      {fixedCount === undefined && (
-        <Box>
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<Add />}
-            onClick={addRow}
-          >
-            {t(addLabel)}
-          </Button>
-        </Box>
+        )}
+      {enableCompendiumPicker && pickerOpen && (
+        <Suspense fallback={null}>
+          <CompendiumViewerModal
+            open={pickerOpen}
+            onClose={() => setPickerOpen(false)}
+            restrictToTypes={["effects"]}
+            initialType="effects"
+            context={undefined}
+            onAddItem={(item) => addFromCompendium(item)}
+          />
+        </Suspense>
       )}
     </Box>
   );

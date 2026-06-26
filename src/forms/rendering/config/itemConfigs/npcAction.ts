@@ -1,10 +1,17 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import type { NpcAction } from "../../../schema/itemSchemas/npcAction";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  behaviorsTabField,
+  behaviorGroupLabels,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
 
-export type NpcActionFormState = NpcAction;
+export type NpcActionFormState = NpcAction & Record<string, unknown>;
 const NPC_ACTION_LABEL_PREFIX = "npc.action";
+
+export { DEFAULT_ITEM_TABS as npcActionTabs };
 
 const G = {
   core: "core",
@@ -14,6 +21,7 @@ const G = {
 export const npcActionGroupLabels: GroupLabels = {
   core: "section.core",
   meta: "section.meta",
+  ...behaviorGroupLabels,
 };
 
 export const npcActionFieldConfig: ItemFieldConfig<NpcActionFormState> = [
@@ -61,4 +69,5 @@ export const npcActionFieldConfig: ItemFieldConfig<NpcActionFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<NpcActionFormState>),
+  behaviorsTabField as unknown as FieldConfig<NpcActionFormState>,
 ];

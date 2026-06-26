@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { Attributes, Elements } from "../../../types/Misc";
 import { MetaSchema } from "../meta";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 import {
   categories,
   accuracyChecks,
 } from "../../../routes/equip/customWeapons/libs";
-import { calculateCustomWeaponStats } from "../../../components/player/common/playerCalculations";
-import { SLOT_TIERS } from "../../../components/player/equipment/technospheres/slotTiers";
+import { calculateCustomWeaponStats } from "../../../libs/playerCalculations";
+import { SLOT_TIERS } from "../../../libs/player/slotTiers";
 import {
   WeaponAccuracySchema,
   WeaponDamageSchema,
@@ -41,7 +42,6 @@ export const CustomWeaponSchema = z.object({
   itemType: z.literal("customWeapon"),
   name: z.string().min(1),
   description: z.string().optional(),
-  book: z.string().default("homebrew"),
   category: z.string(),
   range: z.enum(["melee", "ranged"]),
   hands: z.union([z.literal(1), z.literal(2)]),
@@ -74,6 +74,7 @@ export const CustomWeaponFormStateSchema = z.object({
   selectedQuality: z.string().optional(),
   isEquipped: z.boolean().optional(),
   dataType: z.string().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 export const CustomWeaponPersistedSchema = CustomWeaponSchema.extend(

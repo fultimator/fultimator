@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { flushSync } from "react-dom";
 import { useLocation, useParams } from "react-router";
 import { useTranslate } from "../../translation/translate";
 import { useDatabase } from "../../hooks/useDatabase";
@@ -20,23 +21,10 @@ import {
 } from "@mui/material";
 import html2canvas from "html2canvas";
 import Confetti from "react-confetti";
-import PlayerCard from "../../components/player/playerSheet/PlayerCard";
-import PlayerNumbers from "../../components/player/playerSheet/PlayerNumbers";
-import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
-import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
-import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
-import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
-import PlayerCampActivities from "../../components/player/playerSheet/PlayerCampActivities";
-import PlayerZeroPower from "../../components/player/playerSheet/PlayerZeroPower";
-import PlayerOthers from "../../components/player/playerSheet/PlayerOthers";
-import PlayerClasses from "../../components/player/playerSheet/PlayerClasses";
-import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
-import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
-import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
-import PlayerSpellsFull from "../../components/player/playerSheet/PlayerSpellsFull";
-import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
-import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
-import MnemoReceptaclePanel from "../../components/player/equipment/technospheres/MnemoReceptaclePanel";
+import {
+  PlayerSheetFull,
+  PlayerSheetCompact,
+} from "../../components/shared/actors";
 import powered_by_fu from "/images/routes/powered_by_fu.png";
 import Layout from "../../components/Layout";
 import {
@@ -46,25 +34,35 @@ import {
   Save,
   KeyboardArrowUp,
 } from "@mui/icons-material";
-import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
 // import { getPc } from "../../utility/db";
 import { useTheme } from "@mui/material/styles";
 import { FullscreenTwoTone, FullscreenExitTwoTone } from "@mui/icons-material";
 import useDownload from "../../hooks/useDownload";
-import { fixVerticalLabels } from "../../utility/screenshotFix";
+import usePrintPDF, { buildAppPDF } from "../../hooks/usePrintPDF";
+import {
+  fixVerticalLabels,
+  expandCompactHeaderForExport,
+  expandAccordionsForExport,
+  applyPrintModeToClone,
+  hideEditControlsInClone,
+} from "../../utility/screenshotFix";
+import ExportDialog from "../../components/shared/actors/pc/export/ExportDialog";
 import deepEqual from "deep-equal";
 import { usePrompt } from "../../hooks/usePrompt";
 import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
-} from "../../components/player/playerTransforms";
-import useLevelUpFlow from "../../components/player/common/hooks/useLevelUpFlow";
-import { canLevelUpFromExp as canLevelUpFromExpCheck } from "../../components/player/common/levelUpLogic";
+} from "../../libs/actor";
+import useLevelUpFlow from "../../libs/player/hooks/useLevelUpFlow";
+import { canLevelUpFromExp as canLevelUpFromExpCheck } from "../../libs/player/levelUpLogic";
 
 export default function CharacterSheet() {
   const { t } = useTranslate();
   const theme = useTheme();
   const [download] = useDownload();
+  const [printPDF] = usePrintPDF();
+  const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
+  const [isExporting, setIsExporting] = React.useState(false);
   const location = useLocation();
   const { cloudUser: user, dbMode } = useDatabaseContext();
   let params = useParams();
@@ -304,28 +302,40 @@ export default function CharacterSheet() {
     };
   }, [player]);
 
-  const takeScreenshot = async () => {
-    if (!imagesLoaded) {
-      // Images are not loaded yet, prevent taking screenshot
-      return;
-    }
+  const captureCanvas = async (settings = {}) => {
+    if (!imagesLoaded) return null;
 
-    const element = document.getElementById(
-      fullCharacterSheet ? "character-sheet" : "character-sheet-short",
-    );
+    const {
+      theme: themeOption = "current",
+      scale = 2,
+      printMode = false,
+    } = settings;
 
-    if (!element) return;
+    const elementId = fullCharacterSheet
+      ? "character-sheet"
+      : "character-sheet-short";
+    const element = document.getElementById(elementId);
+    if (!element) return null;
 
-    // Save original styles
     const originalWidth = element.style.width;
     const originalMaxHeight = element.style.maxHeight;
     const originalOverflow = element.style.overflow;
 
-    // 1400px for full sheet (2 columns), 600px for short sheet (1 column)
     const captureWidth = fullCharacterSheet ? "1400px" : "600px";
 
+    let bgColor;
+    if (themeOption === "light" || printMode) {
+      bgColor = "#ffffff";
+    } else if (themeOption === "dark") {
+      bgColor = "#121212";
+    } else {
+      bgColor =
+        theme.palette.mode === "dark"
+          ? theme.palette.background.default
+          : "#ffffff";
+    }
+
     try {
-      // Temporarily apply capture styles
       element.style.width = captureWidth;
       element.style.maxHeight = "none";
       element.style.overflow = "visible";
@@ -334,30 +344,87 @@ export default function CharacterSheet() {
         useCORS: true,
         allowTaint: true,
         logging: false,
-        scale: 2,
-        backgroundColor:
-          theme.palette.mode === "dark"
-            ? theme.palette.background.default
-            : "#ffffff",
+        scale,
+        backgroundColor: bgColor,
         windowWidth: fullCharacterSheet ? 1400 : 600,
         onclone: (clonedDoc) => {
           fixVerticalLabels(element, clonedDoc);
+          expandCompactHeaderForExport(element, clonedDoc);
+          hideEditControlsInClone(clonedDoc, elementId);
+          if (settings.format === "app-pdf") {
+            expandAccordionsForExport(element, clonedDoc);
+          }
+          if (printMode) {
+            applyPrintModeToClone(clonedDoc, elementId);
+          }
         },
       });
-      const imgData = canvas.toDataURL("image/png");
 
       // Restore original styles
       element.style.width = originalWidth;
       element.style.maxHeight = originalMaxHeight;
       element.style.overflow = originalOverflow;
 
-      await download(imgData, player.name + "_sheet.png");
+      return { canvas, element, scale };
     } catch (error) {
       console.error("Error capturing screenshot:", error);
       // Restore original styles even if there's an error
       element.style.width = originalWidth;
       element.style.maxHeight = originalMaxHeight;
       element.style.overflow = originalOverflow;
+      return null;
+    }
+  };
+
+  const handleExport = async (settings) => {
+    setIsExporting(true);
+    const wasEditMode = isSheetEditMode;
+    if (wasEditMode) {
+      flushSync(() => setIsSheetEditMode(false));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    try {
+      if (settings.format === "pdf") {
+        await printPDF(player);
+      } else if (settings.format === "app-pdf") {
+        // Expand all class and mnemosphere accordions before capture
+        const expandClassBtn = document.querySelector(
+          "[data-expand-all-classes='collapsed']",
+        );
+        const expandMnemoBtn = document.querySelector(
+          "[data-expand-all-mnemo='collapsed']",
+        );
+        if (expandClassBtn) expandClassBtn.click();
+        if (expandMnemoBtn) expandMnemoBtn.click();
+        if (expandClassBtn || expandMnemoBtn) {
+          await new Promise((r) => setTimeout(r, 350)); // wait for MUI transitions
+        }
+        const result = await captureCanvas({ ...settings, scale: 1 });
+        if (result) {
+          await buildAppPDF(
+            result.canvas,
+            result.element,
+            result.scale,
+            `${player.name ?? "character"}_sheet.pdf`,
+          );
+        }
+      } else {
+        const result = await captureCanvas(settings);
+        if (result) {
+          await download(
+            result.canvas.toDataURL("image/png"),
+            `${player.name ?? "character"}_sheet.png`,
+          );
+        }
+      }
+      setExportDialogOpen(false);
+    } catch (err) {
+      console.error("Export error:", err);
+    } finally {
+      if (wasEditMode) setIsSheetEditMode(true);
+      setIsExporting(false);
     }
   };
 
@@ -495,17 +562,20 @@ export default function CharacterSheet() {
     campActivities: settings.optionalRules?.campActivities ?? false,
     zeroPower: settings.optionalRules?.zeroPower ?? false,
     technospheres: settings.optionalRules?.technospheres ?? false,
+    technospheresVariant:
+      settings.optionalRules?.technospheresVariant ?? "standard",
+    innateClasses: settings.optionalRules?.innateClasses ?? [],
   };
 
   return (
     <Layout fullWidth={true} unsavedChanges={isUpdated}>
-      <Grid container spacing={1} sx={{ paddingX: 1 }}>
+      <Grid container spacing={1} sx={{ paddingX: 1 }} id="sheet-action-bar">
         <Grid size={isMobile ? 8 : 10}>
           <Button
             variant="contained"
             color="primary"
-            onClick={takeScreenshot}
-            style={{ marginBottom: "16px", width: "100%" }} // Add margin to separate from grid
+            onClick={() => setExportDialogOpen(true)}
+            style={{ marginBottom: "16px", width: "100%" }}
             startIcon={<Download />}
           >
             {t("Download Character Sheet")}
@@ -517,7 +587,7 @@ export default function CharacterSheet() {
               variant="outlined"
               color="primary"
               onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
-              style={{ marginBottom: "16px", width: "100%" }} // Add margin to separate from grid
+              style={{ marginBottom: "16px", width: "100%" }}
               sx={{ display: isMobile ? "none" : "flex" }}
             >
               {fullCharacterSheet
@@ -558,154 +628,23 @@ export default function CharacterSheet() {
         </Grid>
       </Grid>
       {fullCharacterSheet ? (
-        <Grid container spacing={2} sx={{ padding: 1 }} id="character-sheet">
-          <Grid
-            container
-            spacing={2}
-            size={{
-              xs: 12,
-              md: 6,
-            }}
-          >
-            <Grid size={12}>
-              <Stack direction="column" spacing={2}>
-                <PlayerCard
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isOwner={isOwner}
-                  isCharacterSheet={true}
-                  characterImage={player.info.imgurl}
-                  updateMaxStats={updateMaxStats}
-                  canLevelUpFromExp={canLevelUpFromExp}
-                  onLevelUpRequest={openLevelUpDialog}
-                />
-                <PlayerNumbers
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isOwner={isOwner}
-                  isCharacterSheet={true}
-                />
-                {/* <PlayerTraits player={player} isCharacterSheet={true} /> */}
-                <PlayerBonds
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                />
-                <PlayerRituals
-                  player={player}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                  clockSections={ritualClockSections}
-                  setClockSections={setRitualClockSections}
-                  clockState={ritualClockState}
-                  setClockState={setRitualClockState}
-                />
-                {optionalRules.zeroPower && (
-                  <PlayerZeroPower
-                    player={player}
-                    setPlayer={handleSetPlayer}
-                    isEditMode={isEditMode}
-                  />
-                )}
-                {optionalRules.campActivities && (
-                  <PlayerCampActivities
-                    player={player}
-                    setPlayer={handleSetPlayer}
-                    isEditMode={isEditMode}
-                  />
-                )}
-                <PlayerOthers
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                />
-                <PlayerLoadout
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                  isOwner={isOwner}
-                />
-                <PlayerEquipment
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isOwner={isOwner}
-                  isCharacterSheet={true}
-                />
-                <PlayerVehicle
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                />
-                <PlayerNotes
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                />
-
-                <PlayerSpellsFull
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                />
-              </Stack>
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            spacing={2}
-            size={{
-              xs: 12,
-              md: 6,
-            }}
-          >
-            <Grid size={12}>
-              <Stack direction="column" spacing={2}>
-                <PlayerClasses
-                  player={player}
-                  setPlayer={handleSetPlayer}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
-                  updateMaxStats={updateMaxStats}
-                />
-                {optionalRules.technospheres &&
-                  ["integrated", "mnemospheres"].includes(
-                    player?.settings?.optionalRules?.technospheresVariant ??
-                      "standard",
-                  ) && (
-                    <MnemoReceptaclePanel
-                      player={player}
-                      setPlayer={handleSetPlayer}
-                      readOnly={!isEditMode}
-                    />
-                  )}
-                {optionalRules.quirks && (
-                  <PlayerQuirk
-                    player={player}
-                    isEditMode={isEditMode}
-                    isCharacterSheet={true}
-                  />
-                )}
-              </Stack>
-            </Grid>
-          </Grid>
-
-          <Grid size={12}>
-            <PlayerCompanion
-              player={player}
-              setPlayer={handleSetPlayer}
-              isEditMode={isEditMode}
-              isCharacterSheet={true}
-            />
-          </Grid>
-          <Grid container size={12}>
+        <Box id="character-sheet" sx={{ p: 1 }}>
+          <PlayerSheetFull
+            pc={player}
+            onUpdate={handleSetPlayer}
+            isInteractive={isEditMode}
+            isOwner={isOwner}
+            characterImage={player.info.imgurl}
+            updateMaxStats={updateMaxStats}
+            canLevelUpFromExp={canLevelUpFromExp}
+            onLevelUpRequest={openLevelUpDialog}
+            optionalRules={optionalRules}
+            clockSections={ritualClockSections}
+            setClockSections={setRitualClockSections}
+            clockState={ritualClockState}
+            setClockState={setRitualClockState}
+          />
+          <Grid container size={12} sx={{ mt: 2 }}>
             <Grid size={4}>
               <img
                 src={powered_by_fu}
@@ -729,7 +668,7 @@ export default function CharacterSheet() {
               </Typography>
             </Grid>
           </Grid>
-        </Grid>
+        </Box>
       ) : (
         <Grid
           container
@@ -739,18 +678,24 @@ export default function CharacterSheet() {
           }}
         >
           <Grid container size={12}>
-            <PlayerCardSheet
-              player={player}
-              setPlayer={handleSetPlayer}
-              isEditMode={isEditMode}
+            <PlayerSheetCompact
+              pc={player}
+              onUpdate={handleSetPlayer}
+              isInteractive={isEditMode}
               isOwner={isOwner}
-              isCharacterSheet={true}
               optionalRules={optionalRules}
               characterImage={player.info.imgurl}
               id="character-sheet-short"
               canLevelUpFromExp={canLevelUpFromExp}
               onLevelUpRequest={openLevelUpDialog}
               updateMaxStats={updateMaxStats}
+              onToggleEditMode={
+                isOwner ? () => setIsSheetEditMode((v) => !v) : undefined
+              }
+              clockSections={ritualClockSections}
+              setClockSections={setRitualClockSections}
+              clockState={ritualClockState}
+              setClockState={setRitualClockState}
             />
           </Grid>
         </Grid>
@@ -800,6 +745,12 @@ export default function CharacterSheet() {
           </Tooltip>
         </Box>
       )}
+      <ExportDialog
+        open={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        onDownload={handleExport}
+        isLoading={isExporting}
+      />
       <Dialog
         open={levelUpDialogOpen}
         onClose={closeLevelUpDialog}

@@ -61,9 +61,15 @@ export function TypeAffinity({ type, affinity }) {
         color: "red.main",
         fontWeight: "bold",
         fontFamily: "inherit",
-        textAlign: "left",
+        textAlign: "center",
         textTransform: "uppercase",
-        px: 0.2,
+        px: 0,
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        lineHeight: 1,
       }}
     >
       {/* Type */}

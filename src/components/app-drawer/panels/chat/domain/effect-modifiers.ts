@@ -2,6 +2,7 @@ import { resolveActorEffects } from "../../../../../libs/actorEffectsResolver";
 import { calcHP } from "../../../../../libs/npcs";
 import type { TypePlayer } from "../../../../../types/Players";
 import type { TypeNpc } from "../../../../../types/Npcs";
+import { zeroDamageBonuses } from "../../../../../types/Bonuses";
 import type { CheckModifier } from "../types";
 
 type Actor = TypePlayer | TypeNpc;
@@ -9,6 +10,14 @@ type Actor = TypePlayer | TypeNpc;
 export interface AccuracyContext {
   range?: "melee" | "ranged" | string;
   category?: string;
+  checkType?: "magic";
+  inCrisis?: boolean;
+}
+
+export interface OutgoingDamageContext {
+  range?: "melee" | "ranged" | "spell";
+  category?: string;
+  damageType?: string;
   inCrisis?: boolean;
 }
 
@@ -26,9 +35,29 @@ export function accuracyModifiersFromEffects(
   push(out, "Accuracy", acc.accuracyCheck);
   if (ctx.range === "melee") push(out, "Melee", acc.melee);
   if (ctx.range === "ranged") push(out, "Ranged", acc.ranged);
+  if (ctx.checkType === "magic") push(out, "Magic", acc.magic);
   if (ctx.category) push(out, capitalize(ctx.category), acc[ctx.category]);
 
   return out;
+}
+
+export function outgoingDamageBonusFromEffects(
+  actor: Actor,
+  ctx: OutgoingDamageContext = {},
+): number {
+  const { bonuses } = resolveActorEffects(actor, {
+    inCrisis: ctx.inCrisis ?? isActorInCrisis(actor),
+  });
+  const dmg = (bonuses.damage ?? zeroDamageBonuses()) as unknown as Record<
+    string,
+    number
+  >;
+  let total = dmg.all ?? 0;
+  if (ctx.range) total += dmg[ctx.range] ?? 0;
+  if (ctx.category) total += dmg[ctx.category] ?? 0;
+  if (ctx.damageType && ctx.damageType !== "untyped")
+    total += dmg[ctx.damageType] ?? 0;
+  return total;
 }
 
 function push(

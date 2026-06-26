@@ -33,11 +33,11 @@ const CustomHeader2: React.FC<CustomHeaderProps> = ({
         paddingBottom: "5px",
         color: isDarkMode ? "white" : "black",
         textAlign: "left",
-        marginBottom: "4px",
+        marginBottom: 0,
         textTransform: "uppercase",
-        backgroundColor: theme.ternary,
-        backgroundSize: "100% 100%",
-        backgroundRepeat: "no-repeat",
+        background: isDarkMode
+          ? `linear-gradient(90deg, ${theme.ternary}, rgba(24,26,27,0) 100%)`
+          : `linear-gradient(90deg, ${theme.ternary} 0%, #ffffff 100%)`,
       }}
     >
       <Typography variant="h2" sx={{ fontSize: "1.3em" }}>

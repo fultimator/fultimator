@@ -44,7 +44,10 @@ export function resolveResource(ctx: ResourceContext): ResourceResult {
     const flatBonus = ctx.incomingLossBonuses[r];
     if (flatBonus !== 0) {
       amount += flatBonus;
-      bonusesApplied.push({ label: `incomingLoss.${r} bonus`, value: flatBonus });
+      bonusesApplied.push({
+        label: `incomingLoss.${r} bonus`,
+        value: flatBonus,
+      });
       breakdown.push({ label: `loss bonus`, value: flatBonus });
     }
 
@@ -54,7 +57,10 @@ export function resolveResource(ctx: ResourceContext): ResourceResult {
     if (multiplier !== 1) {
       const before = amount;
       amount = Math.max(0, Math.floor(amount * multiplier));
-      bonusesApplied.push({ label: `incomingLoss.${r} ×${multiplier}`, value: amount - before });
+      bonusesApplied.push({
+        label: `incomingLoss.${r} ×${multiplier}`,
+        value: amount - before,
+      });
       breakdown.push({ label: `loss ×${multiplier}`, value: amount });
     }
 
@@ -71,7 +77,10 @@ export function resolveResource(ctx: ResourceContext): ResourceResult {
     const outFlat = ctx.outgoingRecoveryBonuses?.[r] ?? 0;
     if (outFlat !== 0) {
       amount += outFlat;
-      bonusesApplied.push({ label: `outgoingRecovery.${r} bonus`, value: outFlat });
+      bonusesApplied.push({
+        label: `outgoingRecovery.${r} bonus`,
+        value: outFlat,
+      });
       breakdown.push({ label: "outgoing recovery bonus", value: outFlat });
     }
 
@@ -79,14 +88,20 @@ export function resolveResource(ctx: ResourceContext): ResourceResult {
     if (outMult !== 1) {
       const before = amount;
       amount = Math.max(0, Math.floor(amount * outMult));
-      bonusesApplied.push({ label: `outgoingRecovery.${r} ×${outMult}`, value: amount - before });
+      bonusesApplied.push({
+        label: `outgoingRecovery.${r} ×${outMult}`,
+        value: amount - before,
+      });
       breakdown.push({ label: `outgoing ×${outMult}`, value: amount });
     }
 
     const inFlat = ctx.incomingRecoveryBonuses[r];
     if (inFlat !== 0) {
       amount += inFlat;
-      bonusesApplied.push({ label: `incomingRecovery.${r} bonus`, value: inFlat });
+      bonusesApplied.push({
+        label: `incomingRecovery.${r} bonus`,
+        value: inFlat,
+      });
       breakdown.push({ label: "incoming recovery bonus", value: inFlat });
     }
 
@@ -96,7 +111,10 @@ export function resolveResource(ctx: ResourceContext): ResourceResult {
     if (inMult !== 1) {
       const before = amount;
       amount = Math.max(0, Math.floor(amount * inMult));
-      bonusesApplied.push({ label: `incomingRecovery.${r} ×${inMult}`, value: amount - before });
+      bonusesApplied.push({
+        label: `incomingRecovery.${r} ×${inMult}`,
+        value: amount - before,
+      });
       breakdown.push({ label: `incoming ×${inMult}`, value: amount });
     }
 

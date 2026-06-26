@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -21,14 +20,15 @@ import {
   Close,
   Description,
   Favorite,
-  Casino,
   Edit,
   Download,
 } from "@mui/icons-material";
-import NpcActorCard from "../shared/actorCards/npc/NpcActorCard";
+import NpcActorCard from "../shared/actors/npc/NpcActorCard";
 import StatsTab from "./npcDetail/StatsTab";
 import NotesTab from "./npcDetail/NotesTab";
-import AttributeSection from "./npcDetail/AttributeSection";
+import AttributeSection, { DefStatsRow } from "./npcDetail/AttributeSection";
+import StandardRollsSection from "./npcDetail/StandardRollsSection";
+import DefenseModifierDialog from "./npcDetail/DefenseModifierDialog";
 import {
   calcPrecision,
   calcDamage,
@@ -38,9 +38,8 @@ import {
 } from "../../libs/npcs";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
-import RollsTab from "./npcDetail/RollsTab";
-import StandardRollsSection from "./npcDetail/StandardRollsSection";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
+import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import {
   prepareAccuracyCheck,
   rollAccuracyCheck,
@@ -76,13 +75,10 @@ const NPCDetail = ({
   selectedNPCs,
   setSelectedNPCs,
   calcAttr,
-  handleDecreaseUltima,
-  handleIncreaseUltima,
   npcRef,
   isMobile,
-  addLog,
+  emitLog,
   addMessage,
-  openLogs,
   npcDetailWidth,
   checkNewTurn,
   handleEditNPC,
@@ -93,23 +89,54 @@ const NPCDetail = ({
   const [open, setOpen] = useState(false);
   const [numTargets, setNumTargets] = useState(1);
   const [error, setError] = useState("");
-  const [clickedData, setClickedData] = useState({});
+  const [clickedData, _setClickedData] = useState({});
+  const [defenseDialogType, setDefenseDialogType] = useState(null);
+
+  const withTargets = (msg) => {
+    if (msg.kind !== "accuracy" && msg.kind !== "magic") return msg;
+    const targets = useCombatEncounterStore.getState().targets;
+    if (!targets.length) return msg;
+    return { ...msg, check: { ...msg.check, targetsSnapshot: [...targets] } };
+  };
 
   const {
     autoUseMP,
-    autoOpenLogs,
     showBaseAttackEffect,
     showWeaponAttackEffect,
     showSpellEffect,
     autoCheckTurnAfterRoll,
-    hideLogs,
-    logSpellUse,
     studyValues,
   } = useCombatSimSettingsStore.getState().settings;
 
-  //console.log(studyValues);
-
   if (!selectedNPC) return null;
+
+  const getDefenseValue = (defenseType) => {
+    const baseValue =
+      defenseType === "DEF" ? calcDef(selectedNPC) : calcMDef(selectedNPC);
+    const modifier =
+      defenseType === "DEF"
+        ? selectedNPC?.combatStats?.defenseModifier
+        : selectedNPC?.combatStats?.mdefenseModifier;
+    const overrideMap = selectedNPC?.combatStats?.defenseOverride || {};
+    const overrideValue =
+      defenseType === "MDEF" && overrideMap.MDEF === undefined
+        ? overrideMap["M.DEF"]
+        : overrideMap[defenseType];
+    const hasOverride =
+      overrideValue !== "" &&
+      overrideValue !== null &&
+      overrideValue !== undefined;
+    if (hasOverride) return Number.parseInt(overrideValue, 10) || 0;
+    const calculatedValue = modifier == null ? baseValue : baseValue + modifier;
+    const attrValue =
+      defenseType === "DEF"
+        ? calcAttr("Slow", "Enraged", "dexterity", selectedNPC)
+        : calcAttr("Dazed", "Enraged", "insight", selectedNPC);
+    return (calculatedValue || 0) + (attrValue || 0);
+  };
+
+  const defValue = getDefenseValue("DEF");
+  const mdefValue = getDefenseValue("MDEF");
 
   const attributes = {
     dexterity: calcAttr("Slow", "Enraged", "dexterity", selectedNPC),
@@ -197,44 +224,29 @@ const NPCDetail = ({
         secondary: resolveNpcAttributeDie(normalizeAttrKey(attr2Raw)),
       };
       const magicBonus = calcMagic(selectedNPC);
-      const intent = prepareMagicCheck(
-        {
-          arg: spellData.name,
-          name: spellData.name,
-          attr1: toAttr(attr1Raw),
-          attr2: toAttr(attr2Raw),
-          accuracyBonus: magicBonus !== 0 ? magicBonus : undefined,
-          baseDamage: 0,
-          damageType: spellData.damage?.type ?? "physical",
-          damageHrZero: spellData.damageHrZero ?? false,
-          description:
-            showSpellEffect && spellData.effect ? spellData.effect : undefined,
-        },
-      );
+      const intent = prepareMagicCheck({
+        arg: spellData.name,
+        name: spellData.name,
+        attr1: toAttr(attr1Raw),
+        attr2: toAttr(attr2Raw),
+        accuracyBonus: magicBonus !== 0 ? magicBonus : undefined,
+        baseDamage: 0,
+        damageType: spellData.damage?.type ?? "physical",
+        damageHrZero: spellData.damageHrZero ?? false,
+        description:
+          showSpellEffect && spellData.effect ? spellData.effect : undefined,
+      });
       const rolls = rollMagicCheck(dieSizes);
       const result = processMagicCheck(intent, rolls, dieSizes, npcSpeaker);
-      if (addMessage) addMessage(buildMagicCheckMessage(result));
+      if (addMessage) addMessage(withTargets(buildMagicCheckMessage(result)));
     } else {
-      if (logSpellUse) {
-        addLog(
-          "combat_sim_log_spell_use",
-          selectedNPC.name +
-            (selectedNPC?.combatStats?.combatNotes
-              ? "【" + selectedNPC.combatStats.combatNotes + "】"
-              : ""),
-          spellData.name,
-          numTargets,
-          {
-            effect: showSpellEffect && spellData.effect ? spellData.effect : "",
-            markdown: true,
-          },
-        );
-      }
+      emitLog({
+        type: "spell-use",
+        actorName: selectedNPC.name,
+        spellName: spellData.name,
+      });
     }
 
-    if (autoOpenLogs) {
-      openLogs();
-    }
     if (isMobile) {
       setSelectedNPC(null);
     }
@@ -247,7 +259,7 @@ const NPCDetail = ({
     setNumTargets(1);
   };
 
-  const handleAttack = (attack, attackType) => {
+  const _handleAttack = (attack, attackType) => {
     const attr1Raw =
       attackType === "weapon"
         ? (attack.accuracy?.attr1 ?? attack.weapon?.att1)
@@ -286,11 +298,8 @@ const NPCDetail = ({
 
     const rolls = rollAccuracyCheck(dieSizes);
     const result = processAccuracyCheck(intent, rolls, dieSizes, npcSpeaker);
-    if (addMessage) addMessage(buildAccuracyCheckMessage(result));
+    if (addMessage) addMessage(withTargets(buildAccuracyCheckMessage(result)));
 
-    if (autoOpenLogs) {
-      openLogs();
-    }
     if (isMobile) {
       setSelectedNPC(null);
     }
@@ -302,7 +311,6 @@ const NPCDetail = ({
   };
 
   function handleUseMP(mpCost) {
-    // Update the selectedNPC and selectedNPCs
     setSelectedNPC((prev) => ({
       ...prev,
       combatStats: {
@@ -336,11 +344,16 @@ const NPCDetail = ({
   ) => {
     const labelToAttr = (label) => {
       switch (label.toUpperCase()) {
-        case "DEX": return "dex";
-        case "INS": return "ins";
-        case "MIG": return "mig";
-        case "WLP": return "wlp";
-        default: return "dex";
+        case "DEX":
+          return "dex";
+        case "INS":
+          return "ins";
+        case "MIG":
+          return "mig";
+        case "WLP":
+          return "wlp";
+        default:
+          return "dex";
       }
     };
 
@@ -366,9 +379,6 @@ const NPCDetail = ({
       }
     }
 
-    if (autoOpenLogs) {
-      openLogs();
-    }
     if (autoCheckTurnAfterRoll) {
       setTimeout(() => {
         checkNewTurn(selectedNPC.combatId);
@@ -430,17 +440,6 @@ const NPCDetail = ({
       />
       <Tab
         iconPosition="start"
-        icon={<Casino fontSize="small" />}
-        label={!isMobile && t("combat_sim_rolls")}
-        sx={{
-          minHeight: 40,
-          fontSize: { md: "0.8rem" },
-          padding: { xs: "4px 4px", sm: "4px 6px", md: "4px 8px" },
-          minWidth: 0,
-        }}
-      />
-      <Tab
-        iconPosition="start"
         icon={<Edit fontSize="small" />}
         label={!isMobile && t("combat_sim_notes")}
         sx={{
@@ -462,7 +461,7 @@ const NPCDetail = ({
             alignItems: "center",
             justifyContent: "space-between",
             borderBottom: `1px solid ${theme.palette.divider}`,
-            paddingBottom: 1,
+            p: 1,
           }}
         >
           <Typography
@@ -500,7 +499,7 @@ const NPCDetail = ({
 
       {!isMobile && renderTabs}
 
-      <Box sx={{ flexGrow: 1, overflowY: "auto", paddingTop: 1 }}>
+      <Box sx={{ flexGrow: 1, overflowY: "auto", paddingTop: 1, px: 1 }}>
         {tabIndex === 0 && (
           <NpcActorCard
             npc={selectedNPC}
@@ -516,33 +515,29 @@ const NPCDetail = ({
             selectedNPC={selectedNPC}
             calcHP={calcHP}
             calcMP={calcMP}
-            calcDef={calcDef}
-            calcMDef={calcMDef}
             calcAttr={calcAttr}
             handleOpen={handleOpen}
             toggleStatusEffect={toggleStatusEffect}
-            handleDecreaseUltima={handleDecreaseUltima}
-            handleIncreaseUltima={handleIncreaseUltima}
-            onUpdateDefenseModifiers={handleUpdateDefenseModifiers}
-            isMobile={isMobile}
+            applyCommand={(command) => {
+              window.dispatchEvent(
+                new window.CustomEvent("chat:run-command", {
+                  detail: {
+                    command,
+                    speaker: npcSpeaker,
+                    actorDoc: selectedNPC,
+                  },
+                }),
+              );
+            }}
           />
         )}
         {tabIndex === 2 && (
-          <RollsTab
-            selectedNPC={selectedNPC}
-            setClickedData={setClickedData}
-            setOpen={setOpen}
-            handleAttack={handleAttack}
-            handleSpell={handleConfirmSpell}
-          />
-        )}
-        {tabIndex === 3 && (
           <NotesTab
             selectedNPC={selectedNPC}
             setSelectedNPC={setSelectedNPC}
             selectedNPCs={selectedNPCs}
             setSelectedNPCs={setSelectedNPCs}
-            addLog={addLog}
+            emitLog={emitLog}
           />
         )}
       </Box>
@@ -605,11 +600,9 @@ const NPCDetail = ({
           </Button>
         </Box>
       )}
-      {tabIndex === 2 && !isMobile && !hideLogs && (
+      {tabIndex === 1 && !isMobile && (
         <Box
-          sx={{
-            borderTop: "1px solid " + theme.palette.divider,
-          }}
+          sx={{ borderTop: `1px solid rgba(255,255,255,0.08)`, px: 0, pt: 0.5 }}
         >
           <StandardRollsSection
             selectedNPC={selectedNPC}
@@ -618,9 +611,16 @@ const NPCDetail = ({
           />
         </Box>
       )}
-
       {!isMobile && (
-        <AttributeSection selectedNPC={selectedNPC} calcAttr={calcAttr} />
+        <>
+          <DefStatsRow
+            defValue={defValue}
+            mdefValue={mdefValue}
+            onDefClick={() => setDefenseDialogType("DEF")}
+            onMdefClick={() => setDefenseDialogType("MDEF")}
+          />
+          <AttributeSection selectedNPC={selectedNPC} calcAttr={calcAttr} />
+        </>
       )}
 
       {/* Target Selection Dialog */}
@@ -699,6 +699,16 @@ const NPCDetail = ({
           </Button>
         </DialogActions>
       </Dialog>
+      <DefenseModifierDialog
+        open={!!defenseDialogType}
+        onClose={() => setDefenseDialogType(null)}
+        defenseType={defenseDialogType}
+        npc={selectedNPC}
+        onUpdate={handleUpdateDefenseModifiers}
+        calcDef={calcDef}
+        calcMDef={calcMDef}
+        calcAttr={calcAttr}
+      />
     </>
   );
 
@@ -714,6 +724,8 @@ const NPCDetail = ({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          px: 1,
+          py: 1,
           letterSpacing: 1,
           fontWeight: "bold",
           textTransform: "uppercase",
@@ -727,7 +739,9 @@ const NPCDetail = ({
         </IconButton>
       </DialogTitle>
       {renderTabs}
-      <DialogContent dividers>{content}</DialogContent>
+      <DialogContent dividers sx={{ p: 0 }}>
+        {content}
+      </DialogContent>
       <DialogActions sx={{ p: 0 }}>
         <Grid container spacing={0}>
           {tabIndex === 0 && (
@@ -788,19 +802,27 @@ const NPCDetail = ({
               </Box>
             </Grid>
           )}
-          {tabIndex === 2 && !hideLogs && (
+          {tabIndex === 1 && (
             <Grid size={12}>
-              <StandardRollsSection
-                selectedNPC={selectedNPC}
-                calcAttr={calcAttr}
-                handleRoll={handleRoll}
-              />
+              <Box sx={{ borderTop: `1px solid rgba(255,255,255,0.08)` }}>
+                <StandardRollsSection
+                  selectedNPC={selectedNPC}
+                  calcAttr={calcAttr}
+                  handleRoll={handleRoll}
+                />
+              </Box>
             </Grid>
           )}
           <Grid size={12}>
-            <Box sx={{ width: "100%" }}>
-              <AttributeSection selectedNPC={selectedNPC} calcAttr={calcAttr} />
-            </Box>
+            <DefStatsRow
+              defValue={getDefenseValue("DEF")}
+              mdefValue={getDefenseValue("MDEF")}
+              onDefClick={() => setDefenseDialogType("DEF")}
+              onMdefClick={() => setDefenseDialogType("MDEF")}
+            />
+          </Grid>
+          <Grid size={12}>
+            <AttributeSection selectedNPC={selectedNPC} calcAttr={calcAttr} />
           </Grid>
         </Grid>
       </DialogActions>
@@ -810,7 +832,7 @@ const NPCDetail = ({
       sx={{
         width: npcDetailWidth,
         bgcolor: theme.palette.background.paper,
-        padding: 2,
+        padding: 0,
         display: "flex",
         flexDirection: "column",
         height: "100%",

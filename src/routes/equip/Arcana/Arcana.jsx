@@ -1,131 +1,176 @@
 import {
   Grid,
   Paper,
-  useTheme,
   Button,
-  FormControl,
-  TextField,
-  Divider,
+  useTheme,
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { AutoAwesome, Download } from "@mui/icons-material";
+import { AutoAwesome, Download, Search } from "@mui/icons-material";
 import { useState, useRef } from "react";
-import { SharedArcanumCard } from "../../../components/shared/itemCards";
-import ChangeName from "../common/ChangeName";
+import { SharedArcanumCard } from "../../../components/shared/items";
 import ApplyRework from "../common/ApplyRework";
 import { useTranslate } from "../../../translation/translate";
 import { useStickyTop } from "../../../hooks/useStickyTop";
-import CustomTextarea from "../../../components/common/CustomTextarea";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
+import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import useDownloadImage from "../../../hooks/useDownloadImage";
+import useUploadJSON from "../../../hooks/useUploadJSON";
+import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
+import { playerSpellFieldConfig } from "../../../forms/rendering/config/itemConfigs/spells";
 
-function Arcana() {
+function buildInitialState() {
+  return {
+    spellType: "arcanist",
+    fuid: undefined,
+    name: "Arcanum",
+    // default fields (zeroed)
+    class: "",
+    isOffensive: false,
+    "cost.resource": "mp",
+    "cost.amount": 0,
+    "cost.perTarget": false,
+    maxTargets: 1,
+    targetDescription: "",
+    duration: "",
+    "accuracy.attr1": "insight",
+    "accuracy.attr2": "will",
+    "accuracy.value": 0,
+    "accuracy.defense": "mdef",
+    "damage.value": 0,
+    "damage.type": "physical",
+    "damage.hrZero": false,
+    description: "",
+    // arcanist fields
+    domain: "",
+    domainDesc: "",
+    merge: "",
+    mergeDesc: "",
+    pulse: "",
+    pulseDesc: "",
+    dismiss: "",
+    dismissDesc: "",
+    // other fields (zeroed)
+    category: "",
+    infusionRank: null,
+    event: "",
+    genoclepsis: "",
+    type: "",
+    status: "",
+    attribute: "",
+    recovery: "",
+    effect: "",
+    wellspring: "",
+    cookingEffects: [],
+    "meta.book": "",
+    "meta.page": undefined,
+    "meta.bookName": "",
+    "meta.isOfficial": false,
+  };
+}
+
+function Arcana({ variant = "equip" }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const stickyTop = useStickyTop();
   const secondary = theme.palette.secondary.main;
 
-  const [name, setName] = useState("Arcanum");
-  const [description, setDescription] = useState("");
-  const [domain, setDomain] = useState("");
-  const [mergeName, setMergeName] = useState("");
-  const [mergeBenefit, setMergeBenefit] = useState("");
-  const [pulseName, setPulseName] = useState("");
-  const [pulseBenefit, setPulseBenefit] = useState("");
-  const [dismissName, setDismissName] = useState("");
-  const [dismissBenefit, setDismissBenefit] = useState("");
-  const [rework, setRework] = useState(false);
+  const [formState, setFormState] = useState(buildInitialState);
+  const [compendiumOpen, setCompendiumOpen] = useState(false);
 
   const fileInputRef = useRef(null);
   const cardRef = useRef(null);
-  const [downloadImage, downloadSnackbar] = useDownloadImage(name, cardRef);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
+    formState.name,
+    cardRef,
+  );
+
+  const { handleFileUpload } = useUploadJSON((data) => {
+    if (!data) return;
+    setFormState((prev) => ({
+      ...prev,
+      name: data.name ?? prev.name,
+      domain:
+        data.domain ?? (data.domainDesc ? t(data.domainDesc) : prev.domain),
+      domainDesc: data.domainDesc
+        ? t(data.domainDesc)
+        : (data.domain ?? prev.domainDesc),
+      merge: data.merge ? t(data.merge) : (data.mergeName ?? prev.merge),
+      mergeDesc: data.mergeDesc
+        ? t(data.mergeDesc)
+        : (data.mergeBenefit ?? prev.mergeDesc),
+      pulse: data.pulse ? t(data.pulse) : (data.pulseName ?? prev.pulse),
+      pulseDesc: data.pulseDesc
+        ? t(data.pulseDesc)
+        : (data.pulseBenefit ?? prev.pulseDesc),
+      dismiss: data.dismiss
+        ? t(data.dismiss)
+        : (data.dismissName ?? prev.dismiss),
+      dismissDesc: data.dismissDesc
+        ? t(data.dismissDesc)
+        : (data.dismissBenefit ?? prev.dismissDesc),
+      spellType:
+        data.spellType ?? (data.rework ? "arcanist-rework" : "arcanist"),
+      fuid: data.fuid ?? prev.fuid,
+    }));
+  });
+
+  const handleArcanumSelected = (item) => {
+    setFormState((prev) => ({
+      ...prev,
+      name: item.name ?? prev.name,
+      domain:
+        item.domain ?? (item.domainDesc ? t(item.domainDesc) : prev.domain),
+      domainDesc: item.domainDesc
+        ? t(item.domainDesc)
+        : (item.domain ?? prev.domainDesc),
+      merge: item.merge ? t(item.merge) : (item.mergeName ?? prev.merge),
+      mergeDesc: item.mergeDesc
+        ? t(item.mergeDesc)
+        : (item.mergeBenefit ?? prev.mergeDesc),
+      pulse: item.pulse ? t(item.pulse) : (item.pulseName ?? prev.pulse),
+      pulseDesc: item.pulseDesc
+        ? t(item.pulseDesc)
+        : (item.pulseBenefit ?? prev.pulseDesc),
+      dismiss: item.dismiss
+        ? t(item.dismiss)
+        : (item.dismissName ?? prev.dismiss),
+      dismissDesc: item.dismissDesc
+        ? t(item.dismissDesc)
+        : (item.dismissBenefit ?? prev.dismissDesc),
+      spellType:
+        item.spellType ?? (item.rework ? "arcanist-rework" : "arcanist"),
+      fuid: item.fuid ?? prev.fuid,
+    }));
+    setCompendiumOpen(false);
+  };
+
+  const handleClearFields = () => setFormState(buildInitialState());
+
+  const isRework = formState.spellType === "arcanist-rework";
 
   const arcanumData = {
-    name,
-    description,
-    domain,
-    mergeName,
-    mergeBenefit,
-    pulseName,
-    pulseBenefit,
-    dismissName,
-    dismissBenefit,
-    rework,
-    spellType: rework ? "arcanist-rework" : "arcanist",
-  };
-
-  const handleFileUpload = (data) => {
-    if (data) {
-      const {
-        name: uploadedName,
-        description: uploadedDescription,
-        domain: uploadedDomain,
-        mergeName: uploadedMergeName,
-        mergeBenefit: uploadedMergeBenefit,
-        pulseName: uploadedPulseName,
-        pulseBenefit: uploadedPulseBenefit,
-        dismissName: uploadedDismissName,
-        dismissBenefit: uploadedDismissBenefit,
-        rework: uploadedRework,
-      } = data;
-
-      if (uploadedName) {
-        setName(uploadedName);
-      }
-      if (uploadedDescription) {
-        setDescription(uploadedDescription);
-      }
-      if (uploadedDomain) {
-        setDomain(uploadedDomain);
-      }
-      if (uploadedMergeName) {
-        setMergeName(uploadedMergeName);
-      }
-      if (uploadedMergeBenefit) {
-        setMergeBenefit(uploadedMergeBenefit);
-      }
-      if (uploadedPulseName) {
-        setPulseName(uploadedPulseName);
-      }
-      if (uploadedPulseBenefit) {
-        setPulseBenefit(uploadedPulseBenefit);
-      }
-      if (uploadedDismissName) {
-        setDismissName(uploadedDismissName);
-      }
-      if (uploadedDismissBenefit) {
-        setDismissBenefit(uploadedDismissBenefit);
-      }
-      if (uploadedRework) {
-        setRework(uploadedRework);
-      }
-    }
-  };
-
-  const handleClearFields = () => {
-    setName("Arcanum");
-    setDescription("");
-    setDomain("");
-    setMergeName("");
-    setMergeBenefit("");
-    setPulseName("");
-    setPulseBenefit("");
-    setDismissName("");
-    setDismissBenefit("");
+    spellType: formState.spellType,
+    rework: isRework,
+    name: formState.name,
+    fuid: formState.fuid,
+    domain: formState.domain,
+    domainDesc: formState.domainDesc,
+    merge: formState.merge,
+    mergeDesc: formState.mergeDesc,
+    pulse: formState.pulse,
+    pulseDesc: formState.pulseDesc,
+    dismiss: formState.dismiss,
+    dismissDesc: formState.dismissDesc,
+    description: formState.description,
   };
 
   return (
     <Grid container spacing={2}>
       {/* Form */}
-      <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
-      >
+      <Grid size={{ xs: 12, sm: 6 }}>
         <Paper
           elevation={3}
           sx={{
@@ -135,162 +180,77 @@ function Arcana() {
             borderColor: secondary,
           }}
         >
-          {/* Header */}
           <CustomHeaderAlt
             headerText={t("Arcana")}
             icon={<AutoAwesome fontSize="large" />}
+            actionIcon={<Search fontSize="large" />}
+            onAction={() => setCompendiumOpen(true)}
           />
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+          <Grid container spacing={2} sx={{ mb: 1 }}>
+            <SchemaFieldRenderer
+              config={playerSpellFieldConfig.filter(
+                (f) => f.key !== "spellType",
+              )}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="core"
+            />
+          </Grid>
+          <Grid container spacing={2} sx={{ mb: 1 }}>
+            <SchemaFieldRenderer
+              config={playerSpellFieldConfig}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="arcanist"
+            />
+          </Grid>
+          <Grid container spacing={2}>
             <Grid size={6}>
-              <ChangeName
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => fileInputRef.current.click()}
+              >
+                {t("Upload JSON")}
+              </Button>
             </Grid>
             <Grid size={6}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="effect"
-                  label={t("Domain")}
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                ></TextField>
-              </FormControl>
+              <Button variant="outlined" fullWidth onClick={handleClearFields}>
+                {t("Clear All Fields")}
+              </Button>
             </Grid>
             <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="description"
-                  label={t("Description")}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  size="small"
-                ></TextField>
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="mergeName"
-                  label={t("Merge Name")}
-                  value={mergeName}
-                  onChange={(e) => setMergeName(e.target.value)}
-                  size="small"
-                ></TextField>
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <CustomTextarea
-                  id="mergeBenefit"
-                  label={t("Merge Benefit")}
-                  value={mergeBenefit}
-                  onChange={(e) => setMergeBenefit(e.target.value)}
-                />
-              </FormControl>
-            </Grid>
-
-            {/* Pulse fields */}
-            {rework && (
-              <>
-                <Grid size={12}>
-                  <FormControl variant="standard" fullWidth>
-                    <TextField
-                      id="pulseName"
-                      label={t("Pulse Name")}
-                      value={pulseName}
-                      onChange={(e) => setPulseName(e.target.value)}
-                      size="small"
-                    />
-                  </FormControl>
-                </Grid>
-                <Grid size={12}>
-                  <FormControl variant="standard" fullWidth>
-                    <CustomTextarea
-                      id="pulseBenefit"
-                      label={t("Pulse Benefit")}
-                      value={pulseBenefit}
-                      onChange={(e) => setPulseBenefit(e.target.value)}
-                    />
-                  </FormControl>
-                </Grid>
-              </>
-            )}
-
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <TextField
-                  id="dismissName"
-                  label={t("Dismiss Name")}
-                  value={dismissName}
-                  onChange={(e) => setDismissName(e.target.value)}
-                  size="small"
-                ></TextField>
-              </FormControl>
-            </Grid>
-            <Grid size={12}>
-              <FormControl variant="standard" fullWidth>
-                <CustomTextarea
-                  id="dismissBenefit"
-                  label={t("Dismiss Benefit")}
-                  value={dismissBenefit}
-                  onChange={(e) => setDismissBenefit(e.target.value)}
-                />
-              </FormControl>
-              <Divider />
-            </Grid>
-            <Grid size={12}>
-              <Grid container spacing={2} sx={{ alignItems: "center" }}>
-                <Grid>
-                  <Button
-                    variant="outlined"
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    {t("Upload JSON")}
-                  </Button>
-                </Grid>
-                <Grid>
-                  <Button variant="outlined" onClick={handleClearFields}>
-                    {t("Clear All Fields")}
-                  </Button>
-                </Grid>
-                <Grid size="grow">
-                  <ApplyRework rework={rework} setRework={setRework} />
-                </Grid>
-              </Grid>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      const result = JSON.parse(reader.result);
-                      handleFileUpload(result);
-                    };
-                    reader.readAsText(file);
-                  }
-                }}
-                style={{ display: "none" }}
+              <ApplyRework
+                rework={isRework}
+                setRework={(val) =>
+                  setFormState((prev) => ({
+                    ...prev,
+                    spellType: val ? "arcanist-rework" : "arcanist",
+                  }))
+                }
               />
             </Grid>
           </Grid>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+          />
         </Paper>
       </Grid>
-      {/* Pretty */}
+      {/* Preview */}
       <Grid
-        size={{
-          xs: 12,
-          sm: 6,
-        }}
+        size={{ xs: 12, sm: 6 }}
         sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
       >
         <div ref={cardRef}>
           <SharedArcanumCard
             item={arcanumData}
-            variant="equip"
+            variant={variant}
             imageMode="slot"
             showImageToggle
             actionContent={
@@ -303,7 +263,7 @@ function Arcana() {
                   </IconButton>
                 </Tooltip>
                 <Export
-                  name={name}
+                  name={formState.name}
                   dataType="player-spells"
                   data={arcanumData}
                 />
@@ -317,6 +277,14 @@ function Arcana() {
         </div>
       </Grid>
       {downloadSnackbar}
+      <CompendiumViewerModal
+        open={compendiumOpen}
+        onClose={() => setCompendiumOpen(false)}
+        onAddItem={handleArcanumSelected}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        initialSpellClass="Arcanist"
+      />
     </Grid>
   );
 }

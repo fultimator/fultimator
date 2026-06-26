@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const HoplosphereSchema = z.object({
+  itemType: z.literal("hoplosphere").default("hoplosphere"),
+  id: z.string().optional(),
   name: z.string().min(1),
   fuid: z.string().optional(),
   description: z.string().default(""),
@@ -10,6 +13,7 @@ export const HoplosphereSchema = z.object({
   cost: z.number().int().nonnegative(),
   coagEffects: z.record(z.string(), z.string()).default({}),
   meta: MetaSchema.optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 export type Hoplosphere = z.infer<typeof HoplosphereSchema>;

@@ -17,10 +17,12 @@ export type ComponentToken =
   | "accuracy-check"
   | "accuracy-attr-pair"
   | "readonly-number"
+  | "readonly-markdown"
   | "rare-bonus-block"
   | "martial-toggle"
   | "offensive-toggle"
   | "autocomplete"
+  | "color"
   | "toggle-group"
   | "chip-multi-select"
   | "object-list"
@@ -52,6 +54,11 @@ export type FieldGridSize =
   | number
   | Partial<Record<"xs" | "sm" | "md" | "lg" | "xl", "auto" | "grow" | number>>;
 
+export interface TabDefinition {
+  key: string;
+  label: string;
+}
+
 export interface FieldConfig<TFormState extends Record<string, unknown>> {
   key: string;
   kind: FieldKind;
@@ -59,9 +66,12 @@ export interface FieldConfig<TFormState extends Record<string, unknown>> {
   component?: ComponentToken; // required for kind === "editable"
   defaultValue?: unknown;
   surfaces?: FormSurface[]; // omit to mean all three
+  tab?: string; // omit to place in the first tab
   group?: string;
   order: number;
-  componentProps?: Record<string, unknown>;
+  componentProps?:
+    | Record<string, unknown>
+    | ((state: TFormState) => Record<string, unknown>);
   parse?: (raw: unknown) => unknown;
   format?: (value: unknown) => unknown;
   dependencies?: DependencyPredicate<TFormState>;

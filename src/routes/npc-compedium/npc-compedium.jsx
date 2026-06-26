@@ -37,8 +37,7 @@ import {
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
-// import NpcUgly from "../../components/npc/Ugly";
+import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import {
   ArrowRight,
   ArrowLeft,
@@ -67,7 +66,7 @@ import Export from "../../components/Export";
 import {
   NPC_CURRENT_SCHEMA_VERSION,
   applyNpcPostLoadTransforms,
-} from "../../components/npc/npcTransforms";
+} from "../../libs/actor";
 import { useTranslate, languageOptions } from "../../translation/translate";
 
 import ReportContentDialog from "../../components/appbar/ReportContentDialog";

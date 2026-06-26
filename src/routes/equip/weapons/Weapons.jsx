@@ -11,7 +11,7 @@ import CompendiumViewerModal from "../../../components/compendium/CompendiumView
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useEffect, useRef } from "react";
 import weapons from "../../../libs/weapons";
-import { SharedWeaponCard } from "../../../components/shared/itemCards";
+import { SharedWeaponCard } from "../../../components/shared/items";
 import { useTranslate } from "../../../translation/translate";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
 import Export from "../../../components/Export";
@@ -70,7 +70,7 @@ function buildInitialState(weapon) {
   };
 }
 
-function Weapons() {
+function Weapons({ variant = "equip" }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -108,7 +108,7 @@ function Weapons() {
   const {
     base,
     name,
-    category,
+    _category,
     type,
     hands,
     att1,
@@ -120,7 +120,7 @@ function Weapons() {
     precBonus,
     rework,
     quality,
-    qualityName,
+    _qualityName,
     qualityCost,
     totalBonus,
     selectedQuality,
@@ -426,7 +426,7 @@ function Weapons() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <SharedWeaponCard
               item={base}
-              variant="equip"
+              variant={variant}
               imageMode="slot"
               showImageToggle
             />
@@ -436,7 +436,7 @@ function Weapons() {
             <div ref={cardRef}>
               <SharedWeaponCard
                 item={customItem}
-                variant="equip"
+                variant={variant}
                 imageMode="slot"
                 showImageToggle
                 actionContent={

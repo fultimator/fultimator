@@ -1,7 +1,8 @@
 export function calcHP(npc) {
   if (!npc || !npc.attributes) return 0;
   const might = npc.attributes.might?.base ?? 8;
-  let hp = 2 * npc.lvl + 5 * might;
+  const lvl = Number(npc.lvl) || 1;
+  let hp = 2 * lvl + 5 * might;
 
   // Skill Extra HP
   const hpBonus = npc.resources?.hp.bonus ?? npc.extra?.hp ?? 0;
@@ -52,7 +53,8 @@ export function calcHP(npc) {
 export function calcMP(npc) {
   if (!npc || !npc.attributes) return 0;
   const will = npc.attributes.will?.base ?? 8;
-  let mp = npc.lvl + 5 * will;
+  const lvl = Number(npc.lvl) || 1;
+  let mp = lvl + 5 * will;
   // Skill Extra MP
   const mpBonus = npc.resources?.mp.bonus ?? npc.extra?.mp ?? 0;
   if (mpBonus) {

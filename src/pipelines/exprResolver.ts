@@ -7,7 +7,10 @@ export interface ExprBindings {
   item?: Record<string, unknown>;
 }
 
-function getPath(obj: Record<string, unknown> | undefined, path: string): number {
+function getPath(
+  obj: Record<string, unknown> | undefined,
+  path: string,
+): number {
   if (!obj) return 0;
   const parts = path.split(".");
   let cur: unknown = obj;
@@ -28,9 +31,30 @@ function resolveToken(token: string, bindings: ExprBindings): number {
   return isNaN(n) ? 0 : n;
 }
 
+// Evaluate a single multiplicative term: tokens joined by * and /.
+function evalTerm(term: string, bindings: ExprBindings): number {
+  const parts = term.split(/([*/])/);
+  let result: number | null = null;
+  let op = "*";
+  for (const part of parts) {
+    const p = part.trim();
+    if (p === "*" || p === "/") {
+      op = p;
+    } else if (p !== "") {
+      const val = resolveToken(p, bindings);
+      if (result === null) {
+        result = val;
+      } else {
+        result = op === "*" ? result * val : val !== 0 ? result / val : 0;
+      }
+    }
+  }
+  return result ?? 0;
+}
+
 export function resolveExpr(expr: ExprValue, bindings: ExprBindings): number {
-  // Split on + and - while keeping the operator, then evaluate left to right.
-  // Handles: "$sl + @target.statusCount - 1"
+  // Split on + and - (additive), evaluate each term (multiplicative) separately.
+  // Handles: "$sl * 10", "$sl * @source.bonds.count + 3", "$sl + @target.statusCount - 1"
   const raw = expr.expr;
   const tokens = raw.split(/([+-])/);
   let result = 0;
@@ -40,7 +64,7 @@ export function resolveExpr(expr: ExprValue, bindings: ExprBindings): number {
     if (t === "+" || t === "-") {
       op = t;
     } else if (t !== "") {
-      const val = resolveToken(t, bindings);
+      const val = evalTerm(t, bindings);
       result = op === "+" ? result + val : result - val;
     }
   }
@@ -48,5 +72,9 @@ export function resolveExpr(expr: ExprValue, bindings: ExprBindings): number {
 }
 
 export function isExprValue(v: unknown): v is ExprValue {
-  return typeof v === "object" && v !== null && typeof (v as ExprValue).expr === "string";
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    typeof (v as ExprValue).expr === "string"
+  );
 }

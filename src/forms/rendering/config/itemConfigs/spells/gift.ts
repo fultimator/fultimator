@@ -25,15 +25,4 @@ export const giftFields: ItemFieldConfig<PlayerSpellFormState> = [
     fullWidth: true,
     dependencies: isGift,
   },
-  {
-    key: "description",
-    kind: "editable",
-    label: "spell.gift.description",
-    component: "textarea",
-    defaultValue: "",
-    group: "description",
-    order: 80,
-    fullWidth: true,
-    dependencies: isGift,
-  },
 ];

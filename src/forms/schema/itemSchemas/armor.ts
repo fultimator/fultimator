@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
 import allArmor from "../../../libs/armor";
-import { SLOT_TIERS } from "../../../components/player/equipment/technospheres/slotTiers";
+import { SLOT_TIERS } from "../../../libs/player/slotTiers";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 const SlotTierValues = ["alpha", "beta", "gamma", "delta"] as const;
 
@@ -19,7 +20,6 @@ export const ArmorSchema = z.object({
   itemType: z.literal("armor"),
   name: z.string().min(1),
   description: z.string().optional(),
-  book: z.string().default("homebrew"),
   martial: z.boolean().default(false),
   def: z.number().int().default(0),
   mdef: z.number().int().default(0),
@@ -38,6 +38,7 @@ export type Armor = z.infer<typeof ArmorSchema>;
 export const ArmorFormStateSchema = z.object({
   base: z.unknown().optional(),
   fuid: z.string().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
   qualityCost: z.coerce.number().int().nonnegative().default(0),
   selectedQuality: z.string().optional(),
   isSlotsVariant: z.boolean().default(false),
@@ -106,7 +107,11 @@ export function buildArmorFormState(
     itemType: "armor",
     base,
     fuid: item?.fuid,
-    book: item?.book ?? "homebrew",
+    meta: {
+      isOfficial: false,
+      ...(item?.meta ?? {}),
+      book: item?.meta?.book ?? (item as { book?: string })?.book ?? "homebrew",
+    },
     name: item?.name ?? base.name,
     martial: item?.martial ?? base.martial,
     def: item?.def ?? base.def,

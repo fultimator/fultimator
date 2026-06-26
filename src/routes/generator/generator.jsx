@@ -24,12 +24,13 @@ import Weapons from "../equip/weapons/Weapons";
 import { ArmorPanel, ShieldPanel } from "../equip/ArmorShield/ArmorShield";
 import Accessories from "../equip/Accessories/Accessories";
 import Arcana from "../equip/Arcana/Arcana";
+import Spells from "../equip/Spells/Spells";
 import Qualities from "../equip/Qualities/Qualities";
 import CustomWeapons from "../equip/customWeapons/CustomWeapons.jsx";
 import {
   SharedRitualCard,
   SharedProjectCard,
-} from "../../components/shared/itemCards";
+} from "../../components/shared/items";
 import { useTranslate } from "../../translation/translate";
 import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
 import CustomTextarea from "../../components/common/CustomTextarea";
@@ -178,6 +179,13 @@ function RitualsProjects() {
             <Button
               size="small"
               variant="outlined"
+              onClick={() => scrollToSection("section-spells")}
+            >
+              {t("Spells")}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
               onClick={() => scrollToSection("section-qualities")}
             >
               {t("Qualities")}
@@ -214,7 +222,7 @@ function RitualsProjects() {
           id="section-weapons"
         >
           <Grid size={12}>
-            <Weapons />
+            <Weapons variant="print" />
           </Grid>
         </Grid>
 
@@ -225,7 +233,7 @@ function RitualsProjects() {
           id="section-custom-weapons"
         >
           <Grid size={12}>
-            <CustomWeapons />
+            <CustomWeapons variant="print" />
           </Grid>
         </Grid>
 
@@ -236,7 +244,7 @@ function RitualsProjects() {
           id="section-armor"
         >
           <Grid size={12}>
-            <ArmorPanel />
+            <ArmorPanel variant="print" />
           </Grid>
         </Grid>
 
@@ -247,7 +255,7 @@ function RitualsProjects() {
           id="section-shield"
         >
           <Grid size={12}>
-            <ShieldPanel />
+            <ShieldPanel variant="print" />
           </Grid>
         </Grid>
 
@@ -258,7 +266,7 @@ function RitualsProjects() {
           id="section-accessories"
         >
           <Grid size={12}>
-            <Accessories />
+            <Accessories variant="print" />
           </Grid>
         </Grid>
 
@@ -269,7 +277,18 @@ function RitualsProjects() {
           id="section-arcana"
         >
           <Grid size={12}>
-            <Arcana />
+            <Arcana variant="print" />
+          </Grid>
+        </Grid>
+
+        <Grid
+          container
+          spacing={1}
+          sx={{ mb: sectionGap, scrollMarginTop: `${sectionScrollOffset}px` }}
+          id="section-spells"
+        >
+          <Grid size={12}>
+            <Spells variant="print" />
           </Grid>
         </Grid>
 
@@ -280,7 +299,7 @@ function RitualsProjects() {
           id="section-qualities"
         >
           <Grid size={12}>
-            <Qualities />
+            <Qualities variant="print" />
           </Grid>
         </Grid>
       </Layout>
@@ -596,6 +615,7 @@ function Rituals() {
         >
           <SharedRitualCard
             item={ritualPreview}
+            variant="print"
             showImageToggle
             imageMode="slot"
             cardRef={cardRef}
@@ -978,6 +998,7 @@ function Projects() {
         >
           <SharedProjectCard
             item={projectPreview}
+            variant="print"
             showImageToggle
             imageMode="slot"
             cardRef={cardRef}

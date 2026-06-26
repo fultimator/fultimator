@@ -15,6 +15,8 @@ import {
   ArrowLeft,
   Save,
   AutoAwesome,
+  PlayArrow,
+  Stop,
 } from "@mui/icons-material";
 import { t, replacePlaceholders } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
@@ -31,6 +33,8 @@ export default function BattleHeader({
   round,
   handleIncreaseRound,
   handleDecreaseRound,
+  combatActive = false,
+  onToggleCombat,
   isMobile,
   isAutoSaveEnabled = false,
   lastManualSaved = null,
@@ -170,6 +174,26 @@ export default function BattleHeader({
             sx={{ padding: 1, color: isDarkMode ? "#fff" : "primary" }}
           >
             <ArrowRight fontSize={isMobile ? "small" : "medium"} />
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          title={
+            combatActive
+              ? t("combat_sim_end_encounter")
+              : t("combat_sim_start_encounter")
+          }
+        >
+          <IconButton
+            onClick={onToggleCombat}
+            size="small"
+            color={combatActive ? "error" : "success"}
+            sx={{ padding: 1, ml: 0.5 }}
+          >
+            {combatActive ? (
+              <Stop fontSize={isMobile ? "small" : "medium"} />
+            ) : (
+              <PlayArrow fontSize={isMobile ? "small" : "medium"} />
+            )}
           </IconButton>
         </Tooltip>
       </Box>

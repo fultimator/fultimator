@@ -27,7 +27,13 @@ import {
 /**
  * NotesMarkdown Component
  */
-const NotesMarkdown = ({ children, ...props }) => {
+const NotesMarkdown = ({
+  children,
+  compact = false,
+  uniform = false,
+  fontSize = undefined,
+  ...props
+}) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
@@ -92,15 +98,25 @@ const NotesMarkdown = ({ children, ...props }) => {
         p: ({ _node, ...props }) => (
           <Typography
             variant="body1"
-            sx={{
-              fontFamily: "'PT Sans Narrow', sans-serif",
-              mt: 0.75,
-              mb: 0.75,
-              marginLeft: 2,
-              lineHeight: 1.6,
-              fontSize: "1rem",
-              color: theme.palette.text.primary,
-            }}
+            component="div"
+            sx={
+              compact || uniform
+                ? {
+                    margin: 0,
+                    lineHeight: 1.5,
+                    fontSize: fontSize ?? "0.85rem",
+                    color: theme.palette.text.secondary,
+                  }
+                : {
+                    fontFamily: "'PT Sans Narrow', sans-serif",
+                    mt: 0.75,
+                    mb: 0.75,
+                    marginLeft: 2,
+                    lineHeight: 1.6,
+                    fontSize: fontSize ?? "1rem",
+                    color: theme.palette.text.primary,
+                  }
+            }
             {...props}
           />
         ),

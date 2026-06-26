@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
 import allShields from "../../../libs/shields";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const ShieldModifiersSchema = z.object({
   def: z.number().int().default(0),
@@ -16,7 +17,6 @@ export const ShieldSchema = z.object({
   itemType: z.literal("shield"),
   name: z.string().min(1),
   description: z.string().optional(),
-  book: z.string().default("homebrew"),
   martial: z.boolean().default(false),
   def: z.number().int().default(0),
   mdef: z.number().int().default(0),
@@ -33,6 +33,7 @@ export type Shield = z.infer<typeof ShieldSchema>;
 export const ShieldFormStateSchema = z.object({
   base: z.unknown().optional(),
   fuid: z.string().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
   qualityCost: z.coerce.number().int().nonnegative().default(0),
   selectedQuality: z.string().optional(),
   defModifier: z.number().int().default(0),
@@ -77,7 +78,11 @@ export function buildShieldFormState(
     itemType: "shield",
     base,
     fuid: item?.fuid,
-    book: item?.book ?? "homebrew",
+    meta: {
+      isOfficial: false,
+      ...(item?.meta ?? {}),
+      book: item?.meta?.book ?? (item as { book?: string })?.book ?? "homebrew",
+    },
     name: item?.name ?? base.name,
     martial: item?.martial ?? base.martial,
     def: item?.def ?? base.def,

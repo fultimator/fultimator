@@ -30,7 +30,7 @@ describe("itemFormRegistry", () => {
   });
 
   const schemaConfigTypes = QUICK_CREATE_TAB_KEYS.filter(
-    (k) => k !== "player-spell",
+    (k) => k !== "player-spell" && k !== "effect",
   );
 
   it("schema-config entries have schema, defaultState, buildPayload, and fields", () => {

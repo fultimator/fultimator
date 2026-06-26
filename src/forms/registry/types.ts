@@ -4,6 +4,7 @@ import type {
   CompendiumItem,
   CompendiumItemType,
 } from "../../types/CompendiumPack";
+import type { TabDefinition } from "../rendering/config/fieldConfig";
 
 export interface FormContext {
   compendiumClasses: CompendiumItem[];
@@ -29,6 +30,7 @@ export interface ItemFormDefinition<TState = unknown, TPayload = unknown> {
   schema?: ZodType<TPayload>;
   defaultState?: () => TState;
   fields?: unknown;
+  tabs?: TabDefinition[];
   buildPayload?: PayloadBuilder<TState, TPayload>;
   discriminatorKey?: string;
   subtypeDefinitions?: Record<string, ItemSubtypeDefinition<TState, TPayload>>;

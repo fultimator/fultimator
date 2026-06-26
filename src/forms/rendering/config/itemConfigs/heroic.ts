@@ -1,12 +1,19 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import type { Heroic } from "../../../schema/itemSchemas/heroic";
 import classList from "../../../../libs/classes";
 import type { SelectOption } from "../../fieldRenderers";
 import { metaFieldConfig } from "../metaFieldConfig";
 import { SHARED_LABEL_KEYS, prefixedLabel } from "./sharedLabelKeys";
+import {
+  behaviorsTabField,
+  behaviorGroupLabels,
+  DEFAULT_ITEM_TABS,
+} from "../shared/behaviorFields";
 
-export type HeroicFormState = Heroic;
+export type HeroicFormState = Heroic & Record<string, unknown>;
 const HEROIC_LABEL_PREFIX = "heroic";
+
+export { DEFAULT_ITEM_TABS as heroicTabs };
 
 const classOptions: SelectOption[] = (classList as { name: string }[]).map(
   (c) => ({ value: c.name, label: c.name }),
@@ -20,6 +27,7 @@ const G = {
 export const heroicGroupLabels: GroupLabels = {
   core: "section.core",
   body: "section.body",
+  ...behaviorGroupLabels,
 };
 
 export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
@@ -76,4 +84,5 @@ export const heroicFieldConfig: ItemFieldConfig<HeroicFormState> = [
     fullWidth: true,
   },
   ...(metaFieldConfig as unknown as ItemFieldConfig<HeroicFormState>),
+  behaviorsTabField as unknown as FieldConfig<HeroicFormState>,
 ];

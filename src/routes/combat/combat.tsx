@@ -22,10 +22,10 @@ import { useDatabase } from "../../hooks/useDatabase";
 
 import { SignIn } from "../../components/auth";
 import Layout from "../../components/Layout";
-import NpcActorCard from "../../components/shared/actorCards/npc/NpcActorCard";
+import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import PointBar from "../../components/PointBar";
 import { calcHP, calcMP } from "../../libs/npcs";
-import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
+import { applyNpcPostLoadTransforms } from "../../libs/actor";
 import { useEffect } from "react";
 import React from "react";
 import { TypeNpc } from "../../types/Npcs";

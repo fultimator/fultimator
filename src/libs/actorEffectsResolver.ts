@@ -5,13 +5,13 @@ import {
   type ActorMultipliers,
 } from "../types/Bonuses";
 import type {
-  ActorEffect,
-  ActionBehavior,
+  Behavior,
   EffectChange,
   EffectMode,
   GrantData,
-  ItemEffect,
 } from "../types/Effects";
+import { type Affinities, type Elements } from "../types/Misc";
+import { combineAffinities } from "../pipelines/damagePipeline";
 import type {
   Accessories,
   Armor,
@@ -40,6 +40,7 @@ export interface ResolvedEffects {
   bonuses: ActorBonuses;
   multipliers: ActorMultipliers;
   grants: GrantData[];
+  affinityGrants: Partial<Record<Elements, Affinities>>;
 }
 
 export function resolveActorEffects(
@@ -49,66 +50,196 @@ export function resolveActorEffects(
   const bonuses = clone(actor.bonuses ?? zeroActorBonuses());
   const multipliers = clone(actor.multipliers ?? oneActorMultipliers());
   const grants: GrantData[] = [];
+  const baseAffinities = (actor.affinities ?? {}) as Partial<
+    Record<Elements, Affinities>
+  >;
+  const affinityGrants: Partial<Record<Elements, Affinities>> = {};
 
-  const effects = collectEffectiveEffects(actor, ctx);
-  const changes = effects.flatMap((e) => e.changes ?? []);
+  const passiveBehaviors = collectPassiveBehaviors(actor, ctx);
+  const changes = passiveBehaviors.flatMap((b) => b.changes ?? []);
   const sorted = changes.slice().sort(byPriority);
 
   const overlay = { bonuses, multipliers };
   for (const change of sorted) {
-    applyChange(overlay, change);
+    if (change.key.startsWith("affinities.")) {
+      applyAffinityChange(affinityGrants, baseAffinities, change);
+    } else {
+      applyChange(overlay, change);
+    }
   }
 
-  for (const effect of effects) {
-    if (effect.grants) grants.push(...effect.grants);
+  for (const beh of passiveBehaviors) {
+    if (beh.grants) grants.push(...beh.grants);
   }
 
-  return { bonuses, multipliers, grants };
+  return { bonuses, multipliers, grants, affinityGrants };
 }
 
-function collectEffectiveEffects(
+function collectPassiveBehaviors(
   actor: Actor,
   ctx: ResolveContext,
-): ActorEffect[] {
-  const out: ActorEffect[] = [];
+): Behavior[] {
+  const out: Behavior[] = [];
 
   for (const e of actor.effects ?? []) {
-    if (isActive(e, ctx)) out.push(e);
+    if (e.disabled === true) continue;
+    for (const beh of e.behaviors ?? []) {
+      if (beh.trigger?.kind !== "passive") continue;
+      if (!isActive(beh, ctx)) continue;
+      out.push(beh);
+    }
   }
 
   for (const item of walkItems(actor)) {
-    for (const e of item.effects ?? []) {
-      if (e.transfer !== true) continue;
-      if (!isActive(e, ctx)) continue;
-      out.push(itemEffectAsActorEffect(e));
+    for (const beh of itemBehaviors(item)) {
+      if (beh.transfer !== true) continue;
+      if (beh.trigger?.kind !== "passive") continue;
+      if (!isActive(beh, ctx)) continue;
+      out.push(beh);
     }
   }
 
   return out;
 }
 
-function behaviorEffects(
-  item: { behavior?: ActionBehavior },
-): { effects?: ItemEffect[] } {
-  return { effects: item.behavior?.effects };
+type ItemWithEffects = {
+  behaviors?: Behavior[];
+};
+
+function itemBehaviors(item: ItemWithEffects): Behavior[] {
+  return item.behaviors ?? [];
 }
 
-function* walkItems(actor: Actor): Generator<{ effects?: ItemEffect[] }> {
+type SubItemContainer = Record<string, unknown>;
+
+function hasOwnEnabled(value: unknown): boolean {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    Object.prototype.hasOwnProperty.call(value, "enabled")
+  );
+}
+
+function isEnabledWhenPresent(value: unknown): boolean {
+  if (!hasOwnEnabled(value)) return true;
+  return (value as { enabled?: unknown }).enabled === true;
+}
+
+function isSpellEnabledForTransfer(spell: SubItemContainer): boolean {
+  if (spell.spellType === "pilot-vehicle") return true;
+  return isEnabledWhenPresent(spell);
+}
+
+function getStableKey(value: Record<string, unknown>): string | undefined {
+  const keys = [
+    value.id,
+    value.key,
+    value.fuid,
+    value._packItemId,
+    value.name,
+    value.customName,
+  ];
+  return keys.find((key): key is string => typeof key === "string" && !!key);
+}
+
+function matchesStableKey(
+  a: Record<string, unknown>,
+  b: Record<string, unknown>,
+): boolean {
+  const aKey = getStableKey(a);
+  const bKey = getStableKey(b);
+  if (aKey && bKey && aKey === bKey) return true;
+  return false;
+}
+
+function activeVehicle(vehicles: SubItemContainer[]): SubItemContainer | null {
+  if (vehicles.length === 0) return null;
+  return vehicles.find((v) => v.enabled === true) ?? vehicles[0];
+}
+
+function isNestedSpellItemActive(
+  spell: SubItemContainer,
+  key: string,
+  item: SubItemContainer,
+  _itemIndex: number,
+): boolean {
+  if (key === "magiseeds") {
+    const current = spell.currentMagiseed;
+    if (typeof current === "string" && current) {
+      const itemKey = getStableKey(item);
+      return itemKey === current;
+    }
+    if (current && typeof current === "object") {
+      return matchesStableKey(item, current as Record<string, unknown>);
+    }
+    return isEnabledWhenPresent(item);
+  }
+
+  if (key === "therioforms" || key === "symbols") {
+    return isEnabledWhenPresent(item);
+  }
+
+  return true;
+}
+
+function* walkSpellSubItems(
+  spell: SubItemContainer,
+): Generator<ItemWithEffects> {
+  if (!isSpellEnabledForTransfer(spell)) return;
+
+  const arrays = [
+    "gifts",
+    "dances",
+    "tones",
+    "keys",
+    "symbols",
+    "therioforms",
+    "magiseeds",
+    "invocations",
+    "effects",
+    "targets",
+  ];
+  for (const key of arrays) {
+    const arr = spell[key];
+    if (!Array.isArray(arr)) continue;
+    for (let index = 0; index < arr.length; index++) {
+      const sub = arr[index] as SubItemContainer;
+      if (isNestedSpellItemActive(spell, key, sub, index)) {
+        yield sub as ItemWithEffects;
+      }
+    }
+  }
+  const rawVehicles = Array.isArray(spell["vehicles"])
+    ? (spell["vehicles"] as SubItemContainer[])
+    : Array.isArray(spell["currentVehicles"])
+      ? (spell["currentVehicles"] as SubItemContainer[])
+      : [];
+  const vehicle = activeVehicle(rawVehicles);
+  if (vehicle) {
+    yield vehicle as ItemWithEffects;
+    const modules = vehicle["modules"];
+    if (Array.isArray(modules))
+      for (const mod of modules) yield mod as ItemWithEffects;
+  }
+}
+
+function* walkItems(actor: Actor): Generator<ItemWithEffects> {
   if (isPlayer(actor)) {
     for (const klass of actor.classes ?? []) {
-      if (Array.isArray(klass.skills))
-        for (const s of klass.skills) yield behaviorEffects(s);
-      if (Array.isArray(klass.heroic))
-        for (const h of klass.heroic) yield behaviorEffects(h);
-      if (Array.isArray(klass.spells))
-        for (const sp of klass.spells) yield behaviorEffects(sp);
+      if (Array.isArray(klass.skills)) for (const s of klass.skills) yield s;
+      if (Array.isArray(klass.heroic)) for (const h of klass.heroic) yield h;
+      for (const sp of klass.spells ?? []) {
+        const spell = sp as unknown as SubItemContainer;
+        if (!isSpellEnabledForTransfer(spell)) continue;
+        if (isEnabledWhenPresent(spell)) yield sp;
+        yield* walkSpellSubItems(spell);
+      }
     }
 
     for (const eq of actor.equipment ?? []) {
       const equippedItems = equippedPlayerItems(actor, eq);
-      yield* equippedItems;
-
       for (const item of equippedItems) {
+        yield item as ItemWithEffects;
         if (!isWeaponItem(item) || !item.slotted?.length) continue;
         for (const sphereId of item.slotted) {
           const hoplo = (eq.hoplospheres ?? []).find((h) => h.id === sphereId);
@@ -120,21 +251,27 @@ function* walkItems(actor: Actor): Generator<{ effects?: ItemEffect[] }> {
           const mnemo = (eq.mnemospheres ?? []).find((m) => m.id === sphereId);
           if (!mnemo) continue;
           if (Array.isArray(mnemo.skills))
-            for (const s of mnemo.skills) yield behaviorEffects(s);
+            for (const s of mnemo.skills) yield s;
           if (Array.isArray(mnemo.heroic))
-            for (const h of mnemo.heroic) yield behaviorEffects(h);
-          if (Array.isArray(mnemo.spells))
-            for (const sp of mnemo.spells) yield behaviorEffects(sp);
+            for (const h of mnemo.heroic) yield h;
+          if (Array.isArray(mnemo.spells)) {
+            for (const sp of mnemo.spells) {
+              const spell = sp as unknown as SubItemContainer;
+              if (!isSpellEnabledForTransfer(spell)) continue;
+              if (isEnabledWhenPresent(spell)) yield sp;
+              yield* walkSpellSubItems(spell);
+            }
+          }
         }
       }
     }
   } else {
-    for (const a of actor.attacks ?? []) yield behaviorEffects(a);
-    for (const a of actor.weaponattacks ?? []) yield behaviorEffects(a);
-    for (const s of actor.spells ?? []) yield behaviorEffects(s);
-    for (const s of actor.special ?? []) yield behaviorEffects(s);
-    for (const a of actor.actions ?? []) yield behaviorEffects(a);
-    for (const r of actor.raregear ?? []) yield behaviorEffects(r);
+    for (const a of actor.attacks ?? []) yield a;
+    for (const a of actor.weaponattacks ?? []) yield a;
+    for (const s of actor.spells ?? []) yield s;
+    for (const s of actor.special ?? []) yield s;
+    for (const a of actor.actions ?? []) yield a;
+    for (const r of actor.raregear ?? []) yield r;
   }
 }
 
@@ -186,18 +323,6 @@ function isWeaponItem(item: PlayerEquipmentItem): item is SlottedEquipmentItem {
   return item.itemType === "weapon" || item.itemType === "customWeapon";
 }
 
-function itemEffectAsActorEffect(e: ItemEffect): ActorEffect {
-  return {
-    id: e.id,
-    name: e.name,
-    disabled: e.disabled,
-    changes: e.changes,
-    grants: e.grants,
-    duration: e.duration,
-    predicate: e.predicate,
-  };
-}
-
 function isActive(
   e: { disabled?: boolean; predicate?: { crisisInteraction?: string } },
   ctx: ResolveContext,
@@ -211,6 +336,24 @@ function isActive(
 
 function byPriority(a: EffectChange, b: EffectChange): number {
   return (a.priority ?? 0) - (b.priority ?? 0);
+}
+
+function applyAffinityChange(
+  grants: Partial<Record<Elements, Affinities>>,
+  baseAffinities: Partial<Record<Elements, Affinities>>,
+  change: EffectChange,
+): void {
+  const element = change.key.split(".")[1] as Elements;
+  const incoming = change.value as Affinities;
+
+  if (change.mode === 0) {
+    grants[element] = incoming;
+  } else {
+    const existing = grants[element] ?? baseAffinities[element] ?? null;
+    grants[element] = existing
+      ? combineAffinities(existing, incoming)
+      : incoming;
+  }
 }
 
 function applyChange(

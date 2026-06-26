@@ -3,6 +3,7 @@ import { Box, Button, Divider, Tooltip, Typography } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { Undo as UndoIcon } from "@mui/icons-material";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
+import { devLog } from "../../../../../utils/devLog";
 import type { DamagePipelineTarget } from "../types";
 import { TypeIcon } from "../../../../types";
 import { normalizeDamageType } from "./primitives-utils";
@@ -46,22 +47,51 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
   };
 
   const applyOne = (id: string) => {
-    const success = applyHpDamage(id, damage);
+    devLog("[DamagePipelineTargets] applyOne", {
+      combatId: id,
+      damage,
+      normalizedType,
+      targets: targets.map((t) => ({ combatId: t.combatId, name: t.name })),
+    });
+    const success = applyHpDamage(id, damage, normalizedType);
+    devLog("[DamagePipelineTargets] applyOne result", {
+      combatId: id,
+      success,
+    });
     if (!success) return;
     setAppliedMap((prev) => ({ ...prev, [id]: true }));
   };
 
   const revertOne = (id: string) => {
-    const success = revertHpDamage(id, damage);
+    devLog("[DamagePipelineTargets] revertOne", {
+      combatId: id,
+      damage,
+      normalizedType,
+    });
+    const success = revertHpDamage(id, damage, normalizedType);
+    devLog("[DamagePipelineTargets] revertOne result", {
+      combatId: id,
+      success,
+    });
     if (!success) return;
     setAppliedMap((prev) => ({ ...prev, [id]: false }));
   };
 
   const applyHits = () => {
+    devLog("[DamagePipelineTargets] applyHits start", {
+      damage,
+      normalizedType,
+      hitMap,
+      appliedMap,
+    });
     const next = { ...appliedMap };
     targets.forEach((t) => {
       if (hitMap[t.combatId] && !appliedMap[t.combatId]) {
-        const success = applyHpDamage(t.combatId, damage);
+        const success = applyHpDamage(t.combatId, damage, normalizedType);
+        devLog("[DamagePipelineTargets] applyHits target", {
+          combatId: t.combatId,
+          success,
+        });
         if (success) {
           next[t.combatId] = true;
         }
@@ -75,15 +105,9 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
     hitTargets.length > 0 && hitTargets.every((t) => appliedMap[t.combatId]);
 
   // Keep row tone subtle so it blends with existing chat card styling.
-  const hitBg = isDark
-    ? "rgba(91,169,91,0.12)"
-    : "rgba(91,169,91,0.08)";
-  const missBg = isDark
-    ? "rgba(180,80,80,0.12)"
-    : "rgba(180,80,80,0.08)";
-  const appliedHitBg = isDark
-    ? "rgba(91,169,91,0.2)"
-    : "rgba(91,169,91,0.12)";
+  const hitBg = isDark ? "rgba(91,169,91,0.12)" : "rgba(91,169,91,0.08)";
+  const missBg = isDark ? "rgba(180,80,80,0.12)" : "rgba(180,80,80,0.08)";
+  const appliedHitBg = isDark ? "rgba(91,169,91,0.2)" : "rgba(91,169,91,0.12)";
 
   return (
     <Box
@@ -140,8 +164,9 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
                 {target.name}
               </Typography>
 
-              {/* Hit / Miss pill — clickable to toggle */}
-              <Tooltip title={isApplied ? "" : isHit ? "Mark as Miss" : "Mark as Hit"}>
+              <Tooltip
+                title={isApplied ? "" : isHit ? "Mark as Miss" : "Mark as Hit"}
+              >
                 <Box
                   component="button"
                   onClick={() => toggleHit(target.combatId)}
@@ -178,7 +203,15 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
                 </Box>
               </Tooltip>
 
-              <Tooltip title={isApplied ? "Revert damage" : isHit ? "Apply damage" : "No damage (miss)"}>
+              <Tooltip
+                title={
+                  isApplied
+                    ? "Revert damage"
+                    : isHit
+                      ? "Apply damage"
+                      : "No damage (miss)"
+                }
+              >
                 <span>
                   <Button
                     size="small"
@@ -211,7 +244,12 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
                     {isApplied ? (
                       <UndoIcon sx={{ fontSize: 14 }} />
                     ) : (
-                      <Box sx={{ lineHeight: 0, "& svg": { width: 13, height: 13 } }}>
+                      <Box
+                        sx={{
+                          lineHeight: 0,
+                          "& svg": { width: 13, height: 13 },
+                        }}
+                      >
                         <TypeIcon type={normalizedType} disabled={!isHit} />
                       </Box>
                     )}

@@ -1,7 +1,12 @@
-import type { GroupLabels, ItemFieldConfig } from "../fieldConfig";
+import type { GroupLabels, ItemFieldConfig, FieldConfig } from "../fieldConfig";
 import { metaFieldConfigWithGroup } from "../metaFieldConfig";
 import type { CustomWeaponPersisted } from "../../../schema/itemSchemas/customWeapon";
-import { calculateCustomWeaponStats } from "../../../../components/player/common/playerCalculations";
+import {
+  behaviorsTabField,
+  PASSIVE_ITEM_TABS,
+  BEHAVIOR_GROUPS,
+} from "../shared/behaviorFields";
+import { calculateCustomWeaponStats } from "../../../../libs/playerCalculations";
 import { Attributes, Elements } from "../../../../types/Misc";
 import { categories } from "../../../../routes/equip/customWeapons/libs";
 import allQualities from "../../../../libs/qualities";
@@ -42,10 +47,12 @@ export type CustomWeaponFormState = CustomWeaponPersisted & {
 };
 const CUSTOM_WEAPON_LABEL_PREFIX = "customWeapon";
 
+export { PASSIVE_ITEM_TABS as customWeaponTabs };
+
 function calcCustomWeaponCost(s: CustomWeaponFormState): number {
   const singleAttributeCost =
     s.overrideAccuracyAttributes &&
-      s.selectedAccuracyCheck.attr1 === s.selectedAccuracyCheck.attr2
+    s.selectedAccuracyCheck.attr1 === s.selectedAccuracyCheck.attr2
       ? 50
       : 0;
   return (
@@ -148,6 +155,7 @@ export const customWeaponGroupLabels: GroupLabels = {
   slots: "section.slots",
   secondary: "section.secondary",
   secondaryModifiers: "section.secondaryModifiers",
+  [BEHAVIOR_GROUPS.selfEffects]: "behavior.effects",
 };
 
 export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
@@ -192,8 +200,8 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
           s.selectedCategory.toLowerCase().includes(r),
         )
           ? (s.customizations ?? []).filter(
-            (c) => c.name !== "weapon_customization_powerful",
-          )
+              (c) => c.name !== "weapon_customization_powerful",
+            )
           : s.customizations,
     },
   },
@@ -269,6 +277,7 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     order: 20,
     componentProps: { options: typeOptions },
     dependencies: (s) =>
+      s.overrideDamageType === true ||
       (s.customizations ?? []).some(
         (c) => c.name === "weapon_customization_elemental",
       ),
@@ -423,7 +432,9 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     onChangeEffects: {
       "rare.overrideDamageType": (s) => s.overrideDamageType,
       rareOverrideDamageTypeValue: (s) =>
-        s.overrideDamageType ? s.rareOverrideDamageTypeValue : s.customDamageType,
+        s.overrideDamageType
+          ? s.rareOverrideDamageTypeValue
+          : s.customDamageType,
       cost: calcCustomWeaponCost,
     },
   },
@@ -633,8 +644,8 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
           s.secondSelectedCategory.toLowerCase().includes(r),
         )
           ? (s.secondCustomizations ?? []).filter(
-            (c) => c.name !== "weapon_customization_powerful",
-          )
+              (c) => c.name !== "weapon_customization_powerful",
+            )
           : s.secondCustomizations,
     },
   },
@@ -831,4 +842,5 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
   ...(metaFieldConfigWithGroup(
     G.source,
   ) as unknown as ItemFieldConfig<CustomWeaponFormState>),
+  behaviorsTabField as unknown as FieldConfig<CustomWeaponFormState>,
 ];

@@ -2,7 +2,7 @@ import React from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type DrawerTab = "chat" | "customizer" | "themes";
+export type DrawerTab = "chat" | "actorSelect" | "customizer" | "themes";
 
 export interface DrawerBottomAction {
   id: string;

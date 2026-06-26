@@ -25,13 +25,13 @@ import {
   ExpandLess,
   AccessTime,
 } from "@mui/icons-material";
-import Clock from "../player/playerSheet/Clock";
+import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { useClock } from "../../hooks/useClock";
 
-function CombatClock({ clock, index, onUpdate, onRemove, onReset, addLog }) {
+function CombatClock({ clock, index, onUpdate, onRemove, onReset, emitLog }) {
   const { logClockCurrentState } =
     useCombatSimSettingsStore.getState().settings;
   const theme = useTheme();
@@ -45,9 +45,10 @@ function CombatClock({ clock, index, onUpdate, onRemove, onReset, addLog }) {
 
   const logCurrentClock = () => {
     if (logClockCurrentState) {
-      addLog("combat_sim_log_clock_current_state", "--isClock--", {
-        name: clock.name,
-        current: filledCount,
+      emitLog({
+        type: "clock-state",
+        clockName: clock.name,
+        progress: filledCount,
         max: clock.sections,
       });
     }
@@ -146,7 +147,7 @@ export default function CombatSimClocks({
   onUpdate,
   onRemove,
   onReset,
-  addLog,
+  emitLog,
 }) {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
@@ -349,7 +350,7 @@ export default function CombatSimClocks({
                         onUpdate={onUpdate}
                         onRemove={onRemove}
                         onReset={onReset}
-                        addLog={addLog}
+                        emitLog={emitLog}
                       />
                     </Grid>
                   ))}

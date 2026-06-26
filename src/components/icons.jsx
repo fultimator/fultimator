@@ -1,3 +1,5 @@
+import { ACTION_ICON_SRC_BY_KEY } from "./actionIconSrc";
+
 const AFFINITY_ICON_BASE = "/assets/icons/affinities";
 const RESOURCE_ICON_BASE = "/assets/icons/resources";
 const ATTRIBUTE_ICON_BASE = "/assets/icons/attributes";
@@ -174,6 +176,27 @@ export function CheckGroupIcon({ size }) {
 
 export function CheckRitualIcon({ size }) {
   return <CheckImg name="check_ritual" alt="Ritual Check" size={size} />;
+}
+
+export function ActionCommandIcon({ action, size = "1em", alt = "" }) {
+  const key = String(action ?? "").toLowerCase();
+  if (key === "check") {
+    return <CheckOpenIcon size={size} />;
+  }
+  const src = ACTION_ICON_SRC_BY_KEY[key];
+  if (!src) return null;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      style={{
+        width: size,
+        height: size,
+        display: "block",
+        objectFit: "contain",
+      }}
+    />
+  );
 }
 
 function AffinityImg({ name, disabled, alt, size = "1.5em" }) {

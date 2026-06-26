@@ -7,6 +7,7 @@ interface CustomTextareaProps {
   id?: string;
   label: string;
   value: string;
+  previewValue?: string;
   helperText?: string;
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
@@ -14,6 +15,7 @@ interface CustomTextareaProps {
   onMouseOver?: (event: React.MouseEvent<HTMLElement>) => void;
   onMouseOut?: (event: React.MouseEvent<HTMLElement>) => void;
   readOnly?: boolean;
+  disabled?: boolean;
   minRows?: number;
   maxRows?: number;
   maxLength?: number;
@@ -24,6 +26,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   id,
   label,
   value,
+  previewValue,
   helperText = "",
   onChange,
   onFocus,
@@ -31,6 +34,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
   onMouseOver,
   onMouseOut,
   readOnly = false,
+  disabled = false,
   minRows,
   maxRows,
   maxLength,
@@ -53,10 +57,10 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
 
   const handleFocus = useCallback(
     (e: React.FocusEvent<HTMLTextAreaElement>) => {
-      setIsFocused(true);
+      if (!readOnly) setIsFocused(true);
       if (onFocus) onFocus(e);
     },
-    [onFocus],
+    [onFocus, readOnly],
   );
 
   const handleBlur = useCallback(
@@ -131,19 +135,10 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
       fontFamily: theme.typography.body1.fontFamily,
       fontSize: theme.typography.body1.fontSize,
       lineHeight: "1.4375em",
-      color: showPreview ? "transparent" : theme.text.primary,
-      WebkitTextFillColor: showPreview ? "transparent" : theme.text.primary,
-      textShadow: showPreview ? "none" : "none",
-      caretColor: showPreview ? "transparent" : theme.text.primary,
-      userSelect: showPreview ? "none" : "text",
     },
     "& .MuiOutlinedInput-input::placeholder": {
       color: theme.text.secondary,
       opacity: 0.7,
-    },
-    "& .MuiInputBase-input.MuiOutlinedInput-inputMultiline": {
-      color: showPreview ? "transparent !important" : theme.text.primary,
-      WebkitTextFillColor: showPreview ? "transparent" : theme.text.primary,
     },
     "& .MuiFormHelperText-root": {
       marginLeft: 0,
@@ -152,6 +147,9 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
       marginBottom: 0,
     },
   };
+
+  const inputHideStyle: React.CSSProperties =
+    showPreview && !readOnly ? { opacity: 0, userSelect: "none" } : {};
 
   return (
     <Box sx={{ my: "5px", position: "relative" }}>
@@ -177,21 +175,36 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
           onBlur={handleBlur}
           onMouseOver={handleMouseOver}
           onMouseOut={handleMouseOut}
-          disabled={readOnly}
           multiline
           minRows={effectiveMinRows}
           maxRows={maxRows}
           slotProps={{
-            htmlInput: { maxLength, tabIndex: showPreview ? -1 : 0 },
+            htmlInput: {
+              maxLength,
+              tabIndex: showPreview ? -1 : 0,
+              style: inputHideStyle,
+              readOnly,
+            },
+            inputLabel: readOnly
+              ? {
+                  style: {
+                    color:
+                      theme.mode === "dark"
+                        ? "rgba(255,255,255,0.4)"
+                        : "rgba(36,52,70,0.45)",
+                  },
+                }
+              : undefined,
           }}
           placeholder={placeholder}
           helperText={helperText}
           variant="outlined"
           fullWidth
+          disabled={disabled}
           sx={textFieldSx}
         />
 
-        {showPreview ? (
+        {showPreview && !readOnly ? (
           <Box
             sx={{
               position: "absolute",
@@ -213,7 +226,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
               },
             }}
           >
-            <ReactMarkdown>{value}</ReactMarkdown>
+            <ReactMarkdown>{previewValue ?? value}</ReactMarkdown>
           </Box>
         ) : null}
       </Box>

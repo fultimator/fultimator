@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const AccessoryModifiersSchema = z.object({
   def: z.number().int().default(0),
@@ -15,7 +16,6 @@ export const AccessorySchema = z.object({
   itemType: z.literal("accessory"),
   name: z.string().min(1),
   description: z.string().optional(),
-  book: z.string().default("homebrew"),
   quality: z.string().optional(),
   cost: z.number().int().nonnegative().optional(),
   meta: MetaSchema.optional(),
@@ -25,6 +25,7 @@ export type Accessory = z.infer<typeof AccessorySchema>;
 
 export const AccessoryFormStateSchema = z.object({
   fuid: z.string().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
   qualityCost: z.coerce.number().int().nonnegative().default(0),
   selectedQuality: z.string().optional(),
   modifiers: AccessoryModifiersSchema.optional(),
@@ -67,7 +68,11 @@ export function buildAccessoryFormState(
   return {
     itemType: "accessory",
     fuid: item?.fuid,
-    book: item?.book ?? "homebrew",
+    meta: {
+      isOfficial: false,
+      ...(item?.meta ?? {}),
+      book: item?.meta?.book ?? (item as { book?: string })?.book ?? "homebrew",
+    },
     name: item?.name ?? "",
     quality: item?.quality ?? "",
     qualityCost: item?.qualityCost ?? 0,

@@ -6,6 +6,7 @@ import { PlayerSpellTherioformSchema } from "./therioform";
 import { PlayerSpellMagichantSchema } from "./magichant";
 import { PlayerSpellSymbolSchema } from "./symbol";
 import { PlayerSpellInvocationSchema } from "./invocation";
+import { PlayerSpellWellspringSchema } from "./wellspring";
 import {
   PlayerSpellArcanistSchema,
   PlayerSpellArcanistReworkSchema,
@@ -30,6 +31,7 @@ export * from "./therioform";
 export * from "./magichant";
 export * from "./symbol";
 export * from "./invocation";
+export * from "./wellspring";
 export * from "./arcanist";
 export * from "./tinkerer";
 export * from "./magitech";
@@ -47,6 +49,7 @@ export const PlayerSpellSubtypeSchemas = {
   magichant: PlayerSpellMagichantSchema,
   symbol: PlayerSpellSymbolSchema,
   invocation: PlayerSpellInvocationSchema,
+  wellspring: PlayerSpellWellspringSchema,
   arcanist: PlayerSpellArcanistSchema,
   "arcanist-rework": PlayerSpellArcanistReworkSchema,
   "tinkerer-alchemy": PlayerSpellTinkererAlchemySchema,

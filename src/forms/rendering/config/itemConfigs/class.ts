@@ -11,7 +11,7 @@ const CLASS_LABEL_PREFIX = "class";
 const CLASS_SKILL_LABEL_PREFIX = "class.skill";
 
 const BLANK_SKILL = {
-  skillName: "",
+  name: "",
   fuid: undefined as string | undefined,
   maxLvl: 1,
   description: "",
@@ -63,7 +63,7 @@ const skillRowFields: ItemFieldConfig<Record<string, unknown>> = [
     gridSize: 12,
   },
   {
-    key: "skillName",
+    key: "name",
     kind: "editable",
     label: "class.skill.name",
     component: "text",

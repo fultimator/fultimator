@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   Grid,
@@ -12,13 +12,13 @@ import { useStickyTop } from "../../../hooks/useStickyTop";
 import { AutoAwesome, Download, Search } from "@mui/icons-material";
 import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
-import { SharedCustomWeaponCard } from "../../../components/shared/itemCards";
+import { SharedCustomWeaponCard } from "../../../components/shared/items";
 import Export from "../../../components/Export";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
 import allQualities from "../../../libs/qualities";
 import groupBy from "../../../libs/groupby";
-import { calculateCustomWeaponStats } from "../../../components/player/common/playerCalculations";
+import { calculateCustomWeaponStats } from "../../../libs/playerCalculations";
 import { categories, accuracyChecks } from "./libs.jsx";
 import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
 import {
@@ -28,8 +28,7 @@ import {
 
 const qualities = allQualities
   .filter(
-    (q) =>
-      q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+    (q) => q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
   )
   .filter(
     (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
@@ -253,7 +252,7 @@ function buildInitialState(data) {
   };
 }
 
-function CustomWeapons() {
+function CustomWeapons({ variant = "equip" }) {
   const { t } = useTranslate();
   const stickyTop = useStickyTop();
   const theme = useTheme();
@@ -321,7 +320,7 @@ function CustomWeapons() {
     secondSelectedRange,
     secondSelectedAccuracyCheck,
     secondCustomDamageType,
-    secondOverrideDamageType,
+    _secondOverrideDamageType,
     secondCustomizations,
     secondPrecModifier,
     secondDamageModifier,
@@ -346,7 +345,7 @@ function CustomWeapons() {
   const pHasElemental = (customizations ?? []).some(
     (c) => c.name === "weapon_customization_elemental",
   );
-  const pType = pHasElemental
+  const _pType = pHasElemental
     ? (formState.damage?.type ?? customDamageType ?? "physical")
     : overrideDamageType
       ? (formState.rareOverrideDamageTypeValue ?? "physical")
@@ -408,7 +407,9 @@ function CustomWeapons() {
           (c) => c.name === "weapon_customization_elemental",
         );
         const s2Type = s2HasElemental
-          ? (formState.secondDamage?.type ?? secondCustomDamageType ?? "physical")
+          ? (formState.secondDamage?.type ??
+            secondCustomDamageType ??
+            "physical")
           : overrideDamageType
             ? (formState.rareOverrideDamageTypeValue ?? "physical")
             : "physical";
@@ -611,7 +612,7 @@ function CustomWeapons() {
         sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
       >
         <SharedCustomWeaponCard
-          variant="equip"
+          variant={variant}
           item={exportData}
           cardRef={weaponCardsRef}
           imageMode="slot"

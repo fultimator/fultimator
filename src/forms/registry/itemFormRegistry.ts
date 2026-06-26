@@ -28,23 +28,63 @@ import {
   PlayerSpellTinkererAlchemySchema,
   PlayerSpellTinkererInfusionSchema,
 } from "../schema/itemSchemas/playerSpell";
-import { weaponFieldConfig } from "../rendering/config/itemConfigs/weapon";
-import { customWeaponFieldConfig } from "../rendering/config/itemConfigs/customWeapon";
-import { armorFieldConfig } from "../rendering/config/itemConfigs/armor";
-import { shieldFieldConfig } from "../rendering/config/itemConfigs/shield";
-import { accessoryFieldConfig } from "../rendering/config/itemConfigs/accessory";
-import { npcSpecialFieldConfig } from "../rendering/config/itemConfigs/npcSpecial";
-import { npcActionFieldConfig } from "../rendering/config/itemConfigs/npcAction";
+import {
+  weaponFieldConfig,
+  weaponTabs,
+} from "../rendering/config/itemConfigs/weapon";
+import {
+  customWeaponFieldConfig,
+  customWeaponTabs,
+} from "../rendering/config/itemConfigs/customWeapon";
+import {
+  armorFieldConfig,
+  armorTabs,
+} from "../rendering/config/itemConfigs/armor";
+import {
+  shieldFieldConfig,
+  shieldTabs,
+} from "../rendering/config/itemConfigs/shield";
+import {
+  accessoryFieldConfig,
+  accessoryTabs,
+} from "../rendering/config/itemConfigs/accessory";
+import {
+  npcSpecialFieldConfig,
+  npcSpecialTabs,
+} from "../rendering/config/itemConfigs/npcSpecial";
+import {
+  npcActionFieldConfig,
+  npcActionTabs,
+} from "../rendering/config/itemConfigs/npcAction";
 import { qualityFieldConfig } from "../rendering/config/itemConfigs/quality";
-import { heroicFieldConfig } from "../rendering/config/itemConfigs/heroic";
-import { npcAttackFieldConfig } from "../rendering/config/itemConfigs/npcAttack";
-import { npcSpellFieldConfig } from "../rendering/config/itemConfigs/npcSpell";
+import {
+  heroicFieldConfig,
+  heroicTabs,
+} from "../rendering/config/itemConfigs/heroic";
+import {
+  npcAttackFieldConfig,
+  npcAttackTabs,
+} from "../rendering/config/itemConfigs/npcAttack";
+import {
+  npcSpellFieldConfig,
+  npcSpellTabs,
+} from "../rendering/config/itemConfigs/npcSpell";
 import { classFieldConfig } from "../rendering/config/itemConfigs/class";
+import { itemFieldConfig } from "../rendering/config/itemConfigs/item";
+import { consumableFieldConfig } from "../rendering/config/itemConfigs/consumable";
+import { noteFieldConfig } from "../rendering/config/itemConfigs/note";
+import { ItemSchema } from "../schema/itemSchemas/item";
+import { ConsumableSchema } from "../schema/itemSchemas/consumable";
+import { NoteSchema } from "../schema/itemSchemas/note";
 import { optionalFieldConfig } from "../rendering/config/itemConfigs/optional";
 import { mnemosphereFieldConfig } from "../rendering/config/itemConfigs/mnemosphere";
-import { hoplosphereFieldConfig } from "../rendering/config/itemConfigs/hoplosphere";
+import {
+  hoplosphereFieldConfig,
+  hoplosphereTabs,
+} from "../rendering/config/itemConfigs/hoplosphere";
 import {
   playerSpellFieldConfig,
+  playerSpellTabs,
   type PlayerSpellFormState,
 } from "../rendering/config/itemConfigs/playerSpell";
 import {
@@ -70,6 +110,10 @@ const labelByKey: Record<CompendiumItemType, string> = {
   shield: "Shield",
   accessory: "Accessory",
   optional: "Optional",
+  item: "Item",
+  consumable: "Consumable",
+  note: "Note",
+  effect: "Effect",
 };
 
 const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
@@ -81,6 +125,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "weapons",
     schema: WeaponPersistedSchema,
     fields: weaponFieldConfig,
+    tabs: weaponTabs,
     defaultState: () => createDefaultStateFromFields(weaponFieldConfig),
     buildPayload: createSchemaPayloadBuilder(WeaponPersistedSchema),
   },
@@ -92,6 +137,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "custom-weapons",
     schema: CustomWeaponPersistedSchema,
     fields: customWeaponFieldConfig,
+    tabs: customWeaponTabs,
     defaultState: () => createDefaultStateFromFields(customWeaponFieldConfig),
     buildPayload: createSchemaPayloadBuilder(CustomWeaponPersistedSchema),
   },
@@ -103,6 +149,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "armor",
     schema: ArmorPersistedSchema,
     fields: armorFieldConfig,
+    tabs: armorTabs,
     defaultState: () => createDefaultStateFromFields(armorFieldConfig),
     buildPayload: createSchemaPayloadBuilder(ArmorPersistedSchema),
   },
@@ -114,6 +161,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "shields",
     schema: ShieldPersistedSchema,
     fields: shieldFieldConfig,
+    tabs: shieldTabs,
     defaultState: () => createDefaultStateFromFields(shieldFieldConfig),
     buildPayload: createSchemaPayloadBuilder(ShieldPersistedSchema),
   },
@@ -125,6 +173,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "accessories",
     schema: AccessoryPersistedSchema,
     fields: accessoryFieldConfig,
+    tabs: accessoryTabs,
     defaultState: () => createDefaultStateFromFields(accessoryFieldConfig),
     buildPayload: createSchemaPayloadBuilder(AccessoryPersistedSchema),
   },
@@ -136,6 +185,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "special",
     schema: NpcSpecialSchema,
     fields: npcSpecialFieldConfig,
+    tabs: npcSpecialTabs,
     defaultState: () => createDefaultStateFromFields(npcSpecialFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcSpecialSchema),
   },
@@ -147,6 +197,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "actions",
     schema: NpcActionSchema,
     fields: npcActionFieldConfig,
+    tabs: npcActionTabs,
     defaultState: () => createDefaultStateFromFields(npcActionFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcActionSchema),
   },
@@ -169,6 +220,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "heroics",
     schema: HeroicSchema,
     fields: heroicFieldConfig,
+    tabs: heroicTabs,
     defaultState: () => createDefaultStateFromFields(heroicFieldConfig),
     buildPayload: createSchemaPayloadBuilder(HeroicSchema),
   },
@@ -180,6 +232,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "attacks",
     schema: NpcAttackSchema,
     fields: npcAttackFieldConfig,
+    tabs: npcAttackTabs,
     defaultState: () => createDefaultStateFromFields(npcAttackFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcAttackSchema),
   },
@@ -191,6 +244,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "spells",
     schema: NpcSpellSchema,
     fields: npcSpellFieldConfig,
+    tabs: npcSpellTabs,
     defaultState: () => createDefaultStateFromFields(npcSpellFieldConfig),
     buildPayload: createSchemaPayloadBuilder(NpcSpellSchema),
   },
@@ -250,6 +304,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "hoplospheres",
     schema: HoplosphereSchema,
     fields: hoplosphereFieldConfig,
+    tabs: hoplosphereTabs,
     defaultState: () => createDefaultStateFromFields(hoplosphereFieldConfig),
     buildPayload: createSchemaPayloadBuilder(HoplosphereSchema),
   },
@@ -261,6 +316,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
     exportDataType: "player-spells",
     schema: PlayerSpellSchema,
     fields: playerSpellFieldConfig,
+    tabs: playerSpellTabs,
     defaultState: () => createDefaultStateFromFields(playerSpellFieldConfig),
     discriminatorKey: "spellType",
     subtypeDefinitions: Object.fromEntries(
@@ -289,6 +345,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
             isOfficial: s["meta.isOfficial"],
           }
         : undefined;
+      const showInPlayerSheet = s.showInPlayerSheet ?? true;
 
       // default spell: flat fields from form state
       if (spellType === "default") {
@@ -298,7 +355,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
           name: s.name.trim(),
           fuid: s.fuid || undefined,
           meta: metaObj,
-          showInPlayerSheet: true,
+          showInPlayerSheet,
           description: s.description.trim(),
           isOffensive: s.isOffensive,
           cost: {
@@ -329,7 +386,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         name: s.name.trim(),
         fuid: s.fuid || undefined,
         meta: metaObj,
-        showInPlayerSheet: true,
+        showInPlayerSheet,
         spellType,
       };
 
@@ -443,10 +500,10 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
               {
                 key: s.name.trim() || "magichant_custom_name",
                 customName: "",
-                type: s.keyType.trim(),
-                status: s.keyStatus.trim(),
-                attribute: s.keyAttribute.trim(),
-                recovery: s.keyRecovery.trim(),
+                type: s.type.trim(),
+                status: s.status.trim(),
+                attribute: s.attribute.trim(),
+                recovery: s.recovery.trim(),
               },
             ],
             tones: [],
@@ -484,21 +541,21 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         return {
           ...base,
           spellType: "invocation" as const,
-          spellName: s.name.trim() || "Invocation",
-          tracker: {
-            innerWellspring: false,
-            chosenWellspring: null,
-            activeWellsprings: [],
-          },
-          invocations: [
-            {
-              key: s.name.trim() || "invoker_custom_name",
-              customName: "",
-              type: s.invType.trim(),
-              effect: s.effect.trim(),
-              wellspring: s.wellspring.trim(),
-            },
-          ],
+          name: s.name.trim(),
+          type: s.type.trim(),
+          effect: s.effect.trim(),
+          wellspring: s.wellspring.trim(),
+        };
+      }
+
+      if (spellType === "wellspring") {
+        return {
+          ...base,
+          spellType: "wellspring" as const,
+          name: s.name.trim(),
+          color: (s.color as string) || "#888888",
+          textColor: (s.textColor as "black" | "white") || "white",
+          icon: (s.icon as string) || "untyped",
         };
       }
 
@@ -520,22 +577,40 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
       }
 
       if (spellType === "magiseed") {
+        const extra = s as unknown as Record<string, unknown>;
+        const importedSeeds = extra.magiseeds as typeof s.magiseeds | undefined;
+        const effects = {
+          0: s["effects.0"] ?? "",
+          1: s["effects.1"] ?? "",
+          2: s["effects.2"] ?? "",
+          3: s["effects.3"] ?? "",
+        };
+        const hasSeedData =
+          importedSeeds ||
+          s.rangeStart !== 0 ||
+          s.rangeEnd !== 3 ||
+          Object.values(effects).some((v) => v !== "");
+        const seeds: typeof s.magiseeds =
+          importedSeeds ??
+          (hasSeedData
+            ? [
+                {
+                  key: s.name?.trim() || "magiseed_custom",
+                  customName: "",
+                  description: s.description ?? "",
+                  rangeStart: s.rangeStart ?? 0,
+                  rangeEnd: s.rangeEnd ?? 3,
+                  effects,
+                },
+              ]
+            : []);
         return {
           ...base,
           spellType: "magiseed" as const,
           growthClock: 0,
-          gardenDescription: "",
+          gardenDescription: s.gardenDescription ?? "",
           currentMagiseed: null,
-          magiseeds: [
-            {
-              key: s.name.trim() || "magiseed_custom",
-              customName: "",
-              description: s.seedDescription.trim(),
-              rangeStart: s.seedRangeStart,
-              rangeEnd: s.seedRangeEnd,
-              effects: {},
-            },
-          ],
+          magiseeds: seeds,
         };
       }
 
@@ -551,7 +626,8 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         return {
           ...base,
           spellType: "tinkerer-magitech" as const,
-          rank: 1,
+          spellName: s.spellName?.trim() || "",
+          rank: typeof s.rank === "number" ? s.rank : 1,
           magispheres: [],
         };
       }
@@ -594,6 +670,39 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
       return null;
     },
   },
+  item: {
+    key: "item",
+    label: labelByKey.item,
+    implementation: "schema-config",
+    addItemType: "item",
+    exportDataType: "items",
+    schema: ItemSchema,
+    fields: itemFieldConfig,
+    defaultState: () => createDefaultStateFromFields(itemFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(ItemSchema),
+  },
+  consumable: {
+    key: "consumable",
+    label: labelByKey.consumable,
+    implementation: "schema-config",
+    addItemType: "consumable",
+    exportDataType: "consumables",
+    schema: ConsumableSchema,
+    fields: consumableFieldConfig,
+    defaultState: () => createDefaultStateFromFields(consumableFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(ConsumableSchema),
+  },
+  note: {
+    key: "note",
+    label: labelByKey.note,
+    implementation: "schema-config",
+    addItemType: "note",
+    exportDataType: "notes",
+    schema: NoteSchema,
+    fields: noteFieldConfig,
+    defaultState: () => createDefaultStateFromFields(noteFieldConfig),
+    buildPayload: createSchemaPayloadBuilder(NoteSchema),
+  },
 };
 
 const exportDataTypeByKey: Record<CompendiumItemType, string> = {
@@ -613,6 +722,10 @@ const exportDataTypeByKey: Record<CompendiumItemType, string> = {
   shield: "shields",
   accessory: "accessories",
   optional: "optionals",
+  item: "items",
+  consumable: "consumables",
+  note: "notes",
+  effect: "effects",
 };
 
 export const itemFormRegistry: Record<CompendiumItemType, ItemFormDefinition> =

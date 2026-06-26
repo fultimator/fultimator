@@ -8,10 +8,19 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from "@mui/material";
-import { AccessTime, Close, Notes, Replay, TouchApp } from "@mui/icons-material";
+import {
+  AccessTime,
+  Close,
+  GroupAdd,
+  Notes,
+  Replay,
+  TouchApp,
+} from "@mui/icons-material";
 import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import { useCombatEncounterStore } from "../../../stores/combatEncounterStore";
+import { useAppDrawerStore } from "../../../store/appDrawerStore";
+import { useThemeStore } from "../../../store/themeStore";
 
 export default function SelectedNpcsHeader({
   selectedNPCs,
@@ -27,6 +36,8 @@ export default function SelectedNpcsHeader({
   const setInteractionMode = useCombatEncounterStore(
     (s) => s.setInteractionMode,
   );
+  const setDrawerTab = useAppDrawerStore((s) => s.setActiveTab);
+  const setDrawerOpen = useThemeStore((s) => s.setDrawerOpen);
 
   const isAllTurnsChecked = selectedNPCs?.every((npc) =>
     npc.combatStats.turns?.every(Boolean),
@@ -92,6 +103,37 @@ export default function SelectedNpcsHeader({
           gap: isMobile ? 2 : 1,
         }}
       >
+        {isMobile ? (
+          <IconButton
+            size="small"
+            sx={{
+              padding: 0.5,
+              border: `1px solid ${primary}`,
+              boxShadow: 3,
+            }}
+            color="primary"
+            onClick={() => {
+              setDrawerTab("actorSelect");
+              setDrawerOpen(true);
+            }}
+          >
+            <GroupAdd />
+          </IconButton>
+        ) : (
+          <Button
+            size="small"
+            sx={{ padding: "0 0.5rem" }}
+            color="primary"
+            variant="outlined"
+            onClick={() => {
+              setDrawerTab("actorSelect");
+              setDrawerOpen(true);
+            }}
+            endIcon={<GroupAdd />}
+          >
+            Add Actors
+          </Button>
+        )}
         {isMobile ? (
           <IconButton
             size="small"

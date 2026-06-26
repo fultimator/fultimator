@@ -88,6 +88,8 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
     selectedQualityCategories,
     selectedHeroicClasses,
     selectedOptionalSubtypes,
+    selectedEffectTransfer,
+    selectedEffectApplicableTypes,
     searchQuery,
     isPilotClassSelected,
     isChanterClassSelected,
@@ -141,6 +143,16 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
       if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
         items = items.filter((item) =>
           selectedOptionalSubtypes.includes(item.subtype),
+        );
+      }
+      if (selectedType === "effects" && selectedEffectTransfer !== "") {
+        const wantTransfer = selectedEffectTransfer === "true";
+        items = items.filter((item) => Boolean(item.transfer) === wantTransfer);
+      }
+      if (selectedType === "effects" && selectedEffectApplicableTypes.length > 0) {
+        items = items.filter((item) =>
+          Array.isArray(item.applicableTypes) &&
+          selectedEffectApplicableTypes.some((t) => item.applicableTypes.includes(t)),
         );
       }
       if (selectedType === "player-spells" && selectedSpellClass) {
@@ -240,6 +252,16 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
           selectedOptionalSubtypes.includes(item.subtype),
         );
       }
+      if (selectedType === "effects" && selectedEffectTransfer !== "") {
+        const wantTransfer = selectedEffectTransfer === "true";
+        items = items.filter((item) => Boolean(item.transfer) === wantTransfer);
+      }
+      if (selectedType === "effects" && selectedEffectApplicableTypes.length > 0) {
+        items = items.filter((item) =>
+          Array.isArray(item.applicableTypes) &&
+          selectedEffectApplicableTypes.some((t) => item.applicableTypes.includes(t)),
+        );
+      }
 
       if (!searchQuery.trim()) return items;
       const q = searchQuery.toLowerCase();
@@ -313,6 +335,8 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
     selectedBook,
     selectedHeroicClasses,
     selectedOptionalSubtypes,
+    selectedEffectTransfer,
+    selectedEffectApplicableTypes,
     isPilotClassSelected,
     isChanterClassSelected,
     isInvokerClassSelected,

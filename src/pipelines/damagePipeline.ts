@@ -35,6 +35,10 @@ export interface DamageContext {
   ignoreImmunity: boolean;
   ignoreAbsorption: boolean;
   incomingDamageBonuses: DamageBonuses;
+  outgoingDamageBonuses: DamageBonuses;
+  attackRange: "melee" | "ranged" | "spell" | null;
+  attackCategory: string | null;
+  targetSpecies: string | null;
 }
 
 export interface DamageResult {
@@ -75,22 +79,41 @@ function incomingBonusForElement(
   return (b.all ?? 0) + (element !== "untyped" ? (b[element] ?? 0) : 0);
 }
 
+function outgoingBonusFor(ctx: DamageContext): number {
+  const b = ctx.outgoingDamageBonuses as unknown as Record<string, number>;
+  let total = b.all ?? 0;
+  if (ctx.attackRange) total += b[ctx.attackRange] ?? 0;
+  if (ctx.attackCategory) total += b[ctx.attackCategory] ?? 0;
+  if (ctx.damageType !== "untyped") total += b[ctx.damageType] ?? 0;
+  if (ctx.targetSpecies) total += b[ctx.targetSpecies] ?? 0;
+  return total;
+}
+
 export function resolveDamage(ctx: DamageContext): DamageResult {
   const breakdown: DamageStep[] = [];
   const isUntyped = ctx.damageType === "untyped";
 
-  // Step 1: base + incoming damage bonuses (flat increment before affinity)
-  const bonus = incomingBonusForElement(ctx.incomingDamageBonuses, ctx.damageType);
-  const boosted = (ctx.baseDamage + bonus);
+  // Step 1: base + outgoing bonus (attacker) + incoming bonus (target), flat before affinity
+  const outBonus = outgoingBonusFor(ctx);
+  const inBonus = incomingBonusForElement(
+    ctx.incomingDamageBonuses,
+    ctx.damageType,
+  );
+  const bonus = outBonus + inBonus;
+  const boosted = ctx.baseDamage + bonus;
   breakdown.push({ label: "base", value: ctx.baseDamage });
-  if (bonus !== 0) breakdown.push({ label: "incoming bonus", value: bonus });
+  if (outBonus !== 0)
+    breakdown.push({ label: "outgoing bonus", value: outBonus });
+  if (inBonus !== 0)
+    breakdown.push({ label: "incoming bonus", value: inBonus });
 
   // Step 2: untyped damage bypasses all affinity resolution
   if (isUntyped) {
     const guardReduced = ctx.isGuarding
       ? Math.max(0, Math.floor(boosted * 0.5))
       : boosted;
-    if (ctx.isGuarding) breakdown.push({ label: "guarding (÷2)", value: guardReduced });
+    if (ctx.isGuarding)
+      breakdown.push({ label: "guarding (÷2)", value: guardReduced });
     return {
       finalDamage: guardReduced,
       effectiveAffinity: null,
@@ -105,7 +128,7 @@ export function resolveDamage(ctx: DamageContext): DamageResult {
   // Step 3: affinity resolution
   const effective = resolveEffectiveAffinity(ctx);
   let multiplier: DamageMultiplier = 1;
-  const affinityResult: AffinityResult = effective as AffinityResult ?? null;
+  const affinityResult: AffinityResult = (effective as AffinityResult) ?? null;
 
   if (effective != null && effective !== Aff.None) {
     if (effective === Aff.Absorpbtion && !ctx.ignoreAbsorption) {
@@ -165,6 +188,7 @@ export function buildDamageContext(opts: {
   damageType: DamageElement;
   npcAffinities: Record<string, string>;
   temporaryAffinities?: Partial<Record<string, Affinities>>;
+  affinityGrants?: Partial<Record<string, Affinities>>;
   affinityLocks?: string[];
   isGuarding?: boolean;
   ignoreResistance?: boolean;
@@ -172,11 +196,24 @@ export function buildDamageContext(opts: {
   ignoreVulnerability?: boolean;
   ignoreAbsorption?: boolean;
   incomingDamageBonuses?: DamageBonuses;
+  outgoingDamageBonuses?: DamageBonuses;
+  attackRange?: "melee" | "ranged" | "spell" | null;
+  attackCategory?: string | null;
+  targetSpecies?: string | null;
 }): DamageContext {
   const element = opts.damageType;
   const raw = opts.npcAffinities[element] as Affinities | undefined;
   const native: Affinities | null = raw ?? null;
-  const temp = (opts.temporaryAffinities?.[element] as Affinities | undefined) ?? null;
+
+  const runtimeTemp =
+    (opts.temporaryAffinities?.[element] as Affinities | undefined) ?? null;
+  const granted =
+    (opts.affinityGrants?.[element] as Affinities | undefined) ?? null;
+  const allTemporary =
+    runtimeTemp && granted
+      ? combineAffinities(runtimeTemp, granted)
+      : (runtimeTemp ?? granted);
+  const temp = allTemporary;
 
   return {
     baseDamage: opts.baseDamage,
@@ -191,5 +228,9 @@ export function buildDamageContext(opts: {
     ignoreImmunity: opts.ignoreImmunity ?? false,
     ignoreAbsorption: opts.ignoreAbsorption ?? false,
     incomingDamageBonuses: opts.incomingDamageBonuses ?? ({} as DamageBonuses),
+    outgoingDamageBonuses: opts.outgoingDamageBonuses ?? ({} as DamageBonuses),
+    attackRange: opts.attackRange ?? null,
+    attackCategory: opts.attackCategory ?? null,
+    targetSpecies: opts.targetSpecies ?? null,
   };
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 const AccuracySchema = z.object({
   attr1: z.string(),
@@ -25,6 +26,7 @@ export const NpcAttackSchema = z.object({
   category: z.string().default("Melee Attack"),
   effect: z.string().default(""),
   meta: MetaSchema.optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 export type NpcAttack = z.infer<typeof NpcAttackSchema>;

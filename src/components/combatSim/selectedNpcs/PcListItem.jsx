@@ -4,17 +4,28 @@ import {
   Typography,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton,
-  Checkbox,
   Tooltip,
+  Menu,
+  MenuItem,
 } from "@mui/material";
-import { Delete, TouchApp } from "@mui/icons-material";
+import {
+  Delete,
+  TouchApp,
+  DragIndicator,
+  MoreVert,
+  ArrowUpward,
+  ArrowDownward,
+} from "@mui/icons-material";
+import TurnTokens from "./TurnTokens";
+import ResourceInlineBars from "./ResourceInlineBars";
+import ResourceInlineReadout from "./ResourceInlineReadout";
 import { GiDeathSkull } from "react-icons/gi";
-import { IoIosWarning } from "react-icons/io";
 import { t } from "../../../translation/translate";
-import { useTheme } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useCombatEncounterStore } from "../../../stores/combatEncounterStore";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function PcListItem({
   pc,
@@ -22,20 +33,46 @@ export default function PcListItem({
   selectedPcID,
   handleListItemClick,
   handleRemovePC,
+  handleMoveUp,
+  handleMoveDown,
+  selectedPCs = [],
   handleHpMpClick,
   handleUpdatePcTurns,
-  isMobile,
+  combatActive = false,
+  isActiveFaction = false,
+  activeTurnIndex = null,
+  onStartTurn,
+  onEndTurn,
+  useDragAndDrop = true,
+  onRowNode,
 }) {
+  const [anchorMenu, setAnchorMenu] = useState(null);
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const isDarkMode = theme.palette.mode === "dark";
 
-  const { targets, setTarget, toggleTarget, runtimeActors } = useCombatEncounterStore();
+  const { targets, setTarget, toggleTarget, runtimeActors } =
+    useCombatEncounterStore();
   const [hovered, setHovered] = useState(false);
   const pcName = pc.name || pc.characterName || "Unknown";
   const isTargeted = targets.some((t) => t.combatId === pc.combatId);
   const runtime = runtimeActors[pc.combatId];
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: pc.combatId });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    position: "relative",
+    zIndex: isDragging ? 1000 : 1,
+  };
 
   useEffect(() => {
     if (!hovered) return;
@@ -56,58 +93,88 @@ export default function PcListItem({
 
   const maxHp = pc.stats?.hp?.max ?? 0;
   const maxMp = pc.stats?.mp?.max ?? 0;
-  const currentHp = runtime?.currentHp ?? pc.combatStats?.currentHp ?? maxHp;
-  const currentMp = runtime?.currentMp ?? pc.combatStats?.currentMp ?? maxMp;
+  const maxIp = pc.stats?.ip?.max ?? 0;
+  const maxFp = pc.combatStats?.maxFp ?? 6;
+  const currentHp = pc.combatStats?.currentHp ?? runtime?.currentHp ?? maxHp;
+  const currentMp = pc.combatStats?.currentMp ?? runtime?.currentMp ?? maxMp;
+  const currentIp =
+    pc.combatStats?.currentIp ??
+    runtime?.currentIp ??
+    pc.stats?.ip?.current ??
+    0;
+  const currentFp =
+    pc.combatStats?.currentFp ??
+    runtime?.currentFp ??
+    pc.info?.fabulapoints ??
+    0;
 
   return (
     <ListItem
+      ref={(node) => {
+        setNodeRef(node);
+        onRowNode?.(pc.combatId, node);
+      }}
+      style={style}
       onClick={(e) =>
         e.target.type !== "checkbox" && handleListItemClick(pc.combatId)
       }
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       sx={{
-        border: isTargeted
-          ? `2px solid ${theme.palette.warning.main}`
-          : isDarkMode
-            ? selectedPcID === pc.combatId
-              ? "1px solid #fff"
-              : "1px solid #555"
-            : selectedPcID === pc.combatId
-              ? "1px solid " + primary
-              : "1px solid #ddd",
-        marginY: 1,
-        borderRadius: 1,
+        border:
+          selectedPcID === pc.combatId
+            ? `2px solid ${theme.palette.success.main}`
+            : `1px solid ${alpha(theme.palette.success.main, 0.28)}`,
+        marginY: 0.35,
+        borderRadius: 1.2,
         position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: isTargeted
-          ? isDarkMode
-            ? "rgba(237,177,80,0.08)"
-            : "rgba(237,177,80,0.06)"
-          : isDarkMode
-            ? currentHp === 0
-              ? "#5c1010"
-              : "#2a2a4a"
-            : currentHp === 0
-              ? "#ffe6e6"
-              : "#f0f0ff",
+        backgroundColor: isDarkMode
+          ? currentHp === 0
+            ? "rgba(211,47,47,0.22)"
+            : "rgba(255,255,255,0.04)"
+          : currentHp === 0
+            ? "#ffeaea"
+            : "rgba(238,250,247,0.82)",
         "&:hover": {
           backgroundColor: isDarkMode
             ? currentHp === 0
-              ? "#6f0000"
-              : "#3a3a5c"
+              ? "rgba(211,47,47,0.3)"
+              : "rgba(255,255,255,0.07)"
             : currentHp === 0
-              ? "#ffcccc"
-              : "#e0e0ff",
+              ? "#ffdede"
+              : "rgba(246,255,252,0.98)",
         },
-        paddingY: 1,
+        paddingY: 0.5,
         flexDirection: "row",
         overflow: "visible",
         cursor: "pointer",
+        containerType: "inline-size",
+        containerName: "initiative-row",
       }}
     >
+      {useDragAndDrop && (
+        <Box
+          {...attributes}
+          {...listeners}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 24,
+            mr: 0.5,
+            color: theme.palette.text.secondary,
+            cursor: "grab",
+            touchAction: "none",
+            "&:hover": { color: theme.palette.text.primary },
+          }}
+        >
+          <DragIndicator fontSize="small" />
+        </Box>
+      )}
+
       {/* Selected indicator badge */}
       {selectedPcID === pc.combatId && (
         <Tooltip title="Selected" enterDelay={300}>
@@ -169,16 +236,20 @@ export default function PcListItem({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          width: isMobile ? "5px" : "10px",
+          width: 24,
           height: "100%",
-          borderRight: "1px solid #ccc",
-          padding: "0 10px",
+          borderRight: `1px solid ${theme.palette.divider}`,
+          padding: "0 7px",
           gap: "2px",
         }}
       >
         <Typography
           variant="h6"
-          sx={{ fontWeight: "bold", color: isDarkMode ? "#fff" : "#333" }}
+          sx={{
+            fontWeight: "bold",
+            color: isDarkMode ? "#fff" : "#333",
+            fontSize: "0.92rem",
+          }}
         >
           {index + 1}
         </Typography>
@@ -192,11 +263,13 @@ export default function PcListItem({
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              fontFamily: "Antonio",
+              fontWeight: 700,
               fontSize: {
-                xs: "0.7rem",
-                sm: "0.8rem",
-                md: "0.9rem",
-                lg: "1rem",
+                xs: "0.95rem",
+                sm: "1.02rem",
+                md: "1.06rem",
+                lg: "1.08rem",
               },
             }}
           >
@@ -223,112 +296,134 @@ export default function PcListItem({
           </Typography>
         }
         secondary={
-          <>
-            <Tooltip
-              title={t("combat_sim_edit_hp")}
-              enterDelay={500}
-              enterNextDelay={500}
-            >
-              <Typography
-                component="span"
-                variant="h5"
-                sx={{
-                  color:
-                    currentHp <= Math.floor(maxHp / 2) ? "#D32F2F" : "#4CAF50",
-                  fontWeight: "bold",
-                  transition: "color 0.2s ease-in-out",
-                  "&:hover": {
-                    color:
-                      currentHp <= Math.floor(maxHp / 2)
-                        ? "#B71C1C"
-                        : "#388E3C",
-                    textDecoration: "underline",
-                  },
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleHpMpClick("HP", pc);
-                }}
-              >
-                {currentHp}/{maxHp} {t("HP")}{" "}
-                {currentHp <= Math.floor(maxHp / 2) && (
-                  <IoIosWarning
-                    style={{ fontSize: "1.2em", verticalAlign: "middle" }}
-                  />
-                )}
-              </Typography>
-            </Tooltip>
-            {" | "}
-            <Tooltip
-              title={t("combat_sim_edit_mp")}
-              enterDelay={500}
-              enterNextDelay={500}
-            >
-              <Typography
-                component="span"
-                variant="h5"
-                sx={{
-                  color: "#2196F3",
-                  fontWeight: "bold",
-                  transition: "color 0.2s ease-in-out",
-                  "&:hover": { color: "#1976D2", textDecoration: "underline" },
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleHpMpClick("MP", pc);
-                }}
-              >
-                {currentMp}/{maxMp} {t("MP")}
-              </Typography>
-            </Tooltip>
-          </>
+          <Box>
+            <ResourceInlineReadout
+              currentHp={currentHp}
+              maxHp={maxHp}
+              currentMp={currentMp}
+              maxMp={maxMp}
+              currentIp={currentIp}
+              maxIp={maxIp}
+              hpColor={theme.palette.error.main}
+              hpHover={theme.palette.error.dark}
+              mpColor={theme.palette.info.main}
+              mpHover={theme.palette.info.dark}
+              ipColor={theme.palette.success.main}
+              ipHover={theme.palette.success.dark}
+              onHpClick={(e) => {
+                e.stopPropagation();
+                handleHpMpClick("HP", pc);
+              }}
+              onMpClick={(e) => {
+                e.stopPropagation();
+                handleHpMpClick("MP", pc);
+              }}
+              onIpClick={(e) => {
+                e.stopPropagation();
+                handleHpMpClick("IP", pc);
+              }}
+              currentFp={currentFp}
+              maxFp={maxFp}
+              fpColor={theme.palette.warning.main}
+              fpHover={theme.palette.warning.dark}
+              onFpClick={(e) => {
+                e.stopPropagation();
+                handleHpMpClick("FP", pc);
+              }}
+            />
+            <ResourceInlineBars
+              hpPct={maxHp > 0 ? (currentHp / maxHp) * 100 : 0}
+              mpPct={maxMp > 0 ? (currentMp / maxMp) * 100 : 0}
+              ipPct={maxIp > 0 ? (currentIp / maxIp) * 100 : 0}
+              hpColor={theme.palette.error.main}
+              mpColor={theme.palette.info.main}
+              ipColor={theme.palette.success.main}
+              tone="pc"
+            />
+          </Box>
         }
-        sx={{ flex: 1, paddingLeft: 2, fontWeight: "500", overflow: "hidden" }}
+        disableTypography
+        sx={{
+          flex: 1,
+          paddingLeft: 1,
+          fontWeight: "500",
+          overflow: "hidden",
+          my: 0,
+        }}
       />
 
-      <ListItemSecondaryAction
+      <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-end",
-          minWidth: "80px",
+          minWidth: "72px",
           flexShrink: 0,
           zIndex: 5,
+          gap: 0.25,
         }}
       >
-        <Tooltip
-          title={t("combat_sim_check_turn")}
-          enterDelay={500}
-          enterNextDelay={500}
-        >
-          <Checkbox
-            checked={pc.combatStats?.turns?.[0] ?? false}
-            onChange={(e) => {
-              e.stopPropagation();
-              handleUpdatePcTurns(pc.combatId, [e.target.checked]);
-            }}
-            color="success"
-            sx={{ padding: "2px", zIndex: 10 }}
-          />
-        </Tooltip>
+        <TurnTokens
+          turns={pc.combatStats?.turns ?? [false]}
+          combatActive={combatActive}
+          isActiveFaction={isActiveFaction}
+          activeTurnIndex={activeTurnIndex}
+          onStartTurn={onStartTurn}
+          onEndTurn={onEndTurn}
+          onToggle={(newTurns) => handleUpdatePcTurns(pc.combatId, newTurns)}
+          color="primary"
+        />
         <IconButton
           edge="end"
-          color="error"
+          color="primary"
           onClick={(e) => {
             e.stopPropagation();
-            handleRemovePC(pc.combatId);
+            setAnchorMenu(e.currentTarget);
           }}
-          sx={{ padding: 1 }}
+          sx={{ padding: 0.5 }}
         >
-          <Tooltip
-            title={t("combat_sim_delete")}
-            enterDelay={500}
-            enterNextDelay={500}
+          <MoreVert fontSize="small" />
+        </IconButton>
+        <Menu
+          anchorEl={anchorMenu}
+          open={Boolean(anchorMenu)}
+          onClose={() => setAnchorMenu(null)}
+        >
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMoveUp?.(pc.combatId);
+              setAnchorMenu(null);
+            }}
+            disabled={index === 0}
+          >
+            <ArrowUpward fontSize="small" />
+            {" " + t("combat_sim_move_up")}
+          </MenuItem>
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMoveDown?.(pc.combatId);
+              setAnchorMenu(null);
+            }}
+            disabled={index === selectedPCs.length - 1}
+          >
+            <ArrowDownward fontSize="small" />
+            {" " + t("combat_sim_move_down")}
+          </MenuItem>
+          <MenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemovePC(pc.combatId);
+              setAnchorMenu(null);
+            }}
+            sx={{ color: "error.main" }}
           >
             <Delete fontSize="small" />
-          </Tooltip>
-        </IconButton>
-      </ListItemSecondaryAction>
+            {" " + t("combat_sim_delete")}
+          </MenuItem>
+        </Menu>
+      </Box>
     </ListItem>
   );
 }

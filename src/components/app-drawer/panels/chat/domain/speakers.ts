@@ -2,15 +2,17 @@ import { useMemo } from "react";
 import { useLocation } from "react-router";
 import { useDatabase } from "../../../../../hooks/useDatabase";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
+import { applyPostLoadTransforms } from "../../../../../libs/actor/playerTransforms";
 import {
   resolveEffectiveSlot,
   getActiveVehicle,
-} from "../../../../player/equipment/slots/equipmentSlots";
+} from "../../../../../libs/player/slots/equipmentSlots";
 import {
   getAvailableSupportModules,
   getPilotSpellInfo,
   getSlotLocks,
-} from "../../../../player/equipment/slots/loadoutSelectors";
+} from "../../../../../libs/player/slots/loadoutSelectors";
+import type { Behavior } from "../../../../../types/Effects";
 import type { TypePlayer } from "../../../../../types/Players";
 import { DEFAULT_SPEAKER } from "../constants";
 import type { Attribute } from "../types";
@@ -31,12 +33,15 @@ export type AttackOption = {
   range?: "melee" | "ranged" | string;
   isWeaponModule?: boolean;
   description?: string;
+  extraTags?: string[];
+  behaviors?: Behavior[];
 };
 
 export type SpellOption = {
   arg: string;
   name: string;
   description?: string;
+  effect?: string;
   spellType?: string;
   isOffensive?: boolean;
   attr1?: Attribute;
@@ -46,6 +51,8 @@ export type SpellOption = {
   accuracyDefense?: "def" | "mdef" | string;
   damageType?: string;
   damageHrZero?: boolean;
+  extraTags?: string[];
+  behaviors?: Behavior[];
 };
 
 function quoteArg(name: string): string {
@@ -70,6 +77,105 @@ function toAttr(raw: unknown): Attribute | undefined {
   return LONG_TO_ATTR[raw.toLowerCase()] ?? undefined;
 }
 
+function toNumber(raw: unknown): number | undefined {
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  if (typeof raw === "string") {
+    const parsed = Number(raw);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return undefined;
+}
+
+function toRange(raw: unknown): "melee" | "ranged" {
+  if (typeof raw !== "string") return "melee";
+  const normalized = raw.toLowerCase();
+  return normalized === "ranged" || normalized === "weapon_range_ranged"
+    ? "ranged"
+    : "melee";
+}
+
+function hasOwnEnabled(value: unknown): boolean {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    Object.prototype.hasOwnProperty.call(value, "enabled")
+  );
+}
+
+function isEnabledWhenPresent(value: unknown): boolean {
+  if (!hasOwnEnabled(value)) return true;
+  return (value as { enabled?: unknown }).enabled === true;
+}
+
+function resolveEquippedItem(
+  equipment: Record<string, unknown>,
+  ref: Record<string, unknown> | null | undefined,
+): Record<string, unknown> | undefined {
+  if (!ref) return undefined;
+  const source = typeof ref.source === "string" ? ref.source : undefined;
+  if (!source) return undefined;
+  const collection = equipment[source];
+  if (!Array.isArray(collection)) return undefined;
+  if (typeof ref.index === "number") {
+    const item = collection[ref.index];
+    if (item && typeof item === "object") {
+      return item as Record<string, unknown>;
+    }
+  }
+  const name = typeof ref.name === "string" ? ref.name : undefined;
+  if (!name) return undefined;
+  return collection.find(
+    (item): item is Record<string, unknown> =>
+      !!item &&
+      typeof item === "object" &&
+      (item as Record<string, unknown>).name === name,
+  );
+}
+
+function equippedWeaponItems(
+  doc: Record<string, unknown>,
+  equipment: Record<string, unknown>,
+): Record<string, unknown>[] {
+  const out: Record<string, unknown>[] = [];
+  const seen = new Set<Record<string, unknown>>();
+  const push = (item: Record<string, unknown> | undefined) => {
+    if (!item || seen.has(item)) return;
+    if (item.itemType !== "weapon" && item.itemType !== "customWeapon") return;
+    seen.add(item);
+    out.push(item);
+  };
+
+  const slots =
+    doc.equippedSlots && typeof doc.equippedSlots === "object"
+      ? (doc.equippedSlots as Record<string, unknown>)
+      : null;
+  if (slots) {
+    push(
+      resolveEquippedItem(equipment, slots.mainHand as Record<string, unknown>),
+    );
+    push(
+      resolveEquippedItem(equipment, slots.offHand as Record<string, unknown>),
+    );
+    return out;
+  }
+
+  for (const key of ["weapons", "customWeapons"]) {
+    const arr = equipment[key];
+    if (!Array.isArray(arr)) continue;
+    for (const item of arr) {
+      if (
+        item &&
+        typeof item === "object" &&
+        (item as Record<string, unknown>).isEquipped === true
+      ) {
+        push(item as Record<string, unknown>);
+      }
+    }
+  }
+
+  return out;
+}
+
 export function resolveSpellOptions(
   doc: Record<string, unknown> | null,
 ): SpellOption[] {
@@ -77,6 +183,7 @@ export function resolveSpellOptions(
 
   const results: SpellOption[] = [];
   const pushSpell = (spell: Record<string, unknown>) => {
+    if (!isEnabledWhenPresent(spell)) return;
     const name = typeof spell.name === "string" ? spell.name : "";
     if (!name) return;
     const isOffensive =
@@ -89,19 +196,25 @@ export function resolveSpellOptions(
       arg: quoteArg(spellType ? `${name} ${spellType}` : name),
       name,
       description:
-        typeof spell.description === "string" ? spell.description : undefined,
+        typeof spell.description === "string"
+          ? spell.description
+          : typeof spell.effect === "string"
+            ? spell.effect
+            : undefined,
+      effect: typeof spell.effect === "string" ? spell.effect : undefined,
       spellType,
       isOffensive,
       attr1: toAttr(acc?.attr1),
       attr2: toAttr(acc?.attr2),
-      baseDamage: typeof dmg?.value === "number" ? dmg.value : 0,
+      baseDamage: toNumber(dmg?.value) ?? 0,
       accuracyBonus:
-        typeof acc?.value === "number" && acc.value !== 0
-          ? acc.value
-          : undefined,
+        (toNumber(acc?.value) ?? 0) !== 0 ? toNumber(acc?.value) : undefined,
       accuracyDefense: typeof acc?.defense === "string" ? acc.defense : "mdef",
       damageType: typeof dmg?.type === "string" ? dmg.type : "physical",
       damageHrZero: dmg?.hrZero === true,
+      behaviors: Array.isArray(spell.behaviors)
+        ? (spell.behaviors as Behavior[])
+        : undefined,
     });
   };
 
@@ -125,9 +238,24 @@ export function resolveSpellOptions(
       ? (doc.equipment[0] as Record<string, unknown>)
       : null;
   if (equipment && Array.isArray(equipment.mnemospheres)) {
+    const slottedIds = new Set<string>();
+    for (const weapon of equippedWeaponItems(doc, equipment)) {
+      const slotted = weapon.slotted;
+      if (!Array.isArray(slotted)) continue;
+      for (const id of slotted) {
+        if (typeof id === "string" && id) slottedIds.add(id);
+      }
+    }
     for (const mnemo of equipment.mnemospheres) {
       if (!mnemo || typeof mnemo !== "object") continue;
-      const spells = (mnemo as Record<string, unknown>).spells;
+      const mnemoRecord = mnemo as Record<string, unknown>;
+      if (
+        typeof mnemoRecord.id !== "string" ||
+        !slottedIds.has(mnemoRecord.id)
+      ) {
+        continue;
+      }
+      const spells = mnemoRecord.spells;
       if (!Array.isArray(spells)) continue;
       for (const s of spells) {
         if (s && typeof s === "object") pushSpell(s as Record<string, unknown>);
@@ -161,10 +289,7 @@ function extractPcWeaponStats(
 > {
   if (!item) return {};
   const acc = item.accuracy as Record<string, unknown> | undefined;
-  const normalizedRange =
-    item.range === "ranged" || item.range === "weapon_range_ranged"
-      ? "ranged"
-      : "melee";
+  const normalizedRange = toRange(item.range);
   const category =
     typeof item.category === "string" ? item.category : undefined;
   const hands = item.hands === 2 ? 2 : item.hands === 1 ? 1 : undefined;
@@ -227,6 +352,10 @@ export function resolveAttackOptions(
             attr2: toAttr(acc?.attr2),
             damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
             damageHrZero: dmg?.hrZero === true,
+            range: toRange(a.range),
+            behaviors: Array.isArray(a.behaviors)
+              ? (a.behaviors as Behavior[])
+              : undefined,
           });
         }
       }
@@ -254,10 +383,10 @@ export function resolveAttackOptions(
             damageHrZero: dmg?.hrZero === true,
             hands: wa.hands === 2 ? 2 : wa.hands === 1 ? 1 : undefined,
             category: typeof wa.category === "string" ? wa.category : undefined,
-            range:
-              wa.range === "ranged" || wa.range === "weapon_range_ranged"
-                ? "ranged"
-                : "melee",
+            range: toRange(wa.range),
+            behaviors: Array.isArray(wa.behaviors)
+              ? (wa.behaviors as Behavior[])
+              : undefined,
           });
         }
       }
@@ -409,10 +538,10 @@ export function resolveAttackOptions(
                       ? module.category
                       : undefined,
                   isWeaponModule: true,
-                  range:
-                    module.range === "ranged" || module.range === "Ranged"
-                      ? "ranged"
-                      : "melee",
+                  range: toRange(module.range),
+                  behaviors: Array.isArray(module.behaviors)
+                    ? (module.behaviors as Behavior[])
+                    : undefined,
                 });
               };
 
@@ -508,33 +637,42 @@ export function resolveAttackOptions(
       name,
       slot: effectiveLabel,
       ...extractPcWeaponStats(item, source),
+      behaviors: Array.isArray(item?.behaviors)
+        ? (item.behaviors as Behavior[])
+        : undefined,
     });
   };
 
   resolveSlotItem("mainHand", "(Main)");
   resolveSlotItem("offHand", "(Off)");
 
-  // Fallback: if no equippedSlots data, list all weapons/customWeapons
+  // Fallback: if no equippedSlots data, list legacy equipped weapons/customWeapons.
   if (results.length === 0) {
     const weapons = Array.isArray(equipment.weapons) ? equipment.weapons : [];
     const customWeapons = Array.isArray(equipment.customWeapons)
       ? equipment.customWeapons
       : [];
     for (const w of weapons) {
-      if (w && typeof w.name === "string" && w.name) {
+      if (w && typeof w.name === "string" && w.name && w.isEquipped === true) {
         results.push({
           arg: quoteArg(w.name),
           name: w.name,
           ...extractPcWeaponStats(w, "weapons"),
+          behaviors: Array.isArray(w.behaviors)
+            ? (w.behaviors as Behavior[])
+            : undefined,
         });
       }
     }
     for (const w of customWeapons) {
-      if (w && typeof w.name === "string" && w.name) {
+      if (w && typeof w.name === "string" && w.name && w.isEquipped === true) {
         results.push({
           arg: quoteArg(w.name),
           name: w.name,
           ...extractPcWeaponStats(w, "customWeapons"),
+          behaviors: Array.isArray(w.behaviors)
+            ? (w.behaviors as Behavior[])
+            : undefined,
         });
       }
     }
@@ -609,7 +747,7 @@ export const useRouteActor = (): {
   const cloudDb = useDatabase("cloud");
 
   const playerIdMatch = location.pathname.match(
-    /^\/(?:player-edit|pc-gallery)\/([^/]+)$/,
+    /^\/(?:player-edit|pc-gallery|character-sheet)\/([^/]+)$/,
   );
   const npcIdMatch = location.pathname.match(/^\/npc-gallery\/([^/]+)$/);
   const playerId = playerIdMatch?.[1] ?? "";
@@ -650,8 +788,19 @@ export const useRouteActor = (): {
     unknown,
   ];
 
+  const rawPlayerDoc = localPlayerDoc ?? cloudPlayerDoc ?? null;
+  const playerDoc = useMemo(
+    () =>
+      rawPlayerDoc
+        ? (applyPostLoadTransforms(
+            rawPlayerDoc as unknown as TypePlayer,
+          ) as unknown as Record<string, unknown>)
+        : null,
+    [rawPlayerDoc],
+  );
+
   return {
-    playerDoc: localPlayerDoc ?? cloudPlayerDoc ?? null,
+    playerDoc,
     npcDoc: localNpcDoc ?? cloudNpcDoc ?? null,
   };
 };
@@ -689,6 +838,9 @@ export function resolveEquipmentSlots(
   doc: Record<string, unknown> | null,
 ): EquipmentSlot[] {
   if (!doc) return [];
+
+  // NPCs use attacks[]/weaponattacks[] only
+  if (Array.isArray(doc.attacks) || Array.isArray(doc.weaponattacks)) return [];
 
   const player = doc as unknown as TypePlayer;
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);

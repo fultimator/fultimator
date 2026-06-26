@@ -86,7 +86,7 @@ export function SchemaFieldRenderer<
   const visible = config
     .filter((field) => {
       if (field.surfaces && !field.surfaces.includes(surface)) return false;
-      if (group !== undefined && field.group !== group) return false;
+      if (group !== undefined && (field.group ?? "") !== group) return false;
       if (field.kind === "computed") return false;
       if (!field.component) return false;
       if (field.dependencies && !field.dependencies(state)) return false;
@@ -164,12 +164,18 @@ export function SchemaFieldRenderer<
             field.component === "autocomplete"
             ? extraProps
             : Object.fromEntries(
-                Object.entries(extraProps).filter(([k]) => k !== "onBrowse"),
+                Object.entries(extraProps).filter(
+                  ([k]) => k !== "onBrowse" && k !== "options",
+                ),
               )
           : undefined;
+        const resolvedComponentProps =
+          typeof field.componentProps === "function"
+            ? field.componentProps(state)
+            : field.componentProps;
         const mergedProps = filteredExtra
-          ? { ...field.componentProps, ...filteredExtra }
-          : field.componentProps;
+          ? { ...resolvedComponentProps, ...filteredExtra }
+          : resolvedComponentProps;
         const componentPropsWithNestedRenderer = {
           ...(mergedProps ?? {}),
           ...(field.component === "fuid" ? { name: state.name ?? "" } : {}),
@@ -179,12 +185,16 @@ export function SchemaFieldRenderer<
             onChange,
             surface = "edit",
             cols = 2,
+            group,
+            groupLabels,
           }: {
             config: ItemFieldConfig<Record<string, unknown>>;
             state: Record<string, unknown>;
             onChange: (next: Record<string, unknown>) => void;
             surface?: FormSurface;
             cols?: 1 | 2 | 3 | 4;
+            group?: string;
+            groupLabels?: GroupLabels;
           }) => (
             <SchemaFieldRenderer
               config={config}
@@ -192,6 +202,8 @@ export function SchemaFieldRenderer<
               onChange={onChange}
               surface={surface}
               cols={cols}
+              group={group}
+              groupLabels={groupLabels}
             />
           ),
         };
@@ -221,6 +233,10 @@ export function SchemaFieldRenderer<
               }
               value={displayValue}
               onCommit={handleCommit}
+              disabled={
+                ((componentPropsWithNestedRenderer as Record<string, unknown>)
+                  ?.disabled as boolean) ?? false
+              }
               componentProps={componentPropsWithNestedRenderer}
             />
           </Grid>

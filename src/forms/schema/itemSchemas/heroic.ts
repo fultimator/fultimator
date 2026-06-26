@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const HeroicSchema = z.object({
   itemType: z.literal("heroic").default("heroic"),
@@ -9,6 +10,7 @@ export const HeroicSchema = z.object({
   description: z.string().default(""),
   applicableTo: z.array(z.string()).default([]),
   meta: MetaSchema.optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 export type Heroic = z.infer<typeof HeroicSchema>;

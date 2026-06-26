@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box, Card, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import { useEncounterChatStore } from "../../stores/encounterChatStore";
 import { useThemeStore } from "../../store/themeStore";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
 import { MessageContent } from "../app-drawer/panels/chat/message-templates/registry";
@@ -27,8 +28,30 @@ interface ToastEntry {
   exiting: boolean;
 }
 
+function shouldToastMessage(message: ChatMessage): boolean {
+  if (message.kind === "log") return false;
+  return (
+    message.kind === "generic" ||
+    message.kind === "attribute" ||
+    message.kind === "open" ||
+    message.kind === "opposed" ||
+    message.kind === "accuracy" ||
+    message.kind === "magic" ||
+    message.kind === "display"
+  );
+}
+
 export const ChatToastOverlay: React.FC = () => {
-  const messages = useChatMessagesStore((s) => s.messages);
+  const globalMessages = useChatMessagesStore((s) => s.messages);
+  const encounterMessages = useEncounterChatStore((s) => s.messages);
+  const encounterHydrated = useEncounterChatStore((s) => s.isHydrated);
+  const messages = React.useMemo(
+    () =>
+      [...globalMessages, ...encounterMessages].sort(
+        (a, b) => a.createdAt - b.createdAt,
+      ),
+    [globalMessages, encounterMessages],
+  );
   const drawerOpen = useThemeStore((s) => s.drawerOpen);
   const setDrawerOpen = useThemeStore((s) => s.setDrawerOpen);
   const activeTab = useAppDrawerStore((s) => s.activeTab);
@@ -36,11 +59,26 @@ export const ChatToastOverlay: React.FC = () => {
 
   const [toasts, setToasts] = useState<ToastEntry[]>([]);
   const mountedCountRef = useRef<number | null>(null);
+  const messagesLengthRef = useRef<number>(0);
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  // Keep a live ref so the hydration effect below always reads the current length.
+  messagesLengthRef.current = messages.length;
 
   useEffect(() => {
     mountedCountRef.current = messages.length;
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // When the encounter chat is bulk-loaded (hydrated), advance the baseline so
+  // pre-existing messages are never toasted. Uses a ref for messages.length to
+  // avoid a stale closure when the store clears and reloads within a session.
+  const prevHydratedRef = useRef(false);
+  useEffect(() => {
+    if (encounterHydrated && !prevHydratedRef.current) {
+      mountedCountRef.current = messagesLengthRef.current;
+    }
+    prevHydratedRef.current = encounterHydrated;
+  }, [encounterHydrated]);
 
   const dismissToast = (id: string) => {
     const t = timers.current.get(id);
@@ -85,6 +123,7 @@ export const ChatToastOverlay: React.FC = () => {
     if (drawerOpen && activeTab === "chat") return;
 
     newMessages.forEach((msg) => {
+      if (!shouldToastMessage(msg)) return;
       if (timers.current.has(msg.id)) return;
       timers.current.set(
         msg.id,
@@ -157,6 +196,7 @@ const ToastCard: React.FC<ToastCardProps> = ({
 }) => {
   const cardRef = useRef<HTMLDivElement | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const mouseStartX = useRef<number | null>(null);
   const swiped = useRef(false);
 
   const applyDrag = (el: HTMLDivElement, dx: number, transition = "none") => {
@@ -204,13 +244,55 @@ const ToastCard: React.FC<ToastCardProps> = ({
       }
     };
 
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return;
+      if ((e.target as Element | null)?.closest("button")) return;
+      mouseStartX.current = e.clientX;
+      swiped.current = false;
+      onPause(toast.id);
+      el.style.cursor = "grabbing";
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (mouseStartX.current === null) return;
+      const dx = e.clientX - mouseStartX.current;
+      if (dx > 0) {
+        e.preventDefault();
+        swiped.current = dx > 10;
+        el.style.animation = "none";
+        applyDrag(el, dx);
+      }
+    };
+
+    const onMouseUp = (e: MouseEvent) => {
+      if (mouseStartX.current === null) return;
+      const dx = e.clientX - mouseStartX.current;
+      mouseStartX.current = null;
+      el.style.cursor = "";
+      if (dx > 60) {
+        swiped.current = true;
+        onDismiss(toast.id);
+      } else {
+        swiped.current = false;
+        el.style.animation = "";
+        applyDrag(el, 0, "transform 0.2s ease, opacity 0.2s ease");
+        onResume(toast.id);
+      }
+    };
+
     el.addEventListener("touchstart", onTouchStart, { passive: true });
     el.addEventListener("touchmove", onTouchMove, { passive: false });
     el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
     return () => {
       el.removeEventListener("touchstart", onTouchStart);
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
     };
   }, [toast.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -221,7 +303,9 @@ const ToastCard: React.FC<ToastCardProps> = ({
         if (!swiped.current) onOpen();
       }}
       onMouseEnter={() => onPause(toast.id)}
-      onMouseLeave={() => onResume(toast.id)}
+      onMouseLeave={() => {
+        if (mouseStartX.current === null) onResume(toast.id);
+      }}
       sx={{
         ...cardAnimations,
         pointerEvents: "auto",
@@ -249,7 +333,8 @@ const ToastCard: React.FC<ToastCardProps> = ({
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 700 }} noWrap>
-          {toast.message.speaker ?? "NPC"}
+          {("speaker" in toast.message ? toast.message.speaker : undefined) ??
+            "NPC"}
         </Typography>
         <IconButton
           size="small"

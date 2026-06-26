@@ -12,32 +12,49 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import BattleHeader from "../../components/combatSim/BattleHeader";
-import SelectorPanel from "../../components/combatSim/SelectorPanel";
 import PCDetail from "../../components/combatSim/PCDetail";
 import { calcHP, calcMP } from "../../libs/npcs";
-import SelectedNpcs from "../../components/combatSim/SelectedNpcs";
+import SelectedActors from "../../components/combatSim/SelectedActors";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import NPCDetail from "../../components/combatSim/NPCDetail";
 import CombatSimClocks from "../../components/combatSim/CombatSimClocks";
 import { typesList } from "../../libs/types";
 import { t } from "../../translation/translate";
 import DamageHealDialog from "../../components/combatSim/DamageHealDialog";
-import CombatLog from "../../components/combatSim/CombatLog";
 import { Cloud as CloudIcon, DragHandle } from "@mui/icons-material";
 import debounce from "lodash.debounce";
 import { globalConfirm } from "../../utility/globalConfirm";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
+import { useCombatActorSelectStore } from "../../store/combatActorSelectStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
+import InitiativeDialog from "../../components/combatSim/InitiativeDialog";
 import NpcEditModal from "../../components/combatSim/NpcEditModal";
 import { SignIn } from "../../components/auth";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
-import { applyNpcPostLoadTransforms } from "../../components/npc/npcTransforms";
-import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../components/player/playerTransforms";
-import { buildDamageContext, resolveDamage } from "../../pipelines/damagePipeline";
+import { applyNpcPostLoadTransforms } from "../../libs/actor";
+import { applyPostLoadTransforms as applyPlayerPostLoadTransforms } from "../../libs/actor";
+import {
+  buildDamageContext,
+  resolveDamage,
+} from "../../pipelines/damagePipeline";
+import { scanForTrigger } from "../../pipelines/triggerScanner";
+import { fireTriggers } from "../../pipelines/triggerExecutor";
 import { getActorBonuses } from "../../libs/actorBonuses";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import { useEncounterChatStore } from "../../stores/encounterChatStore";
+import { useChatChannelStore } from "../../stores/chatChannelStore";
+import { isValidChatMessage } from "../../components/app-drawer/panels/chat/domain/validation";
+import { emitCombatLog } from "../../libs/combatLogEmitter";
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function villainUltimaMax(villain) {
+  if (villain === "minor") return 5;
+  if (villain === "major") return 10;
+  if (villain === "supreme") return 15;
+  return 5;
+}
 
 export default function CombatSimulator() {
   const { authLoading, dbMode, cloudUser, activeUid } = useDatabaseContext();
@@ -148,36 +165,19 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     autosaveEnabled,
     autosaveInterval,
     showSaveSnackbar,
-    hideLogs,
     askBeforeRemoveNpc,
     autoRemoveNPCFaint,
     askBeforeRemoveClock,
-
-    // Visible log types
-    logClockAdded,
-    logClockRemoved,
-    logClockReset,
-    logClockUpdate,
-    logEncounterNameUpdated,
-    logNewRound,
-    logNpcAdded,
-    logNpcDamage,
-    logNpcDamageNoType,
-    logNpcFainted,
-    logNpcHeal,
-    logNpcRemoved,
-    logNpcUsedMp,
-    logRoundDecrease,
-    logRoundIncrease,
-    logStatusEffectAdded,
-    logStatusEffectRemoved,
-    logTurnChecked,
-    logUseUltimaPoint,
   } = useCombatSimSettingsStore.getState().settings;
   const AUTO_SAVE_DELAY = 1000 * (autosaveInterval ?? 30); // Delay for autosave, default 30 seconds
 
   // ========== Encounter States ==========
   const [encounter, setEncounter] = useState(null); // Current encounter
+  const [combatActive, setCombatActive] = useState(false);
+  const [initiative, setInitiative] = useState("players");
+  const [currentTurn, setCurrentTurn] = useState("players");
+  const [activeTurn, setActiveTurn] = useState(null);
+  const [initiativeDialogOpen, setInitiativeDialogOpen] = useState(false);
   const [encounterName, setEncounterName] = useState(""); // Encounter name
   const [isEditing, setIsEditing] = useState(false); // Encounter name editing state
   const [npcList, setNpcList] = useState([]); // Available NPCs
@@ -188,24 +188,27 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const [selectedPC, setSelectedPC] = useState(null); // Selected PC (for PC Sheet)
   const [npcClicked, setNpcClicked] = useState(null); // Entity clicked for HP/MP change
   const [clickedEntityType, setClickedEntityType] = useState("npc"); // "npc" | "pc"
-  const [npcDrawerOpen, setNpcDrawerOpen] = useState(false); // Selector Drawer open (mobile)
   const [lastSaved, setLastSaved] = useState(null); // Last saved time
   const [lastAutoSaved, setLastAutoSaved] = useState(null); // Last auto-saved time
   const [encounterNotes, setEncounterNotes] = useState([]); // Encounter notes
 
   // ========== UI Interaction States ==========
-  const [npcDetailWidth, setNpcDetailWidth] = useState(30); // NPC detail width (%)
+  const [npcDetailWidth, setNpcDetailWidth] = useState(36); // NPC detail width (%)
   const isResizing = useRef(false); // Resizing flag
   const startX = useRef(0);
   const startWidth = useRef(npcDetailWidth);
   const prevSelectedNpcsRef = useRef(null);
   const prevSelectedPCsRef = useRef(null);
   const prevRoundRef = useRef(null);
-  const prevLogsRef = useRef(null);
   const prevEncounterNameRef = useRef(null);
   const prevClocksRef = useRef(null);
   const prevNotesRef = useRef(null);
+  const prevCombatActiveRef = useRef(null);
+  const prevInitiativeRef = useRef(null);
+  const prevCurrentTurnRef = useRef(null);
+  const prevActiveTurnRef = useRef(null);
   const [tabIndex, setTabIndex] = useState(0); // NPC sheet tab index
+  const [pcTabIndex, setPcTabIndex] = useState(0); // PC sheet tab index
   const [selectedStudy, setSelectedStudy] = useState(0); // NPC study level (0 = full sheet, 1-3 = study tiers)
   const [isSaveSnackbarOpen, setIsSaveSnackbarOpen] = useState(false); // Save notification state
   const isDifferentUser = !isLocalMode && encounter?.uid !== user?.uid;
@@ -213,21 +216,68 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [npcEditModalOpen, setNpcEditModalOpen] = useState(false);
 
+  // Keep selected detail actors synced with live list updates.
+  useEffect(() => {
+    if (!selectedPC?.combatId) return;
+    const livePc = selectedPCs.find(
+      (pc) => pc.combatId === selectedPC.combatId,
+    );
+    if (!livePc) {
+      setSelectedPC(null);
+      return;
+    }
+    if (livePc !== selectedPC) {
+      setSelectedPC(livePc);
+    }
+  }, [selectedPC, selectedPCs]);
+
+  useEffect(() => {
+    if (!selectedNPC?.combatId) return;
+    const liveNpc = selectedNPCs.find(
+      (npc) => npc.combatId === selectedNPC.combatId,
+    );
+    if (!liveNpc) {
+      setSelectedNPC(null);
+      return;
+    }
+    if (liveNpc !== selectedNPC) {
+      setSelectedNPC(liveNpc);
+    }
+  }, [selectedNPC, selectedNPCs]);
+
   // Sync actors to shared store so the chat panel can read them without a Firestore round-trip.
   const setEncounterActors = useCombatEncounterStore((s) => s.setActors);
   const setActiveActorName = useCombatEncounterStore(
     (s) => s.setActiveActorName,
   );
   const clearEncounterActors = useCombatEncounterStore((s) => s.clearActors);
+  const setEncounterChat = useEncounterChatStore((s) => s.setMessages);
+  const addEncounterChatMessage = useEncounterChatStore((s) => s.addMessage);
+  const clearEncounterChat = useEncounterChatStore((s) => s.clear);
+  const setEncounterChannel = useChatChannelStore((s) => s.setEncounterChannel);
+  const clearEncounterChannel = useChatChannelStore(
+    (s) => s.clearEncounterChannel,
+  );
   const clearTargets = useCombatEncounterStore((s) => s.clearTargets);
+  const runtimeActors = useCombatEncounterStore((s) => s.runtimeActors);
+  const setActorSelectPanelData = useCombatActorSelectStore(
+    (s) => s.setPanelData,
+  );
+  const clearActorSelectPanelData = useCombatActorSelectStore(
+    (s) => s.clearPanelData,
+  );
   useEffect(() => {
     setEncounterActors(id, selectedNPCs, selectedPCs);
   }, [id, selectedNPCs, selectedPCs]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => () => clearEncounterActors(), []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ========== Log States ==========
-  const [logs, setLogs] = useState([]);
-  const [logOpen, setLogOpen] = useState(true);
+  useEffect(
+    () => () => {
+      clearEncounterActors();
+      clearEncounterChat();
+      clearEncounterChannel();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   // ========== HP/MP Dialog States ==========
   const [statType, setStatType] = useState("HP");
@@ -247,9 +297,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const [downloadImage, downloadSnackbar] = useDownloadImage();
 
   // Helper for fetching single NPC
-  const getNpc = async (npcId) => {
-    return db.getDoc(db.doc("npc-personal", npcId));
-  };
+  const getNpc = useCallback(
+    async (npcId) => {
+      return db.getDoc(db.doc("npc-personal", npcId));
+    },
+    [db],
+  );
 
   // Sync NPC selector list whenever the live collection updates
   useEffect(() => {
@@ -276,18 +329,49 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           applyPlayerPostLoadTransforms(pc),
         ),
       );
-      setLogs(encounterData.logs || []);
       setEncounterClocks(encounterData.clocks || []);
       setEncounterNotes(encounterData.notes || []);
       setLastSaved(encounterData.lastSaved);
       setLastAutoSaved(encounterData.lastAutoSaved);
+      if (encounterData.combatActive != null)
+        setCombatActive(encounterData.combatActive);
+      if (encounterData.initiative) setInitiative(encounterData.initiative);
+      if (encounterData.currentTurn) setCurrentTurn(encounterData.currentTurn);
+      if (encounterData.activeTurn !== undefined)
+        setActiveTurn(encounterData.activeTurn);
+
+      setEncounterChat(
+        id,
+        (encounterData.chatMessages ?? []).filter((m) => isValidChatMessage(m)),
+      );
+      setEncounterChannel(id, encounterData.name || "Unnamed Encounter");
+
+      // Seed refs so the change-detection effect doesn't fire dirty on first render
+      prevEncounterNameRef.current = encounterData.name || "Unnamed Encounter";
+      prevSelectedNpcsRef.current = JSON.parse(
+        JSON.stringify(encounterData.selectedNPCs || []),
+      );
+      prevSelectedPCsRef.current = JSON.parse(
+        JSON.stringify(encounterData.selectedPCs || []),
+      );
+      prevRoundRef.current = encounterData.round;
+      prevClocksRef.current = JSON.parse(
+        JSON.stringify(encounterData.clocks || []),
+      );
+      prevNotesRef.current = JSON.parse(
+        JSON.stringify(encounterData.notes || []),
+      );
+      prevCombatActiveRef.current = encounterData.combatActive ?? false;
+      prevInitiativeRef.current = encounterData.initiative ?? "players";
+      prevCurrentTurnRef.current = encounterData.currentTurn ?? "players";
+      prevActiveTurnRef.current = encounterData.activeTurn ?? null;
 
       setInitialized(true);
       setLoading(false);
     } else if (!encounterData && !loadingEncounter && !initialized) {
       setLoading(false);
     }
-  }, [encounterData, initialized, loadingEncounter, user.uid]);
+  }, [encounterData, initialized, loadingEncounter, user.uid]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Autosave setup (Debounced)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -308,9 +392,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         selectedNPCs,
         selectedPCs,
         round: encounter?.round,
-        logs,
         clocks: encounterClocks,
         notes: encounterNotes,
+        combatActive,
+        initiative,
+        currentTurn,
+        activeTurn,
       };
 
       const hasChanged =
@@ -318,9 +405,13 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         !deepEqual(selectedNPCs, prevSelectedNpcsRef.current) ||
         !deepEqual(selectedPCs, prevSelectedPCsRef.current) ||
         encounter?.round !== prevRoundRef.current ||
-        !deepEqual(logs, prevLogsRef.current) ||
         !deepEqual(encounterClocks, prevClocksRef.current) ||
-        !deepEqual(encounterNotes, prevNotesRef.current);
+        !deepEqual(encounterNotes, prevNotesRef.current) ||
+        combatActive !== prevCombatActiveRef.current ||
+        initiative !== prevInitiativeRef.current ||
+        currentTurn !== prevCurrentTurnRef.current ||
+        !deepEqual(activeTurn, prevActiveTurnRef.current) ||
+        useEncounterChatStore.getState().isDirty;
 
       if (hasChanged) {
         setIsDirty(true);
@@ -333,9 +424,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     selectedNPCs,
     selectedPCs,
     encounter?.round,
-    logs,
     encounterClocks,
     encounterNotes,
+    combatActive,
+    initiative,
+    currentTurn,
+    activeTurn,
     isDifferentUser,
     debouncedAutoSave,
     setIsDirty,
@@ -347,17 +441,23 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     prevSelectedNpcsRef.current = JSON.parse(JSON.stringify(selectedNPCs));
     prevSelectedPCsRef.current = JSON.parse(JSON.stringify(selectedPCs));
     prevRoundRef.current = encounter?.round;
-    prevLogsRef.current = JSON.parse(JSON.stringify(logs));
     prevClocksRef.current = JSON.parse(JSON.stringify(encounterClocks));
     prevNotesRef.current = JSON.parse(JSON.stringify(encounterNotes));
+    prevCombatActiveRef.current = combatActive;
+    prevInitiativeRef.current = initiative;
+    prevCurrentTurnRef.current = currentTurn;
+    prevActiveTurnRef.current = activeTurn;
   }, [
     encounterName,
     selectedNPCs,
     selectedPCs,
     encounter?.round,
-    logs,
     encounterClocks,
     encounterNotes,
+    combatActive,
+    initiative,
+    currentTurn,
+    activeTurn,
   ]);
 
   // Deep comparison helper for state tracking
@@ -370,15 +470,20 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     if (isDifferentUser) return;
 
     const saveTime = Date.now();
-    const dataToSave = encounterToSave || {
+    const chatMsgs = useEncounterChatStore.getState().messages;
+    const baseData = encounterToSave || {
       name: encounterName,
       selectedNPCs,
       selectedPCs,
       round: encounter.round,
-      logs,
       clocks: encounterClocks,
       notes: encounterNotes,
+      combatActive,
+      initiative,
+      currentTurn,
+      activeTurn,
     };
+    const dataToSave = { ...baseData, chatMessages: chatMsgs };
 
     try {
       await db.setDoc(db.doc("encounters", id), {
@@ -394,6 +499,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         setIsSaveSnackbarOpen(true);
       }
       setIsDirty(false);
+      useEncounterChatStore.getState().markClean();
     } catch (error) {
       console.error("Error saving encounter:", error);
     }
@@ -422,28 +528,33 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     return () => clearInterval(interval);
   }, [lastSaved, lastAutoSaved]);
 
-  const addMessage = useChatMessagesStore((s) => s.addMessage);
+  const addGlobalMessage = useChatMessagesStore((s) => s.addMessage);
 
-  // Handle Log state
-  const addLog = (message, name, value, status) => {
-    const newLog = {
-      id: Date.now(),
-      timestamp: new Date(),
-      text: message,
-      value1: name,
-      value2: value,
-      value3: status,
-    };
-    setLogs((prev) => [newLog, ...prev]);
-  };
+  // Always route combat messages to the encounter channel when one is loaded,
+  // regardless of which channel the user is currently viewing.
+  const addMessage = useCallback(
+    (message) => {
+      const encId = useEncounterChatStore.getState().encounterId;
+      if (encId) {
+        addEncounterChatMessage({
+          ...message,
+          channelId: `encounter:${encId}`,
+        });
+      } else {
+        addGlobalMessage(message);
+      }
+    },
+    [addEncounterChatMessage, addGlobalMessage],
+  );
 
-  const clearLogs = () => {
-    setLogs([]);
-  };
-
-  const handleLogToggle = () => {
-    setLogOpen(!logOpen);
-  };
+  // Thin wrapper that reads settings fresh and posts to encounterChatStore
+  const emitLog = useCallback(
+    (event) => {
+      const settings = useCombatSimSettingsStore.getState().settings;
+      emitCombatLog(event, settings, addEncounterChatMessage, id);
+    },
+    [addEncounterChatMessage, id],
+  );
 
   // Handle Encounter Name Change
   const handleEncounterNameChange = (e) => {
@@ -456,8 +567,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
   const handleBlur = () => {
     setIsEditing(false);
-    if (logEncounterNameUpdated && encounterName !== encounter.name) {
-      addLog("combat_sim_log_encounter_name_updated", encounterName);
+    if (encounterName !== encounter.name) {
+      emitLog({ type: "encounter-renamed", newName: encounterName });
     }
   };
 
@@ -470,18 +581,43 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
   // Handle Increase/Decrease Round
   const handleIncreaseRound = () => {
-    setEncounter((prev) => ({ ...prev, round: prev.round + 1 }));
-    if (logRoundIncrease) {
-      addLog("combat_sim_log_round_increase", encounter.round + 1);
+    setSelectedNPCs((prev) =>
+      prev.map((npc) => ({
+        ...npc,
+        combatStats: {
+          ...npc.combatStats,
+          turns: npc.combatStats.turns
+            ? npc.combatStats.turns.map(() => false)
+            : [],
+        },
+      })),
+    );
+    setSelectedPCs((prev) =>
+      prev.map((pc) => ({
+        ...pc,
+        combatStats: { ...pc.combatStats, turns: [false] },
+      })),
+    );
+    if (combatActive) {
+      setCurrentTurn(initiative);
+      setActiveTurn(null);
     }
+    setEncounter((prev) => ({ ...prev, round: prev.round + 1 }));
+    emitLog({
+      type: "round-change",
+      round: encounter.round + 1,
+      direction: "up",
+    });
   };
 
   const handleDecreaseRound = () => {
     if (encounter.round > 1) {
       setEncounter((prev) => ({ ...prev, round: prev.round - 1 }));
-      if (logRoundDecrease) {
-        addLog("combat_sim_log_round_decrease", encounter.round - 1);
-      }
+      emitLog({
+        type: "round-change",
+        round: encounter.round - 1,
+        direction: "down",
+      });
     }
   };
 
@@ -508,42 +644,96 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       })),
     );
 
-    // Increment the round
+    // Increment the round and reset turn to initiative winner
     setEncounter((prev) => ({ ...prev, round: prev.round + 1 }));
-
-    if (logNewRound) {
-      // Add log entry
-      addLog("combat_sim_log_new_round", (encounter?.round || 0) + 1);
+    if (combatActive) {
+      setCurrentTurn(initiative);
+      setActiveTurn(null);
     }
+
+    emitLog({
+      type: "round-change",
+      round: (encounter?.round || 0) + 1,
+      direction: "new",
+    });
   };
 
   // Handle Update NPC Turns
-  const handleUpdateNpcTurns = (combatId, newTurns) => {
-    setSelectedNPCs((prev) =>
-      prev.map((npc) =>
-        npc.combatId === combatId
-          ? { ...npc, combatStats: { ...npc.combatStats, turns: newTurns } }
-          : npc,
-      ),
-    );
+  const handleStartActorTurn = (combatId, turnIndex, faction) => {
+    if (activeTurn) return; // another turn already in progress
+    setActiveTurn({ combatId, turnIndex, faction });
+  };
 
-    // Add log entry if new turns have been checked so oldTurns < newTurns
-    const npc = selectedNPCs.find((npc) => npc.combatId === combatId);
-    if (npc) {
-      const oldTurns = npc.combatStats.turns || [];
-      const newTurnsCount = newTurns.filter((turn) => turn).length;
-      const oldTurnsCount = oldTurns.filter((turn) => turn).length;
-      if (newTurnsCount > oldTurnsCount) {
-        if (logTurnChecked) {
-          addLog(
-            "combat_sim_log_turn_checked",
-            npc.name +
-              (npc?.combatStats?.combatNotes
-                ? "【" + npc.combatStats.combatNotes + "】"
-                : ""),
-            newTurnsCount,
-          );
+  const handleEndActorTurn = (combatId, turnIndex, faction, isNpc) => {
+    setActiveTurn(null);
+    if (isNpc) {
+      const nextNPCs = selectedNPCs.map((n) => {
+        if (n.combatId !== combatId) return n;
+        const newTurns = [...(n.combatStats?.turns ?? [])];
+        newTurns[turnIndex] = true;
+        return { ...n, combatStats: { ...n.combatStats, turns: newTurns } };
+      });
+      setSelectedNPCs(nextNPCs);
+      {
+        const npc = selectedNPCs.find((n) => n.combatId === combatId);
+        if (npc) {
+          emitLog({ type: "turn-checked", actorName: npc.name });
         }
+      }
+      setCurrentTurn(determineNextTurn("npcs", nextNPCs, selectedPCs));
+    } else {
+      const nextPCs = selectedPCs.map((p) => {
+        if (p.combatId !== combatId) return p;
+        const newTurns = [...(p.combatStats?.turns ?? [])];
+        newTurns[turnIndex] = true;
+        return { ...p, combatStats: { ...p.combatStats, turns: newTurns } };
+      });
+      setSelectedPCs(nextPCs);
+      {
+        const pc = selectedPCs.find((p) => p.combatId === combatId);
+        if (pc) {
+          emitLog({ type: "turn-checked", actorName: pc.name });
+        }
+      }
+      setCurrentTurn(determineNextTurn("players", selectedNPCs, nextPCs));
+    }
+  };
+
+  // After a turn is taken, flip currentTurn to the other faction if they still have turns left.
+  // nextNpcs/nextPCs are the up-to-date arrays (state setters are async).
+  const determineNextTurn = (lastFaction, nextNPCs, nextPCs) => {
+    const other = lastFaction === "npcs" ? "players" : "npcs";
+    const otherHasTurns =
+      other === "npcs"
+        ? nextNPCs.some((n) => n.combatStats?.turns?.some((t) => !t))
+        : nextPCs.some((p) => p.combatStats?.turns?.some((t) => !t));
+    const sameHasTurns =
+      lastFaction === "npcs"
+        ? nextNPCs.some((n) => n.combatStats?.turns?.some((t) => !t))
+        : nextPCs.some((p) => p.combatStats?.turns?.some((t) => !t));
+    if (otherHasTurns) return other;
+    if (sameHasTurns) return lastFaction;
+    return lastFaction; // all turns exhausted, round over
+  };
+
+  const handleUpdateNpcTurns = (combatId, newTurns) => {
+    const npc = selectedNPCs.find((npc) => npc.combatId === combatId);
+    const oldTurns = npc?.combatStats?.turns || [];
+    const oldTurnsCount = oldTurns.filter((t) => t).length;
+    const newTurnsCount = newTurns.filter((t) => t).length;
+    const turnWasTaken = newTurnsCount > oldTurnsCount;
+
+    const nextNPCs = selectedNPCs.map((n) =>
+      n.combatId === combatId
+        ? { ...n, combatStats: { ...n.combatStats, turns: newTurns } }
+        : n,
+    );
+    setSelectedNPCs(nextNPCs);
+
+    if (npc && turnWasTaken) {
+      emitLog({ type: "turn-checked", actorName: npc.name });
+      if (combatActive) {
+        setCurrentTurn(determineNextTurn("npcs", nextNPCs, selectedPCs));
       }
     }
   };
@@ -562,89 +752,122 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   };
 
   // Determine number of turns based on rank
-  const getTurnCount = (rank) => {
+  const getTurnCount = useCallback((rank) => {
     if (rank === "soldier" || rank === "champion1" || !rank) return 1;
     if (rank === "elite") return 2;
     const match = rank.match(/champion(\d)/);
     return match ? parseInt(match[1], 10) : 1;
-  };
+  }, []);
 
   // Handle Select NPC from the list of available NPCs
-  const handleSelectNPC = async (npcId) => {
-    if (selectedNPCs.length < 30) {
-      const npc = await getNpc(npcId); // Fetch full NPC data using getNpc
-      if (!npc) return;
-      const normalizedNpc = applyNpcPostLoadTransforms(npc);
+  const handleSelectNPC = useCallback(
+    async (npcId) => {
+      if (selectedNPCs.length < 30) {
+        const npc = await getNpc(npcId); // Fetch full NPC data using getNpc
+        if (!npc) return;
+        const normalizedNpc = applyNpcPostLoadTransforms(npc);
 
-      // Calculate Ultima value only if the NPC is a villain
-      let ultimaValue = null;
-      if (normalizedNpc.villain === "minor") {
-        ultimaValue = 5;
-      } else if (normalizedNpc.villain === "major") {
-        ultimaValue = 10;
-      } else if (normalizedNpc.villain === "superme") {
-        ultimaValue = 15;
-      }
+        // Calculate Ultima value only if the NPC is a villain
+        let ultimaValue = null;
+        if (normalizedNpc.villain) {
+          ultimaValue = villainUltimaMax(normalizedNpc.villain);
+        }
 
-      // Create combatStats object and conditionally add ultima
-      const combatStats = {
-        notes: "",
-        currentHp: calcHP(normalizedNpc),
-        currentMp: calcMP(normalizedNpc),
-        turns: new Array(getTurnCount(normalizedNpc.rank)).fill(false),
-        statusEffects: [],
-        combatNotes: "",
-        ...(ultimaValue !== null && { ultima: ultimaValue }), // Only add ultima if it's not null
-      };
+        // Create combatStats object and conditionally add ultima
+        const combatStats = {
+          notes: "",
+          currentHp: calcHP(normalizedNpc),
+          maxHp: calcHP(normalizedNpc),
+          currentMp: calcMP(normalizedNpc),
+          maxMp: calcMP(normalizedNpc),
+          turns: new Array(getTurnCount(normalizedNpc.rank)).fill(false),
+          statusEffects: [],
+          combatNotes: "",
+          ...(ultimaValue !== null && { ultima: ultimaValue }),
+        };
 
-      setSelectedNPCs((prev) => [
-        ...prev,
-        {
-          ...normalizedNpc,
-          id: npcId,
-          sourceDocId: npcId,
-          sourceCollection: "npc-personal",
-          combatId: `${npcId}-${Date.now()}`,
-          combatStats: combatStats,
-        },
-      ]);
+        setSelectedNPCs((prev) => [
+          ...prev,
+          {
+            ...normalizedNpc,
+            id: npcId,
+            sourceDocId: npcId,
+            sourceCollection: "npc-personal",
+            combatId: `${npcId}-${Date.now()}`,
+            combatStats: combatStats,
+          },
+        ]);
 
-      if (logNpcAdded) {
-        // Add log entry to logs array
-        addLog("combat_sim_log_npc_added", normalizedNpc.name);
-      }
-    } else {
-      if (window.electron) {
+        emitLog({ type: "actor-added", name: normalizedNpc.name });
+      } else if (window.electron) {
         window.electron.alert(t("combat_sim_too_many_npcs"));
       } else {
         alert(t("combat_sim_too_many_npcs"));
       }
-    }
-  };
+    },
+    [selectedNPCs.length, getNpc, getTurnCount, emitLog],
+  );
 
   // Handle Select PC from the player list
-  const handleSelectPC = (player) => {
-    if (selectedNPCs.length + selectedPCs.length < 30) {
-      const normalizedPlayer = applyPlayerPostLoadTransforms(player);
-      setSelectedPCs((prev) => [
-        ...prev,
-        {
-          ...normalizedPlayer,
-          id: player.id,
-          sourceDocId: player.id,
-          sourceCollection: "player-personal",
-          combatId: `${player.id}-${Date.now()}`,
-          combatStats: {
-            currentHp: normalizedPlayer.stats?.hp?.max ?? 0,
-            currentMp: normalizedPlayer.stats?.mp?.max ?? 0,
-            turns: [false],
-            statusEffects: [],
-            combatNotes: "",
+  const handleSelectPC = useCallback(
+    (player) => {
+      if (selectedNPCs.length + selectedPCs.length < 30) {
+        const normalizedPlayer = applyPlayerPostLoadTransforms(player);
+        setSelectedPCs((prev) => [
+          ...prev,
+          {
+            ...normalizedPlayer,
+            id: player.id,
+            sourceDocId: player.id,
+            sourceCollection: "player-personal",
+            combatId: `${player.id}-${Date.now()}`,
+            combatStats: {
+              currentHp: normalizedPlayer.stats?.hp?.max ?? 0,
+              maxHp: normalizedPlayer.stats?.hp?.max ?? 0,
+              currentMp: normalizedPlayer.stats?.mp?.max ?? 0,
+              maxMp: normalizedPlayer.stats?.mp?.max ?? 0,
+              turns: [false],
+              statusEffects: [],
+              combatNotes: "",
+            },
           },
-        },
-      ]);
+        ]);
+
+        emitLog({ type: "actor-added", name: normalizedPlayer.name });
+      }
+    },
+    [selectedNPCs.length, selectedPCs.length, emitLog],
+  );
+
+  useEffect(() => {
+    if (isDifferentUser) {
+      clearActorSelectPanelData();
+      return;
     }
-  };
+    setActorSelectPanelData({
+      npcList,
+      playerList,
+      loadingNpcs,
+      loadingPlayers,
+      handleSelectNPC,
+      handleSelectPC,
+    });
+  }, [
+    npcList,
+    playerList,
+    loadingNpcs,
+    loadingPlayers,
+    handleSelectNPC,
+    handleSelectPC,
+    isDifferentUser,
+    clearActorSelectPanelData,
+    setActorSelectPanelData,
+  ]);
+
+  useEffect(
+    () => () => clearActorSelectPanelData(),
+    [clearActorSelectPanelData],
+  );
 
   // Handle Remove PC from the selected PCs list
   const handleRemovePC = async (pcCombatId) => {
@@ -654,9 +877,14 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       );
       if (!confirmRemove) return;
     }
+    const pcToRemove = selectedPCs.find((pc) => pc.combatId === pcCombatId);
     setSelectedPCs((prev) => prev.filter((pc) => pc.combatId !== pcCombatId));
     if (selectedPC?.combatId === pcCombatId) {
       setSelectedPC(null);
+    }
+
+    if (pcToRemove) {
+      emitLog({ type: "actor-removed", name: pcToRemove.name });
     }
   };
 
@@ -670,13 +898,25 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
   // Handle Update PC Turns
   const handleUpdatePcTurns = (combatId, newTurns) => {
-    setSelectedPCs((prev) =>
-      prev.map((pc) =>
-        pc.combatId === combatId
-          ? { ...pc, combatStats: { ...pc.combatStats, turns: newTurns } }
-          : pc,
-      ),
+    const pc = selectedPCs.find((p) => p.combatId === combatId);
+    const oldTurns = pc?.combatStats?.turns || [];
+    const oldTurnsCount = oldTurns.filter((t) => t).length;
+    const newTurnsCount = newTurns.filter((t) => t).length;
+    const turnWasTaken = newTurnsCount > oldTurnsCount;
+
+    const nextPCs = selectedPCs.map((p) =>
+      p.combatId === combatId
+        ? { ...p, combatStats: { ...p.combatStats, turns: newTurns } }
+        : p,
     );
+    setSelectedPCs(nextPCs);
+
+    if (pc && turnWasTaken) {
+      emitLog({ type: "turn-checked", actorName: pc.name });
+      if (combatActive) {
+        setCurrentTurn(determineNextTurn("players", selectedNPCs, nextPCs));
+      }
+    }
   };
 
   // Handle Remove NPC from the selected NPCs list
@@ -699,15 +939,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       setSelectedNPC(null);
     }
 
-    // Add log entry to logs array
-    if (npcToRemove && logNpcRemoved) {
-      addLog(
-        "combat_sim_log_npc_removed",
-        npcToRemove.name +
-          (npcToRemove?.combatStats?.combatNotes
-            ? "【" + npcToRemove.combatStats.combatNotes + "】"
-            : ""),
-      );
+    if (npcToRemove) {
+      emitLog({ type: "actor-removed", name: npcToRemove.name });
     }
   };
 
@@ -733,8 +966,32 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     }
   };
 
+  const handlePcMoveUp = (pcCombatId) => {
+    const index = selectedPCs.findIndex((pc) => pc.combatId === pcCombatId);
+    if (index > 0) {
+      const updated = [...selectedPCs];
+      const [moved] = updated.splice(index, 1);
+      updated.splice(index - 1, 0, moved);
+      setSelectedPCs(updated);
+    }
+  };
+
+  const handlePcMoveDown = (pcCombatId) => {
+    const index = selectedPCs.findIndex((pc) => pc.combatId === pcCombatId);
+    if (index < selectedPCs.length - 1) {
+      const updated = [...selectedPCs];
+      const [moved] = updated.splice(index, 1);
+      updated.splice(index + 1, 0, moved);
+      setSelectedPCs(updated);
+    }
+  };
+
   const handleSortEnd = (sortedNPCs) => {
     setSelectedNPCs(sortedNPCs);
+  };
+
+  const handlePcSortEnd = (sortedPCs) => {
+    setSelectedPCs(sortedPCs);
   };
 
   // Handle NPC Click in the selected NPCs list
@@ -784,6 +1041,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       adjustedValue = isHealing ? Number(value) : -Number(value);
       const maxHP = npcClicked.stats?.hp?.max ?? 0;
       const maxMP = npcClicked.stats?.mp?.max ?? 0;
+      const maxIP = npcClicked.stats?.ip?.max ?? 0;
+      const actorName = npcClicked.name;
+      const projectedHp =
+        npcClicked.combatStats.currentHp +
+        (statType === "HP" ? adjustedValue : 0);
 
       setSelectedPCs((prev) =>
         prev.map((pc) => {
@@ -804,12 +1066,27 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             ),
             maxMP,
           );
+          const newIp = Math.min(
+            Math.max(
+              (pc.combatStats.currentIp ?? pc.stats?.ip?.current ?? 0) +
+                (statType === "IP" ? adjustedValue : 0),
+              0,
+            ),
+            maxIP,
+          );
+          const newFp = Math.max(
+            (pc.combatStats.currentFp ?? pc.info?.fabulapoints ?? 0) +
+              (statType === "FP" ? adjustedValue : 0),
+            0,
+          );
           return {
             ...pc,
             combatStats: {
               ...pc.combatStats,
               currentHp: statType === "HP" ? newHp : pc.combatStats.currentHp,
               currentMp: statType === "MP" ? newMp : pc.combatStats.currentMp,
+              currentIp: statType === "IP" ? newIp : pc.combatStats.currentIp,
+              currentFp: statType === "FP" ? newFp : pc.combatStats.currentFp,
             },
           };
         }),
@@ -832,6 +1109,21 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           ),
           maxMP,
         );
+        const newIp = Math.min(
+          Math.max(
+            (selectedPC.combatStats.currentIp ??
+              selectedPC.stats?.ip?.current ??
+              0) + (statType === "IP" ? adjustedValue : 0),
+            0,
+          ),
+          maxIP,
+        );
+        const newFp = Math.max(
+          (selectedPC.combatStats.currentFp ??
+            selectedPC.info?.fabulapoints ??
+            0) + (statType === "FP" ? adjustedValue : 0),
+          0,
+        );
         setSelectedPC({
           ...selectedPC,
           combatStats: {
@@ -840,8 +1132,44 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
               statType === "HP" ? newHp : selectedPC.combatStats.currentHp,
             currentMp:
               statType === "MP" ? newMp : selectedPC.combatStats.currentMp,
+            currentIp:
+              statType === "IP" ? newIp : selectedPC.combatStats.currentIp,
+            currentFp:
+              statType === "FP" ? newFp : selectedPC.combatStats.currentFp,
           },
         });
+      }
+
+      if (adjustedValue < 0 && statType === "HP") {
+        emitLog({
+          type: "damage",
+          actorName: "GM",
+          targetName: actorName,
+          amount: Math.abs(adjustedValue),
+          damageType: damageType || "untyped",
+        });
+      } else if (adjustedValue < 0) {
+        emitLog({
+          type: "resource-loss",
+          actorName: "GM",
+          targetName: actorName,
+          amount: Math.abs(adjustedValue),
+          resource: statType.toLowerCase(),
+        });
+      } else if (adjustedValue > 0) {
+        emitLog({
+          type: "heal",
+          actorName: "GM",
+          targetName: actorName,
+          amount: Math.abs(adjustedValue),
+          resource: statType.toLowerCase(),
+        });
+      }
+
+      if (projectedHp <= 0) {
+        setTimeout(() => {
+          emitLog({ type: "fainted", targetName: actorName });
+        }, 200);
       }
 
       handleClose();
@@ -867,6 +1195,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       if (npc.combatId === npcClicked.combatId) {
         const maxHP = calcHP(npcClicked);
         const maxMP = calcMP(npcClicked);
+        const maxIP = npcClicked.stats?.ip?.max ?? 0;
+        const maxFP = npcClicked.combatStats?.maxFp ?? 6;
         const newHp = Math.min(
           Math.max(
             npc.combatStats.currentHp + (statType === "HP" ? adjustedValue : 0),
@@ -881,6 +1211,30 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           ),
           maxMP,
         );
+        const newIp = Math.min(
+          Math.max(
+            (npc.combatStats.currentIp ?? 0) +
+              (statType === "IP" ? adjustedValue : 0),
+            0,
+          ),
+          maxIP,
+        );
+        const newFp = Math.min(
+          Math.max(
+            (npc.combatStats.currentFp ?? 0) +
+              (statType === "FP" ? adjustedValue : 0),
+            0,
+          ),
+          maxFP,
+        );
+        const newUp = Math.min(
+          Math.max(
+            (npc.combatStats.ultima ?? 0) +
+              (statType === "UP" ? adjustedValue : 0),
+            0,
+          ),
+          villainUltimaMax(npc.villain),
+        );
 
         return {
           ...npc,
@@ -888,6 +1242,9 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             ...npc.combatStats,
             currentHp: statType === "HP" ? newHp : npc.combatStats.currentHp,
             currentMp: statType === "MP" ? newMp : npc.combatStats.currentMp,
+            currentIp: statType === "IP" ? newIp : npc.combatStats.currentIp,
+            currentFp: statType === "FP" ? newFp : npc.combatStats.currentFp,
+            ultima: statType === "UP" ? newUp : npc.combatStats.ultima,
           },
         };
       }
@@ -899,6 +1256,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     if (selectedNPC && selectedNPC.combatId === npcClicked.combatId) {
       const maxHP = calcHP(npcClicked);
       const maxMP = calcMP(npcClicked);
+      const maxIP = npcClicked.stats?.ip?.max ?? 0;
+      const maxFP = npcClicked.combatStats?.maxFp ?? 6;
       const newHp = Math.min(
         Math.max(
           npcClicked.combatStats.currentHp +
@@ -915,6 +1274,30 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         ),
         maxMP,
       );
+      const newIp = Math.min(
+        Math.max(
+          (npcClicked.combatStats.currentIp ?? 0) +
+            (statType === "IP" ? adjustedValue : 0),
+          0,
+        ),
+        maxIP,
+      );
+      const newFp = Math.min(
+        Math.max(
+          (npcClicked.combatStats.currentFp ?? 0) +
+            (statType === "FP" ? adjustedValue : 0),
+          0,
+        ),
+        maxFP,
+      );
+      const newUp = Math.min(
+        Math.max(
+          (npcClicked.combatStats.ultima ?? 0) +
+            (statType === "UP" ? adjustedValue : 0),
+          0,
+        ),
+        villainUltimaMax(npcClicked.villain),
+      );
 
       setSelectedNPC({
         ...selectedNPC,
@@ -924,75 +1307,53 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             statType === "HP" ? newHp : selectedNPC.combatStats.currentHp,
           currentMp:
             statType === "MP" ? newMp : selectedNPC.combatStats.currentMp,
+          currentIp:
+            statType === "IP" ? newIp : selectedNPC.combatStats.currentIp,
+          currentFp:
+            statType === "FP" ? newFp : selectedNPC.combatStats.currentFp,
+          ultima: statType === "UP" ? newUp : selectedNPC.combatStats.ultima,
         },
       });
     }
 
     handleClose();
 
-    // log for damage
-    if (
-      adjustedValue < 0 &&
-      statType === "HP" &&
-      damageType !== "" &&
-      logNpcDamage
-    ) {
-      addLog(
-        "combat_sim_log_npc_damage",
-        npcClicked.name +
-          (npcClicked?.combatStats?.combatNotes
-            ? "【" + npcClicked.combatStats.combatNotes + "】"
-            : ""),
-        Math.abs(adjustedValue),
-        damageType,
-      );
-    } else if (adjustedValue < 0 && statType === "HP" && logNpcDamageNoType) {
-      addLog(
-        "combat_sim_log_npc_damage_no_type",
-        npcClicked.name +
-          (npcClicked?.combatStats?.combatNotes
-            ? "【" + npcClicked.combatStats.combatNotes + "】"
-            : ""),
-        Math.abs(adjustedValue),
-      );
-    } else if (adjustedValue < 0 && statType === "MP" && logNpcUsedMp) {
-      addLog(
-        "combat_sim_log_npc_used_mp",
-        npcClicked.name +
-          (npcClicked?.combatStats?.combatNotes
-            ? "【" + npcClicked.combatStats.combatNotes + "】"
-            : ""),
-        Math.abs(adjustedValue),
-      );
-    } else if (adjustedValue > 0 && logNpcHeal) {
-      addLog(
-        "combat_sim_log_npc_heal",
-        npcClicked.name +
-          (npcClicked?.combatStats?.combatNotes
-            ? "【" + npcClicked.combatStats.combatNotes + "】"
-            : ""),
-        Math.abs(adjustedValue),
-        statType,
-      );
+    // log for damage/heal/resource
+    if (adjustedValue < 0 && statType === "HP") {
+      emitLog({
+        type: "damage",
+        actorName: "GM",
+        targetName: npcClicked.name,
+        amount: Math.abs(adjustedValue),
+        damageType: damageType || "untyped",
+      });
+    } else if (adjustedValue < 0) {
+      emitLog({
+        type: "resource-loss",
+        actorName: "GM",
+        targetName: npcClicked.name,
+        amount: Math.abs(adjustedValue),
+        resource: statType.toLowerCase(),
+      });
+    } else if (adjustedValue > 0) {
+      emitLog({
+        type: "heal",
+        actorName: "GM",
+        targetName: npcClicked.name,
+        amount: Math.abs(adjustedValue),
+        resource: statType.toLowerCase(),
+      });
     }
 
-    // Add log if npc fainted after damage (0.5 seconds delay)
+    // fainted
     if (
       npcClicked.combatStats.currentHp +
         (statType === "HP" ? adjustedValue : 0) <=
       0
     ) {
-      if (logNpcFainted) {
-        setTimeout(() => {
-          addLog(
-            "combat_sim_log_npc_fainted",
-            npcClicked.name +
-              (npcClicked?.combatStats?.combatNotes
-                ? "【" + npcClicked.combatStats.combatNotes + "】"
-                : ""),
-          );
-        }, 200);
-      }
+      setTimeout(() => {
+        emitLog({ type: "fainted", targetName: npcClicked.name });
+      }, 200);
       if (autoRemoveNPCFaint) {
         setTimeout(() => {
           handleRemoveNPC(npcClicked.combatId, true);
@@ -1048,29 +1409,9 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     // Add log entry if status effect is added or removed
     if (updatedStatusEffects.includes(status)) {
-      if (logStatusEffectAdded) {
-        addLog(
-          "combat_sim_log_status_effect_added",
-          npc.name +
-            (npc?.combatStats?.combatNotes
-              ? "【" + npc.combatStats.combatNotes + "】"
-              : ""),
-          null,
-          status,
-        );
-      }
+      emitLog({ type: "status-added", targetName: npc.name, status });
     } else {
-      if (logStatusEffectRemoved) {
-        addLog(
-          "combat_sim_log_status_effect_removed",
-          npc.name +
-            (npc?.combatStats?.combatNotes
-              ? "【" + npc.combatStats.combatNotes + "】"
-              : ""),
-          null,
-          status,
-        );
-      }
+      emitLog({ type: "status-removed", targetName: npc.name, status });
     }
   };
 
@@ -1094,66 +1435,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     return attributeValue;
   }
-
-  // Handle Ultima Points
-  const handleIncreaseUltima = () => {
-    // update SelectedNPC and selectedNPCs
-    setSelectedNPC((prev) => ({
-      ...prev,
-      combatStats: {
-        ...prev.combatStats,
-        ultima: (prev.combatStats.ultima || 0) + 1,
-      },
-    }));
-    setSelectedNPCs((prev) =>
-      prev.map((npc) =>
-        npc.combatId === selectedNPC.combatId
-          ? {
-              ...npc,
-              combatStats: {
-                ...npc.combatStats,
-                ultima: (npc.combatStats.ultima || 0) + 1,
-              },
-            }
-          : npc,
-      ),
-    );
-  };
-
-  const handleDecreaseUltima = () => {
-    // update SelectedNPC and selectedNPCs
-    setSelectedNPC((prev) => ({
-      ...prev,
-      combatStats: {
-        ...prev.combatStats,
-        ultima: Math.max((prev.combatStats.ultima || 0) - 1, 0),
-      },
-    }));
-    setSelectedNPCs((prev) =>
-      prev.map((npc) =>
-        npc.combatId === selectedNPC.combatId
-          ? {
-              ...npc,
-              combatStats: {
-                ...npc.combatStats,
-                ultima: Math.max((npc.combatStats.ultima || 0) - 1, 0),
-              },
-            }
-          : npc,
-      ),
-    );
-
-    if (logUseUltimaPoint) {
-      // Add log entry
-      addLog(
-        "combat_sim_log_used_ultima_point",
-        selectedNPC.name +
-          (selectedNPC?.combatStats?.combatNotes
-            ? "【" + selectedNPC.combatStats.combatNotes + "】"
-            : ""),
-      );
-    }
-  };
 
   // NPC Detail width resizing
   const handleMouseDown = (e) => {
@@ -1231,11 +1512,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
   const handleSaveClock = (newClock) => {
     setEncounterClocks([...encounterClocks, newClock]);
-    if (logClockAdded) {
-      addLog("combat_sim_log_clock_added", "--isClock--", {
-        name: newClock.name,
-      });
-    }
+    emitLog({ type: "clock-added", clockName: newClock.name });
   };
 
   const handleUpdateClock = (index, newState) => {
@@ -1245,13 +1522,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       state: newState,
     };
     setEncounterClocks(updatedClocks);
-    if (logClockUpdate) {
-      addLog("combat_sim_log_clock_updated", "--isClock--", {
-        name: updatedClocks[index].name,
-        current: newState.filter(Boolean).length,
-        max: updatedClocks[index].sections,
-      });
-    }
+    emitLog({
+      type: "clock-updated",
+      clockName: updatedClocks[index].name,
+      progress: newState.filter(Boolean).length,
+      max: updatedClocks[index].sections,
+    });
   };
 
   const handleRemoveClock = async (index) => {
@@ -1264,11 +1540,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     const clockName = encounterClocks[index].name;
     setEncounterClocks(encounterClocks.filter((_, i) => i !== index));
-    if (logClockRemoved) {
-      addLog("combat_sim_log_clock_removed", "--isClock--", {
-        name: clockName,
-      });
-    }
+    emitLog({ type: "clock-removed", clockName });
   };
 
   const handleResetClock = (index) => {
@@ -1278,13 +1550,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       state: new Array(updatedClocks[index].sections).fill(false),
     };
     setEncounterClocks(updatedClocks);
-    if (logClockReset) {
-      addLog("combat_sim_log_clock_reset", "--isClock--", {
-        name: updatedClocks[index].name,
-        current: updatedClocks[index].state.filter(Boolean).length,
-        max: updatedClocks[index].sections,
-      });
-    }
+    emitLog({ type: "clock-reset", clockName: updatedClocks[index].name });
   };
 
   const handleNotesSave = (newNotes) => {
@@ -1345,6 +1611,35 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         round={encounter.round}
         handleIncreaseRound={handleIncreaseRound}
         handleDecreaseRound={handleDecreaseRound}
+        combatActive={combatActive}
+        onToggleCombat={() => {
+          if (combatActive) {
+            setCombatActive(false);
+            setActiveTurn(null);
+            setCurrentTurn("players");
+            setInitiative("players");
+            setSelectedNPCs((prev) =>
+              prev.map((npc) => ({
+                ...npc,
+                combatStats: {
+                  ...npc.combatStats,
+                  turns: npc.combatStats.turns
+                    ? npc.combatStats.turns.map(() => false)
+                    : [],
+                },
+              })),
+            );
+            setSelectedPCs((prev) =>
+              prev.map((pc) => ({
+                ...pc,
+                combatStats: { ...pc.combatStats, turns: [false] },
+              })),
+            );
+            setEncounter((prev) => ({ ...prev, round: 1 }));
+          } else {
+            setInitiativeDialogOpen(true);
+          }
+        }}
         isMobile={isMobile}
         isDifferentUser={isDifferentUser}
         isAutoSaveEnabled={autosaveEnabled}
@@ -1362,24 +1657,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         onUpdate={(index, newState) => handleUpdateClock(index, newState)}
         onRemove={(index) => handleRemoveClock(index)}
         onReset={(index) => handleResetClock(index)}
-        addLog={addLog}
+        emitLog={emitLog}
       />
 
-      {isMobile && (
-        <SelectorPanel
-          isMobile={isMobile}
-          npcDrawerOpen={npcDrawerOpen}
-          setNpcDrawerOpen={setNpcDrawerOpen}
-          npcList={npcList}
-          handleSelectNPC={handleSelectNPC}
-          playerList={playerList}
-          handleSelectPC={handleSelectPC}
-          loadingNpcs={loadingNpcs}
-          loadingPlayers={loadingPlayers}
-        />
-      )}
-
-      {/* Three Columns: NPC Selector, Selected NPCs, NPC Sheet */}
+      {/* Main Columns: Selected NPCs + NPC/PC Sheet */}
       <Box
         sx={{
           display: "flex",
@@ -1387,20 +1668,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           height: isMobile ? "calc(100vh - 195px)" : "calc(100vh - 157px)",
         }}
       >
-        {/* Selector Panel (NPC + PC tabs) */}
-        {!isMobile && !isDifferentUser && (
-          <SelectorPanel
-            isMobile={isMobile}
-            npcDrawerOpen={npcDrawerOpen}
-            setNpcDrawerOpen={setNpcDrawerOpen}
-            npcList={npcList}
-            handleSelectNPC={handleSelectNPC}
-            playerList={playerList}
-            handleSelectPC={handleSelectPC}
-            loadingNpcs={loadingNpcs}
-            loadingPlayers={loadingPlayers}
-          />
-        )}
         <Box
           sx={{
             flex: 1,
@@ -1412,7 +1679,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           }}
         >
           {/* Selected NPCs */}
-          <SelectedNpcs
+          <SelectedActors
             selectedNPCs={selectedNPCs}
             handleResetTurns={handleResetTurns}
             handleMoveUp={handleMoveUp}
@@ -1431,6 +1698,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             isDifferentUser={isDifferentUser}
             useDragAndDrop={npcReorderingMethod === "dragAndDrop"}
             onSortEnd={handleSortEnd}
+            onSortEndPC={handlePcSortEnd}
             onClockClick={() => setClockDialogOpen(true)}
             onNotesClick={() => setNotesDialogOpen(true)}
             onClearAll={() => {
@@ -1440,21 +1708,19 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             }}
             selectedPCs={selectedPCs}
             handleRemovePC={handleRemovePC}
+            handlePcMoveUp={handlePcMoveUp}
+            handlePcMoveDown={handlePcMoveDown}
             handlePcClick={handlePcClick}
             handleHpMpClickPC={(type, pc) => handleOpen(type, pc, "pc")}
             handleUpdatePcTurns={handleUpdatePcTurns}
             selectedPcID={selectedPC?.combatId}
+            combatActive={combatActive}
+            initiative={initiative}
+            currentTurn={currentTurn}
+            activeTurn={activeTurn}
+            onStartActorTurn={handleStartActorTurn}
+            onEndActorTurn={handleEndActorTurn}
           />
-          {/* Combat Log */}
-          {!hideLogs && (
-            <CombatLog
-              isMobile={false}
-              logs={logs}
-              open={logOpen}
-              onToggle={handleLogToggle}
-              clearLogs={clearLogs}
-            />
-          )}
         </Box>
         {/* Detail Resize Handle */}
         {(selectedNPC || selectedPC) && (
@@ -1503,13 +1769,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             selectedNPCs={selectedNPCs}
             setSelectedNPCs={setSelectedNPCs}
             calcAttr={calcAttr}
-            handleDecreaseUltima={handleDecreaseUltima}
-            handleIncreaseUltima={handleIncreaseUltima}
             npcRef={null}
             isMobile={isMobile}
-            addLog={addLog}
+            emitLog={emitLog}
             addMessage={addMessage}
-            openLogs={() => setLogOpen(true)}
             npcDetailWidth={`${npcDetailWidth}%`}
             checkNewTurn={checkNewTurn}
             handleEditNPC={handleEditNPC}
@@ -1521,6 +1784,14 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             selectedPC={selectedPC}
             setSelectedPC={setSelectedPC}
             npcDetailWidth={`${npcDetailWidth}%`}
+            isMobile={isMobile}
+            selectedPCs={selectedPCs}
+            setSelectedPCs={setSelectedPCs}
+            emitLog={emitLog}
+            addMessage={addMessage}
+            handleOpen={handleOpen}
+            tabIndex={pcTabIndex}
+            setTabIndex={setPcTabIndex}
           />
         )}
       </Box>
@@ -1544,9 +1815,48 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         setIsIgnoreResistance={setIsIgnoreResistance}
         isIgnoreImmunity={isIgnoreImmunity}
         setIsIgnoreImmunity={setIsIgnoreImmunity}
+        clickedEntityType={clickedEntityType}
         inputRef={inputRef}
       />
       {/* Notes Dialog */}
+      <InitiativeDialog
+        open={initiativeDialogOpen}
+        pcCount={selectedPCs.length}
+        npcCount={selectedNPCs.length}
+        onConfirm={(won) => {
+          setInitiative(won);
+          setCurrentTurn(won);
+          setInitiativeDialogOpen(false);
+          setCombatActive(true);
+
+          const allActors = [
+            ...selectedNPCs.map((doc) => ({
+              doc,
+              runtime: runtimeActors[doc.combatId],
+            })),
+            ...selectedPCs.map((doc) => ({
+              doc,
+              runtime: runtimeActors[doc.combatId],
+            })),
+          ].filter((a) => a.runtime != null);
+
+          const matches = scanForTrigger("combat-start", allActors);
+          for (const { chatOutput } of fireTriggers(matches)) {
+            if (!chatOutput) continue;
+            addMessage({
+              id: crypto.randomUUID(),
+              createdAt: Date.now(),
+              speaker: chatOutput.speaker,
+              kind: "display",
+              itemType: chatOutput.itemType,
+              name: chatOutput.itemName,
+              tags: [],
+              description: chatOutput.text,
+            });
+          }
+        }}
+        onCancel={() => setInitiativeDialogOpen(false)}
+      />
       <GeneralNotesDialog
         open={notesDialogOpen}
         onClose={() => setNotesDialogOpen(false)}

@@ -1,4 +1,11 @@
 import { z } from "zod";
+import {
+  BehaviorSchema,
+  EffectChangeSchema,
+  GrantDataSchema,
+  EffectDurationSchema,
+  EffectPredicateSchema,
+} from "../shared/behaviorSchemas";
 
 const AffinityValueSchema = z.enum(["vu", "rs", "im", "ab", "no"]);
 
@@ -48,6 +55,15 @@ const NpcFeaturesSchema = z.object({
   magic: NpcFeatureSchema.optional(),
 });
 
+const NpcStatusesSchema = z.object({
+  slow: z.boolean(),
+  dazed: z.boolean(),
+  weak: z.boolean(),
+  shaken: z.boolean(),
+  enraged: z.boolean(),
+  poisoned: z.boolean(),
+});
+
 const NpcResourcePoolSchema = z.object({
   current: z.number(),
   bonus: z.number(),
@@ -69,7 +85,96 @@ const NpcDerivedSchema = z.object({
   init: z.object({ bonus: z.number() }),
 });
 
-const NpcArmorSchema = z
+const ResourceDeltaSchema = z.object({
+  hp: z.number(),
+  mp: z.number(),
+  ip: z.number(),
+});
+
+const ResourceMultiplierSchema = z.object({
+  hp: z.number(),
+  mp: z.number(),
+  ip: z.number(),
+});
+
+const AccuracyBonusesSchema = z.object({
+  all: z.number(),
+  accuracyCheck: z.number(),
+  melee: z.number(),
+  ranged: z.number(),
+  magic: z.number(),
+  opposed: z.number(),
+  open: z.number(),
+  arcane: z.number(),
+  bow: z.number(),
+  brawling: z.number(),
+  dagger: z.number(),
+  firearm: z.number(),
+  flail: z.number(),
+  heavy: z.number(),
+  spear: z.number(),
+  sword: z.number(),
+  thrown: z.number(),
+});
+
+const DamageBonusesSchema = z.object({
+  all: z.number(),
+  melee: z.number(),
+  ranged: z.number(),
+  spell: z.number(),
+  arcane: z.number(),
+  bow: z.number(),
+  brawling: z.number(),
+  dagger: z.number(),
+  firearm: z.number(),
+  flail: z.number(),
+  heavy: z.number(),
+  spear: z.number(),
+  sword: z.number(),
+  thrown: z.number(),
+  physical: z.number(),
+  air: z.number(),
+  bolt: z.number(),
+  dark: z.number(),
+  earth: z.number(),
+  fire: z.number(),
+  ice: z.number(),
+  light: z.number(),
+  poison: z.number(),
+  beast: z.number(),
+  construct: z.number(),
+  demon: z.number(),
+  elemental: z.number(),
+  humanoid: z.number(),
+  monster: z.number(),
+  plant: z.number(),
+  undead: z.number(),
+});
+
+const NpcBonusesSchema = z.object({
+  incomingRecovery: ResourceDeltaSchema,
+  incomingLoss: ResourceDeltaSchema,
+  outgoingRecovery: ResourceDeltaSchema,
+  accuracy: AccuracyBonusesSchema,
+  damage: DamageBonusesSchema,
+  incomingDamage: DamageBonusesSchema,
+});
+
+const NpcMultipliersSchema = z.object({
+  incomingRecovery: ResourceMultiplierSchema,
+  incomingLoss: ResourceMultiplierSchema,
+  outgoingRecovery: ResourceMultiplierSchema,
+});
+
+const ActorEffectSchema = z.object({
+  id: z.string(),
+  name: z.string().default(""),
+  disabled: z.boolean().optional(),
+  origin: z.string().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
+});
+
+export const NpcArmorSchema = z
   .object({
     name: z.string(),
     def: z.number().optional(),
@@ -81,49 +186,50 @@ const NpcArmorSchema = z
     fuid: z.string().optional(),
     armor: z.boolean().optional(),
   })
-  .passthrough();
+  .loose();
 
-const AccuracySchema = z.object({
+export const NpcAccuracySchema = z.object({
   attr1: z.string(),
   attr2: z.string(),
   value: z.number().optional(),
   defense: z.string().optional(),
 });
 
-const DamageSchema = z.object({
+export const NpcDamageSchema = z.object({
   value: z.number().optional(),
   type: z.string().optional(),
   hrZero: z.boolean().optional(),
 });
 
-const NpcAttackSchema = z
+export const NpcAttackSchema = z
   .object({
     name: z.string(),
     range: z.enum(["melee", "ranged"]).optional(),
-    accuracy: AccuracySchema.optional(),
-    damage: DamageSchema.optional(),
+    accuracy: NpcAccuracySchema.optional(),
+    damage: NpcDamageSchema.optional(),
     effect: z.string().optional(),
     special: z.array(z.string()).optional(),
     extraDamage: z.boolean().optional(),
     itemType: z.string().optional(),
+    behaviors: z.array(BehaviorSchema).optional(),
   })
-  .passthrough();
+  .loose();
 
-const NpcWeaponAttackSchema = NpcAttackSchema;
+export const NpcWeaponAttackSchema = NpcAttackSchema;
 
-const ResourceCostSchema = z.object({
+export const NpcResourceCostSchema = z.object({
   resource: z.string().optional(),
   amount: z.number().optional(),
   perTarget: z.boolean().optional(),
 });
 
-const NpcSpellSchema = z
+export const NpcSpellSchema = z
   .object({
     name: z.string(),
-    accuracy: AccuracySchema.optional(),
+    accuracy: NpcAccuracySchema.optional(),
     isOffensive: z.boolean().optional(),
-    damage: DamageSchema.optional(),
-    cost: ResourceCostSchema.optional(),
+    damage: NpcDamageSchema.optional(),
+    cost: NpcResourceCostSchema.optional(),
     maxTargets: z.number().optional(),
     targetDescription: z.string().optional(),
     duration: z.string().optional(),
@@ -133,28 +239,33 @@ const NpcSpellSchema = z
     special: z.array(z.string()).optional(),
     itemType: z.string().optional(),
     spellType: z.string().optional(),
+    behaviors: z.array(BehaviorSchema).optional(),
   })
-  .passthrough();
+  .loose();
 
-const NpcActionSchema = z.object({
+export const NpcActionSchema = z.object({
   name: z.string(),
   effect: z.string().optional(),
   spCost: z.number().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
-const NpcSpecialSchema = NpcActionSchema;
+export const NpcSpecialSchema = NpcActionSchema;
 
-const NpcRareGearSchema = z.object({
+export const NpcRareGearSchema = z.object({
   name: z.string(),
+  effect: z.string().optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
+});
+
+export const NpcNotesSchema = z.object({
+  fuid: z.string().optional(),
+  name: z.string(),
+  description: z.string().optional(),
   effect: z.string().optional(),
 });
 
-const NpcNotesSchema = z.object({
-  name: z.string(),
-  effect: z.string().optional(),
-});
-
-const NpcTagsSchema = z.object({
+export const NpcTagsSchema = z.object({
   name: z.string(),
 });
 
@@ -200,12 +311,25 @@ export const NpcPersistedSchema = z.object({
   createdBy: z.string().optional(),
   language: z.string().optional(),
   published: z.boolean().optional(),
+  statuses: NpcStatusesSchema.optional(),
   resources: NpcResourcesSchema.optional(),
   derived: NpcDerivedSchema.optional(),
   features: NpcFeaturesSchema.optional(),
+  bonuses: NpcBonusesSchema.optional(),
+  multipliers: NpcMultipliersSchema.optional(),
+  effects: z.array(ActorEffectSchema).optional(),
 });
 
 export type NpcPersisted = z.infer<typeof NpcPersistedSchema>;
+export type NpcArmor = z.infer<typeof NpcArmorSchema>;
+export type NpcAttack = z.infer<typeof NpcAttackSchema>;
+export type NpcWeaponAttack = z.infer<typeof NpcWeaponAttackSchema>;
+export type NpcSpell = z.infer<typeof NpcSpellSchema>;
+export type NpcAction = z.infer<typeof NpcActionSchema>;
+export type NpcSpecial = z.infer<typeof NpcSpecialSchema>;
+export type NpcRareGear = z.infer<typeof NpcRareGearSchema>;
+export type NpcNotes = z.infer<typeof NpcNotesSchema>;
+export type NpcTags = z.infer<typeof NpcTagsSchema>;
 
 export const validateNpcPersisted = (data: unknown) =>
   NpcPersistedSchema.safeParse(data);

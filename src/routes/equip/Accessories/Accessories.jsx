@@ -4,7 +4,7 @@ import CompendiumViewerModal from "../../../components/compendium/CompendiumView
 import { IconButton, Tooltip } from "@mui/material";
 import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useRef } from "react";
-import { SharedAccessoryCard } from "../../../components/shared/itemCards";
+import { SharedAccessoryCard } from "../../../components/shared/items";
 import { useTranslate } from "../../../translation/translate";
 import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
@@ -35,7 +35,7 @@ function buildInitialState() {
   };
 }
 
-function Accessories() {
+function Accessories({ variant = "equip" }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
@@ -192,7 +192,7 @@ function Accessories() {
         >
           <div ref={cardRef}>
             <SharedAccessoryCard
-              variant="equip"
+              variant={variant}
               item={formState}
               imageMode="slot"
               showImageToggle

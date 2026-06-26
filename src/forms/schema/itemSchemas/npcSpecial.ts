@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
+import { BehaviorSchema } from "../shared/behaviorSchemas";
 
 export const NpcSpecialSchema = z.object({
   fuid: z.string().optional(),
@@ -8,6 +9,7 @@ export const NpcSpecialSchema = z.object({
   effect: z.string().default(""),
   spCost: z.number().int().nonnegative().optional(),
   meta: MetaSchema.optional(),
+  behaviors: z.array(BehaviorSchema).optional(),
 });
 
 export type NpcSpecial = z.infer<typeof NpcSpecialSchema>;

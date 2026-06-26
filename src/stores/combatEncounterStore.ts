@@ -4,6 +4,14 @@ import {
   type RuntimeActor,
   type RuntimeActorSource,
 } from "../types/RuntimeActor";
+import {
+  buildDamageContext,
+  resolveDamage,
+  type DamageElement,
+} from "../pipelines/damagePipeline";
+import { getActorBonuses } from "../libs/actorBonuses";
+import { resolveActorEffects } from "../libs/actorEffectsResolver";
+import { devLog } from "../utils/devLog";
 
 type ActorDoc = Record<string, unknown>;
 
@@ -17,6 +25,7 @@ interface CombatEncounterState {
   encounterId: string | null;
   selectedNPCs: ActorDoc[];
   selectedPCs: ActorDoc[];
+  actorDocsById: Record<string, ActorDoc>;
   runtimeActors: Record<string, RuntimeActor>;
   activeActorName: string | null;
   targets: TargetRef[];
@@ -29,8 +38,16 @@ interface CombatEncounterState {
   clearTargets: () => void;
   setInteractionMode: (mode: "select" | "target") => void;
   // runtime actor mutations
-  applyHpDamage: (combatId: string, amount: number) => boolean;
-  revertHpDamage: (combatId: string, amount: number) => boolean;
+  applyHpDamage: (
+    combatId: string,
+    amount: number,
+    damageType?: string,
+  ) => boolean;
+  revertHpDamage: (
+    combatId: string,
+    amount: number,
+    damageType?: string,
+  ) => boolean;
   updateRuntimeActor: (
     combatId: string,
     updater: (actor: RuntimeActor) => RuntimeActor,
@@ -74,6 +91,7 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
     encounterId: null,
     selectedNPCs: [],
     selectedPCs: [],
+    actorDocsById: {},
     runtimeActors: {},
     activeActorName: null,
     targets: [],
@@ -81,15 +99,29 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
 
     setActors: (encounterId, npcs, pcs) =>
       set((state) => {
+        const incomingCount = npcs.length + pcs.length;
         const fresh = buildRuntimeActors(npcs, pcs);
-        const merged: Record<string, RuntimeActor> = {};
-        for (const [id, actor] of Object.entries(fresh)) {
-          merged[id] = state.runtimeActors[id] ?? actor;
+        const merged: Record<string, RuntimeActor> =
+          incomingCount > 0 ? {} : { ...state.runtimeActors };
+        if (incomingCount > 0) {
+          for (const [id, actor] of Object.entries(fresh)) {
+            merged[id] = state.runtimeActors[id] ?? actor;
+          }
         }
+
+        const nextActorDocsById: Record<string, ActorDoc> =
+          incomingCount > 0 ? {} : { ...state.actorDocsById };
+        for (const actor of [...npcs, ...pcs]) {
+          const key = String(actor.combatId ?? "");
+          if (!key) continue;
+          nextActorDocsById[key] = actor;
+        }
+
         return {
           encounterId,
           selectedNPCs: npcs,
           selectedPCs: pcs,
+          actorDocsById: nextActorDocsById,
           runtimeActors: merged,
         };
       }),
@@ -97,14 +129,23 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
     setActiveActorName: (name) => set({ activeActorName: name }),
 
     clearActors: () =>
-      set({
-        encounterId: null,
-        selectedNPCs: [],
-        selectedPCs: [],
-        runtimeActors: {},
-        activeActorName: null,
-        targets: [],
-        interactionMode: "select",
+      set((state) => {
+        devLog("[combatEncounterStore] clearActors", {
+          encounterId: state.encounterId,
+          prevNPCs: state.selectedNPCs.length,
+          prevPCs: state.selectedPCs.length,
+          prevRuntime: Object.keys(state.runtimeActors).length,
+        });
+        return {
+          encounterId: null,
+          selectedNPCs: [],
+          selectedPCs: [],
+          actorDocsById: {},
+          runtimeActors: {},
+          activeActorName: null,
+          targets: [],
+          interactionMode: "select",
+        };
       }),
 
     setTarget: (ref) => set({ targets: [ref] }),
@@ -123,12 +164,81 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
 
     setInteractionMode: (mode) => set({ interactionMode: mode }),
 
-    applyHpDamage: (combatId, amount) => {
+    applyHpDamage: (combatId, amount, damageType) => {
       let applied = false;
       set((state) => {
         const key = String(combatId);
         const actor = state.runtimeActors[key];
         let foundInDocs = false;
+        const targetDoc =
+          state.selectedNPCs.find((n) => String(n.combatId ?? "") === key) ??
+          state.selectedPCs.find((p) => String(p.combatId ?? "") === key) ??
+          state.actorDocsById[key] ??
+          null;
+
+        const resolveMaxHp = (doc: ActorDoc | null): number => {
+          if (!doc) return Number.POSITIVE_INFINITY;
+          const stats =
+            (doc.stats as Record<string, unknown> | undefined) ?? {};
+          const hp = (stats.hp as Record<string, unknown> | undefined) ?? {};
+          const max = Number(hp.max);
+          return Number.isFinite(max) && max > 0
+            ? max
+            : Number.POSITIVE_INFINITY;
+        };
+
+        const resolveAppliedAmount = (doc: ActorDoc | null): number => {
+          const baseAmount = Math.max(0, Number(amount) || 0);
+          if (!doc || !damageType || damageType === "untyped")
+            return baseAmount;
+          const normalized = String(damageType).toLowerCase();
+          const allowed: DamageElement[] = [
+            "physical",
+            "air",
+            "bolt",
+            "dark",
+            "earth",
+            "fire",
+            "ice",
+            "light",
+            "poison",
+          ];
+          if (!allowed.includes(normalized as DamageElement)) return baseAmount;
+
+          try {
+            const { affinityGrants } = resolveActorEffects(doc as never);
+            const dmgCtx = buildDamageContext({
+              baseDamage: baseAmount,
+              damageType: normalized as DamageElement,
+              npcAffinities:
+                (doc.affinities as Record<string, string> | undefined) ?? {},
+              temporaryAffinities: actor?.temporaryAffinities,
+              affinityGrants,
+              isGuarding: false,
+              incomingDamageBonuses: getActorBonuses(doc).incomingDamage,
+            });
+            const resolved = resolveDamage(dmgCtx).finalDamage;
+            return Math.max(0, Number(resolved) || 0);
+          } catch {
+            return baseAmount;
+          }
+        };
+
+        const appliedAmount = resolveAppliedAmount(targetDoc);
+        const maxHp = resolveMaxHp(targetDoc);
+
+        devLog("[combatEncounterStore] applyHpDamage input", {
+          combatId: key,
+          amount,
+          damageType,
+          hasRuntimeActor: Boolean(actor),
+          hasTargetDoc: Boolean(targetDoc),
+          selectedNPCCount: state.selectedNPCs.length,
+          selectedPCCount: state.selectedPCs.length,
+          appliedAmount,
+          maxHp,
+          runtimeHp: actor?.currentHp,
+        });
 
         const patchDocHp = (doc: ActorDoc): ActorDoc => {
           const stats =
@@ -139,7 +249,10 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
             ...doc,
             combatStats: {
               ...stats,
-              currentHp: Math.max(0, currentHp - amount),
+              currentHp: Math.min(
+                maxHp,
+                Math.max(0, currentHp - appliedAmount),
+              ),
             },
           };
         };
@@ -150,9 +263,22 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
         const nextSelectedPCs = state.selectedPCs.map((pc) =>
           String(pc.combatId ?? "") === key ? patchDocHp(pc) : pc,
         );
+        const nextActorDocsById = {
+          ...state.actorDocsById,
+          ...(targetDoc ? { [key]: patchDocHp(targetDoc) } : {}),
+        };
 
         if (!actor && !foundInDocs) return state;
         applied = true;
+
+        if (!appliedAmount || appliedAmount <= 0) {
+          devLog("[combatEncounterStore] applyHpDamage no-op amount", {
+            combatId: key,
+            amount,
+            damageType,
+            appliedAmount,
+          });
+        }
 
         return {
           runtimeActors: {
@@ -161,24 +287,99 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
               ? {
                   [key]: {
                     ...actor,
-                    currentHp: Math.max(0, actor.currentHp - amount),
+                    currentHp: Math.min(
+                      maxHp,
+                      Math.max(0, actor.currentHp - appliedAmount),
+                    ),
                   },
                 }
               : {}),
           },
           selectedNPCs: nextSelectedNPCs,
           selectedPCs: nextSelectedPCs,
+          actorDocsById: nextActorDocsById,
         };
+      });
+      devLog("[combatEncounterStore] applyHpDamage result", {
+        combatId: String(combatId),
+        applied,
       });
       return applied;
     },
 
-    revertHpDamage: (combatId, amount) => {
+    revertHpDamage: (combatId, amount, damageType) => {
       let reverted = false;
       set((state) => {
         const key = String(combatId);
         const actor = state.runtimeActors[key];
         let foundInDocs = false;
+        const targetDoc =
+          state.selectedNPCs.find((n) => String(n.combatId ?? "") === key) ??
+          state.selectedPCs.find((p) => String(p.combatId ?? "") === key) ??
+          state.actorDocsById[key] ??
+          null;
+
+        const resolveMaxHp = (doc: ActorDoc | null): number => {
+          if (!doc) return Number.POSITIVE_INFINITY;
+          const stats =
+            (doc.stats as Record<string, unknown> | undefined) ?? {};
+          const hp = (stats.hp as Record<string, unknown> | undefined) ?? {};
+          const max = Number(hp.max);
+          return Number.isFinite(max) && max > 0
+            ? max
+            : Number.POSITIVE_INFINITY;
+        };
+
+        const resolveAppliedAmount = (doc: ActorDoc | null): number => {
+          const baseAmount = Math.max(0, Number(amount) || 0);
+          if (!doc || !damageType || damageType === "untyped")
+            return baseAmount;
+          const normalized = String(damageType).toLowerCase();
+          const allowed: DamageElement[] = [
+            "physical",
+            "air",
+            "bolt",
+            "dark",
+            "earth",
+            "fire",
+            "ice",
+            "light",
+            "poison",
+          ];
+          if (!allowed.includes(normalized as DamageElement)) return baseAmount;
+          try {
+            const { affinityGrants } = resolveActorEffects(doc as never);
+            const dmgCtx = buildDamageContext({
+              baseDamage: baseAmount,
+              damageType: normalized as DamageElement,
+              npcAffinities:
+                (doc.affinities as Record<string, string> | undefined) ?? {},
+              temporaryAffinities: actor?.temporaryAffinities,
+              affinityGrants,
+              isGuarding: false,
+              incomingDamageBonuses: getActorBonuses(doc).incomingDamage,
+            });
+            const resolved = resolveDamage(dmgCtx).finalDamage;
+            return Math.max(0, Number(resolved) || 0);
+          } catch {
+            return baseAmount;
+          }
+        };
+        const appliedAmount = resolveAppliedAmount(targetDoc);
+        const maxHp = resolveMaxHp(targetDoc);
+
+        devLog("[combatEncounterStore] revertHpDamage input", {
+          combatId: key,
+          amount,
+          damageType,
+          hasRuntimeActor: Boolean(actor),
+          hasTargetDoc: Boolean(targetDoc),
+          selectedNPCCount: state.selectedNPCs.length,
+          selectedPCCount: state.selectedPCs.length,
+          appliedAmount,
+          maxHp,
+          runtimeHp: actor?.currentHp,
+        });
 
         const patchDocHp = (doc: ActorDoc): ActorDoc => {
           const stats =
@@ -189,7 +390,10 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
             ...doc,
             combatStats: {
               ...stats,
-              currentHp: currentHp + amount,
+              currentHp: Math.min(
+                maxHp,
+                Math.max(0, currentHp + appliedAmount),
+              ),
             },
           };
         };
@@ -200,6 +404,10 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
         const nextSelectedPCs = state.selectedPCs.map((pc) =>
           String(pc.combatId ?? "") === key ? patchDocHp(pc) : pc,
         );
+        const nextActorDocsById = {
+          ...state.actorDocsById,
+          ...(targetDoc ? { [key]: patchDocHp(targetDoc) } : {}),
+        };
 
         if (!actor && !foundInDocs) return state;
         reverted = true;
@@ -211,14 +419,22 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
               ? {
                   [key]: {
                     ...actor,
-                    currentHp: actor.currentHp + amount,
+                    currentHp: Math.min(
+                      maxHp,
+                      Math.max(0, actor.currentHp + appliedAmount),
+                    ),
                   },
                 }
               : {}),
           },
           selectedNPCs: nextSelectedNPCs,
           selectedPCs: nextSelectedPCs,
+          actorDocsById: nextActorDocsById,
         };
+      });
+      devLog("[combatEncounterStore] revertHpDamage result", {
+        combatId: String(combatId),
+        reverted,
       });
       return reverted;
     },

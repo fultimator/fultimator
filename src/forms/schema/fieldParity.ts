@@ -10,7 +10,6 @@ const WEAPON_FIELDS = [
   "itemType",
   "name",
   "description",
-  "book",
   "category",
   "range",
   "hands",
@@ -24,6 +23,17 @@ const WEAPON_FIELDS = [
   "special",
   "meta",
   "base",
+  "fuid",
+  "behaviors",
+  "att1",
+  "att2",
+  "type",
+  "damageHrZero",
+  "rareBonuses",
+  "precModifier",
+  "damageModifier",
+  "defModifier",
+  "mDefModifier",
   "damageBonus",
   "damageReworkBonus",
   "precBonus",
@@ -39,7 +49,6 @@ const CUSTOM_WEAPON_FIELDS = [
   "itemType",
   "name",
   "description",
-  "book",
   "category",
   "range",
   "hands",
@@ -66,6 +75,7 @@ const CUSTOM_WEAPON_FIELDS = [
   "selectedQuality",
   "isEquipped",
   "dataType",
+  "behaviors",
 ] as const;
 
 const ACCESSORY_FIELDS = [
@@ -83,6 +93,7 @@ const ACCESSORY_FIELDS = [
   "damageMeleeModifier",
   "damageRangedModifier",
   "modifiers",
+  "meta",
   "isEquipped",
 ] as const;
 
@@ -107,6 +118,7 @@ const SHIELD_FIELDS = [
   "damageMeleeModifier",
   "damageRangedModifier",
   "modifiers",
+  "meta",
   "isEquipped",
 ] as const;
 
@@ -134,6 +146,7 @@ const ARMOR_FIELDS = [
   "damageMeleeModifier",
   "damageRangedModifier",
   "modifiers",
+  "meta",
   "isEquipped",
 ] as const;
 

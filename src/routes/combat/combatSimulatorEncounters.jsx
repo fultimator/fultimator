@@ -58,12 +58,12 @@ import {
   applyNpcPostLoadTransforms,
   getPendingNpcMigrations,
   npcNeedsMigration,
-} from "../../components/npc/npcTransforms";
+} from "../../libs/actor";
 import {
   applyPostLoadTransforms,
   getPendingPlayerMigrations,
   playerNeedsMigration,
-} from "../../components/player/playerTransforms";
+} from "../../libs/actor";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
@@ -315,11 +315,16 @@ const CombatSimEncounters = () => {
     const pcs = Array.isArray(encounter.selectedPCs)
       ? encounter.selectedPCs
       : [];
+    const stripUndefined = (obj) => JSON.parse(JSON.stringify(obj));
     const nextNpcs = npcs.map((npc) =>
-      npcNeedsMigration(npc) ? applyNpcPostLoadTransforms(npc) : npc,
+      npcNeedsMigration(npc)
+        ? stripUndefined(applyNpcPostLoadTransforms(npc))
+        : npc,
     );
     const nextPcs = pcs.map((pc) =>
-      playerNeedsMigration(pc) ? applyPostLoadTransforms(pc) : pc,
+      playerNeedsMigration(pc)
+        ? stripUndefined(applyPostLoadTransforms(pc))
+        : pc,
     );
 
     const changed =
@@ -843,7 +848,7 @@ const CombatSimEncounters = () => {
         open={notification.open}
         autoHideDuration={4000}
         onClose={handleNotificationClose}
-        TransitionComponent={Fade}
+        slots={{ transition: Fade }}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert

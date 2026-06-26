@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
+import { flushSync } from "react-dom";
 import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
@@ -44,32 +45,17 @@ import {
   Alert,
 } from "@mui/material";
 import Layout from "../../components/Layout";
-import PlayerCard from "../../components/player/playerSheet/PlayerCard";
-import EditPlayerBasics from "../../components/player/informations/EditPlayerBasics";
-import EditPlayerTraits from "../../components/player/informations/EditPlayerTraits";
-import EditPlayerNotes from "../../components/player/informations/EditPlayerNotes";
-import EditPlayerBonds from "../../components/player/informations/EditPlayerBonds";
-import EditPlayerQuirk from "../../components/player/informations/EditPlayerQuirk";
-import EditPlayerCampActivities from "../../components/player/informations/EditPlayerCampActivities";
-import EditPlayerZeroPower from "../../components/player/informations/EditPlayerZeroPower";
-import EditPlayerOther from "../../components/player/informations/EditPlayerOthers";
-import EditPlayerAffinities from "../../components/player/stats/EditPlayerAffinities";
-import EditPlayerAttributes from "../../components/player/stats/EditPlayerAttributes";
-import EditPlayerStatuses from "../../components/player/stats/EditPlayerStatuses";
-import EditPlayerImmunities from "../../components/player/stats/EditPlayerImmunities";
-import EditManualStats from "../../components/player/stats/EditManualStats";
-import EditPlayerClasses from "../../components/player/classes/EditPlayerClasses";
-import PlayerControls from "../../components/player/playerSheet/PlayerControls";
-import EditPlayerSpells from "../../components/player/spells/EditPlayerSpells";
-import EditPlayerEquipment from "../../components/player/equipment/EditPlayerEquipment";
-import _PlayerTraits from "../../components/player/playerSheet/PlayerTraits";
-import PlayerBonds from "../../components/player/playerSheet/PlayerBonds";
-import PlayerEquipment from "../../components/player/playerSheet/PlayerEquipment";
-import PlayerSpells from "../../components/player/playerSheet/PlayerSpells";
-import PlayerArcana from "../../components/player/playerSheet/PlayerArcana";
-import PlayerSkills from "../../components/player/playerSheet/PlayerSkills";
-import PlayerNotes from "../../components/player/playerSheet/PlayerNotes";
-import PlayerCompanion from "../../components/player/playerSheet/PlayerCompanion";
+import {
+  PlayerSheetFull,
+  PlayerSheetCompact,
+} from "../../components/shared/actors";
+import InformationTab from "../../components/shared/actors/pc/tabs/InformationTab";
+import StatsTab from "../../components/shared/actors/pc/tabs/StatsTab";
+import ClassesTab from "../../components/shared/actors/pc/tabs/ClassesTab";
+import SpellsTab from "../../components/shared/actors/pc/tabs/SpellsTab";
+import BackpackTab from "../../components/shared/actors/pc/tabs/BackpackTab";
+import NotesTab from "../../components/shared/actors/pc/tabs/NotesTab";
+import EffectsTab from "../../components/shared/actors/pc/tabs/EffectsTab";
 import { useTranslate } from "../../translation/translate";
 import { styled } from "@mui/system";
 import {
@@ -85,26 +71,14 @@ import {
   LockOpen,
   ExpandMore,
   ExpandLess,
+  AutoAwesome,
 } from "@mui/icons-material";
 import { usePrompt } from "../../hooks/usePrompt";
 import deepEqual from "deep-equal";
 import html2canvas from "html2canvas";
 import Confetti from "react-confetti";
 import useDownload from "../../hooks/useDownload";
-import PlayerRituals from "../../components/player/playerSheet/PlayerRituals";
-import PlayerQuirk from "../../components/player/playerSheet/PlayerQuirk";
-import PlayerCampActivities from "../../components/player/playerSheet/PlayerCampActivities";
-import PlayerZeroPower from "../../components/player/playerSheet/PlayerZeroPower";
-import PlayerOthers from "../../components/player/playerSheet/PlayerOthers";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
-import PlayerGadgets from "../../components/player/playerSheet/PlayerGadgets";
-import PlayerMagichant from "../../components/player/playerSheet/PlayerMagichant";
-import PlayerGift from "../../components/player/playerSheet/PlayerGift";
-import PlayerTherioforms from "../../components/player/playerSheet/PlayerTherioforms";
-import PlayerVehicle from "../../components/player/playerSheet/PlayerVehicle";
-import PlayerInvoker from "../../components/player/playerSheet/PlayerInvoker";
-import PlayerGourmet from "../../components/player/playerSheet/PlayerGourmet";
-import PlayerDeck from "../../components/player/playerSheet/PlayerDeck.jsx";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import {
   CharacterSheetIcon,
@@ -115,27 +89,30 @@ import {
   NotesIcon2 as NotesIcon,
 } from "../../components/icons";
 
-import PlayerSymbol from "../../components/player/playerSheet/PlayerSymbol";
-import PlayerMagiseed from "../../components/player/playerSheet/PlayerMagiseed";
-import PlayerDance from "../../components/player/playerSheet/PlayerDance";
-import PlayerCardSheet from "../../components/player/playerSheet/compact/PlayerSheetCompact";
-import { fixVerticalLabels } from "../../utility/screenshotFix";
+import {
+  fixVerticalLabels,
+  expandCompactHeaderForExport,
+  expandAccordionsForExport,
+  applyPrintModeToClone,
+  hideEditControlsInClone,
+} from "../../utility/screenshotFix";
+import usePrintPDF, { buildAppPDF } from "../../hooks/usePrintPDF";
+import ExportDialog from "../../components/shared/actors/pc/export/ExportDialog";
 import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
-} from "../../components/player/playerTransforms";
+} from "../../libs/actor";
 import classList from "../../libs/classes";
-import { syncAutomaticClassLevels } from "../../components/player/classes/classLevelUtils";
+import { syncAutomaticClassLevels } from "../../libs/player/classLevelUtils";
 import { buildMnemosphere } from "../../libs/mnemospheres";
-import PlayerLoadout from "../../components/player/playerSheet/PlayerLoadout";
 import CustomHeader from "../../components/common/CustomHeader";
 import SettingRow from "../../components/common/SettingRow";
-import MigrateFromCompendiumDialog from "../../components/player/settings/MigrateFromCompendiumDialog";
-import useLevelUpFlow from "../../components/player/common/hooks/useLevelUpFlow";
+import MigrateFromCompendiumDialog from "/src/libs/player/MigrateFromCompendiumDialog";
+import useLevelUpFlow from "../../libs/player/hooks/useLevelUpFlow";
 import {
   canLevelUpFromExp as canLevelUpFromExpCheck,
   applyExpLevelUp,
-} from "../../components/player/common/levelUpLogic";
+} from "../../libs/player/levelUpLogic";
 import { executeCommand } from "../../components/app-drawer/panels/chat/domain/commands";
 
 export default function PlayerEdit() {
@@ -336,22 +313,141 @@ export default function PlayerEdit() {
   usePrompt(t("unsaved_changes"), isUpdated);
 
   const [download] = useDownload();
+  const [printPDF] = usePrintPDF();
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
 
-  const takeScreenshot = async () => {
-    const element = document.getElementById(
-      compactView ? "character-sheet-short" : "character-sheet",
-    );
-    const canvas = await html2canvas(element, {
-      useCORS: true,
-      ignoreCORS: true,
-      scale: 2,
-      backgroundColor: theme.palette.background.default,
-      onclone: (clonedDoc) => {
-        fixVerticalLabels(element, clonedDoc);
-      },
+  useEffect(() => {
+    const images = document.querySelectorAll("img");
+    const promises = [];
+    images.forEach((image) => {
+      if (!image.complete) {
+        promises.push(
+          new Promise((resolve) => {
+            image.onload = resolve;
+          }),
+        );
+      }
     });
-    const data = canvas.toDataURL("image/png");
-    download(data, `${playerTemp.name}.png`);
+    Promise.all(promises).then(() => setImagesLoaded(true));
+    return () => {
+      images.forEach((image) => {
+        image.onload = null;
+      });
+    };
+  }, [playerTemp]);
+
+  const captureCanvas = async (settings = {}) => {
+    if (!imagesLoaded) return null;
+    const {
+      theme: themeOption = "current",
+      scale = 2,
+      printMode = false,
+    } = settings;
+    const elementId = compactView ? "character-sheet-short" : "character-sheet";
+    const element = document.getElementById(elementId);
+    if (!element) return null;
+    const originalWidth = element.style.width;
+    const originalMaxHeight = element.style.maxHeight;
+    const originalOverflow = element.style.overflow;
+    const captureWidth = compactView ? "600px" : "1400px";
+    let bgColor;
+    if (themeOption === "light" || printMode) {
+      bgColor = "#ffffff";
+    } else if (themeOption === "dark") {
+      bgColor = "#121212";
+    } else {
+      bgColor =
+        theme.palette.mode === "dark"
+          ? theme.palette.background.default
+          : "#ffffff";
+    }
+    try {
+      element.style.width = captureWidth;
+      element.style.maxHeight = "none";
+      element.style.overflow = "visible";
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        scale,
+        backgroundColor: bgColor,
+        windowWidth: compactView ? 600 : 1400,
+        onclone: (clonedDoc) => {
+          fixVerticalLabels(element, clonedDoc);
+          expandCompactHeaderForExport(element, clonedDoc);
+          hideEditControlsInClone(clonedDoc, elementId);
+          if (settings.format === "app-pdf") {
+            expandAccordionsForExport(element, clonedDoc);
+          }
+          if (printMode) {
+            applyPrintModeToClone(clonedDoc, elementId);
+          }
+        },
+      });
+      element.style.width = originalWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
+      return { canvas, element, scale };
+    } catch (error) {
+      console.error("Error capturing canvas:", error);
+      element.style.width = originalWidth;
+      element.style.maxHeight = originalMaxHeight;
+      element.style.overflow = originalOverflow;
+      return null;
+    }
+  };
+
+  const handleExport = async (settings) => {
+    setIsExporting(true);
+    const wasEditMode = isSheetEditMode;
+    if (wasEditMode) {
+      flushSync(() => setIsSheetEditMode(false));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => requestAnimationFrame(r));
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    try {
+      if (settings.format === "pdf") {
+        await printPDF(playerTemp);
+      } else if (settings.format === "app-pdf") {
+        const expandClassBtn = document.querySelector(
+          "[data-expand-all-classes='collapsed']",
+        );
+        const expandMnemoBtn = document.querySelector(
+          "[data-expand-all-mnemo='collapsed']",
+        );
+        if (expandClassBtn) expandClassBtn.click();
+        if (expandMnemoBtn) expandMnemoBtn.click();
+        if (expandClassBtn || expandMnemoBtn) {
+          await new Promise((r) => setTimeout(r, 350)); // wait for MUI transitions
+        }
+        const result = await captureCanvas({ ...settings, scale: 1 });
+        if (result) {
+          await buildAppPDF(
+            result.canvas,
+            result.element,
+            result.scale,
+            `${playerTemp.name ?? "character"}_sheet.pdf`,
+          );
+        }
+      } else {
+        const result = await captureCanvas(settings);
+        if (result) {
+          await download(
+            result.canvas.toDataURL("image/png"),
+            `${playerTemp.name ?? "character"}_sheet.png`,
+          );
+        }
+      }
+      setExportDialogOpen(false);
+    } catch (err) {
+      console.error("Export error:", err);
+    } finally {
+      if (wasEditMode) setIsSheetEditMode(true);
+      setIsExporting(false);
+    }
   };
 
   const handleTabChange = (event, newValue) => {
@@ -520,6 +616,7 @@ export default function PlayerEdit() {
 
   const settings = playerTemp?.settings ?? {};
   const defaultView = settings.defaultView === "compact" ? "compact" : "normal";
+  const expandAllSections = settings.expandAllSections ?? true;
   const advancement = settings.advancement ?? false;
   const automaticClassLevel =
     (settings.optionalRules?.technospheres ?? false) ||
@@ -674,6 +771,13 @@ export default function PlayerEdit() {
     setCompactView(value === "compact");
   };
 
+  const handleExpandAllSectionsChange = (checked) => {
+    updatePlayerSettings((prevSettings) => ({
+      ...prevSettings,
+      expandAllSections: checked,
+    }));
+  };
+
   const handleAdvancementChange = (checked) => {
     updatePlayerSettings((prevSettings) => ({
       ...prevSettings,
@@ -776,13 +880,17 @@ export default function PlayerEdit() {
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 5)}>
                   <EquipmentIcon color="black" size="1.5em" />
-                  <ListItemText primary={t("Equipment")} sx={{ ml: 1 }} />
+                  <ListItemText primary={t("Backpack")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 6)}>
                   <NotesIcon color="black" size="1.5em" />
                   <ListItemText primary={t("Notes")} sx={{ ml: 1 }} />
                 </ListItem>
                 <ListItem onClick={(e) => handleTabChange(e, 7)}>
+                  <AutoAwesome />
+                  <ListItemText primary={t("Effects")} sx={{ ml: 1 }} />
+                </ListItem>
+                <ListItem onClick={(e) => handleTabChange(e, 8)}>
                   <Settings />
                   <ListItemText primary={t("Settings")} sx={{ ml: 1 }} />
                 </ListItem>
@@ -826,7 +934,7 @@ export default function PlayerEdit() {
                 onClick={(e) => handleTabChange(e, 5)}
                 isActive={openTab === 5}
               >
-                {t("Equipment")}
+                {t("Backpack")}
               </Tab>
               <Tab
                 onClick={(e) => handleTabChange(e, 6)}
@@ -837,6 +945,12 @@ export default function PlayerEdit() {
               <Tab
                 onClick={(e) => handleTabChange(e, 7)}
                 isActive={openTab === 7}
+              >
+                {t("Effects")}
+              </Tab>
+              <Tab
+                onClick={(e) => handleTabChange(e, 8)}
+                isActive={openTab === 8}
                 sx={{ minWidth: 48 }}
               >
                 <Settings />
@@ -882,7 +996,7 @@ export default function PlayerEdit() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={takeScreenshot}
+                onClick={() => setExportDialogOpen(true)}
                 style={{ width: "100%" }}
                 startIcon={<Download />}
               >
@@ -951,11 +1065,11 @@ export default function PlayerEdit() {
                 </Box>
               </Grid>
               <Grid container size={12}>
-                <PlayerCardSheet
-                  player={playerTemp}
-                  setPlayer={setPlayerTemp}
-                  isEditMode={isEditMode}
-                  isCharacterSheet={true}
+                <PlayerSheetCompact
+                  pc={playerTemp}
+                  onUpdate={setPlayerTemp}
+                  isInteractive={isEditMode}
+                  isOwner={isOwner}
                   optionalRules={optionalRules}
                   characterImage={playerTemp.info.imgurl}
                   id="character-sheet-short"
@@ -976,70 +1090,39 @@ export default function PlayerEdit() {
                       : undefined
                   }
                   onAddFeature={isEditMode ? () => setOpenTab(4) : undefined}
+                  clockSections={ritualClockSections}
+                  setClockSections={setRitualClockSections}
+                  clockState={ritualClockState}
+                  setClockState={setRitualClockState}
                 />
               </Grid>
             </Grid>
           ) : (
             <div id="character-sheet">
-              <PlayerCard
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-                isOwner={isOwner}
-                isCharacterSheet={false}
-                updateMaxStats={updateMaxStats}
-                canLevelUpFromExp={canLevelUpFromExp}
-                onLevelUpRequest={openLevelUpDialog}
-              />
-              {/* TODO: Add Zenit somewhere else */}
-              {/* <PlayerNumbers
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-                isOwner={isOwner}
-              />
-              <Divider sx={{ my: 1 }} /> */}
-              {isOwner && (
+              {/* {isOwner && (
                 <PlayerControls
                   player={playerTemp}
                   setPlayer={setPlayerTemp}
                   onQuickCheck={handleQuickCheck}
                 />
-              )}
-              <PlayerBonds
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerNotes
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <Divider sx={{ my: 1 }} />
-              <PlayerLoadout
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
+              )} */}
+              <PlayerSheetFull
+                pc={playerTemp}
+                onUpdate={setPlayerTemp}
+                isInteractive={isEditMode}
                 isOwner={isOwner}
+                onQuickCheck={handleQuickCheck}
+                characterImage={playerTemp.info.imgurl}
+                updateMaxStats={updateMaxStats}
+                canLevelUpFromExp={canLevelUpFromExp}
+                onLevelUpRequest={openLevelUpDialog}
+                optionalRules={optionalRules}
+                clockSections={ritualClockSections}
+                setClockSections={setRitualClockSections}
+                clockState={ritualClockState}
+                setClockState={setRitualClockState}
               />
-              <Divider sx={{ my: 1 }} />
-              <PlayerEquipment
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerVehicle
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerSkills
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerSpells
+              {/* <PlayerSkills
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
@@ -1049,31 +1132,6 @@ export default function PlayerEdit() {
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
               />
-              <PlayerRituals
-                player={playerTemp}
-                isEditMode={isEditMode}
-                clockSections={ritualClockSections}
-                setClockSections={setRitualClockSections}
-                clockState={ritualClockState}
-                setClockState={setRitualClockState}
-              />
-              {optionalRules.quirks && (
-                <PlayerQuirk player={playerTemp} isEditMode={isEditMode} />
-              )}
-              {optionalRules.campActivities && (
-                <PlayerCampActivities
-                  player={playerTemp}
-                  setPlayer={setPlayerTemp}
-                  isEditMode={isEditMode}
-                />
-              )}
-              {optionalRules.zeroPower && (
-                <PlayerZeroPower
-                  player={playerTemp}
-                  setPlayer={setPlayerTemp}
-                  isEditMode={isEditMode}
-                />
-              )}
               <PlayerGadgets
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
@@ -1119,137 +1177,68 @@ export default function PlayerEdit() {
                 player={playerTemp}
                 setPlayer={setPlayerTemp}
                 isEditMode={isEditMode}
-              />
-              <PlayerOthers
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <PlayerCompanion player={playerTemp} isEditMode={isEditMode} />
+              /> */}
             </div>
           )}
         </TabPanel>
         <TabPanel value={1} currentValue={openTab}>
-          <EditPlayerBasics
+          <InformationTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
+            isOwner={isOwner}
+            optionalRules={optionalRules}
             updateMaxStats={updateMaxStats}
-            isEditMode={isEditMode}
             advancement={advancement}
             onLevelUpRequest={openLevelUpDialog}
           />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerTraits
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerBonds
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          {optionalRules.quirks && (
-            <>
-              <EditPlayerQuirk
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <Divider sx={{ my: 1 }} />
-            </>
-          )}
-          {optionalRules.campActivities && (
-            <>
-              <EditPlayerCampActivities
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <Divider sx={{ my: 1 }} />
-            </>
-          )}
-          {optionalRules.zeroPower && (
-            <>
-              <EditPlayerZeroPower
-                player={playerTemp}
-                setPlayer={setPlayerTemp}
-                isEditMode={isEditMode}
-              />
-              <Divider sx={{ my: 1 }} />
-            </>
-          )}
-          <EditPlayerOther
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
         </TabPanel>
         <TabPanel value={2} currentValue={openTab}>
-          <EditPlayerAttributes
+          <StatsTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
+            isOwner={isOwner}
             updateMaxStats={updateMaxStats}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerAffinities
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerStatuses
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditPlayerImmunities
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
-          />
-          <Divider sx={{ my: 1 }} />
-          <EditManualStats
-            player={playerTemp}
-            setPlayer={setPlayerTemp}
-            updateMaxStats={updateMaxStats}
-            isEditMode={isEditMode}
           />
         </TabPanel>
         <TabPanel value={3} currentValue={openTab}>
-          <EditPlayerClasses
+          <ClassesTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
+            isOwner={isOwner}
             updateMaxStats={updateMaxStats}
-            isEditMode={isEditMode}
+            defaultExpandAll={expandAllSections}
           />
         </TabPanel>
         <TabPanel value={4} currentValue={openTab}>
-          <EditPlayerSpells
+          <SpellsTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
+            isOwner={isOwner}
+            defaultExpandAll={expandAllSections}
           />
         </TabPanel>
         <TabPanel value={5} currentValue={openTab}>
-          <EditPlayerEquipment
+          <BackpackTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
+            isOwner={isOwner}
           />
         </TabPanel>
         <TabPanel value={6} currentValue={openTab}>
-          <EditPlayerNotes
+          <NotesTab
             player={playerTemp}
             setPlayer={setPlayerTemp}
-            isEditMode={isEditMode}
+            isOwner={isOwner}
           />
         </TabPanel>
         <TabPanel value={7} currentValue={openTab}>
+          <EffectsTab
+            player={playerTemp}
+            setPlayer={setPlayerTemp}
+            isEditMode={isOwner}
+          />
+        </TabPanel>
+        <TabPanel value={8} currentValue={openTab}>
           <Paper
             elevation={3}
             sx={{
@@ -1289,6 +1278,21 @@ export default function PlayerEdit() {
                         <MenuItem value="compact">{t("Compact View")}</MenuItem>
                       </Select>
                     </FormControl>
+                  </SettingRow>
+
+                  <SettingRow
+                    label={t("Expand All Sections")}
+                    hint={t(
+                      "When enabled, all spell and class sections start expanded on load.",
+                    )}
+                    compactControl
+                  >
+                    <Checkbox
+                      checked={expandAllSections}
+                      onChange={(e) =>
+                        handleExpandAllSectionsChange(e.target.checked)
+                      }
+                    />
                   </SettingRow>
 
                   <SettingRow
@@ -1951,6 +1955,12 @@ export default function PlayerEdit() {
           </Button>
         </DialogActions>
       </Dialog>
+      <ExportDialog
+        open={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        onDownload={handleExport}
+        isLoading={isExporting}
+      />
       <MigrateFromCompendiumDialog
         open={isMigrateDialogOpen}
         onClose={() => setIsMigrateDialogOpen(false)}

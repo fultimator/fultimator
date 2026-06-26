@@ -723,6 +723,43 @@ function applyGradientOpacity(
   return `linear-gradient(rgba(${overlayColor},${overlayOpacity})), ${background}`;
 }
 
+export function getThemePanelRadius({
+  mode,
+  primary,
+  secondary,
+  ternary,
+  quaternary,
+  paper,
+  profile = "default",
+  panelRadiusOverride,
+  styleCustomization,
+}: Pick<
+  ThemeComponentFactoryOptions,
+  | "mode"
+  | "primary"
+  | "secondary"
+  | "ternary"
+  | "quaternary"
+  | "paper"
+  | "profile"
+  | "panelRadiusOverride"
+  | "styleCustomization"
+>): number {
+  const tokens = buildProfileTokens(
+    profile,
+    mode,
+    primary,
+    secondary,
+    ternary,
+    quaternary,
+    paper,
+    styleCustomization,
+  );
+  if (panelRadiusOverride !== null && panelRadiusOverride !== undefined)
+    return panelRadiusOverride;
+  return tokens.panelRadius;
+}
+
 export function createThemeComponents({
   mode,
   primary,
@@ -938,6 +975,13 @@ export function createThemeComponents({
           "&.Mui-focused": {
             color: isDark ? "#ffffff" : primary,
           },
+          "&.Mui-disabled": {
+            color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
+          },
+          ".MuiFormControl-root:has(input[readonly]) &, .MuiFormControl-root:has(textarea[readonly]) &":
+            {
+              color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
+            },
         },
       },
     },
@@ -1068,6 +1112,16 @@ export function createThemeComponents({
           color: isDark ? "#edf2f8" : "#243446",
           "&:hover": { color: isDark ? "#edf2f8" : "#243446" },
           "&.Mui-focused": { color: isDark ? "#edf2f8" : "#243446" },
+          "&.Mui-disabled": {
+            backgroundColor: isDark
+              ? alpha(ternary, 0.65)
+              : alpha(ternary, 0.7),
+            color: isDark ? "#edf2f8" : "#243446",
+            WebkitTextFillColor: isDark ? "#edf2f8" : "#243446",
+            opacity: 1,
+            cursor: "default",
+            "& fieldset": { borderColor: alpha(quaternary, 0.6) },
+          },
           "&.MuiInputBase-multiline": {
             borderRadius: multilineRadius,
           },
@@ -1085,6 +1139,11 @@ export function createThemeComponents({
           color: isDark ? "#edf2f8" : "#243446",
           "&:hover": { color: isDark ? "#edf2f8" : "#243446" },
           "&.Mui-focused": { color: isDark ? "#edf2f8" : "#243446" },
+          "&.Mui-disabled": {
+            WebkitTextFillColor: isDark ? "#edf2f8" : "#243446",
+            opacity: 1,
+            cursor: "default",
+          },
         },
       },
     },
@@ -1122,6 +1181,14 @@ export function createThemeComponents({
       styleOverrides: {
         select: {
           color: isDark ? "#edf2f8" : "#243446",
+          "&.Mui-disabled": {
+            WebkitTextFillColor: isDark ? "#edf2f8" : "#243446",
+            opacity: 1,
+            cursor: "default",
+          },
+        },
+        icon: {
+          "&.Mui-disabled": { opacity: 1 },
         },
       },
     },
@@ -1446,13 +1513,19 @@ export function createThemeComponents({
     },
     MuiSlider: {
       styleOverrides: {
-        root: { color: secondary },
+        root: {
+          color: secondary,
+          "&.Mui-disabled": { color: alpha(quaternary, 0.2) },
+        },
         thumb: {
           backgroundColor: secondary,
           "&:hover, &.Mui-focusVisible": { backgroundColor: quaternary },
           "&.Mui-disabled": { backgroundColor: alpha(quaternary, 0.2) },
         },
-        track: { backgroundColor: secondary },
+        track: {
+          backgroundColor: secondary,
+          "&.Mui-disabled": { backgroundColor: alpha(quaternary, 0.2) },
+        },
         rail: { backgroundColor: quaternary },
         mark: { backgroundColor: quaternary },
         markActive: { backgroundColor: secondary },

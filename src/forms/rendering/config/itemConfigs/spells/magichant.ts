@@ -10,7 +10,7 @@ import {
 
 export const magichantFields: ItemFieldConfig<PlayerSpellFormState> = [
   {
-    key: "keyType",
+    key: "type",
     kind: "editable",
     label: "spell.magichant.keyType",
     component: "autocomplete",
@@ -22,7 +22,7 @@ export const magichantFields: ItemFieldConfig<PlayerSpellFormState> = [
     componentProps: { options: MAGICHANT_KEY_TYPES, freeSolo: true },
   },
   {
-    key: "keyStatus",
+    key: "status",
     kind: "editable",
     label: "spell.magichant.keyStatus",
     component: "autocomplete",
@@ -34,7 +34,7 @@ export const magichantFields: ItemFieldConfig<PlayerSpellFormState> = [
     componentProps: { options: MAGICHANT_KEY_STATUSES, freeSolo: true },
   },
   {
-    key: "keyAttribute",
+    key: "attribute",
     kind: "editable",
     label: "spell.magichant.keyAttribute",
     component: "autocomplete",
@@ -46,7 +46,7 @@ export const magichantFields: ItemFieldConfig<PlayerSpellFormState> = [
     componentProps: { options: MAGICHANT_KEY_ATTRIBUTES, freeSolo: true },
   },
   {
-    key: "keyRecovery",
+    key: "recovery",
     kind: "editable",
     label: "spell.magichant.keyRecovery",
     component: "autocomplete",

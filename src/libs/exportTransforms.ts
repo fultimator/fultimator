@@ -1,12 +1,9 @@
-import {
-  applyPostLoadTransforms,
-  applyPreSaveTransforms,
-} from "../components/player/playerTransforms";
+import { applyPostLoadTransforms, applyPreSaveTransforms } from "../libs/actor";
 import { TypePlayer } from "../types/Players";
 import {
   applyNpcPostLoadTransforms,
   applyNpcPreSaveTransforms,
-} from "../components/npc/npcTransforms";
+} from "../libs/actor";
 import { TypeNpc } from "../types/Npcs";
 import {
   normalizeCustomWeaponLike,
