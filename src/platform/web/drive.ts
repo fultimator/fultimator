@@ -1,10 +1,10 @@
 // Web platform - Google Drive sync.
-// Drive access is piggybacked on the Firebase Google sign-in: googleAuthProvider
-// includes the drive.file scope, so the same OAuth access token covers both.
-// No separate GIS library needed.
+// Drive access uses a dedicated provider (driveAuthProvider) that carries the
+// drive.file scope. It is only invoked when the user opts into Drive Sync, so a
+// normal sign-in never requests Drive access. No separate GIS library needed.
 
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth, googleAuthProvider } from "../../firebase";
+import { auth, driveAuthProvider } from "../../firebase";
 import { getDb, STORES, notifyAllListeners, clearPendingSync } from "../idb";
 
 export const DRIVE_TOKEN_KEY = "fultimator_drive_token";
@@ -27,7 +27,7 @@ export function storeAccessToken(token: string): void {
 
 /** Re-sign-in with Google to obtain a fresh access token (includes drive.file scope). */
 async function requestFreshToken(): Promise<string> {
-  const result = await signInWithPopup(auth, googleAuthProvider);
+  const result = await signInWithPopup(auth, driveAuthProvider);
   const credential = GoogleAuthProvider.credentialFromResult(result);
   if (!credential?.accessToken)
     throw new Error("Google sign-in did not return an access token");

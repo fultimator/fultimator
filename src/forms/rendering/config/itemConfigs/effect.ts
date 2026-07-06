@@ -13,9 +13,7 @@ import {
   makeEffectChangeRowFields,
   EFFECT_CHANGE_KEY_OPTIONS,
 } from "../shared/behaviorFields";
-import {
-  ITEM_SCOPED_KEYS,
-} from "../shared/itemScopedKeys";
+import { ITEM_SCOPED_KEYS } from "../shared/itemScopedKeys";
 
 export const EFFECT_APPLICABLE_TYPE_OPTIONS = [
   { value: "weapon", label: "Weapon" },
@@ -41,7 +39,9 @@ export function effectKeyOptionsFromTypes(
 ): string[] {
   if (transfer) return EFFECT_CHANGE_KEY_OPTIONS;
   if (!applicableTypes.length) return [];
-  const perType = applicableTypes.map((t) => new Set(ITEM_SCOPED_KEYS[t] ?? []));
+  const perType = applicableTypes.map(
+    (t) => new Set(ITEM_SCOPED_KEYS[t] ?? []),
+  );
   if (perType.length === 1) return [...perType[0]];
   const [first, ...rest] = perType;
   return [...first].filter((k) => rest.every((s) => s.has(k)));
@@ -60,7 +60,6 @@ export const effectGroupLabels: GroupLabels = {
 export function makeEffectFieldConfig(
   applicableTypes: string[] = [],
 ): ItemFieldConfig<EffectFormState> {
-
   const applicableTypesField = {
     key: "applicableTypes",
     kind: "editable",

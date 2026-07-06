@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { useParams } from "react-router";
 import Layout from "../../components/Layout";
 import {
@@ -207,6 +213,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const prevInitiativeRef = useRef(null);
   const prevCurrentTurnRef = useRef(null);
   const prevActiveTurnRef = useRef(null);
+  const handleSaveStateRef = useRef(null);
   const [tabIndex, setTabIndex] = useState(0); // NPC sheet tab index
   const [pcTabIndex, setPcTabIndex] = useState(0); // PC sheet tab index
   const [selectedStudy, setSelectedStudy] = useState(0); // NPC study level (0 = full sheet, 1-3 = study tiers)
@@ -374,14 +381,14 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   }, [encounterData, initialized, loadingEncounter, user.uid]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Autosave setup (Debounced)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debouncedAutoSave = useCallback(
-    debounce((encounterToSave) => {
-      if (!isDifferentUser && autosaveEnabled) {
-        handleSaveState(true, encounterToSave);
-      }
-    }, AUTO_SAVE_DELAY),
-    [isDifferentUser, autosaveEnabled, AUTO_SAVE_DELAY],
+  const debouncedAutoSave = useMemo(
+    () =>
+      debounce((encounterToSave) => {
+        if (!isDifferentUser && autosaveEnabled) {
+          handleSaveStateRef.current(true, encounterToSave);
+        }
+      }, AUTO_SAVE_DELAY),
+    [AUTO_SAVE_DELAY, isDifferentUser, autosaveEnabled],
   );
 
   // Effect to track changes and trigger debounced autosave
@@ -504,6 +511,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       console.error("Error saving encounter:", error);
     }
   };
+  handleSaveStateRef.current = handleSaveState;
 
   // Human-readable time since last save
   const [timeAgo, setTimeAgo] = useState("");

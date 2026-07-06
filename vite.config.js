@@ -3,8 +3,28 @@ import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
+
+// Pre-bundle every @mui/icons-material deep import used in src, so Vite
+// discovers them all upfront instead of mid-session.
+function findMuiIconImports(dir) {
+  const icons = new Set();
+  const importRe = /@mui\/icons-material\/([A-Za-z0-9]+)/g;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      for (const icon of findMuiIconImports(fullPath)) icons.add(icon);
+    } else if (/\.(jsx?|tsx?)$/.test(entry.name)) {
+      const content = readFileSync(fullPath, "utf-8");
+      for (const match of content.matchAll(importRe)) icons.add(match[1]);
+    }
+  }
+  return icons;
+}
+const muiIconDeps = [...findMuiIconImports(path.resolve(__dirname, "src"))].map(
+  (icon) => `@mui/icons-material/${icon}`,
+);
 
 export default defineConfig({
   plugins: [
@@ -29,9 +49,13 @@ export default defineConfig({
       },
     }),
   ],
+  cacheDir: "node_modules/.vite-web",
   server: {
     port: 3000,
     open: true, // Automatically opens the browser
+  },
+  optimizeDeps: {
+    include: ["jszip", ...muiIconDeps],
   },
   base: "/", // Ensures correct path resolution
   define: {

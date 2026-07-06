@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, type ReactNode } from "react";
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth } from "../firebase";
+import { IS_ELECTRON } from "../platform";
 import { CloudAdapter } from "../adapters/CloudAdapter";
 import { LocalAdapter } from "../adapters/LocalAdapter";
 import {
@@ -11,16 +12,20 @@ import type { DbMode } from "../types/Database";
 
 const DB_MODE_KEY = "fultimator_db_mode";
 
+function readStoredMode(): DbMode | null {
+  try {
+    const stored = localStorage.getItem(DB_MODE_KEY);
+    if (stored === "cloud" || stored === "local") return stored;
+  } catch {
+    // localStorage not available
+  }
+  return null;
+}
+
 export function DatabaseProvider({ children }: { children: ReactNode }) {
-  const [dbMode, setDbModeState] = useState<DbMode>(() => {
-    try {
-      const stored = localStorage.getItem(DB_MODE_KEY);
-      if (stored === "cloud" || stored === "local") return stored;
-    } catch {
-      // localStorage not available
-    }
-    return "local";
-  });
+  const [dbMode, setDbModeState] = useState<DbMode>(
+    () => readStoredMode() ?? "local",
+  );
 
   const [cloudUser, setCloudUser] = useState<FirebaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -29,6 +34,10 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
     return onAuthStateChanged(auth, (user) => {
       setCloudUser(user);
       setAuthLoading(false);
+      // Web only: default returning signed-in users to cloud unless they chose a mode.
+      if (!IS_ELECTRON && user && readStoredMode() === null) {
+        setDbModeState("cloud");
+      }
     });
   }, []);
 

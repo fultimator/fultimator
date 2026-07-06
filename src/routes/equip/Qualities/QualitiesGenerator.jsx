@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { RestartAltOutlined } from "@mui/icons-material";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import randomQualities from "../../generator/randomqualities.json";
 import { useCustomTheme } from "../../../hooks/useCustomTheme";
 import CopyToClipboard from "../../../components/common/CopyToClipboard";
@@ -52,7 +52,7 @@ function QualitiesGenerator({ onGenerate }) {
   const [generate, setGenerate] = useState(0);
   const [currentGeneratedText, setCurrentGeneratedText] = useState("");
 
-  const generatePrefixes = () => {
+  const generatePrefixes = useCallback(() => {
     const prefixes = [];
     randomQualities.forEach((item) => {
       if (item.Conditions && item.Conditions !== "") {
@@ -89,9 +89,9 @@ function QualitiesGenerator({ onGenerate }) {
       }
     });
     return prefixes;
-  };
+  }, [selectedDamageType, selectedSpecies, selectedStatuses]);
 
-  const generateSuffixes = () => {
+  const generateSuffixes = useCallback(() => {
     const prefixes = [];
     randomQualities.forEach((item) => {
       if (item.Effects && item.Effects !== "") {
@@ -131,19 +131,15 @@ function QualitiesGenerator({ onGenerate }) {
       }
     });
     return prefixes;
-  };
-
-  const prefixes = useMemo(generatePrefixes, [
-    selectedDamageType,
-    selectedSpecies,
-    selectedStatuses,
-  ]);
-  const suffixes = useMemo(generateSuffixes, [
+  }, [
     selectedDamageType,
     selectedSpecies,
     selectedStatuses,
     selectedAttributes,
   ]);
+
+  const prefixes = useMemo(() => generatePrefixes(), [generatePrefixes]);
+  const suffixes = useMemo(() => generateSuffixes(), [generateSuffixes]);
 
   const getRandomPrefix = () => {
     return prefixes[Math.floor(Math.random() * prefixes.length)];

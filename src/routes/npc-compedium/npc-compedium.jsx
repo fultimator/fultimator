@@ -137,12 +137,6 @@ function Personal({ user }) {
   const [language, setLanguage] = useState("en");
   const [levels, setLevels] = useState([5, 60]);
 
-  /*
-  useEffect(() => {
-    console.log("User ID: ", user.uid);
-  }, []);
-  */
-
   const [searchParams, setSearchParams] = useState({
     type: "All",
     name: "",
@@ -150,8 +144,6 @@ function Personal({ user }) {
     rank: "",
     language: "en",
   });
-
-  console.log(searchParams);
 
   const constraints = [where("published", "==", true)];
 
@@ -198,7 +190,7 @@ function Personal({ user }) {
   const [personalList, loading, err] = useCollectionDataCloud(personalQuery);
 
   if (err) {
-    console.log(err);
+    console.error(err);
   }
 
   const nextPage = () => {
@@ -663,7 +655,6 @@ function Personal({ user }) {
               contentName={selectedReportNpc.name}
               contentAuthor={selectedReportNpc.uid}
               contentType="NPC"
-              onSuccess={() => console.log("success")}
             />
           </>
         ) : (

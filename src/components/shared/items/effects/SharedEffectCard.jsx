@@ -59,14 +59,17 @@ export const SharedEffectCard = React.memo(function SharedEffectCard({
   const triggerKind = item.trigger?.kind ?? "passive";
   const isPassive = triggerKind === "passive";
   const changes = isPassive
-    ? (Array.isArray(item.changes) ? item.changes : [])
-    : (Array.isArray(item.appliesEffect?.changes) ? item.appliesEffect.changes : []);
+    ? Array.isArray(item.changes)
+      ? item.changes
+      : []
+    : Array.isArray(item.appliesEffect?.changes)
+      ? item.appliesEffect.changes
+      : [];
   const applicableTypes = Array.isArray(item.applicableTypes)
     ? item.applicableTypes
     : [];
-  const afterEffects = !isPassive && Array.isArray(item.afterEffects)
-    ? item.afterEffects
-    : [];
+  const afterEffects =
+    !isPassive && Array.isArray(item.afterEffects) ? item.afterEffects : [];
 
   return (
     <CardContentWrapper
@@ -105,7 +108,11 @@ export const SharedEffectCard = React.memo(function SharedEffectCard({
                   }}
                 />
                 <Chip
-                  label={t(item.transfer ? "behavior.transfer.true" : "behavior.transfer.false")}
+                  label={t(
+                    item.transfer
+                      ? "behavior.transfer.true"
+                      : "behavior.transfer.false",
+                  )}
                   size="small"
                   sx={{
                     backgroundColor: "rgba(255,255,255,0.15)",
@@ -170,24 +177,50 @@ export const SharedEffectCard = React.memo(function SharedEffectCard({
           >
             {[
               item.appliesEffect?.label
-                ? { label: t("behavior.appliesEffect.label"), value: item.appliesEffect.label }
+                ? {
+                    label: t("behavior.appliesEffect.label"),
+                    value: item.appliesEffect.label,
+                  }
                 : null,
               item.appliesEffect?.target
-                ? { label: t("behavior.appliesEffect.target"), value: t(`appliesEffect.target.${item.appliesEffect.target}`) }
+                ? {
+                    label: t("behavior.appliesEffect.target"),
+                    value: t(
+                      `appliesEffect.target.${item.appliesEffect.target}`,
+                    ),
+                  }
                 : null,
-              item.appliesEffect?.duration?.event && item.appliesEffect.duration.event !== "none"
-                ? { label: t("behavior.appliesEffect.duration"), value: t(`effect.duration.${item.appliesEffect.duration.event}`) }
+              item.appliesEffect?.duration?.event &&
+              item.appliesEffect.duration.event !== "none"
+                ? {
+                    label: t("behavior.appliesEffect.duration"),
+                    value: t(
+                      `effect.duration.${item.appliesEffect.duration.event}`,
+                    ),
+                  }
                 : null,
-              item.appliesEffect?.predicate?.crisisInteraction && item.appliesEffect.predicate.crisisInteraction !== "none"
-                ? { label: t("behavior.appliesEffect.crisisInteraction"), value: t(`effect.crisis.${item.appliesEffect.predicate.crisisInteraction}`) }
+              item.appliesEffect?.predicate?.crisisInteraction &&
+              item.appliesEffect.predicate.crisisInteraction !== "none"
+                ? {
+                    label: t("behavior.appliesEffect.crisisInteraction"),
+                    value: t(
+                      `effect.crisis.${item.appliesEffect.predicate.crisisInteraction}`,
+                    ),
+                  }
                 : null,
               item.chatOutput?.text
-                ? { label: t("behavior.chatOutput.text"), value: item.chatOutput.text }
+                ? {
+                    label: t("behavior.chatOutput.text"),
+                    value: item.chatOutput.text,
+                  }
                 : null,
             ]
               .filter(Boolean)
               .map((entry, i) => (
-                <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Box
+                  key={i}
+                  sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                >
                   {i > 0 && <Diamond color={customTheme.secondary} />}
                   <Typography sx={{ fontSize: scale.body }}>
                     <strong>{entry.label}:</strong> {entry.value}
@@ -212,7 +245,10 @@ export const SharedEffectCard = React.memo(function SharedEffectCard({
             }}
           >
             {changes.map((ch, i) => (
-              <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <Box
+                key={i}
+                sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+              >
                 {i > 0 && <Diamond color={customTheme.secondary} />}
                 <Typography sx={{ fontSize: scale.body }}>
                   <strong>{ch.key}</strong>{" "}
@@ -239,17 +275,28 @@ export const SharedEffectCard = React.memo(function SharedEffectCard({
             }}
           >
             {afterEffects.map((ae, i) => {
-              const amt = ae.amount === "half-damage" || ae.amount === "half-loss"
-                ? t(`afterEffect.amount.${ae.amount}`)
-                : ae.amount != null && typeof ae.amount === "object" && ae.amount.expr
-                  ? ae.amount.expr
-                  : ae.amount != null && ae.amount !== "" ? String(ae.amount) : "";
+              const amt =
+                ae.amount === "half-damage" || ae.amount === "half-loss"
+                  ? t(`afterEffect.amount.${ae.amount}`)
+                  : ae.amount != null &&
+                      typeof ae.amount === "object" &&
+                      ae.amount.expr
+                    ? ae.amount.expr
+                    : ae.amount != null && ae.amount !== ""
+                      ? String(ae.amount)
+                      : "";
               return (
-                <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Box
+                  key={i}
+                  sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                >
                   {i > 0 && <Diamond color={customTheme.secondary} />}
                   <Typography sx={{ fontSize: scale.body }}>
-                    <strong>{t(`afterEffect.target.${ae.target ?? "targets"}`)}</strong>{" "}
-                    {t(`afterEffect.direction.${ae.direction ?? "loss"}`)}{amt ? ` ${amt}` : ""}{" "}
+                    <strong>
+                      {t(`afterEffect.target.${ae.target ?? "targets"}`)}
+                    </strong>{" "}
+                    {t(`afterEffect.direction.${ae.direction ?? "loss"}`)}
+                    {amt ? ` ${amt}` : ""}{" "}
                     {String(ae.resource ?? "hp").toUpperCase()}
                   </Typography>
                 </Box>

@@ -1,7 +1,8 @@
-import { registerSW } from "virtual:pwa-register";
+const PWA_REGISTER_MODULE = "virtual:pwa-register";
 
-export function registerPwaServiceWorker() {
+export async function registerPwaServiceWorker() {
   if (import.meta.env.PROD) {
+    const { registerSW } = await import(/* @vite-ignore */ PWA_REGISTER_MODULE);
     const updateSW = registerSW({
       onNeedRefresh() {
         if (window.confirm("New version available. Reload to update?")) {

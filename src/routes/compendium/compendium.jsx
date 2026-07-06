@@ -759,7 +759,9 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               >
                 <MenuItem value="">{t("All")}</MenuItem>
                 <MenuItem value="true">{t("behavior.transfer.true")}</MenuItem>
-                <MenuItem value="false">{t("behavior.transfer.false")}</MenuItem>
+                <MenuItem value="false">
+                  {t("behavior.transfer.false")}
+                </MenuItem>
               </Select>
             </FormControl>
             <Autocomplete
@@ -788,7 +790,12 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                 value.map((option, index) => {
                   const { key, ...tagProps } = getTagProps({ index });
                   return (
-                    <Chip key={key} label={t(option.label)} size="small" {...tagProps} />
+                    <Chip
+                      key={key}
+                      label={t(option.label)}
+                      size="small"
+                      {...tagProps}
+                    />
                   );
                 })
               }
@@ -921,7 +928,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   );
 });
 // Card dispatcher
-
 
 export const ItemCard = React.memo(function ItemCard({
   type,
@@ -1348,7 +1354,8 @@ function CompendiumViewer() {
         const newParams = { ...urlBase(), type: selectedType };
         if (value) newParams.effectTransfer = value;
         if (selectedEffectApplicableTypes.length > 0)
-          newParams.effectApplicableTypes = selectedEffectApplicableTypes.join(",");
+          newParams.effectApplicableTypes =
+            selectedEffectApplicableTypes.join(",");
         setSearchParams(newParams);
         if (scrollRef?.current) scrollRef.current.scrollTop = 0;
       },
@@ -1356,7 +1363,8 @@ function CompendiumViewer() {
         setSearchQuery("");
         setSelectedIdx(null);
         const newParams = { ...urlBase(), type: selectedType };
-        if (selectedEffectTransfer) newParams.effectTransfer = selectedEffectTransfer;
+        if (selectedEffectTransfer)
+          newParams.effectTransfer = selectedEffectTransfer;
         if (types.length > 0) newParams.effectApplicableTypes = types.join(",");
         setSearchParams(newParams);
         if (scrollRef?.current) scrollRef.current.scrollTop = 0;

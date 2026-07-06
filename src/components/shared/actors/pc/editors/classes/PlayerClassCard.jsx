@@ -336,7 +336,6 @@ export default function PlayerClassCard({
       !hasMultipleFaithfulCompanionSkills &&
       hasSingleFaithfulCompanionSkill
     ) {
-      console.log("Fetching companions...");
       setLoading(true);
       setErr(null);
       const companionsQuery = query(

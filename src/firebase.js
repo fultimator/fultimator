@@ -36,5 +36,7 @@ try {
 export { firestore };
 export const auth = getAuth(app);
 export const googleAuthProvider = new GoogleAuthProvider();
-// Request Drive access alongside Firebase auth - one sign-in covers both
-googleAuthProvider.addScope("https://www.googleapis.com/auth/drive.file");
+// Separate provider used only when the user opts into Drive Sync, so a normal
+// sign-in does not trigger the Google Drive consent screen.
+export const driveAuthProvider = new GoogleAuthProvider();
+driveAuthProvider.addScope("https://www.googleapis.com/auth/drive.file");

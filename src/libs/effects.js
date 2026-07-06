@@ -121,7 +121,9 @@ export const officialEffects = [
     description: "Reduces incoming lightning damage by 3.",
     trigger: { kind: "passive" },
     transfer: true,
-    changes: [{ key: "bonuses.incomingDamage.lightning", mode: 2, value: "-3" }],
+    changes: [
+      { key: "bonuses.incomingDamage.lightning", mode: 2, value: "-3" },
+    ],
     meta: { book: "core", isOfficial: true },
   },
   {
@@ -501,7 +503,9 @@ export const officialEffects = [
     description: "Multiplies outgoing HP recovery by 1.5x.",
     trigger: { kind: "passive" },
     transfer: true,
-    changes: [{ key: "multipliers.outgoingRecovery.hp", mode: 1, value: "1.5" }],
+    changes: [
+      { key: "multipliers.outgoingRecovery.hp", mode: 1, value: "1.5" },
+    ],
     meta: { book: "core", isOfficial: true },
   },
 
@@ -565,7 +569,9 @@ export const officialEffects = [
     description: "Multiplies incoming HP recovery by 1.5x.",
     trigger: { kind: "passive" },
     transfer: true,
-    changes: [{ key: "multipliers.incomingRecovery.hp", mode: 1, value: "1.5" }],
+    changes: [
+      { key: "multipliers.incomingRecovery.hp", mode: 1, value: "1.5" },
+    ],
     meta: { book: "core", isOfficial: true },
   },
 
@@ -914,7 +920,8 @@ export const officialEffects = [
     fuid: "npc-attack-attr1-override",
     itemType: "effect",
     name: "NPC Attack Attr1 Override",
-    description: "Overrides the NPC attack's first accuracy attribute to Dexterity.",
+    description:
+      "Overrides the NPC attack's first accuracy attribute to Dexterity.",
     trigger: { kind: "passive" },
     transfer: false,
     applicableTypes: ["npcAttack"],
@@ -925,7 +932,8 @@ export const officialEffects = [
     fuid: "npc-attack-attr2-override",
     itemType: "effect",
     name: "NPC Attack Attr2 Override",
-    description: "Overrides the NPC attack's second accuracy attribute to Might.",
+    description:
+      "Overrides the NPC attack's second accuracy attribute to Might.",
     trigger: { kind: "passive" },
     transfer: false,
     applicableTypes: ["npcAttack"],
@@ -936,7 +944,8 @@ export const officialEffects = [
     fuid: "npc-attack-defense-override",
     itemType: "effect",
     name: "NPC Attack Defense Override",
-    description: "Overrides the NPC attack's targeted defense to Magic Defense.",
+    description:
+      "Overrides the NPC attack's targeted defense to Magic Defense.",
     trigger: { kind: "passive" },
     transfer: false,
     applicableTypes: ["npcAttack"],
@@ -1004,7 +1013,8 @@ export const officialEffects = [
     fuid: "npc-spell-attr2-override",
     itemType: "effect",
     name: "NPC Spell Attr2 Override",
-    description: "Overrides the NPC spell's second accuracy attribute to Insight.",
+    description:
+      "Overrides the NPC spell's second accuracy attribute to Insight.",
     trigger: { kind: "passive" },
     transfer: false,
     applicableTypes: ["npcSpell"],

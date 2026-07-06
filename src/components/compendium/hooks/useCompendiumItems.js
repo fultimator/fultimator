@@ -149,10 +149,16 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
         const wantTransfer = selectedEffectTransfer === "true";
         items = items.filter((item) => Boolean(item.transfer) === wantTransfer);
       }
-      if (selectedType === "effects" && selectedEffectApplicableTypes.length > 0) {
-        items = items.filter((item) =>
-          Array.isArray(item.applicableTypes) &&
-          selectedEffectApplicableTypes.some((t) => item.applicableTypes.includes(t)),
+      if (
+        selectedType === "effects" &&
+        selectedEffectApplicableTypes.length > 0
+      ) {
+        items = items.filter(
+          (item) =>
+            Array.isArray(item.applicableTypes) &&
+            selectedEffectApplicableTypes.some((t) =>
+              item.applicableTypes.includes(t),
+            ),
         );
       }
       if (selectedType === "player-spells" && selectedSpellClass) {
@@ -256,10 +262,16 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
         const wantTransfer = selectedEffectTransfer === "true";
         items = items.filter((item) => Boolean(item.transfer) === wantTransfer);
       }
-      if (selectedType === "effects" && selectedEffectApplicableTypes.length > 0) {
-        items = items.filter((item) =>
-          Array.isArray(item.applicableTypes) &&
-          selectedEffectApplicableTypes.some((t) => item.applicableTypes.includes(t)),
+      if (
+        selectedType === "effects" &&
+        selectedEffectApplicableTypes.length > 0
+      ) {
+        items = items.filter(
+          (item) =>
+            Array.isArray(item.applicableTypes) &&
+            selectedEffectApplicableTypes.some((t) =>
+              item.applicableTypes.includes(t),
+            ),
         );
       }
 
