@@ -33,6 +33,13 @@ export async function exportDatabase(): Promise<void> {
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Legacy desktop stored timestamps as ISO strings; coerce to epoch ms for sorting.
+function coerceTimestamp(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? value : parsed;
+}
+
 function normaliseRecord(record: unknown): unknown {
   if (typeof record !== "object" || record === null) return record;
   const r = record as Record<string, unknown>;
@@ -42,7 +49,12 @@ function normaliseRecord(record: unknown): unknown {
   // Strip Firestore-only fields - local records can never be published,
   // and the original uid would lock the record to a foreign Firebase account.
   const { published: _pub, uid: _uid, ...rest } = r;
-  return { ...rest, id };
+  return {
+    ...rest,
+    id,
+    ...("createdAt" in r ? { createdAt: coerceTimestamp(r.createdAt) } : {}),
+    ...("updatedAt" in r ? { updatedAt: coerceTimestamp(r.updatedAt) } : {}),
+  };
 }
 
 /** Replace the database from an imported fultimatordb.json file. */
