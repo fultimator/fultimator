@@ -10,6 +10,11 @@ import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
 } from "../../libs/actor";
+import {
+  stampSave,
+  stampCreate,
+  compareTimestamps,
+} from "../../libs/actor/timestamps";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router";
 
@@ -124,6 +129,7 @@ function Personal() {
     },
   };
   const [name, setName] = useState("");
+  const [sort, setSort] = useState("name");
   const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
@@ -225,8 +231,16 @@ function Personal() {
         })
         .sort((item1, item2) => {
           if (direction === "ascending") {
+            if (sort === "createdAt")
+              return compareTimestamps(item1.createdAt, item2.createdAt);
+            else if (sort === "updatedAt")
+              return compareTimestamps(item1.updatedAt, item2.updatedAt);
             return item1.name.localeCompare(item2.name);
           } else {
+            if (sort === "createdAt")
+              return compareTimestamps(item2.createdAt, item1.createdAt);
+            else if (sort === "updatedAt")
+              return compareTimestamps(item2.updatedAt, item1.updatedAt);
             return item2.name.localeCompare(item1.name);
           }
         })
@@ -419,8 +433,8 @@ function Personal() {
 
     try {
       // Normalize and migrate before saving
-      const normalizedData = applyPreSaveTransforms(
-        applyPostLoadTransforms(data),
+      const normalizedData = stampCreate(
+        applyPreSaveTransforms(applyPostLoadTransforms(data)),
       );
       if (forcedId) {
         await db.setDoc(db.doc("player-personal", forcedId), normalizedData);
@@ -451,7 +465,7 @@ function Personal() {
       delete data.id;
       data.uid = activeUid;
       data.published = false;
-      data = applyPreSaveTransforms(data);
+      data = stampCreate(applyPreSaveTransforms(data));
 
       const res = await db.addDoc(db.collection("player-personal"), data);
       console.debug("Document added with ID: ", res.id);
@@ -485,11 +499,12 @@ function Personal() {
 
   const preparePlayerTransferData = (player, target, nextName) => {
     const canonical = canonicalizeForTransfer("pc", player);
-    return normalizeOwnershipForTarget(
+    const normalized = normalizeOwnershipForTarget(
       { ...canonical, name: nextName, published: false },
       target,
       cloudUser?.uid,
     );
+    return stampSave(normalized, normalized.createdAt);
   };
 
   const exportSelectedAsJson = async () => {
@@ -917,6 +932,30 @@ function Personal() {
                   htmlInput: { maxLength: 50 },
                 }}
               />
+            </Grid>
+            <Grid
+              sx={{ minWidth: 160 }}
+              size={{
+                xs: 12,
+                sm: "auto",
+              }}
+            >
+              <FormControl fullWidth size="small">
+                <InputLabel id="sort">{t("Sort:")}</InputLabel>
+                <Select
+                  labelId="sort"
+                  id="select-sort"
+                  value={sort}
+                  label="Sort:"
+                  onChange={(evt) => {
+                    setSort(evt.target.value);
+                  }}
+                >
+                  <MenuItem value={"name"}>{t("Name")}</MenuItem>
+                  <MenuItem value={"createdAt"}>{t("creation_date")}</MenuItem>
+                  <MenuItem value={"updatedAt"}>{t("updated_date")}</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid
               sx={{ minWidth: 160 }}

@@ -71,6 +71,7 @@ import {
   applyNpcPostLoadTransforms,
   applyNpcPreSaveTransforms,
 } from "../../libs/actor";
+import { stampSave } from "../../libs/actor/timestamps";
 import { NpcProvider } from "/src/components/shared/actors/npc/context";
 
 // Combine all blacklisted names into a single array
@@ -171,7 +172,10 @@ export default function NpcEdit() {
 
   const handleSave = useCallback(() => {
     setIsUpdated(false);
-    activeSetDoc(ref, applyNpcPreSaveTransforms(npcTemp));
+    activeSetDoc(
+      ref,
+      stampSave(applyNpcPreSaveTransforms(npcTemp), npcTemp.publishedAt),
+    );
     setSavedSnackbarOpen(true);
   }, [ref, npcTemp, activeSetDoc]);
 
@@ -323,15 +327,18 @@ export default function NpcEdit() {
     setIsUpdated(false);
     activeSetDoc(
       ref,
-      applyNpcPreSaveTransforms({
-        ...npcTemp,
-        published: true,
-        searchString: npcTemp.name
-          .replace(/[\W_]+/g, " ")
-          .toLowerCase()
-          .split(" "),
-        publishedAt: Date.now(),
-      }),
+      stampSave(
+        applyNpcPreSaveTransforms({
+          ...npcTemp,
+          published: true,
+          searchString: npcTemp.name
+            .replace(/[\W_]+/g, " ")
+            .toLowerCase()
+            .split(" "),
+          publishedAt: Date.now(),
+        }),
+        npcTemp.publishedAt,
+      ),
     );
     if (isBlacklisted(npcTemp.name)) {
       sendDiscordWebhook(
@@ -351,7 +358,10 @@ export default function NpcEdit() {
     setIsUpdated(false);
     activeSetDoc(
       ref,
-      applyNpcPreSaveTransforms({ ...npcTemp, language: newLang }),
+      stampSave(
+        applyNpcPreSaveTransforms({ ...npcTemp, language: newLang }),
+        npcTemp.publishedAt,
+      ),
     );
 
     // Send message to webhook when updating publish language as moderator
@@ -372,7 +382,10 @@ export default function NpcEdit() {
     setIsUpdated(false);
     activeSetDoc(
       ref,
-      applyNpcPreSaveTransforms({ ...npcTemp, published: false }),
+      stampSave(
+        applyNpcPreSaveTransforms({ ...npcTemp, published: false }),
+        npcTemp.publishedAt,
+      ),
     );
 
     // Send message to webhook when unpublishing as moderator
