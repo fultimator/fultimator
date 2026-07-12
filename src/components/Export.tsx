@@ -11,7 +11,10 @@ import {
 } from "@mui/material";
 import { useTranslate } from "../translation/translate";
 import { buildItemText } from "../libs/buildItemText";
-import { canonicalizeForTransfer } from "../libs/exportTransforms";
+import {
+  canonicalizeForTransfer,
+  canonicalizeForExport,
+} from "../libs/exportTransforms";
 
 type Props = {
   name?: string;
@@ -31,12 +34,17 @@ function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
     () => canonicalizeForTransfer(dataType, data),
     [dataType, data],
   );
-  const canonicalDataObject =
-    canonicalData && typeof canonicalData === "object"
-      ? (canonicalData as Record<string, unknown>)
+  // JSON export includes derived fields (e.g. NPC max HP/MP).
+  const exportData = React.useMemo(
+    () => canonicalizeForExport(dataType, data),
+    [dataType, data],
+  );
+  const exportDataObject =
+    exportData && typeof exportData === "object"
+      ? (exportData as Record<string, unknown>)
       : {};
   const [downloadJSON, copyToClipboard] = useDownloadJSON(name, {
-    ...canonicalDataObject,
+    ...exportDataObject,
     dataType,
   });
 

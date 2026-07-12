@@ -47,6 +47,22 @@ function normalizeFirestoreError(err: unknown): DbError {
   return { code: "unknown", message: String(err), raw: err };
 }
 
+// Firestore rejects any undefined value in a document tree.
+function stripUndefined<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map((v) => stripUndefined(v)) as T;
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      if (v === undefined) continue;
+      out[k] = stripUndefined(v);
+    }
+    return out as T;
+  }
+  return value;
+}
+
 export const CloudAdapter: DatabaseAdapter = {
   collection: (path: string) => collection(firestore, path),
 
@@ -87,7 +103,10 @@ export const CloudAdapter: DatabaseAdapter = {
 
   async addDoc(ref: unknown, data: Record<string, unknown>) {
     try {
-      const docRef = await fsAddDoc(ref as CollectionReference, data);
+      const docRef = await fsAddDoc(
+        ref as CollectionReference,
+        stripUndefined(data),
+      );
       return { id: docRef.id };
     } catch (err) {
       throw normalizeFirestoreError(err);
@@ -96,7 +115,7 @@ export const CloudAdapter: DatabaseAdapter = {
 
   async setDoc(ref: unknown, data: Record<string, unknown>) {
     try {
-      await fsSetDoc(ref as DocumentReference, data);
+      await fsSetDoc(ref as DocumentReference, stripUndefined(data));
     } catch (err) {
       throw normalizeFirestoreError(err);
     }
@@ -114,7 +133,10 @@ export const CloudAdapter: DatabaseAdapter = {
     const batch = fsWriteBatch(firestore);
     return {
       set(ref, data) {
-        batch.set(ref as DocumentReference, data as Record<string, unknown>);
+        batch.set(
+          ref as DocumentReference,
+          stripUndefined(data as Record<string, unknown>),
+        );
       },
       delete(ref) {
         batch.delete(ref as DocumentReference);

@@ -79,9 +79,15 @@ import {
   applyNpcPreSaveTransforms,
   applyNpcPostLoadTransforms,
 } from "../../libs/actor";
+import {
+  stampSave,
+  stampCreate,
+  compareTimestamps,
+} from "../../libs/actor/timestamps";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import {
   canonicalizeForTransfer,
+  canonicalizeForExport,
   normalizeOwnershipForTarget,
 } from "../../libs/exportTransforms";
 
@@ -256,7 +262,10 @@ function Personal() {
       affinities: {},
     };
     try {
-      const docRef = await db.addDoc(db.collection("npc-personal"), data);
+      const docRef = await db.addDoc(
+        db.collection("npc-personal"),
+        stampCreate(data),
+      );
       navigate(`/npc-gallery/${docRef.id}`);
     } catch (e) {
       console.debug(e);
@@ -278,7 +287,7 @@ function Personal() {
 
       const res = await db.addDoc(
         db.collection("npc-personal"),
-        applyNpcPreSaveTransforms(data),
+        stampCreate(applyNpcPreSaveTransforms(data)),
       );
       console.debug("Document added with ID: ", res.id);
     } catch (error) {
@@ -290,7 +299,10 @@ function Personal() {
     const data = { ...npc, published: false };
     delete data.id;
     try {
-      const docRef = await db.addDoc(db.collection("npc-personal"), data);
+      const docRef = await db.addDoc(
+        db.collection("npc-personal"),
+        stampCreate(data),
+      );
       notify(t("NPC copied"));
       navigate(`/npc-gallery/${docRef.id}`);
     } catch {
@@ -344,7 +356,10 @@ function Personal() {
         target,
         cloudUser?.uid,
       );
-      await targetDb.addDoc(targetDb.collection("npc-personal"), data);
+      await targetDb.addDoc(
+        targetDb.collection("npc-personal"),
+        stampSave(data, data.createdAt ?? data.publishedAt),
+      );
     }
   };
 
@@ -466,7 +481,7 @@ function Personal() {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     const zip = new JSZip();
     selected.forEach((npc) => {
-      const canonical = canonicalizeForTransfer("npc", npc);
+      const canonical = canonicalizeForExport("npc", npc);
       zip.file(
         `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`,
         JSON.stringify(canonical, null, 2),
@@ -584,16 +599,26 @@ function Personal() {
           return true;
         })
         .sort((item1, item2) => {
+          // Fall back to publishedAt for NPCs that predate the createdAt field.
+          const createdAtOf = (item) => item.createdAt ?? item.publishedAt;
           if (direction === "ascending") {
             if (sort === "name") return item1.name.localeCompare(item2.name);
             else if (sort === "level") return item1.lvl - item2.lvl;
             else if (sort === "publishedAt")
-              return (item1.publishedAt ?? 0) - (item2.publishedAt ?? 0);
+              return compareTimestamps(item1.publishedAt, item2.publishedAt);
+            else if (sort === "createdAt")
+              return compareTimestamps(createdAtOf(item1), createdAtOf(item2));
+            else if (sort === "updatedAt")
+              return compareTimestamps(item1.updatedAt, item2.updatedAt);
           } else {
             if (sort === "name") return item2.name.localeCompare(item1.name);
             else if (sort === "level") return item2.lvl - item1.lvl;
             else if (sort === "publishedAt")
-              return (item2.publishedAt ?? 0) - (item1.publishedAt ?? 0);
+              return compareTimestamps(item2.publishedAt, item1.publishedAt);
+            else if (sort === "createdAt")
+              return compareTimestamps(createdAtOf(item2), createdAtOf(item1));
+            else if (sort === "updatedAt")
+              return compareTimestamps(item2.updatedAt, item1.updatedAt);
           }
         })
         .filter((item) => {
@@ -794,6 +819,8 @@ function Personal() {
                 >
                   <MenuItem value={"name"}>{t("Name")}</MenuItem>
                   <MenuItem value={"level"}>{t("Level")}</MenuItem>
+                  <MenuItem value={"createdAt"}>{t("creation_date")}</MenuItem>
+                  <MenuItem value={"updatedAt"}>{t("updated_date")}</MenuItem>
                   <MenuItem value={"publishedAt"}>
                     {t("Published Date")}
                   </MenuItem>
@@ -1443,7 +1470,7 @@ function Npc({
   const [actionsAnchor, setActionsAnchor] = useState(null);
   const [_exportAnchor, setExportAnchor] = useState(null);
   const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
-  const exportData = canonicalizeForTransfer("npc", npc);
+  const exportData = canonicalizeForExport("npc", npc);
 
   const [collapse, setCollapse] = useState(false);
 

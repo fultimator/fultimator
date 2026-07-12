@@ -102,6 +102,7 @@ import {
   applyPreSaveTransforms,
   applyPostLoadTransforms,
 } from "../../libs/actor";
+import { stampSave } from "../../libs/actor/timestamps";
 import classList from "../../libs/classes";
 import { syncAutomaticClassLevels } from "../../libs/player/classLevelUtils";
 import { buildMnemosphere } from "../../libs/mnemospheres";
@@ -242,7 +243,7 @@ export default function PlayerEdit() {
         defaultView: compactView ? "compact" : "normal",
       },
     };
-    activeSetDoc(ref, applyPreSaveTransforms(playerToSave));
+    activeSetDoc(ref, stampSave(applyPreSaveTransforms(playerToSave)));
     setSavedSnackbarOpen(true);
   }, [ref, playerTemp, compactView, activeSetDoc]);
 

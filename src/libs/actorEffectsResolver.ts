@@ -300,11 +300,11 @@ function equippedPlayerItems(
     return out;
   }
 
-  for (const item of eq.weapons ?? []) if (item.isEquipped) push(item);
-  for (const item of eq.customWeapons ?? []) if (item.isEquipped) push(item);
-  for (const item of eq.shields ?? []) if (item.isEquipped) push(item);
-  for (const item of eq.armor ?? []) if (item.isEquipped) push(item);
-  for (const item of eq.accessories ?? []) if (item.isEquipped) push(item);
+  for (const item of eq.weapons ?? []) if (item?.isEquipped) push(item);
+  for (const item of eq.customWeapons ?? []) if (item?.isEquipped) push(item);
+  for (const item of eq.shields ?? []) if (item?.isEquipped) push(item);
+  for (const item of eq.armor ?? []) if (item?.isEquipped) push(item);
+  for (const item of eq.accessories ?? []) if (item?.isEquipped) push(item);
   return out;
 }
 

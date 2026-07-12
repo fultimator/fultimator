@@ -126,6 +126,28 @@ describe("resolveActorEffects", () => {
     expect(bonuses.accuracy.sword).toBe(3);
   });
 
+  it("ignores null/undefined equipment entries without crashing", () => {
+    const player = playerWithEquipment({
+      weapons: [
+        null,
+        {
+          itemType: "weapon",
+          name: "Equipped Sword",
+          isEquipped: true,
+          behaviors: [transferBehavior(3, "bonuses.accuracy.sword")],
+        },
+      ],
+      customWeapons: [undefined],
+      shields: [null],
+      armor: [],
+      accessories: [null],
+    } as unknown as TypePlayer["equipment"][number]);
+
+    const { bonuses } = resolveActorEffects(player);
+
+    expect(bonuses.accuracy.sword).toBe(3);
+  });
+
   it("transfers hoplosphere and mnemosphere effects only when slotted into equipped weapons", () => {
     const player = {
       ...playerWithEquipment({
