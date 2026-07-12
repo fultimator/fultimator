@@ -87,6 +87,7 @@ import {
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import {
   canonicalizeForTransfer,
+  canonicalizeForExport,
   normalizeOwnershipForTarget,
 } from "../../libs/exportTransforms";
 
@@ -480,7 +481,7 @@ function Personal() {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     const zip = new JSZip();
     selected.forEach((npc) => {
-      const canonical = canonicalizeForTransfer("npc", npc);
+      const canonical = canonicalizeForExport("npc", npc);
       zip.file(
         `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`,
         JSON.stringify(canonical, null, 2),
@@ -1469,7 +1470,7 @@ function Npc({
   const [actionsAnchor, setActionsAnchor] = useState(null);
   const [_exportAnchor, setExportAnchor] = useState(null);
   const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
-  const exportData = canonicalizeForTransfer("npc", npc);
+  const exportData = canonicalizeForExport("npc", npc);
 
   const [collapse, setCollapse] = useState(false);
 

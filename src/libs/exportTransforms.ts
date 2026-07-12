@@ -5,6 +5,7 @@ import {
   applyNpcPreSaveTransforms,
 } from "../libs/actor";
 import { TypeNpc } from "../types/Npcs";
+import { calcHP, calcMP } from "./npcs";
 import {
   normalizeCustomWeaponLike,
   normalizeWeaponLike,
@@ -34,6 +35,30 @@ export function canonicalizeForTransfer(
     console.warn("canonicalizeForTransfer fallback:", error);
     return data;
   }
+}
+
+/**
+ * Canonicalize for a JSON/text export.
+ */
+export function canonicalizeForExport(
+  dataType: string,
+  data: unknown,
+): unknown {
+  const canonical = canonicalizeForTransfer(dataType, data);
+  if (dataType !== "npc" || !canonical || typeof canonical !== "object") {
+    return canonical;
+  }
+  const npc = canonical as TypeNpc;
+  const resources = npc.resources;
+  if (!resources) return canonical;
+  return {
+    ...npc,
+    resources: {
+      ...resources,
+      hp: { ...resources.hp, max: calcHP(npc) },
+      mp: { ...resources.mp, max: calcMP(npc) },
+    },
+  };
 }
 
 function asObject(value: unknown): Record<string, unknown> {
