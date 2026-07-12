@@ -2928,18 +2928,6 @@
     "ru": ""
   },
   {
-    "key": "Create NPC",
-    "en": "Create NPC",
-    "it": "Crea NPC",
-    "de": "NSC erstellen",
-    "pl": "Utwórz BNa",
-    "fr": "Créer le PNJ",
-    "es": "Crear PNJ",
-    "pt-BR": "Criar PNJ",
-    "zh": "创建NPC",
-    "ru": ""
-  },
-  {
     "key": "Created By:",
     "en": "Created By:",
     "it": "Creato da:",
@@ -7860,19 +7848,7 @@
     "ru": ""
   },
   {
-    "key": "Player Name",
-    "en": "Character Name",
-    "it": "Nome Personaggio",
-    "de": "Spielername",
-    "pl": "Imię Postaci",
-    "fr": "Nom du personnage",
-    "es": "Nombre del jugador",
-    "pt-BR": "Nome do Personagem",
-    "zh": "",
-    "ru": ""
-  },
-  {
-    "key": "Create Player",
+    "key": "create_pc",
     "en": "Create Character",
     "it": "Crea Personaggio",
     "de": "Erstelle Spieler",
@@ -7881,6 +7857,18 @@
     "es": "Crear jugador",
     "pt-BR": "Criar Personagem",
     "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "create_npc",
+    "en": "Create NPC",
+    "it": "Crea NPC",
+    "de": "NSC erstellen",
+    "pl": "Utwórz BNa",
+    "fr": "Créer le PNJ",
+    "es": "Crear PNJ",
+    "pt-BR": "Criar PNJ",
+    "zh": "创建NPC",
     "ru": ""
   },
   {
@@ -14372,6 +14360,102 @@
     "fr": "You perform an action that is not covered above.",
     "es": "You perform an action that is not covered above.",
     "pt-BR": "You perform an action that is not covered above.",
+    "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "optional_name_hint",
+    "en": "Optional. Leave empty to create with an empty name.",
+    "it": "Optional. Leave empty to create with an empty name.",
+    "de": "Optional. Leave empty to create with an empty name.",
+    "pl": "Optional. Leave empty to create with an empty name.",
+    "fr": "Optional. Leave empty to create with an empty name.",
+    "es": "Optional. Leave empty to create with an empty name.",
+    "pt-BR": "Optional. Leave empty to create with an empty name.",
+    "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "species_hint",
+    "en": "Sets starting affinities for the species.",
+    "it": "Sets starting affinities for the species.",
+    "de": "Sets starting affinities for the species.",
+    "pl": "Sets starting affinities for the species.",
+    "fr": "Sets starting affinities for the species.",
+    "es": "Sets starting affinities for the species.",
+    "pt-BR": "Sets starting affinities for the species.",
+    "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "set_npc_type_type",
+    "en": "Sets the NPC's type.",
+    "it": "",
+    "de": "",
+    "pl": "",
+    "fr": "",
+    "es": "",
+    "pt-BR": "",
+    "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "companion_type_hint",
+    "en": "Choose Companion to link this NPC to a Player Character's level and skill, instead of a standard combat rank.",
+    "it": "",
+    "de": "",
+    "pl": "",
+    "fr": "",
+    "es": "",
+    "pt-BR": "",
+    "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "skill_level",
+    "en": "Skill Level",
+    "it": "",
+    "de": "",
+    "pl": "",
+    "fr": "",
+    "es": "",
+    "pt-BR": "",
+    "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "skill_level_hint",
+    "en": "The rank of the Player Character's skill that grants this companion.",
+    "it": "",
+    "de": "",
+    "pl": "",
+    "fr": "",
+    "es": "",
+    "pt-BR": "",
+    "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "player_level",
+    "en": "PC Level",
+    "it": "",
+    "de": "",
+    "pl": "",
+    "fr": "",
+    "es": "",
+    "pt-BR": "",
+    "zh": "",
+    "ru": ""
+  },
+  {
+    "key": "player_level_hint",
+    "en": "The level of the linked Player Character.",
+    "it": "",
+    "de": "",
+    "pl": "",
+    "fr": "",
+    "es": "",
+    "pt-BR": "",
     "zh": "",
     "ru": ""
   },

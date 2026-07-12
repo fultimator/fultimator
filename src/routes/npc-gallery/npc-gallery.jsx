@@ -9,6 +9,10 @@ import {
   Box,
   Button,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Divider,
   IconButton,
   ListItemIcon,
@@ -33,6 +37,7 @@ import {
   Fab,
 } from "@mui/material";
 import Layout from "../../components/Layout";
+import SettingRow from "../../components/common/SettingRow";
 import { SignIn } from "../../components/auth";
 import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import {
@@ -90,6 +95,42 @@ import {
   canonicalizeForExport,
   normalizeOwnershipForTarget,
 } from "../../libs/exportTransforms";
+import { applySpeciesEffects } from "../../forms/rendering/config/actorConfigs/npcSpeciesEffects";
+
+const CREATE_NPC_SPECIES_OPTIONS = [
+  { value: "Beast", label: "Beast" },
+  { value: "Construct", label: "Construct" },
+  { value: "Demon", label: "Demon" },
+  { value: "Elemental", label: "Elemental" },
+  { value: "Monster", label: "Monster" },
+  { value: "Plant", label: "Plant" },
+  { value: "Undead", label: "Undead" },
+  { value: "Humanoid", label: "Humanoid" },
+  { value: "Variant Humanoid", label: "Variant Humanoid" },
+];
+
+const CREATE_NPC_RANK_OPTIONS = [
+  { value: "soldier", label: "Soldier" },
+  { value: "elite", label: "Elite" },
+  { value: "champion1", label: "Champion(1)" },
+  { value: "champion2", label: "Champion(2)" },
+  { value: "champion3", label: "Champion(3)" },
+  { value: "champion4", label: "Champion(4)" },
+  { value: "champion5", label: "Champion(5)" },
+  { value: "champion6", label: "Champion(6)" },
+  { value: "companion", label: "Companion" },
+  { value: "groupvehicle", label: "Group Vehicle" },
+];
+
+const CREATE_NPC_COMPANION_LVL_OPTIONS = [1, 2, 3, 4, 5];
+
+const defaultCreateNpcOptions = {
+  name: "",
+  species: "Beast",
+  rank: "soldier",
+  companionlvl: 1,
+  companionpclvl: 5,
+};
 
 export default function NpcGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
@@ -142,6 +183,12 @@ function Personal() {
 
   // Migration states
   const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+
+  // Create NPC modal state
+  const [isCreateNpcModalOpen, setIsCreateNpcModalOpen] = useState(false);
+  const [createNpcOptions, setCreateNpcOptions] = useState(
+    defaultCreateNpcOptions,
+  );
 
   const npcQuery = useMemo(
     () =>
@@ -251,15 +298,25 @@ function Personal() {
     navigate(location.pathname, { replace: true });
   };
 
-  const addNpc = async function () {
+  const createNpc = async (options = defaultCreateNpcOptions) => {
+    const species = options.species || "Beast";
+    const { affinities, immunities } = applySpeciesEffects(species);
     const data = {
-      name: "-",
-      species: "Beast",
+      name: options.name || "-",
+      species,
       lvl: 5,
+      rank: options.rank || "soldier",
       imgurl: "",
       attributes: { dexterity: 8, might: 8, will: 8, insight: 8 },
       attacks: [],
-      affinities: {},
+      affinities,
+      immunities,
+      ...(options.rank === "companion"
+        ? {
+            companionlvl: options.companionlvl ?? 1,
+            companionpclvl: options.companionpclvl ?? 5,
+          }
+        : {}),
     };
     try {
       const docRef = await db.addDoc(
@@ -270,6 +327,28 @@ function Personal() {
     } catch (e) {
       console.debug(e);
     }
+  };
+
+  const handleOpenCreateNpcModal = () => {
+    setCreateNpcOptions(defaultCreateNpcOptions);
+    setIsCreateNpcModalOpen(true);
+  };
+
+  const handleCloseCreateNpcModal = () => {
+    setIsCreateNpcModalOpen(false);
+  };
+
+  const handleCreateNpcOptionChange = (field, value) => {
+    setCreateNpcOptions((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleCreateNpcConfirm = async () => {
+    handleCloseCreateNpcModal();
+    await createNpc(createNpcOptions);
+    setCreateNpcOptions(defaultCreateNpcOptions);
   };
 
   const handleFileUpload = async (jsonData) => {
@@ -888,10 +967,10 @@ function Personal() {
             <Button
               variant="contained"
               startIcon={<HistoryEdu />}
-              onClick={addNpc}
+              onClick={handleOpenCreateNpcModal}
               disabled={dbMode === "cloud" && !cloudUser}
             >
-              {t("Create NPC")}
+              {t("create_npc")}
             </Button>
             {SUPPORTS_LOCAL_DB && (
               <ToggleButtonGroup
@@ -1389,6 +1468,137 @@ function Personal() {
         onMigrateAll={handleMigrateAllNpcs}
         getMigrations={getPendingNpcMigrations}
       />
+      <Dialog
+        open={isCreateNpcModalOpen}
+        onClose={handleCloseCreateNpcModal}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{t("create_npc")}</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ mt: 1 }}>
+            <SettingRow label={t("Name")} hint={t("optional_name_hint")}>
+              <TextField
+                value={createNpcOptions.name}
+                onChange={(evt) =>
+                  handleCreateNpcOptionChange("name", evt.target.value)
+                }
+                size="small"
+                sx={{ minWidth: 220 }}
+              />
+            </SettingRow>
+
+            <SettingRow label={t("Species")} hint={t("species_hint")}>
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ minWidth: 180 }}
+              >
+                <Select
+                  value={createNpcOptions.species}
+                  onChange={(evt) =>
+                    handleCreateNpcOptionChange("species", evt.target.value)
+                  }
+                >
+                  {CREATE_NPC_SPECIES_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {t(option.label)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </SettingRow>
+
+            <SettingRow
+              label={t("Rank")}
+              hint={
+                createNpcOptions.rank === "companion"
+                  ? t("companion_type_hint")
+                  : t("set_npc_type_type")
+              }
+              showDivider={createNpcOptions.rank !== "companion"}
+            >
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ minWidth: 180 }}
+              >
+                <Select
+                  value={createNpcOptions.rank}
+                  onChange={(evt) =>
+                    handleCreateNpcOptionChange("rank", evt.target.value)
+                  }
+                >
+                  {CREATE_NPC_RANK_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {t(option.label)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </SettingRow>
+
+            {createNpcOptions.rank === "companion" && (
+              <SettingRow
+                label={t("skill_level")}
+                hint={t("skill_level_hint")}
+                showDivider={false}
+                dense
+              >
+                <FormControl
+                  variant="outlined"
+                  size="small"
+                  sx={{ minWidth: 100 }}
+                >
+                  <Select
+                    value={createNpcOptions.companionlvl}
+                    onChange={(evt) =>
+                      handleCreateNpcOptionChange(
+                        "companionlvl",
+                        Number(evt.target.value),
+                      )
+                    }
+                  >
+                    {CREATE_NPC_COMPANION_LVL_OPTIONS.map((n) => (
+                      <MenuItem key={n} value={n}>
+                        {n}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </SettingRow>
+            )}
+
+            {createNpcOptions.rank === "companion" && (
+              <SettingRow
+                label={t("player_level")}
+                hint={t("player_level_hint")}
+                showDivider={false}
+                dense
+              >
+                <TextField
+                  type="number"
+                  value={createNpcOptions.companionpclvl}
+                  onChange={(evt) =>
+                    handleCreateNpcOptionChange(
+                      "companionpclvl",
+                      Number(evt.target.value) || 5,
+                    )
+                  }
+                  size="small"
+                  sx={{ minWidth: 100 }}
+                />
+              </SettingRow>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCreateNpcModal}>{t("Cancel")}</Button>
+          <Button variant="contained" onClick={handleCreateNpcConfirm}>
+            {t("create_npc")}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

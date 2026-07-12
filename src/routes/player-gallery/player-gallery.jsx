@@ -999,7 +999,7 @@ function Personal() {
               onClick={handleOpenCreatePlayerModal}
               disabled={dbMode === "cloud" && !cloudUser}
             >
-              {t("Create Player")}
+              {t("create_player")}
             </Button>
             {SUPPORTS_LOCAL_DB && (
               <ToggleButtonGroup
@@ -1410,13 +1410,10 @@ function Personal() {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>{t("Create Player")}</DialogTitle>
+        <DialogTitle>{t("create_pc")}</DialogTitle>
         <DialogContent dividers>
           <Box sx={{ mt: 1 }}>
-            <SettingRow
-              label={t("Player Name")}
-              hint={t("Optional. Leave empty to create with an empty name.")}
-            >
+            <SettingRow label={t("Name")} hint={t("optional_name_hint")}>
               <TextField
                 value={createPlayerOptions.name}
                 onChange={(evt) =>
@@ -1679,7 +1676,7 @@ function Personal() {
         <DialogActions>
           <Button onClick={handleCloseCreatePlayerModal}>{t("Cancel")}</Button>
           <Button variant="contained" onClick={handleCreatePlayerConfirm}>
-            {t("Create Player")}
+            {t("create_pc")}
           </Button>
         </DialogActions>
       </Dialog>
