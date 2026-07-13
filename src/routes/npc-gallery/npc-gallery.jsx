@@ -28,9 +28,11 @@ import {
   Paper,
   TextField,
   FormControl,
+  FormControlLabel,
   InputLabel,
   Select,
   MenuItem,
+  Switch,
   Autocomplete,
   ToggleButtonGroup,
   ToggleButton,
@@ -96,6 +98,16 @@ import {
   normalizeOwnershipForTarget,
 } from "../../libs/exportTransforms";
 import { applySpeciesEffects } from "../../forms/rendering/config/actorConfigs/npcSpeciesEffects";
+import {
+  applyRole,
+  QA_LEVELS,
+  QA_ROLE_KEYS,
+} from "../../libs/quickAssembly/roles";
+
+const CREATE_NPC_ROLE_OPTIONS = QA_ROLE_KEYS.map((key) => ({
+  value: key,
+  label: key.charAt(0).toUpperCase() + key.slice(1),
+}));
 
 const CREATE_NPC_SPECIES_OPTIONS = [
   { value: "Beast", label: "Beast" },
@@ -130,6 +142,9 @@ const defaultCreateNpcOptions = {
   rank: "soldier",
   companionlvl: 1,
   companionpclvl: 5,
+  useQuickAssembly: false,
+  role: "brute",
+  lvl: 5,
 };
 
 export default function NpcGallery() {
@@ -301,23 +316,30 @@ function Personal() {
   const createNpc = async (options = defaultCreateNpcOptions) => {
     const species = options.species || "Beast";
     const { affinities, immunities } = applySpeciesEffects(species);
-    const data = {
-      name: options.name || "-",
-      species,
-      lvl: 5,
-      rank: options.rank || "soldier",
-      imgurl: "",
-      attributes: { dexterity: 8, might: 8, will: 8, insight: 8 },
-      attacks: [],
-      affinities,
-      immunities,
-      ...(options.rank === "companion"
-        ? {
-            companionlvl: options.companionlvl ?? 1,
-            companionpclvl: options.companionpclvl ?? 5,
-          }
-        : {}),
-    };
+    const useQuickAssembly = !!options.useQuickAssembly;
+    const role = useQuickAssembly ? options.role || "brute" : "custom";
+    const lvl = useQuickAssembly ? options.lvl || 5 : 5;
+    const data = applyRole(
+      {
+        name: options.name || "-",
+        species,
+        lvl,
+        role,
+        rank: options.rank || "soldier",
+        imgurl: "",
+        attributes: { dexterity: 8, might: 8, will: 8, insight: 8 },
+        attacks: [],
+        affinities,
+        immunities,
+        ...(options.rank === "companion"
+          ? {
+              companionlvl: options.companionlvl ?? 1,
+              companionpclvl: options.companionpclvl ?? 5,
+            }
+          : {}),
+      },
+      { role, level: lvl },
+    );
     try {
       const docRef = await db.addDoc(
         db.collection("npc-personal"),
@@ -1487,6 +1509,82 @@ function Personal() {
                 sx={{ minWidth: 220 }}
               />
             </SettingRow>
+
+            <SettingRow
+              label={t("role_use_quick_assembly")}
+              hint={t("role_hint")}
+              showDivider={!createNpcOptions.useQuickAssembly}
+            >
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={createNpcOptions.useQuickAssembly}
+                    onChange={(evt) =>
+                      handleCreateNpcOptionChange(
+                        "useQuickAssembly",
+                        evt.target.checked,
+                      )
+                    }
+                  />
+                }
+                label=""
+                sx={{ m: 0 }}
+              />
+            </SettingRow>
+
+            {createNpcOptions.useQuickAssembly && (
+              <SettingRow
+                label={t("role")}
+                hint={t("role_select_hint")}
+                showDivider={false}
+                dense
+              >
+                <FormControl
+                  variant="outlined"
+                  size="small"
+                  sx={{ minWidth: 180 }}
+                >
+                  <Select
+                    value={createNpcOptions.role}
+                    onChange={(evt) =>
+                      handleCreateNpcOptionChange("role", evt.target.value)
+                    }
+                  >
+                    {CREATE_NPC_ROLE_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {t(option.label)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </SettingRow>
+            )}
+
+            {createNpcOptions.useQuickAssembly && (
+              <SettingRow label={t("Level")} hint={t("role_level_hint")} dense>
+                <FormControl
+                  variant="outlined"
+                  size="small"
+                  sx={{ minWidth: 100 }}
+                >
+                  <Select
+                    value={createNpcOptions.lvl}
+                    onChange={(evt) =>
+                      handleCreateNpcOptionChange(
+                        "lvl",
+                        Number(evt.target.value),
+                      )
+                    }
+                  >
+                    {QA_LEVELS.map((n) => (
+                      <MenuItem key={n} value={n}>
+                        {n}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </SettingRow>
+            )}
 
             <SettingRow label={t("Species")} hint={t("species_hint")}>
               <FormControl

@@ -2,9 +2,10 @@ import React from "react";
 import EditCompendiumModal from "./EditCompendiumModal";
 
 const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
-  const handleSave = (selectedItem) => {
+  const handleSave = (selectedItem, selectedType) => {
+    const kind = selectedItem.itemType || selectedType;
     setNpc((prevNpc) => {
-      switch (selectedItem.itemType) {
+      switch (kind) {
         case "spell":
           return {
             ...prevNpc,
@@ -70,6 +71,40 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
             ],
           };
         }
+
+        case "special":
+          return {
+            ...prevNpc,
+            special: [
+              ...(prevNpc.special || []),
+              {
+                name: selectedItem.name,
+                effect:
+                  selectedItem.effect ||
+                  selectedItem.description ||
+                  selectedItem.special?.[0] ||
+                  "",
+                spCost: selectedItem.spCost ?? 1,
+              },
+            ],
+          };
+
+        case "actions":
+          return {
+            ...prevNpc,
+            actions: [
+              ...(prevNpc.actions || []),
+              {
+                name: selectedItem.name,
+                effect:
+                  selectedItem.effect ||
+                  selectedItem.description ||
+                  selectedItem.special?.[0] ||
+                  "",
+                spCost: selectedItem.spCost ?? 1,
+              },
+            ],
+          };
 
         default:
           return prevNpc;

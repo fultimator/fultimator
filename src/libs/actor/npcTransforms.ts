@@ -110,6 +110,11 @@ function defaultSpCost(npc: TypeNpc): TypeNpc {
   };
 }
 
+function defaultQuickAssemblyRole(npc: TypeNpc): TypeNpc {
+  if (npc.role) return npc;
+  return { ...npc, role: "custom" };
+}
+
 function defaultImmunities(npc: TypeNpc): TypeNpc {
   return {
     ...npc,
@@ -679,6 +684,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Normalize legacy numeric string fields (phases, spCost, resource pools)",
     fn: normalizeLegacyNumericNpcFields,
+  },
+  {
+    version: 12,
+    label:
+      "Quick Assembly: default role to 'custom' for pre-existing NPCs (freeform)",
+    fn: defaultQuickAssemblyRole,
   },
 ];
 

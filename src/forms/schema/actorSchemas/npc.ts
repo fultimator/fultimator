@@ -281,6 +281,17 @@ export const NpcPersistedSchema = z.object({
   traits: z.string().optional(),
   description: z.string().optional(),
   species: z.string().default("Beast"),
+  role: z
+    .enum([
+      "brute",
+      "hunter",
+      "mage",
+      "saboteur",
+      "sentinel",
+      "support",
+      "custom",
+    ])
+    .default("custom"),
   rank: z.string().optional(),
   sizes: z.string().optional(),
   phases: z.number().optional(),
