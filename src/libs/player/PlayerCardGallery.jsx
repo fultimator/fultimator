@@ -15,6 +15,7 @@ import { TypeAffinity } from "/src/components/shared/actors/common/TypeAffinity"
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { calculateAttribute, newShade } from "/src/libs/playerCalculations";
 import { isItemEquipped } from "/src/libs/player/slots/equipmentSlots";
+import { resolveWellsprings } from "/src/libs/player/wellsprings";
 import CardLoadout from "/src/components/shared/actors/pc/playerSheet/CardLoadout";
 // Styled Components
 // Sub-components
@@ -536,9 +537,12 @@ export default function PlayerCardGallery({
     }
     if (spell.spellType === "invocation") {
       const tracker = spell.tracker || {};
-      const wells = tracker.activeWellsprings || [];
+      const allWellsprings = resolveWellsprings(spell.customWellsprings || []);
+      const labelFor = (key) =>
+        allWellsprings.find((w) => w.key === key)?.label ?? key;
+      const wells = (tracker.activeWellsprings || []).map(labelFor);
       const inner = tracker.innerWellspring
-        ? ` + ${tracker.chosenWellspring || ""}`
+        ? ` + ${labelFor(tracker.chosenWellspring || "")}`
         : "";
       return `${t("Wellsprings")}: ${wells.join(", ") || "-"}${inner}`;
     }

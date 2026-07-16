@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const ItemSchema = z.object({
+  id: z.string().optional(),
   fuid: z.string().optional(),
   name: z.string(),
   description: z.string().default(""),

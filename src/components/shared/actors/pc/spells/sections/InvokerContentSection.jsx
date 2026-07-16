@@ -70,14 +70,14 @@ function WellspringChip({
           objectFit: "contain",
           filter: isSelected ? undefined : "grayscale(0.4)",
         }}
-        alt={wellspring.key}
+        alt={wellspring.label ?? wellspring.key}
       />
       <span
         style={{
           color: isSelected ? wellspring.textColor : undefined,
         }}
       >
-        {wellspring.key}
+        {wellspring.label ?? wellspring.key}
       </span>
     </Box>
   );

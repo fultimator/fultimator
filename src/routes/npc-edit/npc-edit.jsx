@@ -160,10 +160,9 @@ export default function NpcEdit() {
 
   useEffect(() => {
     const baseline = npc
-      ? applyNpcPreSaveTransforms(JSON.parse(JSON.stringify(npc)))
+      ? applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc)))
       : npc;
-    const current = npcTemp ? applyNpcPreSaveTransforms(npcTemp) : npcTemp;
-    setIsUpdated(!deepEqual(current, baseline));
+    setIsUpdated(!deepEqual(npcTemp, baseline));
   }, [npcTemp, npc]);
 
   const appDrawerOpen = useThemeStore((s) => s.drawerOpen);

@@ -4,6 +4,7 @@ import { AccuracySchema, CostSchema, DamageSchema } from "./shared";
 import { BehaviorSchema } from "../../shared/behaviorSchemas";
 
 export const PlayerSpellDefaultSchema = z.object({
+  id: z.string().optional(),
   class: z.string(),
   name: z.string().min(1),
   fuid: z.string().optional(),

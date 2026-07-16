@@ -26,10 +26,12 @@ export const affinityIconSrc = (icon) =>
 export function resolveWellsprings(customWellsprings = []) {
   const standard = STANDARD_WELLSPRINGS.map((w) => ({
     ...w,
+    label: w.key,
     isStandard: true,
   }));
   const custom = (customWellsprings || []).map((w) => ({
-    key: w.name,
+    key: w.id ?? w.name,
+    label: w.name,
     color: w.color || "#888",
     textColor: w.textColor || "white",
     icon: w.icon || "untyped",

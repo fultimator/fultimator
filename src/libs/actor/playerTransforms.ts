@@ -11,6 +11,7 @@ import {
 } from "../../libs/weaponNormalization";
 import { normalizeDefensiveList } from "../../libs/equipmentDefensiveNormalization";
 import { availableModules } from "../../libs/pilotVehicleData";
+import { backfillIds } from "./itemIds";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
@@ -319,6 +320,44 @@ function migrateSlotIndexes(player: TypePlayer): TypePlayer {
  */
 function restoreRuntimeEquippedFlags(player: TypePlayer): TypePlayer {
   return rehydrateIsEquipped(player);
+}
+
+/**
+ * Backfills a stable `id` on any inventory item that doesn't have one yet.
+ * Runs on every load (not just once) so items added after this was introduced
+ * - purchases, imports, Quick Assembly output - also get an id.
+ */
+function backfillItemIds(player: TypePlayer): TypePlayer {
+  const inv = player.equipment?.[0];
+  return {
+    ...player,
+    ...(inv
+      ? {
+          equipment: [
+            {
+              ...inv,
+              weapons: backfillIds(inv.weapons) as typeof inv.weapons,
+              customWeapons: backfillIds(
+                inv.customWeapons,
+              ) as typeof inv.customWeapons,
+              armor: backfillIds(inv.armor) as typeof inv.armor,
+              shields: backfillIds(inv.shields) as typeof inv.shields,
+              accessories: backfillIds(
+                inv.accessories,
+              ) as typeof inv.accessories,
+            },
+            ...(player.equipment?.slice(1) ?? []),
+          ],
+        }
+      : {}),
+    classes: player.classes?.map((cls) => ({
+      ...cls,
+      spells: backfillIds(cls.spells) as typeof cls.spells,
+    })),
+    items: backfillIds(player.items) as typeof player.items,
+    consumables: backfillIds(player.consumables) as typeof player.consumables,
+    notes: backfillIds(player.notes) as typeof player.notes,
+  };
 }
 
 /**
@@ -1489,6 +1528,7 @@ function rehydrateVehicleModules(player: TypePlayer): TypePlayer {
 const ALWAYS_RUN_TRANSFORMS: PlayerTransform[] = [
   syncAutomaticClassLevels, // class lvl must stay in sync with skill totals
   migrateSlotIndexes, // new items may be saved without an index
+  backfillItemIds, // new items may be saved without an id
   restoreRuntimeEquippedFlags, // isEquipped is stripped on save, must be rehydrated
   pruneStaleSlotRefs, // spheres may be deleted between loads
   rehydrateVehicleModules, // re-hydrate module stats from static data every load

@@ -112,6 +112,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
               renderValue={(val) => {
                 const w = allWellsprings.find((x) => x.key === val);
                 if (!w) return val;
+                const label = w.label ?? w.key;
                 return (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <img
@@ -119,9 +120,9 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
                       width={18}
                       height={18}
                       style={{ objectFit: "contain", flexShrink: 0 }}
-                      alt={w.key}
+                      alt={label}
                     />
-                    {w.key}
+                    {label}
                   </Box>
                 );
               }}
@@ -134,9 +135,9 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
                       width={18}
                       height={18}
                       style={{ objectFit: "contain", flexShrink: 0 }}
-                      alt={w.key}
+                      alt={w.label ?? w.key}
                     />
-                    {w.key}
+                    {w.label ?? w.key}
                   </Box>
                 </MenuItem>
               ))}
@@ -164,6 +165,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
                 {selected.map((val) => {
                   const w = allWellsprings.find((x) => x.key === val);
                   const isOrphaned = !w;
+                  const label = w?.label ?? val;
                   const removeVal = (e) => {
                     e.stopPropagation();
                     handleAlwaysActiveChange(
@@ -193,7 +195,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
                                 width={14}
                                 height={14}
                                 style={{ objectFit: "contain", flexShrink: 0 }}
-                                alt={val}
+                                alt={label}
                               />
                             )}
                             <span
@@ -203,7 +205,7 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
                                   : undefined
                               }
                             >
-                              {val}
+                              {label}
                             </span>
                           </span>
                         }
@@ -239,9 +241,9 @@ export default function InvokerGeneralSection({ formState, setFormState, t }) {
                     width={18}
                     height={18}
                     style={{ objectFit: "contain", flexShrink: 0 }}
-                    alt={w.key}
+                    alt={w.label ?? w.key}
                   />
-                  {w.key}
+                  {w.label ?? w.key}
                 </Box>
               </MenuItem>
             ))}

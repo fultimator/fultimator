@@ -17,6 +17,7 @@ export const ArmorModifiersSchema = z.object({
 });
 
 export const ArmorSchema = z.object({
+  id: z.string().optional(),
   itemType: z.literal("armor"),
   name: z.string().min(1),
   description: z.string().optional(),
@@ -106,6 +107,7 @@ export function buildArmorFormState(
   return {
     itemType: "armor",
     base,
+    id: item?.id,
     fuid: item?.fuid,
     meta: {
       isOfficial: false,
