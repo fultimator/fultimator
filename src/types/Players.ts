@@ -182,6 +182,7 @@ export interface Vehicle {
 }
 
 export interface Spells {
+  id?: string;
   fuid?: string;
   name: string;
   book?: string;
@@ -275,6 +276,7 @@ export interface Rituals {
 }
 
 export interface PlayerItems {
+  id?: string;
   fuid?: string;
   name: string;
   description: string;
@@ -283,6 +285,7 @@ export interface PlayerItems {
 }
 
 export interface PlayerConsumables {
+  id?: string;
   fuid?: string;
   name: string;
   description: string;
@@ -290,6 +293,7 @@ export interface PlayerConsumables {
 }
 
 export interface PlayerNotes {
+  id?: string;
   fuid?: string;
   name: string;
   description: string;

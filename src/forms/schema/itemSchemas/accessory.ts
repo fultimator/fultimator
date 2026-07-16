@@ -13,6 +13,7 @@ export const AccessoryModifiersSchema = z.object({
 });
 
 export const AccessorySchema = z.object({
+  id: z.string().optional(),
   itemType: z.literal("accessory"),
   name: z.string().min(1),
   description: z.string().optional(),
@@ -67,6 +68,7 @@ export function buildAccessoryFormState(
 ): AccessoryPersisted {
   return {
     itemType: "accessory",
+    id: item?.id,
     fuid: item?.fuid,
     meta: {
       isOfficial: false,

@@ -8,6 +8,7 @@ import {
 import { Affinities, Elements } from "../../types/Misc";
 import { normalizeDefensiveItem } from "../../libs/equipmentDefensiveNormalization";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { ensureId, backfillIds } from "./itemIds";
 
 type NpcTransform = (npc: TypeNpc) => TypeNpc;
 
@@ -530,6 +531,49 @@ function renameWindToAir(npc: TypeNpc): TypeNpc {
   };
 }
 
+/**
+ * Backfills a stable `id` on any attack/weaponattack/spell/armor/shield that
+ * doesn't have one yet. Runs on every load (not just once) so items added
+ * after this was introduced also get an id.
+ */
+function backfillNpcItemIds(npc: TypeNpc): TypeNpc {
+  type WithOptionalId = Record<string, unknown> & { id?: string };
+  return {
+    ...npc,
+    attacks: backfillIds(
+      npc.attacks as unknown as WithOptionalId[],
+    ) as unknown as typeof npc.attacks,
+    weaponattacks: backfillIds(
+      npc.weaponattacks as unknown as WithOptionalId[],
+    ) as unknown as typeof npc.weaponattacks,
+    spells: backfillIds(
+      npc.spells as unknown as WithOptionalId[],
+    ) as unknown as typeof npc.spells,
+    actions: backfillIds(
+      npc.actions as unknown as WithOptionalId[],
+    ) as unknown as typeof npc.actions,
+    special: backfillIds(
+      npc.special as unknown as WithOptionalId[],
+    ) as unknown as typeof npc.special,
+    notes: backfillIds(
+      npc.notes as unknown as WithOptionalId[],
+    ) as unknown as typeof npc.notes,
+    raregear: backfillIds(
+      npc.raregear as unknown as WithOptionalId[],
+    ) as unknown as typeof npc.raregear,
+    armor: npc.armor
+      ? (ensureId(
+          npc.armor as unknown as WithOptionalId,
+        ) as unknown as typeof npc.armor)
+      : npc.armor,
+    shield: npc.shield
+      ? (ensureId(
+          npc.shield as unknown as WithOptionalId,
+        ) as unknown as typeof npc.shield)
+      : npc.shield,
+  };
+}
+
 function normalizeLegacyNumericNpcFields(npc: TypeNpc): TypeNpc {
   const toNumberIfNumericString = (value: unknown): unknown => {
     if (typeof value === "string" && value.trim() !== "") {
@@ -648,6 +692,7 @@ export function applyNpcPostLoadTransforms(npc: TypeNpc): TypeNpc {
   if ((result.schemaVersion ?? 0) < NPC_CURRENT_SCHEMA_VERSION) {
     result = { ...result, schemaVersion: NPC_CURRENT_SCHEMA_VERSION };
   }
+  result = backfillNpcItemIds(result);
   return renameWindToAir(result);
 }
 

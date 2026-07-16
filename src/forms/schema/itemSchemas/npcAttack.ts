@@ -16,6 +16,7 @@ const DamageSchema = z.object({
 });
 
 export const NpcAttackSchema = z.object({
+  id: z.string().optional(),
   itemType: z.literal("basic"),
   name: z.string().min(1),
   fuid: z.string().optional(),

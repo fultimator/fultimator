@@ -22,6 +22,7 @@ const CostSchema = z.object({
 });
 
 export const NpcSpellSchema = z.object({
+  id: z.string().optional(),
   itemType: z.literal("spell"),
   name: z.string().min(1),
   fuid: z.string().optional(),

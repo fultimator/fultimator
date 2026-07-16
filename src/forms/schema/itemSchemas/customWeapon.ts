@@ -39,6 +39,7 @@ export const CustomWeaponRareSchema = z.object({
 });
 
 export const CustomWeaponSchema = z.object({
+  id: z.string().optional(),
   itemType: z.literal("customWeapon"),
   name: z.string().min(1),
   description: z.string().optional(),
@@ -261,6 +262,7 @@ export function buildCustomWeaponFormState(
 
   return {
     itemType: "customWeapon",
+    id: item.id,
     name: item.name ?? "",
     category: item.category ?? categories[0],
     range: item.range ?? "melee",
@@ -403,6 +405,7 @@ export function buildCustomWeaponSavePayload(
 
   return {
     itemType: "customWeapon",
+    id: formState.id,
     name: formState.name,
     category: formState.selectedCategory,
     range: formState.selectedRange,

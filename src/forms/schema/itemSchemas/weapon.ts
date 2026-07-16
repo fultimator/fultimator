@@ -45,6 +45,7 @@ export const WeaponRareSchema = z.object({
 });
 
 export const WeaponSchema = z.object({
+  id: z.string().optional(),
   itemType: z.literal("weapon"),
   name: z.string().min(1),
   description: z.string().optional(),
@@ -136,6 +137,7 @@ export function buildWeaponFormState(
   const damageReworkBonus = item?.damageReworkBonus ?? false;
   return {
     base,
+    id: item?.id,
     fuid: item?.fuid,
     name: item?.name ?? allWeapons[0].name,
     category: item?.category ?? "",
@@ -207,6 +209,7 @@ export function buildWeaponSavePayload(
     mDefModifier,
     isEquipped,
     fuid,
+    id,
   } = formState;
 
   const savedCost = calcWeaponCost({
@@ -235,6 +238,7 @@ export function buildWeaponSavePayload(
     name,
     category,
     fuid,
+    id,
     range: getWeaponRange(base),
     type,
     hands,

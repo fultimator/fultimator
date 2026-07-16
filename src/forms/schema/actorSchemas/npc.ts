@@ -244,6 +244,7 @@ export const NpcSpellSchema = z
   .loose();
 
 export const NpcActionSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   effect: z.string().optional(),
   spCost: z.number().optional(),
@@ -253,12 +254,14 @@ export const NpcActionSchema = z.object({
 export const NpcSpecialSchema = NpcActionSchema;
 
 export const NpcRareGearSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   effect: z.string().optional(),
   behaviors: z.array(BehaviorSchema).optional(),
 });
 
 export const NpcNotesSchema = z.object({
+  id: z.string().optional(),
   fuid: z.string().optional(),
   name: z.string(),
   description: z.string().optional(),

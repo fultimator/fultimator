@@ -35,6 +35,7 @@ export const CostSchema = z.object({
 });
 
 export const PlayerSpellNonStaticBaseSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1),
   fuid: z.string().optional(),
   meta: MetaSchema.optional(),

@@ -7,6 +7,7 @@ export interface SurfaceFieldParity {
 }
 
 const WEAPON_FIELDS = [
+  "id",
   "itemType",
   "name",
   "description",
@@ -46,6 +47,7 @@ const WEAPON_FIELDS = [
 ] as const;
 
 const CUSTOM_WEAPON_FIELDS = [
+  "id",
   "itemType",
   "name",
   "description",
