@@ -84,6 +84,7 @@ export function IconPicker({ value, onChange }) {
 }
 
 function WellspringSelectOption({ wellspring }) {
+  const label = wellspring.label ?? wellspring.key;
   return (
     <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <img
@@ -91,9 +92,9 @@ function WellspringSelectOption({ wellspring }) {
         width={18}
         height={18}
         style={{ objectFit: "contain", flexShrink: 0 }}
-        alt={wellspring.key}
+        alt={label}
       />
-      {wellspring.key}
+      {label}
     </span>
   );
 }
@@ -312,6 +313,7 @@ function InvocationRow({
   t,
 }) {
   const wsEntry = allWellsprings.find((w) => w.key === inv.wellspring);
+  const wsLabel = wsEntry?.label ?? wsEntry?.key;
   const handleSendToChat = () =>
     sendDisplayMessage("invocation", inv.customName || t("Unnamed"), {
       tags: [inv.wellspring, inv.type].filter(Boolean),
@@ -334,7 +336,7 @@ function InvocationRow({
           width={20}
           height={20}
           style={{ objectFit: "contain", flexShrink: 0 }}
-          alt={wsEntry.key}
+          alt={wsLabel}
         />
       )}
       <Typography
@@ -514,6 +516,7 @@ function InvocationGroup({
     );
 
   const wellspringEntry = allWellsprings.find((w) => w.key === wsKey);
+  const wsLabel = wellspringEntry?.label ?? wsKey;
 
   return (
     <Box>
@@ -535,10 +538,10 @@ function InvocationGroup({
               width={16}
               height={16}
               style={{ objectFit: "contain" }}
-              alt={wsKey}
+              alt={wsLabel}
             />
             <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-              {wsKey}
+              {wsLabel}
             </Typography>
           </>
         ) : (
@@ -653,7 +656,13 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
   const addWellspring = () =>
     setCustomWellsprings((prev) => [
       ...prev,
-      { name: "", color: "#888888", textColor: "white", icon: "untyped" },
+      {
+        id: crypto.randomUUID(),
+        name: "",
+        color: "#888888",
+        textColor: "white",
+        icon: "untyped",
+      },
     ]);
 
   const updateWellspring = (i, field, val) =>
@@ -702,8 +711,8 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
       effect: inv.effect || "",
     });
 
-  const addMissingInvocations = (wellspringName) => {
-    const nameLower = wellspringName.toLowerCase();
+  const addMissingInvocations = (wellspring) => {
+    const nameLower = wellspring.name.toLowerCase();
     const matching = [];
     for (const pack of packs) {
       for (const item of pack.items) {
@@ -729,7 +738,7 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
         .map((inv) => ({
           key: crypto.randomUUID(),
           customName: String(inv.name || ""),
-          wellspring: wellspringName,
+          wellspring: wellspring.id ?? wellspring.name,
           type: String(inv.type || "Blast"),
           effect: String(inv.effect || ""),
         }));
@@ -739,19 +748,22 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
 
   const handleImportWellspring = (item) => {
     if (item.spellType !== "wellspring" || !item.name) return;
-    setCustomWellsprings((prev) => {
-      if (prev.some((w) => w.name.toLowerCase() === item.name.toLowerCase()))
-        return prev;
-      return [
+    const existing = customWellsprings.find(
+      (w) => w.name.toLowerCase() === item.name.toLowerCase(),
+    );
+    const newId = existing?.id ?? crypto.randomUUID();
+    if (!existing) {
+      setCustomWellsprings((prev) => [
         ...prev,
         {
+          id: newId,
           name: item.name,
           color: item.color || "#888888",
           textColor: item.textColor || "white",
           icon: item.icon || "untyped",
         },
-      ];
-    });
+      ]);
+    }
 
     const nameLower = item.name.toLowerCase();
     const matchingInvocations = [];
@@ -780,7 +792,7 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
           .map((inv) => ({
             key: crypto.randomUUID(),
             customName: String(inv.name || ""),
-            wellspring: item.name,
+            wellspring: newId,
             type: String(inv.type || "Blast"),
             effect: String(inv.effect || ""),
           }));
@@ -793,12 +805,16 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
 
   const handleImportInvocation = (item) => {
     if (item.spellType !== "invocation" || !item.name) return;
+    const matchingCustom = customWellsprings.find(
+      (w) =>
+        w.name.toLowerCase() === String(item.wellspring || "").toLowerCase(),
+    );
     setInvocations((prev) => [
       ...prev,
       {
         key: crypto.randomUUID(),
         customName: item.name,
-        wellspring: item.wellspring || "",
+        wellspring: matchingCustom?.id ?? item.wellspring ?? "",
         type: item.type || "Blast",
         effect: item.effect || "",
       },
@@ -873,12 +889,12 @@ export default function InvokerCustomSection({ formState, setFormState, t }) {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {customWellsprings.map((w, i) => (
               <WellspringRow
-                key={i}
+                key={w.id ?? i}
                 wellspring={w}
                 index={i}
                 onUpdate={updateWellspring}
                 onAddMissingInvocations={
-                  w.name ? () => addMissingInvocations(w.name) : undefined
+                  w.name ? () => addMissingInvocations(w) : undefined
                 }
                 onAddToCompendium={() => addWellspringToCompendium(w)}
                 onDelete={() => removeWellspring(i)}

@@ -115,7 +115,9 @@ function ThemedSpellInvoker({
                   color: "#4CAF50",
                 }}
               >
-                + {t("invoker_invocation_inner")}: {chosenWellspring}
+                + {t("invoker_invocation_inner")}:{" "}
+                {allWellsprings.find((w) => w.key === chosenWellspring)
+                  ?.label ?? chosenWellspring}
               </Typography>
             )}
             {alwaysActiveWellsprings.length > 0 && (
@@ -129,7 +131,12 @@ function ThemedSpellInvoker({
                 }}
               >
                 + {t("invoker_always_active")}:{" "}
-                {alwaysActiveWellsprings.join(", ")}
+                {alwaysActiveWellsprings
+                  .map(
+                    (val) =>
+                      allWellsprings.find((w) => w.key === val)?.label ?? val,
+                  )
+                  .join(", ")}
               </Typography>
             )}
             <Typography
@@ -202,7 +209,7 @@ function ThemedSpellInvoker({
                     width={18}
                     height={18}
                     style={{ objectFit: "contain" }}
-                    alt={wellspring.key}
+                    alt={wellspring.label ?? wellspring.key}
                   />
                   <span
                     style={{
@@ -212,7 +219,7 @@ function ThemedSpellInvoker({
                     {t(`invoker_${wellspring.key.toLowerCase()}`) !==
                     `invoker_${wellspring.key.toLowerCase()}`
                       ? t(`invoker_${wellspring.key.toLowerCase()}`)
-                      : wellspring.key}
+                      : (wellspring.label ?? wellspring.key)}
                   </span>
                 </Box>
               );
@@ -419,14 +426,14 @@ function ThemedSpellInvoker({
                         width={16}
                         height={16}
                         style={{ objectFit: "contain", flexShrink: 0 }}
-                        alt={invocation.wellspring}
+                        alt={wellspringEntry.label ?? invocation.wellspring}
                       />
                     )}
                     <Typography sx={bodyTextSx}>
                       {t(`invoker_${invocation.wellspring.toLowerCase()}`) !==
                       `invoker_${invocation.wellspring.toLowerCase()}`
                         ? t(`invoker_${invocation.wellspring.toLowerCase()}`)
-                        : invocation.wellspring}
+                        : (wellspringEntry?.label ?? invocation.wellspring)}
                     </Typography>
                   </Box>
                   <Box

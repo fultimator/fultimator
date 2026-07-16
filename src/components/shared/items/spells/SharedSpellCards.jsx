@@ -1665,9 +1665,13 @@ export const SharedInvocationCard = React.memo(function SharedInvocationCard({
                       width={14}
                       height={14}
                       style={{ objectFit: "contain", flexShrink: 0 }}
-                      alt={item.wellspring}
+                      alt={
+                        wellsprings.find((w) => w.key === item.wellspring)
+                          ?.label ?? item.wellspring
+                      }
                     />
-                    {item.wellspring}
+                    {wellsprings.find((w) => w.key === item.wellspring)
+                      ?.label ?? item.wellspring}
                   </Box>
                 }
                 size="small"

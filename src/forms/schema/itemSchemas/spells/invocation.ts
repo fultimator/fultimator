@@ -17,6 +17,7 @@ const InvocationItemSchema = z.object({
 });
 
 const CustomWellspringSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   color: z.string().default("#888"),
   textColor: z.enum(["black", "white"]).default("white"),
