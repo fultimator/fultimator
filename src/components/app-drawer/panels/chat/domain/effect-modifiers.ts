@@ -60,6 +60,59 @@ export function outgoingDamageBonusFromEffects(
   return total;
 }
 
+interface EffectLike {
+  name?: string;
+  disabled?: boolean;
+  behaviors?: Array<{
+    trigger?: { kind?: string };
+    predicate?: { crisisInteraction?: string };
+    changes?: Array<{ key?: string; mode?: number; value?: unknown }>;
+  }>;
+}
+
+function damageKeysForContext(ctx: OutgoingDamageContext): Set<string> {
+  const keys = new Set<string>(["bonuses.damage.all"]);
+  if (ctx.range) keys.add(`bonuses.damage.${ctx.range}`);
+  if (ctx.category) keys.add(`bonuses.damage.${ctx.category}`);
+  if (ctx.damageType && ctx.damageType !== "untyped")
+    keys.add(`bonuses.damage.${ctx.damageType}`);
+  return keys;
+}
+
+export function outgoingDamageModifiersFromEffects(
+  actor: Actor,
+  ctx: OutgoingDamageContext = {},
+): CheckModifier[] {
+  const inCrisis = ctx.inCrisis ?? isActorInCrisis(actor);
+  const keys = damageKeysForContext(ctx);
+  const rows: CheckModifier[] = [];
+
+  const effects =
+    (actor as unknown as { effects?: EffectLike[] }).effects ?? [];
+  for (const effect of effects) {
+    if (!effect || effect.disabled === true) continue;
+    let value = 0;
+    for (const beh of effect.behaviors ?? []) {
+      if ((beh.trigger?.kind ?? "passive") !== "passive") continue;
+      const ci = beh.predicate?.crisisInteraction ?? "none";
+      if (ci === "active" && !inCrisis) continue;
+      if (ci === "inactive" && inCrisis) continue;
+      for (const ch of beh.changes ?? []) {
+        if (ch.mode !== 2 || !ch.key || !keys.has(ch.key)) continue;
+        value += Number(ch.value) || 0;
+      }
+    }
+    if (value !== 0) rows.push({ label: effect.name || "Effect", value });
+  }
+
+  const total = outgoingDamageBonusFromEffects(actor, { ...ctx, inCrisis });
+  const attributed = rows.reduce((sum, r) => sum + r.value, 0);
+  const remainder = total - attributed;
+  if (remainder !== 0) rows.push({ label: "Effect Bonus", value: remainder });
+
+  return rows;
+}
+
 function push(
   out: CheckModifier[],
   label: string,

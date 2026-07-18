@@ -19,6 +19,7 @@ export function prepareAccuracyCheck(
   options?: {
     damageSituationalBonus?: number;
     damageOutgoingBonus?: number;
+    damageModifiers?: CheckModifier[];
     hrZero?: boolean;
   },
 ): AccuracyCheckIntent {
@@ -37,6 +38,7 @@ export function prepareAccuracyCheck(
     baseDamage: weapon.baseDamage ?? 0,
     damageSituationalBonus: options?.damageSituationalBonus ?? 0,
     damageOutgoingBonus: options?.damageOutgoingBonus ?? 0,
+    damageModifiers: options?.damageModifiers ?? [],
     damageType: weapon.damageType ?? "physical",
     defense: weapon.accuracyDefense ?? "def",
     hands: weapon.hands,

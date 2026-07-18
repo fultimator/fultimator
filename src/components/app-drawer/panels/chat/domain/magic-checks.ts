@@ -16,7 +16,10 @@ function rollDie(sides: number): number {
 export function prepareMagicCheck(
   spell: SpellOption,
   extraModifiers: CheckModifier[] = [],
-  options?: { damageOutgoingBonus?: number },
+  options?: {
+    damageOutgoingBonus?: number;
+    damageModifiers?: CheckModifier[];
+  },
 ): MagicCheckIntent {
   const modifiers: CheckModifier[] = [...extraModifiers];
   if (spell.accuracyBonus && spell.accuracyBonus !== 0) {
@@ -33,6 +36,7 @@ export function prepareMagicCheck(
     description: spell.description,
     baseDamage: spell.baseDamage ?? 0,
     damageOutgoingBonus: options?.damageOutgoingBonus ?? 0,
+    damageModifiers: options?.damageModifiers ?? [],
     damageType: spell.damageType ?? "physical",
     defense: spell.accuracyDefense ?? "mdef",
     hrZero: spell.damageHrZero ?? false,

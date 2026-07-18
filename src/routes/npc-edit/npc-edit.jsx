@@ -50,6 +50,7 @@ import {
   EditExtra,
   EditSpells,
   EditActions,
+  EditEffects,
   EditNotes,
   EditRareGear,
   EditPublish,
@@ -594,6 +595,9 @@ export default function NpcEdit() {
                   </Grid>
                   <Grid size={{ xs: 12, md: 6 }} id="edit-section-notes">
                     <EditNotes npc={npcTemp} setNpc={setNpcTemp} />
+                  </Grid>
+                  <Grid size={12} id="edit-section-effects">
+                    <EditEffects npc={npcTemp} setNpc={setNpcTemp} />
                   </Grid>
                 </Grid>
               )}

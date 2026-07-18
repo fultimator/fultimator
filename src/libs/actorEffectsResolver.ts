@@ -84,7 +84,7 @@ function collectPassiveBehaviors(
   for (const e of actor.effects ?? []) {
     if (e.disabled === true) continue;
     for (const beh of e.behaviors ?? []) {
-      if (beh.trigger?.kind !== "passive") continue;
+      if ((beh.trigger?.kind ?? "passive") !== "passive") continue;
       if (!isActive(beh, ctx)) continue;
       out.push(beh);
     }
@@ -93,7 +93,7 @@ function collectPassiveBehaviors(
   for (const item of walkItems(actor)) {
     for (const beh of itemBehaviors(item)) {
       if (beh.transfer !== true) continue;
-      if (beh.trigger?.kind !== "passive") continue;
+      if ((beh.trigger?.kind ?? "passive") !== "passive") continue;
       if (!isActive(beh, ctx)) continue;
       out.push(beh);
     }

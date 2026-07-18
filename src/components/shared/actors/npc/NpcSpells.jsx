@@ -17,7 +17,10 @@ import {
   processMagicCheck,
   buildMagicCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/magic-checks";
-import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageModifiersFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { ATTR_SHORT } from "./npcShared";
 import { StyledMarkdown, ClickableName } from "./NpcMarkdown";
 
@@ -56,12 +59,22 @@ function SpellRow({ spell, npc, showRoll }) {
       primary: npc.attributes?.[spell.accuracy?.attr1]?.base ?? 6,
       secondary: npc.attributes?.[spell.accuracy?.attr2]?.base ?? 6,
     };
-    const effectModifiers = accuracyModifiersFromEffects(npc);
+    const effectModifiers = accuracyModifiersFromEffects(npc, {
+      checkType: "magic",
+    });
+    const damageModifiers = outgoingDamageModifiersFromEffects(npc, {
+      range: "spell",
+      damageType: spell.damage?.type,
+    });
+    const damageOutgoingBonus = damageModifiers.reduce(
+      (sum, m) => sum + m.value,
+      0,
+    );
     const intent = prepareMagicCheck(
       {
         attr1: attr1Short,
         attr2: attr2Short,
-        accuracyBonus: spellAccuracyBonus,
+        accuracyBonus: spellAccuracyBonus + calcMagic(npc),
         name: spell.name,
         baseDamage: spell.damage?.value ?? 0,
         damageType: spell.damage?.type ?? "physical",
@@ -70,6 +83,7 @@ function SpellRow({ spell, npc, showRoll }) {
         spellType: spell.spellType ?? "npc",
       },
       effectModifiers,
+      { damageOutgoingBonus, damageModifiers },
     );
     const rolls = rollMagicCheck(dieSizes);
     const result = processMagicCheck(

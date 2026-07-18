@@ -14,6 +14,8 @@ import {
 } from "../../../../../libs/player/slots/loadoutSelectors";
 import type { Behavior } from "../../../../../types/Effects";
 import type { TypePlayer } from "../../../../../types/Players";
+import type { TypeNpc } from "../../../../../types/Npcs";
+import { calcPrecision, calcDamage, calcMagic } from "../../../../../libs/npcs";
 import { DEFAULT_SPEAKER } from "../constants";
 import type { Attribute } from "../types";
 
@@ -182,7 +184,9 @@ export function resolveSpellOptions(
   if (!doc) return [];
 
   const results: SpellOption[] = [];
-  const pushSpell = (spell: Record<string, unknown>) => {
+  const isNpc = !Array.isArray(doc.classes);
+  const npcMagicBonus = isNpc ? calcMagic(doc as unknown as TypeNpc) : 0;
+  const pushSpell = (spell: Record<string, unknown>, magicBonus = 0) => {
     if (!isEnabledWhenPresent(spell)) return;
     const name = typeof spell.name === "string" ? spell.name : "";
     if (!name) return;
@@ -192,6 +196,7 @@ export function resolveSpellOptions(
     const dmg = spell.damage as Record<string, unknown> | undefined;
     const spellType =
       typeof spell.spellType === "string" ? spell.spellType : undefined;
+    const accuracyBonus = (toNumber(acc?.value) ?? 0) + magicBonus;
     results.push({
       arg: quoteArg(spellType ? `${name} ${spellType}` : name),
       name,
@@ -207,8 +212,7 @@ export function resolveSpellOptions(
       attr1: toAttr(acc?.attr1),
       attr2: toAttr(acc?.attr2),
       baseDamage: toNumber(dmg?.value) ?? 0,
-      accuracyBonus:
-        (toNumber(acc?.value) ?? 0) !== 0 ? toNumber(acc?.value) : undefined,
+      accuracyBonus: accuracyBonus !== 0 ? accuracyBonus : undefined,
       accuracyDefense: typeof acc?.defense === "string" ? acc.defense : "mdef",
       damageType: typeof dmg?.type === "string" ? dmg.type : "physical",
       damageHrZero: dmg?.hrZero === true,
@@ -220,7 +224,8 @@ export function resolveSpellOptions(
 
   if (Array.isArray(doc.spells)) {
     for (const s of doc.spells) {
-      if (s && typeof s === "object") pushSpell(s as Record<string, unknown>);
+      if (s && typeof s === "object")
+        pushSpell(s as Record<string, unknown>, npcMagicBonus);
     }
   }
   if (Array.isArray(doc.classes)) {
@@ -340,16 +345,22 @@ export function resolveAttackOptions(
   const weaponattacks = doc.weaponattacks;
   if (Array.isArray(attacks) || Array.isArray(weaponattacks)) {
     const results: AttackOption[] = [];
+    const npc = doc as unknown as TypeNpc;
     if (Array.isArray(attacks)) {
       for (const a of attacks) {
         if (a && typeof a.name === "string" && a.name) {
           const acc = a.accuracy as Record<string, unknown> | undefined;
           const dmg = a.damage as Record<string, unknown> | undefined;
+          const precision = calcPrecision(a, npc);
           results.push({
             arg: quoteArg(a.name),
             name: a.name,
             attr1: toAttr(acc?.attr1),
             attr2: toAttr(acc?.attr2),
+            baseDamage: calcDamage(a, npc),
+            accuracyBonus: precision !== 0 ? precision : undefined,
+            accuracyDefense:
+              typeof acc?.defense === "string" ? acc.defense : undefined,
             damageType: typeof dmg?.type === "string" ? dmg.type : undefined,
             damageHrZero: dmg?.hrZero === true,
             range: toRange(a.range),
@@ -367,16 +378,14 @@ export function resolveAttackOptions(
         if (typeof name === "string" && name) {
           const acc = wa.accuracy as Record<string, unknown> | undefined;
           const dmg = wa.damage as Record<string, unknown> | undefined;
+          const precision = calcPrecision(wa, npc);
           results.push({
             arg: quoteArg(name),
             name,
             attr1: toAttr(acc?.attr1),
             attr2: toAttr(acc?.attr2),
             baseDamage: typeof dmg?.value === "number" ? dmg.value : undefined,
-            accuracyBonus:
-              typeof acc?.value === "number" && acc.value !== 0
-                ? acc.value
-                : undefined,
+            accuracyBonus: precision !== 0 ? precision : undefined,
             accuracyDefense:
               typeof acc?.defense === "string" ? acc.defense : undefined,
             damageType: typeof dmg?.type === "string" ? dmg.type : undefined,

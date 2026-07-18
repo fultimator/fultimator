@@ -41,6 +41,10 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageModifiersFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { TypeName } from "/src/components/types";
 import { MeleeIcon, DistanceIcon } from "/src/components/icons";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
@@ -388,18 +392,34 @@ export default function EditAttacks({ npc, setNpc }) {
                 primary: npc.attributes?.[attack.accuracy?.attr1]?.base ?? 6,
                 secondary: npc.attributes?.[attack.accuracy?.attr2]?.base ?? 6,
               };
-              const intent = prepareAccuracyCheck({
-                attr1: ATTR_ROLL[attack.accuracy?.attr1] ?? "dex",
-                attr2: ATTR_ROLL[attack.accuracy?.attr2] ?? "dex",
-                accuracyBonus: accBonus,
-                name: attack.name,
-                description: attack.effect ?? attack.special?.[0] ?? undefined,
-                baseDamage: dmgValue,
-                damageType: dmgType,
-                accuracyDefense: attack.accuracy?.defense ?? "def",
+              const effectModifiers = accuracyModifiersFromEffects(npc, {
                 range: attack.range,
-                hrZero,
               });
+              const damageModifiers = outgoingDamageModifiersFromEffects(npc, {
+                range: attack.range,
+                damageType: dmgType,
+              });
+              const damageOutgoingBonus = damageModifiers.reduce(
+                (sum, m) => sum + m.value,
+                0,
+              );
+              const intent = prepareAccuracyCheck(
+                {
+                  attr1: ATTR_ROLL[attack.accuracy?.attr1] ?? "dex",
+                  attr2: ATTR_ROLL[attack.accuracy?.attr2] ?? "dex",
+                  accuracyBonus: accBonus,
+                  name: attack.name,
+                  description:
+                    attack.effect ?? attack.special?.[0] ?? undefined,
+                  baseDamage: dmgValue,
+                  damageType: dmgType,
+                  accuracyDefense: attack.accuracy?.defense ?? "def",
+                  range: attack.range,
+                  hrZero,
+                },
+                effectModifiers,
+                { damageOutgoingBonus, damageModifiers },
+              );
               const rolls = rollAccuracyCheck(dieSizes);
               const result = processAccuracyCheck(
                 intent,

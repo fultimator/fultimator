@@ -17,7 +17,10 @@ import {
   processAccuracyCheck,
   buildAccuracyCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/accuracy-checks";
-import { accuracyModifiersFromEffects } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageModifiersFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { ATTR_SHORT, damageTypeLabels } from "./npcShared";
 import { SpanMarkdown, ClickableName } from "./NpcMarkdown";
 
@@ -37,11 +40,19 @@ function AttackRow({ attack, npc, attackType, showRoll }) {
     const effectModifiers = accuracyModifiersFromEffects(npc, {
       range: attack.range,
     });
+    const damageModifiers = outgoingDamageModifiersFromEffects(npc, {
+      range: attack.range,
+      damageType: attack.damage?.type,
+    });
+    const damageOutgoingBonus = damageModifiers.reduce(
+      (sum, m) => sum + m.value,
+      0,
+    );
     const intent = prepareAccuracyCheck(
       {
         attr1: attr1Short,
         attr2: attr2Short,
-        accuracyBonus: attack.accuracy?.value ?? 0,
+        accuracyBonus: calcPrecision(attack, npc),
         name: attack.name,
         baseDamage: isWeapon
           ? (attack.damage?.value ?? 0)
@@ -52,6 +63,7 @@ function AttackRow({ attack, npc, attackType, showRoll }) {
         hrZero: attack.damage?.hrZero === true,
       },
       effectModifiers,
+      { damageOutgoingBonus, damageModifiers },
     );
     const rolls = rollAccuracyCheck(dieSizes);
     const result = processAccuracyCheck(
