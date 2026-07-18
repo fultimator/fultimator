@@ -258,6 +258,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     (s) => s.setActiveActorName,
   );
   const clearEncounterActors = useCombatEncounterStore((s) => s.clearActors);
+  const sweepAppliedEffects = useCombatEncounterStore(
+    (s) => s.sweepAppliedEffects,
+  );
+  const clearAppliedEffects = useCombatEncounterStore(
+    (s) => s.clearAppliedEffects,
+  );
   const setEncounterChat = useEncounterChatStore((s) => s.setMessages);
   const addEncounterChatMessage = useEncounterChatStore((s) => s.addMessage);
   const clearEncounterChat = useEncounterChatStore((s) => s.clear);
@@ -611,6 +617,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       setActiveTurn(null);
     }
     setEncounter((prev) => ({ ...prev, round: prev.round + 1 }));
+    sweepAppliedEffects("end-of-round");
     emitLog({
       type: "round-change",
       round: encounter.round + 1,
@@ -670,10 +677,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const handleStartActorTurn = (combatId, turnIndex, faction) => {
     if (activeTurn) return; // another turn already in progress
     setActiveTurn({ combatId, turnIndex, faction });
+    sweepAppliedEffects("start-of-turn", combatId);
   };
 
   const handleEndActorTurn = (combatId, turnIndex, faction, isNpc) => {
     setActiveTurn(null);
+    sweepAppliedEffects("end-of-turn", combatId);
     if (isNpc) {
       const nextNPCs = selectedNPCs.map((n) => {
         if (n.combatId !== combatId) return n;
@@ -1644,6 +1653,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
               })),
             );
             setEncounter((prev) => ({ ...prev, round: 1 }));
+            clearAppliedEffects();
           } else {
             setInitiativeDialogOpen(true);
           }

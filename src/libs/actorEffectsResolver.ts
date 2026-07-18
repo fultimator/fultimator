@@ -5,11 +5,13 @@ import {
   type ActorMultipliers,
 } from "../types/Bonuses";
 import type {
+  AppliedEffect,
   Behavior,
   EffectChange,
   EffectMode,
   GrantData,
 } from "../types/Effects";
+import { isAppliedEffectActive } from "./appliedEffects";
 import { type Affinities, type Elements } from "../types/Misc";
 import { combineAffinities } from "../pipelines/damagePipeline";
 import type {
@@ -34,6 +36,8 @@ type SlottedEquipmentItem = (Weapons | CustomWeapons) & { slotted?: string[] };
 
 export interface ResolveContext {
   inCrisis?: boolean;
+  // Combat-temporary effects that overlay on top of passive effects.
+  appliedEffects?: AppliedEffect[];
 }
 
 export interface ResolvedEffects {
@@ -56,7 +60,13 @@ export function resolveActorEffects(
   const affinityGrants: Partial<Record<Elements, Affinities>> = {};
 
   const passiveBehaviors = collectPassiveBehaviors(actor, ctx);
-  const changes = passiveBehaviors.flatMap((b) => b.changes ?? []);
+  const activeApplied = (ctx.appliedEffects ?? []).filter((ae) =>
+    isAppliedEffectActive(ae, { inCrisis: ctx.inCrisis }),
+  );
+  const changes = [
+    ...passiveBehaviors.flatMap((b) => b.changes ?? []),
+    ...activeApplied.flatMap((ae) => ae.changes ?? []),
+  ];
   const sorted = changes.slice().sort(byPriority);
 
   const overlay = { bonuses, multipliers };
@@ -70,6 +80,9 @@ export function resolveActorEffects(
 
   for (const beh of passiveBehaviors) {
     if (beh.grants) grants.push(...beh.grants);
+  }
+  for (const ae of activeApplied) {
+    if (ae.grants) grants.push(...ae.grants);
   }
 
   return { bonuses, multipliers, grants, affinityGrants };

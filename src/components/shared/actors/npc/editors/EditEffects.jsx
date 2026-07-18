@@ -50,7 +50,7 @@ function ActorEffectDialogInner({ effect, isNew, onClose, onSave, onDelete }) {
       <DialogTitle>
         {isNew ? t("add_actor_effect") : t("edit_actor_effect")}
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ "&.MuiDialogContent-root": { pt: 4 } }}>
         <TabbedSchemaFormRenderer
           tabs={NO_TABS}
           config={actorEffectRowFields}

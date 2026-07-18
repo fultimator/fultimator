@@ -25,6 +25,7 @@ import {
 } from "./speakers";
 import {
   accuracyModifiersFromEffects,
+  checkModifiersFromEffects,
   outgoingDamageBonusFromEffects,
   isActorInCrisis,
 } from "./effect-modifiers";
@@ -38,7 +39,8 @@ import type {
   DamagePipelineTarget,
   DieSides,
 } from "../types";
-import type { Behavior } from "../../../../../types/Effects";
+import type { AppliedEffect, Behavior } from "../../../../../types/Effects";
+import { materializeAppliedEffect } from "../../../../../libs/appliedEffects";
 
 export interface ActiveBehaviorOutput {
   speaker: string;
@@ -62,6 +64,58 @@ function collectActiveBehaviorOutputs(
     out.push({ speaker, itemName, itemType, text });
   }
   return out;
+}
+
+function rollerAppliedEffects(
+  playerDoc: Record<string, unknown> | null,
+): AppliedEffect[] {
+  const combatId = playerDoc?.combatId as string | undefined;
+  if (!combatId) return [];
+  const runtime = useCombatEncounterStore.getState().getRuntimeActor(combatId);
+  return runtime?.appliedEffects ?? [];
+}
+
+function applyBehaviorEffectsOnResolve(
+  behaviors: Behavior[] | undefined,
+  action: "attack" | "spell",
+  playerDoc: Record<string, unknown> | null,
+  targets: DamagePipelineTarget[] | undefined,
+  itemName: string,
+): void {
+  if (!behaviors || behaviors.length === 0) return;
+  const store = useCombatEncounterStore.getState();
+  const selfCombatId = playerDoc?.combatId as string | undefined;
+  const targetIds = (targets ?? []).map((t) => t.combatId).filter(Boolean);
+
+  for (const beh of behaviors) {
+    const applies = beh.appliesEffect;
+    if (!applies) continue;
+    const kind = beh.trigger?.kind ?? "passive";
+    const matchesAction =
+      (kind === "chat-action" &&
+        (beh.trigger as { action?: string }).action === action) ||
+      kind === "on-hit";
+    if (!matchesAction) continue;
+
+    let recipients: string[];
+    if (applies.target === "self") {
+      recipients = selfCombatId ? [selfCombatId] : [];
+    } else if (applies.target === "single" || applies.target === "all") {
+      recipients = targetIds;
+    } else {
+      recipients = []; // cover-target: needs cover context, unsupported here
+    }
+
+    for (const combatId of recipients) {
+      store.applyEffectToActor(
+        combatId,
+        materializeAppliedEffect(applies, {
+          origin: `${action}:${itemName}:${beh.id}`,
+          sourceCombatId: selfCombatId,
+        }),
+      );
+    }
+  }
 }
 
 export type CommandContext = {
@@ -385,10 +439,22 @@ function runCheckFromParams(
     primary: resolveAttributeDie(context.playerDoc, params.primary),
     secondary: resolveAttributeDie(context.playerDoc, params.secondary),
   };
-  const modifiers =
+  const checkKind =
+    params.forceKind ?? (params.difficulty != null ? "attribute" : "open");
+  const effectModifiers = context.playerDoc
+    ? checkModifiersFromEffects(
+        context.playerDoc as unknown as TypePlayer | TypeNpc,
+        {
+          kind: checkKind,
+          appliedEffects: rollerAppliedEffects(context.playerDoc),
+        },
+      )
+    : [];
+  const situational =
     (params.modifier ?? 0) !== 0
       ? [{ label: "Modifier", value: params.modifier ?? 0 }]
       : [];
+  const modifiers = [...effectModifiers, ...situational];
   const intent = prepareCheck({
     primary: params.primary,
     secondary: params.secondary,
@@ -398,10 +464,8 @@ function runCheckFromParams(
   });
   const rolls = rollCheck(dieSizes);
   const result = processCheck(intent, rolls, dieSizes, context.speaker);
-  const kind =
-    params.forceKind ?? (params.difficulty != null ? "attribute" : "open");
   return [
-    kind === "attribute"
+    checkKind === "attribute"
       ? buildAttributeCheckMessage(result)
       : buildOpenCheckMessage(result),
   ];
@@ -525,6 +589,7 @@ const actionCommand: Command = {
           secondary as Attribute,
         ),
       };
+      const rollerApplied = rollerAppliedEffects(context.playerDoc);
       const effectModifiers = context.playerDoc
         ? accuracyModifiersFromEffects(
             context.playerDoc as unknown as TypePlayer | TypeNpc,
@@ -534,6 +599,7 @@ const actionCommand: Command = {
               inCrisis: isActorInCrisis(
                 context.playerDoc as unknown as TypePlayer | TypeNpc,
               ),
+              appliedEffects: rollerApplied,
             },
           )
         : [];
@@ -544,6 +610,7 @@ const actionCommand: Command = {
               range: effectiveWeapon.range as "melee" | "ranged" | undefined,
               category: effectiveWeapon.category,
               damageType: effectiveWeapon.damageType,
+              appliedEffects: rollerApplied,
             },
           )
         : 0;
@@ -569,6 +636,13 @@ const actionCommand: Command = {
       );
       const targetsSnapshot =
         context.targetsSnapshot ?? useCombatEncounterStore.getState().targets;
+      applyBehaviorEffectsOnResolve(
+        weapon.behaviors,
+        "attack",
+        context.playerDoc,
+        targetsSnapshot,
+        weapon.name,
+      );
       return [
         buildAccuracyCheckMessage({
           ...result,
@@ -614,16 +688,21 @@ const actionCommand: Command = {
         primary: resolveAttributeDie(context.playerDoc, primary),
         secondary: resolveAttributeDie(context.playerDoc, secondary),
       };
+      const rollerApplied = rollerAppliedEffects(context.playerDoc);
       const magicModifiers = context.playerDoc
         ? accuracyModifiersFromEffects(
             context.playerDoc as unknown as TypePlayer,
-            { checkType: "magic" },
+            { checkType: "magic", appliedEffects: rollerApplied },
           )
         : [];
       const spellDamageOutgoing = context.playerDoc
         ? outgoingDamageBonusFromEffects(
             context.playerDoc as unknown as TypePlayer,
-            { range: "spell", damageType: spell.damageType },
+            {
+              range: "spell",
+              damageType: spell.damageType,
+              appliedEffects: rollerApplied,
+            },
           )
         : 0;
       const intent = prepareMagicCheck(
@@ -649,6 +728,13 @@ const actionCommand: Command = {
       );
       const targetsSnapshot =
         context.targetsSnapshot ?? useCombatEncounterStore.getState().targets;
+      applyBehaviorEffectsOnResolve(
+        spell.behaviors,
+        "spell",
+        context.playerDoc,
+        targetsSnapshot,
+        spell.name,
+      );
       return [
         buildMagicCheckMessage({
           ...result,

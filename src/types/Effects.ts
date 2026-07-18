@@ -39,6 +39,8 @@ export interface ActorEffect {
 export interface AppliedEffect {
   id: string;
   origin?: string;
+  sourceCombatId?: string;
+  label?: string;
   changesFingerprint: string;
   changes?: EffectChange[];
   grants?: GrantData[];

@@ -336,6 +336,42 @@ describe("resolveActorEffects", () => {
       resolveActorEffects(player, { inCrisis: true }).bonuses.accuracy.all,
     ).toBe(4);
   });
+
+  it("overlays combat-temporary applied effects from context", () => {
+    const player = { classes: [], equipment: [] } as unknown as TypePlayer;
+    const { bonuses } = resolveActorEffects(player, {
+      appliedEffects: [
+        {
+          id: "ae1",
+          changesFingerprint: "fp",
+          duration: { event: "none" },
+          changes: [{ key: "bonuses.damage.all", mode: 2, value: "3" }],
+        },
+      ],
+    });
+    expect(bonuses.damage.all).toBe(3);
+  });
+
+  it("suppresses applied effects whose crisis predicate fails", () => {
+    const player = { classes: [], equipment: [] } as unknown as TypePlayer;
+    const appliedEffects = [
+      {
+        id: "ae1",
+        changesFingerprint: "fp",
+        duration: { event: "none" as const },
+        predicate: { crisisInteraction: "active" as const },
+        changes: [{ key: "bonuses.damage.all", mode: 2 as const, value: "3" }],
+      },
+    ];
+    expect(
+      resolveActorEffects(player, { appliedEffects, inCrisis: false }).bonuses
+        .damage.all,
+    ).toBe(0);
+    expect(
+      resolveActorEffects(player, { appliedEffects, inCrisis: true }).bonuses
+        .damage.all,
+    ).toBe(3);
+  });
 });
 
 describe("resolveActorEffects - affinityGrants", () => {
