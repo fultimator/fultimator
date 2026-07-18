@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain } from "electron";
-import { fileURLToPath } from "node:url";
+import { app, BrowserWindow, ipcMain, protocol, net } from "electron";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import fs from "node:fs";
 import { createAppMenu } from "./menus";
 import path from "node:path";
 import { createLoadingWindow } from "./window";
@@ -28,6 +29,33 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
   : RENDERER_DIST;
+
+const APP_SCHEME = "app";
+const APP_ORIGIN = `${APP_SCHEME}://bundle`;
+
+// app:// lets absolute /assets paths load from the bundle instead of file://.
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: APP_SCHEME,
+    privileges: { standard: true, secure: true, supportFetchAPI: true },
+  },
+]);
+
+function registerAppProtocol() {
+  protocol.handle(APP_SCHEME, (request) => {
+    let pathname = decodeURIComponent(new URL(request.url).pathname);
+    if (pathname === "/" || pathname === "") pathname = "/index.html";
+    const filePath = path.join(RENDERER_DIST, pathname);
+    const rel = path.relative(RENDERER_DIST, filePath);
+    if (rel.startsWith("..") || path.isAbsolute(rel)) {
+      return new Response("Forbidden", { status: 403 });
+    }
+    const target = fs.existsSync(filePath)
+      ? filePath
+      : path.join(RENDERER_DIST, "index.html");
+    return net.fetch(pathToFileURL(target).toString());
+  });
+}
 
 let win: BrowserWindow | null;
 let loadingWindow: BrowserWindow | null;
@@ -94,7 +122,7 @@ function createWindow() {
     };
     tryLoad();
   } else {
-    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+    win.loadURL(`${APP_ORIGIN}/index.html`);
   }
 
   // Handle navigating to the home page
@@ -103,7 +131,7 @@ function createWindow() {
       if (VITE_DEV_SERVER_URL) {
         win.loadURL(VITE_DEV_SERVER_URL);
       } else {
-        win.loadFile(path.join(RENDERER_DIST, "index.html"));
+        win.loadURL(`${APP_ORIGIN}/index.html`);
       }
     } else {
       console.error("Main window not found");
@@ -153,6 +181,7 @@ app
   .whenReady()
   .then(() => {
     console.log("App is ready, creating window...");
+    registerAppProtocol();
     createWindow();
   })
   .catch((err) => {
