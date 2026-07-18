@@ -1,7 +1,5 @@
-// Quick Assembly roles: selecting a role seeds an NPC's four attribute dice from a
-// level-based lookup.
-// The existing NPC derives HP/MP/init, accuracy and damage from attributes + level
-// + rank, so a role only needs to set attributes.
+// Role seeds an NPC's four attribute dice from a level-based lookup; the NPC calc
+// then derives HP/MP/init/accuracy/damage from attributes + level + rank.
 
 const ATTRS = ["dexterity", "insight", "might", "will"];
 
@@ -44,17 +42,33 @@ export const QA_ROLES = {
   ],
 };
 
-// "custom" is excluded: it is the classic freeform NPC (Quick Assembly toggle off).
+// Flat HP/DEF/M.DEF modifiers not covered by the attribute/level formulas.
+// Brute's level-50+ HP bump lives in getRoleHpBonus, not here.
+export const QA_ROLE_DEFAULTS = {
+  brute: { hp: 10, def: 0, mDef: 0 },
+  hunter: { hp: 0, def: 0, mDef: 0 },
+  mage: { hp: 0, def: 1, mDef: 2 },
+  saboteur: { hp: 0, def: 1, mDef: 2 },
+  sentinel: { hp: 0, def: 2, mDef: 1 },
+  support: { hp: 10, def: 0, mDef: 0 },
+};
+
+export function getRoleHpBonus(role, level) {
+  const base = QA_ROLE_DEFAULTS[role]?.hp ?? 0;
+  if (role === "brute" && Number(level) >= 50) return base + 10;
+  return base;
+}
+
+// Excludes "custom" (the freeform NPC when Quick Assembly is off).
 export const QA_ROLE_KEYS = Object.keys(QA_ROLES);
 
-// Levels a Quick Assembly NPC may occupy; the level picker is restricted to these.
 export const QA_LEVELS = [5, 10, 20, 30, 40, 50, 60];
 
 export function isQuickAssemblyRole(role) {
   return typeof role === "string" && role in QA_ROLES;
 }
 
-// Snap an arbitrary level to the nearest allowed breakpoint (ties round down).
+// Snap to the nearest allowed level (ties round down).
 export function clampQuickAssemblyLevel(level) {
   const n = Number(level);
   if (!Number.isFinite(n)) return QA_LEVELS[0];
@@ -71,8 +85,66 @@ export function getRoleAttributesForLevel(role, level) {
   return Object.fromEntries(ATTRS.map((attr, i) => [attr, steps[step][i]]));
 }
 
-// True when the NPC's attributes still match the role defaults for the given level,
-// i.e. the GM has not hand-tuned them.
+// Accuracy/Magic check bonus: +1 per 10 levels.
+export function getRoleAccuracyBonus(level) {
+  return Math.floor(Number(level) / 10);
+}
+
+// Attacks/Spells extra damage: +5 per 20 levels.
+export function getRoleDamageBonus(level) {
+  return Math.floor(Number(level) / 20) * 5;
+}
+
+const ATTR_SHORT = {
+  dexterity: "DEX",
+  insight: "INS",
+  might: "MIG",
+  will: "WLP",
+};
+
+// Mirrors calcHP/calcMP in libs/npcs.js for a base-rank NPC.
+function roleHp(role, attrs, level) {
+  return 2 * Number(level) + 5 * attrs.might + getRoleHpBonus(role, level);
+}
+function roleMp(attrs, level) {
+  return Number(level) + 5 * attrs.will;
+}
+
+// e.g. "INS d10; WLP d10" for attributes raised above their level-5 base.
+function attributeChangeLabel(role, level) {
+  const base = getRoleAttributesForLevel(role, 5);
+  const current = getRoleAttributesForLevel(role, level);
+  if (!base || !current) return "";
+  const parts = [];
+  for (const attr of ATTRS) {
+    if (current[attr] > base[attr]) {
+      parts.push(`${ATTR_SHORT[attr]} d${current[attr]}`);
+    }
+  }
+  return parts.join("; ");
+}
+
+// One row per level breakpoint above 5, for the higher-level stat chart.
+export function getRoleProgression(role) {
+  if (!QA_ROLES[role]) return [];
+  return QA_LEVELS.filter((lvl) => lvl > 5).map((level) => {
+    const attrs = getRoleAttributesForLevel(role, level);
+    return {
+      level,
+      attributeChange: attributeChangeLabel(role, level),
+      hp: roleHp(role, attrs, level),
+      mp: roleMp(attrs, level),
+      accuracyBonus: getRoleAccuracyBonus(level),
+      damageBonus: getRoleDamageBonus(level),
+    };
+  });
+}
+
+export function getRoleDefaults(role) {
+  return QA_ROLE_DEFAULTS[role] ?? { hp: 0, def: 0, mDef: 0 };
+}
+
+// True when the NPC's attributes still match the role defaults (not hand-tuned).
 export function attributesMatchRole(npc, role, level) {
   const target = getRoleAttributesForLevel(role, level);
   if (!target) return false;
@@ -81,8 +153,8 @@ export function attributesMatchRole(npc, role, level) {
   );
 }
 
-// Set the four attribute bases from the role/level lookup. Pure; returns the NPC
-// unchanged for the "custom" (or unknown) role.
+// Set the four attribute bases and the role's flat HP/DEF/M.DEF modifiers.
+// Pure; returns the NPC unchanged for "custom" or an unknown role.
 export function applyRole(npc, { role, level } = {}) {
   const nextRole = role ?? npc?.role ?? "custom";
   const nextLvl = level ?? npc?.lvl ?? 5;
@@ -95,5 +167,39 @@ export function applyRole(npc, { role, level } = {}) {
   for (const attr of ATTRS) {
     attributes[attr] = { ...attributes[attr], base: target[attr] };
   }
-  return { ...next, attributes };
+
+  const defaults = getRoleDefaults(nextRole);
+  const hpBonus = getRoleHpBonus(nextRole, nextLvl);
+  const result = {
+    ...next,
+    attributes,
+    extra: {
+      ...next.extra,
+      hp: hpBonus,
+      def: defaults.def,
+      mDef: defaults.mDef,
+    },
+  };
+
+  if (next.resources) {
+    result.resources = {
+      ...next.resources,
+      hp: { ...next.resources.hp, bonus: hpBonus },
+    };
+  }
+  if (next.derived) {
+    result.derived = {
+      ...next.derived,
+      def:
+        next.derived.def?.override !== undefined
+          ? next.derived.def
+          : { ...next.derived.def, bonus: defaults.def },
+      mdef:
+        next.derived.mdef?.override !== undefined
+          ? next.derived.mdef
+          : { ...next.derived.mdef, bonus: defaults.mDef },
+    };
+  }
+
+  return result;
 }
