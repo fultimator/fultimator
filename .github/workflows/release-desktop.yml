@@ -6,16 +6,8 @@ on:
 
 jobs:
   build-mac:
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-14
     timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-13
-            arch: x64
-          - os: macos-14
-            arch: arm64
     steps:
       - uses: actions/checkout@v4
 
@@ -45,7 +37,7 @@ jobs:
           VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Package with electron-builder
-        run: npx electron-builder --mac --${{ matrix.arch }} --publish never
+        run: npx electron-builder --mac --x64 --arm64 --publish never
 
       - name: Upload DMG to release
         uses: softprops/action-gh-release@v2
