@@ -1,5 +1,7 @@
 import React, { useMemo, ReactNode } from "react";
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import { markdownSanitizeSchema } from "../utility/markdownSanitizeSchema";
 
 interface MarkdownConfig {
   fontSize?: string;
@@ -16,7 +18,7 @@ export const useMarkdown = (config: MarkdownConfig = {}) => {
 
   return useMemo(
     () => ({
-      rehypePlugins: [rehypeRaw],
+      rehypePlugins: [rehypeRaw, [rehypeSanitize, markdownSanitizeSchema]],
       components: {
         p: (props: MarkdownComponentProps) => (
           <p style={{ margin: 0, padding: 0, fontSize }} {...props} />

@@ -1,10 +1,11 @@
-import { app, Menu, BrowserWindow, dialog, shell } from "electron";
+import { app, Menu, BrowserWindow, dialog } from "electron";
 import path from "node:path";
 import fs from "fs";
 import { fileURLToPath } from "node:url";
 import os from "os";
 import https from "https";
 import semver from "semver";
+import { safeOpenExternal } from "./urlGuard";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -85,18 +86,16 @@ export function createAppMenu(mainWindow: BrowserWindow) {
         {
           label: "Visit GitHub",
           click: () =>
-            shell.openExternal("https://github.com/fultimator/fultimator"),
+            safeOpenExternal("https://github.com/fultimator/fultimator"),
         },
         {
           label: "Report Issue",
           click: () =>
-            shell.openExternal(
-              "https://github.com/fultimator/fultimator/issues",
-            ),
+            safeOpenExternal("https://github.com/fultimator/fultimator/issues"),
         },
         {
           label: "Join Discord",
-          click: () => shell.openExternal("https://discord.gg/aNEgvHm3Re"),
+          click: () => safeOpenExternal("https://discord.gg/aNEgvHm3Re"),
         },
         {
           label: "Check for Updates",
@@ -192,7 +191,7 @@ export function checkForUpdates(mainWindow: BrowserWindow) {
               })
               .then((result) => {
                 if (result.response === 0) {
-                  shell.openExternal(latestRelease.html_url);
+                  safeOpenExternal(latestRelease.html_url);
                 }
               });
           } else {

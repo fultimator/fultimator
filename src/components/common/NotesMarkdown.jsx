@@ -4,10 +4,12 @@ import { Typography, Box, Link } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import remarkGfm from "remark-gfm"; // GitHub-flavored markdown
 import rehypeRaw from "rehype-raw"; // Raw HTML
+import rehypeSanitize from "rehype-sanitize"; // Strip unsafe HTML from user content
 import remarkParse from "remark-parse"; // Parse nested markdown
 import rehypeReact from "rehype-react"; // To render HTML as React components
 import remarkCustomCallouts from "../../utility/remarkCustomCallouts";
 import remarkDirective from "remark-directive";
+import { markdownSanitizeSchema } from "../../utility/markdownSanitizeSchema";
 
 import { TypeIcon } from "../types";
 import {
@@ -92,7 +94,11 @@ const NotesMarkdown = ({
         remarkParse,
         remarkCustomCallouts,
       ]}
-      rehypePlugins={[rehypeRaw, rehypeReact]}
+      rehypePlugins={[
+        rehypeRaw,
+        [rehypeSanitize, markdownSanitizeSchema],
+        rehypeReact,
+      ]}
       components={{
         // Custom styling for paragraphs (p)
         p: ({ _node, ...props }) => (

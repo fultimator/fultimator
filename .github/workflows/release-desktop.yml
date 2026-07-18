@@ -69,6 +69,7 @@ jobs:
       - name: Build (tsc + vite)
         run: npx tsc && npx vite build --config vite.electron.config.ts
         env:
+          NODE_OPTIONS: --max-old-space-size=4096
           VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
           VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
           VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
@@ -111,6 +112,7 @@ jobs:
       - name: Build (tsc + vite)
         run: npx tsc && npx vite build --config vite.electron.config.ts
         env:
+          NODE_OPTIONS: --max-old-space-size=4096
           VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
           VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
           VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
@@ -160,6 +162,7 @@ jobs:
       - name: Build (tsc + vite)
         run: npx tsc && npx vite build --config vite.electron.config.ts
         env:
+          NODE_OPTIONS: --max-old-space-size=4096
           VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
           VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
           VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}

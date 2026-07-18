@@ -1,4 +1,5 @@
-import { ipcRenderer, contextBridge, shell } from "electron";
+import { ipcRenderer, contextBridge } from "electron";
+import { safeOpenExternal } from "./urlGuard";
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("ipcRenderer", {
@@ -45,7 +46,7 @@ contextBridge.exposeInMainWorld("electron", {
   getGoogleTokens: () => ipcRenderer.invoke("get-google-tokens"),
   uploadBufferToGoogleDrive: (buffer: ArrayBuffer, fileName: string) =>
     ipcRenderer.invoke("upload-buffer-to-google-drive", buffer, fileName),
-  openExternal: (url: string) => shell.openExternal(url),
+  openExternal: (url: string) => safeOpenExternal(url),
   checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
   openFile: (filePath: string) => ipcRenderer.invoke("open-file", filePath),
   showFileInFolder: (filePath: string) =>

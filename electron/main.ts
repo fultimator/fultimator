@@ -1,10 +1,11 @@
-import { app, BrowserWindow, ipcMain, shell } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import { fileURLToPath } from "node:url";
 import { createAppMenu } from "./menus";
 import path from "node:path";
 import { createLoadingWindow } from "./window";
 import "./google";
 import { setupIpcHandlers } from "./ipc-handlers";
+import { safeOpenExternal } from "./urlGuard";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The built directory structure
@@ -109,9 +110,9 @@ function createWindow() {
     }
   });
 
-  // Open external links in default browser
+  // Open external links in default browser (http/https/mailto only)
   win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    safeOpenExternal(url);
     return { action: "deny" };
   });
 
