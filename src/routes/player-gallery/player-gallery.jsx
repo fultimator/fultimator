@@ -999,7 +999,7 @@ function Personal() {
               onClick={handleOpenCreatePlayerModal}
               disabled={dbMode === "cloud" && !cloudUser}
             >
-              {t("create_player")}
+              {t("create_pc")}
             </Button>
             {SUPPORTS_LOCAL_DB && (
               <ToggleButtonGroup
