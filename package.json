@@ -9,6 +9,9 @@
   "scripts": {
     "start": "npm run dev:web",
     "build": "npm run build:web",
+    "android:sync": "npm run build:web && cap sync android",
+    "android:build": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "android:run": "npm run android:build && adb install -r android/app/build/outputs/apk/debug/app-debug.apk",
     "dev:web": "vite",
     "dev:electron": "vite --config vite.electron.config.ts",
     "build:vite": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build",
@@ -32,6 +35,9 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@capacitor-firebase/authentication": "^8.3.0",
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
@@ -52,7 +58,7 @@
     "date-fns": "^4.0.0",
     "deep-equal": "^2.2.3",
     "electron-store": "^10.0.1",
-    "firebase": "^9.6.1",
+    "firebase": "^11.10.0",
     "googleapis": "^148.0.0",
     "history": "^5.1.0",
     "html2canvas": "^1.4.1",
@@ -92,6 +98,7 @@
     "workbox-build": "7.3.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.4.2",
     "@eslint/js": "^9.0.0",
     "@types/node": "^20.17.24",
     "@types/react": "^19.0.0",

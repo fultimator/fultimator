@@ -23,7 +23,7 @@ import {
   Info,
 } from "@mui/icons-material";
 import { useTranslate } from "../../translation/translate";
-import { IS_ELECTRON, SUPPORTS_LOCAL_DB } from "../../platform";
+import { IS_ELECTRON, IS_CAPACITOR, SUPPORTS_LOCAL_DB } from "../../platform";
 // Local DB export / import
 import {
   getAuth,
@@ -151,6 +151,12 @@ const MenuOption: React.FC<MenuOptionProps> = ({
     googleAuthProvider.setCustomParameters({ prompt: "select_account" });
     await handleAuthentication(
       async () => {
+        // Web OAuth popup/redirect does not work inside the Capacitor WebView;
+        // use the native Google sign-in plugin there instead.
+        if (IS_CAPACITOR) {
+          const { signInWithGoogleNative } = await import("../../nativeAuth");
+          return await signInWithGoogleNative();
+        }
         const result = await signInWithPopup(auth, googleAuthProvider);
         if (!IS_ELECTRON) {
           const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -167,6 +173,10 @@ const MenuOption: React.FC<MenuOptionProps> = ({
     googleAuthProvider.setCustomParameters({ prompt: "select_account" });
     await handleAuthentication(
       async () => {
+        if (IS_CAPACITOR) {
+          const { signInWithGoogleNative } = await import("../../nativeAuth");
+          return await signInWithGoogleNative();
+        }
         const result = await signInWithPopup(auth, googleAuthProvider);
         if (!IS_ELECTRON) {
           const credential = GoogleAuthProvider.credentialFromResult(result);
