@@ -39,6 +39,7 @@ export const PlayerSpellNonStaticBaseSchema = z.object({
   name: z.string().min(1),
   fuid: z.string().optional(),
   meta: MetaSchema.optional(),
+  description: z.string().optional(),
   showInPlayerSheet: z.boolean().default(true),
   behaviors: z.array(BehaviorSchema).optional(),
   spellType: z.enum([

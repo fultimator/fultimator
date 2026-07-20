@@ -140,6 +140,7 @@ export function buildWeaponFormState(
     id: item?.id,
     fuid: item?.fuid,
     name: item?.name ?? allWeapons[0].name,
+    description: item?.description ?? "",
     category: item?.category ?? "",
     type,
     hands: item?.hands ?? allWeapons[0].hands,
@@ -187,6 +188,7 @@ export function buildWeaponSavePayload(
   const {
     base,
     name,
+    description,
     category,
     type,
     hands,
@@ -236,6 +238,7 @@ export function buildWeaponSavePayload(
   return normalizeWeaponLike({
     base,
     name,
+    description,
     category,
     fuid,
     id,

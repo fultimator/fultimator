@@ -184,6 +184,19 @@ export const npcAttackFieldConfig: ItemFieldConfig<NpcAttackFormState> = [
     gridSize: { xs: 12, md: 4 },
   },
   {
+    key: "description",
+    kind: "editable",
+    label: prefixedLabel(
+      NPC_ATTACK_LABEL_PREFIX,
+      SHARED_LABEL_KEYS.description,
+    ),
+    component: "textarea",
+    defaultValue: "",
+    group: G.effect,
+    order: 29,
+    fullWidth: true,
+  },
+  {
     key: "effect",
     kind: "editable",
     label: prefixedLabel(NPC_ATTACK_LABEL_PREFIX, SHARED_LABEL_KEYS.effect),

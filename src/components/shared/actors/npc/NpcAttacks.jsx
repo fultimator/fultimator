@@ -129,6 +129,14 @@ function AttackRow({ attack, npc, attackType, showRoll }) {
             </Typography>
           ))}
         </Typography>
+        {attack.description && (
+          <Typography
+            component="div"
+            sx={{ fontStyle: "italic", color: "text.secondary", mt: 0.25 }}
+          >
+            <SpanMarkdown>{attack.description}</SpanMarkdown>
+          </Typography>
+        )}
       </Grid>
     </Fragment>
   );

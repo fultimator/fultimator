@@ -181,6 +181,20 @@ export const customWeaponFieldConfig: ItemFieldConfig<CustomWeaponFormState> = [
     validationHints: { required: true },
   },
   {
+    key: "description",
+    kind: "editable",
+    label: prefixedLabel(
+      CUSTOM_WEAPON_LABEL_PREFIX,
+      SHARED_LABEL_KEYS.description,
+    ),
+    component: "textarea",
+    defaultValue: "",
+    group: G.core,
+    order: 0.5,
+    fullWidth: true,
+    componentProps: { maxLength: 1500 },
+  },
+  {
     key: "selectedCategory",
     kind: "editable",
     label: prefixedLabel(

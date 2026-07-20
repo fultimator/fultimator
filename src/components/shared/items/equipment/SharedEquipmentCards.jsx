@@ -102,6 +102,23 @@ const QUALITY_MARKDOWN_COMPONENTS = {
   p: ({ _node, ...props }) => <p style={{ margin: 0 }} {...props} />,
 };
 
+function DescriptionRow({ item, customTheme, imageMode }) {
+  if (!item.description) return null;
+  return (
+    <Box sx={qualityRowSx(customTheme, imageMode)}>
+      <Typography variant="body2" sx={{ lineHeight: 1.35 }} component="div">
+        <StyledMarkdown
+          allowedElements={["strong", "em"]}
+          unwrapDisallowed
+          components={QUALITY_MARKDOWN_COMPONENTS}
+        >
+          {item.description}
+        </StyledMarkdown>
+      </Typography>
+    </Box>
+  );
+}
+
 function rowMinHeight(imageMode) {
   return isImageMode(imageMode) ? ROW_MIN_HEIGHT : ROW_MIN_HEIGHT_NO_IMAGE;
 }
@@ -417,6 +434,11 @@ export const SharedWeaponCard = React.memo(function SharedWeaponCard({
       </RowsWithOptionalImage>
 
       <QualityRow item={item} customTheme={customTheme} imageMode={imageMode} />
+      <DescriptionRow
+        item={item}
+        customTheme={customTheme}
+        imageMode={imageMode}
+      />
     </CardContentWrapper>
   );
 });
@@ -575,6 +597,11 @@ function SharedArmorLikeCard({
           />
         )}
       </RowsWithOptionalImage>
+      <DescriptionRow
+        item={item}
+        customTheme={customTheme}
+        imageMode={imageMode}
+      />
     </CardContentWrapper>
   );
 }
@@ -1082,6 +1109,11 @@ export const SharedCustomWeaponCard = React.memo(
             </>
           )}
         </RowsWithOptionalImage>
+        <DescriptionRow
+          item={item}
+          customTheme={customTheme}
+          imageMode={imageMode}
+        />
       </CardContentWrapper>
     );
   },
@@ -1199,6 +1231,11 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
         </Grid>
 
         <QualityRow
+          item={item}
+          customTheme={customTheme}
+          imageMode={imageMode}
+        />
+        <DescriptionRow
           item={item}
           customTheme={customTheme}
           imageMode={imageMode}

@@ -184,17 +184,6 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
     dependencies: (s) => isDefault(s) && s.isOffensive,
   },
   {
-    key: "description",
-    kind: "editable",
-    label: prefixedLabel(SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.description),
-    component: "textarea",
-    defaultValue: "",
-    group: "description",
-    order: 60,
-    fullWidth: true,
-    dependencies: isDefault,
-  },
-  {
     key: "showInPlayerSheet",
     kind: "editable",
     label: "Show in Character Sheet",

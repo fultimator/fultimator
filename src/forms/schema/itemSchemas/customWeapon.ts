@@ -159,6 +159,7 @@ export function buildCustomWeaponFormState(
     return {
       itemType: "customWeapon",
       name: "",
+      description: "",
       category: categories[0],
       range: "melee",
       hands: 2,
@@ -264,6 +265,7 @@ export function buildCustomWeaponFormState(
     itemType: "customWeapon",
     id: item.id,
     name: item.name ?? "",
+    description: item.description ?? "",
     category: item.category ?? categories[0],
     range: item.range ?? "melee",
     hands: item.hands ?? 2,
@@ -407,6 +409,7 @@ export function buildCustomWeaponSavePayload(
     itemType: "customWeapon",
     id: formState.id,
     name: formState.name,
+    description: formState.description ?? "",
     category: formState.selectedCategory,
     range: formState.selectedRange,
     accuracy: {

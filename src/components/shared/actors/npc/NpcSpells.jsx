@@ -125,6 +125,14 @@ function SpellRow({ spell, npc, showRoll }) {
             {spell.duration}
           </strong>
           <br />
+          {spell.description && (
+            <Typography
+              component="div"
+              sx={{ fontStyle: "italic", color: "text.secondary" }}
+            >
+              <StyledMarkdown>{spell.description}</StyledMarkdown>
+            </Typography>
+          )}
           <Typography component="span">
             <StyledMarkdown>{spell.effect}</StyledMarkdown>
           </Typography>

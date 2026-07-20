@@ -21,6 +21,7 @@ export function AccessoryPreviewCard({ formState }) {
         name: formState.name,
         cost: formState.cost,
         quality: formState.quality,
+        description: formState.description,
       }}
     />
   );
@@ -34,6 +35,7 @@ export function ArmorPreviewCard({ formState, ctx }) {
         ...formState.base,
         name: formState.name,
         cost: formState.cost,
+        description: formState.description,
         martial: formState.martial,
         quality: formState.quality,
         init: formState.init,
@@ -61,6 +63,7 @@ export function ShieldPreviewCard({ formState }) {
         cost: formState.cost,
         martial: formState.martial,
         quality: formState.quality,
+        description: formState.description,
         init: formState.init,
         rework: formState.rework,
         defModifier: parseInt(String(formState.defModifier)),
@@ -145,6 +148,7 @@ export function CustomWeaponPreviewCard({ formState, ctx }) {
     <SharedCustomWeaponCard
       item={{
         name: formState.name,
+        description: formState.description,
         category: selectedCategory,
         range: formState.selectedRange,
         accuracy: {
@@ -197,6 +201,7 @@ export function WeaponPreviewCard({ formState }) {
       item={normalizeWeaponLike({
         base: formState.base,
         name: formState.name,
+        description: formState.description,
         type: formState.type,
         hands: formState.hands,
         att1: formState.att1,

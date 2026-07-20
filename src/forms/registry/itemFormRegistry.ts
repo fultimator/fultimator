@@ -337,45 +337,65 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         s.spellType === "magichant-key" ? "magichant" : s.spellType;
       if (!spellType) return null;
 
-      const metaObj = s["meta.book"]
+      const metaState =
+        (
+          s as unknown as {
+            meta?: {
+              book?: string;
+              page?: string;
+              bookName?: string;
+              isOfficial?: boolean;
+            };
+          }
+        ).meta ?? {};
+      const metaObj = metaState.book
         ? {
-            book: s["meta.book"],
-            page: s["meta.page"],
-            bookName: s["meta.bookName"] || undefined,
-            isOfficial: s["meta.isOfficial"],
+            book: metaState.book,
+            page: metaState.page,
+            bookName: metaState.bookName || undefined,
+            isOfficial: metaState.isOfficial,
           }
         : undefined;
       const showInPlayerSheet = s.showInPlayerSheet ?? true;
 
-      // default spell: flat fields from form state
+      // default spell: nested field groups from form state
       if (spellType === "default") {
+        const nested = s as unknown as {
+          cost?: { amount?: number; perTarget?: boolean };
+          accuracy?: { attr1?: string; attr2?: string };
+          damage?: { value?: number; type?: string; hrZero?: boolean };
+        };
+        const cost = nested.cost ?? {};
+        const accuracy = nested.accuracy ?? {};
+        const damage = nested.damage ?? {};
         const payload = {
           spellType: "default" as const,
           class: s.class,
-          name: s.name.trim(),
+          name: (s.name ?? "").trim(),
           fuid: s.fuid || undefined,
           meta: metaObj,
           showInPlayerSheet,
-          description: s.description.trim(),
+          description: (s.description ?? "").trim(),
           isOffensive: s.isOffensive,
           cost: {
             resource: "mp" as const,
-            amount: s["cost.amount"],
-            perTarget: s["cost.perTarget"],
+            amount: cost.amount ?? 0,
+            perTarget: cost.perTarget ?? true,
           },
           maxTargets: s.maxTargets,
-          targetDescription: s.targetDescription.trim() || "One creature",
-          duration: s.duration.trim() || "Instantaneous",
+          targetDescription:
+            (s.targetDescription ?? "").trim() || "One creature",
+          duration: (s.duration ?? "").trim() || "Instantaneous",
           accuracy: {
-            attr1: s["accuracy.attr1"],
-            attr2: s["accuracy.attr2"],
+            attr1: accuracy.attr1,
+            attr2: accuracy.attr2,
             value: 0,
             defense: "mdef" as const,
           },
           damage: {
-            value: s.isOffensive ? s["damage.value"] : 0,
-            type: s.isOffensive ? s["damage.type"] : "physical",
-            hrZero: s["damage.hrZero"],
+            value: s.isOffensive ? (damage.value ?? 0) : 0,
+            type: s.isOffensive ? (damage.type ?? "physical") : "physical",
+            hrZero: damage.hrZero ?? false,
           },
         };
         const parsed = PlayerSpellDefaultSchema.safeParse(payload);
@@ -388,6 +408,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         meta: metaObj,
         showInPlayerSheet,
         spellType,
+        description: (s.description ?? "").trim() || undefined,
       };
 
       // arcanist: flat domain/merge/dismiss fields from form state
@@ -607,6 +628,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
         return {
           ...base,
           spellType: "magiseed" as const,
+          description: undefined,
           growthClock: 0,
           gardenDescription: s.gardenDescription ?? "",
           currentMagiseed: null,
@@ -633,19 +655,25 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
       }
 
       if (spellType === "gamble") {
+        const gambleNested = s as unknown as {
+          cost?: { amount?: number; perTarget?: boolean };
+          accuracy?: { attr2?: string };
+        };
+        const gambleCost = gambleNested.cost ?? {};
+        const gambleAccuracy = gambleNested.accuracy ?? {};
         return {
           ...base,
           spellType: "gamble" as const,
           spellName: s.name.trim() || "New Gamble",
           cost: {
             resource: "mp" as const,
-            amount: s["cost.amount"] ?? 0,
-            perTarget: s["cost.perTarget"] ?? true,
+            amount: gambleCost.amount ?? 0,
+            perTarget: gambleCost.perTarget ?? true,
           },
           maxTargets: s.maxTargets ?? 2,
           targetDescription: s.targetDescription.trim() || "Special",
           duration: s.duration.trim() || "Instantaneous",
-          attr: s["accuracy.attr2"] || "will",
+          attr: gambleAccuracy.attr2 || "will",
           targets: [],
         };
       }

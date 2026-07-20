@@ -256,6 +256,17 @@ export const weaponFieldConfig: ItemFieldConfig<WeaponFormState> = [
       disabled: true,
     },
   },
+  {
+    key: "description",
+    kind: "editable",
+    label: prefixedLabel(WEAPON_LABEL_PREFIX, SHARED_LABEL_KEYS.description),
+    component: "textarea",
+    defaultValue: "",
+    group: G.core,
+    order: 6,
+    fullWidth: true,
+    componentProps: { maxLength: 1500 },
+  },
   // Accuracy
   {
     key: "att1",

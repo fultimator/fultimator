@@ -73,6 +73,17 @@ export const accessoryFieldConfig: ItemFieldConfig<AccessoryFormState> = [
     validationHints: { required: true },
   },
   {
+    key: "description",
+    kind: "editable",
+    label: prefixedLabel(ACCESSORY_LABEL_PREFIX, SHARED_LABEL_KEYS.description),
+    component: "textarea",
+    defaultValue: "",
+    group: G.core,
+    order: 1,
+    fullWidth: true,
+    componentProps: { maxLength: 1500 },
+  },
+  {
     key: "selectedQuality",
     kind: "form-state",
     label: "shared.quality.preset",

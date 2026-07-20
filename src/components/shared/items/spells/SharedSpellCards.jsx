@@ -37,6 +37,11 @@ import {
   RowsWithOptionalImage,
 } from "/src/components/shared/items/core";
 
+function normalizeSpellEntry(item, arrayKey) {
+  const entry = item?.[arrayKey]?.[0];
+  return entry ? { ...item, ...entry } : (item ?? {});
+}
+
 export const SharedSpellCard = React.memo(function SharedSpellCard({
   item,
   id = CARD_DEFAULTS.id,
@@ -75,12 +80,10 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
   const attr1 = attributes[item.accuracy?.attr1];
   const attr2 = attributes[item.accuracy?.attr2];
   const accuracyBonus = item.accuracy?.value ?? 0;
-  const effectText =
-    item.effect ??
-    item.description ??
-    (Array.isArray(item.special)
-      ? item.special.join("; ")
-      : (item.special ?? ""));
+  const effectText = Array.isArray(item.special)
+    ? item.special.join("; ")
+    : (item.effect ?? item.special ?? "");
+  const descriptionText = item.description ?? "";
   const targetText = item.targetDescription ?? "";
 
   return (
@@ -185,7 +188,9 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
           </Grid>
         </Grid>
 
-        {((item.isOffensive ?? item.type === "offensive") || effectText) && (
+        {((item.isOffensive ?? item.type === "offensive") ||
+          effectText ||
+          descriptionText) && (
           <Box sx={{ px: 2, py: 0.75 }}>
             <Typography
               variant="body2"
@@ -225,9 +230,25 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
                         : `HR + ${(typeof item.damage === "object" ? item.damage?.value : item.damage) || 0}`}
                       <CloseBracket />{" "}
                       {item.damage?.type ? t(item.damage.type) : "physical"}{" "}
-                      {effectText && <Diamond />}{" "}
+                      {(descriptionText || effectText) && <Diamond />}{" "}
                     </strong>
                   )}
+                {descriptionText && (
+                  <span style={{ display: "inline" }}>
+                    <StyledMarkdown
+                      allowedElements={["strong", "em"]}
+                      unwrapDisallowed
+                    >
+                      {t(descriptionText)}
+                    </StyledMarkdown>
+                  </span>
+                )}
+                {descriptionText && effectText && (
+                  <>
+                    {" "}
+                    <Diamond />{" "}
+                  </>
+                )}
                 {effectText && (
                   <span style={{ display: "inline" }}>
                     <StyledMarkdown
@@ -668,7 +689,7 @@ export const SharedGambleSpellCard = React.memo(function SharedGambleSpellCard({
 });
 
 export const SharedGiftCard = React.memo(function SharedGiftCard({
-  item,
+  item: rawItem,
   id = CARD_DEFAULTS.id,
   onHeaderClick = CARD_DEFAULTS.onHeaderClick,
   showHeader = CARD_DEFAULTS.showHeader,
@@ -685,7 +706,8 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
-  item = item ?? {};
+  const item = rawItem ?? {};
+  const giftEntry = normalizeSpellEntry(item, "gifts");
   const {
     t,
     customTheme,
@@ -759,29 +781,30 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
               component="div"
               sx={{ fontSize: scale.body, "& p": { margin: 0 } }}
             >
-              {item.event ? md(t(item.event)) : "-"}
+              {giftEntry.event ? md(t(giftEntry.event)) : "-"}
             </Typography>
           </Box>
         </Box>
         <Box sx={bodyBoxSx()}>
-          {item.effect && (
+          {giftEntry.effect && (
             <Typography
               variant="body2"
               component="div"
               sx={{ color: "text.secondary", lineHeight: 1.5 }}
             >
-              {md(t(item.effect))}
+              {md(t(giftEntry.effect))}
             </Typography>
           )}
-          {item.description && item.description !== item.effect && (
-            <Typography
-              variant="body2"
-              component="div"
-              sx={{ color: "text.secondary", lineHeight: 1.5 }}
-            >
-              {md(t(item.description))}
-            </Typography>
-          )}
+          {giftEntry.description &&
+            giftEntry.description !== giftEntry.effect && (
+              <Typography
+                variant="body2"
+                component="div"
+                sx={{ color: "text.secondary", lineHeight: 1.5 }}
+              >
+                {md(t(giftEntry.description))}
+              </Typography>
+            )}
         </Box>
       </RowsWithOptionalImage>
     </CardContentWrapper>
@@ -789,7 +812,7 @@ export const SharedGiftCard = React.memo(function SharedGiftCard({
 });
 
 export const SharedDanceCard = React.memo(function SharedDanceCard({
-  item,
+  item: rawItem,
   id = CARD_DEFAULTS.id,
   onHeaderClick = CARD_DEFAULTS.onHeaderClick,
   showHeader = CARD_DEFAULTS.showHeader,
@@ -806,7 +829,7 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
-  item = item ?? {};
+  const item = normalizeSpellEntry(rawItem ?? {}, "dances");
   const {
     t,
     customTheme,
@@ -882,6 +905,20 @@ export const SharedDanceCard = React.memo(function SharedDanceCard({
           </Box>
         </Box>
         <Box sx={bodyBoxSx()}>
+          {item.description && item.description !== item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{
+                color: "text.secondary",
+                fontStyle: "italic",
+                lineHeight: 1.5,
+                mb: item.effect ? 0.5 : 0,
+              }}
+            >
+              {md(t(item.description))}
+            </Typography>
+          )}
           <Typography
             variant="body2"
             component="div"
@@ -928,6 +965,10 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
     defaultImageVisible,
     imageTempInfoTextKey,
   });
+
+  const entry = normalizeSpellEntry(item, "therioforms");
+  const genoclepsisText = entry.genoclepsis ?? "";
+  const effectText = entry.effect ?? entry.description ?? "";
 
   return (
     <CardContentWrapper
@@ -992,27 +1033,18 @@ export const SharedTherioformCard = React.memo(function SharedTherioformCard({
                 "& p": { margin: 0 },
               }}
             >
-              {item.genoclepsis ? md(t(item.genoclepsis)) : "-"}
+              {genoclepsisText ? md(t(genoclepsisText)) : "-"}
             </Typography>
           </Box>
         </Box>
         <Box sx={bodyBoxSx()}>
-          {item.effect && (
+          {effectText && (
             <Typography
               variant="body2"
               component="div"
               sx={{ color: "text.secondary", lineHeight: 1.5 }}
             >
-              {md(t(item.effect))}
-            </Typography>
-          )}
-          {item.description && item.description !== item.effect && (
-            <Typography
-              variant="body2"
-              component="div"
-              sx={{ color: "text.secondary", lineHeight: 1.5 }}
-            >
-              {md(t(item.description))}
+              {md(t(effectText))}
             </Typography>
           )}
         </Box>
@@ -1387,13 +1419,29 @@ export const SharedAlchemyCard = React.memo(function SharedAlchemyCard({
               {item.category}
             </Typography>
           )}
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{ color: "text.secondary", lineHeight: 1.5 }}
-          >
-            {md(item.effect)}
-          </Typography>
+          {item.description && item.description !== item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{
+                color: "text.secondary",
+                fontStyle: "italic",
+                lineHeight: 1.5,
+                mb: item.effect ? 0.5 : 0,
+              }}
+            >
+              {md(t(item.description))}
+            </Typography>
+          )}
+          {item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{ color: "text.secondary", lineHeight: 1.5 }}
+            >
+              {md(item.effect)}
+            </Typography>
+          )}
         </Box>
       </RowsWithOptionalImage>
     </CardContentWrapper>
@@ -1688,6 +1736,20 @@ export const SharedInvocationCard = React.memo(function SharedInvocationCard({
               />
             )}
           </Box>
+          {item.description && item.description !== item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{
+                color: "text.secondary",
+                fontStyle: "italic",
+                lineHeight: 1.5,
+                mb: item.effect ? 0.5 : 0,
+              }}
+            >
+              {md(t(item.description))}
+            </Typography>
+          )}
           <Typography
             variant="body2"
             component="div"
@@ -1702,7 +1764,7 @@ export const SharedInvocationCard = React.memo(function SharedInvocationCard({
 });
 
 export const SharedCookingCard = React.memo(function SharedCookingCard({
-  item,
+  item: rawItem,
   id = CARD_DEFAULTS.id,
   onHeaderClick = CARD_DEFAULTS.onHeaderClick,
   showHeader = CARD_DEFAULTS.showHeader,
@@ -1719,7 +1781,17 @@ export const SharedCookingCard = React.memo(function SharedCookingCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
-  item = item ?? {};
+  const base = rawItem ?? {};
+  const item =
+    !base.cookbookEffects && Array.isArray(base.cookbook?.effects)
+      ? {
+          ...base,
+          cookbookEffects: base.cookbook.effects.map((entry, i) => ({
+            id: i + 1,
+            effect: entry.effect ?? "",
+          })),
+        }
+      : base;
   const {
     t,
     customTheme,
@@ -1770,6 +1842,20 @@ export const SharedCookingCard = React.memo(function SharedCookingCard({
           </Typography>
         </Box>
         <Box sx={bodyBoxSx()}>
+          {item.description && item.description !== item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{
+                color: "text.secondary",
+                fontStyle: "italic",
+                lineHeight: 1.5,
+                mb: 0.75,
+              }}
+            >
+              {md(t(item.description))}
+            </Typography>
+          )}
           {item.cookbookEffects?.length > 0 ? (
             item.cookbookEffects.map((entry) =>
               entry.effect ? (
@@ -1815,7 +1901,7 @@ export const SharedCookingCard = React.memo(function SharedCookingCard({
 });
 
 export const SharedMagiseedCard = React.memo(function SharedMagiseedCard({
-  item,
+  item: rawItem,
   id = CARD_DEFAULTS.id,
   onHeaderClick = CARD_DEFAULTS.onHeaderClick,
   showHeader = CARD_DEFAULTS.showHeader,
@@ -1832,7 +1918,7 @@ export const SharedMagiseedCard = React.memo(function SharedMagiseedCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
-  item = item ?? {};
+  const item = normalizeSpellEntry(rawItem ?? {}, "magiseeds");
   const {
     t,
     customTheme,
@@ -2615,7 +2701,7 @@ export const SharedPilotVehicleCard = React.memo(
 );
 
 export const SharedSymbolCard = React.memo(function SharedSymbolCard({
-  item,
+  item: rawItem,
   id = CARD_DEFAULTS.id,
   onHeaderClick = CARD_DEFAULTS.onHeaderClick,
   showHeader = CARD_DEFAULTS.showHeader,
@@ -2632,7 +2718,7 @@ export const SharedSymbolCard = React.memo(function SharedSymbolCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
-  item = item ?? {};
+  const item = normalizeSpellEntry(rawItem ?? {}, "symbols");
   const {
     t,
     customTheme,
@@ -2683,6 +2769,20 @@ export const SharedSymbolCard = React.memo(function SharedSymbolCard({
           </Typography>
         </Box>
         <Box sx={bodyBoxSx()}>
+          {item.description && item.description !== item.effect && (
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{
+                color: "text.secondary",
+                fontStyle: "italic",
+                lineHeight: 1.5,
+                mb: item.effect ? 0.5 : 0,
+              }}
+            >
+              {md(t(item.description))}
+            </Typography>
+          )}
           <Typography
             variant="body2"
             component="div"
@@ -2697,7 +2797,7 @@ export const SharedSymbolCard = React.memo(function SharedSymbolCard({
 });
 
 export const SharedMagichantCard = React.memo(function SharedMagichantCard({
-  item,
+  item: rawItem,
   id = CARD_DEFAULTS.id,
   onHeaderClick = CARD_DEFAULTS.onHeaderClick,
   showHeader = CARD_DEFAULTS.showHeader,
@@ -2714,7 +2814,9 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
   actionContent = CARD_DEFAULTS.actionContent,
   defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
 }) {
-  item = item ?? {};
+  const base = rawItem ?? {};
+  const magichantEntry = base.keys?.[0] ?? base.tones?.[0];
+  const item = magichantEntry ? { ...base, ...magichantEntry } : base;
   const {
     t,
     customTheme,
@@ -2732,6 +2834,7 @@ export const SharedMagichantCard = React.memo(function SharedMagichantCard({
 
   const isKey =
     item.magichantSubtype === "key" ||
+    base.keys?.length > 0 ||
     item.type ||
     item.status ||
     item.attribute ||

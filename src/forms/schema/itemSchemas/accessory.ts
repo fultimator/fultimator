@@ -76,6 +76,7 @@ export function buildAccessoryFormState(
       book: item?.meta?.book ?? (item as { book?: string })?.book ?? "homebrew",
     },
     name: item?.name ?? "",
+    description: item?.description ?? "",
     quality: item?.quality ?? "",
     qualityCost: item?.qualityCost ?? 0,
     selectedQuality: item?.selectedQuality ?? "",

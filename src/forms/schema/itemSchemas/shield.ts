@@ -86,6 +86,7 @@ export function buildShieldFormState(
       book: item?.meta?.book ?? (item as { book?: string })?.book ?? "homebrew",
     },
     name: item?.name ?? base.name,
+    description: item?.description ?? "",
     martial: item?.martial ?? base.martial,
     def: item?.def ?? base.def,
     mdef: item?.mdef ?? base.mdef,

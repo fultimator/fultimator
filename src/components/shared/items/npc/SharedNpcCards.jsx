@@ -3,6 +3,7 @@ import { Box, Chip, Grid, Typography } from "@mui/material";
 
 import { Martial } from "/src/components/icons";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
+import Diamond from "/src/components/Diamond";
 import attributes from "/src/libs/attributes";
 import types from "/src/libs/types";
 import {
@@ -174,11 +175,18 @@ export const SharedAttackCard = React.memo(function SharedAttackCard({
           </Grid>
         </Grid>
 
-        {(item.effect || item.special?.length > 0) && (
+        {(item.description || item.effect || item.special?.length > 0) && (
           <Grid container sx={{ px: 2, py: "4px" }}>
             <Grid size={12}>
               <Typography variant="body2">
-                <strong>{t("Effect")}:</strong>{" "}
+                {item.description}
+                {item.description &&
+                  (item.effect || item.special?.length > 0) && (
+                    <>
+                      {" "}
+                      <Diamond color={customTheme.primary} />{" "}
+                    </>
+                  )}
                 {item.effect || item.special?.join("; ")}
               </Typography>
             </Grid>

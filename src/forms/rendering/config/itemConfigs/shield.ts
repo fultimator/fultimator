@@ -128,6 +128,17 @@ export const shieldFieldConfig: ItemFieldConfig<ShieldFormState> = [
     gridSize: "auto",
   },
   {
+    key: "description",
+    kind: "editable",
+    label: prefixedLabel(SHIELD_LABEL_PREFIX, SHARED_LABEL_KEYS.description),
+    component: "textarea",
+    defaultValue: "",
+    group: G.core,
+    order: 3,
+    fullWidth: true,
+    componentProps: { maxLength: 1500 },
+  },
+  {
     key: "rework",
     kind: "editable",
     label: "shared.rework",

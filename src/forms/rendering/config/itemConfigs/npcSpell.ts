@@ -257,6 +257,16 @@ export const npcSpellFieldConfig: ItemFieldConfig<NpcSpellFormState> = [
     componentProps: { options: TARGET_OPTIONS, freeSolo: true },
   },
   {
+    key: "description",
+    kind: "editable",
+    label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.description),
+    component: "textarea",
+    defaultValue: "",
+    group: G.effect,
+    order: 39,
+    fullWidth: true,
+  },
+  {
     key: "effect",
     kind: "editable",
     label: prefixedLabel(NPC_SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.effect),

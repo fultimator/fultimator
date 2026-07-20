@@ -58,6 +58,17 @@ export const playerSpellFieldConfig: ItemFieldConfig<PlayerSpellFormState> = [
     gridSize: "grow",
     validationHints: { required: true },
   },
+  {
+    key: "description",
+    kind: "editable",
+    label: prefixedLabel(SPELL_LABEL_PREFIX, SHARED_LABEL_KEYS.description),
+    component: "textarea",
+    defaultValue: "",
+    group: "description",
+    order: 60,
+    fullWidth: true,
+    dependencies: (s) => s.spellType !== "magiseed",
+  },
 
   ...defaultFields,
   ...arcanistFields,

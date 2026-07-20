@@ -25,6 +25,7 @@ export const NpcAttackSchema = z.object({
   damage: DamageSchema,
   martial: z.boolean().default(false),
   category: z.string().default("Melee Attack"),
+  description: z.string().optional(),
   effect: z.string().default(""),
   meta: MetaSchema.optional(),
   behaviors: z.array(BehaviorSchema).optional(),
