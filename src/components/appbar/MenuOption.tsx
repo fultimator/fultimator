@@ -141,7 +141,13 @@ const MenuOption: React.FC<MenuOptionProps> = ({
 
   const handleSignOut = async () => {
     await handleAuthentication(
-      () => firebaseSignOut(auth),
+      async () => {
+        if (IS_CAPACITOR) {
+          const { signOutNative } = await import("../../nativeAuth");
+          await signOutNative();
+        }
+        await firebaseSignOut(auth);
+      },
       t("Signed Out", true),
       t("Sign-out Error", true),
     );

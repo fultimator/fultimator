@@ -1,26 +1,29 @@
-// Native Google sign-in for the Capacitor (Android/iOS) shell.
-//
-// Firebase's web OAuth (signInWithPopup/signInWithRedirect) does not work inside
-// a Capacitor WebView: the __/auth/handler redirect never returns to the
-// localhost/capacitor origin. Instead we use the native Google sign-in plugin to
-// obtain a Google idToken, then feed that credential into the Firebase JS SDK so
-// the rest of the app (auth.currentUser, useAuthState, Firestore rules) is
-// unchanged.
 import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "./firebase";
+import { storeAccessToken } from "./platform/web/drive";
 
-export async function signInWithGoogleNative() {
-  const result = await FirebaseAuthentication.signInWithGoogle();
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+
+export async function signInWithGoogleNative(withDriveScope = false) {
+  const result = await FirebaseAuthentication.signInWithGoogle(
+    withDriveScope ? { scopes: [DRIVE_SCOPE] } : undefined,
+  );
   const idToken = result.credential?.idToken;
   if (!idToken) {
     throw new Error("Native Google sign-in did not return an idToken");
+  }
+  if (withDriveScope && result.credential?.accessToken) {
+    storeAccessToken(result.credential.accessToken);
   }
   const credential = GoogleAuthProvider.credential(idToken);
   return signInWithCredential(auth, credential);
 }
 
-export async function signOutNative() {
-  // Sign out of both the native layer and the JS SDK so state stays consistent.
+export async function loginDriveNative(): Promise<void> {
+  await signInWithGoogleNative(true);
+}
+
+export async function signOutNative(): Promise<void> {
   await FirebaseAuthentication.signOut();
 }

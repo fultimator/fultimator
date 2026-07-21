@@ -6,6 +6,7 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth, driveAuthProvider } from "../../firebase";
 import { getDb, STORES, notifyAllListeners, clearPendingSync } from "../idb";
+import { IS_CAPACITOR } from "../index";
 
 export const DRIVE_TOKEN_KEY = "fultimator_drive_token";
 
@@ -27,6 +28,14 @@ export function storeAccessToken(token: string): void {
 
 /** Re-sign-in with Google to obtain a fresh access token (includes drive.file scope). */
 async function requestFreshToken(): Promise<string> {
+  if (IS_CAPACITOR) {
+    const { loginDriveNative } = await import("../../nativeAuth");
+    await loginDriveNative();
+    const token = getStoredToken();
+    if (!token)
+      throw new Error("Native Google sign-in did not return an access token");
+    return token;
+  }
   const result = await signInWithPopup(auth, driveAuthProvider);
   const credential = GoogleAuthProvider.credentialFromResult(result);
   if (!credential?.accessToken)
