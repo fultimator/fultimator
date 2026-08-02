@@ -68,3 +68,24 @@ export function getUnlockedGrants(role, level) {
   const lvl = Number(level);
   return (QA_LEVEL_GRANTS[role] ?? []).filter((g) => g.level <= lvl);
 }
+
+export function getRankExtras(rank) {
+  if (rank === "elite") return { roleSkills: 1, bossSkills: 0 };
+  const champion = /^champion([1-6])$/.exec(rank ?? "");
+  if (champion) {
+    return { roleSkills: Number(champion[1]), bossSkills: 1 };
+  }
+  return { roleSkills: 0, bossSkills: 0 };
+}
+
+export function getRankGrants(rank) {
+  const { roleSkills, bossSkills } = getRankExtras(rank);
+  const grants = [];
+  if (roleSkills > 0) {
+    grants.push({ source: "rank", kind: "roleSkill", count: roleSkills });
+  }
+  if (bossSkills > 0) {
+    grants.push({ source: "rank", kind: "bossSkill", count: bossSkills });
+  }
+  return grants;
+}

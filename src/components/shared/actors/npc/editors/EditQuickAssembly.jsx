@@ -33,7 +33,10 @@ import {
   QA_LEVELS,
   QA_ROLE_KEYS,
 } from "/src/libs/quickAssembly/roles";
-import { getUnlockedGrants } from "/src/libs/quickAssembly/levelGrants";
+import {
+  getUnlockedGrants,
+  getRankGrants,
+} from "/src/libs/quickAssembly/levelGrants";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 
 const ROLE_OPTIONS = QA_ROLE_KEYS.map((key) => ({
@@ -71,6 +74,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   const isQuickAssembly = npc.role && npc.role !== "custom";
   const level = clampQuickAssemblyLevel(npc.lvl ?? 5);
   const grants = isQuickAssembly ? getUnlockedGrants(npc.role, level) : [];
+  const rankGrants = isQuickAssembly ? getRankGrants(npc.rank) : [];
   const progression = isQuickAssembly ? getRoleProgression(npc.role) : [];
 
   const seedRole = (role, lvl = level) =>
@@ -273,6 +277,37 @@ export default function EditQuickAssembly({ npc, setNpc }) {
               </Stack>
             </>
           )}
+
+          {rankGrants.length > 0 && (
+            <>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                {t("role_rank_grants")}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 1.5 }}
+              >
+                {t("role_rank_grants_hint")}
+              </Typography>
+              <Stack spacing={1}>
+                {rankGrants.map((grant, i) => (
+                  <GrantRow
+                    key={`rank-${grant.kind}-${i}`}
+                    grant={grant}
+                    npc={npc}
+                    t={t}
+                    onToggleAffinity={toggleAffinity}
+                    onToggleStatusImmunity={toggleStatusImmunity}
+                    onToggleFeature={toggleFeature}
+                    onToggleDefBonus={toggleDefBonus}
+                    onOpenCompendium={() => setCompendiumOpen(true)}
+                  />
+                ))}
+              </Stack>
+            </>
+          )}
         </>
       )}
 
@@ -373,7 +408,8 @@ function GrantRow({
   onToggleDefBonus,
   onOpenCompendium,
 }) {
-  const label = `L${grant.level} - ${t(`role_grant_${grant.kind}`)}${
+  const prefix = grant.level ? `L${grant.level} - ` : "";
+  const label = `${prefix}${t(`role_grant_${grant.kind}`)}${
     grant.count > 1 ? ` (${grant.count})` : ""
   }`;
   const noteKey = grant.note ? NOTE_KEYS[grant.note] : null;
@@ -428,6 +464,13 @@ function GrantFiller({
       return (
         <Button size="small" variant="outlined" onClick={onOpenCompendium}>
           {t("role_grant_add_skill")}
+        </Button>
+      );
+
+    case "bossSkill":
+      return (
+        <Button size="small" variant="outlined" onClick={onOpenCompendium}>
+          {t("role_grant_add_boss_skill")}
         </Button>
       );
 
