@@ -12,6 +12,7 @@ export default [
       "node_modules/**",
       "dist-electron/**",
       "build/**",
+      "android/**",
       "data/**",
       "*.config.js",
       ".dependency-cruiser.js",
