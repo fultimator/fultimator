@@ -240,6 +240,7 @@ export const NpcSpellSchema = z
     itemType: z.string().optional(),
     spellType: z.string().optional(),
     behaviors: z.array(BehaviorSchema).optional(),
+    _qaAdded: z.boolean().optional(),
   })
   .loose();
 
@@ -249,6 +250,8 @@ export const NpcActionSchema = z.object({
   effect: z.string().optional(),
   spCost: z.number().optional(),
   behaviors: z.array(BehaviorSchema).optional(),
+  _qaAdded: z.boolean().optional(),
+  _qaSlot: z.string().nullable().optional(),
 });
 
 export const NpcSpecialSchema = NpcActionSchema;
@@ -293,6 +296,7 @@ export const NpcPersistedSchema = z.object({
     ])
     .default("custom"),
   rank: z.string().optional(),
+  qaSelections: z.record(z.string(), z.boolean()).optional(),
   sizes: z.string().optional(),
   phases: z.number().optional(),
   villain: z.string().optional(),

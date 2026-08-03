@@ -69,6 +69,14 @@ export function getUnlockedGrants(role, level) {
   return (QA_LEVEL_GRANTS[role] ?? []).filter((g) => g.level <= lvl);
 }
 
+export function getAllGrants(role, level) {
+  const lvl = Number(level);
+  return (QA_LEVEL_GRANTS[role] ?? []).map((g) => ({
+    ...g,
+    locked: g.level > lvl,
+  }));
+}
+
 export function getRankExtras(rank) {
   if (rank === "elite") return { roleSkills: 1, bossSkills: 0 };
   const champion = /^champion([1-6])$/.exec(rank ?? "");
