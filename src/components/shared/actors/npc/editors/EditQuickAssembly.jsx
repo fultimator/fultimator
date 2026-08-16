@@ -55,7 +55,14 @@ import {
   getUnlockedGrants,
   getAllGrants,
   getRankGrants,
+  isGrantApplied,
+  isGrantCountable,
+  grantSlotId,
 } from "/src/libs/quickAssembly/levelGrants";
+import {
+  DAMAGE_TYPES,
+  STATUS_EFFECTS,
+} from "/src/libs/quickAssembly/constants";
 import { getSpeciesStep } from "/src/libs/quickAssembly/species";
 import {
   resolveSpellOptions,
@@ -71,50 +78,9 @@ const ROLE_OPTIONS = QA_ROLE_KEYS.map((key) => ({
   label: key.charAt(0).toUpperCase() + key.slice(1),
 }));
 
-const DAMAGE_TYPES = [
-  "physical",
-  "air",
-  "bolt",
-  "dark",
-  "earth",
-  "fire",
-  "ice",
-  "light",
-  "poison",
-];
-
 const NOTE_KEYS = {
   "other than physical": "role_grant_note_not_physical",
 };
-
-const COUNTABLE_GRANT_KINDS = new Set([
-  "resistance",
-  "immunity",
-  "statusImmunity",
-  "accuracyBonus",
-  "magicBonus",
-  "accuracyOrMagic",
-  "defBonus",
-]);
-
-function isGrantCountable(grant) {
-  return COUNTABLE_GRANT_KINDS.has(grant?.kind);
-}
-
-// Stable slot id: level grants by level, rank by kind, species by position.
-function grantSlotId(grant, source, index) {
-  if (source === "species") return `species-${index}`;
-  if (grant.source === "rank" || source === "rank") return `rank-${grant.kind}`;
-  if (grant.level != null) return `level-${grant.level}`;
-  return `${grant.kind}-${index}`;
-}
-
-function countAffinities(grant, npc, value) {
-  const restrictNonPhysical = grant?.note === "other than physical";
-  return Object.entries(npc?.affinities ?? {}).filter(
-    ([type, v]) => v === value && !(restrictNonPhysical && type === "physical"),
-  ).length;
-}
 
 const FLYING_PATTERN = /\b(fly(ing)?|flight)\b/i;
 function findFlyingSpecial(personalPack) {
@@ -125,36 +91,6 @@ function findFlyingSpecial(personalPack) {
         FLYING_PATTERN.test(i.data?.fuid ?? "")),
   );
   return item?.data ?? null;
-}
-
-function isGrantApplied(grant, npc) {
-  const need = grant?.count ?? 1;
-  switch (grant?.kind) {
-    case "resistance":
-      return countAffinities(grant, npc, "rs") >= need;
-    case "immunity":
-      return countAffinities(grant, npc, "im") >= need;
-    case "statusImmunity":
-      return (
-        (grant.options ?? []).filter((s) => npc?.immunities?.[s]).length >= need
-      );
-    case "accuracyBonus":
-      return !!(npc?.features?.precision?.enabled ?? npc?.extra?.precision);
-    case "magicBonus":
-      return !!npc?.features?.magic?.enabled;
-    case "accuracyOrMagic":
-      return (
-        !!(npc?.features?.precision?.enabled ?? npc?.extra?.precision) ||
-        !!npc?.features?.magic?.enabled
-      );
-    case "defBonus":
-      return (
-        (npc?.extra?.def ?? 0) >= (grant.def ?? 0) &&
-        (npc?.extra?.mDef ?? 0) >= (grant.mdef ?? 0)
-      );
-    default:
-      return false;
-  }
 }
 
 export default function EditQuickAssembly({ npc, setNpc }) {
@@ -1355,7 +1291,7 @@ function SpeciesGrantFiller({
     }
 
     case "statusImmunity": {
-      const options = grant.options ?? ALL_STATUSES;
+      const options = grant.options ?? STATUS_EFFECTS;
       return (
         <Stack
           direction="row"
@@ -1499,5 +1435,3 @@ function SpeciesGrantFiller({
       return null;
   }
 }
-
-const ALL_STATUSES = ["slow", "dazed", "weak", "shaken", "enraged", "poisoned"];

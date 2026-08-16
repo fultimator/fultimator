@@ -1,5 +1,6 @@
 import { npcSpells } from "../npcSpells";
 import { backfillIds } from "../actor/itemIds";
+import { STATUS_EFFECTS } from "./constants";
 
 export function findOfficialSpell(fuid) {
   return npcSpells.find((s) => s.fuid === fuid) ?? null;
@@ -32,8 +33,6 @@ export function removeSpell(npc, fuid) {
   return { ...npc, spells: (npc.spells ?? []).filter((s) => s.fuid !== fuid) };
 }
 
-const ALL_STATUSES = ["slow", "dazed", "weak", "shaken", "enraged", "poisoned"];
-
 export function isSpeciesGrantApplied(grant, npc) {
   const need = grant?.count ?? 1;
   switch (grant?.kind) {
@@ -49,7 +48,7 @@ export function isSpeciesGrantApplied(grant, npc) {
       return picked >= need;
     }
     case "statusImmunity": {
-      const options = grant.options ?? ALL_STATUSES;
+      const options = grant.options ?? STATUS_EFFECTS;
       return options.filter((s) => npc?.immunities?.[s]).length >= need;
     }
     case "hp":

@@ -144,12 +144,23 @@ export function getRoleDefaults(role) {
   return QA_ROLE_DEFAULTS[role] ?? { hp: 0, def: 0, mDef: 0 };
 }
 
-// True when the NPC's attributes still match the role defaults (not hand-tuned).
 export function attributesMatchRole(npc, role, level) {
-  const target = getRoleAttributesForLevel(role, level);
-  if (!target) return false;
-  return ATTRS.every(
-    (attr) => (npc?.attributes?.[attr]?.base ?? null) === target[attr],
+  if (!QA_ROLES[role]) return false;
+  const applied = applyRole(npc, { role, level });
+  const eq = (a, b) => (a ?? null) === (b ?? null);
+
+  for (const attr of ATTRS) {
+    if (!eq(npc?.attributes?.[attr]?.base, applied?.attributes?.[attr]?.base)) {
+      return false;
+    }
+  }
+  return (
+    eq(npc?.extra?.hp, applied?.extra?.hp) &&
+    eq(npc?.extra?.def, applied?.extra?.def) &&
+    eq(npc?.extra?.mDef, applied?.extra?.mDef) &&
+    eq(npc?.resources?.hp?.bonus, applied?.resources?.hp?.bonus) &&
+    eq(npc?.derived?.def?.bonus, applied?.derived?.def?.bonus) &&
+    eq(npc?.derived?.mdef?.bonus, applied?.derived?.mdef?.bonus)
   );
 }
 

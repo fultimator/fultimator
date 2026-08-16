@@ -97,3 +97,61 @@ export function getRankGrants(rank) {
   }
   return grants;
 }
+
+export const COUNTABLE_GRANT_KINDS = new Set([
+  "resistance",
+  "immunity",
+  "statusImmunity",
+  "accuracyBonus",
+  "magicBonus",
+  "accuracyOrMagic",
+  "defBonus",
+]);
+
+export function isGrantCountable(grant) {
+  return COUNTABLE_GRANT_KINDS.has(grant?.kind);
+}
+
+export function grantSlotId(grant, source, index) {
+  if (source === "species") return `species-${index}`;
+  if (grant.source === "rank" || source === "rank") return `rank-${grant.kind}`;
+  if (grant.level != null) return `level-${grant.level}`;
+  return `${grant.kind}-${index}`;
+}
+
+export function countAffinities(grant, npc, value) {
+  const restrictNonPhysical = grant?.note === "other than physical";
+  return Object.entries(npc?.affinities ?? {}).filter(
+    ([type, v]) => v === value && !(restrictNonPhysical && type === "physical"),
+  ).length;
+}
+
+export function isGrantApplied(grant, npc) {
+  const need = grant?.count ?? 1;
+  switch (grant?.kind) {
+    case "resistance":
+      return countAffinities(grant, npc, "rs") >= need;
+    case "immunity":
+      return countAffinities(grant, npc, "im") >= need;
+    case "statusImmunity":
+      return (
+        (grant.options ?? []).filter((s) => npc?.immunities?.[s]).length >= need
+      );
+    case "accuracyBonus":
+      return !!(npc?.features?.precision?.enabled ?? npc?.extra?.precision);
+    case "magicBonus":
+      return !!npc?.features?.magic?.enabled;
+    case "accuracyOrMagic":
+      return (
+        !!(npc?.features?.precision?.enabled ?? npc?.extra?.precision) ||
+        !!npc?.features?.magic?.enabled
+      );
+    case "defBonus":
+      return (
+        (npc?.extra?.def ?? 0) >= (grant.def ?? 0) &&
+        (npc?.extra?.mDef ?? 0) >= (grant.mdef ?? 0)
+      );
+    default:
+      return false;
+  }
+}

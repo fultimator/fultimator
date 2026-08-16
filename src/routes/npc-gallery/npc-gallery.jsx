@@ -327,7 +327,12 @@ function Personal() {
         role,
         rank: options.rank || "soldier",
         imgurl: "",
-        attributes: { dexterity: 8, might: 8, will: 8, insight: 8 },
+        attributes: {
+          dexterity: { base: 8 },
+          insight: { base: 8 },
+          might: { base: 8 },
+          will: { base: 8 },
+        },
         attacks: [],
         affinities,
         immunities,
