@@ -30,7 +30,7 @@ function Rank({ npc }) {
   );
 }
 
-function VillainPhase({ villain, phases, multipart }) {
+function VillainPhase({ villain, phases, multipart, role }) {
   const { t } = useTranslate();
 
   const getVillainLabel = (villainType) => {
@@ -46,11 +46,19 @@ function VillainPhase({ villain, phases, multipart }) {
     }
   };
 
+  const roleLabel =
+    role && role !== "custom"
+      ? t(role.charAt(0).toUpperCase() + role.slice(1))
+      : null;
+
   const phaseString =
     phases && phases >= 1 ? `${t("Phase", true)} ${phases}` : null;
-  const values = [getVillainLabel(villain), phaseString, multipart].filter(
-    Boolean,
-  );
+  const values = [
+    roleLabel,
+    getVillainLabel(villain),
+    phaseString,
+    multipart,
+  ].filter(Boolean);
   const combinedString = values.length > 0 ? values.join(" ⬥ ") : null;
 
   return <>{combinedString}</>;
@@ -177,11 +185,14 @@ export function NpcHeader({ npc, npcImage }) {
           />
         </Dialog>
         <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-          {(npc.villain || npc.phases || npc.multipart) && (
+          {(npc.villain ||
+            npc.phases ||
+            npc.multipart ||
+            (npc.role && npc.role !== "custom")) && (
             <Box
               sx={{
                 px: 1,
-                py: 0.5,
+                py: 0.25,
                 borderBottom,
                 borderImage: borderImageBody,
               }}
@@ -189,7 +200,7 @@ export function NpcHeader({ npc, npcImage }) {
               <Typography
                 sx={{
                   fontFamily: "Antonio",
-                  fontSize: "1.25rem",
+                  fontSize: "1rem",
                   textTransform: "uppercase",
                 }}
               >
@@ -197,6 +208,7 @@ export function NpcHeader({ npc, npcImage }) {
                   villain={npc.villain}
                   phases={npc.phases}
                   multipart={npc.multipart}
+                  role={npc.role}
                 />
               </Typography>
             </Box>

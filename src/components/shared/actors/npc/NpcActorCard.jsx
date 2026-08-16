@@ -10,6 +10,7 @@ import { NpcImmunities } from "./NpcImmunities";
 import { NpcAttacks } from "./NpcAttacks";
 import { NpcSpells } from "./NpcSpells";
 import { NpcSpecialRules } from "./NpcSpecialRules";
+import { NpcEffects } from "./NpcEffects";
 import { NpcActions } from "./NpcActions";
 import { NpcNotes } from "./NpcNotes";
 import { NpcRareGear } from "./NpcRareGear";
@@ -81,6 +82,9 @@ export default function NpcActorCard({
                 </div>
                 <div id={`npc-section-special-${npc.id}`}>
                   <NpcSpecialRules npc={npc} variant={variant} />
+                </div>
+                <div id={`npc-section-effects-${npc.id}`}>
+                  <NpcEffects npc={npc} variant={variant} />
                 </div>
                 <div id={`npc-section-raregear-${npc.id}`}>
                   <NpcRareGear npc={npc} variant={variant} />

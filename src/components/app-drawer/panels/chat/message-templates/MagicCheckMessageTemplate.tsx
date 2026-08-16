@@ -286,6 +286,23 @@ export const MagicCheckMessageTemplate: React.FC<
               value={check.intent.baseDamage}
               signed
             />
+            {check.intent.damageModifiers &&
+            check.intent.damageModifiers.length > 0
+              ? check.intent.damageModifiers.map((mod, i) => (
+                  <BreakdownRow
+                    key={i}
+                    label={mod.label}
+                    value={mod.value}
+                    signed
+                  />
+                ))
+              : (check.intent.damageOutgoingBonus ?? 0) !== 0 && (
+                  <BreakdownRow
+                    label="Effect Bonus"
+                    value={check.intent.damageOutgoingBonus ?? 0}
+                    signed
+                  />
+                )}
             <Divider sx={{ my: 0.25 }} />
             <BreakdownRow label="Damage Total" value={check.damage} bold />
           </Box>

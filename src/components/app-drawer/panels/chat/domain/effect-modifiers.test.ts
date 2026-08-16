@@ -44,14 +44,14 @@ describe("accuracyModifiersFromEffects", () => {
 
   it("applies crisis-gated accuracy modifiers for NPCs in crisis", () => {
     expect(accuracyModifiersFromEffects(npc(30))).toEqual([
-      { label: "All", value: 2 },
+      { label: "Crisis Aim", value: 2 },
     ]);
     expect(accuracyModifiersFromEffects(npc(31))).toEqual([]);
   });
 
   it("allows callers to override derived crisis state", () => {
     expect(accuracyModifiersFromEffects(npc(31), { inCrisis: true })).toEqual([
-      { label: "All", value: 2 },
+      { label: "Crisis Aim", value: 2 },
     ]);
   });
 });

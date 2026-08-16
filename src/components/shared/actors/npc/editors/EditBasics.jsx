@@ -15,6 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import { EditAttributes } from "./EditAttributes";
+import EditQuickAssembly from "./EditQuickAssembly";
 import ReactMarkdown from "react-markdown";
 import { useTranslate } from "/src/translation/translate";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
@@ -88,9 +89,15 @@ export default function EditBasics({ npc, setNpc }) {
             cols={2}
           />
 
-          <Grid size={{ xs: 12, sm: 3 }}>
-            <EditLevel npc={npc} setnpc={setNpc} />
+          <Grid size={12}>
+            <EditQuickAssembly npc={npc} setNpc={setNpc} />
           </Grid>
+
+          {(!npc.role || npc.role === "custom") && (
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <EditLevel npc={npc} setnpc={setNpc} />
+            </Grid>
+          )}
 
           <SchemaFieldRenderer
             config={detailFields}

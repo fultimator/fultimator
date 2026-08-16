@@ -32,6 +32,8 @@ import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
 const TYPE_TO_PACK_TYPE = {
   spell: "npc-spell",
   basic: "npc-attack",
+  special: "npc-special",
+  actions: "npc-action",
 };
 
 const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
@@ -76,6 +78,10 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
       case "basic":
         newType = npcAttacks;
         break;
+      case "special":
+      case "actions":
+        newType = [];
+        break;
       default:
         newType = [];
         break;
@@ -111,7 +117,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
 
   const handleSave = () => {
     if (selectedItem) {
-      onSave(selectedItem);
+      onSave(selectedItem, selectedType);
     }
     onClose();
   };
@@ -189,6 +195,8 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
             >
               <MenuItem value="spell">{t("Spells")}</MenuItem>
               <MenuItem value="basic">{t("Basic Attacks")}</MenuItem>
+              <MenuItem value="special">{t("Special Rules")}</MenuItem>
+              <MenuItem value="actions">{t("Other Actions")}</MenuItem>
             </Select>
           </Grid>
           <Grid>

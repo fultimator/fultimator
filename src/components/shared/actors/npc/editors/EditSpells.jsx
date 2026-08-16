@@ -44,6 +44,10 @@ import {
   processMagicCheck,
   buildMagicCheckMessage,
 } from "/src/components/app-drawer/panels/chat/domain/magic-checks";
+import {
+  accuracyModifiersFromEffects,
+  outgoingDamageModifiersFromEffects,
+} from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { TypeName } from "/src/components/types";
 import { SpellIcon, OffensiveSpellIcon } from "/src/components/icons";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
@@ -422,18 +426,33 @@ export default function EditSpells({ npc, setNpc }) {
                 primary: npc.attributes?.[spell.accuracy?.attr1]?.base ?? 6,
                 secondary: npc.attributes?.[spell.accuracy?.attr2]?.base ?? 6,
               };
-              const intent = prepareMagicCheck({
-                attr1: attrMap[spell.accuracy?.attr1] ?? "ins",
-                attr2: attrMap[spell.accuracy?.attr2] ?? "wlp",
-                accuracyBonus: accBonus,
-                name: spell.name,
-                description: spell.effect ?? spell.special?.[0] ?? undefined,
-                baseDamage: dmgValue,
-                damageType: dmgType,
-                accuracyDefense: "mdef",
-                damageHrZero: hrZero,
-                spellType: spell.spellType ?? "npc",
+              const effectModifiers = accuracyModifiersFromEffects(npc, {
+                checkType: "magic",
               });
+              const damageModifiers = outgoingDamageModifiersFromEffects(npc, {
+                range: "spell",
+                damageType: dmgType,
+              });
+              const damageOutgoingBonus = damageModifiers.reduce(
+                (sum, m) => sum + m.value,
+                0,
+              );
+              const intent = prepareMagicCheck(
+                {
+                  attr1: attrMap[spell.accuracy?.attr1] ?? "ins",
+                  attr2: attrMap[spell.accuracy?.attr2] ?? "wlp",
+                  accuracyBonus: accBonus,
+                  name: spell.name,
+                  description: spell.effect ?? spell.special?.[0] ?? undefined,
+                  baseDamage: dmgValue,
+                  damageType: dmgType,
+                  accuracyDefense: "mdef",
+                  damageHrZero: hrZero,
+                  spellType: spell.spellType ?? "npc",
+                },
+                effectModifiers,
+                { damageOutgoingBonus, damageModifiers },
+              );
               const rolls = rollMagicCheck(dieSizes);
               const result = processMagicCheck(
                 intent,

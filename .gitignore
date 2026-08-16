@@ -9,6 +9,7 @@
 /coverage
 /data
 /docs
+/scripts
 
 # ide
 .idea

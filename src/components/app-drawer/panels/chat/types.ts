@@ -49,6 +49,7 @@ export type AccuracyCheckIntent = {
   baseDamage: number;
   damageSituationalBonus?: number;
   damageOutgoingBonus?: number;
+  damageModifiers?: CheckModifier[];
   damageType: string;
   defense?: "def" | "mdef" | string;
   hands?: 1 | 2;
@@ -94,6 +95,7 @@ export type MagicCheckIntent = {
   description?: string;
   baseDamage: number;
   damageOutgoingBonus?: number;
+  damageModifiers?: CheckModifier[];
   damageType: string;
   defense?: "def" | "mdef" | string;
   hrZero?: boolean;

@@ -4,6 +4,7 @@ export { default as EditAttacks } from "./EditAttacks";
 export { EditAttributes } from "./EditAttributes";
 export { default as EditBasics } from "./EditBasics";
 export { default as EditCompendiumModal } from "./EditCompendiumModal";
+export { default as EditEffects } from "./EditEffects";
 export { default as EditExtra } from "./EditExtra";
 export { default as EditNotes } from "./EditNotes";
 export { default as EditPublish } from "./EditPublish";

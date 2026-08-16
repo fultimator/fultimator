@@ -11,6 +11,12 @@ import {
 } from "../pipelines/damagePipeline";
 import { getActorBonuses } from "../libs/actorBonuses";
 import { resolveActorEffects } from "../libs/actorEffectsResolver";
+import {
+  isAppliedEffectExpired,
+  isSameAppliedEffect,
+  type SweepEvent,
+} from "../libs/appliedEffects";
+import type { AppliedEffect } from "../types/Effects";
 import { devLog } from "../utils/devLog";
 
 type ActorDoc = Record<string, unknown>;
@@ -53,6 +59,10 @@ interface CombatEncounterState {
     updater: (actor: RuntimeActor) => RuntimeActor,
   ) => void;
   getRuntimeActor: (combatId: string) => RuntimeActor | undefined;
+  // combat-temporary applied effects
+  applyEffectToActor: (combatId: string, effect: AppliedEffect) => void;
+  clearAppliedEffects: (combatId?: string) => void;
+  sweepAppliedEffects: (event: SweepEvent, activeCombatId?: string) => void;
 }
 
 function buildRuntimeActors(
@@ -452,5 +462,64 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
       }),
 
     getRuntimeActor: (combatId) => get().runtimeActors[combatId],
+
+    applyEffectToActor: (combatId, effect) =>
+      set((state) => {
+        const actor = state.runtimeActors[combatId];
+        if (!actor) return state;
+        const existing = actor.appliedEffects ?? [];
+        const filtered = existing.filter(
+          (e) => !isSameAppliedEffect(e, effect),
+        );
+        return {
+          runtimeActors: {
+            ...state.runtimeActors,
+            [combatId]: { ...actor, appliedEffects: [...filtered, effect] },
+          },
+        };
+      }),
+
+    clearAppliedEffects: (combatId) =>
+      set((state) => {
+        if (combatId) {
+          const actor = state.runtimeActors[combatId];
+          if (!actor) return state;
+          return {
+            runtimeActors: {
+              ...state.runtimeActors,
+              [combatId]: { ...actor, appliedEffects: [] },
+            },
+          };
+        }
+        const next: Record<string, RuntimeActor> = {};
+        for (const [id, actor] of Object.entries(state.runtimeActors)) {
+          next[id] = { ...actor, appliedEffects: [] };
+        }
+        return { runtimeActors: next };
+      }),
+
+    sweepAppliedEffects: (event, activeCombatId) =>
+      set((state) => {
+        let changed = false;
+        const next: Record<string, RuntimeActor> = {};
+        for (const [id, actor] of Object.entries(state.runtimeActors)) {
+          const current = actor.appliedEffects ?? [];
+          const kept = current.filter(
+            (effect) =>
+              !isAppliedEffectExpired(effect, {
+                event,
+                activeCombatId,
+                selfCombatId: id,
+              }),
+          );
+          if (kept.length !== current.length) {
+            changed = true;
+            next[id] = { ...actor, appliedEffects: kept };
+          } else {
+            next[id] = actor;
+          }
+        }
+        return changed ? { runtimeActors: next } : state;
+      }),
   }),
 );
