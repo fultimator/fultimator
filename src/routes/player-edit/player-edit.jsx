@@ -28,8 +28,9 @@ import {
   Tooltip,
   Typography,
   Fab,
-  Stack,
   Paper,
+  BottomNavigation,
+  BottomNavigationAction,
   Checkbox,
   Select,
   MenuItem,
@@ -79,7 +80,6 @@ import html2canvas from "html2canvas";
 import Confetti from "react-confetti";
 import useDownload from "../../hooks/useDownload";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
 import {
   CharacterSheetIcon,
   StatsIcon,
@@ -1456,35 +1456,74 @@ export default function PlayerEdit() {
         </Button>
         <Box sx={{ height: "15vh" }} />
       </Box>
-      {/* Floating Action Buttons */}
+      {/* Mobile bottom navigation */}
       {isSmallScreen && (
-        <Box
+        <Paper
+          elevation={6}
           sx={{
             position: "fixed",
-            bottom: 16,
-            left: 16,
-            zIndex: 1200,
-            textAlign: "center",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1300,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            overflowX: "auto",
+            overflowY: "hidden",
+            WebkitOverflowScrolling: "touch",
           }}
         >
-          <Fab onClick={toggleDrawer(true)} color="primary" size="medium">
-            <Stack
-              direction="column"
-              sx={{ alignItems: "center" }}
-              spacing={0.5}
-            >
-              <MenuBookIcon fontSize="medium" />
-              <Typography variant="caption" sx={{ fontSize: "10px" }}>
-                {t("Menu")}
-              </Typography>
-            </Stack>
-          </Fab>
-        </Box>
+          <BottomNavigation
+            showLabels
+            value={openTab}
+            onChange={(e, newValue) => handleTabChange(e, newValue)}
+            sx={{
+              width: "max-content",
+              minWidth: "100%",
+              "& .MuiBottomNavigationAction-root": {
+                flex: "0 0 auto",
+                minWidth: 80,
+                px: 1,
+              },
+            }}
+          >
+            <BottomNavigationAction
+              label={t("Player Sheet")}
+              icon={<CharacterSheetIcon color="currentColor" size="1.4em" />}
+            />
+            <BottomNavigationAction label={t("Informations")} icon={<Info />} />
+            <BottomNavigationAction
+              label={t("Stats")}
+              icon={<StatsIcon color="currentColor" size="1.4em" />}
+            />
+            <BottomNavigationAction
+              label={t("Classes")}
+              icon={<ClassesIcon color="currentColor" size="1.4em" />}
+            />
+            <BottomNavigationAction
+              label={t("Spells")}
+              icon={<SpellsIcon color="currentColor" size="1.4em" />}
+            />
+            <BottomNavigationAction
+              label={t("Backpack")}
+              icon={<EquipmentIcon color="currentColor" size="1.4em" />}
+            />
+            <BottomNavigationAction
+              label={t("Notes")}
+              icon={<NotesIcon color="currentColor" size="1.4em" />}
+            />
+            <BottomNavigationAction
+              label={t("Effects")}
+              icon={<AutoAwesome />}
+            />
+            <BottomNavigationAction label={t("Settings")} icon={<Settings />} />
+          </BottomNavigation>
+        </Paper>
       )}
       <Box
         sx={{
           position: "fixed",
-          bottom: 16,
+          bottom: isSmallScreen ? 72 : 16,
           right: appDrawerOpen
             ? APP_DRAWER_WIDTH + 16
             : isDesktop

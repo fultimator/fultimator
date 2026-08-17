@@ -151,7 +151,11 @@ const Layout: React.FC<LayoutProps> = ({
     new RegExp(route.replace(/:\w+/, "[^/]+")).test(location.pathname),
   );
 
-  const pcRoutes = ["/pc-gallery/:playerId", "/character-sheet/:playerId"];
+  const pcRoutes = [
+    "/pc-gallery/:playerId",
+    "/player-edit/:playerId",
+    "/character-sheet/:playerId",
+  ];
   const isPcEdit = pcRoutes.some((route) =>
     new RegExp(route.replace(/:\w+/, "[^/]+")).test(location.pathname),
   );
