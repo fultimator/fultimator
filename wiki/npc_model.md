@@ -17,6 +17,8 @@ Schema: `src/forms/schema/actorSchemas/npc.ts`
 - `createdBy` {string?}: Creator display name
 - `published` {bool?}: Firestore-only. Distinguishes published vs personal records; stripped on export
 - `schemaVersion` {int?}: Bumped during post-load migration transforms
+- `label` {string?}: Optional display label
+- `tags` {object[]?}: List of `{ name }` tag entries
 
 ---
 
@@ -24,6 +26,8 @@ Schema: `src/forms/schema/actorSchemas/npc.ts`
 
 - `species` {string}: Default `"Beast"`. One of: `"Beast"` `"Construct"` `"Demon"` `"Elemental"` `"Humanoid"` `"Variant Humanoid"` `"Monster"` `"Plant"` `"Undead"`
 - `rank` {string?}: `"soldier"` `"elite"` `"champion1"`-`"champion6"` `"companion"` `"groupvehicle"`
+- `role` {string}: Default `"custom"`. Quick Assembly role - `"brute"` `"hunter"` `"mage"` `"saboteur"` `"sentinel"` `"support"` `"custom"`. `"custom"` = classic freeform NPC. See [quick_assembly_model.md](quick_assembly_model.md)
+- `qaSelections` {Record<string, bool>?}: Quick Assembly per-slot selection flags. See [quick_assembly_model.md](quick_assembly_model.md#persisted-schema-fields)
 - `sizes` {string?}: `"small"` `"medium"` `"large"` (empty string means none)
 - `villain` {string?}: `"minor"` `"major"` `"supreme"` - grants Ultima Points (UP)
 - `phases` {int?}: Number of boss phases
@@ -109,7 +113,7 @@ Both fields use the same shape. Schema is `loose()` - unknown fields are preserv
 
 ## Actions & Abilities
 
-All of the following support optional `passives` and `behaviors` arrays. See [native_effects.md](native_effects.md).
+All of the following support an optional `behaviors` array. See [native_effects.md](native_effects.md).
 
 ### Attacks - `npc.attacks[]`
 
@@ -151,25 +155,29 @@ Schema is `loose()`.
 
 Active abilities the NPC can use.
 
+- `actions[n].id` {string?}
 - `actions[n].name` {string}
 - `actions[n].effect` {string?}
 - `actions[n].spCost` {number?}: SP (Skill Point) cost, used to track available skills budget
 
 ### Special Rules - `npc.special[]`
 
-Passive traits and innate rules on the NPC.
+Passive traits and innate rules on the NPC. Same shape as `actions` (`NpcSpecialSchema = NpcActionSchema`).
 
+- `special[n].id` {string?}
 - `special[n].name` {string}
 - `special[n].effect` {string?}
 - `special[n].spCost` {number?}: SP (Skill Point) cost, used to track available skills budget
 
 ### Rare Gear - `npc.raregear[]`
 
+- `raregear[n].id` {string?}
 - `raregear[n].name` {string}
 - `raregear[n].effect` {string?}
 
 ### Notes - `npc.notes[]`
 
+- `notes[n].id` {string?}
 - `notes[n].fuid` {string?}: Compendium item ID
 - `notes[n].name` {string}
 - `notes[n].description` {string?}: Flavor text
@@ -179,17 +187,14 @@ Passive traits and innate rules on the NPC.
 
 ## Actor Effects
 
-Active effects on this NPC from items or persistent abilities.
-Shape is [Passive](native_effects.md#passive) without `transfer`, plus `origin`.
+Active effects on this NPC from items or persistent abilities. Each effect wraps a
+`behaviors` array. See [native_effects.md](native_effects.md#actor-effect).
 
 - `effects[n].id` {string}
-- `effects[n].name` {string}
+- `effects[n].name` {string}: Default `""`
 - `effects[n].disabled` {bool?}
 - `effects[n].origin` {string?}: Source item or ability that created this effect
-- `effects[n].changes` {EffectChange[]?}: See [native_effects.md](native_effects.md#effect-change)
-- `effects[n].grants` {GrantData[]?}: See [native_effects.md](native_effects.md#grant-data)
-- `effects[n].duration` {EffectDuration?}: See [native_effects.md](native_effects.md#effect-duration)
-- `effects[n].predicate` {EffectPredicate?}: See [native_effects.md](native_effects.md#effect-predicate)
+- `effects[n].behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md#behavior)
 
 ---
 

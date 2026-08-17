@@ -2,7 +2,7 @@
 
 Item schemas live in `src/forms/schema/itemSchemas/`.
 
-All items that support mechanics use `passives` and `behaviors`. See [native_effects.md](native_effects.md).
+All items that support mechanics carry a `behaviors` array. See [native_effects.md](native_effects.md).
 
 ---
 
@@ -42,10 +42,11 @@ NPC item types (`basic`, `spell`, `action`, `special`) are embedded directly in 
 
 Canonical fields (`WeaponSchema`):
 
+- `id` {string?}: Persistent item ID
 - `itemType` {string}: `"weapon"`
 - `name` {string}
 - `description` {string?}
-- `book` {string}: Default `"homebrew"`
+- `meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference (replaces the old top-level `book`)
 - `category` {string}: e.g. `"sword"` `"bow"` `"brawling"`
 - `range` {string}: `"melee"` / `"ranged"`
 - `hands` {1 | 2}
@@ -62,22 +63,25 @@ Persisted-only fields (form state, stored alongside canonical):
 
 - `fuid` {string?}
 - `selectedQuality` / `qualityName` / `qualityCost` {string / int}
-- `att1` / `att2` / `type` {string}: Flat mirrors of `accuracy.attr1`, `accuracy.attr2`, `damage.type`
+- `type` {string?}: Flat mirror of `damage.type`
+- `rareBonuses` {object?}: Rare weapon bonus flags
 - `damageBonus` / `precBonus` / `rework` / `damageReworkBonus` {bool}
 - `damageHrZero` {bool}
 - `precModifier` / `damageModifier` / `defModifier` / `mDefModifier` {int}
 - `totalBonus` {int}
+- `isEquipped` {bool?}: Legacy equipped flag - authoritative state is `equippedSlots`
 - `base` {object}: Unmodified base weapon from compendium
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Custom Weapon (`"customWeapon"`)
 
 Canonical fields (`CustomWeaponSchema`):
 
+- `id` {string?}: Persistent item ID
 - `itemType` {string}: `"customWeapon"`
 - `name` {string}
 - `description` {string?}
-- `book` {string}: Default `"homebrew"`
+- `meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference (replaces the old top-level `book`)
 - `category` {string}
 - `range` {string}: `"melee"` / `"ranged"`
 - `hands` {1 | 2}
@@ -97,16 +101,17 @@ Persisted-only fields (form state):
 
 - `dataType` {string}: `"weapon"`
 - `selectedQuality` {string?}
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Armor (`"armor"`)
 
 Canonical fields (`ArmorSchema`):
 
+- `id` {string?}: Persistent item ID
 - `itemType` {string}: `"armor"`
 - `name` {string}
 - `description` {string?}
-- `book` {string}: Default `"homebrew"`
+- `meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference (replaces the old top-level `book`)
 - `martial` {bool}
 - `def` / `mdef` / `init` {int}
 - `rework` {bool}
@@ -123,7 +128,7 @@ Persisted-only fields:
 - `selectedQuality` / `qualityCost` {string / int}
 - `defModifier` / `mDefModifier` / `initModifier` / `magicModifier` / `precModifier` {int}
 - `damageMeleeModifier` / `damageRangedModifier` {int}
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Shield (`"shield"`)
 
@@ -133,10 +138,11 @@ Same canonical shape as Armor minus `slots` / `slotted`. `itemType` is `"shield"
 
 Canonical fields (`AccessorySchema`):
 
+- `id` {string?}: Persistent item ID
 - `itemType` {string}: `"accessory"`
 - `name` {string}
 - `description` {string?}
-- `book` {string}: Default `"homebrew"`
+- `meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference (replaces the old top-level `book`)
 - `quality` {string?}
 - `cost` {int?}
 
@@ -147,7 +153,7 @@ Persisted-only fields:
 - `modifiers` {object?}: `{ def, mdef, init, magic, accuracy, damageMelee, damageRanged }`
 - `defModifier` / `mDefModifier` / `initModifier` / `magicModifier` / `precModifier` {int}
 - `damageMeleeModifier` / `damageRangedModifier` {int}
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ---
 
@@ -162,7 +168,7 @@ Never standalone records - always nested inside the NPC document.
 - `accuracy` {object?}: `{ attr1, attr2, value?, defense? }`
 - `damage` {object?}: `{ value?, type?, hrZero? }`
 - `effect` {string?} - `special` {string[]?} - `extraDamage` {bool?}
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Spells - `npc.spells[]` (`"spell"`)
 
@@ -175,40 +181,81 @@ Never standalone records - always nested inside the NPC document.
 - `maxTargets` {number?} - `targetDescription` {string?} - `duration` {string?}
 - `effect` / `description` {string?} - `special` {string[]?}
 - `spellType` {string?}: Spell discipline tag
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Actions - `npc.actions[]`
 
-Active abilities the NPC can use.
+Active abilities the NPC can use. (Embedded shape; see [npc_model.md](npc_model.md). The standalone `npcAction.ts` compendium form uses `fuid` / `description` / `meta` instead of `id`.)
 
+- `id` {string?}
 - `name` {string} - `effect` {string?}
 - `spCost` {number?}: SP cost, tracks available skills budget
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Special Rules - `npc.special[]`
 
-Passive traits and innate rules on the NPC.
+Passive traits and innate rules on the NPC. Same embedded shape as `actions`.
 
+- `id` {string?}
 - `name` {string} - `effect` {string?}
 - `spCost` {number?}: SP cost, tracks available skills budget
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ---
 
 ## PC Spells - `pc.classes[n].spells[]`
 
-Spells are a discriminated union across 16+ discipline types. See `src/forms/schema/itemSchemas/spells/` for each variant.
+`PlayerSpellSchema` is a `z.union` of 18 subtype schemas discriminated by `spellType`.
+See `src/forms/schema/itemSchemas/spells/`. There is no top-level `mp`, `attr1`/`attr2`, or
+`index` field - accuracy/damage/cost are nested objects and only on `default`.
 
-Common fields:
+### Shared base (`PlayerSpellNonStaticBaseSchema`)
 
+Every subtype **except `default`** extends this base:
+
+- `id` {string?}
 - `name` {string}
-- `spellType` {string}: Matches a value from `classes[n].benefits.spellClasses`
-- `mp` {int}: MP cost per target
-- `maxTargets` {int} - `targetDesc` {string} - `duration` {string}
+- `fuid` {string?}: Compendium item ID
+- `meta` {object?}: `{ book, page?, bookName?, isOfficial }`
+- `description` {string?}
+- `showInPlayerSheet` {bool}: Default `true`
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
+- `spellType` {string}: One of `"default"` `"gift"` `"dance"` `"therioform"` `"magichant"` `"symbol"` `"invocation"` `"wellspring"` `"arcanist"` `"arcanist-rework"` `"tinkerer-alchemy"` `"tinkerer-infusion"` `"tinkerer-magitech"` `"cooking"` `"magiseed"` `"pilot-vehicle"` `"gamble"` `"deck"`
+
+### `default` (`PlayerSpellDefaultSchema`)
+
+The classic spell shape - a standalone object that does **not** extend the base:
+
+- `id` {string?} - `class` {string} - `name` {string} - `fuid` {string?} - `meta` {object?}
 - `description` {string} - `isOffensive` {bool}
-- `attr1` / `attr2` {string}: Accuracy attributes (offensive spells only)
-- `index` {int}
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `cost` {object}: `{ resource: "mp", amount, perTarget }`
+- `maxTargets` {int} - `targetDescription` {string} - `duration` {string}
+- `accuracy` {object}: `{ attr1, attr2, value, defense }`
+- `damage` {object}: `{ value, type, hrZero }`
+- `spellType` {string}: `"default"`
+- `behaviors` {Behavior[]?}
+
+### Subtype-specific fields
+
+Each non-`default` subtype adds these on top of the shared base:
+
+- `gift`: `clock` {int}, `gifts[]` `{ key, customName, event, effect }`
+- `dance`: `dances[]` `{ key, customName, effect, duration }`
+- `therioform`: `therioforms[]` `{ key, customName, genoclepsis, description }`
+- `magichant`: `keys[]` `{ key, customName, type, status, attribute, recovery }`, `tones[]` `{ key, customName, effect }`
+- `symbol`: `symbols[]` `{ key, customName, effect }`
+- `invocation`: `spellName`, tracker `{ innerWellspring, chosenWellspring, activeWellsprings[] }`, `invocations[]`, `customWellsprings[]` `{ id?, name, color, textColor, icon }`
+- `wellspring`: `color`, `textColor` (`"black"`/`"white"`), `icon`
+- `arcanist`: `domain`/`domainDesc`, `merge`/`mergeDesc`, `dismiss`/`dismissDesc`
+- `arcanist-rework`: the arcanist fields plus `pulse`/`pulseDesc`
+- `tinkerer-alchemy`: `category` {string?}
+- `tinkerer-infusion`: `infusionRank` {int?}
+- `tinkerer-magitech`: `rank` {int 1-3}, `magispheres[]`
+- `cooking`: `spellName`, cookbook `{ effects[], ingredientInventory[] }`
+- `magiseed`: `growthClock`, `gardenDescription`, `currentMagiseed`, `magiseeds[]`
+- `pilot-vehicle`: vehicle module schemas (armor / weapon / support) and slots
+- `gamble`: `spellName`, `maxTargets`, `targetDescription`, `duration`, `attr`, `targets[]` `{ rangeFrom, rangeTo, effect, secondRoll, secondEffects[] }`
+- `deck`: `spellName`, `cardsInDeck` {int}, `hand[]`, `discardPile[]` (cards `{ suit, value, isJoker }`)
 
 ---
 
@@ -227,7 +274,7 @@ Two distinct shapes depending on context:
 - `description` {string}
 - `applicableTo` {string[]}: Class names this heroic skill applies to
 - `meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 **Embedded in `pc.classes[n].heroic[]`** (`HeroicSkillSchema` - `class.ts`):
 
@@ -237,7 +284,7 @@ Two distinct shapes depending on context:
 - `description` {string}
 - `specialSkill` {string?}: Key of a special skill override
 - `meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference
-- `passives` {Passive[]?} - `behaviors` {Behavior[]?}
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Camp Activity (`"campActivity"`)
 
@@ -298,9 +345,11 @@ Compendium class definition. Shape differs from the embedded class in the PC doc
 - `benefits.other` {object[]}: `{ description: string }[]` custom benefit entries
 - `benefits.spellClasses` {string[]}
 - `skills[m].fuid` {string?}
-- `skills[m].skillName` {string}
+- `skills[m].name` {string}
 - `skills[m].maxLvl` {int 1-10}: Default `1`
+- `skills[m].currentLvl` {int}: Default `0`
 - `skills[m].description` {string}
+- `skills[m].behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 - `skills[m].specialSkill` {string}
 
 ### Mnemosphere (`"mnemosphere"`) - `pc.equipment[0].mnemospheres[]`
@@ -308,20 +357,23 @@ Compendium class definition. Shape differs from the embedded class in the PC doc
 Represents a slotted mnemosphere sphere. Schema is `looseObject()`.
 
 - `itemType` {string}: `"mnemosphere"`
+- `id` {string?}
 - `name` {string}
 - `fuid` {string?}
 - `class` {string?}: Associated class name
 - `lvl` {int?}: Sphere level
 - `cost` {int?}
-- `skills` {unknown[]?}: Embedded skill entries
-- `heroic` {unknown[]?}: Embedded heroic entries
-- `spells` {unknown[]?}: Embedded spell entries
+- `skills` {SkillSchema[]?}: Embedded skill entries
+- `heroic` {HeroicSkillSchema[]?}: Embedded heroic entries
+- `spells` {PlayerSpell[]?}: Embedded spell entries
+- `meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference
 
 ### Hoplosphere (`"hoplosphere"`) - `pc.equipment[0].hoplospheres[]`
 
 Vehicle module item.
 
 - `itemType` {string}: `"hoplosphere"`
+- `id` {string?}
 - `name` {string}
 - `fuid` {string?}
 - `description` {string}
@@ -329,13 +381,14 @@ Vehicle module item.
 - `socketable` {string}: `"all"` / `"weapon"`
 - `cost` {int}
 - `coagEffects` {object}: Map of string keys to string values
-- `passives` {Passive[]?}
-- `behaviors` {Behavior[]?}
+- `meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference
+- `behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Item (`"item"`) - `pc.items[]`
 
 Generic inventory item.
 
+- `id` {string?}: Persistent item ID
 - `fuid` {string?}: Compendium item ID
 - `name` {string}
 - `description` {string}: Flavor text
@@ -346,6 +399,7 @@ Generic inventory item.
 
 Consumable item with an IP cost.
 
+- `id` {string?}: Persistent item ID
 - `fuid` {string?}: Compendium item ID
 - `name` {string}
 - `description` {string}: Flavor / effect text
@@ -355,6 +409,7 @@ Consumable item with an IP cost.
 
 Named text block usable by both PCs and NPCs.
 
+- `id` {string?}: Persistent item ID
 - `fuid` {string?}: Compendium item ID
 - `name` {string}
 - `description` {string}: Flavor text

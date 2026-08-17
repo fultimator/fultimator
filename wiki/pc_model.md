@@ -12,8 +12,8 @@ For item schemas (weapons, armor, shields, accessories, custom weapons, spells) 
 - `uid` {string}: Owner user ID
 - `name` {string}: Display name
 - `lvl` {int}: Level
-- `dataType` {string?}: Document discriminator, commonly `"pc"`
-- `published` {bool?}: Firestore-only. Stripped on export
+- `published` {bool?}: Firestore-only. Stripped on export. Not part of the Zod schema
+- `schemaVersion` {int?}: Bumped during post-load migration transforms
 
 ---
 
@@ -55,9 +55,9 @@ Replace `<key>` with: `dexterity` `insight` `might` `willpower`
 
 ## Statuses
 
-Replace `<key>` with: `slow` `dazed` `enraged` `weak` `shaken` `poisoned` `dexUp` `insUp` `migUp` `wlpUp`
+Replace `<key>` with: `slow` `dazed` `weak` `shaken` `enraged` `poisoned`
 
-- `statuses.<key>` {bool}
+- `statuses.<key>` {bool}: Default `false`
 
 ---
 
@@ -107,11 +107,12 @@ Aggregate ritual discipline access derived from equipped classes.
 
 - `classes[n].name` {string}
 - `classes[n].lvl` {int}
-- `classes[n].benefits.hpplus` / `.mpplus` / `.ipplus` {int}
+- `classes[n].benefits.hpplus` / `.mpplus` / `.ipplus` {int}: Default `0`
+- `classes[n].benefits.isCustomBenefit` {bool}: Default `false`
 - `classes[n].benefits.martials` {object}: `{ armor, shields, melee, ranged }` booleans
 - `classes[n].benefits.rituals` {object}: `{ ritualism }` boolean
 - `classes[n].benefits.other` {object[]}: `{ description: string }[]` custom benefit entries
-- `classes[n].benefits.custom` {string[]}: Custom benefit labels
+- `classes[n].benefits.custom` {unknown[]}: Custom benefit entries
 - `classes[n].benefits.spellClasses` {string[]}: Spell discipline tags e.g. `"default"`
 
 ### Skills - `classes[n].skills[m]`
@@ -121,26 +122,25 @@ Aggregate ritual discipline access derived from equipped classes.
 - `classes[n].skills[m].description` {string}
 - `classes[n].skills[m].specialSkill` {string?}: Key of a special skill override
 - `classes[n].skills[m].fuid` {string?}: Compendium item ID
-- `classes[n].skills[m].passives` {Passive[]?}
-- `classes[n].skills[m].behaviors` {Behavior[]?}
+- `classes[n].skills[m].behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Heroic Skills - `classes[n].heroic[m]`
 
 - `classes[n].heroic[m].name` {string}
 - `classes[n].heroic[m].quote` {string}
 - `classes[n].heroic[m].description` {string}
+- `classes[n].heroic[m].specialSkill` {string?}: Key of a special skill override
 - `classes[n].heroic[m].meta` {object?}: `{ book, page?, bookName?, isOfficial }` - source book reference
 - `classes[n].heroic[m].fuid` {string?}: Compendium item ID
-- `classes[n].heroic[m].passives` {Passive[]?}
-- `classes[n].heroic[m].behaviors` {Behavior[]?}
+- `classes[n].heroic[m].behaviors` {Behavior[]?}: See [native_effects.md](native_effects.md)
 
 ### Spells - `classes[n].spells[m]`
 
-Spell fields vary by discipline. See [item_model.md](item_model.md) for full spell schemas.
+A union of 18 subtypes discriminated by `spellType`. See [item_model.md](item_model.md#pc-spells) for the full per-discipline schemas.
 
-- `classes[n].spells[m].spellType` {string}: Matches a value from `benefits.spellClasses`
+- `classes[n].spells[m].spellType` {string}: Discipline discriminant (18 values)
 - `classes[n].spells[m].name` {string}
-- `classes[n].spells[m].index` {int}
+- `classes[n].spells[m].id` {string?}
 
 ---
 
@@ -231,7 +231,7 @@ These fields are optional on the persisted document and populated by the engine 
 - `derived.init` {object}: `{ bonus }` - computed initiative
 - `bonuses` {object}: Aggregated flat bonuses split into `incomingRecovery`, `incomingLoss`, `outgoingRecovery`, `accuracy`, `damage`, `incomingDamage`
 - `multipliers` {object}: Aggregated multipliers for `incomingRecovery`, `incomingLoss`, `outgoingRecovery`
-- `effects` {ActorEffect[]?}: Active effects applied to this actor (PassiveSchema minus `transfer`, plus `origin?`)
+- `effects` {ActorEffect[]?}: Active effects applied to this actor. Each wraps a `behaviors` array. See [native_effects.md](native_effects.md#actor-effect)
 
 ---
 
